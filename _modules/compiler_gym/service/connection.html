@@ -1,0 +1,761 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>compiler_gym.service.connection &mdash; CompilerGym 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="author" title="About these documents" href="../../../about.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> CompilerGym
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environments Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command Line Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/views.html">compiler_gym.views</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CompilerGym</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>compiler_gym.service.connection</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for compiler_gym.service.connection</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) Facebook, Inc. and its affiliates.</span>
+<span class="c1">#</span>
+<span class="c1"># This source code is licensed under the MIT license found in the</span>
+<span class="c1"># LICENSE file in the root directory of this source tree.</span>
+<span class="sd">&quot;&quot;&quot;This module contains the logic for connecting to services.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">random</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span><span class="p">,</span> <span class="n">time</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">grpc</span>
+
+<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CompilerGymServiceStub</span><span class="p">,</span>
+    <span class="n">GetSpacesReply</span><span class="p">,</span>
+    <span class="n">GetSpacesRequest</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">cache_path</span>
+
+<span class="n">GRPC_CHANNEL_OPTIONS</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># Raise the default inbound message filter from 4MB.</span>
+    <span class="p">(</span><span class="s2">&quot;grpc.max_receive_message_length&quot;</span><span class="p">,</span> <span class="mi">100</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">),</span>
+    <span class="c1"># Spurious error UNAVAILABLE &quot;Trying to connect an http1.x server&quot;.</span>
+    <span class="c1"># https://putridparrot.com/blog/the-unavailable-trying-to-connect-an-http1-x-server-grpc-error/</span>
+    <span class="p">(</span><span class="s2">&quot;grpc.enable_http_proxy&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+<span class="p">]</span>
+
+
+<div class="viewcode-block" id="ConnectionOpts"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.ConnectionOpts">[docs]</a><span class="k">class</span> <span class="nc">ConnectionOpts</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The options used to configure a connection to a service.&quot;&quot;&quot;</span>
+
+    <span class="n">rpc_call_max_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">300</span>
+    <span class="sd">&quot;&quot;&quot;The maximum number of seconds to wait for an RPC method call to succeed.&quot;&quot;&quot;</span>
+
+    <span class="n">init_max_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="sd">&quot;&quot;&quot;The maximum number of seconds to spend attempting to establish a</span>
+<span class="sd">    connection to the service before failing.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">init_max_attempts</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="sd">&quot;&quot;&quot;The maximum number of attempts to make to establish a connection to the</span>
+<span class="sd">    service before failing.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">local_service_port_init_max_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="sd">&quot;&quot;&quot;The maximum number of seconds to wait for a local service to write the port.txt file.&quot;&quot;&quot;</span>
+
+    <span class="n">local_service_exit_max_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="sd">&quot;&quot;&quot;The maximum number of seconds to wait for a local service to terminate on close.&quot;&quot;&quot;</span>
+
+    <span class="n">rpc_init_max_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="sd">&quot;&quot;&quot;The maximum number of seconds to wait for an RPC connection to establish.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="ServiceError"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.ServiceError">[docs]</a><span class="k">class</span> <span class="nc">ServiceError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Error raised from the service.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="ServiceInitError"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.ServiceInitError">[docs]</a><span class="k">class</span> <span class="nc">ServiceInitError</span><span class="p">(</span><span class="n">ServiceError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Error raised if the service fails to initialize.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="ServiceTransportError"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.ServiceTransportError">[docs]</a><span class="k">class</span> <span class="nc">ServiceTransportError</span><span class="p">(</span><span class="n">ServiceError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Error that is raised if communication with the service fails.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="ServiceIsClosed"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.ServiceIsClosed">[docs]</a><span class="k">class</span> <span class="nc">ServiceIsClosed</span><span class="p">(</span><span class="n">ServiceError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Error that is raised if trying to interact with a closed service.&quot;&quot;&quot;</span></div>
+
+
+<span class="n">Request</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Request&quot;</span><span class="p">)</span>
+<span class="n">Reply</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Reply&quot;</span><span class="p">)</span>
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Protocol</span>
+
+    <span class="k">class</span> <span class="nc">StubMethod</span><span class="p">(</span><span class="n">Protocol</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Type annotation for an RPC stub method that accepts a request message</span>
+<span class="sd">        and returns a reply.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">Request</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Request&quot;</span><span class="p">)</span>
+        <span class="n">Reply</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Reply&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Reply</span><span class="p">:</span>
+            <span class="o">...</span>
+
+
+<span class="k">else</span><span class="p">:</span>
+    <span class="c1"># Legacy support for Python &lt; 3.8.</span>
+    <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span>
+
+    <span class="n">StubMethod</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Request</span><span class="p">],</span> <span class="n">Reply</span><span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">Connection</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for service connections.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor. Don&#39;t instantiate this directly, use the subclasses.</span>
+
+<span class="sd">        :param channel: The RPC channel to use.</span>
+<span class="sd">        :param url: The URL of the RPC service.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="n">channel</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stub</span> <span class="o">=</span> <span class="n">CompilerGymServiceStub</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">:</span> <span class="n">GetSpacesReply</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">GetSpaces</span><span class="p">,</span> <span class="n">GetSpacesRequest</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">stub_method</span><span class="p">:</span> <span class="n">StubMethod</span><span class="p">,</span>
+        <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Reply</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Call the service with the given arguments.&quot;&quot;&quot;</span>
+        <span class="c1"># House keeping note: if you modify the exceptions that this method</span>
+        <span class="c1"># raises, please update the CompilerGymServiceConnection.__call__()</span>
+        <span class="c1"># docstring.</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">stub_method</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;Cannot invoke RPC on closed channel!&quot;</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ServiceIsClosed</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RPC communication failed with message: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">e</span>
+        <span class="k">except</span> <span class="n">grpc</span><span class="o">.</span><span class="n">RpcError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># We raise &quot;from None&quot; to discard the gRPC stack trace, with the</span>
+            <span class="c1"># remaining stack trace correctly pointing to the CompilerGym</span>
+            <span class="c1"># calling code.</span>
+            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">INVALID_ARGUMENT</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">())</span> <span class="kn">from</span> <span class="bp">None</span>
+            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">UNIMPLEMENTED</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">())</span> <span class="kn">from</span> <span class="bp">None</span>
+            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">NOT_FOUND</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">())</span> <span class="kn">from</span> <span class="bp">None</span>
+            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">RESOURCE_EXHAUSTED</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">())</span> <span class="kn">from</span> <span class="bp">None</span>
+            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">FAILED_PRECONDITION</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">()))</span> <span class="kn">from</span> <span class="bp">None</span>
+            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">UNAVAILABLE</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ServiceTransportError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="bp">None</span>
+            <span class="k">elif</span> <span class="p">(</span>
+                <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">INTERNAL</span>
+                <span class="ow">and</span> <span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Exception serializing request!&quot;</span>
+            <span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">()</span><span class="si">}</span><span class="s2"> Request type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span> <span class="kn">from</span> <span class="bp">None</span>
+            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">DEADLINE_EXCEEDED</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">()</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">timeout</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> seconds)&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="bp">None</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;RPC call returned status code </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span><span class="si">}</span><span class="s2"> and error `</span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">()</span><span class="si">}</span><span class="s2">`&quot;</span>
+                <span class="p">)</span> <span class="kn">from</span> <span class="bp">None</span>
+
+
+<span class="k">def</span> <span class="nf">make_working_dir</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Make a working directory for a service. The calling code is responsible for</span>
+<span class="sd">    removing this directory when done.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">service_directory</span> <span class="o">=</span> <span class="n">cache_path</span><span class="p">(</span><span class="s2">&quot;service&quot;</span><span class="p">)</span>
+    <span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
+    <span class="n">random_hash</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">getrandbits</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
+    <span class="n">working_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">service_directory</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">random_hash</span><span class="si">:</span><span class="s2">08x</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="p">(</span><span class="n">working_dir</span> <span class="o">/</span> <span class="s2">&quot;logs&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">working_dir</span>
+
+
+<span class="k">class</span> <span class="nc">ManagedConnection</span><span class="p">(</span><span class="n">Connection</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A connection to a service using a managed subprocess.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">local_service_binary</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+        <span class="n">port_init_max_seconds</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">rpc_init_max_seconds</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">process_exit_max_seconds</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor.</span>
+
+<span class="sd">        :param local_service_binary: The path of the service binary.</span>
+<span class="sd">        :raises TimeoutError: If fails to establish connection within a specified time limit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process_exit_max_seconds</span> <span class="o">=</span> <span class="n">process_exit_max_seconds</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">Path</span><span class="p">(</span><span class="n">local_service_binary</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File not found: </span><span class="si">{</span><span class="n">local_service_binary</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">=</span> <span class="n">make_working_dir</span><span class="p">()</span>
+
+        <span class="c1"># Set environment variable COMPILER_GYM_SERVICE_ARGS to pass</span>
+        <span class="c1"># additional arguments to the service.</span>
+        <span class="n">args</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;COMPILER_GYM_SERVICE_ARGS&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="nb">str</span><span class="p">(</span><span class="n">local_service_binary</span><span class="p">),</span>
+            <span class="sa">f</span><span class="s2">&quot;--port=0&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;--log_dir=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="si">}</span><span class="s2">/logs&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;--working_dir=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+            <span class="n">args</span><span class="p">,</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Set environment variable COMPILER_GYM_SERVICE_DEBUG=1 to pipe</span>
+        <span class="c1"># local service output to stderr. Set COMPILER_GYM_SERVICE_LOG_LEVEL=val</span>
+        <span class="c1"># to set log level to &lt;val&gt;, where large values are increasingly</span>
+        <span class="c1"># verbose.</span>
+        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;COMPILER_GYM_SERVICE_DEBUG&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;0&quot;</span><span class="p">:</span>
+            <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--alsologtostderr&quot;</span><span class="p">)</span>
+        <span class="n">log_level</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;COMPILER_GYM_SERVICE_LOG_LEVEL&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">log_level</span><span class="p">:</span>
+            <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-v=</span><span class="si">{</span><span class="n">log_level</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;$ </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+            <span class="n">cmd</span><span class="p">,</span>
+            <span class="n">stdout</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span>
+            <span class="n">stderr</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Read the port from a file generated by the service.</span>
+        <span class="n">wait_secs</span> <span class="o">=</span> <span class="mf">0.1</span>
+        <span class="n">port_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">/</span> <span class="s2">&quot;port.txt&quot;</span>
+        <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="n">port_init_max_seconds</span>
+        <span class="k">while</span> <span class="n">time</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">end_time</span><span class="p">:</span>
+            <span class="n">returncode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">returncode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Service terminated with returncode: </span><span class="si">{</span><span class="n">returncode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">port_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">port_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">port</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">())</span>
+                <span class="k">break</span>
+            <span class="n">sleep</span><span class="p">(</span><span class="n">wait_secs</span><span class="p">)</span>
+            <span class="n">wait_secs</span> <span class="o">*=</span> <span class="mf">1.2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">rpc_init_max_seconds</span><span class="p">)</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
+                <span class="s2">&quot;Service failed to produce port file after &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">port_init_max_seconds</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> seconds&quot;</span>
+            <span class="p">)</span>
+
+        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;localhost:</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">port</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="n">wait_secs</span> <span class="o">=</span> <span class="mf">0.1</span>
+        <span class="n">attempts</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="n">rpc_init_max_seconds</span>
+        <span class="k">while</span> <span class="n">time</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">end_time</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">channel</span> <span class="o">=</span> <span class="n">grpc</span><span class="o">.</span><span class="n">insecure_channel</span><span class="p">(</span>
+                    <span class="n">url</span><span class="p">,</span>
+                    <span class="n">options</span><span class="o">=</span><span class="n">GRPC_CHANNEL_OPTIONS</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">channel_ready</span> <span class="o">=</span> <span class="n">grpc</span><span class="o">.</span><span class="n">channel_ready_future</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span>
+                <span class="n">attempts</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">channel_ready</span><span class="o">.</span><span class="n">result</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">wait_secs</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="p">(</span><span class="n">grpc</span><span class="o">.</span><span class="n">FutureTimeoutError</span><span class="p">,</span> <span class="n">grpc</span><span class="o">.</span><span class="n">RpcError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Connection attempt </span><span class="si">{</span><span class="n">attempts</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">wait_secs</span> <span class="o">*=</span> <span class="mf">1.2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">process_exit_max_seconds</span><span class="p">)</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
+                <span class="s2">&quot;Failed to connect to RPC service after &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">process_exit_max_seconds</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> seconds&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">attempts</span><span class="si">}</span><span class="s2"> attempts made)&quot;</span>
+            <span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Terminate a local subprocess and close the connection.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">process_exit_max_seconds</span><span class="p">)</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2"> running on PID=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">pid</span><span class="si">}</span><span class="s2">&quot;</span>
+
+
+<span class="k">class</span> <span class="nc">UnmanagedConnection</span><span class="p">(</span><span class="n">Connection</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A connection to a service that is not managed by this process.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rpc_init_max_seconds</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor.</span>
+
+<span class="sd">        :param url: The URL of the service to connect to.</span>
+<span class="sd">        :raises TimeoutError: If fails to establish connection within a specified time limit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="n">wait_secs</span> <span class="o">=</span> <span class="mf">0.1</span>
+        <span class="n">attempts</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">end_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span> <span class="o">+</span> <span class="n">rpc_init_max_seconds</span>
+        <span class="k">while</span> <span class="n">time</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">end_time</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">channel</span> <span class="o">=</span> <span class="n">grpc</span><span class="o">.</span><span class="n">insecure_channel</span><span class="p">(</span>
+                    <span class="n">url</span><span class="p">,</span>
+                    <span class="n">options</span><span class="o">=</span><span class="n">GRPC_CHANNEL_OPTIONS</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">channel_ready</span> <span class="o">=</span> <span class="n">grpc</span><span class="o">.</span><span class="n">channel_ready_future</span><span class="p">(</span><span class="n">channel</span><span class="p">)</span>
+                <span class="n">attempts</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">channel_ready</span><span class="o">.</span><span class="n">result</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">wait_secs</span><span class="p">)</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="p">(</span><span class="n">grpc</span><span class="o">.</span><span class="n">FutureTimeoutError</span><span class="p">,</span> <span class="n">grpc</span><span class="o">.</span><span class="n">RpcError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Connection attempt </span><span class="si">{</span><span class="n">attempts</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">wait_secs</span> <span class="o">*=</span> <span class="mf">1.2</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to connect to </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2"> after &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rpc_init_max_seconds</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> seconds &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">attempts</span><span class="si">}</span><span class="s2"> attempts made)&quot;</span>
+            <span class="p">)</span>
+
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span>
+
+
+<div class="viewcode-block" id="CompilerGymServiceConnection"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.CompilerGymServiceConnection">[docs]</a><span class="k">class</span> <span class="nc">CompilerGymServiceConnection</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A connection to a compiler gym service.</span>
+
+<span class="sd">    There are two types of service connections: managed and unmanaged. The type</span>
+<span class="sd">    of connection is determined by the endpoint. If a &quot;host:port&quot; URL is provided,</span>
+<span class="sd">    an unmanaged connection is created. If the path of a file is provided, a</span>
+<span class="sd">    managed connection is used. The difference between a managed and unmanaged</span>
+<span class="sd">    connection is that with a managed connection, the lifecycle of the service</span>
+<span class="sd">    if controlled by the client connection. That is, when a managed connection</span>
+<span class="sd">    is created, a service subprocess is started by executing the specified path.</span>
+<span class="sd">    When the connection is closed, the subprocess is terminated. With an</span>
+<span class="sd">    unmanaged connection, if the service fails is goes offline, the client will</span>
+<span class="sd">    fail.</span>
+
+<span class="sd">    This class provides a common abstraction between the two types of connection,</span>
+<span class="sd">    and provides a call method for invoking remote procedures on the service.</span>
+
+<span class="sd">    Example usage of an unmanaged service connection:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        # Connect to a service running on localhost:8080. The user must</span>
+<span class="sd">        # started a process running on port 8080.</span>
+<span class="sd">        connection = CompilerGymServiceConnection(&quot;localhost:8080&quot;)</span>
+<span class="sd">        # Invoke an RPC method.</span>
+<span class="sd">        connection(connection.stub.StartEpisode, StartEpisodeRequest())</span>
+<span class="sd">        # Close the connection. The service running on port 8080 is</span>
+<span class="sd">        # left running.</span>
+<span class="sd">        connection.close()</span>
+
+<span class="sd">    Example usage of a managed service connection:</span>
+
+<span class="sd">    .. code-block:: python</span>
+
+<span class="sd">        # Start a subprocess using the binary located at /path/to/my/service.</span>
+<span class="sd">        connection = CompilerGymServiceConnection(Path(&quot;/path/to/my/service&quot;))</span>
+<span class="sd">        # Invoke an RPC method.</span>
+<span class="sd">        connection(connection.stub.StartEpisode, StartEpisodeRequest())</span>
+<span class="sd">        # Close the connection. The subprocess is terminated.</span>
+<span class="sd">        connection.close()</span>
+
+<span class="sd">    :ivar stub: A CompilerGymServiceStub that can be used as the first argument</span>
+<span class="sd">        to :py:meth:`__call__()` to specify an RPC</span>
+<span class="sd">        method to call.</span>
+<span class="sd">    :ivar action_spaces: A list of action spaces provided by the service.</span>
+<span class="sd">    :ivar observation_spaces: A list of observation spaces provided by the</span>
+<span class="sd">        service.</span>
+<span class="sd">    :ivar reward_spaces: A list of reward spaces provided by the service.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CompilerGymServiceConnection.__init__"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.CompilerGymServiceConnection.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="n">ConnectionOpts</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor.</span>
+
+<span class="sd">        :param endpoint: The connection endpoint. Either the URL of a service,</span>
+<span class="sd">            e.g. &quot;localhost:8080&quot;, or the path of a local service binary.</span>
+<span class="sd">        :param opts: The connection options.</span>
+<span class="sd">        :raises ValueError: If the provided options are invalid.</span>
+<span class="sd">        :raises FileNotFoundError: In case opts.local_service_binary is not found.</span>
+<span class="sd">        :raises TimeoutError: In case the service failed to start within</span>
+<span class="sd">                opts.init_max_seconds seconds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span> <span class="o">=</span> <span class="n">endpoint</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">opts</span> <span class="o">=</span> <span class="n">opts</span> <span class="ow">or</span> <span class="n">ConnectionOpts</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stub</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_establish_connection</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_spaces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">action_space_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">observation_spaces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">observation_space_list</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reward_spaces</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">reward_space_list</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_establish_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Create and establish a connection.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_connection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">stub</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">stub</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">_create_connection</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="n">ConnectionOpts</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Connection</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Initialize the service connection, either by connecting to an RPC</span>
+<span class="sd">        service or by starting a locally-managed subprocess.</span>
+
+<span class="sd">        :param endpoint: The connection endpoint. Either the URL of a service,</span>
+<span class="sd">            e.g. &quot;localhost:8080&quot;, or the path of a local service binary.</span>
+<span class="sd">        :param opts: The connection options.</span>
+<span class="sd">        :raises ValueError: If the provided options are invalid.</span>
+<span class="sd">        :raises FileNotFoundError: In case opts.local_service_binary is not found.</span>
+<span class="sd">        :raises ServiceError: In case opts.init_max_attempts failures are made</span>
+<span class="sd">            without successfully starting the connection.</span>
+<span class="sd">        :raises TimeoutError: In case the service failed to start within</span>
+<span class="sd">            opts.init_max_seconds seconds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">endpoint</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;No endpoint provided for service connection&quot;</span><span class="p">)</span>
+
+        <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
+        <span class="n">end_time</span> <span class="o">=</span> <span class="n">start_time</span> <span class="o">+</span> <span class="n">opts</span><span class="o">.</span><span class="n">init_max_seconds</span>
+        <span class="n">attempts</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="n">time</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">end_time</span> <span class="ow">and</span> <span class="n">attempts</span> <span class="o">&lt;</span> <span class="n">opts</span><span class="o">.</span><span class="n">init_max_attempts</span><span class="p">:</span>
+            <span class="n">attempts</span> <span class="o">+=</span> <span class="mi">1</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="n">ManagedConnection</span><span class="p">(</span>
+                        <span class="n">local_service_binary</span><span class="o">=</span><span class="n">endpoint</span><span class="p">,</span>
+                        <span class="n">process_exit_max_seconds</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">local_service_exit_max_seconds</span><span class="p">,</span>
+                        <span class="n">rpc_init_max_seconds</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">rpc_init_max_seconds</span><span class="p">,</span>
+                        <span class="n">port_init_max_seconds</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">local_service_port_init_max_seconds</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">return</span> <span class="n">UnmanagedConnection</span><span class="p">(</span>
+                        <span class="n">url</span><span class="o">=</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">rpc_init_max_seconds</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">rpc_init_max_seconds</span>
+                    <span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">TimeoutError</span><span class="p">,</span> <span class="n">ServiceError</span><span class="p">,</span> <span class="ne">NotImplementedError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># Catch preventable errors so that we can retry:</span>
+                <span class="c1">#   TimeoutError: raised if a service does not produce a port file establish a</span>
+                <span class="c1">#       connection without a deadline.</span>
+                <span class="c1">#   ServiceError: raised by an RPC method returning an error status.</span>
+                <span class="c1">#   NotImplementedError: raised if an RPC method is accessed before the RPC service</span>
+                <span class="c1">#       has initialized.</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2"> (attempt </span><span class="si">{</span><span class="n">attempts</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to create connection to </span><span class="si">{</span><span class="n">endpoint</span><span class="si">}</span><span class="s2"> after &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> seconds &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">attempts</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">opts</span><span class="o">.</span><span class="n">init_max_attempts</span><span class="si">}</span><span class="s2"> attempts made)&quot;</span>
+            <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Closed connection to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">closed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Whether the connection is closed.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="ow">is</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="fm">__del__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="c1"># Don&#39;t let the subprocess be orphaned if user forgot to close(), or</span>
+        <span class="c1"># if an exception was thrown.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<div class="viewcode-block" id="CompilerGymServiceConnection.restart"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.CompilerGymServiceConnection.restart">[docs]</a>    <span class="k">def</span> <span class="nf">restart</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Restart a connection a service. If the service is managed by this</span>
+<span class="sd">        connection (i.e. it is a local binary), the existing service process</span>
+<span class="sd">        will be killed and replaced. Else, only the connection to the unmanaged</span>
+<span class="sd">        service process is replaced.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_establish_connection</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="CompilerGymServiceConnection.__call__"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.CompilerGymServiceConnection.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">stub_method</span><span class="p">:</span> <span class="n">StubMethod</span><span class="p">,</span>
+        <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Reply</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Invoke an RPC method on the service and return its response. All</span>
+<span class="sd">        RPC methods accept a single `request` message, and respond with a</span>
+<span class="sd">        response message.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">        .. code-block:: python</span>
+
+<span class="sd">            connection = CompilerGymServiceConnection(&quot;localhost:8080&quot;)</span>
+<span class="sd">            request = compiler_gym.service.proto.GetSpacesRequest()</span>
+<span class="sd">            reply = connection(connection.stub.GetSpaces, request)</span>
+
+<span class="sd">        In the above example, the `GetSpaces` RPC method is invoked on a</span>
+<span class="sd">        connection, yielding a `GetSpacesReply` message.</span>
+
+<span class="sd">        :param stub_method: An RPC method attribute on `CompilerGymServiceStub`.</span>
+<span class="sd">        :param request: A request message.</span>
+<span class="sd">        :param timeout: The maximum number of seconds to await a reply. If not</span>
+<span class="sd">            provided, the default value is</span>
+<span class="sd">            :code:`ConnectionOpts.rpc_call_max_seconds`.</span>
+<span class="sd">        :raises ValueError: If the service responds with an error indicating an</span>
+<span class="sd">            invalid argument.</span>
+<span class="sd">        :raises NotImplementedError: If the service responds with an error</span>
+<span class="sd">            indicating that the requested functionality is not implemented.</span>
+<span class="sd">        :raises FileNotFoundError: If the service responds with an error</span>
+<span class="sd">            indicating that a requested resource was not found.</span>
+<span class="sd">        :raises OSError: If the service responds with an error indicating that</span>
+<span class="sd">            it ran out of resources.</span>
+<span class="sd">        :raises TypeError: If the provided `request` parameter is of</span>
+<span class="sd">            incorrect type or cannot be serialized, or if the service responds</span>
+<span class="sd">            with an error indicating that a precondition failed.</span>
+<span class="sd">        :raises TimeoutError: If the service failed to respond to the query</span>
+<span class="sd">            within the specified `timeout`.</span>
+<span class="sd">        :raises ServiceTransportError: If the client failed to communicate with</span>
+<span class="sd">            the service.</span>
+<span class="sd">        :raises ServiceIsClosed: If the connection to the service is closed.</span>
+<span class="sd">        :raises ServiceError: If the service raised an error not covered by</span>
+<span class="sd">            any of the above conditions.</span>
+<span class="sd">        :return: A reply message.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">closed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_establish_connection</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="p">(</span>
+            <span class="n">stub_method</span><span class="p">,</span>
+            <span class="n">request</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">rpc_call_max_seconds</span><span class="p">,</span>
+        <span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright Facebook AI Research
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

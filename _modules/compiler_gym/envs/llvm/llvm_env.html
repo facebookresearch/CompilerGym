@@ -1,0 +1,422 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>compiler_gym.envs.llvm.llvm_env &mdash; CompilerGym 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="author" title="About these documents" href="../../../../about.html" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home" alt="Documentation Home"> CompilerGym
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../llvm/index.html">LLVM Environments Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command Line Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/views.html">compiler_gym.views</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">CompilerGym</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>compiler_gym.envs.llvm.llvm_env</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for compiler_gym.envs.llvm.llvm_env</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) Facebook, Inc. and its affiliates.</span>
+<span class="c1">#</span>
+<span class="c1"># This source code is licensed under the MIT license found in the</span>
+<span class="c1"># LICENSE file in the root directory of this source tree.</span>
+<span class="sd">&quot;&quot;&quot;Extensions to the CompilerEnv environment for LLVM.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">gym.spaces</span> <span class="kn">import</span> <span class="n">Dict</span> <span class="k">as</span> <span class="n">DictSpace</span>
+
+<span class="kn">from</span> <span class="nn">compiler_gym.envs.compiler_env</span> <span class="kn">import</span> <span class="n">CompilerEnv</span><span class="p">,</span> <span class="n">step_t</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.datasets</span> <span class="kn">import</span> <span class="n">LLVM_DATASETS</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.spaces</span> <span class="kn">import</span> <span class="n">Commandline</span><span class="p">,</span> <span class="n">CommandlineFlag</span><span class="p">,</span> <span class="n">Scalar</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.third_party.autophase</span> <span class="kn">import</span> <span class="n">AUTOPHASE_FEATURE_NAMES</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.third_party.inst2vec</span> <span class="kn">import</span> <span class="n">Inst2vecEncoder</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">runfiles_path</span><span class="p">,</span> <span class="n">site_data_path</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.views</span> <span class="kn">import</span> <span class="n">ObservationView</span>
+
+<span class="n">_ACTIONS_LIST</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span>
+    <span class="n">runfiles_path</span><span class="p">(</span><span class="s2">&quot;CompilerGym/compiler_gym/envs/llvm/service/passes/actions_list.txt&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">_FLAGS_LIST</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span>
+    <span class="n">runfiles_path</span><span class="p">(</span><span class="s2">&quot;CompilerGym/compiler_gym/envs/llvm/service/passes/actions_flags.txt&quot;</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">_DESCRIPTIONS_LIST</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span>
+    <span class="n">runfiles_path</span><span class="p">(</span>
+        <span class="s2">&quot;CompilerGym/compiler_gym/envs/llvm/service/passes/actions_descriptions.txt&quot;</span>
+    <span class="p">)</span>
+<span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">_read_list_file</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
+                <span class="k">yield</span> <span class="n">action</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
+
+
+<span class="n">_ACTIONS</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">_read_list_file</span><span class="p">(</span><span class="n">_ACTIONS_LIST</span><span class="p">))</span>
+<span class="n">_FLAGS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">_ACTIONS</span><span class="p">,</span> <span class="n">_read_list_file</span><span class="p">(</span><span class="n">_FLAGS_LIST</span><span class="p">)))</span>
+<span class="n">_DESCRIPTIONS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">_ACTIONS</span><span class="p">,</span> <span class="n">_read_list_file</span><span class="p">(</span><span class="n">_DESCRIPTIONS_LIST</span><span class="p">)))</span>
+
+
+<span class="k">class</span> <span class="nc">LlvmObservationView</span><span class="p">(</span><span class="n">ObservationView</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An extended observation spaces view for LLVM.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span> <span class="o">=</span> <span class="n">Inst2vecEncoder</span><span class="p">()</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_derived_space</span><span class="p">(</span>
+            <span class="n">base_name</span><span class="o">=</span><span class="s2">&quot;CpuInfo&quot;</span><span class="p">,</span>
+            <span class="n">derived_name</span><span class="o">=</span><span class="s2">&quot;CpuInfoDict&quot;</span><span class="p">,</span>
+            <span class="n">derived_space</span><span class="o">=</span><span class="n">DictSpace</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">(</span><span class="n">size_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">),</span>
+                    <span class="s2">&quot;cores_count&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+                    <span class="s2">&quot;l1i_cache_size&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+                    <span class="s2">&quot;l1i_cache_count&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+                    <span class="s2">&quot;l1d_cache_size&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+                    <span class="s2">&quot;l1d_cache_count&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+                    <span class="s2">&quot;l2_cache_size&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+                    <span class="s2">&quot;l2_cache_count&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+                    <span class="s2">&quot;l3_cache_size&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+                    <span class="s2">&quot;l3_cache_count&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+                    <span class="s2">&quot;l4_cache_size&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+                    <span class="s2">&quot;l4_cache_count&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+                <span class="p">}</span>
+            <span class="p">),</span>
+            <span class="n">cb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">base_observation</span><span class="p">:</span> <span class="n">base_observation</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_derived_space</span><span class="p">(</span>
+            <span class="n">base_name</span><span class="o">=</span><span class="s2">&quot;Ir&quot;</span><span class="p">,</span>
+            <span class="n">derived_name</span><span class="o">=</span><span class="s2">&quot;Inst2vecPreprocessedText&quot;</span><span class="p">,</span>
+            <span class="n">derived_space</span><span class="o">=</span><span class="n">Sequence</span><span class="p">(</span><span class="n">size_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">),</span>
+            <span class="n">cb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">base_observation</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span><span class="o">.</span><span class="n">preprocess</span><span class="p">(</span><span class="n">base_observation</span><span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_derived_space</span><span class="p">(</span>
+            <span class="n">base_name</span><span class="o">=</span><span class="s2">&quot;Ir&quot;</span><span class="p">,</span>
+            <span class="n">derived_name</span><span class="o">=</span><span class="s2">&quot;Inst2vecEmbeddingIndices&quot;</span><span class="p">,</span>
+            <span class="n">derived_space</span><span class="o">=</span><span class="n">Sequence</span><span class="p">(</span><span class="n">size_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
+            <span class="n">cb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">base_observation</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span><span class="o">.</span><span class="n">preprocess</span><span class="p">(</span><span class="n">base_observation</span><span class="p">)</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_derived_space</span><span class="p">(</span>
+            <span class="n">base_name</span><span class="o">=</span><span class="s2">&quot;Ir&quot;</span><span class="p">,</span>
+            <span class="n">derived_name</span><span class="o">=</span><span class="s2">&quot;Inst2vec&quot;</span><span class="p">,</span>
+            <span class="n">derived_space</span><span class="o">=</span><span class="n">Sequence</span><span class="p">(</span><span class="n">size_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">),</span>
+            <span class="n">cb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">base_observation</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span><span class="o">.</span><span class="n">preprocess</span><span class="p">(</span><span class="n">base_observation</span><span class="p">))</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_derived_space</span><span class="p">(</span>
+            <span class="n">base_name</span><span class="o">=</span><span class="s2">&quot;Autophase&quot;</span><span class="p">,</span>
+            <span class="n">derived_name</span><span class="o">=</span><span class="s2">&quot;AutophaseDict&quot;</span><span class="p">,</span>
+            <span class="n">derived_space</span><span class="o">=</span><span class="n">DictSpace</span><span class="p">(</span>
+                <span class="p">{</span>
+                    <span class="n">name</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+                    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">AUTOPHASE_FEATURE_NAMES</span>
+                <span class="p">}</span>
+            <span class="p">),</span>
+            <span class="n">cb</span><span class="o">=</span><span class="k">lambda</span> <span class="n">base_observation</span><span class="p">:</span> <span class="p">{</span>
+                <span class="n">name</span><span class="p">:</span> <span class="n">val</span>
+                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">AUTOPHASE_FEATURE_NAMES</span><span class="p">,</span> <span class="n">base_observation</span><span class="p">)</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+
+
+<div class="viewcode-block" id="LlvmEnv"><a class="viewcode-back" href="../../../../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv">[docs]</a><span class="k">class</span> <span class="nc">LlvmEnv</span><span class="p">(</span><span class="n">CompilerEnv</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A specialized CompilerEnv for LLVM.</span>
+
+<span class="sd">    This extends the default :class:`CompilerEnv` environment, adding extra LLVM</span>
+<span class="sd">    functionality. Specifically, the actions use the</span>
+<span class="sd">    :class:`CommandlineFlag &lt;compiler_gym.spaces.CommandlineFlag&gt;` space, which</span>
+<span class="sd">    is a type of :code:`Discrete` space that provides additional documentation</span>
+<span class="sd">    about each action, and the</span>
+<span class="sd">    :meth:`LlvmEnv.commandline() &lt;compiler_gym.envs.LlvmEnv.commandline&gt;` method</span>
+<span class="sd">    can be used to produce an equivalent LLVM opt invocation for the current</span>
+<span class="sd">    environment state.</span>
+
+<span class="sd">    :ivar actions: The list of actions that have been performed since the</span>
+<span class="sd">        previous call to :func:`reset`.</span>
+<span class="sd">    :vartype actions: List[int]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">=</span> <span class="n">site_data_path</span><span class="p">(</span><span class="s2">&quot;llvm/10.0.0/bitcode_benchmarks&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Register the LLVM datasets.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">datasets_site_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">LLVM_DATASETS</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">register_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">_observation_view_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">LlvmObservationView</span>
+
+<div class="viewcode-block" id="LlvmEnv.step"><a class="viewcode-back" href="../../../../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.step">[docs]</a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">step_t</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LlvmEnv.reset"><a class="viewcode-back" href="../../../../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actions</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_make_action_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">entries</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Commandline</span><span class="p">:</span>
+        <span class="n">flags</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">CommandlineFlag</span><span class="p">(</span>
+                <span class="n">name</span><span class="o">=</span><span class="n">entry</span><span class="p">,</span> <span class="n">flag</span><span class="o">=</span><span class="n">_FLAGS</span><span class="p">[</span><span class="n">entry</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="n">_DESCRIPTIONS</span><span class="p">[</span><span class="n">entry</span><span class="p">]</span>
+            <span class="p">)</span>
+            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span>
+        <span class="p">]</span>
+        <span class="k">return</span> <span class="n">Commandline</span><span class="p">(</span><span class="n">items</span><span class="o">=</span><span class="n">flags</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LlvmEnv.commandline"><a class="viewcode-back" href="../../../../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.commandline">[docs]</a>    <span class="k">def</span> <span class="nf">commandline</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Returns an LLVM :code:`opt` command line invocation for the current</span>
+<span class="sd">        environment state.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">command</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Commandline</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span><span class="p">)</span><span class="o">.</span><span class="n">commandline</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">actions</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;opt </span><span class="si">{</span><span class="n">command</span><span class="si">}</span><span class="s2"> input.bc -o output.bc&quot;</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">ir</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Print the LLVM-IR of the program in its current state.</span>
+
+<span class="sd">        Alias for :code:`env.observation[&quot;Ir&quot;]`.</span>
+
+<span class="sd">        :return: A string of LLVM-IR.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;Ir&quot;</span><span class="p">]</span>
+
+<div class="viewcode-block" id="LlvmEnv.write_bitcode"><a class="viewcode-back" href="../../../../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.write_bitcode">[docs]</a>    <span class="k">def</span> <span class="nf">write_bitcode</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">Path</span><span class="p">,</span> <span class="nb">str</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;Write the current program state to a bitcode file.</span>
+
+<span class="sd">        :param path: The path of the file to write.</span>
+<span class="sd">        :return: The input :code:`path` argument.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
+        <span class="n">tmp_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;BitcodeFile&quot;</span><span class="p">]</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">tmp_path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="LlvmEnv.render"><a class="viewcode-back" href="../../../../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;human&quot;</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;human&quot;</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ir</span><span class="p">)</span>
+        <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span></div></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright Facebook AI Research
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -1,0 +1,1166 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>LLVM Environments Reference &mdash; CompilerGym 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Command Line Reference" href="../cli.html" />
+    <link rel="prev" title="Getting Started" href="../getting_started.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> CompilerGym
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">LLVM Environments Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#observation-spaces">Observation Spaces</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#autophase">Autophase</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#inst2vec">Inst2vec</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#programl">ProGraML</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#hardware-information">Hardware Information</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#llvm-ir">LLVM-IR</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#reward-spaces">Reward Spaces</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#codesize">Codesize</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#action-space">Action Space</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/compiler_gym.html">compiler_gym</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/views.html">compiler_gym.views</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CompilerGym</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>LLVM Environments Reference</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/llvm/index.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="llvm-environments-reference">
+<h1>LLVM Environments Reference<a class="headerlink" href="#llvm-environments-reference" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://llvm.org/">LLVM</a> is a production-grade compiler used throughout
+industry. It defines a machine independent intermediate representation (IR), and
+comprises a family of tools with frontends for C, C++, OpenCL, and many other
+languages.</p>
+<p>CompilerGym exposes the LLVM IR optimizer for reinforcement learning through an
+<a class="reference internal" href="../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv" title="compiler_gym.envs.LlvmEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">LlvmEnv</span></code></a> environment.</p>
+<div class="contents local topic" id="overview">
+<p class="topic-title">Overview:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#datasets" id="id1">Datasets</a></p></li>
+<li><p><a class="reference internal" href="#observation-spaces" id="id2">Observation Spaces</a></p>
+<ul>
+<li><p><a class="reference internal" href="#autophase" id="id3">Autophase</a></p></li>
+<li><p><a class="reference internal" href="#inst2vec" id="id4">Inst2vec</a></p></li>
+<li><p><a class="reference internal" href="#programl" id="id5">ProGraML</a></p></li>
+<li><p><a class="reference internal" href="#hardware-information" id="id6">Hardware Information</a></p></li>
+<li><p><a class="reference internal" href="#llvm-ir" id="id7">LLVM-IR</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#reward-spaces" id="id8">Reward Spaces</a></p>
+<ul>
+<li><p><a class="reference internal" href="#codesize" id="id9">Codesize</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#action-space" id="id10">Action Space</a></p></li>
+</ul>
+</div>
+<div class="section" id="datasets">
+<h2><a class="toc-backref" href="#id1">Datasets</a><a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h2>
+<p>We provide several datasets of open-source LLVM-IR benchmarks for download:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 37%" />
+<col style="width: 19%" />
+<col style="width: 18%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Dataset</p></th>
+<th class="head"><p>License</p></th>
+<th class="head"><p>Num. Benchmarks</p></th>
+<th class="head"><p>Size on disk</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>blas-v0</p></td>
+<td><p>BSD 3-Clause</p></td>
+<td><p>300</p></td>
+<td><p>4.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p>cBench-v0</p></td>
+<td><p>BSD 3-Clause</p></td>
+<td><p>23</p></td>
+<td><p>7.2 MB</p></td>
+</tr>
+<tr class="row-even"><td><p>github-v0</p></td>
+<td><p>CC BY 4.0</p></td>
+<td><p>50,708</p></td>
+<td><p>726.0 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p>linux-v0</p></td>
+<td><p>GPL-2.0</p></td>
+<td><p>13,920</p></td>
+<td><p>516.0 MB</p></td>
+</tr>
+<tr class="row-even"><td><p>mibench-v0</p></td>
+<td><p>BSD 3-Clause</p></td>
+<td><p>40</p></td>
+<td><p>238.5 kB</p></td>
+</tr>
+<tr class="row-odd"><td><p>npb-v0</p></td>
+<td><p>NASA Open Source Agreement v1.3</p></td>
+<td><p>122</p></td>
+<td><p>2.3 MB</p></td>
+</tr>
+<tr class="row-even"><td><p>opencv-v0</p></td>
+<td><p>Apache 2.0</p></td>
+<td><p>442</p></td>
+<td><p>21.9 MB</p></td>
+</tr>
+<tr class="row-odd"><td><p>poj104-v0</p></td>
+<td><p>BSD 3-Clause</p></td>
+<td><p>49,628</p></td>
+<td><p>304.2 MB</p></td>
+</tr>
+<tr class="row-even"><td><p>polybench-v0</p></td>
+<td><p>BSD 3-Clause</p></td>
+<td><p>27</p></td>
+<td><p>162.6 kB</p></td>
+</tr>
+<tr class="row-odd"><td><p>tensorflow-v0</p></td>
+<td><p>Apache 2.0</p></td>
+<td><p>1,985</p></td>
+<td><p>299.7 MB</p></td>
+</tr>
+</tbody>
+</table>
+<p>Install these datasets using the <a class="reference internal" href="../cli.html#module-compiler_gym.bin.datasets" title="compiler_gym.bin.datasets"><code class="xref py py-mod docutils literal notranslate"><span class="pre">compiler_gym.bin.datasets</span></code></a> command line
+tool, or programatically using
+<a class="reference internal" href="../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.require_datasets" title="compiler_gym.envs.CompilerEnv.require_datasets"><code class="xref py py-meth docutils literal notranslate"><span class="pre">CompilerEnv.require_datasets()</span></code></a>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-v0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">require_datasets</span><span class="p">([</span><span class="s2">&quot;tensorflow-v0&quot;</span><span class="p">,</span> <span class="s2">&quot;npb-v0&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="observation-spaces">
+<h2><a class="toc-backref" href="#id2">Observation Spaces</a><a class="headerlink" href="#observation-spaces" title="Permalink to this headline">¶</a></h2>
+<p>We provide several observation spaces for LLVM based on prior compiler research.</p>
+<div class="section" id="autophase">
+<h3><a class="toc-backref" href="#id3">Autophase</a><a class="headerlink" href="#autophase" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 2%" />
+<col style="width: 98%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Observation space</p></th>
+<th class="head"><p>Shape</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Autophase</p></td>
+<td><p><cite>Box(0, 9223372036854775807, (56,), int64)</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>AutophaseDict</p></td>
+<td><p><cite>Dict(ArgsPhi:int&lt;0,inf&gt;, BB03Phi:int&lt;0,inf&gt;, BBHiPhi:int&lt;0,inf&gt;, BBNoPhi:int&lt;0,inf&gt;, BBNumArgsHi:int&lt;0,inf&gt;, BBNumArgsLo:int&lt;0,inf&gt;, BeginPhi:int&lt;0,inf&gt;, BlockLow:int&lt;0,inf&gt;, BlockMid:int&lt;0,inf&gt;, BranchCount:int&lt;0,inf&gt;, CriticalCount:int&lt;0,inf&gt;, NumAShrInst:int&lt;0,inf&gt;, NumAddInst:int&lt;0,inf&gt;, NumAllocaInst:int&lt;0,inf&gt;, NumAndInst:int&lt;0,inf&gt;, NumBitCastInst:int&lt;0,inf&gt;, NumBrInst:int&lt;0,inf&gt;, NumCallInst:int&lt;0,inf&gt;, NumEdges:int&lt;0,inf&gt;, NumGetElementPtrInst:int&lt;0,inf&gt;, NumICmpInst:int&lt;0,inf&gt;, NumLShrInst:int&lt;0,inf&gt;, NumLoadInst:int&lt;0,inf&gt;, NumMulInst:int&lt;0,inf&gt;, NumOrInst:int&lt;0,inf&gt;, NumPHIInst:int&lt;0,inf&gt;, NumRetInst:int&lt;0,inf&gt;, NumSExtInst:int&lt;0,inf&gt;, NumSelectInst:int&lt;0,inf&gt;, NumShlInst:int&lt;0,inf&gt;, NumStoreInst:int&lt;0,inf&gt;, NumSubInst:int&lt;0,inf&gt;, NumTruncInst:int&lt;0,inf&gt;, NumXorInst:int&lt;0,inf&gt;, NumZExtInst:int&lt;0,inf&gt;, TotalBlocks:int&lt;0,inf&gt;, TotalFuncs:int&lt;0,inf&gt;, TotalInsts:int&lt;0,inf&gt;, TotalMemInst:int&lt;0,inf&gt;, UncondBranches:int&lt;0,inf&gt;, binaryConstArg:int&lt;0,inf&gt;, const32Bit:int&lt;0,inf&gt;, const64Bit:int&lt;0,inf&gt;, morePreds:int&lt;0,inf&gt;, numConstOnes:int&lt;0,inf&gt;, numConstZeroes:int&lt;0,inf&gt;, onePred:int&lt;0,inf&gt;, onePredOneSuc:int&lt;0,inf&gt;, onePredTwoSuc:int&lt;0,inf&gt;, oneSuccessor:int&lt;0,inf&gt;, returnInt:int&lt;0,inf&gt;, testUnary:int&lt;0,inf&gt;, twoEach:int&lt;0,inf&gt;, twoPred:int&lt;0,inf&gt;, twoPredOneSuc:int&lt;0,inf&gt;, twoSuccessor:int&lt;0,inf&gt;)</cite></p></td>
+</tr>
+</tbody>
+</table>
+<p>The Autophase observation space is a 56-dimension integer feature vector
+summarizing the static LLVM-IR representation. It is described in:</p>
+<blockquote>
+<div><p>Haj-Ali, A., Huang, Q. J., Xiang, J., Moses, W., Asanovic, K., Wawrzynek,
+J., &amp; Stoica, I. (2020).
+<a class="reference external" href="https://proceedings.mlsys.org/paper/2020/file/4e732ced3463d06de0ca9a15b6153677-Paper.pdf">AutoPhase: Juggling HLS phase orderings in random forests with deep reinforcement learning</a>.
+Proceedings of Machine Learning and Systems, 2, 70-81.</p>
+</div></blockquote>
+<p>Use the <code class="code docutils literal notranslate"><span class="pre">Autophase</span></code> observation space to access the feature vectors as an
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html">np.array</a>,
+and <code class="code docutils literal notranslate"><span class="pre">AutophaseDict</span></code> to receive them as a self-documented dictionary, keyed
+by the name of each feature.</p>
+</div>
+<div class="section" id="inst2vec">
+<h3><a class="toc-backref" href="#id4">Inst2vec</a><a class="headerlink" href="#inst2vec" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 50%" />
+<col style="width: 50%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Observation space</p></th>
+<th class="head"><p>Shape</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Inst2vec</p></td>
+<td><p><cite>ndarray_list&lt;&gt;[0,inf])</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>Inst2vecEmbeddingIndices</p></td>
+<td><p><cite>int32_list&lt;&gt;[0,inf])</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>Inst2vecPreprocessedText</p></td>
+<td><p><cite>str_list&lt;&gt;[0,inf])</cite></p></td>
+</tr>
+</tbody>
+</table>
+<p>The inst2vec observation space represents LLVM-IR as sequence of embedding
+vectors, one per LLVM statement, using embeddings trained offline on a large
+corpus of LLVM-IR. It is described in:</p>
+<blockquote>
+<div><p>Ben-Nun, T., Jakobovits, A. S., &amp; Hoefler, T. (2018).
+<a class="reference external" href="https://papers.nips.cc/paper/2018/file/17c3433fecc21b57000debdf7ad5c930-Paper.pdf">Neural code comprehension: A learnable representation of code semantics</a>.
+In Advances in Neural Information Processing Systems (pp. 3585-3597).</p>
+</div></blockquote>
+<p>The inst2vec methodology comprises three steps, all of which are exposed as
+observation spaces:</p>
+<p><strong>Step 1: pre-processing</strong></p>
+<p>The LLVM-IR statements are pre-processed to remove literals, identifiers, and
+simplify the expressions. Using the Inst2vecPreprocessedText observation space
+returns a list of pre-processed strings, one per statement. It could be useful
+if you want to normalize the IR but then do your own embedding.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.manual_env -- --env=llvm-v0 --benchmark=cBench/crc32
+
+Initialized environment in 268.7ms
+Reset benchmark://cBench/crc32 environment in 24.7ms
+
+Step 1. Select: [a]ction [o]bservation [r]eward [c]ommandline [e]nd &gt;&gt;&gt; observation
+Observable values: [0] Autophase, [1] BitcodeFile, [2] CpuInfo, [3] Inst2vec, [4] Inst2vecEmbeddingIndices, [5] Inst2vecPreprocessedText, [6] Ir, [7] Programl &gt;&gt;&gt; Inst2vecPreprocessedText
+[&#39;opaque = type opaque&#39;, &#39;&lt;@ID&gt; = internal global [... i32, i32* &lt;%ID&gt;, align 4&#39;, &#39;ret i32 &lt;%ID&gt;&#39;]
+Observation Inst2vecPreprocessedText in 232.0ms
+</pre></div>
+</div>
+<p><strong>Step 2: encoding</strong></p>
+<p>Each of the pre-processed statements is mapped to an index into a vocabulary of
+over 8k LLVM-IR statements. If a statement is not found in the vocabulary, it
+maps to a special !UNK vocabulary item. Using the Inst2vecEmbeddingIndices
+observation space returns a list of vocabulary indices. This would be useful if
+you want to learn your own embeddings using the same vocabulary, or if you want
+to use the inst2vec pre-trained embeddings but are processing them on a GPU
+where you have already allocated and copied the embedding table, minimizing
+transfer sizes.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Step</span> <span class="mf">1.</span> <span class="n">Select</span><span class="p">:</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="n">ction</span> <span class="p">[</span><span class="n">o</span><span class="p">]</span><span class="n">bservation</span> <span class="p">[</span><span class="n">r</span><span class="p">]</span><span class="n">eward</span> <span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="n">ommandline</span> <span class="p">[</span><span class="n">e</span><span class="p">]</span><span class="n">nd</span> <span class="o">&gt;&gt;&gt;</span> <span class="n">observation</span>
+<span class="n">Observable</span> <span class="n">values</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="n">Autophase</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="n">BitcodeFile</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">CpuInfo</span><span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="n">Inst2vec</span><span class="p">,</span> <span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="n">Inst2vecEmbeddingIndices</span><span class="p">,</span> <span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="n">Inst2vecPreprocessedText</span><span class="p">,</span> <span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="n">Ir</span><span class="p">,</span> <span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="n">Programl</span> <span class="o">&gt;&gt;&gt;</span> <span class="n">Inst2vecEmbeddingIndices</span>
+<span class="p">[</span><span class="mi">8564</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">46</span><span class="p">,</span> <span class="mi">46</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">1348</span><span class="p">,</span> <span class="mi">178</span><span class="p">,</span> <span class="mi">286</span><span class="p">,</span> <span class="mi">214</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">235</span><span class="p">,</span> <span class="mi">697</span><span class="p">,</span> <span class="mi">1513</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">395</span><span class="p">,</span> <span class="mi">1513</span><span class="p">,</span> <span class="mi">2298</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">289</span><span class="p">,</span> <span class="mi">291</span><span class="p">,</span> <span class="mi">3729</span><span class="p">,</span> <span class="mi">3729</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">178</span><span class="p">,</span> <span class="mi">289</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">1412</span><span class="p">,</span> <span class="mi">1412</span><span class="p">,</span> <span class="mi">205</span><span class="p">,</span> <span class="mi">415</span><span class="p">,</span> <span class="mi">205</span><span class="p">,</span> <span class="mi">213</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">5666</span><span class="p">,</span> <span class="mi">204</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">213</span><span class="p">,</span> <span class="mi">215</span><span class="p">,</span> <span class="mi">364</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">5665</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">311</span><span class="p">,</span> <span class="mi">634</span><span class="p">,</span> <span class="mi">204</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">415</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">640</span><span class="p">,</span> <span class="mi">214</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">295</span><span class="p">,</span> <span class="mi">675</span><span class="p">,</span> <span class="mi">697</span><span class="p">,</span> <span class="mi">1513</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">395</span><span class="p">,</span> <span class="mi">1513</span><span class="p">,</span> <span class="mi">214</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">5665</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">634</span><span class="p">,</span> <span class="mi">204</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">213</span><span class="p">,</span> <span class="mi">215</span><span class="p">,</span> <span class="mi">415</span><span class="p">,</span> <span class="mi">205</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">5665</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">961</span><span class="p">,</span> <span class="mi">214</span><span class="p">,</span> <span class="mi">415</span><span class="p">,</span> <span class="mi">214</span><span class="p">,</span> <span class="mi">364</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">295</span><span class="p">,</span> <span class="mi">257</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">291</span><span class="p">,</span> <span class="mi">178</span><span class="p">,</span> <span class="mi">178</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">214</span><span class="p">,</span> <span class="mi">205</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">977</span><span class="p">,</span> <span class="mi">204</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">213</span><span class="p">,</span> <span class="mi">235</span><span class="p">,</span> <span class="mi">697</span><span class="p">,</span> <span class="mi">1513</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">395</span><span class="p">,</span> <span class="mi">1513</span><span class="p">,</span> <span class="mi">214</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">420</span><span class="p">,</span> <span class="mi">214</span><span class="p">,</span> <span class="mi">213</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">961</span><span class="p">,</span> <span class="mi">2298</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">289</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">289</span><span class="p">,</span> <span class="mi">178</span><span class="p">,</span> <span class="mi">178</span><span class="p">,</span> <span class="mi">289</span><span class="p">,</span> <span class="mi">311</span><span class="p">,</span> <span class="mi">594</span><span class="p">,</span> <span class="mi">311</span><span class="p">,</span> <span class="mi">364</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">295</span><span class="p">,</span> <span class="mi">431</span><span class="p">,</span> <span class="mi">311</span><span class="p">,</span> <span class="mi">425</span><span class="p">,</span> <span class="mi">204</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">597</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">594</span><span class="p">,</span> <span class="mi">213</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">295</span><span class="p">,</span> <span class="mi">653</span><span class="p">,</span> <span class="mi">311</span><span class="p">,</span> <span class="mi">295</span><span class="p">,</span> <span class="mi">634</span><span class="p">,</span> <span class="mi">204</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">597</span><span class="p">,</span> <span class="mi">213</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">295</span><span class="p">,</span> <span class="mi">634</span><span class="p">,</span> <span class="mi">612</span><span class="p">,</span> <span class="mi">257</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">289</span><span class="p">,</span> <span class="mi">289</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">178</span><span class="p">,</span> <span class="mi">178</span><span class="p">,</span> <span class="mi">364</span><span class="p">,</span> <span class="mi">311</span><span class="p">,</span> <span class="mi">594</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">5666</span><span class="p">,</span> <span class="mi">204</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">5391</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">364</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">5665</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">5665</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">205</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">488</span><span class="p">,</span> <span class="mi">204</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">295</span><span class="p">,</span> <span class="mi">597</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">640</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">540</span><span class="p">,</span> <span class="mi">612</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">640</span><span class="p">,</span> <span class="mi">214</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">364</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">295</span><span class="p">,</span> <span class="mi">257</span><span class="p">]</span>
+<span class="n">Observation</span> <span class="n">Inst2vecEmbeddingIndices</span> <span class="ow">in</span> <span class="mf">83.3</span><span class="n">ms</span>
+</pre></div>
+</div>
+<p><strong>Step 3: embedding</strong></p>
+<p>The vocabulary indices are mapped to 200-D embedding vectors, producing an
+np.array of shape (num_statements, 200). This could be fed into an LSTM to
+produce a program embedding.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Step</span> <span class="mf">1.</span> <span class="n">Select</span><span class="p">:</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="n">ction</span> <span class="p">[</span><span class="n">o</span><span class="p">]</span><span class="n">bservation</span> <span class="p">[</span><span class="n">r</span><span class="p">]</span><span class="n">eward</span> <span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="n">ommandline</span> <span class="p">[</span><span class="n">e</span><span class="p">]</span><span class="n">nd</span> <span class="o">&gt;&gt;&gt;</span> <span class="n">observation</span>
+<span class="n">Observable</span> <span class="n">values</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="n">Autophase</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="n">BitcodeFile</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">CpuInfo</span><span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="n">Inst2vec</span><span class="p">,</span> <span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="n">Inst2vecEmbeddingIndices</span><span class="p">,</span> <span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="n">Inst2vecPreprocessedText</span><span class="p">,</span> <span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="n">Ir</span><span class="p">,</span> <span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="n">Programl</span> <span class="o">&gt;&gt;&gt;</span> <span class="n">Inst2vec</span>
+<span class="p">[[</span><span class="o">-</span><span class="mf">0.59749085</span>  <span class="mf">0.63315004</span> <span class="o">-</span><span class="mf">0.0308373</span>  <span class="o">...</span>  <span class="mf">0.14833118</span>  <span class="mf">0.86420786</span>
+   <span class="mf">0.44808227</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">0.59749085</span>  <span class="mf">0.63315004</span> <span class="o">-</span><span class="mf">0.0308373</span>  <span class="o">...</span>  <span class="mf">0.14833118</span>  <span class="mf">0.86420786</span>
+   <span class="mf">0.44808227</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">0.3826681</span>   <span class="mf">0.681551</span>   <span class="o">-</span><span class="mf">0.48866785</span> <span class="o">...</span> <span class="o">-</span><span class="mf">0.34639767</span>  <span class="mf">0.4906757</span>
+   <span class="mf">0.40215215</span><span class="p">]</span>
+ <span class="o">...</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">0.59749085</span>  <span class="mf">0.63315004</span> <span class="o">-</span><span class="mf">0.0308373</span>  <span class="o">...</span>  <span class="mf">0.14833118</span>  <span class="mf">0.86420786</span>
+   <span class="mf">0.44808227</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">0.5932641</span>   <span class="mf">0.55792844</span>  <span class="mf">0.01643612</span> <span class="o">...</span>  <span class="mf">0.31370804</span>  <span class="mf">0.5398467</span>
+   <span class="mf">0.64350367</span><span class="p">]</span>
+ <span class="p">[</span><span class="o">-</span><span class="mf">0.61786747</span>  <span class="mf">0.84928125</span> <span class="o">-</span><span class="mf">0.19026336</span> <span class="o">...</span> <span class="o">-</span><span class="mf">0.2501209</span>   <span class="mf">0.2700288</span>
+   <span class="mf">0.6338952</span> <span class="p">]]</span>
+<span class="n">Observation</span> <span class="n">Inst2vec</span> <span class="ow">in</span> <span class="mf">80.8</span><span class="n">ms</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="programl">
+<h3><a class="toc-backref" href="#id5">ProGraML</a><a class="headerlink" href="#programl" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 33%" />
+<col style="width: 68%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Observation space</p></th>
+<th class="head"><p>Shape</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Programl</p></td>
+<td><p><cite>str_list&lt;&gt;[0,inf]) -&gt; json://networkx/MultiDiGraph</cite></p></td>
+</tr>
+</tbody>
+</table>
+<p>The ProGraML representation is a graph-based representation of LLVM-IR which
+includes control-flow, data-flow, and call-flow. This graph is represented as
+an <a class="reference external" href="https://networkx.org/documentation/stable/reference/classes/multidigraph.html">nx.MultiDiGraph</a>.
+ProGraML is described in:</p>
+<blockquote>
+<div><p>Cummins, C., Fisches, Z. V., Ben-Nun, T., Hoefler, T., &amp; Leather, H. (2020).
+<a class="reference external" href="https://arxiv.org/pdf/2003.10536.pdf">ProGraML: Graph-based Deep Learning for Program Optimization and Analysis</a>.
+arXiv preprint arXiv:2003.10536.</p>
+</div></blockquote>
+</div>
+<div class="section" id="hardware-information">
+<h3><a class="toc-backref" href="#id6">Hardware Information</a><a class="headerlink" href="#hardware-information" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 7%" />
+<col style="width: 93%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Observation space</p></th>
+<th class="head"><p>Shape</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>CpuInfo</p></td>
+<td><p><cite>str_list&lt;&gt;[0,inf]) -&gt; json://</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>CpuInfoDict</p></td>
+<td><p><cite>Dict(cores_count:int&lt;-inf,inf&gt;, l1d_cache_count:int&lt;-inf,inf&gt;, l1d_cache_size:int&lt;-inf,inf&gt;, l1i_cache_count:int&lt;-inf,inf&gt;, l1i_cache_size:int&lt;-inf,inf&gt;, l2_cache_count:int&lt;-inf,inf&gt;, l2_cache_size:int&lt;-inf,inf&gt;, l3_cache_count:int&lt;-inf,inf&gt;, l3_cache_size:int&lt;-inf,inf&gt;, l4_cache_count:int&lt;-inf,inf&gt;, l4_cache_size:int&lt;-inf,inf&gt;, name:str_list&lt;&gt;[0,inf]))</cite></p></td>
+</tr>
+</tbody>
+</table>
+<p>Essential performance information about the host CPU can be accessed as JSON
+dictionary, extracted using the <a class="reference external" href="https://github.com/pytorch/cpuinfo">cpuinfo</a>
+library.</p>
+</div>
+<div class="section" id="llvm-ir">
+<h3><a class="toc-backref" href="#id7">LLVM-IR</a><a class="headerlink" href="#llvm-ir" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 51%" />
+<col style="width: 49%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Observation space</p></th>
+<th class="head"><p>Shape</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Ir</p></td>
+<td><p><cite>str_list&lt;&gt;[0,inf])</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>BitcodeFile</p></td>
+<td><p><cite>str_list&lt;&gt;[0,4096.0])</cite></p></td>
+</tr>
+</tbody>
+</table>
+<p>A serialized representation of the LLVM-IR can be accessed as a string through
+the <code class="code docutils literal notranslate"><span class="pre">Ir</span></code> observation space, or by writing the bitcode to disk and return
+its path using the <code class="code docutils literal notranslate"><span class="pre">BitcodeFile</span></code> observation space.</p>
+</div>
+</div>
+<div class="section" id="reward-spaces">
+<h2><a class="toc-backref" href="#id8">Reward Spaces</a><a class="headerlink" href="#reward-spaces" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="codesize">
+<h3><a class="toc-backref" href="#id9">Codesize</a><a class="headerlink" href="#codesize" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 67%" />
+<col style="width: 33%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Reward space</p></th>
+<th class="head"><p>Range</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>IrInstructionCount</p></td>
+<td><p>(-inf, 0.0)</p></td>
+</tr>
+<tr class="row-odd"><td><p>IrInstructionCountO3</p></td>
+<td><p>(0.0, inf)</p></td>
+</tr>
+<tr class="row-even"><td><p>IrInstructionCountOz</p></td>
+<td><p>(0.0, inf)</p></td>
+</tr>
+<tr class="row-odd"><td><p>IrInstructionCountOzDiff</p></td>
+<td><p>(-inf, inf)</p></td>
+</tr>
+</tbody>
+</table>
+<p>The number of LLVM-IR instructions in the program can be used as reward
+signals, either using the raw instruction count, or by normalizing the
+instruction count relative to the instruction count when the program is
+optimized using the <code class="code docutils literal notranslate"><span class="pre">-O3</span></code> of <code class="code docutils literal notranslate"><span class="pre">-Oz</span></code> LLVM pipelines.</p>
+</div>
+</div>
+<div class="section" id="action-space">
+<h2><a class="toc-backref" href="#id10">Action Space</a><a class="headerlink" href="#action-space" title="Permalink to this headline">¶</a></h2>
+<p>The LLVM action space exposes the selection of semantics-preserving optimization
+transforms as a discrete space.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 26%" />
+<col style="width: 23%" />
+<col style="width: 51%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Action</p></th>
+<th class="head"><p>Flag</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>AddDiscriminatorsPass</p></td>
+<td><p><cite>-add-discriminators</cite></p></td>
+<td><p>Add DWARF path discriminators</p></td>
+</tr>
+<tr class="row-odd"><td><p>AggressiveDcepass</p></td>
+<td><p><cite>-adce</cite></p></td>
+<td><p>Aggressive Dead Code Elimination</p></td>
+</tr>
+<tr class="row-even"><td><p>AggressiveInstCombinerPass</p></td>
+<td><p><cite>-aggressive-instcombine</cite></p></td>
+<td><p>Combine pattern based expressions</p></td>
+</tr>
+<tr class="row-odd"><td><p>AlignmentFromAssumptionsPass</p></td>
+<td><p><cite>-alignment-from-assumptions</cite></p></td>
+<td><p>Alignment from assumptions</p></td>
+</tr>
+<tr class="row-even"><td><p>AlwaysInlinerLegacyPass</p></td>
+<td><p><cite>-always-inline</cite></p></td>
+<td><p>Inliner for always_inline functions</p></td>
+</tr>
+<tr class="row-odd"><td><p>ArgumentPromotionPass</p></td>
+<td><p><cite>-argpromotion</cite></p></td>
+<td><p>Promote ‘by reference’ arguments to scalars</p></td>
+</tr>
+<tr class="row-even"><td><p>AttributorLegacyPass</p></td>
+<td><p><cite>-attributor</cite></p></td>
+<td><p>Deduce and propagate attributes</p></td>
+</tr>
+<tr class="row-odd"><td><p>BarrierNoopPass</p></td>
+<td><p><cite>-barrier</cite></p></td>
+<td><p>A No-Op Barrier Pass</p></td>
+</tr>
+<tr class="row-even"><td><p>BitTrackingDcepass</p></td>
+<td><p><cite>-bdce</cite></p></td>
+<td><p>Bit-Tracking Dead Code Elimination</p></td>
+</tr>
+<tr class="row-odd"><td><p>BlockExtractorPass</p></td>
+<td><p><cite>-extract-blocks</cite></p></td>
+<td><p>Extract basic blocks from module</p></td>
+</tr>
+<tr class="row-even"><td><p>BoundsCheckingLegacyPass</p></td>
+<td><p><cite>-bounds-checking</cite></p></td>
+<td><p>Run-time bounds checking</p></td>
+</tr>
+<tr class="row-odd"><td><p>BreakCriticalEdgesPass</p></td>
+<td><p><cite>-break-crit-edges</cite></p></td>
+<td><p>Break critical edges in CFG</p></td>
+</tr>
+<tr class="row-even"><td><p>CfgsimplificationPass</p></td>
+<td><p><cite>-simplifycfg</cite></p></td>
+<td><p>Simplify the CFG</p></td>
+</tr>
+<tr class="row-odd"><td><p>CallSiteSplittingPass</p></td>
+<td><p><cite>-callsite-splitting</cite></p></td>
+<td><p>Call-site splitting</p></td>
+</tr>
+<tr class="row-even"><td><p>CalledValuePropagationPass</p></td>
+<td><p><cite>-called-value-propagation</cite></p></td>
+<td><p>Called Value Propagation</p></td>
+</tr>
+<tr class="row-odd"><td><p>CanonicalizeAliasesPass</p></td>
+<td><p><cite>-canonicalize-aliases</cite></p></td>
+<td><p>Canonicalize aliases</p></td>
+</tr>
+<tr class="row-even"><td><p>ConstantHoistingPass</p></td>
+<td><p><cite>-consthoist</cite></p></td>
+<td><p>Constant Hoisting</p></td>
+</tr>
+<tr class="row-odd"><td><p>ConstantMergePass</p></td>
+<td><p><cite>-constmerge</cite></p></td>
+<td><p>Merge Duplicate Global Constants</p></td>
+</tr>
+<tr class="row-even"><td><p>ConstantPropagationPass</p></td>
+<td><p><cite>-constprop</cite></p></td>
+<td><p>Simple constant propagation</p></td>
+</tr>
+<tr class="row-odd"><td><p>ControlHeightReductionLegacyPass</p></td>
+<td><p><cite>-chr</cite></p></td>
+<td><p>Reduce control height in the hot paths</p></td>
+</tr>
+<tr class="row-even"><td><p>CoroCleanupLegacyPass</p></td>
+<td><p><cite>-coro-cleanup</cite></p></td>
+<td><p>Lower all coroutine related intrinsics</p></td>
+</tr>
+<tr class="row-odd"><td><p>CoroEarlyLegacyPass</p></td>
+<td><p><cite>-coro-early</cite></p></td>
+<td><p>Lower early coroutine intrinsics</p></td>
+</tr>
+<tr class="row-even"><td><p>CoroElideLegacyPass</p></td>
+<td><p><cite>-coro-elide</cite></p></td>
+<td><p>Coroutine frame allocation elision and indirect calls replacement</p></td>
+</tr>
+<tr class="row-odd"><td><p>CoroSplitLegacyPass</p></td>
+<td><p><cite>-coro-split</cite></p></td>
+<td><p>Split coroutine into a set of functions driving its state machine</p></td>
+</tr>
+<tr class="row-even"><td><p>CorrelatedValuePropagationPass</p></td>
+<td><p><cite>-correlated-propagation</cite></p></td>
+<td><p>Value Propagation</p></td>
+</tr>
+<tr class="row-odd"><td><p>CrossDsocfipass</p></td>
+<td><p><cite>-cross-dso-cfi</cite></p></td>
+<td><p>Cross-DSO CFI</p></td>
+</tr>
+<tr class="row-even"><td><p>DeadArgEliminationPass</p></td>
+<td><p><cite>-deadargelim</cite></p></td>
+<td><p>Dead Argument Elimination</p></td>
+</tr>
+<tr class="row-odd"><td><p>DeadCodeEliminationPass</p></td>
+<td><p><cite>-dce</cite></p></td>
+<td><p>Dead Code Elimination</p></td>
+</tr>
+<tr class="row-even"><td><p>DeadInstEliminationPass</p></td>
+<td><p><cite>-die</cite></p></td>
+<td><p>Dead Instruction Elimination</p></td>
+</tr>
+<tr class="row-odd"><td><p>DeadStoreEliminationPass</p></td>
+<td><p><cite>-dse</cite></p></td>
+<td><p>Dead Store Elimination</p></td>
+</tr>
+<tr class="row-even"><td><p>DemoteRegisterToMemoryPass</p></td>
+<td><p><cite>-reg2mem</cite></p></td>
+<td><p>Demote all values to stack slots</p></td>
+</tr>
+<tr class="row-odd"><td><p>DivRemPairsPass</p></td>
+<td><p><cite>-div-rem-pairs</cite></p></td>
+<td><p>Hoist/decompose integer division and remainder</p></td>
+</tr>
+<tr class="row-even"><td><p>EarlyCsepass</p></td>
+<td><p><cite>-early-cse-memssa</cite></p></td>
+<td><p>Early CSE w/ MemorySSA</p></td>
+</tr>
+<tr class="row-odd"><td><p>EliminateAvailableExternallyPass</p></td>
+<td><p><cite>-elim-avail-extern</cite></p></td>
+<td><p>Eliminate Available Externally Globals</p></td>
+</tr>
+<tr class="row-even"><td><p>EntryExitInstrumenterPass</p></td>
+<td><p><cite>-ee-instrument</cite></p></td>
+<td><p>Instrument function entry/exit with calls to e.g. mcount()(pre inlining)</p></td>
+</tr>
+<tr class="row-odd"><td><p>FlattenCfgpass</p></td>
+<td><p><cite>-flattencfg</cite></p></td>
+<td><p>Flatten the CFG</p></td>
+</tr>
+<tr class="row-even"><td><p>Float2intPass</p></td>
+<td><p><cite>-float2int</cite></p></td>
+<td><p>Float to int</p></td>
+</tr>
+<tr class="row-odd"><td><p>ForceFunctionAttrsLegacyPass</p></td>
+<td><p><cite>-forceattrs</cite></p></td>
+<td><p>Force set function attributes</p></td>
+</tr>
+<tr class="row-even"><td><p>FunctionInliningPass</p></td>
+<td><p><cite>-inline</cite></p></td>
+<td><p>Function Integration/Inlining</p></td>
+</tr>
+<tr class="row-odd"><td><p>GcovprofilerPass</p></td>
+<td><p><cite>-insert-gcov-profiling</cite></p></td>
+<td><p>Insert instrumentation for GCOV profiling</p></td>
+</tr>
+<tr class="row-even"><td><p>GvnhoistPass</p></td>
+<td><p><cite>-gvn-hoist</cite></p></td>
+<td><p>Early GVN Hoisting of Expressions</p></td>
+</tr>
+<tr class="row-odd"><td><p>Gvnpass</p></td>
+<td><p><cite>-gvn</cite></p></td>
+<td><p>Global Value Numbering</p></td>
+</tr>
+<tr class="row-even"><td><p>GvnsinkPass</p></td>
+<td><p><cite>-gvn-sink</cite></p></td>
+<td><p>Early GVN sinking of Expressions</p></td>
+</tr>
+<tr class="row-odd"><td><p>GlobalDcepass</p></td>
+<td><p><cite>-globaldce</cite></p></td>
+<td><p>Dead Global Elimination</p></td>
+</tr>
+<tr class="row-even"><td><p>GlobalOptimizerPass</p></td>
+<td><p><cite>-globalopt</cite></p></td>
+<td><p>Global Variable Optimizer</p></td>
+</tr>
+<tr class="row-odd"><td><p>GlobalSplitPass</p></td>
+<td><p><cite>-globalsplit</cite></p></td>
+<td><p>Global splitter</p></td>
+</tr>
+<tr class="row-even"><td><p>GuardWideningPass</p></td>
+<td><p><cite>-guard-widening</cite></p></td>
+<td><p>Widen guards</p></td>
+</tr>
+<tr class="row-odd"><td><p>HotColdSplittingPass</p></td>
+<td><p><cite>-hotcoldsplit</cite></p></td>
+<td><p>Hot Cold Splitting</p></td>
+</tr>
+<tr class="row-even"><td><p>IpconstantPropagationPass</p></td>
+<td><p><cite>-ipconstprop</cite></p></td>
+<td><p>Interprocedural constant propagation</p></td>
+</tr>
+<tr class="row-odd"><td><p>Ipsccppass</p></td>
+<td><p><cite>-ipsccp</cite></p></td>
+<td><p>Interprocedural Sparse Conditional Constant Propagation</p></td>
+</tr>
+<tr class="row-even"><td><p>IndVarSimplifyPass</p></td>
+<td><p><cite>-indvars</cite></p></td>
+<td><p>Induction Variable Simplification</p></td>
+</tr>
+<tr class="row-odd"><td><p>InductiveRangeCheckEliminationPass</p></td>
+<td><p><cite>-irce</cite></p></td>
+<td><p>Inductive range check elimination</p></td>
+</tr>
+<tr class="row-even"><td><p>InferAddressSpacesPass</p></td>
+<td><p><cite>-infer-address-spaces</cite></p></td>
+<td><p>Infer address spaces</p></td>
+</tr>
+<tr class="row-odd"><td><p>InferFunctionAttrsLegacyPass</p></td>
+<td><p><cite>-inferattrs</cite></p></td>
+<td><p>Infer set function attributes</p></td>
+</tr>
+<tr class="row-even"><td><p>InjectTlimappingsLegacyPass</p></td>
+<td><p><cite>-inject-tli-mappings</cite></p></td>
+<td><p>Inject TLI Mappings</p></td>
+</tr>
+<tr class="row-odd"><td><p>InstSimplifyLegacyPass</p></td>
+<td><p><cite>-instsimplify</cite></p></td>
+<td><p>Remove redundant instructions</p></td>
+</tr>
+<tr class="row-even"><td><p>InstructionCombiningPass</p></td>
+<td><p><cite>-instcombine</cite></p></td>
+<td><p>Combine redundant instructions</p></td>
+</tr>
+<tr class="row-odd"><td><p>InstructionNamerPass</p></td>
+<td><p><cite>-instnamer</cite></p></td>
+<td><p>Assign names to anonymous instructions</p></td>
+</tr>
+<tr class="row-even"><td><p>JumpThreadingPass</p></td>
+<td><p><cite>-jump-threading</cite></p></td>
+<td><p>Jump Threading</p></td>
+</tr>
+<tr class="row-odd"><td><p>Lcssapass</p></td>
+<td><p><cite>-lcssa</cite></p></td>
+<td><p>Loop-Closed SSA Form Pass</p></td>
+</tr>
+<tr class="row-even"><td><p>Licmpass</p></td>
+<td><p><cite>-licm</cite></p></td>
+<td><p>Loop Invariant Code Motion</p></td>
+</tr>
+<tr class="row-odd"><td><p>LibCallsShrinkWrapPass</p></td>
+<td><p><cite>-libcalls-shrinkwrap</cite></p></td>
+<td><p>Conditionally eliminate dead library calls</p></td>
+</tr>
+<tr class="row-even"><td><p>LoadStoreVectorizerPass</p></td>
+<td><p><cite>-load-store-vectorizer</cite></p></td>
+<td><p>Vectorize load and Store instructions</p></td>
+</tr>
+<tr class="row-odd"><td><p>LoopDataPrefetchPass</p></td>
+<td><p><cite>-loop-data-prefetch</cite></p></td>
+<td><p>Loop Data Prefetch</p></td>
+</tr>
+<tr class="row-even"><td><p>LoopDeletionPass</p></td>
+<td><p><cite>-loop-deletion</cite></p></td>
+<td><p>Delete dead loops</p></td>
+</tr>
+<tr class="row-odd"><td><p>LoopDistributePass</p></td>
+<td><p><cite>-loop-distribute</cite></p></td>
+<td><p>Loop Distribution</p></td>
+</tr>
+<tr class="row-even"><td><p>LoopExtractorPass</p></td>
+<td><p><cite>-loop-extract</cite></p></td>
+<td><p>Extract loops into new functions</p></td>
+</tr>
+<tr class="row-odd"><td><p>LoopFusePass</p></td>
+<td><p><cite>-loop-fusion</cite></p></td>
+<td><p>Loop Fusion</p></td>
+</tr>
+<tr class="row-even"><td><p>LoopGuardWideningPass</p></td>
+<td><p><cite>-loop-guard-widening</cite></p></td>
+<td><p>Widen guards (within a single loop, as a loop pass)</p></td>
+</tr>
+<tr class="row-odd"><td><p>LoopIdiomPass</p></td>
+<td><p><cite>-loop-idiom</cite></p></td>
+<td><p>Recognize loop idioms</p></td>
+</tr>
+<tr class="row-even"><td><p>LoopInstSimplifyPass</p></td>
+<td><p><cite>-loop-instsimplify</cite></p></td>
+<td><p>Simplify instructions in loops</p></td>
+</tr>
+<tr class="row-odd"><td><p>LoopInterchangePass</p></td>
+<td><p><cite>-loop-interchange</cite></p></td>
+<td><p>Interchanges loops for cache reuse</p></td>
+</tr>
+<tr class="row-even"><td><p>LoopLoadEliminationPass</p></td>
+<td><p><cite>-loop-load-elim</cite></p></td>
+<td><p>Loop Load Elimination</p></td>
+</tr>
+<tr class="row-odd"><td><p>LoopPredicationPass</p></td>
+<td><p><cite>-loop-predication</cite></p></td>
+<td><p>Loop predication</p></td>
+</tr>
+<tr class="row-even"><td><p>LoopRerollPass</p></td>
+<td><p><cite>-loop-reroll</cite></p></td>
+<td><p>Reroll loops</p></td>
+</tr>
+<tr class="row-odd"><td><p>LoopRotatePass</p></td>
+<td><p><cite>-loop-rotate</cite></p></td>
+<td><p>Rotate Loops</p></td>
+</tr>
+<tr class="row-even"><td><p>LoopSimplifyCfgpass</p></td>
+<td><p><cite>-loop-simplifycfg</cite></p></td>
+<td><p>Simplify loop CFG</p></td>
+</tr>
+<tr class="row-odd"><td><p>LoopSimplifyPass</p></td>
+<td><p><cite>-loop-simplify</cite></p></td>
+<td><p>Canonicalize natural loops</p></td>
+</tr>
+<tr class="row-even"><td><p>LoopSinkPass</p></td>
+<td><p><cite>-loop-sink</cite></p></td>
+<td><p>Loop Sink</p></td>
+</tr>
+<tr class="row-odd"><td><p>LoopStrengthReducePass</p></td>
+<td><p><cite>-loop-reduce</cite></p></td>
+<td><p>Loop Strength Reduction</p></td>
+</tr>
+<tr class="row-even"><td><p>LoopUnrollAndJamPass</p></td>
+<td><p><cite>-loop-unroll-and-jam</cite></p></td>
+<td><p>Unroll and Jam loops</p></td>
+</tr>
+<tr class="row-odd"><td><p>LoopUnrollPass</p></td>
+<td><p><cite>-loop-unroll</cite></p></td>
+<td><p>Unroll loops</p></td>
+</tr>
+<tr class="row-even"><td><p>LoopUnswitchPass</p></td>
+<td><p><cite>-loop-unswitch</cite></p></td>
+<td><p>Unswitch loops</p></td>
+</tr>
+<tr class="row-odd"><td><p>LoopVectorizePass</p></td>
+<td><p><cite>-loop-vectorize</cite></p></td>
+<td><p>Loop Vectorization</p></td>
+</tr>
+<tr class="row-even"><td><p>LoopVersioningLicmpass</p></td>
+<td><p><cite>-loop-versioning-licm</cite></p></td>
+<td><p>Loop Versioning For LICM</p></td>
+</tr>
+<tr class="row-odd"><td><p>LoopVersioningPass</p></td>
+<td><p><cite>-loop-versioning</cite></p></td>
+<td><p>Loop Versioning</p></td>
+</tr>
+<tr class="row-even"><td><p>LowerAtomicPass</p></td>
+<td><p><cite>-loweratomic</cite></p></td>
+<td><p>Lower atomic intrinsics to non-atomic form</p></td>
+</tr>
+<tr class="row-odd"><td><p>LowerConstantIntrinsicsPass</p></td>
+<td><p><cite>-lower-constant-intrinsics</cite></p></td>
+<td><p>Lower constant intrinsics</p></td>
+</tr>
+<tr class="row-even"><td><p>LowerExpectIntrinsicPass</p></td>
+<td><p><cite>-lower-expect</cite></p></td>
+<td><p>Lower ‘expect’ Intrinsics</p></td>
+</tr>
+<tr class="row-odd"><td><p>LowerGuardIntrinsicPass</p></td>
+<td><p><cite>-lower-guard-intrinsic</cite></p></td>
+<td><p>Lower the guard intrinsic to normal control flow</p></td>
+</tr>
+<tr class="row-even"><td><p>LowerInvokePass</p></td>
+<td><p><cite>-lowerinvoke</cite></p></td>
+<td><p>Lower invoke and unwind, for unwindless code generators</p></td>
+</tr>
+<tr class="row-odd"><td><p>LowerMatrixIntrinsicsPass</p></td>
+<td><p><cite>-lower-matrix-intrinsics</cite></p></td>
+<td><p>Lower the matrix intrinsics</p></td>
+</tr>
+<tr class="row-even"><td><p>LowerSwitchPass</p></td>
+<td><p><cite>-lowerswitch</cite></p></td>
+<td><p>Lower SwitchInst’s to branches</p></td>
+</tr>
+<tr class="row-odd"><td><p>LowerWidenableConditionPass</p></td>
+<td><p><cite>-lower-widenable-condition</cite></p></td>
+<td><p>Lower the widenable condition to default true value</p></td>
+</tr>
+<tr class="row-even"><td><p>MemCpyOptPass</p></td>
+<td><p><cite>-memcpyopt</cite></p></td>
+<td><p>MemCpy Optimization</p></td>
+</tr>
+<tr class="row-odd"><td><p>MergeFunctionsPass</p></td>
+<td><p><cite>-mergefunc</cite></p></td>
+<td><p>Merge Functions</p></td>
+</tr>
+<tr class="row-even"><td><p>MergeIcmpsLegacyPass</p></td>
+<td><p><cite>-mergeicmps</cite></p></td>
+<td><p>Merge contiguous icmps into a memcmp</p></td>
+</tr>
+<tr class="row-odd"><td><p>MergedLoadStoreMotionPass</p></td>
+<td><p><cite>-mldst-motion</cite></p></td>
+<td><p>MergedLoadStoreMotion</p></td>
+</tr>
+<tr class="row-even"><td><p>ModuleSanitizerCoverageLegacyPassPass</p></td>
+<td><p><cite>-sancov</cite></p></td>
+<td><p>Pass for instrumenting coverage on functions</p></td>
+</tr>
+<tr class="row-odd"><td><p>NameAnonGlobalPass</p></td>
+<td><p><cite>-name-anon-globals</cite></p></td>
+<td><p>Provide a name to nameless globals</p></td>
+</tr>
+<tr class="row-even"><td><p>NaryReassociatePass</p></td>
+<td><p><cite>-nary-reassociate</cite></p></td>
+<td><p>Nary reassociation</p></td>
+</tr>
+<tr class="row-odd"><td><p>NewGvnpass</p></td>
+<td><p><cite>-newgvn</cite></p></td>
+<td><p>Global Value Numbering</p></td>
+</tr>
+<tr class="row-even"><td><p>ObjCarcapelimPass</p></td>
+<td><p><cite>-objc-arc-apelim</cite></p></td>
+<td><p>ObjC ARC autorelease pool elimination</p></td>
+</tr>
+<tr class="row-odd"><td><p>ObjCarccontractPass</p></td>
+<td><p><cite>-objc-arc-contract</cite></p></td>
+<td><p>ObjC ARC contraction</p></td>
+</tr>
+<tr class="row-even"><td><p>ObjCarcexpandPass</p></td>
+<td><p><cite>-objc-arc-expand</cite></p></td>
+<td><p>ObjC ARC expansion</p></td>
+</tr>
+<tr class="row-odd"><td><p>ObjCarcoptPass</p></td>
+<td><p><cite>-objc-arc</cite></p></td>
+<td><p>ObjC ARC optimization</p></td>
+</tr>
+<tr class="row-even"><td><p>PgomemOpsizeOptLegacyPass</p></td>
+<td><p><cite>-pgo-memop-opt</cite></p></td>
+<td><p>Optimize memory intrinsic using its size value profile</p></td>
+</tr>
+<tr class="row-odd"><td><p>PartialInliningPass</p></td>
+<td><p><cite>-partial-inliner</cite></p></td>
+<td><p>Partial Inliner</p></td>
+</tr>
+<tr class="row-even"><td><p>PartiallyInlineLibCallsPass</p></td>
+<td><p><cite>-partially-inline-libcalls</cite></p></td>
+<td><p>Partially inline calls to library functions</p></td>
+</tr>
+<tr class="row-odd"><td><p>PlaceSafepointsPass</p></td>
+<td><p><cite>-place-safepoints</cite></p></td>
+<td><p>Place Safepoints</p></td>
+</tr>
+<tr class="row-even"><td><p>PostInlineEntryExitInstrumenterPass</p></td>
+<td><p><cite>-post-inline-ee-instrument</cite></p></td>
+<td><p>Instrument function entry/exit with calls to e.g. mcount()” “(post inlining)</p></td>
+</tr>
+<tr class="row-odd"><td><p>PostOrderFunctionAttrsLegacyPass</p></td>
+<td><p><cite>-functionattrs</cite></p></td>
+<td><p>Deduce function attributes</p></td>
+</tr>
+<tr class="row-even"><td><p>PromoteMemoryToRegisterPass</p></td>
+<td><p><cite>-mem2reg</cite></p></td>
+<td><p>Promote Memory to ” “Register</p></td>
+</tr>
+<tr class="row-odd"><td><p>PruneEhpass</p></td>
+<td><p><cite>-prune-eh</cite></p></td>
+<td><p>Remove unused exception handling info</p></td>
+</tr>
+<tr class="row-even"><td><p>ReassociatePass</p></td>
+<td><p><cite>-reassociate</cite></p></td>
+<td><p>Reassociate expressions</p></td>
+</tr>
+<tr class="row-odd"><td><p>RedundantDbgInstEliminationPass</p></td>
+<td><p><cite>-redundant-dbg-inst-elim</cite></p></td>
+<td><p>Redundant Dbg Instruction Elimination</p></td>
+</tr>
+<tr class="row-even"><td><p>ReversePostOrderFunctionAttrsPass</p></td>
+<td><p><cite>-rpo-functionattrs</cite></p></td>
+<td><p>Deduce function attributes in RPO</p></td>
+</tr>
+<tr class="row-odd"><td><p>RewriteStatepointsForGclegacyPass</p></td>
+<td><p><cite>-rewrite-statepoints-for-gc</cite></p></td>
+<td><p>Make relocations explicit at statepoints</p></td>
+</tr>
+<tr class="row-even"><td><p>RewriteSymbolsPass</p></td>
+<td><p><cite>-rewrite-symbols</cite></p></td>
+<td><p>Rewrite Symbols</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sccppass</p></td>
+<td><p><cite>-sccp</cite></p></td>
+<td><p>Sparse Conditional Constant Propagation</p></td>
+</tr>
+<tr class="row-even"><td><p>SlpvectorizerPass</p></td>
+<td><p><cite>-slp-vectorizer</cite></p></td>
+<td><p>SLP Vectorizer</p></td>
+</tr>
+<tr class="row-odd"><td><p>Sroapass</p></td>
+<td><p><cite>-sroa</cite></p></td>
+<td><p>Scalar Replacement Of Aggregates</p></td>
+</tr>
+<tr class="row-even"><td><p>ScalarizerPass</p></td>
+<td><p><cite>-scalarizer</cite></p></td>
+<td><p>Scalarize vector operations</p></td>
+</tr>
+<tr class="row-odd"><td><p>SeparateConstOffsetFromGeppass</p></td>
+<td><p><cite>-separate-const-offset-from-gep</cite></p></td>
+<td><p>Split GEPs to a variadic base and a constant offset for better CSE</p></td>
+</tr>
+<tr class="row-even"><td><p>SimpleLoopUnswitchLegacyPass</p></td>
+<td><p><cite>-simple-loop-unswitch</cite></p></td>
+<td><p>Simple unswitch loops</p></td>
+</tr>
+<tr class="row-odd"><td><p>SingleLoopExtractorPass</p></td>
+<td><p><cite>-loop-extract-single</cite></p></td>
+<td><p>Extract at most one loop into a new function</p></td>
+</tr>
+<tr class="row-even"><td><p>SinkingPass</p></td>
+<td><p><cite>-sink</cite></p></td>
+<td><p>Code sinking</p></td>
+</tr>
+<tr class="row-odd"><td><p>SpeculativeExecutionPass</p></td>
+<td><p><cite>-speculative-execution</cite></p></td>
+<td><p>Speculatively execute instructions</p></td>
+</tr>
+<tr class="row-even"><td><p>StraightLineStrengthReducePass</p></td>
+<td><p><cite>-slsr</cite></p></td>
+<td><p>Straight line strength reduction</p></td>
+</tr>
+<tr class="row-odd"><td><p>StripDeadDebugInfoPass</p></td>
+<td><p><cite>-strip-dead-debug-info</cite></p></td>
+<td><p>Strip debug info for unused symbols</p></td>
+</tr>
+<tr class="row-even"><td><p>StripDeadPrototypesPass</p></td>
+<td><p><cite>-strip-dead-prototypes</cite></p></td>
+<td><p>Strip Unused Function Prototypes</p></td>
+</tr>
+<tr class="row-odd"><td><p>StripDebugDeclarePass</p></td>
+<td><p><cite>-strip-debug-declare</cite></p></td>
+<td><p>Strip all llvm.dbg.declare intrinsics</p></td>
+</tr>
+<tr class="row-even"><td><p>StripNonDebugSymbolsPass</p></td>
+<td><p><cite>-strip-nondebug</cite></p></td>
+<td><p>Strip all symbols, except dbg symbols, from a module</p></td>
+</tr>
+<tr class="row-odd"><td><p>StripNonLineTableDebugInfoPass</p></td>
+<td><p><cite>-strip-nonlinetable-debuginfo</cite></p></td>
+<td><p>Strip all debug info except linetables</p></td>
+</tr>
+<tr class="row-even"><td><p>StripSymbolsPass</p></td>
+<td><p><cite>-strip</cite></p></td>
+<td><p>Strip all symbols from a module</p></td>
+</tr>
+<tr class="row-odd"><td><p>StructurizeCfgpass</p></td>
+<td><p><cite>-structurizecfg</cite></p></td>
+<td><p>Structurize the CFG</p></td>
+</tr>
+<tr class="row-even"><td><p>TailCallEliminationPass</p></td>
+<td><p><cite>-tailcallelim</cite></p></td>
+<td><p>Tail Call Elimination</p></td>
+</tr>
+<tr class="row-odd"><td><p>UnifyFunctionExitNodesPass</p></td>
+<td><p><cite>-mergereturn</cite></p></td>
+<td><p>Unify function exit nodes</p></td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../cli.html" class="btn btn-neutral float-right" title="Command Line Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../getting_started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright Facebook AI Research
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

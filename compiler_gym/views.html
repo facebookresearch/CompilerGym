@@ -1,0 +1,383 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>compiler_gym.views &mdash; CompilerGym 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="prev" title="compiler_gym.spaces" href="spaces.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> CompilerGym
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../llvm/index.html">LLVM Environments Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym.html">compiler_gym</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">compiler_gym.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spaces.html">compiler_gym.spaces</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">compiler_gym.views</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#observationview">ObservationView</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rewardview">RewardView</a></li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CompilerGym</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>compiler_gym.views</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/compiler_gym/views.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="compiler-gym-views">
+<h1>compiler_gym.views<a class="headerlink" href="#compiler-gym-views" title="Permalink to this headline">¶</a></h1>
+<p>The <a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv" title="compiler_gym.envs.CompilerEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompilerEnv</span></code></a> exposes the
+available observation spaces and reward spaces through view
+objects. These views provide a flexible interface into lazily computed
+values. At any point during the lifetime of an environment, any of the
+available observation and reward spaces can be queried through the
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">observation</span></code> and
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">reward</span></code> attributes,
+respectively.</p>
+<div class="section" id="observationview">
+<h2>ObservationView<a class="headerlink" href="#observationview" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="compiler_gym.views.ObservationView">
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.views.</code><code class="sig-name descname">ObservationView</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">get_observation</span><span class="p">:</span> <span class="n">Callable<span class="p">[</span><span class="p">[</span>compiler_gym.service.proto.compiler_gym_service_pb2.ObservationRequest<span class="p">]</span><span class="p">, </span>compiler_gym.service.proto.compiler_gym_service_pb2.Observation<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">spaces</span><span class="p">:</span> <span class="n">List<span class="p">[</span>compiler_gym.service.proto.compiler_gym_service_pb2.ObservationSpace<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/views/observation.html#ObservationView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.views.ObservationView" title="Permalink to this definition">¶</a></dt>
+<dd><p>A view into the available observation spaces of a service.</p>
+<p>Example usage:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-v0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+<span class="go">[&quot;Autophase&quot;, &quot;Ir&quot;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="s2">&quot;Autophase&quot;</span><span class="p">]</span>
+<span class="go">Box(56,)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;Autophase&quot;</span><span class="p">]</span>
+<span class="go">[0, 1, ..., 2]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;Ir&quot;</span><span class="p">]</span>
+<span class="go">int main() {...}</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="compiler_gym.views.ObservationView.__getitem__">
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">observation_space</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; Union<span class="p">[</span>numpy.ndarray<span class="p">, </span>str<span class="p">, </span>bytes<span class="p">, </span>List<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">, </span>networkx.classes.digraph.DiGraph<span class="p">]</span><a class="reference internal" href="../_modules/compiler_gym/views/observation.html#ObservationView.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.views.ObservationView.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Request an observation from the given space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>observation_space</strong> – The observation space to query.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An observation.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>KeyError</strong> – If the requested observation space does not exist.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compiler_gym.views.ObservationView.register_derived_space">
+<code class="sig-name descname">register_derived_space</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">base_name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">derived_name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">derived_space</span><span class="p">:</span> <span class="n">gym.spaces.space.Space</span></em>, <em class="sig-param"><span class="n">cb</span><span class="p">:</span> <span class="n">Callable<span class="p">[</span><span class="p">[</span>Union<span class="p">[</span>numpy.ndarray<span class="p">, </span>str<span class="p">, </span>bytes<span class="p">, </span>List<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">, </span>networkx.classes.digraph.DiGraph<span class="p">]</span><span class="p">]</span><span class="p">, </span>Union<span class="p">[</span>numpy.ndarray<span class="p">, </span>str<span class="p">, </span>bytes<span class="p">, </span>List<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">, </span>networkx.classes.digraph.DiGraph<span class="p">]</span><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/compiler_gym/views/observation.html#ObservationView.register_derived_space"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.views.ObservationView.register_derived_space" title="Permalink to this definition">¶</a></dt>
+<dd><p>Add a hook for implementing derived observation spaces.</p>
+<p>Subclasses of ObservationView call this method in their
+<code class="code docutils literal notranslate"><span class="pre">__init__()</span></code> after initializing the base class to register new
+observation spaces that are derived from those provided by the
+CompilerService.</p>
+<p>Example usage:</p>
+<p>Suppose we have a service that provides a “src” observation space
+that returns a string of source code. We want to create a new
+observation space, “src_len”, that returns the length of the source
+code. We do this by calling <code class="code docutils literal notranslate"><span class="pre">register_derived_space()</span></code> and
+providing the a callback to translate from the base observation space
+to the derived value:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyObservationView</span><span class="p">(</span><span class="n">ObservationView</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">register_derived_space</span><span class="p">(</span>
+            <span class="n">derived_name</span><span class="o">=</span><span class="s2">&quot;src_len&quot;</span><span class="p">,</span>
+            <span class="n">base_name</span><span class="o">=</span><span class="s2">&quot;src&quot;</span><span class="p">,</span>
+            <span class="n">derived_space</span><span class="o">=</span><span class="n">Box</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">),</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+            <span class="n">derive</span><span class="o">=</span><span class="k">lambda</span> <span class="n">src</span><span class="p">:</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">src</span><span class="p">)],</span>
+        <span class="p">)</span>
+</pre></div>
+</div>
+<p>Now we can request for “src_len” observation space and receive
+observations from this new derived space.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;src_len&quot;</span><span class="p">]</span>
+<span class="go">[1021,]</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>base_name</strong> – The name of the observation space that this new
+observation space is derived from.</p></li>
+<li><p><strong>derived_name</strong> – The name of the derived observation space</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compiler_gym.views.ObservationView.translate">
+<code class="sig-name descname">translate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">observation_space</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">observation</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>numpy.ndarray<span class="p">, </span>str<span class="p">, </span>bytes<span class="p">, </span>List<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">, </span>networkx.classes.digraph.DiGraph<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; Union<span class="p">[</span>numpy.ndarray<span class="p">, </span>str<span class="p">, </span>bytes<span class="p">, </span>List<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">, </span>networkx.classes.digraph.DiGraph<span class="p">]</span><a class="reference internal" href="../_modules/compiler_gym/views/observation.html#ObservationView.translate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.views.ObservationView.translate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Translate an observation according to the space.</p>
+<p>This methods translates the value returned by a CompilerSpace according
+to any derived observation spaces, as registered using
+register_derived_space(). If the requested observation space is not
+derived the observation is returned unmodified.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>observation_space</strong> – The name of the observation space.</p></li>
+<li><p><strong>observation</strong> – An observation returned by a CompilerService.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An observation, after applying any derived space translations.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="rewardview">
+<h2>RewardView<a class="headerlink" href="#rewardview" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="compiler_gym.views.RewardView">
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.views.</code><code class="sig-name descname">RewardView</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">get_reward</span><span class="p">:</span> <span class="n">Callable<span class="p">[</span><span class="p">[</span>compiler_gym.service.proto.compiler_gym_service_pb2.RewardRequest<span class="p">]</span><span class="p">, </span>compiler_gym.service.proto.compiler_gym_service_pb2.Reward<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">spaces</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>compiler_gym.service.proto.compiler_gym_service_pb2.RewardSpace<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/views/reward.html#RewardView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.views.RewardView" title="Permalink to this definition">¶</a></dt>
+<dd><p>A view into a set of reward spaces.</p>
+<p>Example usage:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-v0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">ranges</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
+<span class="go">[&quot;codesize&quot;]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">ranges</span><span class="p">[</span><span class="s2">&quot;codesize&quot;</span><span class="p">]</span>
+<span class="go">(-np.inf, 0)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">reward</span><span class="p">[</span><span class="s2">&quot;codesize&quot;</span><span class="p">]</span>
+<span class="go">-1243</span>
+</pre></div>
+</div>
+<dl class="py method">
+<dt id="compiler_gym.views.RewardView.__getitem__">
+<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">reward_space</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="../_modules/compiler_gym/views/reward.html#RewardView.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.views.RewardView.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Request an observation from the given space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>reward_space</strong> – The reward space to query.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A reward.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>KeyError</strong> – If the requested reward space does not exist.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="spaces.html" class="btn btn-neutral float-left" title="compiler_gym.spaces" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright Facebook AI Research
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

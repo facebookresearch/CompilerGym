@@ -1,0 +1,300 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>compiler_gym &mdash; CompilerGym 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="compiler_gym.datasets" href="datasets.html" />
+    <link rel="prev" title="Frequently Asked Questions" href="../faq.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> CompilerGym
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../llvm/index.html">LLVM Environments Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">compiler_gym</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">compiler_gym.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spaces.html">compiler_gym.spaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="views.html">compiler_gym.views</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CompilerGym</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>compiler_gym</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/compiler_gym/compiler_gym.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-compiler_gym">
+<span id="compiler-gym"></span><h1>compiler_gym<a class="headerlink" href="#module-compiler_gym" title="Permalink to this headline">¶</a></h1>
+<p>CompilerGym is a set of compiler optimization environments for reinforcement learning.</p>
+<p>After importing this module, the <a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv" title="compiler_gym.envs.CompilerEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompilerGym</span> <span class="pre">environments</span></code></a>
+will be available through the <code class="code docutils literal notranslate"><span class="pre">gym.make(...)</span></code> interface:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">gym</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">compiler_gym</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-v0&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The list of CompilerGym environments that can be passed to <code class="code docutils literal notranslate"><span class="pre">gym.make(...)</span></code>
+is available through <code class="code docutils literal notranslate"><span class="pre">compiler_gym.COMPILER_GYM_ENVS</span></code>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">compiler_gym</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">compiler_gym</span><span class="o">.</span><span class="n">COMPILER_GYM_ENVS</span>
+<span class="go">[&#39;llvm-v0&#39;, &#39;llvm-ic-v0&#39;, &#39;llvm-autophase-ic-v0&#39;, &#39;llvm-ir-ic-v0&#39;]</span>
+</pre></div>
+</div>
+<dl class="py function">
+<dt id="compiler_gym.cache_path">
+<code class="sig-prename descclassname">compiler_gym.</code><code class="sig-name descname">cache_path</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">relpath</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; pathlib.Path<a class="reference internal" href="../_modules/compiler_gym/util/runfiles_path.html#cache_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.cache_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a path within the cache directory.</p>
+<p>CompilerGym uses a directory to cache files in, such as downloaded content. The default location
+for this cache is <code class="code docutils literal notranslate"><span class="pre">~/.cache/compiler_gym</span></code>. Set the environment variable
+<code class="code docutils literal notranslate"><span class="pre">$COMPILER_GYM_CACHE</span></code> to override this default location.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>relpath</strong> – The relative path within the cache.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The absolute path of the cache.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="compiler_gym.download">
+<code class="sig-prename descclassname">compiler_gym.</code><code class="sig-name descname">download</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">url</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">sha256</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; bytes<a class="reference internal" href="../_modules/compiler_gym/util/download.html#download"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.download" title="Permalink to this definition">¶</a></dt>
+<dd><p>Download a file and return its contents.</p>
+<p>If <code class="code docutils literal notranslate"><span class="pre">sha256</span></code> is provided and the download succeeds, the file contents are cached locally
+in <code class="code docutils literal notranslate"><span class="pre">$cache_path/downloads/$sha256</span></code>. See <a class="reference internal" href="#compiler_gym.cache_path" title="compiler_gym.cache_path"><code class="xref py py-func docutils literal notranslate"><span class="pre">compiler_gym.cache_path()</span></code></a>.</p>
+<p>An inter-process lock ensures that only a single call to this function may
+execute at a time.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> – The URL of the file to download.</p></li>
+<li><p><strong>sha256</strong> – The expected sha256 checksum of the file.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The contents of the downloaded file.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>OSError</strong> – If the download fails, or if the downloaded content does match the expected
+<code class="code docutils literal notranslate"><span class="pre">sha256</span></code> checksum.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="compiler_gym.site_data_path">
+<code class="sig-prename descclassname">compiler_gym.</code><code class="sig-name descname">site_data_path</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">relpath</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; pathlib.Path<a class="reference internal" href="../_modules/compiler_gym/util/runfiles_path.html#site_data_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.site_data_path" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a path within the site data directory.</p>
+<p>CompilerGym uses a directory to store persistent site data files in, such as benchmark datasets.
+The default location is <code class="code docutils literal notranslate"><span class="pre">~/.local/share/compiler_gym</span></code>. Set the environment variable
+<code class="code docutils literal notranslate"><span class="pre">$COMPILER_GYM_SITE_DATA</span></code> to override this default location.</p>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="datasets.html" class="btn btn-neutral float-right" title="compiler_gym.datasets" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../faq.html" class="btn btn-neutral float-left" title="Frequently Asked Questions" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright Facebook AI Research
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

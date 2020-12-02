@@ -1,0 +1,312 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Contributing &mdash; CompilerGym 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Changelog" href="changelog.html" />
+    <link rel="prev" title="About" href="about.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> CompilerGym
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environments Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#pull-requests">Pull Requests</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#code-style">Code Style</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#contributor-license-agreement-cla">Contributor License Agreement (“CLA”)</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/compiler_gym.html">compiler_gym</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/datasets.html">compiler_gym.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/spaces.html">compiler_gym.spaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/views.html">compiler_gym.views</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CompilerGym</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Contributing</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/contributing.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="contributing">
+<h1>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h1>
+<p>We want to make contributing to CompilerGym as easy and transparent as
+possible. The most helpful ways to contribute are:</p>
+<ol class="arabic simple">
+<li><p>Provide feedback.</p></li>
+</ol>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/facebookresearch/CompilerGym/issues">Report
+bugs</a>. In
+particular, it’s important to report any crash or correctness bug. We
+use GitHub issues to track public bugs. Please ensure your
+description is clear and has sufficient instructions to be able to
+reproduce the issue.</p></li>
+<li><p>Report issues when the documentation is incomplete or unclear, or an
+error message could be improved.</p></li>
+<li><p>Make feature requests. Let us know if you have a use case that is not
+well supported, including as much detail as possible.</p></li>
+</ul>
+<ol class="arabic simple" start="2">
+<li><p>Contribute to the CompilerGym ecosystem.</p></li>
+</ol>
+<ul class="simple">
+<li><p>Pull requests. Please see below for details. The easiest way to get
+stuck is to grab an <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/issues?q=is%3Aopen+is%3Aissue+no%3Aassignee+label%3A%22Good+first+issue%22">unassigned “Good first issue”
+ticket</a>!</p></li>
+<li><p>Add new features not on the roadmap. Examples could include adding
+support for new compilers, producing research results using
+CompilerGym, etc.</p></li>
+</ul>
+<div class="section" id="pull-requests">
+<h2>Pull Requests<a class="headerlink" href="#pull-requests" title="Permalink to this headline">¶</a></h2>
+<p>We actively welcome your pull requests.</p>
+<ol class="arabic simple">
+<li><p>Fork <a class="reference external" href="https://github.com/facebookresearch/CompilerGym">the repo</a>
+and create your branch from <code class="docutils literal notranslate"><span class="pre">development</span></code>.</p></li>
+<li><p>If you’ve added code that should be tested, add tests.</p></li>
+<li><p>If you’ve changed APIs, update the documentation.</p></li>
+<li><p>Ensure the test suite passes.</p></li>
+<li><p>Make sure your code lints (see “Code Style” below).</p></li>
+<li><p>If you haven’t already, complete the Contributor License Agreement
+(“CLA”).</p></li>
+</ol>
+</div>
+<div class="section" id="code-style">
+<h2>Code Style<a class="headerlink" href="#code-style" title="Permalink to this headline">¶</a></h2>
+<p>We want to ease the burden of code formatting using tools. Our code
+style is simple:</p>
+<ul class="simple">
+<li><p>Python:
+<a class="reference external" href="https://github.com/psf/black/blob/master/docs/the_black_code_style.md">black</a>
+and <a class="reference external" href="https://pypi.org/project/isort/">isort</a>.</p></li>
+<li><p>C++: <a class="reference external" href="https://google.github.io/styleguide/cppguide.html">Google C++
+style</a> with 100
+character line length and <code class="docutils literal notranslate"><span class="pre">camelCaseFunctionNames()</span></code>.</p></li>
+</ul>
+<p>We use <a class="reference external" href="/.pre-commit-config.yaml">pre-commit</a> to format our code to
+enforce these rules. Before submitting pull requests, please run
+pre-commit to ensure the code is correctly formatted.</p>
+<p>Other common sense rules we encourage are:</p>
+<ul class="simple">
+<li><p>Prefer descriptive names over short ones.</p></li>
+<li><p>Split complex code into small units.</p></li>
+<li><p>When writing new features, add tests.</p></li>
+<li><p>Prefer easy-to-use code over easy-to-read, and easy-to-read code over
+easy-to-write.</p></li>
+</ul>
+</div>
+<div class="section" id="contributor-license-agreement-cla">
+<h2>Contributor License Agreement (“CLA”)<a class="headerlink" href="#contributor-license-agreement-cla" title="Permalink to this headline">¶</a></h2>
+<p>In order to accept your pull request, we need you to submit a CLA. You
+only need to do this once to work on any of Facebook’s open source
+projects.</p>
+<p>Complete your CLA here: <a class="reference external" href="https://code.facebook.com/cla">https://code.facebook.com/cla</a></p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="changelog.html" class="btn btn-neutral float-right" title="Changelog" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="about.html" class="btn btn-neutral float-left" title="About" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright Facebook AI Research
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

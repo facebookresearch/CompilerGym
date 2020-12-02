@@ -1,0 +1,10 @@
+..
+  Generated from CHANGELOG.md. Do not edit!
+
+Changelog
+=========
+
+Release 0.1.0 (2020-12-21)
+--------------------------
+
+Initial release.

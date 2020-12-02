@@ -1,0 +1,516 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Command Line Reference &mdash; CompilerGym 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script src="_static/jquery.js"></script>
+        <script src="_static/underscore.js"></script>
+        <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+    <link rel="author" title="About these documents" href="about.html" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="About" href="about.html" />
+    <link rel="prev" title="LLVM Environments Reference" href="llvm/index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> CompilerGym
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environments Reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Command Line Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-compiler_gym.bin.service">compiler_gym.bin.service</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#listing-available-environments">Listing available environments</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#querying-the-capabilities-of-a-service">Querying the capabilities of a service</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-compiler_gym.bin.datasets">compiler_gym.bin.datasets</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#listing-installed-datasets">Listing installed datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#downloading-datasets">Downloading datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#activating-and-deactivating-datasets">Activating and deactivating datasets</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#deleting-datasets">Deleting datasets</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-compiler_gym.bin.manual_env">compiler_gym.bin.manual_env</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#module-compiler_gym.bin.random_search">compiler_gym.bin.random_search</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#search-strategy">Search strategy</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#execution-strategy">Execution strategy</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#module-compiler_gym.bin.random_replay">compiler_gym.bin.random_replay</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/compiler_gym.html">compiler_gym</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/datasets.html">compiler_gym.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/spaces.html">compiler_gym.spaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/views.html">compiler_gym.views</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">CompilerGym</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>Command Line Reference</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/cli.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="command-line-reference">
+<h1>Command Line Reference<a class="headerlink" href="#command-line-reference" title="Permalink to this headline">¶</a></h1>
+<p>Compiler Gym includes several modules in the <code class="code docutils literal notranslate"><span class="pre">compiler_gym.bin</span></code> module
+for command line use. This document provides an overview of each module. Run any
+of the commands with <code class="code docutils literal notranslate"><span class="pre">--helpfull</span></code> to examine the full usage options.</p>
+<div class="contents local topic" id="command-line-tools">
+<p class="topic-title">Command line tools:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#module-compiler_gym.bin.service" id="id1">compiler_gym.bin.service</a></p>
+<ul>
+<li><p><a class="reference internal" href="#listing-available-environments" id="id2">Listing available environments</a></p></li>
+<li><p><a class="reference internal" href="#querying-the-capabilities-of-a-service" id="id3">Querying the capabilities of a service</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#module-compiler_gym.bin.datasets" id="id4">compiler_gym.bin.datasets</a></p>
+<ul>
+<li><p><a class="reference internal" href="#listing-installed-datasets" id="id5">Listing installed datasets</a></p></li>
+<li><p><a class="reference internal" href="#downloading-datasets" id="id6">Downloading datasets</a></p></li>
+<li><p><a class="reference internal" href="#activating-and-deactivating-datasets" id="id7">Activating and deactivating datasets</a></p></li>
+<li><p><a class="reference internal" href="#deleting-datasets" id="id8">Deleting datasets</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#module-compiler_gym.bin.manual_env" id="id9">compiler_gym.bin.manual_env</a></p></li>
+<li><p><a class="reference internal" href="#module-compiler_gym.bin.random_search" id="id10">compiler_gym.bin.random_search</a></p>
+<ul>
+<li><p><a class="reference internal" href="#search-strategy" id="id11">Search strategy</a></p></li>
+<li><p><a class="reference internal" href="#execution-strategy" id="id12">Execution strategy</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#module-compiler_gym.bin.random_replay" id="id13">compiler_gym.bin.random_replay</a></p></li>
+</ul>
+</div>
+<div class="section" id="module-compiler_gym.bin.service">
+<span id="compiler-gym-bin-service"></span><h2><a class="toc-backref" href="#id1">compiler_gym.bin.service</a><a class="headerlink" href="#module-compiler_gym.bin.service" title="Permalink to this headline">¶</a></h2>
+<p>This program lists the capabilities of CompilerGym services.</p>
+<div class="section" id="listing-available-environments">
+<h3><a class="toc-backref" href="#id2">Listing available environments</a><a class="headerlink" href="#listing-available-environments" title="Permalink to this headline">¶</a></h3>
+<p>List the environments that are available using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.service --ls_env
+</pre></div>
+</div>
+</div>
+<div class="section" id="querying-the-capabilities-of-a-service">
+<h3><a class="toc-backref" href="#id3">Querying the capabilities of a service</a><a class="headerlink" href="#querying-the-capabilities-of-a-service" title="Permalink to this headline">¶</a></h3>
+<p>Query the capabilities of a service using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.service --env=&lt;env&gt; [--tablefmt=&lt;fmt&gt;] [--heading_level=&lt;num&gt;]
+</pre></div>
+</div>
+<p>For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.service --env=llvm-v0
+# CompilerGym Service `/path/to/compiler_gym/envs/llvm/service/service`
+
+## Programs
+
++------------------------+
+| Benchmark              |
++========================+
+| benchmark://npb-v0/1   |
++------------------------+
+
+...
+
+## Action Spaces
+
+
+### `PassesAll` (Commandline)
+
++---------------------------------------+-----------------------------------+-------------------------------+
+| Action                                | Flag                              | Description                   |
++=======================================+===================================+===============================+
+| AddDiscriminatorsPass                 | `-add-discriminators`             | Add DWARF path discriminators |
++---------------------------------------+-----------------------------------+-------------------------------+
+...
+</pre></div>
+</div>
+<p>The capabilities of an unmanaged service can be queries using the
+<code class="code docutils literal notranslate"><span class="pre">--service</span></code> flag. For example, query a service running at
+<code class="code docutils literal notranslate"><span class="pre">localhost:8080</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.service --service=localhost:8080
+</pre></div>
+</div>
+<p>Or query the capabilities of a binary that implements the RPC service interface
+using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.service --local_service_binary=/path/to/service/binary
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="module-compiler_gym.bin.datasets">
+<span id="compiler-gym-bin-datasets"></span><h2><a class="toc-backref" href="#id4">compiler_gym.bin.datasets</a><a class="headerlink" href="#module-compiler_gym.bin.datasets" title="Permalink to this headline">¶</a></h2>
+<p>Manage datasets of benchmarks.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.datasets --env=&lt;env&gt; [command...]
+</pre></div>
+</div>
+<p>Where <code class="code docutils literal notranslate"><span class="pre">command</span></code> is one of <code class="code docutils literal notranslate"><span class="pre">--download=&lt;dataset...&gt;</span></code>,
+<code class="code docutils literal notranslate"><span class="pre">--activate=&lt;dataset...&gt;</span></code>, <code class="code docutils literal notranslate"><span class="pre">--deactivate=&lt;dataset...&gt;</span></code>,
+and <code class="code docutils literal notranslate"><span class="pre">--delete=&lt;dataset...&gt;</span></code>.</p>
+<div class="section" id="listing-installed-datasets">
+<h3><a class="toc-backref" href="#id5">Listing installed datasets</a><a class="headerlink" href="#listing-installed-datasets" title="Permalink to this headline">¶</a></h3>
+<p>If run with no arguments, this command shows an overview of the datasets that
+are activate, inactive, and available to download. For example:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m comiler_gym.bin.benchmarks --env=llvm-v0
+llvm-v0 benchmarks site dir: /home/user/.local/share/compiler_gym/llvm/10.0.0/bitcode_benchmarks
+
++-------------------+--------------+-----------------+----------------+
+| Active Datasets   | License      |   #. Benchmarks | Size on disk   |
++===================+==============+=================+================+
+| cBench-v0         | BSD 3-Clause |              23 | 7.2 MB         |
++-------------------+--------------+-----------------+----------------+
+| Total             |              |              23 | 7.2 MB         |
++-------------------+--------------+-----------------+----------------+
+These benchmarks are ready for use. Deactivate them using `--deactivate=&lt;name&gt;`.
+
++---------------------+-----------+-----------------+----------------+
+| Inactive Datasets   | License   |   #. Benchmarks | Size on disk   |
++=====================+===========+=================+================+
+| Total               |           |               0 | 0 Bytes        |
++---------------------+-----------+-----------------+----------------+
+These benchmarks may be activated using `--activate=&lt;name&gt;`.
+
++------------------------+---------------------------------+-----------------+----------------+
+| Downloadable Dataset   | License                         | #. Benchmarks   | Size on disk   |
++========================+=================================+=================+================+
+| blas-v0                | BSD 3-Clause                    | 300             | 4.0 MB         |
++------------------------+---------------------------------+-----------------+----------------+
+| polybench-v0           | BSD 3-Clause                    | 27              | 162.6 kB       |
++------------------------+---------------------------------+-----------------+----------------+
+These benchmarks may be installed using `--download=&lt;name&gt; --activate=&lt;name&gt;`.
+</pre></div>
+</div>
+</div>
+<div class="section" id="downloading-datasets">
+<h3><a class="toc-backref" href="#id6">Downloading datasets</a><a class="headerlink" href="#downloading-datasets" title="Permalink to this headline">¶</a></h3>
+<p>Use <code class="code docutils literal notranslate"><span class="pre">--download</span></code> to download a dataset from the list of available datasets:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --download=npb-v0
+</pre></div>
+</div>
+<p>After downloading, the dataset will be activated and the benchmarks will be
+available to use by the environment.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">compiler_gym</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">gym</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-v0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">=</span> <span class="s2">&quot;npb-v0&quot;</span>
+</pre></div>
+</div>
+<p>The flag <code class="code docutils literal notranslate"><span class="pre">--download_all</span></code> can be used to download every available dataset:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --download_all
+</pre></div>
+</div>
+<p><code class="code docutils literal notranslate"><span class="pre">--download</span></code> accepts the URL of any <code class="code docutils literal notranslate"><span class="pre">.tar.bz2</span></code> file to support custom datasets:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --download=https://example.com/dataset.tar.bz2
+</pre></div>
+</div>
+<p>Or use the <code class="code docutils literal notranslate"><span class="pre">file:///</span></code> URI to install a local archive file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.benchmarks --env=llvm-v0 --download=file:////tmp/dataset.tar.bz2
+</pre></div>
+</div>
+<p>The list of datasets that are available to download may be extended by calling
+<a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.register_dataset" title="compiler_gym.envs.CompilerEnv.register_dataset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">CompilerEnv.register_dataset()</span></code></a>
+on a <code class="code docutils literal notranslate"><span class="pre">CompilerEnv</span></code> instance.</p>
+<p>To programmatically download datasets, see
+<a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.require_dataset" title="compiler_gym.envs.CompilerEnv.require_dataset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">CompilerEnv.require_dataset()</span></code></a>.</p>
+</div>
+<div class="section" id="activating-and-deactivating-datasets">
+<h3><a class="toc-backref" href="#id7">Activating and deactivating datasets</a><a class="headerlink" href="#activating-and-deactivating-datasets" title="Permalink to this headline">¶</a></h3>
+<p>Datasets have two states: active and inactive. An inactive dataset still exists
+locally on the filesystem, but is excluded from use by CompilerGym environments.
+This be useful if you have many datasets downloaded and you would to limit the
+benchmarks that can be selected randomly by an environment.</p>
+<p>Activate or deactivate datasets using the <code class="code docutils literal notranslate"><span class="pre">--activate</span></code> and <code class="code docutils literal notranslate"><span class="pre">--deactivate</span></code>
+flags, respectively:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --activate=npb-v0,github-v0 --deactivate=cbench
+</pre></div>
+</div>
+<p>The <code class="code docutils literal notranslate"><span class="pre">--activate_all</span></code> and <code class="code docutils literal notranslate"><span class="pre">--deactivate_all</span></code> flags can be used as a
+shortcut to activate or deactivate every downloaded:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># Activate all inactivate datasets:
+$ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --activate_all
+# Make all activate datasets inactive:
+$ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --deactivate_all
+</pre></div>
+</div>
+</div>
+<div class="section" id="deleting-datasets">
+<h3><a class="toc-backref" href="#id8">Deleting datasets</a><a class="headerlink" href="#deleting-datasets" title="Permalink to this headline">¶</a></h3>
+<p>To remove a dataset from the filesystem, use <code class="code docutils literal notranslate"><span class="pre">--delete</span></code>:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --delete=npb-v0
+</pre></div>
+</div>
+<p>Once deleted, a dataset must be downloaded before it can be used again.</p>
+<p>A <code class="code docutils literal notranslate"><span class="pre">--delete_all</span></code> flag can be used to delete all of the locally installed
+datasets.</p>
+</div>
+</div>
+<div class="section" id="module-compiler_gym.bin.manual_env">
+<span id="compiler-gym-bin-manual-env"></span><h2><a class="toc-backref" href="#id9">compiler_gym.bin.manual_env</a><a class="headerlink" href="#module-compiler_gym.bin.manual_env" title="Permalink to this headline">¶</a></h2>
+<p>Run a CompilerGym environment with text interface controls.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.manual_env --env=&lt;env&gt; [--benchmark=&lt;name&gt;] [--observation=&lt;space&gt;] [--reward=&lt;space&gt;]
+</pre></div>
+</div>
+<p>The benchmark to use can be specified using <code class="code docutils literal notranslate"><span class="pre">--benchmark=&lt;name&gt;</span></code>. If not
+provided, you be presented with a list of benchmarks to choose from on launch.
+Select <code class="code docutils literal notranslate"><span class="pre">random</span></code> to select a benchmark randomly.</p>
+</div>
+<div class="section" id="module-compiler_gym.bin.random_search">
+<span id="compiler-gym-bin-random-search"></span><h2><a class="toc-backref" href="#id10">compiler_gym.bin.random_search</a><a class="headerlink" href="#module-compiler_gym.bin.random_search" title="Permalink to this headline">¶</a></h2>
+<p>Run a parallelized random search of an environment’s action space.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.random_search --env=&lt;env&gt; --benchmark=&lt;name&gt; [--runtime=&lt;sec&gt;]
+</pre></div>
+</div>
+<p>This program runs a simple random agent on the action space of a single
+benchmark. The best reward, and sequence of actions that produced this, are
+logged to file.</p>
+<p>For example, run a random search of the LLVM instruction count optimization
+space on a Dijkstra benchmark for 60 seconds using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.random_search --env=llvm-ic-v0 --benchmark=cBench-v0/dijkstra --runtime=60
+Started 16 worker threads for benchmark benchmark://cBench-v0/dijkstra (410 instructions) using reward IrInstructionCountOz.
+=== Running for a minute ===
+Runtime: a minute. Num steps: 470,407 (7,780 / sec). Num episodes: 4,616 (76 / sec). Num restarts: 0.
+Best reward: 101.59% (96 passes, found after 35 seconds)
+Wrote /home/user/logs/compilergym/random/cBench-v0/dijkstra/2020-12-02T17:53:08.726667/random_search_best_actions.txt and
+     /home/user/logs/compilergym/random/cBench-v0/dijkstra/2020-12-02T17:53:08.726667/random_search_progress.csv.
+Ending jobs ... done
+Step [000 / 096]: reward=0.621951
+Step [001 / 096]: reward=0.621951, change=0.000000, action=AlwaysInlinerLegacyPass
+...
+Step [094 / 096]: reward=1.007905, change=0.066946, action=CfgsimplificationPass
+Step [095 / 096]: reward=1.007905, change=0.000000, action=LoopVersioningPass
+Step [096 / 096]: reward=1.015936, change=0.008031, action=NewGvnpass
+Wrote /home/user/logs/compilergym/random/cBench-v0/dijkstra/2020-12-02T17:53:08.726667/random_search_best_actions_progress.csv
+Wrote /home/user/logs/compilergym/random/cBench-v0/dijkstra/2020-12-02T17:53:08.726667/optimized.bc
+</pre></div>
+</div>
+<div class="section" id="search-strategy">
+<h3><a class="toc-backref" href="#id11">Search strategy</a><a class="headerlink" href="#search-strategy" title="Permalink to this headline">¶</a></h3>
+<p>At each step, the agent selects an action randomly and records the
+reward. After a number of steps without improving reward (the “patience” of the
+agent), the agent terminates, and the environment resets. The number of steps
+to take without making progress can be configured using the
+<code class="code docutils literal notranslate"><span class="pre">--patience=&lt;num&gt;</span></code> flag.</p>
+<p>Use <code class="code docutils literal notranslate"><span class="pre">--runtime</span></code> to limit the total runtime of the search. If not provided,
+the search will run indefinitely. Use <code class="code docutils literal notranslate"><span class="pre">C-c</span></code> to cancel an in-progress
+search.</p>
+</div>
+<div class="section" id="execution-strategy">
+<h3><a class="toc-backref" href="#id12">Execution strategy</a><a class="headerlink" href="#execution-strategy" title="Permalink to this headline">¶</a></h3>
+<p>The results of the search are logged to files. Control the location of these
+logs using the <code class="code docutils literal notranslate"><span class="pre">--output_dir=/path</span></code> flag.</p>
+<p>Multiple agents are run in parallel. By default, the number of agents is equal
+to the number of processors on the host machine. Set a different value using
+<code class="code docutils literal notranslate"><span class="pre">--nproc</span></code>.</p>
+</div>
+</div>
+<div class="section" id="module-compiler_gym.bin.random_replay">
+<span id="compiler-gym-bin-random-replay"></span><h2><a class="toc-backref" href="#id13">compiler_gym.bin.random_replay</a><a class="headerlink" href="#module-compiler_gym.bin.random_replay" title="Permalink to this headline">¶</a></h2>
+<p>Replay the best solution found from a random search.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.random_replay --env=llvm-ic-v0 --output_dir=/path/to/logs
+</pre></div>
+</div>
+<p>Given a set of <a class="reference internal" href="#module-compiler_gym.bin.random_search" title="compiler_gym.bin.random_search"><code class="xref py py-mod docutils literal notranslate"><span class="pre">compiler_gym.bin.random_search</span></code></a> logs generated from a
+prior search, replay the best sequence of actions found and record the
+incremental reward of each action.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="about.html" class="btn btn-neutral float-right" title="About" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="llvm/index.html" class="btn btn-neutral float-left" title="LLVM Environments Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright Facebook AI Research
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

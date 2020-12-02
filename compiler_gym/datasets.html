@@ -1,0 +1,372 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>compiler_gym.datasets &mdash; CompilerGym 0.1.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="compiler_gym.envs" href="envs.html" />
+    <link rel="prev" title="compiler_gym" href="compiler_gym.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> CompilerGym
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../llvm/index.html">LLVM Environments Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym.html">compiler_gym</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">compiler_gym.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spaces.html">compiler_gym.spaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="views.html">compiler_gym.views</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CompilerGym</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>compiler_gym.datasets</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/compiler_gym/datasets.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="compiler-gym-datasets">
+<h1>compiler_gym.datasets<a class="headerlink" href="#compiler-gym-datasets" title="Permalink to this headline">¶</a></h1>
+<p>An instance of a CompilerGym environment uses a benchmark as the program being
+optimized. Collections of benchmarks are packaged into datasets, storing
+additional metadata such as the license, defined by the
+<a class="reference internal" href="#compiler_gym.datasets.Dataset" title="compiler_gym.datasets.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> class.</p>
+<p>A simple filesystem-based scheme is used to manage datasets:</p>
+<ul class="simple">
+<li><p>Every top-level directory in an environment’s site-data folder is
+treated as a “dataset”.</p></li>
+<li><p>A benchmarks.inactive directory contains datasets that the user has
+downloaded, but are not used by the environment. Moving a directory
+from &lt;site&gt;/benchmarks to &lt;site&gt;/benchmarks.inactive means that the
+environment will no longer use it.</p></li>
+<li><p>Datasets can be packaged as .tar.bz2 archives and downloaded from
+the web or local filesystem. Environments may advertise a list of
+available datasets.</p></li>
+</ul>
+<p>Datasets are packaged for each compiler and stored locally in the filesystem.
+The filesystem location can be queries using
+<code class="xref py py-attr docutils literal notranslate"><span class="pre">CompilerEnv.datasets_site_path</span></code>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-v0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span>
+<span class="go">/home/user/.local/share/compiler_gym/llvm/10.0.0/bitcode_benchmarks</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="../cli.html#module-compiler_gym.bin.datasets" title="compiler_gym.bin.datasets"><code class="xref py py-mod docutils literal notranslate"><span class="pre">compiler_gym.bin.datasets</span></code></a> module can be used to download and manage
+datasets for an environment.</p>
+<span class="target" id="module-compiler_gym.datasets"></span><p>Manage datasets of benchmarks.</p>
+<dl class="py class">
+<dt id="compiler_gym.datasets.Dataset">
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.datasets.</code><code class="sig-name descname">Dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">license</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">file_count</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">size_bytes</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">url</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">sha256</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">compiler</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">description</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>A collection of benchmarks for use by an environment.</p>
+<dl class="py attribute">
+<dt id="compiler_gym.datasets.Dataset.compiler">
+<code class="sig-name descname">compiler</code><em class="property">: str</em><a class="headerlink" href="#compiler_gym.datasets.Dataset.compiler" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the compiler that this dataset supports.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="compiler_gym.datasets.Dataset.description">
+<code class="sig-name descname">description</code><em class="property">: str</em><a class="headerlink" href="#compiler_gym.datasets.Dataset.description" title="Permalink to this definition">¶</a></dt>
+<dd><p>An optional human-readable description of the dataset.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="compiler_gym.datasets.Dataset.file_count">
+<code class="sig-name descname">file_count</code><em class="property">: int</em><a class="headerlink" href="#compiler_gym.datasets.Dataset.file_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of files in the unpacked dataset.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compiler_gym.datasets.Dataset.from_json_file">
+<em class="property">classmethod </em><code class="sig-name descname">from_json_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span> &#x2192; compiler_gym.datasets.dataset.Dataset<a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.from_json_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.from_json_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Construct a dataset form a JSON metadata file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> – Path of the JSON metadata.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A Dataset instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="compiler_gym.datasets.Dataset.license">
+<code class="sig-name descname">license</code><em class="property">: str</em><a class="headerlink" href="#compiler_gym.datasets.Dataset.license" title="Permalink to this definition">¶</a></dt>
+<dd><p>The license of the dataset.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="compiler_gym.datasets.Dataset.name">
+<code class="sig-name descname">name</code><em class="property">: str</em><a class="headerlink" href="#compiler_gym.datasets.Dataset.name" title="Permalink to this definition">¶</a></dt>
+<dd><p>The name of the dataset.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="compiler_gym.datasets.Dataset.sha256">
+<code class="sig-name descname">sha256</code><em class="property">: str</em><a class="headerlink" href="#compiler_gym.datasets.Dataset.sha256" title="Permalink to this definition">¶</a></dt>
+<dd><p>The sha256 checksum of the dataset archive. If provided, this is used to
+verify the contents of the dataset upon download.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="compiler_gym.datasets.Dataset.size_bytes">
+<code class="sig-name descname">size_bytes</code><em class="property">: int</em><a class="headerlink" href="#compiler_gym.datasets.Dataset.size_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>The size of the unpacked dataset in bytes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compiler_gym.datasets.Dataset.to_json_file">
+<code class="sig-name descname">to_json_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">path</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span> &#x2192; pathlib.Path<a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.to_json_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.to_json_file" title="Permalink to this definition">¶</a></dt>
+<dd><p>Write the dataset metadata to a JSON file.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>path</strong> – Path of the file to write.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>The path of the written file.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="compiler_gym.datasets.Dataset.url">
+<code class="sig-name descname">url</code><em class="property">: str</em><a class="headerlink" href="#compiler_gym.datasets.Dataset.url" title="Permalink to this definition">¶</a></dt>
+<dd><p>A URL where the dataset can be downloaded from. May be an empty string.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="compiler_gym.datasets.require">
+<code class="sig-prename descclassname">compiler_gym.datasets.</code><code class="sig-name descname">require</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">dataset</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>compiler_gym.datasets.dataset.Dataset<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#require"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.require" title="Permalink to this definition">¶</a></dt>
+<dd><p>Require that the given dataset is available to the environment.</p>
+<p>This will download and activate the dataset if it is not already installed.
+After calling this function, benchmarks from the dataset will be available
+to use.</p>
+<p>Example usage:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-v0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">require</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="s2">&quot;blas-v0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;blas-v0/1&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>env</strong> – The environment that this dataset is required for.</p></li>
+<li><p><strong>dataset</strong> – The name of the dataset to download, the URL of the dataset,
+or a <a class="reference internal" href="#compiler_gym.datasets.Dataset" title="compiler_gym.datasets.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> instance.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="code docutils literal notranslate"><span class="pre">True</span></code> if the dataset was downloaded, or <code class="code docutils literal notranslate"><span class="pre">False</span></code> if the
+dataset was already available.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="envs.html" class="btn btn-neutral float-right" title="compiler_gym.envs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="compiler_gym.html" class="btn btn-neutral float-left" title="compiler_gym" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright Facebook AI Research
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>
