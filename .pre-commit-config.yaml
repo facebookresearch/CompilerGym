@@ -1,0 +1,78 @@
+---
+# Run the project code formatters.
+#
+# Installation
+# ------------
+#
+# The pre-commit hooks rely on third party linters being in your $PATH.
+# On macOS, install these using:
+#
+#     $ brew install pre-commit buildifier llvm prototool python
+#     $ python -m pip install -r requirements_pre_commit.txt
+#
+# On linux:
+#
+#     $ sudo apt install golang clang-format
+#     $ go get github.com/bazelbuild/buildtools/buildifier
+#     $ GO111MODULE=on go get github.com/uber/prototool/cmd/prototool@dev
+#     $ python -m pip install -r requirements.pre_commit.txt
+#
+# Usage
+# -----
+#
+# Run the pre-commit hooks on all files using:
+#
+#     $ pre-commit run --all-files
+#
+# Install the pre-commit hook using:
+#
+#     $ pre-commit install
+#
+repos:
+    - repo: https://github.com/pre-commit/pre-commit-hooks
+      rev: v2.3.0
+      hooks:
+          - id: check-added-large-files
+            args: [--maxkb=10000]
+          - id: check-case-conflict
+          - id: check-docstring-first
+          - id: check-executables-have-shebangs
+          - id: check-json
+          - id: check-merge-conflict
+          - id: check-symlinks
+          - id: end-of-file-fixer
+          - id: pretty-format-json
+          - id: requirements-txt-fixer
+          - id: trailing-whitespace
+    - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
+      rev: master
+      hooks:
+          - id: yamlfmt
+    - repo: https://github.com/timothycrosley/isort
+      rev: master
+      hooks:
+          - id: isort
+    - repo: https://github.com/psf/black
+      rev: stable
+      hooks:
+          - id: black
+            language_version: python3.8
+    - repo: https://github.com/kynan/nbstripout
+      rev: master
+      hooks:
+          - id: nbstripout
+            files: .ipynb
+    - repo: https://github.com/pocc/pre-commit-hooks
+      rev: python
+      hooks:
+          - id: clang-format
+            args: [-i]
+    - repo: https://github.com/nametake/pre-commit-prototool
+      rev: master
+      hooks:
+          - id: prototool-lint
+          - id: prototool-format-fix
+    - repo: https://github.com/FelixSeptem/pre-commit-golang
+      rev: master
+      hooks:
+          - id: bazel-buildifier

@@ -1,0 +1,10 @@
+absl-py>=0.10.0
+fasteners==0.15
+grpcio==1.34.0
+gym>=0.17.2
+humanize>=2.6.0
+networkx==2.5
+numpy>=1.19.3
+protobuf==3.13.0
+requests>=2.24.0
+tabulate>=0.8.7

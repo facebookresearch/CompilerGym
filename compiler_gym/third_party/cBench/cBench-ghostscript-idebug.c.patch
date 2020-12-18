@@ -1,0 +1,48 @@
+--- ../idebug.c	2020-06-18 01:33:00.000000000 +0100
++++ idebug.c	2020-06-18 01:33:27.000000000 +0100
+@@ -77,7 +77,7 @@
+ 	case t_integer:
+ 	  dprintf1("int %ld", pref->value.intval); break;
+ 	case t_mark:
+-	  dprintf("mark"); break;
++	  break;
+ 	case t_mixedarray:
+ 	  dprintf2("mixed packedarray(%u)0x%lx", size,
+ 		   (ulong)pref->value.packed); break;
+@@ -87,7 +87,7 @@
+ 	  debug_print_name(pref);
+ 	  break;
+ 	case t_null:
+-	  dprintf("null"); break;
++	  break;
+ 	case t_oparray:
+ 	  dprintf2("op_array(%u)0x%lx:", size, (ulong)pref->value.const_refs);
+ 	  { const op_array_table *opt = op_index_op_array_table(size);
+@@ -128,7 +128,6 @@
+ 	switch ( *pref >> r_packed_type_shift )
+ 	{
+ 	case pt_executable_operator:
+-	  dprintf("<op_name>");
+ 	  op_index_ref(elt, &nref);
+ 	  debug_print_ref(&nref);
+ 	  break;
+@@ -136,9 +135,8 @@
+ 	  dprintf1("<int> %d", (int)elt + packed_min_intval);
+ 	  break;
+ 	case pt_literal_name:
+-	  dprintf("<lit_name>"); goto ptn;
++	  goto ptn;
+ 	case pt_executable_name:
+-	  dprintf("<exec_name>");
+ ptn:	  name_index_ref(elt, &nref);
+ 	  dprintf2("(0x%lx#%u)", (ulong)nref.value.pname, elt);
+ 	  debug_print_name(&nref);
+@@ -169,8 +167,6 @@
+
+ 	if ( type >= tx_next_index )
+ 	  dprintf1("0x%02x?? ", type);
+-	else if ( type >= t_next_index )
+-	  dprintf("opr* ");
+ 	else
+ 	  dprintf1("%s ", type_strings[type]);
+ 	for ( ; ap->mask; ++ap )

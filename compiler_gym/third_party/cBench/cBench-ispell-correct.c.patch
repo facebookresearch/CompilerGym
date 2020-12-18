@@ -1,0 +1,47 @@
+--- ../correct.c	2020-06-18 01:23:38.000000000 +0100
++++ correct.c	2020-06-18 01:24:24.000000000 +0100
+@@ -165,7 +165,7 @@
+ 		  struct flagent * sufent,
+ 		  ichar_t savearea[MAX_CAPS][INPUTWORDLEN + MAXAFFIXLEN],
+ 		  int * nsaved));
+-static char *	getline P ((char * buf));
++static char *	cbench_getline P ((char * buf));
+ void		askmode P ((void));
+ void		copyout P ((char ** cc, int cnt));
+ static void	lookharder P ((char * string));
+@@ -447,7 +447,7 @@
+
+ 		move (li - 1, 0);
+ 		(void) putchar ('!');
+-		if (getline (buf) == NULL)
++		if (cbench_getline (buf) == NULL)
+ 		    {
+ 		    (void) putchar (7);
+ 		    erase ();
+@@ -472,7 +472,7 @@
+ 		    (void) printf ("%s ", CORR_C_READONLY);
+ 		    }
+ 		(void) printf (CORR_C_REPLACE_WITH);
+-		if (getline (ctok) == NULL)
++		if (cbench_getline (ctok) == NULL)
+ 		    {
+ 		    (void) putchar (7);
+ 		    /* Put it back */
+@@ -534,7 +534,7 @@
+ 		char	buf[100];
+ 		move (li - 1, 0);
+ 		(void) printf (CORR_C_LOOKUP_PROMPT);
+-		if (getline (buf) == NULL)
++		if (cbench_getline (buf) == NULL)
+ 		    {
+ 		    (void) putchar (7);
+ 		    erase ();
+@@ -1388,7 +1388,7 @@
+ #endif /* NO_CAPITALIZATION_SUPPORT */
+     }
+
+-static char * getline (s)
++static char * cbench_getline (s)
+     register char *	s;
+     {
+     register char *	p;

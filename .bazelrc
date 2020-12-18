@@ -1,0 +1,90 @@
+# See: https://bazel.build/versions/master/docs/bazel-user-manual.html#flag--compilation_mode
+
+# This project requires C++17.
+build --cxxopt='-std=c++17'
+test --cxxopt='-std=c++17'
+
+# Workaround for broken grpc build on macOS.
+# See: https://github.com/bazelbuild/bazel/issues/4341
+build --copt -DGRPC_BAZEL_BUILD
+test --copt -DGRPC_BAZEL_BUILD
+
+# By default, magic_enum requires enum values be in the range -127 to +127.
+# Increase this to support the big enum generated describing the list of LLVM
+# passes. See:
+# https://github.com/Neargye/magic_enum/blob/master/doc/limitations.md
+build --copt -DMAGIC_ENUM_RANGE_MIN=0
+build --copt -DMAGIC_ENUM_RANGE_MAX=512
+test --copt -DMAGIC_ENUM_RANGE_MIN=0
+test --copt -DMAGIC_ENUM_RANGE_MAX=512
+
+# Promote unused variable warnings to errors.
+# TODO(github.com/facebookresearch/CompilerGym/issues/3): Temporarily disabled
+# to mitigate build warnigns in external dependency.
+# build --cxxopt='-Werror=unused-variable'
+# test --cxxopt='-Werror=unused-variable'
+
+# Promote unused result warnings to errors.
+# TODO(github.com/facebookresearch/CompilerGym/issues/3): Temporarily disabled
+# to mitigate build warnigns in external dependency.
+# build --cxxopt='-Werror=unused-result'
+# test --cxxopt='-Werror=unused-result'
+
+# Promote warnings about missing braces on if/else blocks to errors.
+build --cxxopt='-Werror=dangling-else'
+test --cxxopt='-Werror=dangling-else'
+
+# Default to continuing on build error. Override using --keep_going=false.
+build --keep_going
+test --keep_going
+
+# Show test error output. Override using --test_output={summary,full}.
+test --test_output=errors
+
+# Address sanitizer
+# To use it: bazel build --config asan
+build:asan --strip=never
+build:asan --copt -fsanitize=address
+build:asan --copt -DADDRESS_SANITIZER
+build:asan --copt -O1
+build:asan --copt -g
+build:asan --copt -fno-omit-frame-pointer
+build:asan --linkopt -fsanitize=address
+
+# Thread sanitizer
+# bazel build --config tsan
+build:tsan --strip=never
+build:tsan --copt -fsanitize=thread
+build:tsan --copt -DTHREAD_SANITIZER
+build:tsan --copt -DDYNAMIC_ANNOTATIONS_ENABLED=1
+build:tsan --copt -DDYNAMIC_ANNOTATIONS_EXTERNAL_IMPL=1
+build:tsan --copt -O1
+build:tsan --copt -fno-omit-frame-pointer
+build:tsan --linkopt -fsanitize=thread
+
+# --config msan: Memory sanitizer
+build:msan --strip=never
+build:msan --copt -fsanitize=memory
+build:msan --copt -DADDRESS_SANITIZER
+build:msan --copt -O1
+build:msan --copt -fno-omit-frame-pointer
+build:msan --linkopt -fsanitize=memory
+
+# --config ubsan: Undefined Behavior Sanitizer
+build:ubsan --strip=never
+build:ubsan --copt -fsanitize=undefined
+build:ubsan --copt -O1
+build:ubsan --copt -fno-omit-frame-pointer
+build:ubsan --linkopt -fsanitize=undefined
+build:ubsan --linkopt -lubsan
+
+# --config ci: Continuous Integration tool
+query:ci --noshow_progress
+query:ci --noshow_loading_progress
+build:ci --noshow_progress
+build:ci --noshow_loading_progress
+build:ci --show_task_finish
+build:ci --action_env=PATH
+build:ci --keep_going
+build:ci --verbose_failures
+build:ci --test_output=errors

@@ -1,0 +1,48 @@
+---
+name: Pre-commit
+
+on: [push, pull_request]
+
+jobs:
+    all:
+        name: all
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v2
+            - name: Install clang-format
+              run: |
+                  wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+                  sudo apt-get install clang-format-10
+                  sudo rm -f /usr/bin/clang-format
+                  sudo ln -s /usr/bin/clang-format-10 /usr/bin/clang-format
+                  clang-format --version
+            - name: Install go
+              uses: actions/setup-go@v2
+              with:
+                  go-version: ^1.13.1
+            - name: Install buildifier
+              run: |
+                  go get github.com/bazelbuild/buildtools/buildifier
+                  buildifier --version
+            - name: Install prototool
+              run: |
+                  GO111MODULE=on go get github.com/uber/prototool/cmd/prototool@dev
+                  prototool version
+            - name: Install Python 3.8
+              uses: actions/setup-python@v2
+              with:
+                  python-version: 3.8
+            - name: Install Python dependencies
+              run: |
+                  sudo apt-get install python3-setuptools
+                  python3 -m pip install --upgrade wheel
+                  python3 -m pip install -r requirements_pre_commit.txt
+                  python3 -m isort --version
+                  python3 -m black --version
+                  python3 -m pre_commit --version
+            - name: Run pre-commit checks
+              # TODO(github.com/facebookresearch/CompilerGym/issues/1): Disable
+              # isort due to inconsistent results when run locally versus in
+              # the GitHub Actions environment.
+              run: SKIP=isort python3 -m pre_commit run --all-files
