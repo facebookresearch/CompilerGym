@@ -330,8 +330,8 @@ class CompilerEnv(gym.Env):
                     self.service.stub.EndEpisode,
                     EndEpisodeRequest(session_id=self._session_id),
                 )
-            except Exception as e:
-                warnings.warn(f"Failure to terminate episode on service close: {e}")
+            except:
+                pass
             self._session_id = None
 
         if self.service:
