@@ -43,7 +43,7 @@ for an overview of the key concepts.
 Install the latest CompilerGym release using:
 
     $ pip install compiler_gym
-    
+
 The binary works on MacOS and Linux (on Ubuntu 18.04, Fedora 28, Debian 10 or newer equivalents)
 
 ### Building from Source
