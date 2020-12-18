@@ -55,7 +55,7 @@ py_test(
     name = "custom_benchmarks_test",
     srcs = ["custom_benchmarks_test.py"],
     data = [
-        "//compiler_gym/third_party/cBench",
+        "//compiler_gym/third_party/cBench:crc32",
     ],
     deps = [
         ":fixtures",
