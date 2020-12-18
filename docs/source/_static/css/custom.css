@@ -1,0 +1,51 @@
+/**
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ *
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+a {
+	color: #ee4c2c;
+}
+
+a:visited {
+	color: #ee4c2c;
+}
+
+/* Logo and header */
+div.wy-side-nav-search, .wy-nav-top {
+	background-color: #f3f4f7;
+}
+div.wy-side-nav-search a {
+	color: #ee4c2c;
+}
+.wy-nav-top, .wy-nav-top a {
+	color: #6c6c6d;
+}
+div.wy-side-nav-search div.version {
+	color: #6c6c6d;
+}
+
+/* Sidebar */
+div.wy-menu .caption {
+	color: #000;
+}
+
+div.wy-side-scroll {
+	background-color: #f3f4f7;
+}
+div.wy-side-scroll a {
+	color: #6c6c6d;
+}
+.wy-menu-vertical li.current>a, .wy-menu-vertical li.on a {
+	color: #ee4c2c;
+}
+.wy-menu-vertical a:hover {
+	background-color: #f3f4f7;
+}
+
+.rst-content .toctree-wrapper>p.caption, h1, h2, h3, h4, h5, h6, legend {
+	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+	font-weight: 300;
+}

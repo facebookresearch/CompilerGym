@@ -1,0 +1,40 @@
+--- ../add.c	2020-06-18 11:59:48.000000000 +0100
++++ add.c	2020-06-18 12:08:52.000000000 +0100
+@@ -35,7 +35,7 @@
+ word gsm_mult P2((a,b), word a, word b)
+ {
+ 	if (a == MIN_WORD && b == MIN_WORD) return MAX_WORD;
+-	else return SASR( (longword)a * (longword)b, 15 );
++	SASR(a, 15);
+ }
+
+ word gsm_mult_r P2((a,b), word a, word b)
+@@ -171,13 +171,7 @@
+ 	if (n >= 32) return -(a < 0);
+ 	if (n <= -32) return 0;
+ 	if (n < 0) return a << -n;
+-
+-#	ifdef	SASR
+-		return a >> n;
+-#	else
+-		if (a >= 0) return a >> n;
+-		else return -(longword)( -(ulongword)a >> n );
+-#	endif
++	return SASR(a, n);
+ }
+
+ word gsm_asr P2((a,n), word a, int n)
+@@ -186,12 +180,7 @@
+ 	if (n <= -16) return 0;
+ 	if (n < 0) return a << -n;
+
+-#	ifdef	SASR
+-		return a >> n;
+-#	else
+-		if (a >= 0) return a >> n;
+-		else return -(word)( -(uword)a >> n );
+-#	endif
++	return SASR(a, n);
+ }
+
+ /*

@@ -1,0 +1,11 @@
+PruneEhpass
+PostOrderFunctionAttrsLegacyPass
+Ipsccppass
+GlobalOptimizerPass
+PromoteMemoryToRegisterPass
+DeadArgEliminationPass
+Sroapass
+EarlyCsepass
+LowerAtomicPass
+InstructionCombiningPass
+LoopSimplifyPass

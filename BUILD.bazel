@@ -1,0 +1,37 @@
+# Copyright (c) Facebook, Inc. and its affiliates.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+
+exports_files([
+    "README.md",
+    "VERSION",
+    "empty.py",
+])
+
+py_library(
+    name = "CompilerGym",
+    data = [
+        "//compiler_gym/third_party/cBench:benchmarks_list",
+    ],
+    deps = [
+        "//compiler_gym",
+        "//compiler_gym/bin",
+        "//compiler_gym/datasets",
+        "//compiler_gym/envs",
+        "//compiler_gym/service",
+        "//compiler_gym/spaces",
+        "//compiler_gym/views",
+        "//examples/sensitivity_analysis:action_sensitivity_analysis",
+        "//examples/sensitivity_analysis:benchmark_sensitivity_analysis",
+    ],
+)
+
+py_binary(
+    name = "package",
+    srcs = ["empty.py"],
+    main = "empty.py",
+    deps = [
+        ":CompilerGym",
+    ],
+)

@@ -1,0 +1,187 @@
+# DeepDataFlow. https://zenodo.org/record/4122437
+#
+# Copyright (c) Facebook, Inc. and its affiliates.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+
+filegroup(
+    name = "DeepDataFlow",
+    srcs = [
+        ":blas_bitcodes",
+        ":github_bitcodes",
+        ":linux_bitcodes",
+        ":npb_bitcodes",
+        ":opencv_bitcodes",
+        ":poj104_bitcodes",
+        ":tensorflow_bitcodes",
+    ],
+)
+
+filegroup(
+    name = "tarfiles",
+    srcs = [
+        ":blas_tar",
+        ":github_tar",
+        ":linux_tar",
+        ":npb_tar",
+        ":opencv_tar",
+        ":poj104_tar",
+        ":tensorflow_tar",
+    ],
+)
+
+genrule(
+    name = "blas_bitcodes",
+    srcs = [
+        "@DeepDataFlow//:all",
+        "@DeepDataFlow//:readme",
+    ],
+    outs = ["blas"],
+    cmd = "$(location :split_dataset) $$(dirname $(location @DeepDataFlow//:readme)) $(@D) blas .bc",
+    tools = [":split_dataset"],
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "blas_tar",
+    srcs = [":blas_bitcodes"],
+    outs = ["blas-llvm-10.0.0.tar.bz2"],
+    cmd = "tar cjfh $@ -C $(@D) blas",
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "github_bitcodes",
+    srcs = [
+        "@DeepDataFlow//:all",
+        "@DeepDataFlow//:readme",
+    ],
+    outs = ["github"],
+    cmd = "$(location :split_dataset) $$(dirname $(location @DeepDataFlow//:readme)) $(@D) github .bc",
+    tools = [":split_dataset"],
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "github_tar",
+    srcs = [":github_bitcodes"],
+    outs = ["github-llvm-10.0.0.tar.bz2"],
+    cmd = "tar cjfh $@ -C $(@D) github",
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "linux_bitcodes",
+    srcs = [
+        "@DeepDataFlow//:all",
+        "@DeepDataFlow//:readme",
+    ],
+    outs = ["linux"],
+    cmd = "$(location :split_dataset) $$(dirname $(location @DeepDataFlow//:readme)) $(@D) linux .bc",
+    tools = [":split_dataset"],
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "linux_tar",
+    srcs = [":linux_bitcodes"],
+    outs = ["linux-llvm-10.0.0.tar.bz2"],
+    cmd = "tar cjfh $@ -C $(@D) linux",
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "npb_bitcodes",
+    srcs = [
+        "@DeepDataFlow//:all",
+        "@DeepDataFlow//:readme",
+    ],
+    outs = ["npb"],
+    cmd = "$(location :split_dataset) $$(dirname $(location @DeepDataFlow//:readme)) $(@D) npb .bc",
+    tools = [":split_dataset"],
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "npb_tar",
+    srcs = [":npb_bitcodes"],
+    outs = ["npb-llvm-10.0.0.tar.bz2"],
+    cmd = "tar cjfh $@ -C $(@D) npb",
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "opencv_bitcodes",
+    srcs = [
+        "@DeepDataFlow//:all",
+        "@DeepDataFlow//:readme",
+    ],
+    outs = ["opencv"],
+    cmd = "$(location :split_dataset) $$(dirname $(location @DeepDataFlow//:readme)) $(@D) opencv .bc",
+    tools = [":split_dataset"],
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "opencv_tar",
+    srcs = [":opencv_bitcodes"],
+    outs = ["opencv-llvm-10.0.0.tar.bz2"],
+    cmd = "tar cjfh $@ -C $(@D) opencv",
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "poj104_bitcodes",
+    srcs = [
+        "@DeepDataFlow//:all",
+        "@DeepDataFlow//:readme",
+    ],
+    outs = ["poj104"],
+    cmd = "$(location :split_dataset) $$(dirname $(location @DeepDataFlow//:readme)) $(@D) poj104 .0.bc",
+    tools = [":split_dataset"],
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "poj104_tar",
+    srcs = [":poj104_bitcodes"],
+    outs = ["poj104-llvm-10.0.0.tar.bz2"],
+    cmd = "tar cjfh $@ -C $(@D) poj104",
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "tensorflow_bitcodes",
+    srcs = [
+        "@DeepDataFlow//:all",
+        "@DeepDataFlow//:readme",
+    ],
+    outs = ["tensorflow"],
+    cmd = "$(location :split_dataset) $$(dirname $(location @DeepDataFlow//:readme)) $(@D) tensorflow .bc",
+    tools = [":split_dataset"],
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "tensorflow_tar",
+    srcs = [":tensorflow_bitcodes"],
+    outs = ["tensorflow-llvm-10.0.0.tar.bz2"],
+    cmd = "tar cjfh $@ -C $(@D) tensorflow",
+    visibility = ["//visibility:public"],
+)
+
+sh_binary(
+    name = "split_dataset",
+    srcs = ["split_dataset.sh"],
+)
+
+py_test(
+    name = "file_count_test",
+    srcs = ["file_count_test.py"],
+    data = [":DeepDataFlow"],
+    deps = [
+        "//compiler_gym/util:runfiles_path",
+        "//tests:test_main",
+    ],
+)

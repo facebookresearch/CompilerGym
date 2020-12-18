@@ -1,0 +1,3 @@
+black==19.10b0
+isort==4.3.21
+pre-commit==2.7.1
