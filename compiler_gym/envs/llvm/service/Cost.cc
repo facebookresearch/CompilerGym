@@ -60,46 +60,54 @@ std::string moduleToString(llvm::Module& module) {
   return str;
 }
 
-Status runCommandOnModule(const std::string& cmd, llvm::Module& module, std::string* stdout) {
-  const std::string ir = moduleToString(module);
-  VLOG(4) << "$ " << cmd;
-  auto process =
-      subprocess::Popen(cmd, subprocess::shell{true}, subprocess::input{subprocess::PIPE},
-                        subprocess::output{subprocess::PIPE}, subprocess::error{subprocess::PIPE});
-  const auto output = process.communicate(ir.c_str(), ir.size());
-  if (process.retcode()) {
-    std::string error(output.second.buf.begin(), output.second.buf.end());
-    return Status(StatusCode::INTERNAL, error);
-  }
-  *stdout = std::string(output.first.buf.begin(), output.first.buf.end());
-  return Status::OK;
-}
-
 Status getNativeTextSizeInBytes(llvm::Module& module, int64_t* value,
                                 const fs::path& workingDirectory) {
-  const auto clang = util::getRunfilesPath("compiler_gym/third_party/llvm/clang");
-  DCHECK(fs::exists(clang)) << "File not found: " << clang.string();
+  const auto clangPath = util::getRunfilesPath("compiler_gym/third_party/llvm/clang");
+  DCHECK(fs::exists(clangPath)) << "File not found: " << clangPath.string();
+
   const auto tmpFile = fs::unique_path(workingDirectory / "module-%%%%.o");
 
-  // NOTE(cummins): Requires awk and size being in the path.
-  const std::string cmd =
-      fmt::format("set -o pipefail; {} -O0 -xir - -c -o {} && size {} | awk 'NR==2 {}'",
-                  clang.string(), tmpFile.string(), tmpFile.string(), "{print $1}");
-  std::string stdout;
-  auto status = runCommandOnModule(cmd, module, &stdout);
+  // Lower the module to an object file using clang.
+  // TODO(cummins): Use clang driver APIs rather than invoking command line.
+  // https://github.com/llvm/llvm-project/blob/b8d2b6f6cf6015751fc950c3e8149404e8b37fe8/clang/examples/clang-interpreter/main.cpp
+  const std::string ir = moduleToString(module);
+  auto clang =
+      subprocess::Popen({clangPath.string(), "-O0", "-xir", "-", "-c", "-o", tmpFile.string()},
+                        subprocess::input{subprocess::PIPE}, subprocess::output{subprocess::PIPE},
+                        subprocess::error{subprocess::PIPE});
+  const auto clangOutput = clang.communicate(ir.c_str(), ir.size());
+  if (clang.retcode()) {
+    fs::remove(tmpFile);
+    std::string error(clangOutput.second.buf.begin(), clangOutput.second.buf.end());
+    return Status(StatusCode::INTERNAL, error);
+  }
 
+  // Use size to measure the size of the text section.
+  // NOTE(cummins): Requires that `awk` and `size` are in PATH.
+  auto size =
+      subprocess::Popen(fmt::format("size {} | awk 'NR==2 {}'", tmpFile.string(), "{print $1}"),
+                        subprocess::shell{true}, subprocess::output{subprocess::PIPE},
+                        subprocess::error{subprocess::PIPE});
+  const auto sizeOutput = size.communicate();
   fs::remove(tmpFile);
-  RETURN_IF_ERROR(status);
+  if (size.retcode()) {
+    std::string error(sizeOutput.second.buf.begin(), sizeOutput.second.buf.end());
+    return Status(StatusCode::INTERNAL, error);
+  }
 
+  std::string stdout{sizeOutput.first.buf.begin(), sizeOutput.first.buf.end()};
   try {
     *value = std::stoi(stdout);
   } catch (std::exception const& e) {
-    return Status(StatusCode::INTERNAL, fmt::format("Failed to read command output as integer.\n"
-                                                    "Command: {}\n"
-                                                    "Stdout: {}\n",
-                                                    cmd, stdout));
+    return Status(StatusCode::INTERNAL, fmt::format("Failed to parse integer: `{}`\n", stdout));
   }
   return Status::OK;
+}
+
+inline size_t getBaselineCostIndex(LlvmBaselinePolicy policy, LlvmCostFunction cost) {
+  return static_cast<size_t>(magic_enum::enum_count<LlvmCostFunction>()) *
+             static_cast<size_t>(policy) +
+         static_cast<size_t>(cost);
 }
 
 }  // anonymous namespace
@@ -116,12 +124,6 @@ double getCost(const LlvmCostFunction& cost, llvm::Module& module,
       return static_cast<double>(size);
     }
   }
-}
-
-size_t getBaselineCostIndex(LlvmBaselinePolicy policy, LlvmCostFunction cost) {
-  return static_cast<size_t>(magic_enum::enum_count<LlvmCostFunction>()) *
-             static_cast<size_t>(policy) +
-         static_cast<size_t>(cost);
 }
 
 double getBaselineCost(const BaselineCosts& baselineCosts, LlvmBaselinePolicy policy,
