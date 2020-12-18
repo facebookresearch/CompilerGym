@@ -1,0 +1,316 @@
+# Copyright (c) Facebook, Inc. and its affiliates.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+
+genrule(
+    name = "cBench_tar",
+    srcs = [":cBench"],
+    outs = ["cBench-llvm-10.0.0.tar.bz2"],
+    cmd = "tar cjfh $@ -C $(@D) cBench",
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
+    name = "cBench",
+    srcs = [
+        ":adpcm",
+        ":bitcount",
+        ":blowfish",
+        ":bzip2",
+        ":crc32",
+        ":dijkstra",
+        ":ghostscript",
+        ":gsm",
+        ":ispell",
+        ":jpeg-c",
+        ":jpeg-d",
+        ":lame",
+        ":patricia",
+        ":qsort",
+        ":rijndael",
+        ":sha",
+        ":stringsearch",
+        ":stringsearch2",
+        ":susan",
+        ":tiff2bw",
+        ":tiff2rgba",
+        ":tiffdither",
+        ":tiffmedian",
+    ],
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "jpeg-c",
+    srcs = [
+        "@ctuning-programs//:all",
+        "@ctuning-programs//:readme",
+    ],
+    outs = ["cBench/jpeg-c.bc"],
+    cmd = "mkdir -p cBench && $(location //compiler_gym/third_party/ctuning-programs:make_bitcode) $(location @llvm//10.0.0:clang) $(location @llvm//10.0.0:llvm-link) $@ $$(dirname $(location @ctuning-programs//:readme))/program/cbench-consumer-jpeg-c",
+    tools = [
+        "//compiler_gym/third_party/ctuning-programs:make_bitcode",
+        "@llvm//10.0.0:clang",
+        "@llvm//10.0.0:llvm-link",
+    ],
+)
+
+genrule(
+    name = "jpeg-d",
+    srcs = [
+        "@ctuning-programs//:all",
+        "@ctuning-programs//:readme",
+    ],
+    outs = ["cBench/jpeg-d.bc"],
+    cmd = "mkdir -p cBench && $(location //compiler_gym/third_party/ctuning-programs:make_bitcode) $(location @llvm//10.0.0:clang) $(location @llvm//10.0.0:llvm-link) $@ $$(dirname $(location @ctuning-programs//:readme))/program/cbench-consumer-jpeg-d",
+    tools = [
+        "//compiler_gym/third_party/ctuning-programs:make_bitcode",
+        "@llvm//10.0.0:clang",
+        "@llvm//10.0.0:llvm-link",
+    ],
+)
+
+genrule(
+    name = "stringsearch2",
+    srcs = [
+        "@ctuning-programs//:all",
+        "@ctuning-programs//:readme",
+    ],
+    outs = ["cBench/stringsearch2.bc"],
+    cmd = "mkdir -p cBench && $(location //compiler_gym/third_party/ctuning-programs:make_bitcode) $(location @llvm//10.0.0:clang) $(location @llvm//10.0.0:llvm-link) $@ $$(dirname $(location @ctuning-programs//:readme))/program/cbench-office-stringsearch2",
+    tools = [
+        "//compiler_gym/third_party/ctuning-programs:make_bitcode",
+        "@llvm//10.0.0:clang",
+        "@llvm//10.0.0:llvm-link",
+    ],
+)
+
+genrule(
+    name = "adpcm",
+    srcs = [
+        "@cBench//:all",
+        "@cBench//:readme",
+    ],
+    outs = ["cBench/adpcm.bc"],
+    cmd = "mkdir -p $(@D) && $(location :make_llvm_module) --path=$$(dirname $(location @cBench//:readme))/telecom_adpcm_c --output_path=$@",
+    tools = [":make_llvm_module"],
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "bitcount",
+    srcs = [
+        "@cBench//:all",
+        "@cBench//:readme",
+    ],
+    outs = ["cBench/bitcount.bc"],
+    cmd = "mkdir -p $(@D) && $(location :make_llvm_module) --path=$$(dirname $(location @cBench//:readme))/automotive_bitcount --output_path=$@",
+    tools = [":make_llvm_module"],
+)
+
+genrule(
+    name = "blowfish",
+    srcs = [
+        "@cBench//:all",
+        "@cBench//:readme",
+    ],
+    outs = ["cBench/blowfish.bc"],
+    cmd = "mkdir -p $(@D) && $(location :make_llvm_module) --path=$$(dirname $(location @cBench//:readme))/security_blowfish_d --output_path=$@",
+    tools = [":make_llvm_module"],
+)
+
+genrule(
+    name = "bzip2",
+    srcs = [
+        "@cBench//:all",
+        "@cBench//:readme",
+    ],
+    outs = ["cBench/bzip2.bc"],
+    cmd = "mkdir -p $(@D) && $(location :make_llvm_module) --path=$$(dirname $(location @cBench//:readme))/bzip2d --output_path=$@",
+    tools = [":make_llvm_module"],
+)
+
+genrule(
+    name = "dijkstra",
+    srcs = [
+        "@cBench//:all",
+        "@cBench//:readme",
+    ],
+    outs = ["cBench/dijkstra.bc"],
+    cmd = "mkdir -p $(@D) && $(location :make_llvm_module) --path=$$(dirname $(location @cBench//:readme))/network_dijkstra --output_path=$@",
+    tools = [":make_llvm_module"],
+)
+
+genrule(
+    name = "ghostscript",
+    srcs = [
+        "@cBench//:all",
+        "@cBench//:readme",
+        "cBench-ghostscript-std.h.patch",
+        "cBench-ghostscript-idebug.c.patch",
+    ],
+    outs = ["cBench/ghostscript.bc"],
+    cmd = (
+        "mkdir -p $(@D) && rsync -rL $$(dirname $(location @cBench//:readme))/office_ghostscript/ $(@D)/office_ghostscript_src/ && " +
+        "patch --quiet --forward $(@D)/office_ghostscript_src/src/idebug.c < $(location cBench-ghostscript-idebug.c.patch);" +
+        "patch --quiet --forward $(@D)/office_ghostscript_src/src/std.h < $(location cBench-ghostscript-std.h.patch);" +
+        "$(location :make_llvm_module) --path=$(@D)/office_ghostscript_src --output_path=$@"
+    ),
+    tools = [":make_llvm_module"],
+)
+
+genrule(
+    name = "gsm",
+    srcs = [
+        "@cBench//:all",
+        "@cBench//:readme",
+        "cBench-gsm-add.c.patch",
+    ],
+    outs = ["cBench/gsm.bc"],
+    cmd = (
+        "mkdir -p $(@D) &&rsync -rL $$(dirname $(location @cBench//:readme))/telecom_gsm/ $(@D)/telecom_gsm_src/ && " +
+        "patch --quiet --forward $(@D)/telecom_gsm_src/src/add.c < $(location cBench-gsm-add.c.patch);" +
+        "$(location :make_llvm_module) --path=$(@D)/telecom_gsm_src --cflags='-DSASR','-DSTUPID_COMPILER','-DNeedFunctionPrototypes=1' --output_path=$@"
+    ),
+    tools = [":make_llvm_module"],
+)
+
+genrule(
+    name = "ispell",
+    srcs = [
+        "@cBench//:all",
+        "@cBench//:readme",
+        "cBench-ispell-correct.c.patch",
+    ],
+    outs = ["cBench/ispell.bc"],
+    cmd = (
+        "mkdir -p $(@D) &&rsync -rL $$(dirname $(location @cBench//:readme))/office_ispell/ $(@D)/office_ispell_src/ && " +
+        "patch --quiet --forward $(@D)/office_ispell_src/src/correct.c < $(location cBench-ispell-correct.c.patch);" +
+        "$(location :make_llvm_module) --path=$(@D)/office_ispell_src --output_path=$@"
+    ),
+    tools = [":make_llvm_module"],
+)
+
+genrule(
+    name = "lame",
+    srcs = [
+        "@cBench//:all",
+        "@cBench//:readme",
+    ],
+    outs = ["cBench/lame.bc"],
+    cmd = "mkdir -p $(@D) && $(location :make_llvm_module) --path=$$(dirname $(location @cBench//:readme))/consumer_lame --cflags='-DLAMESNDFILE','-DHAVEMPGLIB','-DLAMEPARSE' --output_path=$@",
+    tools = [":make_llvm_module"],
+)
+
+genrule(
+    name = "patricia",
+    srcs = [
+        "@cBench//:all",
+        "@cBench//:readme",
+    ],
+    outs = ["cBench/patricia.bc"],
+    cmd = (
+        "mkdir -p $(@D) && $(location :make_llvm_module) --path=$$(dirname $(location @cBench//:readme))/network_patricia/ --output_path=$@"
+    ),
+    tools = [":make_llvm_module"],
+)
+
+genrule(
+    name = "qsort",
+    srcs = [
+        "@cBench//:all",
+        "@cBench//:readme",
+    ],
+    outs = ["cBench/qsort.bc"],
+    cmd = "mkdir -p $(@D) && $(location :make_llvm_module) --path=$$(dirname $(location @cBench//:readme))/automotive_qsort1 --output_path=$@",
+    tools = [":make_llvm_module"],
+)
+
+genrule(
+    name = "rijndael",
+    srcs = [
+        "@cBench//:all",
+        "@cBench//:readme",
+    ],
+    outs = ["cBench/rijndael.bc"],
+    cmd = "mkdir -p $(@D) && $(location :make_llvm_module) --path=$$(dirname $(location @cBench//:readme))/security_rijndael_d --output_path=$@",
+    tools = [":make_llvm_module"],
+)
+
+genrule(
+    name = "sha",
+    srcs = [
+        "@cBench//:all",
+        "@cBench//:readme",
+    ],
+    outs = ["cBench/sha.bc"],
+    cmd = "mkdir -p $(@D) && $(location :make_llvm_module) --path=$$(dirname $(location @cBench//:readme))/security_sha --output_path=$@",
+    tools = [":make_llvm_module"],
+)
+
+genrule(
+    name = "stringsearch",
+    srcs = [
+        "@cBench//:all",
+        "@cBench//:readme",
+    ],
+    outs = ["cBench/stringsearch.bc"],
+    cmd = "mkdir -p $(@D) && $(location :make_llvm_module) --path=$$(dirname $(location @cBench//:readme))/office_stringsearch1 --output_path=$@",
+    tools = [":make_llvm_module"],
+)
+
+genrule(
+    name = "susan",
+    srcs = [
+        "@cBench//:all",
+        "@cBench//:readme",
+    ],
+    outs = ["cBench/susan.bc"],
+    cmd = "mkdir -p $(@D) && $(location :make_llvm_module) --path=$$(dirname $(location @cBench//:readme))/automotive_susan_c --output_path=$@",
+    tools = [":make_llvm_module"],
+)
+
+genrule(
+    name = "tiff2bw",
+    srcs = [
+        "@cBench//:all",
+        "@cBench//:readme",
+    ],
+    outs = ["cBench/tiff2bw.bc"],
+    cmd = "mkdir -p $(@D) && $(location :make_llvm_module) --path=$$(dirname $(location @cBench//:readme))/consumer_tiff2bw --output_path=$@",
+    tools = [":make_llvm_module"],
+)
+
+genrule(
+    name = "tiff2rgba",
+    srcs = [
+        "@cBench//:all",
+        "@cBench//:readme",
+    ],
+    outs = ["cBench/tiff2rgba.bc"],
+    cmd = "mkdir -p $(@D) && $(location :make_llvm_module) --path=$$(dirname $(location @cBench//:readme))/consumer_tiff2rgba --output_path=$@",
+    tools = [":make_llvm_module"],
+)
+
+genrule(
+    name = "tiffdither",
+    srcs = [
+        "@cBench//:all",
+        "@cBench//:readme",
+    ],
+    outs = ["cBench/tiffdither.bc"],
+    cmd = "mkdir -p $(@D) && $(location :make_llvm_module) --path=$$(dirname $(location @cBench//:readme))/consumer_tiffdither --output_path=$@",
+    tools = [":make_llvm_module"],
+)
+
+genrule(
+    name = "tiffmedian",
+    srcs = [
+        "@cBench//:all",
+        "@cBench//:readme",
+    ],
+    outs = ["cBench/tiffmedian.bc"],
+    cmd = "mkdir -p $(@D) && $(location :make_llvm_module) --path=$$(dirname $(location @cBench//:readme))/consumer_tiffmedian --output_path=$@",
+    tools = [":make_llvm_module"],
+)
