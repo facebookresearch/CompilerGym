@@ -7,6 +7,7 @@
 #include <magic_enum.hpp>
 #include <optional>
 
+#include "boost/filesystem.hpp"
 #include "compiler_gym/envs/llvm/service/RewardSpaces.h"
 #include "llvm/IR/Module.h"
 
@@ -15,9 +16,11 @@ namespace compiler_gym::llvm_service {
 using BaselineCosts = std::array<std::optional<double>, magic_enum::enum_count<LlvmRewardSpace>()>;
 
 // Compute the cost using a given reward space. A lower cost is better.
-double getCost(const LlvmRewardSpace& space, llvm::Module& module);
+double getCost(const LlvmRewardSpace& space, llvm::Module& module,
+               const boost::filesystem::path& workingDirectory);
 
 // Compute the baseline costs used for calculating reward.
-void setbaselineCosts(const llvm::Module& unoptimizedModule, BaselineCosts* baselineCosts);
+void setbaselineCosts(const llvm::Module& unoptimizedModule, BaselineCosts* baselineCosts,
+                      const boost::filesystem::path& workingDirectory);
 
 }  // namespace compiler_gym::llvm_service

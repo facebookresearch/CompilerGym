@@ -28,9 +28,11 @@ static const std::string kExpectedExtension = ".bc";
 
 static const fs::path kSiteBenchmarksDir = util::getSiteDataPath("llvm/10.0.0/bitcode_benchmarks");
 
-BenchmarkFactory::BenchmarkFactory(std::optional<std::mt19937_64> rand,
+BenchmarkFactory::BenchmarkFactory(const boost::filesystem::path& workingDirectory,
+                                   std::optional<std::mt19937_64> rand,
                                    size_t maxLoadedBenchmarkSize)
-    : rand_(rand.has_value() ? *rand : std::mt19937_64(std::random_device()())),
+    : workingDirectory_(workingDirectory),
+      rand_(rand.has_value() ? *rand : std::mt19937_64(std::random_device()())),
       loadedBenchmarksSize_(0),
       maxLoadedBenchmarkSize_(maxLoadedBenchmarkSize) {
   // Register all benchmarks from the site data directory.
@@ -92,8 +94,8 @@ Status BenchmarkFactory::addBitcode(const std::string& uri, const Bitcode& bitco
             << loadedBenchmarksSize_ << ", " << benchmarks_.size() << " bitcodes";
   }
 
-  benchmarks_.insert(
-      {uri, Benchmark(uri, std::move(context), std::move(module), bitcodeSize, bitcodePath)});
+  benchmarks_.insert({uri, Benchmark(uri, std::move(context), std::move(module), bitcodeSize,
+                                     workingDirectory_, bitcodePath)});
   loadedBenchmarksSize_ += bitcodeSize;
 
   return Status::OK;
@@ -211,7 +213,7 @@ Status BenchmarkFactory::getBenchmark(std::unique_ptr<Benchmark>* benchmark) {
   } else {
     auto loadedBenchmark = std::next(std::begin(benchmarks_), index - unloadedBenchmarkCount);
     CHECK(loadedBenchmark != benchmarks_.end());
-    *benchmark = loadedBenchmark->second.clone();
+    *benchmark = loadedBenchmark->second.clone(workingDirectory_);
   }
 
   return Status::OK;
@@ -228,7 +230,7 @@ Status BenchmarkFactory::getBenchmark(const std::string& uri,
 
   auto loaded = benchmarks_.find(resolvedUri);
   if (loaded != benchmarks_.end()) {
-    *benchmark = loaded->second.clone();
+    *benchmark = loaded->second.clone(workingDirectory_);
     return Status::OK;
   }
 
@@ -315,7 +317,7 @@ Status BenchmarkFactory::loadBenchmark(
   RETURN_IF_ERROR(addBitcode(uri, bitcode, fs::path(path)));
 
   unloadedBitcodePaths_.erase(iterator);
-  *benchmark = benchmarks_.find(uri)->second.clone();
+  *benchmark = benchmarks_.find(uri)->second.clone(workingDirectory_);
   return Status::OK;
 }
 

@@ -18,6 +18,7 @@ std::vector<RewardSpace> getLlvmRewardSpaceList() {
     space.set_name(util::enumNameToPascalCase<LlvmRewardSpace>(value));
     switch (value) {
       case LlvmRewardSpace::IR_INSTRUCTION_COUNT:
+      case LlvmRewardSpace::NATIVE_TEXT_SIZE_BYTES:
         space.mutable_range()->mutable_max()->set_value(0);
         break;
       case LlvmRewardSpace::IR_INSTRUCTION_COUNT_OZ:

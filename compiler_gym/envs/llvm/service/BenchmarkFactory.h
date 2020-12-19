@@ -42,7 +42,8 @@ class BenchmarkFactory {
   // combined size of the bitcodes that may be cached in memory. Once this
   // size is reached, benchmarks are offloaded so that they must be re-read from
   // disk.
-  BenchmarkFactory(std::optional<std::mt19937_64> rand = std::nullopt,
+  BenchmarkFactory(const boost::filesystem::path& workingDirectory,
+                   std::optional<std::mt19937_64> rand = std::nullopt,
                    size_t maxLoadedBenchmarkSize = kMaxLoadedBenchmarkSize);
 
   // Add a new bitcode. bitcodePath is optional. If provided, it allows the
@@ -101,13 +102,15 @@ class BenchmarkFactory {
       std::unique_ptr<Benchmark>* benchmark);
 
   // A map from benchmark name to the path of a bitcode file. This is used to
-  // store the paths of benchmarks which have not yet been loaded into memory.
+  // store the paths of benchmarks w
+  // hich have not yet been loaded into memory.
   // Once loaded, they are removed from this map and replaced by an entry in
   // benchmarks_.
   std::unordered_map<std::string, boost::filesystem::path> unloadedBitcodePaths_;
   // A mapping from URI to benchmarks which have been loaded into memory.
   std::unordered_map<std::string, Benchmark> benchmarks_;
 
+  const boost::filesystem::path workingDirectory_;
   std::mt19937_64 rand_;
   // The current and maximum allowed sizes of the loaded benchmarks.
   size_t loadedBenchmarksSize_;

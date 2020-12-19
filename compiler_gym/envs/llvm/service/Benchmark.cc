@@ -14,6 +14,7 @@
 #include "llvm/Bitcode/BitcodeWriter.h"
 #include "llvm/Support/SHA1.h"
 
+namespace fs = boost::filesystem;
 using grpc::Status;
 using grpc::StatusCode;
 
@@ -21,9 +22,10 @@ namespace compiler_gym::llvm_service {
 
 namespace {
 
-BaselineCosts getBaselineCosts(const llvm::Module& unoptimizedModule) {
+BaselineCosts getBaselineCosts(const llvm::Module& unoptimizedModule,
+                               const fs::path& workingDirectory) {
   BaselineCosts baselineCosts;
-  setbaselineCosts(unoptimizedModule, &baselineCosts);
+  setbaselineCosts(unoptimizedModule, &baselineCosts, workingDirectory);
   return baselineCosts;
 }
 
@@ -66,11 +68,11 @@ std::unique_ptr<llvm::Module> makeModule(llvm::LLVMContext& context, const Bitco
 
 // A benchmark is an LLVM module and the LLVM context that owns it.
 Benchmark::Benchmark(const std::string& name, const Bitcode& bitcode,
-                     std::optional<boost::filesystem::path> bitcodePath,
+                     const fs::path& workingDirectory, std::optional<fs::path> bitcodePath,
                      const BaselineCosts* baselineCosts)
     : context_(std::make_unique<llvm::LLVMContext>()),
       module_(makeModuleOrDie(*context_, bitcode, name)),
-      baselineCosts_(baselineCosts ? *baselineCosts : getBaselineCosts(*module_)),
+      baselineCosts_(baselineCosts ? *baselineCosts : getBaselineCosts(*module_, workingDirectory)),
       hash_(getModuleHash(*module_)),
       name_(name),
       bitcodeSize_(bitcode.size()),
@@ -78,22 +80,23 @@ Benchmark::Benchmark(const std::string& name, const Bitcode& bitcode,
 
 Benchmark::Benchmark(const std::string& name, std::unique_ptr<llvm::LLVMContext> context,
                      std::unique_ptr<llvm::Module> module, size_t bitcodeSize,
-                     std::optional<boost::filesystem::path> bitcodePath,
+                     const fs::path& workingDirectory, std::optional<fs::path> bitcodePath,
                      const BaselineCosts* baselineCosts)
     : context_(std::move(context)),
       module_(std::move(module)),
-      baselineCosts_(baselineCosts ? *baselineCosts : getBaselineCosts(*module_)),
+      baselineCosts_(baselineCosts ? *baselineCosts : getBaselineCosts(*module_, workingDirectory)),
       hash_(getModuleHash(*module_)),
       name_(name),
       bitcodeSize_(bitcodeSize),
       bitcodePath_(bitcodePath) {}
 
-std::unique_ptr<Benchmark> Benchmark::clone() const {
+std::unique_ptr<Benchmark> Benchmark::clone(const fs::path& workingDirectory) const {
   Bitcode bitcode;
   llvm::raw_svector_ostream ostream(bitcode);
   llvm::WriteBitcodeToFile(module(), ostream);
 
-  return std::make_unique<Benchmark>(name(), bitcode, bitcodePath(), &baselineCosts());
+  return std::make_unique<Benchmark>(name(), bitcode, workingDirectory, bitcodePath(),
+                                     &baselineCosts());
 }
 
 }  // namespace compiler_gym::llvm_service

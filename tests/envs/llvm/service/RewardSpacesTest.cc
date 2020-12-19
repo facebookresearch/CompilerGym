@@ -17,7 +17,7 @@ namespace {
 TEST(RewardSpacesTest, getLlvmRewardSpaceList) {
   const auto spaces = getLlvmRewardSpaceList();
 
-  ASSERT_EQ(spaces.size(), 4);
+  ASSERT_EQ(spaces.size(), 5);
 
   EXPECT_EQ(spaces[0].name(), "IrInstructionCount");
   EXPECT_FALSE(spaces[0].range().has_min());
@@ -34,6 +34,10 @@ TEST(RewardSpacesTest, getLlvmRewardSpaceList) {
   EXPECT_EQ(spaces[3].name(), "IrInstructionCountOzDiff");
   EXPECT_FALSE(spaces[3].range().has_max());
   EXPECT_FALSE(spaces[3].range().has_max());
+
+  EXPECT_EQ(spaces[4].name(), "NativeTextSizeBytes");
+  EXPECT_FALSE(spaces[4].range().has_min());
+  EXPECT_EQ(spaces[4].range().max().value(), 0);
 }
 
 }  // anonymous namespace

@@ -293,7 +293,7 @@ Status LlvmEnvironment::getReward(LlvmRewardSpace space, Reward* reply) {
 
   const std::optional<double> baselineCost =
       benchmark().baselineCosts()[static_cast<size_t>(space)];
-  const double currentCost = getCost(space, benchmark().module());
+  const double currentCost = getCost(space, benchmark().module(), workingDirectory_);
 
   if (baselineCost.has_value()) {
     reply->set_reward(*baselineCost / currentCost);

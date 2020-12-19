@@ -263,11 +263,21 @@ Codesize
 +--------------------------+-------------+
 | IrInstructionCountOzDiff | (-inf, inf) |
 +--------------------------+-------------+
+| NativeTextSizeBytes      | (-inf, 0.0) |
++--------------------------+-------------+
 
 The number of LLVM-IR instructions in the program can be used as reward
-signals, either using the raw instruction count, or by normalizing the
-instruction count relative to the instruction count when the program is
-optimized using the :code:`-O3` of :code:`-Oz` LLVM pipelines.
+signals, either using the raw instruction count (:code:`IrInstructionCount`),
+or by normalizing the instruction count relative to the instruction count when
+the program is optimized using the :code:`-O3` of :code:`-Oz` LLVM pipelines.
+LLVM-IR instruction count is fast to evaluate, deterministic, and
+platform-independent, but is not a measure of true codesize reduction as it does
+not take into account the effects of lowering.
+
+The :code:`NativeTextSizeBytes` reward signal returns the size of the
+:code:`.TEXT` section of the module after lowering to native code. This is more
+expensive to compute than :code:`IrInstructionCount`. The native code size
+depends on the target platform.
 
 
 Action Space
