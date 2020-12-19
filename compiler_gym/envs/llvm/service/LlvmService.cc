@@ -23,7 +23,7 @@ using grpc::StatusCode;
 namespace fs = boost::filesystem;
 
 LlvmService::LlvmService(const fs::path& workingDirectory)
-    : workingDirectory_(workingDirectory), benchmarkFactory_(), nextSessionId_(0) {}
+    : workingDirectory_(workingDirectory), benchmarkFactory_(workingDirectory), nextSessionId_(0) {}
 
 Status LlvmService::GetSpaces(ServerContext* /* unused */, const GetSpacesRequest* /* unused */,
                               GetSpacesReply* reply) {

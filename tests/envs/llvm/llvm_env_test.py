@@ -788,6 +788,7 @@ def test_reward_spaces(env: CompilerEnv):
         "IrInstructionCountO3",
         "IrInstructionCountOz",
         "IrInstructionCountOzDiff",
+        "NativeTextSizeBytes",
     }
 
     reward_space = "IrInstructionCount"
@@ -804,6 +805,9 @@ def test_reward_spaces(env: CompilerEnv):
 
     reward_space = "IrInstructionCountOzDiff"
     assert env.reward.ranges[reward_space] == (-np.inf, np.inf)
+
+    reward_space = "NativeTextSizeBytes"
+    assert env.reward.ranges[reward_space] == (-np.inf, 0)
 
     invalid = "invalid value"
     with pytest.raises(KeyError) as ctx:
