@@ -37,7 +37,7 @@ class RandomAgentWorker(Thread):
         self.total_environment_count = 0
         self.total_episode_count = 0
         self.total_step_count = 0
-        self.best_reward = 0
+        self.best_reward = -float("inf")
         self.best_actions: List[int] = []
         self.best_commandline: List[int] = []
         self.best_found_at_time = time()
@@ -150,7 +150,7 @@ def random_search(
     best_actions = []
     best_commandline = ""
     started = time()
-    last_best_reward = 0
+    last_best_reward = -float("inf")
 
     print(
         f"Started {len(workers)} worker threads for "
@@ -203,7 +203,7 @@ def random_search(
                     f"({humanize.intcomma(int(total_episode_count / runtime))} / sec). "
                     f"Num restarts: {humanize.intcomma(total_environment_count - nproc)}.\n"
                     "\033[K"
-                    f"Best reward: {best_reward:.2%} "
+                    f"Best reward: {best_reward:.4f} "
                     f"({len(best_actions)} passes, "
                     f"found after {humanize.naturaldelta(best_worker.best_found_at_time - started)})",
                     end="",
