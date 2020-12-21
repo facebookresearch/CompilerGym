@@ -40,6 +40,16 @@ enum class LlvmObservationSpace {
   PROGRAML,
   // A JSON dictionary of properties describing the CPU.
   CPU_INFO,
+  // The number of LLVM-IR instructions in the current module.
+  IR_INSTRUCTION_COUNT,
+  IR_INSTRUCTION_COUNT_O0,
+  IR_INSTRUCTION_COUNT_O3,
+  IR_INSTRUCTION_COUNT_OZ,
+  // The size of the .text section of the lowered module. Platform dependent.
+  NATIVE_TEXT_SIZE_BYTES,
+  NATIVE_TEXT_SIZE_BYTES_O0,
+  NATIVE_TEXT_SIZE_BYTES_O3,
+  NATIVE_TEXT_SIZE_BYTES_OZ,
 };
 
 // Return the list of available observation spaces.

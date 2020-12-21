@@ -16,7 +16,7 @@ namespace {
 TEST(ObservationSpacesTest, getLlvmObservationSpaceList) {
   const auto spaces = getLlvmObservationSpaceList();
 
-  ASSERT_EQ(spaces.size(), 5);
+  ASSERT_EQ(spaces.size(), 13);
 
   EXPECT_EQ(spaces[0].name(), "Ir");
   EXPECT_EQ(spaces[0].string_size_range().min().value(), 0);
@@ -34,6 +34,18 @@ TEST(ObservationSpacesTest, getLlvmObservationSpaceList) {
   }
 
   EXPECT_EQ(spaces[3].name(), "Programl");
+
+  EXPECT_EQ(spaces[4].name(), "CpuInfo");
+
+  EXPECT_EQ(spaces[5].name(), "IrInstructionCount");
+  EXPECT_EQ(spaces[6].name(), "IrInstructionCountO0");
+  EXPECT_EQ(spaces[7].name(), "IrInstructionCountO3");
+  EXPECT_EQ(spaces[8].name(), "IrInstructionCountOz");
+
+  EXPECT_EQ(spaces[9].name(), "NativeTextSizeBytes");
+  EXPECT_EQ(spaces[10].name(), "NativeTextSizeBytesO0");
+  EXPECT_EQ(spaces[11].name(), "NativeTextSizeBytesO3");
+  EXPECT_EQ(spaces[12].name(), "NativeTextSizeBytesOz");
 }
 
 }  // anonymous namespace

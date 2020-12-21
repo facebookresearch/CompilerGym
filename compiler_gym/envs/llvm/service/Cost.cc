@@ -77,7 +77,7 @@ Status runCommandOnModule(const std::string& cmd, llvm::Module& module, std::str
 
 Status getNativeTextSizeInBytes(llvm::Module& module, int64_t* value,
                                 const fs::path& workingDirectory) {
-  const auto clang = util::getRunfilesPath("CompilerGym/compiler_gym/third_party/llvm/clang");
+  const auto clang = util::getRunfilesPath("compiler_gym/third_party/llvm/clang");
   DCHECK(fs::exists(clang)) << "File not found: " << clang.string();
   const auto tmpFile = fs::unique_path(workingDirectory / "module-%%%%.o");
 
@@ -104,50 +104,92 @@ Status getNativeTextSizeInBytes(llvm::Module& module, int64_t* value,
 
 }  // anonymous namespace
 
-double getCost(const LlvmRewardSpace& space, llvm::Module& module,
+double getCost(const LlvmCostFunction& cost, llvm::Module& module,
                const fs::path& workingDirectory) {
-  switch (space) {
-    case LlvmRewardSpace::IR_INSTRUCTION_COUNT:
-      return -static_cast<double>(module.getInstructionCount());
-    case LlvmRewardSpace::IR_INSTRUCTION_COUNT_OZ:
-    case LlvmRewardSpace::IR_INSTRUCTION_COUNT_OZ_DIFF:
-    case LlvmRewardSpace::IR_INSTRUCTION_COUNT_O3:
-      // A module should never contain zero instructions, but this isn't
-      // enforced. Instead, clamp the minimum instruction count to 1 to prevent
-      // divide-by-zero errors when calculating the ratio of costs.
-      return std::max(static_cast<double>(module.getInstructionCount()), 1.0);
-    case LlvmRewardSpace::NATIVE_TEXT_SIZE_BYTES: {
+  switch (cost) {
+    case LlvmCostFunction::IR_INSTRUCTION_COUNT:
+      return static_cast<double>(module.getInstructionCount());
+    case LlvmCostFunction::NATIVE_TEXT_SIZE_BYTES: {
       int64_t size;
-      CHECK(getNativeTextSizeInBytes(module, &size, workingDirectory).ok());
-      return -static_cast<double>(size);
+      const auto status = getNativeTextSizeInBytes(module, &size, workingDirectory);
+      CHECK(status.ok()) << status.error_message();
+      return static_cast<double>(size);
     }
   }
+}
+
+size_t getBaselineCostIndex(LlvmBaselinePolicy policy, LlvmCostFunction cost) {
+  return static_cast<size_t>(magic_enum::enum_count<LlvmCostFunction>()) *
+             static_cast<size_t>(policy) +
+         static_cast<size_t>(cost);
+}
+
+double getBaselineCost(const BaselineCosts& baselineCosts, LlvmBaselinePolicy policy,
+                       LlvmCostFunction cost) {
+  return baselineCosts[getBaselineCostIndex(policy, cost)];
 }
 
 void setbaselineCosts(const llvm::Module& unoptimizedModule, BaselineCosts* baselineCosts,
                       const fs::path& workingDirectory) {
   // Create a copy of the unoptimized module and apply the default set of LLVM
   // optimizations.
+  std::unique_ptr<llvm::Module> moduleO0 = llvm::CloneModule(unoptimizedModule);
+
   std::unique_ptr<llvm::Module> moduleOz = llvm::CloneModule(unoptimizedModule);
   applyBaselineOptimizations(moduleOz.get(), /*optLevel=*/2, /*sizeLevel=*/2);
 
   std::unique_ptr<llvm::Module> moduleO3 = llvm::CloneModule(unoptimizedModule);
   applyBaselineOptimizations(moduleO3.get(), /*optLevel=*/3, /*sizeLevel=*/0);
 
-  for (const auto space : magic_enum::enum_values<LlvmRewardSpace>()) {
-    switch (space) {
-      case LlvmRewardSpace::IR_INSTRUCTION_COUNT:
-      case LlvmRewardSpace::NATIVE_TEXT_SIZE_BYTES:
-        (*baselineCosts)[static_cast<size_t>(space)].reset();
+  for (const auto policy : magic_enum::enum_values<LlvmBaselinePolicy>()) {
+    // Set the baseline module.
+    llvm::Module* baselineModule{nullptr};
+    switch (policy) {
+      case LlvmBaselinePolicy::O0:
+        baselineModule = moduleO0.get();
         break;
-      case LlvmRewardSpace::IR_INSTRUCTION_COUNT_OZ:
-      case LlvmRewardSpace::IR_INSTRUCTION_COUNT_OZ_DIFF:
-        (*baselineCosts)[static_cast<size_t>(space)] = getCost(space, *moduleOz, workingDirectory);
+      case LlvmBaselinePolicy::O3:
+        baselineModule = moduleO3.get();
         break;
-      case LlvmRewardSpace::IR_INSTRUCTION_COUNT_O3:
-        (*baselineCosts)[static_cast<size_t>(space)] = getCost(space, *moduleO3, workingDirectory);
+      case LlvmBaselinePolicy::Oz:
+        baselineModule = moduleOz.get();
         break;
     }
+    DCHECK(baselineModule);
+
+    // Compute and set the baseline costs.
+    for (const auto cost : magic_enum::enum_values<LlvmCostFunction>()) {
+      const auto idx = getBaselineCostIndex(policy, cost);
+      const auto cc = getCost(cost, *baselineModule, workingDirectory);
+      (*baselineCosts)[idx] = cc;
+    }
+  }
+}
+
+LlvmCostFunction getCostFunction(LlvmRewardSpace space) {
+  switch (space) {
+    case LlvmRewardSpace::IR_INSTRUCTION_COUNT:
+    case LlvmRewardSpace::IR_INSTRUCTION_COUNT_O3:
+    case LlvmRewardSpace::IR_INSTRUCTION_COUNT_Oz:
+      return LlvmCostFunction::IR_INSTRUCTION_COUNT;
+    case LlvmRewardSpace::NATIVE_TEXT_SIZE_BYTES:
+    case LlvmRewardSpace::NATIVE_TEXT_SIZE_BYTES_O3:
+    case LlvmRewardSpace::NATIVE_TEXT_SIZE_BYTES_Oz:
+      return LlvmCostFunction::NATIVE_TEXT_SIZE_BYTES;
+  }
+}
+
+LlvmBaselinePolicy getBaselinePolicy(LlvmRewardSpace space) {
+  switch (space) {
+    case LlvmRewardSpace::IR_INSTRUCTION_COUNT:
+    case LlvmRewardSpace::NATIVE_TEXT_SIZE_BYTES:
+      return LlvmBaselinePolicy::O0;
+    case LlvmRewardSpace::IR_INSTRUCTION_COUNT_O3:
+    case LlvmRewardSpace::NATIVE_TEXT_SIZE_BYTES_O3:
+      return LlvmBaselinePolicy::O3;
+    case LlvmRewardSpace::IR_INSTRUCTION_COUNT_Oz:
+    case LlvmRewardSpace::NATIVE_TEXT_SIZE_BYTES_Oz:
+      return LlvmBaselinePolicy::Oz;
   }
 }
 
