@@ -222,7 +222,8 @@ Status LlvmEnvironment::getObservation(LlvmObservationSpace space, Observation* 
     }
     case LlvmObservationSpace::BITCODE_FILE: {
       // Generate an output path with 16 bits of randomness.
-      const std::string outpath = fs::unique_path(workingDirectory_ / "module-%%%%%%%%.bc").string();
+      const std::string outpath =
+          fs::unique_path(workingDirectory_ / "module-%%%%%%%%.bc").string();
       std::error_code error;
       llvm::raw_fd_ostream outfile(outpath, error);
       if (error.value()) {

@@ -73,9 +73,8 @@ Status LlvmService::StartEpisode(ServerContext* /* unused */, const StartEpisode
 
   // Construct the environment.
   reply->set_session_id(nextSessionId_);
-  sessions_[nextSessionId_] = std::make_unique<LlvmEnvironment>(std::move(benchmark), actionSpace,
-                                                                eagerObservation, eagerReward,
-                                                                workingDirectory_);
+  sessions_[nextSessionId_] = std::make_unique<LlvmEnvironment>(
+      std::move(benchmark), actionSpace, eagerObservation, eagerReward, workingDirectory_);
   ++nextSessionId_;
   return Status::OK;
 }
