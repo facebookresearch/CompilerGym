@@ -11,7 +11,7 @@ namespace compiler_gym::util {
 // When running under bazel, the working directory is the root of the
 // CompilerGym workspace. Back up one level so that we can reference other
 // workspaces.
-static const std::string kDefaultBase{"../"};
+static const std::string kDefaultBase{".."};
 
 fs::path getRunfilesPath(const std::string& relPath) {
   const char* base = std::getenv("COMPILER_GYM_RUNFILES");
