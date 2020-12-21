@@ -287,7 +287,7 @@ class ManagedConnection(Connection):
         """Terminate a local subprocess and close the connection."""
         self.process.kill()
         self.process.communicate(timeout=self.process_exit_max_seconds)
-        shutil.rmtree(self.working_dir)
+        shutil.rmtree(self.working_dir, ignore_errors=True)
         super().close()
 
     def __repr__(self):
