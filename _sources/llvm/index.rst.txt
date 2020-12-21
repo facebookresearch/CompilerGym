@@ -53,7 +53,8 @@ tool, or programatically using
 Observation Spaces
 ------------------
 
-We provide several observation spaces for LLVM based on prior compiler research.
+We provide several observation spaces for LLVM based on published compiler
+research.
 
 Autophase
 ~~~~~~~~~
@@ -78,6 +79,27 @@ Use the :code:`Autophase` observation space to access the feature vectors as an
 `np.array <https://numpy.org/doc/stable/reference/generated/numpy.array.html>`_,
 and :code:`AutophaseDict` to receive them as a self-documented dictionary, keyed
 by the name of each feature.
+
+Example values:
+
+
+    >>> env.observation["Autophase"]
+    array([   0,    0,   26,   25,    1,   26,   10,    1,    8,   10,    0,
+              0,    0,   37,    0,   36,    0,    2,   46,  175, 1664, 1212,
+            263,   26,  193,    0,   59,    6,    0,    3,   32,    0,   36,
+             10, 1058,   10,    0,  840,    0,    0,    0,    1,  416,    0,
+              0,  148,   60,    0,    0,    0,   37, 3008, 2062,    9,    0,
+           1262])
+    >>> env.observation["AutophaseDict"]
+    {'BBNumArgsHi': 0, 'BBNumArgsLo': 0, 'onePred': 26, 'onePredOneSuc': 25,
+     'onePredTwoSuc': 1, 'oneSuccessor': 26, 'twoPred': 10, 'twoPredOneSuc': 1,
+     'twoEach': 8, 'twoSuccessor': 10, 'morePreds': 0, 'BB03Phi': 0,
+     'BBHiPhi': 0, 'BBNoPhi': 37, 'BeginPhi': 0, 'BranchCount': 36,
+     'returnInt': 0, 'CriticalCount': 2, 'NumEdges': 46, 'const32Bit': 175,
+     'const64Bit': 1664, 'numConstZeroes': 1212, 'numConstOnes': 263,
+     'UncondBranches': 26, 'binaryConstArg': 193, 'NumAShrInst': 0,
+     'NumAddInst': 59, 'NumAllocaInst': 6, 'NumAndInst': 0, 'BlockMid': 3,
+     'BlockLow': 32, 'NumBitCastInst': 0, 'NumBrInst': 36, 'NumCallInst': 10, ... }
 
 Inst2vec
 ~~~~~~~~
@@ -110,17 +132,8 @@ simplify the expressions. Using the Inst2vecPreprocessedText observation space
 returns a list of pre-processed strings, one per statement. It could be useful
 if you want to normalize the IR but then do your own embedding.
 
-.. code-block::
-
-    $ python -m compiler_gym.bin.manual_env -- --env=llvm-v0 --benchmark=cBench/crc32
-
-    Initialized environment in 268.7ms
-    Reset benchmark://cBench/crc32 environment in 24.7ms
-
-    Step 1. Select: [a]ction [o]bservation [r]eward [c]ommandline [e]nd >>> observation
-    Observable values: [0] Autophase, [1] BitcodeFile, [2] CpuInfo, [3] Inst2vec, [4] Inst2vecEmbeddingIndices, [5] Inst2vecPreprocessedText, [6] Ir, [7] Programl >>> Inst2vecPreprocessedText
-    ['opaque = type opaque', '<@ID> = internal global [... i32, i32* <%ID>, align 4', 'ret i32 <%ID>']
-    Observation Inst2vecPreprocessedText in 232.0ms
+    >>> env.observation["Inst2vecPreprocessedText"]
+    ['opaque = type opaque', ..., 'ret i32 <%ID>']
 
 **Step 2: encoding**
 
@@ -133,12 +146,8 @@ to use the inst2vec pre-trained embeddings but are processing them on a GPU
 where you have already allocated and copied the embedding table, minimizing
 transfer sizes.
 
-.. code-block::
-
-    Step 1. Select: [a]ction [o]bservation [r]eward [c]ommandline [e]nd >>> observation
-    Observable values: [0] Autophase, [1] BitcodeFile, [2] CpuInfo, [3] Inst2vec, [4] Inst2vecEmbeddingIndices, [5] Inst2vecPreprocessedText, [6] Ir, [7] Programl >>> Inst2vecEmbeddingIndices
-    [8564, 8564, 5, 46, 46, 40, 8564, 13, 8, 8564, 1348, 178, 286, 214, 182, 235, 697, 1513, 192, 8564, 182, 182, 395, 1513, 2298, 8564, 289, 291, 3729, 3729, 8564, 178, 289, 200, 1412, 1412, 205, 415, 205, 213, 8564, 8564, 5666, 204, 8564, 213, 215, 364, 216, 8564, 216, 8564, 5665, 8564, 311, 634, 204, 8564, 415, 182, 640, 214, 182, 295, 675, 697, 1513, 192, 8564, 182, 182, 395, 1513, 214, 216, 8564, 5665, 8564, 634, 204, 8564, 213, 215, 415, 205, 216, 8564, 5665, 8564, 182, 961, 214, 415, 214, 364, 216, 8564, 295, 257, 8564, 291, 178, 178, 200, 214, 205, 216, 8564, 182, 977, 204, 8564, 182, 213, 235, 697, 1513, 192, 8564, 182, 182, 395, 1513, 214, 216, 8564, 182, 420, 214, 213, 8564, 200, 216, 8564, 182, 961, 2298, 8564, 289, 8564, 289, 178, 178, 289, 311, 594, 311, 364, 216, 8564, 295, 431, 311, 425, 204, 8564, 597, 8564, 594, 213, 8564, 295, 653, 311, 295, 634, 204, 8564, 182, 182, 597, 213, 8564, 216, 8564, 216, 8564, 295, 634, 612, 257, 8564, 289, 289, 8564, 8564, 178, 178, 364, 311, 594, 8564, 8564, 8564, 5666, 204, 8564, 5391, 8564, 364, 216, 8564, 5665, 8564, 5665, 8564, 205, 216, 8564, 182, 182, 488, 204, 8564, 295, 597, 182, 640, 182, 540, 612, 8564, 216, 8564, 182, 640, 214, 216, 8564, 364, 216, 8564, 295, 257]
-    Observation Inst2vecEmbeddingIndices in 83.3ms
+    >>> env.observation["Inst2vecEmbeddingIndices"]
+    [8564, 8564, 5, 46, ..., 257]
 
 **Step 3: embedding**
 
@@ -146,25 +155,20 @@ The vocabulary indices are mapped to 200-D embedding vectors, producing an
 np.array of shape (num_statements, 200). This could be fed into an LSTM to
 produce a program embedding.
 
-.. code-block::
-
-    Step 1. Select: [a]ction [o]bservation [r]eward [c]ommandline [e]nd >>> observation
-    Observable values: [0] Autophase, [1] BitcodeFile, [2] CpuInfo, [3] Inst2vec, [4] Inst2vecEmbeddingIndices, [5] Inst2vecPreprocessedText, [6] Ir, [7] Programl >>> Inst2vec
-    [[-0.59749085  0.63315004 -0.0308373  ...  0.14833118  0.86420786
-       0.44808227]
-     [-0.59749085  0.63315004 -0.0308373  ...  0.14833118  0.86420786
-       0.44808227]
-     [-0.3826681   0.681551   -0.48866785 ... -0.34639767  0.4906757
-       0.40215215]
-     ...
-     [-0.59749085  0.63315004 -0.0308373  ...  0.14833118  0.86420786
-       0.44808227]
-     [-0.5932641   0.55792844  0.01643612 ...  0.31370804  0.5398467
-       0.64350367]
-     [-0.61786747  0.84928125 -0.19026336 ... -0.2501209   0.2700288
-       0.6338952 ]]
-    Observation Inst2vec in 80.8ms
-
+    >>> env.observation["Inst2vec"]
+    array([[-0.26956588,  0.47407162, -0.36637706, ..., -0.49256894,
+             0.8016193 ,  0.71160674],
+           [-0.59749085,  0.63315004, -0.0308373 , ...,  0.14833118,
+             0.86420786,  0.44808227],
+           [-0.59749085,  0.63315004, -0.0308373 , ...,  0.14833118,
+             0.86420786,  0.44808227],
+           ...,
+           [-0.37584195,  0.43671703, -0.5360456 , ...,  0.6030259 ,
+             0.82574934,  0.6306344 ],
+           [-0.59749085,  0.63315004, -0.0308373 , ...,  0.14833118,
+             0.86420786,  0.44808227],
+           [-0.43074277,  0.8589559 , -0.35770646, ...,  0.28785184,
+             0.8492773 ,  0.8914213 ]], dtype=float32)
 
 ProGraML
 ~~~~~~~~
@@ -184,6 +188,19 @@ ProGraML is described in:
     `ProGraML: Graph-based Deep Learning for Program Optimization and Analysis <https://arxiv.org/pdf/2003.10536.pdf>`_.
     arXiv preprint arXiv:2003.10536.
 
+Example usage:
+
+    >>> G = env.observation["Programl"]
+    >>> G
+    <networkx.classes.multidigraph.MultiDiGraph object at 0x7f9d8050ffa0>
+    >>> G.number_of_nodes()
+    6326
+    >>> G.nodes[1000]
+    {'block': 8, 'features': {'full_text': ['%439 = load double, double* @tmp2, align 8']}, 'function': 0, 'text': 'load', 'type': 0}
+    >>> G.edge[0, 1, 0]
+    {'flow': 2, 'position': 0}
+
+
 Hardware Information
 ~~~~~~~~~~~~~~~~~~~~
 
@@ -199,6 +216,10 @@ Essential performance information about the host CPU can be accessed as JSON
 dictionary, extracted using the `cpuinfo <https://github.com/pytorch/cpuinfo>`_
 library.
 
+Example usage:
+
+    >>> env.observation["CpuInfo"]
+    {'cores_count': 8, 'l1d_cache_count': 8, ...}
 
 LLVM-IR
 ~~~~~~~
@@ -212,8 +233,18 @@ LLVM-IR
 +--------------------------+-------------------------+
 
 A serialized representation of the LLVM-IR can be accessed as a string through
-the :code:`Ir` observation space, or by writing the bitcode to disk and return
-its path using the :code:`BitcodeFile` observation space.
+the :code:`Ir` observation space:
+
+    >>> env.observation["Ir"]
+    '; ModuleID = \'benchmark://npb-v0/50\'\n ..."use-soft-float"="false" }\n'
+
+Alternatively the module can be serialized to a bitcode file on disk:
+
+    >>> env.observation["BitcodeFile"]
+    '/home/user/.cache/compiler_gym/service/2020-12-21T11:55:41.716711-6f4f0669/module-5a8b9fcf.bc'
+
+Note that the files generated by the :code:`BitcodeFile` observation space are
+put in a temporary directory that is removed when :code:`env.close()` is called.
 
 Reward Spaces
 -------------

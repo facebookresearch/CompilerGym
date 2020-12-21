@@ -8,7 +8,7 @@ Install the latest CompilerGym release using:
 
 ::
 
-   $ pip install compiler_gym
+   $ pip3 install compiler_gym
 
 Building from Source
 ~~~~~~~~~~~~~~~~~~~~

@@ -194,9 +194,9 @@
             
   <div class="section" id="command-line-reference">
 <h1>Command Line Reference<a class="headerlink" href="#command-line-reference" title="Permalink to this headline">¶</a></h1>
-<p>Compiler Gym includes several modules in the <code class="code docutils literal notranslate"><span class="pre">compiler_gym.bin</span></code> module
-for command line use. This document provides an overview of each module. Run any
-of the commands with <code class="code docutils literal notranslate"><span class="pre">--helpfull</span></code> to examine the full usage options.</p>
+<p>Compiler Gym includes several command line tools in the <code class="code docutils literal notranslate"><span class="pre">compiler_gym.bin</span></code>
+module. This document provides an overview of each module. Run any of the
+commands with <code class="code docutils literal notranslate"><span class="pre">--helpfull</span></code> to examine the full usage options.</p>
 <div class="contents local topic" id="command-line-tools">
 <p class="topic-title">Command line tools:</p>
 <ul class="simple">
@@ -267,7 +267,7 @@ of the commands with <code class="code docutils literal notranslate"><span class
 ...
 </pre></div>
 </div>
-<p>The capabilities of an unmanaged service can be queries using the
+<p>The capabilities of an unmanaged service can be queried using the
 <code class="code docutils literal notranslate"><span class="pre">--service</span></code> flag. For example, query a service running at
 <code class="code docutils literal notranslate"><span class="pre">localhost:8080</span></code>:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.service --service=localhost:8080
@@ -412,8 +412,6 @@ Started 16 worker threads for benchmark benchmark://cBench-v0/dijkstra (410 inst
 === Running for a minute ===
 Runtime: a minute. Num steps: 470,407 (7,780 / sec). Num episodes: 4,616 (76 / sec). Num restarts: 0.
 Best reward: 101.59% (96 passes, found after 35 seconds)
-Wrote /home/user/logs/compilergym/random/cBench-v0/dijkstra/2020-12-02T17:53:08.726667/random_search_best_actions.txt and
-     /home/user/logs/compilergym/random/cBench-v0/dijkstra/2020-12-02T17:53:08.726667/random_search_progress.csv.
 Ending jobs ... done
 Step [000 / 096]: reward=0.621951
 Step [001 / 096]: reward=0.621951, change=0.000000, action=AlwaysInlinerLegacyPass
@@ -421,8 +419,6 @@ Step [001 / 096]: reward=0.621951, change=0.000000, action=AlwaysInlinerLegacyPa
 Step [094 / 096]: reward=1.007905, change=0.066946, action=CfgsimplificationPass
 Step [095 / 096]: reward=1.007905, change=0.000000, action=LoopVersioningPass
 Step [096 / 096]: reward=1.015936, change=0.008031, action=NewGvnpass
-Wrote /home/user/logs/compilergym/random/cBench-v0/dijkstra/2020-12-02T17:53:08.726667/random_search_best_actions_progress.csv
-Wrote /home/user/logs/compilergym/random/cBench-v0/dijkstra/2020-12-02T17:53:08.726667/optimized.bc
 </pre></div>
 </div>
 <div class="section" id="search-strategy">

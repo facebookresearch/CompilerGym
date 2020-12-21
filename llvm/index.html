@@ -296,7 +296,8 @@ tool, or programatically using
 </div>
 <div class="section" id="observation-spaces">
 <h2><a class="toc-backref" href="#id2">Observation Spaces</a><a class="headerlink" href="#observation-spaces" title="Permalink to this headline">¶</a></h2>
-<p>We provide several observation spaces for LLVM based on prior compiler research.</p>
+<p>We provide several observation spaces for LLVM based on published compiler
+research.</p>
 <div class="section" id="autophase">
 <h3><a class="toc-backref" href="#id3">Autophase</a><a class="headerlink" href="#autophase" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
@@ -330,6 +331,26 @@ Proceedings of Machine Learning and Systems, 2, 70-81.</p>
 <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html">np.array</a>,
 and <code class="code docutils literal notranslate"><span class="pre">AutophaseDict</span></code> to receive them as a self-documented dictionary, keyed
 by the name of each feature.</p>
+<p>Example values:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;Autophase&quot;</span><span class="p">]</span>
+<span class="go">array([   0,    0,   26,   25,    1,   26,   10,    1,    8,   10,    0,</span>
+<span class="go">          0,    0,   37,    0,   36,    0,    2,   46,  175, 1664, 1212,</span>
+<span class="go">        263,   26,  193,    0,   59,    6,    0,    3,   32,    0,   36,</span>
+<span class="go">         10, 1058,   10,    0,  840,    0,    0,    0,    1,  416,    0,</span>
+<span class="go">          0,  148,   60,    0,    0,    0,   37, 3008, 2062,    9,    0,</span>
+<span class="go">       1262])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;AutophaseDict&quot;</span><span class="p">]</span>
+<span class="go">{&#39;BBNumArgsHi&#39;: 0, &#39;BBNumArgsLo&#39;: 0, &#39;onePred&#39;: 26, &#39;onePredOneSuc&#39;: 25,</span>
+<span class="go"> &#39;onePredTwoSuc&#39;: 1, &#39;oneSuccessor&#39;: 26, &#39;twoPred&#39;: 10, &#39;twoPredOneSuc&#39;: 1,</span>
+<span class="go"> &#39;twoEach&#39;: 8, &#39;twoSuccessor&#39;: 10, &#39;morePreds&#39;: 0, &#39;BB03Phi&#39;: 0,</span>
+<span class="go"> &#39;BBHiPhi&#39;: 0, &#39;BBNoPhi&#39;: 37, &#39;BeginPhi&#39;: 0, &#39;BranchCount&#39;: 36,</span>
+<span class="go"> &#39;returnInt&#39;: 0, &#39;CriticalCount&#39;: 2, &#39;NumEdges&#39;: 46, &#39;const32Bit&#39;: 175,</span>
+<span class="go"> &#39;const64Bit&#39;: 1664, &#39;numConstZeroes&#39;: 1212, &#39;numConstOnes&#39;: 263,</span>
+<span class="go"> &#39;UncondBranches&#39;: 26, &#39;binaryConstArg&#39;: 193, &#39;NumAShrInst&#39;: 0,</span>
+<span class="go"> &#39;NumAddInst&#39;: 59, &#39;NumAllocaInst&#39;: 6, &#39;NumAndInst&#39;: 0, &#39;BlockMid&#39;: 3,</span>
+<span class="go"> &#39;BlockLow&#39;: 32, &#39;NumBitCastInst&#39;: 0, &#39;NumBrInst&#39;: 36, &#39;NumCallInst&#39;: 10, ... }</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="inst2vec">
 <h3><a class="toc-backref" href="#id4">Inst2vec</a><a class="headerlink" href="#inst2vec" title="Permalink to this headline">¶</a></h3>
@@ -370,15 +391,8 @@ observation spaces:</p>
 simplify the expressions. Using the Inst2vecPreprocessedText observation space
 returns a list of pre-processed strings, one per statement. It could be useful
 if you want to normalize the IR but then do your own embedding.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.manual_env -- --env=llvm-v0 --benchmark=cBench/crc32
-
-Initialized environment in 268.7ms
-Reset benchmark://cBench/crc32 environment in 24.7ms
-
-Step 1. Select: [a]ction [o]bservation [r]eward [c]ommandline [e]nd &gt;&gt;&gt; observation
-Observable values: [0] Autophase, [1] BitcodeFile, [2] CpuInfo, [3] Inst2vec, [4] Inst2vecEmbeddingIndices, [5] Inst2vecPreprocessedText, [6] Ir, [7] Programl &gt;&gt;&gt; Inst2vecPreprocessedText
-[&#39;opaque = type opaque&#39;, &#39;&lt;@ID&gt; = internal global [... i32, i32* &lt;%ID&gt;, align 4&#39;, &#39;ret i32 &lt;%ID&gt;&#39;]
-Observation Inst2vecPreprocessedText in 232.0ms
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;Inst2vecPreprocessedText&quot;</span><span class="p">]</span>
+<span class="go">[&#39;opaque = type opaque&#39;, ..., &#39;ret i32 &lt;%ID&gt;&#39;]</span>
 </pre></div>
 </div>
 <p><strong>Step 2: encoding</strong></p>
@@ -390,32 +404,28 @@ you want to learn your own embeddings using the same vocabulary, or if you want
 to use the inst2vec pre-trained embeddings but are processing them on a GPU
 where you have already allocated and copied the embedding table, minimizing
 transfer sizes.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Step</span> <span class="mf">1.</span> <span class="n">Select</span><span class="p">:</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="n">ction</span> <span class="p">[</span><span class="n">o</span><span class="p">]</span><span class="n">bservation</span> <span class="p">[</span><span class="n">r</span><span class="p">]</span><span class="n">eward</span> <span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="n">ommandline</span> <span class="p">[</span><span class="n">e</span><span class="p">]</span><span class="n">nd</span> <span class="o">&gt;&gt;&gt;</span> <span class="n">observation</span>
-<span class="n">Observable</span> <span class="n">values</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="n">Autophase</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="n">BitcodeFile</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">CpuInfo</span><span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="n">Inst2vec</span><span class="p">,</span> <span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="n">Inst2vecEmbeddingIndices</span><span class="p">,</span> <span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="n">Inst2vecPreprocessedText</span><span class="p">,</span> <span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="n">Ir</span><span class="p">,</span> <span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="n">Programl</span> <span class="o">&gt;&gt;&gt;</span> <span class="n">Inst2vecEmbeddingIndices</span>
-<span class="p">[</span><span class="mi">8564</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">46</span><span class="p">,</span> <span class="mi">46</span><span class="p">,</span> <span class="mi">40</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">1348</span><span class="p">,</span> <span class="mi">178</span><span class="p">,</span> <span class="mi">286</span><span class="p">,</span> <span class="mi">214</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">235</span><span class="p">,</span> <span class="mi">697</span><span class="p">,</span> <span class="mi">1513</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">395</span><span class="p">,</span> <span class="mi">1513</span><span class="p">,</span> <span class="mi">2298</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">289</span><span class="p">,</span> <span class="mi">291</span><span class="p">,</span> <span class="mi">3729</span><span class="p">,</span> <span class="mi">3729</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">178</span><span class="p">,</span> <span class="mi">289</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">1412</span><span class="p">,</span> <span class="mi">1412</span><span class="p">,</span> <span class="mi">205</span><span class="p">,</span> <span class="mi">415</span><span class="p">,</span> <span class="mi">205</span><span class="p">,</span> <span class="mi">213</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">5666</span><span class="p">,</span> <span class="mi">204</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">213</span><span class="p">,</span> <span class="mi">215</span><span class="p">,</span> <span class="mi">364</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">5665</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">311</span><span class="p">,</span> <span class="mi">634</span><span class="p">,</span> <span class="mi">204</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">415</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">640</span><span class="p">,</span> <span class="mi">214</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">295</span><span class="p">,</span> <span class="mi">675</span><span class="p">,</span> <span class="mi">697</span><span class="p">,</span> <span class="mi">1513</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">395</span><span class="p">,</span> <span class="mi">1513</span><span class="p">,</span> <span class="mi">214</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">5665</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">634</span><span class="p">,</span> <span class="mi">204</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">213</span><span class="p">,</span> <span class="mi">215</span><span class="p">,</span> <span class="mi">415</span><span class="p">,</span> <span class="mi">205</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">5665</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">961</span><span class="p">,</span> <span class="mi">214</span><span class="p">,</span> <span class="mi">415</span><span class="p">,</span> <span class="mi">214</span><span class="p">,</span> <span class="mi">364</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">295</span><span class="p">,</span> <span class="mi">257</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">291</span><span class="p">,</span> <span class="mi">178</span><span class="p">,</span> <span class="mi">178</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">214</span><span class="p">,</span> <span class="mi">205</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">977</span><span class="p">,</span> <span class="mi">204</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">213</span><span class="p">,</span> <span class="mi">235</span><span class="p">,</span> <span class="mi">697</span><span class="p">,</span> <span class="mi">1513</span><span class="p">,</span> <span class="mi">192</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">395</span><span class="p">,</span> <span class="mi">1513</span><span class="p">,</span> <span class="mi">214</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">420</span><span class="p">,</span> <span class="mi">214</span><span class="p">,</span> <span class="mi">213</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">200</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">961</span><span class="p">,</span> <span class="mi">2298</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">289</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">289</span><span class="p">,</span> <span class="mi">178</span><span class="p">,</span> <span class="mi">178</span><span class="p">,</span> <span class="mi">289</span><span class="p">,</span> <span class="mi">311</span><span class="p">,</span> <span class="mi">594</span><span class="p">,</span> <span class="mi">311</span><span class="p">,</span> <span class="mi">364</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">295</span><span class="p">,</span> <span class="mi">431</span><span class="p">,</span> <span class="mi">311</span><span class="p">,</span> <span class="mi">425</span><span class="p">,</span> <span class="mi">204</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">597</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">594</span><span class="p">,</span> <span class="mi">213</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">295</span><span class="p">,</span> <span class="mi">653</span><span class="p">,</span> <span class="mi">311</span><span class="p">,</span> <span class="mi">295</span><span class="p">,</span> <span class="mi">634</span><span class="p">,</span> <span class="mi">204</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">597</span><span class="p">,</span> <span class="mi">213</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">295</span><span class="p">,</span> <span class="mi">634</span><span class="p">,</span> <span class="mi">612</span><span class="p">,</span> <span class="mi">257</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">289</span><span class="p">,</span> <span class="mi">289</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">178</span><span class="p">,</span> <span class="mi">178</span><span class="p">,</span> <span class="mi">364</span><span class="p">,</span> <span class="mi">311</span><span class="p">,</span> <span class="mi">594</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">5666</span><span class="p">,</span> <span class="mi">204</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">5391</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">364</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">5665</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">5665</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">205</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">488</span><span class="p">,</span> <span class="mi">204</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">295</span><span class="p">,</span> <span class="mi">597</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">640</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">540</span><span class="p">,</span> <span class="mi">612</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">182</span><span class="p">,</span> <span class="mi">640</span><span class="p">,</span> <span class="mi">214</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">364</span><span class="p">,</span> <span class="mi">216</span><span class="p">,</span> <span class="mi">8564</span><span class="p">,</span> <span class="mi">295</span><span class="p">,</span> <span class="mi">257</span><span class="p">]</span>
-<span class="n">Observation</span> <span class="n">Inst2vecEmbeddingIndices</span> <span class="ow">in</span> <span class="mf">83.3</span><span class="n">ms</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;Inst2vecEmbeddingIndices&quot;</span><span class="p">]</span>
+<span class="go">[8564, 8564, 5, 46, ..., 257]</span>
 </pre></div>
 </div>
 <p><strong>Step 3: embedding</strong></p>
 <p>The vocabulary indices are mapped to 200-D embedding vectors, producing an
 np.array of shape (num_statements, 200). This could be fed into an LSTM to
 produce a program embedding.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">Step</span> <span class="mf">1.</span> <span class="n">Select</span><span class="p">:</span> <span class="p">[</span><span class="n">a</span><span class="p">]</span><span class="n">ction</span> <span class="p">[</span><span class="n">o</span><span class="p">]</span><span class="n">bservation</span> <span class="p">[</span><span class="n">r</span><span class="p">]</span><span class="n">eward</span> <span class="p">[</span><span class="n">c</span><span class="p">]</span><span class="n">ommandline</span> <span class="p">[</span><span class="n">e</span><span class="p">]</span><span class="n">nd</span> <span class="o">&gt;&gt;&gt;</span> <span class="n">observation</span>
-<span class="n">Observable</span> <span class="n">values</span><span class="p">:</span> <span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="n">Autophase</span><span class="p">,</span> <span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="n">BitcodeFile</span><span class="p">,</span> <span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="n">CpuInfo</span><span class="p">,</span> <span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="n">Inst2vec</span><span class="p">,</span> <span class="p">[</span><span class="mi">4</span><span class="p">]</span> <span class="n">Inst2vecEmbeddingIndices</span><span class="p">,</span> <span class="p">[</span><span class="mi">5</span><span class="p">]</span> <span class="n">Inst2vecPreprocessedText</span><span class="p">,</span> <span class="p">[</span><span class="mi">6</span><span class="p">]</span> <span class="n">Ir</span><span class="p">,</span> <span class="p">[</span><span class="mi">7</span><span class="p">]</span> <span class="n">Programl</span> <span class="o">&gt;&gt;&gt;</span> <span class="n">Inst2vec</span>
-<span class="p">[[</span><span class="o">-</span><span class="mf">0.59749085</span>  <span class="mf">0.63315004</span> <span class="o">-</span><span class="mf">0.0308373</span>  <span class="o">...</span>  <span class="mf">0.14833118</span>  <span class="mf">0.86420786</span>
-   <span class="mf">0.44808227</span><span class="p">]</span>
- <span class="p">[</span><span class="o">-</span><span class="mf">0.59749085</span>  <span class="mf">0.63315004</span> <span class="o">-</span><span class="mf">0.0308373</span>  <span class="o">...</span>  <span class="mf">0.14833118</span>  <span class="mf">0.86420786</span>
-   <span class="mf">0.44808227</span><span class="p">]</span>
- <span class="p">[</span><span class="o">-</span><span class="mf">0.3826681</span>   <span class="mf">0.681551</span>   <span class="o">-</span><span class="mf">0.48866785</span> <span class="o">...</span> <span class="o">-</span><span class="mf">0.34639767</span>  <span class="mf">0.4906757</span>
-   <span class="mf">0.40215215</span><span class="p">]</span>
- <span class="o">...</span>
- <span class="p">[</span><span class="o">-</span><span class="mf">0.59749085</span>  <span class="mf">0.63315004</span> <span class="o">-</span><span class="mf">0.0308373</span>  <span class="o">...</span>  <span class="mf">0.14833118</span>  <span class="mf">0.86420786</span>
-   <span class="mf">0.44808227</span><span class="p">]</span>
- <span class="p">[</span><span class="o">-</span><span class="mf">0.5932641</span>   <span class="mf">0.55792844</span>  <span class="mf">0.01643612</span> <span class="o">...</span>  <span class="mf">0.31370804</span>  <span class="mf">0.5398467</span>
-   <span class="mf">0.64350367</span><span class="p">]</span>
- <span class="p">[</span><span class="o">-</span><span class="mf">0.61786747</span>  <span class="mf">0.84928125</span> <span class="o">-</span><span class="mf">0.19026336</span> <span class="o">...</span> <span class="o">-</span><span class="mf">0.2501209</span>   <span class="mf">0.2700288</span>
-   <span class="mf">0.6338952</span> <span class="p">]]</span>
-<span class="n">Observation</span> <span class="n">Inst2vec</span> <span class="ow">in</span> <span class="mf">80.8</span><span class="n">ms</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;Inst2vec&quot;</span><span class="p">]</span>
+<span class="go">array([[-0.26956588,  0.47407162, -0.36637706, ..., -0.49256894,</span>
+<span class="go">         0.8016193 ,  0.71160674],</span>
+<span class="go">       [-0.59749085,  0.63315004, -0.0308373 , ...,  0.14833118,</span>
+<span class="go">         0.86420786,  0.44808227],</span>
+<span class="go">       [-0.59749085,  0.63315004, -0.0308373 , ...,  0.14833118,</span>
+<span class="go">         0.86420786,  0.44808227],</span>
+<span class="go">       ...,</span>
+<span class="go">       [-0.37584195,  0.43671703, -0.5360456 , ...,  0.6030259 ,</span>
+<span class="go">         0.82574934,  0.6306344 ],</span>
+<span class="go">       [-0.59749085,  0.63315004, -0.0308373 , ...,  0.14833118,</span>
+<span class="go">         0.86420786,  0.44808227],</span>
+<span class="go">       [-0.43074277,  0.8589559 , -0.35770646, ...,  0.28785184,</span>
+<span class="go">         0.8492773 ,  0.8914213 ]], dtype=float32)</span>
 </pre></div>
 </div>
 </div>
@@ -446,6 +456,18 @@ ProGraML is described in:</p>
 <a class="reference external" href="https://arxiv.org/pdf/2003.10536.pdf">ProGraML: Graph-based Deep Learning for Program Optimization and Analysis</a>.
 arXiv preprint arXiv:2003.10536.</p>
 </div></blockquote>
+<p>Example usage:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;Programl&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">G</span>
+<span class="go">&lt;networkx.classes.multidigraph.MultiDiGraph object at 0x7f9d8050ffa0&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">G</span><span class="o">.</span><span class="n">number_of_nodes</span><span class="p">()</span>
+<span class="go">6326</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">G</span><span class="o">.</span><span class="n">nodes</span><span class="p">[</span><span class="mi">1000</span><span class="p">]</span>
+<span class="go">{&#39;block&#39;: 8, &#39;features&#39;: {&#39;full_text&#39;: [&#39;%439 = load double, double* @tmp2, align 8&#39;]}, &#39;function&#39;: 0, &#39;text&#39;: &#39;load&#39;, &#39;type&#39;: 0}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">G</span><span class="o">.</span><span class="n">edge</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">0</span><span class="p">]</span>
+<span class="go">{&#39;flow&#39;: 2, &#39;position&#39;: 0}</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="hardware-information">
 <h3><a class="toc-backref" href="#id6">Hardware Information</a><a class="headerlink" href="#hardware-information" title="Permalink to this headline">¶</a></h3>
@@ -471,6 +493,11 @@ arXiv preprint arXiv:2003.10536.</p>
 <p>Essential performance information about the host CPU can be accessed as JSON
 dictionary, extracted using the <a class="reference external" href="https://github.com/pytorch/cpuinfo">cpuinfo</a>
 library.</p>
+<p>Example usage:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;CpuInfo&quot;</span><span class="p">]</span>
+<span class="go">{&#39;cores_count&#39;: 8, &#39;l1d_cache_count&#39;: 8, ...}</span>
+</pre></div>
+</div>
 </div>
 <div class="section" id="llvm-ir">
 <h3><a class="toc-backref" href="#id7">LLVM-IR</a><a class="headerlink" href="#llvm-ir" title="Permalink to this headline">¶</a></h3>
@@ -494,8 +521,18 @@ library.</p>
 </tbody>
 </table>
 <p>A serialized representation of the LLVM-IR can be accessed as a string through
-the <code class="code docutils literal notranslate"><span class="pre">Ir</span></code> observation space, or by writing the bitcode to disk and return
-its path using the <code class="code docutils literal notranslate"><span class="pre">BitcodeFile</span></code> observation space.</p>
+the <code class="code docutils literal notranslate"><span class="pre">Ir</span></code> observation space:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;Ir&quot;</span><span class="p">]</span>
+<span class="go">&#39;; ModuleID = \&#39;benchmark://npb-v0/50\&#39;\n ...&quot;use-soft-float&quot;=&quot;false&quot; }\n&#39;</span>
+</pre></div>
+</div>
+<p>Alternatively the module can be serialized to a bitcode file on disk:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;BitcodeFile&quot;</span><span class="p">]</span>
+<span class="go">&#39;/home/user/.cache/compiler_gym/service/2020-12-21T11:55:41.716711-6f4f0669/module-5a8b9fcf.bc&#39;</span>
+</pre></div>
+</div>
+<p>Note that the files generated by the <code class="code docutils literal notranslate"><span class="pre">BitcodeFile</span></code> observation space are
+put in a temporary directory that is removed when <code class="code docutils literal notranslate"><span class="pre">env.close()</span></code> is called.</p>
 </div>
 </div>
 <div class="section" id="reward-spaces">

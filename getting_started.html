@@ -91,11 +91,11 @@
               <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#key-concepts">Key Concepts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#building-from-source">Building from Source</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#compilergym-overview">CompilerGym Overview</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#using-compilergym">Using CompilerGym</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#selecting-an-environment">Selecting an environment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#installing-benchmarks">Installing benchmarks</a></li>
@@ -190,18 +190,18 @@
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
 <p>CompilerGym is a toolkit for applying reinforcement learning to compiler
 optimization tasks. This document provides a short walkthrough of the key
-concepts. We will start by installing CompilerGym, then work up to trying
-random strategies on the codesize reduction task of a production-grade compiler.
-It will take about 15 minutes to work through. Lets get stuck in!</p>
+concepts, using the codesize reduction task of a production-grade compiler
+as an example. It will take about 20 minutes to work through. Lets get
+started!</p>
 <div class="contents local topic" id="topics-covered">
 <p class="topic-title">Topics covered:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#installation" id="id3">Installation</a></p>
+<li><p><a class="reference internal" href="#key-concepts" id="id3">Key Concepts</a></p></li>
+<li><p><a class="reference internal" href="#installation" id="id4">Installation</a></p>
 <ul>
-<li><p><a class="reference internal" href="#building-from-source" id="id4">Building from Source</a></p></li>
+<li><p><a class="reference internal" href="#building-from-source" id="id5">Building from Source</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#compilergym-overview" id="id5">CompilerGym Overview</a></p></li>
 <li><p><a class="reference internal" href="#using-compilergym" id="id6">Using CompilerGym</a></p>
 <ul>
 <li><p><a class="reference internal" href="#selecting-an-environment" id="id7">Selecting an environment</a></p></li>
@@ -213,14 +213,41 @@ It will take about 15 minutes to work through. Lets get stuck in!</p>
 </li>
 </ul>
 </div>
+<div class="section" id="key-concepts">
+<h2><a class="toc-backref" href="#id3">Key Concepts</a><a class="headerlink" href="#key-concepts" title="Permalink to this headline">¶</a></h2>
+<p>CompilerGym exposes compiler optimization problems as environments for
+reinforcement learning. It uses the <a class="reference external" href="https://gym.openai.com/">OpenAI Gym</a>
+interface to expose the “agent-environment loop” of reinforcement learning:</p>
+<img alt="_images/overview.png" src="_images/overview.png" />
+<p>The ingredients for reinforcement learning that CompilerGym provides are:</p>
+<ul class="simple">
+<li><p><strong>Environment</strong>: a compiler optimization task. For example,
+<em>optimizing a C++ graph-traversal program for codesize using LLVM</em>. The
+environment encapsulates an instance of a compiler and a particular program
+that is being compiled. As an agent interacts with the environment, the state
+of the program, and the compiler, can change.</p></li>
+<li><p><strong>Action Space</strong>: the actions that may be taken at the current environment
+state. For example, this could be a set of optimization transformations that
+the compiler can apply to the program.</p></li>
+<li><p><strong>Observation</strong>: a view of the current environment state. For example, this
+could be the Intermediate Representation (IR) of the program that is being
+compiled. The types of observations that are available depend on the compiler.</p></li>
+<li><p><strong>Reward</strong>: a metric indicating the quality of the previous action. For
+example, for a codesize optimization task this could be the change to the
+number of instructions of the previous action.</p></li>
+</ul>
+<p>A single instance of this “agent-environment loop” represents the compilation of
+a particular program. The goal is to develop an agent that maximises the
+cumulative reward from these environments so as to produce the best programs.</p>
+</div>
 <div class="section" id="installation">
-<h2><a class="toc-backref" href="#id3">Installation</a><a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id4">Installation</a><a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>Install the latest CompilerGym release using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install compiler_gym
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip3 install compiler_gym
 </pre></div>
 </div>
 <div class="section" id="building-from-source">
-<h3><a class="toc-backref" href="#id4">Building from Source</a><a class="headerlink" href="#building-from-source" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id5">Building from Source</a><a class="headerlink" href="#building-from-source" title="Permalink to this headline">¶</a></h3>
 <p>If you prefer, you may build from source. This requires a modern C++
 toolchain. On macOS you can use the system compiler. On linux, install
 the required toolchain using:</p>
@@ -262,33 +289,6 @@ $ conda env remove -n compiler_gym
 </div>
 </div>
 </div>
-<div class="section" id="compilergym-overview">
-<h2><a class="toc-backref" href="#id5">CompilerGym Overview</a><a class="headerlink" href="#compilergym-overview" title="Permalink to this headline">¶</a></h2>
-<p>CompilerGym exposes compiler optimization problems as environments for
-reinforcement learning. It uses the <a class="reference external" href="https://gym.openai.com/">OpenAI Gym</a>
-interface to expose the “agent-environment loop” of reinforcement learning:</p>
-<img alt="_images/overview.png" src="_images/overview.png" />
-<p>The ingredients of reinforcement learning that CompilerGym provides are:</p>
-<ul class="simple">
-<li><p><strong>Environment</strong>: a compiler optimization task. For example,
-<em>optimizing a C++ graph-traversal program for codesize using LLVM</em>. The
-environment encapsulates an instance of a compiler and a particular program
-that is being compiled. As an agent interacts with the environment, the state
-of the program, and the compiler, can change.</p></li>
-<li><p><strong>Observation</strong>: a view of the current environment state. For example, this
-could be the Intermediate Representation (IR) of the program that is being
-compiled. The types of observations that are available depend on the compiler.</p></li>
-<li><p><strong>Reward</strong>: a metric indicating the quality of the previous action. For
-example, for a codesize optimization task this could be the change to the
-number of instructions of the previous action.</p></li>
-<li><p><strong>Action Space</strong>: the actions that may be taken at the current state. For
-example, this could be a set of optimization transformations that the compiler
-can apply to the program.</p></li>
-</ul>
-<p>A single instance of this “agent-environment loop” represents the compilation of
-a particular program. Your goal is to write an agent that maximises the
-cumulative reward from the environment so as to produce the best program.</p>
-</div>
 <div class="section" id="using-compilergym">
 <h2><a class="toc-backref" href="#id6">Using CompilerGym</a><a class="headerlink" href="#using-compilergym" title="Permalink to this headline">¶</a></h2>
 <p>Begin by firing up a python interpreter:</p>
@@ -310,28 +310,29 @@ cumulative reward from the environment so as to produce the best program.</p>
 <h3><a class="toc-backref" href="#id7">Selecting an environment</a><a class="headerlink" href="#selecting-an-environment" title="Permalink to this headline">¶</a></h3>
 <p>CompilerGym environments are named using one of the following formats:</p>
 <ol class="arabic simple">
-<li><p><code class="code docutils literal notranslate"><span class="pre">&lt;compiler&gt;-&lt;observation&gt;-&lt;reward&gt;-v[0-9]+</span></code></p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">&lt;compiler&gt;-&lt;reward&gt;-v[0-9]+</span></code></p></li>
-<li><p><code class="code docutils literal notranslate"><span class="pre">&lt;compiler&gt;-v[0-9]+</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&lt;compiler&gt;-&lt;observation&gt;-&lt;reward&gt;-&lt;version&gt;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&lt;compiler&gt;-&lt;reward&gt;-&lt;version&gt;</span></code></p></li>
+<li><p><code class="code docutils literal notranslate"><span class="pre">&lt;compiler&gt;-&lt;version&gt;</span></code></p></li>
 </ol>
 <p>Where <code class="code docutils literal notranslate"><span class="pre">&lt;compiler&gt;</span></code> identifiers the compiler optimization task,
-<code class="code docutils literal notranslate"><span class="pre">&lt;observation&gt;</span></code> is the type of observations that are provided,
+<code class="code docutils literal notranslate"><span class="pre">&lt;observation&gt;</span></code> is the default type of observations that are provided,
 and <code class="code docutils literal notranslate"><span class="pre">&lt;reward&gt;</span></code> is the reward signal.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>A key concept is that
 CompilerGym environments enables <strong>lazy evaluation</strong> of observations and
-reward signals. This can make training much more efficient for scenarios
-in which you do not need to compute a reward or observation after every
-step. If an environment omits a <code class="code docutils literal notranslate"><span class="pre">&lt;observation&gt;</span></code> or <code class="code docutils literal notranslate"><span class="pre">&lt;reward&gt;</span></code>
-tag, this means that values can be lazily evaluated using
-<a class="reference internal" href="compiler_gym/views.html"><span class="doc">views</span></a>.</p>
+reward signals. This makes the environment much more computationally
+efficient for scenarios in which you do not need to compute a reward or
+observation for every step. If an environment omits a <code class="code docutils literal notranslate"><span class="pre">&lt;observation&gt;</span></code>
+or <code class="code docutils literal notranslate"><span class="pre">&lt;reward&gt;</span></code> tag, this means that no observation or reward is
+provided by default. See <a class="reference internal" href="compiler_gym/views.html"><span class="doc">compiler_gym.views</span></a> for
+further details.</p>
 </div>
 <p>For this tutorial, we will use the following environment:</p>
 <ul class="simple">
-<li><p><strong>Compiler</strong>: <a class="reference external" href="https://llvm.org/">LLVM</a>.</p></li>
-<li><p><strong>Observation</strong>: <a class="reference internal" href="llvm/index.html#autophase"><span class="std std-ref">Autophase</span></a>.</p></li>
-<li><p><strong>Reward</strong>: <a class="reference internal" href="llvm/index.html#codesize"><span class="std std-ref">IR Instruction count relative to -Oz</span></a>.</p></li>
+<li><p><strong>Compiler</strong>: <a class="reference internal" href="llvm/index.html"><span class="doc">LLVM</span></a>.</p></li>
+<li><p><strong>Observation Type</strong>: <a class="reference internal" href="llvm/index.html#autophase"><span class="std std-ref">Autophase</span></a>.</p></li>
+<li><p><strong>Reward Signal</strong>: <a class="reference internal" href="llvm/index.html#codesize"><span class="std std-ref">IR Instruction count relative to -Oz</span></a>.</p></li>
 </ul>
 <p>Create an instance of this environment using:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-autophase-ic-v0&quot;</span><span class="p">)</span>
@@ -340,10 +341,10 @@ tag, this means that values can be lazily evaluated using
 </div>
 <div class="section" id="installing-benchmarks">
 <h3><a class="toc-backref" href="#id8">Installing benchmarks</a><a class="headerlink" href="#installing-benchmarks" title="Permalink to this headline">¶</a></h3>
-<p>To use the compiler environment, we need a program to compile. We call these
-programs <em>benchmarks</em>, and collections of benchmarks are assembled into
-<em>datasets</em>. You may provide your own programs to use as benchmarks, or download
-one of our pre-assembled datasets.</p>
+<p>A compiler requires a program as input. For the purposes of CompilerGym we call
+these input programs <em>benchmarks</em>, and collections of benchmarks are assembled
+into <em>datasets</em>. You may provide your own programs to use as benchmarks, or
+download one of our pre-assembled datasets.</p>
 <p>The benchmarks that are available to an environment can be queried using
 <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.benchmarks" title="compiler_gym.envs.CompilerEnv.benchmarks"><code class="xref py py-attr docutils literal notranslate"><span class="pre">env.benchmarks</span></code></a>:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">benchmarks</span>
@@ -361,7 +362,7 @@ dataset:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">require_dataset</span><span class="p">(</span><span class="s2">&quot;npb-v0&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Now, <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.benchmarks" title="compiler_gym.envs.CompilerEnv.benchmarks"><code class="xref py py-attr docutils literal notranslate"><span class="pre">env.benchmarks</span></code></a> will list
+<p>Now, <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.benchmarks" title="compiler_gym.envs.CompilerEnv.benchmarks"><code class="xref py py-attr docutils literal notranslate"><span class="pre">env.benchmarks</span></code></a> lists
 the 123 benchmarks that comprise the dataset we just installed:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">benchmarks</span>
 <span class="go">[&#39;benchmark://npb-v0/46&#39;, &#39;benchmark://npb-v0/17&#39;, ...]</span>
@@ -476,40 +477,40 @@ LLVM-IR as a ratio compared to number of instructions when the code is compiled
 with LLVM’s <code class="code docutils literal notranslate"><span class="pre">-Oz</span></code> optimizations enabled. A value greater than one means
 that the sequence of optimizations performed yields better results than LLVM’s
 default pipeline. Let’s run 100 random actions and see how close we can get:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">101</span><span class="p">):</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;benchmark://npb-v0/50&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">101</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">observation</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">sample</span><span class="p">())</span>
 <span class="gp">... </span>    <span class="k">if</span> <span class="n">done</span><span class="p">:</span>
 <span class="gp">... </span>        <span class="k">break</span>
-<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Step </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">, reward=</span><span class="si">{</span><span class="n">reward</span><span class="si">:</span><span class="s2">.3%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Step </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">, quality=</span><span class="si">{</span><span class="n">reward</span><span class="si">:</span><span class="s2">.3%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="gp">...</span>
-<span class="go">Step 1, reward=44.299%</span>
-<span class="go">Step 2, reward=44.299%</span>
-<span class="go">Step 3, reward=44.299%</span>
-<span class="go">Step 4, reward=44.299%</span>
-<span class="go">Step 5, reward=44.299%</span>
-<span class="go">Step 6, reward=54.671%</span>
-<span class="go">Step 7, reward=54.671%</span>
-<span class="go">Step 8, reward=54.608%</span>
-<span class="go">Step 9, reward=54.608%</span>
-<span class="go">Step 10, reward=54.608%</span>
-<span class="go">Step 11, reward=54.608%</span>
-<span class="go">Step 12, reward=54.766%</span>
-<span class="go">Step 13, reward=54.766%</span>
-<span class="go">Step 14, reward=53.650%</span>
-<span class="go">Step 15, reward=53.650%</span>
+<span class="go">Step 1, quality=44.299%</span>
+<span class="go">Step 2, quality=44.299%</span>
+<span class="go">Step 3, quality=44.299%</span>
+<span class="go">Step 4, quality=44.299%</span>
+<span class="go">Step 5, quality=44.299%</span>
+<span class="go">Step 6, quality=54.671%</span>
+<span class="go">Step 7, quality=54.671%</span>
+<span class="go">Step 8, quality=54.608%</span>
+<span class="go">Step 9, quality=54.608%</span>
+<span class="go">Step 10, quality=54.608%</span>
+<span class="go">Step 11, quality=54.608%</span>
+<span class="go">Step 12, quality=54.766%</span>
+<span class="go">Step 13, quality=54.766%</span>
+<span class="go">Step 14, quality=53.650%</span>
+<span class="go">Step 15, quality=53.650%</span>
 <span class="gp">...</span>
-<span class="go">Step 97, reward=88.104%</span>
-<span class="go">Step 98, reward=88.104%</span>
-<span class="go">Step 99, reward=88.104%</span>
-<span class="go">Step 100, reward=88.104%</span>
+<span class="go">Step 97, quality=88.104%</span>
+<span class="go">Step 98, quality=88.104%</span>
+<span class="go">Step 99, quality=88.104%</span>
+<span class="go">Step 100, quality=88.104%</span>
 </pre></div>
 </div>
 <p>Not bad, but clearly there is room for improvement! Because at each step we are
-taking random actions, your results will differ with every run. Try calling
-<a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.reset()</span></code></a> and running it again.
-Was the result better or worse? Of course, there may be better ways of selecting
-actions than choosing randomly, but for the purpose of this tutorial we will
-leave that as an exercise for the reader :)</p>
+taking random actions, your results will differ with every run. Try running it
+again. Was the result better or worse? Of course, there may be better ways of
+selecting actions than choosing randomly, but for the purpose of this tutorial
+we will leave that as an exercise for the reader :)</p>
 <p>Before we finish, lets use
 <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.commandline" title="compiler_gym.envs.CompilerEnv.commandline"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.commandline()</span></code></a>
 to produce an LLVM <code class="code docutils literal notranslate"><span class="pre">opt</span></code> command line invocation that is equivalent to

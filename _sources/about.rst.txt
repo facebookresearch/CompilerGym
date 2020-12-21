@@ -25,16 +25,13 @@ manner, and those that do often don’t provide an accessible platform
 for experimentation. This creates a high barrier to entry. As a
 result, progress is slow.
 
-What is needed are high quality tools that expose the optimization
-decisions in a way that makes experimenting with compilers easy.
-
 Our Vision
 -----------
 
 We aim to lower the barrier to entry to compiler AI research by
 building a playground that allows anyone to experiment with program
 optimizations, without needing to write a single line of C++. We have
-three goals:
+four goals:
 
 #. Build the “ImageNet for compilers”: a high-quality, open-source
    OpenAI gym environment for experimenting with compiler
@@ -42,6 +39,10 @@ three goals:
    into the hands of AI researchers. The environment takes care of the
    substantial engineering legwork that is required to get started in
    compiler research.
+
+#. Improve the fairness and reproducibility of compiler research by
+   allowing direct comparison of different techniques using a common
+   experimental framework.
 
 #. Allow users to control every single decision that a compiler
    makes. To begin with, we will focus on exposing high-level
@@ -63,24 +64,23 @@ three goals:
 Roadmap
 -------
 
-* v0.1 software release.
+* v0.1.0 software release.
 
   * Release the LLVM codesize problem set for one-line install on
     Linux / macOS.
 
   * Provide baseline agent implementations and results on benchmarks.
 
-* v1.x release.
+* v0.1.x releases.
 
-  * Add support for optimizing LLVM for performance.
+  * Add support for optimizing LLVM for performance and compiled
+    codesize.
 
-  * Add support for distributed agent/environment during training.
+  * Add support for distributed agent/environments during training.
 
   * Add a distributed environment state cache to make training faster.
 
-* v2.x release.
-
-  * Add support for optimizing for performance.
+* v1.x.x releases.
 
   * Take what we learned from building environments for compilers and
     generalize it to other systems domains, e.g. OS level

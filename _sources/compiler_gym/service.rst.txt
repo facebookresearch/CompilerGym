@@ -3,7 +3,7 @@ compiler_gym.service
 
 .. currentmodule:: compiler_gym.service
 
-CompilerGym uses a client/service architecture. Services provide an
+CompilerGym uses a client/server architecture. Services provide an
 interface for manipulating compiler behavior. Clients are Python
 frontend objects that provide a reinforcement learning abstraction on
 top of the service. Communication between the service and client is

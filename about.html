@@ -211,15 +211,13 @@ compilers don’t expose the optimization decisions in a discoverable
 manner, and those that do often don’t provide an accessible platform
 for experimentation. This creates a high barrier to entry. As a
 result, progress is slow.</p>
-<p>What is needed are high quality tools that expose the optimization
-decisions in a way that makes experimenting with compilers easy.</p>
 </div>
 <div class="section" id="our-vision">
 <h2><a class="toc-backref" href="#id3">Our Vision</a><a class="headerlink" href="#our-vision" title="Permalink to this headline">¶</a></h2>
 <p>We aim to lower the barrier to entry to compiler AI research by
 building a playground that allows anyone to experiment with program
 optimizations, without needing to write a single line of C++. We have
-three goals:</p>
+four goals:</p>
 <ol class="arabic simple">
 <li><p>Build the “ImageNet for compilers”: a high-quality, open-source
 OpenAI gym environment for experimenting with compiler
@@ -227,6 +225,9 @@ optimizations using real-world software and datasets and get it
 into the hands of AI researchers. The environment takes care of the
 substantial engineering legwork that is required to get started in
 compiler research.</p></li>
+<li><p>Improve the fairness and reproducibility of compiler research by
+allowing direct comparison of different techniques using a common
+experimental framework.</p></li>
 <li><p>Allow users to control every single decision that a compiler
 makes. To begin with, we will focus on exposing high-level
 optimization decisions for which there are existing hand-tuned
@@ -245,23 +246,23 @@ existing build infrastructure.</p></li>
 <div class="section" id="roadmap">
 <span id="id1"></span><h2><a class="toc-backref" href="#id4">Roadmap</a><a class="headerlink" href="#roadmap" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><p>v0.1 software release.</p>
+<li><p>v0.1.0 software release.</p>
 <ul>
 <li><p>Release the LLVM codesize problem set for one-line install on
 Linux / macOS.</p></li>
 <li><p>Provide baseline agent implementations and results on benchmarks.</p></li>
 </ul>
 </li>
-<li><p>v1.x release.</p>
+<li><p>v0.1.x releases.</p>
 <ul>
-<li><p>Add support for optimizing LLVM for performance.</p></li>
-<li><p>Add support for distributed agent/environment during training.</p></li>
+<li><p>Add support for optimizing LLVM for performance and compiled
+codesize.</p></li>
+<li><p>Add support for distributed agent/environments during training.</p></li>
 <li><p>Add a distributed environment state cache to make training faster.</p></li>
 </ul>
 </li>
-<li><p>v2.x release.</p>
+<li><p>v1.x.x releases.</p>
 <ul>
-<li><p>Add support for optimizing for performance.</p></li>
 <li><p>Take what we learned from building environments for compilers and
 generalize it to other systems domains, e.g. OS level
 optimizations, scheduling problems, etc.</p></li>

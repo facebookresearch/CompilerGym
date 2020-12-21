@@ -23,7 +23,7 @@ going on:
 
 ::
 
-    $ pythom -m compiler_gym.manual_env --env=llvm-ic-v0
+    $ pythom -m compiler_gym.bin.manual_env --env=llvm-v0
 
 
 I found a bug. How do I report it?

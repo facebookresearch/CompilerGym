@@ -3,17 +3,15 @@ Getting Started
 
 CompilerGym is a toolkit for applying reinforcement learning to compiler
 optimization tasks. This document provides a short walkthrough of the key
-concepts. We will start by installing CompilerGym, then work up to trying
-random strategies on the codesize reduction task of a production-grade compiler.
-It will take about 15 minutes to work through. Lets get stuck in!
+concepts, using the codesize reduction task of a production-grade compiler
+as an example. It will take about 20 minutes to work through. Lets get
+started!
 
 .. contents:: Topics covered:
     :local:
 
-.. include:: installation.rst
 
-
-CompilerGym Overview
+Key Concepts
 --------------------
 
 CompilerGym exposes compiler optimization problems as environments for
@@ -22,13 +20,17 @@ interface to expose the "agent-environment loop" of reinforcement learning:
 
 .. image:: /_static/img/overview.png
 
-The ingredients of reinforcement learning that CompilerGym provides are:
+The ingredients for reinforcement learning that CompilerGym provides are:
 
 * **Environment**: a compiler optimization task. For example,
   *optimizing a C++ graph-traversal program for codesize using LLVM*. The
   environment encapsulates an instance of a compiler and a particular program
   that is being compiled. As an agent interacts with the environment, the state
   of the program, and the compiler, can change.
+
+* **Action Space**: the actions that may be taken at the current environment
+  state. For example, this could be a set of optimization transformations that
+  the compiler can apply to the program.
 
 * **Observation**: a view of the current environment state. For example, this
   could be the Intermediate Representation (IR) of the program that is being
@@ -38,13 +40,12 @@ The ingredients of reinforcement learning that CompilerGym provides are:
   example, for a codesize optimization task this could be the change to the
   number of instructions of the previous action.
 
-* **Action Space**: the actions that may be taken at the current state. For
-  example, this could be a set of optimization transformations that the compiler
-  can apply to the program.
-
 A single instance of this "agent-environment loop" represents the compilation of
-a particular program. Your goal is to write an agent that maximises the
-cumulative reward from the environment so as to produce the best program.
+a particular program. The goal is to develop an agent that maximises the
+cumulative reward from these environments so as to produce the best programs.
+
+
+.. include:: installation.rst
 
 
 Using CompilerGym
@@ -73,28 +74,29 @@ Selecting an environment
 
 CompilerGym environments are named using one of the following formats:
 
-#. :code:`<compiler>-<observation>-<reward>-v[0-9]+`
-#. :code:`<compiler>-<reward>-v[0-9]+`
-#. :code:`<compiler>-v[0-9]+`
+#. :code:`<compiler>-<observation>-<reward>-<version>`
+#. :code:`<compiler>-<reward>-<version>`
+#. :code:`<compiler>-<version>`
 
 Where :code:`<compiler>` identifiers the compiler optimization task,
-:code:`<observation>` is the type of observations that are provided,
+:code:`<observation>` is the default type of observations that are provided,
 and :code:`<reward>` is the reward signal.
 
 .. note::
     A key concept is that
     CompilerGym environments enables **lazy evaluation** of observations and
-    reward signals. This can make training much more efficient for scenarios
-    in which you do not need to compute a reward or observation after every
-    step. If an environment omits a :code:`<observation>` or :code:`<reward>`
-    tag, this means that values can be lazily evaluated using
-    :doc:`views <compiler_gym/views>`.
+    reward signals. This makes the environment much more computationally
+    efficient for scenarios in which you do not need to compute a reward or
+    observation for every step. If an environment omits a :code:`<observation>`
+    or :code:`<reward>` tag, this means that no observation or reward is
+    provided by default. See :doc:`compiler_gym.views <compiler_gym/views>` for
+    further details.
 
 For this tutorial, we will use the following environment:
 
-* **Compiler**: `LLVM <https://llvm.org/>`_.
-* **Observation**: :ref:`Autophase <llvm/index:Autophase>`.
-* **Reward**: :ref:`IR Instruction count relative to -Oz <llvm/index:Codesize>`.
+* **Compiler**: :doc:`LLVM <llvm/index>`.
+* **Observation Type**: :ref:`Autophase <llvm/index:Autophase>`.
+* **Reward Signal**: :ref:`IR Instruction count relative to -Oz <llvm/index:Codesize>`.
 
 Create an instance of this environment using:
 
@@ -104,10 +106,10 @@ Create an instance of this environment using:
 Installing benchmarks
 ~~~~~~~~~~~~~~~~~~~~~
 
-To use the compiler environment, we need a program to compile. We call these
-programs *benchmarks*, and collections of benchmarks are assembled into
-*datasets*. You may provide your own programs to use as benchmarks, or download
-one of our pre-assembled datasets.
+A compiler requires a program as input. For the purposes of CompilerGym we call
+these input programs *benchmarks*, and collections of benchmarks are assembled
+into *datasets*. You may provide your own programs to use as benchmarks, or
+download one of our pre-assembled datasets.
 
 The benchmarks that are available to an environment can be queried using
 :attr:`env.benchmarks <compiler_gym.envs.CompilerEnv.benchmarks>`:
@@ -126,7 +128,7 @@ dataset:
 
     >>> env.require_dataset("npb-v0")
 
-Now, :attr:`env.benchmarks <compiler_gym.envs.CompilerEnv.benchmarks>` will list
+Now, :attr:`env.benchmarks <compiler_gym.envs.CompilerEnv.benchmarks>` lists
 the 123 benchmarks that comprise the dataset we just installed:
 
     >>> env.benchmarks
@@ -243,39 +245,39 @@ with LLVM's :code:`-Oz` optimizations enabled. A value greater than one means
 that the sequence of optimizations performed yields better results than LLVM's
 default pipeline. Let's run 100 random actions and see how close we can get:
 
+    >>> env.reset(benchmark="benchmark://npb-v0/50")
     >>> for i in range(1, 101):
     ...     observation, reward, done, info = env.step(env.action_space.sample())
     ...     if done:
     ...         break
-    ...     print(f"Step {i}, reward={reward:.3%}")
+    ...     print(f"Step {i}, quality={reward:.3%}")
     ...
-    Step 1, reward=44.299%
-    Step 2, reward=44.299%
-    Step 3, reward=44.299%
-    Step 4, reward=44.299%
-    Step 5, reward=44.299%
-    Step 6, reward=54.671%
-    Step 7, reward=54.671%
-    Step 8, reward=54.608%
-    Step 9, reward=54.608%
-    Step 10, reward=54.608%
-    Step 11, reward=54.608%
-    Step 12, reward=54.766%
-    Step 13, reward=54.766%
-    Step 14, reward=53.650%
-    Step 15, reward=53.650%
+    Step 1, quality=44.299%
+    Step 2, quality=44.299%
+    Step 3, quality=44.299%
+    Step 4, quality=44.299%
+    Step 5, quality=44.299%
+    Step 6, quality=54.671%
+    Step 7, quality=54.671%
+    Step 8, quality=54.608%
+    Step 9, quality=54.608%
+    Step 10, quality=54.608%
+    Step 11, quality=54.608%
+    Step 12, quality=54.766%
+    Step 13, quality=54.766%
+    Step 14, quality=53.650%
+    Step 15, quality=53.650%
     ...
-    Step 97, reward=88.104%
-    Step 98, reward=88.104%
-    Step 99, reward=88.104%
-    Step 100, reward=88.104%
+    Step 97, quality=88.104%
+    Step 98, quality=88.104%
+    Step 99, quality=88.104%
+    Step 100, quality=88.104%
 
 Not bad, but clearly there is room for improvement! Because at each step we are
-taking random actions, your results will differ with every run. Try calling
-:meth:`env.reset() <compiler_gym.envs.CompilerEnv.reset>` and running it again.
-Was the result better or worse? Of course, there may be better ways of selecting
-actions than choosing randomly, but for the purpose of this tutorial we will
-leave that as an exercise for the reader :)
+taking random actions, your results will differ with every run. Try running it
+again. Was the result better or worse? Of course, there may be better ways of
+selecting actions than choosing randomly, but for the purpose of this tutorial
+we will leave that as an exercise for the reader :)
 
 Before we finish, lets use
 :meth:`env.commandline() <compiler_gym.envs.CompilerEnv.commandline>`
