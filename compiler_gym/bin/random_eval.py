@@ -59,8 +59,8 @@ def eval_logs(outdir: Path) -> None:
             (
                 benchmark,
                 humanize.intcomma(meta["num_instructions"]),
-                f"{meta['init_reward']:.2%}",
-                f"{best.reward:.2%}",
+                f"{meta['init_reward']:.4f}",
+                f"{best.reward:.4f}",
                 (
                     f"{humanize.intcomma(best.total_episode_count)} attempts "
                     f"in {humanize.naturaldelta(best.runtime_seconds)}"
@@ -74,8 +74,8 @@ def eval_logs(outdir: Path) -> None:
         (
             "Geomean",
             "",
-            f"{geometric_mean(totals['init_reward']):.2%}",
-            f"{geometric_mean(totals['max_reward']):.2%}",
+            f"{geometric_mean(totals['init_reward']):.4f}",
+            f"{geometric_mean(totals['max_reward']):.4f}",
             "",
             "",
         )
@@ -84,8 +84,8 @@ def eval_logs(outdir: Path) -> None:
         (
             "Average",
             humanize.intcomma(int(totals["instructions"] / row_count)),
-            f"{np.array(totals['init_reward']).mean():.2%}",
-            f"{np.array(totals['max_reward']).mean():.2%}",
+            f"{np.array(totals['init_reward']).mean():.4f}",
+            f"{np.array(totals['max_reward']).mean():.4f}",
             (
                 f"{humanize.intcomma(int(totals['attempts'] / row_count))} attempts "
                 f"in {humanize.naturaldelta(totals['time'] / row_count)}"

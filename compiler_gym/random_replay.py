@@ -19,7 +19,7 @@ def replay_actions(env: CompilerEnv, action_names: List[str], outdir: Path):
     start_time = time()
     init_reward = env.reward[env.eager_reward_space]
 
-    print(f"Step [{0:03d} / {len(action_names):03d}]: reward={init_reward:.2%}")
+    print(f"Step [{0:03d} / {len(action_names):03d}]: reward={init_reward:.4f}")
 
     with open(str(logs_path), "w") as f:
         progress = logs.ProgressLogEntry(
@@ -36,8 +36,8 @@ def replay_actions(env: CompilerEnv, action_names: List[str], outdir: Path):
             _, reward, done, _ = env.step(env.action_space.names.index(action))
             assert not done
             print(
-                f"Step [{i:03d} / {len(action_names):03d}]: reward={reward:.2%}, "
-                f"change={reward-previous_reward:.2%}, action={action}"
+                f"Step [{i:03d} / {len(action_names):03d}]: reward={reward:.4f}, "
+                f"change={reward-previous_reward:.4f}, action={action}"
             )
             progress = logs.ProgressLogEntry(
                 runtime_seconds=time() - start_time,
