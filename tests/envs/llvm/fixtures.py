@@ -14,7 +14,7 @@ from compiler_gym.service import CompilerGymServiceConnection
 from compiler_gym.util.runfiles_path import runfiles_path
 
 ACTIONS_LIST = Path(
-    runfiles_path("CompilerGym/compiler_gym/envs/llvm/service/passes/actions_list.txt")
+    runfiles_path("CompilerGym/compiler_gym/envs/llvm/service/passes/actions_flags.txt")
 )
 
 BENCHMARKS_LIST = Path(

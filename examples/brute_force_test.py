@@ -17,7 +17,7 @@ def test_run_brute_force_smoke_test():
         outdir = Path(tmp)
         run_brute_force(
             make_env=lambda: gym.make("llvm-ic-v0"),
-            action_names=["Sroapass", "PromoteMemoryToRegisterPass"],
+            action_names=["-sroa", "-mem2reg"],
             episode_length=2,
             outdir=outdir,
             nproc=1,

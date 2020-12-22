@@ -56,10 +56,9 @@ class Commandline(NamedDiscrete):
         :param name: The name of the space.
         """
         items = list(items)
-        names = [f.name for f in items]
         self.flags = [f.flag for f in items]
         self.descriptions = [f.description for f in items]
-        super().__init__(names, name)
+        super().__init__([f.flag for f in items], name)
 
     def __repr__(self) -> str:
         return f"Commandline([{' '.join(self.flags)}])"
