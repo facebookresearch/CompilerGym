@@ -75,6 +75,7 @@ py_library(
         "//compiler_gym/envs/llvm/service/passes:actions_genfiles",
         "//compiler_gym/third_party/cBench:benchmarks_list",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "//compiler_gym",
         "//compiler_gym/envs",
