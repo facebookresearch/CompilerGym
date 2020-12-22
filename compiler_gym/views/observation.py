@@ -65,7 +65,7 @@ class ObservationView(object):
             ),
         )
 
-    # TODO(cummins): Register an opaque_sequence_type handler that replaces the
+    # TODO(cummins): Register an opaque_data_format handler that replaces the
     # "Space" and updates observation2py / observation2str.
 
     def register_derived_space(
