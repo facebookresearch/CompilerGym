@@ -365,7 +365,7 @@ but powerful strategy for randomly searching the optimization space:
     $ python -m compiler_gym.bin.random_search --env=llvm-autophase-ic-v0 --benchmark=npb-v0/50 --runtime=10
 
     Started 16 worker threads for benchmark://npb-v0/50 (3,008 instructions) using reward IrInstructionCountOz.
-    Writing logs to /home/user/logs/compilergym/random/npb-v0/50/2020-12-03T17:24:17.304887
+    Writing logs to /home/user/logs/compiler_gym/random/npb-v0/50/2020-12-03T17:24:17.304887
     === Running for 10 seconds ===
     Runtime: 10 seconds. Num steps: 32,287 (3,206 / sec). Num episodes: 285 (28 / sec). Num restarts: 0.
     Best reward: 107.85% (69 passes, found after 9 seconds)
