@@ -145,6 +145,8 @@ def random_search(
     with open(str(metadata_path), "w") as f:
         json.dump(metadata, f, sort_keys=True, indent=2)
 
+    env.close()
+
     workers = [RandomAgentWorker(make_env, patience) for _ in range(nproc)]
     for worker in workers:
         worker.start()
@@ -243,6 +245,7 @@ def random_search(
     print("done")
 
     print("Replaying actions from best solution found:")
+    env = make_env()
     env.reset()
     replay_actions(env, best_action_names, outdir)
     env.close()
