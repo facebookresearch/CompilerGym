@@ -18,13 +18,12 @@ std::vector<RewardSpace> getLlvmRewardSpaceList() {
     space.set_name(util::enumNameToPascalCase<LlvmRewardSpace>(value));
     switch (value) {
       case LlvmRewardSpace::IR_INSTRUCTION_COUNT:
-        space.mutable_range()->mutable_max()->set_value(0);
-        break;
-      case LlvmRewardSpace::IR_INSTRUCTION_COUNT_OZ:
       case LlvmRewardSpace::IR_INSTRUCTION_COUNT_O3:
-        space.mutable_range()->mutable_min()->set_value(0);
-        break;
-      case LlvmRewardSpace::IR_INSTRUCTION_COUNT_OZ_DIFF:
+      case LlvmRewardSpace::IR_INSTRUCTION_COUNT_Oz:
+      case LlvmRewardSpace::NATIVE_TEXT_SIZE_BYTES:
+      case LlvmRewardSpace::NATIVE_TEXT_SIZE_BYTES_O3:
+      case LlvmRewardSpace::NATIVE_TEXT_SIZE_BYTES_Oz:
+        // These reward spaces have no bounds.
         break;
     }
     spaces.push_back(space);

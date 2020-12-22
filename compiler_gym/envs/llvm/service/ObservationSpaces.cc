@@ -53,6 +53,19 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
         encodedSize.mutable_min()->set_value(0);
         space.set_opaque_data_format("json://");
         *space.mutable_string_size_range() = encodedSize;
+        break;
+      }
+      case LlvmObservationSpace::IR_INSTRUCTION_COUNT:
+      case LlvmObservationSpace::IR_INSTRUCTION_COUNT_O0:
+      case LlvmObservationSpace::IR_INSTRUCTION_COUNT_O3:
+      case LlvmObservationSpace::IR_INSTRUCTION_COUNT_OZ:
+      case LlvmObservationSpace::NATIVE_TEXT_SIZE_BYTES:
+      case LlvmObservationSpace::NATIVE_TEXT_SIZE_BYTES_O0:
+      case LlvmObservationSpace::NATIVE_TEXT_SIZE_BYTES_O3:
+      case LlvmObservationSpace::NATIVE_TEXT_SIZE_BYTES_OZ: {
+        auto featureSize = space.mutable_int64_range_list()->add_range();
+        featureSize->mutable_min()->set_value(0);
+        break;
       }
     }
     spaces.push_back(space);

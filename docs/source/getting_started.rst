@@ -246,11 +246,13 @@ that the sequence of optimizations performed yields better results than LLVM's
 default pipeline. Let's run 100 random actions and see how close we can get:
 
     >>> env.reset(benchmark="benchmark://npb-v0/50")
+    >>> episode_returns = 0
     >>> for i in range(1, 101):
     ...     observation, reward, done, info = env.step(env.action_space.sample())
     ...     if done:
     ...         break
-    ...     print(f"Step {i}, quality={reward:.3%}")
+    ...     episode_returns += reward
+    ...     print(f"Step {i}, quality={episode_returns:.3%}")
     ...
     Step 1, quality=44.299%
     Step 2, quality=44.299%
@@ -365,7 +367,7 @@ but powerful strategy for randomly searching the optimization space:
     $ python -m compiler_gym.bin.random_search --env=llvm-autophase-ic-v0 --benchmark=npb-v0/50 --runtime=10
 
     Started 16 worker threads for benchmark://npb-v0/50 (3,008 instructions) using reward IrInstructionCountOz.
-    Writing logs to /home/user/logs/compilergym/random/npb-v0/50/2020-12-03T17:24:17.304887
+    Writing logs to /home/user/logs/compiler_gym/random/npb-v0/50/2020-12-03T17:24:17.304887
     === Running for 10 seconds ===
     Runtime: 10 seconds. Num steps: 32,287 (3,206 / sec). Num episodes: 285 (28 / sec). Num restarts: 0.
     Best reward: 107.85% (69 passes, found after 9 seconds)

@@ -27,7 +27,7 @@ def test_step(env: CompilerEnv, action_name: str):
     else:
         assert isinstance(observation, np.ndarray)
         assert observation.shape == (56,)
-        assert reward < 0
+        assert isinstance(reward, float)
 
 
 if __name__ == "__main__":

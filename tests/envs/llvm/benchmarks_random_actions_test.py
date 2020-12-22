@@ -43,7 +43,7 @@ def test_benchmark_random_actions(benchmark_name: str):
             else:
                 assert isinstance(observation, np.ndarray)
                 assert observation.shape == (56,)
-                assert reward <= 0
+                assert isinstance(reward, float)
     finally:
         env.close()
 

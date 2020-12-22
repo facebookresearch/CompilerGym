@@ -33,7 +33,7 @@ def test_run_action_sensitivity_analysis():
             actions=actions,
             rewards_path=tmp / "rewards.txt",
             runtimes_path=tmp / "runtimes.txt",
-            reward=reward,
+            reward_space=reward,
             num_trials=2,
             max_warmup_steps=5,
             nproc=1,

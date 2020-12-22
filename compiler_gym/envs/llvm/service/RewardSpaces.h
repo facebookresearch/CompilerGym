@@ -18,17 +18,13 @@ namespace compiler_gym::llvm_service {
 //   3. Add a new switch case to LlvmEnvironment::getReward().
 //   4. Run `bazel test //compiler_gym/...` and update the newly failing tests.
 enum class LlvmRewardSpace {
-  // Returns a reward in the range (0,inf) that is the ratio of the number of
-  // LLVM instructions in the current module, relative to the number of
-  // instructions when optimized with -Oz. This is quick to evaluate as it does
-  // not require compiling the module.
+  // Returns the number of IR instructions in the current module.
   IR_INSTRUCTION_COUNT,
-  IR_INSTRUCTION_COUNT_OZ,
   IR_INSTRUCTION_COUNT_O3,
-  // Same as above, but the reward at a given timestep is change in
-  // instantaneous reward relative to the previous step. i.e:
-  //     R^diff_{t} = R_{t} - R_{t-1}.
-  IR_INSTRUCTION_COUNT_OZ_DIFF,
+  IR_INSTRUCTION_COUNT_Oz,
+  NATIVE_TEXT_SIZE_BYTES,
+  NATIVE_TEXT_SIZE_BYTES_O3,
+  NATIVE_TEXT_SIZE_BYTES_Oz,
 };
 
 // Get the list of available reward spaces.

@@ -77,6 +77,14 @@ def test_observation_spaces(env: CompilerEnv):
         "Inst2vecPreprocessedText",
         "Inst2vecEmbeddingIndices",
         "Inst2vec",
+        "IrInstructionCount",
+        "IrInstructionCountO0",
+        "IrInstructionCountO3",
+        "IrInstructionCountOz",
+        "NativeTextSizeBytes",
+        "NativeTextSizeBytesO0",
+        "NativeTextSizeBytesO3",
+        "NativeTextSizeBytesOz",
     }
 
 
@@ -780,6 +788,19 @@ def test_inst2vec_observation_space(
     )
 
 
+def test_ir_instruction_count_observation_space(env: CompilerEnv):
+    env.reset("cBench-v0/crc32")
+    key = "IrInstructionCount"
+    space = env.observation.spaces[key]
+    assert isinstance(space, Box)
+
+    value: np.ndarray = env.observation[key]
+    assert isinstance(value, np.ndarray)
+    assert value.shape == (1,)
+
+    np.testing.assert_array_equal([196], value)
+
+
 def test_reward_spaces(env: CompilerEnv):
     env.reset("cBench-v0/crc32")
 
@@ -787,23 +808,34 @@ def test_reward_spaces(env: CompilerEnv):
         "IrInstructionCount",
         "IrInstructionCountO3",
         "IrInstructionCountOz",
-        "IrInstructionCountOzDiff",
+        "NativeTextSizeBytes",
+        "NativeTextSizeBytesO3",
+        "NativeTextSizeBytesOz",
     }
 
     reward_space = "IrInstructionCount"
-    assert env.reward.ranges[reward_space] == (-np.inf, 0)
-    assert env.reward[reward_space] < 0
+    assert env.reward.ranges[reward_space] == (-np.inf, np.inf)
+    assert env.reward[reward_space] == 0
 
     reward_space = "IrInstructionCountO3"
-    assert env.reward.ranges[reward_space] == (0, np.inf)
-    assert env.reward[reward_space] > 0
+    assert env.reward.ranges[reward_space] == (-np.inf, np.inf)
+    assert env.reward[reward_space] == 0
 
     reward_space = "IrInstructionCountOz"
-    assert env.reward.ranges[reward_space] == (0, np.inf)
-    assert env.reward[reward_space] > 0
-
-    reward_space = "IrInstructionCountOzDiff"
     assert env.reward.ranges[reward_space] == (-np.inf, np.inf)
+    assert env.reward[reward_space] == 0
+
+    reward_space = "NativeTextSizeBytes"
+    assert env.reward.ranges[reward_space] == (-np.inf, np.inf)
+    assert env.reward[reward_space] == 0
+
+    reward_space = "NativeTextSizeBytesO3"
+    assert env.reward.ranges[reward_space] == (-np.inf, np.inf)
+    assert env.reward[reward_space] == 0
+
+    reward_space = "NativeTextSizeBytesOz"
+    assert env.reward.ranges[reward_space] == (-np.inf, np.inf)
+    assert env.reward[reward_space] == 0
 
     invalid = "invalid value"
     with pytest.raises(KeyError) as ctx:

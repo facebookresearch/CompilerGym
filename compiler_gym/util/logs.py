@@ -21,17 +21,17 @@ BEST_ACTIONS_PROGRESS_NAME = "random_search_best_actions_progress.csv"
 def create_logging_dir(name: str) -> Path:
     """Create a directory for writing logs to.
 
-    Defaults to ~/logs/compilergym base directory, set
+    Defaults to ~/logs/compiler_gym base directory, set
     $COMPILER_GYM_LOGS=/path/to/dir to override this.
 
     Usage:
         >>> create_logging_dir("my_script")
-        Path("~/logs/compilergym/my_script/2020-11-03T11:00:00")
+        Path("~/logs/compiler_gym/my_script/2020-11-03T11:00:00")
 
     :param name: The grouping name for the logs.
     :return: The path of a logging directory.
     """
-    logging_base_dir = os.environ.get("COMPILER_GYM_LOGS", "~/logs/compilergym")
+    logging_base_dir = os.environ.get("COMPILER_GYM_LOGS", "~/logs/compiler_gym")
     logging_base_dir = Path(logging_base_dir).expanduser()
     logging_base_dir = logging_base_dir / name
 

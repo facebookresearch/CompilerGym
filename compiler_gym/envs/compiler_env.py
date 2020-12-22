@@ -21,6 +21,7 @@ from compiler_gym.service import (
     observation2py,
     observation_t,
 )
+from compiler_gym.service.connection import ServiceTransportError
 from compiler_gym.service.proto import (
     ActionRequest,
     AddBenchmarkRequest,
@@ -330,8 +331,8 @@ class CompilerEnv(gym.Env):
                     self.service.stub.EndEpisode,
                     EndEpisodeRequest(session_id=self._session_id),
                 )
-            except Exception as e:
-                warnings.warn(f"Failure to terminate episode on service close: {e}")
+            except:
+                pass
             self._session_id = None
 
         if self.service:
@@ -350,6 +351,7 @@ class CompilerEnv(gym.Env):
         self,
         benchmark: Optional[Union[str, Benchmark]] = None,
         action_space: Optional[str] = None,
+        retry_count: int = 0,
     ) -> Optional[observation_t]:
         """Reset the environment state.
 
@@ -366,6 +368,9 @@ class CompilerEnv(gym.Env):
             subsequent calls to :code:`reset()` will use this action space.
             If no aciton space is provided, the default action space is used.
         """
+        if retry_count > self.connection_settings.init_max_attempts:
+            raise OSError(f"Failed to reset environment after {retry_count} attempts")
+
         # Start a new service if required.
         if self.service is None:
             self.service = CompilerGymServiceConnection(
@@ -390,29 +395,42 @@ class CompilerEnv(gym.Env):
             )
             self._user_specified_benchmark = self._user_specified_benchmark.uri
 
-        reply = self.service(
-            self.service.stub.StartEpisode,
-            StartEpisodeRequest(
-                benchmark=self._user_specified_benchmark,
-                action_space=(
-                    [a.name for a in self.action_spaces].index(self.action_space_name)
-                    if self.action_space_name
-                    else 0
+        try:
+            reply = self.service(
+                self.service.stub.StartEpisode,
+                StartEpisodeRequest(
+                    benchmark=self._user_specified_benchmark,
+                    action_space=(
+                        [a.name for a in self.action_spaces].index(
+                            self.action_space_name
+                        )
+                        if self.action_space_name
+                        else 0
+                    ),
+                    use_eager_observation_space=self._eager_observation,
+                    eager_observation_space=(
+                        self.observation.indices[self.eager_observation_space]
+                        if self._eager_observation
+                        else None
+                    ),
+                    use_eager_reward_space=self._eager_reward,
+                    eager_reward_space=(
+                        self.reward.indices[self.eager_reward_space]
+                        if self._eager_reward
+                        else None
+                    ),
                 ),
-                use_eager_observation_space=self._eager_observation,
-                eager_observation_space=(
-                    self.observation.indices[self.eager_observation_space]
-                    if self._eager_observation
-                    else None
-                ),
-                use_eager_reward_space=self._eager_reward,
-                eager_reward_space=(
-                    self.reward.indices[self.eager_reward_space]
-                    if self._eager_reward
-                    else None
-                ),
-            ),
-        )
+            )
+        except (ServiceError, ServiceTransportError):
+            # Abort and retry on error.
+            self.service.close()
+            self.service = None
+            return self.reset(
+                benchmark=benchmark,
+                action_space=action_space,
+                retry_count=retry_count + 1,
+            )
+
         self._benchmark = reply.benchmark
         self._session_id = reply.session_id
         self.observation.session_id = reply.session_id
@@ -441,7 +459,7 @@ class CompilerEnv(gym.Env):
         request = ActionRequest(session_id=self._session_id, action=[action])
         try:
             reply = self.service(self.service.stub.TakeAction, request)
-        except (ServiceError, TimeoutError) as e:
+        except (ServiceError, ServiceTransportError, TimeoutError) as e:
             self.close()
             info = {"error_details": str(e)}
             return observation, reward, True, info

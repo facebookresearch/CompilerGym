@@ -114,8 +114,7 @@ LlvmEnvironment::LlvmEnvironment(std::unique_ptr<Benchmark> benchmark, LlvmActio
       eagerObservationSpace_(eagerObservationSpace),
       eagerRewardSpace_(eagerRewardSpace),
       tlii_(getTargetLibraryInfo(benchmark_->module())),
-      actionCount_(0),
-      previousReward_(0) {
+      actionCount_(0) {
   // Initialize LLVM.
   initLlvm();
 
@@ -141,7 +140,6 @@ LlvmEnvironment::LlvmEnvironment(std::unique_ptr<Benchmark> benchmark, LlvmActio
   }
   if (eagerRewardSpace_.has_value()) {
     CHECK(getReward(eagerRewardSpace_.value(), &eagerReward_).ok());
-    previousReward_ = eagerReward_.reward();
   }
 }
 
@@ -172,18 +170,14 @@ Status LlvmEnvironment::takeAction(const ActionRequest& request, ActionReply* re
   }
 
   if (eagerRewardSpace().has_value()) {
-    // Compute new reward if needed.
-    if (!reply->action_had_no_effect()) {
+    if (reply->action_had_no_effect()) {
+      // Action had no effect, so no reward.
+      reply->mutable_reward()->set_reward(0);
+    } else {
+      // Compute new reward if needed.
       eagerReward_ = {};
       RETURN_IF_ERROR(getReward(eagerRewardSpace().value(), &eagerReward_));
-    }
-    *reply->mutable_reward() = eagerReward_;
-
-    // TODO(cummins): Refactor this to make "_DIFF"-style reward computation
-    // more general.
-    if (eagerRewardSpace().value() == LlvmRewardSpace::IR_INSTRUCTION_COUNT_OZ_DIFF) {
-      reply->mutable_reward()->set_reward(eagerReward_.reward() - previousReward_);
-      previousReward_ = eagerReward_.reward();
+      *reply->mutable_reward() = eagerReward_;
     }
   }
 
@@ -282,24 +276,83 @@ Status LlvmEnvironment::getObservation(LlvmObservationSpace space, Observation* 
       *reply->mutable_string_value() = hwinfo.dump();
       break;
     }
+    case LlvmObservationSpace::IR_INSTRUCTION_COUNT: {
+      const auto cost =
+          getCost(LlvmCostFunction::IR_INSTRUCTION_COUNT, benchmark().module(), workingDirectory_);
+      reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
+      break;
+    }
+    case LlvmObservationSpace::IR_INSTRUCTION_COUNT_O0: {
+      const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O0,
+                                        LlvmCostFunction::IR_INSTRUCTION_COUNT);
+      reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
+      break;
+    }
+    case LlvmObservationSpace::IR_INSTRUCTION_COUNT_O3: {
+      const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O3,
+                                        LlvmCostFunction::IR_INSTRUCTION_COUNT);
+      reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
+      break;
+    }
+    case LlvmObservationSpace::IR_INSTRUCTION_COUNT_OZ: {
+      const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::Oz,
+                                        LlvmCostFunction::IR_INSTRUCTION_COUNT);
+      reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
+      break;
+    }
+    case LlvmObservationSpace::NATIVE_TEXT_SIZE_BYTES: {
+      const auto cost = getCost(LlvmCostFunction::NATIVE_TEXT_SIZE_BYTES, benchmark().module(),
+                                workingDirectory_);
+      reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
+      break;
+    }
+    case LlvmObservationSpace::NATIVE_TEXT_SIZE_BYTES_O0: {
+      const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O0,
+                                        LlvmCostFunction::NATIVE_TEXT_SIZE_BYTES);
+      reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
+      break;
+    }
+    case LlvmObservationSpace::NATIVE_TEXT_SIZE_BYTES_O3: {
+      const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O3,
+                                        LlvmCostFunction::NATIVE_TEXT_SIZE_BYTES);
+      reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
+      break;
+    }
+    case LlvmObservationSpace::NATIVE_TEXT_SIZE_BYTES_OZ: {
+      const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::Oz,
+                                        LlvmCostFunction::NATIVE_TEXT_SIZE_BYTES);
+      reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
+      break;
+    }
   }
 
   return Status::OK;
 }
 
 Status LlvmEnvironment::getReward(LlvmRewardSpace space, Reward* reply) {
-  // TODO(cummins): Raise an error if requesting a "_DIFF" reward but that is
-  // not eagerly computed, as the previousReward_ will be incorrect.
+  const LlvmCostFunction cost = getCostFunction(space);
+  const auto costIdx = static_cast<size_t>(cost);
+  const LlvmBaselinePolicy baselinePolicy = getBaselinePolicy(space);
 
-  const std::optional<double> baselineCost =
-      benchmark().baselineCosts()[static_cast<size_t>(space)];
-  const double currentCost = getCost(space, benchmark().module());
+  // Fetch the cached costs.
+  const double unoptimizedCost =
+      getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O0, cost);
+  const double baselineCost = getBaselineCost(benchmark().baselineCosts(), baselinePolicy, cost);
+  const double previousCost =
+      previousCosts_[costIdx].has_value() ? *previousCosts_[costIdx] : unoptimizedCost;
 
-  if (baselineCost.has_value()) {
-    reply->set_reward(*baselineCost / currentCost);
-  } else {
-    reply->set_reward(currentCost);
+  // Compute a new cost.
+  const double currentCost = getCost(cost, benchmark().module(), workingDirectory_);
+
+  // Derive the reward from the costs.
+  double reward = previousCost - currentCost;
+  if (baselinePolicy != LlvmBaselinePolicy::O0) {
+    reward /= unoptimizedCost - baselineCost;
   }
+  reply->set_reward(reward);
+
+  // Update the cached costs.
+  previousCosts_[costIdx] = currentCost;
 
   return Status::OK;
 }

@@ -17,23 +17,31 @@ namespace {
 TEST(RewardSpacesTest, getLlvmRewardSpaceList) {
   const auto spaces = getLlvmRewardSpaceList();
 
-  ASSERT_EQ(spaces.size(), 4);
+  ASSERT_EQ(spaces.size(), 6);
 
   EXPECT_EQ(spaces[0].name(), "IrInstructionCount");
   EXPECT_FALSE(spaces[0].range().has_min());
   EXPECT_EQ(spaces[0].range().max().value(), 0);
 
-  EXPECT_EQ(spaces[1].name(), "IrInstructionCountOz");
+  EXPECT_EQ(spaces[1].name(), "IrInstructionCountO3");
   EXPECT_EQ(spaces[1].range().min().value(), 0);
   EXPECT_FALSE(spaces[1].range().has_max());
 
-  EXPECT_EQ(spaces[2].name(), "IrInstructionCountO3");
+  EXPECT_EQ(spaces[2].name(), "IrInstructionCountOz");
   EXPECT_EQ(spaces[2].range().min().value(), 0);
   EXPECT_FALSE(spaces[2].range().has_max());
 
-  EXPECT_EQ(spaces[3].name(), "IrInstructionCountOzDiff");
-  EXPECT_FALSE(spaces[3].range().has_max());
-  EXPECT_FALSE(spaces[3].range().has_max());
+  EXPECT_EQ(spaces[3].name(), "NativeTextSizeBytes");
+  EXPECT_FALSE(spaces[3].range().has_min());
+  EXPECT_EQ(spaces[3].range().max().value(), 0);
+
+  EXPECT_EQ(spaces[4].name(), "NativeTextSizeBytesO3");
+  EXPECT_FALSE(spaces[4].range().has_min());
+  EXPECT_EQ(spaces[4].range().max().value(), 0);
+
+  EXPECT_EQ(spaces[5].name(), "NativeTextSizeBytesOz");
+  EXPECT_FALSE(spaces[5].range().has_min());
+  EXPECT_EQ(spaces[5].range().max().value(), 0);
 }
 
 }  // anonymous namespace

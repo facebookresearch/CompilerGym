@@ -37,7 +37,7 @@ class RandomAgentWorker(Thread):
         self.total_environment_count = 0
         self.total_episode_count = 0
         self.total_step_count = 0
-        self.best_reward = -float("inf")
+        self.best_returns = -float("inf")
         self.best_actions: List[int] = []
         self.best_commandline: List[int] = []
         self.best_found_at_time = time()
@@ -71,6 +71,7 @@ class RandomAgentWorker(Thread):
         observation = env.reset()
         actions: List[int] = []
         patience = self._patience
+        total_returns = 0
         while patience >= 0:
             patience -= 1
             self.total_step_count += 1
@@ -81,9 +82,10 @@ class RandomAgentWorker(Thread):
             observation, reward, done, _ = env.step(action_index)
             if done:
                 return False
-            if reward > self.best_reward:
+            total_returns += reward
+            if total_returns > self.best_returns:
                 patience = self._patience
-                self.best_reward = reward
+                self.best_returns = total_returns
                 self.best_actions = actions.copy()
                 self.best_commandline = env.commandline()
                 self.best_found_at_time = time()
@@ -143,6 +145,8 @@ def random_search(
     with open(str(metadata_path), "w") as f:
         json.dump(metadata, f, sort_keys=True, indent=2)
 
+    env.close()
+
     workers = [RandomAgentWorker(make_env, patience) for _ in range(nproc)]
     for worker in workers:
         worker.start()
@@ -150,7 +154,7 @@ def random_search(
     best_actions = []
     best_commandline = ""
     started = time()
-    last_best_reward = -float("inf")
+    last_best_returns = -float("inf")
 
     print(
         f"Started {len(workers)} worker threads for "
@@ -188,8 +192,8 @@ def random_search(
                     worker.total_environment_count for worker in workers
                 )
 
-                best_worker = max(workers, key=lambda worker: worker.best_reward)
-                best_reward = best_worker.best_reward
+                best_worker = max(workers, key=lambda worker: worker.best_returns)
+                best_returns = best_worker.best_returns
                 best_actions = best_worker.best_actions
                 best_commandline = best_worker.best_commandline
                 runtime = time() - started
@@ -203,7 +207,7 @@ def random_search(
                     f"({humanize.intcomma(int(total_episode_count / runtime))} / sec). "
                     f"Num restarts: {humanize.intcomma(total_environment_count - nproc)}.\n"
                     "\033[K"
-                    f"Best reward: {best_reward:.4f} "
+                    f"Best reward: {best_returns:.4f} "
                     f"({len(best_actions)} passes, "
                     f"found after {humanize.naturaldelta(best_worker.best_found_at_time - started)})",
                     end="",
@@ -211,16 +215,16 @@ def random_search(
                 )
 
                 # Log the incremental progress improvements.
-                if best_reward > last_best_reward:
+                if best_returns > last_best_returns:
                     entry = logs.ProgressLogEntry(
                         runtime_seconds=runtime,
                         total_episode_count=total_episode_count,
                         total_step_count=total_step_count,
                         num_passes=len(best_actions),
-                        reward=best_reward,
+                        reward=best_returns,
                     )
                     print(entry.to_csv(), file=f, flush=True)
-                    last_best_reward = best_reward
+                    last_best_returns = best_returns
 
     except KeyboardInterrupt:
         print("\nkeyboard interrupt", end="", flush=True)
@@ -241,8 +245,9 @@ def random_search(
     print("done")
 
     print("Replaying actions from best solution found:")
+    env = make_env()
     env.reset()
     replay_actions(env, best_action_names, outdir)
     env.close()
 
-    return best_reward
+    return best_returns

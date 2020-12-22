@@ -64,10 +64,20 @@ cc_library(
     name = "Cost",
     srcs = ["Cost.cc"],
     hdrs = ["Cost.h"],
+    data = [
+        "//compiler_gym/third_party/llvm:clang",
+    ],
     deps = [
         ":RewardSpaces",
+        "//compiler_gym/util:GrpcStatusMacros",
+        "//compiler_gym/util:RunfilesPath",
+        "@boost//:filesystem",
+        "@com_github_grpc_grpc//:grpc++",
+        "@fmt",
+        "@glog",
         "@llvm//10.0.0",
         "@magic_enum",
+        "@subprocess",
     ],
 )
 

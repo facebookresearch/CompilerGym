@@ -76,21 +76,21 @@ flags.DEFINE_integer(
 FLAGS = flags.FLAGS
 
 
-def get_reward_deltas(
+def get_rewards(
     action: int,
     action_name: str,
-    reward: str,
+    reward_space: str,
     num_trials: int,
     max_warmup_steps: int,
     max_attempts_multiplier: int = 5,
 ) -> SensitivityAnalysisResult:
     """Run random trials to get a list of num_trials reward deltas."""
-    reward_deltas, runtimes = [], []
+    rewards, runtimes = [], []
     benchmark = benchmark_from_flags()
     num_attempts = 0
     while (
         num_attempts < max_attempts_multiplier * num_trials
-        and len(reward_deltas) < num_trials
+        and len(rewards) < num_trials
     ):
         num_attempts += 1
         with env_session_from_flags(benchmark=benchmark) as env:
@@ -98,18 +98,18 @@ def get_reward_deltas(
             env.eager_reward_space = None
             env.reset(benchmark=benchmark)
             with Timer() as t:
-                reward_delta = run_one_trial(env, reward, action, max_warmup_steps)
-            if reward_delta is not None:
-                reward_deltas.append(reward_delta)
+                reward = run_one_trial(env, reward_space, action, max_warmup_steps)
+            if reward is not None:
+                rewards.append(reward)
                 runtimes.append(t.time)
 
     return SensitivityAnalysisResult(
-        name=action_name, runtimes=np.array(runtimes), rewards=np.array(reward_deltas)
+        name=action_name, runtimes=np.array(runtimes), rewards=np.array(rewards)
     )
 
 
 def run_one_trial(
-    env: CompilerEnv, reward: str, action: int, max_warmup_steps: int
+    env: CompilerEnv, reward_space: str, action: int, max_warmup_steps: int
 ) -> Optional[float]:
     """Run a random number of "warmup" steps in an environment, then compute
     the reward delta of the given action.
@@ -121,21 +121,22 @@ def run_one_trial(
         _, _, done, _ = env.step(env.action_space.sample())
         if done:
             return None
-    init_reward = env.reward[reward]
+    # Force reward calculation.
+    init_reward = env.reward[reward_space]
+    assert init_reward is not None
     _, _, done, _ = env.step(action)
     if done:
         return None
-    reward_after = env.reward[reward]
-    assert init_reward is not None
+    reward_after = env.reward[reward_space]
     assert reward_after is not None
-    return (reward_after - init_reward) / init_reward
+    return reward_after
 
 
 def run_action_sensitivity_analysis(
     actions: List[int],
     rewards_path: Path,
     runtimes_path: Path,
-    reward: str,
+    reward_space: str,
     num_trials: int,
     max_warmup_steps: int,
     nproc: int = cpu_count(),
@@ -148,10 +149,10 @@ def run_action_sensitivity_analysis(
     with ThreadPoolExecutor(max_workers=nproc) as executor:
         analysis_futures = {
             executor.submit(
-                get_reward_deltas,
+                get_rewards,
                 action,
                 action_names[action],
-                reward,
+                reward_space,
                 num_trials,
                 max_warmup_steps,
                 max_attempts_multiplier,
