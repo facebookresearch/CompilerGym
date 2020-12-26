@@ -7,7 +7,7 @@
 # The pre-commit hooks rely on third party linters being in your $PATH.
 # On macOS, install these using:
 #
-#     $ brew install pre-commit buildifier llvm prototool python
+#     $ brew install pre-commit buildifier llvm prototool python hadolint
 #     $ python -m pip install -r requirements_pre_commit.txt
 #
 # On linux:
@@ -15,6 +15,7 @@
 #     $ sudo apt install golang clang-format
 #     $ go get github.com/bazelbuild/buildtools/buildifier
 #     $ GO111MODULE=on go get github.com/uber/prototool/cmd/prototool@dev
+#     $ wget -O hadolint https://github.com/hadolint/hadolint/releases/download/v1.19.0/hadolint-Linux-x86_64 && chmod +x hadolint && sudo mv hadolint /usr/local/bin/hadolint
 #     $ python -m pip install -r requirements.pre_commit.txt
 #
 # Usage
@@ -76,3 +77,7 @@ repos:
       rev: master
       hooks:
           - id: bazel-buildifier
+    - repo: https://github.com/petalmd/dockerfile-pre-commit
+      rev: v1.0
+      hooks:
+          - id: dockerlint
