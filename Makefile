@@ -48,6 +48,10 @@ Deployment
     make install
         Build and install the python wheel.
 
+    make bdist_wheel-manylinux
+        Use a docker container to build a python wheel for linux. This is only
+        used for making release builds. This requires docker.
+
 
 Tidying up
 -----------
@@ -59,12 +63,12 @@ Tidying up
         Clean up all build artifacts, including the build cache.
 
     make uninstall
-    	Uninstall the python package.
+        Uninstall the python package.
 
     make purge
-    	Uninstall the python package and completely remove all datasets, logs,
-    	and cached files. Any experimental data or generated logs will be
-    	irreversibly deleted!
+        Uninstall the python package and completely remove all datasets, logs,
+        and cached files. Any experimental data or generated logs will be
+        irreversibly deleted!
 endef
 export HELP
 
@@ -125,10 +129,14 @@ endif
 bdist_wheel: bazel-build
 	$(PYTHON) setup.py bdist_wheel
 
+bdist_wheel-linux:
+	docker build -t chriscummins/compiler_gym-linux-build packaging
+	docker run -v $(ROOT):/CompilerGym --rm chriscummins/compiler_gym-linux-build:latest /bin/sh -c 'cd /CompilerGym && make bdist_wheel'
+	mv dist/compiler_gym-$(VERSION)-py3-none-linux_x86_64.whl dist/compiler_gym-$(VERSION)-py3-none-manylinux2014_x86_64.whl
 
-all: docs bdist_wheel
+all: docs bdist_wheel bdist_wheel-linux
 
-.PHONY: bdist_wheel
+.PHONY: bdist_wheel bdist_wheel-linux
 
 #################
 # Documentation #
