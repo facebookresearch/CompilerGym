@@ -18,12 +18,33 @@ std::vector<RewardSpace> getLlvmRewardSpaceList() {
     space.set_name(util::enumNameToPascalCase<LlvmRewardSpace>(value));
     switch (value) {
       case LlvmRewardSpace::IR_INSTRUCTION_COUNT:
+        space.set_deterministic(true);
+        break;
       case LlvmRewardSpace::IR_INSTRUCTION_COUNT_O3:
+        space.set_deterministic(true);
+        space.set_has_success_threshold(true);
+        space.set_success_threshold(1.0);
+        break;
       case LlvmRewardSpace::IR_INSTRUCTION_COUNT_Oz:
+        space.set_deterministic(true);
+        space.set_has_success_threshold(true);
+        space.set_success_threshold(1.0);
+        break;
       case LlvmRewardSpace::NATIVE_TEXT_SIZE_BYTES:
-      case LlvmRewardSpace::NATIVE_TEXT_SIZE_BYTES_O3:
-      case LlvmRewardSpace::NATIVE_TEXT_SIZE_BYTES_Oz:
-        // These reward spaces have no bounds.
+        space.set_deterministic(true);
+        space.set_platform_dependent(true);
+        break;
+      case LlvmRewardSpace::NATIVE_TEXT_SIZE_O3:
+        space.set_deterministic(true);
+        space.set_has_success_threshold(true);
+        space.set_success_threshold(1.0);
+        space.set_platform_dependent(true);
+        break;
+      case LlvmRewardSpace::NATIVE_TEXT_SIZE_Oz:
+        space.set_deterministic(true);
+        space.set_has_success_threshold(true);
+        space.set_success_threshold(1.0);
+        space.set_platform_dependent(true);
         break;
     }
     spaces.push_back(space);

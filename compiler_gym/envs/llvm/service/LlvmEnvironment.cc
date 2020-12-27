@@ -306,19 +306,19 @@ Status LlvmEnvironment::getObservation(LlvmObservationSpace space, Observation* 
       reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
       break;
     }
-    case LlvmObservationSpace::NATIVE_TEXT_SIZE_BYTES_O0: {
+    case LlvmObservationSpace::NATIVE_TEXT_SIZE_O0: {
       const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O0,
                                         LlvmCostFunction::NATIVE_TEXT_SIZE_BYTES);
       reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
       break;
     }
-    case LlvmObservationSpace::NATIVE_TEXT_SIZE_BYTES_O3: {
+    case LlvmObservationSpace::NATIVE_TEXT_SIZE_O3: {
       const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O3,
                                         LlvmCostFunction::NATIVE_TEXT_SIZE_BYTES);
       reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
       break;
     }
-    case LlvmObservationSpace::NATIVE_TEXT_SIZE_BYTES_OZ: {
+    case LlvmObservationSpace::NATIVE_TEXT_SIZE_OZ: {
       const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::Oz,
                                         LlvmCostFunction::NATIVE_TEXT_SIZE_BYTES);
       reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));

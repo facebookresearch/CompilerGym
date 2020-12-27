@@ -36,7 +36,7 @@ BENCHMARK_NAMES = list(_read_list_file(BENCHMARKS_LIST))
 
 env = gym.make("llvm-v0")
 OBSERVATION_SPACE_NAMES = sorted(env.observation.spaces.keys())
-REWARD_SPACE_NAMES = sorted(env.reward.ranges.keys())
+REWARD_SPACE_NAMES = sorted(env.reward.spaces.keys())
 env.close()
 
 

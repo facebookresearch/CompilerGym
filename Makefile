@@ -130,9 +130,11 @@ bdist_wheel: bazel-build
 	$(PYTHON) setup.py bdist_wheel
 
 bdist_wheel-linux:
+	rm -rf build
 	docker build -t chriscummins/compiler_gym-linux-build packaging
 	docker run -v $(ROOT):/CompilerGym --rm chriscummins/compiler_gym-linux-build:latest /bin/sh -c 'cd /CompilerGym && make bdist_wheel'
 	mv dist/compiler_gym-$(VERSION)-py3-none-linux_x86_64.whl dist/compiler_gym-$(VERSION)-py3-none-manylinux2014_x86_64.whl
+	rm -rf build
 
 all: docs bdist_wheel bdist_wheel-linux
 

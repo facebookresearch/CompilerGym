@@ -4,12 +4,11 @@
 # LICENSE file in the root directory of this source tree.
 from typing import Callable, Dict, List
 
-import numpy as np
-from gym.spaces import Box, Space
+from gym.spaces import Space
 
-from compiler_gym.service import observation2py, observation_t, scalar_range2tuple
+from compiler_gym.service import observation2py, observation_t
 from compiler_gym.service.proto import Observation, ObservationRequest, ObservationSpace
-from compiler_gym.spaces import Sequence
+from compiler_gym.views.observation_space_spec import ObservationSpaceSpec
 
 
 class ObservationView(object):
@@ -21,7 +20,7 @@ class ObservationView(object):
     >>> env.reset()
     >>> env.observation.spaces.keys()
     ["Autophase", "Ir"]
-    >>> env.observation.spaces["Autophase"]
+    >>> env.observation.spaces["Autophase"].space
     Box(56,)
     >>> env.observation["Autophase"]
     [0, 1, ..., 2]
@@ -36,8 +35,9 @@ class ObservationView(object):
     ):
         if not spaces:
             raise ValueError("No observation spaces")
-        self.indices = {s.name: i for i, s in enumerate(spaces)}
-        self.spaces = {s.name: shape2space(s) for s in spaces}
+        self.spaces = {
+            s.name: ObservationSpaceSpec.from_proto(i, s) for i, s in enumerate(spaces)
+        }
         self.session_id = -1
 
         self._get_observation = get_observation
@@ -53,13 +53,13 @@ class ObservationView(object):
         """
         request = ObservationRequest(
             session_id=self.session_id,
-            observation_space=self.indices[observation_space],
+            observation_space=self.spaces[observation_space].index,
         )
         return self.translate(
             observation_space,
             observation2py(
                 self._base_spaces.get(
-                    observation_space, self.spaces[observation_space]
+                    observation_space, self.spaces[observation_space].space
                 ),
                 self._get_observation(request),
             ),
@@ -113,8 +113,12 @@ class ObservationView(object):
             observation space is derived from.
         :param derived_name: The name of the derived observation space
         """
-        self.spaces[derived_name] = derived_space
-        self.indices[derived_name] = self.indices[base_name]
+        base_spec = self.spaces[base_name]
+        spec = ObservationSpaceSpec(id=derived_name, space=derived_space)
+        spec.index = base_spec.index
+        spec.deterministic = base_spec.deterministic
+        spec.platform_dependent = base_spec.platform_dependent
+        self.spaces[derived_name] = spec
         self._translate_cbs[derived_name] = cb
 
     def __repr__(self):
@@ -135,38 +139,3 @@ class ObservationView(object):
         :return: An observation, after applying any derived space translations.
         """
         return self._translate_cbs.get(observation_space, lambda x: x)(observation)
-
-
-def shape2space(space: ObservationSpace) -> Space:
-    """Convert an ObservationSpace description into a gym Space."""
-
-    def make_box(scalar_range_list, dtype, defaults):
-        bounds = [scalar_range2tuple(r, defaults) for r in scalar_range_list]
-        return Box(
-            low=np.array([b[0] for b in bounds], dtype=dtype),
-            high=np.array([b[1] for b in bounds], dtype=dtype),
-            dtype=dtype,
-        )
-
-    def make_seq(scalar_range, dtype, defaults):
-        return Sequence(
-            size_range=scalar_range2tuple(scalar_range, defaults),
-            dtype=dtype,
-            opaque_data_format=space.opaque_data_format,
-        )
-
-    shape_type = space.WhichOneof("shape")
-    if shape_type == "int64_range_list":
-        return make_box(
-            space.int64_range_list.range,
-            np.int64,
-            (np.iinfo(np.int64).min, np.iinfo(np.int64).max),
-        )
-    elif shape_type == "double_range_list":
-        return make_box(space.double_range_list.range, np.float64, (-np.inf, np.inf))
-    elif shape_type == "string_size_range":
-        return make_seq(space.string_size_range, str, (0, None))
-    elif shape_type == "binary_size_range":
-        return make_seq(space.binary_size_range, bytes, (0, None))
-    else:
-        raise TypeError(f"Cannot determine shape of ObservationSpace: {space}")

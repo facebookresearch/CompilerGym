@@ -12,14 +12,17 @@ import sys
 from datetime import datetime
 from pathlib import Path
 from time import sleep, time
-from typing import NamedTuple, Optional, TypeVar, Union
+from typing import List, NamedTuple, Optional, TypeVar, Union
 
 import grpc
 
 from compiler_gym.service.proto import (
+    ActionSpace,
     CompilerGymServiceStub,
     GetSpacesReply,
     GetSpacesRequest,
+    ObservationSpace,
+    RewardSpace,
 )
 from compiler_gym.util.runfiles_path import cache_path, runfiles_path
 
@@ -400,9 +403,15 @@ class CompilerGymServiceConnection(object):
         self.stub = None
         self._establish_connection()
 
-        self.action_spaces = list(self.connection.spaces.action_space_list)
-        self.observation_spaces = list(self.connection.spaces.observation_space_list)
-        self.reward_spaces = list(self.connection.spaces.reward_space_list)
+        self.action_spaces: List[ActionSpace] = list(
+            self.connection.spaces.action_space_list
+        )
+        self.observation_spaces: List[ObservationSpace] = list(
+            self.connection.spaces.observation_space_list
+        )
+        self.reward_spaces: List[RewardSpace] = list(
+            self.connection.spaces.reward_space_list
+        )
 
     def _establish_connection(self) -> None:
         """Create and establish a connection."""

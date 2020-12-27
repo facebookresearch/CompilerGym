@@ -14,8 +14,8 @@ pytest_plugins = ["tests.envs.llvm.fixtures"]
 
 def test_step(env: CompilerEnv, action_name: str):
     """Run each action on a single benchmark."""
-    env.eager_reward_space = "IrInstructionCount"
-    env.eager_observation_space = "Autophase"
+    env.reward_space = "IrInstructionCount"
+    env.observation_space = "Autophase"
     env.reset(benchmark="cBench-v0/crc32")
     observation, reward, done, info = env.step(
         env.action_space.from_string(action_name)

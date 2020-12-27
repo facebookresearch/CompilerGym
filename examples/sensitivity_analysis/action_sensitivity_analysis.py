@@ -94,8 +94,8 @@ def get_rewards(
     ):
         num_attempts += 1
         with env_session_from_flags(benchmark=benchmark) as env:
-            env.eager_observation_space = None
-            env.eager_reward_space = None
+            env.observation_space = None
+            env.reward_space = None
             env.reset(benchmark=benchmark)
             with Timer() as t:
                 reward = run_one_trial(env, reward_space, action, max_warmup_steps)

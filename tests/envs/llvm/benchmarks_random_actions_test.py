@@ -21,8 +21,8 @@ FUZZ_TIME_SECONDS = 2
 def make_env(benchmark_name: str) -> CompilerEnv:
     """Construct an environment for testing."""
     env = gym.make("llvm-v0")
-    env.eager_reward_space = "IrInstructionCount"
-    env.eager_observation_space = "Autophase"
+    env.reward_space = "IrInstructionCount"
+    env.observation_space = "Autophase"
     env.reset(benchmark=benchmark_name)
     return env
 

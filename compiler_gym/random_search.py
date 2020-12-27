@@ -116,9 +116,9 @@ def random_search(
         sanitized_benchmark_name = "/".join(benchmark_name.split("/")[-2:])
         outdir = create_logging_dir(f"random/{sanitized_benchmark_name}")
 
-    reward_space_name = env.eager_reward_space
-    if not reward_space_name:
+    if not env.reward_space:
         raise ValueError("Eager reward must be specified for random search")
+    reward_space_name = env.reward_space.id
 
     action_space_names = list(env.action_space.names)
     num_instructions = int(-env.reward["IrInstructionCount"])
