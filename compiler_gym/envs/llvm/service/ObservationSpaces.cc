@@ -20,12 +20,18 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
       case LlvmObservationSpace::IR: {
         ScalarRange irSize;
         space.mutable_string_size_range()->mutable_min()->set_value(0);
+        space.set_deterministic(true);
+        space.set_platform_dependent(false);
         break;
       }
       case LlvmObservationSpace::BITCODE_FILE: {
         ScalarRange pathLength;
         space.mutable_string_size_range()->mutable_min()->set_value(0);
         space.mutable_string_size_range()->mutable_max()->set_value(4096);
+        // A random file path is generated, so the returned value is not
+        // deterministic.
+        space.set_deterministic(false);
+        space.set_platform_dependent(false);
         break;
       }
       case LlvmObservationSpace::AUTOPHASE: {
@@ -37,6 +43,8 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
         }
         *space.mutable_int64_range_list()->mutable_range() = {featureSizes.begin(),
                                                               featureSizes.end()};
+        space.set_deterministic(true);
+        space.set_platform_dependent(false);
         break;
       }
       case LlvmObservationSpace::PROGRAML: {
@@ -45,6 +53,8 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
         encodedSize.mutable_min()->set_value(0);
         space.set_opaque_data_format("json://networkx/MultiDiGraph");
         *space.mutable_string_size_range() = encodedSize;
+        space.set_deterministic(true);
+        space.set_platform_dependent(false);
         break;
       }
       case LlvmObservationSpace::CPU_INFO: {
@@ -53,18 +63,28 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
         encodedSize.mutable_min()->set_value(0);
         space.set_opaque_data_format("json://");
         *space.mutable_string_size_range() = encodedSize;
+        space.set_deterministic(true);
+        space.set_platform_dependent(true);
         break;
       }
       case LlvmObservationSpace::IR_INSTRUCTION_COUNT:
       case LlvmObservationSpace::IR_INSTRUCTION_COUNT_O0:
       case LlvmObservationSpace::IR_INSTRUCTION_COUNT_O3:
-      case LlvmObservationSpace::IR_INSTRUCTION_COUNT_OZ:
+      case LlvmObservationSpace::IR_INSTRUCTION_COUNT_OZ: {
+        auto featureSize = space.mutable_int64_range_list()->add_range();
+        featureSize->mutable_min()->set_value(0);
+        space.set_deterministic(true);
+        space.set_platform_dependent(false);
+        break;
+      }
       case LlvmObservationSpace::NATIVE_TEXT_SIZE_BYTES:
       case LlvmObservationSpace::NATIVE_TEXT_SIZE_O0:
       case LlvmObservationSpace::NATIVE_TEXT_SIZE_O3:
       case LlvmObservationSpace::NATIVE_TEXT_SIZE_OZ: {
         auto featureSize = space.mutable_int64_range_list()->add_range();
         featureSize->mutable_min()->set_value(0);
+        space.set_deterministic(true);
+        space.set_platform_dependent(true);
         break;
       }
     }

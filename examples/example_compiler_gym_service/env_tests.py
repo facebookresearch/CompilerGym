@@ -34,10 +34,13 @@ def test_action_space(env: CompilerEnv):
 
 def test_observation_spaces(env: CompilerEnv):
     env.reset()
-    assert env.observation.spaces == {
-        "ir": Sequence(size_range=(0, None), dtype=str, opaque_data_format=""),
-        "features": Box(shape=(3,), low=-100, high=100, dtype=np.int64),
-    }
+    assert env.observation.spaces.keys() == {"ir", "features"}
+    assert env.observation.spaces["ir"].space == Sequence(
+        size_range=(0, None), dtype=str, opaque_data_format=""
+    )
+    assert env.observation.spaces["features"].space == Box(
+        shape=(3,), low=-100, high=100, dtype=np.int64
+    )
 
 
 def test_reward_spaces(env: CompilerEnv):
@@ -68,11 +71,11 @@ def test_reset_invalid_benchmark(env: CompilerEnv):
     assert str(ctx.value) == "Unknown program name"
 
 
-def test_invalid_eager_observation_space(
+def test_invalid_observation_space(
     env: CompilerEnv,
 ):
     with pytest.raises(LookupError):
-        env.eager_observation_space = 100
+        env.observation_space = 100
 
 
 def test_invalid_reward_space(
@@ -95,7 +98,7 @@ def test_takeAction_out_of_range(env: CompilerEnv):
 
 
 def test_eager_ir_observation(env: CompilerEnv):
-    env.eager_observation_space = "ir"
+    env.observation_space = "ir"
     observation = env.reset()
     assert observation == "Hello, world!"
 
@@ -108,7 +111,7 @@ def test_eager_ir_observation(env: CompilerEnv):
 def test_eager_features_observation(
     env: CompilerEnv,
 ):
-    env.eager_observation_space = "features"
+    env.observation_space = "features"
     observation = env.reset()
     assert isinstance(observation, np.ndarray)
     assert observation.shape == (3,)

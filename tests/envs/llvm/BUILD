@@ -129,6 +129,16 @@ py_test(
 )
 
 py_test(
+    name = "observation_spaces_test",
+    srcs = ["observation_spaces_test.py"],
+    deps = [
+        ":fixtures",
+        "//compiler_gym/envs",
+        "//tests:test_main",
+    ],
+)
+
+py_test(
     name = "reward_spaces_test",
     srcs = ["reward_spaces_test.py"],
     deps = [

@@ -22,6 +22,12 @@ ObservationView
 
    .. automethod:: __getitem__
 
+ObservationSpaceSpec
+--------------------
+
+.. autoclass:: ObservationSpaceSpec
+   :members:
+
 
 RewardView
 ----------

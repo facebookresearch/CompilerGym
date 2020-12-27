@@ -115,7 +115,7 @@ def env_from_flags(benchmark: Optional[Union[str, Benchmark]] = None) -> Compile
         env = gym.make(FLAGS.env, connection_settings=connection_settings)
         env.benchmark = benchmark or env.benchmark
         if FLAGS.observation:
-            env.eager_observation_space = FLAGS.observation
+            env.observation_space = FLAGS.observation
         if FLAGS.reward:
             env.reward_space = FLAGS.reward
         return env
@@ -127,7 +127,7 @@ def env_from_flags(benchmark: Optional[Union[str, Benchmark]] = None) -> Compile
             service=local_service_binary or FLAGS.service,
             connection_settings=connection_settings,
             benchmark=benchmark,
-            eager_observation_space=FLAGS.observation,
+            observation_space=FLAGS.observation,
             reward_space=FLAGS.reward,
         )
     else:

@@ -22,7 +22,7 @@ def make_env(benchmark_name: str) -> CompilerEnv:
     """Construct an environment for testing."""
     env = gym.make("llvm-v0")
     env.reward_space = "IrInstructionCount"
-    env.eager_observation_space = "Autophase"
+    env.observation_space = "Autophase"
     env.reset(benchmark=benchmark_name)
     return env
 

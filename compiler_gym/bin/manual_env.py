@@ -60,9 +60,9 @@ def run_manual_env(env: CompilerEnv):
         eager_observation = env.reset(benchmark=benchmark)
 
     print(f"Reset {env.benchmark} environment in {timer}")
-    if env.eager_observation_space and eager_observation is not None:
+    if env.observation_space and eager_observation is not None:
         print(
-            f"Observation: {observation2str(env.observation.spaces[env.eager_observation_space], eager_observation)}"
+            f"Observation: {observation2str(env.observation_space, eager_observation)}"
         )
 
     observation_names = sorted(env.observation.spaces.keys())
@@ -96,9 +96,9 @@ def run_manual_env(env: CompilerEnv):
                     eager_observation, eager_reward, done, info = env.step(index)
 
                 # Print the eager observation, if available.
-                if env.eager_observation_space and eager_observation is not None:
+                if env.observation_space and eager_observation is not None:
                     print(
-                        f"Observation: {observation2str(env.observation.spaces[env.eager_observation_space], eager_observation)}"
+                        f"Observation: {observation2str(env.observation_space, eager_observation)}"
                     )
 
                 # Print the eager reward and the diff, if available.
@@ -128,7 +128,9 @@ def run_manual_env(env: CompilerEnv):
                 )
                 with Timer() as timer:
                     value = env.observation[observation_name]
-                print(observation2str(env.observation.spaces[observation_name], value))
+                print(
+                    observation2str(env.observation.spaces[observation_name].id, value)
+                )
                 print(f"Observation {observation_name} in {timer}")
                 break
             elif c == "r":

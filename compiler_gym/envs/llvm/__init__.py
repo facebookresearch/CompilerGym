@@ -46,7 +46,7 @@ def _register_llvm_gym_service():
             entry_point="compiler_gym.envs.llvm:LlvmEnv",
             kwargs={
                 "service": _LLVM_SERVICE_BINARY,
-                "eager_observation_space": observation_spaces[observation_space],
+                "observation_space": observation_spaces[observation_space],
                 "reward_space": reward_spaces[reward_space],
             },
         )

@@ -20,7 +20,6 @@ from compiler_gym.service import (
     ServiceError,
     observation2py,
     observation_t,
-    scalar_range2tuple,
 )
 from compiler_gym.service.connection import ServiceTransportError
 from compiler_gym.service.proto import (
@@ -29,11 +28,15 @@ from compiler_gym.service.proto import (
     Benchmark,
     EndEpisodeRequest,
     GetBenchmarksRequest,
-    RewardSpace,
     StartEpisodeRequest,
 )
 from compiler_gym.spaces import NamedDiscrete
-from compiler_gym.views import ObservationView, RewardSpaceSpec, RewardView
+from compiler_gym.views import (
+    ObservationSpaceSpec,
+    ObservationView,
+    RewardSpaceSpec,
+    RewardView,
+)
 
 # Type hints.
 info_t = Dict[str, Any]
@@ -54,7 +57,7 @@ class CompilerEnv(gym.Env):
 
     >>> env = CompilerEnv(
         service="localhost:8080",
-        eager_observation_space="features",
+        observation_space="features",
         reward_space="runtime"
     )
 
@@ -106,7 +109,7 @@ class CompilerEnv(gym.Env):
         self,
         service: Union[str, Path],
         benchmark: Optional[Union[str, Benchmark]] = None,
-        eager_observation_space: Optional[str] = None,
+        observation_space: Optional[str] = None,
         reward_space: Optional[str] = None,
         action_space: Optional[str] = None,
         connection_settings: Optional[ConnectionOpts] = None,
@@ -122,7 +125,7 @@ class CompilerEnv(gym.Env):
             argument and instead passing by choosing from the
             :code:`CompilerEnv.benchmarks` attribute and passing it to
             :func:`reset()` when called.
-        :param eager_observation_space: Compute and return observations at each
+        :param observation_space: Compute and return observations at each
             :func:`step()` from this space. If not provided, :func:`step()`
             returns :code:`None` for the observation value.
         :param reward_space: Compute and return reward at each :func:`step()`
@@ -181,7 +184,7 @@ class CompilerEnv(gym.Env):
         self.reward_range: Tuple[float, float] = (-np.inf, np.inf)
 
         # Initialize eager observation/reward.
-        self.eager_observation_space = eager_observation_space
+        self.observation_space = observation_space
         self.reward_space = reward_space
 
     def commandline(self) -> str:
@@ -290,37 +293,36 @@ class CompilerEnv(gym.Env):
         return self._session_id is not None
 
     @property
-    def eager_observation_space(self) -> Optional[str]:
+    def observation_space(self) -> Optional[ObservationSpaceSpec]:
         """The eager observation space. This is the observation value that is
         returned by :func:`~step()`.
 
-        :getter: Returns the name of the eager observation space, or
+        :getter: Returns the specification of the eager observation space, or
             :code:`None` if not set.
-        :setter: Set the name of the eager observation space.
+        :setter: Set the eager observation space.
 
         .. note::
             Setting a new eager observation space has no effect until
             :func:`~reset()` is called on the environment.
         """
-        return self._eager_observation_space or None
+        return self._eager_observation_space
 
-    @eager_observation_space.setter
-    def eager_observation_space(self, eager_observation_space: Optional[str]) -> None:
+    @observation_space.setter
+    def observation_space(self, observation_space: Optional[str]) -> None:
         if (
-            eager_observation_space is not None
-            and eager_observation_space not in self.observation.spaces
+            observation_space is not None
+            and observation_space not in self.observation.spaces
         ):
-            raise LookupError(f"Observation space not found: {eager_observation_space}")
+            raise LookupError(f"Observation space not found: {observation_space}")
         if self.in_episode:
             warnings.warn(
                 "Changing eager observation space has no effect until reset() is called."
             )
-        self._eager_observation = eager_observation_space is not None
-        self._eager_observation_space = eager_observation_space or ""
+        self._eager_observation = observation_space is not None
         if self._eager_observation:
-            self.observation_space = self.observation.spaces[
-                self._eager_observation_space
-            ]
+            self._eager_observation_space = self.observation.spaces[observation_space]
+        else:
+            self._eager_observation_space = None
 
     def close(self):
         """Close the environment.
@@ -412,9 +414,7 @@ class CompilerEnv(gym.Env):
                     ),
                     use_eager_observation_space=self._eager_observation,
                     eager_observation_space=(
-                        self.observation.indices[self.eager_observation_space]
-                        if self._eager_observation
-                        else None
+                        self.observation_space.index if self.observation_space else None
                     ),
                     use_eager_reward_space=bool(self.reward_space),
                     eager_reward_space=(
@@ -444,7 +444,7 @@ class CompilerEnv(gym.Env):
             )
 
         if self._eager_observation:
-            return self.observation[self.eager_observation_space]
+            return self.observation[self.observation_space.id]
 
     def step(self, action: int) -> step_t:
         """Take a step.
@@ -473,8 +473,8 @@ class CompilerEnv(gym.Env):
 
         if self._eager_observation:
             observation = self.observation.translate(
-                self.eager_observation_space,
-                observation2py(self.eager_observation_space, reply.observation),
+                self.observation_space.id,
+                observation2py(self.observation_space.space, reply.observation),
             )
         if self._eager_reward:
             reward = reply.reward.reward
@@ -501,11 +501,9 @@ class CompilerEnv(gym.Env):
         :raises TypeError: If eager observations are not set, or if the
             requested render mode does not exist.
         """
-        if not self.eager_observation_space:
-            raise ValueError(
-                "Cannot call render() when no eager observation space is used"
-            )
-        observation = self.observation[self.eager_observation_space]
+        if not self.observation_space:
+            raise ValueError("Cannot call render() when no observation space is used")
+        observation = self.observation[self.observation_space.id]
         if mode == "human":
             print(observation)
         elif mode == "ansi":

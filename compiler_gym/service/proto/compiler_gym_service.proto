@@ -178,7 +178,11 @@ message ObservationSpace {
   // observations using this value. For example, an opaque_data_format of
   // "string_json" could be used to indicate that the observation is a
   // string-serialized JSON value.
-  string opaque_data_format = 12;
+  string opaque_data_format = 6;
+  // Whether the observation space is deterministic.
+  bool deterministic = 7;
+  // Whether the observations depend on the service execution environment.
+  bool platform_dependent = 8;
 }
 
 message ObservationRequest {

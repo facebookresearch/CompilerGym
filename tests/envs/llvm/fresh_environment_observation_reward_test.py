@@ -27,7 +27,7 @@ def env() -> CompilerEnv:
 def test_step(env: CompilerEnv, observation_space: str, reward_space: str):
     """Request every combination of observation and reward in a fresh environment."""
     env.reward_space = None
-    env.eager_observation_space = None
+    env.observation_space = None
     env.reset(benchmark="cBench-v0/crc32")
 
     observation = env.observation[observation_space]
