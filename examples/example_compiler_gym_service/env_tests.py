@@ -32,19 +32,17 @@ def test_action_space(env: CompilerEnv):
     ]
 
 
-def test_observation_space_list(env: CompilerEnv):
+def test_observation_spaces(env: CompilerEnv):
     env.reset()
-    env.observation.spaces = {
-        "ir": Sequence(size_range=(0, None)),
-        "features": Box(shape=(3,), low=-100, high=100),
+    assert env.observation.spaces == {
+        "ir": Sequence(size_range=(0, None), dtype=str, opaque_data_format=""),
+        "features": Box(shape=(3,), low=-100, high=100, dtype=np.int64),
     }
 
 
-def test_reward_space_list(env: CompilerEnv):
+def test_reward_spaces(env: CompilerEnv):
     env.reset()
-    env.reward.ranges = {
-        "codesize": (None, 0),
-    }
+    assert env.reward.spaces.keys() == {"codesize"}
 
 
 def test_takeAction_before_startEpisode(env: CompilerEnv):
@@ -77,11 +75,11 @@ def test_invalid_eager_observation_space(
         env.eager_observation_space = 100
 
 
-def test_invalid_eager_reward_space(
+def test_invalid_reward_space(
     env: CompilerEnv,
 ):
     with pytest.raises(LookupError):
-        env.eager_reward_space = 100
+        env.reward_space = 100
 
 
 def test_double_reset(env: CompilerEnv):
@@ -119,7 +117,7 @@ def test_eager_features_observation(
 
 
 def test_eager_reward(env: CompilerEnv):
-    env.eager_reward_space = "codesize"
+    env.reward_space = "codesize"
     env.reset()
     observation, reward, done, info = env.step(0)
     assert observation is None

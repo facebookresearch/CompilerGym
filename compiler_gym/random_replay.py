@@ -17,7 +17,7 @@ from compiler_gym.util import logs
 def replay_actions(env: CompilerEnv, action_names: List[str], outdir: Path):
     logs_path = outdir / logs.BEST_ACTIONS_PROGRESS_NAME
     start_time = time()
-    init_reward = env.reward[env.eager_reward_space]
+    init_reward = env.reward[env.reward_space.id]
 
     print(f"Step [{0:03d} / {len(action_names):03d}]: reward={init_reward:.4f}")
 
@@ -73,7 +73,7 @@ def replay_actions_from_logs(env: CompilerEnv, logdir: Path, benchmark=None) -> 
         actions = [l.strip() for l in f.readlines() if l.strip()]
 
     benchmark = benchmark or meta["benchmark"]
-    env.eager_reward_space = meta["reward"]
+    env.reward_space = meta["reward"]
     env.reset(benchmark=benchmark)
     replay_actions(env, actions, logdir)
     env.close()

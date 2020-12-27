@@ -23,8 +23,8 @@ enum class LlvmRewardSpace {
   IR_INSTRUCTION_COUNT_O3,
   IR_INSTRUCTION_COUNT_Oz,
   NATIVE_TEXT_SIZE_BYTES,
-  NATIVE_TEXT_SIZE_BYTES_O3,
-  NATIVE_TEXT_SIZE_BYTES_Oz,
+  NATIVE_TEXT_SIZE_O3,
+  NATIVE_TEXT_SIZE_Oz,
 };
 
 // Get the list of available reward spaces.

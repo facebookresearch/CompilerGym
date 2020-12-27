@@ -35,7 +35,7 @@ def _register_example_gym_service():
             kwargs={
                 "service": _EXAMPLE_SERVICE_BINARY,
                 "eager_observation_space": observation_space,
-                "eager_reward_space": reward_space,
+                "reward_space": reward_space,
             },
         )
 

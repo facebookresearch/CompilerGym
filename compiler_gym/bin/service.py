@@ -86,6 +86,13 @@ def header(message: str, level: int):
     return f"\n\n{prefix} {message}\n"
 
 
+def shape2str(shape, n: int = 80):
+    string = str(shape)
+    if len(string) > n:
+        return f"`{string[:n-4]}` ..."
+    return f"`{string}`"
+
+
 def print_service_capabilities(env: CompilerEnv, base_heading_level: int = 1):
     """Discover and print the capabilities of a CompilerGym service.
 
@@ -104,7 +111,7 @@ def print_service_capabilities(env: CompilerEnv, base_heading_level: int = 1):
         tabulate(
             sorted(
                 [
-                    (space, f"`{shape}`")
+                    (space, shape2str(shape))
                     for space, shape in env.observation.spaces.items()
                 ]
             ),
@@ -114,8 +121,23 @@ def print_service_capabilities(env: CompilerEnv, base_heading_level: int = 1):
     print(header("Reward Spaces", base_heading_level + 1))
     print(
         tabulate(
-            sorted(env.reward.ranges.items()),
-            headers=("Reward space", "Range"),
+            [
+                (
+                    name,
+                    space.range,
+                    space.success_threshold,
+                    "Yes" if space.deterministic else "No",
+                    "Yes" if space.platform_dependent else "No",
+                )
+                for name, space in sorted(env.reward.spaces.items())
+            ],
+            headers=(
+                "Reward space",
+                "Range",
+                "Success threshold",
+                "Deterministic?",
+                "Platform dependent?",
+            ),
         )
     )
 
@@ -155,8 +177,10 @@ def main(argv):
     assert 0 < FLAGS.heading_level <= 4, f"--heading_level must be in range [1,4]"
 
     env = env_from_flags()
-    print_service_capabilities(env, base_heading_level=FLAGS.heading_level)
-    env.close()
+    try:
+        print_service_capabilities(env, base_heading_level=FLAGS.heading_level)
+    finally:
+        env.close()
 
 
 if __name__ == "__main__":

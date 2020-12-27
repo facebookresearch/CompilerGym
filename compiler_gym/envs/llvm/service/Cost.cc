@@ -175,8 +175,8 @@ LlvmCostFunction getCostFunction(LlvmRewardSpace space) {
     case LlvmRewardSpace::IR_INSTRUCTION_COUNT_Oz:
       return LlvmCostFunction::IR_INSTRUCTION_COUNT;
     case LlvmRewardSpace::NATIVE_TEXT_SIZE_BYTES:
-    case LlvmRewardSpace::NATIVE_TEXT_SIZE_BYTES_O3:
-    case LlvmRewardSpace::NATIVE_TEXT_SIZE_BYTES_Oz:
+    case LlvmRewardSpace::NATIVE_TEXT_SIZE_O3:
+    case LlvmRewardSpace::NATIVE_TEXT_SIZE_Oz:
       return LlvmCostFunction::NATIVE_TEXT_SIZE_BYTES;
   }
 }
@@ -187,10 +187,10 @@ LlvmBaselinePolicy getBaselinePolicy(LlvmRewardSpace space) {
     case LlvmRewardSpace::NATIVE_TEXT_SIZE_BYTES:
       return LlvmBaselinePolicy::O0;
     case LlvmRewardSpace::IR_INSTRUCTION_COUNT_O3:
-    case LlvmRewardSpace::NATIVE_TEXT_SIZE_BYTES_O3:
+    case LlvmRewardSpace::NATIVE_TEXT_SIZE_O3:
       return LlvmBaselinePolicy::O3;
     case LlvmRewardSpace::IR_INSTRUCTION_COUNT_Oz:
-    case LlvmRewardSpace::NATIVE_TEXT_SIZE_BYTES_Oz:
+    case LlvmRewardSpace::NATIVE_TEXT_SIZE_Oz:
       return LlvmBaselinePolicy::Oz;
   }
 }

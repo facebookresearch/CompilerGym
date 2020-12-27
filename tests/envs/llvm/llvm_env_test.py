@@ -21,19 +21,6 @@ from tests.test_main import main
 pytest_plugins = ["tests.envs.llvm.fixtures"]
 
 
-def test_eager_reward_space(env: CompilerEnv):
-    env.eager_reward_space = "IrInstructionCount"
-    assert env.eager_reward_space == "IrInstructionCount"
-
-    env.eager_reward_space = None
-    assert env.eager_reward_space is None
-
-    invalid = "invalid value"
-    with pytest.raises(LookupError) as ctx:
-        env.eager_reward_space = invalid
-    assert str(ctx.value) == f"Reward space not found: {invalid}"
-
-
 def test_eager_observation_space(env: CompilerEnv):
     env.eager_observation_space = "Autophase"
     assert env.eager_observation_space == "Autophase"
@@ -82,9 +69,9 @@ def test_observation_spaces(env: CompilerEnv):
         "IrInstructionCountO3",
         "IrInstructionCountOz",
         "NativeTextSizeBytes",
-        "NativeTextSizeBytesO0",
-        "NativeTextSizeBytesO3",
-        "NativeTextSizeBytesOz",
+        "NativeTextSizeO0",
+        "NativeTextSizeO3",
+        "NativeTextSizeOz",
     }
 
 
@@ -801,48 +788,6 @@ def test_ir_instruction_count_observation_space(env: CompilerEnv):
     np.testing.assert_array_equal([196], value)
 
 
-def test_reward_spaces(env: CompilerEnv):
-    env.reset("cBench-v0/crc32")
-
-    assert set(env.reward.ranges.keys()) == {
-        "IrInstructionCount",
-        "IrInstructionCountO3",
-        "IrInstructionCountOz",
-        "NativeTextSizeBytes",
-        "NativeTextSizeBytesO3",
-        "NativeTextSizeBytesOz",
-    }
-
-    reward_space = "IrInstructionCount"
-    assert env.reward.ranges[reward_space] == (-np.inf, np.inf)
-    assert env.reward[reward_space] == 0
-
-    reward_space = "IrInstructionCountO3"
-    assert env.reward.ranges[reward_space] == (-np.inf, np.inf)
-    assert env.reward[reward_space] == 0
-
-    reward_space = "IrInstructionCountOz"
-    assert env.reward.ranges[reward_space] == (-np.inf, np.inf)
-    assert env.reward[reward_space] == 0
-
-    reward_space = "NativeTextSizeBytes"
-    assert env.reward.ranges[reward_space] == (-np.inf, np.inf)
-    assert env.reward[reward_space] == 0
-
-    reward_space = "NativeTextSizeBytesO3"
-    assert env.reward.ranges[reward_space] == (-np.inf, np.inf)
-    assert env.reward[reward_space] == 0
-
-    reward_space = "NativeTextSizeBytesOz"
-    assert env.reward.ranges[reward_space] == (-np.inf, np.inf)
-    assert env.reward[reward_space] == 0
-
-    invalid = "invalid value"
-    with pytest.raises(KeyError) as ctx:
-        _ = env.reward[invalid]
-    assert str(ctx.value) == f"'{invalid}'"
-
-
 def test_double_reset(env: CompilerEnv):
     env.reset(benchmark="cBench-v0/crc32")
     env.reset(benchmark="cBench-v0/crc32")
@@ -851,7 +796,7 @@ def test_double_reset(env: CompilerEnv):
 
 def test_service_env_dies_reset(env: CompilerEnv):
     env.eager_observation_space = "Autophase"
-    env.eager_reward_space = "IrInstructionCount"
+    env.reward_space = "IrInstructionCount"
     env.reset("cBench-v0/crc32")
 
     # Kill the service.

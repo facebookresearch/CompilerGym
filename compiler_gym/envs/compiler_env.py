@@ -20,6 +20,7 @@ from compiler_gym.service import (
     ServiceError,
     observation2py,
     observation_t,
+    scalar_range2tuple,
 )
 from compiler_gym.service.connection import ServiceTransportError
 from compiler_gym.service.proto import (
@@ -28,10 +29,11 @@ from compiler_gym.service.proto import (
     Benchmark,
     EndEpisodeRequest,
     GetBenchmarksRequest,
+    RewardSpace,
     StartEpisodeRequest,
 )
 from compiler_gym.spaces import NamedDiscrete
-from compiler_gym.views import ObservationView, RewardView
+from compiler_gym.views import ObservationView, RewardSpaceSpec, RewardView
 
 # Type hints.
 info_t = Dict[str, Any]
@@ -53,7 +55,7 @@ class CompilerEnv(gym.Env):
     >>> env = CompilerEnv(
         service="localhost:8080",
         eager_observation_space="features",
-        eager_reward_space="runtime"
+        reward_space="runtime"
     )
 
     Once constructed, an environment can be used in exactly the same way as a
@@ -105,7 +107,7 @@ class CompilerEnv(gym.Env):
         service: Union[str, Path],
         benchmark: Optional[Union[str, Benchmark]] = None,
         eager_observation_space: Optional[str] = None,
-        eager_reward_space: Optional[str] = None,
+        reward_space: Optional[str] = None,
         action_space: Optional[str] = None,
         connection_settings: Optional[ConnectionOpts] = None,
     ):
@@ -123,9 +125,9 @@ class CompilerEnv(gym.Env):
         :param eager_observation_space: Compute and return observations at each
             :func:`step()` from this space. If not provided, :func:`step()`
             returns :code:`None` for the observation value.
-        :param eager_reward_space: Compute and return reward at each
-            :func:`step()` from this space. If not provided, :func:`step()`
-            returns :code:`None` for the reward value.
+        :param reward_space: Compute and return reward at each :func:`step()`
+            from this space. If not provided, :func:`step()` returns
+            :code:`None` for the reward value.
         :param action_space: The name of the action space to use. If not
             specified, the default action space for this compiler is used.
         :raises FileNotFoundError: If service is a path to a file that is not
@@ -180,7 +182,7 @@ class CompilerEnv(gym.Env):
 
         # Initialize eager observation/reward.
         self.eager_observation_space = eager_observation_space
-        self.eager_reward_space = eager_reward_space
+        self.reward_space = reward_space
 
     def commandline(self) -> str:
         """Return the current state as a commandline invocation.
@@ -245,35 +247,36 @@ class CompilerEnv(gym.Env):
         self._user_specified_benchmark = benchmark
 
     @property
-    def eager_reward_space(self) -> Optional[str]:
+    def reward_space(self) -> Optional[RewardSpaceSpec]:
         """The eager reward space. This is the reward that is returned by
         :func:`~step()`.
 
-        :getter: Returns the name of the eager reward space, or :code:`None` if
-            not set.
-        :setter: Set the name of the eager reward space.
+        :getter: Returns a :class:`RewardSpaceSpec <compiler_gym.views.RewardSpaceSpec>`,
+            or :code:`None` if not set.
+        :setter: Set the eager reward space.
 
         .. note::
             Setting a new eager reward space has no effect until
             :func:`~reset()` is called on the environment.
         """
-        return self._eager_reward_space or None
+        return (
+            self.reward.spaces[self._eager_reward_space]
+            if self._eager_reward_space
+            else None
+        )
 
-    @eager_reward_space.setter
-    def eager_reward_space(self, eager_reward_space: Optional[str]) -> None:
-        if (
-            eager_reward_space is not None
-            and eager_reward_space not in self.reward.ranges
-        ):
-            raise LookupError(f"Reward space not found: {eager_reward_space}")
+    @reward_space.setter
+    def reward_space(self, reward_space: Optional[str]) -> None:
+        if reward_space is not None and reward_space not in self.reward.spaces:
+            raise LookupError(f"Reward space not found: {reward_space}")
         if self.in_episode:
             warnings.warn(
                 "Changing eager reward space has no effect until reset() is called."
             )
-        self._eager_reward = eager_reward_space is not None
-        self._eager_reward_space = eager_reward_space or ""
+        self._eager_reward: bool = reward_space is not None
+        self._eager_reward_space: str = reward_space or ""
         if self._eager_reward:
-            self.reward_range = self.reward.ranges[self._eager_reward_space]
+            self.reward_range = self.reward.spaces[reward_space].range
         else:
             self.reward_range = (-np.inf, np.inf)
 
@@ -413,11 +416,9 @@ class CompilerEnv(gym.Env):
                         if self._eager_observation
                         else None
                     ),
-                    use_eager_reward_space=self._eager_reward,
+                    use_eager_reward_space=bool(self.reward_space),
                     eager_reward_space=(
-                        self.reward.indices[self.eager_reward_space]
-                        if self._eager_reward
-                        else None
+                        self.reward_space.index if self.reward_space else None
                     ),
                 ),
             )

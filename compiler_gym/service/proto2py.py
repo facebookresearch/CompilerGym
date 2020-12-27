@@ -10,7 +10,7 @@ import networkx as nx
 import numpy as np
 from gym.spaces import Space
 
-from compiler_gym.service.proto import Observation, ScalarRange
+from compiler_gym.service.proto import Observation, RewardSpace, ScalarRange
 from compiler_gym.spaces import Sequence
 
 json_t = Union[List[Any], Dict[str, Any]]

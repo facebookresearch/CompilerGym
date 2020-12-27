@@ -66,7 +66,7 @@ def run_manual_env(env: CompilerEnv):
         )
 
     observation_names = sorted(env.observation.spaces.keys())
-    reward_names = sorted(env.reward.ranges.keys())
+    reward_names = sorted(env.reward.spaces.keys())
     last_eager_reward: Optional[float] = None
     step_count = 1
 
@@ -102,7 +102,7 @@ def run_manual_env(env: CompilerEnv):
                     )
 
                 # Print the eager reward and the diff, if available.
-                if env.eager_reward_space and eager_reward is not None:
+                if env.reward_space and eager_reward is not None:
                     reward_diff = ""
                     if last_eager_reward is not None and eager_reward is not None:
                         reward_diff = (

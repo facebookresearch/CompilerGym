@@ -10,6 +10,7 @@ py_library(
     deps = [
         ":observation",
         ":reward",
+        ":reward_space_spec",
     ],
 )
 
@@ -27,6 +28,16 @@ py_library(
     name = "reward",
     srcs = ["reward.py"],
     visibility = ["//compiler_gym:__subpackages__"],
+    deps = [
+        ":reward_space_spec",
+        "//compiler_gym/service",
+        "//compiler_gym/service/proto",
+    ],
+)
+
+py_library(
+    name = "reward_space_spec",
+    srcs = ["reward_space_spec.py"],
     deps = [
         "//compiler_gym/service",
         "//compiler_gym/service/proto",

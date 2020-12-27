@@ -4,5 +4,6 @@
 # LICENSE file in the root directory of this source tree.
 from compiler_gym.views.observation import ObservationView
 from compiler_gym.views.reward import RewardView
+from compiler_gym.views.reward_space_spec import RewardSpaceSpec
 
-__all__ = ["ObservationView", "RewardView"]
+__all__ = ["ObservationView", "RewardView", "RewardSpaceSpec"]

@@ -252,16 +252,14 @@ Reward Spaces
 Codesize
 ~~~~~~~~
 
++--------------------------+-------------+-------------------+
+| Reward space             | Range       | Success threshold |
++==========================+=============+===================+
+| IrInstructionCount       | (-inf, inf) |                   |
++--------------------------+-------------+-------------------+
+| IrInstructionCountO3     | (-inf, inf) | 1.0
 +--------------------------+-------------+
-| Reward space             | Range       |
-+==========================+=============+
-| IrInstructionCount       | (-inf, 0.0) |
-+--------------------------+-------------+
-| IrInstructionCountO3     | (0.0, inf)  |
-+--------------------------+-------------+
-| IrInstructionCountOz     | (0.0, inf)  |
-+--------------------------+-------------+
-| IrInstructionCountOzDiff | (-inf, inf) |
+| IrInstructionCountOz     | (-inf, inf) | 1.0
 +--------------------------+-------------+
 | NativeTextSizeBytes      | (-inf, 0.0) |
 +--------------------------+-------------+

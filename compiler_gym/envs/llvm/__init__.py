@@ -20,7 +20,7 @@ def _register_llvm_gym_service():
     """Register an environment for each combination of LLVM
     observation/reward/benchmark."""
     observation_spaces = {"autophase": "Autophase", "ir": "Ir"}
-    reward_spaces = {"ic": "IrInstructionCountOz"}
+    reward_spaces = {"ic": "IrInstructionCountOz", "codesize": "NativeTextSizeOz"}
 
     register(
         id="llvm-v0",
@@ -36,7 +36,7 @@ def _register_llvm_gym_service():
             entry_point="compiler_gym.envs.llvm:LlvmEnv",
             kwargs={
                 "service": _LLVM_SERVICE_BINARY,
-                "eager_reward_space": reward_spaces[reward_space],
+                "reward_space": reward_spaces[reward_space],
             },
         )
 
@@ -47,7 +47,7 @@ def _register_llvm_gym_service():
             kwargs={
                 "service": _LLVM_SERVICE_BINARY,
                 "eager_observation_space": observation_spaces[observation_space],
-                "eager_reward_space": reward_spaces[reward_space],
+                "reward_space": reward_spaces[reward_space],
             },
         )
 
