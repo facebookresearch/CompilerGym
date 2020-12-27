@@ -154,14 +154,13 @@ def print_service_capabilities(env: CompilerEnv, base_heading_level: int = 1):
         if isinstance(action_space, Commandline):
             table = tabulate(
                 [
-                    (n, f"`{f}`", d)
-                    for n, f, d in zip(
+                    (f"`{n}`", d)
+                    for n, d in zip(
                         action_space.names,
-                        action_space.flags,
                         action_space.descriptions,
                     )
                 ],
-                headers=("Action", "Flag", "Description"),
+                headers=("Action", "Description"),
             )
         else:
             table = tabulate(
