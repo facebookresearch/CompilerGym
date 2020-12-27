@@ -11,7 +11,21 @@ py_library(
     ],
     visibility = ["//compiler_gym/envs:__pkg__"],
     deps = [
+        ":benchmarks",
         ":llvm_env",
+        "//compiler_gym/util",
+    ],
+)
+
+py_library(
+    name = "benchmarks",
+    srcs = ["benchmarks.py"],
+    data = [
+        "//compiler_gym/third_party/llvm:clang",
+        "//compiler_gym/third_party/llvm:llvm-link",
+    ],
+    deps = [
+        "//compiler_gym/service/proto",
         "//compiler_gym/util",
     ],
 )
