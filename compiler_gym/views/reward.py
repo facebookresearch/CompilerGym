@@ -20,6 +20,9 @@ class RewardView(object):
     (-np.inf, 0)
     >>> env.reward["codesize"]
     -1243
+
+    :ivar spaces: Specifications of available reward spaces.
+    :vartype spaces: Dict[str, RewardSpaceSpec]
     """
 
     def __init__(
