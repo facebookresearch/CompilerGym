@@ -15,6 +15,7 @@ option java_outer_classname = "CompilerGymServiceProto";
 option java_package = "com.compiler_gym";
 
 service CompilerGymService {
+  rpc GetVersion(GetVersionRequest) returns (GetVersionReply);
   // Start a CompilerGym service episode. Must be called after Init().
   rpc StartEpisode(StartEpisodeRequest) returns (StartEpisodeReply);
   // Make an optimization decision. The set of valid actions is the last
@@ -37,6 +38,18 @@ service CompilerGymService {
   rpc GetBenchmarks(GetBenchmarksRequest) returns (GetBenchmarksReply);
   // Register a new benchmark.
   rpc AddBenchmark(AddBenchmarkRequest) returns (AddBenchmarkReply);
+}
+
+// ===========================================================================
+// GetVersion().
+
+message GetVersionRequest {}
+
+message GetVersionReply {
+  // The version string for this service.
+  string service_version = 1;
+  // The version string for the underlying compiler.
+  string compiler_version = 2;
 }
 
 // ===========================================================================

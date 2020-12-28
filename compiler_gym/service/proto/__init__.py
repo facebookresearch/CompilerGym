@@ -13,6 +13,8 @@ from compiler_gym.service.proto.compiler_gym_service_pb2 import (
     GetBenchmarksRequest,
     GetSpacesReply,
     GetSpacesRequest,
+    GetVersionReply,
+    GetVersionRequest,
     Int64List,
     Observation,
     ObservationRequest,
@@ -64,4 +66,6 @@ __all__ = [
     "ServiceIsClosed",
     "ServiceTransportError",
     "CompilerGymServiceConnection",
+    "GetVersionRequest",
+    "GetVersionReply",
 ]

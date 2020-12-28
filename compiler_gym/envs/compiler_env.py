@@ -28,6 +28,8 @@ from compiler_gym.service.proto import (
     Benchmark,
     EndEpisodeRequest,
     GetBenchmarksRequest,
+    GetVersionReply,
+    GetVersionRequest,
     StartEpisodeRequest,
 )
 from compiler_gym.spaces import NamedDiscrete
@@ -174,6 +176,9 @@ class CompilerEnv(gym.Env):
             spaces=self.service.reward_spaces,
         )
 
+        # Lazily evaluated version strings.
+        self._versions: Optional[GetVersionReply] = None
+
         # A compiler service supports multiple simultaneous environments. This
         # session ID is used to identify this environment.
         self._session_id: Optional[int] = None
@@ -186,6 +191,25 @@ class CompilerEnv(gym.Env):
         # Initialize eager observation/reward.
         self.observation_space = observation_space
         self.reward_space = reward_space
+
+    @property
+    def versions(self) -> GetVersionReply:
+        """Get the version numbers from the compiler service."""
+        if self._versions is None:
+            self._versions = self.service(
+                self.service.stub.GetVersion, GetVersionRequest()
+            )
+        return self._versions
+
+    @property
+    def version(self) -> str:
+        """The version string of the compiler service."""
+        return self.versions.service_version
+
+    @property
+    def compiler_version(self) -> str:
+        """The version string of the underlying compiler that this service supports."""
+        return self.versions.compiler_version
 
     def commandline(self) -> str:
         """Return the current state as a commandline invocation.

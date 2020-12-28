@@ -8,6 +8,7 @@ import numpy as np
 import pytest
 from gym.spaces import Box
 
+import compiler_gym
 import examples.example_compiler_gym_service  # Register environments.
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.spaces import NamedDiscrete, Sequence
@@ -21,6 +22,11 @@ def env() -> CompilerEnv:
         yield env
     finally:
         env.close()
+
+
+def test_versions(env: CompilerEnv):
+    assert env.version == compiler_gym.__version__
+    assert env.compiler_version == "1.0.0"
 
 
 def test_action_space(env: CompilerEnv):

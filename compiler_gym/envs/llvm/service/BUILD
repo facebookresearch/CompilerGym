@@ -131,7 +131,9 @@ cc_library(
         ":RewardSpaces",
         "//compiler_gym/service/proto:compiler_gym_service_cc",
         "//compiler_gym/util:GrpcStatusMacros",
+        "//compiler_gym/util:Version",
         "@boost//:filesystem",
+        "@llvm//10.0.0",
     ],
 )
 
