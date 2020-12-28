@@ -3,6 +3,9 @@ name: CI
 
 on:
     push:
+        branches:
+            - development
+            - stable
     pull_request:
     schedule:
         - cron: 0 0 * * 0 # weekly
