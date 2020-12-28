@@ -50,3 +50,12 @@ cc_library(
         "@gtest",
     ],
 )
+
+py_test(
+    name = "version_test",
+    srcs = ["version_test.py"],
+    deps = [
+        ":test_main",
+        "//compiler_gym",
+    ],
+)

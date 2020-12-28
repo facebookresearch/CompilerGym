@@ -21,6 +21,7 @@ cc_library(
         "//compiler_gym/service/proto:compiler_gym_service_cc",
         "//compiler_gym/service/proto:compiler_gym_service_cc_grpc",
         "//compiler_gym/util:GrpcStatusMacros",
+        "//compiler_gym/util:Version",
         "@boost//:filesystem",
         "@com_github_grpc_grpc//:grpc++",
     ],

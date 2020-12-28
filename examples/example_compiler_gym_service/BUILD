@@ -19,8 +19,7 @@ py_test(
     srcs = ["env_tests.py"],
     deps = [
         ":example_compiler_gym_service",
-        "//compiler_gym/envs",
-        "//compiler_gym/spaces",
+        "//compiler_gym",
         "//tests:test_main",
     ],
 )

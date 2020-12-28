@@ -13,12 +13,21 @@ import pytest
 from gym.spaces import Box
 from gym.spaces import Dict as DictSpace
 
+import compiler_gym
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.spaces import Sequence
 from tests.test_main import main
 
 pytest_plugins = ["tests.envs.llvm.fixtures"]
+
+
+def test_service_version(env: LlvmEnv):
+    assert env.version == compiler_gym.__version__
+
+
+def test_compiler_version(env: LlvmEnv):
+    assert env.compiler_version.startswith("10.0.0")
 
 
 def test_action_space_names(env: CompilerEnv, action_names: List[str]):

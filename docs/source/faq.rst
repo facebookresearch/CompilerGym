@@ -45,7 +45,7 @@ explore the optimization space.
 What features are going to be added in the future?
 --------------------------------------------------
 
-See :doc:`roadmap`.
+See :ref:`roadmap <about:roadmap>`.
 
 
 How do I run this on my own program?

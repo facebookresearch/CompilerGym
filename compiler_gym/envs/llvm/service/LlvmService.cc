@@ -14,6 +14,8 @@
 #include "compiler_gym/service/proto/compiler_gym_service.pb.h"
 #include "compiler_gym/util/EnumUtil.h"
 #include "compiler_gym/util/GrpcStatusMacros.h"
+#include "compiler_gym/util/Version.h"
+#include "llvm/Config/llvm-config.h"
 
 namespace compiler_gym::llvm_service {
 
@@ -24,6 +26,14 @@ namespace fs = boost::filesystem;
 
 LlvmService::LlvmService(const fs::path& workingDirectory)
     : workingDirectory_(workingDirectory), benchmarkFactory_(workingDirectory), nextSessionId_(0) {}
+
+Status LlvmService::GetVersion(ServerContext* /* unused */, const GetVersionRequest* /* unused */,
+                               GetVersionReply* reply) {
+  VLOG(2) << "GetSpaces()";
+  reply->set_service_version(COMPILER_GYM_VERSION);
+  reply->set_compiler_version(LLVM_VERSION_STRING);
+  return Status::OK;
+}
 
 Status LlvmService::GetSpaces(ServerContext* /* unused */, const GetSpacesRequest* /* unused */,
                               GetSpacesReply* reply) {

@@ -111,8 +111,7 @@ py_test(
     srcs = ["llvm_env_test.py"],
     deps = [
         ":fixtures",
-        "//compiler_gym/envs",
-        "//compiler_gym/spaces",
+        "//compiler_gym",
         "//tests:test_main",
     ],
 )

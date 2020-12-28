@@ -17,6 +17,7 @@ py_library(
         "tabulate.py",
         "timer.py",
         "user_input.py",
+        "version.py",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -81,4 +82,24 @@ cc_library(
     name = "StrLenConstexpr",
     hdrs = ["StrLenConstexpr.h"],
     visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "make_version",
+    srcs = ["//:VERSION"],
+    outs = ["version.py"],
+    cmd = "echo \"__version__ = \\\"$$(cat $<)\\\"\" > $@",
+)
+
+cc_library(
+    name = "Version",
+    hdrs = ["Version.h"],
+    visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "make_version_header",
+    srcs = ["//:VERSION"],
+    outs = ["Version.h"],
+    cmd = "echo \"#define COMPILER_GYM_VERSION \\\"$$(cat $<)\\\"\" > $@",
 )
