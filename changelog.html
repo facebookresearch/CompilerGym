@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Changelog &mdash; CompilerGym 0.1.0 documentation</title>
+  <title>Changelog &mdash; CompilerGym 0.1.1 documentation</title>
   
 
   
@@ -31,6 +31,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -63,7 +64,7 @@
             
             
               <div class="version">
-                0.1.0
+                0.1.1
               </div>
             
           
@@ -91,11 +92,12 @@
               <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environments Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#release-0-1-1-2020-12-28">Release 0.1.1 (2020-12-28)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#release-0-1-0-2020-12-21">Release 0.1.0 (2020-12-21)</a></li>
 </ul>
 </li>
@@ -106,6 +108,7 @@
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/datasets.html">compiler_gym.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/views.html">compiler_gym.views</a></li>
@@ -176,6 +179,22 @@
             
   <div class="section" id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="release-0-1-1-2020-12-28">
+<h2>Release 0.1.1 (2020-12-28)<a class="headerlink" href="#release-0-1-1-2020-12-28" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><p>Expose the package version through <code class="docutils literal notranslate"><span class="pre">compiler_gym.__version__</span></code>, and
+the compiler version through <code class="docutils literal notranslate"><span class="pre">CompilerEnv.compiler_version</span></code>.</p></li>
+<li><p>Add a <a class="reference external" href="https://colab.research.google.com/github/facebookresearch/CompilerGym/blob/development/examples/getting-started.ipynb">notebook
+version</a>
+of the “Getting Started” guide that can be run in colab.</p></li>
+<li><p>[llvm] Reformulate reward signals to be cumulative.</p></li>
+<li><p>[llvm] Add a new reward signal based on the size of the <code class="docutils literal notranslate"><span class="pre">.text</span></code>
+section of compiled object files.</p></li>
+<li><p>[llvm] Add a <code class="docutils literal notranslate"><span class="pre">LlvmEnv.make_benchmark()</span></code> API for easily constructing
+custom benchmarks for use in environments.</p></li>
+<li><p>Numerous bug fixes and improvements.</p></li>
+</ul>
+</div>
 <div class="section" id="release-0-1-0-2020-12-21">
 <h2>Release 0.1.0 (2020-12-21)<a class="headerlink" href="#release-0-1-0-2020-12-21" title="Permalink to this headline">¶</a></h2>
 <p>Initial release.</p>

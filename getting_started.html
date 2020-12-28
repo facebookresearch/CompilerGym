@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Getting Started &mdash; CompilerGym 0.1.0 documentation</title>
+  <title>Getting Started &mdash; CompilerGym 0.1.1 documentation</title>
   
 
   
@@ -31,6 +31,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -38,7 +39,7 @@
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="LLVM Environments Reference" href="llvm/index.html" />
+    <link rel="next" title="LLVM Environment Reference" href="llvm/index.html" />
     <link rel="prev" title="Indices and tables" href="index.html" /> 
 </head>
 
@@ -63,7 +64,7 @@
             
             
               <div class="version">
-                0.1.0
+                0.1.1
               </div>
             
           
@@ -106,7 +107,7 @@
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environments Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
@@ -118,6 +119,7 @@
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/datasets.html">compiler_gym.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/views.html">compiler_gym.views</a></li>
@@ -188,6 +190,7 @@
             
   <div class="section" id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
+<a class="reference external image-reference" href="https://colab.research.google.com/github/facebookresearch/CompilerGym/blob/development/examples/getting-started.ipynb"><img alt="https://colab.research.google.com/assets/colab-badge.svg" src="https://colab.research.google.com/assets/colab-badge.svg" /></a>
 <p>CompilerGym is a toolkit for applying reinforcement learning to compiler
 optimization tasks. This document provides a short walkthrough of the key
 concepts, using the codesize reduction task of a production-grade compiler
@@ -243,9 +246,11 @@ cumulative reward from these environments so as to produce the best programs.</p
 <div class="section" id="installation">
 <h2><a class="toc-backref" href="#id4">Installation</a><a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>Install the latest CompilerGym release using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip3 install compiler_gym
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install compiler_gym
 </pre></div>
 </div>
+<p>The binary works on macOS and Linux (on Ubuntu 18.04, Fedora 28, Debian
+10 or newer equivalents).</p>
 <div class="section" id="building-from-source">
 <h3><a class="toc-backref" href="#id5">Building from Source</a><a class="headerlink" href="#building-from-source" title="Permalink to this headline">¶</a></h3>
 <p>If you prefer, you may build from source. This requires a modern C++
@@ -373,7 +378,7 @@ the 123 benchmarks that comprise the dataset we just installed:</p>
 <h3><a class="toc-backref" href="#id9">The compiler environment</a><a class="headerlink" href="#the-compiler-environment" title="Permalink to this headline">¶</a></h3>
 <p>If you have experience using <a class="reference external" href="https://gym.openai.com/">OpenAI Gym</a>, the
 CompilerGym environments will be familiar. If not, you can call <code class="code docutils literal notranslate"><span class="pre">help()</span></code>
-on any object to query the documentation:</p>
+on any function, object, or method to query the documentation:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">help</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -387,7 +392,7 @@ The <a class="reference internal" href="llvm/index.html#action-space"><span clas
 </pre></div>
 </div>
 <p>The observation space is described by
-<code class="xref py py-meth docutils literal notranslate"><span class="pre">env.observation_space</span></code>.
+<a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.observation_space" title="compiler_gym.envs.CompilerEnv.observation_space"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.observation_space</span></code></a>.
 The <a class="reference internal" href="llvm/index.html#autophase"><span class="std std-ref">Autophase</span></a> observation space is a 56-dimension
 vector of integers:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">shape</span>
@@ -472,17 +477,20 @@ information:</p>
 <span class="go">{&#39;action_had_no_effect&#39;: True, &#39;new_action_space&#39;: False}</span>
 </pre></div>
 </div>
-<p>For this environment, reward represents the number of instructions in the
-LLVM-IR as a ratio compared to number of instructions when the code is compiled
-with LLVM’s <code class="code docutils literal notranslate"><span class="pre">-Oz</span></code> optimizations enabled. A value greater than one means
+<p>For this environment, reward represents the reduction in code size of the
+previous action, scaled to the total codesize reduction achieved with LLVM’s
+<code class="code docutils literal notranslate"><span class="pre">-Oz</span></code> optimizations enabled. A cumulative reward greater than one means
 that the sequence of optimizations performed yields better results than LLVM’s
-default pipeline. Let’s run 100 random actions and see how close we can get:</p>
+default optimizations. Let’s run 100 random actions and see how close we can
+get:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;benchmark://npb-v0/50&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">episode_reward</span> <span class="o">=</span> <span class="mi">0</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">101</span><span class="p">):</span>
 <span class="gp">... </span>    <span class="n">observation</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">sample</span><span class="p">())</span>
 <span class="gp">... </span>    <span class="k">if</span> <span class="n">done</span><span class="p">:</span>
 <span class="gp">... </span>        <span class="k">break</span>
-<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Step </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">, quality=</span><span class="si">{</span><span class="n">reward</span><span class="si">:</span><span class="s2">.3%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="gp">... </span>    <span class="n">episode_reward</span> <span class="o">+=</span> <span class="n">reward</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Step </span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">, quality=</span><span class="si">{</span><span class="n">episode_reward</span><span class="si">:</span><span class="s2">.3%</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 <span class="gp">...</span>
 <span class="go">Step 1, quality=44.299%</span>
 <span class="go">Step 2, quality=44.299%</span>
@@ -587,7 +595,7 @@ but powerful strategy for randomly searching the optimization space:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.random_search --env=llvm-autophase-ic-v0 --benchmark=npb-v0/50 --runtime=10
 
 Started 16 worker threads for benchmark://npb-v0/50 (3,008 instructions) using reward IrInstructionCountOz.
-Writing logs to /home/user/logs/compilergym/random/npb-v0/50/2020-12-03T17:24:17.304887
+Writing logs to /home/user/logs/compiler_gym/random/npb-v0/50/2020-12-03T17:24:17.304887
 === Running for 10 seconds ===
 Runtime: 10 seconds. Num steps: 32,287 (3,206 / sec). Num episodes: 285 (28 / sec). Num restarts: 0.
 Best reward: 107.85% (69 passes, found after 9 seconds)
@@ -617,7 +625,7 @@ going!</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="llvm/index.html" class="btn btn-neutral float-right" title="LLVM Environments Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="llvm/index.html" class="btn btn-neutral float-right" title="LLVM Environment Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
         <a href="index.html" class="btn btn-neutral float-left" title="Indices and tables" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>

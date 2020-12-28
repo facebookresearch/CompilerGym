@@ -13,6 +13,7 @@ respectively.
 
 .. currentmodule:: compiler_gym.views
 
+
 ObservationView
 ---------------
 
@@ -21,6 +22,13 @@ ObservationView
 
    .. automethod:: __getitem__
 
+ObservationSpaceSpec
+--------------------
+
+.. autoclass:: ObservationSpaceSpec
+   :members:
+
+
 RewardView
 ----------
 
@@ -28,3 +36,10 @@ RewardView
    :members:
 
    .. automethod:: __getitem__
+
+
+RewardSpaceSpec
+---------------
+
+.. autoclass:: RewardSpaceSpec
+   :members:

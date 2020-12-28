@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.envs.llvm.llvm_env &mdash; CompilerGym 0.1.0 documentation</title>
+  <title>compiler_gym.envs.llvm.llvm_env &mdash; CompilerGym 0.1.1 documentation</title>
   
 
   
@@ -31,6 +31,7 @@
         <script src="../../../../_static/underscore.js"></script>
         <script src="../../../../_static/doctools.js"></script>
         <script src="../../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
 
@@ -61,7 +62,7 @@
             
             
               <div class="version">
-                0.1.0
+                0.1.1
               </div>
             
           
@@ -89,7 +90,7 @@
               <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../llvm/index.html">LLVM Environments Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../about.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
@@ -101,6 +102,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/views.html">compiler_gym.views</a></li>
@@ -182,6 +184,7 @@
 <span class="kn">from</span> <span class="nn">gym.spaces</span> <span class="kn">import</span> <span class="n">Dict</span> <span class="k">as</span> <span class="n">DictSpace</span>
 
 <span class="kn">from</span> <span class="nn">compiler_gym.envs.compiler_env</span> <span class="kn">import</span> <span class="n">CompilerEnv</span><span class="p">,</span> <span class="n">step_t</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.benchmarks</span> <span class="kn">import</span> <span class="n">make_benchmark</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.datasets</span> <span class="kn">import</span> <span class="n">LLVM_DATASETS</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.spaces</span> <span class="kn">import</span> <span class="n">Commandline</span><span class="p">,</span> <span class="n">CommandlineFlag</span><span class="p">,</span> <span class="n">Scalar</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.third_party.autophase</span> <span class="kn">import</span> <span class="n">AUTOPHASE_FEATURE_NAMES</span>
@@ -312,6 +315,11 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">LLVM_DATASETS</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">register_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+
+<div class="viewcode-block" id="LlvmEnv.make_benchmark"><a class="viewcode-back" href="../../../../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.make_benchmark">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">make_benchmark</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Alias to :func:`compiler_gym.envs.llvm.make_benchmark`.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">make_benchmark</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_observation_view_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

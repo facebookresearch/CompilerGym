@@ -1,0 +1,361 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>compiler_gym.envs.llvm &mdash; CompilerGym 0.1.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="compiler_gym.service" href="../compiler_gym/service.html" />
+    <link rel="prev" title="compiler_gym.envs" href="../compiler_gym/envs.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> CompilerGym
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="index.html">LLVM Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/compiler_gym.html">compiler_gym</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">compiler_gym.envs.llvm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/views.html">compiler_gym.views</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CompilerGym</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>compiler_gym.envs.llvm</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/llvm/api.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="compiler-gym-envs-llvm">
+<h1>compiler_gym.envs.llvm<a class="headerlink" href="#compiler-gym-envs-llvm" title="Permalink to this headline">¶</a></h1>
+<p>The <code class="code docutils literal notranslate"><span class="pre">compiler_gym.envs.llvm</span></code> module contains supporting APIs for the
+<a class="reference internal" href="index.html"><span class="doc">LLVM Environments</span></a>.</p>
+<dl class="py function">
+<dt id="compiler_gym.envs.llvm.make_benchmark">
+<code class="sig-prename descclassname">compiler_gym.envs.llvm.</code><code class="sig-name descname">make_benchmark</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inputs</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">, </span>compiler_gym.envs.llvm.benchmarks.ClangInvocation<span class="p">, </span>List<span class="p">[</span>Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">, </span>compiler_gym.envs.llvm.benchmarks.ClangInvocation<span class="p">]</span><span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">copt</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">system_includes</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">timeout</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">600</span></em><span class="sig-paren">)</span> &#x2192; compiler_gym.service.proto.compiler_gym_service_pb2.Benchmark<a class="reference internal" href="../_modules/compiler_gym/envs/llvm/benchmarks.html#make_benchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.make_benchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a benchmark for use by LLVM environments.</p>
+<p>This function takes one or more inputs and uses them to create a benchmark
+that can be passed to <a class="reference internal" href="../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.reset" title="compiler_gym.envs.LlvmEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compiler_gym.envs.LlvmEnv.reset()</span></code></a>.</p>
+<p>For single-source C/C++ programs, you can pass the path of the source file:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">benchmark</span> <span class="o">=</span> <span class="n">make_benchmark</span><span class="p">(</span><span class="s1">&#39;my_app.c&#39;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-v0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="n">benchmark</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The clang invocation used is roughly equivalent to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ clang my_app.c -O0 -c -emit-llvm -o benchmark.bc
+</pre></div>
+</div>
+<p>Additional compile-time arguments to clang can be provided using the
+<code class="code docutils literal notranslate"><span class="pre">copt</span></code> argument:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">benchmark</span> <span class="o">=</span> <span class="n">make_benchmark</span><span class="p">(</span><span class="s1">&#39;/path/to/my_app.cpp&#39;</span><span class="p">,</span> <span class="n">copt</span><span class="o">=</span><span class="p">[</span><span class="s1">&#39;-O2&#39;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>If you need more fine-grained control over the options, you can directly
+construct a <a class="reference internal" href="#compiler_gym.envs.llvm.ClangInvocation" title="compiler_gym.envs.llvm.ClangInvocation"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClangInvocation</span></code></a>
+to pass a list of arguments to clang:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">benchmark</span> <span class="o">=</span> <span class="n">make_benchmark</span><span class="p">(</span>
+<span class="go">    ClangInvocation([&#39;/path/to/my_app.c&#39;], timeout=10)</span>
+<span class="go">)</span>
+</pre></div>
+</div>
+<p>For multi-file programs, pass a list of inputs that will be compiled
+separately and then linked to a single module:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">benchmark</span> <span class="o">=</span> <span class="n">make_benchmark</span><span class="p">([</span>
+<span class="go">    &#39;main.c&#39;,</span>
+<span class="go">    &#39;lib.cpp&#39;,</span>
+<span class="go">    &#39;lib2.bc&#39;,</span>
+<span class="go">])</span>
+</pre></div>
+</div>
+<p>If you already have prepared bitcode files, those can be linked and used
+directly:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">benchmark</span> <span class="o">=</span> <span class="n">make_benchmark</span><span class="p">([</span>
+<span class="go">    &#39;bitcode1.bc&#39;,</span>
+<span class="go">    &#39;bitcode2.bc&#39;,</span>
+<span class="go">])</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>LLVM bitcode compatibility is
+<a class="reference external" href="https://llvm.org/docs/DeveloperPolicy.html#ir-backwards-compatibility">not guaranteed</a>,
+so you must ensure that any precompiled bitcodes are compatible with the
+LLVM version used by CompilerGym, which can be queried using
+<a class="reference internal" href="../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.compiler_version" title="compiler_gym.envs.CompilerEnv.compiler_version"><code class="xref py py-func docutils literal notranslate"><span class="pre">LlvmEnv.compiler_version</span></code></a>.</p>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>inputs</strong> – An input, or list of inputs.</p></li>
+<li><p><strong>copt</strong> – A list of command line options to pass to clang when compiling
+source files.</p></li>
+<li><p><strong>system_includes</strong> – Whether to include the system standard libraries
+during compilation jobs. This requires a system toolchain. See
+<a class="reference internal" href="#compiler_gym.envs.llvm.get_system_includes" title="compiler_gym.envs.llvm.get_system_includes"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_system_includes()</span></code></a>.</p></li>
+<li><p><strong>timeout</strong> – The maximum number of seconds to allow clang to run before
+terminating.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <code class="code docutils literal notranslate"><span class="pre">Benchmark</span></code> message.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>FileNotFoundError</strong> – If any input sources are not found.</p></li>
+<li><p><strong>TypeError</strong> – If the inputs are of unsupported types.</p></li>
+<li><p><strong>OSError</strong> – If a compilation job fails.</p></li>
+<li><p><strong>TimeoutExpired</strong> – If a compilation job exceeds <code class="code docutils literal notranslate"><span class="pre">timeout</span></code> seconds.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="compiler_gym.envs.llvm.ClangInvocation">
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.envs.llvm.</code><code class="sig-name descname">ClangInvocation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">args</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">system_includes</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">timeout</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">600</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/benchmarks.html#ClangInvocation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.ClangInvocation" title="Permalink to this definition">¶</a></dt>
+<dd><p>Class to represent a single invocation of the clang compiler.</p>
+<dl class="py method">
+<dt id="compiler_gym.envs.llvm.ClangInvocation.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">args</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">system_includes</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">timeout</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">600</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/benchmarks.html#ClangInvocation.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.ClangInvocation.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a clang invocation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>args</strong> – The list of arguments to pass to clang.</p></li>
+<li><p><strong>system_includes</strong> – Whether to include the system standard libraries
+during compilation jobs. This requires a system toolchain. See
+<a class="reference internal" href="#compiler_gym.envs.llvm.get_system_includes" title="compiler_gym.envs.llvm.get_system_includes"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_system_includes()</span></code></a>.</p></li>
+<li><p><strong>timeout</strong> – The maximum number of seconds to allow clang to run
+before terminating.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt id="compiler_gym.envs.llvm.get_system_includes">
+<code class="sig-prename descclassname">compiler_gym.envs.llvm.</code><code class="sig-name descname">get_system_includes</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>pathlib.Path<span class="p">]</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/benchmarks.html#get_system_includes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.get_system_includes" title="Permalink to this definition">¶</a></dt>
+<dd><p>Determine the system include paths for C/C++ compilation jobs.</p>
+<p>This uses the system compiler to determine the search paths for C/C++ system
+headers. By default, <code class="code docutils literal notranslate"><span class="pre">c++</span></code> is invoked. This can be overridden by
+setting <code class="code docutils literal notranslate"><span class="pre">os.environ[&quot;CXX&quot;]</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A list of paths to system header directories.</p>
+</dd>
+<dt class="field-even">Raises</dt>
+<dd class="field-even"><p><strong>OSError</strong> – If the compiler fails, or if the search paths cannot be
+determined.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="../compiler_gym/service.html" class="btn btn-neutral float-right" title="compiler_gym.service" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../compiler_gym/envs.html" class="btn btn-neutral float-left" title="compiler_gym.envs" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright Facebook AI Research
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.views.observation &mdash; CompilerGym 0.1.0 documentation</title>
+  <title>compiler_gym.views.observation &mdash; CompilerGym 0.1.1 documentation</title>
   
 
   
@@ -31,6 +31,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
         <script src="../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -61,7 +62,7 @@
             
             
               <div class="version">
-                0.1.0
+                0.1.1
               </div>
             
           
@@ -89,7 +90,7 @@
               <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environments Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../about.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
@@ -101,6 +102,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/views.html">compiler_gym.views</a></li>
@@ -174,12 +176,11 @@
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
 
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">gym.spaces</span> <span class="kn">import</span> <span class="n">Box</span><span class="p">,</span> <span class="n">Space</span>
+<span class="kn">from</span> <span class="nn">gym.spaces</span> <span class="kn">import</span> <span class="n">Space</span>
 
-<span class="kn">from</span> <span class="nn">compiler_gym.service</span> <span class="kn">import</span> <span class="n">observation2py</span><span class="p">,</span> <span class="n">observation_t</span><span class="p">,</span> <span class="n">scalar_range2tuple</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.service</span> <span class="kn">import</span> <span class="n">observation2py</span><span class="p">,</span> <span class="n">observation_t</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">Observation</span><span class="p">,</span> <span class="n">ObservationRequest</span><span class="p">,</span> <span class="n">ObservationSpace</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.spaces</span> <span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.views.observation_space_spec</span> <span class="kn">import</span> <span class="n">ObservationSpaceSpec</span>
 
 
 <div class="viewcode-block" id="ObservationView"><a class="viewcode-back" href="../../../compiler_gym/views.html#compiler_gym.views.ObservationView">[docs]</a><span class="k">class</span> <span class="nc">ObservationView</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
@@ -191,7 +192,7 @@
 <span class="sd">    &gt;&gt;&gt; env.reset()</span>
 <span class="sd">    &gt;&gt;&gt; env.observation.spaces.keys()</span>
 <span class="sd">    [&quot;Autophase&quot;, &quot;Ir&quot;]</span>
-<span class="sd">    &gt;&gt;&gt; env.observation.spaces[&quot;Autophase&quot;]</span>
+<span class="sd">    &gt;&gt;&gt; env.observation.spaces[&quot;Autophase&quot;].space</span>
 <span class="sd">    Box(56,)</span>
 <span class="sd">    &gt;&gt;&gt; env.observation[&quot;Autophase&quot;]</span>
 <span class="sd">    [0, 1, ..., 2]</span>
@@ -206,8 +207,9 @@
     <span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">spaces</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No observation spaces&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">indices</span> <span class="o">=</span> <span class="p">{</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">i</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">spaces</span><span class="p">)}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span> <span class="o">=</span> <span class="p">{</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">shape2space</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">spaces</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">ObservationSpaceSpec</span><span class="o">.</span><span class="n">from_proto</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">spaces</span><span class="p">)</span>
+        <span class="p">}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">session_id</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_get_observation</span> <span class="o">=</span> <span class="n">get_observation</span>
@@ -223,19 +225,19 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">request</span> <span class="o">=</span> <span class="n">ObservationRequest</span><span class="p">(</span>
             <span class="n">session_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
-            <span class="n">observation_space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">observation_space</span><span class="p">],</span>
+            <span class="n">observation_space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">observation_space</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span>
             <span class="n">observation_space</span><span class="p">,</span>
             <span class="n">observation2py</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_base_spaces</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-                    <span class="n">observation_space</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">observation_space</span><span class="p">]</span>
+                    <span class="n">observation_space</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">observation_space</span><span class="p">]</span><span class="o">.</span><span class="n">space</span>
                 <span class="p">),</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">_get_observation</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
             <span class="p">),</span>
         <span class="p">)</span></div>
 
-    <span class="c1"># TODO(cummins): Register an opaque_sequence_type handler that replaces the</span>
+    <span class="c1"># TODO(cummins): Register an opaque_data_format handler that replaces the</span>
     <span class="c1"># &quot;Space&quot; and updates observation2py / observation2str.</span>
 
 <div class="viewcode-block" id="ObservationView.register_derived_space"><a class="viewcode-back" href="../../../compiler_gym/views.html#compiler_gym.views.ObservationView.register_derived_space">[docs]</a>    <span class="k">def</span> <span class="nf">register_derived_space</span><span class="p">(</span>
@@ -283,8 +285,12 @@
 <span class="sd">            observation space is derived from.</span>
 <span class="sd">        :param derived_name: The name of the derived observation space</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">derived_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">derived_space</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">derived_name</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="n">base_name</span><span class="p">]</span>
+        <span class="n">base_spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">base_name</span><span class="p">]</span>
+        <span class="n">spec</span> <span class="o">=</span> <span class="n">ObservationSpaceSpec</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">derived_name</span><span class="p">,</span> <span class="n">space</span><span class="o">=</span><span class="n">derived_space</span><span class="p">)</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">base_spec</span><span class="o">.</span><span class="n">index</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">deterministic</span> <span class="o">=</span> <span class="n">base_spec</span><span class="o">.</span><span class="n">deterministic</span>
+        <span class="n">spec</span><span class="o">.</span><span class="n">platform_dependent</span> <span class="o">=</span> <span class="n">base_spec</span><span class="o">.</span><span class="n">platform_dependent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">derived_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">spec</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_translate_cbs</span><span class="p">[</span><span class="n">derived_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">cb</span></div>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -305,41 +311,6 @@
 <span class="sd">        :return: An observation, after applying any derived space translations.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_translate_cbs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">observation_space</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">)(</span><span class="n">observation</span><span class="p">)</span></div></div>
-
-
-<span class="k">def</span> <span class="nf">shape2space</span><span class="p">(</span><span class="n">space</span><span class="p">:</span> <span class="n">ObservationSpace</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Space</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Convert an ObservationSpace description into a gym Space.&quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">make_box</span><span class="p">(</span><span class="n">scalar_range_list</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">defaults</span><span class="p">):</span>
-        <span class="n">bounds</span> <span class="o">=</span> <span class="p">[</span><span class="n">scalar_range2tuple</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">defaults</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">scalar_range_list</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">Box</span><span class="p">(</span>
-            <span class="n">low</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bounds</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">),</span>
-            <span class="n">high</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bounds</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">),</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="k">def</span> <span class="nf">make_seq</span><span class="p">(</span><span class="n">scalar_range</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">defaults</span><span class="p">):</span>
-        <span class="k">return</span> <span class="n">Sequence</span><span class="p">(</span>
-            <span class="n">size_range</span><span class="o">=</span><span class="n">scalar_range2tuple</span><span class="p">(</span><span class="n">scalar_range</span><span class="p">,</span> <span class="n">defaults</span><span class="p">),</span>
-            <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
-            <span class="n">opaque_data_format</span><span class="o">=</span><span class="n">space</span><span class="o">.</span><span class="n">opaque_data_format</span><span class="p">,</span>
-        <span class="p">)</span>
-
-    <span class="n">shape_type</span> <span class="o">=</span> <span class="n">space</span><span class="o">.</span><span class="n">WhichOneof</span><span class="p">(</span><span class="s2">&quot;shape&quot;</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">shape_type</span> <span class="o">==</span> <span class="s2">&quot;int64_range_list&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">make_box</span><span class="p">(</span>
-            <span class="n">space</span><span class="o">.</span><span class="n">int64_range_list</span><span class="o">.</span><span class="n">range</span><span class="p">,</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
-            <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">),</span>
-        <span class="p">)</span>
-    <span class="k">elif</span> <span class="n">shape_type</span> <span class="o">==</span> <span class="s2">&quot;double_range_list&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">make_box</span><span class="p">(</span><span class="n">space</span><span class="o">.</span><span class="n">double_range_list</span><span class="o">.</span><span class="n">range</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">))</span>
-    <span class="k">elif</span> <span class="n">shape_type</span> <span class="o">==</span> <span class="s2">&quot;string_size_range&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">make_seq</span><span class="p">(</span><span class="n">space</span><span class="o">.</span><span class="n">string_size_range</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
-    <span class="k">elif</span> <span class="n">shape_type</span> <span class="o">==</span> <span class="s2">&quot;binary_size_range&quot;</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">make_seq</span><span class="p">(</span><span class="n">space</span><span class="o">.</span><span class="n">binary_size_range</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Cannot determine shape of ObservationSpace: </span><span class="si">{</span><span class="n">space</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 </pre></div>
 
            </div>

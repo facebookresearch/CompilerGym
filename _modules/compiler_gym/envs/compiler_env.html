@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.envs.compiler_env &mdash; CompilerGym 0.1.0 documentation</title>
+  <title>compiler_gym.envs.compiler_env &mdash; CompilerGym 0.1.1 documentation</title>
   
 
   
@@ -31,6 +31,7 @@
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
         <script src="../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -61,7 +62,7 @@
             
             
               <div class="version">
-                0.1.0
+                0.1.1
               </div>
             
           
@@ -89,7 +90,7 @@
               <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environments Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../about.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
@@ -101,6 +102,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/views.html">compiler_gym.views</a></li>
@@ -191,16 +193,24 @@
     <span class="n">observation2py</span><span class="p">,</span>
     <span class="n">observation_t</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.service.connection</span> <span class="kn">import</span> <span class="n">ServiceTransportError</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ActionRequest</span><span class="p">,</span>
     <span class="n">AddBenchmarkRequest</span><span class="p">,</span>
     <span class="n">Benchmark</span><span class="p">,</span>
     <span class="n">EndEpisodeRequest</span><span class="p">,</span>
     <span class="n">GetBenchmarksRequest</span><span class="p">,</span>
+    <span class="n">GetVersionReply</span><span class="p">,</span>
+    <span class="n">GetVersionRequest</span><span class="p">,</span>
     <span class="n">StartEpisodeRequest</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.spaces</span> <span class="kn">import</span> <span class="n">NamedDiscrete</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.views</span> <span class="kn">import</span> <span class="n">ObservationView</span><span class="p">,</span> <span class="n">RewardView</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.views</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ObservationSpaceSpec</span><span class="p">,</span>
+    <span class="n">ObservationView</span><span class="p">,</span>
+    <span class="n">RewardSpaceSpec</span><span class="p">,</span>
+    <span class="n">RewardView</span><span class="p">,</span>
+<span class="p">)</span>
 
 <span class="c1"># Type hints.</span>
 <span class="n">info_t</span> <span class="o">=</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
@@ -221,8 +231,8 @@
 
 <span class="sd">    &gt;&gt;&gt; env = CompilerEnv(</span>
 <span class="sd">        service=&quot;localhost:8080&quot;,</span>
-<span class="sd">        eager_observation_space=&quot;features&quot;,</span>
-<span class="sd">        eager_reward_space=&quot;runtime&quot;</span>
+<span class="sd">        observation_space=&quot;features&quot;,</span>
+<span class="sd">        reward_space=&quot;runtime&quot;</span>
 <span class="sd">    )</span>
 
 <span class="sd">    Once constructed, an environment can be used in exactly the same way as a</span>
@@ -273,8 +283,8 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">service</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
         <span class="n">benchmark</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Benchmark</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">eager_observation_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">eager_reward_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">observation_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">reward_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">action_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">connection_settings</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ConnectionOpts</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
@@ -289,12 +299,12 @@
 <span class="sd">            argument and instead passing by choosing from the</span>
 <span class="sd">            :code:`CompilerEnv.benchmarks` attribute and passing it to</span>
 <span class="sd">            :func:`reset()` when called.</span>
-<span class="sd">        :param eager_observation_space: Compute and return observations at each</span>
+<span class="sd">        :param observation_space: Compute and return observations at each</span>
 <span class="sd">            :func:`step()` from this space. If not provided, :func:`step()`</span>
 <span class="sd">            returns :code:`None` for the observation value.</span>
-<span class="sd">        :param eager_reward_space: Compute and return reward at each</span>
-<span class="sd">            :func:`step()` from this space. If not provided, :func:`step()`</span>
-<span class="sd">            returns :code:`None` for the reward value.</span>
+<span class="sd">        :param reward_space: Compute and return reward at each :func:`step()`</span>
+<span class="sd">            from this space. If not provided, :func:`step()` returns</span>
+<span class="sd">            :code:`None` for the reward value.</span>
 <span class="sd">        :param action_space: The name of the action space to use. If not</span>
 <span class="sd">            specified, the default action space for this compiler is used.</span>
 <span class="sd">        :raises FileNotFoundError: If service is a path to a file that is not</span>
@@ -312,9 +322,12 @@
         <span class="c1"># The benchmark that is currently being used, and the benchmark that</span>
         <span class="c1"># the user requested. Those do not always correlate, since the user</span>
         <span class="c1"># could request a random benchmark.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_user_specified_benchmark</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">=</span> <span class="n">benchmark</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use_uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_user_specified_benchmark_uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># A map from benchmark URIs to Benchmark messages. We keep track of any</span>
+        <span class="c1"># user-provided custom benchmarks so that we can register them with a</span>
+        <span class="c1"># reset service.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_custom_benchmarks</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Benchmark</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">action_space_name</span> <span class="o">=</span> <span class="n">action_space</span>
 
@@ -338,6 +351,9 @@
             <span class="n">spaces</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">reward_spaces</span><span class="p">,</span>
         <span class="p">)</span>
 
+        <span class="c1"># Lazily evaluated version strings.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_versions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GetVersionReply</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
         <span class="c1"># A compiler service supports multiple simultaneous environments. This</span>
         <span class="c1"># session ID is used to identify this environment.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
@@ -347,9 +363,29 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Space</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reward_range</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
 
-        <span class="c1"># Initialize eager observation/reward.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">eager_observation_space</span> <span class="o">=</span> <span class="n">eager_observation_space</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">eager_reward_space</span> <span class="o">=</span> <span class="n">eager_reward_space</span></div>
+        <span class="c1"># Initialize eager observation/reward and benchmark.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span> <span class="o">=</span> <span class="n">observation_space</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span> <span class="o">=</span> <span class="n">reward_space</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">=</span> <span class="n">benchmark</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">versions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GetVersionReply</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get the version numbers from the compiler service.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_versions</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_versions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">GetVersion</span><span class="p">,</span> <span class="n">GetVersionRequest</span><span class="p">()</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_versions</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;The version string of the compiler service.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">versions</span><span class="o">.</span><span class="n">service_version</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">compiler_version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;The version string of the underlying compiler that this service supports.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">versions</span><span class="o">.</span><span class="n">compiler_version</span>
 
 <div class="viewcode-block" id="CompilerEnv.commandline"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.commandline">[docs]</a>    <span class="k">def</span> <span class="nf">commandline</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return the current state as a commandline invocation.</span>
@@ -391,58 +427,91 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">benchmark</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;The name of the benchmark that is being used.</span>
+        <span class="sd">&quot;&quot;&quot;Get or set the name of the benchmark to use.</span>
 
-<span class="sd">        :getter: Get the name of the current benchmark. Return :code:`None` if</span>
+<span class="sd">        :getter: Get the name of the current benchmark. Returns :code:`None` if</span>
 <span class="sd">            :func:`__init__` was not provided a benchmark and :func:`reset` has</span>
 <span class="sd">            not yet been called.</span>
 <span class="sd">        :setter: Set the benchmark to use. If :code:`None`, a random benchmark</span>
-<span class="sd">            is selected by the service on each call to :func:`reset`.</span>
+<span class="sd">            is selected by the service on each call to :func:`reset`. Else,</span>
+<span class="sd">            the same benchmark is used for every episode.</span>
+
+<span class="sd">        By default, a benchmark will be selected randomly by the service</span>
+<span class="sd">        from the available :func:`benchmarks` on a call to :func:`reset`. To</span>
+<span class="sd">        force a specific benchmark to be chosen, set this property (or pass</span>
+<span class="sd">        the benchmark as an argument to :func:`reset`):</span>
+
+<span class="sd">        &gt;&gt;&gt; env.benchmark = &quot;benchmark://foo&quot;</span>
+<span class="sd">        &gt;&gt;&gt; env.reset()</span>
+<span class="sd">        &gt;&gt;&gt; env.benchmark</span>
+<span class="sd">        &quot;benchmark://foo&quot;</span>
+
+<span class="sd">        Once set, all subsequent calls to :func:`reset` will select the same</span>
+<span class="sd">        benchmark.</span>
+
+<span class="sd">        &gt;&gt;&gt; env.benchmark = None</span>
+<span class="sd">        &gt;&gt;&gt; env.reset()  # random benchmark is chosen</span>
 
 <span class="sd">        .. note::</span>
 <span class="sd">            Setting a new benchmark has no effect until :func:`~reset()` is</span>
-<span class="sd">            called on the environment.</span>
+<span class="sd">            called.</span>
+
+<span class="sd">        To return to random benchmark selection, set this property to</span>
+<span class="sd">        :code:`None`:</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use_uri</span>
 
     <span class="nd">@benchmark</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">benchmark</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">benchmark</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Benchmark</span><span class="p">]]):</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">benchmark</span><span class="p">,</span> <span class="n">Benchmark</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark</span> <span class="o">=</span> <span class="n">benchmark</span><span class="o">.</span><span class="n">uri</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Changing the benchmark has no effect until reset() is called.&quot;</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">benchmark</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="n">benchmark</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_user_specified_benchmark_uri</span> <span class="o">=</span> <span class="n">benchmark</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">benchmark</span><span class="p">,</span> <span class="n">Benchmark</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_user_specified_benchmark_uri</span> <span class="o">=</span> <span class="n">benchmark</span><span class="o">.</span><span class="n">uri</span>
+            <span class="c1"># Register the custom benchmark, and record the Benchmark object</span>
+            <span class="c1"># in case of environment restart.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_custom_benchmarks</span><span class="p">[</span><span class="n">benchmark</span><span class="o">.</span><span class="n">uri</span><span class="p">]</span> <span class="o">=</span> <span class="n">benchmark</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">AddBenchmark</span><span class="p">,</span>
+                <span class="n">AddBenchmarkRequest</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="p">[</span><span class="n">benchmark</span><span class="p">]),</span>
+            <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark</span> <span class="o">=</span> <span class="n">benchmark</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_user_specified_benchmark</span> <span class="o">=</span> <span class="n">benchmark</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported benchmark type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">benchmark</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">eager_reward_space</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">reward_space</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RewardSpaceSpec</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;The eager reward space. This is the reward that is returned by</span>
 <span class="sd">        :func:`~step()`.</span>
 
-<span class="sd">        :getter: Returns the name of the eager reward space, or :code:`None` if</span>
-<span class="sd">            not set.</span>
-<span class="sd">        :setter: Set the name of the eager reward space.</span>
+<span class="sd">        :getter: Returns a :class:`RewardSpaceSpec &lt;compiler_gym.views.RewardSpaceSpec&gt;`,</span>
+<span class="sd">            or :code:`None` if not set.</span>
+<span class="sd">        :setter: Set the eager reward space.</span>
 
 <span class="sd">        .. note::</span>
 <span class="sd">            Setting a new eager reward space has no effect until</span>
 <span class="sd">            :func:`~reset()` is called on the environment.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eager_reward_space</span> <span class="ow">or</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_eager_reward_space</span><span class="p">]</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eager_reward_space</span>
+            <span class="k">else</span> <span class="kc">None</span>
+        <span class="p">)</span>
 
-    <span class="nd">@eager_reward_space</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">eager_reward_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eager_reward_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="k">if</span> <span class="p">(</span>
-            <span class="n">eager_reward_space</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-            <span class="ow">and</span> <span class="n">eager_reward_space</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">ranges</span>
-        <span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reward space not found: </span><span class="si">{</span><span class="n">eager_reward_space</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="nd">@reward_space</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">reward_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reward_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">reward_space</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">reward_space</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">spaces</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reward space not found: </span><span class="si">{</span><span class="n">reward_space</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="s2">&quot;Changing eager reward space has no effect until reset() is called.&quot;</span>
             <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_eager_reward</span> <span class="o">=</span> <span class="n">eager_reward_space</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_eager_reward_space</span> <span class="o">=</span> <span class="n">eager_reward_space</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_eager_reward</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">reward_space</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_eager_reward_space</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">reward_space</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eager_reward</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">reward_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">ranges</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_eager_reward_space</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reward_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">reward_space</span><span class="p">]</span><span class="o">.</span><span class="n">range</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">reward_range</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
 
@@ -456,37 +525,36 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">eager_observation_space</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">observation_space</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ObservationSpaceSpec</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;The eager observation space. This is the observation value that is</span>
 <span class="sd">        returned by :func:`~step()`.</span>
 
-<span class="sd">        :getter: Returns the name of the eager observation space, or</span>
+<span class="sd">        :getter: Returns the specification of the eager observation space, or</span>
 <span class="sd">            :code:`None` if not set.</span>
-<span class="sd">        :setter: Set the name of the eager observation space.</span>
+<span class="sd">        :setter: Set the eager observation space.</span>
 
 <span class="sd">        .. note::</span>
 <span class="sd">            Setting a new eager observation space has no effect until</span>
 <span class="sd">            :func:`~reset()` is called on the environment.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eager_observation_space</span> <span class="ow">or</span> <span class="kc">None</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eager_observation_space</span>
 
-    <span class="nd">@eager_observation_space</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">eager_observation_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">eager_observation_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="nd">@observation_space</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">observation_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observation_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">if</span> <span class="p">(</span>
-            <span class="n">eager_observation_space</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-            <span class="ow">and</span> <span class="n">eager_observation_space</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">spaces</span>
+            <span class="n">observation_space</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+            <span class="ow">and</span> <span class="n">observation_space</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">spaces</span>
         <span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Observation space not found: </span><span class="si">{</span><span class="n">eager_observation_space</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Observation space not found: </span><span class="si">{</span><span class="n">observation_space</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="s2">&quot;Changing eager observation space has no effect until reset() is called.&quot;</span>
             <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_eager_observation</span> <span class="o">=</span> <span class="n">eager_observation_space</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_eager_observation_space</span> <span class="o">=</span> <span class="n">eager_observation_space</span> <span class="ow">or</span> <span class="s2">&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_eager_observation</span> <span class="o">=</span> <span class="n">observation_space</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eager_observation</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_eager_observation_space</span>
-            <span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_eager_observation_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">observation_space</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_eager_observation_space</span> <span class="o">=</span> <span class="kc">None</span>
 
 <div class="viewcode-block" id="CompilerEnv.close"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.close">[docs]</a>    <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Close the environment.</span>
@@ -500,8 +568,8 @@
                     <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">EndEpisode</span><span class="p">,</span>
                     <span class="n">EndEpisodeRequest</span><span class="p">(</span><span class="n">session_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">),</span>
                 <span class="p">)</span>
-            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failure to terminate episode on service close: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">except</span><span class="p">:</span>
+                <span class="k">pass</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">:</span>
@@ -520,6 +588,7 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">benchmark</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Benchmark</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">action_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">retry_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">observation_t</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Reset the environment state.</span>
 
@@ -536,10 +605,18 @@
 <span class="sd">            subsequent calls to :code:`reset()` will use this action space.</span>
 <span class="sd">            If no aciton space is provided, the default action space is used.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">retry_count</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection_settings</span><span class="o">.</span><span class="n">init_max_attempts</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to reset environment after </span><span class="si">{</span><span class="n">retry_count</span><span class="si">}</span><span class="s2"> attempts&quot;</span><span class="p">)</span>
+
         <span class="c1"># Start a new service if required.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="n">CompilerGymServiceConnection</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">service_endpoint</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection_settings</span>
+            <span class="p">)</span>
+            <span class="c1"># Re-register any custom benchmarks.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">AddBenchmark</span><span class="p">,</span>
+                <span class="n">AddBenchmarkRequest</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_custom_benchmarks</span><span class="o">.</span><span class="n">values</span><span class="p">())),</span>
             <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">action_space_name</span> <span class="o">=</span> <span class="n">action_space</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_space_name</span>
@@ -550,40 +627,46 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">EndEpisode</span><span class="p">,</span>
                 <span class="n">EndEpisodeRequest</span><span class="p">(</span><span class="n">session_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">),</span>
             <span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="c1"># Add the new benchmark, if required.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_user_specified_benchmark</span> <span class="o">=</span> <span class="n">benchmark</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_specified_benchmark</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_user_specified_benchmark</span><span class="p">,</span> <span class="n">Benchmark</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">AddBenchmark</span><span class="p">,</span>
-                <span class="n">AddBenchmarkRequest</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_user_specified_benchmark</span><span class="p">]),</span>
+        <span class="c1"># Update the user requested benchmark, if provided. NOTE: This means</span>
+        <span class="c1"># that env.reset(benchmark=None) does NOT unset a forced benchmark.</span>
+        <span class="k">if</span> <span class="n">benchmark</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">=</span> <span class="n">benchmark</span>
+
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">reply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">StartEpisode</span><span class="p">,</span>
+                <span class="n">StartEpisodeRequest</span><span class="p">(</span>
+                    <span class="n">benchmark</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_user_specified_benchmark_uri</span><span class="p">,</span>
+                    <span class="n">action_space</span><span class="o">=</span><span class="p">(</span>
+                        <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_spaces</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span>
+                            <span class="bp">self</span><span class="o">.</span><span class="n">action_space_name</span>
+                        <span class="p">)</span>
+                        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_space_name</span>
+                        <span class="k">else</span> <span class="mi">0</span>
+                    <span class="p">),</span>
+                    <span class="n">use_eager_observation_space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_eager_observation</span><span class="p">,</span>
+                    <span class="n">eager_observation_space</span><span class="o">=</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">index</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span> <span class="k">else</span> <span class="kc">None</span>
+                    <span class="p">),</span>
+                    <span class="n">use_eager_reward_space</span><span class="o">=</span><span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="p">),</span>
+                    <span class="n">eager_reward_space</span><span class="o">=</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="o">.</span><span class="n">index</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span> <span class="k">else</span> <span class="kc">None</span>
+                    <span class="p">),</span>
+                <span class="p">),</span>
             <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_user_specified_benchmark</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_specified_benchmark</span><span class="o">.</span><span class="n">uri</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">ServiceError</span><span class="p">,</span> <span class="n">ServiceTransportError</span><span class="p">):</span>
+            <span class="c1"># Abort and retry on error.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span>
+                <span class="n">benchmark</span><span class="o">=</span><span class="n">benchmark</span><span class="p">,</span>
+                <span class="n">action_space</span><span class="o">=</span><span class="n">action_space</span><span class="p">,</span>
+                <span class="n">retry_count</span><span class="o">=</span><span class="n">retry_count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+            <span class="p">)</span>
 
-        <span class="n">reply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">StartEpisode</span><span class="p">,</span>
-            <span class="n">StartEpisodeRequest</span><span class="p">(</span>
-                <span class="n">benchmark</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_user_specified_benchmark</span><span class="p">,</span>
-                <span class="n">action_space</span><span class="o">=</span><span class="p">(</span>
-                    <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_spaces</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">action_space_name</span><span class="p">)</span>
-                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_space_name</span>
-                    <span class="k">else</span> <span class="mi">0</span>
-                <span class="p">),</span>
-                <span class="n">use_eager_observation_space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_eager_observation</span><span class="p">,</span>
-                <span class="n">eager_observation_space</span><span class="o">=</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">eager_observation_space</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eager_observation</span>
-                    <span class="k">else</span> <span class="kc">None</span>
-                <span class="p">),</span>
-                <span class="n">use_eager_reward_space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_eager_reward</span><span class="p">,</span>
-                <span class="n">eager_reward_space</span><span class="o">=</span><span class="p">(</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">indices</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">eager_reward_space</span><span class="p">]</span>
-                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eager_reward</span>
-                    <span class="k">else</span> <span class="kc">None</span>
-                <span class="p">),</span>
-            <span class="p">),</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark</span> <span class="o">=</span> <span class="n">reply</span><span class="o">.</span><span class="n">benchmark</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use_uri</span> <span class="o">=</span> <span class="n">reply</span><span class="o">.</span><span class="n">benchmark</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span> <span class="o">=</span> <span class="n">reply</span><span class="o">.</span><span class="n">session_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">session_id</span> <span class="o">=</span> <span class="n">reply</span><span class="o">.</span><span class="n">session_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">session_id</span> <span class="o">=</span> <span class="n">reply</span><span class="o">.</span><span class="n">session_id</span>
@@ -595,7 +678,7 @@
             <span class="p">)</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eager_observation</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">eager_observation_space</span><span class="p">]</span></div>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">id</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="CompilerEnv.step"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.step">[docs]</a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">step_t</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Take a step.</span>
@@ -611,7 +694,7 @@
         <span class="n">request</span> <span class="o">=</span> <span class="n">ActionRequest</span><span class="p">(</span><span class="n">session_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">,</span> <span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="n">action</span><span class="p">])</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">reply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">TakeAction</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
-        <span class="k">except</span> <span class="p">(</span><span class="n">ServiceError</span><span class="p">,</span> <span class="ne">TimeoutError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">ServiceError</span><span class="p">,</span> <span class="n">ServiceTransportError</span><span class="p">,</span> <span class="ne">TimeoutError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="n">info</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;error_details&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
             <span class="k">return</span> <span class="n">observation</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">info</span>
@@ -624,8 +707,8 @@
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eager_observation</span><span class="p">:</span>
             <span class="n">observation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">eager_observation_space</span><span class="p">,</span>
-                <span class="n">observation2py</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">eager_observation_space</span><span class="p">,</span> <span class="n">reply</span><span class="o">.</span><span class="n">observation</span><span class="p">),</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="n">observation2py</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">space</span><span class="p">,</span> <span class="n">reply</span><span class="o">.</span><span class="n">observation</span><span class="p">),</span>
             <span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eager_reward</span><span class="p">:</span>
             <span class="n">reward</span> <span class="o">=</span> <span class="n">reply</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">reward</span>
@@ -652,11 +735,9 @@
 <span class="sd">        :raises TypeError: If eager observations are not set, or if the</span>
 <span class="sd">            requested render mode does not exist.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">eager_observation_space</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="s2">&quot;Cannot call render() when no eager observation space is used&quot;</span>
-            <span class="p">)</span>
-        <span class="n">observation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">eager_observation_space</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Cannot call render() when no observation space is used&quot;</span><span class="p">)</span>
+        <span class="n">observation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">id</span><span class="p">]</span>
         <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;human&quot;</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="n">observation</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;ansi&quot;</span><span class="p">:</span>
@@ -666,7 +747,7 @@
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">benchmarks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;The list of available benchmarks.&quot;&quot;&quot;</span>
+        <span class="sd">&quot;&quot;&quot;Enumerate the list of available benchmarks.&quot;&quot;&quot;</span>
         <span class="n">reply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">GetBenchmarks</span><span class="p">,</span> <span class="n">GetBenchmarksRequest</span><span class="p">())</span>
         <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">reply</span><span class="o">.</span><span class="n">benchmark</span><span class="p">)</span>
 

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; CompilerGym 0.1.0 documentation</title>
+  <title>Index &mdash; CompilerGym 0.1.1 documentation</title>
   
 
   
@@ -31,6 +31,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -61,7 +62,7 @@
             
             
               <div class="version">
-                0.1.0
+                0.1.1
               </div>
             
           
@@ -89,7 +90,7 @@
               <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environments Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
@@ -101,6 +102,7 @@
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/datasets.html">compiler_gym.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/views.html">compiler_gym.views</a></li>
@@ -176,8 +178,8 @@
  | <a href="#B"><strong>B</strong></a>
  | <a href="#C"><strong>C</strong></a>
  | <a href="#D"><strong>D</strong></a>
- | <a href="#E"><strong>E</strong></a>
  | <a href="#F"><strong>F</strong></a>
+ | <a href="#G"><strong>G</strong></a>
  | <a href="#I"><strong>I</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
@@ -187,6 +189,7 @@
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
  | <a href="#U"><strong>U</strong></a>
+ | <a href="#V"><strong>V</strong></a>
  | <a href="#W"><strong>W</strong></a>
  
 </div>
@@ -206,6 +209,8 @@
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.__init__">__init__() (compiler_gym.envs.CompilerEnv method)</a>
 
       <ul>
+        <li><a href="llvm/api.html#compiler_gym.envs.llvm.ClangInvocation.__init__">(compiler_gym.envs.llvm.ClangInvocation method)</a>
+</li>
         <li><a href="compiler_gym/service.html#compiler_gym.service.CompilerGymServiceConnection.__init__">(compiler_gym.service.CompilerGymServiceConnection method)</a>
 </li>
         <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Commandline.__init__">(compiler_gym.spaces.Commandline method)</a>
@@ -244,6 +249,8 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compiler_gym/compiler_gym.html#compiler_gym.cache_path">cache_path() (in module compiler_gym)</a>
+</li>
+      <li><a href="llvm/api.html#compiler_gym.envs.llvm.ClangInvocation">ClangInvocation (class in compiler_gym.envs.llvm)</a>
 </li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.close">close() (compiler_gym.envs.CompilerEnv method)</a>
 </li>
@@ -314,6 +321,8 @@
         <li><a href="compiler_gym/datasets.html#module-compiler_gym.datasets">module</a>
 </li>
       </ul></li>
+      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.compiler_version">compiler_version() (compiler_gym.envs.CompilerEnv property)</a>
+</li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv">CompilerEnv (class in compiler_gym.envs)</a>
 </li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.CompilerGymServiceConnection">CompilerGymServiceConnection (class in compiler_gym.service)</a>
@@ -347,18 +356,6 @@
   </ul></td>
 </tr></table>
 
-<h2 id="E">E</h2>
-<table style="width: 100%" class="indextable genindextable"><tr>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.eager_observation_space">eager_observation_space() (compiler_gym.envs.CompilerEnv property)</a>
-</li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.eager_reward_space">eager_reward_space() (compiler_gym.envs.CompilerEnv property)</a>
-</li>
-  </ul></td>
-</tr></table>
-
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
@@ -371,6 +368,14 @@
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset.from_json_file">from_json_file() (compiler_gym.datasets.Dataset class method)</a>
 </li>
       <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.NamedDiscrete.from_string">from_string() (compiler_gym.spaces.NamedDiscrete method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="G">G</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="llvm/api.html#compiler_gym.envs.llvm.get_system_includes">get_system_includes() (in module compiler_gym.envs.llvm)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -412,6 +417,12 @@
 <h2 id="M">M</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.make_benchmark">make_benchmark() (compiler_gym.envs.LlvmEnv static method)</a>
+
+      <ul>
+        <li><a href="llvm/api.html#compiler_gym.envs.llvm.make_benchmark">(in module compiler_gym.envs.llvm)</a>
+</li>
+      </ul></li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.make_manifest_file">make_manifest_file() (compiler_gym.envs.CompilerEnv method)</a>
 </li>
       <li>
@@ -455,6 +466,12 @@
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.observation_space">observation_space() (compiler_gym.envs.CompilerEnv property)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compiler_gym/views.html#compiler_gym.views.ObservationSpaceSpec">ObservationSpaceSpec (class in compiler_gym.views)</a>
+</li>
       <li><a href="compiler_gym/views.html#compiler_gym.views.ObservationView">ObservationView (class in compiler_gym.views)</a>
 </li>
   </ul></td>
@@ -477,10 +494,10 @@
 </li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.require_dataset">require_dataset() (compiler_gym.envs.CompilerEnv method)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.require_datasets">require_datasets() (compiler_gym.envs.CompilerEnv method)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reset">reset() (compiler_gym.envs.CompilerEnv method)</a>
 
       <ul>
@@ -488,6 +505,10 @@
 </li>
       </ul></li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.CompilerGymServiceConnection.restart">restart() (compiler_gym.service.CompilerGymServiceConnection method)</a>
+</li>
+      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reward_space">reward_space() (compiler_gym.envs.CompilerEnv property)</a>
+</li>
+      <li><a href="compiler_gym/views.html#compiler_gym.views.RewardSpaceSpec">RewardSpaceSpec (class in compiler_gym.views)</a>
 </li>
       <li><a href="compiler_gym/views.html#compiler_gym.views.RewardView">RewardView (class in compiler_gym.views)</a>
 </li>
@@ -554,6 +575,18 @@
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset.url">url (compiler_gym.datasets.Dataset attribute)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="V">V</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.version">version() (compiler_gym.envs.CompilerEnv property)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.versions">versions() (compiler_gym.envs.CompilerEnv property)</a>
 </li>
   </ul></td>
 </tr></table>

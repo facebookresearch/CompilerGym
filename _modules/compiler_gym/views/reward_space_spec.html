@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.views.reward &mdash; CompilerGym 0.1.1 documentation</title>
+  <title>compiler_gym.views.reward_space_spec &mdash; CompilerGym 0.1.1 documentation</title>
   
 
   
@@ -154,7 +154,7 @@
         
           <li><a href="../../index.html">Module code</a> &raquo;</li>
         
-      <li>compiler_gym.views.reward</li>
+      <li>compiler_gym.views.reward_space_spec</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -169,62 +169,56 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for compiler_gym.views.reward</h1><div class="highlight"><pre>
+  <h1>Source code for compiler_gym.views.reward_space_spec</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) Facebook, Inc. and its affiliates.</span>
 <span class="c1">#</span>
 <span class="c1"># This source code is licensed under the MIT license found in the</span>
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span>
-
 <span class="kn">from</span> <span class="nn">compiler_gym.service</span> <span class="kn">import</span> <span class="n">scalar_range2tuple</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">Reward</span><span class="p">,</span> <span class="n">RewardRequest</span><span class="p">,</span> <span class="n">RewardSpace</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.views.reward_space_spec</span> <span class="kn">import</span> <span class="n">RewardSpaceSpec</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">RewardSpace</span>
 
 
-<div class="viewcode-block" id="RewardView"><a class="viewcode-back" href="../../../compiler_gym/views.html#compiler_gym.views.RewardView">[docs]</a><span class="k">class</span> <span class="nc">RewardView</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A view into a set of reward spaces.</span>
+<div class="viewcode-block" id="RewardSpaceSpec"><a class="viewcode-back" href="../../../compiler_gym/views.html#compiler_gym.views.RewardSpaceSpec">[docs]</a><span class="k">class</span> <span class="nc">RewardSpaceSpec</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Specification of a reward space.</span>
 
-<span class="sd">    Example usage:</span>
+<span class="sd">    :ivar id: The name of the reward space.</span>
+<span class="sd">    :vartype id: str</span>
 
-<span class="sd">    &gt;&gt;&gt; env = gym.make(&quot;llvm-v0&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; env.reset()</span>
-<span class="sd">    &gt;&gt;&gt; env.reward.spaces[&quot;codesize&quot;].range</span>
-<span class="sd">    (-np.inf, 0)</span>
-<span class="sd">    &gt;&gt;&gt; env.reward[&quot;codesize&quot;]</span>
-<span class="sd">    -1243</span>
+<span class="sd">    :ivar index: The index into the list of reward spaces that the service</span>
+<span class="sd">        supports.</span>
+<span class="sd">    :vartype index: int</span>
 
-<span class="sd">    :ivar spaces: Specifications of available reward spaces.</span>
-<span class="sd">    :vartype spaces: Dict[str, RewardSpaceSpec]</span>
+<span class="sd">    :ivar range: The lower and upper bounds of the reward.</span>
+<span class="sd">    :vartype range: Tuple[float, float]</span>
+
+<span class="sd">    :ivar success_threshold: The cumulative reward threshold before an episode is</span>
+<span class="sd">        considered successful. For example, episodes where reward is scaled to</span>
+<span class="sd">        an existing heuristic can be considered &quot;successful&quot; when the reward</span>
+<span class="sd">        exceeds the existing heuristic.</span>
+<span class="sd">    :vartype success_threshold: Optional[float]</span>
+
+<span class="sd">    :ivar deterministic: Whether the reward signal is deterministic.</span>
+<span class="sd">        Examples of non-deterministic rewards are those with measurement noise</span>
+<span class="sd">        such as program runtime.</span>
+<span class="sd">    :vartype deterministic: bool</span>
+
+<span class="sd">    :ivar platform_dependent: Whether the reward values depend on the execution</span>
+<span class="sd">        environment of the service.</span>
+<span class="sd">    :vartype platform_dependent: bool</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-        <span class="n">get_reward</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">RewardRequest</span><span class="p">],</span> <span class="n">Reward</span><span class="p">],</span>
-        <span class="n">spaces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">RewardSpace</span><span class="p">],</span>
-    <span class="p">):</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_get_reward</span> <span class="o">=</span> <span class="n">get_reward</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">session_id</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">spaces</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No reward spaces&quot;</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span> <span class="o">=</span> <span class="p">{</span><span class="n">s</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">RewardSpaceSpec</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">spaces</span><span class="p">)}</span>
-
-<div class="viewcode-block" id="RewardView.__getitem__"><a class="viewcode-back" href="../../../compiler_gym/views.html#compiler_gym.views.RewardView.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">reward_space</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Request an observation from the given space.</span>
-
-<span class="sd">        :param reward_space: The reward space to query.</span>
-<span class="sd">        :return: A reward.</span>
-<span class="sd">        :raises KeyError: If the requested reward space does not exist.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">request</span> <span class="o">=</span> <span class="n">RewardRequest</span><span class="p">(</span>
-            <span class="n">session_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span> <span class="n">reward_space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">reward_space</span><span class="p">]</span><span class="o">.</span><span class="n">index</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">spec</span><span class="p">:</span> <span class="n">RewardSpace</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">index</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">range</span> <span class="o">=</span> <span class="n">scalar_range2tuple</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">range</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">success_threshold</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">spec</span><span class="o">.</span><span class="n">success_threshold</span> <span class="k">if</span> <span class="n">spec</span><span class="o">.</span><span class="n">has_success_threshold</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_reward</span><span class="p">(</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="n">reward</span></div></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">deterministic</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">deterministic</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">platform_dependent</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">platform_dependent</span>
 
-    <span class="c1"># TODO(cummins): Copy the register_derived_space() functionality from</span>
-    <span class="c1"># ObservationView to allow derived reward spaces, possible creating a shared</span>
-    <span class="c1"># superclass.</span>
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;RewardSpaceSpec(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">)&quot;</span></div>
 </pre></div>
 
            </div>

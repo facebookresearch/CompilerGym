@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Command Line Reference &mdash; CompilerGym 0.1.0 documentation</title>
+  <title>Command Line Reference &mdash; CompilerGym 0.1.1 documentation</title>
   
 
   
@@ -31,6 +31,7 @@
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
         <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -39,7 +40,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="About" href="about.html" />
-    <link rel="prev" title="LLVM Environments Reference" href="llvm/index.html" /> 
+    <link rel="prev" title="LLVM Environment Reference" href="llvm/index.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -63,7 +64,7 @@
             
             
               <div class="version">
-                0.1.0
+                0.1.1
               </div>
             
           
@@ -91,7 +92,7 @@
               <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environments Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Command Line Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#module-compiler_gym.bin.service">compiler_gym.bin.service</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#listing-available-environments">Listing available environments</a></li>
@@ -124,6 +125,7 @@
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/datasets.html">compiler_gym.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/views.html">compiler_gym.views</a></li>
@@ -237,7 +239,7 @@ commands with <code class="code docutils literal notranslate"><span class="pre">
 <div class="section" id="querying-the-capabilities-of-a-service">
 <h3><a class="toc-backref" href="#id3">Querying the capabilities of a service</a><a class="headerlink" href="#querying-the-capabilities-of-a-service" title="Permalink to this headline">¶</a></h3>
 <p>Query the capabilities of a service using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.service --env=&lt;env&gt; [--tablefmt=&lt;fmt&gt;] [--heading_level=&lt;num&gt;]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.service --env=&lt;env&gt; [--heading_level=&lt;num&gt;]
 </pre></div>
 </div>
 <p>For example:</p>
@@ -464,7 +466,7 @@ incremental reward of each action.</p>
         <a href="about.html" class="btn btn-neutral float-right" title="About" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="llvm/index.html" class="btn btn-neutral float-left" title="LLVM Environments Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="llvm/index.html" class="btn btn-neutral float-left" title="LLVM Environment Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

@@ -1,6 +1,9 @@
 Getting Started
 ===============
 
+.. image:: https://colab.research.google.com/assets/colab-badge.svg
+   :target: https://colab.research.google.com/github/facebookresearch/CompilerGym/blob/development/examples/getting-started.ipynb
+
 CompilerGym is a toolkit for applying reinforcement learning to compiler
 optimization tasks. This document provides a short walkthrough of the key
 concepts, using the codesize reduction task of a production-grade compiler
@@ -68,6 +71,7 @@ We can see what environments are available using:
 
     >>> compiler_gym.COMPILER_GYM_ENVS
     ['llvm-v0', 'llvm-ic-v0', 'llvm-autophase-ic-v0', 'llvm-ir-ic-v0']
+
 
 Selecting an environment
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -139,7 +143,7 @@ The compiler environment
 
 If you have experience using `OpenAI Gym <https://gym.openai.com/>`_, the
 CompilerGym environments will be familiar. If not, you can call :code:`help()`
-on any object to query the documentation:
+on any function, object, or method to query the documentation:
 
     >>> help(env)
 
@@ -239,18 +243,21 @@ information:
     >>> info
     {'action_had_no_effect': True, 'new_action_space': False}
 
-For this environment, reward represents the number of instructions in the
-LLVM-IR as a ratio compared to number of instructions when the code is compiled
-with LLVM's :code:`-Oz` optimizations enabled. A value greater than one means
+For this environment, reward represents the reduction in code size of the
+previous action, scaled to the total codesize reduction achieved with LLVM's
+:code:`-Oz` optimizations enabled. A cumulative reward greater than one means
 that the sequence of optimizations performed yields better results than LLVM's
-default pipeline. Let's run 100 random actions and see how close we can get:
+default optimizations. Let's run 100 random actions and see how close we can
+get:
 
     >>> env.reset(benchmark="benchmark://npb-v0/50")
+    >>> episode_reward = 0
     >>> for i in range(1, 101):
     ...     observation, reward, done, info = env.step(env.action_space.sample())
     ...     if done:
     ...         break
-    ...     print(f"Step {i}, quality={reward:.3%}")
+    ...     episode_reward += reward
+    ...     print(f"Step {i}, quality={episode_reward:.3%}")
     ...
     Step 1, quality=44.299%
     Step 2, quality=44.299%
@@ -365,7 +372,7 @@ but powerful strategy for randomly searching the optimization space:
     $ python -m compiler_gym.bin.random_search --env=llvm-autophase-ic-v0 --benchmark=npb-v0/50 --runtime=10
 
     Started 16 worker threads for benchmark://npb-v0/50 (3,008 instructions) using reward IrInstructionCountOz.
-    Writing logs to /home/user/logs/compilergym/random/npb-v0/50/2020-12-03T17:24:17.304887
+    Writing logs to /home/user/logs/compiler_gym/random/npb-v0/50/2020-12-03T17:24:17.304887
     === Running for 10 seconds ===
     Runtime: 10 seconds. Num steps: 32,287 (3,206 / sec). Num episodes: 285 (28 / sec). Num restarts: 0.
     Best reward: 107.85% (69 passes, found after 9 seconds)

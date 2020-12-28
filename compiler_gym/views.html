@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.views &mdash; CompilerGym 0.1.0 documentation</title>
+  <title>compiler_gym.views &mdash; CompilerGym 0.1.1 documentation</title>
   
 
   
@@ -31,6 +31,7 @@
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
         <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -62,7 +63,7 @@
             
             
               <div class="version">
-                0.1.0
+                0.1.1
               </div>
             
           
@@ -90,7 +91,7 @@
               <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../llvm/index.html">LLVM Environments Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../about.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
@@ -102,11 +103,14 @@
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">compiler_gym.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">compiler_gym.views</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#observationview">ObservationView</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#observationspacespec">ObservationSpaceSpec</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#rewardview">RewardView</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rewardspacespec">RewardSpaceSpec</a></li>
 </ul>
 </li>
 </ul>
@@ -195,7 +199,7 @@ respectively.</p>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
 <span class="go">[&quot;Autophase&quot;, &quot;Ir&quot;]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="s2">&quot;Autophase&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="s2">&quot;Autophase&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">space</span>
 <span class="go">Box(56,)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;Autophase&quot;</span><span class="p">]</span>
 <span class="go">[0, 1, ..., 2]</span>
@@ -287,23 +291,48 @@ derived the observation is returned unmodified.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="observationspacespec">
+<h2>ObservationSpaceSpec<a class="headerlink" href="#observationspacespec" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="compiler_gym.views.ObservationSpaceSpec">
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.views.</code><code class="sig-name descname">ObservationSpaceSpec</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">space</span><span class="p">:</span> <span class="n">gym.spaces.space.Space</span></em>, <em class="sig-param"><span class="n">deterministic</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">platform_dependent</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/views/observation_space_spec.html#ObservationSpaceSpec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.views.ObservationSpaceSpec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specification of an observation space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>str</em>) – The name of the observation space.</p></li>
+<li><p><strong>index</strong> (<em>int</em>) – The index into the list of observation spaces that the service
+supports.</p></li>
+<li><p><strong>space</strong> (<em>Space</em>) – The space.</p></li>
+<li><p><strong>deterministic</strong> (<em>bool</em>) – Whether the observation space is deterministic.</p></li>
+<li><p><strong>platform_dependent</strong> (<em>bool</em>) – Whether the observation values depend on the
+execution environment of the service.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
 <div class="section" id="rewardview">
 <h2>RewardView<a class="headerlink" href="#rewardview" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="compiler_gym.views.RewardView">
-<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.views.</code><code class="sig-name descname">RewardView</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">get_reward</span><span class="p">:</span> <span class="n">Callable<span class="p">[</span><span class="p">[</span>compiler_gym.service.proto.compiler_gym_service_pb2.RewardRequest<span class="p">]</span><span class="p">, </span>compiler_gym.service.proto.compiler_gym_service_pb2.Reward<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">spaces</span><span class="p">:</span> <span class="n">Sequence<span class="p">[</span>compiler_gym.service.proto.compiler_gym_service_pb2.RewardSpace<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/views/reward.html#RewardView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.views.RewardView" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.views.</code><code class="sig-name descname">RewardView</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">get_reward</span><span class="p">:</span> <span class="n">Callable<span class="p">[</span><span class="p">[</span>compiler_gym.service.proto.compiler_gym_service_pb2.RewardRequest<span class="p">]</span><span class="p">, </span>compiler_gym.service.proto.compiler_gym_service_pb2.Reward<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">spaces</span><span class="p">:</span> <span class="n">List<span class="p">[</span>compiler_gym.service.proto.compiler_gym_service_pb2.RewardSpace<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/views/reward.html#RewardView"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.views.RewardView" title="Permalink to this definition">¶</a></dt>
 <dd><p>A view into a set of reward spaces.</p>
 <p>Example usage:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-v0&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">ranges</span><span class="o">.</span><span class="n">keys</span><span class="p">()</span>
-<span class="go">[&quot;codesize&quot;]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">ranges</span><span class="p">[</span><span class="s2">&quot;codesize&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="s2">&quot;codesize&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">range</span>
 <span class="go">(-np.inf, 0)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">reward</span><span class="p">[</span><span class="s2">&quot;codesize&quot;</span><span class="p">]</span>
 <span class="go">-1243</span>
 </pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Variables</dt>
+<dd class="field-odd"><p><strong>spaces</strong> (<em>Dict</em><em>[</em><em>str</em><em>, </em><a class="reference internal" href="#compiler_gym.views.RewardSpaceSpec" title="compiler_gym.views.RewardSpaceSpec"><em>RewardSpaceSpec</em></a><em>]</em>) – Specifications of available reward spaces.</p>
+</dd>
+</dl>
 <dl class="py method">
 <dt id="compiler_gym.views.RewardView.__getitem__">
 <code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">reward_space</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="../_modules/compiler_gym/views/reward.html#RewardView.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.views.RewardView.__getitem__" title="Permalink to this definition">¶</a></dt>
@@ -321,6 +350,34 @@ derived the observation is returned unmodified.</p>
 </dl>
 </dd></dl>
 
+</dd></dl>
+
+</div>
+<div class="section" id="rewardspacespec">
+<h2>RewardSpaceSpec<a class="headerlink" href="#rewardspacespec" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="compiler_gym.views.RewardSpaceSpec">
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.views.</code><code class="sig-name descname">RewardSpaceSpec</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">index</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">spec</span><span class="p">:</span> <span class="n">compiler_gym.service.proto.compiler_gym_service_pb2.RewardSpace</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/views/reward_space_spec.html#RewardSpaceSpec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.views.RewardSpaceSpec" title="Permalink to this definition">¶</a></dt>
+<dd><p>Specification of a reward space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> (<em>str</em>) – The name of the reward space.</p></li>
+<li><p><strong>index</strong> (<em>int</em>) – The index into the list of reward spaces that the service
+supports.</p></li>
+<li><p><strong>range</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>) – The lower and upper bounds of the reward.</p></li>
+<li><p><strong>success_threshold</strong> (<em>Optional</em><em>[</em><em>float</em><em>]</em>) – The cumulative reward threshold before an episode is
+considered successful. For example, episodes where reward is scaled to
+an existing heuristic can be considered “successful” when the reward
+exceeds the existing heuristic.</p></li>
+<li><p><strong>deterministic</strong> (<em>bool</em>) – Whether the reward signal is deterministic.
+Examples of non-deterministic rewards are those with measurement noise
+such as program runtime.</p></li>
+<li><p><strong>platform_dependent</strong> (<em>bool</em>) – Whether the reward values depend on the execution
+environment of the service.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </div>
