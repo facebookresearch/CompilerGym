@@ -13,6 +13,7 @@ py_library(
     name = "CompilerGym",
     data = [
         "//compiler_gym/third_party/cBench:benchmarks_list",
+        "//compiler_gym/third_party/cBench:crc32",
     ],
     deps = [
         "//compiler_gym",
