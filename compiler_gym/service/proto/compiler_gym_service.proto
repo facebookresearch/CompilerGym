@@ -15,6 +15,7 @@ option java_outer_classname = "CompilerGymServiceProto";
 option java_package = "com.compiler_gym";
 
 service CompilerGymService {
+  rpc GetVersion(GetVersionRequest) returns (GetVersionReply);
   // Start a CompilerGym service episode. Must be called after Init().
   rpc StartEpisode(StartEpisodeRequest) returns (StartEpisodeReply);
   // Make an optimization decision. The set of valid actions is the last
@@ -37,6 +38,18 @@ service CompilerGymService {
   rpc GetBenchmarks(GetBenchmarksRequest) returns (GetBenchmarksReply);
   // Register a new benchmark.
   rpc AddBenchmark(AddBenchmarkRequest) returns (AddBenchmarkReply);
+}
+
+// ===========================================================================
+// GetVersion().
+
+message GetVersionRequest {}
+
+message GetVersionReply {
+  // The version string for this service.
+  string service_version = 1;
+  // The version string for the underlying compiler.
+  string compiler_version = 2;
 }
 
 // ===========================================================================
@@ -178,7 +191,11 @@ message ObservationSpace {
   // observations using this value. For example, an opaque_data_format of
   // "string_json" could be used to indicate that the observation is a
   // string-serialized JSON value.
-  string opaque_data_format = 12;
+  string opaque_data_format = 6;
+  // Whether the observation space is deterministic.
+  bool deterministic = 7;
+  // Whether the observations depend on the service execution environment.
+  bool platform_dependent = 8;
 }
 
 message ObservationRequest {
@@ -196,6 +213,16 @@ message RewardSpace {
   string name = 1;
   // The range of continuous values in this reward space.
   ScalarRange range = 2;
+  // The cumulative reward threshold before an episode is considered successful.
+  // For example, episodes where reward is scaled to an existing heuristic can
+  // be considered "successful" when the reward exceeds the existing heuristic.
+  bool has_success_threshold = 3;
+  double success_threshold = 4;
+  // Whether the reward signal is deterministic. Examples of non-deterministic
+  // rewards are those with measurement noise such as program runtime.
+  bool deterministic = 5;
+  // Whether the reward signal depends on execution environment of the service.
+  bool platform_dependent = 6;
 }
 
 message RewardRequest {

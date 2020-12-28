@@ -9,6 +9,7 @@
 
 #include "compiler_gym/service/proto/compiler_gym_service.pb.h"
 #include "compiler_gym/util/GrpcStatusMacros.h"
+#include "compiler_gym/util/Version.h"
 
 namespace compiler_gym::example_service {
 
@@ -53,6 +54,13 @@ ExampleService::ExampleService(const fs::path& workingDirectory)
   codesize.set_name("codesize");
   codesize.mutable_range()->mutable_max()->set_value(0);
   rewardSpaces_.push_back(codesize);
+}
+
+Status ExampleService::GetVersion(ServerContext* /* unused */,
+                                  const GetVersionRequest* /* unused */, GetVersionReply* reply) {
+  reply->set_service_version(COMPILER_GYM_VERSION);
+  reply->set_compiler_version("1.0.0");
+  return Status::OK;
 }
 
 Status ExampleService::GetSpaces(ServerContext* /* unused*/, const GetSpacesRequest* /* unused */,

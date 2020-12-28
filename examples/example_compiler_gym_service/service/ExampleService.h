@@ -20,6 +20,8 @@ class ExampleService final : public CompilerGymService::Service {
   explicit ExampleService(const boost::filesystem::path& workingDirectory);
 
   // RPC endpoints.
+  grpc::Status GetVersion(grpc::ServerContext* context, const GetVersionRequest* request,
+                          GetVersionReply* reply) final override;
 
   grpc::Status GetSpaces(grpc::ServerContext* context, const GetSpacesRequest* request,
                          GetSpacesReply* reply) final override;

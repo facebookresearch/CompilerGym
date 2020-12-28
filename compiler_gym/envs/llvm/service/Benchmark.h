@@ -34,16 +34,18 @@ std::unique_ptr<llvm::Module> makeModule(llvm::LLVMContext& context, const Bitco
 class Benchmark {
  public:
   Benchmark(const std::string& name, const Bitcode& bitcode,
+            const boost::filesystem::path& workingDirectory,
             std::optional<boost::filesystem::path> bitcodePath = std::nullopt,
             const BaselineCosts* baselineCosts = nullptr);
 
   Benchmark(const std::string& name, std::unique_ptr<llvm::LLVMContext> context,
             std::unique_ptr<llvm::Module> module, size_t bitcodeSize,
+            const boost::filesystem::path& workingDirectory,
             std::optional<boost::filesystem::path> bitcodePath = std::nullopt,
             const BaselineCosts* baselineCosts = nullptr);
 
   // Make a copy of the benchmark.
-  std::unique_ptr<Benchmark> clone() const;
+  std::unique_ptr<Benchmark> clone(const boost::filesystem::path& workingDirectory) const;
 
   inline const std::string& name() const { return name_; }
 

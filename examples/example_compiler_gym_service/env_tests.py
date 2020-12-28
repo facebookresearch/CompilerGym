@@ -8,6 +8,7 @@ import numpy as np
 import pytest
 from gym.spaces import Box
 
+import compiler_gym
 import examples.example_compiler_gym_service  # Register environments.
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.spaces import NamedDiscrete, Sequence
@@ -23,6 +24,11 @@ def env() -> CompilerEnv:
         env.close()
 
 
+def test_versions(env: CompilerEnv):
+    assert env.version == compiler_gym.__version__
+    assert env.compiler_version == "1.0.0"
+
+
 def test_action_space(env: CompilerEnv):
     assert env.action_spaces == [
         NamedDiscrete(
@@ -32,19 +38,20 @@ def test_action_space(env: CompilerEnv):
     ]
 
 
-def test_observation_space_list(env: CompilerEnv):
+def test_observation_spaces(env: CompilerEnv):
     env.reset()
-    env.observation.spaces = {
-        "ir": Sequence(size_range=(0, None)),
-        "features": Box(shape=(3,), low=-100, high=100),
-    }
+    assert env.observation.spaces.keys() == {"ir", "features"}
+    assert env.observation.spaces["ir"].space == Sequence(
+        size_range=(0, None), dtype=str, opaque_data_format=""
+    )
+    assert env.observation.spaces["features"].space == Box(
+        shape=(3,), low=-100, high=100, dtype=np.int64
+    )
 
 
-def test_reward_space_list(env: CompilerEnv):
+def test_reward_spaces(env: CompilerEnv):
     env.reset()
-    env.reward.ranges = {
-        "codesize": (None, 0),
-    }
+    assert env.reward.spaces.keys() == {"codesize"}
 
 
 def test_takeAction_before_startEpisode(env: CompilerEnv):
@@ -70,18 +77,18 @@ def test_reset_invalid_benchmark(env: CompilerEnv):
     assert str(ctx.value) == "Unknown program name"
 
 
-def test_invalid_eager_observation_space(
+def test_invalid_observation_space(
     env: CompilerEnv,
 ):
     with pytest.raises(LookupError):
-        env.eager_observation_space = 100
+        env.observation_space = 100
 
 
-def test_invalid_eager_reward_space(
+def test_invalid_reward_space(
     env: CompilerEnv,
 ):
     with pytest.raises(LookupError):
-        env.eager_reward_space = 100
+        env.reward_space = 100
 
 
 def test_double_reset(env: CompilerEnv):
@@ -97,7 +104,7 @@ def test_takeAction_out_of_range(env: CompilerEnv):
 
 
 def test_eager_ir_observation(env: CompilerEnv):
-    env.eager_observation_space = "ir"
+    env.observation_space = "ir"
     observation = env.reset()
     assert observation == "Hello, world!"
 
@@ -110,7 +117,7 @@ def test_eager_ir_observation(env: CompilerEnv):
 def test_eager_features_observation(
     env: CompilerEnv,
 ):
-    env.eager_observation_space = "features"
+    env.observation_space = "features"
     observation = env.reset()
     assert isinstance(observation, np.ndarray)
     assert observation.shape == (3,)
@@ -119,7 +126,7 @@ def test_eager_features_observation(
 
 
 def test_eager_reward(env: CompilerEnv):
-    env.eager_reward_space = "codesize"
+    env.reward_space = "codesize"
     env.reset()
     observation, reward, done, info = env.step(0)
     assert observation is None

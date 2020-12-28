@@ -1,7 +1,12 @@
 ---
 name: Pre-commit
 
-on: [push, pull_request]
+on:
+    push:
+        branches:
+            - development
+    pull_request:
+
 
 jobs:
     all:
@@ -29,6 +34,11 @@ jobs:
               run: |
                   GO111MODULE=on go get github.com/uber/prototool/cmd/prototool@dev
                   prototool version
+            - name: Install hadolint
+              run: |
+                  wget -O hadolint https://github.com/hadolint/hadolint/releases/download/v1.19.0/hadolint-Linux-x86_64
+                  chmod +x hadolint
+                  sudo mv hadolint /usr/local/bin
             - name: Install Python 3.8
               uses: actions/setup-python@v2
               with:

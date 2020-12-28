@@ -32,13 +32,20 @@ developers to expose new optimization problems for AI.
 
 # Getting Started
 
-Starting with CompilerGym is simple if you are familiar with other gym environments.
+Starting with CompilerGym is simple. If you not already familiar with the gym
+interface, refer to the
+[getting started guide](http://facebookresearch.github.io/CompilerGym/getting_started.html)
+for an overview of the key concepts.
+
 
 ## Installation
 
 Install the latest CompilerGym release using:
 
     $ pip install compiler_gym
+
+The binary works on macOS and Linux (on Ubuntu 18.04, Fedora 28, Debian 10 or
+newer equivalents).
 
 ### Building from Source
 
@@ -84,15 +91,16 @@ environment using:
 
 ## Trying it out
 
-To use the environments, import `compiler_gym`:
+In Python, import `compiler_gym` to use the environments:
 
 ```py
 >>> import gym
->>> import compiler_gym
->>> env = gym.make("llvm-autophase-ic-v0")
->>> env.require_dataset("npb-v0")       # download a dataset of benchmarks
->>> env.reset()                         # calling reset starts a new compilation episode
->>> env.step(env.action_space.sample()) # apply a random optimization
+>>> import compiler_gym                     # imports the CompilerGym environments
+>>> env = gym.make("llvm-autophase-ic-v0")  # starts a new environment
+>>> env.require_dataset("npb-v0")           # downloads a set of programs
+>>> env.reset()                             # starts a new compilation session with a random program
+>>> env.render()                            # prints the IR of the program
+>>> env.step(env.action_space.sample())     # applies a random optimization, updates state/reward/actions
 ```
 
 See the

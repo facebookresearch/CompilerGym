@@ -98,9 +98,8 @@ class LlvmEnvironment {
   // we can reuse them when actions have no effect.
   Observation eagerObservation_;
   Reward eagerReward_;
-  // For incremental reward spaces, the previous reward value is stored and
-  // updated here.
-  double previousReward_;
+  // The previous costs. Used to compute incremental returns.
+  PreviousCosts previousCosts_;
 };
 
 }  // namespace compiler_gym::llvm_service

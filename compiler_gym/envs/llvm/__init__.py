@@ -5,11 +5,16 @@
 """Register the LLVM environments."""
 from itertools import product
 
+from compiler_gym.envs.llvm.benchmarks import (
+    ClangInvocation,
+    get_system_includes,
+    make_benchmark,
+)
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.util.registration import register
 from compiler_gym.util.runfiles_path import runfiles_path
 
-__all__ = ["LlvmEnv"]
+__all__ = ["LlvmEnv", "make_benchmark", "ClangInvocation", "get_system_includes"]
 
 _LLVM_SERVICE_BINARY = runfiles_path(
     "CompilerGym/compiler_gym/envs/llvm/service/service"
@@ -20,7 +25,7 @@ def _register_llvm_gym_service():
     """Register an environment for each combination of LLVM
     observation/reward/benchmark."""
     observation_spaces = {"autophase": "Autophase", "ir": "Ir"}
-    reward_spaces = {"ic": "IrInstructionCountOz"}
+    reward_spaces = {"ic": "IrInstructionCountOz", "codesize": "ObjectTextSizeOz"}
 
     register(
         id="llvm-v0",
@@ -36,7 +41,7 @@ def _register_llvm_gym_service():
             entry_point="compiler_gym.envs.llvm:LlvmEnv",
             kwargs={
                 "service": _LLVM_SERVICE_BINARY,
-                "eager_reward_space": reward_spaces[reward_space],
+                "reward_space": reward_spaces[reward_space],
             },
         )
 
@@ -46,8 +51,8 @@ def _register_llvm_gym_service():
             entry_point="compiler_gym.envs.llvm:LlvmEnv",
             kwargs={
                 "service": _LLVM_SERVICE_BINARY,
-                "eager_observation_space": observation_spaces[observation_space],
-                "eager_reward_space": reward_spaces[reward_space],
+                "observation_space": observation_spaces[observation_space],
+                "reward_space": reward_spaces[reward_space],
             },
         )
 

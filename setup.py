@@ -57,6 +57,7 @@ setuptools.setup(
         "compiler_gym.spaces",
         "compiler_gym.third_party",
         "compiler_gym.third_party.autophase",
+        "compiler_gym.third_party.llvm",
         "compiler_gym.third_party.inst2vec",
         "compiler_gym.util",
         "compiler_gym.util.flags",
@@ -72,6 +73,9 @@ setuptools.setup(
             "envs/llvm/service/libLLVMPolly.so",
             "third_party/inst2vec/*.pickle",
             "third_party/cBench/benchmarks.txt",
+            "third_party/cBench/cBench/crc32.bc",  # Needed for install-tests.
+            "third_party/llvm/clang",
+            "third_party/llvm/llvm-link",
         ]
     },
     install_requires=requirements,

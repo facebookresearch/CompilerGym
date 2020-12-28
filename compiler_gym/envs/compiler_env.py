@@ -21,16 +21,24 @@ from compiler_gym.service import (
     observation2py,
     observation_t,
 )
+from compiler_gym.service.connection import ServiceTransportError
 from compiler_gym.service.proto import (
     ActionRequest,
     AddBenchmarkRequest,
     Benchmark,
     EndEpisodeRequest,
     GetBenchmarksRequest,
+    GetVersionReply,
+    GetVersionRequest,
     StartEpisodeRequest,
 )
 from compiler_gym.spaces import NamedDiscrete
-from compiler_gym.views import ObservationView, RewardView
+from compiler_gym.views import (
+    ObservationSpaceSpec,
+    ObservationView,
+    RewardSpaceSpec,
+    RewardView,
+)
 
 # Type hints.
 info_t = Dict[str, Any]
@@ -51,8 +59,8 @@ class CompilerEnv(gym.Env):
 
     >>> env = CompilerEnv(
         service="localhost:8080",
-        eager_observation_space="features",
-        eager_reward_space="runtime"
+        observation_space="features",
+        reward_space="runtime"
     )
 
     Once constructed, an environment can be used in exactly the same way as a
@@ -103,8 +111,8 @@ class CompilerEnv(gym.Env):
         self,
         service: Union[str, Path],
         benchmark: Optional[Union[str, Benchmark]] = None,
-        eager_observation_space: Optional[str] = None,
-        eager_reward_space: Optional[str] = None,
+        observation_space: Optional[str] = None,
+        reward_space: Optional[str] = None,
         action_space: Optional[str] = None,
         connection_settings: Optional[ConnectionOpts] = None,
     ):
@@ -119,12 +127,12 @@ class CompilerEnv(gym.Env):
             argument and instead passing by choosing from the
             :code:`CompilerEnv.benchmarks` attribute and passing it to
             :func:`reset()` when called.
-        :param eager_observation_space: Compute and return observations at each
+        :param observation_space: Compute and return observations at each
             :func:`step()` from this space. If not provided, :func:`step()`
             returns :code:`None` for the observation value.
-        :param eager_reward_space: Compute and return reward at each
-            :func:`step()` from this space. If not provided, :func:`step()`
-            returns :code:`None` for the reward value.
+        :param reward_space: Compute and return reward at each :func:`step()`
+            from this space. If not provided, :func:`step()` returns
+            :code:`None` for the reward value.
         :param action_space: The name of the action space to use. If not
             specified, the default action space for this compiler is used.
         :raises FileNotFoundError: If service is a path to a file that is not
@@ -142,9 +150,12 @@ class CompilerEnv(gym.Env):
         # The benchmark that is currently being used, and the benchmark that
         # the user requested. Those do not always correlate, since the user
         # could request a random benchmark.
-        self._benchmark = None
-        self._user_specified_benchmark = None
-        self.benchmark = benchmark
+        self._benchmark_in_use_uri: Optional[str] = None
+        self._user_specified_benchmark_uri: Optional[str] = None
+        # A map from benchmark URIs to Benchmark messages. We keep track of any
+        # user-provided custom benchmarks so that we can register them with a
+        # reset service.
+        self._custom_benchmarks: Dict[str, Benchmark] = {}
 
         self.action_space_name = action_space
 
@@ -168,6 +179,9 @@ class CompilerEnv(gym.Env):
             spaces=self.service.reward_spaces,
         )
 
+        # Lazily evaluated version strings.
+        self._versions: Optional[GetVersionReply] = None
+
         # A compiler service supports multiple simultaneous environments. This
         # session ID is used to identify this environment.
         self._session_id: Optional[int] = None
@@ -177,9 +191,29 @@ class CompilerEnv(gym.Env):
         self.observation_space: Optional[Space] = None
         self.reward_range: Tuple[float, float] = (-np.inf, np.inf)
 
-        # Initialize eager observation/reward.
-        self.eager_observation_space = eager_observation_space
-        self.eager_reward_space = eager_reward_space
+        # Initialize eager observation/reward and benchmark.
+        self.observation_space = observation_space
+        self.reward_space = reward_space
+        self.benchmark = benchmark
+
+    @property
+    def versions(self) -> GetVersionReply:
+        """Get the version numbers from the compiler service."""
+        if self._versions is None:
+            self._versions = self.service(
+                self.service.stub.GetVersion, GetVersionRequest()
+            )
+        return self._versions
+
+    @property
+    def version(self) -> str:
+        """The version string of the compiler service."""
+        return self.versions.service_version
+
+    @property
+    def compiler_version(self) -> str:
+        """The version string of the underlying compiler that this service supports."""
+        return self.versions.compiler_version
 
     def commandline(self) -> str:
         """Return the current state as a commandline invocation.
@@ -221,58 +255,91 @@ class CompilerEnv(gym.Env):
 
     @property
     def benchmark(self) -> Optional[str]:
-        """The name of the benchmark that is being used.
+        """Get or set the name of the benchmark to use.
 
-        :getter: Get the name of the current benchmark. Return :code:`None` if
+        :getter: Get the name of the current benchmark. Returns :code:`None` if
             :func:`__init__` was not provided a benchmark and :func:`reset` has
             not yet been called.
         :setter: Set the benchmark to use. If :code:`None`, a random benchmark
-            is selected by the service on each call to :func:`reset`.
+            is selected by the service on each call to :func:`reset`. Else,
+            the same benchmark is used for every episode.
+
+        By default, a benchmark will be selected randomly by the service
+        from the available :func:`benchmarks` on a call to :func:`reset`. To
+        force a specific benchmark to be chosen, set this property (or pass
+        the benchmark as an argument to :func:`reset`):
+
+        >>> env.benchmark = "benchmark://foo"
+        >>> env.reset()
+        >>> env.benchmark
+        "benchmark://foo"
+
+        Once set, all subsequent calls to :func:`reset` will select the same
+        benchmark.
+
+        >>> env.benchmark = None
+        >>> env.reset()  # random benchmark is chosen
 
         .. note::
             Setting a new benchmark has no effect until :func:`~reset()` is
-            called on the environment.
+            called.
+
+        To return to random benchmark selection, set this property to
+        :code:`None`:
         """
-        return self._benchmark
+        return self._benchmark_in_use_uri
 
     @benchmark.setter
     def benchmark(self, benchmark: Optional[Union[str, Benchmark]]):
-        if isinstance(benchmark, Benchmark):
-            self._benchmark = benchmark.uri
+        if self.in_episode:
+            warnings.warn(
+                "Changing the benchmark has no effect until reset() is called."
+            )
+        if isinstance(benchmark, str) or benchmark is None:
+            self._user_specified_benchmark_uri = benchmark
+        elif isinstance(benchmark, Benchmark):
+            self._user_specified_benchmark_uri = benchmark.uri
+            # Register the custom benchmark, and record the Benchmark object
+            # in case of environment restart.
+            self._custom_benchmarks[benchmark.uri] = benchmark
+            self.service(
+                self.service.stub.AddBenchmark,
+                AddBenchmarkRequest(benchmark=[benchmark]),
+            )
         else:
-            self._benchmark = benchmark
-        self._user_specified_benchmark = benchmark
+            raise TypeError(f"Unsupported benchmark type: {type(benchmark).__name__}")
 
     @property
-    def eager_reward_space(self) -> Optional[str]:
+    def reward_space(self) -> Optional[RewardSpaceSpec]:
         """The eager reward space. This is the reward that is returned by
         :func:`~step()`.
 
-        :getter: Returns the name of the eager reward space, or :code:`None` if
-            not set.
-        :setter: Set the name of the eager reward space.
+        :getter: Returns a :class:`RewardSpaceSpec <compiler_gym.views.RewardSpaceSpec>`,
+            or :code:`None` if not set.
+        :setter: Set the eager reward space.
 
         .. note::
             Setting a new eager reward space has no effect until
             :func:`~reset()` is called on the environment.
         """
-        return self._eager_reward_space or None
+        return (
+            self.reward.spaces[self._eager_reward_space]
+            if self._eager_reward_space
+            else None
+        )
 
-    @eager_reward_space.setter
-    def eager_reward_space(self, eager_reward_space: Optional[str]) -> None:
-        if (
-            eager_reward_space is not None
-            and eager_reward_space not in self.reward.ranges
-        ):
-            raise LookupError(f"Reward space not found: {eager_reward_space}")
+    @reward_space.setter
+    def reward_space(self, reward_space: Optional[str]) -> None:
+        if reward_space is not None and reward_space not in self.reward.spaces:
+            raise LookupError(f"Reward space not found: {reward_space}")
         if self.in_episode:
             warnings.warn(
                 "Changing eager reward space has no effect until reset() is called."
             )
-        self._eager_reward = eager_reward_space is not None
-        self._eager_reward_space = eager_reward_space or ""
+        self._eager_reward: bool = reward_space is not None
+        self._eager_reward_space: str = reward_space or ""
         if self._eager_reward:
-            self.reward_range = self.reward.ranges[self._eager_reward_space]
+            self.reward_range = self.reward.spaces[reward_space].range
         else:
             self.reward_range = (-np.inf, np.inf)
 
@@ -286,37 +353,36 @@ class CompilerEnv(gym.Env):
         return self._session_id is not None
 
     @property
-    def eager_observation_space(self) -> Optional[str]:
+    def observation_space(self) -> Optional[ObservationSpaceSpec]:
         """The eager observation space. This is the observation value that is
         returned by :func:`~step()`.
 
-        :getter: Returns the name of the eager observation space, or
+        :getter: Returns the specification of the eager observation space, or
             :code:`None` if not set.
-        :setter: Set the name of the eager observation space.
+        :setter: Set the eager observation space.
 
         .. note::
             Setting a new eager observation space has no effect until
             :func:`~reset()` is called on the environment.
         """
-        return self._eager_observation_space or None
+        return self._eager_observation_space
 
-    @eager_observation_space.setter
-    def eager_observation_space(self, eager_observation_space: Optional[str]) -> None:
+    @observation_space.setter
+    def observation_space(self, observation_space: Optional[str]) -> None:
         if (
-            eager_observation_space is not None
-            and eager_observation_space not in self.observation.spaces
+            observation_space is not None
+            and observation_space not in self.observation.spaces
         ):
-            raise LookupError(f"Observation space not found: {eager_observation_space}")
+            raise LookupError(f"Observation space not found: {observation_space}")
         if self.in_episode:
             warnings.warn(
                 "Changing eager observation space has no effect until reset() is called."
             )
-        self._eager_observation = eager_observation_space is not None
-        self._eager_observation_space = eager_observation_space or ""
+        self._eager_observation = observation_space is not None
         if self._eager_observation:
-            self.observation_space = self.observation.spaces[
-                self._eager_observation_space
-            ]
+            self._eager_observation_space = self.observation.spaces[observation_space]
+        else:
+            self._eager_observation_space = None
 
     def close(self):
         """Close the environment.
@@ -330,8 +396,8 @@ class CompilerEnv(gym.Env):
                     self.service.stub.EndEpisode,
                     EndEpisodeRequest(session_id=self._session_id),
                 )
-            except Exception as e:
-                warnings.warn(f"Failure to terminate episode on service close: {e}")
+            except:
+                pass
             self._session_id = None
 
         if self.service:
@@ -350,6 +416,7 @@ class CompilerEnv(gym.Env):
         self,
         benchmark: Optional[Union[str, Benchmark]] = None,
         action_space: Optional[str] = None,
+        retry_count: int = 0,
     ) -> Optional[observation_t]:
         """Reset the environment state.
 
@@ -366,10 +433,18 @@ class CompilerEnv(gym.Env):
             subsequent calls to :code:`reset()` will use this action space.
             If no aciton space is provided, the default action space is used.
         """
+        if retry_count > self.connection_settings.init_max_attempts:
+            raise OSError(f"Failed to reset environment after {retry_count} attempts")
+
         # Start a new service if required.
         if self.service is None:
             self.service = CompilerGymServiceConnection(
                 self.service_endpoint, self.connection_settings
+            )
+            # Re-register any custom benchmarks.
+            self.service(
+                self.service.stub.AddBenchmark,
+                AddBenchmarkRequest(benchmark=list(self._custom_benchmarks.values())),
             )
 
         self.action_space_name = action_space or self.action_space_name
@@ -380,40 +455,46 @@ class CompilerEnv(gym.Env):
                 self.service.stub.EndEpisode,
                 EndEpisodeRequest(session_id=self._session_id),
             )
+            self._session_id = None
 
-        # Add the new benchmark, if required.
-        self._user_specified_benchmark = benchmark or self._user_specified_benchmark
-        if isinstance(self._user_specified_benchmark, Benchmark):
-            self.service(
-                self.service.stub.AddBenchmark,
-                AddBenchmarkRequest(benchmark=[self._user_specified_benchmark]),
+        # Update the user requested benchmark, if provided. NOTE: This means
+        # that env.reset(benchmark=None) does NOT unset a forced benchmark.
+        if benchmark:
+            self.benchmark = benchmark
+
+        try:
+            reply = self.service(
+                self.service.stub.StartEpisode,
+                StartEpisodeRequest(
+                    benchmark=self._user_specified_benchmark_uri,
+                    action_space=(
+                        [a.name for a in self.action_spaces].index(
+                            self.action_space_name
+                        )
+                        if self.action_space_name
+                        else 0
+                    ),
+                    use_eager_observation_space=self._eager_observation,
+                    eager_observation_space=(
+                        self.observation_space.index if self.observation_space else None
+                    ),
+                    use_eager_reward_space=bool(self.reward_space),
+                    eager_reward_space=(
+                        self.reward_space.index if self.reward_space else None
+                    ),
+                ),
             )
-            self._user_specified_benchmark = self._user_specified_benchmark.uri
+        except (ServiceError, ServiceTransportError):
+            # Abort and retry on error.
+            self.service.close()
+            self.service = None
+            return self.reset(
+                benchmark=benchmark,
+                action_space=action_space,
+                retry_count=retry_count + 1,
+            )
 
-        reply = self.service(
-            self.service.stub.StartEpisode,
-            StartEpisodeRequest(
-                benchmark=self._user_specified_benchmark,
-                action_space=(
-                    [a.name for a in self.action_spaces].index(self.action_space_name)
-                    if self.action_space_name
-                    else 0
-                ),
-                use_eager_observation_space=self._eager_observation,
-                eager_observation_space=(
-                    self.observation.indices[self.eager_observation_space]
-                    if self._eager_observation
-                    else None
-                ),
-                use_eager_reward_space=self._eager_reward,
-                eager_reward_space=(
-                    self.reward.indices[self.eager_reward_space]
-                    if self._eager_reward
-                    else None
-                ),
-            ),
-        )
-        self._benchmark = reply.benchmark
+        self._benchmark_in_use_uri = reply.benchmark
         self._session_id = reply.session_id
         self.observation.session_id = reply.session_id
         self.reward.session_id = reply.session_id
@@ -425,7 +506,7 @@ class CompilerEnv(gym.Env):
             )
 
         if self._eager_observation:
-            return self.observation[self.eager_observation_space]
+            return self.observation[self.observation_space.id]
 
     def step(self, action: int) -> step_t:
         """Take a step.
@@ -441,7 +522,7 @@ class CompilerEnv(gym.Env):
         request = ActionRequest(session_id=self._session_id, action=[action])
         try:
             reply = self.service(self.service.stub.TakeAction, request)
-        except (ServiceError, TimeoutError) as e:
+        except (ServiceError, ServiceTransportError, TimeoutError) as e:
             self.close()
             info = {"error_details": str(e)}
             return observation, reward, True, info
@@ -454,8 +535,8 @@ class CompilerEnv(gym.Env):
 
         if self._eager_observation:
             observation = self.observation.translate(
-                self.eager_observation_space,
-                observation2py(self.eager_observation_space, reply.observation),
+                self.observation_space.id,
+                observation2py(self.observation_space.space, reply.observation),
             )
         if self._eager_reward:
             reward = reply.reward.reward
@@ -482,11 +563,9 @@ class CompilerEnv(gym.Env):
         :raises TypeError: If eager observations are not set, or if the
             requested render mode does not exist.
         """
-        if not self.eager_observation_space:
-            raise ValueError(
-                "Cannot call render() when no eager observation space is used"
-            )
-        observation = self.observation[self.eager_observation_space]
+        if not self.observation_space:
+            raise ValueError("Cannot call render() when no observation space is used")
+        observation = self.observation[self.observation_space.id]
         if mode == "human":
             print(observation)
         elif mode == "ansi":
@@ -496,7 +575,7 @@ class CompilerEnv(gym.Env):
 
     @property
     def benchmarks(self) -> List[str]:
-        """The list of available benchmarks."""
+        """Enumerate the list of available benchmarks."""
         reply = self.service(self.service.stub.GetBenchmarks, GetBenchmarksRequest())
         return list(reply.benchmark)
 

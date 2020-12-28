@@ -115,9 +115,9 @@ def env_from_flags(benchmark: Optional[Union[str, Benchmark]] = None) -> Compile
         env = gym.make(FLAGS.env, connection_settings=connection_settings)
         env.benchmark = benchmark or env.benchmark
         if FLAGS.observation:
-            env.eager_observation_space = FLAGS.observation
+            env.observation_space = FLAGS.observation
         if FLAGS.reward:
-            env.eager_reward_space = FLAGS.reward
+            env.reward_space = FLAGS.reward
         return env
     elif FLAGS.service or FLAGS.local_service_binary:
         local_service_binary = (
@@ -127,8 +127,8 @@ def env_from_flags(benchmark: Optional[Union[str, Benchmark]] = None) -> Compile
             service=local_service_binary or FLAGS.service,
             connection_settings=connection_settings,
             benchmark=benchmark,
-            eager_observation_space=FLAGS.observation,
-            eager_reward_space=FLAGS.reward,
+            observation_space=FLAGS.observation,
+            reward_space=FLAGS.reward,
         )
     else:
         raise app.UsageError("Neither --env or --local_service_binary is set")

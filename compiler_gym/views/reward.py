@@ -2,10 +2,11 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-from typing import Callable, Sequence
+from typing import Callable, List
 
 from compiler_gym.service import scalar_range2tuple
 from compiler_gym.service.proto import Reward, RewardRequest, RewardSpace
+from compiler_gym.views.reward_space_spec import RewardSpaceSpec
 
 
 class RewardView(object):
@@ -15,18 +16,19 @@ class RewardView(object):
 
     >>> env = gym.make("llvm-v0")
     >>> env.reset()
-    >>> env.reward.ranges.keys()
-    ["codesize"]
-    >>> env.reward.ranges["codesize"]
+    >>> env.reward.spaces["codesize"].range
     (-np.inf, 0)
     >>> env.reward["codesize"]
     -1243
+
+    :ivar spaces: Specifications of available reward spaces.
+    :vartype spaces: Dict[str, RewardSpaceSpec]
     """
 
     def __init__(
         self,
         get_reward: Callable[[RewardRequest], Reward],
-        spaces: Sequence[RewardSpace],
+        spaces: List[RewardSpace],
     ):
         self._get_reward = get_reward
         self.session_id = -1
@@ -34,8 +36,7 @@ class RewardView(object):
         if not spaces:
             raise ValueError("No reward spaces")
 
-        self.indices = {s.name: i for i, s in enumerate(spaces)}
-        self.ranges = {s.name: scalar_range2tuple(s.range) for s in spaces}
+        self.spaces = {s.name: RewardSpaceSpec(i, s) for i, s in enumerate(spaces)}
 
     def __getitem__(self, reward_space: str) -> float:
         """Request an observation from the given space.
@@ -45,7 +46,7 @@ class RewardView(object):
         :raises KeyError: If the requested reward space does not exist.
         """
         request = RewardRequest(
-            session_id=self.session_id, reward_space=self.indices[reward_space]
+            session_id=self.session_id, reward_space=self.spaces[reward_space].index
         )
         return self._get_reward(request).reward
 

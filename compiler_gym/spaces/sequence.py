@@ -85,3 +85,12 @@ class Sequence(Space):
         :raises NotImplementedError: Not supported.
         """
         raise NotImplementedError
+
+    def __eq__(self, other):
+        if not isinstance(other, Sequence):
+            return False
+        return (
+            self.size_range == other.size_range
+            and self.dtype == other.dtype
+            and self.opaque_data_format == other.opaque_data_format
+        )

@@ -40,6 +40,25 @@ http_archive(
     urls = ["https://github.com/google/glog/archive/v0.4.0.tar.gz"],
 )
 
+# C++ subprocess management. https://github.com/arun11299/cpp-subprocess.git
+
+http_archive(
+    name = "subprocess",
+    build_file_content = """
+cc_library(
+    name = "subprocess",
+    hdrs = ["subprocess.hpp"],
+    include_prefix = "subprocess",
+    visibility = ["//visibility:public"],
+)
+""",
+    sha256 = "886df0a814a7bb7a3fdeead22f75400abd8d3235b81d05817bc8c1125eeebb8f",
+    strip_prefix = "cpp-subprocess-2.0",
+    urls = [
+        "https://github.com/arun11299/cpp-subprocess/archive/v2.0.tar.gz",
+    ],
+)
+
 # === LLVM ===
 
 http_archive(
