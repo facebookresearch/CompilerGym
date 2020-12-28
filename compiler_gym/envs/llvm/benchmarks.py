@@ -191,6 +191,13 @@ def make_benchmark(
         'bitcode2.bc',
     ])
 
+    .. note::
+        LLVM bitcode compatibility is
+        `not guaranteed <https://llvm.org/docs/DeveloperPolicy.html#ir-backwards-compatibility>`_,
+        so you must ensure that any precompiled bitcodes are compatible with the
+        LLVM version used by CompilerGym, which can be queried using
+        :func:`LlvmEnv.compiler_version <compiler_gym.envs.CompilerEnv.compiler_version>`.
+
     :param inputs: An input, or list of inputs.
     :param copt: A list of command line options to pass to clang when compiling
         source files.
