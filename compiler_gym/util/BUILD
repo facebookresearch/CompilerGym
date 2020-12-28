@@ -17,6 +17,7 @@ py_library(
         "tabulate.py",
         "timer.py",
         "user_input.py",
+        "version.py",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -81,4 +82,11 @@ cc_library(
     name = "StrLenConstexpr",
     hdrs = ["StrLenConstexpr.h"],
     visibility = ["//visibility:public"],
+)
+
+genrule(
+    name = "make_version",
+    srcs = ["//:VERSION"],
+    outs = ["version.py"],
+    cmd = "echo \"__version__ = \\\"$$(cat $<)\\\"\" > $@",
 )
