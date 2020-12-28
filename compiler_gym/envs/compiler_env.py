@@ -150,9 +150,12 @@ class CompilerEnv(gym.Env):
         # The benchmark that is currently being used, and the benchmark that
         # the user requested. Those do not always correlate, since the user
         # could request a random benchmark.
-        self._benchmark = None
-        self._user_specified_benchmark = None
-        self.benchmark = benchmark
+        self._benchmark_in_use_uri: Optional[str] = None
+        self._user_specified_benchmark_uri: Optional[str] = None
+        # A map from benchmark URIs to Benchmark messages. We keep track of any
+        # user-provided custom benchmarks so that we can register them with a
+        # reset service.
+        self._custom_benchmarks: Dict[str, Benchmark] = {}
 
         self.action_space_name = action_space
 
@@ -188,9 +191,10 @@ class CompilerEnv(gym.Env):
         self.observation_space: Optional[Space] = None
         self.reward_range: Tuple[float, float] = (-np.inf, np.inf)
 
-        # Initialize eager observation/reward.
+        # Initialize eager observation/reward and benchmark.
         self.observation_space = observation_space
         self.reward_space = reward_space
+        self.benchmark = benchmark
 
     @property
     def versions(self) -> GetVersionReply:
@@ -251,27 +255,59 @@ class CompilerEnv(gym.Env):
 
     @property
     def benchmark(self) -> Optional[str]:
-        """The name of the benchmark that is being used.
+        """Get or set the name of the benchmark to use.
 
-        :getter: Get the name of the current benchmark. Return :code:`None` if
+        :getter: Get the name of the current benchmark. Returns :code:`None` if
             :func:`__init__` was not provided a benchmark and :func:`reset` has
             not yet been called.
         :setter: Set the benchmark to use. If :code:`None`, a random benchmark
-            is selected by the service on each call to :func:`reset`.
+            is selected by the service on each call to :func:`reset`. Else,
+            the same benchmark is used for every episode.
+
+        By default, a benchmark will be selected randomly by the service
+        from the available :func:`benchmarks` on a call to :func:`reset`. To
+        force a specific benchmark to be chosen, set this property (or pass
+        the benchmark as an argument to :func:`reset`):
+
+        >>> env.benchmark = "benchmark://foo"
+        >>> env.reset()
+        >>> env.benchmark
+        "benchmark://foo"
+
+        Once set, all subsequent calls to :func:`reset` will select the same
+        benchmark.
+
+        >>> env.benchmark = None
+        >>> env.reset()  # random benchmark is chosen
 
         .. note::
             Setting a new benchmark has no effect until :func:`~reset()` is
-            called on the environment.
+            called.
+
+        To return to random benchmark selection, set this property to
+        :code:`None`:
         """
-        return self._benchmark
+        return self._benchmark_in_use_uri
 
     @benchmark.setter
     def benchmark(self, benchmark: Optional[Union[str, Benchmark]]):
-        if isinstance(benchmark, Benchmark):
-            self._benchmark = benchmark.uri
+        if self.in_episode:
+            warnings.warn(
+                "Changing the benchmark has no effect until reset() is called."
+            )
+        if isinstance(benchmark, str) or benchmark is None:
+            self._user_specified_benchmark_uri = benchmark
+        elif isinstance(benchmark, Benchmark):
+            self._user_specified_benchmark_uri = benchmark.uri
+            # Register the custom benchmark, and record the Benchmark object
+            # in case of environment restart.
+            self._custom_benchmarks[benchmark.uri] = benchmark
+            self.service(
+                self.service.stub.AddBenchmark,
+                AddBenchmarkRequest(benchmark=[benchmark]),
+            )
         else:
-            self._benchmark = benchmark
-        self._user_specified_benchmark = benchmark
+            raise TypeError(f"Unsupported benchmark type: {type(benchmark).__name__}")
 
     @property
     def reward_space(self) -> Optional[RewardSpaceSpec]:
@@ -405,6 +441,11 @@ class CompilerEnv(gym.Env):
             self.service = CompilerGymServiceConnection(
                 self.service_endpoint, self.connection_settings
             )
+            # Re-register any custom benchmarks.
+            self.service(
+                self.service.stub.AddBenchmark,
+                AddBenchmarkRequest(benchmark=list(self._custom_benchmarks.values())),
+            )
 
         self.action_space_name = action_space or self.action_space_name
 
@@ -414,21 +455,18 @@ class CompilerEnv(gym.Env):
                 self.service.stub.EndEpisode,
                 EndEpisodeRequest(session_id=self._session_id),
             )
+            self._session_id = None
 
-        # Add the new benchmark, if required.
-        self._user_specified_benchmark = benchmark or self._user_specified_benchmark
-        if isinstance(self._user_specified_benchmark, Benchmark):
-            self.service(
-                self.service.stub.AddBenchmark,
-                AddBenchmarkRequest(benchmark=[self._user_specified_benchmark]),
-            )
-            self._user_specified_benchmark = self._user_specified_benchmark.uri
+        # Update the user requested benchmark, if provided. NOTE: This means
+        # that env.reset(benchmark=None) does NOT unset a forced benchmark.
+        if benchmark:
+            self.benchmark = benchmark
 
         try:
             reply = self.service(
                 self.service.stub.StartEpisode,
                 StartEpisodeRequest(
-                    benchmark=self._user_specified_benchmark,
+                    benchmark=self._user_specified_benchmark_uri,
                     action_space=(
                         [a.name for a in self.action_spaces].index(
                             self.action_space_name
@@ -456,7 +494,7 @@ class CompilerEnv(gym.Env):
                 retry_count=retry_count + 1,
             )
 
-        self._benchmark = reply.benchmark
+        self._benchmark_in_use_uri = reply.benchmark
         self._session_id = reply.session_id
         self.observation.session_id = reply.session_id
         self.reward.session_id = reply.session_id
@@ -537,7 +575,7 @@ class CompilerEnv(gym.Env):
 
     @property
     def benchmarks(self) -> List[str]:
-        """The list of available benchmarks."""
+        """Enumerate the list of available benchmarks."""
         reply = self.service(self.service.stub.GetBenchmarks, GetBenchmarksRequest())
         return list(reply.benchmark)
 

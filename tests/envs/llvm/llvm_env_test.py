@@ -3,20 +3,13 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Integrations tests for the LLVM CompilerGym environments."""
-import os
-import sys
-from typing import Any, Dict, List
+from typing import List
 
-import networkx as nx
-import numpy as np
 import pytest
-from gym.spaces import Box
-from gym.spaces import Dict as DictSpace
 
 import compiler_gym
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
-from compiler_gym.spaces import Sequence
 from tests.test_main import main
 
 pytest_plugins = ["tests.envs.llvm.fixtures"]
@@ -128,6 +121,23 @@ def test_unset_forced_benchmark(env: CompilerEnv):
         pytest.fail(
             "Improbably selected the same benchmark 50 times! " "Expected random."
         )
+
+
+def test_change_benchmark_mid_episode(env: LlvmEnv):
+    """Test that changing the benchmark while in an episode has no effect until
+    the next call to reset()."""
+    env.reset(benchmark="benchmark://cBench-v0/crc32")
+    assert env.benchmark == "benchmark://cBench-v0/crc32"
+    env.benchmark = "benchmark://cBench-v0/dijkstra"
+    assert env.benchmark == "benchmark://cBench-v0/crc32"
+    env.reset()
+    assert env.benchmark == "benchmark://cBench-v0/dijkstra"
+
+
+def test_set_benchmark_invalid_type(env: LlvmEnv):
+    with pytest.raises(TypeError) as ctx:
+        env.benchmark = 10
+    assert str(ctx.value) == "Unsupported benchmark type: int"
 
 
 if __name__ == "__main__":
