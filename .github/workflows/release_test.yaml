@@ -1,0 +1,32 @@
+---
+name: Release Test
+
+on:
+    schedule:
+        - cron: 0 0 * * 0 # weekly
+
+jobs:
+    release_package_test:
+        runs-on: ${{ matrix.os }}
+
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [ubuntu-latest, macos-latest]
+                python: [3.8]
+
+        steps:
+            - uses: actions/checkout@v2
+              with:
+                  ref: stable
+
+            - name: Set up Python ${{ matrix.python }}
+              uses: actions/setup-python@v2
+              with:
+                  python-version: ${{ matrix.python }}
+
+            - name: Install python wheel
+              run: python -m pip install compiler_gym
+
+            - name: Test
+              run: make pytest
