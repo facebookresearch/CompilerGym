@@ -5,6 +5,7 @@
 """Integrations tests for the LLVM CompilerGym environments."""
 from typing import List
 
+import gym
 import pytest
 
 import compiler_gym
@@ -138,6 +139,20 @@ def test_set_benchmark_invalid_type(env: LlvmEnv):
     with pytest.raises(TypeError) as ctx:
         env.benchmark = 10
     assert str(ctx.value) == "Unsupported benchmark type: int"
+
+
+def test_gym_make_kwargs():
+    """Test that passing kwargs to gym.make() are forwarded to environment
+    constructor.
+    """
+    env = gym.make(
+        "llvm-v0", observation_space="Autophase", reward_space="IrInstructionCount"
+    )
+    try:
+        assert env.observation_space.id == "Autophase"
+        assert env.reward_space.id == "IrInstructionCount"
+    finally:
+        env.close()
 
 
 if __name__ == "__main__":
