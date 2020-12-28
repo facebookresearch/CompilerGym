@@ -12,6 +12,7 @@ import numpy as np
 from gym.spaces import Dict as DictSpace
 
 from compiler_gym.envs.compiler_env import CompilerEnv, step_t
+from compiler_gym.envs.llvm.benchmarks import make_benchmark
 from compiler_gym.envs.llvm.datasets import LLVM_DATASETS
 from compiler_gym.spaces import Commandline, CommandlineFlag, Scalar, Sequence
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_NAMES
@@ -142,6 +143,11 @@ class LlvmEnv(CompilerEnv):
         self.inactive_datasets_site_path.mkdir(parents=True, exist_ok=True)
         for dataset in LLVM_DATASETS:
             self.register_dataset(dataset)
+
+    @staticmethod
+    def make_benchmark(*args, **kwargs):
+        """Alias to :func:`compiler_gym.envs.llvm.make_benchmark`."""
+        return make_benchmark(*args, **kwargs)
 
     @property
     def _observation_view_type(self):

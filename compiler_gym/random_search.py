@@ -8,7 +8,7 @@ from multiprocessing import cpu_count
 from pathlib import Path
 from threading import Thread
 from time import sleep, time
-from typing import Callable, List, Optional
+from typing import Callable, List, Optional, Union
 
 import humanize
 
@@ -98,7 +98,7 @@ class RandomAgentWorker(Thread):
 
 def random_search(
     make_env: Callable[[], CompilerEnv],
-    outdir: Optional[Path] = None,
+    outdir: Optional[Union[str, Path]] = None,
     total_runtime: Optional[float] = 600,
     patience: int = 100,
     nproc: int = cpu_count(),
@@ -115,6 +115,7 @@ def random_search(
     if not outdir:
         sanitized_benchmark_name = "/".join(benchmark_name.split("/")[-2:])
         outdir = create_logging_dir(f"random/{sanitized_benchmark_name}")
+    outdir = Path(outdir)
 
     if not env.reward_space:
         raise ValueError("Eager reward must be specified for random search")
