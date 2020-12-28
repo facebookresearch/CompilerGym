@@ -80,13 +80,13 @@ jobs:
                   sudo mv bazel.tmp /usr/local/bin/bazel
                   chmod +x /usr/local/bin/bazel
                   sudo apt install clang-9 patchelf
-                  make init
+                  python -m pip install -r tests/requirements.txt
               if: matrix.os == 'ubuntu-latest'
 
             - name: Install dependencies (macos)
               run: |
                   brew install bazelisk
-                  python -m pip install -r compiler_gym/requirements.txt -r tests/requirements.txt
+                  python -m pip install -r tests/requirements.txt
               if: matrix.os == 'macos-latest'
 
             - name: Test

@@ -5,19 +5,10 @@
 #
 # Usage:
 #
-#     $ make_cBench_llvm_module.py \
-#         --benchmark=<benchmark_name> \
-#         --cflags=<cflags> \
-#         --output_path=<path_of_bitcode_file_to_write>
+#     $ make_cBench_llvm_module.py <in_dir> <outpath> [<cflag>...]
 #
-# The generated file embeds the LLVM-IR into a static const char* declaration,
-# e.g.
-#
-#     static const char* CBENCH_DIJKSTRA_IR = R"_llvm_module_(
-#     ...
-#     )_llvm_module_";
-#
-# This can then be loaded into a buffer and passed to llvm::parseIR().
+# This compiles the code from <in_dir> and generates an LLVM bitcode module at
+# the given <outpath>, using any additional <cflags> as clang arguments.
 
 import subprocess
 import sys
@@ -25,14 +16,7 @@ import tempfile
 from pathlib import Path
 from typing import List
 
-from absl import flags
-
 from compiler_gym.util.runfiles_path import runfiles_path
-
-flags.DEFINE_string("path", None, "The name of the cBench benchamrk.")
-flags.DEFINE_list("cflags", [], "A list of additional compiler flags.")
-flags.DEFINE_string("output_path", None, "The output path.")
-FLAGS = flags.FLAGS
 
 # Path of the LLVM binaries.
 CLANG = Path(runfiles_path("llvm/10.0.0/clang"))
@@ -103,12 +87,10 @@ def main():
     assert CLANG.is_file(), f"clang not found: {CLANG}"
     assert LLVM_LINK.is_file(), f"llvm-link not found: {LLVM_LINK}"
 
-    argv = FLAGS(sys.argv)
-    assert len(argv) == 1, f"Unrecognized flags: {argv[1:]}"
-
-    benchmark_dir = Path(FLAGS.path).absolute().resolve()
-    cflags = FLAGS.cflags
-    output_path = Path(FLAGS.output_path).absolute().resolve()
+    # Parse arguments.
+    benchmark_dir, output_path, *cflags = sys.argv[1:]
+    benchmark_dir = Path(benchmark_dir).absolute().resolve()
+    output_path = Path(output_path).absolute().resolve()
 
     make_cbench_llvm_module(benchmark_dir, cflags, output_path)
 

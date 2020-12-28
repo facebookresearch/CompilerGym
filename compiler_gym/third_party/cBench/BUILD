@@ -28,7 +28,7 @@ genrule(
         "@cBench//:readme",
     ],
     outs = ["cBench/crc32.bc"],
-    cmd = "mkdir -p $(@D) && $(location :make_llvm_module) --path=$$(dirname $(location @cBench//:readme))/telecom_CRC32 --output_path=$@",
+    cmd = "mkdir -p $(@D) && $(location :make_llvm_module) $$(dirname $(location @cBench//:readme))/telecom_CRC32 $@",
     tools = [":make_llvm_module"],
     visibility = ["//visibility:public"],
 )
