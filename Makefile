@@ -48,7 +48,7 @@ Deployment
     make install
         Build and install the python wheel.
 
-    make bdist_wheel-manylinux
+    make bdist_wheel-linux
         Use a docker container to build a python wheel for linux. This is only
         used for making release builds. This requires docker.
 
