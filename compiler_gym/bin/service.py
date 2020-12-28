@@ -20,7 +20,7 @@ Query the capabilities of a service using:
 
 .. code-block::
 
-    $ python -m compiler_gym.bin.service --env=<env> [--tablefmt=<fmt>] [--heading_level=<num>]
+    $ python -m compiler_gym.bin.service --env=<env> [--heading_level=<num>]
 
 For example:
 
