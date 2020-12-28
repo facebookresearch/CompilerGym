@@ -66,6 +66,7 @@ cc_library(
     hdrs = ["Cost.h"],
     data = [
         "//compiler_gym/third_party/llvm:clang",
+        "//compiler_gym/third_party/llvm:llvm-size",
     ],
     deps = [
         ":RewardSpaces",
