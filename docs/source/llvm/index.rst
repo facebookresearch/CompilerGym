@@ -264,13 +264,13 @@ Cost Models
 +--------------------------+------------------------------------------------------------------------------------+
 | IrInstructionCountOz     | `Box(0, 9223372036854775807, (1,), int64)`                                         |
 +--------------------------+------------------------------------------------------------------------------------+
-| NativeTextSizeBytes      | `Box(0, 9223372036854775807, (1,), int64)`                                         |
+| ObjectTextSizeBytes      | `Box(0, 9223372036854775807, (1,), int64)`                                         |
 +--------------------------+------------------------------------------------------------------------------------+
-| NativeTextSizeO0         | `Box(0, 9223372036854775807, (1,), int64)`                                         |
+| ObjectTextSizeO0         | `Box(0, 9223372036854775807, (1,), int64)`                                         |
 +--------------------------+------------------------------------------------------------------------------------+
-| NativeTextSizeO3         | `Box(0, 9223372036854775807, (1,), int64)`                                         |
+| ObjectTextSizeO3         | `Box(0, 9223372036854775807, (1,), int64)`                                         |
 +--------------------------+------------------------------------------------------------------------------------+
-| NativeTextSizeOz         | `Box(0, 9223372036854775807, (1,), int64)`                                         |
+| ObjectTextSizeOz         | `Box(0, 9223372036854775807, (1,), int64)`                                         |
 +--------------------------+------------------------------------------------------------------------------------+
 
 Raw values from the cost models used to compute :ref:`rewards <reward>`.
@@ -327,17 +327,17 @@ Codesize
 +----------------------+-----------------+-------------+---------------------+------------------+-----------------------+
 | Reward space         | Baseline Policy | Range       |   Success Threshold | Deterministic?   | Platform dependent?   |
 +======================+=================+=============+=====================+==================+=======================+
-| NativeTextSizeBytes  |                 | (-inf, inf) |                     | Yes              | Yes                   |
+| ObjectTextSizeBytes  |                 | (-inf, inf) |                     | Yes              | Yes                   |
 +----------------------+-----------------+-------------+---------------------+------------------+-----------------------+
-| NativeTextSizeO3     | :code:`-O3`     | (-inf, inf) |                 1.0 | Yes              | Yes                   |
+| ObjectTextSizeO3     | :code:`-O3`     | (-inf, inf) |                 1.0 | Yes              | Yes                   |
 +----------------------+-----------------+-------------+---------------------+------------------+-----------------------+
-| NativeTextSizeOz     | :code:`-Oz`     | (-inf, inf) |                 1.0 | Yes              | Yes                   |
+| ObjectTextSizeOz     | :code:`-Oz`     | (-inf, inf) |                 1.0 | Yes              | Yes                   |
 +----------------------+-----------------+-------------+---------------------+------------------+-----------------------+
 
-The :code:`NativeTextSizeBytes` reward signal returns the size of the
-:code:`.TEXT` section of the module after lowering to native code. This is more
-expensive to compute than :code:`IrInstructionCount` but is a measure of true
-codesize. The native code size depends on the target platform.
+The :code:`ObjectTextSizeBytes` reward signal returns the size of the
+:code:`.TEXT` section of the module after lowering to an object file, before
+linking. This is more expensive to compute than :code:`IrInstructionCount`. The
+object file code size depends on the target platform.
 
 
 Action Space

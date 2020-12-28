@@ -77,10 +77,10 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
         space.set_platform_dependent(false);
         break;
       }
-      case LlvmObservationSpace::NATIVE_TEXT_SIZE_BYTES:
-      case LlvmObservationSpace::NATIVE_TEXT_SIZE_O0:
-      case LlvmObservationSpace::NATIVE_TEXT_SIZE_O3:
-      case LlvmObservationSpace::NATIVE_TEXT_SIZE_OZ: {
+      case LlvmObservationSpace::OBJECT_TEXT_SIZE_BYTES:
+      case LlvmObservationSpace::OBJECT_TEXT_SIZE_O0:
+      case LlvmObservationSpace::OBJECT_TEXT_SIZE_O3:
+      case LlvmObservationSpace::OBJECT_TEXT_SIZE_OZ: {
         auto featureSize = space.mutable_int64_range_list()->add_range();
         featureSize->mutable_min()->set_value(0);
         space.set_deterministic(true);

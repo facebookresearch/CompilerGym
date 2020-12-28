@@ -18,7 +18,7 @@ enum class LlvmCostFunction {
   // and deterministic.
   IR_INSTRUCTION_COUNT,
   // Returns the size (in bytes) of the .TEXT section of the compiled module.
-  NATIVE_TEXT_SIZE_BYTES,
+  OBJECT_TEXT_SIZE_BYTES,
 };
 
 enum class LlvmBaselinePolicy {

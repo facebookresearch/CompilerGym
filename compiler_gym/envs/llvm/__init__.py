@@ -20,7 +20,7 @@ def _register_llvm_gym_service():
     """Register an environment for each combination of LLVM
     observation/reward/benchmark."""
     observation_spaces = {"autophase": "Autophase", "ir": "Ir"}
-    reward_spaces = {"ic": "IrInstructionCountOz", "codesize": "NativeTextSizeOz"}
+    reward_spaces = {"ic": "IrInstructionCountOz", "codesize": "ObjectTextSizeOz"}
 
     register(
         id="llvm-v0",

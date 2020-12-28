@@ -42,10 +42,10 @@ TEST(ObservationSpacesTest, getLlvmObservationSpaceList) {
   EXPECT_EQ(spaces[7].name(), "IrInstructionCountO3");
   EXPECT_EQ(spaces[8].name(), "IrInstructionCountOz");
 
-  EXPECT_EQ(spaces[9].name(), "NativeTextSizeBytes");
-  EXPECT_EQ(spaces[10].name(), "NativeTextSizeO0");
-  EXPECT_EQ(spaces[11].name(), "NativeTextSizeO3");
-  EXPECT_EQ(spaces[12].name(), "NativeTextSizeOz");
+  EXPECT_EQ(spaces[9].name(), "ObjectTextSizeBytes");
+  EXPECT_EQ(spaces[10].name(), "ObjectTextSizeO0");
+  EXPECT_EQ(spaces[11].name(), "ObjectTextSizeO3");
+  EXPECT_EQ(spaces[12].name(), "ObjectTextSizeOz");
 }
 
 }  // anonymous namespace

@@ -30,17 +30,17 @@ std::vector<RewardSpace> getLlvmRewardSpaceList() {
         space.set_has_success_threshold(true);
         space.set_success_threshold(1.0);
         break;
-      case LlvmRewardSpace::NATIVE_TEXT_SIZE_BYTES:
+      case LlvmRewardSpace::OBJECT_TEXT_SIZE_BYTES:
         space.set_deterministic(true);
         space.set_platform_dependent(true);
         break;
-      case LlvmRewardSpace::NATIVE_TEXT_SIZE_O3:
+      case LlvmRewardSpace::OBJECT_TEXT_SIZE_O3:
         space.set_deterministic(true);
         space.set_has_success_threshold(true);
         space.set_success_threshold(1.0);
         space.set_platform_dependent(true);
         break;
-      case LlvmRewardSpace::NATIVE_TEXT_SIZE_Oz:
+      case LlvmRewardSpace::OBJECT_TEXT_SIZE_Oz:
         space.set_deterministic(true);
         space.set_has_success_threshold(true);
         space.set_success_threshold(1.0);

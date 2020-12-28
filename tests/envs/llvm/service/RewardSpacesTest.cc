@@ -31,15 +31,15 @@ TEST(RewardSpacesTest, getLlvmRewardSpaceList) {
   EXPECT_EQ(spaces[2].range().min().value(), 0);
   EXPECT_FALSE(spaces[2].range().has_max());
 
-  EXPECT_EQ(spaces[3].name(), "NativeTextSizeBytes");
+  EXPECT_EQ(spaces[3].name(), "ObjectTextSizeBytes");
   EXPECT_FALSE(spaces[3].range().has_min());
   EXPECT_EQ(spaces[3].range().max().value(), 0);
 
-  EXPECT_EQ(spaces[4].name(), "NativeTextSizeO3");
+  EXPECT_EQ(spaces[4].name(), "ObjectTextSizeO3");
   EXPECT_FALSE(spaces[4].range().has_min());
   EXPECT_EQ(spaces[4].range().max().value(), 0);
 
-  EXPECT_EQ(spaces[5].name(), "NativeTextSizeOz");
+  EXPECT_EQ(spaces[5].name(), "ObjectTextSizeOz");
   EXPECT_FALSE(spaces[5].range().has_min());
   EXPECT_EQ(spaces[5].range().max().value(), 0);
 }

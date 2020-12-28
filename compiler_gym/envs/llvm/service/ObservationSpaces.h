@@ -46,10 +46,10 @@ enum class LlvmObservationSpace {
   IR_INSTRUCTION_COUNT_O3,
   IR_INSTRUCTION_COUNT_OZ,
   // The size of the .text section of the lowered module. Platform dependent.
-  NATIVE_TEXT_SIZE_BYTES,
-  NATIVE_TEXT_SIZE_O0,
-  NATIVE_TEXT_SIZE_O3,
-  NATIVE_TEXT_SIZE_OZ,
+  OBJECT_TEXT_SIZE_BYTES,
+  OBJECT_TEXT_SIZE_O0,
+  OBJECT_TEXT_SIZE_O3,
+  OBJECT_TEXT_SIZE_OZ,
 };
 
 // Return the list of available observation spaces.

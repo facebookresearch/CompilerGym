@@ -60,7 +60,7 @@ std::string moduleToString(llvm::Module& module) {
   return str;
 }
 
-Status getNativeTextSizeInBytes(llvm::Module& module, int64_t* value,
+Status getObjectTextSizeInBytes(llvm::Module& module, int64_t* value,
                                 const fs::path& workingDirectory) {
   const auto clangPath = util::getRunfilesPath("compiler_gym/third_party/llvm/clang");
   DCHECK(fs::exists(clangPath)) << "File not found: " << clangPath.string();
@@ -117,9 +117,9 @@ double getCost(const LlvmCostFunction& cost, llvm::Module& module,
   switch (cost) {
     case LlvmCostFunction::IR_INSTRUCTION_COUNT:
       return static_cast<double>(module.getInstructionCount());
-    case LlvmCostFunction::NATIVE_TEXT_SIZE_BYTES: {
+    case LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES: {
       int64_t size;
-      const auto status = getNativeTextSizeInBytes(module, &size, workingDirectory);
+      const auto status = getObjectTextSizeInBytes(module, &size, workingDirectory);
       CHECK(status.ok()) << status.error_message();
       return static_cast<double>(size);
     }
@@ -174,23 +174,23 @@ LlvmCostFunction getCostFunction(LlvmRewardSpace space) {
     case LlvmRewardSpace::IR_INSTRUCTION_COUNT_O3:
     case LlvmRewardSpace::IR_INSTRUCTION_COUNT_Oz:
       return LlvmCostFunction::IR_INSTRUCTION_COUNT;
-    case LlvmRewardSpace::NATIVE_TEXT_SIZE_BYTES:
-    case LlvmRewardSpace::NATIVE_TEXT_SIZE_O3:
-    case LlvmRewardSpace::NATIVE_TEXT_SIZE_Oz:
-      return LlvmCostFunction::NATIVE_TEXT_SIZE_BYTES;
+    case LlvmRewardSpace::OBJECT_TEXT_SIZE_BYTES:
+    case LlvmRewardSpace::OBJECT_TEXT_SIZE_O3:
+    case LlvmRewardSpace::OBJECT_TEXT_SIZE_Oz:
+      return LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES;
   }
 }
 
 LlvmBaselinePolicy getBaselinePolicy(LlvmRewardSpace space) {
   switch (space) {
     case LlvmRewardSpace::IR_INSTRUCTION_COUNT:
-    case LlvmRewardSpace::NATIVE_TEXT_SIZE_BYTES:
+    case LlvmRewardSpace::OBJECT_TEXT_SIZE_BYTES:
       return LlvmBaselinePolicy::O0;
     case LlvmRewardSpace::IR_INSTRUCTION_COUNT_O3:
-    case LlvmRewardSpace::NATIVE_TEXT_SIZE_O3:
+    case LlvmRewardSpace::OBJECT_TEXT_SIZE_O3:
       return LlvmBaselinePolicy::O3;
     case LlvmRewardSpace::IR_INSTRUCTION_COUNT_Oz:
-    case LlvmRewardSpace::NATIVE_TEXT_SIZE_Oz:
+    case LlvmRewardSpace::OBJECT_TEXT_SIZE_Oz:
       return LlvmBaselinePolicy::Oz;
   }
 }

@@ -51,10 +51,10 @@ def test_observation_spaces(env: LlvmEnv):
         "IrInstructionCountO0",
         "IrInstructionCountO3",
         "IrInstructionCountOz",
-        "NativeTextSizeBytes",
-        "NativeTextSizeO0",
-        "NativeTextSizeO3",
-        "NativeTextSizeOz",
+        "ObjectTextSizeBytes",
+        "ObjectTextSizeO0",
+        "ObjectTextSizeO3",
+        "ObjectTextSizeOz",
     }
 
 
