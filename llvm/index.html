@@ -597,7 +597,7 @@ state <span class="math notranslate nohighlight">\(s_{t-1}\)</span> to the curre
 Running the baseline policy on the initial program state <span class="math notranslate nohighlight">\(s_{t=0}\)</span>
 produces a baseline state <span class="math notranslate nohighlight">\(s_b\)</span> which is used to produce a baseline
 cost <span class="math notranslate nohighlight">\(C(s_b)\)</span>. We use the reduction in cost achieved by this baseline
-policy <span class="math notranslate nohighlight">\(C(C(s_{t=0} - s_{b}))\)</span> to scale the reward signal:</p>
+policy <span class="math notranslate nohighlight">\(C(s_{t=0} - C(s_{b})\)</span> to scale the reward signal:</p>
 <div class="math notranslate nohighlight">
 \[R(s_t) = \frac{C(s_{t-1}) - C(s_t)}{{C(s_{t=0})} - C(s_{b})}\]</div>
 <div class="section" id="ir-instruction-count">
