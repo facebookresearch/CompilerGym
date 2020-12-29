@@ -16,6 +16,7 @@ from tests.test_main import main
 
 def make_env():
     env = gym.make("llvm-autophase-ic-v0")
+    env.require_dataset("cBench-v0")
     env.benchmark = "cBench-v0/dijkstra"
     return env
 
