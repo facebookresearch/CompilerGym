@@ -25,6 +25,11 @@ enum class LlvmRewardSpace {
   OBJECT_TEXT_SIZE_BYTES,
   OBJECT_TEXT_SIZE_O3,
   OBJECT_TEXT_SIZE_Oz,
+#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
+  TEXT_SIZE_BYTES,
+  TEXT_SIZE_O3,
+  TEXT_SIZE_Oz,
+#endif
 };
 
 // Get the list of available reward spaces.

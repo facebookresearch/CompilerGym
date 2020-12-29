@@ -46,6 +46,24 @@ std::vector<RewardSpace> getLlvmRewardSpaceList() {
         space.set_success_threshold(1.0);
         space.set_platform_dependent(true);
         break;
+#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
+      case LlvmRewardSpace::TEXT_SIZE_BYTES:
+        space.set_deterministic(true);
+        space.set_platform_dependent(true);
+        break;
+      case LlvmRewardSpace::TEXT_SIZE_O3:
+        space.set_deterministic(true);
+        space.set_has_success_threshold(true);
+        space.set_success_threshold(1.0);
+        space.set_platform_dependent(true);
+        break;
+      case LlvmRewardSpace::TEXT_SIZE_Oz:
+        space.set_deterministic(true);
+        space.set_has_success_threshold(true);
+        space.set_success_threshold(1.0);
+        space.set_platform_dependent(true);
+        break;
+#endif
     }
     spaces.push_back(space);
   }

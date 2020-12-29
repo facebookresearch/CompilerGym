@@ -60,9 +60,15 @@ std::string moduleToString(llvm::Module& module) {
   return str;
 }
 
+// For the experimental binary .text size cost, getTextSizeInBytes() is extended
+// to support a list of additional args to pass to clang.
+#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
 Status getTextSizeInBytes(llvm::Module& module, int64_t* value,
                           const std::vector<std::string>& clangArgs,
                           const fs::path& workingDirectory) {
+#else
+Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& workingDirectory) {
+#endif
   const auto clangPath = util::getRunfilesPath("compiler_gym/third_party/llvm/clang");
   const auto llvmSizePath = util::getRunfilesPath("compiler_gym/third_party/llvm/llvm-size");
   DCHECK(fs::exists(clangPath)) << "File not found: " << clangPath.string();
@@ -74,12 +80,18 @@ Status getTextSizeInBytes(llvm::Module& module, int64_t* value,
 
   const auto tmpFile = fs::unique_path(workingDirectory / "obj-%%%%");
 
+#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
   std::vector<std::string> clangCmd{clangPath.string(), "-xir", "-", "-o", tmpFile.string()};
   clangCmd.insert(clangCmd.end(), clangArgs.begin(), clangArgs.end());
-
   auto clang =
       subprocess::Popen(clangCmd, subprocess::input{subprocess::PIPE},
                         subprocess::output{subprocess::PIPE}, subprocess::error{subprocess::PIPE});
+#else
+  auto clang =
+      subprocess::Popen({clangPath.string(), "-xir", "-", "-o", tmpFile.string(), "-c"},
+                        subprocess::input{subprocess::PIPE}, subprocess::output{subprocess::PIPE},
+                        subprocess::error{subprocess::PIPE});
+#endif
   const auto clangOutput = clang.communicate(ir.c_str(), ir.size());
   if (clang.retcode()) {
     fs::remove(tmpFile);
@@ -135,10 +147,30 @@ double getCost(const LlvmCostFunction& cost, llvm::Module& module,
       return static_cast<double>(module.getInstructionCount());
     case LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES: {
       int64_t size;
+#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
       const auto status = getTextSizeInBytes(module, &size, {"-c"}, workingDirectory);
+#else
+      const auto status = getTextSizeInBytes(module, &size, workingDirectory);
+#endif
       CHECK(status.ok()) << status.error_message();
       return static_cast<double>(size);
     }
+#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
+
+#ifdef __APPLE__
+#define SYSTEM_LIBRARIES \
+  "-L"                   \
+  "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib"
+#else
+#define SYSTEM_LIBRARIES
+#endif
+    case LlvmCostFunction::TEXT_SIZE_BYTES: {
+      int64_t size;
+      const auto status = getTextSizeInBytes(module, &size, {SYSTEM_LIBRARIES}, workingDirectory);
+      CHECK(status.ok()) << status.error_message();
+      return static_cast<double>(size);
+    }
+#endif
   }
 }
 
@@ -194,6 +226,12 @@ LlvmCostFunction getCostFunction(LlvmRewardSpace space) {
     case LlvmRewardSpace::OBJECT_TEXT_SIZE_O3:
     case LlvmRewardSpace::OBJECT_TEXT_SIZE_Oz:
       return LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES;
+#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
+    case LlvmRewardSpace::TEXT_SIZE_BYTES:
+    case LlvmRewardSpace::TEXT_SIZE_O3:
+    case LlvmRewardSpace::TEXT_SIZE_Oz:
+      return LlvmCostFunction::TEXT_SIZE_BYTES;
+#endif
   }
 }
 
@@ -201,12 +239,21 @@ LlvmBaselinePolicy getBaselinePolicy(LlvmRewardSpace space) {
   switch (space) {
     case LlvmRewardSpace::IR_INSTRUCTION_COUNT:
     case LlvmRewardSpace::OBJECT_TEXT_SIZE_BYTES:
+#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
+    case LlvmRewardSpace::TEXT_SIZE_BYTES:
+#endif
       return LlvmBaselinePolicy::O0;
     case LlvmRewardSpace::IR_INSTRUCTION_COUNT_O3:
     case LlvmRewardSpace::OBJECT_TEXT_SIZE_O3:
+#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
+    case LlvmRewardSpace::TEXT_SIZE_O3:
+#endif
       return LlvmBaselinePolicy::O3;
     case LlvmRewardSpace::IR_INSTRUCTION_COUNT_Oz:
     case LlvmRewardSpace::OBJECT_TEXT_SIZE_Oz:
+#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
+    case LlvmRewardSpace::TEXT_SIZE_Oz:
+#endif
       return LlvmBaselinePolicy::Oz;
   }
 }

@@ -50,6 +50,13 @@ enum class LlvmObservationSpace {
   OBJECT_TEXT_SIZE_O0,
   OBJECT_TEXT_SIZE_O3,
   OBJECT_TEXT_SIZE_OZ,
+#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
+  // The size of the .text section of the compiled binary. Platform dependent.
+  TEXT_SIZE_BYTES,
+  TEXT_SIZE_O0,
+  TEXT_SIZE_O3,
+  TEXT_SIZE_OZ,
+#endif
 };
 
 // Return the list of available observation spaces.
