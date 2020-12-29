@@ -68,9 +68,9 @@ from compiler_gym.util.flags.env_from_flags import env_from_flags
 flags.DEFINE_boolean("ls_reward", False, "List the available reward spaces and exit.")
 flags.DEFINE_integer(
     "patience",
-    100,
+    0,
     "The number of steps that a random agent makes without improvement before terminating. "
-    "Must be > 0.",
+    "If 0, use the size of the action space for the patience value.",
 )
 flags.DEFINE_float("runtime", None, "If set, limit the search to this many seconds.")
 flags.DEFINE_integer(

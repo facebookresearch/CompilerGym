@@ -100,7 +100,7 @@ def random_search(
     make_env: Callable[[], CompilerEnv],
     outdir: Optional[Union[str, Path]] = None,
     total_runtime: Optional[float] = 600,
-    patience: int = 100,
+    patience: int = 0,
     nproc: int = cpu_count(),
     skip_done: bool = False,
 ) -> float:
@@ -111,6 +111,7 @@ def random_search(
             f"random_search() requires CompilerEnv. Called with: {type(env).__name__}"
         )
 
+    patience = patience or env.action_space.n
     benchmark_name = env.benchmark
     if not outdir:
         sanitized_benchmark_name = "/".join(benchmark_name.split("/")[-2:])
