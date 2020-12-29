@@ -100,7 +100,7 @@ def random_search(
     make_env: Callable[[], CompilerEnv],
     outdir: Optional[Union[str, Path]] = None,
     total_runtime: Optional[float] = 600,
-    patience: int = 100,
+    patience: int = 0,
     nproc: int = cpu_count(),
     skip_done: bool = False,
 ) -> float:
@@ -111,6 +111,7 @@ def random_search(
             f"random_search() requires CompilerEnv. Called with: {type(env).__name__}"
         )
 
+    patience = patience or env.action_space.n
     benchmark_name = env.benchmark
     if not outdir:
         sanitized_benchmark_name = "/".join(benchmark_name.split("/")[-2:])
@@ -122,8 +123,7 @@ def random_search(
     reward_space_name = env.reward_space.id
 
     action_space_names = list(env.action_space.names)
-    num_instructions = int(-env.reward["IrInstructionCount"])
-    init_reward = env.reward["IrInstructionCountOz"]
+    num_instructions = int(env.observation["IrInstructionCount"])
 
     metadata_path = outdir / logs.METADATA_NAME
     progress_path = outdir / logs.PROGRESS_LOG_NAME
@@ -141,7 +141,6 @@ def random_search(
         "reward": reward_space_name,
         "patience": patience,
         "num_instructions": num_instructions,
-        "init_reward": init_reward,
     }
     with open(str(metadata_path), "w") as f:
         json.dump(metadata, f, sort_keys=True, indent=2)

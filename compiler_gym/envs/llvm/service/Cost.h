@@ -19,6 +19,10 @@ enum class LlvmCostFunction {
   IR_INSTRUCTION_COUNT,
   // Returns the size (in bytes) of the .TEXT section of the compiled module.
   OBJECT_TEXT_SIZE_BYTES,
+#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
+  // Returns the size (in bytes) of the .TEXT section of the compiled binary.
+  TEXT_SIZE_BYTES,
+#endif
 };
 
 enum class LlvmBaselinePolicy {

@@ -87,6 +87,18 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
         space.set_platform_dependent(true);
         break;
       }
+#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
+      case LlvmObservationSpace::TEXT_SIZE_BYTES:
+      case LlvmObservationSpace::TEXT_SIZE_O0:
+      case LlvmObservationSpace::TEXT_SIZE_O3:
+      case LlvmObservationSpace::TEXT_SIZE_OZ: {
+        auto featureSize = space.mutable_int64_range_list()->add_range();
+        featureSize->mutable_min()->set_value(0);
+        space.set_deterministic(true);
+        space.set_platform_dependent(true);
+        break;
+      }
+#endif
     }
     spaces.push_back(space);
   }

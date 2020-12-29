@@ -12,32 +12,25 @@ from typing import List
 
 from compiler_gym.envs import CompilerEnv, LlvmEnv
 from compiler_gym.util import logs
+from compiler_gym.util.tabulate import tabulate
 
 
 def replay_actions(env: CompilerEnv, action_names: List[str], outdir: Path):
     logs_path = outdir / logs.BEST_ACTIONS_PROGRESS_NAME
     start_time = time()
-    init_reward = env.reward[env.reward_space.id]
 
-    print(f"Step [{0:03d} / {len(action_names):03d}]: reward={init_reward:.4f}")
+    if isinstance(env, LlvmEnv):
+        env.write_bitcode(outdir / "unoptimized.bc")
 
     with open(str(logs_path), "w") as f:
-        progress = logs.ProgressLogEntry(
-            runtime_seconds=time() - start_time,
-            total_episode_count=1,
-            total_step_count=0,
-            num_passes=0,
-            reward=init_reward,
-        )
-        print(progress.to_csv(), "", file=f, sep="")
-
-        previous_reward = init_reward
+        ep_reward = 0
         for i, action in enumerate(action_names, start=1):
             _, reward, done, _ = env.step(env.action_space.names.index(action))
             assert not done
+            ep_reward += reward
             print(
-                f"Step [{i:03d} / {len(action_names):03d}]: reward={reward:.4f}, "
-                f"change={reward-previous_reward:.4f}, action={action}"
+                f"Step [{i:03d} / {len(action_names):03d}]: reward={reward:.4f}   \t"
+                f"episode={ep_reward:.4f}   \taction={action}"
             )
             progress = logs.ProgressLogEntry(
                 runtime_seconds=time() - start_time,
@@ -47,16 +40,28 @@ def replay_actions(env: CompilerEnv, action_names: List[str], outdir: Path):
                 reward=reward,
             )
             print(progress.to_csv(), action, file=f, sep=",")
-            previous_reward = reward
 
     if isinstance(env, LlvmEnv):
-        bitcode_path = outdir / logs.OPTIMIZED_BITCODE
-        # Write optimized bitcode to file.
-        temppath = env.observation["BitcodeFile"]
-        # Copy, don't rename, since rename will fail if the paths are on
-        # different devices.
-        shutil.copyfile(temppath, str(bitcode_path))
-        os.remove(temppath)
+        env.write_bitcode(outdir / "optimized.bc")
+        print(
+            tabulate(
+                [
+                    (
+                        "IR instruction count",
+                        env.observation["IrInstructionCountO0"],
+                        env.observation["IrInstructionCountOz"],
+                        env.observation["IrInstructionCount"],
+                    ),
+                    (
+                        "Object .text size (bytes)",
+                        env.observation["ObjectTextSizeO0"],
+                        env.observation["ObjectTextSizeOz"],
+                        env.observation["ObjectTextSizeBytes"],
+                    ),
+                ],
+                headers=("", "-O0", "-Oz", "final"),
+            )
+        )
 
 
 def replay_actions_from_logs(env: CompilerEnv, logdir: Path, benchmark=None) -> None:

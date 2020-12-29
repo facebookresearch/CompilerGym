@@ -74,8 +74,7 @@ setuptools.setup(
             "third_party/inst2vec/*.pickle",
             "third_party/cBench/benchmarks.txt",
             "third_party/cBench/cBench/crc32.bc",  # Needed for install-tests.
-            "third_party/llvm/clang",
-            "third_party/llvm/llvm-link",
+            "third_party/llvm/*",
         ]
     },
     install_requires=requirements,
