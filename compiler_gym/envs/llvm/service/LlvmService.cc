@@ -7,6 +7,7 @@
 #include <glog/logging.h>
 
 #include <optional>
+#include <sstream>
 
 #include "compiler_gym/envs/llvm/service/ActionSpace.h"
 #include "compiler_gym/envs/llvm/service/ObservationSpaces.h"
@@ -15,6 +16,7 @@
 #include "compiler_gym/util/EnumUtil.h"
 #include "compiler_gym/util/GrpcStatusMacros.h"
 #include "compiler_gym/util/Version.h"
+#include "llvm/ADT/Triple.h"
 #include "llvm/Config/llvm-config.h"
 
 namespace compiler_gym::llvm_service {
@@ -31,7 +33,9 @@ Status LlvmService::GetVersion(ServerContext* /* unused */, const GetVersionRequ
                                GetVersionReply* reply) {
   VLOG(2) << "GetSpaces()";
   reply->set_service_version(COMPILER_GYM_VERSION);
-  reply->set_compiler_version(LLVM_VERSION_STRING);
+  std::stringstream ss;
+  ss << LLVM_VERSION_STRING << " " << llvm::Triple::normalize(LLVM_DEFAULT_TARGET_TRIPLE);
+  reply->set_compiler_version(ss.str());
   return Status::OK;
 }
 
