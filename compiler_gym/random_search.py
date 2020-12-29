@@ -123,8 +123,7 @@ def random_search(
     reward_space_name = env.reward_space.id
 
     action_space_names = list(env.action_space.names)
-    num_instructions = int(-env.reward["IrInstructionCount"])
-    init_reward = env.reward["IrInstructionCountOz"]
+    num_instructions = int(env.observation["IrInstructionCount"])
 
     metadata_path = outdir / logs.METADATA_NAME
     progress_path = outdir / logs.PROGRESS_LOG_NAME
@@ -142,7 +141,6 @@ def random_search(
         "reward": reward_space_name,
         "patience": patience,
         "num_instructions": num_instructions,
-        "init_reward": init_reward,
     }
     with open(str(metadata_path), "w") as f:
         json.dump(metadata, f, sort_keys=True, indent=2)
