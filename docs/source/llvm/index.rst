@@ -293,7 +293,7 @@ For the LLVM environments we use the existing heuristics as baseline policies.
 Running the baseline policy on the initial program state :math:`s_{t=0}`
 produces a baseline state :math:`s_b` which is used to produce a baseline
 cost :math:`C(s_b)`. We use the reduction in cost achieved by this baseline
-policy :math:`C(s_{b}) - C(s_{t=1})` to scale the reward signal:
+policy :math:`C(s_{t=0} - C(s_{b})` to scale the reward signal:
 
 .. math::
     R(s_t) = \frac{C(s_{t-1}) - C(s_t)}{{C(s_{t=0})} - C(s_{b})}

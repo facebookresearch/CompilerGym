@@ -344,8 +344,9 @@ Status LlvmEnvironment::getReward(LlvmRewardSpace space, Reward* reply) {
   // Compute a new cost.
   const double currentCost = getCost(cost, benchmark().module(), workingDirectory_);
 
-  // Derive the reward from the costs.
+  // Reward is reduction in cost ...
   double reward = previousCost - currentCost;
+  // ... scaled to the reduction in cost achieved by a baseline policy
   if (baselinePolicy != LlvmBaselinePolicy::O0) {
     reward /= unoptimizedCost - baselineCost;
   }
