@@ -57,6 +57,7 @@ flags.DEFINE_list(
     ],
     "List of optimizatins to explore.",
 )
+flags.DEFINE_string("reward", "IrInstructionCount", "The reward function to optimize.")
 flags.DEFINE_string("benchmark", "cBench-v0/dijkstra", "Benchmark to optimize.")
 flags.DEFINE_integer("episode_len", 5, "Number of transitions per episode.")
 flags.DEFINE_integer("hidden_size", 64, "Latent vector size.")
@@ -116,10 +117,9 @@ class CustomEnv:
     """
 
     def __init__(self):
-        self._env = gym.make("llvm-v0")
+        self._env = gym.make("llvm-v0", reward_space=FLAGS.reward)
         try:
             self._env.require_dataset("cBench-v0")
-            self._env.eager_reward_space = "IrInstructionCount"
             self._env.reset(benchmark=FLAGS.benchmark)
 
             # Project onto the subset of transformations that have
@@ -147,18 +147,12 @@ class CustomEnv:
 
         # Update environment
         _, reward, done, info = self._env.step(self._actions[action])
-        assert reward is None  # This is supposed to be the reward, but isn't
         done = done or self._steps_taken == FLAGS.episode_len
-
-        size = float(self._env.observation["IrInstructionCount"])
-        reward = self.prior_size - size
-        self.prior_size = size
 
         return self._state, reward, done, info
 
     def reset(self):
         self._env.reset()
-        self.prior_size = float(self._env.observation["IrInstructionCount"])
         self._steps_taken = 0
         self._state = np.zeros(
             (FLAGS.episode_len - 1, len(self.action_space)), dtype=np.int32
@@ -386,6 +380,8 @@ def main(argv):
         print(f"Episode length: {FLAGS.episode_len}")
         print(f"Exploration: {FLAGS.exploration:.2%}")
         print(f"Learning rate: {FLAGS.learning_rate}")
+        print(f"Reward: {FLAGS.reward}")
+        print(f"Benchmark: {FLAGS.benchmark}")
         print(f"Action space: {env.action_space}")
 
         if FLAGS.iterations == 1:
