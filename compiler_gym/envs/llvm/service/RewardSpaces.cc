@@ -20,6 +20,10 @@ std::vector<RewardSpace> getLlvmRewardSpaceList() {
       case LlvmRewardSpace::IR_INSTRUCTION_COUNT:
         space.set_deterministic(true);
         break;
+      case LlvmRewardSpace::IR_INSTRUCTION_COUNT_NORM:
+        space.set_deterministic(true);
+        space.mutable_range()->mutable_max()->set_value(1);
+        break;
       case LlvmRewardSpace::IR_INSTRUCTION_COUNT_O3:
         space.set_deterministic(true);
         space.set_has_success_threshold(true);
@@ -33,6 +37,11 @@ std::vector<RewardSpace> getLlvmRewardSpaceList() {
       case LlvmRewardSpace::OBJECT_TEXT_SIZE_BYTES:
         space.set_deterministic(true);
         space.set_platform_dependent(true);
+        break;
+      case LlvmRewardSpace::OBJECT_TEXT_SIZE_NORM:
+        space.set_deterministic(true);
+        space.set_platform_dependent(true);
+        space.mutable_range()->mutable_max()->set_value(1);
         break;
       case LlvmRewardSpace::OBJECT_TEXT_SIZE_O3:
         space.set_deterministic(true);
@@ -48,6 +57,10 @@ std::vector<RewardSpace> getLlvmRewardSpaceList() {
         break;
 #ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
       case LlvmRewardSpace::TEXT_SIZE_BYTES:
+        space.set_deterministic(true);
+        space.set_platform_dependent(true);
+        break;
+      case LlvmRewardSpace::TEXT_SIZE_NORM:
         space.set_deterministic(true);
         space.set_platform_dependent(true);
         break;

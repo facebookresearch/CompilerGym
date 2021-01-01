@@ -38,9 +38,11 @@ def test_reward_spaces(env: LlvmEnv):
 
     assert set(env.reward.spaces.keys()) == {
         "IrInstructionCount",
+        "IrInstructionCountNorm",
         "IrInstructionCountO3",
         "IrInstructionCountOz",
         "ObjectTextSizeBytes",
+        "ObjectTextSizeNorm",
         "ObjectTextSizeO3",
         "ObjectTextSizeOz",
     }
@@ -54,6 +56,15 @@ def test_instruction_count_reward_spaces(env: LlvmEnv):
     assert str(space) == "RewardSpaceSpec(IrInstructionCount)"
     assert env.reward[key] == 0
     assert space.range == (-np.inf, np.inf)
+    assert space.deterministic
+    assert not space.platform_dependent
+    assert space.success_threshold is None
+
+    key = "IrInstructionCountNorm"
+    space = env.reward.spaces[key]
+    assert str(space) == "RewardSpaceSpec(IrInstructionCountNorm)"
+    assert env.reward[key] == 0
+    assert space.range == (-np.inf, 1.0)
     assert space.deterministic
     assert not space.platform_dependent
     assert space.success_threshold is None
@@ -85,6 +96,15 @@ def test_native_test_size_reward_spaces(env: LlvmEnv):
     assert str(space) == "RewardSpaceSpec(ObjectTextSizeBytes)"
     assert env.reward[key] == 0
     assert space.range == (-np.inf, np.inf)
+    assert space.deterministic
+    assert space.platform_dependent
+    assert space.success_threshold is None
+
+    key = "ObjectTextSizeNorm"
+    space = env.reward.spaces[key]
+    assert str(space) == "RewardSpaceSpec(ObjectTextSizeNorm)"
+    assert env.reward[key] == 0
+    assert space.range == (-np.inf, 1.0)
     assert space.deterministic
     assert space.platform_dependent
     assert space.success_threshold is None
