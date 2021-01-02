@@ -223,6 +223,15 @@ message RewardSpace {
   bool deterministic = 5;
   // Whether the reward signal depends on execution environment of the service.
   bool platform_dependent = 6;
+  // A default reward value. This value should be used by the client in lieu
+  // of a true reward value if the compiler service terminates abruptly, such as
+  // a crash while applying an action.
+  double default_value = 7;
+  // If true, offset the default value by the sum of all rewards for the current
+  // episode. For example, given a default reward value of -10.0 and an episode
+  // with prior rewards [0.1, 0.3, -0.15], the default value is:
+  //     -10.0 - sum(0.1, 0.3, -0.15) = -10.25.
+  bool default_negates_returns = 8;
 }
 
 message RewardRequest {

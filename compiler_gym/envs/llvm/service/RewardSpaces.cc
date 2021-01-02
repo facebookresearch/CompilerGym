@@ -19,62 +19,74 @@ std::vector<RewardSpace> getLlvmRewardSpaceList() {
     switch (value) {
       case LlvmRewardSpace::IR_INSTRUCTION_COUNT:
         space.set_deterministic(true);
+        space.set_default_negates_returns(true);
         break;
       case LlvmRewardSpace::IR_INSTRUCTION_COUNT_NORM:
         space.set_deterministic(true);
         space.mutable_range()->mutable_max()->set_value(1);
+        space.set_default_negates_returns(true);
         break;
       case LlvmRewardSpace::IR_INSTRUCTION_COUNT_O3:
         space.set_deterministic(true);
         space.set_has_success_threshold(true);
         space.set_success_threshold(1.0);
+        space.set_default_negates_returns(true);
         break;
       case LlvmRewardSpace::IR_INSTRUCTION_COUNT_Oz:
         space.set_deterministic(true);
         space.set_has_success_threshold(true);
         space.set_success_threshold(1.0);
+        space.set_default_negates_returns(true);
         break;
       case LlvmRewardSpace::OBJECT_TEXT_SIZE_BYTES:
         space.set_deterministic(true);
         space.set_platform_dependent(true);
+        space.set_default_negates_returns(true);
         break;
       case LlvmRewardSpace::OBJECT_TEXT_SIZE_NORM:
         space.set_deterministic(true);
         space.set_platform_dependent(true);
         space.mutable_range()->mutable_max()->set_value(1);
+        space.set_default_negates_returns(true);
         break;
       case LlvmRewardSpace::OBJECT_TEXT_SIZE_O3:
         space.set_deterministic(true);
         space.set_has_success_threshold(true);
         space.set_success_threshold(1.0);
         space.set_platform_dependent(true);
+        space.set_default_negates_returns(true);
         break;
       case LlvmRewardSpace::OBJECT_TEXT_SIZE_Oz:
         space.set_deterministic(true);
         space.set_has_success_threshold(true);
         space.set_success_threshold(1.0);
         space.set_platform_dependent(true);
+        space.set_default_negates_returns(true);
         break;
 #ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
       case LlvmRewardSpace::TEXT_SIZE_BYTES:
         space.set_deterministic(true);
         space.set_platform_dependent(true);
+        space.set_default_negates_returns(true);
         break;
       case LlvmRewardSpace::TEXT_SIZE_NORM:
         space.set_deterministic(true);
         space.set_platform_dependent(true);
+        space.set_default_negates_returns(true);
         break;
       case LlvmRewardSpace::TEXT_SIZE_O3:
         space.set_deterministic(true);
         space.set_has_success_threshold(true);
         space.set_success_threshold(1.0);
         space.set_platform_dependent(true);
+        space.set_default_negates_returns(true);
         break;
       case LlvmRewardSpace::TEXT_SIZE_Oz:
         space.set_deterministic(true);
         space.set_has_success_threshold(true);
         space.set_success_threshold(1.0);
         space.set_platform_dependent(true);
+        space.set_default_negates_returns(true);
         break;
 #endif
     }

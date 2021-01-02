@@ -387,7 +387,7 @@ Status LlvmEnvironment::getReward(LlvmRewardSpace space, Reward* reply) {
     } else {
       const double baselineImprovement = unoptimizedCost - baselineCost;
       if (baselineImprovement) {
-        reward /= baselineImprovement == 0 ? 1 : baselineImprovement;
+        reward /= baselineImprovement;
       }
     }
   }

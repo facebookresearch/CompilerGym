@@ -21,41 +21,81 @@ TEST(RewardSpacesTest, getLlvmRewardSpaceList) {
   EXPECT_EQ(space->name(), "IrInstructionCount");
   EXPECT_FALSE(space->range().has_min());
   EXPECT_FALSE(space->range().has_max());
+  EXPECT_FALSE(space->has_success_threshold());
+  EXPECT_TRUE(space->deterministic());
+  EXPECT_FALSE(space->platform_dependent());
+  EXPECT_EQ(space->default_value(), 0);
+  EXPECT_TRUE(space->default_negates_returns());
 
   ++space;
   EXPECT_EQ(space->name(), "IrInstructionCountNorm");
   EXPECT_FALSE(space->range().has_min());
   EXPECT_EQ(space->range().max().value(), 1);
+  EXPECT_FALSE(space->has_success_threshold());
+  EXPECT_TRUE(space->deterministic());
+  EXPECT_FALSE(space->platform_dependent());
+  EXPECT_EQ(space->default_value(), 0);
+  EXPECT_TRUE(space->default_negates_returns());
 
   ++space;
   EXPECT_EQ(space->name(), "IrInstructionCountO3");
   EXPECT_EQ(space->range().min().value(), 0);
   EXPECT_FALSE(space->range().has_max());
+  EXPECT_TRUE(space->has_success_threshold());
+  EXPECT_TRUE(space->deterministic());
+  EXPECT_FALSE(space->platform_dependent());
+  EXPECT_EQ(space->default_value(), 0);
+  EXPECT_TRUE(space->default_negates_returns());
 
   ++space;
   EXPECT_EQ(space->name(), "IrInstructionCountOz");
   EXPECT_EQ(space->range().min().value(), 0);
   EXPECT_FALSE(space->range().has_max());
+  EXPECT_TRUE(space->has_success_threshold());
+  EXPECT_TRUE(space->deterministic());
+  EXPECT_FALSE(space->platform_dependent());
+  EXPECT_EQ(space->default_value(), 0);
+  EXPECT_TRUE(space->default_negates_returns());
 
   ++space;
   EXPECT_EQ(space->name(), "ObjectTextSizeBytes");
   EXPECT_FALSE(space->range().has_min());
   EXPECT_FALSE(space->range().has_max());
+  EXPECT_FALSE(space->has_success_threshold());
+  EXPECT_TRUE(space->deterministic());
+  EXPECT_TRUE(space->platform_dependent());
+  EXPECT_EQ(space->default_value(), 0);
+  EXPECT_TRUE(space->default_negates_returns());
 
   ++space;
   EXPECT_EQ(space->name(), "ObjectTextSizeNorm");
   EXPECT_FALSE(space->range().has_min());
   EXPECT_EQ(space->range().max().value(), 1);
+  EXPECT_FALSE(space->has_success_threshold());
+  EXPECT_TRUE(space->deterministic());
+  EXPECT_TRUE(space->platform_dependent());
+  EXPECT_EQ(space->default_value(), 0);
+  EXPECT_TRUE(space->default_negates_returns());
 
   ++space;
   EXPECT_EQ(space->name(), "ObjectTextSizeO3");
   EXPECT_FALSE(space->range().has_min());
   EXPECT_FALSE(space->range().has_max());
+  EXPECT_TRUE(space->has_success_threshold());
+  EXPECT_TRUE(space->deterministic());
+  EXPECT_TRUE(space->platform_dependent());
+  EXPECT_EQ(space->default_value(), 0);
+  EXPECT_TRUE(space->default_negates_returns());
 
   ++space;
   EXPECT_EQ(space->name(), "ObjectTextSizeOz");
   EXPECT_FALSE(space->range().has_min());
   EXPECT_FALSE(space->range().has_max());
+  EXPECT_TRUE(space->has_success_threshold());
+  EXPECT_TRUE(space->deterministic());
+  EXPECT_TRUE(space->platform_dependent());
+  EXPECT_EQ(space->default_value(), 0);
+  EXPECT_TRUE(space->default_negates_returns());
 
   ++space;
   EXPECT_EQ(space, spaces.end());

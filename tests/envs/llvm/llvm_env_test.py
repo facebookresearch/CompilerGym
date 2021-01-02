@@ -58,7 +58,7 @@ def test_service_env_dies_reset(env: CompilerEnv):
     observation, reward, done, _ = env.step(0)
     assert done
     assert observation is None
-    assert reward is None
+    assert reward == 0
 
     # Reset the environment and check that it works.
     env.reset(benchmark="cBench-v0/crc32")

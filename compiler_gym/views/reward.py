@@ -4,7 +4,6 @@
 # LICENSE file in the root directory of this source tree.
 from typing import Callable, List
 
-from compiler_gym.service import scalar_range2tuple
 from compiler_gym.service.proto import Reward, RewardRequest, RewardSpace
 from compiler_gym.views.reward_space_spec import RewardSpaceSpec
 
@@ -49,7 +48,3 @@ class RewardView(object):
             session_id=self.session_id, reward_space=self.spaces[reward_space].index
         )
         return self._get_reward(request).reward
-
-    # TODO(cummins): Copy the register_derived_space() functionality from
-    # ObservationView to allow derived reward spaces, possible creating a shared
-    # superclass.

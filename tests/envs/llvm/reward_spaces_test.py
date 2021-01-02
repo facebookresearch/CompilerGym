@@ -59,6 +59,8 @@ def test_instruction_count_reward_spaces(env: LlvmEnv):
     assert space.deterministic
     assert not space.platform_dependent
     assert space.success_threshold is None
+    assert space.default_value == 0
+    assert space.default_negates_returns
 
     key = "IrInstructionCountNorm"
     space = env.reward.spaces[key]
@@ -68,6 +70,8 @@ def test_instruction_count_reward_spaces(env: LlvmEnv):
     assert space.deterministic
     assert not space.platform_dependent
     assert space.success_threshold is None
+    assert space.default_value == 0
+    assert space.default_negates_returns
 
     key = "IrInstructionCountO3"
     space = env.reward.spaces[key]
@@ -77,6 +81,8 @@ def test_instruction_count_reward_spaces(env: LlvmEnv):
     assert space.deterministic
     assert not space.platform_dependent
     assert space.success_threshold == 1
+    assert space.default_value == 0
+    assert space.default_negates_returns
 
     key = "IrInstructionCountOz"
     space = env.reward.spaces[key]
@@ -86,6 +92,8 @@ def test_instruction_count_reward_spaces(env: LlvmEnv):
     assert space.deterministic
     assert not space.platform_dependent
     assert space.success_threshold == 1
+    assert space.default_value == 0
+    assert space.default_negates_returns
 
 
 def test_native_test_size_reward_spaces(env: LlvmEnv):
@@ -99,6 +107,8 @@ def test_native_test_size_reward_spaces(env: LlvmEnv):
     assert space.deterministic
     assert space.platform_dependent
     assert space.success_threshold is None
+    assert space.default_value == 0
+    assert space.default_negates_returns
 
     key = "ObjectTextSizeNorm"
     space = env.reward.spaces[key]
@@ -108,6 +118,8 @@ def test_native_test_size_reward_spaces(env: LlvmEnv):
     assert space.deterministic
     assert space.platform_dependent
     assert space.success_threshold is None
+    assert space.default_value == 0
+    assert space.default_negates_returns
 
     key = "ObjectTextSizeO3"
     space = env.reward.spaces[key]
@@ -117,6 +129,8 @@ def test_native_test_size_reward_spaces(env: LlvmEnv):
     assert space.deterministic
     assert space.platform_dependent
     assert space.success_threshold == 1
+    assert space.default_value == 0
+    assert space.default_negates_returns
 
     key = "ObjectTextSizeOz"
     space = env.reward.spaces[key]
@@ -126,6 +140,8 @@ def test_native_test_size_reward_spaces(env: LlvmEnv):
     assert space.deterministic
     assert space.platform_dependent
     assert space.success_threshold == 1
+    assert space.default_value == 0
+    assert space.default_negates_returns
 
 
 if __name__ == "__main__":
