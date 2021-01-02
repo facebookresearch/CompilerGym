@@ -39,6 +39,8 @@ class Scalar(Space):
         return min <= x <= max
 
     def __repr__(self):
+        if self.min is None and self.max is None:
+            return self.dtype.__name__
         lower_bound = "-inf" if self.min is None else self.min
         upper_bound = "inf" if self.max is None else self.max
         return f"{self.dtype.__name__}<{lower_bound},{upper_bound}>"
