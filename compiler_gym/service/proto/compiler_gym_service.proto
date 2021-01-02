@@ -196,6 +196,10 @@ message ObservationSpace {
   bool deterministic = 7;
   // Whether the observations depend on the service execution environment.
   bool platform_dependent = 8;
+  // A default observation. This value should be used by the client in lieu
+  // of a true observation if the compiler service terminates abruptly, such as
+  // a crash while applying an action.
+  Observation default_value = 9;
 }
 
 message ObservationRequest {

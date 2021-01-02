@@ -35,7 +35,7 @@ class RewardSpaceSpec(object):
     :vartype platform_dependent: bool
 
     :ivar default_value: A default reward value. This value will be returned by
-        :func:`CompilerEnv.step <compiler_gym.envs.CompilerEnv.step>` if
+        :func:`CompilerEnv.step() <compiler_gym.envs.CompilerEnv.step>` if
         :func:`CompilerEnv.reward_space <compiler_gym.envs.CompilerEnv.reward_space>`
         is set and the service terminates.
     :vartype default_value: float

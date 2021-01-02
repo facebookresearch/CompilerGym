@@ -146,7 +146,11 @@ cc_library(
     deps = [
         "//compiler_gym/service/proto:compiler_gym_service_cc",
         "//compiler_gym/util:EnumUtil",
+        "@glog",
         "@magic_enum",
+        "@nlohmann_json//:json",
+        "@programl//programl/graph/format:node_link_graph",
+        "@programl//programl/proto:programl_cc",
     ],
 )
 

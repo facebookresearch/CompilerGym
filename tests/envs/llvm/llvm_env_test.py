@@ -6,6 +6,7 @@
 from typing import List
 
 import gym
+import numpy as np
 import pytest
 
 import compiler_gym
@@ -57,7 +58,7 @@ def test_service_env_dies_reset(env: CompilerEnv):
     # Check that the environment doesn't fall over.
     observation, reward, done, _ = env.step(0)
     assert done
-    assert observation is None
+    np.testing.assert_array_equal(observation, np.zeros(56))
     assert reward == 0
 
     # Reset the environment and check that it works.

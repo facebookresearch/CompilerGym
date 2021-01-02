@@ -18,7 +18,6 @@ from compiler_gym.service import (
     CompilerGymServiceConnection,
     ConnectionOpts,
     ServiceError,
-    observation2py,
     observation_t,
 )
 from compiler_gym.service.connection import ServiceTransportError
