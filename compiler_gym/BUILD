@@ -12,6 +12,7 @@ py_library(
     visibility = ["//visibility:public"],
     deps = [
         ":random_search",
+        ":validate",
         "//compiler_gym/envs",
         "//compiler_gym/util",
     ],
@@ -35,6 +36,18 @@ py_library(
     deps = [
         ":random_replay",
         "//compiler_gym/envs",
+        "//compiler_gym/util",
+    ],
+)
+
+py_library(
+    name = "validate",
+    srcs = ["validate.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
+    deps = [
+        "//compiler_gym/envs:compiler_env",
+        "//compiler_gym/envs/llvm",
+        "//compiler_gym/spaces",
         "//compiler_gym/util",
     ],
 )

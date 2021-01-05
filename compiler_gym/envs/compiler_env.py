@@ -16,7 +16,7 @@ import gym
 import numpy as np
 from gym.spaces import Space
 
-from compiler_gym.datasets import Dataset, require
+from compiler_gym.datasets.dataset import Dataset, require
 from compiler_gym.service import (
     CompilerGymServiceConnection,
     ConnectionOpts,
