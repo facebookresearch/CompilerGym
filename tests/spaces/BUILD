@@ -4,6 +4,16 @@
 # LICENSE file in the root directory of this source tree.
 
 py_test(
+    name = "commandline_test",
+    timeout = "short",
+    srcs = ["commandline_test.py"],
+    deps = [
+        "//compiler_gym/spaces",
+        "//tests:test_main",
+    ],
+)
+
+py_test(
     name = "named_discrete_test",
     timeout = "short",
     srcs = ["named_discrete_test.py"],
