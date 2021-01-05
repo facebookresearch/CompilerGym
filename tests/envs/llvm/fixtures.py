@@ -21,8 +21,6 @@ BENCHMARKS_LIST = Path(
     runfiles_path("CompilerGym/compiler_gym/third_party/cBench/benchmarks.txt")
 )
 
-SERVICE_BIN = Path(runfiles_path("CompilerGym/compiler_gym/envs/llvm/service/service"))
-
 
 def _read_list_file(path: Path) -> Iterable[str]:
     with open(str(path)) as f:
@@ -74,22 +72,12 @@ def benchmark_name(request) -> str:
     yield request.param
 
 
-@pytest.fixture(scope="function", params=["local", "service"])
-def env(request) -> CompilerEnv:
+@pytest.fixture(scope="function")
+def env() -> CompilerEnv:
     """Create an LLVM environment."""
-    if request.param == "local":
-        env = gym.make("llvm-v0")
-        env.require_dataset("cBench-v0")
-        try:
-            yield env
-        finally:
-            env.close()
-    else:
-        service = CompilerGymServiceConnection(SERVICE_BIN)
-        env = LlvmEnv(service=service.connection.url, benchmark="foo")
-        env.require_dataset("cBench-v0")
-        try:
-            yield env
-        finally:
-            env.close()
-            service.close()
+    env = gym.make("llvm-v0")
+    env.require_dataset("cBench-v0")
+    try:
+        yield env
+    finally:
+        env.close()

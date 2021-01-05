@@ -13,17 +13,6 @@ from tests.test_main import main
 pytest_plugins = ["tests.envs.llvm.fixtures"]
 
 
-@pytest.fixture(scope="module")
-def env() -> CompilerEnv:
-    # Use the same environment for all tests in this shard.
-    env = gym.make("llvm-v0")
-    env.require_dataset("cBench-v0")
-    try:
-        yield env
-    finally:
-        env.close()
-
-
 def test_step(env: CompilerEnv, observation_space: str, reward_space: str):
     """Request every combination of observation and reward in a fresh environment."""
     env.reward_space = None

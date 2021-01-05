@@ -3,18 +3,43 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Integrations tests for the LLVM CompilerGym environments."""
+from pathlib import Path
 from typing import List
 
 import gym
-import numpy as np
 import pytest
 
 import compiler_gym
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
+from compiler_gym.service.connection import CompilerGymServiceConnection
+from compiler_gym.util.runfiles_path import runfiles_path
 from tests.test_main import main
 
 pytest_plugins = ["tests.envs.llvm.fixtures"]
+
+SERVICE_BIN = Path(runfiles_path("CompilerGym/compiler_gym/envs/llvm/service/service"))
+
+
+@pytest.fixture(scope="function", params=["local", "service"])
+def env(request) -> CompilerEnv:
+    """Create an LLVM environment."""
+    if request.param == "local":
+        env = gym.make("llvm-v0")
+        env.require_dataset("cBench-v0")
+        try:
+            yield env
+        finally:
+            env.close()
+    else:
+        service = CompilerGymServiceConnection(SERVICE_BIN)
+        env = LlvmEnv(service=service.connection.url, benchmark="foo")
+        env.require_dataset("cBench-v0")
+        try:
+            yield env
+        finally:
+            env.close()
+            service.close()
 
 
 def test_service_version(env: LlvmEnv):
@@ -47,28 +72,6 @@ def test_double_reset(env: CompilerEnv):
     assert env.in_episode
 
 
-def test_service_env_dies_reset(env: CompilerEnv):
-    env.observation_space = "Autophase"
-    env.reward_space = "IrInstructionCount"
-    env.reset("cBench-v0/crc32")
-
-    # Kill the service.
-    env.service.close()
-
-    # Check that the environment doesn't fall over.
-    observation, reward, done, _ = env.step(0)
-    assert done
-    np.testing.assert_array_equal(observation, np.zeros(56))
-    assert reward == 0
-
-    # Reset the environment and check that it works.
-    env.reset(benchmark="cBench-v0/crc32")
-    observation, reward, done, _ = env.step(0)
-    assert not done
-    assert observation is not None
-    assert reward is not None
-
-
 def test_commandline(env: CompilerEnv):
     env.reset("cBench-v0/crc32")
     assert env.commandline() == "opt  input.bc -o output.bc"
@@ -85,7 +88,7 @@ def test_uri_substring_candidate_match(env: CompilerEnv):
     assert env.benchmark == "benchmark://cBench-v0/crc32"
 
 
-def test_uri_substring_candidate_match_inferref_prefix(env: CompilerEnv):
+def test_uri_substring_candidate_match_infer_protocol(env: CompilerEnv):
     env.reset(benchmark="cBench-v0/crc32")
     assert env.benchmark == "benchmark://cBench-v0/crc32"
 
@@ -154,6 +157,36 @@ def test_gym_make_kwargs():
         assert env.reward_space.id == "IrInstructionCount"
     finally:
         env.close()
+
+
+def test_connection_dies_default_reward(env: LlvmEnv):
+    env.reward_space = "IrInstructionCount"
+    env.reset("cBench-v0/crc32")
+
+    env.reward_space.default_negates_returns = False
+    env.reward_space.default_value = 2.5
+    env.episode_reward = 10
+
+    env.service.close()
+    observation, reward, done, _ = env.step(0)
+    assert done
+
+    assert reward == 2.5
+
+
+def test_connection_dies_default_reward_negated(env: LlvmEnv):
+    env.reward_space = "IrInstructionCount"
+    env.reset("cBench-v0/crc32")
+
+    env.reward_space.default_negates_returns = True
+    env.reward_space.default_value = 2.5
+    env.episode_reward = 10
+
+    env.service.close()
+    observation, reward, done, _ = env.step(0)
+    assert done
+
+    assert reward == -7.5  # negates reward.
 
 
 if __name__ == "__main__":
