@@ -119,7 +119,7 @@ def main(argv):
     finally:
         env.close()
 
-    best_reward = random_search(
+    best_reward, _ = random_search(
         make_env=make_env,
         outdir=Path(FLAGS.output_dir) if FLAGS.output_dir else None,
         patience=FLAGS.patience,
