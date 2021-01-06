@@ -17,31 +17,88 @@ namespace {
 TEST(RewardSpacesTest, getLlvmRewardSpaceList) {
   const auto spaces = getLlvmRewardSpaceList();
 
-  ASSERT_EQ(spaces.size(), 6);
+  auto space = spaces.begin();
+  EXPECT_EQ(space->name(), "IrInstructionCount");
+  EXPECT_FALSE(space->range().has_min());
+  EXPECT_FALSE(space->range().has_max());
+  EXPECT_FALSE(space->has_success_threshold());
+  EXPECT_TRUE(space->deterministic());
+  EXPECT_FALSE(space->platform_dependent());
+  EXPECT_EQ(space->default_value(), 0);
+  EXPECT_TRUE(space->default_negates_returns());
 
-  EXPECT_EQ(spaces[0].name(), "IrInstructionCount");
-  EXPECT_FALSE(spaces[0].range().has_min());
-  EXPECT_EQ(spaces[0].range().max().value(), 0);
+  ++space;
+  EXPECT_EQ(space->name(), "IrInstructionCountNorm");
+  EXPECT_FALSE(space->range().has_min());
+  EXPECT_EQ(space->range().max().value(), 1);
+  EXPECT_FALSE(space->has_success_threshold());
+  EXPECT_TRUE(space->deterministic());
+  EXPECT_FALSE(space->platform_dependent());
+  EXPECT_EQ(space->default_value(), 0);
+  EXPECT_TRUE(space->default_negates_returns());
 
-  EXPECT_EQ(spaces[1].name(), "IrInstructionCountO3");
-  EXPECT_EQ(spaces[1].range().min().value(), 0);
-  EXPECT_FALSE(spaces[1].range().has_max());
+  ++space;
+  EXPECT_EQ(space->name(), "IrInstructionCountO3");
+  EXPECT_EQ(space->range().min().value(), 0);
+  EXPECT_FALSE(space->range().has_max());
+  EXPECT_TRUE(space->has_success_threshold());
+  EXPECT_TRUE(space->deterministic());
+  EXPECT_FALSE(space->platform_dependent());
+  EXPECT_EQ(space->default_value(), 0);
+  EXPECT_TRUE(space->default_negates_returns());
 
-  EXPECT_EQ(spaces[2].name(), "IrInstructionCountOz");
-  EXPECT_EQ(spaces[2].range().min().value(), 0);
-  EXPECT_FALSE(spaces[2].range().has_max());
+  ++space;
+  EXPECT_EQ(space->name(), "IrInstructionCountOz");
+  EXPECT_EQ(space->range().min().value(), 0);
+  EXPECT_FALSE(space->range().has_max());
+  EXPECT_TRUE(space->has_success_threshold());
+  EXPECT_TRUE(space->deterministic());
+  EXPECT_FALSE(space->platform_dependent());
+  EXPECT_EQ(space->default_value(), 0);
+  EXPECT_TRUE(space->default_negates_returns());
 
-  EXPECT_EQ(spaces[3].name(), "ObjectTextSizeBytes");
-  EXPECT_FALSE(spaces[3].range().has_min());
-  EXPECT_EQ(spaces[3].range().max().value(), 0);
+  ++space;
+  EXPECT_EQ(space->name(), "ObjectTextSizeBytes");
+  EXPECT_FALSE(space->range().has_min());
+  EXPECT_FALSE(space->range().has_max());
+  EXPECT_FALSE(space->has_success_threshold());
+  EXPECT_TRUE(space->deterministic());
+  EXPECT_TRUE(space->platform_dependent());
+  EXPECT_EQ(space->default_value(), 0);
+  EXPECT_TRUE(space->default_negates_returns());
 
-  EXPECT_EQ(spaces[4].name(), "ObjectTextSizeO3");
-  EXPECT_FALSE(spaces[4].range().has_min());
-  EXPECT_EQ(spaces[4].range().max().value(), 0);
+  ++space;
+  EXPECT_EQ(space->name(), "ObjectTextSizeNorm");
+  EXPECT_FALSE(space->range().has_min());
+  EXPECT_EQ(space->range().max().value(), 1);
+  EXPECT_FALSE(space->has_success_threshold());
+  EXPECT_TRUE(space->deterministic());
+  EXPECT_TRUE(space->platform_dependent());
+  EXPECT_EQ(space->default_value(), 0);
+  EXPECT_TRUE(space->default_negates_returns());
 
-  EXPECT_EQ(spaces[5].name(), "ObjectTextSizeOz");
-  EXPECT_FALSE(spaces[5].range().has_min());
-  EXPECT_EQ(spaces[5].range().max().value(), 0);
+  ++space;
+  EXPECT_EQ(space->name(), "ObjectTextSizeO3");
+  EXPECT_FALSE(space->range().has_min());
+  EXPECT_FALSE(space->range().has_max());
+  EXPECT_TRUE(space->has_success_threshold());
+  EXPECT_TRUE(space->deterministic());
+  EXPECT_TRUE(space->platform_dependent());
+  EXPECT_EQ(space->default_value(), 0);
+  EXPECT_TRUE(space->default_negates_returns());
+
+  ++space;
+  EXPECT_EQ(space->name(), "ObjectTextSizeOz");
+  EXPECT_FALSE(space->range().has_min());
+  EXPECT_FALSE(space->range().has_max());
+  EXPECT_TRUE(space->has_success_threshold());
+  EXPECT_TRUE(space->deterministic());
+  EXPECT_TRUE(space->platform_dependent());
+  EXPECT_EQ(space->default_value(), 0);
+  EXPECT_TRUE(space->default_negates_returns());
+
+  ++space;
+  EXPECT_EQ(space, spaces.end());
 }
 
 }  // anonymous namespace

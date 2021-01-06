@@ -45,6 +45,7 @@ def _read_list_file(path: Path) -> Iterable[str]:
 _ACTIONS = list(_read_list_file(_ACTIONS_LIST))
 _FLAGS = dict(zip(_ACTIONS, _read_list_file(_FLAGS_LIST)))
 _DESCRIPTIONS = dict(zip(_ACTIONS, _read_list_file(_DESCRIPTIONS_LIST)))
+_INST2VEC_ENCODER = Inst2vecEncoder()
 
 
 class LlvmObservationView(ObservationView):
@@ -52,68 +53,6 @@ class LlvmObservationView(ObservationView):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
-        self.inst2vec = Inst2vecEncoder()
-
-        self.register_derived_space(
-            base_name="CpuInfo",
-            derived_name="CpuInfoDict",
-            derived_space=DictSpace(
-                {
-                    "name": Sequence(size_range=(0, None), dtype=str),
-                    "cores_count": Scalar(min=None, max=None, dtype=int),
-                    "l1i_cache_size": Scalar(min=None, max=None, dtype=int),
-                    "l1i_cache_count": Scalar(min=None, max=None, dtype=int),
-                    "l1d_cache_size": Scalar(min=None, max=None, dtype=int),
-                    "l1d_cache_count": Scalar(min=None, max=None, dtype=int),
-                    "l2_cache_size": Scalar(min=None, max=None, dtype=int),
-                    "l2_cache_count": Scalar(min=None, max=None, dtype=int),
-                    "l3_cache_size": Scalar(min=None, max=None, dtype=int),
-                    "l3_cache_count": Scalar(min=None, max=None, dtype=int),
-                    "l4_cache_size": Scalar(min=None, max=None, dtype=int),
-                    "l4_cache_count": Scalar(min=None, max=None, dtype=int),
-                }
-            ),
-            cb=lambda base_observation: base_observation,
-        )
-
-        self.register_derived_space(
-            base_name="Ir",
-            derived_name="Inst2vecPreprocessedText",
-            derived_space=Sequence(size_range=(0, None), dtype=str),
-            cb=lambda base_observation: self.inst2vec.preprocess(base_observation),
-        )
-        self.register_derived_space(
-            base_name="Ir",
-            derived_name="Inst2vecEmbeddingIndices",
-            derived_space=Sequence(size_range=(0, None), dtype=np.int32),
-            cb=lambda base_observation: self.inst2vec.encode(
-                self.inst2vec.preprocess(base_observation)
-            ),
-        )
-        self.register_derived_space(
-            base_name="Ir",
-            derived_name="Inst2vec",
-            derived_space=Sequence(size_range=(0, None), dtype=np.ndarray),
-            cb=lambda base_observation: self.inst2vec.embed(
-                self.inst2vec.encode(self.inst2vec.preprocess(base_observation))
-            ),
-        )
-
-        self.register_derived_space(
-            base_name="Autophase",
-            derived_name="AutophaseDict",
-            derived_space=DictSpace(
-                {
-                    name: Scalar(min=0, max=None, dtype=int)
-                    for name in AUTOPHASE_FEATURE_NAMES
-                }
-            ),
-            cb=lambda base_observation: {
-                name: val
-                for name, val in zip(AUTOPHASE_FEATURE_NAMES, base_observation)
-            },
-        )
 
 
 class LlvmEnv(CompilerEnv):
@@ -144,9 +83,71 @@ class LlvmEnv(CompilerEnv):
         for dataset in LLVM_DATASETS:
             self.register_dataset(dataset)
 
+        self.inst2vec = _INST2VEC_ENCODER
+
+        self.observation.spaces["CpuInfo"].space = DictSpace(
+            {
+                "name": Sequence(size_range=(0, None), dtype=str),
+                "cores_count": Scalar(min=None, max=None, dtype=int),
+                "l1i_cache_size": Scalar(min=None, max=None, dtype=int),
+                "l1i_cache_count": Scalar(min=None, max=None, dtype=int),
+                "l1d_cache_size": Scalar(min=None, max=None, dtype=int),
+                "l1d_cache_count": Scalar(min=None, max=None, dtype=int),
+                "l2_cache_size": Scalar(min=None, max=None, dtype=int),
+                "l2_cache_count": Scalar(min=None, max=None, dtype=int),
+                "l3_cache_size": Scalar(min=None, max=None, dtype=int),
+                "l3_cache_count": Scalar(min=None, max=None, dtype=int),
+                "l4_cache_size": Scalar(min=None, max=None, dtype=int),
+                "l4_cache_count": Scalar(min=None, max=None, dtype=int),
+            }
+        )
+
+        self.observation.add_derived_space(
+            id="Inst2vecPreprocessedText",
+            base_id="Ir",
+            space=Sequence(size_range=(0, None), dtype=str),
+            cb=lambda base_observation: self.inst2vec.preprocess(base_observation),
+            default_value="",
+        )
+        self.observation.add_derived_space(
+            id="Inst2vecEmbeddingIndices",
+            base_id="Ir",
+            space=Sequence(size_range=(0, None), dtype=np.int32),
+            cb=lambda base_observation: self.inst2vec.encode(
+                self.inst2vec.preprocess(base_observation)
+            ),
+            default_value=np.array([self.inst2vec.vocab["!UNK"]]),
+        )
+        self.observation.add_derived_space(
+            id="Inst2vec",
+            base_id="Ir",
+            space=Sequence(size_range=(0, None), dtype=np.ndarray),
+            cb=lambda base_observation: self.inst2vec.embed(
+                self.inst2vec.encode(self.inst2vec.preprocess(base_observation))
+            ),
+            default_value=np.vstack(
+                [self.inst2vec.embeddings[self.inst2vec.vocab["!UNK"]]]
+            ),
+        )
+
+        self.observation.add_derived_space(
+            id="AutophaseDict",
+            base_id="Autophase",
+            space=DictSpace(
+                {
+                    name: Scalar(min=0, max=None, dtype=int)
+                    for name in AUTOPHASE_FEATURE_NAMES
+                }
+            ),
+            cb=lambda base_observation: {
+                name: val
+                for name, val in zip(AUTOPHASE_FEATURE_NAMES, base_observation)
+            },
+        )
+
     @staticmethod
     def make_benchmark(*args, **kwargs):
-        """Alias to :func:`compiler_gym.envs.llvm.make_benchmark`."""
+        """Alias to :func:`llvm.make_benchmark() <compiler_gym.envs.llvm.make_benchmark>`."""
         return make_benchmark(*args, **kwargs)
 
     @property

@@ -130,7 +130,7 @@ def test_observed_value_types():
     assert mock.called_observation_spaces == [0, 2, 1, 3]
 
 
-def test_register_derived_space():
+def test_add_derived_space():
     spaces = [
         ObservationSpace(
             name="ir",
@@ -141,10 +141,10 @@ def test_register_derived_space():
         ret=[Observation(string_value="Hello, world!")],
     )
     observation = ObservationView(mock, spaces)
-    observation.register_derived_space(
-        base_name="ir",
-        derived_name="ir_len",
-        derived_space=Box(low=0, high=float("inf"), shape=(1,), dtype=int),
+    observation.add_derived_space(
+        id="ir_len",
+        base_id="ir",
+        space=Box(low=0, high=float("inf"), shape=(1,), dtype=int),
         cb=lambda base: [
             len(base),
         ],

@@ -71,7 +71,6 @@ py_library(
     testonly = 1,
     srcs = ["fixtures.py"],
     data = [
-        "//compiler_gym/envs/llvm/service",
         "//compiler_gym/envs/llvm/service/passes:actions_genfiles",
         "//compiler_gym/third_party/cBench:benchmarks_list",
     ],
@@ -143,6 +142,21 @@ py_test(
     deps = [
         ":fixtures",
         "//compiler_gym/envs",
+        "//tests:test_main",
+    ],
+)
+
+py_test(
+    name = "service_connection_test",
+    srcs = ["service_connection_test.py"],
+    data = [
+        "//compiler_gym/envs/llvm/service",
+    ],
+    deps = [
+        ":fixtures",
+        "//compiler_gym",
+        "//compiler_gym/envs",
+        "//compiler_gym/util",
         "//tests:test_main",
     ],
 )

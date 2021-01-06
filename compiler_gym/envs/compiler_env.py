@@ -18,7 +18,6 @@ from compiler_gym.service import (
     CompilerGymServiceConnection,
     ConnectionOpts,
     ServiceError,
-    observation2py,
     observation_t,
 )
 from compiler_gym.service.connection import ServiceTransportError
@@ -105,6 +104,10 @@ class CompilerEnv(gym.Env):
     :ivar reward: A view of the available reward spaces that permits on-demand
         computation of rewards.
     :vartype reward: compiler_gym.views.RewardView
+
+    :ivar episode_reward: If
+        :func:`CompilerEnv.reward_space <compiler_gym.envs.CompilerGym.reward_space>`
+        is set, this value is the sum of all rewards for the current episode.
     """
 
     def __init__(
@@ -190,6 +193,7 @@ class CompilerEnv(gym.Env):
         self.action_space: Optional[Space] = None
         self.observation_space: Optional[Space] = None
         self.reward_range: Tuple[float, float] = (-np.inf, np.inf)
+        self.episode_reward: Optional[float] = None
 
         # Initialize eager observation/reward and benchmark.
         self.observation_space = observation_space
@@ -505,6 +509,9 @@ class CompilerEnv(gym.Env):
                 self.action_space.name, reply.new_action_space.action
             )
 
+        if self.reward_space:
+            self.episode_reward = 0
+
         if self._eager_observation:
             return self.observation[self.observation_space.id]
 
@@ -525,6 +532,12 @@ class CompilerEnv(gym.Env):
         except (ServiceError, ServiceTransportError, TimeoutError) as e:
             self.close()
             info = {"error_details": str(e)}
+            if self.reward_space:
+                reward = self.reward_space.default_value
+                if self.reward_space.default_negates_returns:
+                    reward -= self.episode_reward
+            if self.observation_space:
+                observation = self.observation_space.default_value
             return observation, reward, True, info
 
         # If the action space has changed, update it.
@@ -533,13 +546,11 @@ class CompilerEnv(gym.Env):
                 self.action_space.name, reply.action_space.action
             )
 
-        if self._eager_observation:
-            observation = self.observation.translate(
-                self.observation_space.id,
-                observation2py(self.observation_space.space, reply.observation),
-            )
+        if self.observation_space:
+            observation = self.observation_space.cb(reply.observation)
         if self._eager_reward:
             reward = reply.reward.reward
+            self.episode_reward += reward
 
         info = {
             "action_had_no_effect": reply.action_had_no_effect,

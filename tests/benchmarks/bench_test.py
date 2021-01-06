@@ -3,27 +3,19 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Microbenchmarks for CompilerGym environments."""
+from pathlib import Path
+
 import gym
 import pytest
 
 from compiler_gym.envs import CompilerEnv, LlvmEnv
 from compiler_gym.service import CompilerGymServiceConnection
-from tests.envs.llvm.fixtures import SERVICE_BIN
+from compiler_gym.util.runfiles_path import runfiles_path
 from tests.test_main import main
 
+SERVICE_BIN = Path(runfiles_path("CompilerGym/compiler_gym/envs/llvm/service/service"))
+
 pytest_plugins = ["tests.envs.llvm.fixtures"]
-
-# Redefine this fixture to run only the local LLVM env.
-@pytest.fixture(scope="function")
-def env() -> CompilerEnv:
-    """Create an LLVM environment."""
-    env = gym.make("llvm-v0")
-    env.require_dataset("cBench-v0")
-    try:
-        yield env
-    finally:
-        env.close()
-
 
 # Redefine this fixture since running all of the benchmarks in cBench would
 # take too long, but we do want to use at least one small and one large
