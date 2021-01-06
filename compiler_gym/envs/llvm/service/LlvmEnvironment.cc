@@ -358,33 +358,23 @@ Status LlvmEnvironment::getObservation(LlvmObservationSpace space, Observation* 
 Status LlvmEnvironment::getReward(LlvmRewardSpace space, Reward* reply) {
   const LlvmCostFunction cost = getCostFunction(space);
   const auto costIdx = static_cast<size_t>(cost);
-  const std::optional<LlvmBaselinePolicy> baselinePolicy = getBaselinePolicy(space);
+  const LlvmBaselinePolicy baselinePolicy = getBaselinePolicy(space);
 
   // Fetch the cached costs.
   const double unoptimizedCost =
       getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O0, cost);
+  const double baselineCost = getBaselineCost(benchmark().baselineCosts(), baselinePolicy, cost);
   const double previousCost =
       previousCosts_[costIdx].has_value() ? *previousCosts_[costIdx] : unoptimizedCost;
 
   // Compute a new cost.
   const double currentCost = getCost(cost, benchmark().module(), workingDirectory_);
 
-  // Reward is reduction in cost.
+  // Reward is reduction in cost ...
   double reward = previousCost - currentCost;
-
-  // Optionally scale the reward by comparison to a baseline policy:
-  //   - If the baseline policy is -O0, then scale the reward against the
-  //     baseline cost. For example, an instruction count reward of 10 for a
-  //     program with 100 initial instructions would be 10 / 100 = 0.1.
-  //   - For a baseline policy of -O3 or -Oz, reward is scaled by the reduction
-  //     in cost achieved by that baseline.
-  if (baselinePolicy.has_value()) {
-    const double baselineCost = getBaselineCost(benchmark().baselineCosts(), *baselinePolicy, cost);
-    if (baselinePolicy == LlvmBaselinePolicy::O0) {
-      reward /= baselineCost;
-    } else {
-      reward /= unoptimizedCost - baselineCost;
-    }
+  // ... scaled to the reduction in cost achieved by a baseline policy
+  if (baselinePolicy != LlvmBaselinePolicy::O0) {
+    reward /= unoptimizedCost - baselineCost;
   }
   reply->set_reward(reward);
 

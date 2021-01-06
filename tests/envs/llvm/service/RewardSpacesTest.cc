@@ -17,49 +17,31 @@ namespace {
 TEST(RewardSpacesTest, getLlvmRewardSpaceList) {
   const auto spaces = getLlvmRewardSpaceList();
 
-  auto space = spaces.begin();
+  ASSERT_EQ(spaces.size(), 6);
 
-  EXPECT_EQ(space->name(), "IrInstructionCount");
-  EXPECT_FALSE(space->range().has_min());
-  EXPECT_FALSE(space->range().has_max());
+  EXPECT_EQ(spaces[0].name(), "IrInstructionCount");
+  EXPECT_FALSE(spaces[0].range().has_min());
+  EXPECT_EQ(spaces[0].range().max().value(), 0);
 
-  ++space;
-  EXPECT_EQ(space->name(), "IrInstructionCountNorm");
-  EXPECT_FALSE(space->range().has_min());
-  EXPECT_FALSE(space->range().has_max());
+  EXPECT_EQ(spaces[1].name(), "IrInstructionCountO3");
+  EXPECT_EQ(spaces[1].range().min().value(), 0);
+  EXPECT_FALSE(spaces[1].range().has_max());
 
-  ++space;
-  EXPECT_EQ(space->name(), "IrInstructionCountO3");
-  EXPECT_EQ(space->range().min().value(), 0);
-  EXPECT_FALSE(space->range().has_max());
+  EXPECT_EQ(spaces[2].name(), "IrInstructionCountOz");
+  EXPECT_EQ(spaces[2].range().min().value(), 0);
+  EXPECT_FALSE(spaces[2].range().has_max());
 
-  ++space;
-  EXPECT_EQ(space->name(), "IrInstructionCountOz");
-  EXPECT_EQ(space->range().min().value(), 0);
-  EXPECT_FALSE(space->range().has_max());
+  EXPECT_EQ(spaces[3].name(), "ObjectTextSizeBytes");
+  EXPECT_FALSE(spaces[3].range().has_min());
+  EXPECT_EQ(spaces[3].range().max().value(), 0);
 
-  ++space;
-  EXPECT_EQ(space->name(), "ObjectTextSizeBytes");
-  EXPECT_FALSE(space->range().has_min());
-  EXPECT_FALSE(space->range().has_max());
+  EXPECT_EQ(spaces[4].name(), "ObjectTextSizeO3");
+  EXPECT_FALSE(spaces[4].range().has_min());
+  EXPECT_EQ(spaces[4].range().max().value(), 0);
 
-  ++space;
-  EXPECT_EQ(space->name(), "ObjectTextSizeNorm");
-  EXPECT_FALSE(space->range().has_min());
-  EXPECT_FALSE(space->range().has_max());
-
-  ++space;
-  EXPECT_EQ(space->name(), "ObjectTextSizeO3");
-  EXPECT_FALSE(space->range().has_min());
-  EXPECT_FALSE(space->range().has_max());
-
-  ++space;
-  EXPECT_EQ(space->name(), "ObjectTextSizeOz");
-  EXPECT_FALSE(space->range().has_min());
-  EXPECT_FALSE(space->range().has_max());
-
-  ++space;
-  EXPECT_EQ(space, spaces.end());
+  EXPECT_EQ(spaces[5].name(), "ObjectTextSizeOz");
+  EXPECT_FALSE(spaces[5].range().has_min());
+  EXPECT_EQ(spaces[5].range().max().value(), 0);
 }
 
 }  // anonymous namespace

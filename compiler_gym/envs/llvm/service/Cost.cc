@@ -235,18 +235,12 @@ LlvmCostFunction getCostFunction(LlvmRewardSpace space) {
   }
 }
 
-std::optional<LlvmBaselinePolicy> getBaselinePolicy(LlvmRewardSpace space) {
+LlvmBaselinePolicy getBaselinePolicy(LlvmRewardSpace space) {
   switch (space) {
     case LlvmRewardSpace::IR_INSTRUCTION_COUNT:
     case LlvmRewardSpace::OBJECT_TEXT_SIZE_BYTES:
 #ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
     case LlvmRewardSpace::TEXT_SIZE_BYTES:
-#endif
-      return std::nullopt;
-    case LlvmRewardSpace::IR_INSTRUCTION_COUNT_NORM:
-    case LlvmRewardSpace::OBJECT_TEXT_SIZE_NORM:
-#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
-    case LlvmRewardSpace::TEXT_SIZE__O0:
 #endif
       return LlvmBaselinePolicy::O0;
     case LlvmRewardSpace::IR_INSTRUCTION_COUNT_O3:

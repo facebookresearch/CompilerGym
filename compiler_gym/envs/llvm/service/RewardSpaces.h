@@ -20,16 +20,13 @@ namespace compiler_gym::llvm_service {
 enum class LlvmRewardSpace {
   // Returns the number of IR instructions in the current module.
   IR_INSTRUCTION_COUNT,
-  IR_INSTRUCTION_COUNT_NORM,
   IR_INSTRUCTION_COUNT_O3,
   IR_INSTRUCTION_COUNT_Oz,
   OBJECT_TEXT_SIZE_BYTES,
-  OBJECT_TEXT_SIZE_NORM,
   OBJECT_TEXT_SIZE_O3,
   OBJECT_TEXT_SIZE_Oz,
 #ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
   TEXT_SIZE_BYTES,
-  TEXT_SIZE_NORM,
   TEXT_SIZE_O3,
   TEXT_SIZE_Oz,
 #endif
