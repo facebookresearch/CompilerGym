@@ -61,3 +61,18 @@ class RewardSpaceSpec(object):
 
     def __repr__(self) -> str:
         return f"RewardSpaceSpec({self.id})"
+
+    def reward_on_error(self, episode_reward: float) -> float:
+        """Return the reward value for an error condition.
+
+        This method should be used to produce the reward value that should be
+        used if the compiler service cannot be reached, e.g. because it has
+        crashed or the connection has dropped.
+
+        :param episode_reward: The current cumulative reward of an episode.
+        :return: A reward.
+        """
+        if self.default_negates_returns:
+            return self.default_value - episode_reward
+        else:
+            return self.default_value
