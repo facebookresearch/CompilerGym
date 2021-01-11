@@ -18,16 +18,18 @@ namespace compiler_gym::llvm_service {
 //   3. Add a new switch case to LlvmEnvironment::getReward().
 //   4. Run `bazel test //compiler_gym/...` and update the newly failing tests.
 enum class LlvmRewardSpace {
-  // Returns the number of IR instructions in the current module.
+  // Reward based on the number of IR instructions in the current module.
   IR_INSTRUCTION_COUNT,
   IR_INSTRUCTION_COUNT_NORM,
   IR_INSTRUCTION_COUNT_O3,
   IR_INSTRUCTION_COUNT_Oz,
+  // Reward based on the size of the .text section of the lowered object file.
   OBJECT_TEXT_SIZE_BYTES,
   OBJECT_TEXT_SIZE_NORM,
   OBJECT_TEXT_SIZE_O3,
   OBJECT_TEXT_SIZE_Oz,
 #ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
+  // Reward based on the size of the .text section of the lowered binary.
   TEXT_SIZE_BYTES,
   TEXT_SIZE_NORM,
   TEXT_SIZE_O3,

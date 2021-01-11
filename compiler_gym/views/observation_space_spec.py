@@ -97,11 +97,11 @@ class ObservationSpaceSpec(object):
         # message to a python type. and 'to_string' is a callback that
         # translates from a python type to a string for printing.
         if proto.opaque_data_format == "json://networkx/MultiDiGraph":
+            # TODO(cummins): Add a Graph space.
             space = make_seq(proto.string_size_range, str, (0, None))
             cb = lambda observation: nx.readwrite.json_graph.node_link_graph(
                 json.loads(observation.string_value), multigraph=True, directed=True
             )
-            # TODO(cummins): Add a Graph space.
             to_string = lambda observation: json.dumps(
                 nx.readwrite.json_graph.node_link_data(observation), indent=2
             )
@@ -164,7 +164,7 @@ class ObservationSpaceSpec(object):
         :param id: The name of the derived observation space.
         :param cb: A callback function to compute a derived observation
             from the base observation.
-        :param space: The observation space.
+        :param space: The :code:`gym.Space` describing the observation space.
         :param deterministic: Whether the observation space is deterministic.
             If not provided, the value is inherited from the base observation
             space.

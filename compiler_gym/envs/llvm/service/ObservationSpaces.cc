@@ -34,6 +34,7 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
       case LlvmObservationSpace::BITCODE_FILE: {
         ScalarRange pathLength;
         space.mutable_string_size_range()->mutable_min()->set_value(0);
+        // 4096 is the maximum path length for most filesystems.
         space.mutable_string_size_range()->mutable_max()->set_value(4096);
         // A random file path is generated, so the returned value is not
         // deterministic.
