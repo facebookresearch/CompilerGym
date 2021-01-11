@@ -3,22 +3,18 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Integrations tests for the LLVM CompilerGym environments."""
-from pathlib import Path
 from typing import List
 
 import gym
 import pytest
 
 import compiler_gym
-from compiler_gym.envs import CompilerEnv
+from compiler_gym.envs import CompilerEnv, llvm
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.service.connection import CompilerGymServiceConnection
-from compiler_gym.util.runfiles_path import runfiles_path
 from tests.test_main import main
 
 pytest_plugins = ["tests.envs.llvm.fixtures"]
-
-SERVICE_BIN = Path(runfiles_path("CompilerGym/compiler_gym/envs/llvm/service/service"))
 
 
 @pytest.fixture(scope="function", params=["local", "service"])
@@ -32,7 +28,7 @@ def env(request) -> CompilerEnv:
         finally:
             env.close()
     else:
-        service = CompilerGymServiceConnection(SERVICE_BIN)
+        service = CompilerGymServiceConnection(llvm.LLVM_SERVICE_BINARY)
         env = LlvmEnv(service=service.connection.url, benchmark="foo")
         env.require_dataset("cBench-v0")
         try:

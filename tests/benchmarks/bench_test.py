@@ -3,17 +3,12 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Microbenchmarks for CompilerGym environments."""
-from pathlib import Path
-
 import gym
 import pytest
 
-from compiler_gym.envs import CompilerEnv, LlvmEnv
+from compiler_gym.envs import CompilerEnv, LlvmEnv, llvm
 from compiler_gym.service import CompilerGymServiceConnection
-from compiler_gym.util.runfiles_path import runfiles_path
 from tests.test_main import main
-
-SERVICE_BIN = Path(runfiles_path("CompilerGym/compiler_gym/envs/llvm/service/service"))
 
 pytest_plugins = ["tests.envs.llvm.fixtures"]
 
@@ -40,7 +35,7 @@ def test_make_local(benchmark):
 
 
 def test_make_service(benchmark):
-    service = CompilerGymServiceConnection(SERVICE_BIN)
+    service = CompilerGymServiceConnection(llvm.LLVM_SERVICE_BINARY)
     try:
         benchmark(lambda: LlvmEnv(service=service.connection.url).close())
     finally:
