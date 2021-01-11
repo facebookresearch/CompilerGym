@@ -11,6 +11,17 @@ py_binary(
     ],
 )
 
+py_test(
+    name = "actor_critic_test",
+    timeout = "short",
+    srcs = ["actor_critic_test.py"],
+    deps = [
+        ":actor_critic",
+        "//compiler_gym/util",
+        "//tests:test_main",
+    ],
+)
+
 py_binary(
     name = "brute_force",
     srcs = ["brute_force.py"],
