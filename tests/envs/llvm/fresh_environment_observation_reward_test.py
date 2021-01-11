@@ -4,9 +4,6 @@
 # LICENSE file in the root directory of this source tree.
 """Integrations tests for the LLVM CompilerGym environments."""
 
-import gym
-import pytest
-
 from compiler_gym.envs import CompilerEnv
 from tests.test_main import main
 

@@ -86,7 +86,7 @@ py_library(
 py_test(
     name = "fresh_environment_observation_reward_test",
     srcs = ["fresh_environment_observation_reward_test.py"],
-    shard_count = 4,
+    shard_count = 8,
     deps = [
         ":fixtures",
         "//compiler_gym/envs",
