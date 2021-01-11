@@ -23,6 +23,12 @@ Testing
         other tests that require the python package to be installed. This is
         expensive and not typically required for local development.
 
+    make itest
+        Run the test suite continuously on change. This is equivalent to
+        manually running `make test` when a source file is modified. Note that
+        `make install-test` tests are not run. This requires bazel-watcher.
+        See: https://github.com/bazelbuild/bazel-watcher#installation
+
 
 Documentation
 -------------
@@ -76,6 +82,7 @@ export HELP
 CC ?= clang
 CXX ?= clang++
 BAZEL ?= bazel
+IBAZEL ?= ibazel
 PANDOC ?= pandoc
 PYTHON ?= python3
 
@@ -179,6 +186,9 @@ COMPILER_GYM_CACHE ?= "/tmp/compiler_gym/tests/cache"
 
 test:
 	$(BAZEL) $(BAZEL_OPTS) test $(BAZEL_TEST_OPTS) //...
+
+itest:
+	$(IBAZEL) $(BAZEL_OPTS) test $(BAZEL_TEST_OPTS) //...
 
 tests-datasets:
 	cd .. && python -m compiler_gym.bin.datasets --env=llvm-v0 --download=cBench-v0 >/dev/null
