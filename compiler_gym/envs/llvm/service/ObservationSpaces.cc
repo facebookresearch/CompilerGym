@@ -17,6 +17,11 @@ using nlohmann::json;
 
 namespace compiler_gym::llvm_service {
 
+// The number of features in the Autophase feature vector.
+static constexpr size_t kAutophaseFeatureDim = 56;
+// 4096 is the maximum path length for most filesystems.
+static constexpr size_t kMaximumPathLength = 4096;
+
 std::vector<ObservationSpace> getLlvmObservationSpaceList() {
   std::vector<ObservationSpace> spaces;
   spaces.reserve(magic_enum::enum_count<LlvmObservationSpace>());
@@ -35,7 +40,7 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
         ScalarRange pathLength;
         space.mutable_string_size_range()->mutable_min()->set_value(0);
         // 4096 is the maximum path length for most filesystems.
-        space.mutable_string_size_range()->mutable_max()->set_value(4096);
+        space.mutable_string_size_range()->mutable_max()->set_value(kMaximumPathLength);
         // A random file path is generated, so the returned value is not
         // deterministic.
         space.set_deterministic(false);
@@ -46,15 +51,15 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
         ScalarRange featureSize;
         featureSize.mutable_min()->set_value(0);
         std::vector<ScalarRange> featureSizes;
-        featureSizes.reserve(/* autophase feature vector dim: */ 56);
-        for (int i = 0; i < /* autophase feature vector dim: */ 56; ++i) {
+        featureSizes.reserve(kAutophaseFeatureDim);
+        for (int i = 0; i < kAutophaseFeatureDim; ++i) {
           featureSizes.push_back(featureSize);
         }
         *space.mutable_int64_range_list()->mutable_range() = {featureSizes.begin(),
                                                               featureSizes.end()};
         space.set_deterministic(true);
         space.set_platform_dependent(false);
-        std::vector<int64_t> defaultValue(/* autophase feature vector dim: */ 56, 0);
+        std::vector<int64_t> defaultValue(kAutophaseFeatureDim, 0);
         *space.mutable_default_value()->mutable_int64_list()->mutable_value() = {
             defaultValue.begin(), defaultValue.end()};
         break;
