@@ -4,6 +4,25 @@
 # LICENSE file in the root directory of this source tree.
 
 py_binary(
+    name = "actor_critic",
+    srcs = ["actor_critic.py"],
+    deps = [
+        "//compiler_gym",
+    ],
+)
+
+py_test(
+    name = "actor_critic_test",
+    timeout = "short",
+    srcs = ["actor_critic_test.py"],
+    deps = [
+        ":actor_critic",
+        "//compiler_gym/util",
+        "//tests:test_main",
+    ],
+)
+
+py_binary(
     name = "brute_force",
     srcs = ["brute_force.py"],
     data = ["//compiler_gym/envs/llvm/service"],
