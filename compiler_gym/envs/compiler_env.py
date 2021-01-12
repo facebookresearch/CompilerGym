@@ -533,9 +533,7 @@ class CompilerEnv(gym.Env):
             self.close()
             info = {"error_details": str(e)}
             if self.reward_space:
-                reward = self.reward_space.default_value
-                if self.reward_space.default_negates_returns:
-                    reward -= self.episode_reward
+                reward = self.reward_space.reward_on_error(self.episode_reward)
             if self.observation_space:
                 observation = self.observation_space.default_value
             return observation, reward, True, info

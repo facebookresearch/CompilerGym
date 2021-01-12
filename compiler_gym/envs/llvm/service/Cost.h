@@ -55,7 +55,8 @@ void setbaselineCosts(const llvm::Module& unoptimizedModule, BaselineCosts* base
 // Translate from reward space to a cost function.
 LlvmCostFunction getCostFunction(LlvmRewardSpace space);
 
-// Translate from reward space to a baseline policy.
+// Translate from reward space to a baseline policy. If a reward space has no
+// baseline policy, this returns std::nullopt.
 std::optional<LlvmBaselinePolicy> getBaselinePolicy(LlvmRewardSpace space);
 
 }  // namespace compiler_gym::llvm_service
