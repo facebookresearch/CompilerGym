@@ -108,6 +108,7 @@ py_test(
 py_test(
     name = "llvm_env_test",
     srcs = ["llvm_env_test.py"],
+    shard_count = 4,
     deps = [
         ":fixtures",
         "//compiler_gym",
