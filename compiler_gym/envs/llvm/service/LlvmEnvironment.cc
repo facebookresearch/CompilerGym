@@ -188,7 +188,13 @@ void LlvmEnvironment::runPass(llvm::Pass* pass, ActionReply* reply) {
   llvm::legacy::PassManager passManager;
   setupPassManager(&passManager, pass);
 
-  const bool changed = passManager.run(benchmark().module());
+  bool changed = passManager.run(benchmark().module());
+
+  // TODO: Fix changed. changed is not reliable in LLVM as currently
+  // implemented and the gym environment relies on it being accurate,
+  // so conservatively hardcode it to true for now.
+  changed = true;
+
   reply->set_action_had_no_effect(!changed);
 }
 
@@ -201,6 +207,12 @@ void LlvmEnvironment::runPass(llvm::FunctionPass* pass, ActionReply* reply) {
     changed |= (passManager.run(function) ? 1 : 0);
   }
   changed |= (passManager.doFinalization() ? 1 : 0);
+
+  // TODO: Fix changed. changed is not reliable in LLVM as currently
+  // implemented and the gym environment relies on it being accurate,
+  // so conservatively hardcode it to true for now.
+  changed = true;
+
   reply->set_action_had_no_effect(!changed);
 }
 

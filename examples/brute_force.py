@@ -10,8 +10,8 @@ length and evaluates them, logging the incremental rewards of each.
 Example usage:
 
     $ $ python -m compiler_gym.bin.brute_force \
-       --env=llvm-ic-v0 --benchmark=cBench-v0/dijstra \
-       --episode_length=10 --actions=Sroapass,PromoteMemoryToRegisterPass,NewGvnpass
+       --env=llvm-ic-v0 --benchmark=cBench-v0/dijkstra \
+       --episode_length=10 --actions=-sroa,-mem2reg,-newgvn
     Enumerating all episodes of 3 actions × 10 steps
     Started 24 brute force workers for benchmark cBench-v0/dijkstra using reward IrInstructionCountOz.
     === Running 59,049 trials ===
@@ -102,7 +102,7 @@ class BruteForceProducer(Thread):
 class BruteForceWorker(Thread):
     """Worker thread which reads chunks of action lists and evaluates them.
 
-    Chunks of action lists are read form in_q and written to out_q, along with
+    Chunks of action lists are read from in_q and written to out_q, along with
     the incremental reward of each action.
     """
 
@@ -303,12 +303,14 @@ def main(argv):
 
     # Use default logdir of <base>/brute_force/<benchmark> unless told
     # otherwise.
-    env = env_from_flags(benchmark_from_flags())
-    if not env.benchmark:
+    benchmark = benchmark_from_flags()
+    if not benchmark:
         raise app.UsageError("No benchmark specified.")
+
+    env = env_from_flags(benchmark)
     env.reset()
-    benchmark_name = env.benchmark
-    sanitized_benchmark_name = "/".join(benchmark_name.split("/")[-2:])
+    benchmark = env.benchmark
+    sanitized_benchmark_name = "/".join(benchmark.split("/")[-2:])
     env.close()
     logs_dir = Path(
         FLAGS.output_dir

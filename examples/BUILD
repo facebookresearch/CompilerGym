@@ -48,6 +48,29 @@ py_test(
 )
 
 py_binary(
+    name = "explore",
+    srcs = ["explore.py"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//compiler_gym/envs",
+        "//compiler_gym/service/proto",
+        "//compiler_gym/util",
+        "//compiler_gym/util/flags:benchmark_from_flags",
+        "//compiler_gym/util/flags:env_from_flags",
+    ],
+)
+
+py_test(
+    name = "explore_test",
+    srcs = ["explore_test.py"],
+    deps = [
+        ":explore",
+        "//compiler_gym",
+        "//tests:test_main",
+    ],
+)
+
+py_binary(
     name = "random_walk",
     srcs = ["random_walk.py"],
     visibility = ["//visibility:public"],
