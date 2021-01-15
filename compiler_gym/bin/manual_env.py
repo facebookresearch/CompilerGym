@@ -43,7 +43,9 @@ def run_manual_env(env: CompilerEnv):
         # to select randomly.
         benchmarks = sorted(env.benchmarks)
         if not benchmarks:
-            print("No benchmarks available see https://facebookresearch.github.io/CompilerGym/getting_started.html#installing-benchmarks")
+            print(
+                "No benchmarks available see https://facebookresearch.github.io/CompilerGym/getting_started.html#installing-benchmarks"
+            )
             print("Exiting...")
             env.close()
             return
@@ -51,7 +53,7 @@ def run_manual_env(env: CompilerEnv):
         # Strip default benchmark:// protocol.
         for i, benchmark in enumerate(benchmarks):
             if benchmark.startswith("benchmark://"):
-                benchmarks[i] = benchmark[len("benchmark://"):]
+                benchmarks[i] = benchmark[len("benchmark://") :]
 
         benchmark_index = user_input.read_list_index(
             "Benchmark", ["random"] + benchmarks
