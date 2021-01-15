@@ -19,7 +19,7 @@ py_test(
     name = "all_benchmarks_init_close_test",
     timeout = "long",
     srcs = ["all_benchmarks_init_close_test.py"],
-    shard_count = 4,
+    shard_count = 6,
     deps = [
         ":fixtures",
         "//compiler_gym/envs",
