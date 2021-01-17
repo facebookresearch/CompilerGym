@@ -37,8 +37,9 @@ def test_benchmark_random_actions(benchmark_name: str):
         while time() < end_time:
             observation, reward, done, info = env.step(env.action_space.sample())
             if done:
-                assert observation is None
-                assert reward is None
+                # Default-value for observation is an array of zeros.
+                np.testing.assert_array_equal(observation, np.zeros((56,)))
+                assert isinstance(reward, float)
                 env = make_env(benchmark_name)
             else:
                 assert isinstance(observation, np.ndarray)
