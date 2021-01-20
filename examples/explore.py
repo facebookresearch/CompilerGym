@@ -36,8 +36,7 @@ from compiler_gym.util.flags.env_from_flags import env_from_flags
 flags.DEFINE_list(
     "actions",
     [],
-    "A list of action names to enumerate. If not provided, all actions are used "
-    "(warning: this might take a long time!)",
+    "A list of action names to enumerate. If not provided, all actions are used.",
 )
 flags.DEFINE_integer("episode_length", 5, "The number of steps in each episode.")
 flags.DEFINE_integer(
@@ -46,9 +45,8 @@ flags.DEFINE_integer(
 flags.DEFINE_integer(
     "topn",
     0,
-    "If positive, explore only the top n states "
-    "for each sequence length. This is in effect the widt "
-    "of a beam search.",
+    "If positive, explore only the top n states for each sequence length. "
+    "This is in effect the width of a beam search.",
 )
 flags.DEFINE_integer(
     "show_topn", 3, "Show this many top sequences " "at each sequence length."

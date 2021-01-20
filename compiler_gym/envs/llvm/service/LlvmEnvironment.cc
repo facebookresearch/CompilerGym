@@ -161,24 +161,15 @@ Status LlvmEnvironment::takeAction(const ActionRequest& request, ActionReply* re
   RETURN_IF_ERROR(verifyModuleStatus(benchmark().module()));
 
   if (eagerObservationSpace().has_value()) {
-    // Compute new observation if needed.
-    if (!reply->action_had_no_effect()) {
-      eagerObservation_ = {};
-      RETURN_IF_ERROR(getObservation(eagerObservationSpace().value(), &eagerObservation_));
-    }
+    eagerObservation_ = {};
+    RETURN_IF_ERROR(getObservation(eagerObservationSpace().value(), &eagerObservation_));
     *reply->mutable_observation() = eagerObservation_;
   }
 
   if (eagerRewardSpace().has_value()) {
-    if (reply->action_had_no_effect()) {
-      // Action had no effect, so no reward.
-      reply->mutable_reward()->set_reward(0);
-    } else {
-      // Compute new reward if needed.
-      eagerReward_ = {};
-      RETURN_IF_ERROR(getReward(eagerRewardSpace().value(), &eagerReward_));
-      *reply->mutable_reward() = eagerReward_;
-    }
+    eagerReward_ = {};
+    RETURN_IF_ERROR(getReward(eagerRewardSpace().value(), &eagerReward_));
+    *reply->mutable_reward() = eagerReward_;
   }
 
   return Status::OK;
@@ -188,13 +179,7 @@ void LlvmEnvironment::runPass(llvm::Pass* pass, ActionReply* reply) {
   llvm::legacy::PassManager passManager;
   setupPassManager(&passManager, pass);
 
-  bool changed = passManager.run(benchmark().module());
-
-  // TODO: Fix changed. changed is not reliable in LLVM as currently
-  // implemented and the gym environment relies on it being accurate,
-  // so conservatively hardcode it to true for now.
-  changed = true;
-
+  const bool changed = passManager.run(benchmark().module());
   reply->set_action_had_no_effect(!changed);
 }
 
@@ -207,12 +192,6 @@ void LlvmEnvironment::runPass(llvm::FunctionPass* pass, ActionReply* reply) {
     changed |= (passManager.run(function) ? 1 : 0);
   }
   changed |= (passManager.doFinalization() ? 1 : 0);
-
-  // TODO: Fix changed. changed is not reliable in LLVM as currently
-  // implemented and the gym environment relies on it being accurate,
-  // so conservatively hardcode it to true for now.
-  changed = true;
-
   reply->set_action_had_no_effect(!changed);
 }
 
