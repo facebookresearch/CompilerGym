@@ -436,6 +436,7 @@ class CompilerEnv(gym.Env):
             it overrides any value that set during :func:`__init__`, and
             subsequent calls to :code:`reset()` will use this action space.
             If no aciton space is provided, the default action space is used.
+        :return: The initial observation.
         """
         if retry_count > self.connection_settings.init_max_attempts:
             raise OSError(f"Failed to reset environment after {retry_count} attempts")
