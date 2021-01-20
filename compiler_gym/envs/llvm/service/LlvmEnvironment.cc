@@ -161,24 +161,15 @@ Status LlvmEnvironment::takeAction(const ActionRequest& request, ActionReply* re
   RETURN_IF_ERROR(verifyModuleStatus(benchmark().module()));
 
   if (eagerObservationSpace().has_value()) {
-    // Compute new observation if needed.
-    if (!reply->action_had_no_effect()) {
-      eagerObservation_ = {};
-      RETURN_IF_ERROR(getObservation(eagerObservationSpace().value(), &eagerObservation_));
-    }
+    eagerObservation_ = {};
+    RETURN_IF_ERROR(getObservation(eagerObservationSpace().value(), &eagerObservation_));
     *reply->mutable_observation() = eagerObservation_;
   }
 
   if (eagerRewardSpace().has_value()) {
-    if (reply->action_had_no_effect()) {
-      // Action had no effect, so no reward.
-      reply->mutable_reward()->set_reward(0);
-    } else {
-      // Compute new reward if needed.
-      eagerReward_ = {};
-      RETURN_IF_ERROR(getReward(eagerRewardSpace().value(), &eagerReward_));
-      *reply->mutable_reward() = eagerReward_;
-    }
+    eagerReward_ = {};
+    RETURN_IF_ERROR(getReward(eagerRewardSpace().value(), &eagerReward_));
+    *reply->mutable_reward() = eagerReward_;
   }
 
   return Status::OK;
