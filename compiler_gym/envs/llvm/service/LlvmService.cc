@@ -97,15 +97,14 @@ Status LlvmService::EndEpisode(grpc::ServerContext* /* unused */, const EndEpiso
                                EndEpisodeReply* /* unused */) {
   // Note that unlike the other methods, no error is thrown if the requested
   // episode does not exist.
-  if (sessions_.find(request->session_id()) == sessions_.end()) {
-    return Status::OK;
+  if (sessions_.find(request->session_id()) != sessions_.end()) {
+    const LlvmEnvironment* environment;
+    RETURN_IF_ERROR(session(request->session_id(), &environment));
+    VLOG(1) << "Step " << environment->actionCount() << " EndEpisode("
+            << environment->benchmark().name() << ")";
+
+    sessions_.erase(request->session_id());
   }
-
-  const LlvmEnvironment* environment;
-  RETURN_IF_ERROR(session(request->session_id(), &environment));
-  VLOG(1) << "Step " << environment->actionCount() << " EndEpisode("
-          << environment->benchmark().name() << ")";
-
   return Status::OK;
 }
 
