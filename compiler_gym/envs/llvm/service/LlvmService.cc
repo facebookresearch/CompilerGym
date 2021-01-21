@@ -120,9 +120,7 @@ Status LlvmService::TakeAction(ServerContext* /* unused */, const ActionRequest*
   }
 
   VLOG(2) << "Step " << environment->actionCount() << " TakeAction(" << request->action(0) << ")";
-  RETURN_IF_ERROR(environment->takeAction(*request, reply));
-
-  return Status::OK;
+  return environment->takeAction(*request, reply);
 }
 
 Status LlvmService::GetObservation(ServerContext* /* unused */, const ObservationRequest* request,
@@ -135,9 +133,7 @@ Status LlvmService::GetObservation(ServerContext* /* unused */, const Observatio
 
   LlvmObservationSpace space;
   RETURN_IF_ERROR(util::intToEnum(index, &space));
-  RETURN_IF_ERROR(environment->getObservation(space, reply));
-
-  return Status::OK;
+  return environment->getObservation(space, reply);
 }
 
 Status LlvmService::GetReward(ServerContext* /* unused */, const RewardRequest* request,
