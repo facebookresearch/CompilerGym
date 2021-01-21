@@ -4,7 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 cc_binary(
-    name = "service",
+    name = "compiler_gym-example-service",
     srcs = ["RunService.cc"],
     visibility = ["//visibility:public"],
     deps = [

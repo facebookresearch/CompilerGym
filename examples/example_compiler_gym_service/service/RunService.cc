@@ -13,4 +13,8 @@ const char* usage = R"(LLVM CompilerGym service)";
 using namespace compiler_gym::util;
 using namespace compiler_gym::example_service;
 
-int main(int argc, char** argv) { return runService<ExampleService>(&argc, &argv, usage); }
+int main(int argc, char** argv) {
+  // Call the utility runService() function to launch the service. This function
+  // never returns.
+  return runService<ExampleService>(&argc, &argv, usage);
+}

@@ -6,6 +6,7 @@
 // An example implementation of the CompilerGymService interface.
 #pragma once
 
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -15,6 +16,11 @@
 
 namespace compiler_gym::example_service {
 
+// Forward declaration of helper class.
+class ExampleCompilationSession;
+
+// An example compiler service. This class implements all of the RPC endpoints
+// of the CompilerGymService interface.
 class ExampleService final : public CompilerGymService::Service {
  public:
   explicit ExampleService(const boost::filesystem::path& workingDirectory);
@@ -45,19 +51,41 @@ class ExampleService final : public CompilerGymService::Service {
                              GetBenchmarksReply* reply) final override;
 
  private:
-  [[nodiscard]] grpc::Status setObservation(int32_t observationSpace, Observation* observation);
-  [[nodiscard]] grpc::Status setReward(int32_t rewardSpace, Reward* reward);
+  [[nodiscard]] grpc::Status session(uint64_t id, ExampleCompilationSession** environment);
 
   const boost::filesystem::path workingDirectory_;
-  bool episodeStarted_;
-  std::vector<std::string> programNameList_;
-  std::vector<std::string> actionSpace_;
-  std::vector<ObservationSpace> observationSpaces_;
-  std::vector<RewardSpace> rewardSpaces_;
-  bool eagerObservation_;
-  int32_t eagerObservationSpace_;
-  bool eagerReward_;
-  int32_t eagerRewardSpace_;
+
+  // A single compiler service can support multiple concurrent episodes. This
+  // maps session IDs to objects that represent the individual episodes.
+  std::unordered_map<int, std::unique_ptr<ExampleCompilationSession>> sessions_;
+
+  std::vector<std::string> benchmarkNameList_;
+  uint64_t nextSessionId_;
 };
+
+// The representation of a compilation session.
+class ExampleCompilationSession {
+ public:
+  ExampleCompilationSession(const std::string& benchmark, ActionSpace actionSpace,
+                            std::optional<int32_t> eagerObservation,
+                            std::optional<int32_t> eagerReward);
+
+  [[nodiscard]] grpc::Status takeAction(const ActionRequest* request, ActionReply* reply);
+
+  [[nodiscard]] grpc::Status getObservation(int32_t observationSpace, Observation* observation);
+
+  [[nodiscard]] grpc::Status getReward(int32_t rewardSpace, Reward* reward);
+
+ private:
+  const std::string benchmark_;
+  ActionSpace actionSpace_;
+  std::optional<int32_t> eagerObservation_;
+  std::optional<int32_t> eagerReward_;
+};
+
+// Helper functions to describe the available action/observation/reward spaces.
+std::vector<ActionSpace> getActionSpaces();
+std::vector<ObservationSpace> getObservationSpaces();
+std::vector<RewardSpace> getRewardSpaces();
 
 }  // namespace compiler_gym::example_service
