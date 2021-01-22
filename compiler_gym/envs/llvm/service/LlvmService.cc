@@ -97,15 +97,14 @@ Status LlvmService::EndEpisode(grpc::ServerContext* /* unused */, const EndEpiso
                                EndEpisodeReply* /* unused */) {
   // Note that unlike the other methods, no error is thrown if the requested
   // episode does not exist.
-  if (sessions_.find(request->session_id()) == sessions_.end()) {
-    return Status::OK;
+  if (sessions_.find(request->session_id()) != sessions_.end()) {
+    const LlvmEnvironment* environment;
+    RETURN_IF_ERROR(session(request->session_id(), &environment));
+    VLOG(1) << "Step " << environment->actionCount() << " EndEpisode("
+            << environment->benchmark().name() << ")";
+
+    sessions_.erase(request->session_id());
   }
-
-  const LlvmEnvironment* environment;
-  RETURN_IF_ERROR(session(request->session_id(), &environment));
-  VLOG(1) << "Step " << environment->actionCount() << " EndEpisode("
-          << environment->benchmark().name() << ")";
-
   return Status::OK;
 }
 
@@ -121,9 +120,7 @@ Status LlvmService::TakeAction(ServerContext* /* unused */, const ActionRequest*
   }
 
   VLOG(2) << "Step " << environment->actionCount() << " TakeAction(" << request->action(0) << ")";
-  RETURN_IF_ERROR(environment->takeAction(*request, reply));
-
-  return Status::OK;
+  return environment->takeAction(*request, reply);
 }
 
 Status LlvmService::GetObservation(ServerContext* /* unused */, const ObservationRequest* request,
@@ -136,9 +133,7 @@ Status LlvmService::GetObservation(ServerContext* /* unused */, const Observatio
 
   LlvmObservationSpace space;
   RETURN_IF_ERROR(util::intToEnum(index, &space));
-  RETURN_IF_ERROR(environment->getObservation(space, reply));
-
-  return Status::OK;
+  return environment->getObservation(space, reply);
 }
 
 Status LlvmService::GetReward(ServerContext* /* unused */, const RewardRequest* request,
