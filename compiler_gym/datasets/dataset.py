@@ -73,49 +73,64 @@ class Dataset(NamedTuple):
         return path
 
 
-def activate(env, name: str) -> None:
-    """Move a directory from the inactive to active benchmark directory."""
+def activate(env, name: str) -> bool:
+    """Move a directory from the inactive to active benchmark directory.
+
+    :param: The name of a dataset.
+    :return: :code:`True` if the dataset was activated, else :code:`False` if
+        already active.
+    :raises ValueError: If there is no dataset with that name.
+    """
     with fasteners.InterProcessLock(env.datasets_site_path / "LOCK"):
+        if (env.datasets_site_path / name).exists():
+            # There is already an active benchmark set with this name.
+            return False
         if not (env.inactive_datasets_site_path / name).exists():
             raise ValueError(f"Inactive dataset not found: {name}")
-        if (env.datasets_site_path / name).exists():
-            raise ValueError(
-                f"There is already an active benchmark set with name {name}"
-            )
         os.rename(env.inactive_datasets_site_path / name, env.datasets_site_path / name)
         os.rename(
             env.inactive_datasets_site_path / f"{name}.json",
             env.datasets_site_path / f"{name}.json",
         )
+        return True
 
 
-def delete(env, name: str) -> None:
-    """Delete a directory in the inactive benchmark directory."""
+def delete(env, name: str) -> bool:
+    """Delete a directory in the inactive benchmark directory.
+
+    :param: The name of a dataset.
+    :return: :code:`True` if the dataset was deleted, else :code:`False` if
+        already deleted.
+    """
     with fasteners.InterProcessLock(env.datasets_site_path / "LOCK"):
+        deleted = False
         if (env.datasets_site_path / name).exists():
             shutil.rmtree(str(env.datasets_site_path / name))
             os.unlink(str(env.datasets_site_path / f"{name}.json"))
-        elif (env.inactive_datasets_site_path / name).exists():
+            deleted = True
+        if (env.inactive_datasets_site_path / name).exists():
             shutil.rmtree(str(env.inactive_datasets_site_path / name))
             os.unlink(str(env.inactive_datasets_site_path / f"{name}.json"))
-        else:
-            raise ValueError(f"Inactive dataset not found: {name}")
+            deleted = True
+        return deleted
 
 
-def deactivate(env, name: str):
-    """Move a directory from active to the inactive benchmark directory."""
+def deactivate(env, name: str) -> bool:
+    """Move a directory from active to the inactive benchmark directory.
+
+    :param: The name of a dataset.
+    :return: :code:`True` if the dataset was deactivated, else :code:`False` if
+        already inactive.
+    """
     with fasteners.InterProcessLock(env.datasets_site_path / "LOCK"):
         if not (env.datasets_site_path / name).exists():
-            raise ValueError(f"Active dataset not found: {name}")
-        if (env.inactive_datasets_site_path / name).exists():
-            raise ValueError(
-                f"There is already an inactive benchmark set with name {name}"
-            )
+            return False
         os.rename(env.datasets_site_path / name, env.inactive_datasets_site_path / name)
         os.rename(
             env.datasets_site_path / f"{name}.json",
             env.inactive_datasets_site_path / f"{name}.json",
         )
+        return True
 
 
 def require(env, dataset: Union[str, Dataset]) -> bool:
