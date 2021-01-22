@@ -15,6 +15,7 @@ py_library(
         "shell_format.py",
         "statistics.py",
         "tabulate.py",
+        "temporary_working_directory.py",
         "timer.py",
         "user_input.py",
         "version.py",
