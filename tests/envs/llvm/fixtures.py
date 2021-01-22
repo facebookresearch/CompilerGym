@@ -9,8 +9,7 @@ from typing import Iterable, List
 import gym
 import pytest
 
-from compiler_gym.envs import CompilerEnv, LlvmEnv
-from compiler_gym.service import CompilerGymServiceConnection
+from compiler_gym.envs import CompilerEnv
 from compiler_gym.util.runfiles_path import runfiles_path
 
 ACTIONS_LIST = Path(
