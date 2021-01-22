@@ -40,7 +40,6 @@ py_test(
 
 py_test(
     name = "benchmarks_random_actions_test",
-    timeout = "eternal",
     srcs = ["benchmarks_random_actions_test.py"],
     shard_count = 4,
     deps = [
