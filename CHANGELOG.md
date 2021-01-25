@@ -1,3 +1,14 @@
+## Release 0.1.2 (2021-01-25)
+
+* Add a new `compiler_gym.views.ObservationView.add_derviced_space(...)` API
+  for constructing derived observation spaces.
+* Added default reward and observation values for `env.step()` in case of
+  service failure.
+* Extended the public `compiler_gym.datasets` API for managing datasets.
+* [llvm] Adds `-Norm`-suffixed rewards that are normalized to unoptimized cost.
+* Extended documentation and example codes.
+* Numerous bug fixes and improvements.
+
 ## Release 0.1.1 (2020-12-28)
 
 * Expose the package version through `compiler_gym.__version__`, and
