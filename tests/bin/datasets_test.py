@@ -50,9 +50,7 @@ def test_llvm_activate_non_existent_dataset(site_data):
 def test_llvm_deactivate_non_existent_dataset(site_data):
     del site_data
     invalid = "nonexistent"
-    with pytest.raises(ValueError) as ctx:
-        run_main("--env=llvm-v0", "--deactivate", invalid)
-    assert f"Active dataset not found: {invalid}" == str(ctx.value)
+    run_main("--env=llvm-v0", "--deactivate", invalid)
 
 
 def test_llvm_activate_invalid_metadata_file(site_data):
