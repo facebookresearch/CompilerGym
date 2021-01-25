@@ -218,6 +218,21 @@ def make_benchmark(
     clang_jobs: List[ClangInvocation] = []
 
     def _add_path(path: Path):
+        # NOTE(cummins): There is some discussion about the best way to create
+        # a bitcode that is unoptimized yet does not hinder downstream
+        # optimization opportunities. Here we are using a configuration based
+        # on -O0, yet there is a suggestion that an optimized configuration
+        # can produce better results if the optimizations themselves are
+        # explicitly disabled, as in: ["-Oz", "-Xclang", "-disable-llvm-optzns"]
+        # See: https://lists.llvm.org/pipermail/llvm-dev/2018-August/thread.html#125365
+        DEFAULT_COPT = [
+            "-O",
+            "-Xclang",
+            "-disable-O0-optnone",
+            "-Xclang",
+            "-disable-llvm-passes",
+        ]
+
         if not path.is_file():
             raise FileNotFoundError(path)
 
@@ -226,15 +241,7 @@ def make_benchmark(
         elif path.suffix in {".c", ".cxx", ".cpp", ".cc"}:
             clang_jobs.append(
                 ClangInvocation(
-                    [
-                        str(path),
-                        "-O0",
-                        "-Xclang",
-                        "-disable-O0-optnone",
-                        "-Xclang",
-                        "-disable-llvm-passes",
-                    ]
-                    + copt,
+                    [str(path)] + DEFAULT_COPT + copt,
                     system_includes=system_includes,
                     timeout=timeout,
                 )

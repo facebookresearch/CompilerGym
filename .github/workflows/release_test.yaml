@@ -2,11 +2,12 @@
 name: Release Test
 
 on:
+    workflow_dispatch:
     schedule:
         - cron: 0 0 * * 0 # weekly
 
 jobs:
-    release_package_test:
+    test:
         runs-on: ${{ matrix.os }}
 
         strategy:
@@ -27,6 +28,9 @@ jobs:
 
             - name: Install python wheel
               run: python -m pip install compiler_gym
+
+            - name: Install python test dependencies
+              run: python -m pip install -r tests/requirements.txt
 
             - name: Test
               run: make pytest

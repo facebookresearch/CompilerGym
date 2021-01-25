@@ -1,4 +1,4 @@
-![](docs/source/_static/img/logo.png)
+![CompilerGym](https://github.com/facebookresearch/CompilerGym/raw/development/docs/source/_static/img/logo.png)
 
 ---
 
@@ -111,7 +111,7 @@ tutorials, further details, and API reference.
 # Contributing
 
 We welcome contributions to CompilerGym. If you are interested in contributing please see
-[this document](CONTRIBUTING.md).
+[this document](https://github.com/facebookresearch/CompilerGym/blob/development/CONTRIBUTING.md).
 
 
 # Citation

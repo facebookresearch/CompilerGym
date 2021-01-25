@@ -43,7 +43,6 @@ def test_observation_spaces(env: LlvmEnv):
         "AutophaseDict",
         "Programl",
         "CpuInfo",
-        "CpuInfoDict",
         "Inst2vecPreprocessedText",
         "Inst2vecEmbeddingIndices",
         "Inst2vec",
@@ -209,7 +208,7 @@ def test_cpuinfo_observation_space(env: LlvmEnv):
     env.reset("cBench-v0/crc32")
     key = "CpuInfo"
     space = env.observation.spaces[key]
-    assert isinstance(space.space, Sequence)
+    assert isinstance(space.space, DictSpace)
     value: Dict[str, Any] = env.observation[key]
     assert isinstance(value, dict)
     # Test each expected key, removing it as we go.
@@ -233,12 +232,6 @@ def test_cpuinfo_observation_space(env: LlvmEnv):
         _ = env.observation[invalid]
     assert str(ctx.value) == f"'{invalid}'"
 
-    assert space.deterministic
-    assert space.platform_dependent
-
-    key = "CpuInfoDict"
-    space = env.observation.spaces[key]
-    value: Dict[str, Any] = env.observation[key]
     assert space.deterministic
     assert space.platform_dependent
 
@@ -737,8 +730,8 @@ def test_inst2vec_preprocessed_observation_space(
     assert isinstance(value, list)
     for item, idx in zip(value, cbench_crc32_inst2vec_embedding_indices):
         assert isinstance(item, str)
-    unk = env.observation.inst2vec.vocab["!UNK"]
-    indices = [env.observation.inst2vec.vocab.get(item, unk) for item in value]
+    unk = env.inst2vec.vocab["!UNK"]
+    indices = [env.inst2vec.vocab.get(item, unk) for item in value]
     assert indices == cbench_crc32_inst2vec_embedding_indices
 
     assert space.deterministic
@@ -776,13 +769,13 @@ def test_inst2vec_observation_space(
     assert isinstance(value, np.ndarray)
     assert value.dtype == np.float32
     height, width = value.shape
-    assert width == len(env.observation.inst2vec.embeddings[0])
+    assert width == len(env.inst2vec.embeddings[0])
     assert height == len(cbench_crc32_inst2vec_embedding_indices)
     # Check a handful of values.
     np.testing.assert_array_almost_equal(
         value.tolist(),
         [
-            env.observation.inst2vec.embeddings[idx]
+            env.inst2vec.embeddings[idx]
             for idx in cbench_crc32_inst2vec_embedding_indices
         ],
     )
@@ -791,20 +784,90 @@ def test_inst2vec_observation_space(
     assert not space.platform_dependent
 
 
-def test_ir_instruction_count_observation_space(env: LlvmEnv):
+def test_ir_instruction_count_observation_spaces(env: LlvmEnv):
     env.reset("cBench-v0/crc32")
+
     key = "IrInstructionCount"
     space = env.observation.spaces[key]
     assert isinstance(space.space, Box)
-
-    value: np.ndarray = env.observation[key]
-    assert isinstance(value, np.ndarray)
-    assert value.shape == (1,)
-
-    np.testing.assert_array_equal([196], value)
-
     assert space.deterministic
     assert not space.platform_dependent
+    value: np.ndarray = env.observation[key]
+    assert isinstance(value, np.ndarray)
+    np.testing.assert_array_equal([196], value)
+
+    key = "IrInstructionCountO0"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Box)
+    assert space.deterministic
+    assert not space.platform_dependent
+    value: np.ndarray = env.observation[key]
+    assert isinstance(value, np.ndarray)
+    np.testing.assert_array_equal([196], value)
+
+    key = "IrInstructionCountO3"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Box)
+    assert space.deterministic
+    assert not space.platform_dependent
+    value: np.ndarray = env.observation[key]
+    assert isinstance(value, np.ndarray)
+    np.testing.assert_array_equal([125], value)
+
+    key = "IrInstructionCountOz"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Box)
+    assert space.deterministic
+    assert not space.platform_dependent
+    value: np.ndarray = env.observation[key]
+    assert isinstance(value, np.ndarray)
+    np.testing.assert_array_equal([105], value)
+
+
+def test_object_text_size_observation_spaces(env: LlvmEnv):
+    env.reset("cBench-v0/crc32")
+
+    # Expected .text sizes for this benchmark: -O0, -O3, -Oz.
+    crc32_code_sizes = {"darwin": [1141, 3502, 3265], "linux": [1111, 3480, 3251]}
+    print("ObjectTextSizeO0", env.observation["ObjectTextSizeO0"])
+    print("ObjectTextSizeO3", env.observation["ObjectTextSizeO3"])
+    print("ObjectTextSizeOz", env.observation["ObjectTextSizeOz"])
+
+    key = "ObjectTextSizeBytes"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Box)
+    assert space.deterministic
+    assert space.platform_dependent
+    value: np.ndarray = env.observation[key]
+    assert isinstance(value, np.ndarray)
+    np.testing.assert_array_equal(crc32_code_sizes[sys.platform][0], value)
+
+    key = "ObjectTextSizeO0"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Box)
+    assert space.deterministic
+    assert space.platform_dependent
+    value: np.ndarray = env.observation[key]
+    assert isinstance(value, np.ndarray)
+    np.testing.assert_array_equal(crc32_code_sizes[sys.platform][0], value)
+
+    key = "ObjectTextSizeO3"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Box)
+    assert space.deterministic
+    assert space.platform_dependent
+    value: np.ndarray = env.observation[key]
+    assert isinstance(value, np.ndarray)
+    np.testing.assert_array_equal(crc32_code_sizes[sys.platform][1], value)
+
+    key = "ObjectTextSizeOz"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Box)
+    assert space.deterministic
+    assert space.platform_dependent
+    value: np.ndarray = env.observation[key]
+    assert isinstance(value, np.ndarray)
+    np.testing.assert_array_equal(crc32_code_sizes[sys.platform][2], value)
 
 
 if __name__ == "__main__":

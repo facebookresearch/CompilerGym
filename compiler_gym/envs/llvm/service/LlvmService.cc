@@ -7,6 +7,7 @@
 #include <glog/logging.h>
 
 #include <optional>
+#include <sstream>
 
 #include "compiler_gym/envs/llvm/service/ActionSpace.h"
 #include "compiler_gym/envs/llvm/service/ObservationSpaces.h"
@@ -15,6 +16,7 @@
 #include "compiler_gym/util/EnumUtil.h"
 #include "compiler_gym/util/GrpcStatusMacros.h"
 #include "compiler_gym/util/Version.h"
+#include "llvm/ADT/Triple.h"
 #include "llvm/Config/llvm-config.h"
 
 namespace compiler_gym::llvm_service {
@@ -31,7 +33,9 @@ Status LlvmService::GetVersion(ServerContext* /* unused */, const GetVersionRequ
                                GetVersionReply* reply) {
   VLOG(2) << "GetSpaces()";
   reply->set_service_version(COMPILER_GYM_VERSION);
-  reply->set_compiler_version(LLVM_VERSION_STRING);
+  std::stringstream ss;
+  ss << LLVM_VERSION_STRING << " " << llvm::Triple::normalize(LLVM_DEFAULT_TARGET_TRIPLE);
+  reply->set_compiler_version(ss.str());
   return Status::OK;
 }
 
@@ -93,15 +97,14 @@ Status LlvmService::EndEpisode(grpc::ServerContext* /* unused */, const EndEpiso
                                EndEpisodeReply* /* unused */) {
   // Note that unlike the other methods, no error is thrown if the requested
   // episode does not exist.
-  if (sessions_.find(request->session_id()) == sessions_.end()) {
-    return Status::OK;
+  if (sessions_.find(request->session_id()) != sessions_.end()) {
+    const LlvmEnvironment* environment;
+    RETURN_IF_ERROR(session(request->session_id(), &environment));
+    VLOG(1) << "Step " << environment->actionCount() << " EndEpisode("
+            << environment->benchmark().name() << ")";
+
+    sessions_.erase(request->session_id());
   }
-
-  const LlvmEnvironment* environment;
-  RETURN_IF_ERROR(session(request->session_id(), &environment));
-  VLOG(1) << "Step " << environment->actionCount() << " EndEpisode("
-          << environment->benchmark().name() << ")";
-
   return Status::OK;
 }
 
@@ -117,9 +120,7 @@ Status LlvmService::TakeAction(ServerContext* /* unused */, const ActionRequest*
   }
 
   VLOG(2) << "Step " << environment->actionCount() << " TakeAction(" << request->action(0) << ")";
-  RETURN_IF_ERROR(environment->takeAction(*request, reply));
-
-  return Status::OK;
+  return environment->takeAction(*request, reply);
 }
 
 Status LlvmService::GetObservation(ServerContext* /* unused */, const ObservationRequest* request,
@@ -132,9 +133,7 @@ Status LlvmService::GetObservation(ServerContext* /* unused */, const Observatio
 
   LlvmObservationSpace space;
   RETURN_IF_ERROR(util::intToEnum(index, &space));
-  RETURN_IF_ERROR(environment->getObservation(space, reply));
-
-  return Status::OK;
+  return environment->getObservation(space, reply);
 }
 
 Status LlvmService::GetReward(ServerContext* /* unused */, const RewardRequest* request,

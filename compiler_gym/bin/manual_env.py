@@ -19,7 +19,6 @@ from absl import app, flags
 
 import compiler_gym.util.flags.ls_benchmark  # Flag definition.
 from compiler_gym.envs import CompilerEnv
-from compiler_gym.service import observation2str
 from compiler_gym.util import user_input
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.flags.env_from_flags import env_from_flags
@@ -43,6 +42,14 @@ def run_manual_env(env: CompilerEnv):
         # Allow the user to choose a benchmark, with the first choice being
         # to select randomly.
         benchmarks = sorted(env.benchmarks)
+        if not benchmarks:
+            print(
+                "No benchmarks available see https://facebookresearch.github.io/CompilerGym/getting_started.html#installing-benchmarks"
+            )
+            print("Exiting...")
+            env.close()
+            return
+
         # Strip default benchmark:// protocol.
         for i, benchmark in enumerate(benchmarks):
             if benchmark.startswith("benchmark://"):
@@ -61,9 +68,7 @@ def run_manual_env(env: CompilerEnv):
 
     print(f"Reset {env.benchmark} environment in {timer}")
     if env.observation_space and eager_observation is not None:
-        print(
-            f"Observation: {observation2str(env.observation_space, eager_observation)}"
-        )
+        print(f"Observation: {env.observation_space.to_string(eager_observation)}")
 
     observation_names = sorted(env.observation.spaces.keys())
     reward_names = sorted(env.reward.spaces.keys())
@@ -98,7 +103,7 @@ def run_manual_env(env: CompilerEnv):
                 # Print the eager observation, if available.
                 if env.observation_space and eager_observation is not None:
                     print(
-                        f"Observation: {observation2str(env.observation_space, eager_observation)}"
+                        f"Observation: {env.observation_space.to_string(eager_observation)}"
                     )
 
                 # Print the eager reward and the diff, if available.
@@ -128,9 +133,7 @@ def run_manual_env(env: CompilerEnv):
                 )
                 with Timer() as timer:
                     value = env.observation[observation_name]
-                print(
-                    observation2str(env.observation.spaces[observation_name].id, value)
-                )
+                print(env.observation.spaces[observation_name].to_string(value))
                 print(f"Observation {observation_name} in {timer}")
                 break
             elif c == "r":

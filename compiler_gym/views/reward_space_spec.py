@@ -33,6 +33,18 @@ class RewardSpaceSpec(object):
     :ivar platform_dependent: Whether the reward values depend on the execution
         environment of the service.
     :vartype platform_dependent: bool
+
+    :ivar default_value: A default reward value. This value will be returned by
+        :func:`CompilerEnv.step() <compiler_gym.envs.CompilerEnv.step>` if
+        :func:`CompilerEnv.reward_space <compiler_gym.envs.CompilerEnv.reward_space>`
+        is set and the service terminates.
+    :vartype default_value: float
+
+    :ivar default_negates_returns: If true, the default value will be offset by
+        the sum of all rewards for the current episode. For example, given a
+        default reward value of -10.0 and an episode with prior rewards
+        [0.1, 0.3, -0.15], the default value is: -10.0 - sum(0.1, 0.3, -0.15).
+    :vartype default_negates_returns: bool
     """
 
     def __init__(self, index: int, spec: RewardSpace):
@@ -44,6 +56,23 @@ class RewardSpaceSpec(object):
         )
         self.deterministic = spec.deterministic
         self.platform_dependent = spec.platform_dependent
+        self.default_value = spec.default_value
+        self.default_negates_returns = spec.default_negates_returns
 
     def __repr__(self) -> str:
         return f"RewardSpaceSpec({self.id})"
+
+    def reward_on_error(self, episode_reward: float) -> float:
+        """Return the reward value for an error condition.
+
+        This method should be used to produce the reward value that should be
+        used if the compiler service cannot be reached, e.g. because it has
+        crashed or the connection has dropped.
+
+        :param episode_reward: The current cumulative reward of an episode.
+        :return: A reward.
+        """
+        if self.default_negates_returns:
+            return self.default_value - episode_reward
+        else:
+            return self.default_value

@@ -19,6 +19,10 @@ enum class LlvmCostFunction {
   IR_INSTRUCTION_COUNT,
   // Returns the size (in bytes) of the .TEXT section of the compiled module.
   OBJECT_TEXT_SIZE_BYTES,
+#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
+  // Returns the size (in bytes) of the .TEXT section of the compiled binary.
+  TEXT_SIZE_BYTES,
+#endif
 };
 
 enum class LlvmBaselinePolicy {
@@ -51,7 +55,8 @@ void setbaselineCosts(const llvm::Module& unoptimizedModule, BaselineCosts* base
 // Translate from reward space to a cost function.
 LlvmCostFunction getCostFunction(LlvmRewardSpace space);
 
-// Translate from reward space to a baseline policy.
-LlvmBaselinePolicy getBaselinePolicy(LlvmRewardSpace space);
+// Translate from reward space to a baseline policy. If a reward space has no
+// baseline policy, this returns std::nullopt.
+std::optional<LlvmBaselinePolicy> getBaselinePolicy(LlvmRewardSpace space);
 
 }  // namespace compiler_gym::llvm_service

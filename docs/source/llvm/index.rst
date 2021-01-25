@@ -232,13 +232,11 @@ Example usage:
 Hardware Information
 ~~~~~~~~~~~~~~~~~~~~
 
-+--------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| Observation space        | Shape                                                                                                                                                                                                                                                                                                                                                                 |
-+==========================+=======================================================================================================================================================================================================================================================================================================================================================================+
-| CpuInfo                  | `str_list<>[0,inf]) -> json://`                                                                                                                                                                                                                                                                                                                                       |
-+--------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
-| CpuInfoDict              | `Dict(cores_count:int<-inf,inf>, l1d_cache_count:int<-inf,inf>, l1d_cache_size:int<-inf,inf>, l1i_cache_count:int<-inf,inf>, l1i_cache_size:int<-inf,inf>, l2_cache_count:int<-inf,inf>, l2_cache_size:int<-inf,inf>, l3_cache_count:int<-inf,inf>, l3_cache_size:int<-inf,inf>, l4_cache_count:int<-inf,inf>, l4_cache_size:int<-inf,inf>, name:str_list<>[0,inf]))` |
-+--------------------------+-----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
++----------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
+| Observation space    | Shape                                                                                                                                                                                                                                                   |
++======================+=========================================================================================================================================================================================================================================================+
+| CpuInfo              | `Dict(cores_count:int, l1d_cache_count:int, l1d_cache_size:int, l1i_cache_count:int, l1i_cache_size:int, l2_cache_count:int, l2_cache_size:int, l3_cache_count:int, l3_cache_size:int, l4_cache_count:int, l4_cache_size:int, name:str_list<>[0,inf]))` |
++----------------------+---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+
 
 Essential performance information about the host CPU can be accessed as JSON
 dictionary, extracted using the `cpuinfo <https://github.com/pytorch/cpuinfo>`_
@@ -289,28 +287,45 @@ state :math:`s_{t-1}` to the current state :math:`s_t`:
 .. math::
     R(s_t) = C(s_{t-1}) - C(s_t)
 
-For the LLVM environments we use the existing heuristics as baseline policies.
-Running the baseline policy on the initial program state :math:`s_{t=0}`
-produces a baseline state :math:`s_b` which is used to produce a baseline
-cost :math:`C(s_b)`. We use the reduction in cost achieved by this baseline
-policy :math:`C(s_{b}) - C(s_{t=1})` to scale the reward signal:
+Reward can be normalized using the cost of the program before any optimizations
+are applied as the scaling factor:
 
 .. math::
-    R(s_t) = \frac{C(s_{t-1}) - C(s_t)}{{C(s_{t=0})} - C(s_{b})}
+    R(s_t) = \frac{C(s_{t-1} - C(s_t)}{C(s_{t=0})}
+
+Normalized rewards are indicated by a :code:`Norm` suffix on the reward space
+name.
+
+Alternatively, rewards can be normalized by comparison to a baseline policy. The
+baseline policies are derived from existing
+`LLVM optimization levels <https://clang.llvm.org/docs/CommandGuide/clang.html#code-generation-options>`_:
+:code:`-O3`, and :code:`-Oz`. When a baseline policy is used, reward is the
+reduction in cost from the previous state, scaled by the *reduction in cost*
+achieved by applying the baseline policy to produce a baseline state
+:math:`s_b`:
+
+.. math::
+    R(s_t) = \frac{C(s_{t-1}) - C(s_t)}{{C(s_{t=0})} - C(s_b)}
+
+These reward spaces are indicated by the baseline policy name as a suffix, e.g.
+the reward space :code:`IrInstructionCountO3` is :code:`IrInstructionCount`
+reward normalized to the :code:`-O3` baseline policy.
 
 
 IR Instruction Count
 ~~~~~~~~~~~~~~~~~~~~
 
-+----------------------+-----------------+-------------+---------------------+------------------+-----------------------+
-| Reward space         | Baseline Policy | Range       |   Success Threshold | Deterministic?   | Platform dependent?   |
-+======================+=================+=============+=====================+==================+=======================+
-| IrInstructionCount   |                 | (-inf, inf) |                     | Yes              | No                    |
-+----------------------+-----------------+-------------+---------------------+------------------+-----------------------+
-| IrInstructionCountO3 | :code:`-O3`     | (-inf, inf) |                 1.0 | Yes              | No                    |
-+----------------------+-----------------+-------------+---------------------+------------------+-----------------------+
-| IrInstructionCountOz | :code:`-Oz`     | (-inf, inf) |                 1.0 | Yes              | No                    |
-+----------------------+-----------------+-------------+---------------------+------------------+-----------------------+
++------------------------+-----------------+-------------+---------------------+------------------+-----------------------+
+| Reward space           | Baseline Policy | Range       |   Success Threshold | Deterministic?   | Platform dependent?   |
++========================+=================+=============+=====================+==================+=======================+
+| IrInstructionCount     |                 | (-inf, inf) |                     | Yes              | No                    |
++------------------------+-----------------+-------------+---------------------+------------------+-----------------------+
+| IrInstructionCountNorm |                 | (-inf, 1.0) |                     | Yes              | No                    |
++------------------------+-----------------+-------------+---------------------+------------------+-----------------------+
+| IrInstructionCountO3   | :code:`-O3`     | (-inf, inf) |                 1.0 | Yes              | No                    |
++------------------------+-----------------+-------------+---------------------+------------------+-----------------------+
+| IrInstructionCountOz   | :code:`-Oz`     | (-inf, inf) |                 1.0 | Yes              | No                    |
++------------------------+-----------------+-------------+---------------------+------------------+-----------------------+
 
 The number of LLVM-IR instructions in the program can be used as a reward
 signal either using the raw change in instruction count
@@ -329,6 +344,8 @@ Codesize
 +======================+=================+=============+=====================+==================+=======================+
 | ObjectTextSizeBytes  |                 | (-inf, inf) |                     | Yes              | Yes                   |
 +----------------------+-----------------+-------------+---------------------+------------------+-----------------------+
+| ObjectTextSizeNorm   |                 | (-inf, 1.0) |                     | Yes              | Yes                   |
++----------------------+-----------------+-------------+---------------------+------------------+-----------------------+
 | ObjectTextSizeO3     | :code:`-O3`     | (-inf, inf) |                 1.0 | Yes              | Yes                   |
 +----------------------+-----------------+-------------+---------------------+------------------+-----------------------+
 | ObjectTextSizeOz     | :code:`-Oz`     | (-inf, inf) |                 1.0 | Yes              | Yes                   |
@@ -337,7 +354,8 @@ Codesize
 The :code:`ObjectTextSizeBytes` reward signal returns the size of the
 :code:`.TEXT` section of the module after lowering to an object file, before
 linking. This is more expensive to compute than :code:`IrInstructionCount`. The
-object file code size depends on the target platform.
+object file code size depends on the target platform, see
+:func:`CompilerEnv.compiler_version <compiler_gym.envs.CompilerEnv.compiler_version>`.
 
 
 Action Space

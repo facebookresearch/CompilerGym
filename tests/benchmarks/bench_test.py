@@ -6,24 +6,11 @@
 import gym
 import pytest
 
-from compiler_gym.envs import CompilerEnv, LlvmEnv
+from compiler_gym.envs import CompilerEnv, LlvmEnv, llvm
 from compiler_gym.service import CompilerGymServiceConnection
-from tests.envs.llvm.fixtures import SERVICE_BIN
 from tests.test_main import main
 
 pytest_plugins = ["tests.envs.llvm.fixtures"]
-
-# Redefine this fixture to run only the local LLVM env.
-@pytest.fixture(scope="function")
-def env() -> CompilerEnv:
-    """Create an LLVM environment."""
-    env = gym.make("llvm-v0")
-    env.require_dataset("cBench-v0")
-    try:
-        yield env
-    finally:
-        env.close()
-
 
 # Redefine this fixture since running all of the benchmarks in cBench would
 # take too long, but we do want to use at least one small and one large
@@ -48,7 +35,7 @@ def test_make_local(benchmark):
 
 
 def test_make_service(benchmark):
-    service = CompilerGymServiceConnection(SERVICE_BIN)
+    service = CompilerGymServiceConnection(llvm.LLVM_SERVICE_BINARY)
     try:
         benchmark(lambda: LlvmEnv(service=service.connection.url).close())
     finally:

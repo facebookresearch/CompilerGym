@@ -14,9 +14,15 @@ from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.util.registration import register
 from compiler_gym.util.runfiles_path import runfiles_path
 
-__all__ = ["LlvmEnv", "make_benchmark", "ClangInvocation", "get_system_includes"]
+__all__ = [
+    "LlvmEnv",
+    "make_benchmark",
+    "ClangInvocation",
+    "get_system_includes",
+    "LLVM_SERVICE_BINARY",
+]
 
-_LLVM_SERVICE_BINARY = runfiles_path(
+LLVM_SERVICE_BINARY = runfiles_path(
     "CompilerGym/compiler_gym/envs/llvm/service/service"
 )
 
@@ -31,7 +37,7 @@ def _register_llvm_gym_service():
         id="llvm-v0",
         entry_point="compiler_gym.envs.llvm:LlvmEnv",
         kwargs={
-            "service": _LLVM_SERVICE_BINARY,
+            "service": LLVM_SERVICE_BINARY,
         },
     )
 
@@ -40,7 +46,7 @@ def _register_llvm_gym_service():
             id=f"llvm-{reward_space}-v0",
             entry_point="compiler_gym.envs.llvm:LlvmEnv",
             kwargs={
-                "service": _LLVM_SERVICE_BINARY,
+                "service": LLVM_SERVICE_BINARY,
                 "reward_space": reward_spaces[reward_space],
             },
         )
@@ -50,7 +56,7 @@ def _register_llvm_gym_service():
             id=f"llvm-{observation_space}-{reward_space}-v0",
             entry_point="compiler_gym.envs.llvm:LlvmEnv",
             kwargs={
-                "service": _LLVM_SERVICE_BINARY,
+                "service": LLVM_SERVICE_BINARY,
                 "observation_space": observation_spaces[observation_space],
                 "reward_space": reward_spaces[reward_space],
             },

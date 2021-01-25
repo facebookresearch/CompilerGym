@@ -161,24 +161,15 @@ Status LlvmEnvironment::takeAction(const ActionRequest& request, ActionReply* re
   RETURN_IF_ERROR(verifyModuleStatus(benchmark().module()));
 
   if (eagerObservationSpace().has_value()) {
-    // Compute new observation if needed.
-    if (!reply->action_had_no_effect()) {
-      eagerObservation_ = {};
-      RETURN_IF_ERROR(getObservation(eagerObservationSpace().value(), &eagerObservation_));
-    }
+    eagerObservation_ = {};
+    RETURN_IF_ERROR(getObservation(eagerObservationSpace().value(), &eagerObservation_));
     *reply->mutable_observation() = eagerObservation_;
   }
 
   if (eagerRewardSpace().has_value()) {
-    if (reply->action_had_no_effect()) {
-      // Action had no effect, so no reward.
-      reply->mutable_reward()->set_reward(0);
-    } else {
-      // Compute new reward if needed.
-      eagerReward_ = {};
-      RETURN_IF_ERROR(getReward(eagerRewardSpace().value(), &eagerReward_));
-      *reply->mutable_reward() = eagerReward_;
-    }
+    eagerReward_ = {};
+    RETURN_IF_ERROR(getReward(eagerRewardSpace().value(), &eagerReward_));
+    *reply->mutable_reward() = eagerReward_;
   }
 
   return Status::OK;
@@ -324,6 +315,32 @@ Status LlvmEnvironment::getObservation(LlvmObservationSpace space, Observation* 
       reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
       break;
     }
+#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
+    case LlvmObservationSpace::TEXT_SIZE_BYTES: {
+      const auto cost =
+          getCost(LlvmCostFunction::TEXT_SIZE_BYTES, benchmark().module(), workingDirectory_);
+      reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
+      break;
+    }
+    case LlvmObservationSpace::TEXT_SIZE_O0: {
+      const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O0,
+                                        LlvmCostFunction::TEXT_SIZE_BYTES);
+      reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
+      break;
+    }
+    case LlvmObservationSpace::TEXT_SIZE_O3: {
+      const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O3,
+                                        LlvmCostFunction::TEXT_SIZE_BYTES);
+      reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
+      break;
+    }
+    case LlvmObservationSpace::TEXT_SIZE_OZ: {
+      const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::Oz,
+                                        LlvmCostFunction::TEXT_SIZE_BYTES);
+      reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
+      break;
+    }
+#endif
   }
 
   return Status::OK;
@@ -332,22 +349,38 @@ Status LlvmEnvironment::getObservation(LlvmObservationSpace space, Observation* 
 Status LlvmEnvironment::getReward(LlvmRewardSpace space, Reward* reply) {
   const LlvmCostFunction cost = getCostFunction(space);
   const auto costIdx = static_cast<size_t>(cost);
-  const LlvmBaselinePolicy baselinePolicy = getBaselinePolicy(space);
+  const std::optional<LlvmBaselinePolicy> baselinePolicy = getBaselinePolicy(space);
 
   // Fetch the cached costs.
   const double unoptimizedCost =
       getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O0, cost);
-  const double baselineCost = getBaselineCost(benchmark().baselineCosts(), baselinePolicy, cost);
   const double previousCost =
       previousCosts_[costIdx].has_value() ? *previousCosts_[costIdx] : unoptimizedCost;
 
   // Compute a new cost.
   const double currentCost = getCost(cost, benchmark().module(), workingDirectory_);
 
-  // Derive the reward from the costs.
+  // Reward is reduction in cost.
   double reward = previousCost - currentCost;
-  if (baselinePolicy != LlvmBaselinePolicy::O0) {
-    reward /= unoptimizedCost - baselineCost;
+
+  // Optionally scale the reward by comparison to a baseline policy:
+  //   - If the baseline policy is -O0, then scale the reward against the
+  //     baseline cost. For example, an instruction count reward of 10 for a
+  //     program with 100 initial instructions would be 10 / 100 = 0.1.
+  //   - For a baseline policy of -O3 or -Oz, reward is scaled by the reduction
+  //     in cost achieved by that baseline.
+  if (baselinePolicy.has_value()) {
+    const double baselineCost = getBaselineCost(benchmark().baselineCosts(), *baselinePolicy, cost);
+    if (baselinePolicy == LlvmBaselinePolicy::O0) {
+      if (baselineCost) {
+        reward /= baselineCost;
+      }
+    } else {
+      const double baselineImprovement = unoptimizedCost - baselineCost;
+      if (baselineImprovement) {
+        reward /= baselineImprovement;
+      }
+    }
   }
   reply->set_reward(reward);
 

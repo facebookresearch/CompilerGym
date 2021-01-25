@@ -6,9 +6,14 @@
 py_test(
     name = "bench_test",
     srcs = ["bench_test.py"],
+    data = [
+        "//compiler_gym/envs/llvm/service",
+    ],
+    shard_count = 8,
     deps = [
         "//compiler_gym",
         "//compiler_gym/envs",
+        "//compiler_gym/util",
         "//tests:test_main",
         "//tests/envs/llvm:fixtures",
     ],

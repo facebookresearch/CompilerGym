@@ -32,3 +32,18 @@ genrule(
     cmd = "cp $< $@",
     visibility = ["//visibility:public"],
 )
+
+genrule(
+    name = "make_llvm-size",
+    srcs = select({
+        "@llvm//:darwin": [
+            "@clang-llvm-10.0.0-x86_64-apple-darwin//:llvm-size",
+        ],
+        "//conditions:default": [
+            "@clang-llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04//:llvm-size",
+        ],
+    }),
+    outs = ["llvm-size"],
+    cmd = "cp $< $@",
+    visibility = ["//visibility:public"],
+)

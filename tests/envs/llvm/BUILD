@@ -19,7 +19,7 @@ py_test(
     name = "all_benchmarks_init_close_test",
     timeout = "long",
     srcs = ["all_benchmarks_init_close_test.py"],
-    shard_count = 4,
+    shard_count = 6,
     deps = [
         ":fixtures",
         "//compiler_gym/envs",
@@ -71,7 +71,6 @@ py_library(
     testonly = 1,
     srcs = ["fixtures.py"],
     data = [
-        "//compiler_gym/envs/llvm/service",
         "//compiler_gym/envs/llvm/service/passes:actions_genfiles",
         "//compiler_gym/third_party/cBench:benchmarks_list",
     ],
@@ -87,7 +86,7 @@ py_library(
 py_test(
     name = "fresh_environment_observation_reward_test",
     srcs = ["fresh_environment_observation_reward_test.py"],
-    shard_count = 4,
+    shard_count = 8,
     deps = [
         ":fixtures",
         "//compiler_gym/envs",
@@ -109,6 +108,7 @@ py_test(
 py_test(
     name = "llvm_env_test",
     srcs = ["llvm_env_test.py"],
+    shard_count = 4,
     deps = [
         ":fixtures",
         "//compiler_gym",
@@ -143,6 +143,21 @@ py_test(
     deps = [
         ":fixtures",
         "//compiler_gym/envs",
+        "//tests:test_main",
+    ],
+)
+
+py_test(
+    name = "service_connection_test",
+    srcs = ["service_connection_test.py"],
+    data = [
+        "//compiler_gym/envs/llvm/service",
+    ],
+    deps = [
+        ":fixtures",
+        "//compiler_gym",
+        "//compiler_gym/envs",
+        "//compiler_gym/util",
         "//tests:test_main",
     ],
 )

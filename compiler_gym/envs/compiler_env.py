@@ -3,22 +3,24 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """This module defines the OpenAI gym interface for compilers."""
+import csv
 import os
 import warnings
+from io import StringIO
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple, Union
+from time import time
+from typing import Any, Dict, Iterable, List, NamedTuple, Optional, Tuple, Union
 
 import fasteners
 import gym
 import numpy as np
 from gym.spaces import Space
 
-from compiler_gym.datasets import Dataset, require
+from compiler_gym.datasets.dataset import Dataset, require
 from compiler_gym.service import (
     CompilerGymServiceConnection,
     ConnectionOpts,
     ServiceError,
-    observation2py,
     observation_t,
 )
 from compiler_gym.service.connection import ServiceTransportError
@@ -43,6 +45,81 @@ from compiler_gym.views import (
 # Type hints.
 info_t = Dict[str, Any]
 step_t = Tuple[Optional[observation_t], Optional[float], bool, info_t]
+
+
+def _to_csv(*columns) -> str:
+    buf = StringIO()
+    writer = csv.writer(buf)
+    writer.writerow(columns)
+    return buf.getvalue().rstrip()
+
+
+class CompilerEnvState(NamedTuple):
+    """The representation of a compiler environment state.
+
+    The state of an environment is defined as a benchmark and a sequence of
+    actions that has been applied to it. For a given environment, the state
+    contains the information required to reproduce the result.
+    """
+
+    benchmark: str
+    """The name of the benchmark used for this episode."""
+
+    commandline: str
+    """The list of actions that produced this state, as a commandline."""
+
+    walltime: float
+    """The walltime of the episode."""
+
+    reward: Optional[float] = None
+    """The cumulative reward for this episode."""
+
+    @staticmethod
+    def csv_header() -> str:
+        """Return the header string for the CSV-format.
+
+        :return: A comma-separated string.
+        """
+        return _to_csv("benchmark", "reward", "walltime", "commandline")
+
+    def to_csv(self) -> str:
+        """Serialize a state to a comma separated list of values.
+
+        :return: A comma-separated string.
+        """
+        return _to_csv(self.benchmark, self.reward, self.walltime, self.commandline)
+
+    @classmethod
+    def from_csv(cls, csv_string: str) -> "CompilerEnvState":
+        """Construct a state from a comma separated list of values."""
+        reader = csv.reader(StringIO(csv_string))
+        for line in reader:
+            try:
+                benchmark, reward, walltime, commandline = line
+                break
+            except ValueError as e:
+                raise ValueError(f"Failed to parse input: `{csv_string}`: {e}") from e
+        else:
+            raise ValueError(f"Failed to parse input: `{csv_string}`")
+        return cls(
+            benchmark=benchmark,
+            reward=None if reward == "" else float(reward),
+            walltime=float(walltime),
+            commandline=commandline,
+        )
+
+    def __eq__(self, rhs) -> bool:
+        if not isinstance(rhs, CompilerEnvState):
+            return False
+        epsilon = 1e-5
+        # Note that walltime is excluded from equivalence checks as two states
+        # are equivalent if they define the same point in the optimization space
+        # irrespective of how long it took to get there.
+        return (
+            self.benchmark == rhs.benchmark
+            and abs(self.reward - rhs.reward) < epsilon
+            and self.commandline == rhs.commandline
+        )
 
 
 class CompilerEnv(gym.Env):
@@ -105,6 +182,10 @@ class CompilerEnv(gym.Env):
     :ivar reward: A view of the available reward spaces that permits on-demand
         computation of rewards.
     :vartype reward: compiler_gym.views.RewardView
+
+    :ivar episode_reward: If
+        :func:`CompilerEnv.reward_space <compiler_gym.envs.CompilerGym.reward_space>`
+        is set, this value is the sum of all rewards for the current episode.
     """
 
     def __init__(
@@ -190,6 +271,8 @@ class CompilerEnv(gym.Env):
         self.action_space: Optional[Space] = None
         self.observation_space: Optional[Space] = None
         self.reward_range: Tuple[float, float] = (-np.inf, np.inf)
+        self.episode_reward: Optional[float] = None
+        self.episode_start_time: float = time()
 
         # Initialize eager observation/reward and benchmark.
         self.observation_space = observation_space
@@ -221,6 +304,20 @@ class CompilerEnv(gym.Env):
         :return: A string commandline invocation.
         """
         return ""
+
+    @property
+    def episode_walltime(self) -> float:
+        return time() - self.episode_start_time
+
+    @property
+    def state(self) -> CompilerEnvState:
+        """The tuple representation of the current environment state."""
+        return CompilerEnvState(
+            benchmark=self.benchmark,
+            reward=self.episode_reward,
+            walltime=self.episode_walltime,
+            commandline=self.commandline(),
+        )
 
     @property
     def inactive_datasets_site_path(self) -> Optional[Path]:
@@ -432,6 +529,7 @@ class CompilerEnv(gym.Env):
             it overrides any value that set during :func:`__init__`, and
             subsequent calls to :code:`reset()` will use this action space.
             If no aciton space is provided, the default action space is used.
+        :return: The initial observation.
         """
         if retry_count > self.connection_settings.init_max_attempts:
             raise OSError(f"Failed to reset environment after {retry_count} attempts")
@@ -498,12 +596,16 @@ class CompilerEnv(gym.Env):
         self._session_id = reply.session_id
         self.observation.session_id = reply.session_id
         self.reward.session_id = reply.session_id
+        self.episode_start_time = time()
 
         # If the action space has changed, update it.
         if reply.HasField("new_action_space"):
             self.action_space = self._make_action_space(
                 self.action_space.name, reply.new_action_space.action
             )
+
+        if self.reward_space:
+            self.episode_reward = 0
 
         if self._eager_observation:
             return self.observation[self.observation_space.id]
@@ -525,6 +627,10 @@ class CompilerEnv(gym.Env):
         except (ServiceError, ServiceTransportError, TimeoutError) as e:
             self.close()
             info = {"error_details": str(e)}
+            if self.reward_space:
+                reward = self.reward_space.reward_on_error(self.episode_reward)
+            if self.observation_space:
+                observation = self.observation_space.default_value
             return observation, reward, True, info
 
         # If the action space has changed, update it.
@@ -533,13 +639,11 @@ class CompilerEnv(gym.Env):
                 self.action_space.name, reply.action_space.action
             )
 
-        if self._eager_observation:
-            observation = self.observation.translate(
-                self.observation_space.id,
-                observation2py(self.observation_space.space, reply.observation),
-            )
+        if self.observation_space:
+            observation = self.observation_space.cb(reply.observation)
         if self._eager_reward:
             reward = reply.reward.reward
+            self.episode_reward += reward
 
         info = {
             "action_had_no_effect": reply.action_had_no_effect,

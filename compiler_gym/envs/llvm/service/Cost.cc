@@ -60,46 +60,74 @@ std::string moduleToString(llvm::Module& module) {
   return str;
 }
 
-Status getObjectTextSizeInBytes(llvm::Module& module, int64_t* value,
-                                const fs::path& workingDirectory) {
+// For the experimental binary .text size cost, getTextSizeInBytes() is extended
+// to support a list of additional args to pass to clang.
+#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
+Status getTextSizeInBytes(llvm::Module& module, int64_t* value,
+                          const std::vector<std::string>& clangArgs,
+                          const fs::path& workingDirectory) {
+#else
+Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& workingDirectory) {
+#endif
   const auto clangPath = util::getRunfilesPath("compiler_gym/third_party/llvm/clang");
+  const auto llvmSizePath = util::getRunfilesPath("compiler_gym/third_party/llvm/llvm-size");
   DCHECK(fs::exists(clangPath)) << "File not found: " << clangPath.string();
+  DCHECK(fs::exists(llvmSizePath)) << "File not found: " << llvmSizePath.string();
 
-  const auto tmpFile = fs::unique_path(workingDirectory / "module-%%%%.o");
-
-  // Lower the module to an object file using clang.
-  // TODO(cummins): Use clang driver APIs rather than invoking command line.
-  // https://github.com/llvm/llvm-project/blob/b8d2b6f6cf6015751fc950c3e8149404e8b37fe8/clang/examples/clang-interpreter/main.cpp
+  // Lower the module to an object file using clang and extract the .text
+  // section size using llvm-size.
   const std::string ir = moduleToString(module);
+
+  const auto tmpFile = fs::unique_path(workingDirectory / "obj-%%%%");
+
+#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
+  std::vector<std::string> clangCmd{clangPath.string(), "-xir", "-", "-o", tmpFile.string()};
+  clangCmd.insert(clangCmd.end(), clangArgs.begin(), clangArgs.end());
   auto clang =
-      subprocess::Popen({clangPath.string(), "-O0", "-xir", "-", "-c", "-o", tmpFile.string()},
+      subprocess::Popen(clangCmd, subprocess::input{subprocess::PIPE},
+                        subprocess::output{subprocess::PIPE}, subprocess::error{subprocess::PIPE});
+#else
+  auto clang =
+      subprocess::Popen({clangPath.string(), "-xir", "-", "-o", tmpFile.string(), "-c"},
                         subprocess::input{subprocess::PIPE}, subprocess::output{subprocess::PIPE},
                         subprocess::error{subprocess::PIPE});
+#endif
   const auto clangOutput = clang.communicate(ir.c_str(), ir.size());
   if (clang.retcode()) {
     fs::remove(tmpFile);
-    std::string error(clangOutput.second.buf.begin(), clangOutput.second.buf.end());
+    const std::string error(clangOutput.second.buf.begin(), clangOutput.second.buf.end());
     return Status(StatusCode::INTERNAL, error);
   }
 
-  // Use size to measure the size of the text section.
-  // NOTE(cummins): Requires that `awk` and `size` are in PATH.
-  auto size =
-      subprocess::Popen(fmt::format("size {} | awk 'NR==2 {}'", tmpFile.string(), "{print $1}"),
-                        subprocess::shell{true}, subprocess::output{subprocess::PIPE},
-                        subprocess::error{subprocess::PIPE});
-  const auto sizeOutput = size.communicate();
+  auto llvmSize =
+      subprocess::Popen({llvmSizePath.string(), tmpFile.string()},
+                        subprocess::output{subprocess::PIPE}, subprocess::error{subprocess::PIPE});
+  const auto sizeOutput = llvmSize.communicate();
   fs::remove(tmpFile);
-  if (size.retcode()) {
-    std::string error(sizeOutput.second.buf.begin(), sizeOutput.second.buf.end());
+  if (llvmSize.retcode()) {
+    const std::string error(sizeOutput.second.buf.begin(), sizeOutput.second.buf.end());
     return Status(StatusCode::INTERNAL, error);
   }
 
-  std::string stdout{sizeOutput.first.buf.begin(), sizeOutput.first.buf.end()};
+  // The output of llvm-size is in berkley format, e.g.:
+  //
+  //     $ llvm-size foo.o
+  //     __TEXT __DATA __OBJC others dec hex
+  //     127    0      0      32	   159 9f
+  //
+  // Skip the first line of output and read an integer from the start of the
+  // second line:
+  const std::string stdout{sizeOutput.first.buf.begin(), sizeOutput.first.buf.end()};
+  const size_t eol = stdout.find('\n');
+  const size_t tab = stdout.find('\t', eol + 1);
+  if (eol == std::string::npos || tab == std::string::npos) {
+    return Status(StatusCode::INTERNAL, fmt::format("Failed to parse .TEXT size: `{}`\n", stdout));
+  }
+  const std::string extracted = stdout.substr(eol, tab - eol);
   try {
-    *value = std::stoi(stdout);
+    *value = std::stoi(extracted);
   } catch (std::exception const& e) {
-    return Status(StatusCode::INTERNAL, fmt::format("Failed to parse integer: `{}`\n", stdout));
+    return Status(StatusCode::INTERNAL, fmt::format("Failed to parse .TEXT size: `{}`\n", stdout));
   }
   return Status::OK;
 }
@@ -119,10 +147,30 @@ double getCost(const LlvmCostFunction& cost, llvm::Module& module,
       return static_cast<double>(module.getInstructionCount());
     case LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES: {
       int64_t size;
-      const auto status = getObjectTextSizeInBytes(module, &size, workingDirectory);
+#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
+      const auto status = getTextSizeInBytes(module, &size, {"-c"}, workingDirectory);
+#else
+      const auto status = getTextSizeInBytes(module, &size, workingDirectory);
+#endif
       CHECK(status.ok()) << status.error_message();
       return static_cast<double>(size);
     }
+#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
+
+#ifdef __APPLE__
+#define SYSTEM_LIBRARIES \
+  "-L"                   \
+  "/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib"
+#else
+#define SYSTEM_LIBRARIES
+#endif
+    case LlvmCostFunction::TEXT_SIZE_BYTES: {
+      int64_t size;
+      const auto status = getTextSizeInBytes(module, &size, {SYSTEM_LIBRARIES}, workingDirectory);
+      CHECK(status.ok()) << status.error_message();
+      return static_cast<double>(size);
+    }
+#endif
   }
 }
 
@@ -171,26 +219,50 @@ void setbaselineCosts(const llvm::Module& unoptimizedModule, BaselineCosts* base
 LlvmCostFunction getCostFunction(LlvmRewardSpace space) {
   switch (space) {
     case LlvmRewardSpace::IR_INSTRUCTION_COUNT:
+    case LlvmRewardSpace::IR_INSTRUCTION_COUNT_NORM:
     case LlvmRewardSpace::IR_INSTRUCTION_COUNT_O3:
     case LlvmRewardSpace::IR_INSTRUCTION_COUNT_Oz:
       return LlvmCostFunction::IR_INSTRUCTION_COUNT;
     case LlvmRewardSpace::OBJECT_TEXT_SIZE_BYTES:
+    case LlvmRewardSpace::OBJECT_TEXT_SIZE_NORM:
     case LlvmRewardSpace::OBJECT_TEXT_SIZE_O3:
     case LlvmRewardSpace::OBJECT_TEXT_SIZE_Oz:
       return LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES;
+#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
+    case LlvmRewardSpace::TEXT_SIZE_BYTES:
+    case LlvmRewardSpace::TEXT_SIZE_NORM:
+    case LlvmRewardSpace::TEXT_SIZE_O3:
+    case LlvmRewardSpace::TEXT_SIZE_Oz:
+      return LlvmCostFunction::TEXT_SIZE_BYTES;
+#endif
   }
 }
 
-LlvmBaselinePolicy getBaselinePolicy(LlvmRewardSpace space) {
+std::optional<LlvmBaselinePolicy> getBaselinePolicy(LlvmRewardSpace space) {
   switch (space) {
     case LlvmRewardSpace::IR_INSTRUCTION_COUNT:
     case LlvmRewardSpace::OBJECT_TEXT_SIZE_BYTES:
+#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
+    case LlvmRewardSpace::TEXT_SIZE_BYTES:
+#endif
+      return std::nullopt;
+    case LlvmRewardSpace::IR_INSTRUCTION_COUNT_NORM:
+    case LlvmRewardSpace::OBJECT_TEXT_SIZE_NORM:
+#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
+    case LlvmRewardSpace::TEXT_SIZE__O0:
+#endif
       return LlvmBaselinePolicy::O0;
     case LlvmRewardSpace::IR_INSTRUCTION_COUNT_O3:
     case LlvmRewardSpace::OBJECT_TEXT_SIZE_O3:
+#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
+    case LlvmRewardSpace::TEXT_SIZE_O3:
+#endif
       return LlvmBaselinePolicy::O3;
     case LlvmRewardSpace::IR_INSTRUCTION_COUNT_Oz:
     case LlvmRewardSpace::OBJECT_TEXT_SIZE_Oz:
+#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
+    case LlvmRewardSpace::TEXT_SIZE_Oz:
+#endif
       return LlvmBaselinePolicy::Oz;
   }
 }
