@@ -24,8 +24,11 @@ from compiler_gym.envs import COMPILER_GYM_ENVS, CompilerEnv, observation_t, ste
 from compiler_gym.random_search import random_search
 from compiler_gym.util.download import download
 from compiler_gym.util.runfiles_path import cache_path, site_data_path
+from compiler_gym.validate import ValidationResult, validate_state, validate_states
 
+# The top-level compiler_gym API.
 __all__ = [
+    "__version__",
     "download",
     "cache_path",
     "site_data_path",
@@ -34,4 +37,7 @@ __all__ = [
     "observation_t",
     "step_t",
     "random_search",
+    "ValidationResult",
+    "validate_state",
+    "validate_states",
 ]

@@ -17,20 +17,22 @@ class ThreadedWorker(Thread):
 
     def __init__(self, env_name: str, benchmark: str, actions: List[int]):
         super().__init__()
+        self.done = False
         self.env_name = env_name
         self.benchmark = benchmark
         self.actions = actions
         assert actions
 
     def run(self) -> None:
-        env = gym.make(self.env_name)
-        env.reset(benchmark=self.benchmark)
+        env = gym.make(self.env_name, benchmark=self.benchmark)
+        env.reset()
 
         for action in self.actions:
-            self.observation, self.reward, self.done, self.info = env.step(action)
-            assert not self.done
+            self.observation, self.reward, done, self.info = env.step(action)
+            assert not done
 
         env.close()
+        self.done = True
 
 
 class ThreadedWorkerWithEnv(Thread):
@@ -38,14 +40,17 @@ class ThreadedWorkerWithEnv(Thread):
 
     def __init__(self, env: CompilerEnv, actions: List[int]):
         super().__init__()
+        self.done = False
         self.env = env
         self.actions = actions
         assert actions
 
     def run(self) -> None:
         for action in self.actions:
-            self.observation, self.reward, self.done, self.info = self.env.step(action)
-            assert not self.done
+            self.observation, self.reward, done, self.info = self.env.step(action)
+            assert not done
+
+        self.done = True
 
 
 def test_running_environment_in_background_thread():
@@ -58,7 +63,7 @@ def test_running_environment_in_background_thread():
     thread.start()
     thread.join(timeout=10)
 
-    assert not thread.done
+    assert thread.done
     assert thread.observation is not None
     assert isinstance(thread.reward, float)
     assert thread.info
@@ -75,7 +80,7 @@ def test_moving_environment_to_background_thread():
     thread.start()
     thread.join(timeout=10)
 
-    assert not thread.done
+    assert thread.done
     assert thread.observation is not None
     assert isinstance(thread.reward, float)
     assert thread.info

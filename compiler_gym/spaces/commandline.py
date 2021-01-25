@@ -2,7 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-from typing import Iterable, NamedTuple, Optional, Union
+from typing import Iterable, List, NamedTuple, Optional, Union
 
 from compiler_gym.spaces.named_discrete import NamedDiscrete
 
@@ -73,3 +73,21 @@ class Commandline(NamedDiscrete):
             return self.flags[values]
         else:
             return " ".join([self.flags[v] for v in values])
+
+    def from_commandline(self, commandline: str) -> List[int]:
+        """Produce a sequence of actions from a commandline.
+
+        :param commandline: A string commandline invocation, as produced by
+            :func:`commandline() <compiler_gym.spaces.commandline.Commandline.commandline>`.
+        :return: A list of action values.
+        :raises LookupError: If any of the flags in the commandline are not
+            recognized.
+        """
+        flags = commandline.split()
+        values = []
+        for flag in flags:
+            try:
+                values.append(self.flags.index(flag))
+            except IndexError:
+                raise LookupError(f"Unknown flag: `{flag}`")
+        return values

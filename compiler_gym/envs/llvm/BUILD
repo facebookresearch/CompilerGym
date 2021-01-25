@@ -9,7 +9,7 @@ py_library(
     data = [
         "//compiler_gym/envs/llvm/service",
     ],
-    visibility = ["//compiler_gym/envs:__pkg__"],
+    visibility = ["//compiler_gym:__subpackages__"],
     deps = [
         ":benchmarks",
         ":llvm_env",
@@ -34,7 +34,7 @@ py_library(
     name = "datasets",
     srcs = ["datasets.py"],
     deps = [
-        "//compiler_gym/datasets",
+        "//compiler_gym/datasets:dataset",
     ],
 )
 

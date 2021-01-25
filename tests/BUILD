@@ -52,7 +52,18 @@ cc_library(
 )
 
 py_test(
+    name = "validate_test",
+    timeout = "short",
+    srcs = ["validate_test.py"],
+    deps = [
+        ":test_main",
+        "//compiler_gym",
+    ],
+)
+
+py_test(
     name = "version_test",
+    timeout = "short",
     srcs = ["version_test.py"],
     deps = [
         ":test_main",

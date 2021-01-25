@@ -54,12 +54,12 @@ to the number of processors on the host machine. Set a different value using
 :code:`--nproc`.
 """
 import sys
-from multiprocessing import cpu_count
 from pathlib import Path
 
 from absl import app, flags
 
 import compiler_gym.util.flags.ls_benchmark  # Flag definition.
+import compiler_gym.util.flags.nproc  # Flag definition.
 import compiler_gym.util.flags.output_dir  # Flag definition.
 from compiler_gym.random_search import random_search
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
@@ -73,9 +73,6 @@ flags.DEFINE_integer(
     "If 0, use the size of the action space for the patience value.",
 )
 flags.DEFINE_float("runtime", None, "If set, limit the search to this many seconds.")
-flags.DEFINE_integer(
-    "nproc", cpu_count(), "The number of parallel search processes to run."
-)
 flags.DEFINE_boolean(
     "skip_done",
     False,
@@ -119,7 +116,7 @@ def main(argv):
     finally:
         env.close()
 
-    best_reward = random_search(
+    best_reward, _ = random_search(
         make_env=make_env,
         outdir=Path(FLAGS.output_dir) if FLAGS.output_dir else None,
         patience=FLAGS.patience,

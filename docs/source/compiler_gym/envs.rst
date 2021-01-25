@@ -22,6 +22,13 @@ CompilerEnv
    .. automethod:: __init__
 
 
+CompilerEnvState
+----------------
+
+.. autoclass:: CompilerEnvState
+   :members:
+
+
 LlvmEnv
 -------
 

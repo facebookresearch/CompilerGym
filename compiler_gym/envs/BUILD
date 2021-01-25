@@ -16,9 +16,9 @@ py_library(
 py_library(
     name = "compiler_env",
     srcs = ["compiler_env.py"],
-    visibility = ["//compiler_gym/envs:__subpackages__"],
+    visibility = ["//compiler_gym:__subpackages__"],
     deps = [
-        "//compiler_gym/datasets",
+        "//compiler_gym/datasets:dataset",
         "//compiler_gym/service",
         "//compiler_gym/service/proto",
         "//compiler_gym/spaces",

@@ -9,7 +9,7 @@ import gym
 import pytest
 
 import compiler_gym
-from compiler_gym.envs import CompilerEnv, llvm
+from compiler_gym.envs import CompilerEnv, CompilerEnvState, llvm
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.service.connection import CompilerGymServiceConnection
 from tests.test_main import main
@@ -69,7 +69,7 @@ def test_double_reset(env: CompilerEnv):
 
 
 def test_commandline(env: CompilerEnv):
-    env.reset("cBench-v0/crc32")
+    env.reset(benchmark="cBench-v0/crc32")
     assert env.commandline() == "opt  input.bc -o output.bc"
 
 
@@ -157,7 +157,7 @@ def test_gym_make_kwargs():
 
 def test_connection_dies_default_reward(env: LlvmEnv):
     env.reward_space = "IrInstructionCount"
-    env.reset("cBench-v0/crc32")
+    env.reset(benchmark="cBench-v0/crc32")
 
     env.reward_space.default_negates_returns = False
     env.reward_space.default_value = 2.5
@@ -172,7 +172,7 @@ def test_connection_dies_default_reward(env: LlvmEnv):
 
 def test_connection_dies_default_reward_negated(env: LlvmEnv):
     env.reward_space = "IrInstructionCount"
-    env.reset("cBench-v0/crc32")
+    env.reset(benchmark="cBench-v0/crc32")
 
     env.reward_space.default_negates_returns = True
     env.reward_space.default_value = 2.5
@@ -183,6 +183,17 @@ def test_connection_dies_default_reward_negated(env: LlvmEnv):
     assert done
 
     assert reward == -7.5  # negates reward.
+
+
+def test_state_to_csv_from_csv(env: LlvmEnv):
+    env.reset(benchmark="cBench-v0/crc32")
+    env.episode_reward = 10
+
+    state = env.state
+    assert state.reward == 10
+    state_from_csv = CompilerEnvState.from_csv(env.state.to_csv())
+    assert state_from_csv.reward == 10
+    assert state == state_from_csv
 
 
 if __name__ == "__main__":

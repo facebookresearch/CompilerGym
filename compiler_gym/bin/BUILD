@@ -12,6 +12,7 @@ py_library(
         ":random_replay",
         ":random_search",
         ":service",
+        ":validate",
     ],
 )
 
@@ -60,6 +61,7 @@ py_binary(
         "//compiler_gym/util/flags:benchmark_from_flags",
         "//compiler_gym/util/flags:env_from_flags",
         "//compiler_gym/util/flags:ls_benchmark",
+        "//compiler_gym/util/flags:nproc",
         "//compiler_gym/util/flags:output_dir",
     ],
 )
@@ -85,5 +87,18 @@ py_binary(
         "//compiler_gym/spaces",
         "//compiler_gym/util",
         "//compiler_gym/util/flags:env_from_flags",
+    ],
+)
+
+py_binary(
+    name = "validate",
+    srcs = ["validate.py"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//compiler_gym:validate",
+        "//compiler_gym/util",
+        "//compiler_gym/util/flags:dataset",
+        "//compiler_gym/util/flags:env_from_flags",
+        "//compiler_gym/util/flags:nproc",
     ],
 )

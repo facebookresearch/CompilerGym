@@ -8,7 +8,7 @@ from multiprocessing import cpu_count
 from pathlib import Path
 from threading import Thread
 from time import sleep, time
-from typing import Callable, List, Optional, Union
+from typing import Callable, List, Optional, Tuple, Union
 
 import humanize
 
@@ -103,7 +103,7 @@ def random_search(
     patience: int = 0,
     nproc: int = cpu_count(),
     skip_done: bool = False,
-) -> float:
+) -> Tuple[float, List[int]]:
     env = make_env()
     env.reset()
     if not isinstance(env, CompilerEnv):
@@ -250,4 +250,4 @@ def random_search(
     replay_actions(env, best_action_names, outdir)
     env.close()
 
-    return best_returns
+    return best_returns, best_actions

@@ -3,7 +3,9 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """This module defines the available LLVM datasets."""
-from compiler_gym.datasets import Dataset
+from typing import Callable, Dict, Optional
+
+from compiler_gym.datasets.dataset import Dataset
 
 LLVM_DATASETS = [
     Dataset(
@@ -107,3 +109,13 @@ LLVM_DATASETS = [
         sha256="f77dd1988c772e8359e1303cc9aba0d73d5eb27e0c98415ac3348076ab94efd1",
     ),
 ]
+
+# A map from benchmark name to a callback which takes as input an LlvmEnv
+# instance and returns None if the environment is valid, else a string error
+# message.
+#
+# TODO(cummins): Populate this map for cBench using the CK meta properties.
+# See: https://github.com/ctuning/ai/blob/main/program/cbench-bzip2/.cm/meta.json
+LLVM_BENCHMARK_VALIDATION_CALLBACKS: Dict[
+    str, Callable[["LlvmEnv"], Optional[str]]
+] = {}
