@@ -55,7 +55,7 @@ def site_data_path(relpath: str) -> Path:
     elif os.environ.get("HOME"):
         return Path("~/.local/share/compiler_gym").expanduser() / relpath
     else:
-        return Path("/tmp/CompilerGym") / relpath
+        return Path("/tmp/compiler_gym/site_data") / relpath
 
 
 def cache_path(relpath: str) -> Path:
@@ -74,4 +74,4 @@ def cache_path(relpath: str) -> Path:
     elif os.environ.get("HOME"):
         return Path("~/.cache/compiler_gym").expanduser() / relpath
     else:
-        return Path("/tmp/compiler_gym") / relpath
+        return Path("/tmp/compiler_gym/cache") / relpath

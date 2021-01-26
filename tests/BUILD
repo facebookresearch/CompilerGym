@@ -53,7 +53,6 @@ cc_library(
 
 py_test(
     name = "validate_test",
-    timeout = "short",
     srcs = ["validate_test.py"],
     deps = [
         ":test_main",

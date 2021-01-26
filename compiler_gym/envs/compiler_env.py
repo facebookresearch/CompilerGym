@@ -795,7 +795,7 @@ class CompilerEnv(gym.Env):
             >>> env.benchmark = "my-dataset-v0/1"
 
         :param dataset: A :class:`Dataset` instance describing the new dataset.
-        :return: :code:`True` if the dataset was registered added, else :code:`False`.
+        :return: :code:`True` if the dataset was added, else :code:`False`.
         :raises ValueError: If a dataset with this name is already registered.
         """
         platform = {"darwin": "macos"}.get(sys.platform, sys.platform)

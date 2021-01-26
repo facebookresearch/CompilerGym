@@ -39,6 +39,20 @@ py_test(
 )
 
 py_test(
+    name = "benchmark_semantics_validation_test",
+    timeout = "long",
+    srcs = ["benchmark_semantics_validation_test.py"],
+    shard_count = 5,
+    deps = [
+        ":fixtures",
+        "//compiler_gym",
+        "//compiler_gym/datasets",
+        "//compiler_gym/envs",
+        "//tests:test_main",
+    ],
+)
+
+py_test(
     name = "benchmarks_random_actions_test",
     srcs = ["benchmarks_random_actions_test.py"],
     shard_count = 4,

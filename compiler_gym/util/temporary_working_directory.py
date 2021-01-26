@@ -14,7 +14,21 @@ from typing import Optional, Union
 def temporary_working_directory(directory: Optional[Union[str, Path]] = None) -> Path:
     """Temporarily set the working directory.
 
-    :param directory: The directory to set as the temporary working directory.
+    This function provides a way to set the working directory within the
+    scope of a "with statement". Example usage:
+
+    .. code-block:: python
+
+        print(os.getcwd())  # /tmp/foo
+        with temporary_working_directory("/tmp/bar"):
+            # Now in scope of new working directory.
+            print(os.getcwd())  # /tmp/bar
+        # Return to original working directory.
+        print(os.getcwd())  # /tmp/foo
+
+    :param directory: A directory to set as the temporary working directory. If
+        not provided, a temporary directory is created and deleted once out of
+        scope.
     :return: The temporary working directory.
     """
     old_working_directory = os.getcwd()
@@ -24,6 +38,7 @@ def temporary_working_directory(directory: Optional[Union[str, Path]] = None) ->
             yield Path(directory)
         else:
             with tempfile.TemporaryDirectory(prefix="compiler_gym-") as d:
+                os.chdir(d)
                 yield Path(d)
     finally:
         os.chdir(old_working_directory)

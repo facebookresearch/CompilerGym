@@ -18,7 +18,7 @@ from tests.test_main import main
 pytest_plugins = ["tests.envs.llvm.fixtures"]
 
 EXAMPLE_BITCODE_FILE = runfiles_path(
-    "CompilerGym/compiler_gym/third_party/cBench/cBench/crc32.bc"
+    "CompilerGym/compiler_gym/third_party/cBench/cBench-v0/crc32.bc"
 )
 EXAMPLE_BITCODE_IR_INSTRUCTION_COUNT = 196
 
