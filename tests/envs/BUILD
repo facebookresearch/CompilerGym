@@ -7,6 +7,7 @@ py_test(
     name = "compiler_env_test",
     srcs = ["compiler_env_test.py"],
     deps = [
+        "//compiler_gym/datasets",
         "//compiler_gym/envs",
         "//tests:test_main",
     ],

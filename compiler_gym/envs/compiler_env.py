@@ -5,6 +5,7 @@
 """This module defines the OpenAI gym interface for compilers."""
 import csv
 import os
+import sys
 import warnings
 from io import StringIO
 from pathlib import Path
@@ -778,7 +779,7 @@ class CompilerEnv(gym.Env):
                     )
         return manifest_path
 
-    def register_dataset(self, dataset: Dataset) -> None:
+    def register_dataset(self, dataset: Dataset) -> bool:
         """Register a new dataset.
 
         After registering, the dataset name may be used by
@@ -794,8 +795,13 @@ class CompilerEnv(gym.Env):
             >>> env.benchmark = "my-dataset-v0/1"
 
         :param dataset: A :class:`Dataset` instance describing the new dataset.
+        :return: :code:`True` if the dataset was registered added, else :code:`False`.
         :raises ValueError: If a dataset with this name is already registered.
         """
+        platform = {"darwin": "macos"}.get(sys.platform, sys.platform)
+        if platform not in dataset.platforms:
+            return False
         if dataset.name in self.available_datasets:
             raise ValueError(f"Dataset already registered with name: {dataset.name}")
         self.available_datasets[dataset.name] = dataset
+        return True
