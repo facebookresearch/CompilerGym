@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.datasets.dataset &mdash; CompilerGym 0.1.1 documentation</title>
+  <title>compiler_gym.datasets.dataset &mdash; CompilerGym 0.1.2 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.1
+                0.1.2
               </div>
             
           
@@ -245,49 +245,64 @@
         <span class="k">return</span> <span class="n">path</span></div></div>
 
 
-<span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Move a directory from the inactive to active benchmark directory.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="activate"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.activate">[docs]</a><span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Move a directory from the inactive to active benchmark directory.</span>
+
+<span class="sd">    :param: The name of a dataset.</span>
+<span class="sd">    :return: :code:`True` if the dataset was activated, else :code:`False` if</span>
+<span class="sd">        already active.</span>
+<span class="sd">    :raises ValueError: If there is no dataset with that name.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="n">fasteners</span><span class="o">.</span><span class="n">InterProcessLock</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="s2">&quot;LOCK&quot;</span><span class="p">):</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="c1"># There is already an active benchmark set with this name.</span>
+            <span class="k">return</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Inactive dataset not found: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;There is already an active benchmark set with name </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
             <span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">,</span>
             <span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
 
 
-<span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Delete a directory in the inactive benchmark directory.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="delete"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.delete">[docs]</a><span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Delete a directory in the inactive benchmark directory.</span>
+
+<span class="sd">    :param: The name of a dataset.</span>
+<span class="sd">    :return: :code:`True` if the dataset was deleted, else :code:`False` if</span>
+<span class="sd">        already deleted.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="n">fasteners</span><span class="o">.</span><span class="n">InterProcessLock</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="s2">&quot;LOCK&quot;</span><span class="p">):</span>
+        <span class="n">deleted</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">if</span> <span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">))</span>
             <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">))</span>
-        <span class="k">elif</span> <span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+            <span class="n">deleted</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">if</span> <span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">))</span>
             <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Inactive dataset not found: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">deleted</span> <span class="o">=</span> <span class="kc">True</span>
+        <span class="k">return</span> <span class="n">deleted</span></div>
 
 
-<span class="k">def</span> <span class="nf">deactivate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Move a directory from active to the inactive benchmark directory.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="deactivate"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.deactivate">[docs]</a><span class="k">def</span> <span class="nf">deactivate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Move a directory from active to the inactive benchmark directory.</span>
+
+<span class="sd">    :param: The name of a dataset.</span>
+<span class="sd">    :return: :code:`True` if the dataset was deactivated, else :code:`False` if</span>
+<span class="sd">        already inactive.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">with</span> <span class="n">fasteners</span><span class="o">.</span><span class="n">InterProcessLock</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="s2">&quot;LOCK&quot;</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Active dataset not found: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;There is already an inactive benchmark set with name </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
+            <span class="k">return</span> <span class="kc">False</span>
         <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">)</span>
         <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
             <span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">,</span>
             <span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">,</span>
         <span class="p">)</span>
+        <span class="k">return</span> <span class="kc">True</span></div>
 
 
 <div class="viewcode-block" id="require"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.require">[docs]</a><span class="k">def</span> <span class="nf">require</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>

@@ -32,3 +32,8 @@ compiler_gym.bin.random_replay
 ------------------------------
 
 .. automodule:: compiler_gym.bin.random_replay
+
+compiler_gym.bin.validate
+-------------------------
+
+.. automodule:: compiler_gym.bin.validate

@@ -27,6 +27,7 @@ ObservationSpaceSpec
 
 .. autoclass:: ObservationSpaceSpec
    :members:
+   :exclude-members: from_proto
 
 
 RewardView

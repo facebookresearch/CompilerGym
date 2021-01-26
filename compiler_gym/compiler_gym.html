@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym &mdash; CompilerGym 0.1.1 documentation</title>
+  <title>compiler_gym &mdash; CompilerGym 0.1.2 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.1
+                0.1.2
               </div>
             
           
@@ -190,6 +190,72 @@ is available through <code class="code docutils literal notranslate"><span class
 <span class="go">[&#39;llvm-v0&#39;, &#39;llvm-ic-v0&#39;, &#39;llvm-autophase-ic-v0&#39;, &#39;llvm-ir-ic-v0&#39;]</span>
 </pre></div>
 </div>
+<dl class="py class">
+<dt id="compiler_gym.ValidationResult">
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.</code><code class="sig-name descname">ValidationResult</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span><span class="p">:</span> <span class="n">compiler_gym.envs.compiler_env.CompilerEnvState</span></em>, <em class="sig-param"><span class="n">reward_validated</span><span class="p">:</span> <span class="n">bool</span></em>, <em class="sig-param"><span class="n">actions_replay_failed</span><span class="p">:</span> <span class="n">bool</span></em>, <em class="sig-param"><span class="n">reward_validation_failed</span><span class="p">:</span> <span class="n">bool</span></em>, <em class="sig-param"><span class="n">benchmark_semantics_validated</span><span class="p">:</span> <span class="n">bool</span></em>, <em class="sig-param"><span class="n">benchmark_semantics_validation_failed</span><span class="p">:</span> <span class="n">bool</span></em>, <em class="sig-param"><span class="n">walltime</span><span class="p">:</span> <span class="n">float</span></em>, <em class="sig-param"><span class="n">error_details</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/validate.html#ValidationResult"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.ValidationResult" title="Permalink to this definition">¶</a></dt>
+<dd><p>The result of validating a compiler state.</p>
+<dl class="py attribute">
+<dt id="compiler_gym.ValidationResult.actions_replay_failed">
+<code class="sig-name descname">actions_replay_failed</code><em class="property">: bool</em><a class="headerlink" href="#compiler_gym.ValidationResult.actions_replay_failed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether the commandline was unable to be reproduced.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="compiler_gym.ValidationResult.benchmark_semantics_validated">
+<code class="sig-name descname">benchmark_semantics_validated</code><em class="property">: bool</em><a class="headerlink" href="#compiler_gym.ValidationResult.benchmark_semantics_validated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether the semantics of the benchmark were validated.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="compiler_gym.ValidationResult.benchmark_semantics_validation_failed">
+<code class="sig-name descname">benchmark_semantics_validation_failed</code><em class="property">: bool</em><a class="headerlink" href="#compiler_gym.ValidationResult.benchmark_semantics_validation_failed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether the semantics of the benchmark were found to have changed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="compiler_gym.ValidationResult.error_details">
+<code class="sig-name descname">error_details</code><em class="property">: str</em><a class="headerlink" href="#compiler_gym.ValidationResult.error_details" title="Permalink to this definition">¶</a></dt>
+<dd><p>A description of any validation errors.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compiler_gym.ValidationResult.failed">
+<em class="property">property </em><code class="sig-name descname">failed</code><a class="headerlink" href="#compiler_gym.ValidationResult.failed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether validation failed.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="compiler_gym.ValidationResult.reward_validated">
+<code class="sig-name descname">reward_validated</code><em class="property">: bool</em><a class="headerlink" href="#compiler_gym.ValidationResult.reward_validated" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether the reward that was recorded in the original state was validated.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="compiler_gym.ValidationResult.reward_validation_failed">
+<code class="sig-name descname">reward_validation_failed</code><em class="property">: bool</em><a class="headerlink" href="#compiler_gym.ValidationResult.reward_validation_failed" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether the validated reward differed from the original state.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="compiler_gym.ValidationResult.state">
+<code class="sig-name descname">state</code><em class="property">: compiler_gym.envs.compiler_env.CompilerEnvState</em><a class="headerlink" href="#compiler_gym.ValidationResult.state" title="Permalink to this definition">¶</a></dt>
+<dd><p>The compiler environment state that was validated.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compiler_gym.ValidationResult.success">
+<em class="property">property </em><code class="sig-name descname">success</code><a class="headerlink" href="#compiler_gym.ValidationResult.success" title="Permalink to this definition">¶</a></dt>
+<dd><p>Whether validation succeeded.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="compiler_gym.ValidationResult.walltime">
+<code class="sig-name descname">walltime</code><em class="property">: float</em><a class="headerlink" href="#compiler_gym.ValidationResult.walltime" title="Permalink to this definition">¶</a></dt>
+<dd><p>The wall time in seconds that the validation took.</p>
+</dd></dl>
+
+</dd></dl>
+
 <dl class="py function">
 <dt id="compiler_gym.cache_path">
 <code class="sig-prename descclassname">compiler_gym.</code><code class="sig-name descname">cache_path</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">relpath</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; pathlib.Path<a class="reference internal" href="../_modules/compiler_gym/util/runfiles_path.html#cache_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.cache_path" title="Permalink to this definition">¶</a></dt>
@@ -239,6 +305,45 @@ execute at a time.</p>
 <p>CompilerGym uses a directory to store persistent site data files in, such as benchmark datasets.
 The default location is <code class="code docutils literal notranslate"><span class="pre">~/.local/share/compiler_gym</span></code>. Set the environment variable
 <code class="code docutils literal notranslate"><span class="pre">$COMPILER_GYM_SITE_DATA</span></code> to override this default location.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt id="compiler_gym.validate_state">
+<code class="sig-prename descclassname">compiler_gym.</code><code class="sig-name descname">validate_state</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span><span class="p">:</span> <span class="n">compiler_gym.envs.compiler_env.CompilerEnv</span></em>, <em class="sig-param"><span class="n">state</span><span class="p">:</span> <span class="n">compiler_gym.envs.compiler_env.CompilerEnvState</span></em><span class="sig-paren">)</span> &#x2192; compiler_gym.validate.ValidationResult<a class="reference internal" href="../_modules/compiler_gym/validate.html#validate_state"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.validate_state" title="Permalink to this definition">¶</a></dt>
+<dd><p>Validate a <a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnvState" title="compiler_gym.envs.CompilerEnvState"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompilerEnvState</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>env</strong> – A compiler environment.</p></li>
+<li><p><strong>state</strong> – The environment state to validate.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#compiler_gym.ValidationResult" title="compiler_gym.ValidationResult"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValidationResult</span></code></a> instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="compiler_gym.validate_states">
+<code class="sig-prename descclassname">compiler_gym.</code><code class="sig-name descname">validate_states</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">make_env</span><span class="p">:</span> <span class="n">Callable<span class="p">[</span><span class="p">]</span><span class="p">, </span>compiler_gym.envs.compiler_env.CompilerEnv<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">states</span><span class="p">:</span> <span class="n">Iterable<span class="p">[</span>compiler_gym.envs.compiler_env.CompilerEnvState<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">datasets</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">nproc</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>int<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Iterable<span class="p">[</span>compiler_gym.validate.ValidationResult<span class="p">]</span><a class="reference internal" href="../_modules/compiler_gym/validate.html#validate_states"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.validate_states" title="Permalink to this definition">¶</a></dt>
+<dd><p>A parallelized implementation of
+<a class="reference internal" href="#compiler_gym.validate_state" title="compiler_gym.validate_state"><code class="xref py py-func docutils literal notranslate"><span class="pre">validate_state()</span></code></a> for batched
+validation.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>make_env</strong> – A callback which instantiates a compiler environment.</p></li>
+<li><p><strong>states</strong> – A sequence of compiler environment states to validate.</p></li>
+<li><p><strong>datasets</strong> – An optional list of datasets that are required.</p></li>
+<li><p><strong>nproc</strong> – The number of parallel worker processes to run.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An iterator over validation results. The order of results may
+differ from the input states.</p>
+</dd>
+</dl>
 </dd></dl>
 
 </div>

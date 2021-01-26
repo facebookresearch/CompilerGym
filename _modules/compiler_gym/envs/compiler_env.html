@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.envs.compiler_env &mdash; CompilerGym 0.1.1 documentation</title>
+  <title>compiler_gym.envs.compiler_env &mdash; CompilerGym 0.1.2 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.1
+                0.1.2
               </div>
             
           
@@ -175,22 +175,24 @@
 <span class="c1"># This source code is licensed under the MIT license found in the</span>
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
 <span class="sd">&quot;&quot;&quot;This module defines the OpenAI gym interface for compilers.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">csv</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">StringIO</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">fasteners</span>
 <span class="kn">import</span> <span class="nn">gym</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">gym.spaces</span> <span class="kn">import</span> <span class="n">Space</span>
 
-<span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">require</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">require</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CompilerGymServiceConnection</span><span class="p">,</span>
     <span class="n">ConnectionOpts</span><span class="p">,</span>
     <span class="n">ServiceError</span><span class="p">,</span>
-    <span class="n">observation2py</span><span class="p">,</span>
     <span class="n">observation_t</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service.connection</span> <span class="kn">import</span> <span class="n">ServiceTransportError</span>
@@ -215,6 +217,81 @@
 <span class="c1"># Type hints.</span>
 <span class="n">info_t</span> <span class="o">=</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
 <span class="n">step_t</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">observation_t</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">info_t</span><span class="p">]</span>
+
+
+<span class="k">def</span> <span class="nf">_to_csv</span><span class="p">(</span><span class="o">*</span><span class="n">columns</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="n">buf</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
+    <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
+    <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">buf</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="CompilerEnvState"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnvState">[docs]</a><span class="k">class</span> <span class="nc">CompilerEnvState</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The representation of a compiler environment state.</span>
+
+<span class="sd">    The state of an environment is defined as a benchmark and a sequence of</span>
+<span class="sd">    actions that has been applied to it. For a given environment, the state</span>
+<span class="sd">    contains the information required to reproduce the result.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">benchmark</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="sd">&quot;&quot;&quot;The name of the benchmark used for this episode.&quot;&quot;&quot;</span>
+
+    <span class="n">commandline</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="sd">&quot;&quot;&quot;The list of actions that produced this state, as a commandline.&quot;&quot;&quot;</span>
+
+    <span class="n">walltime</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="sd">&quot;&quot;&quot;The walltime of the episode.&quot;&quot;&quot;</span>
+
+    <span class="n">reward</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="sd">&quot;&quot;&quot;The cumulative reward for this episode.&quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CompilerEnvState.csv_header"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnvState.csv_header">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">csv_header</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the header string for the CSV-format.</span>
+
+<span class="sd">        :return: A comma-separated string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_to_csv</span><span class="p">(</span><span class="s2">&quot;benchmark&quot;</span><span class="p">,</span> <span class="s2">&quot;reward&quot;</span><span class="p">,</span> <span class="s2">&quot;walltime&quot;</span><span class="p">,</span> <span class="s2">&quot;commandline&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CompilerEnvState.to_csv"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnvState.to_csv">[docs]</a>    <span class="k">def</span> <span class="nf">to_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Serialize a state to a comma separated list of values.</span>
+
+<span class="sd">        :return: A comma-separated string.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">_to_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">walltime</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">commandline</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CompilerEnvState.from_csv"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnvState.from_csv">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_csv</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">csv_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CompilerEnvState&quot;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Construct a state from a comma separated list of values.&quot;&quot;&quot;</span>
+        <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">csv_string</span><span class="p">))</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">benchmark</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">walltime</span><span class="p">,</span> <span class="n">commandline</span> <span class="o">=</span> <span class="n">line</span>
+                <span class="k">break</span>
+            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to parse input: `</span><span class="si">{</span><span class="n">csv_string</span><span class="si">}</span><span class="s2">`: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to parse input: `</span><span class="si">{</span><span class="n">csv_string</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">benchmark</span><span class="o">=</span><span class="n">benchmark</span><span class="p">,</span>
+            <span class="n">reward</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">reward</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">reward</span><span class="p">),</span>
+            <span class="n">walltime</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">walltime</span><span class="p">),</span>
+            <span class="n">commandline</span><span class="o">=</span><span class="n">commandline</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">CompilerEnvState</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="n">epsilon</span> <span class="o">=</span> <span class="mf">1e-5</span>
+        <span class="c1"># Note that walltime is excluded from equivalence checks as two states</span>
+        <span class="c1"># are equivalent if they define the same point in the optimization space</span>
+        <span class="c1"># irrespective of how long it took to get there.</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">benchmark</span>
+            <span class="ow">and</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reward</span> <span class="o">-</span> <span class="n">rhs</span><span class="o">.</span><span class="n">reward</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">epsilon</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">commandline</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">commandline</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="CompilerEnv"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv">[docs]</a><span class="k">class</span> <span class="nc">CompilerEnv</span><span class="p">(</span><span class="n">gym</span><span class="o">.</span><span class="n">Env</span><span class="p">):</span>
@@ -277,6 +354,10 @@
 <span class="sd">    :ivar reward: A view of the available reward spaces that permits on-demand</span>
 <span class="sd">        computation of rewards.</span>
 <span class="sd">    :vartype reward: compiler_gym.views.RewardView</span>
+
+<span class="sd">    :ivar episode_reward: If</span>
+<span class="sd">        :func:`CompilerEnv.reward_space &lt;compiler_gym.envs.CompilerGym.reward_space&gt;`</span>
+<span class="sd">        is set, this value is the sum of all rewards for the current episode.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="CompilerEnv.__init__"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -362,6 +443,8 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Space</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Space</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reward_range</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">episode_reward</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">episode_start_time</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
 
         <span class="c1"># Initialize eager observation/reward and benchmark.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span> <span class="o">=</span> <span class="n">observation_space</span>
@@ -393,6 +476,20 @@
 <span class="sd">        :return: A string commandline invocation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="s2">&quot;&quot;</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">episode_walltime</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">episode_start_time</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">state</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CompilerEnvState</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;The tuple representation of the current environment state.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">CompilerEnvState</span><span class="p">(</span>
+            <span class="n">benchmark</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span><span class="p">,</span>
+            <span class="n">reward</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">episode_reward</span><span class="p">,</span>
+            <span class="n">walltime</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">episode_walltime</span><span class="p">,</span>
+            <span class="n">commandline</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">commandline</span><span class="p">(),</span>
+        <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">inactive_datasets_site_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
@@ -604,6 +701,7 @@
 <span class="sd">            it overrides any value that set during :func:`__init__`, and</span>
 <span class="sd">            subsequent calls to :code:`reset()` will use this action space.</span>
 <span class="sd">            If no aciton space is provided, the default action space is used.</span>
+<span class="sd">        :return: The initial observation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">retry_count</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection_settings</span><span class="o">.</span><span class="n">init_max_attempts</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to reset environment after </span><span class="si">{</span><span class="n">retry_count</span><span class="si">}</span><span class="s2"> attempts&quot;</span><span class="p">)</span>
@@ -670,12 +768,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span> <span class="o">=</span> <span class="n">reply</span><span class="o">.</span><span class="n">session_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">session_id</span> <span class="o">=</span> <span class="n">reply</span><span class="o">.</span><span class="n">session_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">session_id</span> <span class="o">=</span> <span class="n">reply</span><span class="o">.</span><span class="n">session_id</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">episode_start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
 
         <span class="c1"># If the action space has changed, update it.</span>
         <span class="k">if</span> <span class="n">reply</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;new_action_space&quot;</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_action_space</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">reply</span><span class="o">.</span><span class="n">new_action_space</span><span class="o">.</span><span class="n">action</span>
             <span class="p">)</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">episode_reward</span> <span class="o">=</span> <span class="mi">0</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eager_observation</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">id</span><span class="p">]</span></div>
@@ -697,6 +799,10 @@
         <span class="k">except</span> <span class="p">(</span><span class="n">ServiceError</span><span class="p">,</span> <span class="n">ServiceTransportError</span><span class="p">,</span> <span class="ne">TimeoutError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="n">info</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;error_details&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)}</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="p">:</span>
+                <span class="n">reward</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="o">.</span><span class="n">reward_on_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">episode_reward</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="p">:</span>
+                <span class="n">observation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">default_value</span>
             <span class="k">return</span> <span class="n">observation</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">info</span>
 
         <span class="c1"># If the action space has changed, update it.</span>
@@ -705,13 +811,11 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">reply</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">action</span>
             <span class="p">)</span>
 
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eager_observation</span><span class="p">:</span>
-            <span class="n">observation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
-                <span class="n">observation2py</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">space</span><span class="p">,</span> <span class="n">reply</span><span class="o">.</span><span class="n">observation</span><span class="p">),</span>
-            <span class="p">)</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="p">:</span>
+            <span class="n">observation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">cb</span><span class="p">(</span><span class="n">reply</span><span class="o">.</span><span class="n">observation</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_eager_reward</span><span class="p">:</span>
             <span class="n">reward</span> <span class="o">=</span> <span class="n">reply</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">reward</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">episode_reward</span> <span class="o">+=</span> <span class="n">reward</span>
 
         <span class="n">info</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;action_had_no_effect&quot;</span><span class="p">:</span> <span class="n">reply</span><span class="o">.</span><span class="n">action_had_no_effect</span><span class="p">,</span>

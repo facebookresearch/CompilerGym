@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.envs.llvm.benchmarks &mdash; CompilerGym 0.1.1 documentation</title>
+  <title>compiler_gym.envs.llvm.benchmarks &mdash; CompilerGym 0.1.2 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.1
+                0.1.2
               </div>
             
           
@@ -390,6 +390,21 @@
     <span class="n">clang_jobs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ClangInvocation</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
 
     <span class="k">def</span> <span class="nf">_add_path</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+        <span class="c1"># NOTE(cummins): There is some discussion about the best way to create</span>
+        <span class="c1"># a bitcode that is unoptimized yet does not hinder downstream</span>
+        <span class="c1"># optimization opportunities. Here we are using a configuration based</span>
+        <span class="c1"># on -O0, yet there is a suggestion that an optimized configuration</span>
+        <span class="c1"># can produce better results if the optimizations themselves are</span>
+        <span class="c1"># explicitly disabled, as in: [&quot;-Oz&quot;, &quot;-Xclang&quot;, &quot;-disable-llvm-optzns&quot;]</span>
+        <span class="c1"># See: https://lists.llvm.org/pipermail/llvm-dev/2018-August/thread.html#125365</span>
+        <span class="n">DEFAULT_COPT</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="s2">&quot;-O&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-Xclang&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-disable-O0-optnone&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-Xclang&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;-disable-llvm-passes&quot;</span><span class="p">,</span>
+        <span class="p">]</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
@@ -398,15 +413,7 @@
         <span class="k">elif</span> <span class="n">path</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;.c&quot;</span><span class="p">,</span> <span class="s2">&quot;.cxx&quot;</span><span class="p">,</span> <span class="s2">&quot;.cpp&quot;</span><span class="p">,</span> <span class="s2">&quot;.cc&quot;</span><span class="p">}:</span>
             <span class="n">clang_jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="n">ClangInvocation</span><span class="p">(</span>
-                    <span class="p">[</span>
-                        <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span>
-                        <span class="s2">&quot;-O0&quot;</span><span class="p">,</span>
-                        <span class="s2">&quot;-Xclang&quot;</span><span class="p">,</span>
-                        <span class="s2">&quot;-disable-O0-optnone&quot;</span><span class="p">,</span>
-                        <span class="s2">&quot;-Xclang&quot;</span><span class="p">,</span>
-                        <span class="s2">&quot;-disable-llvm-passes&quot;</span><span class="p">,</span>
-                    <span class="p">]</span>
-                    <span class="o">+</span> <span class="n">copt</span><span class="p">,</span>
+                    <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)]</span> <span class="o">+</span> <span class="n">DEFAULT_COPT</span> <span class="o">+</span> <span class="n">copt</span><span class="p">,</span>
                     <span class="n">system_includes</span><span class="o">=</span><span class="n">system_includes</span><span class="p">,</span>
                     <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
                 <span class="p">)</span>

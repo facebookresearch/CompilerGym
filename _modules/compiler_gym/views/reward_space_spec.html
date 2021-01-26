@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.views.reward_space_spec &mdash; CompilerGym 0.1.1 documentation</title>
+  <title>compiler_gym.views.reward_space_spec &mdash; CompilerGym 0.1.2 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.1
+                0.1.2
               </div>
             
           
@@ -205,6 +205,18 @@
 <span class="sd">    :ivar platform_dependent: Whether the reward values depend on the execution</span>
 <span class="sd">        environment of the service.</span>
 <span class="sd">    :vartype platform_dependent: bool</span>
+
+<span class="sd">    :ivar default_value: A default reward value. This value will be returned by</span>
+<span class="sd">        :func:`CompilerEnv.step() &lt;compiler_gym.envs.CompilerEnv.step&gt;` if</span>
+<span class="sd">        :func:`CompilerEnv.reward_space &lt;compiler_gym.envs.CompilerEnv.reward_space&gt;`</span>
+<span class="sd">        is set and the service terminates.</span>
+<span class="sd">    :vartype default_value: float</span>
+
+<span class="sd">    :ivar default_negates_returns: If true, the default value will be offset by</span>
+<span class="sd">        the sum of all rewards for the current episode. For example, given a</span>
+<span class="sd">        default reward value of -10.0 and an episode with prior rewards</span>
+<span class="sd">        [0.1, 0.3, -0.15], the default value is: -10.0 - sum(0.1, 0.3, -0.15).</span>
+<span class="sd">    :vartype default_negates_returns: bool</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">spec</span><span class="p">:</span> <span class="n">RewardSpace</span><span class="p">):</span>
@@ -216,9 +228,26 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">deterministic</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">deterministic</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">platform_dependent</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">platform_dependent</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">default_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_negates_returns</span> <span class="o">=</span> <span class="n">spec</span><span class="o">.</span><span class="n">default_negates_returns</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;RewardSpaceSpec(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">)&quot;</span></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;RewardSpaceSpec(</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+<div class="viewcode-block" id="RewardSpaceSpec.reward_on_error"><a class="viewcode-back" href="../../../compiler_gym/views.html#compiler_gym.views.RewardSpaceSpec.reward_on_error">[docs]</a>    <span class="k">def</span> <span class="nf">reward_on_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">episode_reward</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the reward value for an error condition.</span>
+
+<span class="sd">        This method should be used to produce the reward value that should be</span>
+<span class="sd">        used if the compiler service cannot be reached, e.g. because it has</span>
+<span class="sd">        crashed or the connection has dropped.</span>
+
+<span class="sd">        :param episode_reward: The current cumulative reward of an episode.</span>
+<span class="sd">        :return: A reward.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_negates_returns</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span> <span class="o">-</span> <span class="n">episode_reward</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span></div></div>
 </pre></div>
 
            </div>

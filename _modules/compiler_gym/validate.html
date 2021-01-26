@@ -1,0 +1,412 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>compiler_gym.validate &mdash; CompilerGym 0.1.2 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+        <script src="../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> CompilerGym
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.2
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../llvm/index.html">LLVM Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command Line Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../llvm/api.html">compiler_gym.envs.llvm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/views.html">compiler_gym.views</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">CompilerGym</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../index.html">Module code</a> &raquo;</li>
+        
+      <li>compiler_gym.validate</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for compiler_gym.validate</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) Facebook, Inc. and its affiliates.</span>
+<span class="c1">#</span>
+<span class="c1"># This source code is licensed under the MIT license found in the</span>
+<span class="c1"># LICENSE file in the root directory of this source tree.</span>
+<span class="sd">&quot;&quot;&quot;Validate environment states.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">multiprocessing</span>
+<span class="kn">import</span> <span class="nn">multiprocessing.pool</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">cast</span>
+
+<span class="kn">import</span> <span class="nn">gym</span>
+
+<span class="kn">from</span> <span class="nn">compiler_gym.envs.compiler_env</span> <span class="kn">import</span> <span class="n">CompilerEnv</span><span class="p">,</span> <span class="n">CompilerEnvState</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm</span> <span class="kn">import</span> <span class="n">LlvmEnv</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.datasets</span> <span class="kn">import</span> <span class="n">LLVM_BENCHMARK_VALIDATION_CALLBACKS</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.spaces</span> <span class="kn">import</span> <span class="n">Commandline</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.timer</span> <span class="kn">import</span> <span class="n">Timer</span>
+
+
+<div class="viewcode-block" id="ValidationResult"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.ValidationResult">[docs]</a><span class="k">class</span> <span class="nc">ValidationResult</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The result of validating a compiler state.&quot;&quot;&quot;</span>
+
+    <span class="n">state</span><span class="p">:</span> <span class="n">CompilerEnvState</span>
+    <span class="sd">&quot;&quot;&quot;The compiler environment state that was validated.&quot;&quot;&quot;</span>
+
+    <span class="n">reward_validated</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="sd">&quot;&quot;&quot;Whether the reward that was recorded in the original state was validated.&quot;&quot;&quot;</span>
+
+    <span class="n">actions_replay_failed</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="sd">&quot;&quot;&quot;Whether the commandline was unable to be reproduced.&quot;&quot;&quot;</span>
+
+    <span class="n">reward_validation_failed</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="sd">&quot;&quot;&quot;Whether the validated reward differed from the original state.&quot;&quot;&quot;</span>
+
+    <span class="n">benchmark_semantics_validated</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="sd">&quot;&quot;&quot;Whether the semantics of the benchmark were validated.&quot;&quot;&quot;</span>
+
+    <span class="n">benchmark_semantics_validation_failed</span><span class="p">:</span> <span class="nb">bool</span>
+    <span class="sd">&quot;&quot;&quot;Whether the semantics of the benchmark were found to have changed.&quot;&quot;&quot;</span>
+
+    <span class="n">walltime</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="sd">&quot;&quot;&quot;The wall time in seconds that the validation took.&quot;&quot;&quot;</span>
+
+    <span class="n">error_details</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;A description of any validation errors.&quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">success</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Whether validation succeeded.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">failed</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">failed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Whether validation failed.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">actions_replay_failed</span>
+            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_validation_failed</span>
+            <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark_semantics_validation_failed</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">failed</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;❌  </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">benchmark</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">error_details</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">reward</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;✅  </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">benchmark</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;✅  </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">benchmark</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">reward</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span></div>
+
+
+<span class="k">def</span> <span class="nf">_llvm_replay_commandline</span><span class="p">(</span><span class="n">env</span><span class="p">:</span> <span class="n">LlvmEnv</span><span class="p">,</span> <span class="n">commandline</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Replay the sequence of actions given by a commandline.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Strip the decorative elements that LlvmEnv.commandline() adds.</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">commandline</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;opt &quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">commandline</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span>
+        <span class="s2">&quot; input.bc -o output.bc&quot;</span>
+    <span class="p">):</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid commandline: `</span><span class="si">{</span><span class="n">commandline</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
+    <span class="n">commandline</span> <span class="o">=</span> <span class="n">commandline</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;opt &quot;</span><span class="p">)</span> <span class="p">:</span> <span class="o">-</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot; input.bc -o output.bc&quot;</span><span class="p">)]</span>
+
+    <span class="n">actions</span> <span class="o">=</span> <span class="n">cast</span><span class="p">(</span><span class="n">Commandline</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="p">)</span><span class="o">.</span><span class="n">from_commandline</span><span class="p">(</span><span class="n">commandline</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">:</span>
+        <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">done</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Environment terminated with error: `</span><span class="si">{</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;error_details&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">`&quot;</span>
+            <span class="p">)</span>
+    <span class="k">return</span> <span class="n">env</span><span class="o">.</span><span class="n">episode_reward</span>
+
+
+<div class="viewcode-block" id="validate_state"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.validate_state">[docs]</a><span class="k">def</span> <span class="nf">validate_state</span><span class="p">(</span><span class="n">env</span><span class="p">:</span> <span class="n">CompilerEnv</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">CompilerEnvState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ValidationResult</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Validate a :class:`CompilerEnvState &lt;compiler_gym.envs.CompilerEnvState&gt;`.</span>
+
+<span class="sd">    :param env: A compiler environment.</span>
+<span class="sd">    :param state: The environment state to validate.</span>
+<span class="sd">    :return: A :class:`ValidationResult &lt;compiler_gym.ValidationResult&gt;` instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">error_messages</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">validation</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="n">state</span><span class="p">,</span>
+        <span class="s2">&quot;actions_replay_failed&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;reward_validated&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;reward_validation_failed&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;benchmark_semantics_validated&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="s2">&quot;benchmark_semantics_validation_failed&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
+    <span class="p">}</span>
+
+    <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">reward</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">env</span><span class="o">.</span><span class="n">reward_space</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Reward space not specified&quot;</span><span class="p">)</span>
+
+    <span class="k">with</span> <span class="n">Timer</span><span class="p">()</span> <span class="k">as</span> <span class="n">walltime</span><span class="p">:</span>
+        <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="n">state</span><span class="o">.</span><span class="n">benchmark</span><span class="p">)</span>
+        <span class="c1"># Use a while loop here so that we can `break` early out of the</span>
+        <span class="c1"># validation process in case a step fails.</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">reward</span> <span class="o">=</span> <span class="n">_llvm_replay_commandline</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">commandline</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">validation</span><span class="p">[</span><span class="s2">&quot;actions_replay_failed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">error_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+                <span class="k">break</span>
+
+            <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">reward</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">env</span><span class="o">.</span><span class="n">reward_space</span><span class="o">.</span><span class="n">deterministic</span><span class="p">:</span>
+                <span class="n">validation</span><span class="p">[</span><span class="s2">&quot;reward_validated&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="c1"># If reward deviates from the expected amount record the</span>
+                <span class="c1"># error but continue with the remainder of the validation.</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">math</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">reward</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">reward</span><span class="p">,</span> <span class="n">rel_tol</span><span class="o">=</span><span class="mf">1e-5</span><span class="p">,</span> <span class="n">abs_tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">):</span>
+                    <span class="n">validation</span><span class="p">[</span><span class="s2">&quot;reward_validation_failed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">error_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Expected reward </span><span class="si">{</span><span class="n">state</span><span class="o">.</span><span class="n">reward</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> but received reward </span><span class="si">{</span><span class="n">reward</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+
+            <span class="n">validate_semantics</span> <span class="o">=</span> <span class="n">LLVM_BENCHMARK_VALIDATION_CALLBACKS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
+                <span class="n">state</span><span class="o">.</span><span class="n">benchmark</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">validate_semantics</span><span class="p">:</span>
+                <span class="n">validation</span><span class="p">[</span><span class="s2">&quot;benchmark_semantics_validated&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                <span class="n">semantics_error</span> <span class="o">=</span> <span class="n">validate_semantics</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">semantics_error</span><span class="p">:</span>
+                    <span class="n">validation</span><span class="p">[</span><span class="s2">&quot;benchmark_semantics_validation_failed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
+                    <span class="n">error_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">semantics_error</span><span class="p">)</span>
+
+            <span class="c1"># Finished all checks, break the loop.</span>
+            <span class="k">break</span>
+
+    <span class="k">return</span> <span class="n">ValidationResult</span><span class="p">(</span>
+        <span class="n">walltime</span><span class="o">=</span><span class="n">walltime</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">error_details</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">error_messages</span><span class="p">),</span> <span class="o">**</span><span class="n">validation</span>
+    <span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_validate_states_worker</span><span class="p">(</span><span class="n">args</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ValidationResult</span><span class="p">:</span>
+    <span class="n">reward_space</span><span class="p">,</span> <span class="n">state</span> <span class="o">=</span> <span class="n">args</span>
+    <span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-v0&quot;</span><span class="p">,</span> <span class="n">reward_space</span><span class="o">=</span><span class="n">reward_space</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">validate_state</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">state</span><span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">env</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<div class="viewcode-block" id="validate_states"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.validate_states">[docs]</a><span class="k">def</span> <span class="nf">validate_states</span><span class="p">(</span>
+    <span class="n">make_env</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">CompilerEnv</span><span class="p">],</span>
+    <span class="n">states</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">CompilerEnvState</span><span class="p">],</span>
+    <span class="n">datasets</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">nproc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ValidationResult</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;A parallelized implementation of</span>
+<span class="sd">    :func:`validate_state() &lt;compiler_gym.validate_state&gt;` for batched</span>
+<span class="sd">    validation.</span>
+
+<span class="sd">    :param make_env: A callback which instantiates a compiler environment.</span>
+<span class="sd">    :param states: A sequence of compiler environment states to validate.</span>
+<span class="sd">    :param datasets: An optional list of datasets that are required.</span>
+<span class="sd">    :param nproc: The number of parallel worker processes to run.</span>
+<span class="sd">    :return: An iterator over validation results. The order of results may</span>
+<span class="sd">        differ from the input states.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">env</span> <span class="o">=</span> <span class="n">make_env</span><span class="p">()</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">LlvmEnv</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;Only LLVM environment is supported for validation.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Ensure that the required datasets are available.</span>
+        <span class="n">env</span><span class="o">.</span><span class="n">require_datasets</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span>
+        <span class="n">reward_space_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">reward_space</span><span class="o">.</span><span class="n">id</span> <span class="k">if</span> <span class="n">env</span><span class="o">.</span><span class="n">reward_space</span> <span class="k">else</span> <span class="kc">None</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="n">env</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">with</span> <span class="n">multiprocessing</span><span class="o">.</span><span class="n">Pool</span><span class="p">(</span><span class="n">processes</span><span class="o">=</span><span class="n">nproc</span><span class="p">)</span> <span class="k">as</span> <span class="n">pool</span><span class="p">:</span>
+        <span class="k">yield from</span> <span class="n">pool</span><span class="o">.</span><span class="n">imap_unordered</span><span class="p">(</span>
+            <span class="n">_validate_states_worker</span><span class="p">,</span> <span class="p">[(</span><span class="n">reward_space_name</span><span class="p">,</span> <span class="n">r</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">states</span><span class="p">]</span>
+        <span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright Facebook AI Research
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

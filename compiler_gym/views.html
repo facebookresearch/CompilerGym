@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.views &mdash; CompilerGym 0.1.1 documentation</title>
+  <title>compiler_gym.views &mdash; CompilerGym 0.1.2 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                0.1.1
+                0.1.2
               </div>
             
           
@@ -225,65 +225,32 @@ respectively.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.views.ObservationView.register_derived_space">
-<code class="sig-name descname">register_derived_space</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">base_name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">derived_name</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">derived_space</span><span class="p">:</span> <span class="n">gym.spaces.space.Space</span></em>, <em class="sig-param"><span class="n">cb</span><span class="p">:</span> <span class="n">Callable<span class="p">[</span><span class="p">[</span>Union<span class="p">[</span>numpy.ndarray<span class="p">, </span>str<span class="p">, </span>bytes<span class="p">, </span>List<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">, </span>networkx.classes.digraph.DiGraph<span class="p">]</span><span class="p">]</span><span class="p">, </span>Union<span class="p">[</span>numpy.ndarray<span class="p">, </span>str<span class="p">, </span>bytes<span class="p">, </span>List<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">, </span>networkx.classes.digraph.DiGraph<span class="p">]</span><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/compiler_gym/views/observation.html#ObservationView.register_derived_space"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.views.ObservationView.register_derived_space" title="Permalink to this definition">¶</a></dt>
-<dd><p>Add a hook for implementing derived observation spaces.</p>
-<p>Subclasses of ObservationView call this method in their
-<code class="code docutils literal notranslate"><span class="pre">__init__()</span></code> after initializing the base class to register new
-observation spaces that are derived from those provided by the
-CompilerService.</p>
+<dt id="compiler_gym.views.ObservationView.add_derived_space">
+<code class="sig-name descname">add_derived_space</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">base_id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/compiler_gym/views/observation.html#ObservationView.add_derived_space"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.views.ObservationView.add_derived_space" title="Permalink to this definition">¶</a></dt>
+<dd><p>Alias to
+<a class="reference internal" href="#compiler_gym.views.ObservationSpaceSpec.make_derived_space" title="compiler_gym.views.ObservationSpaceSpec.make_derived_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">ObservationSpaceSpec.make_derived_space()</span></code></a>
+that adds the derived space to the observation view.</p>
 <p>Example usage:</p>
-<p>Suppose we have a service that provides a “src” observation space
-that returns a string of source code. We want to create a new
-observation space, “src_len”, that returns the length of the source
-code. We do this by calling <code class="code docutils literal notranslate"><span class="pre">register_derived_space()</span></code> and
-providing the a callback to translate from the base observation space
-to the derived value:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span> <span class="nc">MyObservationView</span><span class="p">(</span><span class="n">ObservationView</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">register_derived_space</span><span class="p">(</span>
-            <span class="n">derived_name</span><span class="o">=</span><span class="s2">&quot;src_len&quot;</span><span class="p">,</span>
-            <span class="n">base_name</span><span class="o">=</span><span class="s2">&quot;src&quot;</span><span class="p">,</span>
-            <span class="n">derived_space</span><span class="o">=</span><span class="n">Box</span><span class="p">(</span><span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="n">high</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">),</span> <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="mi">1</span><span class="p">,),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
-            <span class="n">derive</span><span class="o">=</span><span class="k">lambda</span> <span class="n">src</span><span class="p">:</span> <span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">src</span><span class="p">)],</span>
-        <span class="p">)</span>
-</pre></div>
-</div>
-<p>Now we can request for “src_len” observation space and receive
-observations from this new derived space.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;src_len&quot;</span><span class="p">]</span>
-<span class="go">[1021,]</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">add_derived_space</span><span class="p">(</span>
+<span class="go">    id=&quot;src_len&quot;,</span>
+<span class="go">    base_id=&quot;src&quot;,</span>
+<span class="go">    cb=lambda src: np.array([len(src)], dtype=np.int32),</span>
+<span class="go">    shape=Box(shape=(1,), dtype=np.int32),</span>
+<span class="go">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;src_len&quot;</span><span class="p">]</span>
+<span class="go">1029</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>base_name</strong> – The name of the observation space that this new
-observation space is derived from.</p></li>
-<li><p><strong>derived_name</strong> – The name of the derived observation space</p></li>
+<li><p><strong>id</strong> – The name of the new observation space.</p></li>
+<li><p><strong>base_id</strong> – The name of the observation space that this is derived
+from.</p></li>
+<li><p><strong>**kwargs</strong> – <p>Arguments passed to
+<a class="reference internal" href="#compiler_gym.views.ObservationSpaceSpec.make_derived_space" title="compiler_gym.views.ObservationSpaceSpec.make_derived_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">ObservationSpaceSpec.make_derived_space</span></code></a>.</p>
+</p></li>
 </ul>
-</dd>
-</dl>
-</dd></dl>
-
-<dl class="py method">
-<dt id="compiler_gym.views.ObservationView.translate">
-<code class="sig-name descname">translate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">observation_space</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">observation</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>numpy.ndarray<span class="p">, </span>str<span class="p">, </span>bytes<span class="p">, </span>List<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">, </span>networkx.classes.digraph.DiGraph<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; Union<span class="p">[</span>numpy.ndarray<span class="p">, </span>str<span class="p">, </span>bytes<span class="p">, </span>List<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">, </span>networkx.classes.digraph.DiGraph<span class="p">]</span><a class="reference internal" href="../_modules/compiler_gym/views/observation.html#ObservationView.translate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.views.ObservationView.translate" title="Permalink to this definition">¶</a></dt>
-<dd><p>Translate an observation according to the space.</p>
-<p>This methods translates the value returned by a CompilerSpace according
-to any derived observation spaces, as registered using
-register_derived_space(). If the requested observation space is not
-derived the observation is returned unmodified.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>observation_space</strong> – The name of the observation space.</p></li>
-<li><p><strong>observation</strong> – An observation returned by a CompilerService.</p></li>
-</ul>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>An observation, after applying any derived space translations.</p>
 </dd>
 </dl>
 </dd></dl>
@@ -295,7 +262,7 @@ derived the observation is returned unmodified.</p>
 <h2>ObservationSpaceSpec<a class="headerlink" href="#observationspacespec" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="compiler_gym.views.ObservationSpaceSpec">
-<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.views.</code><code class="sig-name descname">ObservationSpaceSpec</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">space</span><span class="p">:</span> <span class="n">gym.spaces.space.Space</span></em>, <em class="sig-param"><span class="n">deterministic</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">platform_dependent</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/views/observation_space_spec.html#ObservationSpaceSpec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.views.ObservationSpaceSpec" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.views.</code><code class="sig-name descname">ObservationSpaceSpec</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">index</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">space</span><span class="p">:</span> <span class="n">gym.spaces.space.Space</span></em>, <em class="sig-param"><span class="n">cb</span><span class="p">:</span> <span class="n">Callable<span class="p">[</span><span class="p">[</span>Union<span class="p">[</span>numpy.ndarray<span class="p">, </span>str<span class="p">, </span>bytes<span class="p">, </span>List<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">, </span>networkx.classes.digraph.DiGraph<span class="p">, </span>compiler_gym.service.proto.compiler_gym_service_pb2.Observation<span class="p">]</span><span class="p">]</span><span class="p">, </span>Union<span class="p">[</span>numpy.ndarray<span class="p">, </span>str<span class="p">, </span>bytes<span class="p">, </span>List<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">, </span>networkx.classes.digraph.DiGraph<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">to_string</span><span class="p">:</span> <span class="n">Callable<span class="p">[</span><span class="p">[</span>Union<span class="p">[</span>numpy.ndarray<span class="p">, </span>str<span class="p">, </span>bytes<span class="p">, </span>List<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">, </span>networkx.classes.digraph.DiGraph<span class="p">]</span><span class="p">]</span><span class="p">, </span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">deterministic</span><span class="p">:</span> <span class="n">bool</span></em>, <em class="sig-param"><span class="n">platform_dependent</span><span class="p">:</span> <span class="n">bool</span></em>, <em class="sig-param"><span class="n">default_value</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>numpy.ndarray<span class="p">, </span>str<span class="p">, </span>bytes<span class="p">, </span>List<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">, </span>networkx.classes.digraph.DiGraph<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/views/observation_space_spec.html#ObservationSpaceSpec"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.views.ObservationSpaceSpec" title="Permalink to this definition">¶</a></dt>
 <dd><p>Specification of an observation space.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables</dt>
@@ -307,9 +274,44 @@ supports.</p></li>
 <li><p><strong>deterministic</strong> (<em>bool</em>) – Whether the observation space is deterministic.</p></li>
 <li><p><strong>platform_dependent</strong> (<em>bool</em>) – Whether the observation values depend on the
 execution environment of the service.</p></li>
+<li><p><strong>default_value</strong> – A default observation. This value will be returned by
+<a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv.step" title="compiler_gym.envs.CompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">CompilerEnv.step()</span></code></a> if
+<a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv.observation_space" title="compiler_gym.envs.CompilerEnv.observation_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">CompilerEnv.observation_space</span></code></a>
+is set and the service terminates.</p></li>
 </ul>
 </dd>
 </dl>
+<dl class="py method">
+<dt id="compiler_gym.views.ObservationSpaceSpec.make_derived_space">
+<code class="sig-name descname">make_derived_space</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">cb</span><span class="p">:</span> <span class="n">Callable<span class="p">[</span><span class="p">[</span>Union<span class="p">[</span>numpy.ndarray<span class="p">, </span>str<span class="p">, </span>bytes<span class="p">, </span>List<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">, </span>networkx.classes.digraph.DiGraph<span class="p">]</span><span class="p">]</span><span class="p">, </span>Union<span class="p">[</span>numpy.ndarray<span class="p">, </span>str<span class="p">, </span>bytes<span class="p">, </span>List<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">, </span>networkx.classes.digraph.DiGraph<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">space</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>gym.spaces.space.Space<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">deterministic</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>bool<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default_value</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>Union<span class="p">[</span>numpy.ndarray<span class="p">, </span>str<span class="p">, </span>bytes<span class="p">, </span>List<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">, </span>networkx.classes.digraph.DiGraph<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">platform_dependent</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>bool<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">to_string</span><span class="p">:</span> <span class="n">Callable<span class="p">[</span><span class="p">[</span>Union<span class="p">[</span>numpy.ndarray<span class="p">, </span>str<span class="p">, </span>bytes<span class="p">, </span>List<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">, </span>networkx.classes.digraph.DiGraph<span class="p">]</span><span class="p">]</span><span class="p">, </span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; compiler_gym.views.observation_space_spec.ObservationSpaceSpec<a class="reference internal" href="../_modules/compiler_gym/views/observation_space_spec.html#ObservationSpaceSpec.make_derived_space"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.views.ObservationSpaceSpec.make_derived_space" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a derived observation space.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> – The name of the derived observation space.</p></li>
+<li><p><strong>cb</strong> – A callback function to compute a derived observation
+from the base observation.</p></li>
+<li><p><strong>space</strong> – The <code class="code docutils literal notranslate"><span class="pre">gym.Space</span></code> describing the observation space.</p></li>
+<li><p><strong>deterministic</strong> – Whether the observation space is deterministic.
+If not provided, the value is inherited from the base observation
+space.</p></li>
+<li><p><strong>default_value</strong> – The default value for the observation space. If
+not provided, the value is derived from the default value of the
+base observation space.</p></li>
+<li><p><strong>platform_dependent</strong> – Whether the derived observation space is
+platform-dependent. If not provided, the value is inherited from
+the base observation space.</p></li>
+<li><p><strong>to_string</strong> – A callback to convert and observation to a string
+representation. If not provided, the callback is inherited from the
+base observation space.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A new ObservationSpaceSpec.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </div>
@@ -375,9 +377,34 @@ Examples of non-deterministic rewards are those with measurement noise
 such as program runtime.</p></li>
 <li><p><strong>platform_dependent</strong> (<em>bool</em>) – Whether the reward values depend on the execution
 environment of the service.</p></li>
+<li><p><strong>default_value</strong> (<em>float</em>) – A default reward value. This value will be returned by
+<a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv.step" title="compiler_gym.envs.CompilerEnv.step"><code class="xref py py-func docutils literal notranslate"><span class="pre">CompilerEnv.step()</span></code></a> if
+<a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv.reward_space" title="compiler_gym.envs.CompilerEnv.reward_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">CompilerEnv.reward_space</span></code></a>
+is set and the service terminates.</p></li>
+<li><p><strong>default_negates_returns</strong> (<em>bool</em>) – If true, the default value will be offset by
+the sum of all rewards for the current episode. For example, given a
+default reward value of -10.0 and an episode with prior rewards
+[0.1, 0.3, -0.15], the default value is: -10.0 - sum(0.1, 0.3, -0.15).</p></li>
 </ul>
 </dd>
 </dl>
+<dl class="py method">
+<dt id="compiler_gym.views.RewardSpaceSpec.reward_on_error">
+<code class="sig-name descname">reward_on_error</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">episode_reward</span><span class="p">:</span> <span class="n">float</span></em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="../_modules/compiler_gym/views/reward_space_spec.html#RewardSpaceSpec.reward_on_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.views.RewardSpaceSpec.reward_on_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the reward value for an error condition.</p>
+<p>This method should be used to produce the reward value that should be
+used if the compiler service cannot be reached, e.g. because it has
+crashed or the connection has dropped.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>episode_reward</strong> – The current cumulative reward of an episode.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A reward.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </div>

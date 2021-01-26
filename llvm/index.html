@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>LLVM Environment Reference &mdash; CompilerGym 0.1.1 documentation</title>
+  <title>LLVM Environment Reference &mdash; CompilerGym 0.1.2 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.1
+                0.1.2
               </div>
             
           
@@ -517,8 +517,8 @@ arXiv preprint arXiv:2003.10536.</p>
 <h3><a class="toc-backref" href="#id7">Hardware Information</a><a class="headerlink" href="#hardware-information" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 7%" />
-<col style="width: 93%" />
+<col style="width: 8%" />
+<col style="width: 92%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Observation space</p></th>
@@ -527,10 +527,7 @@ arXiv preprint arXiv:2003.10536.</p>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>CpuInfo</p></td>
-<td><p><cite>str_list&lt;&gt;[0,inf]) -&gt; json://</cite></p></td>
-</tr>
-<tr class="row-odd"><td><p>CpuInfoDict</p></td>
-<td><p><cite>Dict(cores_count:int&lt;-inf,inf&gt;, l1d_cache_count:int&lt;-inf,inf&gt;, l1d_cache_size:int&lt;-inf,inf&gt;, l1i_cache_count:int&lt;-inf,inf&gt;, l1i_cache_size:int&lt;-inf,inf&gt;, l2_cache_count:int&lt;-inf,inf&gt;, l2_cache_size:int&lt;-inf,inf&gt;, l3_cache_count:int&lt;-inf,inf&gt;, l3_cache_size:int&lt;-inf,inf&gt;, l4_cache_count:int&lt;-inf,inf&gt;, l4_cache_size:int&lt;-inf,inf&gt;, name:str_list&lt;&gt;[0,inf]))</cite></p></td>
+<td><p><cite>Dict(cores_count:int, l1d_cache_count:int, l1d_cache_size:int, l1i_cache_count:int, l1i_cache_size:int, l2_cache_count:int, l2_cache_size:int, l3_cache_count:int, l3_cache_size:int, l4_cache_count:int, l4_cache_size:int, name:str_list&lt;&gt;[0,inf]))</cite></p></td>
 </tr>
 </tbody>
 </table>
@@ -593,18 +590,29 @@ cost. At a given timestep, reward is the reduction in cost from the previous
 state <span class="math notranslate nohighlight">\(s_{t-1}\)</span> to the current state <span class="math notranslate nohighlight">\(s_t\)</span>:</p>
 <div class="math notranslate nohighlight">
 \[R(s_t) = C(s_{t-1}) - C(s_t)\]</div>
-<p>For the LLVM environments we use the existing heuristics as baseline policies.
-Running the baseline policy on the initial program state <span class="math notranslate nohighlight">\(s_{t=0}\)</span>
-produces a baseline state <span class="math notranslate nohighlight">\(s_b\)</span> which is used to produce a baseline
-cost <span class="math notranslate nohighlight">\(C(s_b)\)</span>. We use the reduction in cost achieved by this baseline
-policy <span class="math notranslate nohighlight">\(C(s_{t=0} - C(s_{b})\)</span> to scale the reward signal:</p>
+<p>Reward can be normalized using the cost of the program before any optimizations
+are applied as the scaling factor:</p>
 <div class="math notranslate nohighlight">
-\[R(s_t) = \frac{C(s_{t-1}) - C(s_t)}{{C(s_{t=0})} - C(s_{b})}\]</div>
+\[R(s_t) = \frac{C(s_{t-1} - C(s_t)}{C(s_{t=0})}\]</div>
+<p>Normalized rewards are indicated by a <code class="code docutils literal notranslate"><span class="pre">Norm</span></code> suffix on the reward space
+name.</p>
+<p>Alternatively, rewards can be normalized by comparison to a baseline policy. The
+baseline policies are derived from existing
+<a class="reference external" href="https://clang.llvm.org/docs/CommandGuide/clang.html#code-generation-options">LLVM optimization levels</a>:
+<code class="code docutils literal notranslate"><span class="pre">-O3</span></code>, and <code class="code docutils literal notranslate"><span class="pre">-Oz</span></code>. When a baseline policy is used, reward is the
+reduction in cost from the previous state, scaled by the <em>reduction in cost</em>
+achieved by applying the baseline policy to produce a baseline state
+<span class="math notranslate nohighlight">\(s_b\)</span>:</p>
+<div class="math notranslate nohighlight">
+\[R(s_t) = \frac{C(s_{t-1}) - C(s_t)}{{C(s_{t=0})} - C(s_b)}\]</div>
+<p>These reward spaces are indicated by the baseline policy name as a suffix, e.g.
+the reward space <code class="code docutils literal notranslate"><span class="pre">IrInstructionCountO3</span></code> is <code class="code docutils literal notranslate"><span class="pre">IrInstructionCount</span></code>
+reward normalized to the <code class="code docutils literal notranslate"><span class="pre">-O3</span></code> baseline policy.</p>
 <div class="section" id="ir-instruction-count">
 <h3><a class="toc-backref" href="#id10">IR Instruction Count</a><a class="headerlink" href="#ir-instruction-count" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 19%" />
+<col style="width: 21%" />
 <col style="width: 15%" />
 <col style="width: 11%" />
 <col style="width: 18%" />
@@ -628,14 +636,21 @@ policy <span class="math notranslate nohighlight">\(C(s_{t=0} - C(s_{b})\)</span
 <td><p>Yes</p></td>
 <td><p>No</p></td>
 </tr>
-<tr class="row-odd"><td><p>IrInstructionCountO3</p></td>
+<tr class="row-odd"><td><p>IrInstructionCountNorm</p></td>
+<td></td>
+<td><p>(-inf, 1.0)</p></td>
+<td></td>
+<td><p>Yes</p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p>IrInstructionCountO3</p></td>
 <td><p><code class="code docutils literal notranslate"><span class="pre">-O3</span></code></p></td>
 <td><p>(-inf, inf)</p></td>
 <td><p>1.0</p></td>
 <td><p>Yes</p></td>
 <td><p>No</p></td>
 </tr>
-<tr class="row-even"><td><p>IrInstructionCountOz</p></td>
+<tr class="row-odd"><td><p>IrInstructionCountOz</p></td>
 <td><p><code class="code docutils literal notranslate"><span class="pre">-Oz</span></code></p></td>
 <td><p>(-inf, inf)</p></td>
 <td><p>1.0</p></td>
@@ -680,14 +695,21 @@ not take into account the effects of lowering.</p>
 <td><p>Yes</p></td>
 <td><p>Yes</p></td>
 </tr>
-<tr class="row-odd"><td><p>ObjectTextSizeO3</p></td>
+<tr class="row-odd"><td><p>ObjectTextSizeNorm</p></td>
+<td></td>
+<td><p>(-inf, 1.0)</p></td>
+<td></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+</tr>
+<tr class="row-even"><td><p>ObjectTextSizeO3</p></td>
 <td><p><code class="code docutils literal notranslate"><span class="pre">-O3</span></code></p></td>
 <td><p>(-inf, inf)</p></td>
 <td><p>1.0</p></td>
 <td><p>Yes</p></td>
 <td><p>Yes</p></td>
 </tr>
-<tr class="row-even"><td><p>ObjectTextSizeOz</p></td>
+<tr class="row-odd"><td><p>ObjectTextSizeOz</p></td>
 <td><p><code class="code docutils literal notranslate"><span class="pre">-Oz</span></code></p></td>
 <td><p>(-inf, inf)</p></td>
 <td><p>1.0</p></td>
@@ -699,7 +721,8 @@ not take into account the effects of lowering.</p>
 <p>The <code class="code docutils literal notranslate"><span class="pre">ObjectTextSizeBytes</span></code> reward signal returns the size of the
 <code class="code docutils literal notranslate"><span class="pre">.TEXT</span></code> section of the module after lowering to an object file, before
 linking. This is more expensive to compute than <code class="code docutils literal notranslate"><span class="pre">IrInstructionCount</span></code>. The
-object file code size depends on the target platform.</p>
+object file code size depends on the target platform, see
+<a class="reference internal" href="../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.compiler_version" title="compiler_gym.envs.CompilerEnv.compiler_version"><code class="xref py py-func docutils literal notranslate"><span class="pre">CompilerEnv.compiler_version</span></code></a>.</p>
 </div>
 </div>
 <div class="section" id="action-space">

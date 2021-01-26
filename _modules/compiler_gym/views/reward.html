@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.views.reward &mdash; CompilerGym 0.1.1 documentation</title>
+  <title>compiler_gym.views.reward &mdash; CompilerGym 0.1.2 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.1
+                0.1.2
               </div>
             
           
@@ -176,7 +176,6 @@
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span>
 
-<span class="kn">from</span> <span class="nn">compiler_gym.service</span> <span class="kn">import</span> <span class="n">scalar_range2tuple</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">Reward</span><span class="p">,</span> <span class="n">RewardRequest</span><span class="p">,</span> <span class="n">RewardSpace</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.views.reward_space_spec</span> <span class="kn">import</span> <span class="n">RewardSpaceSpec</span>
 
@@ -221,10 +220,6 @@
             <span class="n">session_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span> <span class="n">reward_space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">reward_space</span><span class="p">]</span><span class="o">.</span><span class="n">index</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_reward</span><span class="p">(</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="n">reward</span></div></div>
-
-    <span class="c1"># TODO(cummins): Copy the register_derived_space() functionality from</span>
-    <span class="c1"># ObservationView to allow derived reward spaces, possible creating a shared</span>
-    <span class="c1"># superclass.</span>
 </pre></div>
 
            </div>

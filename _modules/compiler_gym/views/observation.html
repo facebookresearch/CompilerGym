@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.views.observation &mdash; CompilerGym 0.1.1 documentation</title>
+  <title>compiler_gym.views.observation &mdash; CompilerGym 0.1.2 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.1
+                0.1.2
               </div>
             
           
@@ -174,11 +174,9 @@
 <span class="c1">#</span>
 <span class="c1"># This source code is licensed under the MIT license found in the</span>
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span>
 
-<span class="kn">from</span> <span class="nn">gym.spaces</span> <span class="kn">import</span> <span class="n">Space</span>
-
-<span class="kn">from</span> <span class="nn">compiler_gym.service</span> <span class="kn">import</span> <span class="n">observation2py</span><span class="p">,</span> <span class="n">observation_t</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.service</span> <span class="kn">import</span> <span class="n">observation_t</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">Observation</span><span class="p">,</span> <span class="n">ObservationRequest</span><span class="p">,</span> <span class="n">ObservationSpace</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.views.observation_space_spec</span> <span class="kn">import</span> <span class="n">ObservationSpaceSpec</span>
 
@@ -213,8 +211,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">session_id</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_get_observation</span> <span class="o">=</span> <span class="n">get_observation</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_base_spaces</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Space</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_translate_cbs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">observation_t</span><span class="p">],</span> <span class="n">observation_t</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
 
 <div class="viewcode-block" id="ObservationView.__getitem__"><a class="viewcode-back" href="../../../compiler_gym/views.html#compiler_gym.views.ObservationView.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observation_space</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">observation_t</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Request an observation from the given space.</span>
@@ -223,94 +219,45 @@
 <span class="sd">        :return: An observation.</span>
 <span class="sd">        :raises KeyError: If the requested observation space does not exist.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">observation_space</span><span class="p">]</span>
         <span class="n">request</span> <span class="o">=</span> <span class="n">ObservationRequest</span><span class="p">(</span>
             <span class="n">session_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
-            <span class="n">observation_space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">observation_space</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
+            <span class="n">observation_space</span><span class="o">=</span><span class="n">space</span><span class="o">.</span><span class="n">index</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span>
-            <span class="n">observation_space</span><span class="p">,</span>
-            <span class="n">observation2py</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_base_spaces</span><span class="o">.</span><span class="n">get</span><span class="p">(</span>
-                    <span class="n">observation_space</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">observation_space</span><span class="p">]</span><span class="o">.</span><span class="n">space</span>
-                <span class="p">),</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_get_observation</span><span class="p">(</span><span class="n">request</span><span class="p">),</span>
-            <span class="p">),</span>
-        <span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">space</span><span class="o">.</span><span class="n">cb</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_get_observation</span><span class="p">(</span><span class="n">request</span><span class="p">))</span></div>
 
-    <span class="c1"># TODO(cummins): Register an opaque_data_format handler that replaces the</span>
-    <span class="c1"># &quot;Space&quot; and updates observation2py / observation2str.</span>
-
-<div class="viewcode-block" id="ObservationView.register_derived_space"><a class="viewcode-back" href="../../../compiler_gym/views.html#compiler_gym.views.ObservationView.register_derived_space">[docs]</a>    <span class="k">def</span> <span class="nf">register_derived_space</span><span class="p">(</span>
+<div class="viewcode-block" id="ObservationView.add_derived_space"><a class="viewcode-back" href="../../../compiler_gym/views.html#compiler_gym.views.ObservationView.add_derived_space">[docs]</a>    <span class="k">def</span> <span class="nf">add_derived_space</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">base_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">derived_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
-        <span class="n">derived_space</span><span class="p">:</span> <span class="n">Space</span><span class="p">,</span>
-        <span class="n">cb</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">observation_t</span><span class="p">],</span> <span class="n">observation_t</span><span class="p">],</span>
+        <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">base_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Add a hook for implementing derived observation spaces.</span>
-
-<span class="sd">        Subclasses of ObservationView call this method in their</span>
-<span class="sd">        :code:`__init__()` after initializing the base class to register new</span>
-<span class="sd">        observation spaces that are derived from those provided by the</span>
-<span class="sd">        CompilerService.</span>
+        <span class="sd">&quot;&quot;&quot;Alias to</span>
+<span class="sd">        :func:`ObservationSpaceSpec.make_derived_space() &lt;compiler_gym.views.ObservationSpaceSpec.make_derived_space&gt;`</span>
+<span class="sd">        that adds the derived space to the observation view.</span>
 
 <span class="sd">        Example usage:</span>
 
-<span class="sd">        Suppose we have a service that provides a &quot;src&quot; observation space</span>
-<span class="sd">        that returns a string of source code. We want to create a new</span>
-<span class="sd">        observation space, &quot;src_len&quot;, that returns the length of the source</span>
-<span class="sd">        code. We do this by calling :code:`register_derived_space()` and</span>
-<span class="sd">        providing the a callback to translate from the base observation space</span>
-<span class="sd">        to the derived value:</span>
-
-<span class="sd">        .. code-block:: python</span>
-
-<span class="sd">            class MyObservationView(ObservationView):</span>
-<span class="sd">                def __init__(self, *args, **kwargs):</span>
-<span class="sd">                    super().__init__(*args, **kwargs)</span>
-<span class="sd">                    self.register_derived_space(</span>
-<span class="sd">                        derived_name=&quot;src_len&quot;,</span>
-<span class="sd">                        base_name=&quot;src&quot;,</span>
-<span class="sd">                        derived_space=Box(low=0, high=float(&quot;inf&quot;), shape=(1,), dtype=int),</span>
-<span class="sd">                        derive=lambda src: [len(src)],</span>
-<span class="sd">                    )</span>
-
-<span class="sd">        Now we can request for &quot;src_len&quot; observation space and receive</span>
-<span class="sd">        observations from this new derived space.</span>
-
+<span class="sd">        &gt;&gt;&gt; env.observation.add_derived_space(</span>
+<span class="sd">            id=&quot;src_len&quot;,</span>
+<span class="sd">            base_id=&quot;src&quot;,</span>
+<span class="sd">            cb=lambda src: np.array([len(src)], dtype=np.int32),</span>
+<span class="sd">            shape=Box(shape=(1,), dtype=np.int32),</span>
+<span class="sd">        )</span>
 <span class="sd">        &gt;&gt;&gt; env.observation[&quot;src_len&quot;]</span>
-<span class="sd">        [1021,]</span>
+<span class="sd">        1029</span>
 
-<span class="sd">        :param base_name: The name of the observation space that this new</span>
-<span class="sd">            observation space is derived from.</span>
-<span class="sd">        :param derived_name: The name of the derived observation space</span>
+<span class="sd">        :param id: The name of the new observation space.</span>
+<span class="sd">        :param base_id: The name of the observation space that this is derived</span>
+<span class="sd">            from.</span>
+<span class="sd">        :param **kwargs: Arguments passed to</span>
+<span class="sd">            :func:`ObservationSpaceSpec.make_derived_space &lt;compiler_gym.views.ObservationSpaceSpec.make_derived_space&gt;`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">base_spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">base_name</span><span class="p">]</span>
-        <span class="n">spec</span> <span class="o">=</span> <span class="n">ObservationSpaceSpec</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="n">derived_name</span><span class="p">,</span> <span class="n">space</span><span class="o">=</span><span class="n">derived_space</span><span class="p">)</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">base_spec</span><span class="o">.</span><span class="n">index</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">deterministic</span> <span class="o">=</span> <span class="n">base_spec</span><span class="o">.</span><span class="n">deterministic</span>
-        <span class="n">spec</span><span class="o">.</span><span class="n">platform_dependent</span> <span class="o">=</span> <span class="n">base_spec</span><span class="o">.</span><span class="n">platform_dependent</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">derived_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">spec</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_translate_cbs</span><span class="p">[</span><span class="n">derived_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">cb</span></div>
+        <span class="n">base_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">base_id</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="nb">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">base_space</span><span class="o">.</span><span class="n">make_derived_space</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;ObservationView[</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span><span class="si">}</span><span class="s2">]&quot;</span>
-
-<div class="viewcode-block" id="ObservationView.translate"><a class="viewcode-back" href="../../../compiler_gym/views.html#compiler_gym.views.ObservationView.translate">[docs]</a>    <span class="k">def</span> <span class="nf">translate</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">observation_space</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">observation</span><span class="p">:</span> <span class="n">observation_t</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">observation_t</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Translate an observation according to the space.</span>
-
-<span class="sd">        This methods translates the value returned by a CompilerSpace according</span>
-<span class="sd">        to any derived observation spaces, as registered using</span>
-<span class="sd">        register_derived_space(). If the requested observation space is not</span>
-<span class="sd">        derived the observation is returned unmodified.</span>
-
-<span class="sd">        :param observation_space: The name of the observation space.</span>
-<span class="sd">        :param observation: An observation returned by a CompilerService.</span>
-<span class="sd">        :return: An observation, after applying any derived space translations.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_translate_cbs</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">observation_space</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">)(</span><span class="n">observation</span><span class="p">)</span></div></div>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;ObservationView[</span><span class="si">{</span><span class="s1">&#39;, &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">keys</span><span class="p">()))</span><span class="si">}</span><span class="s2">]&quot;</span></div>
 </pre></div>
 
            </div>

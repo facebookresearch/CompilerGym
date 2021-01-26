@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.datasets &mdash; CompilerGym 0.1.1 documentation</title>
+  <title>compiler_gym.datasets &mdash; CompilerGym 0.1.2 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.1
+                0.1.2
               </div>
             
           
@@ -283,6 +283,54 @@ verify the contents of the dataset upon download.</p>
 <dd><p>A URL where the dataset can be downloaded from. May be an empty string.</p>
 </dd></dl>
 
+</dd></dl>
+
+<dl class="py function">
+<dt id="compiler_gym.datasets.activate">
+<code class="sig-prename descclassname">compiler_gym.datasets.</code><code class="sig-name descname">activate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#activate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.activate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move a directory from the inactive to active benchmark directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Param</dt>
+<dd class="field-odd"><p>The name of a dataset.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="code docutils literal notranslate"><span class="pre">True</span></code> if the dataset was activated, else <code class="code docutils literal notranslate"><span class="pre">False</span></code> if
+already active.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – If there is no dataset with that name.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="compiler_gym.datasets.deactivate">
+<code class="sig-prename descclassname">compiler_gym.datasets.</code><code class="sig-name descname">deactivate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#deactivate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.deactivate" title="Permalink to this definition">¶</a></dt>
+<dd><p>Move a directory from active to the inactive benchmark directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Param</dt>
+<dd class="field-odd"><p>The name of a dataset.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="code docutils literal notranslate"><span class="pre">True</span></code> if the dataset was deactivated, else <code class="code docutils literal notranslate"><span class="pre">False</span></code> if
+already inactive.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt id="compiler_gym.datasets.delete">
+<code class="sig-prename descclassname">compiler_gym.datasets.</code><code class="sig-name descname">delete</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span></em>, <em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#delete"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.delete" title="Permalink to this definition">¶</a></dt>
+<dd><p>Delete a directory in the inactive benchmark directory.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Param</dt>
+<dd class="field-odd"><p>The name of a dataset.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="code docutils literal notranslate"><span class="pre">True</span></code> if the dataset was deleted, else <code class="code docutils literal notranslate"><span class="pre">False</span></code> if
+already deleted.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.spaces &mdash; CompilerGym 0.1.1 documentation</title>
+  <title>compiler_gym.spaces &mdash; CompilerGym 0.1.2 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.1
+                0.1.2
               </div>
             
           
@@ -461,6 +461,25 @@ commandline flag.</p>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A string commandline invocation.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compiler_gym.spaces.Commandline.from_commandline">
+<code class="sig-name descname">from_commandline</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">commandline</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>int<span class="p">]</span><a class="reference internal" href="../_modules/compiler_gym/spaces/commandline.html#Commandline.from_commandline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.spaces.Commandline.from_commandline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Produce a sequence of actions from a commandline.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>commandline</strong> – A string commandline invocation, as produced by
+<code class="xref py py-func docutils literal notranslate"><span class="pre">commandline()</span></code>.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A list of action values.</p>
+</dd>
+<dt class="field-odd">Raises</dt>
+<dd class="field-odd"><p><strong>LookupError</strong> – If any of the flags in the commandline are not
+recognized.</p>
 </dd>
 </dl>
 </dd></dl>
