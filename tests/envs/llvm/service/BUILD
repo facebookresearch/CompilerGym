@@ -16,6 +16,22 @@ cc_test(
 )
 
 cc_test(
+    name = "GvnSinkTest",
+    srcs = ["GvnSinkTest.cc"],
+    data = ["//compiler_gym/third_party/cBench:blowfish"],
+    deps = [
+        "//compiler_gym/envs/llvm/service:BenchmarkFactory",
+        "//compiler_gym/envs/llvm/service:LlvmEnvironment",
+        "//compiler_gym/util:GrpcStatusMacros",
+        "//compiler_gym/util:RunfilesPath",
+        "//tests:TestMain",
+        "@boost//:filesystem",
+        "@glog",
+        "@gtest",
+    ],
+)
+
+cc_test(
     name = "ObservationSpacesTest",
     srcs = ["ObservationSpacesTest.cc"],
     deps = [

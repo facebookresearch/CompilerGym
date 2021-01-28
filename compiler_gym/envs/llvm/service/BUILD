@@ -31,7 +31,10 @@ cc_library(
     name = "Benchmark",
     srcs = ["Benchmark.cc"],
     hdrs = ["Benchmark.h"],
-    visibility = ["//compiler_gym/envs/llvm/service:__subpackages__"],
+    visibility = [
+        "//compiler_gym/envs/llvm/service:__subpackages__",
+        "//tests:__subpackages__",
+    ],
     deps = [
         ":Cost",
         "@boost//:filesystem",
@@ -46,7 +49,10 @@ cc_library(
     name = "BenchmarkFactory",
     srcs = ["BenchmarkFactory.cc"],
     hdrs = ["BenchmarkFactory.h"],
-    visibility = ["//compiler_gym/envs/llvm/service:__subpackages__"],
+    visibility = [
+        "//compiler_gym/envs/llvm/service:__subpackages__",
+        "//tests:__subpackages__",
+    ],
     deps = [
         ":Benchmark",
         "//compiler_gym/util:GrpcStatusMacros",
@@ -96,6 +102,7 @@ cc_library(
         "-DGOOGLE_PROTOBUF_NO_RTTI",
         "-fno-rtti",
     ],
+    visibility = ["//tests:__subpackages__"],
     deps = [
         ":ActionSpace",
         ":Benchmark",

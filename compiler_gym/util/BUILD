@@ -43,6 +43,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "@com_github_grpc_grpc//:grpc++",
+        "@glog",
     ],
 )
 

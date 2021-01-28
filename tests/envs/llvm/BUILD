@@ -80,6 +80,19 @@ py_test(
     ],
 )
 
+py_test(
+    name = "deterministic_actions_test",
+    timeout = "eternal",
+    srcs = ["deterministic_actions_test.py"],
+    shard_count = 32,
+    tags = ["manual"],
+    deps = [
+        ":fixtures",
+        "//compiler_gym/envs",
+        "//tests:test_main",
+    ],
+)
+
 py_library(
     name = "fixtures",
     testonly = 1,
@@ -115,6 +128,17 @@ py_test(
     name = "fresh_environment_observation_reward_test",
     srcs = ["fresh_environment_observation_reward_test.py"],
     shard_count = 8,
+    deps = [
+        ":fixtures",
+        "//compiler_gym/envs",
+        "//tests:test_main",
+    ],
+)
+
+py_test(
+    name = "gvn_sink_test",
+    srcs = ["gvn_sink_test.py"],
+    shard_count = 4,
     deps = [
         ":fixtures",
         "//compiler_gym/envs",
