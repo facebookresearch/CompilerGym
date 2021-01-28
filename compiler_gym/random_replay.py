@@ -4,8 +4,6 @@
 # LICENSE file in the root directory of this source tree.
 """Replay the sequence of actions that produced the best reward."""
 import json
-import os
-import shutil
 from pathlib import Path
 from time import time
 from typing import List
