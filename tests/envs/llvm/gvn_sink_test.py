@@ -13,7 +13,6 @@ from tests.test_main import main
 pytest_plugins = ["tests.envs.llvm.fixtures"]
 
 
-@pytest.mark.xfail(strict=False)
 @pytest.mark.parametrize(
     "benchmark_name",
     [

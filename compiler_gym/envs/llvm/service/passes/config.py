@@ -199,6 +199,10 @@ _EXCLUDED_PASSES = {
     "CFGuardDispatchPass",
     # We don't want to change the visibility of symbols.
     "InternalizePass",
+    # NOTE(github.com/facebookresearch/CompilerGym/issues/46): The -gvn-sink
+    # pass has been found to produce different states when run multiple times
+    # on the same input.
+    "GVNSinkPass",
 }
 
 # The name of the LLVM target to extract architecture-specific transforms for.

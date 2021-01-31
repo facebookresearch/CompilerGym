@@ -102,6 +102,9 @@ cc_library(
         "-DGOOGLE_PROTOBUF_NO_RTTI",
         "-fno-rtti",
     ],
+    data = [
+        "//compiler_gym/third_party/llvm:opt",
+    ],
     visibility = ["//tests:__subpackages__"],
     deps = [
         ":ActionSpace",
@@ -114,6 +117,7 @@ cc_library(
         "//compiler_gym/third_party/cpuinfo",
         "//compiler_gym/util:EnumUtil",
         "//compiler_gym/util:GrpcStatusMacros",
+        "//compiler_gym/util:RunfilesPath",
         "@boost//:filesystem",
         "@fmt",
         "@glog",
@@ -123,6 +127,7 @@ cc_library(
         "@programl//programl/graph/format:node_link_graph",
         "@programl//programl/ir/llvm",
         "@programl//programl/proto:programl_cc",
+        "@subprocess",
     ],
 )
 

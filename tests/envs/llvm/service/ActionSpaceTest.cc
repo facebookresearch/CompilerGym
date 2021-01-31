@@ -18,7 +18,7 @@ TEST(ActionSpacesTest, getLlvmActionSpace) {
   const auto spaces = getLlvmActionSpaceList();
   EXPECT_EQ(spaces.size(), 1);
   EXPECT_EQ(spaces[0].name(), "PassesAll");
-  EXPECT_EQ(spaces[0].action_size(), 138);
+  EXPECT_EQ(spaces[0].action_size(), 137);
 }
 
 }  // anonymous namespace

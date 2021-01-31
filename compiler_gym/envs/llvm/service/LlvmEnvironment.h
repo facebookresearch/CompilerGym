@@ -57,9 +57,16 @@ class LlvmEnvironment {
   int actionCount() const { return actionCount_; }
 
  protected:
+  // Run the requested action.
+  [[nodiscard]] grpc::Status runAction(LlvmAction action, ActionReply* reply);
+
   // Run the given pass, possibly modifying the underlying LLVM module.
   void runPass(llvm::Pass* pass, ActionReply* reply);
   void runPass(llvm::FunctionPass* pass, ActionReply* reply);
+
+  // Run the commandline `opt` tool on the current LLVM module with the given
+  // arguments, replacing the environment state with the generated output.
+  [[nodiscard]] grpc::Status runOptWithArgs(const std::vector<std::string>& optArgs);
 
   inline Benchmark& benchmark() { return *benchmark_; }
 

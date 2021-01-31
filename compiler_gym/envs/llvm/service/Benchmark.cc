@@ -50,6 +50,31 @@ std::unique_ptr<llvm::Module> makeModuleOrDie(llvm::LLVMContext& context, const 
 
 }  // anonymous namespace
 
+Status readBitcodeFile(const fs::path& path, Bitcode* bitcode) {
+  std::ifstream ifs;
+  ifs.open(path.string());
+
+  ifs.seekg(0, std::ios::end);
+  if (ifs.fail()) {
+    return Status(StatusCode::NOT_FOUND, fmt::format("Error reading file: \"{}\"", path.string()));
+  }
+
+  std::streampos fileSize = ifs.tellg();
+  if (!fileSize) {
+    return Status(StatusCode::INVALID_ARGUMENT,
+                  fmt::format("File is empty: \"{}\"", path.string()));
+  }
+
+  bitcode->resize(fileSize);
+  ifs.seekg(0);
+  ifs.read(&(*bitcode)[0], bitcode->size());
+  if (ifs.fail()) {
+    return Status(StatusCode::NOT_FOUND, fmt::format("Error reading file: \"{}\"", path.string()));
+  }
+
+  return Status::OK;
+}
+
 std::unique_ptr<llvm::Module> makeModule(llvm::LLVMContext& context, const Bitcode& bitcode,
                                          const std::string& name, Status* status) {
   llvm::MemoryBufferRef buffer(llvm::StringRef(bitcode.data(), bitcode.size()), name);

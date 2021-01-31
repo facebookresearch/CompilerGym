@@ -14,6 +14,20 @@ pytest_plugins = ["tests.envs.llvm.fixtures"]
 
 
 def test_deterministic_action(env: LlvmEnv, benchmark_name: str, action_name: str):
+    """Run an action multiple times from the same starting state and check that
+    the generated LLVM-IR is the same.
+
+    Do this for every combination of benchmark and action. This generates many
+    tests.
+
+    Caveats of this test:
+
+        * The initial states are all unoptimized benchmarks. If a pass depends
+          on other passes to take effect it will not be tested.
+
+        * Non-determinism is tested by running the action 20 times. Extremely
+          unlikely non-determinism may not be detected.
+    """
     env.observation_space = "Ir"
 
     checksums = set()
