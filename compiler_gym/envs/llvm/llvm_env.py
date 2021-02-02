@@ -5,6 +5,7 @@
 """Extensions to the CompilerEnv environment for LLVM."""
 import os
 import shutil
+import tempfile
 from pathlib import Path
 from typing import Iterable, List, Optional, Union, cast
 
@@ -177,6 +178,61 @@ class LlvmEnv(CompilerEnv):
         """
         command = cast(Commandline, self.action_space).commandline(self.actions)
         return f"opt {command} input.bc -o output.bc"
+
+    def fork(self) -> "LlvmEnv":
+        """Fork a new environment with exactly the same sate.
+
+        This creates a duplicate environment instance with the current state.
+        The new environment is entirely independently of the source
+        episode and must be managed and
+        :meth:`closed() <compiler_gym.envs.CompilerEnv.close>` by the user.
+
+        Example usage:
+
+        >>> env = gym.make("llvm-v0")
+        # ... use env
+        >>> new_env = env.fork()
+        >>> new_env.actions == env.actions
+        True
+
+        :return: A new environment instance.
+        """
+        # Create a new environment using the same base settings as the current
+        # environment.
+        new_env = LlvmEnv(
+            service=self.service_endpoint,
+            observation_space=self.observation_space,
+            reward_space=self.reward_space,
+            action_space=self.action_space,
+            connection_settings=self.connection_settings,
+        )
+
+        # Serialize the current program state to a bitcode file and use this to
+        # initialize the state of the new environment.
+        with tempfile.TemporaryDirectory(dir=self.service.connection.working_dir) as d:
+            bitcode_file = Path(d) / "benchmark.bc"
+            self.write_bitcode(bitcode_file)
+            benchmark = new_env.make_benchmark(bitcode_file)
+            new_env.reset(benchmark=benchmark)
+
+        # Copy over the mutable episode state.
+        new_env.actions = self.actions.copy()
+
+        # Now that we have initialized the environment with the current state,
+        # set the benchmark so that calls to new_env.reset() will correctly
+        # revert the environment to the initial benchmark state.
+        new_env.benchmark = self.benchmark
+        # Set the "visible" name of the current benchmark to hide the fact that
+        # we loaded from a custom bitcode file.
+        new_env._benchmark_in_use_uri = self.benchmark
+
+        # Re-register any custom benchmarks with the new environment.
+        if self._custom_benchmarks:
+            new_env._add_custom_benchmarks(
+                list(self._custom_benchmarks.values()).copy()
+            )
+
+        return new_env
 
     @property
     def ir(self) -> str:

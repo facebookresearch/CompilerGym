@@ -98,6 +98,20 @@ py_library(
 )
 
 py_test(
+    name = "fork_env_test",
+    timeout = "short",
+    srcs = ["fork_env_test.py"],
+    data = [
+        "//compiler_gym/third_party/cBench:crc32",
+    ],
+    deps = [
+        ":fixtures",
+        "//compiler_gym/envs",
+        "//tests:test_main",
+    ],
+)
+
+py_test(
     name = "fresh_environment_observation_reward_test",
     srcs = ["fresh_environment_observation_reward_test.py"],
     shard_count = 8,
