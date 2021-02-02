@@ -113,12 +113,19 @@ class CompilerEnvState(NamedTuple):
         if not isinstance(rhs, CompilerEnvState):
             return False
         epsilon = 1e-5
+        # If only one benchmark has a reward the states cannot be equal.
+        if self.reward is None != rhs.reward is None:
+            return False
+        if self.reward is None and rhs.reward is None:
+            reward_equal = True
+        else:
+            reward_equal = abs(self.reward - rhs.reward) < epsilon
         # Note that walltime is excluded from equivalence checks as two states
         # are equivalent if they define the same point in the optimization space
         # irrespective of how long it took to get there.
         return (
             self.benchmark == rhs.benchmark
-            and abs(self.reward - rhs.reward) < epsilon
+            and reward_equal
             and self.commandline == rhs.commandline
         )
 
