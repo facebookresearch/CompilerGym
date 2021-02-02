@@ -21,13 +21,10 @@ def test_step(env: CompilerEnv, action_name: str):
         env.action_space.from_string(action_name)
     )
 
-    if done:
-        assert observation is None
-        assert reward is None
-    else:
-        assert isinstance(observation, np.ndarray)
-        assert observation.shape == (56,)
-        assert isinstance(reward, float)
+    assert isinstance(observation, np.ndarray)
+    assert observation.shape == (56,)
+    assert isinstance(reward, float)
+    assert isinstance(done, bool)
 
 
 if __name__ == "__main__":
