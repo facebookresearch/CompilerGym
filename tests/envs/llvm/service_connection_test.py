@@ -47,8 +47,9 @@ def test_service_env_dies_reset(env: CompilerEnv):
     env.service.close()
 
     # Check that the environment doesn't fall over.
-    observation, reward, done, _ = env.step(0)
-    assert done
+    observation, reward, done, info = env.step(0)
+    assert done, info["error_details"]
+    assert not env.in_episode
 
     # Check that default values are returned.
     np.testing.assert_array_equal(observation, np.zeros(56))
@@ -56,6 +57,8 @@ def test_service_env_dies_reset(env: CompilerEnv):
 
     # Reset the environment and check that it works.
     env.reset(benchmark="cBench-v0/crc32")
+    assert env.in_episode
+
     observation, reward, done, info = env.step(0)
     assert not done, info["error_details"]
     assert observation is not None
