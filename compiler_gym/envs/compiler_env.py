@@ -417,13 +417,7 @@ class CompilerEnv(gym.Env):
             self._user_specified_benchmark_uri = benchmark
         elif isinstance(benchmark, Benchmark):
             self._user_specified_benchmark_uri = benchmark.uri
-            # Register the custom benchmark, and record the Benchmark object
-            # in case of environment restart.
-            self._custom_benchmarks[benchmark.uri] = benchmark
-            self.service(
-                self.service.stub.AddBenchmark,
-                AddBenchmarkRequest(benchmark=[benchmark]),
-            )
+            self._add_custom_benchmarks([benchmark])
         else:
             raise TypeError(f"Unsupported benchmark type: {type(benchmark).__name__}")
 
@@ -575,11 +569,8 @@ class CompilerEnv(gym.Env):
             self.service = CompilerGymServiceConnection(
                 self.service_endpoint, self.connection_settings
             )
-            # Re-register any custom benchmarks.
-            self.service(
-                self.service.stub.AddBenchmark,
-                AddBenchmarkRequest(benchmark=list(self._custom_benchmarks.values())),
-            )
+            # Re-register the custom benchmarks with the new service.
+            self._add_custom_benchmarks(self._custom_benchmarks.values())
 
         self.action_space_name = action_space or self.action_space_name
 
@@ -840,3 +831,23 @@ class CompilerEnv(gym.Env):
             raise ValueError(f"Dataset already registered with name: {dataset.name}")
         self.available_datasets[dataset.name] = dataset
         return True
+
+    def _add_custom_benchmarks(self, benchmarks: List[Benchmark]) -> None:
+        """Register custom benchmarks with the compiler service.
+
+        Benchmark registration occurs automatically using the
+        :meth:`env.benchmark <compiler_gym.envs.CompilerEnv.benchmark>`
+        property, there is usually no need to call this method yourself.
+
+        :param benchmarks: The benchmarks to register.
+        """
+        if not benchmarks:
+            return
+
+        for benchmark in benchmarks:
+            self._custom_benchmarks[benchmark.uri] = benchmark
+
+        self.service(
+            self.service.stub.AddBenchmark,
+            AddBenchmarkRequest(benchmark=benchmarks),
+        )
