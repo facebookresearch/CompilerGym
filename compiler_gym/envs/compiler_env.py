@@ -356,6 +356,7 @@ class CompilerEnv(gym.Env):
 
     @action_space.setter
     def action_space(self, action_space: Optional[str]):
+        self.action_space_name = action_space
         index = (
             [a.name for a in self.action_spaces].index(action_space)
             if self.action_space_name
