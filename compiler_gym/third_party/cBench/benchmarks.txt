@@ -9,6 +9,7 @@ benchmark://cBench-v0/gsm
 benchmark://cBench-v0/ispell
 benchmark://cBench-v0/jpeg-c
 benchmark://cBench-v0/jpeg-d
+benchmark://cBench-v0/lame
 benchmark://cBench-v0/patricia
 benchmark://cBench-v0/qsort
 benchmark://cBench-v0/rijndael

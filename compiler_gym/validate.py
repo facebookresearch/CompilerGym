@@ -12,7 +12,7 @@ import gym
 
 from compiler_gym.envs.compiler_env import CompilerEnv, CompilerEnvState
 from compiler_gym.envs.llvm import LlvmEnv
-from compiler_gym.envs.llvm.datasets import LLVM_BENCHMARK_VALIDATION_CALLBACKS
+from compiler_gym.envs.llvm.datasets import get_llvm_benchmark_validation_callback
 from compiler_gym.spaces import Commandline
 from compiler_gym.util.timer import Timer
 
@@ -129,9 +129,7 @@ def validate_state(env: CompilerEnv, state: CompilerEnvState) -> ValidationResul
                         f"Expected reward {state.reward:.4f} but received reward {reward:.4f}"
                     )
 
-            validate_semantics = LLVM_BENCHMARK_VALIDATION_CALLBACKS.get(
-                state.benchmark
-            )
+            validate_semantics = get_llvm_benchmark_validation_callback(env)
             if validate_semantics:
                 validation["benchmark_semantics_validated"] = True
                 semantics_error = validate_semantics(env)

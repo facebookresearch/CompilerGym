@@ -1,0 +1,351 @@
+%    Copyright (C) 1996, 1997 Aladdin Enterprises.  All rights reserved.
+%
+% This file is part of Aladdin Ghostscript.
+%
+% Aladdin Ghostscript is distributed with NO WARRANTY OF ANY KIND.  No author
+% or distributor accepts any responsibility for the consequences of using it,
+% or for whether it serves any particular purpose or works at all, unless he
+% or she says so in writing.  Refer to the Aladdin Ghostscript Free Public
+% License (the "License") for full details.
+%
+% Every copy of Aladdin Ghostscript must include a copy of the License,
+% normally in a plain ASCII text file named PUBLIC.  The License grants you
+% the right to copy, modify and redistribute Aladdin Ghostscript, but only
+% under certain conditions described in the License.  Among other things, the
+% License requires that the copyright notice and this notice be preserved on
+% all copies.
+
+% gs_pdfwr.ps
+% PDF writer additions to systemdict.
+
+% This file should be included iff the pdfwrite "device" is included
+% in the executable.
+
+% Redefine pdfmark to pass the data to the driver.
+% We use a pseudo-parameter named /pdfmark whose value is an array:
+%	key1 value1 ... CTM /type
+/.pdf===dict mark
+  /arraytype
+   { dup xcheck { ({) (}) } { ([) (]) } ifelse
+		% Stack: file obj left right
+      4 1 roll 2 index exch writestring () exch
+       { exch 2 index exch writestring
+	 1 index exch pdfmark===only ( )
+       }
+      forall pop exch writestring
+   } bind
+  /packedarraytype 1 index
+  /dicttype
+   { 1 index (<<\n) writestring
+      { 2 index 3 -1 roll pdfmark===only 1 index ( ) writestring
+	1 index exch pdfmark===only dup (\n) writestring
+      }
+     forall (>>) writestring
+   } bind
+.dicttomark readonly def
+/pdfmark===only		% <file> <obj> pdfmark===only -
+ { .pdf===dict 1 index type .knownget { exec } { write==only } ifelse
+ } bind def
+/.pdfcvs		% <obj> .pdfcvs <string>
+ {		% We can't handle long values yet.
+   =string /NullEncode filter dup 2 index pdfmark===only
+   dup (\n\000) writestring closefile pop
+   =string (\n\000) search
+    { dup length string copy exch pop exch pop }
+    {		% The converted representation didn't fit.  Punt.
+      pop (???)
+    }
+   ifelse
+ } bind def
+/.pdfputparams		% <paramarray> <paramname> .pdfputparams <result...>
+ { currentdevice null false mark 6 -2 roll exch
+		% Don't allow the page device to get cleared....
+     {.putdeviceparams} 0 get .currentpagedevice pop {.setpagedevice} 0 get
+   3 array astore cvx exec
+ } bind def
+/pdfmark		% -mark- <key> <value> ... <markname> pdfmark -
+ { counttomark 1 add copy
+   matrix currentmatrix .pdfcvs exch ]
+   1 2 2 index length 3 sub { 2 copy 2 copy get .pdfcvs put pop } for
+   /pdfmark .pdfputparams
+   type /booleantype ne { cleartomark } if cleartomark
+ } odef
+userdict /pdfmark .undef
+
+% Define setdistillerparams / currentdistillerparams.
+% Distiller parameters are currently treated as device parameters.
+/.distillerparamkeys mark
+		% General parameters
+  /ASCII85EncodePages { }
+  /AutoRotatePages { }
+  /CompatibilityLevel { }
+  /CompressPages { }
+  /CoreDistVersion { }
+  /DoThumbnails { }
+  /ImageMemory { }
+  /LZWEncodePages { }
+  /PreserveHalftoneInfo { }
+  /PreserveOPIComments { }
+  /PreserveOverprintSettings { }
+  /TransferFunctionInfo { }
+  /UCRandBGInfo { }
+  /UseFlateCompression { }
+		% Color sampled image parameters
+  /ColorACSDict { }
+  /AntiAliasColorImages { }
+  /AutoFilterColorImages { }
+  /ColorImageDepth { }
+  /ColorImageDict { }
+  /DownsampleColorImages { }
+  /ColorImageDownsampleType { }
+  /EncodeColorImages { }
+  /ColorImageFilter { }
+  /ColorImageResolution { }
+  /ColorConversionStrategy { }
+  /ConvertCMYKImagesToRGB { }
+  /ConvertImagesToIndexed { }
+		% Grayscale sampled image parameters
+  /GrayACSDict { }
+  /AntiAliasGrayImages { }
+  /AutoFilterGrayImages { }
+  /GrayImageDepth { }
+  /GrayImageDict { }
+  /DownsampleGrayImages { }
+  /GrayImageDownsampleType { }
+  /EncodeGrayImages { }
+  /GrayImageFilter { }
+  /GrayImageResolution { }
+		% Monochrome sampled image parameters
+  /AntiAliasMonoImages { }
+  /MonoImageDepth { }
+  /MonoImageDict { }
+  /DownsampleMonoImages { }
+  /MonoImageDownsampleType { }
+  /EncodeMonoImages { }
+  /MonoImageFilter { }
+  /MonoImageResolution { }
+		% Font embedding parameters
+  /AlwaysEmbed
+   { dup length 0 gt
+      { dup 0 get false eq
+         { dup length 1 sub 1 exch getinterval exch pop /~AlwaysEmbed exch
+         } if
+      } if
+   }
+  /NeverEmbed
+   { dup length 0 gt
+      { dup 0 get false eq
+         { dup length 1 sub 1 exch getinterval exch pop /~NeverEmbed exch
+         } if
+      } if
+   }
+  /EmbedAllFonts { }
+  /SubsetFonts { }
+  /MaxSubsetPct { }
+.dicttomark readonly def
+/.distillerdevice
+ { currentdevice .devicename /pdfwrite eq
+    { currentdevice }
+    { /pdfwrite finddevice }
+   ifelse
+ } bind def
+/setdistillerparams		% <dict> setdistillerparams -
+ { .distillerdevice null false mark 4 index
+    { //.distillerparamkeys 2 index .knownget { exec } { pop pop } ifelse }
+   forall .putdeviceparams
+   type /booleantype eq { pop } { cleartomark pop pop pop } ifelse pop
+ } odef
+/currentdistillerparams		% - currentdistillerparams <dict>
+ { .distillerdevice //.distillerparamkeys .getdeviceparams .dicttomark
+ } odef
+
+% Patch the 'show' operators to pass the data to the device.
+% We use a pseudo-parameter named /show whose value is a dictionary:
+%	/String (str)
+%	/Values [cx cy char ax ay px py]
+%	/Matrix [xx xy yx yy tx ty]
+%	/FontName /fontname
+%	/Encoding [e0 .. e255]
+%	/BaseEncoding [e0 ... e255]
+% We also fill an empty path in order to get the clipping region and
+% current color set properly.  THIS IS A BIG HACK.
+/.pdfknownfonts mark
+  /Courier null
+  /Courier-Bold null
+  /Courier-Oblique null
+  /Courier-BoldOblique null
+  /Helvetica null
+  /Helvetica-Bold null
+  /Helvetica-Oblique null
+  /Helvetica-BoldOblique null
+  /Symbol null
+  /Times-Roman null
+  /Times-Bold null
+  /Times-Italic null
+  /Times-BoldItalic null
+  /ZapfDingbats null
+.dicttomark readonly def
+.currentglobal false .setglobal
+/.pdfknownids 50 dict def
+.setglobal
+/.findorigfont {	% <font> .findorigfont <origfont>
+			% Check for a known font with the same name,
+			% or one of the 14 known names,
+			% and the same UniqueID.
+  dup /UniqueID .knownget {
+    .pdfknownids 1 index .knownget {
+      exch pop dup null ne { true } { pop false } ifelse
+    } {			% We haven't looked up the UniqueID yet.
+			% Register the UniqueIDs of all fonts.
+      .FontDirectory {
+	exch pop dup /UniqueID .knownget {
+			% Stack: font uniqueid somefont somefontid
+	  exch .pdfknownids 3 1 roll put
+	} {
+	  pop
+	} ifelse
+      } forall
+			% Register the UniqueIDs of the 14 built-in fonts,
+			% to make sure they override any other fonts
+			% with the same UniqueIDs.
+      .pdfknownfonts {
+	pop .FontDirectory 1 index .knownget {
+			% Stack: font uniqueid knownname knownfont
+	  dup /UniqueID get exch .pdfknownids 3 1 roll put
+	} if pop
+      } forall
+			% Now see if the UniqueID is known.
+      .pdfknownids 1 index .knownget {
+	exch pop true
+      } {			% Record the UniqueID as not registered.
+	.pdfknownids exch null put false
+      } ifelse
+    } ifelse
+  } {			% This font has no UniqueID.
+    false
+  } ifelse
+			% Stack: font knownfont -true- | font -false-
+  {
+    exch pop
+  } {
+    { dup /OrigFont .knownget not { exit } if exch pop } loop
+  } ifelse
+} .bind def
+/setvmthreshold where { pop 1000000 setvmthreshold } if
+/.pdfdoshow		% <string> <cxd> <cyd> <char> <axd> <ayd> .pdfdoshow
+			%   <bool>
+ { mark /String 8 2 roll
+%vmstatus pop =only pop (, ) print
+   currentpoint transform 7 array astore /Values exch
+   currentfont .findorigfont
+		% Pass the original font name.
+   dup /FontName get
+   /FontName exch 3 -1 roll
+		% Concatenate the "quotient" of the current FontMatrix
+		% and the FontMatrix of the original font.
+		% Be sure to include any translation.
+   /Matrix
+     exch /FontMatrix get matrix invertmatrix
+     currentfont /FontMatrix get 1 index concatmatrix
+     matrix currentmatrix dup 4 0 put dup 5 0 put dup concatmatrix
+   /Encoding currentfont /Encoding .knownget not { [] } if
+	% Make a reasonable guess at the base encoding.
+   /BaseEncoding StandardEncoding
+%vmstatus pop =only pop (, ) print
+   .dicttomark
+		% Set the clipping region and color in the output.
+		% This is another hack!
+   gsave newpath fill grestore
+%vmstatus pop =only pop (, ) print
+   /show .pdfputparams
+%vmstatus pop =only pop () = flush
+   dup type /booleantype eq
+    { pop pop true }
+    { dup /undefined eq
+       { cleartomark pop pop pop false }
+       { dup mark eq { /unknown /rangecheck } if
+	 counttomark 4 add 1 roll cleartomark pop pop pop
+	 /.pdfshow cvx exch signalerror
+       }
+      ifelse
+    }
+   ifelse
+ } .bind def
+/.pdfexecshow		% <proc> .pdfexecshow -
+ { matrix currentmatrix gsave nulldevice setmatrix
+   exec currentpoint grestore moveto
+ } .bind def
+/.pdfwrite?		% - .pdfwrite? <bool>
+ { currentdevice .devicename /pdfwrite eq
+   currentfont /FontType get 1 eq and
+ } .bind def
+% .pdfshow isn't an operator per se, but it still needs to be careful with
+% the stack so that the operators will have stack protection.
+/.pdfshow		% <string> <cx> <cy> <char> <ax> <ay> <showproc>
+			%   .pdfshow -
+ { 7 1 roll .pdfwrite?
+    { .pdfdoshow }
+    { 6 { pop } repeat false }
+   ifelse
+    { .pdfexecshow }
+    { exec }
+   ifelse
+ } .bind def
+/show
+ { dup 0 0 32 0 0 { show } .pdfshow
+ } .bind odef
+/ashow
+ { dup 0 0 32 6 index 6 index { ashow } .pdfshow
+ } .bind odef
+/widthshow
+ { 4 copy 4 -2 roll 4 -1 roll 0 0 { widthshow } .pdfshow
+ } .bind odef
+/awidthshow
+ { 6 copy 6 -2 roll 6 -3 roll { awidthshow } .pdfshow
+ } .bind odef
+/glyphshow where { pop } { (%END) .skipeof } ifelse
+/glyphshow
+ { .pdfwrite?
+    { currentfont /Encoding .knownget not { {} } if
+      0 1 2 index length 1 sub
+       {		% Stack: glyph encoding index
+	 2 copy get 3 index eq { exch pop exch pop null exit } if pop
+       }
+      for null eq
+       { (X) dup 0 3 index put show pop }
+       { glyphshow }
+      ifelse
+    }
+    { glyphshow
+    }
+   ifelse
+ } .bind odef
+%END
+/.kshow1 {	% <index> <proc> <string> .kshow1
+  (X) dup 0 3 index 6 index get put show
+  2 index 1 index length 1 sub lt {
+    dup 3 index get exch 4 -1 roll 1 add get
+    3 -1 roll exec
+  } {
+    pop pop pop
+  } ifelse
+} .bind def
+/kshow {
+  .pdfwrite? {
+		% Construct a closure, and work character by character.
+    0 1 2 index length 1 sub 5 -2 roll
+    //.kshow1 /exec cvx 4 packedarray cvx for
+  } {
+    kshow
+  } ifelse
+} .bind odef
+% The remaining operators aren't implemented correctly.
+/xshow where {
+ pop /xshow { .pdfwrite? { 1 index show pop pop } { xshow } ifelse } .bind odef
+} if
+/yshow where {
+ pop /yshow { .pdfwrite? { 1 index show pop pop } { yshow } ifelse } .bind odef
+} if
+/xyshow where {
+ pop /xyshow { .pdfwrite? { 1 index show pop pop } { xyshow } ifelse } .bind odef
+} if

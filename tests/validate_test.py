@@ -18,6 +18,7 @@ def test_validate_state_no_reward():
     )
     env = gym.make("llvm-v0")
     try:
+        env.require_dataset("cBench-v0")
         result = validate_state(env, state)
     finally:
         env.close()
@@ -37,6 +38,7 @@ def test_validate_state_with_reward():
     )
     env = gym.make("llvm-v0", reward_space="IrInstructionCount")
     try:
+        env.require_dataset("cBench-v0")
         result = validate_state(env, state)
     finally:
         env.close()
@@ -57,6 +59,7 @@ def test_validate_state_invalid_reward():
     )
     env = gym.make("llvm-v0", reward_space="IrInstructionCount")
     try:
+        env.require_dataset("cBench-v0")
         result = validate_state(env, state)
     finally:
         env.close()

@@ -8,7 +8,7 @@ import os
 import shutil
 import tarfile
 from pathlib import Path
-from typing import NamedTuple, Optional, Union
+from typing import List, NamedTuple, Optional, Union
 
 import fasteners
 
@@ -43,6 +43,9 @@ class Dataset(NamedTuple):
 
     description: str = ""
     """An optional human-readable description of the dataset."""
+
+    platforms: List[str] = ["macos", "linux"]
+    """A list of platforms supported by this dataset. Allowed platforms 'macos' and 'linux'."""
 
     @classmethod
     def from_json_file(cls, path: Path) -> "Dataset":

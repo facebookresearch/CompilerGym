@@ -33,6 +33,16 @@ cc_test(
 )
 
 py_test(
+    name = "temporary_working_directory_test",
+    timeout = "short",
+    srcs = ["temporary_working_directory_test.py"],
+    deps = [
+        "//compiler_gym/util",
+        "//tests:test_main",
+    ],
+)
+
+py_test(
     name = "timer_test",
     srcs = ["timer_test.py"],
     deps = [

@@ -30,6 +30,8 @@ def make_cbench_llvm_module(
     cflags = cflags or []
 
     src_dir = benchmark_dir / "src"
+    if not src_dir.is_dir():
+        src_dir = benchmark_dir
     assert src_dir.is_dir(), f"Source directory not found: {src_dir}"
 
     clang_command = [
