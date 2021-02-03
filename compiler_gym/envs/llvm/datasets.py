@@ -274,7 +274,9 @@ def _make_cBench_validator(
                 raise FileNotFoundError(f"Required benchmark input not found: {path}")
 
         # Expand shell variable substitutions in the benchmark command.
-        expanded_command = expand_command_vars(cmd)
+        expanded_command = cmd.replace("$BIN", "./a.out").replace(
+            "$D", str(_CBENCH_DATA)
+        )
 
         with tempfile.TemporaryDirectory(dir=env.service.connection.working_dir) as d:
             # Execute the benchmark in a temporary working directory.
@@ -289,27 +291,23 @@ def _make_cBench_validator(
             # Produce a gold-standard output using a reference version of
             # the benchmark.
             if compare_output or output_files:
-                gs_env = gym.make("llvm-v0")
+                gs_env = env.fork()
                 try:
+                    # Reset to the original benchmark state and compile it.
                     gs_env.reset(benchmark=env.benchmark)
-                    # Serialize the benchmark to a bitcode file that will then be
-                    # compiled to a binary.
-                    bitcode_file = Path(gs_env.observation["BitcodeFile"])
-                    try:
-                        gold_standard = _compile_and_run_bitcode_file(
-                            bitcode_file=bitcode_file,
-                            cmd=expanded_command,
-                            cwd=cwd,
-                            num_runs=1,
-                            linkopts=linkopts,
+                    gs_env.write_bitcode(cwd / "benchmark.bc")
+                    gold_standard = _compile_and_run_bitcode_file(
+                        bitcode_file=cwd / "benchmark.bc",
+                        cmd=expanded_command,
+                        cwd=cwd,
+                        num_runs=1,
+                        linkopts=linkopts,
+                    )
+                    if gold_standard.error:
+                        raise OSError(
+                            f"Failed to produce reference output for benchmark '{env.benchmark}' "
+                            f"using '{cmd}': {gold_standard.error}"
                         )
-                        if gold_standard.error:
-                            raise OSError(
-                                f"Failed to produce reference output for benchmark '{env.benchmark}' "
-                                f"using '{cmd}': {gold_standard.error}"
-                            )
-                    finally:
-                        bitcode_file.unlink()
                 finally:
                     gs_env.close()
 
@@ -331,17 +329,14 @@ def _make_cBench_validator(
 
             # Serialize the benchmark to a bitcode file that will then be
             # compiled to a binary.
-            bitcode_file = Path(env.observation["BitcodeFile"])
-            try:
-                outcome = _compile_and_run_bitcode_file(
-                    bitcode_file=bitcode_file,
-                    cmd=expanded_command,
-                    cwd=cwd,
-                    num_runs=num_runs,
-                    linkopts=linkopts,
-                )
-            finally:
-                bitcode_file.unlink()
+            env.write_bitcode(cwd / "benchmark.bc")
+            outcome = _compile_and_run_bitcode_file(
+                bitcode_file=cwd / "benchmark.bc",
+                cmd=expanded_command,
+                cwd=cwd,
+                num_runs=num_runs,
+                linkopts=linkopts,
+            )
 
             if outcome.error:
                 return outcome.error
@@ -374,26 +369,6 @@ def _make_cBench_validator(
                         return f"Benchmark output file '{path}' differs from expected (binary diff)"
 
     return validator_cb
-
-
-@contextmanager
-def temporary_environment():
-    """Yield a temporary os.environ state."""
-    _environ = os.environ.copy()
-    try:
-        yield
-    finally:
-        os.environ.clear()
-        os.environ.update(_environ)
-
-
-def expand_command_vars(cmd: str) -> str:
-    """Expand shell variables in a command."""
-    with temporary_environment():
-        os.environ.clear()
-        os.environ["BIN"] = "./a.out"
-        os.environ["D"] = str(_CBENCH_DATA)
-        return os.path.expandvars(cmd)
 
 
 # A map from benchmark name to validation callbacks. Defined below.
