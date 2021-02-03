@@ -45,7 +45,7 @@ std::unique_ptr<llvm::Module> makeModuleOrDie(llvm::LLVMContext& context, const 
   Status status;
   auto module = makeModule(context, bitcode, name, &status);
   CHECK(status.ok()) << "Failed to make LLVM module: " << status.error_message();
-  return std::move(module);
+  return module;
 }
 
 }  // anonymous namespace

@@ -52,7 +52,7 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
         featureSize.mutable_min()->set_value(0);
         std::vector<ScalarRange> featureSizes;
         featureSizes.reserve(kAutophaseFeatureDim);
-        for (int i = 0; i < kAutophaseFeatureDim; ++i) {
+        for (size_t i = 0; i < kAutophaseFeatureDim; ++i) {
           featureSizes.push_back(featureSize);
         }
         *space.mutable_int64_range_list()->mutable_range() = {featureSizes.begin(),

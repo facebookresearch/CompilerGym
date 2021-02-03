@@ -172,6 +172,9 @@ double getCost(const LlvmCostFunction& cost, llvm::Module& module,
     }
 #endif
   }
+
+  LOG(FATAL) << "Unreachable";
+  return 0;
 }
 
 double getBaselineCost(const BaselineCosts& baselineCosts, LlvmBaselinePolicy policy,
@@ -236,6 +239,9 @@ LlvmCostFunction getCostFunction(LlvmRewardSpace space) {
       return LlvmCostFunction::TEXT_SIZE_BYTES;
 #endif
   }
+
+  LOG(FATAL) << "Unreachable";
+  return LlvmCostFunction::IR_INSTRUCTION_COUNT;
 }
 
 std::optional<LlvmBaselinePolicy> getBaselinePolicy(LlvmRewardSpace space) {
@@ -265,6 +271,9 @@ std::optional<LlvmBaselinePolicy> getBaselinePolicy(LlvmRewardSpace space) {
 #endif
       return LlvmBaselinePolicy::Oz;
   }
+
+  LOG(FATAL) << "Unreachable";
+  return std::nullopt;
 }
 
 }  // namespace compiler_gym::llvm_service
