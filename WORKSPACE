@@ -197,7 +197,10 @@ filegroup(
 )
 """,
     sha256 = "8908d742f5223f09f9a4d10f7e06bc805a0c1694aa70974d2aae91ab627b51e6",
-    urls = ["https://downloads.sourceforge.net/project/cbenchmark/cBench/V1.1/cBench_V1.1.tar.gz"],
+    urls = [
+        "https://dl.fbaipublicfiles.com/compiler_gym/cBench_V1.1.tar.gz",
+        "https://downloads.sourceforge.net/project/cbenchmark/cBench/V1.1/cBench_V1.1.tar.gz",
+    ],
 )
 
 http_archive(
