@@ -9,6 +9,7 @@ import random
 import shutil
 import subprocess
 import sys
+import warnings
 from datetime import datetime
 from pathlib import Path
 from time import sleep, time
@@ -284,7 +285,10 @@ class ManagedConnection(Connection):
     def close(self):
         """Terminate a local subprocess and close the connection."""
         self.process.kill()
-        self.process.communicate(timeout=self.process_exit_max_seconds)
+        try:
+            self.process.communicate(timeout=self.process_exit_max_seconds)
+        except subprocess.TimeoutExpired:
+            warnings.warn(f"Abandoning orphan process at {self.working_dir}")
         shutil.rmtree(self.working_dir, ignore_errors=True)
         super().close()
 
