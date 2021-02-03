@@ -190,9 +190,18 @@ def _compile_and_run_bitcode_file(
 
     # Generate the a.out binary file.
     assert not binary.is_file()
-    subprocess.check_call(
-        [_CLANG, str(bitcode_file), "-o", str(binary)] + _COMPILE_ARGS + list(linkopts)
+    clang = subprocess.Popen(
+        [_CLANG, str(bitcode_file), "-o", str(binary)] + _COMPILE_ARGS + list(linkopts),
+        stdout=subprocess.PIPE,
+        stderr=subprocess.STDOUT,
+        universal_newlines=True,
     )
+    output, _ = clang.communicate()
+    if clang.returncode:
+        return BenchmarkExecutionResult(
+            walltime_seconds=timeout_seconds,
+            error=output,
+        )
     assert binary.is_file()
 
     # Create a barebones environment to run benchmark in.
