@@ -195,12 +195,19 @@ def _compile_and_run_bitcode_file(
     )
     assert binary.is_file()
 
+    # Create a barebones environment to run benchmark in.
+    env = {
+        "TMPDIR": os.environ.get("TMPDIR", ""),
+        "HOME": os.environ.get("HOME", ""),
+        "USER": os.environ.get("USER", ""),
+    }
+
     process = subprocess.Popen(
         cmd,
         shell=True,
         stderr=subprocess.STDOUT,
         stdout=subprocess.PIPE,
-        env=os.environ,
+        env=env,
         cwd=cwd,
     )
 
@@ -276,66 +283,65 @@ def _make_cBench_validator(
             # directory.
             output_paths = [cwd / o for o in output_files]
 
-            with benchmark_execution_environment(os_env):
-                if pre_execution_callback:
-                    pre_execution_callback(cwd)
+            if pre_execution_callback:
+                pre_execution_callback(cwd)
 
-                # Produce a gold-standard output using a reference version of
-                # the benchmark.
-                if compare_output or output_files:
-                    gs_env = gym.make("llvm-v0")
-                    try:
-                        gs_env.reset(benchmark=env.benchmark)
-                        # Serialize the benchmark to a bitcode file that will then be
-                        # compiled to a binary.
-                        bitcode_file = Path(gs_env.observation["BitcodeFile"])
-                        try:
-                            gold_standard = _compile_and_run_bitcode_file(
-                                bitcode_file=bitcode_file,
-                                cmd=expanded_command,
-                                cwd=cwd,
-                                num_runs=1,
-                                linkopts=linkopts,
-                            )
-                            if gold_standard.error:
-                                raise OSError(
-                                    f"Failed to produce reference output for benchmark '{env.benchmark}' "
-                                    f"using '{cmd}': {gold_standard.error}"
-                                )
-                        finally:
-                            bitcode_file.unlink()
-                    finally:
-                        gs_env.close()
-
-                    # Check that the reference run produced the expected output
-                    # files.
-                    for path in output_paths:
-                        if not path.is_file():
-                            try:
-                                output = gold_standard.output.decode("utf-8")
-                            except UnicodeDecodeError:
-                                output = "<binary>"
-                            raise FileNotFoundError(
-                                f"Expected file '{path}' not generated\n"
-                                f"Benchmark: {env.benchmark}\n"
-                                f"Command: {cmd}\n"
-                                f"Output: {output}"
-                            )
-                        path.rename(f"{path}.gold_standard")
-
-                # Serialize the benchmark to a bitcode file that will then be
-                # compiled to a binary.
-                bitcode_file = Path(env.observation["BitcodeFile"])
+            # Produce a gold-standard output using a reference version of
+            # the benchmark.
+            if compare_output or output_files:
+                gs_env = gym.make("llvm-v0")
                 try:
-                    outcome = _compile_and_run_bitcode_file(
-                        bitcode_file=bitcode_file,
-                        cmd=expanded_command,
-                        cwd=cwd,
-                        num_runs=num_runs,
-                        linkopts=linkopts,
-                    )
+                    gs_env.reset(benchmark=env.benchmark)
+                    # Serialize the benchmark to a bitcode file that will then be
+                    # compiled to a binary.
+                    bitcode_file = Path(gs_env.observation["BitcodeFile"])
+                    try:
+                        gold_standard = _compile_and_run_bitcode_file(
+                            bitcode_file=bitcode_file,
+                            cmd=expanded_command,
+                            cwd=cwd,
+                            num_runs=1,
+                            linkopts=linkopts,
+                        )
+                        if gold_standard.error:
+                            raise OSError(
+                                f"Failed to produce reference output for benchmark '{env.benchmark}' "
+                                f"using '{cmd}': {gold_standard.error}"
+                            )
+                    finally:
+                        bitcode_file.unlink()
                 finally:
-                    bitcode_file.unlink()
+                    gs_env.close()
+
+                # Check that the reference run produced the expected output
+                # files.
+                for path in output_paths:
+                    if not path.is_file():
+                        try:
+                            output = gold_standard.output.decode("utf-8")
+                        except UnicodeDecodeError:
+                            output = "<binary>"
+                        raise FileNotFoundError(
+                            f"Expected file '{path}' not generated\n"
+                            f"Benchmark: {env.benchmark}\n"
+                            f"Command: {cmd}\n"
+                            f"Output: {output}"
+                        )
+                    path.rename(f"{path}.gold_standard")
+
+            # Serialize the benchmark to a bitcode file that will then be
+            # compiled to a binary.
+            bitcode_file = Path(env.observation["BitcodeFile"])
+            try:
+                outcome = _compile_and_run_bitcode_file(
+                    bitcode_file=bitcode_file,
+                    cmd=expanded_command,
+                    cwd=cwd,
+                    num_runs=num_runs,
+                    linkopts=linkopts,
+                )
+            finally:
+                bitcode_file.unlink()
 
             if outcome.error:
                 return outcome.error
@@ -379,27 +385,6 @@ def temporary_environment():
     finally:
         os.environ.clear()
         os.environ.update(_environ)
-
-
-@contextmanager
-def benchmark_execution_environment(env: Dict[str, str]):
-    """Setup the os.environ state for executing benchmarks."""
-    with temporary_environment():
-        for var in os.environ:
-            if not var.startswith("COMPILER_GYM_SITE_DATA") and var not in {
-                "PATH",
-                "RUNFILES_DIR",
-                "RUNFILES_MANIFEST_FILE",
-                "USER",
-                "SHELL",
-                "TERM",
-                "TMPDIR",
-                "HOME",
-            }:
-                del os.environ[var]
-        for key, val in env.items():
-            os.environ[key] = expand_command_vars(val)
-        yield
 
 
 def expand_command_vars(cmd: str) -> str:
