@@ -13,6 +13,15 @@ from tests.test_main import main
 pytest_plugins = ["tests.envs.llvm.fixtures"]
 
 
+ACTION_REPTITION_COUNT = 20
+
+
+def sha1(string: str):
+    sha1 = hashlib.sha1()
+    sha1.update(string.encode("utf-8"))
+    return sha1.hexdigest()
+
+
 def test_deterministic_action(env: LlvmEnv, benchmark_name: str, action_name: str):
     """Run an action multiple times from the same starting state and check that
     the generated LLVM-IR is the same.
@@ -31,22 +40,18 @@ def test_deterministic_action(env: LlvmEnv, benchmark_name: str, action_name: st
     env.observation_space = "Ir"
 
     checksums = set()
-    for i in range(1, 21):
+    for i in range(1, ACTION_REPTITION_COUNT + 1):
         ir = env.reset(benchmark=benchmark_name)
-        sha1 = hashlib.sha1()
-        sha1.update(ir.encode("utf-8"))
-        checksum_before = sha1.hexdigest()
+        checksum_before = sha1(ir)
 
         ir, _, done, _ = env.step(env.action_space.names.index(action_name))
         assert not done
-        sha1 = hashlib.sha1()
-        sha1.update(ir.encode("utf-8"))
-        checksums.add(sha1.hexdigest())
+        checksums.add(sha1(ir))
 
         if len(checksums) != 1:
             pytest.fail(
-                f"Repeating the {action_name} action {i} times on {benchmark_name} "
-                "produced different states"
+                f"Repeating the {action_name} action {i} times on "
+                f"{benchmark_name} produced different states"
             )
 
         # An action which has no effect is not likely to be nondeterministic.

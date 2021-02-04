@@ -9,6 +9,7 @@ from time import time
 import gym
 import numpy as np
 
+from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_DIM
 from tests.test_main import main
 
 pytest_plugins = ["tests.envs.llvm.fixtures"]
@@ -34,7 +35,9 @@ def test_benchmark_random_actions(benchmark_name: str):
             observation, reward, done, info = env.step(env.action_space.sample())
             if done:
                 # Default-value for observation is an array of zeros.
-                np.testing.assert_array_equal(observation, np.zeros((56,)))
+                np.testing.assert_array_equal(
+                    observation, np.zeros((AUTOPHASE_FEATURE_DIM,))
+                )
                 assert isinstance(reward, float)
                 env = gym.make(
                     "llvm-v0",
@@ -45,7 +48,7 @@ def test_benchmark_random_actions(benchmark_name: str):
                 env.reset()
             else:
                 assert isinstance(observation, np.ndarray)
-                assert observation.shape == (56,)
+                assert observation.shape == (AUTOPHASE_FEATURE_DIM,)
                 assert isinstance(reward, float)
     finally:
         env.close()

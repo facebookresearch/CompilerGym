@@ -12,6 +12,8 @@ from tests.test_main import main
 
 pytest_plugins = ["tests.envs.llvm.fixtures"]
 
+ACTION_REPTITION_COUNT = 50
+
 
 @pytest.mark.parametrize(
     "benchmark_name",
@@ -43,7 +45,7 @@ def test_gvn_sink_non_determinism(env: LlvmEnv, benchmark_name: str):
     env.observation_space = "Ir"
 
     checksums = set()
-    for i in range(1, 51):
+    for i in range(1, ACTION_REPTITION_COUNT + 1):
         env.reset(benchmark=benchmark_name)
         ir, _, done, _ = env.step(env.action_space.names.index("-gvn-sink"))
         assert not done

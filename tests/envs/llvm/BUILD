@@ -11,6 +11,7 @@ py_test(
     deps = [
         ":fixtures",
         "//compiler_gym/envs",
+        "//compiler_gym/third_party/autophase",
         "//tests:test_main",
     ],
 )
@@ -61,6 +62,7 @@ py_test(
         ":fixtures",
         "//compiler_gym",
         "//compiler_gym/envs",
+        "//compiler_gym/third_party/autophase",
         "//tests:test_main",
     ],
 )
@@ -212,6 +214,7 @@ py_test(
         ":fixtures",
         "//compiler_gym",
         "//compiler_gym/envs",
+        "//compiler_gym/third_party/autophase",
         "//compiler_gym/util",
         "//tests:test_main",
     ],

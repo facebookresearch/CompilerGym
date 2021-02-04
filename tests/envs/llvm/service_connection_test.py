@@ -11,6 +11,7 @@ import compiler_gym  # Register environments.
 from compiler_gym.envs import CompilerEnv, llvm
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.service.connection import CompilerGymServiceConnection
+from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_DIM
 from tests.test_main import main
 
 pytest_plugins = ["tests.envs.llvm.fixtures"]
@@ -52,7 +53,7 @@ def test_service_env_dies_reset(env: CompilerEnv):
     assert not env.in_episode
 
     # Check that default values are returned.
-    np.testing.assert_array_equal(observation, np.zeros(56))
+    np.testing.assert_array_equal(observation, np.zeros(AUTOPHASE_FEATURE_DIM))
     assert reward == 0
 
     # Reset the environment and check that it works.
