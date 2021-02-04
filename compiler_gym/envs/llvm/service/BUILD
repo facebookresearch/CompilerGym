@@ -78,6 +78,7 @@ cc_library(
         ":RewardSpaces",
         "//compiler_gym/util:GrpcStatusMacros",
         "//compiler_gym/util:RunfilesPath",
+        "//compiler_gym/util:Unreachable",
         "@boost//:filesystem",
         "@com_github_grpc_grpc//:grpc++",
         "@fmt",

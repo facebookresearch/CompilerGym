@@ -86,6 +86,12 @@ cc_library(
     visibility = ["//visibility:public"],
 )
 
+cc_library(
+    name = "Unreachable",
+    hdrs = ["Unreachable.h"],
+    visibility = ["//visibility:public"],
+)
+
 genrule(
     name = "make_version",
     srcs = ["//:VERSION"],
