@@ -60,5 +60,43 @@ def test_invalid_csv_format(monkeypatch):
     assert "Failed to parse input:" in out.stderr
 
 
+def test_validate_cBenh_null_options(monkeypatch):
+    input = """
+benchmark,reward,walltime,commandline
+benchmark://cBench-v0/gsm,,0,opt  input.bc -o output.bc
+benchmark://cBench-v0/lame,,0,opt  input.bc -o output.bc
+benchmark://cBench-v0/stringsearch,,0,opt  input.bc -o output.bc
+benchmark://cBench-v0/ghostscript,,0,opt  input.bc -o output.bc
+benchmark://cBench-v0/qsort,,0,opt  input.bc -o output.bc
+benchmark://cBench-v0/sha,,0,opt  input.bc -o output.bc
+benchmark://cBench-v0/ispell,,0,opt  input.bc -o output.bc
+benchmark://cBench-v0/blowfish,,0,opt  input.bc -o output.bc
+benchmark://cBench-v0/adpcm,,0,opt  input.bc -o output.bc
+benchmark://cBench-v0/tiffdither,,0,opt  input.bc -o output.bc
+benchmark://cBench-v0/bzip2,,0,opt  input.bc -o output.bc
+benchmark://cBench-v0/stringsearch2,,0,opt  input.bc -o output.bc
+benchmark://cBench-v0/bitcount,,0,opt  input.bc -o output.bc
+benchmark://cBench-v0/jpeg-d,,0,opt  input.bc -o output.bc
+benchmark://cBench-v0/jpeg-c,,0,opt  input.bc -o output.bc
+benchmark://cBench-v0/dijkstra,,0,opt  input.bc -o output.bc
+benchmark://cBench-v0/rijndael,,0,opt  input.bc -o output.bc
+benchmark://cBench-v0/patricia,,0,opt  input.bc -o output.bc
+benchmark://cBench-v0/tiff2rgba,,0,opt  input.bc -o output.bc
+benchmark://cBench-v0/crc32,,0,opt  input.bc -o output.bc
+benchmark://cBench-v0/tiff2bw,,0,opt  input.bc -o output.bc
+benchmark://cBench-v0/tiffmedian,,0,opt  input.bc -o output.bc
+benchmark://cBench-v0/susan,,0,opt  input.bc -o output.bc
+""".strip()
+    flags.FLAGS.unparse_flags()
+    flags.FLAGS(["argv0", "--env=llvm-v0", "--dataset=cBench-v0"])
+    monkeypatch.setattr("sys.stdin", StringIO(input))
+
+    with capture_output() as out:
+        main(["argv0"])
+
+    assert out.stdout.count("✅") == 22  # Every benchmark passed.
+    assert not out.stderr
+
+
 if __name__ == "__main__":
     _test_main()
