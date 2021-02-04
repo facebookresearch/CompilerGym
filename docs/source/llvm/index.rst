@@ -18,29 +18,40 @@ Datasets
 
 We provide several datasets of open-source LLVM-IR benchmarks for download:
 
-+------------------------+---------------------------------+-----------------+----------------+
-| Dataset                | License                         | Num. Benchmarks | Size on disk   |
-+========================+=================================+=================+================+
-| blas-v0                | BSD 3-Clause                    | 300             | 4.0 MB         |
-+------------------------+---------------------------------+-----------------+----------------+
-| cBench-v0              | BSD 3-Clause                    | 23              | 7.2 MB         |
-+------------------------+---------------------------------+-----------------+----------------+
-| github-v0              | CC BY 4.0                       | 50,708          | 726.0 MB       |
-+------------------------+---------------------------------+-----------------+----------------+
-| linux-v0               | GPL-2.0                         | 13,920          | 516.0 MB       |
-+------------------------+---------------------------------+-----------------+----------------+
-| mibench-v0             | BSD 3-Clause                    | 40              | 238.5 kB       |
-+------------------------+---------------------------------+-----------------+----------------+
-| npb-v0                 | NASA Open Source Agreement v1.3 | 122             | 2.3 MB         |
-+------------------------+---------------------------------+-----------------+----------------+
-| opencv-v0              | Apache 2.0                      | 442             | 21.9 MB        |
-+------------------------+---------------------------------+-----------------+----------------+
-| poj104-v0              | BSD 3-Clause                    | 49,628          | 304.2 MB       |
-+------------------------+---------------------------------+-----------------+----------------+
-| polybench-v0           | BSD 3-Clause                    | 27              | 162.6 kB       |
-+------------------------+---------------------------------+-----------------+----------------+
-| tensorflow-v0          | Apache 2.0                      | 1,985           | 299.7 MB       |
-+------------------------+---------------------------------+-----------------+----------------+
++------------------------+--------------+-----------------+---------------------+-------------------+
+| Dataset                | License      | Num. Benchmarks | Validatable? [#f1]_ | Difficulty [#f2]_ |
++========================+==============+=================+=====================+===================+
+| blas-v0                | BSD 3-Clause | 300             | No                  | 0.3               |
++------------------------+--------------+-----------------+---------------------+-------------------+
+| cBench-v0              | BSD 3-Clause | 23              | Partial             | 0.8               |
++------------------------+--------------+-----------------+---------------------+-------------------+
+| github-v0              | CC BY 4.0    | 50,708          | No                  | 0.7               |
++------------------------+--------------+-----------------+---------------------+-------------------+
+| linux-v0               | GPL-2.0      | 13,920          | No                  | 0.4               |
++------------------------+--------------+-----------------+---------------------+-------------------+
+| mibench-v0             | BSD 3-Clause | 40              | No                  | 0.8               |
++------------------------+--------------+-----------------+---------------------+-------------------+
+| npb-v0                 | NASA v1.3    | 122             | No                  | 0.4               |
++------------------------+--------------+-----------------+---------------------+-------------------+
+| opencv-v0              | Apache 2.0   | 442             | No                  | 0.3               |
++------------------------+--------------+-----------------+---------------------+-------------------+
+| poj104-v0              | BSD 3-Clause | 49,628          | No                  | 0.7               |
++------------------------+--------------+-----------------+---------------------+-------------------+
+| tensorflow-v0          | Apache 2.0   | 1,985           | No                  | 0.3               |
++------------------------+--------------+-----------------+---------------------+-------------------+
+
+.. [#f1] A **validatable** dataset is one where the behavior of the benchmarks
+         can be checked by compiling the programs to binaries and executing
+         them. If the benchmarks crash, or are found to have different behavior,
+         then validation fails. This type of validation is used to check that
+         the compiler has not broken the semantics of the program.
+         See :mod:`compiler_gym.bin.validate`.
+.. [#f2] The **difficulty** of a dataset is an indicator of how likely a random
+         policy is to outperform the default compiler policy in a given amount
+         of time. A lower difficulty shows that a random policy is more likely
+         to succeed. It is a crude characterization metric that does not take
+         into account factors that may be worth considering such as the
+         diversity of programs, the complexity of the optimization space, etc.
 
 Install these datasets using the :mod:`compiler_gym.bin.datasets` command line
 tool, or programatically using
