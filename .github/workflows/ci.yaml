@@ -127,7 +127,9 @@ jobs:
               if: matrix.os == 'macos-latest'
 
             - name: Test
-              run: make install-test
+              run: |
+                  bazel clean --expunge
+                  make install-test
               env:
                   CC: clang
                   CXX: clang++
