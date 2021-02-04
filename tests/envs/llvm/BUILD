@@ -207,9 +207,6 @@ py_test(
 py_test(
     name = "service_connection_test",
     srcs = ["service_connection_test.py"],
-    data = [
-        "//compiler_gym/envs/llvm/service",
-    ],
     deps = [
         ":fixtures",
         "//compiler_gym",

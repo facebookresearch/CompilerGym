@@ -128,9 +128,9 @@ bazel-build:
 	$(BAZEL) $(BAZEL_OPTS) build $(BAZEL_BUILD_OPTS) //:package
 ifeq ($(OS),Linux)
 	cp -f $(LLVM_POLLY_SO) $(LLVM_SERVICE_DIR)/libLLVMPolly.so
-	chmod 666 $(LLVM_SERVICE_DIR)/service
-	patchelf --set-rpath '$$ORIGIN' $(LLVM_SERVICE_DIR)/service
-	chmod 555 $(LLVM_SERVICE_DIR)/service
+	chmod 666 $(LLVM_SERVICE_DIR)/compiler_gym-llvm-service
+	patchelf --set-rpath '$$ORIGIN' $(LLVM_SERVICE_DIR)/compiler_gym-llvm-service
+	chmod 555 $(LLVM_SERVICE_DIR)/compiler_gym-llvm-service
 endif
 
 bdist_wheel: bazel-build
