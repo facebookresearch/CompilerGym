@@ -6,6 +6,7 @@
 import math
 import multiprocessing
 import multiprocessing.pool
+import re
 from typing import Callable, Iterable, List, NamedTuple, Optional, cast
 
 import gym
@@ -59,13 +60,16 @@ class ValidationResult(NamedTuple):
         )
 
     def __repr__(self):
+        # Remove default-protocol prefix to improve output readability.
+        benchmark = re.sub(r"^benchmark://", "", self.state.benchmark)
+
         if self.failed:
             msg = ", ".join(self.error_details.strip().split("\n"))
-            return f"❌  {self.state.benchmark}  {msg}"
+            return f"❌  {benchmark}  {msg}"
         elif self.state.reward is None:
-            return f"✅  {self.state.benchmark}"
+            return f"✅  {benchmark}"
         else:
-            return f"✅  {self.state.benchmark}  {self.state.reward:.4f}"
+            return f"✅  {benchmark}  {self.state.reward:.4f}"
 
 
 def _llvm_replay_commandline(env: LlvmEnv, commandline: str) -> Optional[float]:
