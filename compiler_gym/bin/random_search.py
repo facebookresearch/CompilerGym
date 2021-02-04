@@ -104,7 +104,7 @@ def main(argv):
         env.close()
         return
 
-    assert FLAGS.patience > 0, "--patience must be > 0"
+    assert FLAGS.patience >= 0, "--patience must be >= 0"
 
     make_env = lambda: env_from_flags(benchmark=benchmark_from_flags())
 

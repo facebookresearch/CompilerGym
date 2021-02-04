@@ -54,6 +54,7 @@ class RandomAgentWorker(Thread):
         while self.should_run_one_episode:
             self.total_environment_count += 1
             env = self._make_env()
+            self._patience = self._patience or env.action_space.n
             self.run_one_environment(env)
             env.close()
 
