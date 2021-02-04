@@ -37,10 +37,12 @@ template <typename Service>
 int runService(int* argc, char*** argv, const char* usage) {
   gflags::SetUsageMessage(std::string(usage));
   gflags::ParseCommandLineFlags(argc, argv, /*remove_flags=*/false);
-  google::InitGoogleLogging((*argv)[0]);
 
   CHECK(!FLAGS_working_dir.empty()) << "--working_dir flag not set";
   CHECK(!FLAGS_port.empty()) << "--port flag not set";
+
+  FLAGS_log_dir = std::string(FLAGS_working_dir) + "/logs";
+  google::InitGoogleLogging((*argv)[0]);
 
   return createAndRunService<Service>(FLAGS_working_dir, FLAGS_port);
 }

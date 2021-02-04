@@ -208,10 +208,10 @@ class ManagedConnection(Connection):
         # command will be set to the local_service_binary's parent, so we can
         # use the relpath for a neater `ps aux` view.
         cmd = [
-            local_service_binary.name,
-            f"--port=0",
-            f"--log_dir={self.working_dir}/logs",
+            f"./{local_service_binary.name}",
             f"--working_dir={self.working_dir}",
+            # We have to set --log_dir as it is recognized by glog
+            f"--log_dir={self.working_dir}/logs",
             args,
         ]
 
