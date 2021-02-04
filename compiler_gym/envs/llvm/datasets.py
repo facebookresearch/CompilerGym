@@ -13,12 +13,10 @@ import tarfile
 import tempfile
 from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from contextlib import contextmanager
 from pathlib import Path
 from typing import Callable, Dict, List, NamedTuple, Optional
 
 import fasteners
-import gym
 
 from compiler_gym.datasets.dataset import Dataset
 from compiler_gym.util.download import download
