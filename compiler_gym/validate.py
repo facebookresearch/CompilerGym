@@ -60,7 +60,8 @@ class ValidationResult(NamedTuple):
 
     def __repr__(self):
         if self.failed:
-            return f"❌  {self.state.benchmark}  {self.error_details}"
+            msg = ", ".join(self.error_details.strip().split("\n"))
+            return f"❌  {self.state.benchmark}  {msg}"
         elif self.state.reward is None:
             return f"✅  {self.state.benchmark}"
         else:
