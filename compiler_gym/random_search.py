@@ -21,7 +21,7 @@ from compiler_gym.util.logs import create_logging_dir
 class RandomAgentWorker(Thread):
     """Worker thread to run a repeating agent.
 
-    To stop the agent, set the alive attribute of this thread to False.
+    To stop the agent, set the :code:`alive` attribute of this thread to False.
     """
 
     def __init__(
@@ -44,9 +44,14 @@ class RandomAgentWorker(Thread):
 
         self.alive = True  # Set this to False to signal the thread to stop.
 
+    @property
+    def should_run_one_episode(self) -> bool:
+        """Whether to run an episode."""
+        return self.alive or not self.total_episode_count
+
     def run(self) -> None:
         """Run episodes in an infinite loop."""
-        while self.alive:
+        while self.should_run_one_episode:
             self.total_environment_count += 1
             env = self._make_env()
             self.run_one_environment(env)
@@ -55,7 +60,7 @@ class RandomAgentWorker(Thread):
     def run_one_environment(self, env: CompilerEnv) -> None:
         """Run random walks in an infinite loop. Returns if the environment ends."""
         try:
-            while self.alive:
+            while self.should_run_one_episode:
                 self.total_episode_count += 1
                 if not self.run_one_episode(env):
                     return
@@ -91,9 +96,6 @@ class RandomAgentWorker(Thread):
                 self.best_found_at_time = time()
 
         return True
-
-
-# Start of boilerplate code to run multiple agents and log progress.
 
 
 def random_search(
