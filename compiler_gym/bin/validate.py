@@ -77,7 +77,8 @@ def read_states_from_stdin() -> Iterator[CompilerEnvState]:
     data = sys.stdin.readlines()
     for line in csv.DictReader(data):
         try:
-            line["reward"] = float(line["reward"]) if line["reward"] else None
+            line["reward"] = float(line["reward"]) if line.get("reward") else None
+            line["walltime"] = float(line["walltime"]) if line.get("walltime") else None
             yield CompilerEnvState(**line)
         except (TypeError, KeyError) as e:
             print(f"Failed to parse input: `{e}`", file=sys.stderr)
