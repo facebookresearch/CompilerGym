@@ -170,10 +170,12 @@ GENERATED_DOCS := \
 	docs/source/installation.rst \
 	$(NULL)
 
-docs: $(GENERATED_DOCS) install
+gendocs: $(GENERATED_DOCS)
+
+docs: gendocs install
 	$(MAKE) -C docs html
 
-livedocs: $(GENERATED_DOCS) install
+livedocs: gendocs
 	$(MAKE) -C docs livehtml
 
 
