@@ -45,16 +45,6 @@ def test_no_validation_callback_for_custom_benchmark(env: LlvmEnv):
     assert validation_cb is None
 
 
-def test_expand_command_vars():
-    assert datasets.expand_command_vars("abc") == "abc"
-    assert datasets.expand_command_vars("$BIN") == "./a.out"
-    assert re.match(
-        r"./a.out .+/runtime_data/foo",
-        datasets.expand_command_vars("$BIN $D/foo"),
-    )
-    assert datasets.expand_command_vars("$UNKNOWN $BIN") == "$UNKNOWN ./a.out"
-
-
 def test_validate_cBench_unoptimized(env: LlvmEnv, benchmark_name: str):
     """Run the validation routine on unoptimized version of all cBench benchmarks."""
     env.reset(benchmark=benchmark_name)
