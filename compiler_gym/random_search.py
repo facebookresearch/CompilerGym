@@ -108,47 +108,47 @@ def random_search(
     skip_done: bool = False,
 ) -> Tuple[float, List[int]]:
     env = make_env()
-    env.reset()
-    if not isinstance(env, CompilerEnv):
-        raise TypeError(
-            f"random_search() requires CompilerEnv. Called with: {type(env).__name__}"
-        )
+    try:
+        env.reset()
+        if not isinstance(env, CompilerEnv):
+            raise TypeError(
+                f"random_search() requires CompilerEnv. Called with: {type(env).__name__}"
+            )
 
-    patience = patience or env.action_space.n
-    benchmark_name = env.benchmark
-    if not outdir:
-        sanitized_benchmark_name = "/".join(benchmark_name.split("/")[-2:])
-        outdir = create_logging_dir(f"random/{sanitized_benchmark_name}")
-    outdir = Path(outdir)
+        benchmark_name = env.benchmark
+        if not outdir:
+            sanitized_benchmark_name = "/".join(benchmark_name.split("/")[-2:])
+            outdir = create_logging_dir(f"random/{sanitized_benchmark_name}")
+        outdir = Path(outdir)
 
-    if not env.reward_space:
-        raise ValueError("Eager reward must be specified for random search")
-    reward_space_name = env.reward_space.id
+        if not env.reward_space:
+            raise ValueError("Eager reward must be specified for random search")
+        reward_space_name = env.reward_space.id
 
-    action_space_names = list(env.action_space.names)
-    num_instructions = int(env.observation["IrInstructionCount"])
+        action_space_names = list(env.action_space.names)
+        num_instructions = int(env.observation["IrInstructionCount"])
 
-    metadata_path = outdir / logs.METADATA_NAME
-    progress_path = outdir / logs.PROGRESS_LOG_NAME
-    best_actions_path = outdir / logs.BEST_ACTIONS_NAME
-    best_commandline_path = outdir / logs.BEST_COMMANDLINE_NAME
+        metadata_path = outdir / logs.METADATA_NAME
+        progress_path = outdir / logs.PROGRESS_LOG_NAME
+        best_actions_path = outdir / logs.BEST_ACTIONS_NAME
+        best_commandline_path = outdir / logs.BEST_COMMANDLINE_NAME
 
-    if skip_done and metadata_path.is_file():
-        # TODO(cummins): Return best reward.
-        return 0
+        if skip_done and metadata_path.is_file():
+            # TODO(cummins): Return best reward.
+            return 0
 
-    # Write a metadata file.
-    metadata = {
-        "env": env.spec.id,
-        "benchmark": benchmark_name,
-        "reward": reward_space_name,
-        "patience": patience,
-        "num_instructions": num_instructions,
-    }
-    with open(str(metadata_path), "w") as f:
-        json.dump(metadata, f, sort_keys=True, indent=2)
-
-    env.close()
+        # Write a metadata file.
+        metadata = {
+            "env": env.spec.id,
+            "benchmark": benchmark_name,
+            "reward": reward_space_name,
+            "patience": patience,
+            "num_instructions": num_instructions,
+        }
+        with open(str(metadata_path), "w") as f:
+            json.dump(metadata, f, sort_keys=True, indent=2)
+    finally:
+        env.close()
 
     workers = [RandomAgentWorker(make_env, patience) for _ in range(nproc)]
     for worker in workers:
