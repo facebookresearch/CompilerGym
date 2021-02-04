@@ -12,6 +12,7 @@ import compiler_gym
 from compiler_gym.envs import CompilerEnv, CompilerEnvState, llvm
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.service.connection import CompilerGymServiceConnection
+from compiler_gym.views import ObservationSpaceSpec, RewardSpaceSpec
 from tests.test_main import main
 
 pytest_plugins = ["tests.envs.llvm.fixtures"]
@@ -194,6 +195,22 @@ def test_state_to_csv_from_csv(env: LlvmEnv):
     state_from_csv = CompilerEnvState.from_csv(env.state.to_csv())
     assert state_from_csv.reward == 10
     assert state == state_from_csv
+
+
+def test_set_observation_space_from_spec(env: LlvmEnv):
+    env.observation_space = env.observation.spaces["Autophase"]
+    obs = env.observation_space
+
+    env.observation_space = "Autophase"
+    assert env.observation_space == obs
+
+
+def test_set_reward_space_from_spec(env: LlvmEnv):
+    env.reward_space = env.reward.spaces["IrInstructionCount"]
+    reward = env.reward_space
+
+    env.reward_space = "IrInstructionCount"
+    assert env.reward_space == reward
 
 
 if __name__ == "__main__":
