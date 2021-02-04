@@ -59,6 +59,7 @@ Else if validation fails, the output is:
 """
 import csv
 import sys
+from typing import Iterator
 
 from absl import app, flags
 
@@ -71,23 +72,28 @@ from compiler_gym.validate import validate_states
 FLAGS = flags.FLAGS
 
 
-def main(argv):
-    """Main entry point."""
-    assert len(argv) == 1, f"Unrecognized flags: {argv[1:]}"
-
+def read_states_from_stdin() -> Iterator[CompilerEnvState]:
+    """Read the CSV states from stdin."""
     data = sys.stdin.readlines()
-    states = []
     for line in csv.DictReader(data):
         try:
             line["reward"] = float(line["reward"])
-            states.append(CompilerEnvState(**line))
+            yield CompilerEnvState(**line)
         except (TypeError, KeyError) as e:
             print(f"Failed to parse input: `{e}`", file=sys.stderr)
             sys.exit(1)
 
+
+def main(argv):
+    """Main entry point."""
+    assert len(argv) == 1, f"Unrecognized flags: {argv[1:]}"
+
     error_count = 0
     for result in validate_states(
-        env_from_flags, states, datasets=FLAGS.dataset, nproc=FLAGS.nproc
+        env_from_flags,
+        read_states_from_stdin(),
+        datasets=FLAGS.dataset,
+        nproc=FLAGS.nproc,
     ):
         print(result)
         if result.failed:

@@ -43,6 +43,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "@com_github_grpc_grpc//:grpc++",
+        "@glog",
     ],
 )
 
@@ -82,6 +83,12 @@ cc_library(
 cc_library(
     name = "StrLenConstexpr",
     hdrs = ["StrLenConstexpr.h"],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "Unreachable",
+    hdrs = ["Unreachable.h"],
     visibility = ["//visibility:public"],
 )
 

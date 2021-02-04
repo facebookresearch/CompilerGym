@@ -23,7 +23,7 @@ std::string enumNameToPascalCase(Enum value) {
   const std::string name(magic_enum::enum_name<Enum>(value));
   std::string out;
   bool capitalize = true;
-  for (int i = 0; i < name.size(); ++i) {
+  for (size_t i = 0; i < name.size(); ++i) {
     if (name[i] == '_') {
       capitalize = true;
     } else {
@@ -72,7 +72,7 @@ std::string demangle() {
 template <typename Enum>
 [[nodiscard]] inline grpc::Status intToEnum(int numericValue, Enum* enumValue) {
   const auto max = magic_enum::enum_count<Enum>();
-  if (numericValue < 0 || numericValue >= max) {
+  if (numericValue < 0 || static_cast<decltype(max)>(numericValue) >= max) {
     return grpc::Status(
         grpc::StatusCode::INVALID_ARGUMENT,
         fmt::format("{}({}) is not in range [0, {})", demangle<Enum>(), numericValue, max));

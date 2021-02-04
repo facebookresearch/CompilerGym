@@ -29,10 +29,10 @@ class ThreadedWorker(Thread):
 
         for action in self.actions:
             self.observation, self.reward, done, self.info = env.step(action)
-            assert not done
+            assert not done, self.info["error_details"]
 
-        env.close()
         self.done = True
+        env.close()
 
 
 class ThreadedWorkerWithEnv(Thread):
@@ -48,7 +48,7 @@ class ThreadedWorkerWithEnv(Thread):
     def run(self) -> None:
         for action in self.actions:
             self.observation, self.reward, done, self.info = self.env.step(action)
-            assert not done
+            assert not done, self.info["error_details"]
 
         self.done = True
 

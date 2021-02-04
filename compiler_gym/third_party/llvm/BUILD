@@ -47,3 +47,18 @@ genrule(
     cmd = "cp $< $@",
     visibility = ["//visibility:public"],
 )
+
+genrule(
+    name = "make_opt",
+    srcs = select({
+        "@llvm//:darwin": [
+            "@clang-llvm-10.0.0-x86_64-apple-darwin//:opt",
+        ],
+        "//conditions:default": [
+            "@clang-llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04//:opt",
+        ],
+    }),
+    outs = ["opt"],
+    cmd = "cp $< $@",
+    visibility = ["//visibility:public"],
+)

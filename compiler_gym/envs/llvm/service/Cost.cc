@@ -14,6 +14,7 @@
 #include "boost/filesystem.hpp"
 #include "compiler_gym/util/GrpcStatusMacros.h"
 #include "compiler_gym/util/RunfilesPath.h"
+#include "compiler_gym/util/Unreachable.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/Transforms/IPO.h"
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
@@ -172,6 +173,8 @@ double getCost(const LlvmCostFunction& cost, llvm::Module& module,
     }
 #endif
   }
+
+  UNREACHABLE("Unhandled cost");
 }
 
 double getBaselineCost(const BaselineCosts& baselineCosts, LlvmBaselinePolicy policy,
@@ -236,6 +239,8 @@ LlvmCostFunction getCostFunction(LlvmRewardSpace space) {
       return LlvmCostFunction::TEXT_SIZE_BYTES;
 #endif
   }
+
+  UNREACHABLE("Unhandled cost function");
 }
 
 std::optional<LlvmBaselinePolicy> getBaselinePolicy(LlvmRewardSpace space) {
@@ -265,6 +270,8 @@ std::optional<LlvmBaselinePolicy> getBaselinePolicy(LlvmRewardSpace space) {
 #endif
       return LlvmBaselinePolicy::Oz;
   }
+
+  UNREACHABLE("Unhandled basline policy");
 }
 
 }  // namespace compiler_gym::llvm_service

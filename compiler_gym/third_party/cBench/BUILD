@@ -369,4 +369,5 @@ genrule(
     outs = ["cBench-v0/tiffmedian.bc"],
     cmd = "mkdir -p $(@D) && $(location :make_llvm_module) $$(dirname $(location @cBench//:readme))/consumer_tiffmedian $@",
     tools = [":make_llvm_module"],
+    visibility = ["//visibility:public"],
 )

@@ -11,6 +11,7 @@ py_test(
     deps = [
         ":fixtures",
         "//compiler_gym/envs",
+        "//compiler_gym/third_party/autophase",
         "//tests:test_main",
     ],
 )
@@ -61,6 +62,7 @@ py_test(
         ":fixtures",
         "//compiler_gym",
         "//compiler_gym/envs",
+        "//compiler_gym/third_party/autophase",
         "//tests:test_main",
     ],
 )
@@ -76,6 +78,19 @@ py_test(
         "//compiler_gym/envs",
         "//compiler_gym/service/proto",
         "//compiler_gym/util",
+        "//tests:test_main",
+    ],
+)
+
+py_test(
+    name = "deterministic_actions_test",
+    timeout = "eternal",
+    srcs = ["deterministic_actions_test.py"],
+    shard_count = 32,
+    tags = ["manual"],
+    deps = [
+        ":fixtures",
+        "//compiler_gym/envs",
         "//tests:test_main",
     ],
 )
@@ -121,6 +136,20 @@ py_test(
         "//tests:test_main",
     ],
 )
+
+# NOTE(https://github.com/facebookresearch/CompilerGym/issues/46): The -gvn-sink
+# pass is temporarily disabled.
+#
+# py_test(
+#     name = "gvn_sink_test",
+#     srcs = ["gvn_sink_test.py"],
+#     shard_count = 4,
+#     deps = [
+#         ":fixtures",
+#         "//compiler_gym/envs",
+#         "//tests:test_main",
+#     ],
+# )
 
 py_test(
     name = "llvm_benchmarks_test",
@@ -185,6 +214,7 @@ py_test(
         ":fixtures",
         "//compiler_gym",
         "//compiler_gym/envs",
+        "//compiler_gym/third_party/autophase",
         "//compiler_gym/util",
         "//tests:test_main",
     ],

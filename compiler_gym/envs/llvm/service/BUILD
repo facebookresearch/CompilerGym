@@ -31,7 +31,10 @@ cc_library(
     name = "Benchmark",
     srcs = ["Benchmark.cc"],
     hdrs = ["Benchmark.h"],
-    visibility = ["//compiler_gym/envs/llvm/service:__subpackages__"],
+    visibility = [
+        "//compiler_gym/envs/llvm/service:__subpackages__",
+        "//tests:__subpackages__",
+    ],
     deps = [
         ":Cost",
         "@boost//:filesystem",
@@ -46,7 +49,10 @@ cc_library(
     name = "BenchmarkFactory",
     srcs = ["BenchmarkFactory.cc"],
     hdrs = ["BenchmarkFactory.h"],
-    visibility = ["//compiler_gym/envs/llvm/service:__subpackages__"],
+    visibility = [
+        "//compiler_gym/envs/llvm/service:__subpackages__",
+        "//tests:__subpackages__",
+    ],
     deps = [
         ":Benchmark",
         "//compiler_gym/util:GrpcStatusMacros",
@@ -72,6 +78,7 @@ cc_library(
         ":RewardSpaces",
         "//compiler_gym/util:GrpcStatusMacros",
         "//compiler_gym/util:RunfilesPath",
+        "//compiler_gym/util:Unreachable",
         "@boost//:filesystem",
         "@com_github_grpc_grpc//:grpc++",
         "@fmt",
@@ -96,6 +103,10 @@ cc_library(
         "-DGOOGLE_PROTOBUF_NO_RTTI",
         "-fno-rtti",
     ],
+    data = [
+        "//compiler_gym/third_party/llvm:opt",
+    ],
+    visibility = ["//tests:__subpackages__"],
     deps = [
         ":ActionSpace",
         ":Benchmark",
@@ -107,6 +118,7 @@ cc_library(
         "//compiler_gym/third_party/cpuinfo",
         "//compiler_gym/util:EnumUtil",
         "//compiler_gym/util:GrpcStatusMacros",
+        "//compiler_gym/util:RunfilesPath",
         "@boost//:filesystem",
         "@fmt",
         "@glog",
@@ -116,6 +128,7 @@ cc_library(
         "@programl//programl/graph/format:node_link_graph",
         "@programl//programl/ir/llvm",
         "@programl//programl/proto:programl_cc",
+        "@subprocess",
     ],
 )
 

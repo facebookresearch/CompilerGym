@@ -61,3 +61,6 @@ AUTOPHASE_FEATURE_NAMES = [
     "ArgsPhi",
     "testUnary",
 ]
+
+# The dimensionality of the autophase feature vector.
+AUTOPHASE_FEATURE_DIM: int = len(AUTOPHASE_FEATURE_NAMES)
