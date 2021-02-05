@@ -22,9 +22,10 @@ from compiler_gym.service import (
     CompilerGymServiceConnection,
     ConnectionOpts,
     ServiceError,
+    ServiceOSError,
+    ServiceTransportError,
     observation_t,
 )
-from compiler_gym.service.connection import ServiceTransportError
 from compiler_gym.service.proto import (
     ActionRequest,
     AddBenchmarkRequest,
@@ -651,7 +652,7 @@ class CompilerEnv(gym.Env):
         request = ActionRequest(session_id=self._session_id, action=[action])
         try:
             reply = self.service(self.service.stub.TakeAction, request)
-        except (ServiceError, ServiceTransportError, TimeoutError) as e:
+        except (ServiceError, ServiceTransportError, ServiceOSError, TimeoutError) as e:
             self.close()
             info = {"error_details": str(e)}
             if self.reward_space:

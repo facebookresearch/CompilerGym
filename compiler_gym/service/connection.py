@@ -66,6 +66,10 @@ class ServiceError(Exception):
     """Error raised from the service."""
 
 
+class ServiceOSError(ServiceError, OSError):
+    """System error raised from the service."""
+
+
 class ServiceInitError(ServiceError, OSError):
     """Error raised if the service fails to initialize."""
 
@@ -147,7 +151,7 @@ class Connection(object):
             elif e.code() == grpc.StatusCode.NOT_FOUND:
                 raise FileNotFoundError(e.details()) from None
             elif e.code() == grpc.StatusCode.RESOURCE_EXHAUSTED:
-                raise OSError(e.details()) from None
+                raise ServiceOSError(e.details()) from None
             elif e.code() == grpc.StatusCode.FAILED_PRECONDITION:
                 raise TypeError(str(e.details())) from None
             elif e.code() == grpc.StatusCode.UNAVAILABLE:
