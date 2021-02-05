@@ -458,6 +458,7 @@ class CompilerGymServiceConnection(object):
             attempts += 1
             try:
                 if isinstance(endpoint, Path):
+                    endpoint_name = endpoint.name
                     return ManagedConnection(
                         local_service_binary=endpoint,
                         process_exit_max_seconds=opts.local_service_exit_max_seconds,
@@ -465,6 +466,7 @@ class CompilerGymServiceConnection(object):
                         port_init_max_seconds=opts.local_service_port_init_max_seconds,
                     )
                 else:
+                    endpoint_name = endpoint
                     return UnmanagedConnection(
                         url=endpoint, rpc_init_max_seconds=opts.rpc_init_max_seconds
                     )
@@ -478,7 +480,7 @@ class CompilerGymServiceConnection(object):
                 logging.warning(f"{type(e).__name__} {e} (attempt {attempts})")
         else:
             raise TimeoutError(
-                f"Failed to create connection to {endpoint} after "
+                f"Failed to create connection to {endpoint_name} after "
                 f"{time() - start_time:.1f} seconds "
                 f"({attempts}/{opts.init_max_attempts} attempts made)"
             )
