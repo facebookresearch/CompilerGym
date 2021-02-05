@@ -65,8 +65,8 @@ from typing import Iterator
 import numpy as np
 from absl import app, flags
 
-import compiler_gym.util.flags.dataset  # Flag definition.
-import compiler_gym.util.flags.nproc  # Flag definition.
+import compiler_gym.util.flags.dataset  # noqa Flag definition.
+import compiler_gym.util.flags.nproc  # noqa Flag definition.
 from compiler_gym import ValidationResult
 from compiler_gym.envs.compiler_env import CompilerEnvState
 from compiler_gym.util.flags.env_from_flags import env_from_flags

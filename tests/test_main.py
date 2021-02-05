@@ -8,7 +8,7 @@ import sys
 import gym
 import pytest
 
-import compiler_gym  # Register environments.
+import compiler_gym  # noqa Register environments.
 
 
 def main():

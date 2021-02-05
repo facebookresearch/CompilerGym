@@ -238,7 +238,7 @@ def random_search(
         f.write("\n")
     with open(str(best_commandline_path), "w") as f:
         print(best_commandline, file=f)
-    print(f"\n", flush=True)
+    print("\n", flush=True)
 
     print("Ending worker threads ... ", end="", flush=True)
     for worker in workers:

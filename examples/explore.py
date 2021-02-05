@@ -17,7 +17,6 @@ Example usage:
 Use --help to list the configurable options.
 """
 import hashlib
-import itertools
 import math
 from enum import IntEnum
 from heapq import nlargest
@@ -77,11 +76,10 @@ class CustomEnv:
                 self._env.action_space.names[a] for a in self._action_indices
             ]
 
-        except:
+        finally:
             # The program will not terminate until the environment is
             # closed, not even if there is an exception.
             self._env.close()
-            raise
 
     def action_names(self, actions):
         return [self._action_names[a] for a in actions]
@@ -494,10 +492,9 @@ def main(argv):
         for _ in range(FLAGS.nproc):
             envs.append(CustomEnv())
         compute_action_graph(envs, episode_length=FLAGS.episode_length)
-    except:
+    finally:
         for env in envs:
             env.close()
-        raise
 
 
 if __name__ == "__main__":

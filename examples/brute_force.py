@@ -35,7 +35,7 @@ from typing import List
 import humanize
 from absl import app, flags
 
-import compiler_gym.util.flags.output_dir  # Flag definition.
+import compiler_gym.util.flags.output_dir  # noqa Flag definition.
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.flags.env_from_flags import env_from_flags

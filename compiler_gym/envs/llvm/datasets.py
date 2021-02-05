@@ -383,7 +383,9 @@ def _make_cBench_validator(
 
 
 # A map from benchmark name to validation callbacks. Defined below.
-_VALIDATORS: Dict[str, List[Callable[["LlvmEnv"], Optional[str]]]] = defaultdict(list)
+_VALIDATORS: Dict[
+    str, List[Callable[["LlvmEnv"], Optional[str]]]  # noqa: F821
+] = defaultdict(list)
 
 
 def validator(
@@ -438,8 +440,8 @@ def validator(
 
 
 def get_llvm_benchmark_validation_callback(
-    env: "LlvmEnv",
-) -> Optional[Callable[["LlvmEnv"], Optional[str]]]:
+    env: "LlvmEnv",  # noqa: F821
+) -> Optional[Callable[["LlvmEnv"], Optional[str]]]:  # noqa: F821
     """Return a callback for validating a given environment state.
 
     If there is no valid callback, returns :code:`None`.

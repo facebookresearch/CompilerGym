@@ -9,7 +9,7 @@ import pytest
 from gym.spaces import Box
 
 import compiler_gym
-import examples.example_compiler_gym_service  # Register environments.
+import examples.example_compiler_gym_service  # noqa Register environments.
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.spaces import NamedDiscrete, Sequence
 from tests.test_main import main

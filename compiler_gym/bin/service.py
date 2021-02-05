@@ -173,7 +173,7 @@ def print_service_capabilities(env: CompilerEnv, base_heading_level: int = 1):
 def main(argv):
     """Main entry point."""
     assert len(argv) == 1, f"Unrecognized flags: {argv[1:]}"
-    assert 0 < FLAGS.heading_level <= 4, f"--heading_level must be in range [1,4]"
+    assert 0 < FLAGS.heading_level <= 4, "--heading_level must be in range [1,4]"
 
     env = env_from_flags()
     try:
