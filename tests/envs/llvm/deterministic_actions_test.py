@@ -22,6 +22,7 @@ def sha1(string: str):
     return sha1.hexdigest()
 
 
+@skip_on_ci  # noqa: F821
 def test_deterministic_action(env: LlvmEnv, benchmark_name: str, action_name: str):
     """Run an action multiple times from the same starting state and check that
     the generated LLVM-IR is the same.

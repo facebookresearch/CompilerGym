@@ -15,6 +15,7 @@ pytest_plugins = ["tests.envs.llvm.fixtures"]
 ACTION_REPTITION_COUNT = 50
 
 
+@pytest.mark.skip(reason="github.com/facebookresearch/CompilerGym/issues/46")
 @pytest.mark.parametrize(
     "benchmark_name",
     [
