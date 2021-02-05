@@ -254,6 +254,8 @@ class ManagedConnection(Connection):
             returncode = self.process.poll()
             if returncode is not None:
                 shutil.rmtree(self.working_dir)
+                if self.process_output:
+                    self.process_output.close()
                 raise ServiceError(f"Service terminated with returncode: {returncode}")
             if port_path.is_file():
                 with open(port_path) as f:
@@ -264,6 +266,8 @@ class ManagedConnection(Connection):
         else:
             self.process.kill()
             self.process.communicate(timeout=rpc_init_max_seconds)
+            if self.process_output:
+                self.process_output.close()
             shutil.rmtree(self.working_dir)
             raise TimeoutError(
                 "Service failed to produce port file after "
@@ -291,6 +295,8 @@ class ManagedConnection(Connection):
         else:
             self.process.kill()
             self.process.communicate(timeout=process_exit_max_seconds)
+            if self.process_output:
+                self.process_output.close()
             shutil.rmtree(self.working_dir)
             raise TimeoutError(
                 "Failed to connect to RPC service after "
@@ -307,6 +313,8 @@ class ManagedConnection(Connection):
             self.process.communicate(timeout=self.process_exit_max_seconds)
         except subprocess.TimeoutExpired:
             warnings.warn(f"Abandoning orphan process at {self.working_dir}")
+        if self.process_output:
+            self.process_output.close()
         shutil.rmtree(self.working_dir, ignore_errors=True)
         super().close()
 
