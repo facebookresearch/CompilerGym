@@ -25,7 +25,7 @@ benchmark://cBench-v0/dijkstra,0,opt  input.bc -o output.bc,0.3
     with capture_output() as out:
         main(["argv0"])
 
-    assert out.stdout == ("✅  benchmark://cBench-v0/dijkstra  0.0000\n")
+    assert out.stdout.startswith("✅  cBench-v0/dijkstra ")
     assert not out.stderr
 
 
@@ -41,8 +41,8 @@ benchmark://cBench-v0/dijkstra,0.5,opt  input.bc -o output.bc,0.3
         with pytest.raises(SystemExit):
             main(["argv0"])
 
-    assert out.stdout == (
-        "❌  benchmark://cBench-v0/dijkstra  Expected reward 0.5000 but received reward 0.0000\n"
+    assert out.stdout.startswith(
+        "❌  cBench-v0/dijkstra  Expected reward 0.5000 but received reward 0.0000\n"
     )
     assert not out.stderr
 
@@ -94,7 +94,7 @@ benchmark://cBench-v0/susan,,0,opt  input.bc -o output.bc
     with capture_output() as out:
         main(["argv0"])
 
-    assert out.stdout.count("✅") == 22  # Every benchmark passed.
+    assert out.stdout.count("✅") == 23  # Every benchmark passed.
     assert not out.stderr
 
 
