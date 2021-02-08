@@ -327,7 +327,7 @@ And to describe the capabilities of each environment:
 .. code-block::
 
     $ python -m compiler_gym.bin.service --env=llvm-v0
-    # CompilerGym Service `/path/to/compiler_gym/envs/llvm/service/service`
+    # CompilerGym Service `/path/to/compiler_gym/envs/llvm/service/compiler_gym-llvm-service`
 
     ## Programs
 

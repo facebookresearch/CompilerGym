@@ -1,7 +1,7 @@
 # This package exposes the LLVM optimization pipeline as a CompilerGym service.
 
 cc_binary(
-    name = "service",
+    name = "compiler_gym-llvm-service",
     srcs = ["RunService.cc"],
     visibility = ["//visibility:public"],
     deps = [

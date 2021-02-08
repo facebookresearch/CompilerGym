@@ -7,7 +7,7 @@ py_library(
     name = "llvm",
     srcs = ["__init__.py"],
     data = [
-        "//compiler_gym/envs/llvm/service",
+        "//compiler_gym/envs/llvm/service:compiler_gym-llvm-service",
     ],
     visibility = ["//compiler_gym:__subpackages__"],
     deps = [

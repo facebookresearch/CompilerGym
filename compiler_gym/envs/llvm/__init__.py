@@ -23,7 +23,7 @@ __all__ = [
 ]
 
 LLVM_SERVICE_BINARY = runfiles_path(
-    "CompilerGym/compiler_gym/envs/llvm/service/service"
+    "CompilerGym/compiler_gym/envs/llvm/service/compiler_gym-llvm-service"
 )
 
 
