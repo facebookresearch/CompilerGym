@@ -224,7 +224,7 @@ install: bazel-build
 # Tidying up #
 ##############
 
-.PHONY: clean distclean uninstall uninstall-purge
+.PHONY: clean distclean uninstall purge
 
 clean:
 	$(MAKE) -C docs clean
@@ -236,5 +236,5 @@ distclean: clean
 uninstall:
 	$(PYTHON) -m pip uninstall compiler_gym
 
-uninstall-purge: uninstall
+purge: distclean uninstall
 	rm -rf $(HOME)/.cache/compiler_gym $(HOME)/logs/compiler_gym $(HOME)/.local/share/compiler_gym
