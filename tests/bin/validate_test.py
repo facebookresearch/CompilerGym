@@ -10,6 +10,7 @@ from absl import flags
 
 from compiler_gym.bin.validate import main
 from compiler_gym.util.capture_output import capture_output
+from tests.fixtures import skip_on_ci
 from tests.test_main import main as _test_main
 
 
@@ -60,6 +61,7 @@ def test_invalid_csv_format(monkeypatch):
     assert "Failed to parse input:" in out.stderr
 
 
+@skip_on_ci
 def test_validate_cBenh_null_options(monkeypatch):
     input = """
 benchmark,reward,walltime,commandline

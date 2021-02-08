@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Pytest fixtures for the LLVM CompilerGym environments."""
+import os
 from pathlib import Path
 from typing import Iterable, List
 
@@ -30,6 +31,12 @@ def _read_list_file(path: Path) -> Iterable[str]:
 
 ACTION_NAMES = list(_read_list_file(ACTIONS_LIST))
 BENCHMARK_NAMES = list(_read_list_file(BENCHMARKS_LIST))
+
+# Skip ghostscript on CI as it is just too heavy.
+if bool(os.environ.get("CI")):
+    BENCHMARK_NAMES = [
+        b for b in BENCHMARK_NAMES if b != "benchmark://cBench-v0/ghostscript"
+    ]
 
 env = gym.make("llvm-v0")
 OBSERVATION_SPACE_NAMES = sorted(env.observation.spaces.keys())

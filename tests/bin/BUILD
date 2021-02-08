@@ -40,6 +40,7 @@ py_test(
     deps = [
         "//compiler_gym",
         "//compiler_gym/bin:validate",
+        "//tests:fixtures",
         "//tests:test_main",
     ],
 )

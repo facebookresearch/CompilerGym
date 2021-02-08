@@ -91,6 +91,7 @@ py_test(
     deps = [
         ":fixtures",
         "//compiler_gym/envs",
+        "//tests:fixtures",
         "//tests:test_main",
     ],
 )
