@@ -1,9 +1,11 @@
+__pycache__
 .DS_Store
-/build
 /.act
 /.clwb
 /.vscode
-/bazel-*
 /*.egg-info
+/bazel-*
+/build
 /dist
-__pycache__
+/node_modules
+/package-lock.json
