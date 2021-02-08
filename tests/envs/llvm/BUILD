@@ -91,6 +91,7 @@ py_test(
     deps = [
         ":fixtures",
         "//compiler_gym/envs",
+        "//tests:fixtures",
         "//tests:test_main",
     ],
 )
@@ -137,19 +138,15 @@ py_test(
     ],
 )
 
-# NOTE(https://github.com/facebookresearch/CompilerGym/issues/46): The -gvn-sink
-# pass is temporarily disabled.
-#
-# py_test(
-#     name = "gvn_sink_test",
-#     srcs = ["gvn_sink_test.py"],
-#     shard_count = 4,
-#     deps = [
-#         ":fixtures",
-#         "//compiler_gym/envs",
-#         "//tests:test_main",
-#     ],
-# )
+py_test(
+    name = "gvn_sink_test",
+    srcs = ["gvn_sink_test.py"],
+    deps = [
+        ":fixtures",
+        "//compiler_gym/envs",
+        "//tests:test_main",
+    ],
+)
 
 py_test(
     name = "llvm_benchmarks_test",
