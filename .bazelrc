@@ -88,3 +88,4 @@ build:ci --action_env=PATH
 build:ci --keep_going
 build:ci --verbose_failures
 build:ci --test_output=errors
+test:ci --test_env=CI
