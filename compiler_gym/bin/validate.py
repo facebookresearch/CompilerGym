@@ -12,7 +12,7 @@ Example usage:
     benchmark,reward,walltime,commandline
     cBench-v0/crc32,0,1.2,opt  input.bc -o output.bc
     EOF
-    python -m compiler_gym.bin.validate < results.csv --env=llvm-v0 --reward=IrInstructionCount
+    python -m compiler_gym.bin.validate < results.csv --env=llvm-ic-v0
 
 Use this script to validate environment states. Environment states are read from
 stdin as a comma-separated list of benchmark names, walltimes, episode rewards,
