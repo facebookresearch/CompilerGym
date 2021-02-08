@@ -6,6 +6,7 @@
 import math
 import multiprocessing
 import multiprocessing.pool
+import re
 from typing import Callable, Iterable, List, NamedTuple, Optional, cast
 
 import gym
@@ -59,12 +60,16 @@ class ValidationResult(NamedTuple):
         )
 
     def __repr__(self):
+        # Remove default-protocol prefix to improve output readability.
+        benchmark = re.sub(r"^benchmark://", "", self.state.benchmark)
+
         if self.failed:
-            return f"❌  {self.state.benchmark}  {self.error_details}"
+            msg = ", ".join(self.error_details.strip().split("\n"))
+            return f"❌  {benchmark}  {msg}"
         elif self.state.reward is None:
-            return f"✅  {self.state.benchmark}"
+            return f"✅  {benchmark}"
         else:
-            return f"✅  {self.state.benchmark}  {self.state.reward:.4f}"
+            return f"✅  {benchmark}  {self.state.reward:.4f}"
 
 
 def _llvm_replay_commandline(env: LlvmEnv, commandline: str) -> Optional[float]:
@@ -160,6 +165,7 @@ def validate_states(
     states: Iterable[CompilerEnvState],
     datasets: Optional[List[str]] = None,
     nproc: Optional[int] = None,
+    inorder: bool = False,
 ) -> Iterable[ValidationResult]:
     """A parallelized implementation of
     :func:`validate_state() <compiler_gym.validate_state>` for batched
@@ -169,6 +175,8 @@ def validate_states(
     :param states: A sequence of compiler environment states to validate.
     :param datasets: An optional list of datasets that are required.
     :param nproc: The number of parallel worker processes to run.
+    :param inorder: Whether to return results in the order they were provided,
+        or in the order that they are available.
     :return: An iterator over validation results. The order of results may
         differ from the input states.
     """
@@ -184,6 +192,7 @@ def validate_states(
         env.close()
 
     with multiprocessing.Pool(processes=nproc) as pool:
-        yield from pool.imap_unordered(
+        map_func = pool.imap if inorder else pool.imap_unordered
+        yield from map_func(
             _validate_states_worker, [(reward_space_name, r) for r in states]
         )

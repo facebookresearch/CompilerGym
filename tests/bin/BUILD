@@ -35,10 +35,12 @@ py_test(
 
 py_test(
     name = "validate_test",
+    timeout = "long",
     srcs = ["validate_test.py"],
     deps = [
         "//compiler_gym",
         "//compiler_gym/bin:validate",
+        "//tests:fixtures",
         "//tests:test_main",
     ],
 )
