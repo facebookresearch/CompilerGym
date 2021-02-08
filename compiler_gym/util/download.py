@@ -18,7 +18,6 @@ def _download(url: str) -> bytes:
         if req.status_code != 200:
             raise OSError(f"GET returned status code {req.status_code}: {url}")
 
-        logging.info(f"Downloaded {url}")
         return req.content
     finally:
         req.close()
