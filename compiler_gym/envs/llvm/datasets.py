@@ -13,12 +13,10 @@ import tarfile
 import tempfile
 from collections import defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from contextlib import contextmanager
 from pathlib import Path
 from typing import Callable, Dict, List, NamedTuple, Optional
 
 import fasteners
-import gym
 
 from compiler_gym.datasets.dataset import Dataset
 from compiler_gym.util.download import download
@@ -354,7 +352,7 @@ def _make_cBench_validator(
                         f"Actual: {outcome.output.decode('utf-8')}"
                     )
                 except UnicodeDecodeError:
-                    return f"Benchmark output differs from expected (binary diff)"
+                    return "Benchmark output differs from expected (binary diff)"
 
             # Difftest the output files.
             for path in output_paths:

@@ -10,7 +10,7 @@ import humanize
 import numpy as np
 from absl import app, flags
 
-import compiler_gym.util.flags.output_dir  # Flag definition.
+import compiler_gym.util.flags.output_dir  # noqa Flag definition.
 from compiler_gym.util import logs
 from compiler_gym.util.statistics import geometric_mean
 from compiler_gym.util.tabulate import tabulate

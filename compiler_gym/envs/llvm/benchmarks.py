@@ -24,7 +24,7 @@ def _communicate(process, input=None, timeout=None):
     """subprocess.communicate() which kills subprocess on timeout."""
     try:
         return process.communicate(input=input, timeout=timeout)
-    except subprocess.TimeoutExpired as e:
+    except subprocess.TimeoutExpired:
         # kill() was added in Python 3.7.
         if sys.version_info >= (3, 7, 0):
             process.kill()

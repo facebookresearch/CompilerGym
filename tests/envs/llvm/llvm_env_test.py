@@ -12,7 +12,6 @@ import compiler_gym
 from compiler_gym.envs import CompilerEnv, CompilerEnvState, llvm
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.service.connection import CompilerGymServiceConnection
-from compiler_gym.views import ObservationSpaceSpec, RewardSpaceSpec
 from tests.test_main import main
 
 pytest_plugins = ["tests.envs.llvm.fixtures"]

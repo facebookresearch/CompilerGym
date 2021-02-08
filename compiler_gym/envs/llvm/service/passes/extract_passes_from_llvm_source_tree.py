@@ -241,11 +241,11 @@ def main(argv):
         # Get the names of all files which contain a pass definition.
         matching_paths = []
         grep = subprocess.check_output(
-            ["grep", "-l", "-E", f"^\s*{INITIALIZE_PASS_RE}", "-R", f"lib/"],
+            ["grep", "-l", "-E", rf"^\s*{INITIALIZE_PASS_RE}", "-R", "lib/"],
             universal_newlines=True,
         )
         matching_paths += grep.strip().split("\n")
-        logging.debug("Processing", len(matching_paths), "files ...")
+        logging.debug("Processing %s files ...", len(matching_paths))
         paths = [Path(path) for path in matching_paths]
 
     # Build a list of pass entries.

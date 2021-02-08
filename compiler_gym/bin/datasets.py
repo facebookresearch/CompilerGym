@@ -136,12 +136,10 @@ import sys
 from pathlib import Path
 from typing import Tuple
 
-import fasteners
 import humanize
 from absl import app, flags
 
 from compiler_gym.datasets.dataset import Dataset, activate, deactivate, delete, require
-from compiler_gym.envs import CompilerEnv
 from compiler_gym.util.flags.env_from_flags import env_from_flags
 from compiler_gym.util.tabulate import tabulate
 

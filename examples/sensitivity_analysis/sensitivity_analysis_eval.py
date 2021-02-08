@@ -18,7 +18,7 @@ from typing import Iterable, NamedTuple
 import numpy as np
 from absl import app, flags
 
-import compiler_gym.util.flags.output_dir  # Flag definition.
+import compiler_gym.util.flags.output_dir  # noqa Flag definition.
 from compiler_gym.util.tabulate import tabulate
 from compiler_gym.util.timer import humanize_duration
 

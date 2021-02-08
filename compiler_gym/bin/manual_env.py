@@ -17,7 +17,7 @@ from typing import Optional
 
 from absl import app, flags
 
-import compiler_gym.util.flags.ls_benchmark  # Flag definition.
+import compiler_gym.util.flags.ls_benchmark  # noqa Flag definition.
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.util import user_input
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags

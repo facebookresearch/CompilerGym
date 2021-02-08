@@ -7,7 +7,7 @@ import gym
 import numpy as np
 import pytest
 
-import compiler_gym  # Register environments.
+import compiler_gym  # noqa Register environments.
 from compiler_gym.envs import CompilerEnv, llvm
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.service.connection import CompilerGymServiceConnection

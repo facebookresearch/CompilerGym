@@ -6,7 +6,7 @@
 import gym
 import pytest
 
-import compiler_gym.envs  # Register LLVM environments.
+import compiler_gym.envs  # noqa Register LLVM environments.
 from compiler_gym.service import CompilerGymServiceConnection, ConnectionOpts
 from compiler_gym.service.proto import GetSpacesRequest
 from tests.test_main import main
