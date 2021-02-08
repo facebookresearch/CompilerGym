@@ -4,11 +4,11 @@
 # LICENSE file in the root directory of this source tree.
 """Tests for action space determinism."""
 import hashlib
+import os
 
 import pytest
 
 from compiler_gym.envs import LlvmEnv
-from tests.envs.llvm.fixtures import skip_on_ci
 from tests.test_main import main
 
 pytest_plugins = ["tests.envs.llvm.fixtures"]
@@ -23,7 +23,8 @@ def sha1(string: str):
     return sha1.hexdigest()
 
 
-@skip_on_ci
+# Long running, highly parametrized test - skip on CI.
+@pytest.mark.skipif(os.environ.get("CI"), reason="Skip on CI")
 def test_deterministic_action(env: LlvmEnv, benchmark_name: str, action_name: str):
     """Run an action multiple times from the same starting state and check that
     the generated LLVM-IR is the same.
