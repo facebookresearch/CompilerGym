@@ -25,7 +25,7 @@ from compiler_gym.service.proto import (
     ObservationSpace,
     RewardSpace,
 )
-from compiler_gym.util.runfiles_path import cache_path, runfiles_path
+from compiler_gym.util.runfiles_path import runfiles_path, transient_cache_path
 
 GRPC_CHANNEL_OPTIONS = [
     # Raise the default inbound message filter from 4MB.
@@ -175,7 +175,7 @@ def make_working_dir():
     """Make a working directory for a service. The calling code is responsible for
     removing this directory when done.
     """
-    service_directory = cache_path("service")
+    service_directory = transient_cache_path("service")
     timestamp = datetime.now().isoformat()
     random_hash = random.getrandbits(32)
     working_dir = Path(service_directory / f"{timestamp}-{random_hash:08x}")
