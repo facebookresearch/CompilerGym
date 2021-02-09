@@ -88,3 +88,7 @@ build:ci --action_env=PATH
 build:ci --keep_going
 build:ci --verbose_failures
 build:ci --test_output=errors
+test:ci --test_env=CI
+# Build warnings unnecessarily clutter the output log, making it harder to
+# diagnose the fault when a test fails. Silence all warnings for test runs.
+test:ci --copt -Wno-everything
