@@ -78,7 +78,7 @@ class ObservationView(object):
         :param id: The name of the new observation space.
         :param base_id: The name of the observation space that this is derived
             from.
-        :param **kwargs: Arguments passed to
+        :param \\**kwargs: Arguments passed to
             :func:`ObservationSpaceSpec.make_derived_space <compiler_gym.views.ObservationSpaceSpec.make_derived_space>`.
         """
         base_space = self.spaces[base_id]
