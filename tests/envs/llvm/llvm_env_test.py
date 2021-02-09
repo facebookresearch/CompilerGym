@@ -60,7 +60,9 @@ def test_all_flags_are_unique(env: LlvmEnv):
 
 
 def test_benchmark_names(env: CompilerEnv, benchmark_names: List[str]):
-    assert set(benchmark_names) == set(env.benchmarks)
+    # Use a subset check as benchmark_names may exclude certain benchmarks for
+    # testing.
+    assert set(benchmark_names).issubset(set(env.benchmarks))
 
 
 def test_double_reset(env: CompilerEnv):
