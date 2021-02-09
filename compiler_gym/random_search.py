@@ -21,7 +21,7 @@ from compiler_gym.util.logs import create_logging_dir
 class RandomAgentWorker(Thread):
     """Worker thread to run a repeating agent.
 
-    To stop the agent, set the alive attribute of this thread to False.
+    To stop the agent, set the :code:`alive` attribute of this thread to False.
     """
 
     def __init__(
@@ -44,18 +44,24 @@ class RandomAgentWorker(Thread):
 
         self.alive = True  # Set this to False to signal the thread to stop.
 
+    @property
+    def should_run_one_episode(self) -> bool:
+        """Whether to run an episode."""
+        return self.alive or not self.total_episode_count
+
     def run(self) -> None:
         """Run episodes in an infinite loop."""
-        while self.alive:
+        while self.should_run_one_episode:
             self.total_environment_count += 1
             env = self._make_env()
+            self._patience = self._patience or env.action_space.n
             self.run_one_environment(env)
             env.close()
 
     def run_one_environment(self, env: CompilerEnv) -> None:
         """Run random walks in an infinite loop. Returns if the environment ends."""
         try:
-            while self.alive:
+            while self.should_run_one_episode:
                 self.total_episode_count += 1
                 if not self.run_one_episode(env):
                     return
@@ -93,9 +99,6 @@ class RandomAgentWorker(Thread):
         return True
 
 
-# Start of boilerplate code to run multiple agents and log progress.
-
-
 def random_search(
     make_env: Callable[[], CompilerEnv],
     outdir: Optional[Union[str, Path]] = None,
@@ -105,47 +108,47 @@ def random_search(
     skip_done: bool = False,
 ) -> Tuple[float, List[int]]:
     env = make_env()
-    env.reset()
-    if not isinstance(env, CompilerEnv):
-        raise TypeError(
-            f"random_search() requires CompilerEnv. Called with: {type(env).__name__}"
-        )
+    try:
+        env.reset()
+        if not isinstance(env, CompilerEnv):
+            raise TypeError(
+                f"random_search() requires CompilerEnv. Called with: {type(env).__name__}"
+            )
 
-    patience = patience or env.action_space.n
-    benchmark_name = env.benchmark
-    if not outdir:
-        sanitized_benchmark_name = "/".join(benchmark_name.split("/")[-2:])
-        outdir = create_logging_dir(f"random/{sanitized_benchmark_name}")
-    outdir = Path(outdir)
+        benchmark_name = env.benchmark
+        if not outdir:
+            sanitized_benchmark_name = "/".join(benchmark_name.split("/")[-2:])
+            outdir = create_logging_dir(f"random/{sanitized_benchmark_name}")
+        outdir = Path(outdir)
 
-    if not env.reward_space:
-        raise ValueError("Eager reward must be specified for random search")
-    reward_space_name = env.reward_space.id
+        if not env.reward_space:
+            raise ValueError("Eager reward must be specified for random search")
+        reward_space_name = env.reward_space.id
 
-    action_space_names = list(env.action_space.names)
-    num_instructions = int(env.observation["IrInstructionCount"])
+        action_space_names = list(env.action_space.names)
+        num_instructions = int(env.observation["IrInstructionCount"])
 
-    metadata_path = outdir / logs.METADATA_NAME
-    progress_path = outdir / logs.PROGRESS_LOG_NAME
-    best_actions_path = outdir / logs.BEST_ACTIONS_NAME
-    best_commandline_path = outdir / logs.BEST_COMMANDLINE_NAME
+        metadata_path = outdir / logs.METADATA_NAME
+        progress_path = outdir / logs.PROGRESS_LOG_NAME
+        best_actions_path = outdir / logs.BEST_ACTIONS_NAME
+        best_commandline_path = outdir / logs.BEST_COMMANDLINE_NAME
 
-    if skip_done and metadata_path.is_file():
-        # TODO(cummins): Return best reward.
-        return 0
+        if skip_done and metadata_path.is_file():
+            # TODO(cummins): Return best reward.
+            return 0
 
-    # Write a metadata file.
-    metadata = {
-        "env": env.spec.id,
-        "benchmark": benchmark_name,
-        "reward": reward_space_name,
-        "patience": patience,
-        "num_instructions": num_instructions,
-    }
-    with open(str(metadata_path), "w") as f:
-        json.dump(metadata, f, sort_keys=True, indent=2)
-
-    env.close()
+        # Write a metadata file.
+        metadata = {
+            "env": env.spec.id,
+            "benchmark": benchmark_name,
+            "reward": reward_space_name,
+            "patience": patience,
+            "num_instructions": num_instructions,
+        }
+        with open(str(metadata_path), "w") as f:
+            json.dump(metadata, f, sort_keys=True, indent=2)
+    finally:
+        env.close()
 
     workers = [RandomAgentWorker(make_env, patience) for _ in range(nproc)]
     for worker in workers:
@@ -235,7 +238,7 @@ def random_search(
         f.write("\n")
     with open(str(best_commandline_path), "w") as f:
         print(best_commandline, file=f)
-    print(f"\n", flush=True)
+    print("\n", flush=True)
 
     print("Ending worker threads ... ", end="", flush=True)
     for worker in workers:

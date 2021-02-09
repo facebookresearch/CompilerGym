@@ -4,6 +4,7 @@ from compiler_gym.service.connection import (
     ServiceError,
     ServiceInitError,
     ServiceIsClosed,
+    ServiceOSError,
     ServiceTransportError,
 )
 from compiler_gym.service.proto2py import observation_t, scalar_range2tuple
@@ -13,6 +14,7 @@ __all__ = [
     "ServiceInitError",
     "ServiceIsClosed",
     "ServiceTransportError",
+    "ServiceOSError",
     "CompilerGymServiceConnection",
     "ConnectionOpts",
     "scalar_range2tuple",

@@ -25,7 +25,6 @@ py_test(
 py_binary(
     name = "brute_force",
     srcs = ["brute_force.py"],
-    data = ["//compiler_gym/envs/llvm/service"],
     visibility = ["//visibility:public"],
     deps = [
         "//compiler_gym/envs",

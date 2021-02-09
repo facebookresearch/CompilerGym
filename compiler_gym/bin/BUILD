@@ -54,7 +54,6 @@ py_binary(
 py_binary(
     name = "random_search",
     srcs = ["random_search.py"],
-    data = ["//compiler_gym/envs/llvm/service"],
     visibility = ["//visibility:public"],
     deps = [
         "//compiler_gym:random_search",

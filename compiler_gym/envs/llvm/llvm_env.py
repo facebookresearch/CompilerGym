@@ -221,7 +221,7 @@ class LlvmEnv(CompilerEnv):
         # Now that we have initialized the environment with the current state,
         # set the benchmark so that calls to new_env.reset() will correctly
         # revert the environment to the initial benchmark state.
-        new_env.benchmark = self.benchmark
+        new_env.__user_specified_benchmark_uri = self.benchmark
         # Set the "visible" name of the current benchmark to hide the fact that
         # we loaded from a custom bitcode file.
         new_env._benchmark_in_use_uri = self.benchmark

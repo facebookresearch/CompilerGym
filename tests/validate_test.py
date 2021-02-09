@@ -12,7 +12,7 @@ from tests.test_main import main
 
 def test_validate_state_no_reward():
     state = CompilerEnvState(
-        benchmark="cBench-v0/dijkstra",
+        benchmark="cBench-v0/crc32",
         walltime=1,
         commandline="opt  input.bc -o output.bc",
     )
@@ -26,12 +26,12 @@ def test_validate_state_no_reward():
     assert result.success
     assert not result.failed
     assert not result.reward_validated
-    assert str(result) == "✅  cBench-v0/dijkstra"
+    assert str(result) == "✅  cBench-v0/crc32"
 
 
 def test_validate_state_with_reward():
     state = CompilerEnvState(
-        benchmark="cBench-v0/dijkstra",
+        benchmark="cBench-v0/crc32",
         walltime=1,
         reward=0,
         commandline="opt  input.bc -o output.bc",
@@ -47,12 +47,12 @@ def test_validate_state_with_reward():
     assert not result.failed
     assert result.reward_validated
     assert not result.reward_validation_failed
-    assert str(result) == "✅  cBench-v0/dijkstra  0.0000"
+    assert str(result) == "✅  cBench-v0/crc32  0.0000"
 
 
 def test_validate_state_invalid_reward():
     state = CompilerEnvState(
-        benchmark="cBench-v0/dijkstra",
+        benchmark="cBench-v0/crc32",
         walltime=1,
         reward=1,
         commandline="opt  input.bc -o output.bc",
@@ -70,13 +70,13 @@ def test_validate_state_invalid_reward():
     assert result.reward_validation_failed
     assert (
         str(result)
-        == "❌  cBench-v0/dijkstra  Expected reward 1.0000 but received reward 0.0000"
+        == "❌  cBench-v0/crc32  Expected reward 1.0000 but received reward 0.0000"
     )
 
 
 def test_validate_states_lambda_callback():
     state = CompilerEnvState(
-        benchmark="cBench-v0/dijkstra",
+        benchmark="cBench-v0/crc32",
         walltime=1,
         commandline="opt  input.bc -o output.bc",
     )

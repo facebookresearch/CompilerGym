@@ -3,13 +3,10 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Integrations tests for the LLVM CompilerGym environments."""
-import re
 import sys
 import tempfile
 from pathlib import Path
 from typing import Set
-
-import pytest
 
 from compiler_gym.envs import LlvmEnv
 from compiler_gym.envs.llvm import datasets

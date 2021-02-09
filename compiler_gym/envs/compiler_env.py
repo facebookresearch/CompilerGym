@@ -10,7 +10,7 @@ import warnings
 from io import StringIO
 from pathlib import Path
 from time import time
-from typing import Any, Dict, Iterable, List, NamedTuple, Optional, Tuple, Union
+from typing import Any, Dict, List, NamedTuple, Optional, Tuple, Union
 
 import fasteners
 import gym
@@ -22,9 +22,10 @@ from compiler_gym.service import (
     CompilerGymServiceConnection,
     ConnectionOpts,
     ServiceError,
+    ServiceOSError,
+    ServiceTransportError,
     observation_t,
 )
-from compiler_gym.service.connection import ServiceTransportError
 from compiler_gym.service.proto import (
     ActionRequest,
     AddBenchmarkRequest,
@@ -114,9 +115,9 @@ class CompilerEnvState(NamedTuple):
             return False
         epsilon = 1e-5
         # If only one benchmark has a reward the states cannot be equal.
-        if self.reward is None != rhs.reward is None:
+        if (self.reward is None) != (rhs.reward is None):
             return False
-        if self.reward is None and rhs.reward is None:
+        if (self.reward is None) and (rhs.reward is None):
             reward_equal = True
         else:
             reward_equal = abs(self.reward - rhs.reward) < epsilon
@@ -523,7 +524,7 @@ class CompilerEnv(gym.Env):
                     self.service.stub.EndEpisode,
                     EndEpisodeRequest(session_id=self._session_id),
                 )
-            except:
+            except:  # noqa Don't feel bad, computer, you tried ;-)
                 pass
             self._session_id = None
 
@@ -651,7 +652,7 @@ class CompilerEnv(gym.Env):
         request = ActionRequest(session_id=self._session_id, action=[action])
         try:
             reply = self.service(self.service.stub.TakeAction, request)
-        except (ServiceError, ServiceTransportError, TimeoutError) as e:
+        except (ServiceError, ServiceTransportError, ServiceOSError, TimeoutError) as e:
             self.close()
             info = {"error_details": str(e)}
             if self.reward_space:

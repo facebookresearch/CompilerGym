@@ -99,41 +99,59 @@ class ObservationSpaceSpec(object):
         if proto.opaque_data_format == "json://networkx/MultiDiGraph":
             # TODO(cummins): Add a Graph space.
             space = make_seq(proto.string_size_range, str, (0, None))
-            cb = lambda observation: nx.readwrite.json_graph.node_link_graph(
-                json.loads(observation.string_value), multigraph=True, directed=True
-            )
-            to_string = lambda observation: json.dumps(
-                nx.readwrite.json_graph.node_link_data(observation), indent=2
-            )
+
+            def cb(observation):
+                return nx.readwrite.json_graph.node_link_graph(
+                    json.loads(observation.string_value), multigraph=True, directed=True
+                )
+
+            def to_string(observation):
+                return json.dumps(
+                    nx.readwrite.json_graph.node_link_data(observation), indent=2
+                )
+
         elif proto.opaque_data_format == "json://":
             space = make_seq(proto.string_size_range, str, (0, None))
-            cb = lambda observation: json.loads(observation.string_value)
-            to_string = lambda observation: json.dumps(observation, indent=2)
+
+            def cb(observation):
+                return json.loads(observation.string_value)
+
+            def to_string(observation):
+                return json.dumps(observation, indent=2)
+
         elif shape_type == "int64_range_list":
             space = make_box(
                 proto.int64_range_list.range,
                 np.int64,
                 (np.iinfo(np.int64).min, np.iinfo(np.int64).max),
             )
-            cb = lambda observation: np.array(
-                observation.int64_list.value, dtype=np.int64
-            )
+
+            def cb(observation):
+                return np.array(observation.int64_list.value, dtype=np.int64)
+
             to_string = str
         elif shape_type == "double_range_list":
             space = make_box(
                 proto.double_range_list.range, np.float64, (-np.inf, np.inf)
             )
-            cb = lambda observation: np.array(
-                observation.double_list.value, dtype=np.float64
-            )
+
+            def cb(observation):
+                return np.array(observation.double_list.value, dtype=np.float64)
+
             to_string = str
         elif shape_type == "string_size_range":
             space = make_seq(proto.string_size_range, str, (0, None))
-            cb = lambda observation: observation.string_value
+
+            def cb(observation):
+                return observation.string_value
+
             to_string = str
         elif shape_type == "binary_size_range":
             space = make_seq(proto.binary_size_range, bytes, (0, None))
-            cb = lambda observation: observation.binary_value
+
+            def cb(observation):
+                return observation.binary_value
+
             to_string = str
         else:
             raise TypeError(f"Cannot determine shape of ObservationSpace: {proto}")
