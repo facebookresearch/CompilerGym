@@ -3,6 +3,16 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
+py_library(
+    name = "fixtures",
+    testonly = 1,
+    srcs = ["fixtures.py"],
+    visibility = [
+        "//examples:__subpackages__",
+        "//tests:__subpackages__",
+    ],
+)
+
 py_test(
     name = "random_search_test",
     timeout = "short",
