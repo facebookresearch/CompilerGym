@@ -371,13 +371,16 @@ def _make_cBench_validator(
                     ["diff", str(path), f"{path}.gold_standard"],
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
-                    universal_newlines=True,
                 )
                 stdout, _ = diff.communicate()
                 if diff.returncode:
                     if stdout.startswith("Binary files "):
                         return f"Benchmark output file '{path.name}' differs from (binary diff)"
-                    return f"Benchmark output file '{path.name}' differs from expected: {stdout}"
+                    try:
+                        stdout = stdout.decode("utf-8")
+                        return f"Benchmark output file '{path.name}' differs from expected: {stdout}"
+                    except UnicodeDecodeError:
+                        return f"Benchmark output file '{path.name}' differs from (binary diff)"
 
     return validator_cb
 
