@@ -202,7 +202,7 @@ def _compile_and_run_bitcode_file(
         )
     assert binary.is_file()
 
-    # Create a barebones environment to run benchmark in.
+    # Create a barebones execution environment for the benchmark.
     env = {
         "TMPDIR": os.environ.get("TMPDIR", ""),
         "HOME": os.environ.get("HOME", ""),
@@ -285,8 +285,8 @@ def _make_cBench_validator(
             "$D", str(_CBENCH_DATA)
         )
 
+        # Create a temporary working directory to execute the benchmark in.
         with tempfile.TemporaryDirectory(dir=env.service.connection.working_dir) as d:
-            # Execute the benchmark in a temporary working directory.
             cwd = Path(d)
             # Translate the output file names into paths inside the working
             # directory.
