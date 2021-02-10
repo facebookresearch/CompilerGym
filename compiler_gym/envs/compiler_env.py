@@ -242,16 +242,16 @@ class CompilerEnv(gym.Env):
         """
         self.metadata = {"render.modes": ["human", "ansi"]}
 
-        self.service_endpoint = service
-        self.connection_settings = connection_settings or ConnectionOpts()
+        self._service_endpoint: Union[str, Path] = service
+        self._connection_settings = connection_settings or ConnectionOpts()
         self.datasets_site_path: Optional[Path] = None
         self.available_datasets: Dict[str, Dataset] = {}
 
         # The benchmark that is currently being used, and the benchmark that
         # the user requested. Those do not always correlate, since the user
         # could request a random benchmark.
-        self._benchmark_in_use_uri: Optional[str] = None
-        self._user_specified_benchmark_uri: Optional[str] = None
+        self._benchmark_in_use_uri: Optional[str] = benchmark
+        self._user_specified_benchmark_uri: Optional[str] = benchmark
         # A map from benchmark URIs to Benchmark messages. We keep track of any
         # user-provided custom benchmarks so that we can register them with a
         # reset service.
@@ -260,7 +260,7 @@ class CompilerEnv(gym.Env):
         self.action_space_name = action_space
 
         self.service = CompilerGymServiceConnection(
-            self.service_endpoint, self.connection_settings
+            self._service_endpoint, self._connection_settings
         )
 
         # Process the available action, observation, and reward spaces.
@@ -293,12 +293,11 @@ class CompilerEnv(gym.Env):
         self.episode_reward: Optional[float] = None
         self.episode_start_time: float = time()
 
-        # Initialize eager observation/reward and benchmark.
+        # Initialize eager observation/reward.
         self._eager_observation_space: Optional[ObservationSpaceSpec] = None
         self._eager_reward_space: Optional[RewardSpaceSpec] = None
         self.observation_space = observation_space
         self.reward_space = reward_space
-        self.benchmark = benchmark
 
     @property
     def versions(self) -> GetVersionReply:
@@ -562,13 +561,13 @@ class CompilerEnv(gym.Env):
             If no aciton space is provided, the default action space is used.
         :return: The initial observation.
         """
-        if retry_count > self.connection_settings.init_max_attempts:
+        if retry_count > self._connection_settings.init_max_attempts:
             raise OSError(f"Failed to reset environment after {retry_count} attempts")
 
         # Start a new service if required.
         if self.service is None:
             self.service = CompilerGymServiceConnection(
-                self.service_endpoint, self.connection_settings
+                self._service_endpoint, self._connection_settings
             )
             # Re-register the custom benchmarks with the new service.
             self._add_custom_benchmarks(self._custom_benchmarks.values())

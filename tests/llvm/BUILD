@@ -9,10 +9,10 @@ py_test(
     srcs = ["all_actions_single_step_test.py"],
     shard_count = 8,
     deps = [
-        ":fixtures",
         "//compiler_gym/envs",
         "//compiler_gym/third_party/autophase",
         "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
     ],
 )
 
@@ -22,9 +22,9 @@ py_test(
     srcs = ["all_benchmarks_init_close_test.py"],
     shard_count = 6,
     deps = [
-        ":fixtures",
         "//compiler_gym/envs",
         "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
     ],
 )
 
@@ -33,9 +33,9 @@ py_test(
     timeout = "short",
     srcs = ["autophase_test.py"],
     deps = [
-        ":fixtures",
         "//compiler_gym/envs",
         "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
     ],
 )
 
@@ -45,11 +45,11 @@ py_test(
     srcs = ["benchmark_semantics_validation_test.py"],
     shard_count = 5,
     deps = [
-        ":fixtures",
         "//compiler_gym",
         "//compiler_gym/datasets",
         "//compiler_gym/envs",
         "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
     ],
 )
 
@@ -59,11 +59,11 @@ py_test(
     srcs = ["benchmarks_random_actions_test.py"],
     shard_count = 4,
     deps = [
-        ":fixtures",
         "//compiler_gym",
         "//compiler_gym/envs",
         "//compiler_gym/third_party/autophase",
         "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
     ],
 )
 
@@ -74,42 +74,11 @@ py_test(
         "//compiler_gym/third_party/cBench:crc32",
     ],
     deps = [
-        ":fixtures",
         "//compiler_gym/envs",
         "//compiler_gym/service/proto",
         "//compiler_gym/util",
         "//tests:test_main",
-    ],
-)
-
-py_test(
-    name = "deterministic_actions_test",
-    timeout = "eternal",
-    srcs = ["deterministic_actions_test.py"],
-    shard_count = 32,
-    tags = ["manual"],
-    deps = [
-        ":fixtures",
-        "//compiler_gym/envs",
-        "//tests:fixtures",
-        "//tests:test_main",
-    ],
-)
-
-py_library(
-    name = "fixtures",
-    testonly = 1,
-    srcs = ["fixtures.py"],
-    data = [
-        "//compiler_gym/envs/llvm/service/passes:actions_genfiles",
-        "//compiler_gym/third_party/cBench:benchmarks_list",
-    ],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//compiler_gym",
-        "//compiler_gym/envs",
-        "//compiler_gym/util",
-        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
     ],
 )
 
@@ -121,20 +90,9 @@ py_test(
         "//compiler_gym/third_party/cBench:crc32",
     ],
     deps = [
-        ":fixtures",
         "//compiler_gym/envs",
         "//tests:test_main",
-    ],
-)
-
-py_test(
-    name = "fork_env_fuzz_test",
-    timeout = "short",
-    srcs = ["fork_env_fuzz_test.py"],
-    deps = [
-        ":fixtures",
-        "//compiler_gym/envs",
-        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
     ],
 )
 
@@ -143,9 +101,9 @@ py_test(
     srcs = ["fresh_environment_observation_reward_test.py"],
     shard_count = 8,
     deps = [
-        ":fixtures",
         "//compiler_gym/envs",
         "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
     ],
 )
 
@@ -153,9 +111,9 @@ py_test(
     name = "gvn_sink_test",
     srcs = ["gvn_sink_test.py"],
     deps = [
-        ":fixtures",
         "//compiler_gym/envs",
         "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
     ],
 )
 
@@ -163,10 +121,10 @@ py_test(
     name = "llvm_benchmarks_test",
     srcs = ["llvm_benchmarks_test.py"],
     deps = [
-        ":fixtures",
         "//compiler_gym/envs",
         "//compiler_gym/service/proto",
         "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
     ],
 )
 
@@ -175,9 +133,9 @@ py_test(
     srcs = ["llvm_env_test.py"],
     shard_count = 4,
     deps = [
-        ":fixtures",
         "//compiler_gym",
         "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
     ],
 )
 
@@ -186,9 +144,9 @@ py_test(
     timeout = "short",
     srcs = ["multiprocessing_test.py"],
     deps = [
-        ":fixtures",
         "//compiler_gym",
         "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
     ],
 )
 
@@ -196,9 +154,9 @@ py_test(
     name = "observation_spaces_test",
     srcs = ["observation_spaces_test.py"],
     deps = [
-        ":fixtures",
         "//compiler_gym/envs",
         "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
     ],
 )
 
@@ -206,9 +164,9 @@ py_test(
     name = "reward_spaces_test",
     srcs = ["reward_spaces_test.py"],
     deps = [
-        ":fixtures",
         "//compiler_gym/envs",
         "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
     ],
 )
 
@@ -216,12 +174,12 @@ py_test(
     name = "service_connection_test",
     srcs = ["service_connection_test.py"],
     deps = [
-        ":fixtures",
         "//compiler_gym",
         "//compiler_gym/envs",
         "//compiler_gym/third_party/autophase",
         "//compiler_gym/util",
         "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
     ],
 )
 

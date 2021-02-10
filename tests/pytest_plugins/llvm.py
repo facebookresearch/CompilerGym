@@ -11,15 +11,14 @@ import gym
 import pytest
 
 from compiler_gym.envs import CompilerEnv
+from compiler_gym.envs.llvm.datasets import VALIDATORS
 from compiler_gym.util.runfiles_path import runfiles_path
 
 ACTIONS_LIST = Path(
-    runfiles_path("CompilerGym/compiler_gym/envs/llvm/service/passes/actions_flags.txt")
+    runfiles_path("compiler_gym/envs/llvm/service/passes/actions_flags.txt")
 )
 
-BENCHMARKS_LIST = Path(
-    runfiles_path("CompilerGym/compiler_gym/third_party/cBench/benchmarks.txt")
-)
+BENCHMARKS_LIST = Path(runfiles_path("compiler_gym/third_party/cBench/benchmarks.txt"))
 
 
 def _read_list_file(path: Path) -> Iterable[str]:
@@ -38,10 +37,10 @@ if bool(os.environ.get("CI")):
         b for b in BENCHMARK_NAMES if b != "benchmark://cBench-v0/ghostscript"
     ]
 
-env = gym.make("llvm-v0")
-OBSERVATION_SPACE_NAMES = sorted(env.observation.spaces.keys())
-REWARD_SPACE_NAMES = sorted(env.reward.spaces.keys())
-env.close()
+_env = gym.make("llvm-v0")
+OBSERVATION_SPACE_NAMES = sorted(_env.observation.spaces.keys())
+REWARD_SPACE_NAMES = sorted(_env.reward.spaces.keys())
+_env.close()
 
 
 @pytest.fixture(scope="module")
@@ -75,6 +74,22 @@ def action_name(request) -> str:
 @pytest.fixture(scope="module", params=BENCHMARK_NAMES)
 def benchmark_name(request) -> str:
     """Enumerate the names of benchmarks."""
+    yield request.param
+
+
+VALIDATABLE_BENCHMARKS = [b for b in BENCHMARK_NAMES if b in VALIDATORS]
+NON_VALIDATABLE_BENCHMARKS = [b for b in BENCHMARK_NAMES if b not in VALIDATORS]
+
+
+@pytest.fixture(scope="module", params=VALIDATABLE_BENCHMARKS)
+def validatable_benchmark_name(request) -> str:
+    """Enumerate the names of benchmarks whose semantics can be validated."""
+    yield request.param
+
+
+@pytest.fixture(scope="module", params=NON_VALIDATABLE_BENCHMARKS)
+def non_validatable_benchmark_name(request) -> str:
+    """Enumerate the names of benchmarks whose semantics cannot be validated."""
     yield request.param
 
 

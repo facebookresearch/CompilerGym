@@ -3,27 +3,14 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Integrations tests for the LLVM CompilerGym environments."""
-import sys
 import tempfile
 from pathlib import Path
-from typing import Set
 
 from compiler_gym.envs import LlvmEnv
-from compiler_gym.envs.llvm import datasets
 from compiler_gym.envs.llvm.datasets import get_llvm_benchmark_validation_callback
 from tests.test_main import main
 
-pytest_plugins = ["tests.envs.llvm.fixtures"]
-
-# The set of cBench benchmarks which do not have support for semantics
-# validation.
-CBENCH_VALIDATION_EXCLUDE_LIST: Set[str] = {
-    "benchmark://cBench-v0/ispell",
-    "benchmark://cBench-v0/stringsearch2",
-}
-if sys.platform == "darwin":
-    CBENCH_VALIDATION_EXCLUDE_LIST.add("benchmark://cBench-v0/lame")
-    CBENCH_VALIDATION_EXCLUDE_LIST.add("benchmark://cBench-v0/ghostscript")
+pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
 def test_no_validation_callback_for_custom_benchmark(env: LlvmEnv):
@@ -42,16 +29,23 @@ def test_no_validation_callback_for_custom_benchmark(env: LlvmEnv):
     assert validation_cb is None
 
 
-def test_validate_cBench_unoptimized(env: LlvmEnv, benchmark_name: str):
-    """Run the validation routine on unoptimized version of all cBench benchmarks."""
-    env.reset(benchmark=benchmark_name)
-    cb = datasets.get_llvm_benchmark_validation_callback(env)
+def test_validate_unoptimized_benchmark(env: LlvmEnv, validatable_benchmark_name: str):
+    """Run the validation routine on unoptimized versions of all benchmarks."""
+    env.reset(benchmark=validatable_benchmark_name)
+    cb = get_llvm_benchmark_validation_callback(env)
 
-    if benchmark_name in CBENCH_VALIDATION_EXCLUDE_LIST:
-        assert cb is None
-    else:
-        assert cb
-        assert cb(env) is None
+    assert cb
+    assert cb(env) is None
+
+
+def test_non_validatable_benchmark_callback(
+    env: LlvmEnv, non_validatable_benchmark_name: str
+):
+    """Run the validation routine on unoptimized versions of all benchmarks."""
+    env.reset(benchmark=non_validatable_benchmark_name)
+    cb = get_llvm_benchmark_validation_callback(env)
+
+    assert cb is None
 
 
 if __name__ == "__main__":

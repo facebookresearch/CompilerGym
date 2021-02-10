@@ -3,13 +3,13 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-py_library(
-    name = "fixtures",
-    testonly = 1,
-    srcs = ["fixtures.py"],
-    visibility = [
-        "//examples:__subpackages__",
-        "//tests:__subpackages__",
+py_test(
+    name = "compiler_env_test",
+    srcs = ["compiler_env_test.py"],
+    deps = [
+        "//compiler_gym/datasets",
+        "//compiler_gym/envs",
+        "//tests:test_main",
     ],
 )
 

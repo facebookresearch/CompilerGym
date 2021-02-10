@@ -23,6 +23,16 @@ Testing
         other tests that require the python package to be installed. This is
         expensive and not typically required for local development.
 
+    make install-fuzz
+        Build and install the python package (equivalent to 'make install'),
+        then run the fuzz testing suite. Fuzz tests are tests that generate
+        their own inputs and run in a loop until an error has been found, or
+        until a minimum number of seconds have elapsed. This minimum time is
+        controlled using a FUZZ_SECONDS variable. The default is 300 seconds (5
+        minutes). Override this value at the command line, for example
+        `FUZZ_SECONDS=60 make install-fuzz` will run the fuzz tests for a
+        minimum of one minute.
+
     make itest
         Run the test suite continuously on change. This is equivalent to
         manually running `make test` when a source file is modified. Note that
@@ -199,9 +209,21 @@ pytest:
 	mkdir -p /tmp/compiler_gym/wheel_tests
 	rm -f /tmp/compiler_gym/wheel_tests/tests
 	ln -s $(ROOT)/tests /tmp/compiler_gym/wheel_tests
-	cd /tmp/compiler_gym/wheel_tests && pytest tests
+	cd /tmp/compiler_gym/wheel_tests && pytest -n auto tests -k "not fuzz"
 
 install-test: | install tests-datasets pytest
+
+# The minimum number of seconds to run the fuzz tests in a loop for. Override
+# this at the commandline, e.g. `FUZZ_SECONDS=1800 make fuzz`.
+FUZZ_SECONDS ?= 300
+
+fuzz:
+	mkdir -p /tmp/compiler_gym/wheel_fuzz_tests
+	rm -f /tmp/compiler_gym/wheel_fuzz_tests/tests
+	ln -s $(ROOT)/tests /tmp/compiler_gym/wheel_fuzz_tests
+	cd /tmp/compiler_gym/wheel_fuzz_tests && pytest tests -p no:sugar -x -vv -k fuzz --seconds=$(FUZZ_SECONDS)
+
+install-fuzz: | install tests-datasets fuzz
 
 post-install-test:
 	$(MAKE) -C examples/makefile_integration clean
@@ -224,17 +246,27 @@ install: bazel-build
 # Tidying up #
 ##############
 
+# A list of all filesystem locations that CompilerGym may use for storing
+# files and data.
+COMPILER_GYM_DATA_FILE_LOCATIONS = \
+    $(HOME)/.cache/compiler_gym \
+    $(HOME)/.local/share/compiler_gym \
+    $(HOME)/logs/compiler_gym \
+    /dev/shm/compiler_gym \
+    /tmp/compiler_gym \
+    $(NULL)
+
 .PHONY: clean distclean uninstall purge
 
 clean:
-	$(MAKE) -C docs clean
+	$(MAKE) -C docs clean || true
 	rm -rf $(GENERATED_DOCS) $(DISTTOOLS_OUTS)
 
 distclean: clean
 	bazel clean --expunge
 
 uninstall:
-	$(PYTHON) -m pip uninstall compiler_gym
+	$(PYTHON) -m pip uninstall -y compiler_gym
 
 purge: distclean uninstall
-	rm -rf $(HOME)/.cache/compiler_gym $(HOME)/logs/compiler_gym $(HOME)/.local/share/compiler_gym
+	rm -rf $(COMPILER_GYM_DATA_FILE_LOCATIONS)

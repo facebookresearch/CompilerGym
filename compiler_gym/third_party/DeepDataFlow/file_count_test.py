@@ -25,7 +25,7 @@ def subset(request):
 
 
 def test_deep_dataflow_file_count(subset: str):
-    bitcode_dir = runfiles_path("CompilerGym/third_party/DeepDataFlow") / subset
+    bitcode_dir = runfiles_path("compiler_gym/third_party/DeepDataFlow") / subset
     num_files = len([f for f in bitcode_dir.iterdir() if f.name.endswith(".bc")])
     assert num_files == EXPECTED_NUMBER_OF_BITCODE_FILES[subset]
 

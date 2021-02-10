@@ -8,7 +8,7 @@ from compiler_gym.util.registration import register
 from compiler_gym.util.runfiles_path import runfiles_path
 
 _EXAMPLE_SERVICE_BINARY = runfiles_path(
-    "CompilerGym/examples/example_compiler_gym_service/service/service"
+    "examples/example_compiler_gym_service/service/service"
 )
 
 

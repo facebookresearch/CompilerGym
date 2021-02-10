@@ -23,7 +23,7 @@ from compiler_gym.util.download import download
 from compiler_gym.util.runfiles_path import cache_path, runfiles_path, site_data_path
 from compiler_gym.util.timer import Timer
 
-_CLANG = runfiles_path("CompilerGym/compiler_gym/third_party/llvm/clang")
+_CLANG = runfiles_path("compiler_gym/third_party/llvm/clang")
 
 _CBENCH_DATA = site_data_path("llvm/cBench-v0-runtime-data/runtime_data")
 _CBENCH_DATA_URL = (
@@ -202,7 +202,7 @@ def _compile_and_run_bitcode_file(
         )
     assert binary.is_file()
 
-    # Create a barebones environment to run benchmark in.
+    # Create a barebones execution environment for the benchmark.
     env = {
         "TMPDIR": os.environ.get("TMPDIR", ""),
         "HOME": os.environ.get("HOME", ""),
@@ -285,8 +285,8 @@ def _make_cBench_validator(
             "$D", str(_CBENCH_DATA)
         )
 
+        # Create a temporary working directory to execute the benchmark in.
         with tempfile.TemporaryDirectory(dir=env.service.connection.working_dir) as d:
-            # Execute the benchmark in a temporary working directory.
             cwd = Path(d)
             # Translate the output file names into paths inside the working
             # directory.
@@ -371,19 +371,22 @@ def _make_cBench_validator(
                     ["diff", str(path), f"{path}.gold_standard"],
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
-                    universal_newlines=True,
                 )
                 stdout, _ = diff.communicate()
                 if diff.returncode:
                     if stdout.startswith("Binary files "):
                         return f"Benchmark output file '{path.name}' differs from (binary diff)"
-                    return f"Benchmark output file '{path.name}' differs from expected: {stdout}"
+                    try:
+                        stdout = stdout.decode("utf-8")
+                        return f"Benchmark output file '{path.name}' differs from expected: {stdout}"
+                    except UnicodeDecodeError:
+                        return f"Benchmark output file '{path.name}' differs from (binary diff)"
 
     return validator_cb
 
 
 # A map from benchmark name to validation callbacks. Defined below.
-_VALIDATORS: Dict[
+VALIDATORS: Dict[
     str, List[Callable[["LlvmEnv"], Optional[str]]]  # noqa: F821
 ] = defaultdict(list)
 
@@ -423,7 +426,7 @@ def validator(
     linkopts = linkopts or []
     env = env or {}
 
-    _VALIDATORS[benchmark].append(
+    VALIDATORS[benchmark].append(
         _make_cBench_validator(
             cmd=cmd,
             input_files=infiles,
@@ -451,7 +454,7 @@ def get_llvm_benchmark_validation_callback(
         argument and returns an optional string containing a validation error
         message.
     """
-    validators = _VALIDATORS.get(env.benchmark)
+    validators = VALIDATORS.get(env.benchmark)
 
     # No match.
     if not validators:
@@ -548,11 +551,12 @@ for i in range(1, 21):
         outs=["output.txt"],
     )
 
-    validator(
-        benchmark="benchmark://cBench-v0/bzip2",
-        cmd=f"$BIN -d -k -f -c $D/bzip2_data/{i}.bz2",
-        data=[f"bzip2_data/{i}.bz2"],
-    )
+    # TODO(cummins): Investigate.
+    # validator(
+    #     benchmark="benchmark://cBench-v0/bzip2",
+    #     cmd=f"$BIN -d -k -f -c $D/bzip2_data/{i}.bz2",
+    #     data=[f"bzip2_data/{i}.bz2"],
+    # )
 
     validator(
         benchmark="benchmark://cBench-v0/crc32",
@@ -566,11 +570,12 @@ for i in range(1, 21):
         data=[f"network_dijkstra_data/{i}.dat"],
     )
 
-    validator(
-        benchmark="benchmark://cBench-v0/gsm",
-        cmd=f"$BIN -fps -c $D/telecom_gsm_data/{i}.au",
-        data=[f"telecom_gsm_data/{i}.au"],
-    )
+    # TODO(cummins): Investigate.
+    # validator(
+    #     benchmark="benchmark://cBench-v0/gsm",
+    #     cmd=f"$BIN -fps -c $D/telecom_gsm_data/{i}.au",
+    #     data=[f"telecom_gsm_data/{i}.au"],
+    # )
 
     # TODO(cummins): ispell executable appears broken. Investigation needed.
     # validator(
@@ -579,19 +584,21 @@ for i in range(1, 21):
     #     data = [f"office_data/{i}.txt"],
     # )
 
-    validator(
-        benchmark="benchmark://cBench-v0/jpeg-c",
-        cmd=f"$BIN -dct int -progressive -outfile output.jpeg $D/consumer_jpeg_data/{i}.ppm",
-        data=[f"consumer_jpeg_data/{i}.ppm"],
-        outs=["output.jpeg"],
-    )
+    # TODO(cummins): Investigate.
+    # validator(
+    #     benchmark="benchmark://cBench-v0/jpeg-c",
+    #     cmd=f"$BIN -dct int -progressive -outfile output.jpeg $D/consumer_jpeg_data/{i}.ppm",
+    #     data=[f"consumer_jpeg_data/{i}.ppm"],
+    #     outs=["output.jpeg"],
+    # )
 
-    validator(
-        benchmark="benchmark://cBench-v0/jpeg-d",
-        cmd=f"$BIN -dct int -outfile output.ppm $D/consumer_jpeg_data/{i}.jpg",
-        data=[f"consumer_jpeg_data/{i}.jpg"],
-        outs=["output.ppm"],
-    )
+    # TODO(cummins): Investigate.
+    # validator(
+    #     benchmark="benchmark://cBench-v0/jpeg-d",
+    #     cmd=f"$BIN -dct int -outfile output.ppm $D/consumer_jpeg_data/{i}.jpg",
+    #     data=[f"consumer_jpeg_data/{i}.jpg"],
+    #     outs=["output.ppm"],
+    # )
 
     validator(
         benchmark="benchmark://cBench-v0/patricia",
@@ -646,49 +653,54 @@ for i in range(1, 21):
         linkopts=["-lm"],
     )
 
-    validator(
-        benchmark="benchmark://cBench-v0/tiff2bw",
-        cmd=f"$BIN $D/consumer_tiff_data/{i}.tif output.tif",
-        data=[f"consumer_tiff_data/{i}.tif"],
-        outs=["output.tif"],
-        linkopts=["-lm"],
-    )
+    # TODO(cummins): Investigate.
+    # validator(
+    #     benchmark="benchmark://cBench-v0/tiff2bw",
+    #     cmd=f"$BIN $D/consumer_tiff_data/{i}.tif output.tif",
+    #     data=[f"consumer_tiff_data/{i}.tif"],
+    #     outs=["output.tif"],
+    #     linkopts=["-lm"],
+    # )
 
-    validator(
-        benchmark="benchmark://cBench-v0/tiff2rgba",
-        cmd=f"$BIN $D/consumer_tiff_data/{i}.tif output.tif",
-        data=[f"consumer_tiff_data/{i}.tif"],
-        outs=["output.tif"],
-        linkopts=["-lm"],
-    )
+    # TODO(cummins): Investigate.
+    # validator(
+    #     benchmark="benchmark://cBench-v0/tiff2rgba",
+    #     cmd=f"$BIN $D/consumer_tiff_data/{i}.tif output.tif",
+    #     data=[f"consumer_tiff_data/{i}.tif"],
+    #     outs=["output.tif"],
+    #     linkopts=["-lm"],
+    # )
 
-    validator(
-        benchmark="benchmark://cBench-v0/tiffdither",
-        cmd=f"$BIN $D/consumer_tiff_data/{i}.bw.tif out.tif",
-        data=[f"consumer_tiff_data/{i}.bw.tif"],
-        outs=["out.tif"],
-        linkopts=["-lm"],
-    )
+    # TODO(cummins): Investigate.
+    # validator(
+    #     benchmark="benchmark://cBench-v0/tiffdither",
+    #     cmd=f"$BIN $D/consumer_tiff_data/{i}.bw.tif out.tif",
+    #     data=[f"consumer_tiff_data/{i}.bw.tif"],
+    #     outs=["out.tif"],
+    #     linkopts=["-lm"],
+    # )
 
-    validator(
-        benchmark="benchmark://cBench-v0/tiffmedian",
-        cmd=f"$BIN $D/consumer_tiff_data/{i}.nocomp.tif output.tif",
-        data=[f"consumer_tiff_data/{i}.nocomp.tif"],
-        outs=["output.tif"],
-        linkopts=["-lm"],
-    )
+    # TODO(cummins): Investigate.
+    # validator(
+    #     benchmark="benchmark://cBench-v0/tiffmedian",
+    #     cmd=f"$BIN $D/consumer_tiff_data/{i}.nocomp.tif output.tif",
+    #     data=[f"consumer_tiff_data/{i}.nocomp.tif"],
+    #     outs=["output.tif"],
+    #     linkopts=["-lm"],
+    # )
 
     # NOTE(cummins): On macOS the following benchmarks abort with an illegal
     # hardware instruction error.
     if sys.platform != "darwin":
-        validator(
-            benchmark="benchmark://cBench-v0/lame",
-            cmd=f"$BIN $D/consumer_data/{i}.wav output.mp3",
-            data=[f"consumer_data/{i}.wav"],
-            outs=["output.mp3"],
-            compare_output=False,
-            linkopts=["-lm"],
-        )
+        # TODO(cummins): Investigate.
+        # validator(
+        #     benchmark="benchmark://cBench-v0/lame",
+        #     cmd=f"$BIN $D/consumer_data/{i}.wav output.mp3",
+        #     data=[f"consumer_data/{i}.wav"],
+        #     outs=["output.mp3"],
+        #     compare_output=False,
+        #     linkopts=["-lm"],
+        # )
 
         validator(
             benchmark="benchmark://cBench-v0/ghostscript",

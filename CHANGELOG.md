@@ -1,6 +1,6 @@
 ## Release 0.1.2 (2021-01-25)
 
-* Add a new `compiler_gym.views.ObservationView.add_derviced_space(...)` API
+* Add a new `compiler_gym.views.ObservationView.add_derived_space(...)` API
   for constructing derived observation spaces.
 * Added default reward and observation values for `env.step()` in case of
   service failure.

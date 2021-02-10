@@ -9,7 +9,7 @@ import pytest
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from tests.test_main import main
 
-pytest_plugins = ["tests.envs.llvm.fixtures"]
+pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
 def test_reward_space(env: LlvmEnv):

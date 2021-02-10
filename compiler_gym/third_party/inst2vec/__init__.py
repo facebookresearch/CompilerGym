@@ -8,10 +8,10 @@ from compiler_gym.third_party.inst2vec import inst2vec_preprocess
 from compiler_gym.util.runfiles_path import runfiles_path
 
 _PICKLED_VOCABULARY = runfiles_path(
-    "CompilerGym/compiler_gym/third_party/inst2vec/dictionary.pickle"
+    "compiler_gym/third_party/inst2vec/dictionary.pickle"
 )
 _PICKLED_EMBEDDINGS = runfiles_path(
-    "CompilerGym/compiler_gym/third_party/inst2vec/embeddings.pickle"
+    "compiler_gym/third_party/inst2vec/embeddings.pickle"
 )
 
 
