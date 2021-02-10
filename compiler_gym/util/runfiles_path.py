@@ -31,12 +31,13 @@ def runfiles_path(relpath: str) -> Path:
         try:
             from rules_python.python.runfiles import runfiles
 
-            return Path(runfiles.Create().Rlocation(relpath))
+            return Path(
+                runfiles.Create().Rlocation(
+                    "CompilerGym" if relpath == "." else f"CompilerGym/{relpath}"
+                )
+            )
         except ModuleNotFoundError:
-            # Try to find the files relative to the current file, assuming that
-            # they are all given as paths "CompilerGym/compiler_gym/foo/bar.txt"
-            # and such.
-            return _PACKAGE_ROOT / Path(*Path(relpath).parts[1:])
+            return _PACKAGE_ROOT / relpath
 
 
 def site_data_path(relpath: str) -> Path:

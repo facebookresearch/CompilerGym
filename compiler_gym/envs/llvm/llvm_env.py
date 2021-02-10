@@ -22,17 +22,15 @@ from compiler_gym.util.runfiles_path import runfiles_path, site_data_path
 from compiler_gym.views import ObservationView
 
 _ACTIONS_LIST = Path(
-    runfiles_path("CompilerGym/compiler_gym/envs/llvm/service/passes/actions_list.txt")
+    runfiles_path("compiler_gym/envs/llvm/service/passes/actions_list.txt")
 )
 
 _FLAGS_LIST = Path(
-    runfiles_path("CompilerGym/compiler_gym/envs/llvm/service/passes/actions_flags.txt")
+    runfiles_path("compiler_gym/envs/llvm/service/passes/actions_flags.txt")
 )
 
 _DESCRIPTIONS_LIST = Path(
-    runfiles_path(
-        "CompilerGym/compiler_gym/envs/llvm/service/passes/actions_descriptions.txt"
-    )
+    runfiles_path("compiler_gym/envs/llvm/service/passes/actions_descriptions.txt")
 )
 
 

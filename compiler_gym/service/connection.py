@@ -221,7 +221,7 @@ class ManagedConnection(Connection):
 
         # Set the root of the runfiles directory.
         env = os.environ.copy()
-        env["COMPILER_GYM_RUNFILES"] = str(runfiles_path("CompilerGym"))
+        env["COMPILER_GYM_RUNFILES"] = str(runfiles_path("."))
 
         # Set environment variable COMPILER_GYM_SERVICE_DEBUG=1 to pipe
         # local service output to stderr. Set COMPILER_GYM_SERVICE_LOG_LEVEL=val

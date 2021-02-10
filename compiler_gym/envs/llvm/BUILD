@@ -24,6 +24,7 @@ py_library(
         "//compiler_gym/third_party/llvm:clang",
         "//compiler_gym/third_party/llvm:llvm-link",
     ],
+    visibility = ["//compiler_gym:__subpackages__"],
     deps = [
         "//compiler_gym/service/proto",
         "//compiler_gym/util",

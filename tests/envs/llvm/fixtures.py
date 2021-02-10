@@ -14,12 +14,10 @@ from compiler_gym.envs import CompilerEnv
 from compiler_gym.util.runfiles_path import runfiles_path
 
 ACTIONS_LIST = Path(
-    runfiles_path("CompilerGym/compiler_gym/envs/llvm/service/passes/actions_flags.txt")
+    runfiles_path("compiler_gym/envs/llvm/service/passes/actions_flags.txt")
 )
 
-BENCHMARKS_LIST = Path(
-    runfiles_path("CompilerGym/compiler_gym/third_party/cBench/benchmarks.txt")
-)
+BENCHMARKS_LIST = Path(runfiles_path("compiler_gym/third_party/cBench/benchmarks.txt"))
 
 
 def _read_list_file(path: Path) -> Iterable[str]:
