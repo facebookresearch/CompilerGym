@@ -83,20 +83,6 @@ py_test(
 )
 
 py_test(
-    name = "deterministic_actions_test",
-    timeout = "eternal",
-    srcs = ["deterministic_actions_test.py"],
-    shard_count = 32,
-    tags = ["manual"],
-    deps = [
-        "//compiler_gym/envs",
-        "//tests:test_main",
-        "//tests/pytest_plugins:common",
-        "//tests/pytest_plugins:llvm",
-    ],
-)
-
-py_test(
     name = "fork_env_test",
     timeout = "short",
     srcs = ["fork_env_test.py"],
