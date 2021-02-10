@@ -28,11 +28,14 @@ We actively welcome your pull requests.
 
 1. Fork [the repo](https://github.com/facebookresearch/CompilerGym) and create
    your branch from `development`.
-2. If you've added code that should be tested, add tests.
-3. If you've changed APIs, update the documentation.
-4. Ensure the test suite passes.
-5. Make sure your code lints (see "Code Style" below).
-6. If you haven't already, complete the Contributor License Agreement
+2. Follow the instructions for
+   [building from source](https://github.com/facebookresearch/CompilerGym#building-from-source)
+   to set up your environment.
+3. If you've added code that should be tested, add tests.
+4. If you've changed APIs, update the [documentation](/docs/source).
+5. Ensure the `make test` suite passes.
+6. Make sure your code lints (see "Code Style" below).
+7. If you haven't already, complete the Contributor License Agreement
    ("CLA").
 
 
