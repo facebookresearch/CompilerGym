@@ -15,7 +15,7 @@ from compiler_gym.service.proto import Benchmark, File
 from compiler_gym.util.runfiles_path import runfiles_path
 from tests.test_main import main
 
-pytest_plugins = ["tests.envs.llvm.fixtures"]
+pytest_plugins = ["tests.llvm.fixtures"]
 
 EXAMPLE_BITCODE_FILE = runfiles_path(
     "compiler_gym/third_party/cBench/cBench-v0/crc32.bc"

@@ -8,7 +8,7 @@ from time import time
 from compiler_gym.envs import LlvmEnv
 from tests.test_main import main
 
-pytest_plugins = ["tests.envs.llvm.fixtures"]
+pytest_plugins = ["tests.llvm.fixtures"]
 
 
 FUZZ_TIME_SECONDS = 30

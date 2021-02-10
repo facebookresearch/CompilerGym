@@ -7,7 +7,7 @@
 from compiler_gym.envs import CompilerEnv
 from tests.test_main import main
 
-pytest_plugins = ["tests.envs.llvm.fixtures"]
+pytest_plugins = ["tests.llvm.fixtures"]
 
 
 def test_step(env: CompilerEnv, observation_space: str, reward_space: str):

@@ -12,7 +12,7 @@ from compiler_gym.envs import CompilerEnv
 from compiler_gym.service.proto import Benchmark, File
 from tests.test_main import main
 
-pytest_plugins = ["tests.envs.llvm.fixtures"]
+pytest_plugins = ["tests.llvm.fixtures"]
 
 
 def test_add_benchmark_invalid_protocol(env: CompilerEnv):

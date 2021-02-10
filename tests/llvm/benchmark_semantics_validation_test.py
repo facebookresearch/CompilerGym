@@ -9,11 +9,10 @@ from pathlib import Path
 from typing import Set
 
 from compiler_gym.envs import LlvmEnv
-from compiler_gym.envs.llvm import datasets
 from compiler_gym.envs.llvm.datasets import get_llvm_benchmark_validation_callback
 from tests.test_main import main
 
-pytest_plugins = ["tests.envs.llvm.fixtures"]
+pytest_plugins = ["tests.llvm.fixtures"]
 
 # The set of cBench benchmarks which do not have support for semantics
 # validation.
@@ -45,7 +44,7 @@ def test_no_validation_callback_for_custom_benchmark(env: LlvmEnv):
 def test_validate_cBench_unoptimized(env: LlvmEnv, benchmark_name: str):
     """Run the validation routine on unoptimized version of all cBench benchmarks."""
     env.reset(benchmark=benchmark_name)
-    cb = datasets.get_llvm_benchmark_validation_callback(env)
+    cb = get_llvm_benchmark_validation_callback(env)
 
     if benchmark_name in CBENCH_VALIDATION_EXCLUDE_LIST:
         assert cb is None

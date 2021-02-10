@@ -11,7 +11,7 @@ from compiler_gym.envs import LlvmEnv
 from tests.fixtures import skip_on_ci
 from tests.test_main import main
 
-pytest_plugins = ["tests.envs.llvm.fixtures"]
+pytest_plugins = ["tests.llvm.fixtures"]
 
 
 ACTION_REPTITION_COUNT = 20
