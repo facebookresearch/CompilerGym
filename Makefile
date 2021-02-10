@@ -237,7 +237,7 @@ COMPILER_GYM_DATA_FILE_LOCATIONS = \
 .PHONY: clean distclean uninstall purge
 
 clean:
-	$(MAKE) -C docs clean
+	$(MAKE) -C docs clean || true
 	rm -rf $(GENERATED_DOCS) $(DISTTOOLS_OUTS)
 
 distclean: clean
