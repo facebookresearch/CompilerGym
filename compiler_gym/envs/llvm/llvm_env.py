@@ -19,7 +19,6 @@ from compiler_gym.spaces import Commandline, CommandlineFlag, Scalar, Sequence
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_NAMES
 from compiler_gym.third_party.inst2vec import Inst2vecEncoder
 from compiler_gym.util.runfiles_path import runfiles_path, site_data_path
-from compiler_gym.views import ObservationView
 
 _ACTIONS_LIST = Path(
     runfiles_path("compiler_gym/envs/llvm/service/passes/actions_list.txt")
@@ -45,13 +44,6 @@ _ACTIONS = list(_read_list_file(_ACTIONS_LIST))
 _FLAGS = dict(zip(_ACTIONS, _read_list_file(_FLAGS_LIST)))
 _DESCRIPTIONS = dict(zip(_ACTIONS, _read_list_file(_DESCRIPTIONS_LIST)))
 _INST2VEC_ENCODER = Inst2vecEncoder()
-
-
-class LlvmObservationView(ObservationView):
-    """An extended observation spaces view for LLVM."""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class LlvmEnv(CompilerEnv):
@@ -148,10 +140,6 @@ class LlvmEnv(CompilerEnv):
     def make_benchmark(*args, **kwargs):
         """Alias to :func:`llvm.make_benchmark() <compiler_gym.envs.llvm.make_benchmark>`."""
         return make_benchmark(*args, **kwargs)
-
-    @property
-    def _observation_view_type(self):
-        return LlvmObservationView
 
     def step(self, action: int) -> step_t:
         self.actions.append(action)
