@@ -213,13 +213,18 @@ class LlvmEnv(CompilerEnv):
             benchmark = new_env.make_benchmark(bitcode_file)
             new_env.reset(benchmark=benchmark)
 
+            # This "custom benchmark" is only needed for initialization and
+            # must be deleted. Otherwise calling new_env.fork() will try and
+            # copy this file.
+            del new_env._custom_benchmarks[benchmark.uri]
+
         # Copy over the mutable episode state.
         new_env.actions = self.actions.copy()
 
         # Now that we have initialized the environment with the current state,
         # set the benchmark so that calls to new_env.reset() will correctly
         # revert the environment to the initial benchmark state.
-        new_env.__user_specified_benchmark_uri = self.benchmark
+        new_env._user_specified_benchmark_uri = self.benchmark
         # Set the "visible" name of the current benchmark to hide the fact that
         # we loaded from a custom bitcode file.
         new_env._benchmark_in_use_uri = self.benchmark

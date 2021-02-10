@@ -66,5 +66,20 @@ def test_fork_custom_benchmark(env: LlvmEnv):
         new_env.close()
 
 
+def test_fork_twice_test(env: LlvmEnv):
+    """Test that fork() on a forked environment works."""
+    env.reset(benchmark="cBench-v0/crc32")
+    fork_a = env.fork()
+    try:
+        fork_b = fork_a.fork()
+        try:
+            assert env.state == fork_a.state
+            assert fork_a.state == fork_b.state
+        finally:
+            fork_b.close()
+    finally:
+        fork_a.close()
+
+
 if __name__ == "__main__":
     main()
