@@ -242,8 +242,8 @@ class CompilerEnv(gym.Env):
         """
         self.metadata = {"render.modes": ["human", "ansi"]}
 
-        self.service_endpoint = service
-        self.connection_settings = connection_settings or ConnectionOpts()
+        self._service_endpoint: Union[str, Path] = service
+        self._connection_settings = connection_settings or ConnectionOpts()
         self.datasets_site_path: Optional[Path] = None
         self.available_datasets: Dict[str, Dataset] = {}
 
@@ -260,7 +260,7 @@ class CompilerEnv(gym.Env):
         self.action_space_name = action_space
 
         self.service = CompilerGymServiceConnection(
-            self.service_endpoint, self.connection_settings
+            self._service_endpoint, self._connection_settings
         )
 
         # Process the available action, observation, and reward spaces.
@@ -561,13 +561,13 @@ class CompilerEnv(gym.Env):
             If no aciton space is provided, the default action space is used.
         :return: The initial observation.
         """
-        if retry_count > self.connection_settings.init_max_attempts:
+        if retry_count > self._connection_settings.init_max_attempts:
             raise OSError(f"Failed to reset environment after {retry_count} attempts")
 
         # Start a new service if required.
         if self.service is None:
             self.service = CompilerGymServiceConnection(
-                self.service_endpoint, self.connection_settings
+                self._service_endpoint, self._connection_settings
             )
             # Re-register the custom benchmarks with the new service.
             self._add_custom_benchmarks(self._custom_benchmarks.values())

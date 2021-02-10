@@ -186,11 +186,11 @@ class LlvmEnv(CompilerEnv):
         # Create a new environment using the same base settings as the current
         # environment.
         new_env = LlvmEnv(
-            service=self.service_endpoint,
+            service=self._service_endpoint,
             observation_space=self.observation_space,
             reward_space=self.reward_space,
             action_space=self.action_space,
-            connection_settings=self.connection_settings,
+            connection_settings=self._connection_settings,
         )
 
         # Serialize the current program state to a bitcode file and use this to
