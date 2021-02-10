@@ -250,8 +250,8 @@ class CompilerEnv(gym.Env):
         # The benchmark that is currently being used, and the benchmark that
         # the user requested. Those do not always correlate, since the user
         # could request a random benchmark.
-        self._benchmark_in_use_uri: Optional[str] = None
-        self._user_specified_benchmark_uri: Optional[str] = None
+        self._benchmark_in_use_uri: Optional[str] = benchmark
+        self._user_specified_benchmark_uri: Optional[str] = benchmark
         # A map from benchmark URIs to Benchmark messages. We keep track of any
         # user-provided custom benchmarks so that we can register them with a
         # reset service.
@@ -293,12 +293,11 @@ class CompilerEnv(gym.Env):
         self.episode_reward: Optional[float] = None
         self.episode_start_time: float = time()
 
-        # Initialize eager observation/reward and benchmark.
+        # Initialize eager observation/reward.
         self._eager_observation_space: Optional[ObservationSpaceSpec] = None
         self._eager_reward_space: Optional[RewardSpaceSpec] = None
         self.observation_space = observation_space
         self.reward_space = reward_space
-        self.benchmark = benchmark
 
     @property
     def versions(self) -> GetVersionReply:
