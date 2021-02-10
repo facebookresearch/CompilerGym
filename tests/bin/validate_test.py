@@ -10,7 +10,7 @@ from absl import flags
 
 from compiler_gym.bin.validate import main
 from compiler_gym.util.capture_output import capture_output
-from tests.fixtures import skip_on_ci
+from tests.pytest_plugins.common import skip_on_ci
 from tests.test_main import main as _test_main
 
 

@@ -12,6 +12,6 @@ py_test(
         "//compiler_gym/envs",
         "//compiler_gym/util",
         "//tests:test_main",
-        "//tests/envs/llvm:fixtures",
+        "//tests/pytest_plugins:llvm",
     ],
 )

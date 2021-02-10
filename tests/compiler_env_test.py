@@ -102,5 +102,15 @@ def test_double_register_dataset(env: CompilerEnv):
     assert str(ctx.value) == f"Dataset already registered with name: {dataset.name}"
 
 
+def test_benchmark_constructor_arg(env: CompilerEnv):
+    env.close()  # Fixture only required to pull in dataset.
+
+    env = gym.make("llvm-v0", benchmark="cBench-v0/dijkstra")
+    try:
+        assert env.benchmark == "cBench-v0/dijkstra"
+    finally:
+        env.close()
+
+
 if __name__ == "__main__":
     main()

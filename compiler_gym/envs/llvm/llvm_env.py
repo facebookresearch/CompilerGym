@@ -19,20 +19,17 @@ from compiler_gym.spaces import Commandline, CommandlineFlag, Scalar, Sequence
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_NAMES
 from compiler_gym.third_party.inst2vec import Inst2vecEncoder
 from compiler_gym.util.runfiles_path import runfiles_path, site_data_path
-from compiler_gym.views import ObservationView
 
 _ACTIONS_LIST = Path(
-    runfiles_path("CompilerGym/compiler_gym/envs/llvm/service/passes/actions_list.txt")
+    runfiles_path("compiler_gym/envs/llvm/service/passes/actions_list.txt")
 )
 
 _FLAGS_LIST = Path(
-    runfiles_path("CompilerGym/compiler_gym/envs/llvm/service/passes/actions_flags.txt")
+    runfiles_path("compiler_gym/envs/llvm/service/passes/actions_flags.txt")
 )
 
 _DESCRIPTIONS_LIST = Path(
-    runfiles_path(
-        "CompilerGym/compiler_gym/envs/llvm/service/passes/actions_descriptions.txt"
-    )
+    runfiles_path("compiler_gym/envs/llvm/service/passes/actions_descriptions.txt")
 )
 
 
@@ -47,13 +44,6 @@ _ACTIONS = list(_read_list_file(_ACTIONS_LIST))
 _FLAGS = dict(zip(_ACTIONS, _read_list_file(_FLAGS_LIST)))
 _DESCRIPTIONS = dict(zip(_ACTIONS, _read_list_file(_DESCRIPTIONS_LIST)))
 _INST2VEC_ENCODER = Inst2vecEncoder()
-
-
-class LlvmObservationView(ObservationView):
-    """An extended observation spaces view for LLVM."""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
 
 
 class LlvmEnv(CompilerEnv):
@@ -151,10 +141,6 @@ class LlvmEnv(CompilerEnv):
         """Alias to :func:`llvm.make_benchmark() <compiler_gym.envs.llvm.make_benchmark>`."""
         return make_benchmark(*args, **kwargs)
 
-    @property
-    def _observation_view_type(self):
-        return LlvmObservationView
-
     def step(self, action: int) -> step_t:
         self.actions.append(action)
         return super().step(action)
@@ -200,11 +186,11 @@ class LlvmEnv(CompilerEnv):
         # Create a new environment using the same base settings as the current
         # environment.
         new_env = LlvmEnv(
-            service=self.service_endpoint,
+            service=self._service_endpoint,
             observation_space=self.observation_space,
             reward_space=self.reward_space,
             action_space=self.action_space,
-            connection_settings=self.connection_settings,
+            connection_settings=self._connection_settings,
         )
 
         # Serialize the current program state to a bitcode file and use this to
@@ -215,13 +201,19 @@ class LlvmEnv(CompilerEnv):
             benchmark = new_env.make_benchmark(bitcode_file)
             new_env.reset(benchmark=benchmark)
 
+            # This "custom benchmark" is only needed for initialization and
+            # must be deleted. Otherwise calling new_env.fork() will try and
+            # copy this file.
+            del new_env._custom_benchmarks[benchmark.uri]
+
         # Copy over the mutable episode state.
         new_env.actions = self.actions.copy()
+        new_env.episode_reward = self.episode_reward
 
         # Now that we have initialized the environment with the current state,
         # set the benchmark so that calls to new_env.reset() will correctly
         # revert the environment to the initial benchmark state.
-        new_env.__user_specified_benchmark_uri = self.benchmark
+        new_env._user_specified_benchmark_uri = self.benchmark
         # Set the "visible" name of the current benchmark to hide the fact that
         # we loaded from a custom bitcode file.
         new_env._benchmark_in_use_uri = self.benchmark

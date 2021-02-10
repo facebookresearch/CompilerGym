@@ -3,14 +3,16 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Tests for LlvmEnv.fork()."""
+import pytest
+
 from compiler_gym.envs import LlvmEnv
 from compiler_gym.util.runfiles_path import runfiles_path
 from tests.test_main import main
 
-pytest_plugins = ["tests.envs.llvm.fixtures"]
+pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 EXAMPLE_BITCODE_FILE = runfiles_path(
-    "CompilerGym/compiler_gym/third_party/cBench/cBench-v0/crc32.bc"
+    "compiler_gym/third_party/cBench/cBench-v0/crc32.bc"
 )
 EXAMPLE_BITCODE_IR_INSTRUCTION_COUNT = 196
 
@@ -64,6 +66,43 @@ def test_fork_custom_benchmark(env: LlvmEnv):
         assert ir(env) == ir(new_env)
     finally:
         new_env.close()
+
+
+def test_fork_twice_test(env: LlvmEnv):
+    """Test that fork() on a forked environment works."""
+    env.reset(benchmark="cBench-v0/crc32")
+    fork_a = env.fork()
+    try:
+        fork_b = fork_a.fork()
+        try:
+            assert env.state == fork_a.state
+            assert fork_a.state == fork_b.state
+        finally:
+            fork_b.close()
+    finally:
+        fork_a.close()
+
+
+@pytest.mark.xfail(reason="Scaled rewards use the incorrect scale for fork()")
+def test_fork_rewards(env: LlvmEnv, reward_space: str):
+    """Test that rewards of """
+    env.reward_space = reward_space
+    env.reset("cBench-v0/dijkstra")
+
+    actions = env.action_space.names
+    act_names = ["-mem2reg", "-simplifycfg"]
+    act_indcs = [actions.index(n) for n in act_names]
+
+    for i in range(len(act_indcs)):
+        act_indc = act_indcs[i]
+
+        forked = env.fork()
+        try:
+            _, env_reward, _, _ = env.step(act_indc)
+            _, fkd_reward, _, _ = forked.step(act_indc)
+            assert env_reward == fkd_reward
+        finally:
+            forked.close()
 
 
 if __name__ == "__main__":

@@ -31,12 +31,13 @@ def runfiles_path(relpath: str) -> Path:
         try:
             from rules_python.python.runfiles import runfiles
 
-            return Path(runfiles.Create().Rlocation(relpath))
+            return Path(
+                runfiles.Create().Rlocation(
+                    "CompilerGym" if relpath == "." else f"CompilerGym/{relpath}"
+                )
+            )
         except ModuleNotFoundError:
-            # Try to find the files relative to the current file, assuming that
-            # they are all given as paths "CompilerGym/compiler_gym/foo/bar.txt"
-            # and such.
-            return _PACKAGE_ROOT / Path(*Path(relpath).parts[1:])
+            return _PACKAGE_ROOT / relpath
 
 
 def site_data_path(relpath: str) -> Path:
@@ -75,3 +76,24 @@ def cache_path(relpath: str) -> Path:
         return Path("~/.cache/compiler_gym").expanduser() / relpath
     else:
         return Path("/tmp/compiler_gym/cache") / relpath
+
+
+def transient_cache_path(relpath: str) -> Path:
+    """Return a path within the transient cache directory.
+
+    The transient cache is a directory used to store files that do not need to persist beyond the
+    lifetime of the current process. When available, the temporary filesystem :code:`/dev/shm` will
+    be used. Else, :meth:`cache_path() <compiler_gym.cache_path>` is used as a fallback. Set the
+    environment variable :code:`$COMPILER_GYM_TRANSIENT_CACHE` to override the default location.
+
+    :param relpath: The relative path within the cache.
+    :return: The absolute path of the cache.
+    """
+    forced = os.environ.get("COMPILER_GYM_TRANSIENT_CACHE")
+    if forced:
+        return Path(forced) / relpath
+    elif Path("/dev/shm").is_dir():
+        return Path("/dev/shm/compiler_gym") / relpath
+    else:
+        # Fallback to using the regular cache.
+        return cache_path(relpath)

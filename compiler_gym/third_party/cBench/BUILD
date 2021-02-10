@@ -83,10 +83,11 @@ py_binary(
     name = "make_llvm_module",
     srcs = ["make_llvm_module.py"],
     data = [
-        "@llvm//10.0.0:clang",
-        "@llvm//10.0.0:llvm-link",
+        "//compiler_gym/third_party/llvm:clang",
+        "//compiler_gym/third_party/llvm:llvm-link",
     ],
     deps = [
+        "//compiler_gym/envs/llvm:benchmarks",
         "//compiler_gym/util",
     ],
 )

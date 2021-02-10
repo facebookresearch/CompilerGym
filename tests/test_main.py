@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 import os
 import sys
+from typing import List, Optional
 
 import gym
 import pytest
@@ -11,7 +12,7 @@ import pytest
 import compiler_gym  # noqa Register environments.
 
 
-def main():
+def main(extra_pytest_args: Optional[List[str]] = None):
     """The main entry point for the pytest runner.
 
     An example file which uses this:
@@ -25,6 +26,9 @@ def main():
             main()
 
     In the above, the single test_foo test will be executed.
+
+    :param extra_pytest_args: A list of additional command line options to pass
+        to pytest.
     """
     # Use isolated data directories for running tests.
     os.environ["COMPILER_GYM_SITE_DATA"] = "/tmp/compiler_gym/tests/site_data"
@@ -53,5 +57,7 @@ def main():
         pytest_args += [f"--shard-id={shard_index}", f"--num-shards={num_shards}"]
     else:
         pytest_args += ["-p", "no:pytest-shard"]
+
+    pytest_args += extra_pytest_args or []
 
     sys.exit(pytest.main(pytest_args))

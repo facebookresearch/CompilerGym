@@ -23,15 +23,20 @@ from compiler_gym.util.version import __version__  # isort:skip
 from compiler_gym.envs import COMPILER_GYM_ENVS, CompilerEnv, observation_t, step_t
 from compiler_gym.random_search import random_search
 from compiler_gym.util.download import download
-from compiler_gym.util.runfiles_path import cache_path, site_data_path
+from compiler_gym.util.runfiles_path import (
+    cache_path,
+    site_data_path,
+    transient_cache_path,
+)
 from compiler_gym.validate import ValidationResult, validate_state, validate_states
 
 # The top-level compiler_gym API.
 __all__ = [
     "__version__",
     "download",
-    "cache_path",
     "site_data_path",
+    "cache_path",
+    "transient_cache_path",
     "CompilerEnv",
     "COMPILER_GYM_ENVS",
     "observation_t",

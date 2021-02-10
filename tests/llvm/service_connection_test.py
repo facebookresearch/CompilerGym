@@ -14,7 +14,7 @@ from compiler_gym.service.connection import CompilerGymServiceConnection
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_DIM
 from tests.test_main import main
 
-pytest_plugins = ["tests.envs.llvm.fixtures"]
+pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
 @pytest.fixture(scope="function", params=["local", "service"])

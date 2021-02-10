@@ -25,7 +25,7 @@ from compiler_gym.service.proto import (
     ObservationSpace,
     RewardSpace,
 )
-from compiler_gym.util.runfiles_path import cache_path, runfiles_path
+from compiler_gym.util.runfiles_path import runfiles_path, transient_cache_path
 
 GRPC_CHANNEL_OPTIONS = [
     # Raise the default inbound message filter from 4MB.
@@ -42,7 +42,7 @@ class ConnectionOpts(NamedTuple):
     rpc_call_max_seconds: float = 300
     """The maximum number of seconds to wait for an RPC method call to succeed."""
 
-    init_max_seconds: float = 10
+    init_max_seconds: float = 30
     """The maximum number of seconds to spend attempting to establish a
     connection to the service before failing.
     """
@@ -52,10 +52,10 @@ class ConnectionOpts(NamedTuple):
     service before failing.
     """
 
-    local_service_port_init_max_seconds: float = 10
+    local_service_port_init_max_seconds: float = 30
     """The maximum number of seconds to wait for a local service to write the port.txt file."""
 
-    local_service_exit_max_seconds: float = 10
+    local_service_exit_max_seconds: float = 30
     """The maximum number of seconds to wait for a local service to terminate on close."""
 
     rpc_init_max_seconds: float = 3
@@ -175,7 +175,7 @@ def make_working_dir():
     """Make a working directory for a service. The calling code is responsible for
     removing this directory when done.
     """
-    service_directory = cache_path("service")
+    service_directory = transient_cache_path("service")
     timestamp = datetime.now().isoformat()
     random_hash = random.getrandbits(32)
     working_dir = Path(service_directory / f"{timestamp}-{random_hash:08x}")
@@ -214,14 +214,12 @@ class ManagedConnection(Connection):
         cmd = [
             f"./{local_service_binary.name}",
             f"--working_dir={self.working_dir}",
-            # We have to set --log_dir as it is recognized by glog
-            f"--log_dir={self.working_dir}/logs",
             args,
         ]
 
         # Set the root of the runfiles directory.
         env = os.environ.copy()
-        env["COMPILER_GYM_RUNFILES"] = str(runfiles_path("CompilerGym"))
+        env["COMPILER_GYM_RUNFILES"] = str(runfiles_path("."))
 
         # Set environment variable COMPILER_GYM_SERVICE_DEBUG=1 to pipe
         # local service output to stderr. Set COMPILER_GYM_SERVICE_LOG_LEVEL=val
