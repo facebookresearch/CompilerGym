@@ -244,7 +244,7 @@ distclean: clean
 	bazel clean --expunge
 
 uninstall:
-	$(PYTHON) -m pip uninstall compiler_gym
+	$(PYTHON) -m pip uninstall -y compiler_gym
 
 purge: distclean uninstall
 	rm -rf $(COMPILER_GYM_DATA_FILE_LOCATIONS)
