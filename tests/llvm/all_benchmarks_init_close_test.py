@@ -7,7 +7,7 @@
 from compiler_gym.envs import CompilerEnv
 from tests.test_main import main
 
-pytest_plugins = ["tests.llvm.fixtures"]
+pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
 def test_init_benchmark(env: CompilerEnv, benchmark_name: str):

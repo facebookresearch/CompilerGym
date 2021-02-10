@@ -10,7 +10,7 @@ from compiler_gym.envs import CompilerEnv, LlvmEnv, llvm
 from compiler_gym.service import CompilerGymServiceConnection
 from tests.test_main import main
 
-pytest_plugins = ["tests.llvm.fixtures"]
+pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 # Redefine this fixture since running all of the benchmarks in cBench would
 # take too long, but we do want to use at least one small and one large

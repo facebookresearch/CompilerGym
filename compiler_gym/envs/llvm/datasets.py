@@ -386,7 +386,7 @@ def _make_cBench_validator(
 
 
 # A map from benchmark name to validation callbacks. Defined below.
-_VALIDATORS: Dict[
+VALIDATORS: Dict[
     str, List[Callable[["LlvmEnv"], Optional[str]]]  # noqa: F821
 ] = defaultdict(list)
 
@@ -426,7 +426,7 @@ def validator(
     linkopts = linkopts or []
     env = env or {}
 
-    _VALIDATORS[benchmark].append(
+    VALIDATORS[benchmark].append(
         _make_cBench_validator(
             cmd=cmd,
             input_files=infiles,
@@ -454,7 +454,7 @@ def get_llvm_benchmark_validation_callback(
         argument and returns an optional string containing a validation error
         message.
     """
-    validators = _VALIDATORS.get(env.benchmark)
+    validators = VALIDATORS.get(env.benchmark)
 
     # No match.
     if not validators:

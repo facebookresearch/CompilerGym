@@ -10,7 +10,7 @@ from compiler_gym.envs import CompilerEnv
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_DIM
 from tests.test_main import main
 
-pytest_plugins = ["tests.llvm.fixtures"]
+pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
 def test_step(env: CompilerEnv, action_name: str):

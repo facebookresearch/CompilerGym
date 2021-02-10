@@ -10,7 +10,7 @@ import pytest
 from compiler_gym.envs import LlvmEnv
 from tests.test_main import main
 
-pytest_plugins = ["tests.llvm.fixtures"]
+pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 ACTION_REPTITION_COUNT = 50
 

@@ -17,7 +17,7 @@ from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.spaces import Sequence
 from tests.test_main import main
 
-pytest_plugins = ["tests.llvm.fixtures"]
+pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
 def test_eager_observation_space(env: LlvmEnv):

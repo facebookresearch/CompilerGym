@@ -37,6 +37,7 @@ py_library(
     data = [
         "//compiler_gym/third_party/llvm:clang",
     ],
+    visibility = ["//tests:__subpackages__"],
     deps = [
         "//compiler_gym/datasets:dataset",
         "//compiler_gym/util",

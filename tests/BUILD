@@ -13,16 +13,6 @@ py_test(
     ],
 )
 
-py_library(
-    name = "fixtures",
-    testonly = 1,
-    srcs = ["fixtures.py"],
-    visibility = [
-        "//examples:__subpackages__",
-        "//tests:__subpackages__",
-    ],
-)
-
 py_test(
     name = "random_search_test",
     timeout = "short",

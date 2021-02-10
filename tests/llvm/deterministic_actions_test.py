@@ -8,10 +8,10 @@ import hashlib
 import pytest
 
 from compiler_gym.envs import LlvmEnv
-from tests.fixtures import skip_on_ci
+from tests.pytest_plugins.common import skip_on_ci
 from tests.test_main import main
 
-pytest_plugins = ["tests.llvm.fixtures"]
+pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
 ACTION_REPTITION_COUNT = 20

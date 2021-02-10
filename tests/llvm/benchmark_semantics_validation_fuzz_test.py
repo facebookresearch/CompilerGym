@@ -10,7 +10,7 @@ from compiler_gym.envs import LlvmEnv
 from compiler_gym.envs.llvm.datasets import get_llvm_benchmark_validation_callback
 from tests.test_main import main
 
-pytest_plugins = ["tests.llvm.fixtures"]
+pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 # The set of cBench benchmarks which do not have support for semantics
 # validation.
