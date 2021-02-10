@@ -132,3 +132,6 @@ jobs:
                   CC: clang
                   CXX: clang++
                   BAZEL_BUILD_OPTS: --config=ci
+
+            - name: Uninstall
+              run: make purge

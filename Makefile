@@ -224,6 +224,16 @@ install: bazel-build
 # Tidying up #
 ##############
 
+# A list of all filesystem locations that CompilerGym may use for storing
+# files and data.
+COMPILER_GYM_DATA_FILE_LOCATIONS = \
+    $(HOME)/.cache/compiler_gym \
+    $(HOME)/.local/share/compiler_gym \
+    $(HOME)/logs/compiler_gym \
+    /dev/shm/compiler_gym \
+    /tmp/compiler_gym \
+    $(NULL)
+
 .PHONY: clean distclean uninstall purge
 
 clean:
@@ -237,4 +247,4 @@ uninstall:
 	$(PYTHON) -m pip uninstall compiler_gym
 
 purge: distclean uninstall
-	rm -rf $(HOME)/.cache/compiler_gym $(HOME)/logs/compiler_gym $(HOME)/.local/share/compiler_gym
+	rm -rf $(COMPILER_GYM_DATA_FILE_LOCATIONS)
