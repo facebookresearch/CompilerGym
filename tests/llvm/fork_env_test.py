@@ -3,6 +3,8 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Tests for LlvmEnv.fork()."""
+import pytest
+
 from compiler_gym.envs import LlvmEnv
 from compiler_gym.util.runfiles_path import runfiles_path
 from tests.test_main import main
@@ -79,6 +81,28 @@ def test_fork_twice_test(env: LlvmEnv):
             fork_b.close()
     finally:
         fork_a.close()
+
+
+@pytest.mark.xfail(reason="Scaled rewards use the incorrect scale for fork()")
+def test_fork_rewards(env: LlvmEnv, reward_space: str):
+    """Test that rewards of """
+    env.reward_space = reward_space
+    env.reset("cBench-v0/dijkstra")
+
+    actions = env.action_space.names
+    act_names = ["-mem2reg", "-simplifycfg"]
+    act_indcs = [actions.index(n) for n in act_names]
+
+    for i in range(len(act_indcs)):
+        act_indc = act_indcs[i]
+
+        forked = env.fork()
+        try:
+            _, env_reward, _, _ = env.step(act_indc)
+            _, fkd_reward, _, _ = forked.step(act_indc)
+            assert env_reward == fkd_reward
+        finally:
+            forked.close()
 
 
 if __name__ == "__main__":
