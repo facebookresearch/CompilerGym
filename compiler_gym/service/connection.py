@@ -214,8 +214,6 @@ class ManagedConnection(Connection):
         cmd = [
             f"./{local_service_binary.name}",
             f"--working_dir={self.working_dir}",
-            # We have to set --log_dir as it is recognized by glog
-            f"--log_dir={self.working_dir}/logs",
             args,
         ]
 
