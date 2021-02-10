@@ -208,6 +208,7 @@ class LlvmEnv(CompilerEnv):
 
         # Copy over the mutable episode state.
         new_env.actions = self.actions.copy()
+        new_env.episode_reward = self.episode_reward
 
         # Now that we have initialized the environment with the current state,
         # set the benchmark so that calls to new_env.reset() will correctly
