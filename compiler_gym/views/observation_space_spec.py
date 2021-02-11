@@ -11,7 +11,7 @@ from gym.spaces import Box, Space
 
 from compiler_gym.service import observation_t, scalar_range2tuple
 from compiler_gym.service.proto import Observation, ObservationSpace
-from compiler_gym.spaces import Sequence
+from compiler_gym.spaces import Scalar, Sequence
 
 
 def _json2nx(observation):
@@ -84,6 +84,12 @@ class ObservationSpaceSpec(object):
                 dtype=dtype,
             )
 
+        def make_scalar(scalar_range, dtype, defaults):
+            scalar_range_tuple = scalar_range2tuple(scalar_range, defaults)
+            return Scalar(
+                min=scalar_range_tuple[0], max=scalar_range_tuple[1], dtype=dtype
+            )
+
         def make_seq(scalar_range, dtype, defaults):
             return Sequence(
                 size_range=scalar_range2tuple(scalar_range, defaults),
@@ -92,10 +98,12 @@ class ObservationSpaceSpec(object):
             )
 
         # Translate from protocol buffer specification to python. There are
-        # three variables to derive: 'space', the gym.Space instance describing
-        # the space. 'cb' is a callback that translates from an Observation
-        # message to a python type. and 'to_string' is a callback that
-        # translates from a python type to a string for printing.
+        # three variables to derive:
+        #   (1) space: the gym.Space instance describing the space.
+        #   (2) cb: is a callback that translates from an Observation message to
+        #           a python type.
+        #   (3) to_string: is a callback that translates from a python type to a
+        #           string for printing.
         if proto.opaque_data_format == "json://networkx/MultiDiGraph":
             # TODO(cummins): Add a Graph space.
             space = make_seq(proto.string_size_range, str, (0, None))
@@ -153,8 +161,30 @@ class ObservationSpaceSpec(object):
                 return observation.binary_value
 
             to_string = str
+        elif shape_type == "scalar_int64_range":
+            space = make_scalar(
+                proto.scalar_int64_range,
+                np.int64,
+                (np.iinfo(np.int64).min, np.iinfo(np.int64).max),
+            )
+
+            def cb(observation):
+                return int(observation.scalar_int64)
+
+            to_string = str
+        elif shape_type == "scalar_double_range":
+            space = make_scalar(
+                proto.scalar_double_range, np.float64, (-np.inf, np.inf)
+            )
+
+            def cb(observation):
+                return int(observation.scalar_double)
+
+            to_string = str
         else:
-            raise TypeError(f"Cannot determine shape of ObservationSpace: {proto}")
+            raise TypeError(
+                f"Unknown shape '{shape_type}' for ObservationSpace:\n{proto}"
+            )
 
         return cls(
             id=proto.name,

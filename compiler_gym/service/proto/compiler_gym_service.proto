@@ -145,6 +145,8 @@ message Observation {
     DoubleList double_list = 2;
     string string_value = 3;
     bytes binary_value = 4;
+    int64 scalar_int64 = 5;
+    double scalar_scalar = 6;
   }
 }
 
@@ -184,6 +186,10 @@ message ObservationSpace {
     // observations are strings of at least 10 characters in length.
     ScalarRange string_size_range = 4;
     ScalarRange binary_size_range = 5;
+    // For scalar values, the _range field describes the bounds of the scalar
+    // value.
+    ScalarRange scalar_int64_range = 10;
+    ScalarRange scalar_double_range = 11;
   }
   // An optional string describing an opaque data format, e.g. a data structure
   // that is serialized to a string/binary array for transmission back to the
