@@ -59,9 +59,9 @@ message StartEpisodeRequest {
   // The name of the benchmark to use for this episode. If not
   // provided, a benchmark is chosen randomly by the service.
   string benchmark = 1;
-  // An index into the GetSpaces().action_space_list selecting the action space
-  // that is to be used for this episode. Once set, the action space cannot
-  // be changed for the duration of the episode.
+  // An index into the GetSpacesReply.action_space_list selecting the action
+  // space that is to be used for this episode. Once set, the action space
+  // cannot be changed for the duration of the episode.
   int32 action_space = 2;
   // Enable eager computation of observation. When set, every call to
   // takeAction() will return the observation given by this index into

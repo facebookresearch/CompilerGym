@@ -7,7 +7,7 @@ py_library(
     name = "example_compiler_gym_service",
     srcs = ["__init__.py"],
     data = [
-        "//examples/example_compiler_gym_service/service",
+        "//examples/example_compiler_gym_service/service:compiler_gym-example-service",
     ],
     deps = [
         "//compiler_gym/util",
