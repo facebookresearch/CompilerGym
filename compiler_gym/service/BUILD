@@ -34,6 +34,5 @@ py_library(
     visibility = ["//visibility:public"],
     deps = [
         "//compiler_gym/service/proto",
-        "//compiler_gym/spaces",
     ],
 )

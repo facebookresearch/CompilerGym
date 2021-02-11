@@ -4,7 +4,15 @@
 # LICENSE file in the root directory of this source tree.
 from compiler_gym.spaces.commandline import Commandline, CommandlineFlag
 from compiler_gym.spaces.named_discrete import NamedDiscrete
+from compiler_gym.spaces.reward import Reward
 from compiler_gym.spaces.scalar import Scalar
 from compiler_gym.spaces.sequence import Sequence
 
-__all__ = ["Scalar", "Sequence", "NamedDiscrete", "Commandline", "CommandlineFlag"]
+__all__ = [
+    "Scalar",
+    "Sequence",
+    "NamedDiscrete",
+    "Commandline",
+    "CommandlineFlag",
+    "Reward",
+]

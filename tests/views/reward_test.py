@@ -5,60 +5,51 @@
 """Unit tests for //compiler_gym/views."""
 import pytest
 
-from compiler_gym.service.proto import (
-    Reward,
-    RewardRequest,
-    RewardSpace,
-    ScalarLimit,
-    ScalarRange,
-)
 from compiler_gym.views import RewardView
 from tests.test_main import main
 
 
-class MockGetReward(object):
-    """Mock for the get_reward callack of RewardView."""
-
-    def __init__(self, ret=None):
-        self.called_reward_spaces = []
+class MockReward(object):
+    def __init__(self, id, ret=None):
+        self.id = id
         self.ret = list(reversed(ret or []))
+        self.observation_spaces = []
 
-    def __call__(self, request: RewardRequest):
-        self.called_reward_spaces.append(request.reward_space)
+    def update(self, *args, **kwargs):
         ret = self.ret[-1]
         del self.ret[-1]
         return ret
 
 
+class MockObservationView(object):
+    pass
+
+
 def test_empty_space():
+    reward = RewardView([], MockObservationView())
     with pytest.raises(ValueError) as ctx:
-        RewardView(MockGetReward(), [])
+        _ = reward["foo"]
     assert str(ctx.value) == "No reward spaces"
 
 
 def test_invalid_reward_name():
-    spaces = [RewardSpace(name="codesize", range=ScalarRange(min=ScalarLimit(value=0)))]
-    reward = RewardView(MockGetReward(), spaces)
+    reward = RewardView([MockReward(id="foo")], MockObservationView())
     with pytest.raises(KeyError):
         _ = reward["invalid"]
 
 
 def test_reward_values():
     spaces = [
-        RewardSpace(name="codesize", range=ScalarRange(max=ScalarLimit(value=0))),
-        RewardSpace(name="runtime", range=ScalarRange(min=ScalarLimit(value=0))),
+        MockReward(id="codesize", ret=[-5]),
+        MockReward(id="runtime", ret=[10]),
     ]
-    mock = MockGetReward(ret=[Reward(reward=-5), Reward(reward=10)])
-    reward = RewardView(mock, spaces)
+    reward = RewardView(spaces, MockObservationView())
 
     value = reward["codesize"]
     assert value == -5
 
     value = reward["runtime"]
     assert value == 10
-
-    # Check that the correct reward_space_list indices were used.
-    assert mock.called_reward_spaces == [0, 1]
 
 
 if __name__ == "__main__":

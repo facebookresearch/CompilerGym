@@ -32,10 +32,10 @@ def test_no_validation_callback_for_custom_benchmark(env: LlvmEnv):
 def test_validate_unoptimized_benchmark(env: LlvmEnv, validatable_benchmark_name: str):
     """Run the validation routine on unoptimized versions of all benchmarks."""
     env.reset(benchmark=validatable_benchmark_name)
-    cb = get_llvm_benchmark_validation_callback(env)
+    validation_cb = get_llvm_benchmark_validation_callback(env)
 
-    assert cb
-    assert cb(env) is None
+    assert validation_cb
+    assert validation_cb(env) is None
 
 
 def test_non_validatable_benchmark_callback(
@@ -43,9 +43,9 @@ def test_non_validatable_benchmark_callback(
 ):
     """Run the validation routine on unoptimized versions of all benchmarks."""
     env.reset(benchmark=non_validatable_benchmark_name)
-    cb = get_llvm_benchmark_validation_callback(env)
+    validation_cb = get_llvm_benchmark_validation_callback(env)
 
-    assert cb is None
+    assert validation_cb is None
 
 
 if __name__ == "__main__":

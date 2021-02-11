@@ -118,14 +118,10 @@ Status writeBitcodeToFile(const llvm::Module& module, const fs::path& path) {
 }  // anonymous namespace
 
 LlvmEnvironment::LlvmEnvironment(std::unique_ptr<Benchmark> benchmark, LlvmActionSpace actionSpace,
-                                 std::optional<LlvmObservationSpace> eagerObservationSpace,
-                                 std::optional<LlvmRewardSpace> eagerRewardSpace,
                                  const boost::filesystem::path& workingDirectory)
     : workingDirectory_(workingDirectory),
       benchmark_(std::move(benchmark)),
       actionSpace_(actionSpace),
-      eagerObservationSpace_(eagerObservationSpace),
-      eagerRewardSpace_(eagerRewardSpace),
       tlii_(getTargetLibraryInfo(benchmark_->module())),
       actionCount_(0) {
   // Initialize LLVM.
@@ -145,18 +141,10 @@ LlvmEnvironment::LlvmEnvironment(std::unique_ptr<Benchmark> benchmark, LlvmActio
 
   // Verify the module now to catch any problems early.
   CHECK(verifyModuleStatus(benchmark_->module()).ok());
-
-  // Compute initial eager observation and reward if required.
-  // TODO(cummins): Defer these so that we can replace CHECKs with status codes.
-  if (eagerObservationSpace_.has_value()) {
-    CHECK(getObservation(eagerObservationSpace_.value(), &eagerObservation_).ok());
-  }
-  if (eagerRewardSpace_.has_value()) {
-    CHECK(getReward(eagerRewardSpace_.value(), &eagerReward_).ok());
-  }
 }
 
-Status LlvmEnvironment::takeAction(const ActionRequest& request, ActionReply* reply) {
+Status LlvmEnvironment::step(const StepRequest& request, StepReply* reply) {
+  // Apply the requested actions.
   actionCount_ += request.action_size();
   switch (actionSpace()) {
     case LlvmActionSpace::PASSES_ALL:
@@ -170,22 +158,18 @@ Status LlvmEnvironment::takeAction(const ActionRequest& request, ActionReply* re
   // Fail now if we have broken something.
   RETURN_IF_ERROR(verifyModuleStatus(benchmark().module()));
 
-  if (eagerObservationSpace().has_value()) {
-    eagerObservation_ = {};
-    RETURN_IF_ERROR(getObservation(eagerObservationSpace().value(), &eagerObservation_));
-    *reply->mutable_observation() = eagerObservation_;
-  }
-
-  if (eagerRewardSpace().has_value()) {
-    eagerReward_ = {};
-    RETURN_IF_ERROR(getReward(eagerRewardSpace().value(), &eagerReward_));
-    *reply->mutable_reward() = eagerReward_;
+  // Compute the requested observations.
+  for (int i = 0; i < request.observation_space_size(); ++i) {
+    LlvmObservationSpace observationSpace;
+    RETURN_IF_ERROR(util::intToEnum(request.observation_space(i), &observationSpace));
+    auto observation = reply->add_observation();
+    RETURN_IF_ERROR(getObservation(observationSpace, observation));
   }
 
   return Status::OK;
 }
 
-Status LlvmEnvironment::runAction(LlvmAction action, ActionReply* reply) {
+Status LlvmEnvironment::runAction(LlvmAction action, StepReply* reply) {
 #ifdef EXPERIMENTAL_UNSTABLE_GVN_SINK_PASS
   // NOTE(https://github.com/facebookresearch/CompilerGym/issues/46): The
   // -gvn-sink pass has been found to have nondeterministic behavior so has
@@ -206,7 +190,7 @@ Status LlvmEnvironment::runAction(LlvmAction action, ActionReply* reply) {
   return Status::OK;
 }
 
-void LlvmEnvironment::runPass(llvm::Pass* pass, ActionReply* reply) {
+void LlvmEnvironment::runPass(llvm::Pass* pass, StepReply* reply) {
   llvm::legacy::PassManager passManager;
   setupPassManager(&passManager, pass);
 
@@ -214,7 +198,7 @@ void LlvmEnvironment::runPass(llvm::Pass* pass, ActionReply* reply) {
   reply->set_action_had_no_effect(!changed);
 }
 
-void LlvmEnvironment::runPass(llvm::FunctionPass* pass, ActionReply* reply) {
+void LlvmEnvironment::runPass(llvm::FunctionPass* pass, StepReply* reply) {
   llvm::legacy::FunctionPassManager passManager(&benchmark().module());
   setupPassManager(&passManager, pass);
 
@@ -412,50 +396,6 @@ Status LlvmEnvironment::getObservation(LlvmObservationSpace space, Observation* 
     }
 #endif
   }
-
-  return Status::OK;
-}
-
-Status LlvmEnvironment::getReward(LlvmRewardSpace space, Reward* reply) {
-  const LlvmCostFunction cost = getCostFunction(space);
-  const auto costIdx = static_cast<size_t>(cost);
-  const std::optional<LlvmBaselinePolicy> baselinePolicy = getBaselinePolicy(space);
-
-  // Fetch the cached costs.
-  const double unoptimizedCost =
-      getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O0, cost);
-  const double previousCost =
-      previousCosts_[costIdx].has_value() ? *previousCosts_[costIdx] : unoptimizedCost;
-
-  // Compute a new cost.
-  const double currentCost = getCost(cost, benchmark().module(), workingDirectory_);
-
-  // Reward is reduction in cost.
-  double reward = previousCost - currentCost;
-
-  // Optionally scale the reward by comparison to a baseline policy:
-  //   - If the baseline policy is -O0, then scale the reward against the
-  //     baseline cost. For example, an instruction count reward of 10 for a
-  //     program with 100 initial instructions would be 10 / 100 = 0.1.
-  //   - For a baseline policy of -O3 or -Oz, reward is scaled by the reduction
-  //     in cost achieved by that baseline.
-  if (baselinePolicy.has_value()) {
-    const double baselineCost = getBaselineCost(benchmark().baselineCosts(), *baselinePolicy, cost);
-    if (baselinePolicy == LlvmBaselinePolicy::O0) {
-      if (baselineCost) {
-        reward /= baselineCost;
-      }
-    } else {
-      const double baselineImprovement = unoptimizedCost - baselineCost;
-      if (baselineImprovement) {
-        reward /= baselineImprovement;
-      }
-    }
-  }
-  reply->set_reward(reward);
-
-  // Update the cached costs.
-  previousCosts_[costIdx] = currentCost;
 
   return Status::OK;
 }

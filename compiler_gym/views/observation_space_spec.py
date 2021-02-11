@@ -11,7 +11,8 @@ from gym.spaces import Box, Space
 
 from compiler_gym.service import observation_t, scalar_range2tuple
 from compiler_gym.service.proto import Observation, ObservationSpace
-from compiler_gym.spaces import Scalar, Sequence
+from compiler_gym.spaces.scalar import Scalar
+from compiler_gym.spaces.sequence import Sequence
 
 
 def _json2nx(observation):
@@ -52,7 +53,7 @@ class ObservationSpaceSpec(object):
         id: str,
         index: int,
         space: Space,
-        cb: Callable[[Union[observation_t, Observation]], observation_t],
+        translate: Callable[[Union[observation_t, Observation]], observation_t],
         to_string: Callable[[observation_t], str],
         deterministic: bool,
         platform_dependent: bool,
@@ -65,7 +66,7 @@ class ObservationSpaceSpec(object):
         self.deterministic = deterministic
         self.platform_dependent = platform_dependent
         self.default_value = default_value
-        self.cb = cb
+        self.translate = translate
         self.to_string = to_string
 
     def __repr__(self) -> str:
@@ -100,15 +101,15 @@ class ObservationSpaceSpec(object):
         # Translate from protocol buffer specification to python. There are
         # three variables to derive:
         #   (1) space: the gym.Space instance describing the space.
-        #   (2) cb: is a callback that translates from an Observation message to
-        #           a python type.
+        #   (2) translate: is a callback that translates from an Observation
+        #           message to a python type.
         #   (3) to_string: is a callback that translates from a python type to a
         #           string for printing.
         if proto.opaque_data_format == "json://networkx/MultiDiGraph":
             # TODO(cummins): Add a Graph space.
             space = make_seq(proto.string_size_range, str, (0, None))
 
-            def cb(observation):
+            def translate(observation):
                 return nx.readwrite.json_graph.node_link_graph(
                     json.loads(observation.string_value), multigraph=True, directed=True
                 )
@@ -121,7 +122,7 @@ class ObservationSpaceSpec(object):
         elif proto.opaque_data_format == "json://":
             space = make_seq(proto.string_size_range, str, (0, None))
 
-            def cb(observation):
+            def translate(observation):
                 return json.loads(observation.string_value)
 
             def to_string(observation):
@@ -134,7 +135,7 @@ class ObservationSpaceSpec(object):
                 (np.iinfo(np.int64).min, np.iinfo(np.int64).max),
             )
 
-            def cb(observation):
+            def translate(observation):
                 return np.array(observation.int64_list.value, dtype=np.int64)
 
             to_string = str
@@ -143,21 +144,21 @@ class ObservationSpaceSpec(object):
                 proto.double_range_list.range, np.float64, (-np.inf, np.inf)
             )
 
-            def cb(observation):
+            def translate(observation):
                 return np.array(observation.double_list.value, dtype=np.float64)
 
             to_string = str
         elif shape_type == "string_size_range":
             space = make_seq(proto.string_size_range, str, (0, None))
 
-            def cb(observation):
+            def translate(observation):
                 return observation.string_value
 
             to_string = str
         elif shape_type == "binary_size_range":
             space = make_seq(proto.binary_size_range, bytes, (0, None))
 
-            def cb(observation):
+            def translate(observation):
                 return observation.binary_value
 
             to_string = str
@@ -168,7 +169,7 @@ class ObservationSpaceSpec(object):
                 (np.iinfo(np.int64).min, np.iinfo(np.int64).max),
             )
 
-            def cb(observation):
+            def translate(observation):
                 return int(observation.scalar_int64)
 
             to_string = str
@@ -177,8 +178,8 @@ class ObservationSpaceSpec(object):
                 proto.scalar_double_range, np.float64, (-np.inf, np.inf)
             )
 
-            def cb(observation):
-                return int(observation.scalar_double)
+            def translate(observation):
+                return float(observation.scalar_double)
 
             to_string = str
         else:
@@ -190,17 +191,17 @@ class ObservationSpaceSpec(object):
             id=proto.name,
             index=index,
             space=space,
-            cb=cb,
+            translate=translate,
             to_string=to_string,
             deterministic=proto.deterministic,
             platform_dependent=proto.platform_dependent,
-            default_value=cb(proto.default_value),
+            default_value=translate(proto.default_value),
         )
 
     def make_derived_space(
         self,
         id: str,
-        cb: Callable[[observation_t], observation_t],
+        translate: Callable[[observation_t], observation_t],
         space: Optional[Space] = None,
         deterministic: Optional[bool] = None,
         default_value: Optional[observation_t] = None,
@@ -210,7 +211,7 @@ class ObservationSpaceSpec(object):
         """Create a derived observation space.
 
         :param id: The name of the derived observation space.
-        :param cb: A callback function to compute a derived observation
+        :param translate: A callback function to compute a derived observation
             from the base observation.
         :param space: The :code:`gym.Space` describing the observation space.
         :param deterministic: Whether the observation space is deterministic.
@@ -231,10 +232,12 @@ class ObservationSpaceSpec(object):
             id=id,
             index=self.index,
             space=space or self.space,
-            cb=lambda observation: cb(self.cb(observation)),
+            translate=lambda observation: translate(self.translate(observation)),
             to_string=to_string or self.to_string,
             default_value=(
-                cb(self.default_value) if default_value is None else default_value
+                translate(self.default_value)
+                if default_value is None
+                else default_value
             ),
             deterministic=(
                 self.deterministic if deterministic is None else deterministic

@@ -38,14 +38,8 @@ class ExampleService final : public CompilerGymService::Service {
   grpc::Status EndEpisode(grpc::ServerContext* context, const EndEpisodeRequest* request,
                           EndEpisodeReply* reply) final override;
 
-  grpc::Status TakeAction(grpc::ServerContext* context, const ActionRequest* request,
-                          ActionReply* reply) final override;
-
-  grpc::Status GetObservation(grpc::ServerContext* context, const ObservationRequest* request,
-                              Observation* reply) final override;
-
-  grpc::Status GetReward(grpc::ServerContext* context, const RewardRequest* request,
-                         Reward* reply) final override;
+  grpc::Status Step(grpc::ServerContext* context, const StepRequest* request,
+                    StepReply* reply) final override;
 
   grpc::Status GetBenchmarks(grpc::ServerContext* context, const GetBenchmarksRequest* request,
                              GetBenchmarksReply* reply) final override;
@@ -66,26 +60,19 @@ class ExampleService final : public CompilerGymService::Service {
 // The representation of a compilation session.
 class ExampleCompilationSession {
  public:
-  ExampleCompilationSession(const std::string& benchmark, ActionSpace actionSpace,
-                            std::optional<int32_t> eagerObservation,
-                            std::optional<int32_t> eagerReward);
+  ExampleCompilationSession(const std::string& benchmark, ActionSpace actionSpace);
 
-  [[nodiscard]] grpc::Status takeAction(const ActionRequest* request, ActionReply* reply);
-
-  [[nodiscard]] grpc::Status getObservation(int32_t observationSpace, Observation* observation);
-
-  [[nodiscard]] grpc::Status getReward(int32_t rewardSpace, Reward* reward);
+  [[nodiscard]] grpc::Status Step(const StepRequest* request, StepReply* reply);
 
  private:
+  grpc::Status getObservation(int32_t observationSpace, Observation* reply);
+
   const std::string benchmark_;
   ActionSpace actionSpace_;
-  std::optional<int32_t> eagerObservation_;
-  std::optional<int32_t> eagerReward_;
 };
 
 // Helper functions to describe the available action/observation/reward spaces.
 std::vector<ActionSpace> getActionSpaces();
 std::vector<ObservationSpace> getObservationSpaces();
-std::vector<RewardSpace> getRewardSpaces();
 
 }  // namespace compiler_gym::example_service

@@ -46,10 +46,10 @@ TEST_F(GvnSinkTest, runGvnSinkOnBlowfish) {
   LlvmEnvironment env(std::move(benchmark), LlvmActionSpace::PASSES_ALL, LlvmObservationSpace::IR,
                       std::nullopt, workingDirectory_);
 
-  ActionRequest request;
+  StepRequest request;
   request.add_action(static_cast<int>(LlvmAction::GVNSINK_PASS));
-  ActionReply reply;
-  ASSERT_OK(env.takeAction(request, &reply));
+  StepReply reply;
+  ASSERT_OK(env.Step(request, &reply));
 }
 
 }  // anonymous namespace

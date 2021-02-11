@@ -17,7 +17,6 @@ py_test(
     name = "reward_test",
     srcs = ["reward_test.py"],
     deps = [
-        "//compiler_gym/service/proto",
         "//compiler_gym/views",
         "//tests:test_main",
     ],

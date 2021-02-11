@@ -11,6 +11,8 @@ from gym.spaces import Space
 class Scalar(Space):
     """A scalar value."""
 
+    __slots__ = ["min", "max", "dtype"]
+
     def __init__(
         self, min: Optional[float] = None, max: Optional[float] = None, dtype=float
     ):

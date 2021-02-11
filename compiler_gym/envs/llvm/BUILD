@@ -53,9 +53,20 @@ py_library(
     deps = [
         ":benchmarks",
         ":datasets",
+        ":llvm_rewards",
         "//compiler_gym/envs:compiler_env",
         "//compiler_gym/spaces",
         "//compiler_gym/third_party/autophase",
         "//compiler_gym/third_party/inst2vec",
+    ],
+)
+
+py_library(
+    name = "llvm_rewards",
+    srcs = ["llvm_rewards.py"],
+    deps = [
+        "//compiler_gym/service",
+        "//compiler_gym/spaces",
+        "//compiler_gym/views",
     ],
 )

@@ -105,7 +105,7 @@ flags, respectively:
 
 .. code-block::
 
-    $ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --activate=npb-v0,github-v0 --deactivate=cbench
+    $ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --activate=npb-v0,github-v0 --deactivate=cBench-v0
 
 The :code:`--activate_all` and :code:`--deactivate_all` flags can be used as a
 shortcut to activate or deactivate every downloaded:

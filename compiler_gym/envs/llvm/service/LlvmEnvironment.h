@@ -14,7 +14,6 @@
 #include "compiler_gym/envs/llvm/service/Benchmark.h"
 #include "compiler_gym/envs/llvm/service/Cost.h"
 #include "compiler_gym/envs/llvm/service/ObservationSpaces.h"
-#include "compiler_gym/envs/llvm/service/RewardSpaces.h"
 #include "compiler_gym/service/proto/compiler_gym_service.grpc.pb.h"
 #include "llvm/Analysis/ProfileSummaryInfo.h"
 #include "llvm/Analysis/TargetLibraryInfo.h"
@@ -33,24 +32,13 @@ namespace compiler_gym::llvm_service {
 // interface using the compiler_gym::service::LlvmService class.
 class LlvmEnvironment {
  public:
-  // Construct an environment by taking ownership of a benchmark. Eager
-  // observations and reward can be disabled by passing std::nullopt.
-  // Throws std::invalid_argument if the benchmark's LLVM module fails
-  // verification.
+  // Construct an environment by taking ownership of a benchmark. Throws
+  // std::invalid_argument if the benchmark's LLVM module fails verification.
   LlvmEnvironment(std::unique_ptr<Benchmark> benchmark, LlvmActionSpace actionSpace,
-                  std::optional<LlvmObservationSpace> eagerObservationSpace,
-                  std::optional<LlvmRewardSpace> eagerRewardSpace,
                   const boost::filesystem::path& workingDirectory);
 
-  // Run the requested action(s), then compute eager observation and reward, if
-  // required.
-  [[nodiscard]] grpc::Status takeAction(const ActionRequest& request, ActionReply* reply);
-
-  // Compute the requested observation.
-  [[nodiscard]] grpc::Status getObservation(LlvmObservationSpace space, Observation* reply);
-
-  // Calculate a reward.
-  [[nodiscard]] grpc::Status getReward(LlvmRewardSpace space, Reward* reply);
+  // Run the requested action(s) then compute the eager observation(s).
+  [[nodiscard]] grpc::Status step(const StepRequest& request, StepReply* reply);
 
   inline const Benchmark& benchmark() const { return *benchmark_; }
 
@@ -58,11 +46,14 @@ class LlvmEnvironment {
 
  protected:
   // Run the requested action.
-  [[nodiscard]] grpc::Status runAction(LlvmAction action, ActionReply* reply);
+  [[nodiscard]] grpc::Status runAction(LlvmAction action, StepReply* reply);
+
+  // Compute the requested observation.
+  [[nodiscard]] grpc::Status getObservation(LlvmObservationSpace space, Observation* reply);
 
   // Run the given pass, possibly modifying the underlying LLVM module.
-  void runPass(llvm::Pass* pass, ActionReply* reply);
-  void runPass(llvm::FunctionPass* pass, ActionReply* reply);
+  void runPass(llvm::Pass* pass, StepReply* reply);
+  void runPass(llvm::FunctionPass* pass, StepReply* reply);
 
   // Run the commandline `opt` tool on the current LLVM module with the given
   // arguments, replacing the environment state with the generated output.
@@ -71,14 +62,6 @@ class LlvmEnvironment {
   inline Benchmark& benchmark() { return *benchmark_; }
 
   inline const LlvmActionSpace actionSpace() const { return actionSpace_; }
-
-  inline const std::optional<LlvmObservationSpace>& eagerObservationSpace() const {
-    return eagerObservationSpace_;
-  }
-
-  inline const std::optional<LlvmRewardSpace>& eagerRewardSpace() const {
-    return eagerRewardSpace_;
-  }
 
   inline const llvm::TargetLibraryInfoImpl& tlii() const { return tlii_; }
 
@@ -95,18 +78,10 @@ class LlvmEnvironment {
   const boost::filesystem::path workingDirectory_;
   const std::unique_ptr<Benchmark> benchmark_;
   const LlvmActionSpace actionSpace_;
-  const std::optional<LlvmObservationSpace> eagerObservationSpace_;
-  const std::optional<LlvmRewardSpace> eagerRewardSpace_;
   const llvm::TargetLibraryInfoImpl tlii_;
   const programl::ProgramGraphOptions programlOptions_;
 
   int actionCount_;
-  // When eagerly computing observations or rewards, store the values so that
-  // we can reuse them when actions have no effect.
-  Observation eagerObservation_;
-  Reward eagerReward_;
-  // The previous costs. Used to compute incremental returns.
-  PreviousCosts previousCosts_;
 };
 
 }  // namespace compiler_gym::llvm_service

@@ -75,7 +75,6 @@ cc_library(
         "//compiler_gym/third_party/llvm:llvm-size",
     ],
     deps = [
-        ":RewardSpaces",
         "//compiler_gym/util:GrpcStatusMacros",
         "//compiler_gym/util:RunfilesPath",
         "//compiler_gym/util:Unreachable",
@@ -112,7 +111,6 @@ cc_library(
         ":Benchmark",
         ":Cost",
         ":ObservationSpaces",
-        ":RewardSpaces",
         "//compiler_gym/service/proto:compiler_gym_service_cc_grpc",
         "//compiler_gym/third_party/autophase:InstCount",
         "//compiler_gym/third_party/cpuinfo",
@@ -142,7 +140,6 @@ cc_library(
         ":Cost",
         ":LlvmEnvironment",
         ":ObservationSpaces",
-        ":RewardSpaces",
         "//compiler_gym/service/proto:compiler_gym_service_cc",
         "//compiler_gym/util:GrpcStatusMacros",
         "//compiler_gym/util:Version",
@@ -164,17 +161,5 @@ cc_library(
         "@nlohmann_json//:json",
         "@programl//programl/graph/format:node_link_graph",
         "@programl//programl/proto:programl_cc",
-    ],
-)
-
-cc_library(
-    name = "RewardSpaces",
-    srcs = ["RewardSpaces.cc"],
-    hdrs = ["RewardSpaces.h"],
-    visibility = ["//tests:__subpackages__"],
-    deps = [
-        "//compiler_gym/service/proto:compiler_gym_service_cc",
-        "//compiler_gym/util:EnumUtil",
-        "@magic_enum",
     ],
 )

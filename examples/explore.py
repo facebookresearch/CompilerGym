@@ -132,7 +132,9 @@ class StateGraph:
     def add_or_find_node(self, fingerprint, reward_sum):
         if fingerprint in self._fingerprint_to_index:
             node_index = self._fingerprint_to_index[fingerprint]
-            assert rewards_close(self._nodes[node_index].reward_sum, reward_sum)
+            assert rewards_close(
+                self._nodes[node_index].reward_sum, reward_sum
+            ), f"{self._nodes[node_index].reward_sum} != {reward_sum}"
             return (node_index, False)
         node_index = self.node_count()
         self._fingerprint_to_index[fingerprint] = node_index

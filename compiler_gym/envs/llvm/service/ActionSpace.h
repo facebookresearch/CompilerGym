@@ -18,7 +18,7 @@ namespace compiler_gym::llvm_service {
 //   1. Add a new entry to this LlvmActionSpace enum.
 //   2. Add a new switch case to getLlvmActionSpaceList() to return the
 //      ActionSpace.
-//   3. Add a new switch case to LlvmEnvironment::takeAction() to compute
+//   3. Add a new switch case to LlvmEnvironment::step() to compute
 //      the actual action.
 //   4. Run `bazel test //compiler_gym/...` and update the newly failing tests.
 enum class LlvmActionSpace {

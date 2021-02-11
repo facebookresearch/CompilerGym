@@ -56,15 +56,13 @@ std::vector<ObservationSpace> getObservationSpaces() {
     featureSizeRange->mutable_max()->set_value(100);
   }
 
-  return {ir, features};
-}
-
-std::vector<RewardSpace> getRewardSpaces() {
-  RewardSpace codesize;
+  ObservationSpace codesize;
   codesize.set_name("codesize");
-  codesize.mutable_range()->mutable_max()->set_value(0);
+  ScalarRange codesizeRange;
+  codesizeRange.mutable_min()->set_value(0);
+  *codesize.mutable_scalar_int64_range() = codesizeRange;
 
-  return {codesize};
+  return {ir, features, codesize};
 }
 
 ExampleService::ExampleService(const fs::path& workingDirectory)
@@ -81,11 +79,9 @@ Status ExampleService::GetSpaces(ServerContext* /* unused*/, const GetSpacesRequ
                                  GetSpacesReply* reply) {
   const auto actionSpaces = getActionSpaces();
   const auto observationSpaces = getObservationSpaces();
-  const auto rewardSpaces = getRewardSpaces();
 
   *reply->mutable_action_space_list() = {actionSpaces.begin(), actionSpaces.end()};
   *reply->mutable_observation_space_list() = {observationSpaces.begin(), observationSpaces.end()};
-  *reply->mutable_reward_space_list() = {rewardSpaces.begin(), rewardSpaces.end()};
   return Status::OK;
 }
 
@@ -109,26 +105,9 @@ Status ExampleService::StartEpisode(ServerContext* /* unused*/, const StartEpiso
       rangeCheck(request->action_space(), 0, static_cast<int32_t>(actionSpaces.size()) - 1));
   const auto actionSpace = actionSpaces[request->action_space()];
 
-  // Range check the eager observation space.
-  std::optional<int32_t> eagerObservation = std::nullopt;
-  if (request->use_eager_observation_space()) {
-    eagerObservation = request->eager_observation_space();
-    RETURN_IF_ERROR(
-        rangeCheck(*eagerObservation, 0, static_cast<int32_t>(getObservationSpaces().size()) - 1));
-  }
-
-  // Range check the eager reward space.
-  std::optional<int32_t> eagerReward = std::nullopt;
-  if (request->use_eager_reward_space()) {
-    eagerReward = request->eager_reward_space();
-    RETURN_IF_ERROR(
-        rangeCheck(*eagerReward, 0, static_cast<int32_t>(getRewardSpaces().size()) - 1));
-  }
-
   // Create the new compilation session given.
   reply->set_session_id(nextSessionId_);
-  sessions_[nextSessionId_] = std::make_unique<ExampleCompilationSession>(
-      benchmark, actionSpace, eagerObservation, eagerReward);
+  sessions_[nextSessionId_] = std::make_unique<ExampleCompilationSession>(benchmark, actionSpace);
   ++nextSessionId_;
 
   return Status::OK;
@@ -144,25 +123,11 @@ Status ExampleService::EndEpisode(ServerContext* /* unused*/, const EndEpisodeRe
   return Status::OK;
 }
 
-Status ExampleService::TakeAction(ServerContext* /* unused*/, const ActionRequest* request,
-                                  ActionReply* reply) {
+Status ExampleService::Step(ServerContext* /* unused*/, const StepRequest* request,
+                            StepReply* reply) {
   ExampleCompilationSession* sess;
   RETURN_IF_ERROR(session(request->session_id(), &sess));
-  return sess->takeAction(request, reply);
-}
-
-Status ExampleService::GetObservation(ServerContext* /* unused*/, const ObservationRequest* request,
-                                      Observation* reply) {
-  ExampleCompilationSession* sess;
-  RETURN_IF_ERROR(session(request->session_id(), &sess));
-  return sess->getObservation(request->observation_space(), reply);
-}
-
-Status ExampleService::GetReward(ServerContext* /* unused*/, const RewardRequest* request,
-                                 Reward* reply) {
-  ExampleCompilationSession* sess;
-  RETURN_IF_ERROR(session(request->session_id(), &sess));
-  return sess->getReward(request->reward_space(), reply);
+  return sess->Step(request, reply);
 }
 
 Status ExampleService::GetBenchmarks(grpc::ServerContext* /*unused*/,
@@ -183,28 +148,24 @@ Status ExampleService::session(uint64_t id, ExampleCompilationSession** sess) {
 }
 
 ExampleCompilationSession::ExampleCompilationSession(const std::string& benchmark,
-                                                     ActionSpace actionSpace,
-                                                     std::optional<int32_t> eagerObservation,
-                                                     std::optional<int32_t> eagerReward)
-    : benchmark_(benchmark),
-      actionSpace_(actionSpace),
-      eagerObservation_(eagerObservation),
-      eagerReward_(eagerReward) {}
+                                                     ActionSpace actionSpace)
+    : benchmark_(benchmark), actionSpace_(actionSpace) {}
 
-Status ExampleCompilationSession::takeAction(const ActionRequest* request, ActionReply* reply) {
+Status ExampleCompilationSession::Step(const StepRequest* request, StepReply* reply) {
   for (int i = 0; i < request->action_size(); ++i) {
     const auto action = request->action(i);
     // Run the actual action. Here we just range check.
     RETURN_IF_ERROR(rangeCheck(action, 0, static_cast<int32_t>(actionSpace_.action_size() - 1)));
   }
 
-  // Compute a new observation and reward if required.
-  if (eagerObservation_.has_value()) {
-    RETURN_IF_ERROR(getObservation(*eagerObservation_, reply->mutable_observation()));
+  // Generate observations.
+  for (int i = 0; i < request->observation_space_size(); ++i) {
+    RETURN_IF_ERROR(rangeCheck(request->observation_space(i), 0,
+                               static_cast<int32_t>(getObservationSpaces().size()) - 1));
+    auto observation = reply->add_observation();
+    RETURN_IF_ERROR(getObservation(request->observation_space(i), observation));
   }
-  if (eagerReward_.has_value()) {
-    RETURN_IF_ERROR(getReward(*eagerReward_, reply->mutable_reward()));
-  }
+
   return Status::OK;
 }
 
@@ -214,24 +175,19 @@ Status ExampleCompilationSession::getObservation(int32_t observationSpace,
   RETURN_IF_ERROR(
       rangeCheck(observationSpace, 0, static_cast<int32_t>(observationSpaces.size()) - 1));
   switch (observationSpace) {
-    case 0:
+    case 0:  // IR
       observation->set_string_value("Hello, world!");
       break;
-    case 1:
+    case 1:  // Features
       for (int i = 0; i < 3; ++i) {
         observation->mutable_int64_list()->add_value(0);
       }
       break;
+    case 2:  // Codesize
+      observation->set_scalar_int64(0);
     default:
       break;
   }
-  return Status::OK;
-}
-
-Status ExampleCompilationSession::getReward(int32_t rewardSpace, Reward* reward) {
-  const auto rewardSpaces = getRewardSpaces();
-  RETURN_IF_ERROR(rangeCheck(rewardSpace, 0, static_cast<int32_t>(rewardSpaces.size()) - 1));
-  reward->set_reward(0);
   return Status::OK;
 }
 
