@@ -14,7 +14,7 @@ from gym.spaces import Box
 from gym.spaces import Dict as DictSpace
 
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
-from compiler_gym.spaces import Sequence
+from compiler_gym.spaces import Scalar, Sequence
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
@@ -791,39 +791,39 @@ def test_ir_instruction_count_observation_spaces(env: LlvmEnv):
 
     key = "IrInstructionCount"
     space = env.observation.spaces[key]
-    assert isinstance(space.space, Box)
+    assert isinstance(space.space, Scalar)
     assert space.deterministic
     assert not space.platform_dependent
-    value: np.ndarray = env.observation[key]
-    assert isinstance(value, np.ndarray)
-    np.testing.assert_array_equal([196], value)
+    value: int = env.observation[key]
+    assert isinstance(value, int)
+    assert value == 196
 
     key = "IrInstructionCountO0"
     space = env.observation.spaces[key]
-    assert isinstance(space.space, Box)
+    assert isinstance(space.space, Scalar)
     assert space.deterministic
     assert not space.platform_dependent
-    value: np.ndarray = env.observation[key]
-    assert isinstance(value, np.ndarray)
-    np.testing.assert_array_equal([196], value)
+    value: int = env.observation[key]
+    assert isinstance(value, int)
+    assert value == 196
 
     key = "IrInstructionCountO3"
     space = env.observation.spaces[key]
-    assert isinstance(space.space, Box)
+    assert isinstance(space.space, Scalar)
     assert space.deterministic
     assert not space.platform_dependent
-    value: np.ndarray = env.observation[key]
-    assert isinstance(value, np.ndarray)
-    np.testing.assert_array_equal([125], value)
+    value: int = env.observation[key]
+    assert isinstance(value, int)
+    assert value == 125
 
     key = "IrInstructionCountOz"
     space = env.observation.spaces[key]
-    assert isinstance(space.space, Box)
+    assert isinstance(space.space, Scalar)
     assert space.deterministic
     assert not space.platform_dependent
-    value: np.ndarray = env.observation[key]
-    assert isinstance(value, np.ndarray)
-    np.testing.assert_array_equal([105], value)
+    value: int = env.observation[key]
+    assert isinstance(value, int)
+    assert value == 105
 
 
 def test_object_text_size_observation_spaces(env: LlvmEnv):
@@ -837,39 +837,39 @@ def test_object_text_size_observation_spaces(env: LlvmEnv):
 
     key = "ObjectTextSizeBytes"
     space = env.observation.spaces[key]
-    assert isinstance(space.space, Box)
+    assert isinstance(space.space, Scalar)
     assert space.deterministic
     assert space.platform_dependent
-    value: np.ndarray = env.observation[key]
-    assert isinstance(value, np.ndarray)
-    np.testing.assert_array_equal(crc32_code_sizes[sys.platform][0], value)
+    value: int = env.observation[key]
+    assert isinstance(value, int)
+    assert value == crc32_code_sizes[sys.platform][0]
 
     key = "ObjectTextSizeO0"
     space = env.observation.spaces[key]
-    assert isinstance(space.space, Box)
+    assert isinstance(space.space, Scalar)
     assert space.deterministic
     assert space.platform_dependent
-    value: np.ndarray = env.observation[key]
-    assert isinstance(value, np.ndarray)
-    np.testing.assert_array_equal(crc32_code_sizes[sys.platform][0], value)
+    value: int = env.observation[key]
+    assert isinstance(value, int)
+    assert value == crc32_code_sizes[sys.platform][0]
 
     key = "ObjectTextSizeO3"
     space = env.observation.spaces[key]
-    assert isinstance(space.space, Box)
+    assert isinstance(space.space, Scalar)
     assert space.deterministic
     assert space.platform_dependent
-    value: np.ndarray = env.observation[key]
-    assert isinstance(value, np.ndarray)
-    np.testing.assert_array_equal(crc32_code_sizes[sys.platform][1], value)
+    value: int = env.observation[key]
+    assert isinstance(value, int)
+    assert value == crc32_code_sizes[sys.platform][1]
 
     key = "ObjectTextSizeOz"
     space = env.observation.spaces[key]
-    assert isinstance(space.space, Box)
+    assert isinstance(space.space, Scalar)
     assert space.deterministic
     assert space.platform_dependent
-    value: np.ndarray = env.observation[key]
-    assert isinstance(value, np.ndarray)
-    np.testing.assert_array_equal(crc32_code_sizes[sys.platform][2], value)
+    value: int = env.observation[key]
+    assert isinstance(value, int)
+    assert value == crc32_code_sizes[sys.platform][2]
 
 
 if __name__ == "__main__":

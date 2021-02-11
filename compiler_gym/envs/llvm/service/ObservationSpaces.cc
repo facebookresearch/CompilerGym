@@ -94,22 +94,22 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
       case LlvmObservationSpace::IR_INSTRUCTION_COUNT_O0:
       case LlvmObservationSpace::IR_INSTRUCTION_COUNT_O3:
       case LlvmObservationSpace::IR_INSTRUCTION_COUNT_OZ: {
-        auto featureSize = space.mutable_int64_range_list()->add_range();
+        auto featureSize = space.mutable_scalar_int64_range();
         featureSize->mutable_min()->set_value(0);
         space.set_deterministic(true);
         space.set_platform_dependent(false);
-        space.mutable_default_value()->mutable_int64_list()->add_value(0);
+        space.mutable_default_value()->set_scalar_int64(0);
         break;
       }
       case LlvmObservationSpace::OBJECT_TEXT_SIZE_BYTES:
       case LlvmObservationSpace::OBJECT_TEXT_SIZE_O0:
       case LlvmObservationSpace::OBJECT_TEXT_SIZE_O3:
       case LlvmObservationSpace::OBJECT_TEXT_SIZE_OZ: {
-        auto featureSize = space.mutable_int64_range_list()->add_range();
+        auto featureSize = space.mutable_scalar_int64_range();
         featureSize->mutable_min()->set_value(0);
         space.set_deterministic(true);
         space.set_platform_dependent(true);
-        space.mutable_default_value()->mutable_int64_list()->add_value(0);
+        space.mutable_default_value()->set_scalar_int64(0);
         break;
       }
 #ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
@@ -117,10 +117,11 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
       case LlvmObservationSpace::TEXT_SIZE_O0:
       case LlvmObservationSpace::TEXT_SIZE_O3:
       case LlvmObservationSpace::TEXT_SIZE_OZ: {
-        auto featureSize = space.mutable_int64_range_list()->add_range();
+        auto featureSize = space.mutable_scalar_int64_range();
         featureSize->mutable_min()->set_value(0);
         space.set_deterministic(true);
         space.set_platform_dependent(true);
+        space.mutable_default_value()->set_scalar_int64(0);
         break;
       }
 #endif

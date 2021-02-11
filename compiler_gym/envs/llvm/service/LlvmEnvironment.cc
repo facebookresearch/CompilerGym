@@ -340,74 +340,74 @@ Status LlvmEnvironment::getObservation(LlvmObservationSpace space, Observation* 
     case LlvmObservationSpace::IR_INSTRUCTION_COUNT: {
       const auto cost =
           getCost(LlvmCostFunction::IR_INSTRUCTION_COUNT, benchmark().module(), workingDirectory_);
-      reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
+      reply->set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::IR_INSTRUCTION_COUNT_O0: {
       const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O0,
                                         LlvmCostFunction::IR_INSTRUCTION_COUNT);
-      reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
+      reply->set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::IR_INSTRUCTION_COUNT_O3: {
       const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O3,
                                         LlvmCostFunction::IR_INSTRUCTION_COUNT);
-      reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
+      reply->set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::IR_INSTRUCTION_COUNT_OZ: {
       const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::Oz,
                                         LlvmCostFunction::IR_INSTRUCTION_COUNT);
-      reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
+      reply->set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::OBJECT_TEXT_SIZE_BYTES: {
       const auto cost = getCost(LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES, benchmark().module(),
                                 workingDirectory_);
-      reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
+      reply->set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::OBJECT_TEXT_SIZE_O0: {
       const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O0,
                                         LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES);
-      reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
+      reply->set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::OBJECT_TEXT_SIZE_O3: {
       const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O3,
                                         LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES);
-      reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
+      reply->set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::OBJECT_TEXT_SIZE_OZ: {
       const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::Oz,
                                         LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES);
-      reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
+      reply->set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
 #ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
     case LlvmObservationSpace::TEXT_SIZE_BYTES: {
       const auto cost =
           getCost(LlvmCostFunction::TEXT_SIZE_BYTES, benchmark().module(), workingDirectory_);
-      reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
+      reply->set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::TEXT_SIZE_O0: {
       const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O0,
                                         LlvmCostFunction::TEXT_SIZE_BYTES);
-      reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
+      reply->set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::TEXT_SIZE_O3: {
       const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O3,
                                         LlvmCostFunction::TEXT_SIZE_BYTES);
-      reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
+      reply->set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::TEXT_SIZE_OZ: {
       const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::Oz,
                                         LlvmCostFunction::TEXT_SIZE_BYTES);
-      reply->mutable_int64_list()->add_value(static_cast<int64_t>(cost));
+      reply->set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
 #endif
