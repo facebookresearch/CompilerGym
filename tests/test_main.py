@@ -12,7 +12,9 @@ import pytest
 import compiler_gym  # noqa Register environments.
 
 
-def main(extra_pytest_args: Optional[List[str]] = None):
+def main(
+    extra_pytest_args: Optional[List[str]] = None, verbose_service_logging: bool = True
+):
     """The main entry point for the pytest runner.
 
     An example file which uses this:
@@ -29,6 +31,8 @@ def main(extra_pytest_args: Optional[List[str]] = None):
 
     :param extra_pytest_args: A list of additional command line options to pass
         to pytest.
+    :param verbose_service_logging: Whether to enable verbose CompilerGym
+        service logging, useful for debugging failing tests.
     """
     # Use isolated data directories for running tests.
     os.environ["COMPILER_GYM_SITE_DATA"] = "/tmp/compiler_gym/tests/site_data"
@@ -44,7 +48,8 @@ def main(extra_pytest_args: Optional[List[str]] = None):
 
     # Use verbose backend debugging when running tests. If a test fails, the debugging
     # output will be included in the captured stderr.
-    os.environ["COMPILER_GYM_SERVICE_DEBUG"] = "1"
+    if verbose_service_logging:
+        os.environ["COMPILER_GYM_SERVICE_DEBUG"] = "1"
 
     pytest_args = sys.argv + ["-vv"]
     # Support for sharding. If a py_test target has the shard_count attribute
