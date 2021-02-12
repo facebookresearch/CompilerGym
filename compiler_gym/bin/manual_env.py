@@ -326,7 +326,6 @@ class CompilerGymShell(cmd.Cmd):
 
                 eager_observation, eager_reward, done, info = self.env.step(index)
 
-                # FIXME Chris, not sure what to do if the rewards aren't eager
                 accept = not done and (eager_reward is not None) and (eager_reward > 0)
                 if accept:
                     # Append the history element
@@ -343,7 +342,6 @@ class CompilerGymShell(cmd.Cmd):
                     # Basically undo
                     self.rerun_stack()
 
-                # FIXME Chris, I'm not sure about the reward diffs. Sometimes it looks like the reward is automatically diffed.
                 print(f"Step: {i+1} Action: {action} Reward: {eager_reward:.6f} Accept: {accept}")
                 if done:
                     print("Episode ended by environment: ", info["error_details"])
