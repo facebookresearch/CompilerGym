@@ -16,10 +16,6 @@ py_library(
     ],
     deps = [
         "//compiler_gym",
-        "//compiler_gym/envs",
-        "//compiler_gym/envs/llvm:datasets",
-        "//compiler_gym/util",
-        "//tests:test_main",
     ],
 )
 
@@ -27,4 +23,13 @@ py_library(
     name = "common",
     testonly = 1,
     srcs = ["common.py"],
+)
+
+py_library(
+    name = "random_util",
+    testonly = 1,
+    srcs = ["random_util.py"],
+    deps = [
+        "//compiler_gym",
+    ],
 )
