@@ -34,6 +34,7 @@ FLAGS = flags.FLAGS
 
 
 class ActionHistoryElement:
+    """The compiler gym shell records a list of actions taken. This class represent those elements."""
     def __init__(self,
         action_name,
         action_index,
@@ -42,6 +43,7 @@ class ActionHistoryElement:
         done,
         info
     ):
+        """Arguments are the returns from env.step"""
         self.action_name = action_name
         self.action_index = action_index
         self.eager_observation = eager_observation
@@ -50,17 +52,27 @@ class ActionHistoryElement:
         self.info = info
 
     def has_no_effect(self):
+        """Determine if the service thinks this action had no effect"""
         return self.info.get("action_had_no_effect")
 
     def has_effect(self):
+        """Determine if the service thinks this action had an effect"""
         return not self.has_no_effect()
 
 
 class CompilerGymShell(cmd.Cmd):
+    """Run an environment manually.
+    The manual environment allows the user to step through the environment,
+    selection observations, rewards, and actions to run as they see fit. This is
+    useful for debugging.
+    """
+    
     init = "Welcome to the CompilerGym manual environment!"
 
     def __init__(self, env: CompilerEnv):
-        """Initialise with an environment."""
+        """Initialise with an environment.
+        :param env: The environment to run.
+        """
         super().__init__()
 
         self.env = env
