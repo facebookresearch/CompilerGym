@@ -44,3 +44,9 @@ class Scalar(Space):
         lower_bound = "-inf" if self.min is None else self.min
         upper_bound = "inf" if self.max is None else self.max
         return f"{self.dtype.__name__}<{lower_bound},{upper_bound}>"
+
+    def __eq__(self, rhs):
+        """Equality test."""
+        if not isinstance(rhs, Scalar):
+            return False
+        return self.min == rhs.min and self.max == rhs.max and self.dtype == rhs.dtype
