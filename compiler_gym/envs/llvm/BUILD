@@ -51,6 +51,7 @@ py_library(
         "//compiler_gym/envs/llvm/service/passes:actions_genfiles",
     ],
     deps = [
+        ":benchmarks",
         ":datasets",
         "//compiler_gym/envs:compiler_env",
         "//compiler_gym/spaces",
