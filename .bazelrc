@@ -34,10 +34,6 @@ test --copt -DMAGIC_ENUM_RANGE_MAX=512
 build --cxxopt='-Werror=dangling-else'
 test --cxxopt='-Werror=dangling-else'
 
-# Default to continuing on build error. Override using --keep_going=false.
-build --keep_going
-test --keep_going
-
 # Show test error output. Override using --test_output={summary,full}.
 test --test_output=errors
 
