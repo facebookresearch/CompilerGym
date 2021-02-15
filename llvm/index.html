@@ -593,7 +593,7 @@ state <span class="math notranslate nohighlight">\(s_{t-1}\)</span> to the curre
 <p>Reward can be normalized using the cost of the program before any optimizations
 are applied as the scaling factor:</p>
 <div class="math notranslate nohighlight">
-\[R(s_t) = \frac{C(s_{t-1} - C(s_t)}{C(s_{t=0})}\]</div>
+\[R(s_t) = \frac{C(s_{t-1}) - C(s_t)}{C(s_{t=0})}\]</div>
 <p>Normalized rewards are indicated by a <code class="code docutils literal notranslate"><span class="pre">Norm</span></code> suffix on the reward space
 name.</p>
 <p>Alternatively, rewards can be normalized by comparison to a baseline policy. The

@@ -291,7 +291,7 @@ Reward can be normalized using the cost of the program before any optimizations
 are applied as the scaling factor:
 
 .. math::
-    R(s_t) = \frac{C(s_{t-1} - C(s_t)}{C(s_{t=0})}
+    R(s_t) = \frac{C(s_{t-1}) - C(s_t)}{C(s_{t=0})}
 
 Normalized rewards are indicated by a :code:`Norm` suffix on the reward space
 name.
