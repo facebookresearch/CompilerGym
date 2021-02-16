@@ -42,7 +42,13 @@ help tutorial will give a step by step guide.
 """
             + output
         )
-        assert re.match(pattern, out.stdout)
+        if not re.match(pattern, out.stdout):
+            pytest.fail(
+                f"Failed to match regex:\n{pattern}\n"
+                + ("*" * 80)
+                + f"\nUsing output:\n{out.stdout}\n"
+            )
+            assert False
 
     finally:
         sys.stdin = old_stdin
