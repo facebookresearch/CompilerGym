@@ -817,7 +817,6 @@ def main(argv):
         return
 
     with Timer("Initialized environment"):
-        # FIXME Chris, I don't seem to actually get a benchmark
         benchmark = benchmark_from_flags()
         env = env_from_flags(benchmark)
 
