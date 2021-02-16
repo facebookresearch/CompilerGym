@@ -3,23 +3,22 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Tests for //compiler_gym/bin:manual_env."""
-import pytest
-from absl import app, flags
 import re
-
 import sys
 from io import StringIO
 from random import seed
+
+import pytest
+from absl import app, flags
+
 from compiler_gym.bin.manual_env import main
-from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
-from compiler_gym.util.flags.env_from_flags import env_from_flags
 from compiler_gym.util.capture_output import capture_output
 from tests.test_main import main as _test_main
 
 FLAGS = flags.FLAGS
 
 
-def io_check(input, output, rnd_seed = 100):
+def io_check(input, output, rnd_seed=100):
     """Run the shell with the given input and check the output matches the
     output regex"""
     seed(rnd_seed)
@@ -32,16 +31,19 @@ def io_check(input, output, rnd_seed = 100):
             except SystemExit:
                 pass  # Expected behaviour is to call sys.exit().
         print(out.stdout)
-        
-        pattern = r"""Initialized environment in [0-9.mu]*s
+
+        pattern = (
+            r"""Initialized environment in [0-9.mu]*s
 Welcome to the CompilerGym Shell!
 ---------------------------------
-Type help or \? for more information. 
+Type help or \? for more information.
 help tutorial will give a step by step guide.
 
-""" + output
+"""
+            + output
+        )
         assert re.match(pattern, out.stdout)
-        
+
     finally:
         sys.stdin = old_stdin
 
@@ -51,48 +53,42 @@ def test_download_cBench():
     io_check(
         """require_dataset cBench-v0""",
         r"""compilergym:NO-BENCHMARK> Downloaded dataset cBench-v0 in [0-9.mu]*s
-Application must be restarted to make changes visible.""")
+Application must be restarted to make changes visible.""",
+    )
 
 
 def test_list_datasets():
-    io_check(
-        """list_datasets""",
-        r"""compilergym:NO-BENCHMARK> .*cBench-v0.*"""
-    )
+    io_check("""list_datasets""", r"""compilergym:NO-BENCHMARK> .*cBench-v0.*""")
 
 
 def test_list_benchmarks():
     io_check(
-        """list_benchmarks""",
-        r"""compilergym:NO-BENCHMARK> .*cBench-v0/adpcm.*"""
+        """list_benchmarks""", r"""compilergym:NO-BENCHMARK> .*cBench-v0/adpcm.*"""
     )
 
 
 def test_list_actions():
-    io_check(
-        """list_actions""",
-        r"""compilergym:NO-BENCHMARK> .*-adce.* -strip.*"""
-    )
+    io_check("""list_actions""", r"""compilergym:NO-BENCHMARK> .*-adce.* -strip.*""")
 
 
 def test_list_rewards():
     io_check(
         """list_rewards""",
-        r"""compilergym:NO-BENCHMARK> .*IrInstructionCount.* ObjectTextSizeOz.*"""
+        r"""compilergym:NO-BENCHMARK> .*IrInstructionCount.* ObjectTextSizeOz.*""",
     )
 
 
 def test_list_observations():
     io_check(
         """list_observations""",
-        r"""compilergym:NO-BENCHMARK> Autophase, .*, Programl"""
+        r"""compilergym:NO-BENCHMARK> Autophase, .*, Programl""",
     )
 
 
 def test_set_benchmark():
     io_check(
         """set_benchmark cBench-v0/adpcm""",
-        r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s"""
+        r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s""",
     )
 
 
@@ -109,7 +105,7 @@ No effect
 Action -adce
 Action -rewrite-statepoints-for-gc
 No effect
-Actions -rewrite-symbols -adce -rewrite-statepoints-for-gc in [0-9.mu]*s.
+Actions -rewrite-symbols -adce -rewrite-statepoints-for-gc in [0-9.mu]*s with reward 0.
 compilergym:cBench-v0/adpcm>    Depth | Action                      | Effect   | Done   | Reward   |   Cumulative Reward
 ---------+-----------------------------+----------+--------+----------+---------------------
        3 | -rewrite-statepoints-for-gc | False    | False  | -        |                   0
@@ -121,8 +117,9 @@ compilergym:cBench-v0/adpcm>    Depth | Action           | Effect   | Done   | R
 ---------+------------------+----------+--------+----------+---------------------
        2 | -adce            | True     | False  | -        |                   0
        1 | -rewrite-symbols | False    | False  | -        |                   0
-       0 | <init>           | False    | False  | 0        |                   0"""
+       0 | <init>           | False    | False  | 0        |                   0""",
     )
+
 
 def test_reward():
     io_check(
@@ -137,7 +134,7 @@ def test_reward():
 compilergym:cBench-v0/adpcm> Reward IrInstructionCount in [0-9.mu]*s
 compilergym:cBench-v0/adpcm> Action -mem2reg
 Reward: 181.000000
-Actions -mem2reg in [0-9.mu]*s.
+Actions -mem2reg in [0-9.mu]*s with reward 181.0.
 compilergym:cBench-v0/adpcm> 0.000000
 Reward IrInstructionCount in [0-9.mu]*s
 compilergym:cBench-v0/adpcm> 0.000000
@@ -149,7 +146,7 @@ compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward 
 compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        1 | -mem2reg | True     | False  |      181 |                 181
-       0 | <init>   | False    | False  |        0 |                   0"""
+       0 | <init>   | False    | False  |        0 |                   0""",
     )
 
 
@@ -165,13 +162,13 @@ def test_observation():
 compilergym:cBench-v0/adpcm> Observation IrInstructionCount in [0-9.mu]*s
 compilergym:cBench-v0/adpcm> Action -mem2reg
 Observation: \[267\]
-Actions -mem2reg in [0-9.mu]*s.
+Actions -mem2reg in [0-9.mu]*s with reward 0.
 compilergym:cBench-v0/adpcm> \[267\]
 Observation IrInstructionCount in [0-9.mu]*s
 compilergym:cBench-v0/adpcm> \[206\]
 Observation IrInstructionCountOz in [0-9.mu]*s
 compilergym:cBench-v0/adpcm> \[206\]
-Observation IrInstructionCountOz in [0-9.mu]*s"""
+Observation IrInstructionCountOz in [0-9.mu]*s""",
     )
 
 
@@ -194,7 +191,7 @@ Got actions in [0-9.mu]*s
  -gvn                            | True     | False  |             72
 (.|\n)*
  -structurizecfg                 | True     | False  |            -25
- -bounds-checking                | True     | False  |            -60"""    
+ -bounds-checking                | True     | False  |            -60""",
     )
 
 
@@ -213,13 +210,13 @@ No effect
 Action -rewrite-statepoints-for-gc
 (.|\n)*
 Reward: 0.000000
-Actions -rewrite-symbols -rewrite-statepoints-for-gc .* -loop-guard-widening -simplifycfg -inferattrs in [0-9.mu]*s.
+Actions -rewrite-symbols -rewrite-statepoints-for-gc .* -loop-guard-widening -simplifycfg -inferattrs in [0-9.mu]*s with reward 87.0.
 compilergym:cBench-v0/adpcm> Warning previous eager reward at 13: -simplifycfg was 14.000000 now 13.000000
 compilergym:cBench-v0/adpcm>    Depth | Action       | Effect   | Done   |   Reward |   Cumulative Reward
 ---------+--------------+----------+--------+----------+---------------------
        2 | -simplifycfg | True     | False  |       13 |                  87
        1 | -newgvn      | True     | False  |       74 |                  74
-       0 | <init>       | False    | False  |        0 |                   0"""    
+       0 | <init>       | False    | False  |        0 |                   0""",
     )
 
 
@@ -234,15 +231,16 @@ compilergym:cBench-v0/adpcm> Action -rewrite-symbols
 No effect
 Action -rewrite-statepoints-for-gc
 (.|\n)*
-Actions -rewrite-symbols -rewrite-statepoints-for-gc .* -loop-guard-widening -simplifycfg -inferattrs in [0-9.mu]*s.
+Actions -rewrite-symbols -rewrite-statepoints-for-gc .* -loop-guard-widening -simplifycfg -inferattrs in [0-9.mu]*s with reward 0.
 compilergym:cBench-v0/adpcm> compilergym:cBench-v0/adpcm>    Depth | Action         | Effect   | Done   | Reward   |   Cumulative Reward
 ---------+----------------+----------+--------+----------+---------------------
        4 | -inferattrs    | True     | False  | -        |                   0
        3 | -simplifycfg   | True     | False  | -        |                   0
        2 | -functionattrs | True     | False  | -        |                   0
        1 | -newgvn        | True     | False  | -        |                   0
-       0 | <init>         | False    | False  | 0        |                   0"""    
+       0 | <init>         | False    | False  | 0        |                   0""",
     )
+
 
 def test_hill_climb():
     io_check(
@@ -266,9 +264,10 @@ Hill climb complete in [0-9.mu]*s. Accepted 1 of 10 steps for total reward of 74
 compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        1 | -newgvn  | True     | False  |       74 |                  74
-       0 | <init>   | False    | False  |        0 |                   0"""
+       0 | <init>   | False    | False  |        0 |                   0""",
     )
-    
+
+
 def test_greedy():
     io_check(
         """set_benchmark cBench-v0/adpcm
@@ -288,9 +287,10 @@ Greedy 1 steps in [0-9.mu]*s
 compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        1 | -mem2reg | True     | False  |      181 |                 181
-       0 | <init>   | False    | False  |        0 |                   0"""
+       0 | <init>   | False    | False  |        0 |                   0""",
     )
-    
+
+
 def test_commandline():
     io_check(
         """set_benchmark cBench-v0/adpcm
@@ -301,9 +301,10 @@ compilergym:cBench-v0/adpcm> Action -rewrite-symbols
 No effect
 Action -rewrite-statepoints-for-gc
 No effect
-Actions -rewrite-symbols -rewrite-statepoints-for-gc in [0-9.mu]*s.
-compilergym:cBench-v0/adpcm> \$ opt -rewrite-symbols -rewrite-statepoints-for-gc input.bc -o output.bc"""
+Actions -rewrite-symbols -rewrite-statepoints-for-gc in [0-9.mu]*s with reward 0.
+compilergym:cBench-v0/adpcm> \$ opt -rewrite-symbols -rewrite-statepoints-for-gc input.bc -o output.bc""",
     )
+
 
 def test_reset():
     io_check(
@@ -316,11 +317,11 @@ compilergym:cBench-v0/adpcm> Action -rewrite-symbols
 No effect
 Action -rewrite-statepoints-for-gc
 No effect
-Actions -rewrite-symbols -rewrite-statepoints-for-gc in [0-9.mu]*s.
+Actions -rewrite-symbols -rewrite-statepoints-for-gc in [0-9.mu]*s with reward 0.
 compilergym:cBench-v0/adpcm> Reset in [0-9.mu]*s
 compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
-       0 | <init>   | False    | False  |        0 |                   0"""
+       0 | <init>   | False    | False  |        0 |                   0""",
     )
 
 
