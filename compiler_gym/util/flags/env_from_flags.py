@@ -112,8 +112,9 @@ def env_from_flags(benchmark: Optional[Union[str, Benchmark]] = None) -> Compile
 
     connection_settings = connection_settings_from_flags()
     if FLAGS.env:
-        env = gym.make(FLAGS.env, connection_settings=connection_settings)
-        env.benchmark = benchmark or env.benchmark
+        env = gym.make(
+            FLAGS.env, benchmark=benchmark, connection_settings=connection_settings
+        )
         if FLAGS.observation:
             env.observation_space = FLAGS.observation
         if FLAGS.reward:

@@ -26,6 +26,17 @@ py_test(
 )
 
 py_test(
+    name = "llvm_trajectory_replay_fuzz_test",
+    srcs = ["llvm_trajectory_replay_fuzz_test.py"],
+    deps = [
+        "//compiler_gym",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+        "//tests/pytest_plugins:random_util",
+    ],
+)
+
+py_test(
     name = "llvm_validate_fuzz_test",
     srcs = ["llvm_validate_fuzz_test.py"],
     deps = [
