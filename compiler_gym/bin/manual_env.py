@@ -8,7 +8,7 @@
 
     $ python -m compiler_gym.bin.manual_env --env=<env> [--benchmark=<name>] [--observation=<space>] [--reward=<space>]
 
-The benchmark to use can be specified using :code:`--benchmark=<name>`. 
+The benchmark to use can be specified using :code:`--benchmark=<name>`.
 
 A tutorial is given in the string tutorial below.
 """
@@ -65,8 +65,8 @@ line, the benchmark can be specified in the shell with:
 
 When a benchmark is set, the prompt will update with the name of the benchmark.
 Supposing that is "bench", then the prompt would be:
-    compilergym:bench> 
-    
+    compilergym:bench>
+
 The list of available benchmarks can be shown with:
     compilergym:bench> list_benchmarks
 
@@ -114,7 +114,7 @@ underlying compiler), whether this terminated compiler, and what the per action
 and cumulative rewards are.
 
 The last action can be undone by:
-    compilergym:bench> undo 
+    compilergym:bench> undo
 
 All actions in the stack can be undone at once by:
     compilergym:bench> reset
@@ -150,7 +150,7 @@ behaviour as the actions through the standard system shell:
 
 Searching
 ---------
-Some very basic search capabilities are supported, directly in the shell. Each 
+Some very basic search capabilities are supported, directly in the shell. Each
 of them just looks for another action to add.
 
 First, is the random search through this command:
@@ -169,7 +169,7 @@ Miscelaneous
 ------------
 One useful command is:
     compilergym:bench> breakpoint
-Which drops into the python debugger. This is very useful if you want to see 
+Which drops into the python debugger. This is very useful if you want to see
 what is going on internally. There is a 'self.env' object that represents the
 environment that is definitely worth exploring.
 
@@ -182,9 +182,7 @@ Drops out of the shell.  Ctrl-D should have the same effect.
 class ActionHistoryElement:
     """The compiler gym shell records a list of actions taken. This class represent those elements."""
 
-    def __init__(
-        self, action_name, action_index, observation, reward, done, info
-    ):
+    def __init__(self, action_name, action_index, observation, reward, done, info):
         """Arguments are the returns from env.step"""
         self.action_name = action_name
         self.action_index = action_index
@@ -211,7 +209,7 @@ class CompilerGymShell(cmd.Cmd):
 
     intro = """Welcome to the CompilerGym Shell!
 ---------------------------------
-Type help or ? for more information. 
+Type help or ? for more information.
 help tutorial will give a step by step guide.
 """
 
@@ -406,7 +404,7 @@ help tutorial will give a step by step guide.
         for i in range(len(args)):
             if args[i] == "-":
                 args[i] = actions[random.randrange(self.env.action_space.n)]
-        
+
         # Now do the actions
         cum_reward = 0
         actions_taken = []
@@ -414,7 +412,7 @@ help tutorial will give a step by step guide.
             for a in args:
                 print(f"Action {a}")
                 index = actions.index(a)
-                
+
                 observation, reward, done, info = self.env.step(index)
 
                 # Print the observation, if available.
@@ -426,6 +424,7 @@ help tutorial will give a step by step guide.
                 # Print the reward, if available.
                 if self.env.reward_space and reward is not None:
                     print(f"Reward: {reward:.6f}")
+                    cum_reward += reward
 
                 # Append the history element
                 hist = ActionHistoryElement(
@@ -437,17 +436,17 @@ help tutorial will give a step by step guide.
                     info,
                 )
                 self.stack.append(hist)
-                
+
                 if hist.has_no_effect():
                     print("No effect")
-                
+
                 actions_taken.append(a)
                 if hist.done:
                     print("Episode ended by environment: ", info["error_details"])
                     print("No further actions will be possible")
                     break
         print(
-            f"Actions {' '.join(actions_taken)} in {timer}.",
+            f"Actions {' '.join(actions_taken)} in {timer} with reward {cum_reward}.",
             flush=True,
         )
 
@@ -457,9 +456,7 @@ help tutorial will give a step by step guide.
         old_stack = self.stack
         self.stack = []
         for i, old_hist in enumerate(old_stack):
-            observation, reward, done, info = self.env.step(
-                old_hist.action_index
-            )
+            observation, reward, done, info = self.env.step(old_hist.action_index)
             hist = ActionHistoryElement(
                 old_hist.action_name,
                 old_hist.action_index,
@@ -521,7 +518,9 @@ help tutorial will give a step by step guide.
                 )
                 if done:
                     print("Episode ended by environment: ", info["error_details"])
-        print(f"Hill climb complete in {timer}. Accepted {num_accepted} of {num_steps} steps for total reward of {cum_reward}.")
+        print(
+            f"Hill climb complete in {timer}. Accepted {num_accepted} of {num_steps} steps for total reward of {cum_reward}."
+        )
 
     def get_action_rewards(self):
         """Get all the rewards for the possible actions at this point"""
@@ -529,9 +528,7 @@ help tutorial will give a step by step guide.
         for index, action in enumerate(self.env.action_space.names):
             self.rerun_stack()
             observation, reward, done, info = self.env.step(index)
-            hist = ActionHistoryElement(
-                action, index, observation, reward, done, info
-            )
+            hist = ActionHistoryElement(action, index, observation, reward, done, info)
             items.append(hist)
             print(f"Action: {action} Reward: {reward:.6f}")
 
@@ -586,11 +583,7 @@ help tutorial will give a step by step guide.
         with Timer() as timer:
             for i in range(num_steps):
                 best = self.get_action_rewards()[0]
-                if (
-                    (not best.done)
-                    and (best.reward is not None)
-                    and (best.reward > 0)
-                ):
+                if (not best.done) and (best.reward is not None) and (best.reward > 0):
                     self.env.step(best.action_index)
                     self.stack.append(best)
                     print(
@@ -729,9 +722,7 @@ help tutorial will give a step by step guide.
             name = hist.action_name
             effect = hist.has_effect()
             done = hist.done
-            reward = (
-                f"{hist.reward:.6f}" if hist.reward is not None else "-"
-            )
+            reward = f"{hist.reward:.6f}" if hist.reward is not None else "-"
             total += hist.reward or 0
             row = (i + 1, name, effect, done, reward, f"{total:.6f}")
             rows.append(row)
@@ -762,9 +753,7 @@ help tutorial will give a step by step guide.
             if old_hist.has_effect() and (
                 old_hist.reward is None or old_hist.reward > 0
             ):
-                observation, reward, done, info = self.env.step(
-                    old_hist.action_index
-                )
+                observation, reward, done, info = self.env.step(old_hist.action_index)
                 hist = ActionHistoryElement(
                     old_hist.action_name,
                     old_hist.action_index,
