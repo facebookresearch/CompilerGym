@@ -405,7 +405,7 @@ help tutorial will give a step by step guide.
         # Replace random actions
         for i in range(len(args)):
             if args[i] == "-":
-                args[i] = actions[self.env.action_space.sample()]
+                args[i] = actions[random.randrange(self.env.action_space.n)]
         
         # Now do the actions
         cum_reward = 0
@@ -498,7 +498,7 @@ help tutorial will give a step by step guide.
         cum_reward = 0
         with Timer() as timer:
             for i in range(num_steps):
-                index = self.env.action_space.sample()
+                index = random.randrange(self.env.action_space.n)
                 action = self.env.action_space.names[index]
 
                 observation, reward, done, info = self.env.step(index)
