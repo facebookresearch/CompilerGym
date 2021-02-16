@@ -48,7 +48,6 @@ help tutorial will give a step by step guide.
                 + ("*" * 80)
                 + f"\nUsing output:\n{out.stdout}\n"
             )
-            assert False
 
     finally:
         sys.stdin = old_stdin
