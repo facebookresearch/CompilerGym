@@ -84,6 +84,11 @@ def test_reward(benchmark, env: CompilerEnv, benchmark_name, reward_space):
     benchmark(lambda: env.reward[reward_space])
 
 
+def test_fork(benchmark, env: CompilerEnv, benchmark_name):
+    env.reset(benchmark_name)
+    benchmark(lambda: env.fork().close())
+
+
 if __name__ == "__main__":
     main(
         extra_pytest_args=[
