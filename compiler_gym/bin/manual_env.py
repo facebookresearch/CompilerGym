@@ -8,46 +8,188 @@
 
     $ python -m compiler_gym.bin.manual_env --env=<env> [--benchmark=<name>] [--observation=<space>] [--reward=<space>]
 
-The benchmark to use can be specified using :code:`--benchmark=<name>`. If not
-provided, you be presented with a list of benchmarks to choose from on launch.
-Select :code:`random` to select a benchmark randomly.
+The benchmark to use can be specified using :code:`--benchmark=<name>`. 
+
+A tutorial is given in the string tutorial below.
 """
+import cmd
+import random
+import readline
 import sys
-from typing import Optional
 
 from absl import app, flags
-import cmd
-import readline
-import random
 
-import compiler_gym.util.flags.ls_benchmark  # Flag definition.
+import compiler_gym.util.flags.ls_benchmark  # noqa Flag definition.
 from compiler_gym.datasets.dataset import require
 from compiler_gym.envs import CompilerEnv
-from compiler_gym.util import user_input
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.flags.env_from_flags import env_from_flags
-from compiler_gym.util.shell_format import emph
 from compiler_gym.util.tabulate import tabulate
 from compiler_gym.util.timer import Timer
 
 FLAGS = flags.FLAGS
 
+tutorial = """
+CompilerGym Shell Tutorial
+==========================
+
+This program gives a basic shell through which many of commands from
+CompilerGym can be executed. CompilerGym provides a simple Python interface to
+various compiler functions, enabling programs to be compiled in different ways
+and to make queries about those programs. The goal is to have a simple system
+for machine learning in compilers.
+
+Downloading Datasets
+--------------------
+When entering the Shell, the environment (compiler choice) will have already
+been made on the command line. The benchmark or program to be compiled may not
+yet be set. Before setting a benchmark, however, the corresponding dataset must
+be downloaded. You may have already downloaded a dataset through the
+compiler_gym.bin.datasets command, but if not, you can do that from this shell.
+
+To download a dataset, call:
+    compilergym:NO-BENCHMARK> require_dataset <dataset-name>
+The command and the dataset name should tab-complete for you (most things will
+tab-complete in the shell). You can also see what datasets are available with
+this command:
+    compilergym:NO-BENCHMARK> list_datasets
+
+Due to a current limitation in the software, you must quit the shell (exit
+command or ctrl-d), before then benchmarks in the dataset are recognised.
+
+Setting a Benchmark, Reward and Observation
+-------------------------------------------
+The CompilerGym operates on a program or benchmark. If not set on the command
+line, the benchmark can be specified in the shell with:
+    compilergym:NO-BENCHMARK> set_benchmark <benchmark-name>
+
+When a benchmark is set, the prompt will update with the name of the benchmark.
+Supposing that is "bench", then the prompt would be:
+    compilergym:bench> 
+    
+The list of available benchmarks can be shown with:
+    compilergym:bench> list_benchmarks
+
+The default reward and observation can be similarly set with:
+    compilergym:bench> set_default_reward <reward-name>
+    compilergym:bench> set_default_observation <observation-name>
+And lists of the choices are available with:
+    compilergym:bench> list_rewards
+    compilergym:bench> list_observations
+
+The default rewards and observations will be reported every time an action is
+taken. So, if, for example, you want to see how the instruction count of the
+benchmark program is affected by your actions, set the default reward to
+"IrInstructionCount". Then the change in instruction count for each action will
+be reported.
+
+Additionally, some of the search techniques require the default reward to be
+set, since they will try to optimise that reward.
+
+Actions and the Action Stack
+----------------------------
+In CompilerGym an action corresponds to invoking an compiler operation
+(currently an LLVM opt pass) on the intermediate representation of the program.
+Each action acts on the result of the previous action and so on.
+
+So, for example, to apply first the 'tail call elimination' pass, then the
+'loop unrolling' pass we call two actions:
+    compilergym:bench> action -tailcallelim
+    compilergym:bench> action -loop-unroll
+Each action will report its default reward.
+Note that multiple actions can be placed on a single line, so that the above is
+equivalent to:
+    compilergym:bench> action -tailcallelim -loop-unroll
+
+You can choose a random action, by using just a '-' as the action name:
+    compilergym:bench> action -
+Since an empty line on the shell repeats the last action, you can execute many
+random actions by typing that line first then holding down return.
+
+The actions are recorded in a stack, with the latest action on the top of the
+stack. You can view the action stack with stack command:
+    compilergym:bench> stack
+This will show for each action if it had an effect (as computed by the
+underlying compiler), whether this terminated compiler, and what the per action
+and cumulative rewards are.
+
+The last action can be undone by:
+    compilergym:bench> undo 
+
+All actions in the stack can be undone at once by:
+    compilergym:bench> reset
+
+You can find out what the effect of each action would be by calling this
+command:
+    compilergym:bench> try_all_actions
+This will show a table with the reward for each action, sorted by best first.
+
+If you have a large stack of actions, many of which are not profitable, you can
+simplify the stack with this command:
+    compilergym:bench> simplify_stack
+This will redo the entire stack, keeping only those actions which previously
+gave good rewards. (Note this doesn't mean that the simplified stack will only
+have positive rewards, some negative actions may be necessary set up for a
+later positive reward.)
+
+Current Status
+--------------
+For the current state of the program - after whatever actions have been called
+on it - you can make several queries.
+
+The first is to get a reward. This might not be the same as the current default
+reward:
+    compilergym:bench> reward <reward-name>
+
+You can see various observations with:
+    compilergym:bench> observation <observation-name>
+
+Finally, you can print the equivalent command line for achieving the same
+behaviour as the actions through the standard system shell:
+    compilergym:bench> commandline
+
+Searching
+---------
+Some very basic search capabilities are supported, directly in the shell. Each 
+of them just looks for another action to add.
+
+First, is the random search through this command:
+    compilergym:bench> action -
+Multiple steps can be taken by holding down the return key.
+
+A hill-climbing search tries an action, but will only accept it if it yields a
+positive reward:
+    compilergym:bench> hill_climb <num-steps>
+
+A simple greedy search tries all possible actions and takes the one with the
+highest reward, stopping when no action has a positive reward:
+    compilergym:bench> greedy <num-steps>
+
+Miscelaneous
+------------
+One useful command is:
+    compilergym:bench> breakpoint
+Which drops into the python debugger. This is very useful if you want to see 
+what is going on internally. There is a 'self.env' object that represents the
+environment that is definitely worth exploring.
+
+And finally:
+    compilergym:bench> exit
+Drops out of the shell.  Ctrl-D should have the same effect.
+"""
+
 
 class ActionHistoryElement:
     """The compiler gym shell records a list of actions taken. This class represent those elements."""
-    def __init__(self,
-        action_name,
-        action_index,
-        eager_observation,
-        eager_reward,
-        done,
-        info
+
+    def __init__(
+        self, action_name, action_index, observation, reward, done, info
     ):
         """Arguments are the returns from env.step"""
         self.action_name = action_name
         self.action_index = action_index
-        self.eager_observation = eager_observation
-        self.eager_reward = eager_reward
+        self.observation = observation
+        self.reward = reward
         self.done = done
         self.info = info
 
@@ -66,8 +208,12 @@ class CompilerGymShell(cmd.Cmd):
     selection observations, rewards, and actions to run as they see fit. This is
     useful for debugging.
     """
-    
-    init = "Welcome to the CompilerGym manual environment!"
+
+    intro = """Welcome to the CompilerGym Shell!
+---------------------------------
+Type help or ? for more information. 
+help tutorial will give a step by step guide.
+"""
 
     def __init__(self, env: CompilerEnv):
         """Initialise with an environment.
@@ -96,6 +242,9 @@ class CompilerGymShell(cmd.Cmd):
 
         self.set_prompt()
 
+    def help_tutorial(self):
+        print(tutorial)
+
     def preloop(self):
         self.old_completer_delims = readline.get_completer_delims()
         readline.set_completer_delims(" \t\n")
@@ -104,7 +253,7 @@ class CompilerGymShell(cmd.Cmd):
         readline.set_completer_delims(self.old_completer_delims)
         # Clear the stack
         self.stack.clear()
-        self.env.close();
+        self.env.close()
         self.env = None
 
     def init_benchmarks(self):
@@ -115,7 +264,6 @@ class CompilerGymShell(cmd.Cmd):
         for i, benchmark in enumerate(self.benchmarks):
             if benchmark.startswith("benchmark://"):
                 self.benchmarks[i] = benchmark[len("benchmark://") :]
-
 
     def set_prompt(self):
         """Set the prompt - shows the benchmark name"""
@@ -134,7 +282,6 @@ class CompilerGymShell(cmd.Cmd):
         else:
             return options
 
-
     def get_datasets(self):
         """Get the list of available datasets"""
         return sorted([k for k in self.env.available_datasets])
@@ -149,20 +296,18 @@ class CompilerGymShell(cmd.Cmd):
 
     def do_require_dataset(self, arg):
         """Require dataset
-            The argument is the name of the dataset to require.
+        The argument is the name of the dataset to require.
         """
         if self.get_datasets().count(arg):
-            with Timer() as timer:
+            with Timer(f"Downloaded dataset {arg}"):
                 require(self.env, arg)
             self.init_benchmarks()
             # FIXME CHRIS, why can't I get it to update the list of benchmarks?
             # I have to restart
-            print(f"Downloaded dataset {arg} in {timer}")
             print("Application must be restarted to make changes visible.")
         else:
             print("Unknown dataset, '" + arg + "'")
             print("Available datasets are listed with command, list_available_datasets")
-
 
     def do_list_benchmarks(self, arg):
         """List all of the available benchmarks"""
@@ -180,11 +325,11 @@ class CompilerGymShell(cmd.Cmd):
 
     def do_set_benchmark(self, arg):
         """Set the current benchmark.
-            set_benchmark <name> - set the benchmark
-            The name should come from the list of benchmarks printed by the command list_benchmarks.
-            Tab completion will be used if available.
-            This command will delete the action history.
-            Use '-' for a random benchmark.
+        set_benchmark <name> - set the benchmark
+        The name should come from the list of benchmarks printed by the command list_benchmarks.
+        Tab completion will be used if available.
+        This command will delete the action history.
+        Use '-' for a random benchmark.
         """
         if arg == "-":
             arg = random.choice(self.benchmarks)
@@ -195,18 +340,19 @@ class CompilerGymShell(cmd.Cmd):
 
             # Set the current benchmark
             with Timer() as timer:
-                eager_observation = self.env.reset(benchmark=arg)
-
+                observation = self.env.reset(benchmark=arg)
             print(f"Reset {self.env.benchmark} environment in {timer}")
-            if self.env.observation_space and eager_observation is not None:
-                print(f"Observation: {self.env.observation_space.to_string(eager_observation)}")
+
+            if self.env.observation_space and observation is not None:
+                print(
+                    f"Observation: {self.env.observation_space.to_string(observation)}"
+                )
 
             self.set_prompt()
 
         else:
             print("Unknown benchmark, '" + arg + "'")
             print("Bencmarks are listed with command, list_benchmarks")
-
 
     def get_actions(self):
         """Get the list of actions"""
@@ -223,93 +369,122 @@ class CompilerGymShell(cmd.Cmd):
 
     def do_action(self, arg):
         """Take a single action step.
-            action <name> - take the named action
-            The name should come from the list of actions printed by the command list_actions.
-            Tab completion will be used if available.
-            Use '-' for a random action.
+        action <name> - take the named action
+        The name should come from the list of actions printed by the command list_actions.
+        Tab completion will be used if available.
+        Use '-' for a random action.
         """
         if not self.env.benchmark:
             print("No benchmark set, please call the set_benchmark command")
             return
 
         if self.stack and self.stack[-1].done:
-            print("No action possible, last action ended by the environment with error:", self.stack[-1].info["error_details"])
+            print(
+                "No action possible, last action ended by the environment with error:",
+                self.stack[-1].info["error_details"],
+            )
             print("Consider commands, back or reset")
             return
 
         # Determine which action to apply
         actions = self.get_actions()
-        if arg == "-":  # Random
-            index = self.env.action_space.sample()
-            arg = actions[index]
-            print(f"action {arg}")
-        elif actions.count(arg):
-            index = actions.index(arg)
-        else:
-            print("Unknown action, '" + arg + "'")
+        # Allow for multiple actions at once
+        args = arg.split()
+        if not args:
+            print("No action given")
             print("Actions are listed with command, list_actions")
             print("Use '-' for a random action")
             return
-
-        # Do the step
+        # Check each action before executing
+        for arg in args:
+            if arg != "-" and actions.count(arg) == 0:
+                print("Unknown action, '" + arg + "'")
+                print("Actions are listed with command, list_actions")
+                print("Use '-' for a random action")
+                return
+        # Replace random actions
+        for i in range(len(args)):
+            if args[i] == "-":
+                args[i] = actions[self.env.action_space.sample()]
+        
+        # Now do the actions
+        cum_reward = 0
+        actions_taken = []
         with Timer() as timer:
-            eager_observation, eager_reward, done, info = self.env.step(index)
+            for a in args:
+                print(f"Action {a}")
+                index = actions.index(a)
+                
+                observation, reward, done, info = self.env.step(index)
 
-        # Print the eager observation, if available.
-        if self.env.observation_space and eager_observation is not None:
-            print(f"Observation: {self.env.observation_space.to_string(eager_observation)}")
+                # Print the observation, if available.
+                if self.env.observation_space and observation is not None:
+                    print(
+                        f"Observation: {self.env.observation_space.to_string(observation)}"
+                    )
 
-        # Print the eager reward and the diff, if available.
-        if self.env.reward_space and eager_reward is not None:
-            print(f"Reward: {eager_reward:.6f}")
+                # Print the reward, if available.
+                if self.env.reward_space and reward is not None:
+                    print(f"Reward: {reward:.6f}")
 
-        # Append the history element
-        hist = ActionHistoryElement(
-            self.env.action_space.names[index],
-            index,
-            eager_observation,
-            eager_reward,
-            done,
-            info
-        )
-        self.stack.append(hist)
-
+                # Append the history element
+                hist = ActionHistoryElement(
+                    self.env.action_space.names[index],
+                    index,
+                    observation,
+                    reward,
+                    done,
+                    info,
+                )
+                self.stack.append(hist)
+                
+                if hist.has_no_effect():
+                    print("No effect")
+                
+                actions_taken.append(a)
+                if hist.done:
+                    print("Episode ended by environment: ", info["error_details"])
+                    print("No further actions will be possible")
+                    break
         print(
-            f"Action {self.env.action_space.names[index]} in {timer}.",
-            " No effect." if hist.has_no_effect() else "",
+            f"Actions {' '.join(actions_taken)} in {timer}.",
             flush=True,
         )
-        if done:
-            print("Episode ended by environment: ", info["error_details"])
-            print("No further actions will be possible")
 
-    def rerun_stack(self, check_rewards = True):
-        """Rerun all the actions on the stack.
-        """
+    def rerun_stack(self, check_rewards=True):
+        """Rerun all the actions on the stack."""
         self.env.reset()
         old_stack = self.stack
         self.stack = []
         for i, old_hist in enumerate(old_stack):
-            eager_observation, eager_reward, done, info = self.env.step(old_hist.action_index)
+            observation, reward, done, info = self.env.step(
+                old_hist.action_index
+            )
             hist = ActionHistoryElement(
                 old_hist.action_name,
                 old_hist.action_index,
-                eager_observation,
-                eager_reward,
+                observation,
+                reward,
                 done,
-                info
+                info,
             )
             self.stack.append(hist)
 
-            if check_rewards and eager_reward != old_hist.eager_reward:
-                print(f"Warning previous eager reward at {i}: {hist.action_name} was {hist.eager_reward:.6f} now {eager_reward:.6f}")
+            if check_rewards and reward != old_hist.reward:
+                print(
+                    f"Warning previous eager reward at {i}: {hist.action_name} was {hist.reward:.6f} now {reward:.6f}"
+                )
 
     def do_hill_climb(self, arg):
         """Do some steps of hill climbing.
-            A random action is taken, but only accepted if it has a positive reward.
-            An argument, if given, should be the number of steps to take.
-            The search will try to improve the default reward. Please call set_default_reward if needed.
+        A random action is taken, but only accepted if it has a positive reward.
+        An argument, if given, should be the number of steps to take.
+        The search will try to improve the default reward. Please call set_default_reward if needed.
         """
+        if not self.env.benchmark:
+            print("No benchmark set, please call the set_benchmark command")
+            return
+
         if not self.env.reward_space:
             print("No default reward set. Call set_default_reward")
             return
@@ -319,74 +494,86 @@ class CompilerGymShell(cmd.Cmd):
         except ValueError:
             num_steps = 1
 
+        num_accepted = 0
+        cum_reward = 0
         with Timer() as timer:
             for i in range(num_steps):
                 index = self.env.action_space.sample()
                 action = self.env.action_space.names[index]
 
-                eager_observation, eager_reward, done, info = self.env.step(index)
+                observation, reward, done, info = self.env.step(index)
 
-                accept = not done and (eager_reward is not None) and (eager_reward > 0)
+                accept = not done and (reward is not None) and (reward > 0)
                 if accept:
                     # Append the history element
                     hist = ActionHistoryElement(
-                        action,
-                        index,
-                        eager_observation,
-                        eager_reward,
-                        done,
-                        info
+                        action, index, observation, reward, done, info
                     )
                     self.stack.append(hist)
+                    num_accepted += 1
+                    cum_reward += reward
                 else:
                     # Basically undo
                     self.rerun_stack()
 
-                print(f"Step: {i+1} Action: {action} Reward: {eager_reward:.6f} Accept: {accept}")
+                print(
+                    f"Step: {i+1} Action: {action} Reward: {reward:.6f} Accept: {accept}"
+                )
                 if done:
                     print("Episode ended by environment: ", info["error_details"])
-        print(f"Hill climbed {num_steps} steps in {timer}")
+        print(f"Hill climb complete in {timer}. Accepted {num_accepted} of {num_steps} steps for total reward of {cum_reward}.")
 
     def get_action_rewards(self):
         """Get all the rewards for the possible actions at this point"""
         items = []
         for index, action in enumerate(self.env.action_space.names):
             self.rerun_stack()
-            eager_observation, eager_reward, done, info = self.env.step(index)
+            observation, reward, done, info = self.env.step(index)
             hist = ActionHistoryElement(
-                action,
-                index,
-                eager_observation,
-                eager_reward,
-                done,
-                info
+                action, index, observation, reward, done, info
             )
             items.append(hist)
-            print(f"Action: {action} Reward: {eager_reward:.6f}")
+            print(f"Action: {action} Reward: {reward:.6f}")
 
         self.rerun_stack()
-        items.sort(key = lambda h: h.eager_reward, reverse = True)
+        items.sort(key=lambda h: h.reward, reverse=True)
         return items
 
     def do_try_all_actions(self, args):
         """Tries all actions from this position and reports the results in sorted order by reward"""
-        with Timer() as timer:
+        if not self.env.benchmark:
+            print("No benchmark set, please call the set_benchmark command")
+            return
+
+        if not self.env.reward_space:
+            print("No default reward set. Call set_default_reward")
+            return
+
+        with Timer("Got actions"):
             items = self.get_action_rewards()
-        print(f"Got actions in {timer}")
 
         def row(item):
-            return (item.action_name, item.has_effect(), item.done, f"{item.eager_reward:.6f}")
+            return (
+                item.action_name,
+                item.has_effect(),
+                item.done,
+                f"{item.reward:.6f}",
+            )
+
         rows = [row(item) for item in items]
         headers = ["Action", "Effect", "Done", "Eager Reward"]
         print(tabulate(rows, headers=headers, tablefmt="presto"))
 
-
     def do_greedy(self, arg):
         """Do some greedy steps.
-            All actions are tried and the one with the biggest positive reward is accepted.
-            An argument, if given, should be the number of steps to take.
-            The search will try to improve the default reward. Please call set_default_reward if needed.
+        All actions are tried and the one with the biggest positive reward is accepted.
+        An argument, if given, should be the number of steps to take.
+        The search will try to improve the default reward. Please call set_default_reward if needed.
         """
+        if not self.env.benchmark:
+            print("No benchmark set, please call the set_benchmark command")
+            return
+
         if not self.env.reward_space:
             print("No default reward set. Call set_default_reward")
             return
@@ -399,16 +586,23 @@ class CompilerGymShell(cmd.Cmd):
         with Timer() as timer:
             for i in range(num_steps):
                 best = self.get_action_rewards()[0]
-                if (not best.done) and (best.eager_reward is not None) and (best.eager_reward > 0):
+                if (
+                    (not best.done)
+                    and (best.reward is not None)
+                    and (best.reward > 0)
+                ):
                     self.env.step(best.action_index)
                     self.stack.append(best)
-                    print(f"Step: {i+1} Selected action: {best.action_name} Reward: {best.eager_reward:.6f}")
+                    print(
+                        f"Step: {i+1} Selected action: {best.action_name} Reward: {best.reward:.6f}"
+                    )
                 else:
-                    print(f"Step: {i+1} Selected no action")
+                    print(f"Step: {i+1} Selected no action.")
+                    if i + 1 < num_steps:
+                        print("Greedy search stopping early.")
                     break
 
-        print(f"Greedy {num_steps} steps in {timer}")
-
+        print(f"Greedy {i+1} steps in {timer}")
 
     def do_list_observations(self, arg):
         """List the available observations"""
@@ -420,13 +614,16 @@ class CompilerGymShell(cmd.Cmd):
 
     def do_observation(self, arg):
         """Show an observation value
-            observation <name> - show the named observation
-            The name should come from the list of observations printed by the command list_observations.
-            Tab completion will be used if available.
+        observation <name> - show the named observation
+        The name should come from the list of observations printed by the command list_observations.
+        Tab completion will be used if available.
         """
         if not self.env.benchmark:
             print("No benchmark set, please call the set_benchmark command")
             return
+
+        if arg == "" and self.env.observation_space:
+            arg = self.env.observation_space.id
 
         if self.observations.count(arg):
             with Timer() as timer:
@@ -443,11 +640,11 @@ class CompilerGymShell(cmd.Cmd):
 
     def do_set_default_observation(self, arg):
         """Set the default observation space
-            set_default_observation <name> - set the named observation
-            The name should come from the list of observations printed by the command list_observations.
-            Tab completion will be used if available.
-            With no argument it will set to None.
-            This command will rerun the actions on the stack.
+        set_default_observation <name> - set the named observation
+        The name should come from the list of observations printed by the command list_observations.
+        Tab completion will be used if available.
+        With no argument it will set to None.
+        This command will rerun the actions on the stack.
         """
         if not self.env.benchmark:
             print("No benchmark set, please call the set_benchmark command")
@@ -457,7 +654,7 @@ class CompilerGymShell(cmd.Cmd):
         if not arg or self.observations.count(arg):
             with Timer() as timer:
                 self.env.observation_space = arg if arg else None
-                self.rerun_stack(check_rewards = False)
+                self.rerun_stack(check_rewards=False)
             print(f"Observation {arg} in {timer}")
         else:
             print("Unknown observation, '" + (arg if arg else "None") + "'")
@@ -473,19 +670,22 @@ class CompilerGymShell(cmd.Cmd):
 
     def do_reward(self, arg):
         """Show an reward value
-            reward <name> - show the named reward
-            The name should come from the list of rewards printed by the command list_rewards.
-            Tab completion will be used if available.
+        reward <name> - show the named reward
+        The name should come from the list of rewards printed by the command list_rewards.
+        Tab completion will be used if available.
         """
         if not self.env.benchmark:
             print("No benchmark set, please call the set_benchmark command")
             return
 
+        if arg == "" and self.env.reward_space:
+            arg = self.env.reward_space.id
+
         if self.rewards.count(arg):
             with Timer(f"Reward {arg}"):
                 print(f"{self.env.reward[arg]:.6f}")
         else:
-            print("Unknown reward, '" + arg + "'")
+            print(f"Unknown reward, '{arg}'")
             print("Rewards are listed with command, list_rewards")
 
     def complete_set_default_reward(self, text, line, begidx, endidx):
@@ -494,11 +694,11 @@ class CompilerGymShell(cmd.Cmd):
 
     def do_set_default_reward(self, arg):
         """Set the default reward space
-            set_default_reward <name> - set the named reward
-            The name should come from the list of rewards printed by the command list_rewards.
-            Tab completion will be used if available.
-            With no argument it will set to None.
-            This command will rerun the actions on the stack.
+        set_default_reward <name> - set the named reward
+        The name should come from the list of rewards printed by the command list_rewards.
+        Tab completion will be used if available.
+        With no argument it will set to None.
+        This command will rerun the actions on the stack.
         """
         if not self.env.benchmark:
             print("No benchmark set, please call the set_benchmark command")
@@ -508,11 +708,10 @@ class CompilerGymShell(cmd.Cmd):
         if not arg or self.rewards.count(arg):
             with Timer(f"Reward {arg}"):
                 self.env.reward_space = arg if arg else None
-                self.rerun_stack(check_rewards = False)
+                self.rerun_stack(check_rewards=False)
         else:
             print("Unknown reward, '" + (arg if arg else "None") + "'")
             print("Rewards are listed with command, list_rewards")
-
 
     def do_commandline(self, arg):
         """Show the command line equivalent of the actions taken so far"""
@@ -520,15 +719,21 @@ class CompilerGymShell(cmd.Cmd):
 
     def do_stack(self, arg):
         """Show the environments on the stack. The current environment is the first shown."""
+        if not self.env.benchmark:
+            print("No benchmark set, please call the set_benchmark command")
+            return
+
         rows = []
         total = 0
         for i, hist in enumerate(self.stack):
             name = hist.action_name
             effect = hist.has_effect()
             done = hist.done
-            reward = f"{hist.eager_reward:.6f}" if hist.eager_reward is not None else "-"
-            total += hist.eager_reward or 0
-            row = (i+1, name, effect, done, reward, f"{total:.6f}")
+            reward = (
+                f"{hist.reward:.6f}" if hist.reward is not None else "-"
+            )
+            total += hist.reward or 0
+            row = (i + 1, name, effect, done, reward, f"{total:.6f}")
             rows.append(row)
         rows.reverse()
         rows.append((0, "<init>", False, False, 0, 0))
@@ -538,48 +743,55 @@ class CompilerGymShell(cmd.Cmd):
 
     def do_simplify_stack(self, arg):
         """Simplify the stack
-            There may be many actions on the stack which have no effect or created a negative reward.
-            This command makes a basic attempt to remove them. It reruns the stack, using only the
-            commands which appeared to have a effect and positive reward. If the reward is None
-            e.g. if there was no default reward set, then it will only check if there was some effect.
-            Note that the new rewards are not checked, so there may be odd effects caused by an action
-            being removed that previously had a negative reward being necessary for a later action to
-            have a positive reward. This means you might see non-positive rewards on the stack afterwards.
+        There may be many actions on the stack which have no effect or created a negative reward.
+        This command makes a basic attempt to remove them. It reruns the stack, using only the
+        commands which appeared to have a effect and positive reward. If the reward is None
+        e.g. if there was no default reward set, then it will only check if there was some effect.
+        Note that the new rewards are not checked, so there may be odd effects caused by an action
+        being removed that previously had a negative reward being necessary for a later action to
+        have a positive reward. This means you might see non-positive rewards on the stack afterwards.
         """
+        if not self.env.benchmark:
+            print("No benchmark set, please call the set_benchmark command")
+            return
+
         self.env.reset()
         old_stack = self.stack
         self.stack = []
         for i, old_hist in enumerate(old_stack):
-            if old_hist.has_effect() and (old_hist.eager_reward is None or old_hist.eager_reward > 0):
-                eager_observation, eager_reward, done, info = self.env.step(old_hist.action_index)
+            if old_hist.has_effect() and (
+                old_hist.reward is None or old_hist.reward > 0
+            ):
+                observation, reward, done, info = self.env.step(
+                    old_hist.action_index
+                )
                 hist = ActionHistoryElement(
                     old_hist.action_name,
                     old_hist.action_index,
-                    eager_observation,
-                    eager_reward,
+                    observation,
+                    reward,
                     done,
-                    info
+                    info,
                 )
                 self.stack.append(hist)
 
-                if eager_reward != old_hist.eager_reward:
-                    print(f"Warning previous eager reward at {i}: {hist.action_name} was {old_hist.eager_reward:.6f} now {eager_reward:.6f}")
-
+                if reward != old_hist.reward:
+                    print(
+                        f"Warning previous eager reward at {i}: {hist.action_name} was {old_hist.reward:.6f} now {reward:.6f}"
+                    )
 
     def do_reset(self, arg):
         """Clear the stack of any actions and reset"""
         self.stack.clear()
-        with Timer() as timer:
+        with Timer("Reset"):
             self.env.reset()
-        print(f"Reset in {timer}")
 
     def do_back(self, arg):
         """Undo the last action, if any"""
         if self.stack:
             top = self.stack.pop()
-            with Timer() as timer:
+            with Timer(f"Undid {top.action_name}"):
                 self.rerun_stack()
-            print(f"Undid {top.action_name} in {timer}")
         else:
             print("No actions to undo")
 
@@ -590,7 +802,7 @@ class CompilerGymShell(cmd.Cmd):
 
     def do_breakpoint(self, arg):
         """Enter the debugger.
-            If you suddenly want to do something funky with self.env, or the self.stack, this is your way in!
+        If you suddenly want to do something funky with self.env, or the self.stack, this is your way in!
         """
         breakpoint()
 
