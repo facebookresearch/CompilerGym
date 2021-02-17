@@ -102,3 +102,13 @@ def env() -> CompilerEnv:
         yield env
     finally:
         env.close()
+
+
+@pytest.fixture(scope="module")
+def cBench_dataset():
+    """Test fixture that ensures that cBench is available."""
+    env = gym.make("llvm-v0")
+    try:
+        env.require_dataset("cBench-v0")
+    finally:
+        env.close()
