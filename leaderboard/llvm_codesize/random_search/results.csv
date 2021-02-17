@@ -1,0 +1,2 @@
+benchmark,reward,walltime,commandline
+benchmark://cBench-v0/adpcm,0.9628099173553718,1.3889172077178955,opt -nary-reassociate -loop-unroll -strip-nondebug -deadargelim -loop-data-prefetch -rewrite-symbols -break-crit-edges -canonicalize-aliases -loop-deletion -mem2reg -objc-arc -strip -extract-blocks -loop-deletion -speculative-execution -objc-arc -consthoist -loop-sink -indvars -mergereturn -adce -barrier -mem2reg -objc-arc -newgvn -argpromotion -hotcoldsplit -div-rem-pairs -libcalls-shrinkwrap -instsimplify -mldst-motion -simplifycfg input.bc -o output.bc
