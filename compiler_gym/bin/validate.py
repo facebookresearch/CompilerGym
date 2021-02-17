@@ -80,6 +80,12 @@ flags.DEFINE_boolean(
     "Whether to print results in the order they are provided. "
     "The default is to print results as soon as they are available.",
 )
+flags.DEFINE_boolean(
+    "debug_force_valid",
+    False,
+    "Debugging flags. Skips the validation and prints output as if all states "
+    "were succesfully validated.",
+)
 FLAGS = flags.FLAGS
 
 
@@ -134,13 +140,27 @@ def main(argv):
     states = list(read_states_from_stdin())
 
     # Send the states off for validation
-    validation_results = validate_states(
-        env_from_flags,
-        states,
-        datasets=FLAGS.dataset,
-        nproc=FLAGS.nproc,
-        inorder=FLAGS.inorder,
-    )
+    if FLAGS.debug_force_valid:
+        validation_results = (
+            ValidationResult(
+                state=state,
+                reward_validated=True,
+                actions_replay_failed=False,
+                reward_validation_failed=False,
+                benchmark_semantics_validated=False,
+                benchmark_semantics_validation_failed=False,
+                walltime=0,
+            )
+            for state in states
+        )
+    else:
+        validation_results = validate_states(
+            env_from_flags,
+            states,
+            datasets=FLAGS.dataset,
+            nproc=FLAGS.nproc,
+            inorder=FLAGS.inorder,
+        )
 
     # Determine the name of the reward space.
     env = env_from_flags()
