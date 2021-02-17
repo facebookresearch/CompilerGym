@@ -604,7 +604,7 @@ class CompilerEnv(gym.Env):
                 self.action_space.name, reply.new_action_space.action
             )
 
-        self.reward.reset()
+        self.reward.reset(benchmark=self.benchmark)
         if self.reward_space:
             self.episode_reward = 0
 

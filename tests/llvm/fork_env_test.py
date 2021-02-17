@@ -85,13 +85,12 @@ def test_fork_twice_test(env: LlvmEnv):
 
 @pytest.mark.xfail(reason="Scaled rewards use the incorrect scale for fork()")
 def test_fork_rewards(env: LlvmEnv, reward_space: str):
-    """Test that rewards of """
+    """Test that rewards are equal after fork() is called."""
     env.reward_space = reward_space
     env.reset("cBench-v0/dijkstra")
 
     actions = env.action_space.names
-    act_names = ["-mem2reg", "-simplifycfg"]
-    act_indcs = [actions.index(n) for n in act_names]
+    act_indcs = [actions.index(n) for n in ["-mem2reg", "-simplifycfg"]]
 
     for i in range(len(act_indcs)):
         act_indc = act_indcs[i]

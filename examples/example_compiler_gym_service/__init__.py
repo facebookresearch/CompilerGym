@@ -24,7 +24,8 @@ class CodesizeReward(Reward):
         )
         self.previous_codesize = None
 
-    def reset(self):
+    def reset(self, benchmark: str):
+        del benchmark  # unused
         self.previous_codesize = None
 
     def update(self, action, observations, observation_view):

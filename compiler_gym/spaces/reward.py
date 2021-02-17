@@ -88,9 +88,13 @@ class Reward(Scalar):
         self.deterministic = deterministic
         self.platform_dependent = platform_dependent
 
-    def reset(self) -> None:
+    def reset(self, benchmark: str) -> None:
         """Reset the rewards space. This is called on
-        :meth:`env.reset() <compiler_gym.envs.CompilerEnv.reset>`."""
+        :meth:`env.reset() <compiler_gym.envs.CompilerEnv.reset>`.
+
+        :param benchmark: The URI of the benchmark that is used for this
+            episode.
+        """
         pass
 
     def update(
