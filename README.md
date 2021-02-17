@@ -30,6 +30,22 @@ experience in compilers, and provides a framework for compiler
 developers to expose new optimization problems for AI.
 
 
+**Table of Contents**
+
+<!-- MarkdownTOC -->
+
+- [Getting Started](#getting-started)
+  - [Installation](#installation)
+    - [Building from Source](#building-from-source)
+  - [Trying it out](#trying-it-out)
+- [Leaderboards](#leaderboards)
+  - [llvm-ic-v0](#llvm-ic-v0)
+    - [cBench-v0](#cbench-v0)
+- [Contributing](#contributing)
+- [Citation](#citation)
+
+<!-- /MarkdownTOC -->
+
 # Getting Started
 
 Starting with CompilerGym is simple. If you not already familiar with the gym
@@ -50,8 +66,8 @@ newer equivalents).
 ### Building from Source
 
 If you prefer, you may build from source. This requires a modern C++ toolchain.
-On macOS you can use the system compiler. On linux, install the required toolchain
-using:
+On macOS you can use the system compiler. On linux, install the required
+toolchain using:
 
     $ sudo apt install clang libtinfo5 patchelf
     $ export CC=clang
@@ -110,6 +126,32 @@ In Python, import `compiler_gym` to use the environments:
 See the
 [documentation website](http://facebookresearch.github.io/CompilerGym/) for
 tutorials, further details, and API reference.
+
+
+# Leaderboards
+
+These leaderboards track the performance of user-submitted algorithms for
+CompilerGym tasks. To submit a result please see
+[this document](https://github.com/facebookresearch/CompilerGym/blob/development/CONTRIBUTING.md#leaderboard-submissions).
+
+## llvm-ic-v0
+
+LLVM is a popular open source compiler used widely in industry and research.
+This environment exposes the optimization pipeline as a set of actions that can
+be applied to a particular program. The goal of the agent is to select the
+sequence of optimizations that lead to the greatest reduction in instruction
+count in the program being compiled. Reward is the reduction in codesize
+achieved scaled to the reduction achieved by LLVM's builtin `-Oz` pipeline.
+
+### cBench-v0
+
+This leaderboard tracks the results achieved by algorithms on the `llvm-ic-v0`
+environment on the 23 benchmarks in the `cBench-v0` dataset.
+
+| Author | Algorithm | Links | Mean Walltime | Geomean Improvement |
+| --- | --- | --- | --- | --- |
+| Facebook | Random search (t=60) | [write-up](https://github.com/facebookresearch/CompilerGym/blob/development/leaderboard/llvm_codesize/random_search/README.md), [results](https://github.com/facebookresearch/CompilerGym/blob/development/leaderboard/llvm_codesize/random_search/README.md) | **152.416s** (std: 157.540s) | **1.053x** (std: 0.120x) |
+| Facebook | Random search (t=1800) | [write-up](https://github.com/facebookresearch/CompilerGym/blob/development/leaderboard/llvm_codesize/random_search/README.md), [results](https://github.com/facebookresearch/CompilerGym/blob/development/leaderboard/llvm_codesize/random_search/results_t1800_p125.csv) | TODO | TODO |
 
 
 # Contributing
