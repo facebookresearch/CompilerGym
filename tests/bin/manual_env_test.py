@@ -17,6 +17,8 @@ from tests.test_main import main as _test_main
 
 FLAGS = flags.FLAGS
 
+pytest_plugins = ["tests.pytest_plugins.llvm"]
+
 
 def io_check(input, output, rnd_seed=100):
     """Run the shell with the given input and check the output matches the
@@ -53,8 +55,8 @@ The 'tutorial' command will give a step by step guide.
         sys.stdin = old_stdin
 
 
-def test_download_cBench():
-    # This one needs to be called before any others
+def test_download_cBench(cBench_dataset):
+    del cBench_dataset  # unused
     io_check(
         """require_dataset cBench-v0""",
         r"""compilergym:NO-BENCHMARK> Downloaded dataset cBench-v0 in [0-9.mu]*s
@@ -62,11 +64,13 @@ Application must be restarted to make changes visible.""",
     )
 
 
-def test_list_datasets():
+def test_list_datasets(cBench_dataset):
+    del cBench_dataset  # unused
     io_check("""list_datasets""", r"""compilergym:NO-BENCHMARK> .*cBench-v0.*""")
 
 
-def test_list_benchmarks():
+def test_list_benchmarks(cBench_dataset):
+    del cBench_dataset  # unused
     io_check(
         """list_benchmarks""", r"""compilergym:NO-BENCHMARK> .*cBench-v0/adpcm.*"""
     )
@@ -90,14 +94,16 @@ def test_list_observations():
     )
 
 
-def test_set_benchmark():
+def test_set_benchmark(cBench_dataset):
+    del cBench_dataset  # unused
     io_check(
         """set_benchmark cBench-v0/adpcm""",
         r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s""",
     )
 
 
-def test_actions_stack_back_stack():
+def test_actions_stack_back_stack(cBench_dataset):
+    del cBench_dataset  # unused
     io_check(
         """set_benchmark cBench-v0/adpcm
         action -mem2reg -adce -adce
@@ -125,7 +131,8 @@ compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   | Reward   
     )
 
 
-def test_reward():
+def test_reward(cBench_dataset):
+    del cBench_dataset  # unused
     io_check(
         """set_benchmark cBench-v0/adpcm
         set_default_reward IrInstructionCount
@@ -154,7 +161,8 @@ compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward 
     )
 
 
-def test_observation():
+def test_observation(cBench_dataset):
+    del cBench_dataset  # unused
     io_check(
         """set_benchmark cBench-v0/adpcm
         set_default_observation IrInstructionCount
@@ -176,7 +184,8 @@ Observation IrInstructionCountOz in [0-9.mu]*s""",
     )
 
 
-def test_try_all_actions():
+def test_try_all_actions(cBench_dataset):
+    del cBench_dataset  # unused
     io_check(
         """set_benchmark cBench-v0/adpcm
         set_default_reward IrInstructionCount
@@ -199,7 +208,8 @@ Got actions in [0-9.mu]*s
     )
 
 
-def test_simplify_stack():
+def test_simplify_stack(cBench_dataset):
+    del cBench_dataset  # unused
     io_check(
         """set_benchmark cBench-v0/adpcm
         set_default_reward IrInstructionCount
@@ -224,7 +234,8 @@ compilergym:cBench-v0/adpcm> compilergym:cBench-v0/adpcm>    Depth | Action   | 
     )
 
 
-def test_simplify_stack_no_reward():
+def test_simplify_stack_no_reward(cBench_dataset):
+    del cBench_dataset  # unused
     io_check(
         """set_benchmark cBench-v0/adpcm
         action -mem2reg -adce -adce
@@ -244,7 +255,8 @@ compilergym:cBench-v0/adpcm> compilergym:cBench-v0/adpcm>    Depth | Action     
     )
 
 
-def test_hill_climb(monkeypatch):
+def test_hill_climb(monkeypatch, cBench_dataset):
+    del cBench_dataset  # unused
     i = 0
 
     def incr():
@@ -271,7 +283,8 @@ compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward 
     )
 
 
-def test_greedy():
+def test_greedy(cBench_dataset):
+    del cBench_dataset  # unused
     io_check(
         """set_benchmark cBench-v0/adpcm
         set_default_reward IrInstructionCount
@@ -294,7 +307,8 @@ compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward 
     )
 
 
-def test_commandline():
+def test_commandline(cBench_dataset):
+    del cBench_dataset  # unused
     io_check(
         """set_benchmark cBench-v0/adpcm
         action -mem2reg -adce
@@ -307,7 +321,8 @@ compilergym:cBench-v0/adpcm> \$ opt -mem2reg -adce input.bc -o output.bc""",
     )
 
 
-def test_reset():
+def test_reset(cBench_dataset):
+    del cBench_dataset  # unused
     io_check(
         """set_benchmark cBench-v0/adpcm
         action -mem2reg -adce

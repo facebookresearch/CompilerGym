@@ -20,6 +20,7 @@ py_test(
         "//compiler_gym/bin:manual_env",
         "//compiler_gym/util",
         "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
     ],
 )
 
