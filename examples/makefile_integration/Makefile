@@ -46,7 +46,7 @@ $(SRCDIR)/gym-optimized.bc: $(SRCDIR)/unoptimized.bc
 	@mkdir -p compiler_gym_logs logs
 	@touch logs/random_search.json  # file must exist
 	@if python -m compiler_gym.bin.random_search --env=llvm-ic-v0 \
-		    --program_data=file:///$(this_dir)/$< --runtime=$(SEARCH_TIME) \
+		    --benchmark=file:///$(this_dir)/$< --runtime=$(SEARCH_TIME) \
 		    --output_dir=$(this_dir)/logs --fail_threshold=1; then \
         cp -v logs/optimized.bc $@; \
 	else \

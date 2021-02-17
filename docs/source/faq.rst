@@ -52,19 +52,21 @@ How do I run this on my own program?
 ------------------------------------
 
 For LLVM, you compile your program to an unoptimized LLVM bitcode
-file. For C/C++ programs, you can do this using clang by running:
+file. This can be done automatically for C/C++ programs using the
+:meth:`env.make_benchmark() <compiler_gym.envs.llvm.make_benchmark>` API, or
+you can do this yourself using clang:
 
 ::
 
     $ clang -emit-llvm -c -O0 -Xclang -disable-O0-optnone -Xclang -disable-llvm-passes myapp.c
 
 Then pass the path of the generated `.bc` file to the CompilerGym
-commandline tools using the `--program_data` flag, e.g.
+commandline tools using the `--benchmark` flag, e.g.
 
 ::
 
-    $ bazel run -c opt //compiler_gym/bin:brute_force -- --env=llvm-v0 \
-        --program_data=file:///$PWD/myapp.bc
+    $ bazel run -c opt //compiler_gym/bin:random_search -- --env=llvm-ic-v0 \
+        --benchmark=file:///$PWD/myapp.bc
 
 
 I want to add a new program representation / reward signal. How do I do that?
