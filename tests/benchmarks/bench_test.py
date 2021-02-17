@@ -2,7 +2,20 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""Microbenchmarks for CompilerGym environments."""
+"""Microbenchmarks for CompilerGym environments.
+
+To run these benchmarks within bazel, compile with optimiztions and stream the
+test output:
+
+    $ bazel test -c opt --test_output=streamed //tests/benchmarks:bench_test
+
+A record of the benchmark results is stored in
+/tmp/compiler_gym/benchmarks/<device>/<run>_bench_test.json
+Compare multiple runs using:
+
+    $ pytest-benchmark compare --group-by=name --sort=fullname \
+        /tests/benchmarks/*_bench_test.json
+"""
 import gym
 import pytest
 
@@ -19,14 +32,21 @@ pytest_plugins = ["tests.pytest_plugins.llvm"]
 #
 # adpcm is small and jpeg-d is large. ghostscript is the largest but that
 # one takes too long.
-@pytest.fixture(params=["cBench-v0/adpcm", "cBench-v0/jpeg-d"])
+@pytest.fixture(
+    params=["cBench-v0/crc32", "cBench-v0/jpeg-d"],
+    ids=["fast_benchmark", "slow_benchmark"],
+)
 def benchmark_name(request) -> str:
     yield request.param
 
 
-# The observation benchmark is too slow for a large input.
-@pytest.fixture(params=["cBench-v0/adpcm"])
+@pytest.fixture(params=["cBench-v0/crc32"], ids=["fast_benchmark"])
 def fast_benchmark_name(request) -> str:
+    yield request.param
+
+
+@pytest.fixture(params=["-globaldce", "-gvn"], ids=["fast_action", "slow_action"])
+def action_name(request) -> str:
     yield request.param
 
 
@@ -46,9 +66,10 @@ def test_reset(benchmark, env: CompilerEnv, benchmark_name):
     benchmark(env.reset, benchmark_name)
 
 
-def test_step(benchmark, env: CompilerEnv, benchmark_name):
+def test_step(benchmark, env: CompilerEnv, benchmark_name, action_name):
     env.reset(benchmark_name)
-    benchmark(env.step, 0)
+    action = env.action_space.flags.index(action_name)
+    benchmark(env.step, action)
 
 
 def test_observation(
@@ -63,5 +84,17 @@ def test_reward(benchmark, env: CompilerEnv, benchmark_name, reward_space):
     benchmark(lambda: env.reward[reward_space])
 
 
+def test_fork(benchmark, env: CompilerEnv, benchmark_name):
+    env.reset(benchmark_name)
+    benchmark(lambda: env.fork().close())
+
+
 if __name__ == "__main__":
-    main()
+    main(
+        extra_pytest_args=[
+            "--benchmark-storage=/tmp/compiler_gym/benchmarks",
+            "--benchmark-save=bench_test",
+            "-x",
+        ],
+        verbose_service_logging=False,
+    )
