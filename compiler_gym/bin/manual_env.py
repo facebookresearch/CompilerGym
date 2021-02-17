@@ -474,7 +474,7 @@ The 'tutorial' command will give a step by step guide."""
 
             if check_rewards and reward != old_hist.reward:
                 print(
-                    f"Warning previous eager reward at {i}: {hist.action_name} was {hist.reward:.6f} now {reward:.6f}"
+                    f"Warning previous reward at {i}: {hist.action_name} was {hist.reward:.6f} now {reward:.6f}"
                 )
 
     def do_hill_climb(self, arg):
@@ -563,7 +563,7 @@ The 'tutorial' command will give a step by step guide."""
             )
 
         rows = [row(item) for item in items]
-        headers = ["Action", "Effect", "Done", "Eager Reward"]
+        headers = ["Action", "Effect", "Done", "Reward"]
         print(tabulate(rows, headers=headers, tablefmt="presto"))
 
     def do_greedy(self, arg):
@@ -771,7 +771,7 @@ The 'tutorial' command will give a step by step guide."""
 
                 if reward != old_hist.reward:
                     print(
-                        f"Warning previous eager reward at {i}: {hist.action_name} was {old_hist.reward:.6f} now {reward:.6f}"
+                        f"Warning previous reward at {i}: {hist.action_name} was {old_hist.reward:.6f} now {reward:.6f}"
                     )
 
     def do_reset(self, arg):

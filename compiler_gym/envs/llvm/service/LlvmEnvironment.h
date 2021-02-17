@@ -37,7 +37,7 @@ class LlvmEnvironment {
   LlvmEnvironment(std::unique_ptr<Benchmark> benchmark, LlvmActionSpace actionSpace,
                   const boost::filesystem::path& workingDirectory);
 
-  // Run the requested action(s) then compute the eager observation(s).
+  // Run the requested action(s) then compute the requested observation(s).
   [[nodiscard]] grpc::Status step(const StepRequest& request, StepReply* reply);
 
   inline const Benchmark& benchmark() const { return *benchmark_; }

@@ -34,6 +34,7 @@ class CostFunctionReward(Reward):
         self.previous_cost: Optional[observation_t] = None
 
     def reset(self) -> None:
+        """Called on env.reset(). Reset incremental progress."""
         self.previous_cost = None
 
     def update(
@@ -64,6 +65,7 @@ class NormalizedReward(CostFunctionReward):
         self.cost_norm: Optional[observation_t] = forced_cost_norm
 
     def reset(self) -> None:
+        """Called on env.reset(). Reset incremental progress."""
         super().reset()
         self.cost_norm = self.forced_cost_norm
 

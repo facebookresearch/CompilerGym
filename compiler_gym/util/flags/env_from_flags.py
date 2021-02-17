@@ -34,14 +34,14 @@ flags.DEFINE_string(
 flags.DEFINE_string(
     "observation",
     None,
-    "The name of an observation space to use for eager observations. Overrides "
-    "the environment default.",
+    "The name of a observation space to use. If set, this overrides any "
+    "default set by the environment.",
 )
 flags.DEFINE_string(
     "reward",
     None,
-    "The name of a reward space to use for eager rewards. Overrides the "
-    "environment default.",
+    "The name of a reward space to use. If set, this overrides any default "
+    "set by the environment.",
 )
 flags.DEFINE_boolean(
     "ls_env",

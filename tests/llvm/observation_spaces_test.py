@@ -20,7 +20,7 @@ from tests.test_main import main
 pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
-def test_eager_observation_space(env: LlvmEnv):
+def test_default_observation_space(env: LlvmEnv):
     env.observation_space = "Autophase"
     assert env.observation_space.id == "Autophase"
 

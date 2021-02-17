@@ -118,8 +118,8 @@ def test_Step_out_of_range(env: CompilerEnv):
     assert str(ctx.value) == "Out-of-range"
 
 
-def test_eager_ir_observation(env: CompilerEnv):
-    """Test eager observation space."""
+def test_default_ir_observation(env: CompilerEnv):
+    """Test default observation space."""
     env.observation_space = "ir"
     observation = env.reset()
     assert observation == "Hello, world!"
@@ -130,8 +130,8 @@ def test_eager_ir_observation(env: CompilerEnv):
     assert not done
 
 
-def test_eager_features_observation(env: CompilerEnv):
-    """Test eager observation space."""
+def test_default_features_observation(env: CompilerEnv):
+    """Test default observation space."""
     env.observation_space = "features"
     observation = env.reset()
     assert isinstance(observation, np.ndarray)
@@ -140,8 +140,8 @@ def test_eager_features_observation(env: CompilerEnv):
     assert observation.tolist() == [0, 0, 0]
 
 
-def test_eager_reward(env: CompilerEnv):
-    """Test eager reward space."""
+def test_default_reward(env: CompilerEnv):
+    """Test default reward space."""
     env.reward_space = "codesize"
     env.reset()
     observation, reward, done, info = env.step(0)

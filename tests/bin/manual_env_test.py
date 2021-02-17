@@ -231,15 +231,15 @@ compilergym:cBench-v0/adpcm> Action: -add-discriminators Reward: 0.000000
 Action: -adce Reward: 1.000000
 (.|\n)*
 Got actions in [0-9.mu]*s
- Action                          | Effect   | Done   |   Eager Reward
----------------------------------+----------+--------+----------------
- -mem2reg                        | True     | False  |            181
- -sroa                           | True     | False  |            181
- -newgvn                         | True     | False  |             74
- -gvn                            | True     | False  |             72
+ Action                          | Effect   | Done   |   Reward
+---------------------------------+----------+--------+---------
+ -mem2reg                        | True     | False  |      181
+ -sroa                           | True     | False  |      181
+ -newgvn                         | True     | False  |       74
+ -gvn                            | True     | False  |       72
 (.|\n)*
- -structurizecfg                 | True     | False  |            -25
- -bounds-checking                | True     | False  |            -60""",
+ -structurizecfg                 | True     | False  |      -25
+ -bounds-checking                | True     | False  |      -60""",
     )
 
 

@@ -290,9 +290,9 @@ class CompilerEnv(gym.Env):
         self.episode_reward: Optional[float] = None
         self.episode_start_time: float = time()
 
-        # Initialize eager observation/reward.
-        self._eager_observation_space: Optional[ObservationSpaceSpec] = None
-        self._eager_reward_space: Optional[Reward] = None
+        # Initialize the default observation/reward spaces.
+        self._default_observation_space: Optional[ObservationSpaceSpec] = None
+        self._default_reward_space: Optional[Reward] = None
         self.observation_space = observation_space
         self.reward_space = reward_space
 
@@ -420,18 +420,14 @@ class CompilerEnv(gym.Env):
 
     @property
     def reward_space(self) -> Optional[Reward]:
-        """The eager reward space. This is the reward that is returned by
+        """The default reward space that is used to return a reward value from
         :func:`~step()`.
 
         :getter: Returns a :class:`Reward <compiler_gym.spaces.Reward>`,
             or :code:`None` if not set.
-        :setter: Set the eager reward space.
-
-        .. note::
-            Setting a new eager reward space has no effect until
-            :func:`~reset()` is called on the environment.
+        :setter: Set the default reward space.
         """
-        return self._eager_reward_space
+        return self._default_reward_space
 
     @reward_space.setter
     def reward_space(self, reward_space: Optional[Union[str, Reward]]) -> None:
@@ -442,18 +438,13 @@ class CompilerEnv(gym.Env):
             reward_space.id if isinstance(reward_space, Reward) else reward_space
         )
 
-        if self.in_episode:
-            warnings.warn(
-                "Changing eager reward space has no effect until reset() is called."
-            )
-
-        self._eager_reward: bool = reward_space is not None
-        self._eager_reward_space: Optional[Reward] = None
-        if self._eager_reward:
-            self._eager_reward_space = self.reward.spaces[reward_space_name]
+        self._default_reward: bool = reward_space is not None
+        self._default_reward_space: Optional[Reward] = None
+        if self._default_reward:
+            self._default_reward_space = self.reward.spaces[reward_space_name]
             self.reward_range = (
-                self._eager_reward_space.min,
-                self._eager_reward_space.max,
+                self._default_reward_space.min,
+                self._default_reward_space.max,
             )
         else:
             self.reward_range = (-np.inf, np.inf)
@@ -469,18 +460,14 @@ class CompilerEnv(gym.Env):
 
     @property
     def observation_space(self) -> Optional[ObservationSpaceSpec]:
-        """The eager observation space. This is the observation value that is
-        returned by :func:`~step()`.
+        """The observation space that is used to return an observation value in
+        :func:`~step()`.
 
-        :getter: Returns the specification of the eager observation space, or
+        :getter: Returns the specification of the default observation space, or
             :code:`None` if not set.
-        :setter: Set the eager observation space.
-
-        .. note::
-            Setting a new eager observation space has no effect until
-            :func:`~reset()` is called on the environment.
+        :setter: Set the default observation space.
         """
-        return self._eager_observation_space
+        return self._default_observation_space
 
     @observation_space.setter
     def observation_space(
@@ -497,15 +484,11 @@ class CompilerEnv(gym.Env):
             if isinstance(observation_space, ObservationSpaceSpec)
             else observation_space
         )
-        if self.in_episode:
-            warnings.warn(
-                "Changing eager observation space has no effect until reset() is called."
-            )
 
-        self._eager_observation = observation_space is not None
-        self._eager_observation_space: Optional[ObservationSpaceSpec] = None
-        if self._eager_observation:
-            self._eager_observation_space = self.observation.spaces[
+        self._default_observation = observation_space is not None
+        self._default_observation_space: Optional[ObservationSpaceSpec] = None
+        if self._default_observation:
+            self._default_observation_space = self.observation.spaces[
                 observation_space_name
             ]
 
@@ -633,7 +616,7 @@ class CompilerEnv(gym.Env):
 
         :param action: Value from the action_space.
         :return: A tuple of observation, reward, done, and info. Observation and
-            reward are None if eager observation/reward is not set. If done
+            reward are None if default observation/reward is not set. If done
             is True, observation and reward may also be None (e.g. because the
             service failed).
         """
@@ -641,9 +624,10 @@ class CompilerEnv(gym.Env):
         observation, reward = None, None
 
         # Build the list of observations that must be computed by the backend
-        # service to suppor the user-requested observation and reward.
-        # TODO(cummins): We could deduplicate this list to improve effiency when
-        # multiple redundant copies of the same observation space are requested.
+        # service to generate the user-requested observation and reward.
+        # TODO(cummins): We could de-duplicate this list to improve effiency
+        # when multiple redundant copies of the same observation space are
+        # requested.
         observation_indices, observation_spaces = [], []
         if self.observation_space:
             observation_indices.append(self.observation_space.index)
@@ -681,7 +665,7 @@ class CompilerEnv(gym.Env):
         # Translate observations to python representations.
         if len(reply.observation) != len(observation_indices):
             raise ServiceError(
-                f"Requested {observation_indices} eager observations "
+                f"Requested {observation_indices} observations "
                 f"but received {len(reply.observation)}"
             )
         observations = [
@@ -718,7 +702,7 @@ class CompilerEnv(gym.Env):
         state.
 
         :param mode: The render mode to use.
-        :raises TypeError: If eager observations are not set, or if the
+        :raises TypeError: If a default observation space is not set, or if the
             requested render mode does not exist.
         """
         if not self.observation_space:
