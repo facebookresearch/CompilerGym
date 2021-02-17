@@ -80,6 +80,12 @@ flags.DEFINE_boolean(
     "Whether to print results in the order they are provided. "
     "The default is to print results as soon as they are available.",
 )
+flags.DEFINE_string(
+    "reward_aggregation",
+    "geomean",
+    "The aggregation method to use for rewards. Allowed values are 'mean' for "
+    "arithmetic mean and 'geomean' for geometric mean.",
+)
 flags.DEFINE_boolean(
     "debug_force_valid",
     False,
@@ -165,10 +171,24 @@ def main(argv):
     # Determine the name of the reward space.
     env = env_from_flags()
     try:
-        if env.reward_space:
-            gmean_name = f"Geometric mean {env.reward_space.id}"
+        if FLAGS.reward_aggregation == "geomean":
+
+            def reward_aggregation(a):
+                return geometric_mean(np.clip(a, 0, None))
+
+            reward_aggregation_name = "Geometric mean"
+        elif FLAGS.reward_aggregation == "mean":
+            reward_aggregation = arithmetic_mean
+            reward_aggregation_name = "Mean"
         else:
-            gmean_name = "Geometric mean"
+            raise app.UsageError(
+                f"Unknown aggregation type: '{FLAGS.reward_aggregation}'"
+            )
+
+        if env.reward_space:
+            reward_name = f"{reward_aggregation_name} {env.reward_space.id}"
+        else:
+            reward_name = ""
     finally:
         env.close()
 
@@ -178,7 +198,7 @@ def main(argv):
         for s in [state_name(s) for s in states]
         + [
             "Mean inference walltime",
-            gmean_name,
+            reward_name,
         ]
     )
     name_col_width = min(max_state_name_length + 2, 78)
@@ -201,12 +221,12 @@ def main(argv):
     walltime_mean = f"{arithmetic_mean(walltimes):.3f}s"
     walltime_std = f"{stdev(walltimes):.3f}s"
     print(
-        f"Mean inference walltime: {emph(walltime_mean)} sec / benchmark "
+        f"Mean walltime per benchmark: {emph(walltime_mean)} "
         f"(std: {emph(walltime_std)})"
     )
-    reward_gmean = f"{geometric_mean(rewards):.3f}"
+    reward = f"{reward_aggregation(rewards):.3f}"
     reward_std = f"{stdev(rewards):.3f}"
-    print(f"{gmean_name}: {emph(reward_gmean)} (std: {emph(reward_std)})")
+    print(f"{reward_name}: {emph(reward)} " f"(std: {emph(reward_std)})")
 
     if error_count:
         sys.exit(1)
