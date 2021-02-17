@@ -2,6 +2,8 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+# Note that the tutorial is extracted from the doc string with the repeated ^
+# signs. So, please keep them as they are.
 """Run a CompilerGym environment with text interface controls.
 
 .. code-block::
@@ -10,26 +12,7 @@
 
 The benchmark to use can be specified using :code:`--benchmark=<name>`.
 
-A tutorial is given in the string tutorial below.
-"""
-import cmd
-import random
-import readline
-import sys
-
-from absl import app, flags
-
-import compiler_gym.util.flags.ls_benchmark  # noqa Flag definition.
-from compiler_gym.datasets.dataset import require
-from compiler_gym.envs import CompilerEnv
-from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
-from compiler_gym.util.flags.env_from_flags import env_from_flags
-from compiler_gym.util.tabulate import tabulate
-from compiler_gym.util.timer import Timer
-
-FLAGS = flags.FLAGS
-
-tutorial = """
+^^^^^^^^^^^^^^^^^^^^^^^^^^
 CompilerGym Shell Tutorial
 ==========================
 
@@ -177,6 +160,26 @@ And finally:
     compilergym:bench> exit
 Drops out of the shell.  Ctrl-D should have the same effect.
 """
+import cmd
+import random
+import readline
+import sys
+
+from absl import app, flags
+
+import compiler_gym.util.flags.ls_benchmark  # noqa Flag definition.
+from compiler_gym.datasets.dataset import require
+from compiler_gym.envs import CompilerEnv
+from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
+from compiler_gym.util.flags.env_from_flags import env_from_flags
+from compiler_gym.util.tabulate import tabulate
+from compiler_gym.util.timer import Timer
+
+FLAGS = flags.FLAGS
+
+
+# Extract the tutorial from the doc string
+tutorial = __doc__.split("^^^^^^^^^^^^^^^^^^^^^^^^^^")[1]
 
 
 class ActionHistoryElement:
@@ -210,7 +213,7 @@ class CompilerGymShell(cmd.Cmd):
     intro = """Welcome to the CompilerGym Shell!
 ---------------------------------
 Type help or ? for more information.
-help tutorial will give a step by step guide.
+The 'tutorial' command will give a step by step guide.
 """
 
     def __init__(self, env: CompilerEnv):
@@ -240,7 +243,8 @@ help tutorial will give a step by step guide.
 
         self.set_prompt()
 
-    def help_tutorial(self):
+    def do_tutorial(self, arg):
+        """Print the turorial"""
         print(tutorial)
 
     def preloop(self):

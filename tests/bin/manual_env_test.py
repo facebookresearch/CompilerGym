@@ -37,7 +37,7 @@ def io_check(input, output, rnd_seed=100):
 Welcome to the CompilerGym Shell!
 ---------------------------------
 Type help or \? for more information.
-help tutorial will give a step by step guide.
+The 'tutorial' command will give a step by step guide.
 
 """
             + output
