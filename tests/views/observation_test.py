@@ -112,6 +112,10 @@ def test_observed_value_types():
             Observation(double_list=DoubleList(value=[1.0, 2.0])),
             Observation(int64_list=Int64List(value=[-5, 15])),
             Observation(binary_value=b"Hello, bytes\0"),
+            Observation(string_value="Hello, IR"),
+            Observation(double_list=DoubleList(value=[1.0, 2.0])),
+            Observation(int64_list=Int64List(value=[-5, 15])),
+            Observation(binary_value=b"Hello, bytes\0"),
         ]
     )
     observation = ObservationView(mock, spaces)
@@ -133,6 +137,26 @@ def test_observed_value_types():
 
     # Check that the correct observation_space_list indices were used.
     assert mock.called_observation_spaces == [0, 2, 1, 3]
+    mock.called_observation_spaces = []
+
+    # Repeat the above tests using the generated bound methods.
+    value = observation.ir()
+    assert isinstance(value, str)
+    assert value == "Hello, IR"
+
+    value = observation.dfeat()
+    np.testing.assert_array_almost_equal(value, [1.0, 2.0])
+    assert value.dtype == np.float64
+
+    value = observation.features()
+    np.testing.assert_array_equal(value, [-5, 15])
+    assert value.dtype == np.int64
+
+    value = observation.binary()
+    assert value == b"Hello, bytes\0"
+
+    # Check that the correct observation_space_list indices were used.
+    assert mock.called_observation_spaces == [0, 2, 1, 3]
 
 
 def test_add_derived_space():
@@ -143,7 +167,10 @@ def test_add_derived_space():
         ),
     ]
     mock = MockGetObservation(
-        ret=[Observation(string_value="Hello, world!")],
+        ret=[
+            Observation(string_value="Hello, world!"),
+            Observation(string_value="Hello, world!"),
+        ],
     )
     observation = ObservationView(mock, spaces)
     observation.add_derived_space(
@@ -156,6 +183,13 @@ def test_add_derived_space():
     )
 
     value = observation["ir_len"]
+    assert isinstance(value, list)
+    assert value == [
+        len("Hello, world!"),
+    ]
+
+    # Repeat the above test using the generated bound method.
+    value = observation.ir_len()
     assert isinstance(value, list)
     assert value == [
         len("Hello, world!"),
