@@ -56,7 +56,7 @@ py_test(
     srcs = ["llvm_stress_fuzz_test.py"],
     data = ["//compiler_gym/third_party/llvm:llvm-stress"],
     flaky = 1,
-    shard_count = 16,
+    shard_count = 20,
     deps = [
         "//compiler_gym",
         "//tests:test_main",
