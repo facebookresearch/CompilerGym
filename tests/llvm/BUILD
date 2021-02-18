@@ -108,6 +108,16 @@ py_test(
 )
 
 py_test(
+    name = "fuzzing_regression_test",
+    srcs = ["fuzzing_regression_test.py"],
+    deps = [
+        "//tests:test_main",
+        "//tests/pytest_plugins:common",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "gvn_sink_test",
     srcs = ["gvn_sink_test.py"],
     deps = [
