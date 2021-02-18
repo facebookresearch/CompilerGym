@@ -5,6 +5,7 @@
 """Tests for //compiler_gym/bin:manual_env."""
 import re
 import sys
+from difflib import unified_diff
 from io import StringIO
 from random import seed
 
@@ -43,13 +44,30 @@ The 'tutorial' command will give a step by step guide.
 
 """
             + output
+            + r"""
+
+compilergym:[a-zA-Z0-9/-]+> Exiting
+"""
         )
-        if not re.match(pattern, out.stdout):
-            pytest.fail(
-                f"Failed to match regex:\n{pattern}\n"
-                + ("*" * 80)
-                + f"\nUsing output:\n{out.stdout}\n"
+
+        # Strip ANSI escape sequences from output that are used for formatting.
+        ansi_escape = re.compile(r"\x1B(?:[@-Z\\-_]|\[[0-?]*[ -/]*[@-~])")
+        stdout = ansi_escape.sub("", out.stdout)
+        # Strip trailing whitespace from output.
+        stdout = "\n".join(n.rstrip() for n in stdout.split("\n"))
+
+        if not re.match(pattern, stdout):
+            # Create a diff between the expected regex and the actual output.
+            # Diffing a regex will create a lot of false-positives, since any
+            # character groups or other expressions will be different, but can
+            # still be helful for tracking down the important differences.
+            diff = unified_diff(
+                pattern.split("\n"),
+                stdout.split("\n"),
+                fromfile="Expected output regex",
+                tofile="Actual output",
             )
+            pytest.fail("\n".join(diff))
 
     finally:
         sys.stdin = old_stdin
@@ -111,18 +129,22 @@ def test_actions_stack_back_stack(cBench_dataset):
         back
         stack""",
         r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s
+
 compilergym:cBench-v0/adpcm> Action -mem2reg
 Action -adce
 Action -adce
 No effect
 Actions -mem2reg -adce -adce in [0-9.mu]*s with reward 0.
+
 compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   | Reward   |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        3 | -adce    | False    | False  | -        |                   0
        2 | -adce    | True     | False  | -        |                   0
        1 | -mem2reg | True     | False  | -        |                   0
        0 | <init>   | False    | False  | 0        |                   0
-compilergym:cBench-v0/adpcm> Undid -adce in 3.7ms
+
+compilergym:cBench-v0/adpcm> Undid -adce in [0-9.mu]*s
+
 compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   | Reward   |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        2 | -adce    | True     | False  | -        |                   0
@@ -142,18 +164,24 @@ def test_reward(cBench_dataset):
         stack
         """,
         r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s
+
 compilergym:cBench-v0/adpcm> Reward IrInstructionCount in [0-9.mu]*s
+
 compilergym:cBench-v0/adpcm> Action -mem2reg
 Reward: 181.000000
 Actions -mem2reg in [0-9.mu]*s with reward 181.0.
+
 compilergym:cBench-v0/adpcm> 0.000000
 Reward IrInstructionCount in [0-9.mu]*s
+
 compilergym:cBench-v0/adpcm> 0.000000
 Reward IrInstructionCountNorm in [0-9.mu]*s
+
 compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        1 | -mem2reg | True     | False  |      181 |                 181
        0 | <init>   | False    | False  |        0 |                   0
+
 compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        1 | -mem2reg | True     | False  |      181 |                 181
@@ -171,14 +199,19 @@ def test_observation(cBench_dataset):
         observation IrInstructionCountOz
         """,
         r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s
+
 compilergym:cBench-v0/adpcm> Observation IrInstructionCount in [0-9.mu]*s
+
 compilergym:cBench-v0/adpcm> Action -mem2reg
 Observation: \[267\]
 Actions -mem2reg in [0-9.mu]*s with reward 0.
+
 compilergym:cBench-v0/adpcm> \[267\]
 Observation IrInstructionCount in [0-9.mu]*s
+
 compilergym:cBench-v0/adpcm> \[206\]
 Observation IrInstructionCountOz in [0-9.mu]*s
+
 compilergym:cBench-v0/adpcm> \[206\]
 Observation IrInstructionCountOz in [0-9.mu]*s""",
     )
@@ -191,7 +224,9 @@ def test_try_all_actions(cBench_dataset):
         set_default_reward IrInstructionCount
         try_all_actions""",
         r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s
+
 compilergym:cBench-v0/adpcm> Reward IrInstructionCount in [0-9.mu]*s
+
 compilergym:cBench-v0/adpcm> Action: -add-discriminators Reward: 0.000000
 Action: -adce Reward: 1.000000
 (.|\n)*
@@ -217,7 +252,9 @@ def test_simplify_stack(cBench_dataset):
         simplify_stack
         stack""",
         r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s
+
 compilergym:cBench-v0/adpcm> Reward IrInstructionCount in [0-9.mu]*s
+
 compilergym:cBench-v0/adpcm> Action -mem2reg
 Reward: 181.000000
 Action -adce
@@ -226,7 +263,9 @@ Action -adce
 Reward: 0.000000
 No effect
 Actions -mem2reg -adce -adce in [0-9.mu]*s with reward 183.0.
-compilergym:cBench-v0/adpcm> compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
+
+compilergym:cBench-v0/adpcm>
+compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        2 | -adce    | True     | False  |        2 |                 183
        1 | -mem2reg | True     | False  |      181 |                 181
@@ -242,13 +281,16 @@ def test_simplify_stack_no_reward(cBench_dataset):
         simplify_stack
         stack""",
         r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s
+
 compilergym:cBench-v0/adpcm> Action -mem2reg
 Action -adce
 Action -adce
 No effect
 Actions -mem2reg -adce -adce in [0-9.mu]*s with reward 0.
-compilergym:cBench-v0/adpcm> compilergym:cBench-v0/adpcm>    Depth | Action         | Effect   | Done   | Reward   |   Cumulative Reward
----------+----------------+----------+--------+----------+---------------------
+
+compilergym:cBench-v0/adpcm>
+compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   | Reward   |   Cumulative Reward
+---------+----------+----------+--------+----------+---------------------
        2 | -adce    | True     | False  | -        |                   0
        1 | -mem2reg | True     | False  | -        |                   0
        0 | <init>   | False    | False  | 0        |                   0""",
@@ -272,10 +314,13 @@ def test_hill_climb(monkeypatch, cBench_dataset):
         hill_climb 2
         stack""",
         r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s
+
 compilergym:cBench-v0/adpcm> Reward IrInstructionCount in [0-9.mu]*s
+
 compilergym:cBench-v0/adpcm> Step: 1 Action: -adce Reward: 1.000000 Accept: True
 Step: 2 Action: -aggressive-instcombine Reward: 0.000000 Accept: False
 Hill climb complete in [0-9.mu]*s. Accepted 1 of 2 steps for total reward of 1.0.
+
 compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        1 | -adce    | True     | False  |        1 |                   1
@@ -291,7 +336,9 @@ def test_greedy(cBench_dataset):
         greedy
         stack""",
         r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s
+
 compilergym:cBench-v0/adpcm> Reward IrInstructionCount in [0-9.mu]*s
+
 compilergym:cBench-v0/adpcm> Action: -add-discriminators Reward: 0.000000
 Action: -adce Reward: 1.000000
 (.|\n)*
@@ -300,6 +347,7 @@ Action: -mem2reg Reward: 181.000000
 Action: -mergereturn Reward: -1.000000
 Step: 1 Selected action: -mem2reg Reward: 181.000000
 Greedy 1 steps in [0-9.mu]*s
+
 compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        1 | -mem2reg | True     | False  |      181 |                 181
@@ -314,9 +362,11 @@ def test_commandline(cBench_dataset):
         action -mem2reg -adce
         commandline""",
         r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s
+
 compilergym:cBench-v0/adpcm> Action -mem2reg
 Action -adce
 Actions -mem2reg -adce in [0-9.mu]*s with reward 0.
+
 compilergym:cBench-v0/adpcm> \$ opt -mem2reg -adce input.bc -o output.bc""",
     )
 
@@ -329,10 +379,13 @@ def test_reset(cBench_dataset):
         reset
         stack""",
         r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s
+
 compilergym:cBench-v0/adpcm> Action -mem2reg
 Action -adce
 Actions -mem2reg -adce in [0-9.mu]*s with reward 0.
+
 compilergym:cBench-v0/adpcm> Reset in [0-9.mu]*s
+
 compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        0 | <init>   | False    | False  |        0 |                   0""",

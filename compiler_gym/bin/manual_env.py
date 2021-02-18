@@ -172,6 +172,7 @@ from compiler_gym.datasets.dataset import require
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.flags.env_from_flags import env_from_flags
+from compiler_gym.util.shell_format import emph
 from compiler_gym.util.tabulate import tabulate
 from compiler_gym.util.timer import Timer
 
@@ -213,8 +214,7 @@ class CompilerGymShell(cmd.Cmd):
     intro = """Welcome to the CompilerGym Shell!
 ---------------------------------
 Type help or ? for more information.
-The 'tutorial' command will give a step by step guide.
-"""
+The 'tutorial' command will give a step by step guide."""
 
     def __init__(self, env: CompilerEnv):
         """Initialise with an environment.
@@ -275,7 +275,8 @@ The 'tutorial' command will give a step by step guide.
                 bname = bname[len("benchmark://") :]
         else:
             bname = "NO-BENCHMARK"
-        self.prompt = f"compilergym:{bname}> "
+        prompt = f"compilergym:{bname}>"
+        self.prompt = f"\n{emph(prompt)} "
 
     def simple_complete(self, text, options):
         """Return a list of options that match the text prefix"""
