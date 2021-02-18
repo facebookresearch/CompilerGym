@@ -70,9 +70,21 @@ def test_double_reset(env: CompilerEnv):
     assert env.in_episode
 
 
-def test_commandline(env: CompilerEnv):
+def test_commandline_no_actions(env: CompilerEnv):
     env.reset(benchmark="cBench-v0/crc32")
     assert env.commandline() == "opt  input.bc -o output.bc"
+    assert env.commandline_to_actions(env.commandline()) == []
+
+
+def test_commandline(env: CompilerEnv):
+    env.reset(benchmark="cBench-v0/crc32")
+    env.step(env.action_space.flags.index("-mem2reg"))
+    env.step(env.action_space.flags.index("-reg2mem"))
+    assert env.commandline() == "opt -mem2reg -reg2mem input.bc -o output.bc"
+    assert env.commandline_to_actions(env.commandline()) == [
+        env.action_space.flags.index("-mem2reg"),
+        env.action_space.flags.index("-reg2mem"),
+    ]
 
 
 def test_uri_substring_candidate_match(env: CompilerEnv):
