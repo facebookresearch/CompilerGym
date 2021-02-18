@@ -120,7 +120,7 @@ class CustomEnv:
         self._env = gym.make("llvm-v0", reward_space=FLAGS.reward)
         try:
             self._env.require_dataset("cBench-v0")
-            self._env.reset(benchmark="benchmark://"+FLAGS.benchmark)
+            self._env.reset(benchmark=FLAGS.benchmark)
 
             # Project onto the subset of transformations that have
             # been specified to be used.
