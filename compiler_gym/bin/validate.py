@@ -12,7 +12,7 @@ Example usage:
     benchmark,reward,walltime,commandline
     cBench-v0/crc32,0,1.2,opt  input.bc -o output.bc
     EOF
-    python -m compiler_gym.bin.validate < results.csv --env=llvm-ic-v0
+    python -m compiler_gym.bin.validate --env=llvm-ic-v0 -
 
 Use this script to validate environment states. Environment states are read from
 stdin as a comma-separated list of benchmark names, walltimes, episode rewards,
@@ -92,12 +92,17 @@ flags.DEFINE_boolean(
     "Debugging flags. Skips the validation and prints output as if all states "
     "were succesfully validated.",
 )
+flags.DEFINE_boolean(
+    "summary_only",
+    False,
+    "Do not print individual validation results, print only the summary at the " "end.",
+)
 FLAGS = flags.FLAGS
 
 
-def read_states_from_stdin() -> Iterator[CompilerEnvState]:
+def read_states(in_file) -> Iterator[CompilerEnvState]:
     """Read the CSV states from stdin."""
-    data = sys.stdin.readlines()
+    data = in_file.readlines()
     for line in csv.DictReader(data):
         try:
             line["reward"] = float(line["reward"]) if line.get("reward") else None
@@ -140,10 +145,22 @@ def stdev(values):
 
 def main(argv):
     """Main entry point."""
-    assert len(argv) == 1, f"Unrecognized flags: {argv[1:]}"
-
     # Parse the input states from the user.
-    states = list(read_states_from_stdin())
+    states = []
+    for path in argv[1:]:
+        if path == "-":
+            states += list(read_states(sys.stdin))
+        else:
+            with open(path) as f:
+                states += list(read_states(f))
+
+    if not states:
+        print(
+            "No inputs to validate. Pass a CSV file path as an argument, or "
+            "use - to read from stdin.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
 
     # Send the states off for validation
     if FLAGS.debug_force_valid:
@@ -207,8 +224,29 @@ def main(argv):
     rewards = []
     walltimes = []
 
-    for result in validation_results:
-        print(to_string(result, name_col_width))
+    if FLAGS.summary_only:
+
+        def intermediate_print(*args, **kwargs):
+            pass
+
+    else:
+        intermediate_print = print
+
+    def plural(quantity, singular, plural):
+        return singular if quantity == 1 else plural
+
+    def progress_message(i):
+        intermediate_print(
+            f"{len(states) - i} remaining {plural(len(states) - i, 'state', 'states')} to validate ... ",
+            end="",
+            flush=True,
+        )
+
+    progress_message(0)
+    for i, result in enumerate(validation_results, start=1):
+        intermediate_print("\r\033[K", to_string(result, name_col_width), sep="")
+        progress_message(len(states) - i)
+
         if result.failed:
             error_count += 1
         elif result.reward_validated and not result.reward_validation_failed:
@@ -216,7 +254,7 @@ def main(argv):
             walltimes.append(result.state.walltime)
 
     # Print a summary footer.
-    print("----", "-" * name_col_width, "-----------", sep="")
+    intermediate_print("----", "-" * name_col_width, "-----------", sep="")
     print(f"Number of validated results: {emph(len(walltimes))} of {len(states)}")
     walltime_mean = f"{arithmetic_mean(walltimes):.3f}s"
     walltime_std = f"{stdev(walltimes):.3f}s"

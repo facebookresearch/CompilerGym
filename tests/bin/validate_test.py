@@ -3,7 +3,9 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Unit tests for //compiler_gym/bin:validate."""
+import tempfile
 from io import StringIO
+from pathlib import Path
 
 import pytest
 from absl import flags
@@ -24,10 +26,42 @@ benchmark://cBench-v0/dijkstra,0,opt  input.bc -o output.bc,0.3
     monkeypatch.setattr("sys.stdin", StringIO(input))
 
     with capture_output() as out:
-        main(["argv0"])
+        main(["argv0", "-"])
 
-    assert out.stdout.startswith("✅  cBench-v0/dijkstra ")
+    assert "✅  cBench-v0/dijkstra " in out.stdout
     assert not out.stderr
+
+
+def test_okay_llvm_result_file_input():
+    with tempfile.TemporaryDirectory() as d:
+        path = Path(d) / "input.csv"
+        with open(str(path), "w") as f:
+            f.write(
+                """
+benchmark,reward,commandline,walltime
+benchmark://cBench-v0/dijkstra,0,opt  input.bc -o output.bc,0.3
+""".strip()
+            )
+        flags.FLAGS.unparse_flags()
+        flags.FLAGS(["argv0", "--env=llvm-ic-v0", "--dataset=cBench-v0"])
+
+        with capture_output() as out:
+            main(["argv0", str(path)])
+
+    assert "✅  cBench-v0/dijkstra " in out.stdout
+    assert not out.stderr
+
+
+def test_no_stdin(monkeypatch):
+    flags.FLAGS.unparse_flags()
+    flags.FLAGS(["argv0", "--env=llvm-ic-v0", "--dataset=cBench-v0"])
+    monkeypatch.setattr("sys.stdin", StringIO(""))
+
+    with capture_output() as out:
+        with pytest.raises(SystemExit):
+            main(["argv0", "-"])
+
+    assert "No inputs to validate" in out.stderr
 
 
 def test_invalid_reward_llvm_result(monkeypatch):
@@ -40,10 +74,11 @@ benchmark://cBench-v0/dijkstra,0.5,opt  input.bc -o output.bc,0.3
     monkeypatch.setattr("sys.stdin", StringIO(input))
     with capture_output() as out:
         with pytest.raises(SystemExit):
-            main(["argv0"])
+            main(["argv0", "-"])
 
-    assert out.stdout.startswith(
+    assert (
         "❌  cBench-v0/dijkstra  Expected reward 0.5000 but received reward 0.0000\n"
+        in out.stdout
     )
     assert not out.stderr
 
@@ -56,7 +91,7 @@ def test_invalid_csv_format(monkeypatch):
 
     with capture_output() as out:
         with pytest.raises(SystemExit):
-            main(["argv0"])
+            main(["argv0", "-"])
 
     assert "Failed to parse input:" in out.stderr
 
@@ -94,7 +129,7 @@ benchmark://cBench-v0/susan,,0,opt  input.bc -o output.bc
     monkeypatch.setattr("sys.stdin", StringIO(input))
 
     with capture_output() as out:
-        main(["argv0"])
+        main(["argv0", "-"])
 
     assert out.stdout.count("✅") == 23  # Every benchmark passed.
     assert not out.stderr
