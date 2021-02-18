@@ -8,6 +8,7 @@
 py_test(
     name = "llvm_deterministic_action_fuzz_test",
     srcs = ["llvm_deterministic_action_fuzz_test.py"],
+    flaky = 1,
     deps = [
         "//compiler_gym",
         "//tests:test_main",
@@ -18,6 +19,7 @@ py_test(
 py_test(
     name = "llvm_fork_env_fuzz_test",
     srcs = ["llvm_fork_env_fuzz_test.py"],
+    flaky = 1,
     deps = [
         "//compiler_gym",
         "//tests:test_main",
@@ -28,6 +30,7 @@ py_test(
 py_test(
     name = "llvm_trajectory_replay_fuzz_test",
     srcs = ["llvm_trajectory_replay_fuzz_test.py"],
+    flaky = 1,
     deps = [
         "//compiler_gym",
         "//tests:test_main",
@@ -39,6 +42,7 @@ py_test(
 py_test(
     name = "llvm_validate_fuzz_test",
     srcs = ["llvm_validate_fuzz_test.py"],
+    flaky = 1,
     deps = [
         "//compiler_gym",
         "//tests:test_main",
@@ -51,6 +55,7 @@ py_test(
     timeout = "long",
     srcs = ["llvm_stress_fuzz_test.py"],
     data = ["//compiler_gym/third_party/llvm:llvm-stress"],
+    flaky = 1,
     shard_count = 16,
     deps = [
         "//compiler_gym",
