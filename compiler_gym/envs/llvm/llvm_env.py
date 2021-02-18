@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Extensions to the CompilerEnv environment for LLVM."""
+import hashlib
 import os
 import shutil
 import tempfile
@@ -348,7 +349,25 @@ class LlvmEnv(CompilerEnv):
         """
         return self.observation["Ir"]
 
-    def write_bitcode(self, path: Union[Path, str]):
+    @property
+    def ir_sha1(self) -> str:
+        """Return the 40-characeter hex sha1 checksum of the current IR."""
+        # TODO(cummins): Compute this on the service-side and add it as an
+        # observation space.
+        return hashlib.sha1(self.ir.encode("utf-8")).hexdigest()
+
+    def write_ir(self, path: Union[Path, str]) -> Path:
+        """Write the current program state to a file.
+
+        :param path: The path of the file to write.
+        :return: The input :code:`path` argument.
+        """
+        path = Path(path).expanduser()
+        with open(path, "w") as f:
+            f.write(self.ir)
+        return path
+
+    def write_bitcode(self, path: Union[Path, str]) -> Path:
         """Write the current program state to a bitcode file.
 
         :param path: The path of the file to write.
@@ -360,6 +379,7 @@ class LlvmEnv(CompilerEnv):
             shutil.copyfile(tmp_path, path)
         finally:
             os.unlink(tmp_path)
+        return path
 
     def render(
         self,
