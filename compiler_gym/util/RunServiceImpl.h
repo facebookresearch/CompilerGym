@@ -32,7 +32,7 @@ int createAndRunService(const boost::filesystem::path& workingDirectory,
 
   // Increase maximum message size beyond the 4MB default as inbound message
   // may be larger (e.g., in the case of IR strings).
-  builder.SetMaxMessageSize(100 * 1024 * 1024);
+  builder.SetMaxMessageSize(512 * 1024 * 1024);
 
   // Start a channel on the port.
   int port;

@@ -45,3 +45,17 @@ py_test(
         "//tests/pytest_plugins:llvm",
     ],
 )
+
+py_test(
+    name = "llvm_stress_fuzz_test",
+    timeout = "long",
+    srcs = ["llvm_stress_fuzz_test.py"],
+    data = ["//compiler_gym/third_party/llvm:llvm-stress"],
+    shard_count = 16,
+    deps = [
+        "//compiler_gym",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+        "//tests/pytest_plugins:random_util",
+    ],
+)
