@@ -29,7 +29,7 @@ from compiler_gym.util.runfiles_path import runfiles_path, transient_cache_path
 
 GRPC_CHANNEL_OPTIONS = [
     # Raise the default inbound message filter from 4MB.
-    ("grpc.max_receive_message_length", 100 * 1024 * 1024),
+    ("grpc.max_receive_message_length", 512 * 1024 * 1024),
     # Spurious error UNAVAILABLE "Trying to connect an http1.x server".
     # https://putridparrot.com/blog/the-unavailable-trying-to-connect-an-http1-x-server-grpc-error/
     ("grpc.enable_http_proxy", 0),
