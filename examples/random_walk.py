@@ -10,8 +10,9 @@ Example usage:
     $ python3 examples/random_walk.py --env=llvm-v0 --step_min=100 --step_max=100 \
         --benchmark=cBench-v0/dijkstra --reward=IrInstructionCount
 """
-import random
 import hashlib
+import random
+
 import humanize
 from absl import app, flags
 
@@ -42,8 +43,10 @@ def run_random_walk(env: CompilerEnv, step_count: int) -> None:
 
     "Use hashes of the environment to record its internal state"
     hashes, actions, rewards = [], [], []
+
     def encode_env_state(env):
         return hashlib.sha1(env.ir.encode("utf-8")).hexdigest()
+
     step_num = 0
     with Timer() as episode_time:
         env.reset()
@@ -87,7 +90,9 @@ def run_random_walk(env: CompilerEnv, step_count: int) -> None:
 
     def minimize_action_sequence(hashes, actions):
         """First pass removes actions that did not change the internal states"""
-        actions = [actions[i] for i in range(len(actions)) if hashes[i] != hashes[i+1]]
+        actions = [
+            actions[i] for i in range(len(actions)) if hashes[i] != hashes[i + 1]
+        ]
         """Second pass removes cancelling actions in the trajectory"""
         cancelling_dict = {"mem2reg": "reg2mem"}
         for act, counteract in cancelling_dict.items():
