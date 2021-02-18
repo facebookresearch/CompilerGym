@@ -15,7 +15,11 @@ option java_outer_classname = "CompilerGymServiceProto";
 option java_package = "com.compiler_gym";
 
 service CompilerGymService {
+  // Request version strings from the service.
   rpc GetVersion(GetVersionRequest) returns (GetVersionReply);
+  // Request the supported service spaces. The service responds with an initial
+  // action space, and a list of available observation and reward spaces.
+  rpc GetSpaces(GetSpacesRequest) returns (GetSpacesReply);
   // Start a CompilerGym service episode. Must be called after Init().
   rpc StartEpisode(StartEpisodeRequest) returns (StartEpisodeReply);
   // Apply a list of optimization decisions and compute a list of observations.
@@ -23,11 +27,10 @@ service CompilerGymService {
   // ActionSpace returned by a call to GetSpaces() or Step(). Valid observations
   // are queried using GetSpaces().
   rpc Step(StepRequest) returns (StepReply);
+  // Fork an episode. This creates a new episode in exactly the same state.
+  rpc ForkEpisode(ForkEpisodeRequest) returns (ForkEpisodeReply);
   // End a CompilerGym service episode. Must be called after StartEpisode().
   rpc EndEpisode(EndEpisodeRequest) returns (EndEpisodeReply);
-  // Request the supported service spaces. The service responds with an initial
-  // action space, and a list of available observation and reward spaces.
-  rpc GetSpaces(GetSpacesRequest) returns (GetSpacesReply);
   // Enumerate the list of available benchmarks.
   rpc GetBenchmarks(GetBenchmarksRequest) returns (GetBenchmarksReply);
   // Register a new benchmark.
@@ -197,6 +200,17 @@ message ObservationSpace {
 }
 
 // ===========================================================================
+// Fork().
+
+message ForkEpisodeRequest {
+  int64 session_id = 1;
+}
+
+message ForkEpisodeReply {
+  int64 session_id = 1;
+}
+
+// ===========================================================================
 // EndEpisode().
 
 message EndEpisodeRequest {
@@ -204,7 +218,10 @@ message EndEpisodeRequest {
   int64 session_id = 1;
 }
 
-message EndEpisodeReply {}
+message EndEpisodeReply {
+  // The number of remaining sessions that are alive. This is a refcount
+  int32 remaining_sessions = 1;
+}
 
 // ===========================================================================
 // GetSpaces().
