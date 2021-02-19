@@ -112,3 +112,21 @@ def cBench_dataset():
         env.require_dataset("cBench-v0")
     finally:
         env.close()
+
+
+@pytest.fixture(scope="module")
+def llvm_opt() -> Path:
+    """Test fixture that yields the path of opt."""
+    return runfiles_path("compiler_gym/third_party/llvm/opt")
+
+
+@pytest.fixture(scope="module")
+def llvm_diff() -> Path:
+    """Test fixture that yields the path of llvm-diff."""
+    return runfiles_path("compiler_gym/third_party/llvm/llvm-diff")
+
+
+@pytest.fixture(scope="module")
+def clang() -> Path:
+    """Test fixture that yields the path of clang."""
+    return runfiles_path("compiler_gym/third_party/llvm/clang")

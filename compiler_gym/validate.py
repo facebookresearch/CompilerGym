@@ -7,14 +7,13 @@ import math
 import multiprocessing
 import multiprocessing.pool
 import re
-from typing import Callable, Iterable, List, NamedTuple, Optional, cast
+from typing import Callable, Iterable, List, NamedTuple, Optional
 
 import gym
 
 from compiler_gym.envs.compiler_env import CompilerEnv, CompilerEnvState
 from compiler_gym.envs.llvm import LlvmEnv
 from compiler_gym.envs.llvm.datasets import get_llvm_benchmark_validation_callback
-from compiler_gym.spaces import Commandline
 from compiler_gym.util.timer import Timer
 
 
@@ -74,15 +73,7 @@ class ValidationResult(NamedTuple):
 
 def _llvm_replay_commandline(env: LlvmEnv, commandline: str) -> Optional[float]:
     """Replay the sequence of actions given by a commandline."""
-
-    # Strip the decorative elements that LlvmEnv.commandline() adds.
-    if not commandline.startswith("opt ") or not commandline.endswith(
-        " input.bc -o output.bc"
-    ):
-        raise ValueError(f"Invalid commandline: `{commandline}`")
-    commandline = commandline[len("opt ") : -len(" input.bc -o output.bc")]
-
-    actions = cast(Commandline, env.action_space).from_commandline(commandline)
+    actions = env.commandline_to_actions(commandline)
     for action in actions:
         _, _, done, info = env.step(action)
         if done:

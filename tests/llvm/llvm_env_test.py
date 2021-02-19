@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Integrations tests for the LLVM CompilerGym environments."""
+from pathlib import Path
 from typing import List
 
 import gym
@@ -14,7 +15,7 @@ from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.service.connection import CompilerGymServiceConnection
 from tests.test_main import main
 
-pytest_plugins = ["tests.pytest_plugins.llvm"]
+pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.llvm"]
 
 
 @pytest.fixture(scope="function", params=["local", "service"])
@@ -70,9 +71,21 @@ def test_double_reset(env: CompilerEnv):
     assert env.in_episode
 
 
-def test_commandline(env: CompilerEnv):
+def test_commandline_no_actions(env: CompilerEnv):
     env.reset(benchmark="cBench-v0/crc32")
     assert env.commandline() == "opt  input.bc -o output.bc"
+    assert env.commandline_to_actions(env.commandline()) == []
+
+
+def test_commandline(env: CompilerEnv):
+    env.reset(benchmark="cBench-v0/crc32")
+    env.step(env.action_space.flags.index("-mem2reg"))
+    env.step(env.action_space.flags.index("-reg2mem"))
+    assert env.commandline() == "opt -mem2reg -reg2mem input.bc -o output.bc"
+    assert env.commandline_to_actions(env.commandline()) == [
+        env.action_space.flags.index("-mem2reg"),
+        env.action_space.flags.index("-reg2mem"),
+    ]
 
 
 def test_uri_substring_candidate_match(env: CompilerEnv):
@@ -230,6 +243,30 @@ def test_same_reward_after_reset(env: LlvmEnv):
     env.reset()
     _, reward_b, _, _ = env.step(action)
     assert reward_a == reward_b
+
+
+def test_write_bitcode(env: LlvmEnv, tmpwd: Path):
+    env.reset(benchmark="cBench-v0/crc32")
+    env.write_bitcode("file.bc")
+    assert Path("file.bc").is_file()
+
+
+def test_write_ir(env: LlvmEnv, tmpwd: Path):
+    env.reset(benchmark="cBench-v0/crc32")
+    env.write_bitcode("file.ll")
+    assert Path("file.ll").is_file()
+
+
+def test_ir_sha1(env: LlvmEnv, tmpwd: Path):
+    env.reset(benchmark="cBench-v0/crc32")
+    before = env.ir_sha1
+
+    _, _, done, info = env.step(env.action_space.flags.index("-mem2reg"))
+    assert not done, info
+    assert not info["action_had_no_effect"], "sanity check failed, action had no effect"
+
+    after = env.ir_sha1
+    assert before != after
 
 
 if __name__ == "__main__":

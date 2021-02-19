@@ -13,6 +13,9 @@ py_library(
     data = [
         "//compiler_gym/envs/llvm/service/passes:actions_genfiles",
         "//compiler_gym/third_party/cBench:benchmarks_list",
+        "//compiler_gym/third_party/llvm:clang",
+        "//compiler_gym/third_party/llvm:llvm-diff",
+        "//compiler_gym/third_party/llvm:opt",
     ],
     deps = [
         "//compiler_gym",

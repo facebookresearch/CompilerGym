@@ -6,6 +6,19 @@
 # LICENSE file in the root directory of this source tree.
 
 py_test(
+    name = "llvm_commandline_opt_equivalence_fuzz_test",
+    srcs = ["llvm_commandline_opt_equivalence_fuzz_test.py"],
+    flaky = 1,
+    deps = [
+        "//compiler_gym",
+        "//tests:test_main",
+        "//tests/pytest_plugins:common",
+        "//tests/pytest_plugins:llvm",
+        "//tests/pytest_plugins:random_util",
+    ],
+)
+
+py_test(
     name = "llvm_deterministic_action_fuzz_test",
     srcs = ["llvm_deterministic_action_fuzz_test.py"],
     flaky = 1,
