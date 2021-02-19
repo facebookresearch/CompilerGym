@@ -24,19 +24,33 @@ jobs:
 
         steps:
             - uses: actions/checkout@v2
-              with:
-                  ref: development
 
             - name: Set up Python ${{ matrix.python }}
               uses: actions/setup-python@v2
               with:
                   python-version: ${{ matrix.python }}
 
-            - name: Install python wheel
-              run: python -m pip install compiler_gym
+            - name: Install build dependencies (linux)
+              run: |
+                  curl -L "https://github.com/bazelbuild/bazelisk/releases/download/v1.6.1/bazelisk-linux-amd64" > bazel.tmp
+                  sudo mv bazel.tmp /usr/local/bin/bazel
+                  chmod +x /usr/local/bin/bazel
+                  sudo apt install clang-9 patchelf
+                  python -m pip install -r compiler_gym/requirements.txt -r tests/requirements.txt
+              if: matrix.os == 'ubuntu-latest'
 
-            - name: Install python test dependencies
-              run: python -m pip install -r tests/requirements.txt
+            - name: Install build dependencies (macOS)
+              run: |
+                  brew install bazelisk
+                  python -m pip install -r compiler_gym/requirements.txt -r tests/requirements.txt
+              if: matrix.os == 'macos-latest'
+
+            - name: Install
+              run: make install
+              env:
+                  CC: clang
+                  CXX: clang++
+                  BAZEL_TEST_OPTS: --config=ci
 
             - name: Test
               run: FUZZ_TIME=600 make fuzz
