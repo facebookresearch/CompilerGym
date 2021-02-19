@@ -50,3 +50,12 @@ Commandline
 
 .. autoclass:: CommandlineFlag
    :members:
+
+
+Reward
+------
+
+.. autoclass:: Reward
+   :members:
+
+   .. automethod:: __init__

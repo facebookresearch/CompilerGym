@@ -11,7 +11,7 @@ from gym.spaces import Box
 import compiler_gym
 import examples.example_compiler_gym_service  # noqa Register environments.
 from compiler_gym.envs import CompilerEnv
-from compiler_gym.spaces import NamedDiscrete, Sequence
+from compiler_gym.spaces import NamedDiscrete, Scalar, Sequence
 from tests.test_main import main
 
 
@@ -43,12 +43,15 @@ def test_action_space(env: CompilerEnv):
 def test_observation_spaces(env: CompilerEnv):
     """Test that the environment reports the service's observation spaces."""
     env.reset()
-    assert env.observation.spaces.keys() == {"ir", "features"}
+    assert env.observation.spaces.keys() == {"ir", "features", "codesize"}
     assert env.observation.spaces["ir"].space == Sequence(
         size_range=(0, None), dtype=str, opaque_data_format=""
     )
     assert env.observation.spaces["features"].space == Box(
         shape=(3,), low=-100, high=100, dtype=np.int64
+    )
+    assert env.observation.spaces["codesize"].space == Scalar(
+        min=0, max=np.iinfo(np.int64).max, dtype=np.int64
     )
 
 
@@ -58,7 +61,7 @@ def test_reward_spaces(env: CompilerEnv):
     assert env.reward.spaces.keys() == {"codesize"}
 
 
-def test_takeAction_before_startEpisode(env: CompilerEnv):
+def test_step_before_startEpisode(env: CompilerEnv):
     """Taking a step() before reset() is illegal."""
     with pytest.raises(Exception):
         env.step(0)
@@ -107,7 +110,7 @@ def test_double_reset(env: CompilerEnv):
     assert env.in_episode
 
 
-def test_takeAction_out_of_range(env: CompilerEnv):
+def test_Step_out_of_range(env: CompilerEnv):
     """Test error handling with an invalid action."""
     env.reset()
     with pytest.raises(ValueError) as ctx:
@@ -115,8 +118,8 @@ def test_takeAction_out_of_range(env: CompilerEnv):
     assert str(ctx.value) == "Out-of-range"
 
 
-def test_eager_ir_observation(env: CompilerEnv):
-    """Test eager observation space."""
+def test_default_ir_observation(env: CompilerEnv):
+    """Test default observation space."""
     env.observation_space = "ir"
     observation = env.reset()
     assert observation == "Hello, world!"
@@ -127,8 +130,8 @@ def test_eager_ir_observation(env: CompilerEnv):
     assert not done
 
 
-def test_eager_features_observation(env: CompilerEnv):
-    """Test eager observation space."""
+def test_default_features_observation(env: CompilerEnv):
+    """Test default observation space."""
     env.observation_space = "features"
     observation = env.reset()
     assert isinstance(observation, np.ndarray)
@@ -137,8 +140,8 @@ def test_eager_features_observation(env: CompilerEnv):
     assert observation.tolist() == [0, 0, 0]
 
 
-def test_eager_reward(env: CompilerEnv):
-    """Test eager reward space."""
+def test_default_reward(env: CompilerEnv):
+    """Test default reward space."""
     env.reward_space = "codesize"
     env.reset()
     observation, reward, done, info = env.step(0)

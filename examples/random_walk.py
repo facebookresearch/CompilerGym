@@ -69,7 +69,7 @@ def run_random_walk(env: CompilerEnv, step_count: int) -> List[float]:
             )
             rewards.append(reward)
             print(f"Reward:       {reward}")
-            if env._eager_observation:
+            if env._default_observation:
                 print(f"Observation:\n{observation}")
             print(f"Step time:    {step_time}")
             if done:

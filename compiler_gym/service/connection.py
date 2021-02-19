@@ -23,7 +23,6 @@ from compiler_gym.service.proto import (
     GetSpacesReply,
     GetSpacesRequest,
     ObservationSpace,
-    RewardSpace,
 )
 from compiler_gym.util.runfiles_path import runfiles_path, transient_cache_path
 
@@ -392,7 +391,6 @@ class CompilerGymServiceConnection(object):
     :ivar action_spaces: A list of action spaces provided by the service.
     :ivar observation_spaces: A list of observation spaces provided by the
         service.
-    :ivar reward_spaces: A list of reward spaces provided by the service.
     """
 
     def __init__(self, endpoint: Union[str, Path], opts: ConnectionOpts = None):
@@ -417,9 +415,6 @@ class CompilerGymServiceConnection(object):
         )
         self.observation_spaces: List[ObservationSpace] = list(
             self.connection.spaces.observation_space_list
-        )
-        self.reward_spaces: List[RewardSpace] = list(
-            self.connection.spaces.reward_space_list
         )
 
     def _establish_connection(self) -> None:

@@ -8,7 +8,6 @@
 #include <optional>
 
 #include "boost/filesystem.hpp"
-#include "compiler_gym/envs/llvm/service/RewardSpaces.h"
 #include "llvm/IR/Module.h"
 
 namespace compiler_gym::llvm_service {
@@ -51,12 +50,5 @@ double getBaselineCost(const BaselineCosts& baselineCosts, LlvmBaselinePolicy po
 // Compute the costs of baseline policies.
 void setbaselineCosts(const llvm::Module& unoptimizedModule, BaselineCosts* baselineCosts,
                       const boost::filesystem::path& workingDirectory);
-
-// Translate from reward space to a cost function.
-LlvmCostFunction getCostFunction(LlvmRewardSpace space);
-
-// Translate from reward space to a baseline policy. If a reward space has no
-// baseline policy, this returns std::nullopt.
-std::optional<LlvmBaselinePolicy> getBaselinePolicy(LlvmRewardSpace space);
 
 }  // namespace compiler_gym::llvm_service

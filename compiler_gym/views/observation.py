@@ -4,8 +4,8 @@
 # LICENSE file in the root directory of this source tree.
 from typing import Callable, List
 
-from compiler_gym.service import observation_t
-from compiler_gym.service.proto import Observation, ObservationRequest, ObservationSpace
+from compiler_gym.service import ServiceError, observation_t
+from compiler_gym.service.proto import ObservationSpace, StepReply, StepRequest
 from compiler_gym.views.observation_space_spec import ObservationSpaceSpec
 
 
@@ -28,7 +28,7 @@ class ObservationView(object):
 
     def __init__(
         self,
-        get_observation: Callable[[ObservationRequest], Observation],
+        get_observation: Callable[[StepRequest], StepReply],
         spaces: List[ObservationSpace],
     ):
         if not spaces:
@@ -48,11 +48,16 @@ class ObservationView(object):
         :raises KeyError: If the requested observation space does not exist.
         """
         space = self.spaces[observation_space]
-        request = ObservationRequest(
+        request = StepRequest(
             session_id=self.session_id,
-            observation_space=space.index,
+            observation_space=[space.index],
         )
-        return space.cb(self._get_observation(request))
+        reply: StepReply = self._get_observation(request)
+        if len(reply.observation) != 1:
+            raise ServiceError(
+                f"Requested 1 observation but received {len(reply.observation)}"
+            )
+        return space.translate(reply.observation[0])
 
     def add_derived_space(
         self,
@@ -69,7 +74,7 @@ class ObservationView(object):
         >>> env.observation.add_derived_space(
             id="src_len",
             base_id="src",
-            cb=lambda src: np.array([len(src)], dtype=np.int32),
+            translate=lambda src: np.array([len(src)], dtype=np.int32),
             shape=Box(shape=(1,), dtype=np.int32),
         )
         >>> env.observation["src_len"]

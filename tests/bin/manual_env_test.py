@@ -161,8 +161,7 @@ def test_reward(cBench_dataset):
         action -mem2reg
         reward
         reward IrInstructionCountNorm
-        stack
-        """,
+        stack""",
         r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s
 
 compilergym:cBench-v0/adpcm> Reward IrInstructionCount in [0-9.mu]*s
@@ -174,7 +173,7 @@ Actions -mem2reg in [0-9.mu]*s with reward 181.0.
 compilergym:cBench-v0/adpcm> 0.000000
 Reward IrInstructionCount in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm> 0.000000
+compilergym:cBench-v0/adpcm> 0.404018
 Reward IrInstructionCountNorm in [0-9.mu]*s
 
 compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
@@ -203,16 +202,16 @@ def test_observation(cBench_dataset):
 compilergym:cBench-v0/adpcm> Observation IrInstructionCount in [0-9.mu]*s
 
 compilergym:cBench-v0/adpcm> Action -mem2reg
-Observation: \[267\]
+Observation: 267
 Actions -mem2reg in [0-9.mu]*s with reward 0.
 
-compilergym:cBench-v0/adpcm> \[267\]
+compilergym:cBench-v0/adpcm> 267
 Observation IrInstructionCount in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm> \[206\]
+compilergym:cBench-v0/adpcm> 206
 Observation IrInstructionCountOz in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm> \[206\]
+compilergym:cBench-v0/adpcm> 206
 Observation IrInstructionCountOz in [0-9.mu]*s""",
     )
 
@@ -231,15 +230,15 @@ compilergym:cBench-v0/adpcm> Action: -add-discriminators Reward: 0.000000
 Action: -adce Reward: 1.000000
 (.|\n)*
 Got actions in [0-9.mu]*s
- Action                          | Effect   | Done   |   Eager Reward
----------------------------------+----------+--------+----------------
- -mem2reg                        | True     | False  |            181
- -sroa                           | True     | False  |            181
- -newgvn                         | True     | False  |             74
- -gvn                            | True     | False  |             72
+ Action                          | Effect   | Done   |   Reward
+---------------------------------+----------+--------+---------
+ -mem2reg                        | True     | False  |      181
+ -sroa                           | True     | False  |      181
+ -newgvn                         | True     | False  |       74
+ -gvn                            | True     | False  |       72
 (.|\n)*
- -structurizecfg                 | True     | False  |            -25
- -bounds-checking                | True     | False  |            -60""",
+ -structurizecfg                 | True     | False  |      -25
+ -bounds-checking                | True     | False  |      -60""",
     )
 
 

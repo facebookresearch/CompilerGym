@@ -30,9 +30,9 @@ def test_fuzz(env: LlvmEnv):
                 break  # Broken trajectory, retry.
         else:
             print(f"Validating state {env.state}")
-            cb = get_llvm_benchmark_validation_callback(env)
-            assert cb
-            assert cb(env) is None
+            validation_cb = get_llvm_benchmark_validation_callback(env)
+            assert validation_cb
+            assert validation_cb(env) is None
             # Stop the test.
             break
 

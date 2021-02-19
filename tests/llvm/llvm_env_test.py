@@ -214,5 +214,23 @@ def test_set_reward_space_from_spec(env: LlvmEnv):
     assert env.reward_space == reward
 
 
+def test_same_reward_after_reset(env: LlvmEnv):
+    """Check that running the same action after calling reset() produces
+    same reward.
+    """
+    env.reward_space = "IrInstructionCount"
+    env.benchmark = "cBench-v0/dijkstra"
+
+    action = env.action_space.flags.index("-instcombine")
+    env.reset()
+
+    _, reward_a, _, _ = env.step(action)
+    assert reward_a, "Sanity check that action produces a reward"
+
+    env.reset()
+    _, reward_b, _, _ = env.step(action)
+    assert reward_a == reward_b
+
+
 if __name__ == "__main__":
     main()

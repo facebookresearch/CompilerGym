@@ -23,7 +23,7 @@ Features:
     * `ir` which returns the string "Hello, world!".
     * `features` which returns an `int64_list` of `[0, 0, 0]`.
 * There is a single reward space `codesize` which returns 0.
-* Supports eager observation and reward.
+* Supports default observation and reward spaces.
 
 See [service/ExampleService.h](service/ExampleService.h) for the service
 implementation, [__init__.py](__init__.py) for a python module that

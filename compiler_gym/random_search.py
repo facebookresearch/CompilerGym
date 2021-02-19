@@ -122,7 +122,7 @@ def random_search(
         outdir = Path(outdir)
 
         if not env.reward_space:
-            raise ValueError("Eager reward must be specified for random search")
+            raise ValueError("A reward space must be specified for random search")
         reward_space_name = env.reward_space.id
 
         action_space_names = list(env.action_space.names)

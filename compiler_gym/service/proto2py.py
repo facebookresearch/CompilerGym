@@ -11,7 +11,7 @@ import numpy as np
 from compiler_gym.service.proto import ScalarRange
 
 json_t = Union[List[Any], Dict[str, Any]]
-observation_t = Union[np.ndarray, str, bytes, json_t, nx.DiGraph]
+observation_t = Union[np.ndarray, str, bytes, int, float, json_t, nx.DiGraph]
 
 
 def scalar_range2tuple(sr: ScalarRange, defaults=(-np.inf, np.inf)):

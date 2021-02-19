@@ -44,14 +44,3 @@ cc_test(
         "@magic_enum",
     ],
 )
-
-cc_test(
-    name = "RewardSpacesTest",
-    srcs = ["RewardSpacesTest.cc"],
-    deps = [
-        "//compiler_gym/envs/llvm/service:RewardSpaces",
-        "//tests:TestMacros",
-        "//tests:TestMain",
-        "@magic_enum",
-    ],
-)

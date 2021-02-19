@@ -18,17 +18,11 @@ service CompilerGymService {
   rpc GetVersion(GetVersionRequest) returns (GetVersionReply);
   // Start a CompilerGym service episode. Must be called after Init().
   rpc StartEpisode(StartEpisodeRequest) returns (StartEpisodeReply);
-  // Make an optimization decision. The set of valid actions is the last
-  // ActionSpace returned by a call to Init() or TakeAction().
-  rpc TakeAction(ActionRequest) returns (ActionReply);
-  // Request an observation of the current state. StartEpisode() must have been
-  // called. If the observation is deterministic, this value will not change
-  // until further TakeAction() calls are made.
-  rpc GetObservation(ObservationRequest) returns (Observation);
-  // Request the reward at the current state. StartEpisode() must have been
-  // called. If the reward is deterministic, the reward will not change between
-  // subsequent calls until TakeAction() is called.
-  rpc GetReward(RewardRequest) returns (Reward);
+  // Apply a list of optimization decisions and compute a list of observations.
+  // Optimization decisions are selected from the last set of valid actions
+  // ActionSpace returned by a call to GetSpaces() or Step(). Valid observations
+  // are queried using GetSpaces().
+  rpc Step(StepRequest) returns (StepReply);
   // End a CompilerGym service episode. Must be called after StartEpisode().
   rpc EndEpisode(EndEpisodeRequest) returns (EndEpisodeReply);
   // Request the supported service spaces. The service responds with an initial
@@ -63,16 +57,6 @@ message StartEpisodeRequest {
   // space that is to be used for this episode. Once set, the action space
   // cannot be changed for the duration of the episode.
   int32 action_space = 2;
-  // Enable eager computation of observation. When set, every call to
-  // takeAction() will return the observation given by this index into
-  // InitReply.observation_space_list.
-  bool use_eager_observation_space = 3;
-  int32 eager_observation_space = 4;
-  // Enable eager computation of reward. When set, every call to
-  // takeAction() will return a reward given by this index into
-  // InitReply.reward_space_list.
-  bool use_eager_reward_space = 5;
-  int32 eager_reward_space = 6;
 }
 
 message StartEpisodeReply {
@@ -82,39 +66,31 @@ message StartEpisodeReply {
   // The name of the benchmark.
   string benchmark = 2;
   // A new action space. This is set only if, after initializing the episode,
-  // the action space has changed. If set, the environment should discard the
-  // previous action space returned by InitReply() and replace it with this one.
-  // Else, the action space remains unchanged.
+  // the action space has changed from the default action space returned by
+  // GetSpaces(). If set, the environment should discard the previous action
+  // space and replace it with this one. Else, the action space remains
+  // unchanged.
   ActionSpace new_action_space = 3;
 }
 
 // ===========================================================================
-// TakeAction().
+// Step().
 
-message ActionSpace {
-  // The name of the action space.
-  string name = 1;
-  // A list of discrete action names.
-  // NOTE(cummins): This currently only supports flat action spaces of
-  // categorical values. In the future we will want to replace this with a more
-  // extensible representation that supports parameterized actions, and actions
-  // of different types (e.g. optimization passes vs optimization contexts).
-  repeated string action = 2;
-}
-
-message ActionRequest {
+message StepRequest {
   // The ID of the session.
   int64 session_id = 1;
   // A list of indices into the ActionSpace.action list. Actions are executed
   // in the order they appear in this list.
   repeated int32 action = 2;
+  // A list of indices into the GetSpacesReply.observation_space_list
+  repeated int32 observation_space = 3;
 }
 
-message ActionReply {
+message StepReply {
   // Indicates that the episode has ended. This could be because there are no
   // further actions that can be made, or because the action has led to an
   // invalid state. Once this field has been set, you should make no further
-  // calls to takeAction(). However, you mays still request reward and new
+  // calls to step(). However, you mays still request reward and new
   // observations.
   bool end_of_episode = 1;
   // A service may set this field to true if the action is known not to have
@@ -126,25 +102,39 @@ message ActionReply {
   // requested action, the action space has changed. Else, the action space
   // remains unchanged.
   ActionSpace new_action_space = 3;
-  // Observed state after completing the action. Set only if
-  // StartEpisodeRequest.eager_observation_space was set during startEpisode().
-  Observation observation = 5;
-  // Reward after completing the action. Set only if
-  // StartEpisodeRequest.eager_reward_space was set during startEpisode().
-  Reward reward = 6;
+  // Observed states after completing the action.
+  repeated Observation observation = 4;
 }
 
 // ===========================================================================
-// GetObservation().
+// Actions.
+
+message ActionSpace {
+  // The name of the action space.
+  string name = 1;
+  // A list of discrete action names.
+  // NOTE(cummins): This currently only supports flat action spaces of
+  // categorical values. In the future we will want to replace this with a more
+  // extensible representation that supports parameterized actions, and actions
+  // of different types (e.g. optimization passes vs optimization contexts).
+  repeated string action = 2;
+  // TODO:
+  repeated int32 observation_space = 3;
+}
+
+// ===========================================================================
+// Observations.
 
 message Observation {
-  // A point in an ObservationSpace is _either_ a vector of integers, a vector
-  // of real values, a string, or an opaque byte array.
+  // A point in an ObservationSpace is _either_ a scalar or vector of integers
+  // or real values, a string, or an opaque byte array.
   oneof value {
     Int64List int64_list = 1;
     DoubleList double_list = 2;
     string string_value = 3;
     bytes binary_value = 4;
+    int64 scalar_int64 = 5;
+    double scalar_scalar = 6;
   }
 }
 
@@ -184,6 +174,10 @@ message ObservationSpace {
     // observations are strings of at least 10 characters in length.
     ScalarRange string_size_range = 4;
     ScalarRange binary_size_range = 5;
+    // For scalar values, the _range field describes the bounds of the scalar
+    // value.
+    ScalarRange scalar_int64_range = 10;
+    ScalarRange scalar_double_range = 11;
   }
   // An optional string describing an opaque data format, e.g. a data structure
   // that is serialized to a string/binary array for transmission back to the
@@ -202,53 +196,6 @@ message ObservationSpace {
   Observation default_value = 9;
 }
 
-message ObservationRequest {
-  // The ID of the session.
-  int64 session_id = 1;
-  // Index into the InitReply.observation_space_list.
-  int32 observation_space = 2;
-}
-
-// ===========================================================================
-// GetReward().
-
-message RewardSpace {
-  // The name of this reward space.
-  string name = 1;
-  // The range of continuous values in this reward space.
-  ScalarRange range = 2;
-  // The cumulative reward threshold before an episode is considered successful.
-  // For example, episodes where reward is scaled to an existing heuristic can
-  // be considered "successful" when the reward exceeds the existing heuristic.
-  bool has_success_threshold = 3;
-  double success_threshold = 4;
-  // Whether the reward signal is deterministic. Examples of non-deterministic
-  // rewards are those with measurement noise such as program runtime.
-  bool deterministic = 5;
-  // Whether the reward signal depends on execution environment of the service.
-  bool platform_dependent = 6;
-  // A default reward value. This value should be used by the client in lieu
-  // of a true reward value if the compiler service terminates abruptly, such as
-  // a crash while applying an action.
-  double default_value = 7;
-  // If true, offset the default value by the sum of all rewards for the current
-  // episode. For example, given a default reward value of -10.0 and an episode
-  // with prior rewards [0.1, 0.3, -0.15], the default value is:
-  //     -10.0 - sum(0.1, 0.3, -0.15) = -10.25.
-  bool default_negates_returns = 8;
-}
-
-message RewardRequest {
-  // The ID of the session.
-  int64 session_id = 1;
-  // Index into the RewardSpaceList.reward_space list.
-  int32 reward_space = 2;
-}
-
-message Reward {
-  double reward = 1;
-}
-
 // ===========================================================================
 // EndEpisode().
 
@@ -265,14 +212,12 @@ message EndEpisodeReply {}
 message GetSpacesRequest {}
 
 message GetSpacesReply {
-  // The initial space of actions. Subsequent calls to takeAction() may produce
+  // The initial space of actions. Subsequent calls to step() may produce
   // a new action space.
   repeated ActionSpace action_space_list = 1;
   // A list of available observation spaces. A service may support one or more
   // observation spaces.
   repeated ObservationSpace observation_space_list = 2;
-  // A list of reward spaces. A service may support one or moe reward spaces.
-  repeated RewardSpace reward_space_list = 3;
 }
 
 // ===========================================================================

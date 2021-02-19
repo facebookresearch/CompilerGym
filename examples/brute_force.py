@@ -181,7 +181,7 @@ def run_brute_force(
     action_names = action_names or env.action_space.names
 
     if not env.reward_space:
-        raise ValueError("Eager reward must be specified for random search")
+        raise ValueError("A reward space must be specified for random search")
     reward_space_name = env.reward_space.id
 
     actions = [env.action_space.names.index(a) for a in action_names]

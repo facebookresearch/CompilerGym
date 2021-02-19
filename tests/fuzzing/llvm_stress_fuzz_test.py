@@ -32,7 +32,9 @@ def test_fuzz(env: LlvmEnv, observation_space: str, reward_space: str):
 
     env.reset()
     apply_random_trajectory(
-        env, random_trajectory_length_range=RANDOM_TRAJECTORY_LENGTH_RANGE
+        env,
+        random_trajectory_length_range=RANDOM_TRAJECTORY_LENGTH_RANGE,
+        timeout=10,
     )
     print(env.state)  # For debugging in case of failure.
 
