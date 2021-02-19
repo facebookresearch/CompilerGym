@@ -7,4 +7,4 @@ networkx==2.5
 numpy>=1.19.3
 protobuf==3.13.0
 requests>=2.24.0
-tabulate>=0.8.7
+tabulate==0.8.7
