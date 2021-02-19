@@ -67,7 +67,7 @@ Status LlvmService::StartSession(ServerContext* /* unused */, const StartSession
   // Construct the environment.
   reply->set_session_id(nextSessionId_);
   sessions_[nextSessionId_] =
-      std::make_unique<LlvmEnvironment>(std::move(benchmark), actionSpace, workingDirectory_);
+      std::make_unique<LlvmSession>(std::move(benchmark), actionSpace, workingDirectory_);
   ++nextSessionId_;
 
   return Status::OK;
@@ -75,7 +75,7 @@ Status LlvmService::StartSession(ServerContext* /* unused */, const StartSession
 
 Status LlvmService::ForkSession(ServerContext* /* unused */, const ForkSessionRequest* request,
                                 ForkSessionReply* reply) {
-  LlvmEnvironment* environment;
+  LlvmSession* environment;
   RETURN_IF_ERROR(session(request->session_id(), &environment));
   return Status(StatusCode::UNIMPLEMENTED, "Fork() is not yet supported");
 }
@@ -85,7 +85,7 @@ Status LlvmService::EndSession(grpc::ServerContext* /* unused */, const EndSessi
   // Note that unlike the other methods, no error is thrown if the requested
   // session does not exist.
   if (sessions_.find(request->session_id()) != sessions_.end()) {
-    const LlvmEnvironment* environment;
+    const LlvmSession* environment;
     RETURN_IF_ERROR(session(request->session_id(), &environment));
     VLOG(1) << "Step " << environment->actionCount() << " EndSession("
             << environment->benchmark().name() << ")";
@@ -97,7 +97,7 @@ Status LlvmService::EndSession(grpc::ServerContext* /* unused */, const EndSessi
 
 Status LlvmService::Step(ServerContext* /* unused */, const StepRequest* request,
                          StepReply* reply) {
-  LlvmEnvironment* environment;
+  LlvmSession* environment;
   RETURN_IF_ERROR(session(request->session_id(), &environment));
 
   VLOG(2) << "Step " << environment->actionCount() << " Step()";
@@ -150,7 +150,7 @@ Status LlvmService::GetBenchmarks(ServerContext* /* unused */,
   return Status::OK;
 }
 
-Status LlvmService::session(uint64_t id, LlvmEnvironment** environment) {
+Status LlvmService::session(uint64_t id, LlvmSession** environment) {
   auto it = sessions_.find(id);
   if (it == sessions_.end()) {
     return Status(StatusCode::INVALID_ARGUMENT, fmt::format("Session not found: {}", id));
@@ -160,7 +160,7 @@ Status LlvmService::session(uint64_t id, LlvmEnvironment** environment) {
   return Status::OK;
 }
 
-Status LlvmService::session(uint64_t id, const LlvmEnvironment** environment) const {
+Status LlvmService::session(uint64_t id, const LlvmSession** environment) const {
   auto it = sessions_.find(id);
   if (it == sessions_.end()) {
     return Status(StatusCode::INVALID_ARGUMENT, fmt::format("Session not found: {}", id));

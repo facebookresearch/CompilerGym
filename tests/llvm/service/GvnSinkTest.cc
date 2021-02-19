@@ -9,7 +9,7 @@
 
 #include "compiler_gym/envs/llvm/service/Benchmark.h"
 #include "compiler_gym/envs/llvm/service/BenchmarkFactory.h"
-#include "compiler_gym/envs/llvm/service/LlvmEnvironment.h"
+#include "compiler_gym/envs/llvm/service/LlvmSession.h"
 #include "compiler_gym/util/GrpcStatusMacros.h"
 #include "compiler_gym/util/RunfilesPath.h"
 #include "glog/logging.h"
@@ -43,8 +43,8 @@ TEST_F(GvnSinkTest, runGvnSinkOnBlowfish) {
   std::unique_ptr<Benchmark> benchmark;
   ASSERT_OK(factory.getBenchmark("benchmark://cBench-v0/blowfish", &benchmark));
 
-  LlvmEnvironment env(std::move(benchmark), LlvmActionSpace::PASSES_ALL, LlvmObservationSpace::IR,
-                      std::nullopt, workingDirectory_);
+  LlvmSession env(std::move(benchmark), LlvmActionSpace::PASSES_ALL, LlvmObservationSpace::IR,
+                  std::nullopt, workingDirectory_);
 
   StepRequest request;
   request.add_action(static_cast<int>(LlvmAction::GVNSINK_PASS));

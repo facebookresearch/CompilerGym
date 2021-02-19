@@ -11,7 +11,7 @@
 #include "boost/filesystem.hpp"
 #include "compiler_gym/envs/llvm/service/Benchmark.h"
 #include "compiler_gym/envs/llvm/service/BenchmarkFactory.h"
-#include "compiler_gym/envs/llvm/service/LlvmEnvironment.h"
+#include "compiler_gym/envs/llvm/service/LlvmSession.h"
 #include "compiler_gym/service/proto/compiler_gym_service.grpc.pb.h"
 #include "compiler_gym/service/proto/compiler_gym_service.pb.h"
 
@@ -48,14 +48,14 @@ class LlvmService final : public CompilerGymService::Service {
                              GetBenchmarksReply* reply) final override;
 
  protected:
-  grpc::Status session(uint64_t id, LlvmEnvironment** environment);
-  grpc::Status session(uint64_t id, const LlvmEnvironment** environment) const;
+  grpc::Status session(uint64_t id, LlvmSession** environment);
+  grpc::Status session(uint64_t id, const LlvmSession** environment) const;
 
   grpc::Status addBenchmark(const ::compiler_gym::Benchmark& request);
 
  private:
   const boost::filesystem::path workingDirectory_;
-  std::unordered_map<uint64_t, std::unique_ptr<LlvmEnvironment>> sessions_;
+  std::unordered_map<uint64_t, std::unique_ptr<LlvmSession>> sessions_;
   BenchmarkFactory benchmarkFactory_;
   uint64_t nextSessionId_;
 };

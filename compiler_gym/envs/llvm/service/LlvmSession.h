@@ -30,12 +30,12 @@ namespace compiler_gym::llvm_service {
 //
 // It can be used directly as a C++ API, or it can be accessed through an RPC
 // interface using the compiler_gym::service::LlvmService class.
-class LlvmEnvironment {
+class LlvmSession {
  public:
   // Construct an environment by taking ownership of a benchmark. Throws
   // std::invalid_argument if the benchmark's LLVM module fails verification.
-  LlvmEnvironment(std::unique_ptr<Benchmark> benchmark, LlvmActionSpace actionSpace,
-                  const boost::filesystem::path& workingDirectory);
+  LlvmSession(std::unique_ptr<Benchmark> benchmark, LlvmActionSpace actionSpace,
+              const boost::filesystem::path& workingDirectory);
 
   // Run the requested action(s) then compute the requested observation(s).
   [[nodiscard]] grpc::Status step(const StepRequest& request, StepReply* reply);
