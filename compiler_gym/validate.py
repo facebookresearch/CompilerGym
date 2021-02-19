@@ -192,7 +192,13 @@ def validate_states(
         env.close()
 
     with multiprocessing.Pool(processes=nproc) as pool:
-        map_func = pool.imap if inorder else pool.imap_unordered
+        if nproc == 1:
+            map_func = map
+        elif inorder:
+            map_func = pool.imap
+        else:
+            map_func = pool.imap_unordered
+
         yield from map_func(
             _validate_states_worker, [(reward_space_name, r) for r in states]
         )
