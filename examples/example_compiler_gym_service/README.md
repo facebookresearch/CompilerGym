@@ -13,8 +13,8 @@ for debugging and testing frontend code.
 
 Features:
 
-* Enforces the service contract, e.g. `Init()` must be called before
-  `StartEpisode()`, list indices must be in-bounds, etc.
+* Enforces the service contract, e.g. `StartSession()` must be called before
+  `EndSession()`, list indices must be in-bounds, etc.
 * Implements all of the RPC endpoints.
 * It has two programs "foo" and "bar".
 * It has a static action space with three items: `["a", "b", "c"]`. The action

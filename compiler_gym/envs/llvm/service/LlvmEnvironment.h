@@ -26,7 +26,7 @@
 namespace compiler_gym::llvm_service {
 
 // This class exposes the LLVM optimization pipeline for an LLVM module as an
-// RL environment.
+// interactive environment.
 //
 // It can be used directly as a C++ API, or it can be accessed through an RPC
 // interface using the compiler_gym::service::LlvmService class.

@@ -29,11 +29,11 @@ from compiler_gym.service import (
 from compiler_gym.service.proto import (
     AddBenchmarkRequest,
     Benchmark,
-    EndEpisodeRequest,
+    EndSessionRequest,
     GetBenchmarksRequest,
     GetVersionReply,
     GetVersionRequest,
-    StartEpisodeRequest,
+    StartSessionRequest,
     StepRequest,
 )
 from compiler_gym.spaces import NamedDiscrete, Reward
@@ -501,8 +501,8 @@ class CompilerEnv(gym.Env):
         if self.in_episode:
             try:
                 self.service(
-                    self.service.stub.EndEpisode,
-                    EndEpisodeRequest(session_id=self._session_id),
+                    self.service.stub.EndSession,
+                    EndSessionRequest(session_id=self._session_id),
                 )
             except:  # noqa Don't feel bad, computer, you tried ;-)
                 pass
@@ -558,8 +558,8 @@ class CompilerEnv(gym.Env):
         # Stop an existing episode.
         if self.in_episode:
             self.service(
-                self.service.stub.EndEpisode,
-                EndEpisodeRequest(session_id=self._session_id),
+                self.service.stub.EndSession,
+                EndSessionRequest(session_id=self._session_id),
             )
             self._session_id = None
 
@@ -570,8 +570,8 @@ class CompilerEnv(gym.Env):
 
         try:
             reply = self.service(
-                self.service.stub.StartEpisode,
-                StartEpisodeRequest(
+                self.service.stub.StartSession,
+                StartSessionRequest(
                     benchmark=self._user_specified_benchmark_uri,
                     action_space=(
                         [a.name for a in self.action_spaces].index(
@@ -688,7 +688,7 @@ class CompilerEnv(gym.Env):
             "new_action_space": reply.HasField("new_action_space"),
         }
 
-        return observation, reward, reply.end_of_episode, info
+        return observation, reward, reply.end_of_session, info
 
     def render(
         self,

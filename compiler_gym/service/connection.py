@@ -369,7 +369,7 @@ class CompilerGymServiceConnection(object):
         # started a process running on port 8080.
         connection = CompilerGymServiceConnection("localhost:8080")
         # Invoke an RPC method.
-        connection(connection.stub.StartEpisode, StartEpisodeRequest())
+        connection(connection.stub.StartSession, StartSessionRequest())
         # Close the connection. The service running on port 8080 is
         # left running.
         connection.close()
@@ -381,7 +381,7 @@ class CompilerGymServiceConnection(object):
         # Start a subprocess using the binary located at /path/to/my/service.
         connection = CompilerGymServiceConnection(Path("/path/to/my/service"))
         # Invoke an RPC method.
-        connection(connection.stub.StartEpisode, StartEpisodeRequest())
+        connection(connection.stub.StartSession, StartSessionRequest())
         # Close the connection. The subprocess is terminated.
         connection.close()
 

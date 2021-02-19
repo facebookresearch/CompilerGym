@@ -49,8 +49,8 @@ Status LlvmService::GetSpaces(ServerContext* /* unused */, const GetSpacesReques
   return Status::OK;
 }
 
-Status LlvmService::StartEpisode(ServerContext* /* unused */, const StartEpisodeRequest* request,
-                                 StartEpisodeReply* reply) {
+Status LlvmService::StartSession(ServerContext* /* unused */, const StartSessionRequest* request,
+                                 StartSessionReply* reply) {
   std::unique_ptr<Benchmark> benchmark;
   if (request->benchmark().size()) {
     RETURN_IF_ERROR(benchmarkFactory_.getBenchmark(request->benchmark(), &benchmark));
@@ -59,7 +59,7 @@ Status LlvmService::StartEpisode(ServerContext* /* unused */, const StartEpisode
   }
 
   reply->set_benchmark(benchmark->name());
-  VLOG(1) << "StartEpisode(" << benchmark->name() << ")";
+  VLOG(1) << "StartSession(" << benchmark->name() << ")";
 
   LlvmActionSpace actionSpace;
   RETURN_IF_ERROR(util::intToEnum(request->action_space(), &actionSpace));
@@ -73,14 +73,14 @@ Status LlvmService::StartEpisode(ServerContext* /* unused */, const StartEpisode
   return Status::OK;
 }
 
-Status LlvmService::EndEpisode(grpc::ServerContext* /* unused */, const EndEpisodeRequest* request,
-                               EndEpisodeReply* /* unused */) {
+Status LlvmService::EndSession(grpc::ServerContext* /* unused */, const EndSessionRequest* request,
+                               EndSessionReply* /* unused */) {
   // Note that unlike the other methods, no error is thrown if the requested
-  // episode does not exist.
+  // session does not exist.
   if (sessions_.find(request->session_id()) != sessions_.end()) {
     const LlvmEnvironment* environment;
     RETURN_IF_ERROR(session(request->session_id(), &environment));
-    VLOG(1) << "Step " << environment->actionCount() << " EndEpisode("
+    VLOG(1) << "Step " << environment->actionCount() << " EndSession("
             << environment->benchmark().name() << ")";
 
     sessions_.erase(request->session_id());

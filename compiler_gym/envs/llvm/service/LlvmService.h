@@ -29,11 +29,11 @@ class LlvmService final : public CompilerGymService::Service {
   grpc::Status GetSpaces(grpc::ServerContext* context, const GetSpacesRequest* request,
                          GetSpacesReply* reply) final override;
 
-  grpc::Status StartEpisode(grpc::ServerContext* context, const StartEpisodeRequest* request,
-                            StartEpisodeReply* reply) final override;
+  grpc::Status StartSession(grpc::ServerContext* context, const StartSessionRequest* request,
+                            StartSessionReply* reply) final override;
 
-  grpc::Status EndEpisode(grpc::ServerContext* context, const EndEpisodeRequest* request,
-                          EndEpisodeReply* reply) final override;
+  grpc::Status EndSession(grpc::ServerContext* context, const EndSessionRequest* request,
+                          EndSessionReply* reply) final override;
 
   grpc::Status Step(grpc::ServerContext* context, const StepRequest* request,
                     StepReply* reply) final override;

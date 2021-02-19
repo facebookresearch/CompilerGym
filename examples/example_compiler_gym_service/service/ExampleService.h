@@ -32,11 +32,11 @@ class ExampleService final : public CompilerGymService::Service {
   grpc::Status GetSpaces(grpc::ServerContext* context, const GetSpacesRequest* request,
                          GetSpacesReply* reply) final override;
 
-  grpc::Status StartEpisode(grpc::ServerContext* context, const StartEpisodeRequest* request,
-                            StartEpisodeReply* reply) final override;
+  grpc::Status StartSession(grpc::ServerContext* context, const StartSessionRequest* request,
+                            StartSessionReply* reply) final override;
 
-  grpc::Status EndEpisode(grpc::ServerContext* context, const EndEpisodeRequest* request,
-                          EndEpisodeReply* reply) final override;
+  grpc::Status EndSession(grpc::ServerContext* context, const EndSessionRequest* request,
+                          EndSessionReply* reply) final override;
 
   grpc::Status Step(grpc::ServerContext* context, const StepRequest* request,
                     StepReply* reply) final override;
@@ -49,8 +49,8 @@ class ExampleService final : public CompilerGymService::Service {
 
   const boost::filesystem::path workingDirectory_;
 
-  // A single compiler service can support multiple concurrent episodes. This
-  // maps session IDs to objects that represent the individual episodes.
+  // A single compiler service can support multiple concurrent sessions. This
+  // maps session IDs to objects that represent the individual sessions.
   std::unordered_map<int, std::unique_ptr<ExampleCompilationSession>> sessions_;
 
   std::vector<std::string> benchmarkNameList_;
