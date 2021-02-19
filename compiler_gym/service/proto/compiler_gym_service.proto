@@ -210,10 +210,12 @@ message ObservationSpace {
 // Fork().
 
 message ForkSessionRequest {
+  // The ID of the session to fork.
   int64 session_id = 1;
 }
 
 message ForkSessionReply {
+  // The ID of the newly created session.
   int64 session_id = 1;
 }
 
@@ -226,7 +228,7 @@ message EndSessionRequest {
 }
 
 message EndSessionReply {
-  // The number of remaining sessions that are alive. This is a refcount
+  // The number of sessions that the service currently has.
   int32 remaining_sessions = 1;
 }
 

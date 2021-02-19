@@ -32,7 +32,8 @@ grpc::Status readBitcodeFile(const boost::filesystem::path& path, Bitcode* bitco
 std::unique_ptr<llvm::Module> makeModule(llvm::LLVMContext& context, const Bitcode& bitcode,
                                          const std::string& name, grpc::Status* status);
 
-// A benchmark is an LLVM module and the LLVM context that owns it.
+// A benchmark is an LLVM module and the LLVM context that owns it. A benchmark
+// is mutable and can be changed over the course of a session.
 class Benchmark {
  public:
   Benchmark(const std::string& name, const Bitcode& bitcode,

@@ -302,7 +302,8 @@ class ManagedConnection(Connection):
         super().close()
 
     def __repr__(self):
-        return f"{self.url} running on PID={self.process.pid}"
+        alive_or_dead = "alive" if self.process.poll() else "dead"
+        return f"{self.url} running on PID={self.process.pid} ({alive_or_dead})"
 
 
 class UnmanagedConnection(Connection):

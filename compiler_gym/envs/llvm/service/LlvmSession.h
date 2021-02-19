@@ -37,12 +37,19 @@ class LlvmSession {
   LlvmSession(std::unique_ptr<Benchmark> benchmark, LlvmActionSpace actionSpace,
               const boost::filesystem::path& workingDirectory);
 
+  inline const Benchmark& benchmark() const { return *benchmark_; }
+  inline Benchmark& benchmark() { return *benchmark_; }
+
+  inline const LlvmActionSpace actionSpace() const { return actionSpace_; }
+
+  inline const boost::filesystem::path& workingDirectory() const { return workingDirectory_; }
+
   // Run the requested action(s) then compute the requested observation(s).
   [[nodiscard]] grpc::Status step(const StepRequest& request, StepReply* reply);
 
-  inline const Benchmark& benchmark() const { return *benchmark_; }
-
-  int actionCount() const { return actionCount_; }
+  // Returns the number of actions that have been applied in calls to step()
+  // since the start of the session. This is just for logging and has no effect.
+  inline int actionCount() const { return actionCount_; }
 
  protected:
   // Run the requested action.
@@ -58,10 +65,6 @@ class LlvmSession {
   // Run the commandline `opt` tool on the current LLVM module with the given
   // arguments, replacing the environment state with the generated output.
   [[nodiscard]] grpc::Status runOptWithArgs(const std::vector<std::string>& optArgs);
-
-  inline Benchmark& benchmark() { return *benchmark_; }
-
-  inline const LlvmActionSpace actionSpace() const { return actionSpace_; }
 
   inline const llvm::TargetLibraryInfoImpl& tlii() const { return tlii_; }
 

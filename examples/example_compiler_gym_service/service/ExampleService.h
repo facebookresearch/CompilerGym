@@ -7,6 +7,7 @@
 #pragma once
 
 #include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -52,6 +53,8 @@ class ExampleService final : public CompilerGymService::Service {
   // A single compiler service can support multiple concurrent sessions. This
   // maps session IDs to objects that represent the individual sessions.
   std::unordered_map<int, std::unique_ptr<ExampleCompilationSession>> sessions_;
+  // Mutex used to ensure thread safety of creation and destruction of sessions.
+  std::mutex sessionsMutex_;
 
   std::vector<std::string> benchmarkNameList_;
   uint64_t nextSessionId_;

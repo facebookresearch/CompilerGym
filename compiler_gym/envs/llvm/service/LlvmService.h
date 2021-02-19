@@ -7,6 +7,7 @@
 #include <grpcpp/grpcpp.h>
 
 #include <memory>
+#include <mutex>
 
 #include "boost/filesystem.hpp"
 #include "compiler_gym/envs/llvm/service/Benchmark.h"
@@ -38,6 +39,9 @@ class LlvmService final : public CompilerGymService::Service {
   grpc::Status EndSession(grpc::ServerContext* context, const EndSessionRequest* request,
                           EndSessionReply* reply) final override;
 
+  // NOTE: Step() is not thread safe. The underlying assumption is that each
+  // LlvmSession is managed by a single thread, so race conditions between
+  // operations that affect the same LlvmSession are not protected against.
   grpc::Status Step(grpc::ServerContext* context, const StepRequest* request,
                     StepReply* reply) final override;
 
@@ -56,6 +60,8 @@ class LlvmService final : public CompilerGymService::Service {
  private:
   const boost::filesystem::path workingDirectory_;
   std::unordered_map<uint64_t, std::unique_ptr<LlvmSession>> sessions_;
+  // Mutex used to ensure thread safety of creation and destruction of sessions.
+  std::mutex sessionsMutex_;
   BenchmarkFactory benchmarkFactory_;
   uint64_t nextSessionId_;
 };
