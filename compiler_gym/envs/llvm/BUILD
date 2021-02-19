@@ -5,7 +5,10 @@
 
 py_library(
     name = "llvm",
-    srcs = ["__init__.py"],
+    srcs = [
+        "__init__.py",
+        ":specs.py",
+    ],
     data = [
         "//compiler_gym/envs/llvm/service:compiler_gym-llvm-service",
     ],
@@ -69,4 +72,18 @@ py_library(
         "//compiler_gym/spaces",
         "//compiler_gym/views",
     ],
+)
+
+genrule(
+    name = "specs",
+    srcs = ["//compiler_gym/envs/llvm/service:compiler_gym-llvm-service"],
+    outs = ["specs.py"],
+    cmd = "$(location :make_specs) $(location //compiler_gym/envs/llvm/service:compiler_gym-llvm-service) $@",
+    tools = [":make_specs"],
+)
+
+py_binary(
+    name = "make_specs",
+    srcs = ["make_specs.py"],
+    deps = [":llvm_env"],
 )

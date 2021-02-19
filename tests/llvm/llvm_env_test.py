@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 """Integrations tests for the LLVM CompilerGym environments."""
 from pathlib import Path
+from enum import Enum
 from typing import List
 
 import gym
@@ -267,6 +268,11 @@ def test_ir_sha1(env: LlvmEnv, tmpwd: Path):
 
     after = env.ir_sha1
     assert before != after
+
+
+def test_generate_enum_declarations(env: LlvmEnv):
+    assert issubclass(llvm.observation_spaces, Enum)
+    assert issubclass(llvm.reward_spaces, Enum)
 
 
 if __name__ == "__main__":
