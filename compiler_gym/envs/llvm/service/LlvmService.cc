@@ -73,6 +73,13 @@ Status LlvmService::StartSession(ServerContext* /* unused */, const StartSession
   return Status::OK;
 }
 
+Status LlvmService::ForkSession(ServerContext* /* unused */, const ForkSessionRequest* request,
+                                ForkSessionReply* reply) {
+  LlvmEnvironment* environment;
+  RETURN_IF_ERROR(session(request->session_id(), &environment));
+  return Status(StatusCode::UNIMPLEMENTED, "Fork() is not yet supported");
+}
+
 Status LlvmService::EndSession(grpc::ServerContext* /* unused */, const EndSessionRequest* request,
                                EndSessionReply* /* unused */) {
   // Note that unlike the other methods, no error is thrown if the requested

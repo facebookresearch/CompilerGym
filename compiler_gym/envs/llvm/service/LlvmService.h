@@ -32,6 +32,9 @@ class LlvmService final : public CompilerGymService::Service {
   grpc::Status StartSession(grpc::ServerContext* context, const StartSessionRequest* request,
                             StartSessionReply* reply) final override;
 
+  grpc::Status ForkSession(grpc::ServerContext* context, const ForkSessionRequest* request,
+                           ForkSessionReply* reply) final override;
+
   grpc::Status EndSession(grpc::ServerContext* context, const EndSessionRequest* request,
                           EndSessionReply* reply) final override;
 
