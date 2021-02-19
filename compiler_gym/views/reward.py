@@ -30,9 +30,12 @@ class RewardView(object):
         spaces: List[Reward],
         observation_view: ObservationView,
     ):
-        self.spaces: Dict[str, Reward] = {s.id: s for s in spaces}
+        self.spaces: Dict[str, Reward] = {}
         self.previous_action = None
         self._observation_view = observation_view
+
+        for space in spaces:
+            self._add_space(space)
 
     def __getitem__(self, reward_space: str) -> float:
         """Request an observation from the given space.
@@ -68,4 +71,12 @@ class RewardView(object):
         """
         if space.id in self.spaces:
             warnings.warn(f"Replacing existing reward space '{space.id}'")
+        self._add_space(space)
+
+    def _add_space(self, space: Reward):
+        """Register a new space."""
         self.spaces[space.id] = space
+        # Bind a new method to this class that is a callback to compute the
+        # given reward space. E.g. if a new space is added with ID `FooBar`,
+        # this reward can be computed using env.reward.FooBar().
+        setattr(self, space.id, lambda: self[space.id])

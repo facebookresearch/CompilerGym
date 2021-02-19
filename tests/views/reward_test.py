@@ -52,5 +52,19 @@ def test_reward_values():
     assert value == 10
 
 
+def test_reward_values_bound_methods():
+    spaces = [
+        MockReward(id="codesize", ret=[-5]),
+        MockReward(id="runtime", ret=[10]),
+    ]
+    reward = RewardView(spaces, MockObservationView())
+
+    value = reward.codesize()
+    assert value == -5
+
+    value = reward.runtime()
+    assert value == 10
+
+
 if __name__ == "__main__":
     main()
