@@ -54,9 +54,11 @@ class RandomAgentWorker(Thread):
         while self.should_run_one_episode:
             self.total_environment_count += 1
             env = self._make_env()
-            self._patience = self._patience or env.action_space.n
-            self.run_one_environment(env)
-            env.close()
+            try:
+                self._patience = self._patience or env.action_space.n
+                self.run_one_environment(env)
+            finally:
+                env.close()
 
     def run_one_environment(self, env: CompilerEnv) -> None:
         """Run random walks in an infinite loop. Returns if the environment ends."""

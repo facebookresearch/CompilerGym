@@ -174,10 +174,10 @@ def make_working_dir():
     """Make a working directory for a service. The calling code is responsible for
     removing this directory when done.
     """
-    service_directory = transient_cache_path("service")
     timestamp = datetime.now().isoformat()
-    random_hash = random.getrandbits(32)
-    working_dir = Path(service_directory / f"{timestamp}-{random_hash:08x}")
+    random_hash = random.getrandbits(16)
+    service_name = f"service-{timestamp}-{random_hash:04x}"
+    working_dir = transient_cache_path(service_name)
     (working_dir / "logs").mkdir(parents=True, exist_ok=False)
     return working_dir
 
