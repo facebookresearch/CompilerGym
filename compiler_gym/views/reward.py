@@ -65,7 +65,7 @@ class RewardView(object):
             space.reset(benchmark=benchmark)
 
     def add_space(self, space: Reward) -> None:
-        """Register a new reward space.
+        """Register a new :class:`Reward <compiler_gym.spaces.Reward>` space.
 
         :param space: The reward space to be added.
         """
