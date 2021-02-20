@@ -72,9 +72,15 @@ commandline tools using the `--benchmark` flag, e.g.
 I want to add a new program representation / reward signal. How do I do that?
 -----------------------------------------------------------------------------
 
-Fork this project and build it from source (see
-:doc:`installation`). Then modify the C++ service implementation for
-the compiler that you are interested in. The service codebase is
-located at :code:`compiler_gym/envs/$COMPILER/service`, where
-:code:`$COMPILER` is the name of the compiler service you would wish
-to modify, e.g. llvm. Once done, send us a pull request!
+If your program representation can be computed from existing observations,
+consider using the :meth:`add_derived_space()
+<compiler_gym.views.ObservationSpace.add_derived_space>` API to add a derived
+observation or :meth:`add_space() <compiler_gym.views.RewardView.add_space>` to
+add a new reward space.
+
+If you require modifying the underlying compiler service implementation, fork
+this project and build it from source (see :doc:`installation`). Then modify the
+C++ service implementation for the compiler that you are interested in. The
+service codebase is located at :code:`compiler_gym/envs/$COMPILER/service`,
+where :code:`$COMPILER` is the name of the compiler service you would wish to
+modify, e.g. llvm. Once done, send us a pull request!
