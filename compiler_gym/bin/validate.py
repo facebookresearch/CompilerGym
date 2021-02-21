@@ -254,7 +254,7 @@ def main(argv):
             walltimes.append(result.state.walltime)
 
     # Print a summary footer.
-    intermediate_print("----", "-" * name_col_width, "-----------", sep="")
+    intermediate_print("\r\033[K----", "-" * name_col_width, "-----------", sep="")
     print(f"Number of validated results: {emph(len(walltimes))} of {len(states)}")
     walltime_mean = f"{arithmetic_mean(walltimes):.3f}s"
     walltime_std = f"{stdev(walltimes):.3f}s"
