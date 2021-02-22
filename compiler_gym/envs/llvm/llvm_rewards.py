@@ -107,4 +107,4 @@ class BaselineImprovementNormalizedReward(NormalizedReward):
         """Return the value used to normalize costs."""
         init_cost = observation_view[self.init_cost_function]
         baseline_cost = observation_view[self.baseline_cost_function]
-        return min(init_cost - baseline_cost, 1)
+        return max(init_cost - baseline_cost, 1)
