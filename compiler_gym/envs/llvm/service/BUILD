@@ -92,6 +92,7 @@ cc_library(
     name = "LlvmService",
     srcs = ["LlvmService.cc"],
     hdrs = ["LlvmService.h"],
+    visibility = ["//visibility:public"],
     deps = [
         ":Benchmark",
         ":BenchmarkFactory",

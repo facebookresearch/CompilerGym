@@ -90,3 +90,15 @@ py_test(
         "//tests:test_main",
     ],
 )
+
+cc_binary(
+    name = "RandomSearch",
+    srcs = ["RandomSearch.cc"],
+    deps = [
+        "//compiler_gym/envs/llvm/service:LlvmService",
+        "@boost//:filesystem",
+        "@gflags",
+        "@glog",
+        "@magic_enum",
+    ],
+)
