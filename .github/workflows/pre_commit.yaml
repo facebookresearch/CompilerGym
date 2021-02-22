@@ -55,4 +55,4 @@ jobs:
               # TODO(github.com/facebookresearch/CompilerGym/issues/1): Disable
               # isort due to inconsistent results when run locally versus in
               # the GitHub Actions environment.
-              run: SKIP=isort python3 -m pre_commit run --all-files
+              run: SKIP=isort python3 -m pre_commit run --all-files --show-diff-on-failure
