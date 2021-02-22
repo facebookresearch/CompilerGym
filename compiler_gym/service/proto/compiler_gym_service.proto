@@ -128,8 +128,6 @@ message ActionSpace {
   // extensible representation that supports parameterized actions, and actions
   // of different types (e.g. optimization passes vs optimization contexts).
   repeated string action = 2;
-  // TODO:
-  repeated int32 observation_space = 3;
 }
 
 // ===========================================================================
