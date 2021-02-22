@@ -72,6 +72,18 @@ class ObservationSpaceSpec(object):
     def __repr__(self) -> str:
         return f"ObservationSpaceSpec({self.id})"
 
+    def __eq__(self, rhs) -> bool:
+        """Equality check."""
+        if not isinstance(rhs, ObservationSpaceSpec):
+            return False
+        return (
+            self.id == rhs.id
+            and self.index == rhs.index
+            and self.space == rhs.space
+            and self.platform_dependent == rhs.platform_dependent
+            and self.deterministic == rhs.deterministic
+        )
+
     @classmethod
     def from_proto(cls, index: int, proto: ObservationSpace):
         """Construct a space from an ObservationSpace message."""

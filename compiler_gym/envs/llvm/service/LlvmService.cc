@@ -49,8 +49,10 @@ Status LlvmService::GetSpaces(ServerContext* /* unused */, const GetSpacesReques
   return Status::OK;
 }
 
-Status LlvmService::StartEpisode(ServerContext* /* unused */, const StartEpisodeRequest* request,
-                                 StartEpisodeReply* reply) {
+Status LlvmService::StartSession(ServerContext* /* unused */, const StartSessionRequest* request,
+                                 StartSessionReply* reply) {
+  const std::lock_guard<std::mutex> lock(sessionsMutex_);
+
   std::unique_ptr<Benchmark> benchmark;
   if (request->benchmark().size()) {
     RETURN_IF_ERROR(benchmarkFactory_.getBenchmark(request->benchmark(), &benchmark));
@@ -59,7 +61,7 @@ Status LlvmService::StartEpisode(ServerContext* /* unused */, const StartEpisode
   }
 
   reply->set_benchmark(benchmark->name());
-  VLOG(1) << "StartEpisode(" << benchmark->name() << ")";
+  VLOG(1) << "StartSession(" << benchmark->name() << "), [" << nextSessionId_ << "]";
 
   LlvmActionSpace actionSpace;
   RETURN_IF_ERROR(util::intToEnum(request->action_space(), &actionSpace));
@@ -67,30 +69,53 @@ Status LlvmService::StartEpisode(ServerContext* /* unused */, const StartEpisode
   // Construct the environment.
   reply->set_session_id(nextSessionId_);
   sessions_[nextSessionId_] =
-      std::make_unique<LlvmEnvironment>(std::move(benchmark), actionSpace, workingDirectory_);
+      std::make_unique<LlvmSession>(std::move(benchmark), actionSpace, workingDirectory_);
   ++nextSessionId_;
 
   return Status::OK;
 }
 
-Status LlvmService::EndEpisode(grpc::ServerContext* /* unused */, const EndEpisodeRequest* request,
-                               EndEpisodeReply* /* unused */) {
+Status LlvmService::ForkSession(ServerContext* /* unused */, const ForkSessionRequest* request,
+                                ForkSessionReply* reply) {
+  const std::lock_guard<std::mutex> lock(sessionsMutex_);
+
+  LlvmSession* environment;
+  RETURN_IF_ERROR(session(request->session_id(), &environment));
+  VLOG(1) << "ForkSession(" << request->session_id() << "), [" << nextSessionId_ << "]";
+
+  // Construct the environment.
+  reply->set_session_id(nextSessionId_);
+  sessions_[nextSessionId_] =
+      std::make_unique<LlvmSession>(environment->benchmark().clone(environment->workingDirectory()),
+                                    environment->actionSpace(), environment->workingDirectory());
+
+  ++nextSessionId_;
+
+  return Status::OK;
+}
+
+Status LlvmService::EndSession(grpc::ServerContext* /* unused */, const EndSessionRequest* request,
+                               EndSessionReply* reply) {
+  const std::lock_guard<std::mutex> lock(sessionsMutex_);
+
   // Note that unlike the other methods, no error is thrown if the requested
-  // episode does not exist.
+  // session does not exist.
   if (sessions_.find(request->session_id()) != sessions_.end()) {
-    const LlvmEnvironment* environment;
+    const LlvmSession* environment;
     RETURN_IF_ERROR(session(request->session_id(), &environment));
-    VLOG(1) << "Step " << environment->actionCount() << " EndEpisode("
-            << environment->benchmark().name() << ")";
+    VLOG(1) << "Step " << environment->actionCount() << " EndSession("
+            << environment->benchmark().name() << "), [" << request->session_id() << "]";
 
     sessions_.erase(request->session_id());
   }
+
+  reply->set_remaining_sessions(sessions_.size());
   return Status::OK;
 }
 
 Status LlvmService::Step(ServerContext* /* unused */, const StepRequest* request,
                          StepReply* reply) {
-  LlvmEnvironment* environment;
+  LlvmSession* environment;
   RETURN_IF_ERROR(session(request->session_id(), &environment));
 
   VLOG(2) << "Step " << environment->actionCount() << " Step()";
@@ -143,7 +168,7 @@ Status LlvmService::GetBenchmarks(ServerContext* /* unused */,
   return Status::OK;
 }
 
-Status LlvmService::session(uint64_t id, LlvmEnvironment** environment) {
+Status LlvmService::session(uint64_t id, LlvmSession** environment) {
   auto it = sessions_.find(id);
   if (it == sessions_.end()) {
     return Status(StatusCode::INVALID_ARGUMENT, fmt::format("Session not found: {}", id));
@@ -153,7 +178,7 @@ Status LlvmService::session(uint64_t id, LlvmEnvironment** environment) {
   return Status::OK;
 }
 
-Status LlvmService::session(uint64_t id, const LlvmEnvironment** environment) const {
+Status LlvmService::session(uint64_t id, const LlvmSession** environment) const {
   auto it = sessions_.find(id);
   if (it == sessions_.end()) {
     return Status(StatusCode::INVALID_ARGUMENT, fmt::format("Session not found: {}", id));

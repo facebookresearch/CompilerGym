@@ -96,8 +96,26 @@ def test_invalid_csv_format(monkeypatch):
     assert "Failed to parse input:" in out.stderr
 
 
+def test_multiple_valid_inputs(monkeypatch):
+    input = """
+benchmark,reward,walltime,commandline
+benchmark://cBench-v0/crc32,,0,opt  input.bc -o output.bc
+benchmark://cBench-v0/crc32,,0,opt  input.bc -o output.bc
+benchmark://cBench-v0/crc32,,0,opt  input.bc -o output.bc
+""".strip()
+    flags.FLAGS.unparse_flags()
+    flags.FLAGS(["argv0", "--env=llvm-v0", "--dataset=cBench-v0"])
+    monkeypatch.setattr("sys.stdin", StringIO(input))
+
+    with capture_output() as out:
+        main(["argv0"])
+
+    assert out.stdout.count("✅") == 3  # Every benchmark passed.
+    assert not out.stderr
+
+
 @skip_on_ci
-def test_validate_cBenh_null_options(monkeypatch):
+def test_validate_cBench_null_options(monkeypatch):
     input = """
 benchmark,reward,walltime,commandline
 benchmark://cBench-v0/gsm,,0,opt  input.bc -o output.bc

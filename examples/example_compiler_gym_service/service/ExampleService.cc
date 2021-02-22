@@ -85,8 +85,10 @@ Status ExampleService::GetSpaces(ServerContext* /* unused*/, const GetSpacesRequ
   return Status::OK;
 }
 
-Status ExampleService::StartEpisode(ServerContext* /* unused*/, const StartEpisodeRequest* request,
-                                    StartEpisodeReply* reply) {
+Status ExampleService::StartSession(ServerContext* /* unused*/, const StartSessionRequest* request,
+                                    StartSessionReply* reply) {
+  const std::lock_guard<std::mutex> lock(sessionsMutex_);
+
   // Determine the benchmark to use.
   std::string benchmark = request->benchmark();
   const auto benchmarks = getBenchmarks();
@@ -113,8 +115,10 @@ Status ExampleService::StartEpisode(ServerContext* /* unused*/, const StartEpiso
   return Status::OK;
 }
 
-Status ExampleService::EndEpisode(ServerContext* /* unused*/, const EndEpisodeRequest* request,
-                                  EndEpisodeReply* /* unused */) {
+Status ExampleService::EndSession(ServerContext* /* unused*/, const EndSessionRequest* request,
+                                  EndSessionReply* /* unused */) {
+  const std::lock_guard<std::mutex> lock(sessionsMutex_);
+
   auto session = sessions_.find(request->session_id());
   // De-allocate the session.
   if (session != sessions_.end()) {

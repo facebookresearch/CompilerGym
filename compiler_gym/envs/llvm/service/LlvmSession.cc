@@ -2,7 +2,7 @@
 //
 // This source code is licensed under the MIT license found in the
 // LICENSE file in the root directory of this source tree.
-#include "compiler_gym/envs/llvm/service/LlvmEnvironment.h"
+#include "compiler_gym/envs/llvm/service/LlvmSession.h"
 
 #include <cpuinfo.h>
 #include <fmt/format.h>
@@ -117,8 +117,8 @@ Status writeBitcodeToFile(const llvm::Module& module, const fs::path& path) {
 
 }  // anonymous namespace
 
-LlvmEnvironment::LlvmEnvironment(std::unique_ptr<Benchmark> benchmark, LlvmActionSpace actionSpace,
-                                 const boost::filesystem::path& workingDirectory)
+LlvmSession::LlvmSession(std::unique_ptr<Benchmark> benchmark, LlvmActionSpace actionSpace,
+                         const boost::filesystem::path& workingDirectory)
     : workingDirectory_(workingDirectory),
       benchmark_(std::move(benchmark)),
       actionSpace_(actionSpace),
@@ -143,7 +143,7 @@ LlvmEnvironment::LlvmEnvironment(std::unique_ptr<Benchmark> benchmark, LlvmActio
   CHECK(verifyModuleStatus(benchmark_->module()).ok());
 }
 
-Status LlvmEnvironment::step(const StepRequest& request, StepReply* reply) {
+Status LlvmSession::step(const StepRequest& request, StepReply* reply) {
   // Apply the requested actions.
   actionCount_ += request.action_size();
   switch (actionSpace()) {
@@ -169,7 +169,7 @@ Status LlvmEnvironment::step(const StepRequest& request, StepReply* reply) {
   return Status::OK;
 }
 
-Status LlvmEnvironment::runAction(LlvmAction action, StepReply* reply) {
+Status LlvmSession::runAction(LlvmAction action, StepReply* reply) {
 #ifdef EXPERIMENTAL_UNSTABLE_GVN_SINK_PASS
   // NOTE(https://github.com/facebookresearch/CompilerGym/issues/46): The
   // -gvn-sink pass has been found to have nondeterministic behavior so has
@@ -190,7 +190,7 @@ Status LlvmEnvironment::runAction(LlvmAction action, StepReply* reply) {
   return Status::OK;
 }
 
-void LlvmEnvironment::runPass(llvm::Pass* pass, StepReply* reply) {
+void LlvmSession::runPass(llvm::Pass* pass, StepReply* reply) {
   llvm::legacy::PassManager passManager;
   setupPassManager(&passManager, pass);
 
@@ -198,7 +198,7 @@ void LlvmEnvironment::runPass(llvm::Pass* pass, StepReply* reply) {
   reply->set_action_had_no_effect(!changed);
 }
 
-void LlvmEnvironment::runPass(llvm::FunctionPass* pass, StepReply* reply) {
+void LlvmSession::runPass(llvm::FunctionPass* pass, StepReply* reply) {
   llvm::legacy::FunctionPassManager passManager(&benchmark().module());
   setupPassManager(&passManager, pass);
 
@@ -210,7 +210,7 @@ void LlvmEnvironment::runPass(llvm::FunctionPass* pass, StepReply* reply) {
   reply->set_action_had_no_effect(!changed);
 }
 
-Status LlvmEnvironment::runOptWithArgs(const std::vector<std::string>& optArgs) {
+Status LlvmSession::runOptWithArgs(const std::vector<std::string>& optArgs) {
   // Create temporary files for `opt` to read from and write to.
   const auto before_path = fs::unique_path(workingDirectory_ / "module-%%%%%%%%.bc");
   const auto after_path = fs::unique_path(workingDirectory_ / "module-%%%%%%%%.bc");
@@ -256,7 +256,7 @@ Status LlvmEnvironment::runOptWithArgs(const std::vector<std::string>& optArgs) 
   return Status::OK;
 }
 
-Status LlvmEnvironment::getObservation(LlvmObservationSpace space, Observation* reply) {
+Status LlvmSession::getObservation(LlvmObservationSpace space, Observation* reply) {
   switch (space) {
     case LlvmObservationSpace::IR: {
       // Serialize the LLVM module to an IR string.

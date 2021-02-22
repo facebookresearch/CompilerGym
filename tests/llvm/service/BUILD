@@ -24,7 +24,7 @@ cc_test(
 #     data = ["//compiler_gym/third_party/cBench:blowfish"],
 #     deps = [
 #         "//compiler_gym/envs/llvm/service:BenchmarkFactory",
-#         "//compiler_gym/envs/llvm/service:LlvmEnvironment",
+#         "//compiler_gym/envs/llvm/service:LlvmSession",
 #         "//compiler_gym/util:GrpcStatusMacros",
 #         "//compiler_gym/util:RunfilesPath",
 #         "//tests:TestMain",
