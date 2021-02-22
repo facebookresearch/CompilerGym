@@ -44,15 +44,9 @@ class ValidationResult(NamedTuple):
     error_details: str = ""
     """A description of any validation errors."""
 
-    @property
-    def success(self) -> bool:
+    def okay(self) -> bool:
         """Whether validation succeeded."""
-        return not self.failed
-
-    @property
-    def failed(self) -> bool:
-        """Whether validation failed."""
-        return (
+        return not (
             self.actions_replay_failed
             or self.reward_validation_failed
             or self.benchmark_semantics_validation_failed
@@ -62,7 +56,7 @@ class ValidationResult(NamedTuple):
         # Remove default-protocol prefix to improve output readability.
         benchmark = re.sub(r"^benchmark://", "", self.state.benchmark)
 
-        if self.failed:
+        if not self.okay():
             msg = ", ".join(self.error_details.strip().split("\n"))
             return f"❌  {benchmark}  {msg}"
         elif self.state.reward is None:

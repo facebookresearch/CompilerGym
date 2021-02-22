@@ -108,10 +108,10 @@ benchmark://cBench-v0/crc32,,0,opt  input.bc -o output.bc
     monkeypatch.setattr("sys.stdin", StringIO(input))
 
     with capture_output() as out:
-        main(["argv0"])
+        main(["argv0", "-"])
 
-    assert out.stdout.count("✅") == 3  # Every benchmark passed.
     assert not out.stderr
+    assert out.stdout.count("✅") == 3  # Every benchmark passed.
 
 
 @skip_on_ci
@@ -149,8 +149,8 @@ benchmark://cBench-v0/susan,,0,opt  input.bc -o output.bc
     with capture_output() as out:
         main(["argv0", "-"])
 
-    assert out.stdout.count("✅") == 23  # Every benchmark passed.
     assert not out.stderr
+    assert out.stdout.count("✅") == 23  # Every benchmark passed.
 
 
 if __name__ == "__main__":
