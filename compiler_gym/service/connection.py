@@ -41,6 +41,20 @@ class ConnectionOpts(NamedTuple):
     rpc_call_max_seconds: float = 300
     """The maximum number of seconds to wait for an RPC method call to succeed."""
 
+    rpc_max_retries: int = 3
+    """The maximum number of failed attempts to communicate with the RPC service
+    before raising an error. Retries are made only for communication errors.
+    Failures from other causes such as error signals raised by the service are
+    not retried."""
+
+    retry_wait_seconds: float = 0.5
+    """The number of seconds to wait between successive attempts to communicate
+    with the RPC service."""
+
+    retry_wait_backoff_exponent: float = 2
+    """The exponential backoff scaling between successive attempts to
+    communicate with the RPC service."""
+
     init_max_seconds: float = 30
     """The maximum number of seconds to spend attempting to establish a
     connection to the service before failing.
@@ -128,46 +142,66 @@ class Connection(object):
         stub_method: StubMethod,
         request: Request,
         timeout: float = 60,
+        max_retries=3,
+        retry_wait_seconds=0.5,
+        retry_wait_backoff_exponent=2,
     ) -> Reply:
         """Call the service with the given arguments."""
         # House keeping note: if you modify the exceptions that this method
         # raises, please update the CompilerGymServiceConnection.__call__()
         # docstring.
-        try:
-            return stub_method(request, timeout=timeout)
-        except ValueError as e:
-            if str(e) == "Cannot invoke RPC on closed channel!":
-                raise ServiceIsClosed(f"RPC communication failed with message: {e}")
-            raise e
-        except grpc.RpcError as e:
-            # We raise "from None" to discard the gRPC stack trace, with the
-            # remaining stack trace correctly pointing to the CompilerGym
-            # calling code.
-            if e.code() == grpc.StatusCode.INVALID_ARGUMENT:
-                raise ValueError(e.details()) from None
-            elif e.code() == grpc.StatusCode.UNIMPLEMENTED:
-                raise NotImplementedError(e.details()) from None
-            elif e.code() == grpc.StatusCode.NOT_FOUND:
-                raise FileNotFoundError(e.details()) from None
-            elif e.code() == grpc.StatusCode.RESOURCE_EXHAUSTED:
-                raise ServiceOSError(e.details()) from None
-            elif e.code() == grpc.StatusCode.FAILED_PRECONDITION:
-                raise TypeError(str(e.details())) from None
-            elif e.code() == grpc.StatusCode.UNAVAILABLE:
-                raise ServiceTransportError(f"{self.url} {e.details()}") from None
-            elif (
-                e.code() == grpc.StatusCode.INTERNAL
-                and e.details() == "Exception serializing request!"
-            ):
-                raise TypeError(
-                    f"{e.details()} Request type: {type(request).__name__}"
-                ) from None
-            elif e.code() == grpc.StatusCode.DEADLINE_EXCEEDED:
-                raise TimeoutError(f"{e.details()} ({timeout:.1f} seconds)") from None
-            else:
-                raise ServiceError(
-                    f"RPC call returned status code {e.code()} and error `{e.details()}`"
-                ) from None
+        while True:
+            attempt = 0
+            try:
+                return stub_method(request, timeout=timeout)
+            except ValueError as e:
+                if str(e) == "Cannot invoke RPC on closed channel!":
+                    raise ServiceIsClosed(f"RPC communication failed with message: {e}")
+                raise e
+            except grpc.RpcError as e:
+                # We raise "from None" to discard the gRPC stack trace, with the
+                # remaining stack trace correctly pointing to the CompilerGym
+                # calling code.
+                if e.code() == grpc.StatusCode.INVALID_ARGUMENT:
+                    raise ValueError(e.details()) from None
+                elif e.code() == grpc.StatusCode.UNIMPLEMENTED:
+                    raise NotImplementedError(e.details()) from None
+                elif e.code() == grpc.StatusCode.NOT_FOUND:
+                    raise FileNotFoundError(e.details()) from None
+                elif e.code() == grpc.StatusCode.RESOURCE_EXHAUSTED:
+                    raise ServiceOSError(e.details()) from None
+                elif e.code() == grpc.StatusCode.FAILED_PRECONDITION:
+                    raise TypeError(str(e.details())) from None
+                elif e.code() == grpc.StatusCode.UNAVAILABLE:
+                    # For "unavailable" errors we retry with exponential
+                    # backoff. This is because this error can be caused by an
+                    # overloaded service, a flaky connection, etc.
+                    attempt += 1
+                    if attempt >= max_retries:
+                        raise ServiceTransportError(
+                            f"{self.url} {e.details()} ({max_retries} retries)"
+                        ) from None
+                    warnings.warn(
+                        f"{self.url} {e.details()} "
+                        f"({max_retries - attempt} attempts remaining)"
+                    )
+                    sleep(retry_wait_seconds)
+                    retry_wait_seconds *= retry_wait_backoff_exponent
+                elif (
+                    e.code() == grpc.StatusCode.INTERNAL
+                    and e.details() == "Exception serializing request!"
+                ):
+                    raise TypeError(
+                        f"{e.details()} Request type: {type(request).__name__}"
+                    ) from None
+                elif e.code() == grpc.StatusCode.DEADLINE_EXCEEDED:
+                    raise TimeoutError(
+                        f"{e.details()} ({timeout:.1f} seconds)"
+                    ) from None
+                else:
+                    raise ServiceError(
+                        f"RPC call returned status code {e.code()} and error `{e.details()}`"
+                    ) from None
 
 
 def make_working_dir():
@@ -513,6 +547,9 @@ class CompilerGymServiceConnection(object):
         stub_method: StubMethod,
         request: Request,
         timeout: Optional[float] = None,
+        max_retries: Optional[int] = None,
+        retry_wait_seconds: Optional[float] = None,
+        retry_wait_backoff_exponent: Optional[float] = None,
     ) -> Reply:
         """Invoke an RPC method on the service and return its response. All
         RPC methods accept a single `request` message, and respond with a
@@ -534,6 +571,14 @@ class CompilerGymServiceConnection(object):
         :param timeout: The maximum number of seconds to await a reply. If not
             provided, the default value is
             :code:`ConnectionOpts.rpc_call_max_seconds`.
+        :param max_retries: The maximum number of failed attempts to communicate
+            with the RPC service before raising an error. Retries are made only
+            for communication errors. Failures from other causes such as error
+            signals raised by the service are not retried.
+        :param retry_wait_seconds: The number of seconds to wait between
+            successive attempts to communicate with the RPC service.
+        :param retry_wait_backoff_exponent: The exponential backoff scaling
+            between successive attempts to communicate with the RPC service.
         :raises ValueError: If the service responds with an error indicating an
             invalid argument.
         :raises NotImplementedError: If the service responds with an error
@@ -560,4 +605,9 @@ class CompilerGymServiceConnection(object):
             stub_method,
             request,
             timeout=timeout or self.opts.rpc_call_max_seconds,
+            max_retries=max_retries or self.opts.rpc_max_retries,
+            retry_wait_seconds=retry_wait_seconds or self.opts.retry_wait_seconds,
+            retry_wait_backoff_exponent=(
+                retry_wait_backoff_exponent or self.opts.retry_wait_backoff_exponent
+            ),
         )
