@@ -236,7 +236,7 @@ def main(argv):
 
     def progress_message(i):
         intermediate_print(
-            f"{len(states) - i} remaining {plural(len(states) - i, 'state', 'states')} to validate ... ",
+            f"{i} remaining {plural(i, 'state', 'states')} to validate ... ",
             end="",
             flush=True,
         )
