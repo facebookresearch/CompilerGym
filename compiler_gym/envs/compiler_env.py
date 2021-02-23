@@ -85,6 +85,7 @@ class CompilerEnvState(NamedTuple):
         return _to_csv("benchmark", "reward", "walltime", "commandline")
 
     def json(self):
+        """Return the state as JSON."""
         return self._asdict()
 
     def to_csv(self) -> str:
@@ -93,6 +94,11 @@ class CompilerEnvState(NamedTuple):
         :return: A comma-separated string.
         """
         return _to_csv(self.benchmark, self.reward, self.walltime, self.commandline)
+
+    @classmethod
+    def from_json(cls, data: Dict[str, Any]) -> "CompilerEnvState":
+        """Construct a state from a JSON dictionary."""
+        return cls(**data)
 
     @classmethod
     def from_csv(cls, csv_string: str) -> "CompilerEnvState":

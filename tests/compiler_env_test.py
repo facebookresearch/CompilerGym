@@ -51,6 +51,35 @@ def test_state_from_csv_invalid_format():
     assert str(ctx.value).startswith("Failed to parse input: `abcdef`: ")
 
 
+def test_state_to_json_from_json():
+    original_state = CompilerEnvState(
+        benchmark="foo", walltime=100, reward=1.5, commandline="-a -b -c"
+    )
+    state_from_json = CompilerEnvState.from_json(original_state.json())
+
+    assert state_from_json.benchmark == "foo"
+    assert state_from_json.walltime == 100
+    assert state_from_json.reward == 1.5
+    assert state_from_json.commandline == "-a -b -c"
+
+
+def test_state_to_json_from_json_no_reward():
+    original_state = CompilerEnvState(
+        benchmark="foo", walltime=100, commandline="-a -b -c"
+    )
+    state_from_json = CompilerEnvState.from_json(original_state.json())
+
+    assert state_from_json.benchmark == "foo"
+    assert state_from_json.walltime == 100
+    assert state_from_json.reward is None
+    assert state_from_json.commandline == "-a -b -c"
+
+
+def test_state_from_json_empty():
+    with pytest.raises(TypeError):
+        CompilerEnvState.from_json({})
+
+
 @pytest.fixture(scope="function")
 def env() -> CompilerEnv:
     env = gym.make("llvm-v0")
