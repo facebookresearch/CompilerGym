@@ -27,17 +27,18 @@ FLAGS = flags.FLAGS
 class ActionResult(NamedTuple):
     """The step() result for an environment."""
 
-    env: CompilerEnv
     action: int
     reward: float
-    done: bool
 
 
 def eval_action(env: CompilerEnv, action: int) -> ActionResult:
     """Evaluate the given action."""
     fkd = env.fork()
-    _, reward, done, info = fkd.step(action)
-    return ActionResult(env=fkd, action=action, reward=reward, done=done)
+    try:
+        _, reward, _, _ = fkd.step(action)
+    finally:
+        fkd.close()
+    return ActionResult(action=action, reward=reward)
 
 
 def e_greedy_search(env: LlvmEnv) -> None:
@@ -60,47 +61,44 @@ def e_greedy_search(env: LlvmEnv) -> None:
                 )
             else:
                 # Create an ordered list of actions, best first, ordered by
-                # reward.
+                # descding reward, using action index as a tie-breaker..
                 futures = [
                     executor.submit(eval_action, env, action)
                     for action in range(env.action_space.n)
                 ]
                 results = [future.result() for future in as_completed(futures)]
                 results = sorted(
-                    results, key=lambda result: result.reward, reverse=True
+                    results,
+                    key=lambda result: (result.reward, result.action),
+                    reverse=True,
                 )
 
                 # Select the best reward and apply it, or terminate the search
                 # if no positive reward is attainable.
-                try:
-                    if results[0].reward <= 0:
-                        logging.debug(
-                            "Greedy search terminated after %d steps, "
-                            "no further reward attainable",
-                            step_count,
-                        )
-                        return
-                    else:
-                        action = results[0].action
-                        expected_reward = results[0].reward
-                        _, reward, done, info = env.step(action)
-                        logging.debug(
-                            "Step %d, greedy action %s, reward %.4f, cumulative %.4f",
-                            step_count,
+                if results[0].reward <= 0:
+                    logging.debug(
+                        "Greedy search terminated after %d steps, "
+                        "no further reward attainable",
+                        step_count,
+                    )
+                    return
+                else:
+                    action, expected_reward = results[0].action, results[0].reward
+                    _, reward, done, _ = env.step(action)
+                    logging.debug(
+                        "Step %d, greedy action %s, reward %.4f, cumulative %.4f",
+                        step_count,
+                        env.action_space.flags[action],
+                        reward,
+                        env.episode_reward,
+                    )
+                    if env.reward_space.deterministic and reward != expected_reward:
+                        logging.warning(
+                            "Action %s produced different reward when reapplying, %.4f != %.4f",
                             env.action_space.flags[action],
                             reward,
-                            env.episode_reward,
+                            expected_reward,
                         )
-                        if env.reward_space.deterministic and reward != expected_reward:
-                            logging.warning(
-                                "Action %s produced different reward when reapplying, %.4f != %.4f",
-                                env.action_space.flags[action],
-                                reward,
-                                expected_reward,
-                            )
-                finally:
-                    for result in results:
-                        result.env.close()
 
                 # Stop the search if we have reached a terminal state.
                 if done:
