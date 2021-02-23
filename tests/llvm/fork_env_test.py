@@ -5,8 +5,6 @@
 """Tests for LlvmEnv.fork()."""
 import subprocess
 
-import pytest
-
 from compiler_gym.envs import LlvmEnv
 from compiler_gym.util.runfiles_path import runfiles_path
 from tests.test_main import main
@@ -17,12 +15,6 @@ EXAMPLE_BITCODE_FILE = runfiles_path(
     "compiler_gym/third_party/cBench/cBench-v0/crc32.bc"
 )
 EXAMPLE_BITCODE_IR_INSTRUCTION_COUNT = 196
-
-
-def test_fork_before_reset(env: LlvmEnv):
-    with pytest.raises(AssertionError) as ctx:
-        env.fork()
-    assert str(ctx.value) == "Must call reset() before fork()"
 
 
 def test_fork_child_process_is_not_orphaned(env: LlvmEnv):
@@ -92,6 +84,33 @@ def test_fork_chain_child_processes_are_not_orphaned(env: LlvmEnv):
         b.close()
         c.close()
         d.close()
+
+
+def test_fork_before_reset(env: LlvmEnv):
+    """Test that fork() before reset() starts an episode."""
+    assert not env.in_episode
+    fkd = env.fork()
+    assert env.in_episode
+    assert fkd.in_episode
+    assert env.benchmark == fkd.benchmark
+
+
+def test_fork_closed_service(env: LlvmEnv):
+    env.reset(benchmark="cBench-v0/crc32")
+
+    _, _, done, _ = env.step(0)
+    assert not done
+    assert env.actions == [0]
+
+    env.close()
+    assert not env.service
+
+    fkd = env.fork()
+    try:
+        assert env.actions == [0]
+        assert fkd.actions == [0]
+    finally:
+        fkd.close()
 
 
 def test_fork_spaces_are_same(env: LlvmEnv):
