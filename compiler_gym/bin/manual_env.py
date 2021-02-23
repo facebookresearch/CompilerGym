@@ -22,8 +22,8 @@ various compiler functions, enabling programs to be compiled in different ways
 and to make queries about those programs. The goal is to have a simple system
 for machine learning in compilers.
 
-Downloading Datasets
---------------------
+Downloading a Dataset
+---------------------
 When entering the Shell, the environment (compiler choice) will have already
 been made on the command line. The benchmark or program to be compiled may not
 yet be set. Before setting a benchmark, however, the corresponding dataset must
@@ -31,32 +31,56 @@ be downloaded. You may have already downloaded a dataset through the
 compiler_gym.bin.datasets command, but if not, you can do that from this shell.
 
 To download a dataset, call:
+
+.. code-block::
+
     compilergym:NO-BENCHMARK> require_dataset <dataset-name>
+
 The command and the dataset name should tab-complete for you (most things will
 tab-complete in the shell). You can also see what datasets are available with
 this command:
+
+.. code-block::
+
     compilergym:NO-BENCHMARK> list_datasets
 
-Due to a current limitation in the software, you must quit the shell (exit
-command or ctrl-d), before then benchmarks in the dataset are recognised.
+Due to a current limitation in the software, you must quit the shell
+(:code:`exit` command or :code:`Ctrl-d`), before then benchmarks in the dataset
+are recognised.
 
 Setting a Benchmark, Reward and Observation
 -------------------------------------------
 The CompilerGym operates on a program or benchmark. If not set on the command
 line, the benchmark can be specified in the shell with:
+
+.. code-block::
+
     compilergym:NO-BENCHMARK> set_benchmark <benchmark-name>
 
 When a benchmark is set, the prompt will update with the name of the benchmark.
 Supposing that is "bench", then the prompt would be:
+
+.. code-block::
+
     compilergym:bench>
 
 The list of available benchmarks can be shown with:
+
+.. code-block::
+
     compilergym:bench> list_benchmarks
 
 The default reward and observation can be similarly set with:
+
+.. code-block::
+
     compilergym:bench> set_default_reward <reward-name>
     compilergym:bench> set_default_observation <observation-name>
+
 And lists of the choices are available with:
+
+.. code-block::
+
     compilergym:bench> list_rewards
     compilergym:bench> list_observations
 
@@ -77,39 +101,68 @@ Each action acts on the result of the previous action and so on.
 
 So, for example, to apply first the 'tail call elimination' pass, then the
 'loop unrolling' pass we call two actions:
+
+.. code-block::
+
     compilergym:bench> action -tailcallelim
     compilergym:bench> action -loop-unroll
+
 Each action will report its default reward.
 Note that multiple actions can be placed on a single line, so that the above is
 equivalent to:
+
+.. code-block::
+
     compilergym:bench> action -tailcallelim -loop-unroll
 
 You can choose a random action, by using just a '-' as the action name:
+
+.. code-block::
+
     compilergym:bench> action -
+
 Since an empty line on the shell repeats the last action, you can execute many
 random actions by typing that line first then holding down return.
 
 The actions are recorded in a stack, with the latest action on the top of the
 stack. You can view the action stack with stack command:
+
+.. code-block::
+
     compilergym:bench> stack
+
 This will show for each action if it had an effect (as computed by the
 underlying compiler), whether this terminated compiler, and what the per action
 and cumulative rewards are.
 
 The last action can be undone by:
+
+.. code-block::
+
     compilergym:bench> undo
 
 All actions in the stack can be undone at once by:
+
+.. code-block::
+
     compilergym:bench> reset
 
 You can find out what the effect of each action would be by calling this
 command:
+
+.. code-block::
+
     compilergym:bench> try_all_actions
+
 This will show a table with the reward for each action, sorted by best first.
 
 If you have a large stack of actions, many of which are not profitable, you can
 simplify the stack with this command:
+
+.. code-block::
+
     compilergym:bench> simplify_stack
+
 This will redo the entire stack, keeping only those actions which previously
 gave good rewards. (Note this doesn't mean that the simplified stack will only
 have positive rewards, some negative actions may be necessary set up for a
@@ -122,13 +175,22 @@ on it - you can make several queries.
 
 The first is to get a reward. This might not be the same as the current default
 reward:
+
+.. code-block::
+
     compilergym:bench> reward <reward-name>
 
 You can see various observations with:
+
+.. code-block::
+
     compilergym:bench> observation <observation-name>
 
 Finally, you can print the equivalent command line for achieving the same
 behaviour as the actions through the standard system shell:
+
+.. code-block::
+
     compilergym:bench> commandline
 
 Searching
@@ -137,28 +199,46 @@ Some very basic search capabilities are supported, directly in the shell. Each
 of them just looks for another action to add.
 
 First, is the random search through this command:
+
+.. code-block::
+
     compilergym:bench> action -
+
 Multiple steps can be taken by holding down the return key.
 
 A hill-climbing search tries an action, but will only accept it if it yields a
 positive reward:
+
+.. code-block::
+
     compilergym:bench> hill_climb <num-steps>
 
 A simple greedy search tries all possible actions and takes the one with the
 highest reward, stopping when no action has a positive reward:
+
+.. code-block::
+
     compilergym:bench> greedy <num-steps>
 
-Miscelaneous
-------------
+Miscellaneous
+-------------
 One useful command is:
+
+.. code-block::
+
     compilergym:bench> breakpoint
+
 Which drops into the python debugger. This is very useful if you want to see
 what is going on internally. There is a 'self.env' object that represents the
 environment that is definitely worth exploring.
 
 And finally:
+
+.. code-block::
+
     compilergym:bench> exit
-Drops out of the shell.  Ctrl-D should have the same effect.
+
+Drops out of the shell. :code:`Ctrl-D` should have the same effect.
 """
 import cmd
 import random

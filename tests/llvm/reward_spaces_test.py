@@ -11,6 +11,32 @@ from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
 
+# Instruction counts for cBench-v0/crc32 benchmark that are used for testing
+# reward signals.
+CRC32_INSTRUCTION_COUNT = 196
+CRC32_INSTRUCTION_COUNT_AFTER_REG2MEM = 203
+CRC32_INSTRUCTION_COUNT_O3 = 125
+CRC32_INSTRUCTION_COUNT_OZ = 105
+
+
+def test_instruction_count_reward(env: LlvmEnv):
+    env.reset(benchmark="cBench-v0/crc32")
+
+    assert env.observation.IrInstructionCount() == CRC32_INSTRUCTION_COUNT
+    action = env.action_space.flags.index("-reg2mem")
+    env.step(action)
+    assert env.observation.IrInstructionCount() == CRC32_INSTRUCTION_COUNT_AFTER_REG2MEM
+
+    ic_diff = CRC32_INSTRUCTION_COUNT - CRC32_INSTRUCTION_COUNT_AFTER_REG2MEM
+    assert env.reward.IrInstructionCount() == ic_diff
+    assert env.reward.IrInstructionCountNorm() == ic_diff / CRC32_INSTRUCTION_COUNT
+
+    o3_improvement = CRC32_INSTRUCTION_COUNT - CRC32_INSTRUCTION_COUNT_O3
+    assert env.reward.IrInstructionCountO3() == ic_diff / o3_improvement
+
+    oz_improvement = CRC32_INSTRUCTION_COUNT - CRC32_INSTRUCTION_COUNT_OZ
+    assert env.reward.IrInstructionCountOz() == ic_diff / oz_improvement
+
 
 def test_reward_space(env: LlvmEnv):
     env.reward_space = "IrInstructionCount"

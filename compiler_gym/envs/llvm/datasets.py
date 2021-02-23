@@ -13,6 +13,7 @@ import tarfile
 import tempfile
 from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from multiprocessing import cpu_count
 from pathlib import Path
 from typing import Callable, Dict, List, NamedTuple, Optional
 
@@ -209,26 +210,29 @@ def _compile_and_run_bitcode_file(
         "USER": os.environ.get("USER", ""),
     }
 
-    process = subprocess.Popen(
-        cmd,
-        shell=True,
-        stderr=subprocess.STDOUT,
-        stdout=subprocess.PIPE,
-        env=env,
-        cwd=cwd,
-    )
-
-    try:
-        with Timer() as timer:
-            stdout, _ = process.communicate(timeout=timeout_seconds)
-    except subprocess.TimeoutExpired:
-        process.kill()
-        return BenchmarkExecutionResult(
-            walltime_seconds=timeout_seconds,
-            error=f"Benchmark failed to complete within {timeout_seconds} timeout.",
+    # Only one benchmark can be executed at a time by a service.
+    # NOTE this assumes that the parent of cwd is the service working directory.
+    with fasteners.InterProcessLock(cwd / "../benchmark_exec.lock"):
+        process = subprocess.Popen(
+            cmd,
+            shell=True,
+            stderr=subprocess.STDOUT,
+            stdout=subprocess.PIPE,
+            env=env,
+            cwd=cwd,
         )
-    finally:
-        binary.unlink()
+
+        try:
+            with Timer() as timer:
+                stdout, _ = process.communicate(timeout=timeout_seconds)
+        except subprocess.TimeoutExpired:
+            process.kill()
+            return BenchmarkExecutionResult(
+                walltime_seconds=timeout_seconds,
+                error=f"Benchmark failed to complete within {timeout_seconds} timeout.",
+            )
+        finally:
+            binary.unlink()
 
     if process.returncode:
         try:
@@ -466,7 +470,7 @@ def get_llvm_benchmark_validation_callback(
 
         # Validation callbacks are read-only on the environment so it is
         # safe to run validators simultaneously in parallel threads.
-        with ThreadPoolExecutor() as executor:
+        with ThreadPoolExecutor(max_workers=cpu_count()) as executor:
             futures = (executor.submit(validator, env) for validator in validators)
             results = (future.result() for future in as_completed(futures))
             errors = [result for result in results if result is not None]
@@ -486,8 +490,8 @@ def get_llvm_benchmark_validation_callback(
                     f"Failed {len(errors)} of {len(validators)} validators: "
                     + "\n".join(msg)
                 )
-            else:
-                return None
+
+            return None
 
     return composed
 

@@ -122,7 +122,7 @@ def to_string(result: ValidationResult, name_col_width: int) -> str:
     """Format a validation result for printing."""
     name = state_name(result.state)
 
-    if result.failed:
+    if not result.okay():
         msg = ", ".join(result.error_details.strip().split("\n"))
         return f"❌  {name}  {msg}"
     elif result.state.reward is None:
@@ -247,14 +247,14 @@ def main(argv):
         intermediate_print("\r\033[K", to_string(result, name_col_width), sep="")
         progress_message(len(states) - i)
 
-        if result.failed:
+        if not result.okay():
             error_count += 1
         elif result.reward_validated and not result.reward_validation_failed:
             rewards.append(result.state.reward)
             walltimes.append(result.state.walltime)
 
     # Print a summary footer.
-    intermediate_print("----", "-" * name_col_width, "-----------", sep="")
+    intermediate_print("\r\033[K----", "-" * name_col_width, "-----------", sep="")
     print(f"Number of validated results: {emph(len(walltimes))} of {len(states)}")
     walltime_mean = f"{arithmetic_mean(walltimes):.3f}s"
     walltime_std = f"{stdev(walltimes):.3f}s"
