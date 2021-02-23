@@ -210,29 +210,26 @@ def _compile_and_run_bitcode_file(
         "USER": os.environ.get("USER", ""),
     }
 
-    # Only one benchmark can be executed at a time by a service.
-    # NOTE this assumes that the parent of cwd is the service working directory.
-    with fasteners.InterProcessLock(cwd / "../benchmark_exec.lock"):
-        process = subprocess.Popen(
-            cmd,
-            shell=True,
-            stderr=subprocess.STDOUT,
-            stdout=subprocess.PIPE,
-            env=env,
-            cwd=cwd,
-        )
-
-        try:
-            with Timer() as timer:
-                stdout, _ = process.communicate(timeout=timeout_seconds)
-        except subprocess.TimeoutExpired:
-            process.kill()
-            return BenchmarkExecutionResult(
-                walltime_seconds=timeout_seconds,
-                error=f"Benchmark failed to complete within {timeout_seconds} timeout.",
+    try:
+        with Timer() as timer:
+            process = subprocess.Popen(
+                cmd,
+                shell=True,
+                stderr=subprocess.STDOUT,
+                stdout=subprocess.PIPE,
+                env=env,
+                cwd=cwd,
             )
-        finally:
-            binary.unlink()
+
+            stdout, _ = process.communicate(timeout=timeout_seconds)
+    except subprocess.TimeoutExpired:
+        process.kill()
+        return BenchmarkExecutionResult(
+            walltime_seconds=timeout_seconds,
+            error=f"Benchmark failed to complete within {timeout_seconds} timeout.",
+        )
+    finally:
+        binary.unlink()
 
     if process.returncode:
         try:
@@ -381,7 +378,7 @@ def _make_cBench_validator(
                     try:
                         stdout = stdout.decode("utf-8")
                         if stdout.startswith("Binary files "):
-                            return f"Benchmark output file '{path.name}' differs from (binary diff)"
+                            return f"Benchmark output file '{path.name}' differs from expected (binary diff)"
                         else:
                             return f"Benchmark output file '{path.name}' differs from expected: {stdout}"
                     except UnicodeDecodeError:
