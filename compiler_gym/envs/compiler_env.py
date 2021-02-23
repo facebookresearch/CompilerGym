@@ -84,6 +84,9 @@ class CompilerEnvState(NamedTuple):
         """
         return _to_csv("benchmark", "reward", "walltime", "commandline")
 
+    def json(self):
+        return self._asdict()
+
     def to_csv(self) -> str:
         """Serialize a state to a comma separated list of values.
 

@@ -58,6 +58,7 @@ Else if validation fails, the output is:
     ❌  <benchmark_name>  <error_details>
 """
 import csv
+import json
 import re
 import sys
 from typing import Iterator
@@ -95,6 +96,11 @@ flags.DEFINE_boolean(
     "summary_only",
     False,
     "Do not print individual validation results, print only the summary at the " "end.",
+)
+flags.DEFINE_string(
+    "validation_logfile",
+    "validation.log.json",
+    "The path of a file to write a JSON validation log to.",
 )
 FLAGS = flags.FLAGS
 
@@ -242,15 +248,27 @@ def main(argv):
         )
 
     progress_message(0)
+    json_log = []
+
+    def dump_json_log():
+        with open(FLAGS.validation_logfile, "w") as f:
+            json.dump(json_log, f)
+
     for i, result in enumerate(validation_results, start=1):
         intermediate_print("\r\033[K", to_string(result, name_col_width), sep="")
         progress_message(len(states) - i)
+        json_log.append(result.json())
 
         if not result.okay():
             error_count += 1
         elif result.reward_validated and not result.reward_validation_failed:
             rewards.append(result.state.reward)
             walltimes.append(result.state.walltime)
+
+        if not i % 10:
+            dump_json_log()
+
+    dump_json_log()
 
     # Print a summary footer.
     intermediate_print("\r\033[K----", "-" * name_col_width, "-----------", sep="")
