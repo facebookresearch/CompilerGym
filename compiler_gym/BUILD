@@ -5,6 +5,7 @@
 #
 # This package contains CompilerGym, a toolkit for applying reinforcement
 # learning to compilers.
+load("@rules_python//python:defs.bzl", "py_library")
 
 py_library(
     name = "compiler_gym",
