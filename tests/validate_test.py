@@ -5,8 +5,7 @@
 """Unit tests for //compiler_gym:validate."""
 import gym
 
-from compiler_gym import validate_state, validate_states
-from compiler_gym.envs import CompilerEnvState
+from compiler_gym import CompilerEnvState, validate_state, validate_states
 from tests.test_main import main
 
 

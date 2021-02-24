@@ -29,6 +29,7 @@ except ModuleNotFoundError as e:
         "compiler_gym` will work."
     ) from e
 
+from compiler_gym.compiler_env_state import CompilerEnvState
 from compiler_gym.envs import COMPILER_GYM_ENVS, CompilerEnv, observation_t, step_t
 from compiler_gym.random_search import random_search
 from compiler_gym.util.download import download
@@ -47,6 +48,7 @@ __all__ = [
     "cache_path",
     "transient_cache_path",
     "CompilerEnv",
+    "CompilerEnvState",
     "COMPILER_GYM_ENVS",
     "observation_t",
     "step_t",

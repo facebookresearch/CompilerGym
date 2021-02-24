@@ -17,6 +17,15 @@ py_test(
 )
 
 py_test(
+    name = "compiler_env_state_test",
+    srcs = ["compiler_env_state_test.py"],
+    deps = [
+        "//compiler_gym",
+        "//tests:test_main",
+    ],
+)
+
+py_test(
     name = "random_search_test",
     timeout = "short",
     srcs = ["random_search_test.py"],
