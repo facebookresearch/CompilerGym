@@ -257,15 +257,15 @@ class ManagedConnection(Connection):
         env = os.environ.copy()
         env["COMPILER_GYM_RUNFILES"] = str(runfiles_path("."))
 
-        # Set environment variable COMPILER_GYM_SERVICE_DEBUG=1 to pipe
-        # local service output to stderr. Set COMPILER_GYM_SERVICE_LOG_LEVEL=val
-        # to set log level to <val>, where large values are increasingly
-        # verbose.
+        # Set environment variable $COMPILER_GYM_SERVICE_DEBUG to control
+        # logging verbosity for the compiler service. With a value of 1, service
+        # output is piped to stderr. Increasing values of 2 and more cause more
+        # verbose output to be logged.
         if os.environ.get("COMPILER_GYM_SERVICE_DEBUG", "0") != "0":
             cmd.append("--alsologtostderr")
-        log_level = os.environ.get("COMPILER_GYM_SERVICE_LOG_LEVEL", "0")
-        if log_level:
-            cmd.append(f"-v={log_level}")
+            log_level = int(os.environ["COMPILER_GYM_SERVICE_DEBUG"]) - 1
+            if log_level:
+                cmd.append(f"-v={log_level}")
 
         logging.debug("$ %s", " ".join(cmd))
         self.process = subprocess.Popen(

@@ -96,5 +96,5 @@ if __name__ == "__main__":
             "--benchmark-save=bench_test",
             "-x",
         ],
-        verbose_service_logging=False,
+        service_debug=0,
     )
