@@ -280,7 +280,12 @@ class LlvmEnv(CompilerEnv):
 
     @property
     def ir_sha1(self) -> str:
-        """Return the 40-characeter hex sha1 checksum of the current IR."""
+        """Return the 40-characeter hex sha1 checksum of the current IR.
+
+        Equivalent to: :code:`hashlib.sha1(env.ir.encode("utf-8")).hexdigest()`.
+
+        :return: A 40-character hexademical sha1 string.
+        """
         # TODO(cummins): Compute this on the service-side and add it as an
         # observation space.
         return hashlib.sha1(self.ir.encode("utf-8")).hexdigest()

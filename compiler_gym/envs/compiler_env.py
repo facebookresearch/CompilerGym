@@ -373,6 +373,9 @@ class CompilerEnv(gym.Env):
 
     @property
     def episode_walltime(self) -> float:
+        """Return the amount of time in seconds since the last call to
+        :meth:`reset() <compiler_env.envs.CompilerEnv.reset>`.
+        """
         return time() - self.episode_start_time
 
     @property
