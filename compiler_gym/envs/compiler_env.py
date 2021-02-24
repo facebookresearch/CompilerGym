@@ -8,9 +8,10 @@ import os
 import sys
 import warnings
 from copy import deepcopy
+from math import isclose
 from pathlib import Path
 from time import time
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import fasteners
 import gym
@@ -41,6 +42,8 @@ from compiler_gym.service.proto import (
     StepRequest,
 )
 from compiler_gym.spaces import NamedDiscrete, Reward
+from compiler_gym.util.timer import Timer
+from compiler_gym.validation_result import ValidationResult
 from compiler_gym.views import ObservationSpaceSpec, ObservationView, RewardView
 
 # Type hints.
@@ -927,3 +930,81 @@ class CompilerEnv(gym.Env):
                 raise ValueError(
                     f"Environment terminated with error: `{info.get('error_details')}`"
                 )
+
+    def validate(self, state: Optional[CompilerEnvState] = None) -> ValidationResult:
+        in_place = state is not None
+        state = state or self.state
+
+        error_messages = []
+        validation = {
+            "state": state,
+            "actions_replay_failed": False,
+            "reward_validated": False,
+            "reward_validation_failed": False,
+            "benchmark_semantics_validated": False,
+            "benchmark_semantics_validation_failed": False,
+        }
+
+        fkd = self.fork()
+        try:
+            with Timer() as walltime:
+                replay_target = self if in_place else fkd
+                replay_target.reset(benchmark=state.benchmark)
+                # Use a while loop here so that we can `break` early out of the
+                # validation process in case a step fails.
+                while True:
+                    try:
+                        replay_target.apply(state)
+                    except (ValueError, OSError) as e:
+                        validation["actions_replay_failed"] = True
+                        error_messages.append(str(e))
+                        break
+
+                    if self.reward_space and self.reward_space.deterministic:
+                        validation["reward_validated"] = True
+                        # If reward deviates from the expected amount record the
+                        # error but continue with the remainder of the validation.
+                        if not isclose(
+                            state.reward,
+                            replay_target.episode_reward,
+                            rel_tol=1e-5,
+                            abs_tol=1e-10,
+                        ):
+                            validation["reward_validation_failed"] = True
+                            error_messages.append(
+                                f"Expected reward {state.reward:.4f} but "
+                                f"received reward {replay_target.episode_reward:.4f}"
+                            )
+
+                    # TODO(https://github.com/facebookresearch/CompilerGym/issues/45):
+                    # Call the new self.benchmark.validation_callback() method
+                    # once implemented.
+                    validate_semantics = self.get_benchmark_validation_callback()
+                    if validate_semantics:
+                        validation["benchmark_semantics_validated"] = True
+                        semantics_error = validate_semantics(self)
+                        if semantics_error:
+                            validation["benchmark_semantics_validation_failed"] = True
+                            error_messages.append(semantics_error)
+
+                    # Finished all checks, break the loop.
+                    break
+        finally:
+            fkd.close()
+
+        return ValidationResult(
+            walltime=walltime.time,
+            error_details="\n".join(error_messages),
+            **validation,
+        )
+
+    def get_benchmark_validation_callback(
+        self,
+    ) -> Optional[Callable[["CompilerEnv"], Optional[str]]]:
+        """Return a callback that validates benchmark semantics, if available.
+
+        TODO(https://github.com/facebookresearch/CompilerGym/issues/45): This is
+        a temporary placeholder for what will eventually become a method on a
+        new Benchmark class.
+        """
+        return None

@@ -38,7 +38,8 @@ from compiler_gym.util.runfiles_path import (
     site_data_path,
     transient_cache_path,
 )
-from compiler_gym.validate import ValidationResult, validate_state, validate_states
+from compiler_gym.validate import validate_states
+from compiler_gym.validation_result import ValidationResult
 
 # The top-level compiler_gym API.
 __all__ = [
@@ -54,6 +55,5 @@ __all__ = [
     "step_t",
     "random_search",
     "ValidationResult",
-    "validate_state",
     "validate_states",
 ]
