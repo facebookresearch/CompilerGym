@@ -180,9 +180,7 @@ class LlvmEnv(CompilerEnv):
             id="Inst2vecPreprocessedText",
             base_id="Ir",
             space=Sequence(size_range=(0, None), dtype=str),
-            translate=lambda base_observation: self.inst2vec.preprocess(
-                base_observation
-            ),
+            translate=self.inst2vec.preprocess,
             default_value="",
         )
         self.observation.add_derived_space(
@@ -235,7 +233,9 @@ class LlvmEnv(CompilerEnv):
         ]
         return Commandline(items=flags, name=name)
 
-    def commandline(self, textformat: bool = False) -> str:
+    def commandline(  # pylint: disable=arguments-differ
+        self, textformat: bool = False
+    ) -> str:
         """Returns an LLVM :code:`opt` command line invocation for the current
         environment state.
 

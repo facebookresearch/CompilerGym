@@ -16,6 +16,7 @@ Compare multiple runs using:
     $ pytest-benchmark compare --group-by=name --sort=fullname \
         /tests/benchmarks/*_bench_test.json
 """
+# pylint: disable=redefined-outer-name
 import gym
 import pytest
 

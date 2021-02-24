@@ -119,6 +119,25 @@ class CompilerEnvState(NamedTuple):
             commandline=commandline,
         )
 
+    @classmethod
+    def read_csv_file(cls, in_file) -> Iterable["CompilerEnvState"]:
+        """Read states from a CSV file.
+
+        :param in_file: A file object.
+        :returns: A generator of :class:`CompilerEnvState` instances.
+        :raises ValueError: If input parsing fails.
+        """
+        data = in_file.readlines()
+        for line in csv.DictReader(data):
+            try:
+                line["reward"] = float(line["reward"]) if line.get("reward") else None
+                line["walltime"] = (
+                    float(line["walltime"]) if line.get("walltime") else None
+                )
+                yield CompilerEnvState(**line)
+            except (TypeError, KeyError) as e:
+                raise ValueError(f"Failed to parse input: `{e}`") from e
+
     def apply(self, env: "CompilerEnv") -> None:
         """Replay the sequence of actions given by a commandline."""
         actions = env.commandline_to_actions(self.commandline)
@@ -587,22 +606,26 @@ class CompilerEnv(gym.Env):
         )
 
         # Set the session ID.
-        new_env._session_id = reply.session_id
+        new_env._session_id = reply.session_id  # pylint: disable=protected-access
         new_env.observation.session_id = reply.session_id
 
         # Re-register any custom benchmarks with the new environment.
         if self._custom_benchmarks:
-            new_env._add_custom_benchmarks(
+            new_env._add_custom_benchmarks(  # pylint: disable=protected-access
                 list(self._custom_benchmarks.values()).copy()
             )
 
         # Now that we have initialized the environment with the current state,
         # set the benchmark so that calls to new_env.reset() will correctly
         # revert the environment to the initial benchmark state.
-        new_env._user_specified_benchmark_uri = self.benchmark
+        new_env._user_specified_benchmark_uri = (  # pylint: disable=protected-access
+            self.benchmark
+        )
         # Set the "visible" name of the current benchmark to hide the fact that
         # we loaded from a custom bitcode file.
-        new_env._benchmark_in_use_uri = self.benchmark
+        new_env._benchmark_in_use_uri = (  # pylint: disable=protected-access
+            self.benchmark
+        )
 
         # Create copies of the mutable reward and observation spaces. This
         # is required to correctly calculate incremental updates.
@@ -640,8 +663,8 @@ class CompilerEnv(gym.Env):
                 # not kill it.
                 if reply.remaining_sessions:
                     close_service = False
-            except:  # noqa Don't feel bad, computer, you tried ;-)
-                pass
+            except:  # noqa pylint: disable=bare-except
+                pass  # Don't feel bad, computer, you tried ;-)
             self._session_id = None
 
         if self.service and close_service:
@@ -656,7 +679,7 @@ class CompilerEnv(gym.Env):
         if hasattr(self, "service") and getattr(self, "service"):
             self.close()
 
-    def reset(
+    def reset(  # pylint: disable=arguments-differ
         self,
         benchmark: Optional[Union[str, Benchmark]] = None,
         action_space: Optional[str] = None,

@@ -108,7 +108,9 @@ if sys.version_info > (3, 8, 0):
         Request = TypeVar("Request")
         Reply = TypeVar("Reply")
 
-        def __call__(self, a: Request, timeout: float) -> Reply:
+        def __call__(
+            self, a: Request, timeout: float
+        ) -> Reply:  # pylint: disable=undefined-variable
             ...
 
 
@@ -146,6 +148,8 @@ class Connection(object):
         retry_wait_backoff_exponent=2,
     ) -> Reply:
         """Call the service with the given arguments."""
+        # pylint: disable=no-member
+        #
         # House keeping note: if you modify the exceptions that this method
         # raises, please update the CompilerGymServiceConnection.__call__()
         # docstring.
@@ -155,7 +159,9 @@ class Connection(object):
                 return stub_method(request, timeout=timeout)
             except ValueError as e:
                 if str(e) == "Cannot invoke RPC on closed channel!":
-                    raise ServiceIsClosed(f"RPC communication failed with message: {e}")
+                    raise ServiceIsClosed(
+                        f"RPC communication failed with message: {e}"
+                    ) from None
                 raise e
             except grpc.RpcError as e:
                 # We raise "from None" to discard the gRPC stack trace, with the
@@ -200,7 +206,7 @@ class Connection(object):
                         f"{e.details()} ({timeout:.1f} seconds)"
                     ) from None
                 elif e.code() == grpc.StatusCode.DATA_LOSS:
-                    raise ServiceError(e.details())
+                    raise ServiceError(e.details()) from None
                 else:
                     raise ServiceError(
                         f"RPC call returned status code {e.code()} and error `{e.details()}`"
@@ -314,7 +320,7 @@ class ManagedConnection(Connection):
                 channel_ready.result(timeout=wait_secs)
                 break
             except (grpc.FutureTimeoutError, grpc.RpcError) as e:
-                logging.debug(f"Connection attempt {attempts} = {e}")
+                logging.debug("Connection attempt %d = %s", attempts, e)
                 wait_secs *= 1.2
         else:
             self.process.kill()
@@ -334,7 +340,7 @@ class ManagedConnection(Connection):
         try:
             self.process.communicate(timeout=self.process_exit_max_seconds)
         except subprocess.TimeoutExpired:
-            logging.warning(f"Abandoning orphan process at {self.working_dir}")
+            logging.warning("Abandoning orphan process at %s", self.working_dir)
         shutil.rmtree(self.working_dir, ignore_errors=True)
         super().close()
 
@@ -367,7 +373,7 @@ class UnmanagedConnection(Connection):
                 channel_ready.result(timeout=wait_secs)
                 break
             except (grpc.FutureTimeoutError, grpc.RpcError) as e:
-                logging.debug(f"Connection attempt {attempts} = {e}")
+                logging.debug("Connection attempt %d = %s", attempts, e)
                 wait_secs *= 1.2
         else:
             raise TimeoutError(
@@ -506,13 +512,13 @@ class CompilerGymServiceConnection(object):
                 #   ServiceError: raised by an RPC method returning an error status.
                 #   NotImplementedError: raised if an RPC method is accessed before the RPC service
                 #       has initialized.
-                logging.warning(f"{type(e).__name__} {e} (attempt {attempts})")
-        else:
-            raise TimeoutError(
-                f"Failed to create connection to {endpoint_name} after "
-                f"{time() - start_time:.1f} seconds "
-                f"({attempts}/{opts.init_max_attempts} attempts made)"
-            )
+                logging.warning("%s %s (attempt %d)", type(e).__name__, e, attempts)
+
+        raise TimeoutError(
+            f"Failed to create connection to {endpoint_name} after "
+            f"{time() - start_time:.1f} seconds "
+            f"({attempts}/{opts.init_max_attempts} attempts made)"
+        )
 
     def __repr__(self):
         if self.connection is None:
