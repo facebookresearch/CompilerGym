@@ -11,7 +11,8 @@ import gym
 import pytest
 
 import compiler_gym
-from compiler_gym.envs import CompilerEnv, CompilerEnvState, llvm
+from compiler_gym.compiler_env_state import CompilerEnvState
+from compiler_gym.envs import CompilerEnv, llvm
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.service.connection import CompilerGymServiceConnection
 from tests.test_main import main
@@ -210,6 +211,21 @@ def test_state_to_csv_from_csv(env: LlvmEnv):
     state_from_csv = CompilerEnvState.from_csv(env.state.to_csv())
     assert state_from_csv.reward == 10
     assert state == state_from_csv
+
+
+def test_apply_state(env: LlvmEnv):
+    """Test that apply() on a clean environment produces same state."""
+    env.reward_space = "IrInstructionCount"
+    env.reset(benchmark="cBench-v0/crc32")
+    env.step(env.action_space.flags.index("-mem2reg"))
+
+    other = gym.make("llvm-v0", reward_space="IrInstructionCount")
+    try:
+        other.apply(env.state)
+
+        assert other.state == env.state
+    finally:
+        other.close()
 
 
 def test_set_observation_space_from_spec(env: LlvmEnv):

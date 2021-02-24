@@ -11,7 +11,8 @@ from typing import Callable, Iterable, List, NamedTuple, Optional
 
 import gym
 
-from compiler_gym.envs.compiler_env import CompilerEnv, CompilerEnvState
+from compiler_gym.compiler_env_state import CompilerEnvState
+from compiler_gym.envs.compiler_env import CompilerEnv
 from compiler_gym.envs.llvm import LlvmEnv
 from compiler_gym.envs.llvm.datasets import get_llvm_benchmark_validation_callback
 from compiler_gym.util.timer import Timer
@@ -65,7 +66,7 @@ class ValidationResult(NamedTuple):
             return f"✅  {benchmark}  {self.state.reward:.4f}"
 
     def json(self):
-        data = self._asdict()
+        data = self._asdict()  # pylint: disable=no-member
         data["state"] = self.state.json()
         return data
 
@@ -96,7 +97,7 @@ def validate_state(env: CompilerEnv, state: CompilerEnvState) -> ValidationResul
         # validation process in case a step fails.
         while True:
             try:
-                state.apply(env)
+                env.apply(state)
                 reward = env.episode_reward
             except (ValueError, OSError) as e:
                 validation["actions_replay_failed"] = True

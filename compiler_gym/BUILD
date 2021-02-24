@@ -20,6 +20,12 @@ py_library(
 )
 
 py_library(
+    name = "compiler_env_state",
+    srcs = ["compiler_env_state.py"],
+    visibility = ["//compiler_gym/envs:__subpackages__"],
+)
+
+py_library(
     name = "random_replay",
     srcs = ["random_replay.py"],
     visibility = ["//visibility:public"],
