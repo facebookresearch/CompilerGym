@@ -17,13 +17,13 @@ from tests.test_main import main as _test_main
 
 
 def test_okay_llvm_result(monkeypatch):
-    input = """
+    stdin = """
 benchmark,reward,commandline,walltime
 benchmark://cBench-v0/dijkstra,0,opt  input.bc -o output.bc,0.3
 """.strip()
     flags.FLAGS.unparse_flags()
     flags.FLAGS(["argv0", "--env=llvm-ic-v0", "--dataset=cBench-v0"])
-    monkeypatch.setattr("sys.stdin", StringIO(input))
+    monkeypatch.setattr("sys.stdin", StringIO(stdin))
 
     with capture_output() as out:
         main(["argv0", "-"])
@@ -34,7 +34,7 @@ benchmark://cBench-v0/dijkstra,0,opt  input.bc -o output.bc,0.3
 
 def test_okay_llvm_result_file_input():
     with tempfile.TemporaryDirectory() as d:
-        path = Path(d) / "input.csv"
+        path = Path(d) / "test.csv"
         with open(str(path), "w") as f:
             f.write(
                 """
@@ -52,7 +52,7 @@ benchmark://cBench-v0/dijkstra,0,opt  input.bc -o output.bc,0.3
     assert not out.stderr
 
 
-def test_no_stdin(monkeypatch):
+def test_no_input(monkeypatch):
     flags.FLAGS.unparse_flags()
     flags.FLAGS(["argv0", "--env=llvm-ic-v0", "--dataset=cBench-v0"])
     monkeypatch.setattr("sys.stdin", StringIO(""))
@@ -65,13 +65,13 @@ def test_no_stdin(monkeypatch):
 
 
 def test_invalid_reward_llvm_result(monkeypatch):
-    input = """
+    stdin = """
 benchmark,reward,commandline,walltime
 benchmark://cBench-v0/dijkstra,0.5,opt  input.bc -o output.bc,0.3
 """.strip()
     flags.FLAGS.unparse_flags()
     flags.FLAGS(["argv0", "--env=llvm-ic-v0", "--dataset=cBench-v0"])
-    monkeypatch.setattr("sys.stdin", StringIO(input))
+    monkeypatch.setattr("sys.stdin", StringIO(stdin))
     with capture_output() as out:
         with pytest.raises(SystemExit):
             main(["argv0", "-"])
@@ -84,10 +84,10 @@ benchmark://cBench-v0/dijkstra,0.5,opt  input.bc -o output.bc,0.3
 
 
 def test_invalid_csv_format(monkeypatch):
-    input = "invalid\ncsv\nformat"
+    stdin = "invalid\ncsv\nformat"
     flags.FLAGS.unparse_flags()
     flags.FLAGS(["argv0", "--env=llvm-ic-v0", "--dataset=cBench-v0"])
-    monkeypatch.setattr("sys.stdin", StringIO(input))
+    monkeypatch.setattr("sys.stdin", StringIO(stdin))
 
     with capture_output() as out:
         with pytest.raises(SystemExit):
@@ -97,7 +97,7 @@ def test_invalid_csv_format(monkeypatch):
 
 
 def test_multiple_valid_inputs(monkeypatch):
-    input = """
+    stdin = """
 benchmark,reward,walltime,commandline
 benchmark://cBench-v0/crc32,,0,opt  input.bc -o output.bc
 benchmark://cBench-v0/crc32,,0,opt  input.bc -o output.bc
@@ -105,7 +105,7 @@ benchmark://cBench-v0/crc32,,0,opt  input.bc -o output.bc
 """.strip()
     flags.FLAGS.unparse_flags()
     flags.FLAGS(["argv0", "--env=llvm-v0", "--dataset=cBench-v0"])
-    monkeypatch.setattr("sys.stdin", StringIO(input))
+    monkeypatch.setattr("sys.stdin", StringIO(stdin))
 
     with capture_output() as out:
         main(["argv0", "-"])
@@ -116,7 +116,7 @@ benchmark://cBench-v0/crc32,,0,opt  input.bc -o output.bc
 
 @skip_on_ci
 def test_validate_cBench_null_options(monkeypatch):
-    input = """
+    stdin = """
 benchmark,reward,walltime,commandline
 benchmark://cBench-v0/gsm,,0,opt  input.bc -o output.bc
 benchmark://cBench-v0/lame,,0,opt  input.bc -o output.bc
@@ -144,7 +144,7 @@ benchmark://cBench-v0/susan,,0,opt  input.bc -o output.bc
 """.strip()
     flags.FLAGS.unparse_flags()
     flags.FLAGS(["argv0", "--env=llvm-v0", "--dataset=cBench-v0"])
-    monkeypatch.setattr("sys.stdin", StringIO(input))
+    monkeypatch.setattr("sys.stdin", StringIO(stdin))
 
     with capture_output() as out:
         main(["argv0", "-"])
