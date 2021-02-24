@@ -344,11 +344,32 @@ class CompilerEnv(gym.Env):
         return self.versions.compiler_version
 
     def commandline(self) -> str:
-        """Return the current state as a commandline invocation.
+        """Interface for :class:`CompilerEnv` subclasses to provide an equivalent
+        commandline invocation to the current environment state.
+
+        See also
+        :meth:`commandline_to_actions() <compiler_gym.envs.CompilerEnv.commandline_to_actions>`.
+
+        Calling this method on a :class:`CompilerEnv` instance raises
+        :code:`NotImplementedError`.
 
         :return: A string commandline invocation.
         """
-        return ""
+        raise NotImplementedError("abstract method")
+
+    def commandline_to_actions(self, commandline: str) -> List[int]:
+        """Interface for :class:`CompilerEnv` subclasses to convert from a
+        commandline invocation to a sequence of actions.
+
+        See also
+        :meth:`commandline() <compiler_gym.envs.CompilerEnv.commandline>`.
+
+        Calling this method on a :class:`CompilerEnv` instance raises
+        :code:`NotImplementedError`.
+
+        :return: A list of actions.
+        """
+        raise NotImplementedError("abstract method")
 
     @property
     def episode_walltime(self) -> float:
