@@ -12,6 +12,8 @@ from compiler_gym.datasets import Dataset
 from compiler_gym.envs import CompilerEnv, CompilerEnvState
 from tests.test_main import main
 
+pytest_plugins = ["tests.pytest_plugins.llvm"]
+
 
 def test_state_to_csv_from_csv():
     original_state = CompilerEnvState(
@@ -78,15 +80,6 @@ def test_state_to_json_from_json_no_reward():
 def test_state_from_json_empty():
     with pytest.raises(TypeError):
         CompilerEnvState.from_json({})
-
-
-@pytest.fixture(scope="function")
-def env() -> CompilerEnv:
-    env = gym.make("llvm-v0")
-    try:
-        yield env
-    finally:
-        env.close()
 
 
 def make_dataset(**kwargs) -> Dataset:

@@ -10,6 +10,7 @@ py_test(
         "//compiler_gym/datasets",
         "//compiler_gym/envs",
         "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
     ],
 )
 
