@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 """This module defines the OpenAI gym interface for compilers."""
 import csv
+import logging
 import os
 import sys
 import warnings
@@ -83,12 +84,21 @@ class CompilerEnvState(NamedTuple):
         """
         return _to_csv("benchmark", "reward", "walltime", "commandline")
 
+    def json(self):
+        """Return the state as JSON."""
+        return self._asdict()
+
     def to_csv(self) -> str:
         """Serialize a state to a comma separated list of values.
 
         :return: A comma-separated string.
         """
         return _to_csv(self.benchmark, self.reward, self.walltime, self.commandline)
+
+    @classmethod
+    def from_json(cls, data: Dict[str, Any]) -> "CompilerEnvState":
+        """Construct a state from a JSON dictionary."""
+        return cls(**data)
 
     @classmethod
     def from_csv(cls, csv_string: str) -> "CompilerEnvState":
@@ -108,6 +118,16 @@ class CompilerEnvState(NamedTuple):
             walltime=float(walltime),
             commandline=commandline,
         )
+
+    def apply(self, env: "CompilerEnv") -> None:
+        """Replay the sequence of actions given by a commandline."""
+        actions = env.commandline_to_actions(self.commandline)
+        for action in actions:
+            _, _, done, info = env.step(action)
+            if done:
+                raise OSError(
+                    f"Environment terminated with error: `{info.get('error_details')}`"
+                )
 
     def __eq__(self, rhs) -> bool:
         if not isinstance(rhs, CompilerEnvState):
@@ -296,6 +316,7 @@ class CompilerEnv(gym.Env):
         self.reward_range: Tuple[float, float] = (-np.inf, np.inf)
         self.episode_reward: Optional[float] = None
         self.episode_start_time: float = time()
+        self.actions: List[int] = []
 
         # Initialize the default observation/reward spaces.
         self._default_observation_space: Optional[ObservationSpaceSpec] = None
@@ -323,14 +344,38 @@ class CompilerEnv(gym.Env):
         return self.versions.compiler_version
 
     def commandline(self) -> str:
-        """Return the current state as a commandline invocation.
+        """Interface for :class:`CompilerEnv` subclasses to provide an equivalent
+        commandline invocation to the current environment state.
+
+        See also
+        :meth:`commandline_to_actions() <compiler_gym.envs.CompilerEnv.commandline_to_actions>`.
+
+        Calling this method on a :class:`CompilerEnv` instance raises
+        :code:`NotImplementedError`.
 
         :return: A string commandline invocation.
         """
-        return ""
+        raise NotImplementedError("abstract method")
+
+    def commandline_to_actions(self, commandline: str) -> List[int]:
+        """Interface for :class:`CompilerEnv` subclasses to convert from a
+        commandline invocation to a sequence of actions.
+
+        See also
+        :meth:`commandline() <compiler_gym.envs.CompilerEnv.commandline>`.
+
+        Calling this method on a :class:`CompilerEnv` instance raises
+        :code:`NotImplementedError`.
+
+        :return: A list of actions.
+        """
+        raise NotImplementedError("abstract method")
 
     @property
     def episode_walltime(self) -> float:
+        """Return the amount of time in seconds since the last call to
+        :meth:`reset() <compiler_env.envs.CompilerEnv.reset>`.
+        """
         return time() - self.episode_start_time
 
     @property
@@ -516,16 +561,24 @@ class CompilerEnv(gym.Env):
         >>> env.reset()
         # ... use env
         >>> new_env = env.fork()
+        >>> new_env.state == env.state
+        True
         >>> new_env.step(1) == env.step(1)
         True
 
         :return: A new environment instance.
         """
-        assert self.in_episode, "Must call reset() before fork()"
+        if not self.in_episode:
+            state_to_replay = self.state
+            if self.actions:
+                logging.warning("Parent service of fork() has died, replaying state")
+            self.reset()
+            state_to_replay.apply(self)
 
         request = ForkSessionRequest(session_id=self._session_id)
         reply: ForkSessionReply = self.service(self.service.stub.ForkSession, request)
 
+        # Create a new environment that shares the connection.
         new_env = type(self)(
             service=self._service_endpoint,
             action_space=self.action_space,
@@ -551,8 +604,8 @@ class CompilerEnv(gym.Env):
         # we loaded from a custom bitcode file.
         new_env._benchmark_in_use_uri = self.benchmark
 
-        # Copy over the mutable episode state.
-        new_env.episode_reward = self.episode_reward
+        # Create copies of the mutable reward and observation spaces. This
+        # is required to correctly calculate incremental updates.
         new_env.reward.spaces = deepcopy(self.reward.spaces)
         new_env.observation.spaces = deepcopy(self.observation.spaces)
 
@@ -562,6 +615,11 @@ class CompilerEnv(gym.Env):
             new_env.observation_space = self.observation_space.id
         if self.reward_space:
             new_env.reward_space = self.reward_space.id
+
+        # Copy over the mutable episode state.
+        new_env.episode_reward = self.episode_reward
+        new_env.episode_start_time = self.episode_start_time
+        new_env.actions = self.actions.copy()
 
         return new_env
 
@@ -675,6 +733,7 @@ class CompilerEnv(gym.Env):
         self.observation.session_id = reply.session_id
         self.reward.get_cost = self.observation.__getitem__
         self.episode_start_time = time()
+        self.actions = []
 
         # If the action space has changed, update it.
         if reply.HasField("new_action_space"):
@@ -716,6 +775,9 @@ class CompilerEnv(gym.Env):
                 for obs in self.reward_space.observation_spaces
             ]
             observation_spaces += self.reward_space.observation_spaces
+
+        # Record the action.
+        self.actions.append(action)
 
         # Send the request to the backend service.
         request = StepRequest(

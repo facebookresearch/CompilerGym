@@ -64,17 +64,10 @@ class ValidationResult(NamedTuple):
         else:
             return f"✅  {benchmark}  {self.state.reward:.4f}"
 
-
-def _llvm_replay_commandline(env: LlvmEnv, commandline: str) -> Optional[float]:
-    """Replay the sequence of actions given by a commandline."""
-    actions = env.commandline_to_actions(commandline)
-    for action in actions:
-        _, _, done, info = env.step(action)
-        if done:
-            raise OSError(
-                f"Environment terminated with error: `{info.get('error_details')}`"
-            )
-    return env.episode_reward
+    def json(self):
+        data = self._asdict()
+        data["state"] = self.state.json()
+        return data
 
 
 def validate_state(env: CompilerEnv, state: CompilerEnvState) -> ValidationResult:
@@ -103,7 +96,8 @@ def validate_state(env: CompilerEnv, state: CompilerEnvState) -> ValidationResul
         # validation process in case a step fails.
         while True:
             try:
-                reward = _llvm_replay_commandline(env, state.commandline)
+                state.apply(env)
+                reward = env.episode_reward
             except (ValueError, OSError) as e:
                 validation["actions_replay_failed"] = True
                 error_messages.append(str(e))

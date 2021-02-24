@@ -9,7 +9,6 @@ import random
 import shutil
 import subprocess
 import sys
-import warnings
 from datetime import datetime
 from pathlib import Path
 from time import sleep, time
@@ -181,9 +180,11 @@ class Connection(object):
                         raise ServiceTransportError(
                             f"{self.url} {e.details()} ({max_retries} retries)"
                         ) from None
-                    warnings.warn(
-                        f"{self.url} {e.details()} "
-                        f"({max_retries - attempt} attempts remaining)"
+                    logging.warning(
+                        "%s %s (%d attempts remaining)",
+                        self.url,
+                        e.details(),
+                        max_retries - attempt,
                     )
                     sleep(retry_wait_seconds)
                     retry_wait_seconds *= retry_wait_backoff_exponent
@@ -331,7 +332,7 @@ class ManagedConnection(Connection):
         try:
             self.process.communicate(timeout=self.process_exit_max_seconds)
         except subprocess.TimeoutExpired:
-            warnings.warn(f"Abandoning orphan process at {self.working_dir}")
+            logging.warning(f"Abandoning orphan process at {self.working_dir}")
         shutil.rmtree(self.working_dir, ignore_errors=True)
         super().close()
 

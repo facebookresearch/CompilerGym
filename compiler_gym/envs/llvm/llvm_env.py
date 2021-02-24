@@ -12,7 +12,7 @@ from typing import Iterable, List, Optional, Union, cast
 import numpy as np
 from gym.spaces import Dict as DictSpace
 
-from compiler_gym.envs.compiler_env import CompilerEnv, step_t
+from compiler_gym.envs.compiler_env import CompilerEnv
 from compiler_gym.envs.llvm.benchmarks import make_benchmark
 from compiler_gym.envs.llvm.datasets import LLVM_DATASETS
 from compiler_gym.envs.llvm.llvm_rewards import (
@@ -149,7 +149,6 @@ class LlvmEnv(CompilerEnv):
                 ),
             ],
         )
-        self.actions: List[int] = []
         self.datasets_site_path = site_data_path("llvm/10.0.0/bitcode_benchmarks")
 
         # Register the LLVM datasets.
@@ -227,14 +226,6 @@ class LlvmEnv(CompilerEnv):
         """Alias to :func:`llvm.make_benchmark() <compiler_gym.envs.llvm.make_benchmark>`."""
         return make_benchmark(*args, **kwargs)
 
-    def step(self, action: int) -> step_t:
-        self.actions.append(action)
-        return super().step(action)
-
-    def reset(self, *args, **kwargs):
-        self.actions = []
-        return super().reset(*args, **kwargs)
-
     def _make_action_space(self, name: str, entries: List[str]) -> Commandline:
         flags = [
             CommandlineFlag(
@@ -277,32 +268,6 @@ class LlvmEnv(CompilerEnv):
             raise ValueError(f"Invalid commandline: `{commandline}`")
         return self.action_space.from_commandline(commandline)
 
-    def fork(self) -> "LlvmEnv":
-        """Fork a new environment with exactly the same sate.
-
-        This creates a duplicate environment instance with the current state.
-        The new environment is entirely independently of the source
-        episode and must be managed and
-        :meth:`closed() <compiler_gym.envs.CompilerEnv.close>` by the user.
-
-        :meth:`reset() <compiler_gym.envs.CompilerEnv.reset>` must be called
-        before :code:`fork()`.
-
-        Example usage:
-
-        >>> env = gym.make("llvm-v0")
-        >>> env.reset()
-        # ... use env
-        >>> new_env = env.fork()
-        >>> new_env.actions == env.actions
-        True
-
-        :return: A new environment instance.
-        """
-        new_env = super().fork()
-        new_env.actions = self.actions.copy()
-        return new_env
-
     @property
     def ir(self) -> str:
         """Print the LLVM-IR of the program in its current state.
@@ -315,7 +280,12 @@ class LlvmEnv(CompilerEnv):
 
     @property
     def ir_sha1(self) -> str:
-        """Return the 40-characeter hex sha1 checksum of the current IR."""
+        """Return the 40-characeter hex sha1 checksum of the current IR.
+
+        Equivalent to: :code:`hashlib.sha1(env.ir.encode("utf-8")).hexdigest()`.
+
+        :return: A 40-character hexademical sha1 string.
+        """
         # TODO(cummins): Compute this on the service-side and add it as an
         # observation space.
         return hashlib.sha1(self.ir.encode("utf-8")).hexdigest()
