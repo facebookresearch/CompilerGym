@@ -149,8 +149,8 @@ class Connection(object):
         # House keeping note: if you modify the exceptions that this method
         # raises, please update the CompilerGymServiceConnection.__call__()
         # docstring.
+        attempt = 0
         while True:
-            attempt = 0
             try:
                 return stub_method(request, timeout=timeout)
             except ValueError as e:
