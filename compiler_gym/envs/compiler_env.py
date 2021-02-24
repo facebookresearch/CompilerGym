@@ -12,7 +12,7 @@ from copy import deepcopy
 from io import StringIO
 from pathlib import Path
 from time import time
-from typing import Any, Dict, List, NamedTuple, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, List, NamedTuple, Optional, Tuple, Union
 
 import fasteners
 import gym
