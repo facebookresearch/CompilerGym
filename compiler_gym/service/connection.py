@@ -46,7 +46,7 @@ class ConnectionOpts(NamedTuple):
     Failures from other causes such as error signals raised by the service are
     not retried."""
 
-    retry_wait_seconds: float = 0.5
+    retry_wait_seconds: float = 0.25
     """The number of seconds to wait between successive attempts to communicate
     with the RPC service."""
 
@@ -144,7 +144,7 @@ class Connection(object):
         request: Request,
         timeout: float = 60,
         max_retries=3,
-        retry_wait_seconds=0.5,
+        retry_wait_seconds=0.25,
         retry_wait_backoff_exponent=2,
     ) -> Reply:
         """Call the service with the given arguments."""
@@ -182,7 +182,7 @@ class Connection(object):
                     # backoff. This is because this error can be caused by an
                     # overloaded service, a flaky connection, etc.
                     attempt += 1
-                    if attempt >= max_retries:
+                    if attempt > max_retries:
                         raise ServiceTransportError(
                             f"{self.url} {e.details()} ({max_retries} retries)"
                         ) from None
