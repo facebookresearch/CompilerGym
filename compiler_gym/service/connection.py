@@ -199,6 +199,8 @@ class Connection(object):
                     raise TimeoutError(
                         f"{e.details()} ({timeout:.1f} seconds)"
                     ) from None
+                elif e.code() == grpc.StatusCode.DATA_LOSS:
+                    raise ServiceError(e.details())
                 else:
                     raise ServiceError(
                         f"RPC call returned status code {e.code()} and error `{e.details()}`"
