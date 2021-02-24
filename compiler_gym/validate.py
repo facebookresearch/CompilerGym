@@ -3,138 +3,23 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Validate environment states."""
-import math
 import multiprocessing
 import multiprocessing.pool
-import re
-from typing import Callable, Iterable, List, NamedTuple, Optional
+from typing import Callable, Iterable, List, Optional
 
 import gym
 
 from compiler_gym.compiler_env_state import CompilerEnvState
 from compiler_gym.envs.compiler_env import CompilerEnv
 from compiler_gym.envs.llvm import LlvmEnv
-from compiler_gym.envs.llvm.datasets import get_llvm_benchmark_validation_callback
-from compiler_gym.util.timer import Timer
-
-
-class ValidationResult(NamedTuple):
-    """The result of validating a compiler state."""
-
-    state: CompilerEnvState
-    """The compiler environment state that was validated."""
-
-    reward_validated: bool
-    """Whether the reward that was recorded in the original state was validated."""
-
-    actions_replay_failed: bool
-    """Whether the commandline was unable to be reproduced."""
-
-    reward_validation_failed: bool
-    """Whether the validated reward differed from the original state."""
-
-    benchmark_semantics_validated: bool
-    """Whether the semantics of the benchmark were validated."""
-
-    benchmark_semantics_validation_failed: bool
-    """Whether the semantics of the benchmark were found to have changed."""
-
-    walltime: float
-    """The wall time in seconds that the validation took."""
-
-    error_details: str = ""
-    """A description of any validation errors."""
-
-    def okay(self) -> bool:
-        """Whether validation succeeded."""
-        return not (
-            self.actions_replay_failed
-            or self.reward_validation_failed
-            or self.benchmark_semantics_validation_failed
-        )
-
-    def __repr__(self):
-        # Remove default-protocol prefix to improve output readability.
-        benchmark = re.sub(r"^benchmark://", "", self.state.benchmark)
-
-        if not self.okay():
-            msg = ", ".join(self.error_details.strip().split("\n"))
-            return f"❌  {benchmark}  {msg}"
-        elif self.state.reward is None:
-            return f"✅  {benchmark}"
-        else:
-            return f"✅  {benchmark}  {self.state.reward:.4f}"
-
-    def json(self):
-        data = self._asdict()  # pylint: disable=no-member
-        data["state"] = self.state.json()
-        return data
-
-
-def validate_state(env: CompilerEnv, state: CompilerEnvState) -> ValidationResult:
-    """Validate a :class:`CompilerEnvState <compiler_gym.envs.CompilerEnvState>`.
-
-    :param env: A compiler environment.
-    :param state: The environment state to validate.
-    :return: A :class:`ValidationResult <compiler_gym.ValidationResult>` instance.
-    """
-    error_messages = []
-    validation = {
-        "state": state,
-        "actions_replay_failed": False,
-        "reward_validated": False,
-        "reward_validation_failed": False,
-        "benchmark_semantics_validated": False,
-        "benchmark_semantics_validation_failed": False,
-    }
-
-    if state.reward is not None and env.reward_space is None:
-        raise ValueError("Reward space not specified")
-
-    with Timer() as walltime:
-        env.reset(benchmark=state.benchmark)
-        # Use a while loop here so that we can `break` early out of the
-        # validation process in case a step fails.
-        while True:
-            try:
-                env.apply(state)
-                reward = env.episode_reward
-            except (ValueError, OSError) as e:
-                validation["actions_replay_failed"] = True
-                error_messages.append(str(e))
-                break
-
-            if state.reward is not None and env.reward_space.deterministic:
-                validation["reward_validated"] = True
-                # If reward deviates from the expected amount record the
-                # error but continue with the remainder of the validation.
-                if not math.isclose(reward, state.reward, rel_tol=1e-5, abs_tol=1e-10):
-                    validation["reward_validation_failed"] = True
-                    error_messages.append(
-                        f"Expected reward {state.reward:.4f} but received reward {reward:.4f}"
-                    )
-
-            validate_semantics = get_llvm_benchmark_validation_callback(env)
-            if validate_semantics:
-                validation["benchmark_semantics_validated"] = True
-                semantics_error = validate_semantics(env)
-                if semantics_error:
-                    validation["benchmark_semantics_validation_failed"] = True
-                    error_messages.append(semantics_error)
-
-            # Finished all checks, break the loop.
-            break
-
-    return ValidationResult(
-        walltime=walltime.time, error_details="\n".join(error_messages), **validation
-    )
+from compiler_gym.validation_result import ValidationResult
 
 
 def _validate_states_worker(args) -> ValidationResult:
     reward_space, state = args
     env = gym.make("llvm-v0", reward_space=reward_space)
     try:
-        result = validate_state(env, state)
+        result = env.validate(state)
     finally:
         env.close()
     return result
@@ -148,7 +33,7 @@ def validate_states(
     inorder: bool = False,
 ) -> Iterable[ValidationResult]:
     """A parallelized implementation of
-    :func:`validate_state() <compiler_gym.validate_state>` for batched
+    :meth:`env.validate() <compiler_gym.envs.CompilerEnv.validate>` for batched
     validation.
 
     :param make_env: A callback which instantiates a compiler environment.

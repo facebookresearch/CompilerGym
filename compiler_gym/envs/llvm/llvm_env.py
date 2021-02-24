@@ -7,14 +7,17 @@ import hashlib
 import os
 import shutil
 from pathlib import Path
-from typing import Iterable, List, Optional, Union, cast
+from typing import Callable, Iterable, List, Optional, Union, cast
 
 import numpy as np
 from gym.spaces import Dict as DictSpace
 
 from compiler_gym.envs.compiler_env import CompilerEnv
 from compiler_gym.envs.llvm.benchmarks import make_benchmark
-from compiler_gym.envs.llvm.datasets import LLVM_DATASETS
+from compiler_gym.envs.llvm.datasets import (
+    LLVM_DATASETS,
+    get_llvm_benchmark_validation_callback,
+)
 from compiler_gym.envs.llvm.llvm_rewards import (
     BaselineImprovementNormalizedReward,
     CostFunctionReward,
@@ -323,3 +326,17 @@ class LlvmEnv(CompilerEnv):
             print(self.ir)
         else:
             return super().render(mode)
+
+    def get_benchmark_validation_callback(
+        self,
+    ) -> Optional[Callable[[CompilerEnv], Optional[str]]]:
+        """Return a callback for validating a given environment state.
+
+        If there is no valid callback, returns :code:`None`.
+
+        :param env: An :class:`LlvmEnv` instance.
+        :return: An optional callback that takes an :class:`LlvmEnv` instance as
+            argument and returns an optional string containing a validation error
+            message.
+        """
+        return get_llvm_benchmark_validation_callback(self)

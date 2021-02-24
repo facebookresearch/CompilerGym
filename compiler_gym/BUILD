@@ -52,9 +52,19 @@ py_library(
     srcs = ["validate.py"],
     visibility = ["//compiler_gym:__subpackages__"],
     deps = [
+        ":validation_result",
         "//compiler_gym/envs:compiler_env",
         "//compiler_gym/envs/llvm",
         "//compiler_gym/spaces",
         "//compiler_gym/util",
+    ],
+)
+
+py_library(
+    name = "validation_result",
+    srcs = ["validation_result.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
+    deps = [
+        ":compiler_env_state",
     ],
 )

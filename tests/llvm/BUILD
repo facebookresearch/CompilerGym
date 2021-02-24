@@ -204,3 +204,12 @@ py_test(
         "//tests:test_main",
     ],
 )
+
+py_test(
+    name = "validate_test",
+    srcs = ["validate_test.py"],
+    deps = [
+        "//compiler_gym",
+        "//tests:test_main",
+    ],
+)

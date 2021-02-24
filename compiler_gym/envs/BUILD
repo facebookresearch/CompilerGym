@@ -20,10 +20,12 @@ py_library(
     visibility = ["//compiler_gym:__subpackages__"],
     deps = [
         "//compiler_gym:compiler_env_state",
+        "//compiler_gym:validation_result",
         "//compiler_gym/datasets:dataset",
         "//compiler_gym/service",
         "//compiler_gym/service/proto",
         "//compiler_gym/spaces",
+        "//compiler_gym/util",
         "//compiler_gym/views",
     ],
 )
