@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 #
 # Extensions to OpenAI gym's spaces.
+load("@rules_python//python:defs.bzl", "py_library")
 
 py_library(
     name = "spaces",

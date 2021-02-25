@@ -261,7 +261,6 @@ def download_cBench_runtime_data() -> bool:
 def _make_cBench_validator(
     cmd: str,
     linkopts: List[str],
-    os_env: Dict[str, str],
     num_runs: int = 1,
     compare_output: bool = True,
     input_files: Optional[List[Path]] = None,
@@ -404,7 +403,6 @@ def validator(
         Callable[[BenchmarkExecutionResult], Optional[str]]
     ] = None,
     linkopts: List[str] = None,
-    env: Dict[str, str] = None,
     pre_execution_callback: Optional[Callable[[], None]] = None,
 ) -> bool:
     """Declare a new benchmark validator.
@@ -426,7 +424,6 @@ def validator(
     infiles = [_CBENCH_DATA / p for p in data or []]
     outfiles = [Path(p) for p in outs or []]
     linkopts = linkopts or []
-    env = env or {}
 
     VALIDATORS[benchmark].append(
         _make_cBench_validator(
@@ -436,7 +433,6 @@ def validator(
             compare_output=compare_output,
             validate_result=validate_result,
             linkopts=linkopts,
-            os_env=env,
             pre_execution_callback=pre_execution_callback,
         )
     )
@@ -475,12 +471,12 @@ def get_llvm_benchmark_validation_callback(
             msg = []
             if errors:
                 freq = sorted(Counter(errors).items(), key=lambda x: -x[1])
-                for i, (message, count) in enumerate(freq, start=1):
+                for j, (message, count) in enumerate(freq, start=1):
                     if count > 1:
-                        msg.append(f"[{i}/{len(freq)}] {count}× {message}")
+                        msg.append(f"[{j}/{len(freq)}] {count}× {message}")
                     else:
-                        msg.append(f"[{i}/{len(freq)}] {message}")
-                    if i >= 3:
+                        msg.append(f"[{j}/{len(freq)}] {message}")
+                    if j >= 3:
                         msg.append("...")
                         break
                 return (
@@ -534,17 +530,18 @@ validator(
 )
 
 for i in range(1, 21):
-    validator(
-        benchmark="benchmark://cBench-v0/adpcm",
-        cmd=f"$BIN $D/telecom_data/{i}.adpcm",
-        data=[f"telecom_data/{i}.adpcm"],
-    )
+    # TODO(cummins): Investigate.
+    # validator(
+    #     benchmark="benchmark://cBench-v0/adpcm",
+    #     cmd=f"$BIN $D/telecom_data/{i}.adpcm",
+    #     data=[f"telecom_data/{i}.adpcm"],
+    # )
 
-    validator(
-        benchmark="benchmark://cBench-v0/adpcm",
-        cmd=f"$BIN $D/telecom_data/{i}.pcm",
-        data=[f"telecom_data/{i}.pcm"],
-    )
+    # validator(
+    #     benchmark="benchmark://cBench-v0/adpcm",
+    #     cmd=f"$BIN $D/telecom_data/{i}.pcm",
+    #     data=[f"telecom_data/{i}.pcm"],
+    # )
 
     validator(
         benchmark="benchmark://cBench-v0/blowfish",

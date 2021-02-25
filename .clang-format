@@ -1,3 +1,4 @@
+---
 Language: Cpp
 # BasedOnStyle:  Google
 AccessModifierOffset: -1
@@ -24,22 +25,22 @@ AlwaysBreakTemplateDeclarations: Yes
 BinPackArguments: true
 BinPackParameters: true
 BraceWrapping:
-  AfterCaseLabel: false
-  AfterClass: false
-  AfterControlStatement: false
-  AfterEnum: false
-  AfterFunction: false
-  AfterNamespace: false
-  AfterObjCDeclaration: false
-  AfterStruct: false
-  AfterUnion: false
-  AfterExternBlock: false
-  BeforeCatch: false
-  BeforeElse: false
-  IndentBraces: false
-  SplitEmptyFunction: true
-  SplitEmptyRecord: true
-  SplitEmptyNamespace: true
+    AfterCaseLabel: false
+    AfterClass: false
+    AfterControlStatement: false
+    AfterEnum: false
+    AfterFunction: false
+    AfterNamespace: false
+    AfterObjCDeclaration: false
+    AfterStruct: false
+    AfterUnion: false
+    AfterExternBlock: false
+    BeforeCatch: false
+    BeforeElse: false
+    IndentBraces: false
+    SplitEmptyFunction: true
+    SplitEmptyRecord: true
+    SplitEmptyNamespace: true
 BreakBeforeBinaryOperators: None
 BreakBeforeBraces: Attach
 BreakBeforeInheritanceComma: false
@@ -62,23 +63,23 @@ DisableFormat: false
 ExperimentalAutoDetectBinPacking: false
 FixNamespaceComments: true
 ForEachMacros:
-- foreach
-- Q_FOREACH
-- BOOST_FOREACH
+    - foreach
+    - Q_FOREACH
+    - BOOST_FOREACH
 IncludeBlocks: Regroup
 IncludeCategories:
-- Regex: ^<ext/.*\.h>
-  Priority: 2
-  SortPriority: 0
-- Regex: ^<.*\.h>
-  Priority: 1
-  SortPriority: 0
-- Regex: ^<.*
-  Priority: 2
-  SortPriority: 0
-- Regex: .*
-  Priority: 3
-  SortPriority: 0
+    - Regex: ^<ext/.*\.h>
+      Priority: 2
+      SortPriority: 0
+    - Regex: ^<.*\.h>
+      Priority: 1
+      SortPriority: 0
+    - Regex: ^<.*
+      Priority: 2
+      SortPriority: 0
+    - Regex: .*
+      Priority: 3
+      SortPriority: 0
 IncludeIsMainRegex: ([-_](test|unittest))?$
 IncludeIsMainSourceRegex: ''
 IndentCaseLabels: true
@@ -107,33 +108,33 @@ PenaltyExcessCharacter: 1000000
 PenaltyReturnTypeOnItsOwnLine: 200
 PointerAlignment: Left
 RawStringFormats:
-- Language: Cpp
-  Delimiters:
-  - cc
-  - CC
-  - cpp
-  - Cpp
-  - CPP
-  - c++
-  - C++
-  CanonicalDelimiter: ''
-  BasedOnStyle: google
-- Language: TextProto
-  Delimiters:
-  - pb
-  - PB
-  - proto
-  - PROTO
-  EnclosingFunctions:
-  - EqualsProto
-  - EquivToProto
-  - PARSE_PARTIAL_TEXT_PROTO
-  - PARSE_TEST_PROTO
-  - PARSE_TEXT_PROTO
-  - ParseTextOrDie
-  - ParseTextProtoOrDie
-  CanonicalDelimiter: ''
-  BasedOnStyle: google
+    - Language: Cpp
+      Delimiters:
+          - cc
+          - CC
+          - cpp
+          - Cpp
+          - CPP
+          - c++
+          - C++
+      CanonicalDelimiter: ''
+      BasedOnStyle: google
+    - Language: TextProto
+      Delimiters:
+          - pb
+          - PB
+          - proto
+          - PROTO
+      EnclosingFunctions:
+          - EqualsProto
+          - EquivToProto
+          - PARSE_PARTIAL_TEXT_PROTO
+          - PARSE_TEST_PROTO
+          - PARSE_TEXT_PROTO
+          - ParseTextOrDie
+          - ParseTextProtoOrDie
+      CanonicalDelimiter: ''
+      BasedOnStyle: google
 ReflowComments: true
 SortIncludes: true
 SortUsingDeclarations: true
@@ -158,8 +159,8 @@ SpacesInSquareBrackets: false
 SpaceBeforeSquareBrackets: false
 Standard: Auto
 StatementMacros:
-- Q_UNUSED
-- QT_REQUIRE_VERSION
+    - Q_UNUSED
+    - QT_REQUIRE_VERSION
 TabWidth: 8
 UseCRLF: false
 UseTab: Never

@@ -3,22 +3,22 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """This module defines the OpenAI gym interface for compilers."""
-import csv
 import logging
 import os
 import sys
 import warnings
 from copy import deepcopy
-from io import StringIO
+from math import isclose
 from pathlib import Path
 from time import time
-from typing import Any, Dict, List, NamedTuple, Optional, Tuple, Union
+from typing import Any, Callable, Dict, List, Optional, Tuple, Union
 
 import fasteners
 import gym
 import numpy as np
 from gym.spaces import Space
 
+from compiler_gym.compiler_env_state import CompilerEnvState
 from compiler_gym.datasets.dataset import Dataset, require
 from compiler_gym.service import (
     CompilerGymServiceConnection,
@@ -42,112 +42,14 @@ from compiler_gym.service.proto import (
     StepRequest,
 )
 from compiler_gym.spaces import NamedDiscrete, Reward
+from compiler_gym.util.debug_util import get_logging_level
+from compiler_gym.util.timer import Timer
+from compiler_gym.validation_result import ValidationResult
 from compiler_gym.views import ObservationSpaceSpec, ObservationView, RewardView
 
 # Type hints.
 info_t = Dict[str, Any]
 step_t = Tuple[Optional[observation_t], Optional[float], bool, info_t]
-
-
-def _to_csv(*columns) -> str:
-    buf = StringIO()
-    writer = csv.writer(buf)
-    writer.writerow(columns)
-    return buf.getvalue().rstrip()
-
-
-class CompilerEnvState(NamedTuple):
-    """The representation of a compiler environment state.
-
-    The state of an environment is defined as a benchmark and a sequence of
-    actions that has been applied to it. For a given environment, the state
-    contains the information required to reproduce the result.
-    """
-
-    benchmark: str
-    """The name of the benchmark used for this episode."""
-
-    commandline: str
-    """The list of actions that produced this state, as a commandline."""
-
-    walltime: float
-    """The walltime of the episode."""
-
-    reward: Optional[float] = None
-    """The cumulative reward for this episode."""
-
-    @staticmethod
-    def csv_header() -> str:
-        """Return the header string for the CSV-format.
-
-        :return: A comma-separated string.
-        """
-        return _to_csv("benchmark", "reward", "walltime", "commandline")
-
-    def json(self):
-        """Return the state as JSON."""
-        return self._asdict()
-
-    def to_csv(self) -> str:
-        """Serialize a state to a comma separated list of values.
-
-        :return: A comma-separated string.
-        """
-        return _to_csv(self.benchmark, self.reward, self.walltime, self.commandline)
-
-    @classmethod
-    def from_json(cls, data: Dict[str, Any]) -> "CompilerEnvState":
-        """Construct a state from a JSON dictionary."""
-        return cls(**data)
-
-    @classmethod
-    def from_csv(cls, csv_string: str) -> "CompilerEnvState":
-        """Construct a state from a comma separated list of values."""
-        reader = csv.reader(StringIO(csv_string))
-        for line in reader:
-            try:
-                benchmark, reward, walltime, commandline = line
-                break
-            except ValueError as e:
-                raise ValueError(f"Failed to parse input: `{csv_string}`: {e}") from e
-        else:
-            raise ValueError(f"Failed to parse input: `{csv_string}`")
-        return cls(
-            benchmark=benchmark,
-            reward=None if reward == "" else float(reward),
-            walltime=float(walltime),
-            commandline=commandline,
-        )
-
-    def apply(self, env: "CompilerEnv") -> None:
-        """Replay the sequence of actions given by a commandline."""
-        actions = env.commandline_to_actions(self.commandline)
-        for action in actions:
-            _, _, done, info = env.step(action)
-            if done:
-                raise OSError(
-                    f"Environment terminated with error: `{info.get('error_details')}`"
-                )
-
-    def __eq__(self, rhs) -> bool:
-        if not isinstance(rhs, CompilerEnvState):
-            return False
-        epsilon = 1e-5
-        # If only one benchmark has a reward the states cannot be equal.
-        if (self.reward is None) != (rhs.reward is None):
-            return False
-        if (self.reward is None) and (rhs.reward is None):
-            reward_equal = True
-        else:
-            reward_equal = abs(self.reward - rhs.reward) < epsilon
-        # Note that walltime is excluded from equivalence checks as two states
-        # are equivalent if they define the same point in the optimization space
-        # irrespective of how long it took to get there.
-        return (
-            self.benchmark == rhs.benchmark
-            and reward_equal
-            and self.commandline == rhs.commandline
-        )
 
 
 class CompilerEnv(gym.Env):
@@ -186,6 +88,10 @@ class CompilerEnv(gym.Env):
     :ivar service: A connection to the underlying compiler service.
     :vartype service: compiler_gym.service.CompilerGymServiceConnection
 
+    :ivar logger: A Logger instance used by the environment for communicating
+        info and warnings.
+    :vartype logger: logging.Logger
+
     :ivar action_spaces: A list of supported action space names.
     :vartype action_spaces: List[str]
 
@@ -212,6 +118,7 @@ class CompilerEnv(gym.Env):
     :ivar episode_reward: If
         :func:`CompilerEnv.reward_space <compiler_gym.envs.CompilerGym.reward_space>`
         is set, this value is the sum of all rewards for the current episode.
+    :vartype episode_reward: float
     """
 
     def __init__(
@@ -224,6 +131,7 @@ class CompilerEnv(gym.Env):
         action_space: Optional[str] = None,
         connection_settings: Optional[ConnectionOpts] = None,
         service_connection: Optional[CompilerGymServiceConnection] = None,
+        logging_level: Optional[int] = None,
     ):
         """Construct and initialize a CompilerGym service environment.
 
@@ -262,6 +170,10 @@ class CompilerEnv(gym.Env):
             with the remote service.
         :param service_connection: An existing compiler gym service connection
             to use.
+        :param logging_level: The integer logging level to use for logging. By
+            default, the value reported by
+            :func:`get_logging_level() <compiler_gym.get_logging_level>` is
+            used.
         :raises FileNotFoundError: If service is a path to a file that is not
             found.
         :raises TimeoutError: If the compiler service fails to initialize
@@ -270,6 +182,12 @@ class CompilerEnv(gym.Env):
         rewards = rewards or []
 
         self.metadata = {"render.modes": ["human", "ansi"]}
+
+        # Set up logging.
+        self.logger = logging.getLogger("compiler_gym.envs")
+        if logging_level is None:
+            logging_level = get_logging_level()
+        self.logger.setLevel(logging_level)
 
         # A compiler service supports multiple simultaneous environments. This
         # session ID is used to identify this environment.
@@ -293,7 +211,9 @@ class CompilerEnv(gym.Env):
         self.action_space_name = action_space
 
         self.service = service_connection or CompilerGymServiceConnection(
-            self._service_endpoint, self._connection_settings
+            endpoint=self._service_endpoint,
+            opts=self._connection_settings,
+            logger=self.logger,
         )
 
         # Process the available action, observation, and reward spaces.
@@ -569,11 +489,16 @@ class CompilerEnv(gym.Env):
         :return: A new environment instance.
         """
         if not self.in_episode:
-            state_to_replay = self.state
             if self.actions:
-                logging.warning("Parent service of fork() has died, replaying state")
+                state_to_replay = self.state
+                self.logger.warning(
+                    "Parent service of fork() has died, replaying state"
+                )
+            else:
+                state_to_replay = None
             self.reset()
-            state_to_replay.apply(self)
+            if state_to_replay:
+                self.apply(state_to_replay)
 
         request = ForkSessionRequest(session_id=self._session_id)
         reply: ForkSessionReply = self.service(self.service.stub.ForkSession, request)
@@ -587,22 +512,26 @@ class CompilerEnv(gym.Env):
         )
 
         # Set the session ID.
-        new_env._session_id = reply.session_id
+        new_env._session_id = reply.session_id  # pylint: disable=protected-access
         new_env.observation.session_id = reply.session_id
 
         # Re-register any custom benchmarks with the new environment.
         if self._custom_benchmarks:
-            new_env._add_custom_benchmarks(
+            new_env._add_custom_benchmarks(  # pylint: disable=protected-access
                 list(self._custom_benchmarks.values()).copy()
             )
 
         # Now that we have initialized the environment with the current state,
         # set the benchmark so that calls to new_env.reset() will correctly
         # revert the environment to the initial benchmark state.
-        new_env._user_specified_benchmark_uri = self.benchmark
+        new_env._user_specified_benchmark_uri = (  # pylint: disable=protected-access
+            self.benchmark
+        )
         # Set the "visible" name of the current benchmark to hide the fact that
         # we loaded from a custom bitcode file.
-        new_env._benchmark_in_use_uri = self.benchmark
+        new_env._benchmark_in_use_uri = (  # pylint: disable=protected-access
+            self.benchmark
+        )
 
         # Create copies of the mutable reward and observation spaces. This
         # is required to correctly calculate incremental updates.
@@ -640,8 +569,8 @@ class CompilerEnv(gym.Env):
                 # not kill it.
                 if reply.remaining_sessions:
                     close_service = False
-            except:  # noqa Don't feel bad, computer, you tried ;-)
-                pass
+            except:  # noqa pylint: disable=bare-except
+                pass  # Don't feel bad, computer, you tried ;-)
             self._session_id = None
 
         if self.service and close_service:
@@ -656,7 +585,7 @@ class CompilerEnv(gym.Env):
         if hasattr(self, "service") and getattr(self, "service"):
             self.close()
 
-    def reset(
+    def reset(  # pylint: disable=arguments-differ
         self,
         benchmark: Optional[Union[str, Benchmark]] = None,
         action_space: Optional[str] = None,
@@ -1002,3 +931,104 @@ class CompilerEnv(gym.Env):
             self.service.stub.AddBenchmark,
             AddBenchmarkRequest(benchmark=benchmarks),
         )
+
+    def apply(self, state: CompilerEnvState) -> None:  # noqa
+        """Replay this state on the given an environment.
+
+        :param env: A :class:`CompilerEnv` instance.
+        :raises ValueError: If this state cannot be applied.
+        """
+        if not self.in_episode:
+            self.reset(benchmark=state.benchmark)
+
+        if self.benchmark != state.benchmark:
+            warnings.warn(
+                f"Applying state from environment for benchmark '{state.benchmark}' "
+                f"to environment for benchmark '{self.benchmark}'"
+            )
+
+        actions = self.commandline_to_actions(state.commandline)
+        for action in actions:
+            _, _, done, info = self.step(action)
+            if done:
+                raise ValueError(
+                    f"Environment terminated with error: `{info.get('error_details')}`"
+                )
+
+    def validate(self, state: Optional[CompilerEnvState] = None) -> ValidationResult:
+        in_place = state is not None
+        state = state or self.state
+
+        error_messages = []
+        validation = {
+            "state": state,
+            "actions_replay_failed": False,
+            "reward_validated": False,
+            "reward_validation_failed": False,
+            "benchmark_semantics_validated": False,
+            "benchmark_semantics_validation_failed": False,
+        }
+
+        fkd = self.fork()
+        try:
+            with Timer() as walltime:
+                replay_target = self if in_place else fkd
+                replay_target.reset(benchmark=state.benchmark)
+                # Use a while loop here so that we can `break` early out of the
+                # validation process in case a step fails.
+                while True:
+                    try:
+                        replay_target.apply(state)
+                    except (ValueError, OSError) as e:
+                        validation["actions_replay_failed"] = True
+                        error_messages.append(str(e))
+                        break
+
+                    if self.reward_space and self.reward_space.deterministic:
+                        validation["reward_validated"] = True
+                        # If reward deviates from the expected amount record the
+                        # error but continue with the remainder of the validation.
+                        if not isclose(
+                            state.reward,
+                            replay_target.episode_reward,
+                            rel_tol=1e-5,
+                            abs_tol=1e-10,
+                        ):
+                            validation["reward_validation_failed"] = True
+                            error_messages.append(
+                                f"Expected reward {state.reward:.4f} but "
+                                f"received reward {replay_target.episode_reward:.4f}"
+                            )
+
+                    # TODO(https://github.com/facebookresearch/CompilerGym/issues/45):
+                    # Call the new self.benchmark.validation_callback() method
+                    # once implemented.
+                    validate_semantics = self.get_benchmark_validation_callback()
+                    if validate_semantics:
+                        validation["benchmark_semantics_validated"] = True
+                        semantics_error = validate_semantics(self)
+                        if semantics_error:
+                            validation["benchmark_semantics_validation_failed"] = True
+                            error_messages.append(semantics_error)
+
+                    # Finished all checks, break the loop.
+                    break
+        finally:
+            fkd.close()
+
+        return ValidationResult(
+            walltime=walltime.time,
+            error_details="\n".join(error_messages),
+            **validation,
+        )
+
+    def get_benchmark_validation_callback(
+        self,
+    ) -> Optional[Callable[["CompilerEnv"], Optional[str]]]:
+        """Return a callback that validates benchmark semantics, if available.
+
+        TODO(https://github.com/facebookresearch/CompilerGym/issues/45): This is
+        a temporary placeholder for what will eventually become a method on a
+        new Benchmark class.
+        """
+        return None

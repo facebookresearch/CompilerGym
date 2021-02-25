@@ -4,22 +4,20 @@ We want to make contributing to CompilerGym as easy and transparent
 as possible. The most helpful ways to contribute are:
 
 1. Provide feedback.
-* [Report bugs](https://github.com/facebookresearch/CompilerGym/issues).
-  In particular, it’s important to report any crash or correctness bug.
-  We use GitHub issues to track public bugs. Please ensure your
-  description is clear and has sufficient instructions to be able to
-  reproduce the issue.
-* Report issues when the documentation is incomplete or unclear, or an
-  error message could be improved.
-* Make feature requests. Let us know if you have a use case that is
-  not well supported, including as much detail as possible.
-2. Contribute to the CompilerGym ecosystem.
-* Pull requests. Please see below for details. The easiest way to get
-  stuck is to grab an [unassigned "Good first issue"
-  ticket](https://github.com/facebookresearch/CompilerGym/issues?q=is%3Aopen+is%3Aissue+no%3Aassignee+label%3A%22Good+first+issue%22)!
-* Add new features not on the roadmap. Examples could include adding
-  support for new compilers, producing research results using
-  CompilerGym, etc.
+   * [Report bugs](https://github.com/facebookresearch/CompilerGym/issues). In
+     particular, it’s important to report any crash or correctness bug. We use
+     GitHub issues to track public bugs. Please ensure your description is clear
+     and has sufficient instructions to be able to reproduce the issue.
+   * Report issues when the documentation is incomplete or unclear, or an error
+     message could be improved.
+   * Make feature requests. Let us know if you have a use case that is not well
+     supported, including as much detail as possible.
+1. Contribute to the CompilerGym ecosystem.
+   * Pull requests. Please see below for details. The easiest way to get stuck
+     is to grab an [unassigned "Good first issue"
+     ticket](https://github.com/facebookresearch/CompilerGym/issues?q=is%3Aopen+is%3Aissue+no%3Aassignee+label%3A%22Good+first+issue%22)!
+   * Add new features not on the roadmap. Examples could include adding support
+     for new compilers, producing research results using CompilerGym, etc.
 
 
 ## Pull Requests

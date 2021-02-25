@@ -1,4 +1,5 @@
 # This package exposes the LLVM optimization pipeline as a CompilerGym service.
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
 cc_binary(
     name = "compiler_gym-llvm-service",

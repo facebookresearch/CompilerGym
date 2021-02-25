@@ -5,6 +5,7 @@
 #
 # This package contains CompilerGym, a toolkit for applying reinforcement
 # learning to compilers.
+load("@rules_python//python:defs.bzl", "py_library")
 
 py_library(
     name = "compiler_gym",
@@ -16,6 +17,12 @@ py_library(
         "//compiler_gym/envs",
         "//compiler_gym/util",
     ],
+)
+
+py_library(
+    name = "compiler_env_state",
+    srcs = ["compiler_env_state.py"],
+    visibility = ["//compiler_gym/envs:__subpackages__"],
 )
 
 py_library(
@@ -45,9 +52,19 @@ py_library(
     srcs = ["validate.py"],
     visibility = ["//compiler_gym:__subpackages__"],
     deps = [
+        ":validation_result",
         "//compiler_gym/envs:compiler_env",
         "//compiler_gym/envs/llvm",
         "//compiler_gym/spaces",
         "//compiler_gym/util",
+    ],
+)
+
+py_library(
+    name = "validation_result",
+    srcs = ["validation_result.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
+    deps = [
+        ":compiler_env_state",
     ],
 )

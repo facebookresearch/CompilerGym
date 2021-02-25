@@ -58,7 +58,7 @@ Status verifyModuleStatus(const llvm::Module& module) {
   llvm::raw_string_ostream rso(errorMessage);
   if (llvm::verifyModule(module, &rso)) {
     rso.flush();
-    return Status(StatusCode::INTERNAL, "Failed to verify module: " + errorMessage);
+    return Status(StatusCode::DATA_LOSS, "Failed to verify module: " + errorMessage);
   }
   return Status::OK;
 }

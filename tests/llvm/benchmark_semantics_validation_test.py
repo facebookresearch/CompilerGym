@@ -6,6 +6,7 @@
 import tempfile
 from pathlib import Path
 
+from compiler_gym import ValidationResult
 from compiler_gym.envs import LlvmEnv
 from compiler_gym.envs.llvm.datasets import get_llvm_benchmark_validation_callback
 from tests.test_main import main
@@ -29,23 +30,44 @@ def test_no_validation_callback_for_custom_benchmark(env: LlvmEnv):
     assert validation_cb is None
 
 
-def test_validate_unoptimized_benchmark(env: LlvmEnv, validatable_benchmark_name: str):
-    """Run the validation routine on unoptimized versions of all benchmarks."""
+def test_validate_benchmark_semantics(env: LlvmEnv, validatable_benchmark_name: str):
+    """Run the validation routine on all benchmarks."""
+    env.reward_space = "IrInstructionCount"
     env.reset(benchmark=validatable_benchmark_name)
-    validation_cb = get_llvm_benchmark_validation_callback(env)
 
-    assert validation_cb
-    assert validation_cb(env) is None
+    # Run a single step.
+    env.step(env.action_space.flags.index("-mem2reg"))
+
+    # Validate the environment state.
+    result: ValidationResult = env.validate()
+    assert not result.error_details
+    assert result.reward_validated
+    assert not result.actions_replay_failed
+    assert not result.reward_validation_failed
+    assert result.benchmark_semantics_validated
+    assert not result.benchmark_semantics_validation_failed
+    assert result.okay()
 
 
-def test_non_validatable_benchmark_callback(
+def test_non_validatable_benchmark_validate(
     env: LlvmEnv, non_validatable_benchmark_name: str
 ):
-    """Run the validation routine on unoptimized versions of all benchmarks."""
+    """Run the validation routine on all benchmarks."""
+    env.reward_space = "IrInstructionCount"
     env.reset(benchmark=non_validatable_benchmark_name)
-    validation_cb = get_llvm_benchmark_validation_callback(env)
 
-    assert validation_cb is None
+    # Run a single step.
+    env.step(env.action_space.flags.index("-mem2reg"))
+
+    # Validate the environment state.
+    result: ValidationResult = env.validate()
+    assert not result.error_details
+    assert result.reward_validated
+    assert not result.actions_replay_failed
+    assert not result.reward_validation_failed
+    assert not result.benchmark_semantics_validated
+    assert not result.benchmark_semantics_validation_failed
+    assert result.okay()
 
 
 if __name__ == "__main__":

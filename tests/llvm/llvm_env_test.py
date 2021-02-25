@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Integrations tests for the LLVM CompilerGym environments."""
+import logging
 from enum import Enum
 from pathlib import Path
 from typing import List
@@ -11,9 +12,11 @@ import gym
 import pytest
 
 import compiler_gym
-from compiler_gym.envs import CompilerEnv, CompilerEnvState, llvm
+from compiler_gym.compiler_env_state import CompilerEnvState
+from compiler_gym.envs import CompilerEnv, llvm
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.service.connection import CompilerGymServiceConnection
+from compiler_gym.util import debug_util as dbg
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.llvm"]
@@ -212,6 +215,21 @@ def test_state_to_csv_from_csv(env: LlvmEnv):
     assert state == state_from_csv
 
 
+def test_apply_state(env: LlvmEnv):
+    """Test that apply() on a clean environment produces same state."""
+    env.reward_space = "IrInstructionCount"
+    env.reset(benchmark="cBench-v0/crc32")
+    env.step(env.action_space.flags.index("-mem2reg"))
+
+    other = gym.make("llvm-v0", reward_space="IrInstructionCount")
+    try:
+        other.apply(env.state)
+
+        assert other.state == env.state
+    finally:
+        other.close()
+
+
 def test_set_observation_space_from_spec(env: LlvmEnv):
     env.observation_space = env.observation.spaces["Autophase"]
     obs = env.observation_space
@@ -273,6 +291,18 @@ def test_ir_sha1(env: LlvmEnv, tmpwd: Path):
 def test_generate_enum_declarations(env: LlvmEnv):
     assert issubclass(llvm.observation_spaces, Enum)
     assert issubclass(llvm.reward_spaces, Enum)
+
+
+def test_logging_default_level(env: LlvmEnv):
+    assert env.logger.level == dbg.get_logging_level()
+
+
+def test_logging_forced_level():
+    env = gym.make("llvm-v0", logging_level=logging.INFO)
+    try:
+        assert env.logger.level == logging.INFO
+    finally:
+        env.close()
 
 
 if __name__ == "__main__":

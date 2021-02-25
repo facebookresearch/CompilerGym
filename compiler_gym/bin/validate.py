@@ -232,7 +232,8 @@ def main(argv):
     if FLAGS.summary_only:
 
         def intermediate_print(*args, **kwargs):
-            pass
+            del args
+            del kwargs
 
     else:
         intermediate_print = print

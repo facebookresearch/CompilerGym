@@ -2,6 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+load("@rules_python//python:defs.bzl", "py_test")
 
 py_test(
     name = "all_actions_single_step_test",
@@ -198,6 +199,15 @@ py_test(
     name = "threading_test",
     timeout = "short",
     srcs = ["threading_test.py"],
+    deps = [
+        "//compiler_gym",
+        "//tests:test_main",
+    ],
+)
+
+py_test(
+    name = "validate_test",
+    srcs = ["validate_test.py"],
     deps = [
         "//compiler_gym",
         "//tests:test_main",

@@ -2,6 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+load("@rules_python//python:defs.bzl", "py_library")
 
 py_library(
     name = "envs",
@@ -18,10 +19,13 @@ py_library(
     srcs = ["compiler_env.py"],
     visibility = ["//compiler_gym:__subpackages__"],
     deps = [
+        "//compiler_gym:compiler_env_state",
+        "//compiler_gym:validation_result",
         "//compiler_gym/datasets:dataset",
         "//compiler_gym/service",
         "//compiler_gym/service/proto",
         "//compiler_gym/spaces",
+        "//compiler_gym/util",
         "//compiler_gym/views",
     ],
 )
