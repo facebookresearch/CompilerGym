@@ -6,12 +6,75 @@
 import tempfile
 from pathlib import Path
 
-from compiler_gym import ValidationResult
+import gym
+
+from compiler_gym import CompilerEnvState, ValidationResult
 from compiler_gym.envs import LlvmEnv
 from compiler_gym.envs.llvm.datasets import get_llvm_benchmark_validation_callback
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
+
+
+def test_validate_state_no_reward():
+    state = CompilerEnvState(
+        benchmark="cBench-v0/crc32",
+        walltime=1,
+        commandline="opt  input.bc -o output.bc",
+    )
+    env = gym.make("llvm-v0")
+    try:
+        env.require_dataset("cBench-v0")
+        result = env.validate(state)
+    finally:
+        env.close()
+
+    assert result.okay()
+    assert not result.reward_validated
+    assert str(result) == "✅  cBench-v0/crc32"
+
+
+def test_validate_state_with_reward():
+    state = CompilerEnvState(
+        benchmark="cBench-v0/crc32",
+        walltime=1,
+        reward=0,
+        commandline="opt  input.bc -o output.bc",
+    )
+    env = gym.make("llvm-v0", reward_space="IrInstructionCount")
+    try:
+        env.require_dataset("cBench-v0")
+        result = env.validate(state)
+    finally:
+        env.close()
+
+    assert result.okay()
+    assert result.reward_validated
+    assert not result.reward_validation_failed
+    assert str(result) == "✅  cBench-v0/crc32  0.0000"
+
+
+def test_validate_state_invalid_reward():
+    state = CompilerEnvState(
+        benchmark="cBench-v0/crc32",
+        walltime=1,
+        reward=1,
+        commandline="opt  input.bc -o output.bc",
+    )
+    env = gym.make("llvm-v0", reward_space="IrInstructionCount")
+    try:
+        env.require_dataset("cBench-v0")
+        result = env.validate(state)
+    finally:
+        env.close()
+
+    assert not result.okay()
+    assert result.reward_validated
+    assert result.reward_validation_failed
+    assert (
+        str(result)
+        == "❌  cBench-v0/crc32  Expected reward 1.0000 but received reward 0.0000"
+    )
 
 
 def test_no_validation_callback_for_custom_benchmark(env: LlvmEnv):
