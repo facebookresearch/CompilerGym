@@ -106,7 +106,8 @@ class Reward(Scalar):
         :param observations: A list of observation values as requested by the
             :code:`observation_spaces` constructor argument.
         :param observation_view: The
-        :class:`ObservationView <compiler_gym.views.ObservationView>` instance.
+            :class:`ObservationView <compiler_gym.views.ObservationView>`
+            instance.
         """
         raise NotImplementedError("abstract class")
 
