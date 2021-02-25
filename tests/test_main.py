@@ -10,9 +10,10 @@ import gym
 import pytest
 
 import compiler_gym  # noqa Register environments.
+from compiler_gym.util import debug_util as dbg
 
 
-def main(extra_pytest_args: Optional[List[str]] = None, service_debug: int = 1):
+def main(extra_pytest_args: Optional[List[str]] = None, debug_level: int = 3):
     """The main entry point for the pytest runner.
 
     An example file which uses this:
@@ -29,11 +30,13 @@ def main(extra_pytest_args: Optional[List[str]] = None, service_debug: int = 1):
 
     :param extra_pytest_args: A list of additional command line options to pass
         to pytest.
-    :param service_debug: The compiler service debugging level. A value of 1
-        causes service-level messages to be logged. Higher values cause more
-        verbose logging. A value of 0 produces no logging, the default.
+    :param debug_level: The debug level to use to run tests. Higher levels are
+        more verbose and may be useful for diagnosing test failures. Normally
+        CompilerGym executes with a debug level of 0.
     """
-    # Use isolated data directories for running tests.
+    dbg.set_debug_level(debug_level)
+
+    # Keep test data isolated from user data.
     os.environ["COMPILER_GYM_SITE_DATA"] = "/tmp/compiler_gym/tests/site_data"
     os.environ["COMPILER_GYM_CACHE"] = "/tmp/compiler_gym/tests/cache"
 
@@ -44,11 +47,6 @@ def main(extra_pytest_args: Optional[List[str]] = None, service_debug: int = 1):
         env.require_dataset("cBench-v0")
     finally:
         env.close()
-
-    # Use verbose backend debugging when running tests. If a test fails, the
-    # debugging output will be included in the captured stderr.
-    if service_debug:
-        os.environ["COMPILER_GYM_SERVICE_DEBUG"] = str(service_debug or 0)
 
     pytest_args = sys.argv + ["-vv"]
     # Support for sharding. If a py_test target has the shard_count attribute

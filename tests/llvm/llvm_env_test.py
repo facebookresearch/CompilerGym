@@ -16,6 +16,7 @@ from compiler_gym.compiler_env_state import CompilerEnvState
 from compiler_gym.envs import CompilerEnv, llvm
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.service.connection import CompilerGymServiceConnection
+from compiler_gym.util import debug_util as dbg
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.llvm"]
@@ -293,7 +294,7 @@ def test_generate_enum_declarations(env: LlvmEnv):
 
 
 def test_logging_default_level(env: LlvmEnv):
-    assert env.logger.level == logging.ERROR
+    assert env.logger.level == dbg.get_logging_level()
 
 
 def test_logging_forced_level():

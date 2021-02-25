@@ -47,6 +47,7 @@ py_library(
     ],
     deps = [
         "//compiler_gym",
+        "//compiler_gym/util",
     ],
 )
 

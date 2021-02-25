@@ -14,6 +14,15 @@ py_test(
     ],
 )
 
+py_test(
+    name = "debug_util_test",
+    srcs = ["debug_util_test.py"],
+    deps = [
+        "//compiler_gym/util",
+        "//tests:test_main",
+    ],
+)
+
 cc_test(
     name = "EnumUtilTest",
     srcs = ["EnumUtilTest.cc"],

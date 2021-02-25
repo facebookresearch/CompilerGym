@@ -23,6 +23,7 @@ from compiler_gym.service.proto import (
     GetSpacesRequest,
     ObservationSpace,
 )
+from compiler_gym.util.debug_util import get_debug_level
 from compiler_gym.util.runfiles_path import runfiles_path, transient_cache_path
 
 GRPC_CHANNEL_OPTIONS = [
@@ -266,15 +267,13 @@ class ManagedConnection(Connection):
         env = os.environ.copy()
         env["COMPILER_GYM_RUNFILES"] = str(runfiles_path("."))
 
-        # Set environment variable $COMPILER_GYM_SERVICE_DEBUG to control
-        # logging verbosity for the compiler service. With a value of 1, service
-        # output is piped to stderr. Increasing values of 2 and more cause more
-        # verbose output to be logged.
-        if os.environ.get("COMPILER_GYM_SERVICE_DEBUG", "0") != "0":
+        # Set the verbosity of the service. The logging level of the service
+        # is the debug level - 1, so that COMPILER_GYM_DEUG=3 will cause VLOG(2)
+        # and lower to be logged to stdout.
+        debug_level = get_debug_level()
+        if debug_level > 0:
             cmd.append("--alsologtostderr")
-            log_level = int(os.environ["COMPILER_GYM_SERVICE_DEBUG"]) - 1
-            if log_level:
-                cmd.append(f"-v={log_level}")
+            cmd.append(f"-v={debug_level - 1}")
 
         logger.debug("$ %s", " ".join(cmd))
         self.process = subprocess.Popen(

@@ -97,5 +97,5 @@ if __name__ == "__main__":
             "--benchmark-save=bench_test",
             "-x",
         ],
-        service_debug=0,
+        debug_level=0,
     )

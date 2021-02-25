@@ -42,6 +42,7 @@ from compiler_gym.service.proto import (
     StepRequest,
 )
 from compiler_gym.spaces import NamedDiscrete, Reward
+from compiler_gym.util.debug_util import get_logging_level
 from compiler_gym.util.timer import Timer
 from compiler_gym.validation_result import ValidationResult
 from compiler_gym.views import ObservationSpaceSpec, ObservationView, RewardView
@@ -88,7 +89,7 @@ class CompilerEnv(gym.Env):
     :vartype service: compiler_gym.service.CompilerGymServiceConnection
 
     :ivar logger: A Logger instance used by the environment for communicating
-    info and warnings.
+        info and warnings.
     :vartype logger: logging.Logger
 
     :ivar action_spaces: A list of supported action space names.
@@ -130,7 +131,7 @@ class CompilerEnv(gym.Env):
         action_space: Optional[str] = None,
         connection_settings: Optional[ConnectionOpts] = None,
         service_connection: Optional[CompilerGymServiceConnection] = None,
-        logging_level: int = logging.ERROR,
+        logging_level: Optional[int] = None,
     ):
         """Construct and initialize a CompilerGym service environment.
 
@@ -169,9 +170,10 @@ class CompilerEnv(gym.Env):
             with the remote service.
         :param service_connection: An existing compiler gym service connection
             to use.
-        :param logging_level: The integer logging level to use for the
-            :code:`env.logger` logger. By default, only errors are logged
-            (:code:`logging.ERROR`).
+        :param logging_level: The integer logging level to use for logging. By
+            default, the value reported by
+            :func:`get_logging_level() <compiler_gym.get_logging_level>` is
+            used.
         :raises FileNotFoundError: If service is a path to a file that is not
             found.
         :raises TimeoutError: If the compiler service fails to initialize
@@ -183,6 +185,8 @@ class CompilerEnv(gym.Env):
 
         # Set up logging.
         self.logger = logging.getLogger("compiler_gym.envs")
+        if logging_level is None:
+            logging_level = get_logging_level()
         self.logger.setLevel(logging_level)
 
         # A compiler service supports multiple simultaneous environments. This
