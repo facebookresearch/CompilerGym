@@ -79,26 +79,28 @@ located at :code:`compiler_gym/envs/$COMPILER/service`, where
 :code:`$COMPILER` is the name of the compiler service you would wish
 to modify, e.g. llvm. Once done, send us a pull request!
 
-Is the optimization really a sequential decision process? I don't think the
-compiler flags are executed in sequence.
+Is the optimization really a sequential decision process?
 -----------------------------------------------------------------------------
 
 Compilers package individual optimizations as "passes" which are then applied
 in a sequential order. Usually the order inside a compiler is fixed (e.g.
 `take a look at how LLVM does it <https://github.com/llvm/llvm-project/blob/main/llvm/lib/Transforms/IPO/PassManagerBuilder.cpp#L517-L922>`_).
-CompilerGym replaces that fixed order with a sequential decision process.
+CompilerGym replaces that fixed order with a sequential decision process where
+any compiler loop is allowed to be applied at any stage.
 
-When does the gym consider an episode is “done”?
+When does CompilerGym consider an episode “done”?
 -----------------------------------------------------------------------------
 
-Never. Optimizations are like rewrite rules, it is up to the user to decide
-when no more improvement can be achieved from further rewrites. E.g. for
-simple random search we can use "patience" `[1] <https://github.com/facebookresearch/CompilerGym/blob/development/compiler_gym/bin/random_search.py#L33-L40/>`_. The only exception
-is if the compiler crashes, or the code ends up in an unexpected
-state - we have to abort. This happens.
+The compiler itself doesn't have a signal for termination. Optimizations are
+like rewrite rules, it is up to the user to decide when no more improvement
+can be achieved from further rewrites. E.g. for simple random search we can
+use "patience" `[1] <https://github.com/facebookresearch/CompilerGym/blob/development/compiler_gym/bin/random_search.py#L33-L40/>`_.
+The only exception is if the compiler crashes, or the code ends up in an
+unexpected state - we have to abort. This happens.
 
 Does it make sense to repeat the same action multiple times for compiler?
 -----------------------------------------------------------------------------
 
-Some actions such as dead code elminiation (-dce), are typically called multiple times after other optimization passes.
-So yes, repeating the same action in different context can bring improvements.
+Some actions such as dead code elminiation (-dce), are typically called multiple
+times after other optimization passes. So yes, repeating the same action in
+different context can bring improvements.
