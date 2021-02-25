@@ -17,27 +17,32 @@ Testing
         runs are minimal and fast. Use this as your go-to target for testing
         modifications to the codebase.
 
-    make install-test
-        Build and install the python package (equivalent to 'make install'),
-        then run the full test suite against the installed package, and any
-        other tests that require the python package to be installed. This is
-        expensive and not typically required for local development.
-
-    make install-fuzz
-        Build and install the python package (equivalent to 'make install'),
-        then run the fuzz testing suite. Fuzz tests are tests that generate
-        their own inputs and run in a loop until an error has been found, or
-        until a minimum number of seconds have elapsed. This minimum time is
-        controlled using a FUZZ_SECONDS variable. The default is 300 seconds (5
-        minutes). Override this value at the command line, for example
-        `FUZZ_SECONDS=60 make install-fuzz` will run the fuzz tests for a
-        minimum of one minute.
-
     make itest
         Run the test suite continuously on change. This is equivalent to
         manually running `make test` when a source file is modified. Note that
         `make install-test` tests are not run. This requires bazel-watcher.
         See: https://github.com/bazelbuild/bazel-watcher#installation
+
+
+Post-installation Tests
+-----------------------
+
+    make install-test
+        Run the full test suite against an installed CompilerGym package. This
+        requires that the CompilerGym package has been installed (`make
+        install`). This is useful for checking the package contents but is
+        usually not needed for interactive development since `make test` runs
+        the same tests without having to install anything.
+
+    make install-fuzz
+        Run the fuzz testing suite against an installed CompilerGym package.
+        Fuzz tests are tests that generate their own inputs and run in a loop
+        until an error has been found, or until a minimum number of seconds have
+        elapsed. This minimum time is controlled using a FUZZ_SECONDS variable.
+        The default is 300 seconds (5 minutes). Override this value at the
+        command line, for example `FUZZ_SECONDS=60 make install-fuzz` will run
+        the fuzz tests for a minimum of one minute. This requires that the
+        CompilerGym package has been installed (`make install`).
 
 
 Documentation
@@ -204,34 +209,30 @@ test:
 itest:
 	$(IBAZEL) $(BAZEL_OPTS) test $(BAZEL_TEST_OPTS) //...
 
-tests-datasets:
+install-test-datasets:
 	cd .. && python -m compiler_gym.bin.datasets --env=llvm-v0 --download=cBench-v0 >/dev/null
 
-pytest:
+install-test: install-test-datasets
 	mkdir -p /tmp/compiler_gym/wheel_tests
 	rm -f /tmp/compiler_gym/wheel_tests/tests
 	ln -s $(ROOT)/tests /tmp/compiler_gym/wheel_tests
 	cd /tmp/compiler_gym/wheel_tests && pytest -n auto tests -k "not fuzz"
 
-install-test: | install tests-datasets pytest
-
 # The minimum number of seconds to run the fuzz tests in a loop for. Override
 # this at the commandline, e.g. `FUZZ_SECONDS=1800 make fuzz`.
 FUZZ_SECONDS ?= 300
 
-fuzz:
+install-fuzz: install-test-datasets
 	mkdir -p /tmp/compiler_gym/wheel_fuzz_tests
 	rm -f /tmp/compiler_gym/wheel_fuzz_tests/tests
 	ln -s $(ROOT)/tests /tmp/compiler_gym/wheel_fuzz_tests
 	cd /tmp/compiler_gym/wheel_fuzz_tests && pytest tests -p no:sugar -x -vv -k fuzz --seconds=$(FUZZ_SECONDS)
 
-install-fuzz: | install tests-datasets fuzz
-
 post-install-test:
 	$(MAKE) -C examples/makefile_integration clean
 	SEARCH_TIME=3 $(MAKE) -C examples/makefile_integration test
 
-.PHONY: test install-test post-install-test
+.PHONY: test post-install-test
 
 
 ################

@@ -125,6 +125,13 @@ jobs:
                       ${{ runner.os }}-install-${{ matrix.python }}-
               if: matrix.os == 'macos-latest'
 
+            - name: Install
+              run: make install
+              env:
+                  CC: clang
+                  CXX: clang++
+                  BAZEL_BUILD_OPTS: --config=ci
+
             - name: Test
               run: make install-test
               env:
