@@ -79,7 +79,7 @@ located at :code:`compiler_gym/envs/$COMPILER/service`, where
 :code:`$COMPILER` is the name of the compiler service you would wish
 to modify, e.g. llvm. Once done, send us a pull request!
 
-Is the optimization really a sequential decision process?
+I don't think compiler optimization is a sequential decision process. How is that enabled?
 -----------------------------------------------------------------------------
 
 Compilers package individual optimizations as "passes" which are then applied
@@ -88,7 +88,7 @@ in a sequential order. Usually the order inside a compiler is fixed (e.g.
 CompilerGym replaces that fixed order with a sequential decision process where
 any compiler loop is allowed to be applied at any stage.
 
-When does CompilerGym consider an episode “done”?
+I wonder when does CompilerGym consider an episode “done”?
 -----------------------------------------------------------------------------
 
 The compiler itself doesn't have a signal for termination. Optimizations are
@@ -98,7 +98,8 @@ use "patience" `[1] <https://github.com/facebookresearch/CompilerGym/blob/develo
 The only exception is if the compiler crashes, or the code ends up in an
 unexpected state - we have to abort. This happens.
 
-Does it make sense to repeat the same action multiple times for compiler?
+Should I always try different actions or repeating the same action multiple
+times can improve the results?
 -----------------------------------------------------------------------------
 
 Some actions such as dead code elminiation (-dce), are typically called multiple
