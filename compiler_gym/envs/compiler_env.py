@@ -491,7 +491,8 @@ class CompilerEnv(gym.Env):
                     "Parent service of fork() has died, replaying state"
                 )
             self.reset()
-            self.apply(state_to_replay)
+            if self.actions:
+                self.apply(state_to_replay)
 
         request = ForkSessionRequest(session_id=self._session_id)
         reply: ForkSessionReply = self.service(self.service.stub.ForkSession, request)
