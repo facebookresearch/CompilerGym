@@ -12,9 +12,9 @@
 
 The benchmark to use can be specified using :code:`--benchmark=<name>`.
 
-^^^^^^^^^^^^^^^^^^^^^^^^^^
+**************************
 CompilerGym Shell Tutorial
-==========================
+**************************
 
 This program gives a basic shell through which many of commands from
 CompilerGym can be executed. CompilerGym provides a simple Python interface to
@@ -260,7 +260,9 @@ FLAGS = flags.FLAGS
 
 
 # Extract the tutorial from the doc string
-tutorial = __doc__.split("^^^^^^^^^^^^^^^^^^^^^^^^^^")[1]
+tutorial = "**************************".join(
+    __doc__.split("**************************")[1:]
+)
 
 
 class ActionHistoryElement:
