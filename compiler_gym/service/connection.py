@@ -124,14 +124,16 @@ else:
 class Connection(object):
     """Base class for service connections."""
 
-    def __init__(self, channel, url: str):
+    def __init__(self, channel, url: str, logger: logging.Logger):
         """Constructor. Don't instantiate this directly, use the subclasses.
 
         :param channel: The RPC channel to use.
         :param url: The URL of the RPC service.
+        :param logger: A logger instance that will be used for logging messages.
         """
         self.channel = channel
         self.url = url
+        self.logger = logger
         self.stub = CompilerGymServiceStub(self.channel)
         self.spaces: GetSpacesReply = self(self.stub.GetSpaces, GetSpacesRequest())
 
@@ -186,7 +188,7 @@ class Connection(object):
                         raise ServiceTransportError(
                             f"{self.url} {e.details()} ({max_retries} retries)"
                         ) from None
-                    logging.warning(
+                    self.logger.warning(
                         "%s %s (%d attempts remaining)",
                         self.url,
                         e.details(),
@@ -234,6 +236,7 @@ class ManagedConnection(Connection):
         port_init_max_seconds: float,
         rpc_init_max_seconds: float,
         process_exit_max_seconds: float,
+        logger: logging.Logger,
     ):
         """Constructor.
 
@@ -273,7 +276,7 @@ class ManagedConnection(Connection):
             if log_level:
                 cmd.append(f"-v={log_level}")
 
-        logging.debug("$ %s", " ".join(cmd))
+        logger.debug("$ %s", " ".join(cmd))
         self.process = subprocess.Popen(
             cmd,
             env=env,
@@ -320,7 +323,7 @@ class ManagedConnection(Connection):
                 channel_ready.result(timeout=wait_secs)
                 break
             except (grpc.FutureTimeoutError, grpc.RpcError) as e:
-                logging.debug("Connection attempt %d = %s", attempts, e)
+                logger.debug("Connection attempt %d = %s", attempts, e)
                 wait_secs *= 1.2
         else:
             self.process.kill()
@@ -332,7 +335,7 @@ class ManagedConnection(Connection):
                 f"({attempts} attempts made)"
             )
 
-        super().__init__(channel, url)
+        super().__init__(channel, url, logger)
 
     def close(self):
         """Terminate a local subprocess and close the connection."""
@@ -340,7 +343,7 @@ class ManagedConnection(Connection):
         try:
             self.process.communicate(timeout=self.process_exit_max_seconds)
         except subprocess.TimeoutExpired:
-            logging.warning("Abandoning orphan process at %s", self.working_dir)
+            self.logger.warning("Abandoning orphan process at %s", self.working_dir)
         shutil.rmtree(self.working_dir, ignore_errors=True)
         super().close()
 
@@ -352,7 +355,7 @@ class ManagedConnection(Connection):
 class UnmanagedConnection(Connection):
     """A connection to a service that is not managed by this process."""
 
-    def __init__(self, url: str, rpc_init_max_seconds: float):
+    def __init__(self, url: str, rpc_init_max_seconds: float, logger: logging.Logger):
         """Constructor.
 
         :param url: The URL of the service to connect to.
@@ -373,7 +376,7 @@ class UnmanagedConnection(Connection):
                 channel_ready.result(timeout=wait_secs)
                 break
             except (grpc.FutureTimeoutError, grpc.RpcError) as e:
-                logging.debug("Connection attempt %d = %s", attempts, e)
+                logger.debug("Connection attempt %d = %s", attempts, e)
                 wait_secs *= 1.2
         else:
             raise TimeoutError(
@@ -382,7 +385,7 @@ class UnmanagedConnection(Connection):
                 f"({attempts} attempts made)"
             )
 
-        super().__init__(channel, url)
+        super().__init__(channel, url, logger)
 
     def __repr__(self):
         return self.url
@@ -437,7 +440,12 @@ class CompilerGymServiceConnection(object):
         service.
     """
 
-    def __init__(self, endpoint: Union[str, Path], opts: ConnectionOpts = None):
+    def __init__(
+        self,
+        endpoint: Union[str, Path],
+        opts: ConnectionOpts = None,
+        logger: Optional[logging.Logger] = None,
+    ):
         """Constructor.
 
         :param endpoint: The connection endpoint. Either the URL of a service,
@@ -452,6 +460,7 @@ class CompilerGymServiceConnection(object):
         self.opts = opts or ConnectionOpts()
         self.connection = None
         self.stub = None
+        self.logger = logger or logging.getLogger("")
         self._establish_connection()
 
         self.action_spaces: List[ActionSpace] = list(
@@ -463,12 +472,15 @@ class CompilerGymServiceConnection(object):
 
     def _establish_connection(self) -> None:
         """Create and establish a connection."""
-        self.connection = self._create_connection(self.endpoint, self.opts)
+        self.connection = self._create_connection(self.endpoint, self.opts, self.logger)
         self.stub = self.connection.stub
 
     @classmethod
     def _create_connection(
-        cls, endpoint: Union[str, Path], opts: ConnectionOpts
+        cls,
+        endpoint: Union[str, Path],
+        opts: ConnectionOpts,
+        logger: logging.Logger,
     ) -> Connection:
         """Initialize the service connection, either by connecting to an RPC
         service or by starting a locally-managed subprocess.
@@ -499,11 +511,14 @@ class CompilerGymServiceConnection(object):
                         process_exit_max_seconds=opts.local_service_exit_max_seconds,
                         rpc_init_max_seconds=opts.rpc_init_max_seconds,
                         port_init_max_seconds=opts.local_service_port_init_max_seconds,
+                        logger=logger,
                     )
                 else:
                     endpoint_name = endpoint
                     return UnmanagedConnection(
-                        url=endpoint, rpc_init_max_seconds=opts.rpc_init_max_seconds
+                        url=endpoint,
+                        rpc_init_max_seconds=opts.rpc_init_max_seconds,
+                        logger=logger,
                     )
             except (TimeoutError, ServiceError, NotImplementedError) as e:
                 # Catch preventable errors so that we can retry:
@@ -512,7 +527,7 @@ class CompilerGymServiceConnection(object):
                 #   ServiceError: raised by an RPC method returning an error status.
                 #   NotImplementedError: raised if an RPC method is accessed before the RPC service
                 #       has initialized.
-                logging.warning("%s %s (attempt %d)", type(e).__name__, e, attempts)
+                logger.warning("%s %s (attempt %d)", type(e).__name__, e, attempts)
 
         raise TimeoutError(
             f"Failed to create connection to {endpoint_name} after "
