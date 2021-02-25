@@ -46,6 +46,29 @@ What features are going to be added in the future?
 See :ref:`roadmap <about:roadmap>`.
 
 
+Is compiler optimization really a sequential decision process?
+--------------------------------------------------------------
+
+Compilers frequently package individual transformations as "optimization passes"
+which are then applied in a sequential order. Usually this order is fixed (e.g.
+`realworld example
+<https://github.com/llvm/llvm-project/blob/71a8e4e7d6b947c8b954ec0763ff7969b3879d7b/llvm/lib/Transforms/IPO/PassManagerBuilder.cpp#L517-L922>`_).
+CompilerGym replaces that fixed order with a sequential decision process where
+any pass may be applied at any stage.
+
+
+When does a compiler enviornment consider an episode “done”?
+------------------------------------------------------------
+
+The compiler itself doesn't have a signal for termination. Actions are like
+rewrite rules, it is up to the user to decide when no more improvement can be
+achieved from further rewrites. E.g. for simple random search we can use
+`"patience"
+<https://github.com/facebookresearch/CompilerGym/blob/8fa65c232d2bf6a7347af44565579c60775162ac/compiler_gym/bin/random_search.py#L33-L40>`_.
+The only exception is if the compiler crashes, or the code ends up in an
+unexpected state - we have to abort. This happens.
+
+
 How do I run this on my own program?
 ------------------------------------
 
@@ -83,28 +106,12 @@ service codebase is located at :code:`compiler_gym/envs/$COMPILER/service`,
 where :code:`$COMPILER` is the name of the compiler service you would wish to
 modify, e.g. llvm. Once done, send us a pull request!
 
-I don't think compiler optimization is a sequential decision process. How is that enabled?
-------------------------------------------------------------------------------------------
 
-Compilers package individual optimizations as "passes" which are then applied
-in a sequential order. Usually the order inside a compiler is fixed (e.g.
-`take a look at how LLVM does it <https://github.com/llvm/llvm-project/blob/main/llvm/lib/Transforms/IPO/PassManagerBuilder.cpp#L517-L922>`_).
-CompilerGym replaces that fixed order with a sequential decision process where
-any compiler loop is allowed to be applied at any stage.
+Should I always try different actions?
+--------------------------------------
 
-I wonder when does CompilerGym consider an episode “done”?
-----------------------------------------------------------
-
-The compiler itself doesn't have a signal for termination. Optimizations are
-like rewrite rules, it is up to the user to decide when no more improvement
-can be achieved from further rewrites. E.g. for simple random search we can
-use "patience" `[1] <https://github.com/facebookresearch/CompilerGym/blob/development/compiler_gym/bin/random_search.py#L33-L40/>`_.
-The only exception is if the compiler crashes, or the code ends up in an
-unexpected state - we have to abort. This happens.
-
-Should I always try different actions, or repeating the same action multiple times can improve the results?
-----------------------------------------------------------------------------------------------------------
-
-Some actions such as dead code elminiation (-dce), are typically called multiple
-times after other optimization passes. So yes, repeating the same action in
-different context can bring improvements.
+Some optimization actions may be called multiple times after other actions. An
+example of this is `dead code elimination
+<https://en.wikipedia.org/wiki/Dead_code_elimination>`_, which can be used to
+"clean up mess" generated from a previous action. So repeating the same action
+in different context can bring improvements.
