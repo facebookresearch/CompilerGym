@@ -40,17 +40,17 @@ class ConnectionOpts(NamedTuple):
     rpc_call_max_seconds: float = 300
     """The maximum number of seconds to wait for an RPC method call to succeed."""
 
-    rpc_max_retries: int = 3
+    rpc_max_retries: int = 5
     """The maximum number of failed attempts to communicate with the RPC service
     before raising an error. Retries are made only for communication errors.
     Failures from other causes such as error signals raised by the service are
     not retried."""
 
-    retry_wait_seconds: float = 0.25
+    retry_wait_seconds: float = 0.1
     """The number of seconds to wait between successive attempts to communicate
     with the RPC service."""
 
-    retry_wait_backoff_exponent: float = 2
+    retry_wait_backoff_exponent: float = 1.5
     """The exponential backoff scaling between successive attempts to
     communicate with the RPC service."""
 
@@ -145,9 +145,9 @@ class Connection(object):
         stub_method: StubMethod,
         request: Request,
         timeout: float = 60,
-        max_retries=3,
-        retry_wait_seconds=0.25,
-        retry_wait_backoff_exponent=2,
+        max_retries=5,
+        retry_wait_seconds=0.1,
+        retry_wait_backoff_exponent=1.5,
     ) -> Reply:
         """Call the service with the given arguments."""
         # pylint: disable=no-member
