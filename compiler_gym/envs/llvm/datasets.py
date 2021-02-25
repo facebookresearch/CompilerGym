@@ -530,17 +530,18 @@ validator(
 )
 
 for i in range(1, 21):
-    validator(
-        benchmark="benchmark://cBench-v0/adpcm",
-        cmd=f"$BIN $D/telecom_data/{i}.adpcm",
-        data=[f"telecom_data/{i}.adpcm"],
-    )
+    # TODO(cummins): Investigate.
+    # validator(
+    #     benchmark="benchmark://cBench-v0/adpcm",
+    #     cmd=f"$BIN $D/telecom_data/{i}.adpcm",
+    #     data=[f"telecom_data/{i}.adpcm"],
+    # )
 
-    validator(
-        benchmark="benchmark://cBench-v0/adpcm",
-        cmd=f"$BIN $D/telecom_data/{i}.pcm",
-        data=[f"telecom_data/{i}.pcm"],
-    )
+    # validator(
+    #     benchmark="benchmark://cBench-v0/adpcm",
+    #     cmd=f"$BIN $D/telecom_data/{i}.pcm",
+    #     data=[f"telecom_data/{i}.pcm"],
+    # )
 
     validator(
         benchmark="benchmark://cBench-v0/blowfish",
