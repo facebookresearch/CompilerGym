@@ -485,13 +485,16 @@ class CompilerEnv(gym.Env):
         :return: A new environment instance.
         """
         if not self.in_episode:
-            state_to_replay = self.state
             if self.actions:
+                state_to_replay = self.state
                 self.logger.warning(
                     "Parent service of fork() has died, replaying state"
                 )
+            else:
+                state_to_replay = None
             self.reset()
-            self.apply(state_to_replay)
+            if state_to_replay:
+                self.apply(state_to_replay)
 
         request = ForkSessionRequest(session_id=self._session_id)
         reply: ForkSessionReply = self.service(self.service.stub.ForkSession, request)
