@@ -147,14 +147,14 @@ def make_action_sources(pass_iterator, outpath: Path):
         print("};", file=enum_f)
         print("  }", file=switch_f)
 
-    logging.debug("Generated", switch_path.name)
-    logging.debug("Generated", enum_path.name)
+    logging.debug("Generated %s", switch_path.name)
+    logging.debug("Generated %s", enum_path.name)
 
     with open(include_path, "w") as f:
         print("#pragma once", file=f)
         for header in sorted(headers):
             print(f'#include "{header}"', file=f)
-    logging.debug("Generated", include_path.name)
+    logging.debug("Generated %s", include_path.name)
 
     with open(actions_path, "w") as f:
         print(
@@ -164,17 +164,17 @@ def make_action_sources(pass_iterator, outpath: Path):
             ),
             file=f,
         )
-    logging.debug("Generated", actions_path.name)
+    logging.debug("Generated %s", actions_path.name)
 
     with open(flags_path, "w") as f:
         print("\n".join(p.flag for p in passes), file=f)
-    logging.debug("Generated", flags_path.name)
+    logging.debug("Generated %s", flags_path.name)
 
     with open(descriptions_path, "w") as f:
         print("\n".join(p.description for p in passes), file=f)
-    logging.debug("Generated", descriptions_path.name)
+    logging.debug("Generated %s", descriptions_path.name)
 
-    logging.debug(f"Created genfiles for {total_passes} pass actions")
+    logging.debug("Created genfiles for %s pass actions", total_passes)
 
 
 def main(argv):
