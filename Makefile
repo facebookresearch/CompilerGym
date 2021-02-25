@@ -134,8 +134,10 @@ DISTTOOLS_OUTS := dist build compiler_gym.egg-info
 LLVM_SERVICE_DIR := $(ROOT)/bazel-bin/package.runfiles/CompilerGym/compiler_gym/envs/llvm/service
 LLVM_POLLY_SO := $(ROOT)/bazel-bin/external/clang-llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04/lib/libLLVMPolly.so
 
-bazel-build:
+bazel-build-pkg:
 	$(BAZEL) $(BAZEL_OPTS) build $(BAZEL_BUILD_OPTS) //:package
+
+bazel-build: bazel-build-pkg
 ifeq ($(OS),Linux)
 	cp -f $(LLVM_POLLY_SO) $(LLVM_SERVICE_DIR)/libLLVMPolly.so
 	chmod 666 $(LLVM_SERVICE_DIR)/compiler_gym-llvm-service
@@ -155,7 +157,7 @@ bdist_wheel-linux:
 
 all: docs bdist_wheel bdist_wheel-linux
 
-.PHONY: bdist_wheel bdist_wheel-linux
+.PHONY: bazel-build-pkg bazel-build bdist_wheel bdist_wheel-linux
 
 #################
 # Documentation #
@@ -182,11 +184,11 @@ GENERATED_DOCS := \
 
 gendocs: $(GENERATED_DOCS)
 
-docs: gendocs install
-	$(MAKE) -C docs html
+docs: gendocs bazel-build
+	PYTHONPATH=$(ROOT)/bazel-bin/package.runfiles/CompilerGym $(MAKE) -C docs html
 
 livedocs: gendocs
-	$(MAKE) -C docs livehtml
+	PYTHONPATH=$(ROOT)/bazel-bin/package.runfiles/CompilerGym $(MAKE) -C docs livehtml
 
 
 ###########
