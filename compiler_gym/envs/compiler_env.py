@@ -87,6 +87,10 @@ class CompilerEnv(gym.Env):
     :ivar service: A connection to the underlying compiler service.
     :vartype service: compiler_gym.service.CompilerGymServiceConnection
 
+    :ivar logger: A Logger instance used by the environment for communicating
+    info and warnings.
+    :vartype logger: logging.Logger
+
     :ivar action_spaces: A list of supported action space names.
     :vartype action_spaces: List[str]
 
@@ -113,6 +117,7 @@ class CompilerEnv(gym.Env):
     :ivar episode_reward: If
         :func:`CompilerEnv.reward_space <compiler_gym.envs.CompilerGym.reward_space>`
         is set, this value is the sum of all rewards for the current episode.
+    :vartype episode_reward: float
     """
 
     def __init__(
@@ -125,6 +130,7 @@ class CompilerEnv(gym.Env):
         action_space: Optional[str] = None,
         connection_settings: Optional[ConnectionOpts] = None,
         service_connection: Optional[CompilerGymServiceConnection] = None,
+        logging_level: int = logging.ERROR,
     ):
         """Construct and initialize a CompilerGym service environment.
 
@@ -163,6 +169,9 @@ class CompilerEnv(gym.Env):
             with the remote service.
         :param service_connection: An existing compiler gym service connection
             to use.
+        :param logging_level: The integer logging level to use for the
+            :code:`env.logger` logger. By default, only errors are logged
+            (:code:`logging.ERROR`).
         :raises FileNotFoundError: If service is a path to a file that is not
             found.
         :raises TimeoutError: If the compiler service fails to initialize
@@ -171,6 +180,10 @@ class CompilerEnv(gym.Env):
         rewards = rewards or []
 
         self.metadata = {"render.modes": ["human", "ansi"]}
+
+        # Set up logging.
+        self.logger = logging.getLogger("compiler_gym.envs")
+        self.logger.setLevel(logging_level)
 
         # A compiler service supports multiple simultaneous environments. This
         # session ID is used to identify this environment.
@@ -194,7 +207,9 @@ class CompilerEnv(gym.Env):
         self.action_space_name = action_space
 
         self.service = service_connection or CompilerGymServiceConnection(
-            self._service_endpoint, self._connection_settings
+            endpoint=self._service_endpoint,
+            opts=self._connection_settings,
+            logger=self.logger,
         )
 
         # Process the available action, observation, and reward spaces.
@@ -472,7 +487,9 @@ class CompilerEnv(gym.Env):
         if not self.in_episode:
             state_to_replay = self.state
             if self.actions:
-                logging.warning("Parent service of fork() has died, replaying state")
+                self.logger.warning(
+                    "Parent service of fork() has died, replaying state"
+                )
             self.reset()
             self.apply(state_to_replay)
 
