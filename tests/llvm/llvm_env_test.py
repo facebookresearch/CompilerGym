@@ -3,8 +3,8 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Integrations tests for the LLVM CompilerGym environments."""
-from pathlib import Path
 from enum import Enum
+from pathlib import Path
 from typing import List
 
 import gym

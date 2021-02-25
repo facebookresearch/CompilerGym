@@ -89,12 +89,31 @@ cc_library(
 )
 
 cc_library(
-    name = "LlvmEnvironment",
+    name = "LlvmService",
+    srcs = ["LlvmService.cc"],
+    hdrs = ["LlvmService.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":Benchmark",
+        ":BenchmarkFactory",
+        ":Cost",
+        ":LlvmSession",
+        ":ObservationSpaces",
+        "//compiler_gym/service/proto:compiler_gym_service_cc",
+        "//compiler_gym/util:GrpcStatusMacros",
+        "//compiler_gym/util:Version",
+        "@boost//:filesystem",
+        "@llvm//10.0.0",
+    ],
+)
+
+cc_library(
+    name = "LlvmSession",
     srcs = [
-        "LlvmEnvironment.cc",
+        "LlvmSession.cc",
     ],
     hdrs = [
-        "LlvmEnvironment.h",
+        "LlvmSession.h",
         "//compiler_gym/envs/llvm/service/passes:ActionHeaders.h",
         "//compiler_gym/envs/llvm/service/passes:ActionSwitch.h",
     ],
@@ -127,24 +146,6 @@ cc_library(
         "@programl//programl/ir/llvm",
         "@programl//programl/proto:programl_cc",
         "@subprocess",
-    ],
-)
-
-cc_library(
-    name = "LlvmService",
-    srcs = ["LlvmService.cc"],
-    hdrs = ["LlvmService.h"],
-    deps = [
-        ":Benchmark",
-        ":BenchmarkFactory",
-        ":Cost",
-        ":LlvmEnvironment",
-        ":ObservationSpaces",
-        "//compiler_gym/service/proto:compiler_gym_service_cc",
-        "//compiler_gym/util:GrpcStatusMacros",
-        "//compiler_gym/util:Version",
-        "@boost//:filesystem",
-        "@llvm//10.0.0",
     ],
 )
 

@@ -4,9 +4,11 @@
 # LICENSE file in the root directory of this source tree.
 """This module defines the OpenAI gym interface for compilers."""
 import csv
+import logging
 import os
 import sys
 import warnings
+from copy import deepcopy
 from io import StringIO
 from pathlib import Path
 from time import time
@@ -29,11 +31,14 @@ from compiler_gym.service import (
 from compiler_gym.service.proto import (
     AddBenchmarkRequest,
     Benchmark,
-    EndEpisodeRequest,
+    EndSessionReply,
+    EndSessionRequest,
+    ForkSessionReply,
+    ForkSessionRequest,
     GetBenchmarksRequest,
     GetVersionReply,
     GetVersionRequest,
-    StartEpisodeRequest,
+    StartSessionRequest,
     StepRequest,
 )
 from compiler_gym.spaces import NamedDiscrete, Reward
@@ -79,12 +84,21 @@ class CompilerEnvState(NamedTuple):
         """
         return _to_csv("benchmark", "reward", "walltime", "commandline")
 
+    def json(self):
+        """Return the state as JSON."""
+        return self._asdict()
+
     def to_csv(self) -> str:
         """Serialize a state to a comma separated list of values.
 
         :return: A comma-separated string.
         """
         return _to_csv(self.benchmark, self.reward, self.walltime, self.commandline)
+
+    @classmethod
+    def from_json(cls, data: Dict[str, Any]) -> "CompilerEnvState":
+        """Construct a state from a JSON dictionary."""
+        return cls(**data)
 
     @classmethod
     def from_csv(cls, csv_string: str) -> "CompilerEnvState":
@@ -104,6 +118,16 @@ class CompilerEnvState(NamedTuple):
             walltime=float(walltime),
             commandline=commandline,
         )
+
+    def apply(self, env: "CompilerEnv") -> None:
+        """Replay the sequence of actions given by a commandline."""
+        actions = env.commandline_to_actions(self.commandline)
+        for action in actions:
+            _, _, done, info = env.step(action)
+            if done:
+                raise OSError(
+                    f"Environment terminated with error: `{info.get('error_details')}`"
+                )
 
     def __eq__(self, rhs) -> bool:
         if not isinstance(rhs, CompilerEnvState):
@@ -199,6 +223,7 @@ class CompilerEnv(gym.Env):
         reward_space: Optional[Union[str, Reward]] = None,
         action_space: Optional[str] = None,
         connection_settings: Optional[ConnectionOpts] = None,
+        service_connection: Optional[CompilerGymServiceConnection] = None,
     ):
         """Construct and initialize a CompilerGym service environment.
 
@@ -235,6 +260,8 @@ class CompilerEnv(gym.Env):
             specified, the default action space for this compiler is used.
         :param connection_settings: The settings used to establish a connection
             with the remote service.
+        :param service_connection: An existing compiler gym service connection
+            to use.
         :raises FileNotFoundError: If service is a path to a file that is not
             found.
         :raises TimeoutError: If the compiler service fails to initialize
@@ -265,7 +292,7 @@ class CompilerEnv(gym.Env):
 
         self.action_space_name = action_space
 
-        self.service = CompilerGymServiceConnection(
+        self.service = service_connection or CompilerGymServiceConnection(
             self._service_endpoint, self._connection_settings
         )
 
@@ -289,6 +316,7 @@ class CompilerEnv(gym.Env):
         self.reward_range: Tuple[float, float] = (-np.inf, np.inf)
         self.episode_reward: Optional[float] = None
         self.episode_start_time: float = time()
+        self.actions: List[int] = []
 
         # Initialize the default observation/reward spaces.
         self._default_observation_space: Optional[ObservationSpaceSpec] = None
@@ -316,14 +344,38 @@ class CompilerEnv(gym.Env):
         return self.versions.compiler_version
 
     def commandline(self) -> str:
-        """Return the current state as a commandline invocation.
+        """Interface for :class:`CompilerEnv` subclasses to provide an equivalent
+        commandline invocation to the current environment state.
+
+        See also
+        :meth:`commandline_to_actions() <compiler_gym.envs.CompilerEnv.commandline_to_actions>`.
+
+        Calling this method on a :class:`CompilerEnv` instance raises
+        :code:`NotImplementedError`.
 
         :return: A string commandline invocation.
         """
-        return ""
+        raise NotImplementedError("abstract method")
+
+    def commandline_to_actions(self, commandline: str) -> List[int]:
+        """Interface for :class:`CompilerEnv` subclasses to convert from a
+        commandline invocation to a sequence of actions.
+
+        See also
+        :meth:`commandline() <compiler_gym.envs.CompilerEnv.commandline>`.
+
+        Calling this method on a :class:`CompilerEnv` instance raises
+        :code:`NotImplementedError`.
+
+        :return: A list of actions.
+        """
+        raise NotImplementedError("abstract method")
 
     @property
     def episode_walltime(self) -> float:
+        """Return the amount of time in seconds since the last call to
+        :meth:`reset() <compiler_env.envs.CompilerEnv.reset>`.
+        """
         return time() - self.episode_start_time
 
     @property
@@ -492,23 +544,107 @@ class CompilerEnv(gym.Env):
                 observation_space_name
             ]
 
+    def fork(self) -> "CompilerEnv":
+        """Fork a new environment with exactly the same state.
+
+        This creates a duplicate environment instance with the current state.
+        The new environment is entirely independently of the source environment.
+        The user must call :meth:`close() <compiler_gym.envs.CompilerEnv.close>`
+        on the original and new environments.
+
+        :meth:`reset() <compiler_gym.envs.CompilerEnv.reset>` must be called
+        before :code:`fork()`.
+
+        Example usage:
+
+        >>> env = gym.make("llvm-v0")
+        >>> env.reset()
+        # ... use env
+        >>> new_env = env.fork()
+        >>> new_env.state == env.state
+        True
+        >>> new_env.step(1) == env.step(1)
+        True
+
+        :return: A new environment instance.
+        """
+        if not self.in_episode:
+            state_to_replay = self.state
+            if self.actions:
+                logging.warning("Parent service of fork() has died, replaying state")
+            self.reset()
+            state_to_replay.apply(self)
+
+        request = ForkSessionRequest(session_id=self._session_id)
+        reply: ForkSessionReply = self.service(self.service.stub.ForkSession, request)
+
+        # Create a new environment that shares the connection.
+        new_env = type(self)(
+            service=self._service_endpoint,
+            action_space=self.action_space,
+            connection_settings=self._connection_settings,
+            service_connection=self.service,
+        )
+
+        # Set the session ID.
+        new_env._session_id = reply.session_id
+        new_env.observation.session_id = reply.session_id
+
+        # Re-register any custom benchmarks with the new environment.
+        if self._custom_benchmarks:
+            new_env._add_custom_benchmarks(
+                list(self._custom_benchmarks.values()).copy()
+            )
+
+        # Now that we have initialized the environment with the current state,
+        # set the benchmark so that calls to new_env.reset() will correctly
+        # revert the environment to the initial benchmark state.
+        new_env._user_specified_benchmark_uri = self.benchmark
+        # Set the "visible" name of the current benchmark to hide the fact that
+        # we loaded from a custom bitcode file.
+        new_env._benchmark_in_use_uri = self.benchmark
+
+        # Create copies of the mutable reward and observation spaces. This
+        # is required to correctly calculate incremental updates.
+        new_env.reward.spaces = deepcopy(self.reward.spaces)
+        new_env.observation.spaces = deepcopy(self.observation.spaces)
+
+        # Set the default observation and reward types. Note the use of IDs here
+        # to prevent passing the spaces by reference.
+        if self.observation_space:
+            new_env.observation_space = self.observation_space.id
+        if self.reward_space:
+            new_env.reward_space = self.reward_space.id
+
+        # Copy over the mutable episode state.
+        new_env.episode_reward = self.episode_reward
+        new_env.episode_start_time = self.episode_start_time
+        new_env.actions = self.actions.copy()
+
+        return new_env
+
     def close(self):
         """Close the environment.
 
         Once closed, :func:`reset` must be called before the environment is used
         again."""
         # Try and close out the episode, but errors are okay.
+        close_service = True
         if self.in_episode:
             try:
-                self.service(
-                    self.service.stub.EndEpisode,
-                    EndEpisodeRequest(session_id=self._session_id),
+                reply: EndSessionReply = self.service(
+                    self.service.stub.EndSession,
+                    EndSessionRequest(session_id=self._session_id),
                 )
+                # The service still has other sessions attached so we should
+                # not kill it.
+                if reply.remaining_sessions:
+                    close_service = False
             except:  # noqa Don't feel bad, computer, you tried ;-)
                 pass
             self._session_id = None
 
-        if self.service:
+        if self.service and close_service:
             self.service.close()
 
         self.service = None
@@ -558,8 +694,8 @@ class CompilerEnv(gym.Env):
         # Stop an existing episode.
         if self.in_episode:
             self.service(
-                self.service.stub.EndEpisode,
-                EndEpisodeRequest(session_id=self._session_id),
+                self.service.stub.EndSession,
+                EndSessionRequest(session_id=self._session_id),
             )
             self._session_id = None
 
@@ -570,8 +706,8 @@ class CompilerEnv(gym.Env):
 
         try:
             reply = self.service(
-                self.service.stub.StartEpisode,
-                StartEpisodeRequest(
+                self.service.stub.StartSession,
+                StartSessionRequest(
                     benchmark=self._user_specified_benchmark_uri,
                     action_space=(
                         [a.name for a in self.action_spaces].index(
@@ -597,6 +733,7 @@ class CompilerEnv(gym.Env):
         self.observation.session_id = reply.session_id
         self.reward.get_cost = self.observation.__getitem__
         self.episode_start_time = time()
+        self.actions = []
 
         # If the action space has changed, update it.
         if reply.HasField("new_action_space"):
@@ -638,6 +775,9 @@ class CompilerEnv(gym.Env):
                 for obs in self.reward_space.observation_spaces
             ]
             observation_spaces += self.reward_space.observation_spaces
+
+        # Record the action.
+        self.actions.append(action)
 
         # Send the request to the backend service.
         request = StepRequest(
@@ -688,7 +828,7 @@ class CompilerEnv(gym.Env):
             "new_action_space": reply.HasField("new_action_space"),
         }
 
-        return observation, reward, reply.end_of_episode, info
+        return observation, reward, reply.end_of_session, info
 
     def render(
         self,

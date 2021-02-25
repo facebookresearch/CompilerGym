@@ -13,6 +13,7 @@ import tarfile
 import tempfile
 from collections import Counter, defaultdict
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from multiprocessing import cpu_count
 from pathlib import Path
 from typing import Callable, Dict, List, NamedTuple, Optional
 
@@ -209,17 +210,17 @@ def _compile_and_run_bitcode_file(
         "USER": os.environ.get("USER", ""),
     }
 
-    process = subprocess.Popen(
-        cmd,
-        shell=True,
-        stderr=subprocess.STDOUT,
-        stdout=subprocess.PIPE,
-        env=env,
-        cwd=cwd,
-    )
-
     try:
         with Timer() as timer:
+            process = subprocess.Popen(
+                cmd,
+                shell=True,
+                stderr=subprocess.STDOUT,
+                stdout=subprocess.PIPE,
+                env=env,
+                cwd=cwd,
+            )
+
             stdout, _ = process.communicate(timeout=timeout_seconds)
     except subprocess.TimeoutExpired:
         process.kill()
@@ -377,7 +378,7 @@ def _make_cBench_validator(
                     try:
                         stdout = stdout.decode("utf-8")
                         if stdout.startswith("Binary files "):
-                            return f"Benchmark output file '{path.name}' differs from (binary diff)"
+                            return f"Benchmark output file '{path.name}' differs from expected (binary diff)"
                         else:
                             return f"Benchmark output file '{path.name}' differs from expected: {stdout}"
                     except UnicodeDecodeError:
@@ -466,7 +467,7 @@ def get_llvm_benchmark_validation_callback(
 
         # Validation callbacks are read-only on the environment so it is
         # safe to run validators simultaneously in parallel threads.
-        with ThreadPoolExecutor() as executor:
+        with ThreadPoolExecutor(max_workers=cpu_count()) as executor:
             futures = (executor.submit(validator, env) for validator in validators)
             results = (future.result() for future in as_completed(futures))
             errors = [result for result in results if result is not None]
@@ -486,8 +487,8 @@ def get_llvm_benchmark_validation_callback(
                     f"Failed {len(errors)} of {len(validators)} validators: "
                     + "\n".join(msg)
                 )
-            else:
-                return None
+
+            return None
 
     return composed
 

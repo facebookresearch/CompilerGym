@@ -6,14 +6,13 @@
 import hashlib
 import os
 import shutil
-import tempfile
 from pathlib import Path
 from typing import Iterable, List, Optional, Union, cast
 
 import numpy as np
 from gym.spaces import Dict as DictSpace
 
-from compiler_gym.envs.compiler_env import CompilerEnv, step_t
+from compiler_gym.envs.compiler_env import CompilerEnv
 from compiler_gym.envs.llvm.benchmarks import make_benchmark
 from compiler_gym.envs.llvm.datasets import LLVM_DATASETS
 from compiler_gym.envs.llvm.llvm_rewards import (
@@ -150,7 +149,6 @@ class LlvmEnv(CompilerEnv):
                 ),
             ],
         )
-        self.actions: List[int] = []
         self.datasets_site_path = site_data_path("llvm/10.0.0/bitcode_benchmarks")
 
         # Register the LLVM datasets.
@@ -228,14 +226,6 @@ class LlvmEnv(CompilerEnv):
         """Alias to :func:`llvm.make_benchmark() <compiler_gym.envs.llvm.make_benchmark>`."""
         return make_benchmark(*args, **kwargs)
 
-    def step(self, action: int) -> step_t:
-        self.actions.append(action)
-        return super().step(action)
-
-    def reset(self, *args, **kwargs):
-        self.actions = []
-        return super().reset(*args, **kwargs)
-
     def _make_action_space(self, name: str, entries: List[str]) -> Commandline:
         flags = [
             CommandlineFlag(
@@ -278,67 +268,6 @@ class LlvmEnv(CompilerEnv):
             raise ValueError(f"Invalid commandline: `{commandline}`")
         return self.action_space.from_commandline(commandline)
 
-    def fork(self) -> "LlvmEnv":
-        """Fork a new environment with exactly the same sate.
-
-        This creates a duplicate environment instance with the current state.
-        The new environment is entirely independently of the source
-        episode and must be managed and
-        :meth:`closed() <compiler_gym.envs.CompilerEnv.close>` by the user.
-
-        Example usage:
-
-        >>> env = gym.make("llvm-v0")
-        # ... use env
-        >>> new_env = env.fork()
-        >>> new_env.actions == env.actions
-        True
-
-        :return: A new environment instance.
-        """
-        # Create a new environment using the same base settings as the current
-        # environment.
-        new_env = LlvmEnv(
-            service=self._service_endpoint,
-            observation_space=self.observation_space,
-            reward_space=self.reward_space,
-            action_space=self.action_space,
-            connection_settings=self._connection_settings,
-        )
-
-        # Serialize the current program state to a bitcode file and use this to
-        # initialize the state of the new environment.
-        with tempfile.TemporaryDirectory(dir=self.service.connection.working_dir) as d:
-            bitcode_file = Path(d) / "benchmark.bc"
-            self.write_bitcode(bitcode_file)
-            benchmark = new_env.make_benchmark(bitcode_file)
-            new_env.reset(benchmark=benchmark)
-
-            # This "custom benchmark" is only needed for initialization and
-            # must be deleted. Otherwise calling new_env.fork() will try and
-            # copy this file.
-            del new_env._custom_benchmarks[benchmark.uri]
-
-        # Copy over the mutable episode state.
-        new_env.actions = self.actions.copy()
-        new_env.episode_reward = self.episode_reward
-
-        # Now that we have initialized the environment with the current state,
-        # set the benchmark so that calls to new_env.reset() will correctly
-        # revert the environment to the initial benchmark state.
-        new_env._user_specified_benchmark_uri = self.benchmark
-        # Set the "visible" name of the current benchmark to hide the fact that
-        # we loaded from a custom bitcode file.
-        new_env._benchmark_in_use_uri = self.benchmark
-
-        # Re-register any custom benchmarks with the new environment.
-        if self._custom_benchmarks:
-            new_env._add_custom_benchmarks(
-                list(self._custom_benchmarks.values()).copy()
-            )
-
-        return new_env
-
     @property
     def ir(self) -> str:
         """Print the LLVM-IR of the program in its current state.
@@ -351,7 +280,12 @@ class LlvmEnv(CompilerEnv):
 
     @property
     def ir_sha1(self) -> str:
-        """Return the 40-characeter hex sha1 checksum of the current IR."""
+        """Return the 40-characeter hex sha1 checksum of the current IR.
+
+        Equivalent to: :code:`hashlib.sha1(env.ir.encode("utf-8")).hexdigest()`.
+
+        :return: A 40-character hexademical sha1 string.
+        """
         # TODO(cummins): Compute this on the service-side and add it as an
         # observation space.
         return hashlib.sha1(self.ir.encode("utf-8")).hexdigest()

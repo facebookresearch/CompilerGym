@@ -44,15 +44,9 @@ class ValidationResult(NamedTuple):
     error_details: str = ""
     """A description of any validation errors."""
 
-    @property
-    def success(self) -> bool:
+    def okay(self) -> bool:
         """Whether validation succeeded."""
-        return not self.failed
-
-    @property
-    def failed(self) -> bool:
-        """Whether validation failed."""
-        return (
+        return not (
             self.actions_replay_failed
             or self.reward_validation_failed
             or self.benchmark_semantics_validation_failed
@@ -62,7 +56,7 @@ class ValidationResult(NamedTuple):
         # Remove default-protocol prefix to improve output readability.
         benchmark = re.sub(r"^benchmark://", "", self.state.benchmark)
 
-        if self.failed:
+        if not self.okay():
             msg = ", ".join(self.error_details.strip().split("\n"))
             return f"❌  {benchmark}  {msg}"
         elif self.state.reward is None:
@@ -70,17 +64,10 @@ class ValidationResult(NamedTuple):
         else:
             return f"✅  {benchmark}  {self.state.reward:.4f}"
 
-
-def _llvm_replay_commandline(env: LlvmEnv, commandline: str) -> Optional[float]:
-    """Replay the sequence of actions given by a commandline."""
-    actions = env.commandline_to_actions(commandline)
-    for action in actions:
-        _, _, done, info = env.step(action)
-        if done:
-            raise OSError(
-                f"Environment terminated with error: `{info.get('error_details')}`"
-            )
-    return env.episode_reward
+    def json(self):
+        data = self._asdict()
+        data["state"] = self.state.json()
+        return data
 
 
 def validate_state(env: CompilerEnv, state: CompilerEnvState) -> ValidationResult:
@@ -109,7 +96,8 @@ def validate_state(env: CompilerEnv, state: CompilerEnvState) -> ValidationResul
         # validation process in case a step fails.
         while True:
             try:
-                reward = _llvm_replay_commandline(env, state.commandline)
+                state.apply(env)
+                reward = env.episode_reward
             except (ValueError, OSError) as e:
                 validation["actions_replay_failed"] = True
                 error_messages.append(str(e))
@@ -183,7 +171,13 @@ def validate_states(
         env.close()
 
     with multiprocessing.Pool(processes=nproc) as pool:
-        map_func = pool.imap if inorder else pool.imap_unordered
+        if nproc == 1:
+            map_func = map
+        elif inorder:
+            map_func = pool.imap
+        else:
+            map_func = pool.imap_unordered
+
         yield from map_func(
             _validate_states_worker, [(reward_space_name, r) for r in states]
         )

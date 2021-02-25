@@ -61,13 +61,13 @@ def test_reward_spaces(env: CompilerEnv):
     assert env.reward.spaces.keys() == {"codesize"}
 
 
-def test_step_before_startEpisode(env: CompilerEnv):
+def test_step_before_reset(env: CompilerEnv):
     """Taking a step() before reset() is illegal."""
     with pytest.raises(Exception):
         env.step(0)
 
 
-def test_observation_before_startEpisode(env: CompilerEnv):
+def test_observation_before_reset(env: CompilerEnv):
     """Taking an observation before reset() is illegal."""
     with pytest.raises(ValueError) as ctx:
         _ = env.observation["ir"]

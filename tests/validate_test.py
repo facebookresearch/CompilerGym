@@ -23,8 +23,7 @@ def test_validate_state_no_reward():
     finally:
         env.close()
 
-    assert result.success
-    assert not result.failed
+    assert result.okay()
     assert not result.reward_validated
     assert str(result) == "✅  cBench-v0/crc32"
 
@@ -43,8 +42,7 @@ def test_validate_state_with_reward():
     finally:
         env.close()
 
-    assert result.success
-    assert not result.failed
+    assert result.okay()
     assert result.reward_validated
     assert not result.reward_validation_failed
     assert str(result) == "✅  cBench-v0/crc32  0.0000"
@@ -64,8 +62,7 @@ def test_validate_state_invalid_reward():
     finally:
         env.close()
 
-    assert not result.success
-    assert result.failed
+    assert not result.okay()
     assert result.reward_validated
     assert result.reward_validation_failed
     assert (
@@ -86,7 +83,7 @@ def test_validate_states_lambda_callback():
         )
     )
     assert len(results) == 1
-    assert results[0].success
+    assert results[0].okay()
 
 
 if __name__ == "__main__":

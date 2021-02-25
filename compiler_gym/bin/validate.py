@@ -58,6 +58,7 @@ Else if validation fails, the output is:
     ❌  <benchmark_name>  <error_details>
 """
 import csv
+import json
 import re
 import sys
 from typing import Iterator
@@ -67,12 +68,11 @@ from absl import app, flags
 
 import compiler_gym.util.flags.dataset  # noqa Flag definition.
 import compiler_gym.util.flags.nproc  # noqa Flag definition.
-from compiler_gym import ValidationResult
 from compiler_gym.envs.compiler_env import CompilerEnvState
 from compiler_gym.util.flags.env_from_flags import env_from_flags
 from compiler_gym.util.shell_format import emph
 from compiler_gym.util.statistics import geometric_mean
-from compiler_gym.validate import validate_states
+from compiler_gym.validate import ValidationResult, validate_states
 
 flags.DEFINE_boolean(
     "inorder",
@@ -96,6 +96,11 @@ flags.DEFINE_boolean(
     "summary_only",
     False,
     "Do not print individual validation results, print only the summary at the " "end.",
+)
+flags.DEFINE_string(
+    "validation_logfile",
+    "validation.log.json",
+    "The path of a file to write a JSON validation log to.",
 )
 FLAGS = flags.FLAGS
 
@@ -122,7 +127,7 @@ def to_string(result: ValidationResult, name_col_width: int) -> str:
     """Format a validation result for printing."""
     name = state_name(result.state)
 
-    if result.failed:
+    if not result.okay():
         msg = ", ".join(result.error_details.strip().split("\n"))
         return f"❌  {name}  {msg}"
     elif result.state.reward is None:
@@ -237,24 +242,36 @@ def main(argv):
 
     def progress_message(i):
         intermediate_print(
-            f"{len(states) - i} remaining {plural(len(states) - i, 'state', 'states')} to validate ... ",
+            f"{i} remaining {plural(i, 'state', 'states')} to validate ... ",
             end="",
             flush=True,
         )
 
     progress_message(0)
+    json_log = []
+
+    def dump_json_log():
+        with open(FLAGS.validation_logfile, "w") as f:
+            json.dump(json_log, f)
+
     for i, result in enumerate(validation_results, start=1):
         intermediate_print("\r\033[K", to_string(result, name_col_width), sep="")
         progress_message(len(states) - i)
+        json_log.append(result.json())
 
-        if result.failed:
+        if not result.okay():
             error_count += 1
         elif result.reward_validated and not result.reward_validation_failed:
             rewards.append(result.state.reward)
             walltimes.append(result.state.walltime)
 
+        if not i % 10:
+            dump_json_log()
+
+    dump_json_log()
+
     # Print a summary footer.
-    intermediate_print("----", "-" * name_col_width, "-----------", sep="")
+    intermediate_print("\r\033[K----", "-" * name_col_width, "-----------", sep="")
     print(f"Number of validated results: {emph(len(walltimes))} of {len(states)}")
     walltime_mean = f"{arithmetic_mean(walltimes):.3f}s"
     walltime_std = f"{stdev(walltimes):.3f}s"

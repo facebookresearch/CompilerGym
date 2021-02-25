@@ -15,19 +15,29 @@ option java_outer_classname = "CompilerGymServiceProto";
 option java_package = "com.compiler_gym";
 
 service CompilerGymService {
+  // Request version strings from the service.
   rpc GetVersion(GetVersionRequest) returns (GetVersionReply);
-  // Start a CompilerGym service episode. Must be called after Init().
-  rpc StartEpisode(StartEpisodeRequest) returns (StartEpisodeReply);
-  // Apply a list of optimization decisions and compute a list of observations.
-  // Optimization decisions are selected from the last set of valid actions
-  // ActionSpace returned by a call to GetSpaces() or Step(). Valid observations
-  // are queried using GetSpaces().
-  rpc Step(StepRequest) returns (StepReply);
-  // End a CompilerGym service episode. Must be called after StartEpisode().
-  rpc EndEpisode(EndEpisodeRequest) returns (EndEpisodeReply);
-  // Request the supported service spaces. The service responds with an initial
-  // action space, and a list of available observation and reward spaces.
+  // Request the action and observation spaces that this service supports. The
+  // service responds with an initial action space, and a list of available
+  // observation and reward spaces.
   rpc GetSpaces(GetSpacesRequest) returns (GetSpacesReply);
+  // Start a new CompilerGym service session. This allocates a new session on
+  // the service and returns a session ID. To terminate the session, call
+  // EndSession() once done.
+  rpc StartSession(StartSessionRequest) returns (StartSessionReply);
+  // Fork a session. This creates a new session in exactly the same state. The
+  // new session must be terminated with EndSession() once done. This returns
+  // an error if the session to fork does not exist.
+  rpc ForkSession(ForkSessionRequest) returns (ForkSessionReply);
+  // End a CompilerGym service session. If the requested session does not exist,
+  // this returns an error.
+  rpc EndSession(EndSessionRequest) returns (EndSessionReply);
+  // Apply a list of optimization decisions and compute a list of observations
+  // for a session. Optimization decisions are selected from the last
+  // ActionSpace returned by a call to GetSpaces() or Step(). Valid observations
+  // are queried using GetSpaces(). This returns an error if the requested
+  // session does not exist.
+  rpc Step(StepRequest) returns (StepReply);
   // Enumerate the list of available benchmarks.
   rpc GetBenchmarks(GetBenchmarksRequest) returns (GetBenchmarksReply);
   // Register a new benchmark.
@@ -47,25 +57,25 @@ message GetVersionReply {
 }
 
 // ===========================================================================
-// StartEpisode().
+// StartSession().
 
-message StartEpisodeRequest {
-  // The name of the benchmark to use for this episode. If not
-  // provided, a benchmark is chosen randomly by the service.
+message StartSessionRequest {
+  // The name of the benchmark to use for this session. If not provided, a
+  // benchmark is chosen randomly by the service.
   string benchmark = 1;
   // An index into the GetSpacesReply.action_space_list selecting the action
-  // space that is to be used for this episode. Once set, the action space
-  // cannot be changed for the duration of the episode.
+  // space that is to be used for this session. Once set, the action space
+  // cannot be changed for the duration of the session.
   int32 action_space = 2;
 }
 
-message StartEpisodeReply {
-  // The ID that has been assigned to the episode. The client must use this ID
-  // in all subsequent interactions with the service for this episode.
+message StartSessionReply {
+  // The ID that has been assigned to the session. The client must use this ID
+  // in all subsequent interactions with the service for this session.
   int64 session_id = 1;
   // The name of the benchmark.
   string benchmark = 2;
-  // A new action space. This is set only if, after initializing the episode,
+  // A new action space. This is set only if, after initializing the session,
   // the action space has changed from the default action space returned by
   // GetSpaces(). If set, the environment should discard the previous action
   // space and replace it with this one. Else, the action space remains
@@ -87,12 +97,12 @@ message StepRequest {
 }
 
 message StepReply {
-  // Indicates that the episode has ended. This could be because there are no
+  // Indicates that the session has ended. This could be because there are no
   // further actions that can be made, or because the action has led to an
   // invalid state. Once this field has been set, you should make no further
   // calls to step(). However, you mays still request reward and new
   // observations.
-  bool end_of_episode = 1;
+  bool end_of_session = 1;
   // A service may set this field to true if the action is known not to have
   // any effect. This allows an agent to assume that observations or rewards
   // computed before this action remain valid, providing that they are
@@ -118,8 +128,6 @@ message ActionSpace {
   // extensible representation that supports parameterized actions, and actions
   // of different types (e.g. optimization passes vs optimization contexts).
   repeated string action = 2;
-  // TODO:
-  repeated int32 observation_space = 3;
 }
 
 // ===========================================================================
@@ -197,14 +205,30 @@ message ObservationSpace {
 }
 
 // ===========================================================================
-// EndEpisode().
+// Fork().
 
-message EndEpisodeRequest {
+message ForkSessionRequest {
+  // The ID of the session to fork.
+  int64 session_id = 1;
+}
+
+message ForkSessionReply {
+  // The ID of the newly created session.
+  int64 session_id = 1;
+}
+
+// ===========================================================================
+// EndSession().
+
+message EndSessionRequest {
   // The ID of the session.
   int64 session_id = 1;
 }
 
-message EndEpisodeReply {}
+message EndSessionReply {
+  // The number of sessions that the service currently has.
+  int32 remaining_sessions = 1;
+}
 
 // ===========================================================================
 // GetSpaces().

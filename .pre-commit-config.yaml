@@ -31,7 +31,7 @@
 #
 repos:
     - repo: https://github.com/pre-commit/pre-commit-hooks
-      rev: v2.3.0
+      rev: v3.4.0
       hooks:
           - id: check-added-large-files
             args: [--maxkb=10000]
@@ -46,39 +46,39 @@ repos:
           - id: requirements-txt-fixer
           - id: trailing-whitespace
     - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
-      rev: master
+      rev: 0.1.0
       hooks:
           - id: yamlfmt
     - repo: https://github.com/timothycrosley/isort
-      rev: master
+      rev: 5.7.0
       hooks:
           - id: isort
     - repo: https://github.com/psf/black
-      rev: stable
+      rev: 20.8b1
       hooks:
           - id: black
             language_version: python3.8
     - repo: https://gitlab.com/pycqa/flake8
-      rev: master
+      rev: 3.8.4
       hooks:
           - id: flake8
     - repo: https://github.com/kynan/nbstripout
-      rev: master
+      rev: 0.3.9
       hooks:
           - id: nbstripout
             files: .ipynb
     - repo: https://github.com/pocc/pre-commit-hooks
-      rev: python
+      rev: v1.1.1
       hooks:
           - id: clang-format
             args: [-i]
     - repo: https://github.com/nametake/pre-commit-prototool
-      rev: master
+      rev: v0.1.0
       hooks:
           - id: prototool-lint
           - id: prototool-format-fix
     - repo: https://github.com/FelixSeptem/pre-commit-golang
-      rev: master
+      rev: 12f5442f51377b10b26651ad745206bbe1500ad6
       hooks:
           - id: bazel-buildifier
     - repo: https://github.com/petalmd/dockerfile-pre-commit
