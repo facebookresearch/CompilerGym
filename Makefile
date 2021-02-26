@@ -73,6 +73,15 @@ Deployment
         Use a docker container to build a python wheel for linux. This is only
         used for making release builds. This requires docker.
 
+    bdist_wheel-linux-shell
+        Drop into a bash terminal in the docker container that is used for
+        linux builds. This may be useful for debugging bdist_wheel-linux
+        builds.
+
+    make bdist_wheel-linux-test
+        Run the `make install-test` suite against the build artifact generated
+        by `make bdist_wheel-linux`.
+
 
 Tidying up
 -----------
@@ -144,13 +153,19 @@ bdist_wheel: bazel-build
 bdist_wheel-linux:
 	rm -rf build
 	docker build -t chriscummins/compiler_gym-linux-build packaging
-	docker run -v $(ROOT):/CompilerGym --rm chriscummins/compiler_gym-linux-build:latest /bin/sh -c 'cd /CompilerGym && make bdist_wheel'
+	docker run -v $(ROOT):/CompilerGym --rm chriscummins/compiler_gym-linux-build:latest /bin/sh -c 'cd /CompilerGym && pip3 install gym numpy requests networkx && make bdist_wheel'
 	mv dist/compiler_gym-$(VERSION)-py3-none-linux_x86_64.whl dist/compiler_gym-$(VERSION)-py3-none-manylinux2014_x86_64.whl
 	rm -rf build
 
+bdist_wheel-linux-shell:
+	docker run -v $(ROOT):/CompilerGym --rm -it --entrypoint "/bin/bash" chriscummins/compiler_gym-linux-build:latest
+
+bdist_wheel-linux-test:
+	docker run -v $(ROOT):/CompilerGym --rm chriscummins/compiler_gym-linux-build:latest /bin/sh -c 'cd /CompilerGym && pip3 install -U pip && pip3 install dist/compiler_gym-$(VERSION)-py3-none-manylinux2014_x86_64.whl && pip install -r tests/requirements.txt && make install-test'
+
 all: docs bdist_wheel bdist_wheel-linux
 
-.PHONY: bazel-build bdist_wheel bdist_wheel-linux
+.PHONY: bazel-build bdist_wheel bdist_wheel-linux bdist_wheel-linux-shell bdist_wheel-linux-test
 
 #################
 # Documentation #
@@ -204,7 +219,7 @@ install-test: install-test-datasets
 	mkdir -p /tmp/compiler_gym/wheel_tests
 	rm -f /tmp/compiler_gym/wheel_tests/tests
 	ln -s $(ROOT)/tests /tmp/compiler_gym/wheel_tests
-	cd /tmp/compiler_gym/wheel_tests && pytest -n auto tests -k "not fuzz"
+	cd /tmp/compiler_gym/wheel_tests && pytest tests -n auto -k "not fuzz"
 
 # The minimum number of seconds to run the fuzz tests in a loop for. Override
 # this at the commandline, e.g. `FUZZ_SECONDS=1800 make fuzz`.
