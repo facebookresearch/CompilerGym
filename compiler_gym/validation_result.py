@@ -64,3 +64,13 @@ class ValidationResult(NamedTuple):
         data = self._asdict()  # pylint: disable=no-member
         data["state"] = self.state.json()
         return data
+
+    @classmethod
+    def from_json(cls, data) -> "ValidationResult":
+        """Create a validation result from JSON data.
+
+        :param data: A JSON dict.
+        :return: A validation result instance.
+        """
+        data["state"] = CompilerEnvState.from_json(data["state"])
+        return cls(**data)
