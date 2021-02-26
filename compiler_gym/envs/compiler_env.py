@@ -20,7 +20,7 @@ import numpy as np
 from gym.spaces import Space
 
 from compiler_gym.compiler_env_state import CompilerEnvState
-from compiler_gym.datasets.dataset import Dataset, require
+from compiler_gym.datasets.dataset import LegacyDataset, require
 from compiler_gym.service import (
     CompilerGymServiceConnection,
     ConnectionOpts,
@@ -104,9 +104,9 @@ class CompilerEnv(gym.Env):
         to store benchmarks.
     :vartype datasets_site_path: Optional[Path]
 
-    :ivar available_datasets: A mapping from dataset name to :class:`Dataset`
+    :ivar available_datasets: A mapping from dataset name to :class:`LegacyDataset`
         objects that are available to download.
-    :vartype available_datasets: Dict[str, Dataset]
+    :vartype available_datasets: Dict[str, LegacyDataset]
 
     :ivar observation: A view of the available observation spaces that permits
         on-demand computation of observations.
@@ -197,7 +197,7 @@ class CompilerEnv(gym.Env):
         self._service_endpoint: Union[str, Path] = service
         self._connection_settings = connection_settings or ConnectionOpts()
         self.datasets_site_path: Optional[Path] = None
-        self.available_datasets: Dict[str, Dataset] = {}
+        self.available_datasets: Dict[str, LegacyDataset] = {}
 
         self.action_space_name = action_space
 
@@ -854,7 +854,7 @@ class CompilerEnv(gym.Env):
         """
         return RewardView
 
-    def require_datasets(self, datasets: List[Union[str, Dataset]]) -> bool:
+    def require_datasets(self, datasets: List[Union[str, LegacyDataset]]) -> bool:
         """Require that the given datasets are available to the environment.
 
         Example usage:
@@ -870,10 +870,11 @@ class CompilerEnv(gym.Env):
 
         :param datasets: A list of datasets to require. Each dataset is the name
             of an available dataset, the URL of a dataset to download, or a
-            :class:`Dataset` instance.
+            :class:`LegacyDataset` instance.
         :return: :code:`True` if one or more datasets were downloaded, or
             :code:`False` if all datasets were already available.
         """
+        self.logger.debug("Requiring datasets: %s", datasets)
         dataset_installed = False
         for dataset in datasets:
             dataset_installed |= require(self, dataset)
@@ -890,14 +891,14 @@ class CompilerEnv(gym.Env):
             self.make_manifest_file()
         return dataset_installed
 
-    def require_dataset(self, dataset: Union[str, Dataset]) -> bool:
+    def require_dataset(self, dataset: Union[str, LegacyDataset]) -> bool:
         """Require that the given dataset is available to the environment.
 
         Alias for
         :meth:`env.require_datasets([dataset]) <compiler_gym.envs.CompilerEnv.require_datasets>`.
 
         :param dataset: The name of the dataset to download, the URL of the dataset, or a
-            :class:`Dataset` instance.
+            :class:`LegacyDataset` instance.
         :return: :code:`True` if the dataset was downloaded, or :code:`False` if
             the dataset was already available.
         """
@@ -927,7 +928,7 @@ class CompilerEnv(gym.Env):
                     )
         return manifest_path
 
-    def register_dataset(self, dataset: Dataset) -> bool:
+    def register_dataset(self, dataset: LegacyDataset) -> bool:
         """Register a new dataset.
 
         After registering, the dataset name may be used by
@@ -936,13 +937,13 @@ class CompilerEnv(gym.Env):
 
         Example usage:
 
-            >>> my_dataset = Dataset(name="my-dataset-v0", ...)
+            >>> my_dataset = LegacyDataset(name="my-dataset-v0", ...)
             >>> env = gym.make("llvm-v0")
             >>> env.register_dataset(my_dataset)
             >>> env.require_dataset("my-dataset-v0")
             >>> env.benchmark = "my-dataset-v0/1"
 
-        :param dataset: A :class:`Dataset` instance describing the new dataset.
+        :param dataset: A :class:`LegacyDataset` instance describing the new dataset.
         :return: :code:`True` if the dataset was added, else :code:`False`.
         :raises ValueError: If a dataset with this name is already registered.
         """

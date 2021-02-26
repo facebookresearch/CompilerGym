@@ -16,7 +16,7 @@ import fasteners
 from compiler_gym.util.download import download
 
 
-class Dataset(NamedTuple):
+class LegacyDataset(NamedTuple):
     """A collection of benchmarks for use by an environment."""
 
     name: str
@@ -57,11 +57,11 @@ class Dataset(NamedTuple):
         return bool(self.deprecated_since)
 
     @classmethod
-    def from_json_file(cls, path: Path) -> "Dataset":
+    def from_json_file(cls, path: Path) -> "LegacyDataset":
         """Construct a dataset form a JSON metadata file.
 
         :param path: Path of the JSON metadata.
-        :return: A Dataset instance.
+        :return: A LegacyDataset instance.
         """
         try:
             with open(str(path), "rb") as f:
@@ -145,7 +145,7 @@ def deactivate(env, name: str) -> bool:
         return True
 
 
-def require(env, dataset: Union[str, Dataset]) -> bool:
+def require(env, dataset: Union[str, LegacyDataset]) -> bool:
     """Require that the given dataset is available to the environment.
 
     This will download and activate the dataset if it is not already installed.
@@ -160,12 +160,14 @@ def require(env, dataset: Union[str, Dataset]) -> bool:
 
     :param env: The environment that this dataset is required for.
     :param dataset: The name of the dataset to download, the URL of the dataset,
-        or a :class:`Dataset` instance.
+        or a :class:`LegacyDataset` instance.
     :return: :code:`True` if the dataset was downloaded, or :code:`False` if the
         dataset was already available.
     """
 
-    def download_and_unpack_archive(url: str, sha256: Optional[str] = None) -> Dataset:
+    def download_and_unpack_archive(
+        url: str, sha256: Optional[str] = None
+    ) -> LegacyDataset:
         json_files_before = {
             f
             for f in env.inactive_datasets_site_path.iterdir()
@@ -182,9 +184,9 @@ def require(env, dataset: Union[str, Dataset]) -> bool:
         new_json = json_files_after - json_files_before
         if not len(new_json):
             raise OSError(f"Downloaded dataset {url} contains no metadata JSON file")
-        return Dataset.from_json_file(list(new_json)[0])
+        return LegacyDataset.from_json_file(list(new_json)[0])
 
-    def unpack_local_archive(path: Path) -> Dataset:
+    def unpack_local_archive(path: Path) -> LegacyDataset:
         if not path.is_file():
             raise FileNotFoundError(f"File not found: {path}")
         json_files_before = {
@@ -202,12 +204,12 @@ def require(env, dataset: Union[str, Dataset]) -> bool:
         new_json = json_files_after - json_files_before
         if not len(new_json):
             raise OSError(f"Downloaded dataset {url} contains no metadata JSON file")
-        return Dataset.from_json_file(list(new_json)[0])
+        return LegacyDataset.from_json_file(list(new_json)[0])
 
     with fasteners.InterProcessLock(env.datasets_site_path / "LOCK"):
         # Resolve the name and URL of the dataset.
         sha256 = None
-        if isinstance(dataset, Dataset):
+        if isinstance(dataset, LegacyDataset):
             name, url = dataset.name, dataset.url
         elif isinstance(dataset, str):
             # Check if we have already downloaded the dataset.
