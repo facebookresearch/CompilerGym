@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.spaces &mdash; CompilerGym 0.1.2 documentation</title>
+  <title>compiler_gym.spaces &mdash; CompilerGym 0.1.3 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.2
+                0.1.3
               </div>
             
           
@@ -111,6 +111,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#sequence">Sequence</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#nameddiscrete">NamedDiscrete</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#commandline">Commandline</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#reward">Reward</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="views.html">compiler_gym.views</a></li>
@@ -190,6 +191,7 @@ observation spaces available to compilers.</p>
 <li><p><a class="reference internal" href="#sequence" id="id2">Sequence</a></p></li>
 <li><p><a class="reference internal" href="#nameddiscrete" id="id3">NamedDiscrete</a></p></li>
 <li><p><a class="reference internal" href="#commandline" id="id4">Commandline</a></p></li>
+<li><p><a class="reference internal" href="#reward" id="id5">Reward</a></p></li>
 </ul>
 </div>
 <div class="section" id="scalar">
@@ -506,6 +508,115 @@ recognized.</p>
 <dt id="compiler_gym.spaces.CommandlineFlag.name">
 <code class="sig-name descname">name</code><em class="property">: str</em><a class="headerlink" href="#compiler_gym.spaces.CommandlineFlag.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>The name of the flag, e.g. <code class="code docutils literal notranslate"><span class="pre">LoopUnroll</span></code>.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="reward">
+<h2><a class="toc-backref" href="#id5">Reward</a><a class="headerlink" href="#reward" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt id="compiler_gym.spaces.Reward">
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.spaces.</code><code class="sig-name descname">Reward</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">observation_spaces</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default_value</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">min</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>float<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">max</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>float<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default_negates_returns</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">success_threshold</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>float<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">deterministic</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">platform_dependent</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/spaces/reward.html#Reward"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.spaces.Reward" title="Permalink to this definition">¶</a></dt>
+<dd><p>An extension of the <a class="reference internal" href="#compiler_gym.spaces.Scalar" title="compiler_gym.spaces.Scalar"><code class="xref py py-class docutils literal notranslate"><span class="pre">Scalar</span></code></a> space
+that is used for computing a reward signal.</p>
+<p>A <code class="code docutils literal notranslate"><span class="pre">Reward</span></code> is a scalar value used to determine the reward for a
+particular action. An instance of <code class="code docutils literal notranslate"><span class="pre">Reward</span></code> is used to represent the
+reward function for a particular episode. For every
+<a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv.step" title="compiler_gym.envs.CompilerEnv.step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.step()</span></code></a> of the environment,
+the <a class="reference internal" href="#compiler_gym.spaces.Reward.update" title="compiler_gym.spaces.Reward.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reward.update()</span></code></a> method is
+called to produce a new incremental reward.</p>
+<p>Environments provide implementations of <code class="code docutils literal notranslate"><span class="pre">Reward</span></code> that compute reward
+signals based on observation values computed by the backend service.</p>
+<dl class="py method">
+<dt id="compiler_gym.spaces.Reward.__init__">
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">observation_spaces</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default_value</span><span class="p">:</span> <span class="n">float</span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">min</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>float<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">max</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>float<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">default_negates_returns</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">success_threshold</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>float<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">deterministic</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">platform_dependent</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/spaces/reward.html#Reward.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.spaces.Reward.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>id</strong> – The ID of the reward space. This is a unique name used to
+represent the reward.</p></li>
+<li><p><strong>observation_spaces</strong> – A list of observation space IDs
+(<a class="reference internal" href="views.html#compiler_gym.views.ObservationSpaceSpec" title="compiler_gym.views.ObservationSpaceSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">space.id</span></code></a> values)
+that are used to compute the reward. May be an empty list if no
+observations are requested. Requested observations will be provided
+to the <code class="code docutils literal notranslate"><span class="pre">observations</span></code> argument of
+<a class="reference internal" href="#compiler_gym.spaces.Reward.update" title="compiler_gym.spaces.Reward.update"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reward.update()</span></code></a>.</p></li>
+<li><p><strong>default_value</strong> – A default reward. This value will be returned by
+<a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv.step" title="compiler_gym.envs.CompilerEnv.step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.step()</span></code></a> if
+the service terminates.</p></li>
+<li><p><strong>min</strong> – The lower bound of the reward.</p></li>
+<li><p><strong>max</strong> – The upper bound of the reward.</p></li>
+<li><p><strong>default_negates_returns</strong> – If true, the default value will be
+offset by the sum of all rewards for the current episode. For
+example, given a default reward value of <em>-10.0</em> and an episode with
+prior rewards <em>[0.1, 0.3, -0.15]</em>, the default value is:
+<em>-10.0 - sum(0.1, 0.3, -0.15)</em>.</p></li>
+<li><p><strong>success_threshold</strong> – The cumulative reward threshold before an
+episode is considered successful. For example, episodes where reward
+is scaled to an existing heuristic can be considered “successful”
+when the reward exceeds the existing heuristic.</p></li>
+<li><p><strong>deterministic</strong> – Whether the reward space is deterministic.</p></li>
+<li><p><strong>platform_dependent</strong> – Whether the reward values depend on the
+execution environment of the service.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compiler_gym.spaces.Reward.range">
+<em class="property">property </em><code class="sig-name descname">range</code><a class="headerlink" href="#compiler_gym.spaces.Reward.range" title="Permalink to this definition">¶</a></dt>
+<dd><p>The lower and upper bounds of the reward.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compiler_gym.spaces.Reward.reset">
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">benchmark</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/compiler_gym/spaces/reward.html#Reward.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.spaces.Reward.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset the rewards space. This is called on
+<a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.reset()</span></code></a>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>benchmark</strong> – The URI of the benchmark that is used for this
+episode.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compiler_gym.spaces.Reward.reward_on_error">
+<code class="sig-name descname">reward_on_error</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">episode_reward</span><span class="p">:</span> <span class="n">float</span></em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="../_modules/compiler_gym/spaces/reward.html#Reward.reward_on_error"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.spaces.Reward.reward_on_error" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return the reward value for an error condition.</p>
+<p>This method should be used to produce the reward value that should be
+used if the compiler service cannot be reached, e.g. because it has
+crashed or the connection has dropped.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>episode_reward</strong> – The current cumulative reward of an episode.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A reward.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compiler_gym.spaces.Reward.update">
+<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">action</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">observations</span><span class="p">:</span> <span class="n">List<span class="p">[</span>Union<span class="p">[</span>numpy.ndarray<span class="p">, </span>str<span class="p">, </span>bytes<span class="p">, </span>int<span class="p">, </span>float<span class="p">, </span>List<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">, </span>networkx.classes.digraph.DiGraph<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">observation_view</span></em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="../_modules/compiler_gym/spaces/reward.html#Reward.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.spaces.Reward.update" title="Permalink to this definition">¶</a></dt>
+<dd><p>Calculate a reward for the given action.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>action</strong> – The action performed.</p></li>
+<li><p><strong>observations</strong> – A list of observation values as requested by the
+<code class="code docutils literal notranslate"><span class="pre">observation_spaces</span></code> constructor argument.</p></li>
+<li><p><strong>observation_view</strong> – The
+<a class="reference internal" href="views.html#compiler_gym.views.ObservationView" title="compiler_gym.views.ObservationView"><code class="xref py py-class docutils literal notranslate"><span class="pre">ObservationView</span></code></a>
+instance.</p></li>
+</ul>
+</dd>
+</dl>
 </dd></dl>
 
 </dd></dl>

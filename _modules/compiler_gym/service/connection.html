@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.service.connection &mdash; CompilerGym 0.1.2 documentation</title>
+  <title>compiler_gym.service.connection &mdash; CompilerGym 0.1.3 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.2
+                0.1.3
               </div>
             
           
@@ -194,13 +194,13 @@
     <span class="n">GetSpacesReply</span><span class="p">,</span>
     <span class="n">GetSpacesRequest</span><span class="p">,</span>
     <span class="n">ObservationSpace</span><span class="p">,</span>
-    <span class="n">RewardSpace</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">cache_path</span><span class="p">,</span> <span class="n">runfiles_path</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.debug_util</span> <span class="kn">import</span> <span class="n">get_debug_level</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">runfiles_path</span><span class="p">,</span> <span class="n">transient_cache_path</span>
 
 <span class="n">GRPC_CHANNEL_OPTIONS</span> <span class="o">=</span> <span class="p">[</span>
     <span class="c1"># Raise the default inbound message filter from 4MB.</span>
-    <span class="p">(</span><span class="s2">&quot;grpc.max_receive_message_length&quot;</span><span class="p">,</span> <span class="mi">100</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;grpc.max_receive_message_length&quot;</span><span class="p">,</span> <span class="mi">512</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">),</span>
     <span class="c1"># Spurious error UNAVAILABLE &quot;Trying to connect an http1.x server&quot;.</span>
     <span class="c1"># https://putridparrot.com/blog/the-unavailable-trying-to-connect-an-http1-x-server-grpc-error/</span>
     <span class="p">(</span><span class="s2">&quot;grpc.enable_http_proxy&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
@@ -213,7 +213,21 @@
     <span class="n">rpc_call_max_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">300</span>
     <span class="sd">&quot;&quot;&quot;The maximum number of seconds to wait for an RPC method call to succeed.&quot;&quot;&quot;</span>
 
-    <span class="n">init_max_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">rpc_max_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="sd">&quot;&quot;&quot;The maximum number of failed attempts to communicate with the RPC service</span>
+<span class="sd">    before raising an error. Retries are made only for communication errors.</span>
+<span class="sd">    Failures from other causes such as error signals raised by the service are</span>
+<span class="sd">    not retried.&quot;&quot;&quot;</span>
+
+    <span class="n">retry_wait_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span>
+    <span class="sd">&quot;&quot;&quot;The number of seconds to wait between successive attempts to communicate</span>
+<span class="sd">    with the RPC service.&quot;&quot;&quot;</span>
+
+    <span class="n">retry_wait_backoff_exponent</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.5</span>
+    <span class="sd">&quot;&quot;&quot;The exponential backoff scaling between successive attempts to</span>
+<span class="sd">    communicate with the RPC service.&quot;&quot;&quot;</span>
+
+    <span class="n">init_max_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">30</span>
     <span class="sd">&quot;&quot;&quot;The maximum number of seconds to spend attempting to establish a</span>
 <span class="sd">    connection to the service before failing.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
@@ -223,10 +237,10 @@
 <span class="sd">    service before failing.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">local_service_port_init_max_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">local_service_port_init_max_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">30</span>
     <span class="sd">&quot;&quot;&quot;The maximum number of seconds to wait for a local service to write the port.txt file.&quot;&quot;&quot;</span>
 
-    <span class="n">local_service_exit_max_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">10</span>
+    <span class="n">local_service_exit_max_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">30</span>
     <span class="sd">&quot;&quot;&quot;The maximum number of seconds to wait for a local service to terminate on close.&quot;&quot;&quot;</span>
 
     <span class="n">rpc_init_max_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">3</span>
@@ -235,6 +249,10 @@
 
 <div class="viewcode-block" id="ServiceError"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.ServiceError">[docs]</a><span class="k">class</span> <span class="nc">ServiceError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Error raised from the service.&quot;&quot;&quot;</span></div>
+
+
+<span class="k">class</span> <span class="nc">ServiceOSError</span><span class="p">(</span><span class="n">ServiceError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;System error raised from the service.&quot;&quot;&quot;</span>
 
 
 <div class="viewcode-block" id="ServiceInitError"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.ServiceInitError">[docs]</a><span class="k">class</span> <span class="nc">ServiceInitError</span><span class="p">(</span><span class="n">ServiceError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">):</span>
@@ -263,7 +281,9 @@
         <span class="n">Request</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Request&quot;</span><span class="p">)</span>
         <span class="n">Reply</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;Reply&quot;</span><span class="p">)</span>
 
-        <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Reply</span><span class="p">:</span>
+        <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
+            <span class="bp">self</span><span class="p">,</span> <span class="n">a</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Reply</span><span class="p">:</span>  <span class="c1"># pylint: disable=undefined-variable</span>
             <span class="o">...</span>
 
 
@@ -277,14 +297,16 @@
 <span class="k">class</span> <span class="nc">Connection</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Base class for service connections.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Constructor. Don&#39;t instantiate this directly, use the subclasses.</span>
 
 <span class="sd">        :param channel: The RPC channel to use.</span>
 <span class="sd">        :param url: The URL of the RPC service.</span>
+<span class="sd">        :param logger: A logger instance that will be used for logging messages.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="n">channel</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stub</span> <span class="o">=</span> <span class="n">CompilerGymServiceStub</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">:</span> <span class="n">GetSpacesReply</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">GetSpaces</span><span class="p">,</span> <span class="n">GetSpacesRequest</span><span class="p">())</span>
 
@@ -296,56 +318,84 @@
         <span class="n">stub_method</span><span class="p">:</span> <span class="n">StubMethod</span><span class="p">,</span>
         <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
         <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span>
+        <span class="n">max_retries</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+        <span class="n">retry_wait_seconds</span><span class="o">=</span><span class="mf">0.1</span><span class="p">,</span>
+        <span class="n">retry_wait_backoff_exponent</span><span class="o">=</span><span class="mf">1.5</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Reply</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Call the service with the given arguments.&quot;&quot;&quot;</span>
+        <span class="c1"># pylint: disable=no-member</span>
+        <span class="c1">#</span>
         <span class="c1"># House keeping note: if you modify the exceptions that this method</span>
         <span class="c1"># raises, please update the CompilerGymServiceConnection.__call__()</span>
         <span class="c1"># docstring.</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">stub_method</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;Cannot invoke RPC on closed channel!&quot;</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">ServiceIsClosed</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RPC communication failed with message: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-            <span class="k">raise</span> <span class="n">e</span>
-        <span class="k">except</span> <span class="n">grpc</span><span class="o">.</span><span class="n">RpcError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="c1"># We raise &quot;from None&quot; to discard the gRPC stack trace, with the</span>
-            <span class="c1"># remaining stack trace correctly pointing to the CompilerGym</span>
-            <span class="c1"># calling code.</span>
-            <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">INVALID_ARGUMENT</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">())</span> <span class="kn">from</span> <span class="bp">None</span>
-            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">UNIMPLEMENTED</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">())</span> <span class="kn">from</span> <span class="bp">None</span>
-            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">NOT_FOUND</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">())</span> <span class="kn">from</span> <span class="bp">None</span>
-            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">RESOURCE_EXHAUSTED</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">())</span> <span class="kn">from</span> <span class="bp">None</span>
-            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">FAILED_PRECONDITION</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">()))</span> <span class="kn">from</span> <span class="bp">None</span>
-            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">UNAVAILABLE</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">ServiceTransportError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="bp">None</span>
-            <span class="k">elif</span> <span class="p">(</span>
-                <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">INTERNAL</span>
-                <span class="ow">and</span> <span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Exception serializing request!&quot;</span>
-            <span class="p">):</span>
-                <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">()</span><span class="si">}</span><span class="s2"> Request type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span> <span class="kn">from</span> <span class="bp">None</span>
-            <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">DEADLINE_EXCEEDED</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">()</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">timeout</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> seconds)&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="bp">None</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;RPC call returned status code </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span><span class="si">}</span><span class="s2"> and error `</span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">()</span><span class="si">}</span><span class="s2">`&quot;</span>
-                <span class="p">)</span> <span class="kn">from</span> <span class="bp">None</span>
+        <span class="n">attempt</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">stub_method</span><span class="p">(</span><span class="n">request</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;Cannot invoke RPC on closed channel!&quot;</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">ServiceIsClosed</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;RPC communication failed with message: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span> <span class="kn">from</span> <span class="bp">None</span>
+                <span class="k">raise</span> <span class="n">e</span>
+            <span class="k">except</span> <span class="n">grpc</span><span class="o">.</span><span class="n">RpcError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># We raise &quot;from None&quot; to discard the gRPC stack trace, with the</span>
+                <span class="c1"># remaining stack trace correctly pointing to the CompilerGym</span>
+                <span class="c1"># calling code.</span>
+                <span class="k">if</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">INVALID_ARGUMENT</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">())</span> <span class="kn">from</span> <span class="bp">None</span>
+                <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">UNIMPLEMENTED</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">())</span> <span class="kn">from</span> <span class="bp">None</span>
+                <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">NOT_FOUND</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">())</span> <span class="kn">from</span> <span class="bp">None</span>
+                <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">RESOURCE_EXHAUSTED</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">ServiceOSError</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">())</span> <span class="kn">from</span> <span class="bp">None</span>
+                <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">FAILED_PRECONDITION</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">()))</span> <span class="kn">from</span> <span class="bp">None</span>
+                <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">UNAVAILABLE</span><span class="p">:</span>
+                    <span class="c1"># For &quot;unavailable&quot; errors we retry with exponential</span>
+                    <span class="c1"># backoff. This is because this error can be caused by an</span>
+                    <span class="c1"># overloaded service, a flaky connection, etc.</span>
+                    <span class="n">attempt</span> <span class="o">+=</span> <span class="mi">1</span>
+                    <span class="k">if</span> <span class="n">attempt</span> <span class="o">&gt;</span> <span class="n">max_retries</span><span class="p">:</span>
+                        <span class="k">raise</span> <span class="n">ServiceTransportError</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">()</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">max_retries</span><span class="si">}</span><span class="s2"> retries)&quot;</span>
+                        <span class="p">)</span> <span class="kn">from</span> <span class="bp">None</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                        <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%d</span><span class="s2"> attempts remaining)&quot;</span><span class="p">,</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
+                        <span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">(),</span>
+                        <span class="n">max_retries</span> <span class="o">-</span> <span class="n">attempt</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">sleep</span><span class="p">(</span><span class="n">retry_wait_seconds</span><span class="p">)</span>
+                    <span class="n">retry_wait_seconds</span> <span class="o">*=</span> <span class="n">retry_wait_backoff_exponent</span>
+                <span class="k">elif</span> <span class="p">(</span>
+                    <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">INTERNAL</span>
+                    <span class="ow">and</span> <span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">()</span> <span class="o">==</span> <span class="s2">&quot;Exception serializing request!&quot;</span>
+                <span class="p">):</span>
+                    <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">()</span><span class="si">}</span><span class="s2"> Request type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">request</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span> <span class="kn">from</span> <span class="bp">None</span>
+                <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">DEADLINE_EXCEEDED</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">()</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">timeout</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> seconds)&quot;</span>
+                    <span class="p">)</span> <span class="kn">from</span> <span class="bp">None</span>
+                <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">DATA_LOSS</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">())</span> <span class="kn">from</span> <span class="bp">None</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;RPC call returned status code </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span><span class="si">}</span><span class="s2"> and error `</span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">()</span><span class="si">}</span><span class="s2">`&quot;</span>
+                    <span class="p">)</span> <span class="kn">from</span> <span class="bp">None</span>
 
 
 <span class="k">def</span> <span class="nf">make_working_dir</span><span class="p">():</span>
     <span class="sd">&quot;&quot;&quot;Make a working directory for a service. The calling code is responsible for</span>
 <span class="sd">    removing this directory when done.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">service_directory</span> <span class="o">=</span> <span class="n">cache_path</span><span class="p">(</span><span class="s2">&quot;service&quot;</span><span class="p">)</span>
     <span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">isoformat</span><span class="p">()</span>
-    <span class="n">random_hash</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">getrandbits</span><span class="p">(</span><span class="mi">32</span><span class="p">)</span>
-    <span class="n">working_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">service_directory</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">random_hash</span><span class="si">:</span><span class="s2">08x</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">random_hash</span> <span class="o">=</span> <span class="n">random</span><span class="o">.</span><span class="n">getrandbits</span><span class="p">(</span><span class="mi">16</span><span class="p">)</span>
+    <span class="n">service_name</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;service-</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">random_hash</span><span class="si">:</span><span class="s2">04x</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">working_dir</span> <span class="o">=</span> <span class="n">transient_cache_path</span><span class="p">(</span><span class="n">service_name</span><span class="p">)</span>
     <span class="p">(</span><span class="n">working_dir</span> <span class="o">/</span> <span class="s2">&quot;logs&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">working_dir</span>
 
@@ -359,6 +409,7 @@
         <span class="n">port_init_max_seconds</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">rpc_init_max_seconds</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">process_exit_max_seconds</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Constructor.</span>
 
@@ -374,30 +425,34 @@
         <span class="c1"># Set environment variable COMPILER_GYM_SERVICE_ARGS to pass</span>
         <span class="c1"># additional arguments to the service.</span>
         <span class="n">args</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;COMPILER_GYM_SERVICE_ARGS&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+
+        <span class="c1"># The command that will be executed. The working directory of this</span>
+        <span class="c1"># command will be set to the local_service_binary&#39;s parent, so we can</span>
+        <span class="c1"># use the relpath for a neater `ps aux` view.</span>
         <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="nb">str</span><span class="p">(</span><span class="n">local_service_binary</span><span class="p">),</span>
-            <span class="sa">f</span><span class="s2">&quot;--port=0&quot;</span><span class="p">,</span>
-            <span class="sa">f</span><span class="s2">&quot;--log_dir=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="si">}</span><span class="s2">/logs&quot;</span><span class="p">,</span>
+            <span class="sa">f</span><span class="s2">&quot;./</span><span class="si">{</span><span class="n">local_service_binary</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="sa">f</span><span class="s2">&quot;--working_dir=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="n">args</span><span class="p">,</span>
         <span class="p">]</span>
 
         <span class="c1"># Set the root of the runfiles directory.</span>
         <span class="n">env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
-        <span class="n">env</span><span class="p">[</span><span class="s2">&quot;COMPILER_GYM_RUNFILES&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">runfiles_path</span><span class="p">(</span><span class="s2">&quot;CompilerGym&quot;</span><span class="p">))</span>
+        <span class="n">env</span><span class="p">[</span><span class="s2">&quot;COMPILER_GYM_RUNFILES&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">runfiles_path</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">))</span>
 
-        <span class="c1"># Set environment variable COMPILER_GYM_SERVICE_DEBUG=1 to pipe</span>
-        <span class="c1"># local service output to stderr. Set COMPILER_GYM_SERVICE_LOG_LEVEL=val</span>
-        <span class="c1"># to set log level to &lt;val&gt;, where large values are increasingly</span>
-        <span class="c1"># verbose.</span>
-        <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;COMPILER_GYM_SERVICE_DEBUG&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span> <span class="o">!=</span> <span class="s2">&quot;0&quot;</span><span class="p">:</span>
+        <span class="c1"># Set the verbosity of the service. The logging level of the service</span>
+        <span class="c1"># is the debug level - 1, so that COMPILER_GYM_DEUG=3 will cause VLOG(2)</span>
+        <span class="c1"># and lower to be logged to stdout.</span>
+        <span class="n">debug_level</span> <span class="o">=</span> <span class="n">get_debug_level</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">debug_level</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--alsologtostderr&quot;</span><span class="p">)</span>
-        <span class="n">log_level</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;COMPILER_GYM_SERVICE_LOG_LEVEL&quot;</span><span class="p">,</span> <span class="s2">&quot;0&quot;</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">log_level</span><span class="p">:</span>
-            <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-v=</span><span class="si">{</span><span class="n">log_level</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-v=</span><span class="si">{</span><span class="n">debug_level</span> <span class="o">-</span> <span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;$ </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span><span class="n">cmd</span><span class="p">,</span> <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;$ </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+            <span class="n">cmd</span><span class="p">,</span>
+            <span class="n">env</span><span class="o">=</span><span class="n">env</span><span class="p">,</span>
+            <span class="n">cwd</span><span class="o">=</span><span class="n">local_service_binary</span><span class="o">.</span><span class="n">parent</span><span class="p">,</span>
+        <span class="p">)</span>
 
         <span class="c1"># Read the port from a file generated by the service.</span>
         <span class="n">wait_secs</span> <span class="o">=</span> <span class="mf">0.1</span>
@@ -439,7 +494,7 @@
                 <span class="n">channel_ready</span><span class="o">.</span><span class="n">result</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">wait_secs</span><span class="p">)</span>
                 <span class="k">break</span>
             <span class="k">except</span> <span class="p">(</span><span class="n">grpc</span><span class="o">.</span><span class="n">FutureTimeoutError</span><span class="p">,</span> <span class="n">grpc</span><span class="o">.</span><span class="n">RpcError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Connection attempt </span><span class="si">{</span><span class="n">attempts</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Connection attempt </span><span class="si">%d</span><span class="s2"> = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">attempts</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
                 <span class="n">wait_secs</span> <span class="o">*=</span> <span class="mf">1.2</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
@@ -451,23 +506,27 @@
                 <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">attempts</span><span class="si">}</span><span class="s2"> attempts made)&quot;</span>
             <span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">close</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Terminate a local subprocess and close the connection.&quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">process_exit_max_seconds</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">process_exit_max_seconds</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Abandoning orphan process at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>
         <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2"> running on PID=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">pid</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">alive_or_dead</span> <span class="o">=</span> <span class="s2">&quot;alive&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;dead&quot;</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2"> running on PID=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">pid</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">alive_or_dead</span><span class="si">}</span><span class="s2">)&quot;</span>
 
 
 <span class="k">class</span> <span class="nc">UnmanagedConnection</span><span class="p">(</span><span class="n">Connection</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A connection to a service that is not managed by this process.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rpc_init_max_seconds</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rpc_init_max_seconds</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Constructor.</span>
 
 <span class="sd">        :param url: The URL of the service to connect to.</span>
@@ -488,7 +547,7 @@
                 <span class="n">channel_ready</span><span class="o">.</span><span class="n">result</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">wait_secs</span><span class="p">)</span>
                 <span class="k">break</span>
             <span class="k">except</span> <span class="p">(</span><span class="n">grpc</span><span class="o">.</span><span class="n">FutureTimeoutError</span><span class="p">,</span> <span class="n">grpc</span><span class="o">.</span><span class="n">RpcError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Connection attempt </span><span class="si">{</span><span class="n">attempts</span><span class="si">}</span><span class="s2"> = </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Connection attempt </span><span class="si">%d</span><span class="s2"> = </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">attempts</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
                 <span class="n">wait_secs</span> <span class="o">*=</span> <span class="mf">1.2</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
@@ -497,7 +556,7 @@
                 <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">attempts</span><span class="si">}</span><span class="s2"> attempts made)&quot;</span>
             <span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span>
@@ -528,7 +587,7 @@
 <span class="sd">        # started a process running on port 8080.</span>
 <span class="sd">        connection = CompilerGymServiceConnection(&quot;localhost:8080&quot;)</span>
 <span class="sd">        # Invoke an RPC method.</span>
-<span class="sd">        connection(connection.stub.StartEpisode, StartEpisodeRequest())</span>
+<span class="sd">        connection(connection.stub.StartSession, StartSessionRequest())</span>
 <span class="sd">        # Close the connection. The service running on port 8080 is</span>
 <span class="sd">        # left running.</span>
 <span class="sd">        connection.close()</span>
@@ -540,7 +599,7 @@
 <span class="sd">        # Start a subprocess using the binary located at /path/to/my/service.</span>
 <span class="sd">        connection = CompilerGymServiceConnection(Path(&quot;/path/to/my/service&quot;))</span>
 <span class="sd">        # Invoke an RPC method.</span>
-<span class="sd">        connection(connection.stub.StartEpisode, StartEpisodeRequest())</span>
+<span class="sd">        connection(connection.stub.StartSession, StartSessionRequest())</span>
 <span class="sd">        # Close the connection. The subprocess is terminated.</span>
 <span class="sd">        connection.close()</span>
 
@@ -550,10 +609,14 @@
 <span class="sd">    :ivar action_spaces: A list of action spaces provided by the service.</span>
 <span class="sd">    :ivar observation_spaces: A list of observation spaces provided by the</span>
 <span class="sd">        service.</span>
-<span class="sd">    :ivar reward_spaces: A list of reward spaces provided by the service.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="CompilerGymServiceConnection.__init__"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.CompilerGymServiceConnection.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="n">ConnectionOpts</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
+<div class="viewcode-block" id="CompilerGymServiceConnection.__init__"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.CompilerGymServiceConnection.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">endpoint</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+        <span class="n">opts</span><span class="p">:</span> <span class="n">ConnectionOpts</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Constructor.</span>
 
 <span class="sd">        :param endpoint: The connection endpoint. Either the URL of a service,</span>
@@ -568,6 +631,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">opts</span> <span class="o">=</span> <span class="n">opts</span> <span class="ow">or</span> <span class="n">ConnectionOpts</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stub</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span> <span class="ow">or</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_establish_connection</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">action_spaces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ActionSpace</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
@@ -575,19 +639,19 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">observation_spaces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationSpace</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">observation_space_list</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reward_spaces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">RewardSpace</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">reward_space_list</span>
         <span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_establish_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Create and establish a connection.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_connection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_connection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stub</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">stub</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">_create_connection</span><span class="p">(</span>
-        <span class="bp">cls</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span> <span class="n">opts</span><span class="p">:</span> <span class="n">ConnectionOpts</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">endpoint</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+        <span class="n">opts</span><span class="p">:</span> <span class="n">ConnectionOpts</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Connection</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Initialize the service connection, either by connecting to an RPC</span>
 <span class="sd">        service or by starting a locally-managed subprocess.</span>
@@ -612,15 +676,20 @@
             <span class="n">attempts</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">Path</span><span class="p">):</span>
+                    <span class="n">endpoint_name</span> <span class="o">=</span> <span class="n">endpoint</span><span class="o">.</span><span class="n">name</span>
                     <span class="k">return</span> <span class="n">ManagedConnection</span><span class="p">(</span>
                         <span class="n">local_service_binary</span><span class="o">=</span><span class="n">endpoint</span><span class="p">,</span>
                         <span class="n">process_exit_max_seconds</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">local_service_exit_max_seconds</span><span class="p">,</span>
                         <span class="n">rpc_init_max_seconds</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">rpc_init_max_seconds</span><span class="p">,</span>
                         <span class="n">port_init_max_seconds</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">local_service_port_init_max_seconds</span><span class="p">,</span>
+                        <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span>
                     <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
+                    <span class="n">endpoint_name</span> <span class="o">=</span> <span class="n">endpoint</span>
                     <span class="k">return</span> <span class="n">UnmanagedConnection</span><span class="p">(</span>
-                        <span class="n">url</span><span class="o">=</span><span class="n">endpoint</span><span class="p">,</span> <span class="n">rpc_init_max_seconds</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">rpc_init_max_seconds</span>
+                        <span class="n">url</span><span class="o">=</span><span class="n">endpoint</span><span class="p">,</span>
+                        <span class="n">rpc_init_max_seconds</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">rpc_init_max_seconds</span><span class="p">,</span>
+                        <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span>
                     <span class="p">)</span>
             <span class="k">except</span> <span class="p">(</span><span class="ne">TimeoutError</span><span class="p">,</span> <span class="n">ServiceError</span><span class="p">,</span> <span class="ne">NotImplementedError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="c1"># Catch preventable errors so that we can retry:</span>
@@ -629,13 +698,13 @@
                 <span class="c1">#   ServiceError: raised by an RPC method returning an error status.</span>
                 <span class="c1">#   NotImplementedError: raised if an RPC method is accessed before the RPC service</span>
                 <span class="c1">#       has initialized.</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2"> (attempt </span><span class="si">{</span><span class="n">attempts</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Failed to create connection to </span><span class="si">{</span><span class="n">endpoint</span><span class="si">}</span><span class="s2"> after &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> seconds &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">attempts</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">opts</span><span class="o">.</span><span class="n">init_max_attempts</span><span class="si">}</span><span class="s2"> attempts made)&quot;</span>
-            <span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> (attempt </span><span class="si">%d</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">attempts</span><span class="p">)</span>
+
+        <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Failed to create connection to </span><span class="si">{</span><span class="n">endpoint_name</span><span class="si">}</span><span class="s2"> after &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> seconds &quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">attempts</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">opts</span><span class="o">.</span><span class="n">init_max_attempts</span><span class="si">}</span><span class="s2"> attempts made)&quot;</span>
+        <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
@@ -673,6 +742,9 @@
         <span class="n">stub_method</span><span class="p">:</span> <span class="n">StubMethod</span><span class="p">,</span>
         <span class="n">request</span><span class="p">:</span> <span class="n">Request</span><span class="p">,</span>
         <span class="n">timeout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">max_retries</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">retry_wait_seconds</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">retry_wait_backoff_exponent</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Reply</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Invoke an RPC method on the service and return its response. All</span>
 <span class="sd">        RPC methods accept a single `request` message, and respond with a</span>
@@ -694,6 +766,14 @@
 <span class="sd">        :param timeout: The maximum number of seconds to await a reply. If not</span>
 <span class="sd">            provided, the default value is</span>
 <span class="sd">            :code:`ConnectionOpts.rpc_call_max_seconds`.</span>
+<span class="sd">        :param max_retries: The maximum number of failed attempts to communicate</span>
+<span class="sd">            with the RPC service before raising an error. Retries are made only</span>
+<span class="sd">            for communication errors. Failures from other causes such as error</span>
+<span class="sd">            signals raised by the service are not retried.</span>
+<span class="sd">        :param retry_wait_seconds: The number of seconds to wait between</span>
+<span class="sd">            successive attempts to communicate with the RPC service.</span>
+<span class="sd">        :param retry_wait_backoff_exponent: The exponential backoff scaling</span>
+<span class="sd">            between successive attempts to communicate with the RPC service.</span>
 <span class="sd">        :raises ValueError: If the service responds with an error indicating an</span>
 <span class="sd">            invalid argument.</span>
 <span class="sd">        :raises NotImplementedError: If the service responds with an error</span>
@@ -720,6 +800,11 @@
             <span class="n">stub_method</span><span class="p">,</span>
             <span class="n">request</span><span class="p">,</span>
             <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">rpc_call_max_seconds</span><span class="p">,</span>
+            <span class="n">max_retries</span><span class="o">=</span><span class="n">max_retries</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">rpc_max_retries</span><span class="p">,</span>
+            <span class="n">retry_wait_seconds</span><span class="o">=</span><span class="n">retry_wait_seconds</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">retry_wait_seconds</span><span class="p">,</span>
+            <span class="n">retry_wait_backoff_exponent</span><span class="o">=</span><span class="p">(</span>
+                <span class="n">retry_wait_backoff_exponent</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">retry_wait_backoff_exponent</span>
+            <span class="p">),</span>
         <span class="p">)</span></div></div>
 </pre></div>
 

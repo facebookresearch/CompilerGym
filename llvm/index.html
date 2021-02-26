@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>LLVM Environment Reference &mdash; CompilerGym 0.1.2 documentation</title>
+  <title>LLVM Environment Reference &mdash; CompilerGym 0.1.3 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.2
+                0.1.3
               </div>
             
           
@@ -202,96 +202,122 @@ languages.</p>
 <div class="contents local topic" id="overview">
 <p class="topic-title">Overview:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#datasets" id="id1">Datasets</a></p></li>
-<li><p><a class="reference internal" href="#observation-spaces" id="id2">Observation Spaces</a></p>
+<li><p><a class="reference internal" href="#datasets" id="id3">Datasets</a></p></li>
+<li><p><a class="reference internal" href="#observation-spaces" id="id4">Observation Spaces</a></p>
 <ul>
-<li><p><a class="reference internal" href="#llvm-ir" id="id3">LLVM-IR</a></p></li>
-<li><p><a class="reference internal" href="#autophase" id="id4">Autophase</a></p></li>
-<li><p><a class="reference internal" href="#inst2vec" id="id5">Inst2vec</a></p></li>
-<li><p><a class="reference internal" href="#programl" id="id6">ProGraML</a></p></li>
-<li><p><a class="reference internal" href="#hardware-information" id="id7">Hardware Information</a></p></li>
-<li><p><a class="reference internal" href="#cost-models" id="id8">Cost Models</a></p></li>
+<li><p><a class="reference internal" href="#llvm-ir" id="id5">LLVM-IR</a></p></li>
+<li><p><a class="reference internal" href="#autophase" id="id6">Autophase</a></p></li>
+<li><p><a class="reference internal" href="#inst2vec" id="id7">Inst2vec</a></p></li>
+<li><p><a class="reference internal" href="#programl" id="id8">ProGraML</a></p></li>
+<li><p><a class="reference internal" href="#hardware-information" id="id9">Hardware Information</a></p></li>
+<li><p><a class="reference internal" href="#cost-models" id="id10">Cost Models</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#reward-spaces" id="id9">Reward Spaces</a></p>
+<li><p><a class="reference internal" href="#reward-spaces" id="id11">Reward Spaces</a></p>
 <ul>
-<li><p><a class="reference internal" href="#ir-instruction-count" id="id10">IR Instruction Count</a></p></li>
-<li><p><a class="reference internal" href="#codesize" id="id11">Codesize</a></p></li>
+<li><p><a class="reference internal" href="#ir-instruction-count" id="id12">IR Instruction Count</a></p></li>
+<li><p><a class="reference internal" href="#codesize" id="id13">Codesize</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#action-space" id="id12">Action Space</a></p></li>
+<li><p><a class="reference internal" href="#action-space" id="id14">Action Space</a></p></li>
 </ul>
 </div>
 <div class="section" id="datasets">
-<h2><a class="toc-backref" href="#id1">Datasets</a><a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id3">Datasets</a><a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h2>
 <p>We provide several datasets of open-source LLVM-IR benchmarks for download:</p>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 27%" />
-<col style="width: 37%" />
-<col style="width: 19%" />
+<col style="width: 25%" />
+<col style="width: 15%" />
 <col style="width: 18%" />
+<col style="width: 22%" />
+<col style="width: 20%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Dataset</p></th>
 <th class="head"><p>License</p></th>
 <th class="head"><p>Num. Benchmarks</p></th>
-<th class="head"><p>Size on disk</p></th>
+<th class="head"><p>Validatable? <a class="footnote-reference brackets" href="#f1" id="id1">1</a></p></th>
+<th class="head"><p>Difficulty <a class="footnote-reference brackets" href="#f2" id="id2">2</a></p></th>
 </tr>
 </thead>
 <tbody>
 <tr class="row-even"><td><p>blas-v0</p></td>
 <td><p>BSD 3-Clause</p></td>
 <td><p>300</p></td>
-<td><p>4.0 MB</p></td>
+<td><p>No</p></td>
+<td><p>0.3</p></td>
 </tr>
 <tr class="row-odd"><td><p>cBench-v0</p></td>
 <td><p>BSD 3-Clause</p></td>
 <td><p>23</p></td>
-<td><p>7.2 MB</p></td>
+<td><p>Partial</p></td>
+<td><p>0.8</p></td>
 </tr>
 <tr class="row-even"><td><p>github-v0</p></td>
 <td><p>CC BY 4.0</p></td>
 <td><p>50,708</p></td>
-<td><p>726.0 MB</p></td>
+<td><p>No</p></td>
+<td><p>0.7</p></td>
 </tr>
 <tr class="row-odd"><td><p>linux-v0</p></td>
 <td><p>GPL-2.0</p></td>
 <td><p>13,920</p></td>
-<td><p>516.0 MB</p></td>
+<td><p>No</p></td>
+<td><p>0.4</p></td>
 </tr>
 <tr class="row-even"><td><p>mibench-v0</p></td>
 <td><p>BSD 3-Clause</p></td>
 <td><p>40</p></td>
-<td><p>238.5 kB</p></td>
+<td><p>No</p></td>
+<td><p>0.8</p></td>
 </tr>
 <tr class="row-odd"><td><p>npb-v0</p></td>
-<td><p>NASA Open Source Agreement v1.3</p></td>
+<td><p>NASA v1.3</p></td>
 <td><p>122</p></td>
-<td><p>2.3 MB</p></td>
+<td><p>No</p></td>
+<td><p>0.4</p></td>
 </tr>
 <tr class="row-even"><td><p>opencv-v0</p></td>
 <td><p>Apache 2.0</p></td>
 <td><p>442</p></td>
-<td><p>21.9 MB</p></td>
+<td><p>No</p></td>
+<td><p>0.3</p></td>
 </tr>
 <tr class="row-odd"><td><p>poj104-v0</p></td>
 <td><p>BSD 3-Clause</p></td>
 <td><p>49,628</p></td>
-<td><p>304.2 MB</p></td>
+<td><p>No</p></td>
+<td><p>0.7</p></td>
 </tr>
-<tr class="row-even"><td><p>polybench-v0</p></td>
-<td><p>BSD 3-Clause</p></td>
-<td><p>27</p></td>
-<td><p>162.6 kB</p></td>
-</tr>
-<tr class="row-odd"><td><p>tensorflow-v0</p></td>
+<tr class="row-even"><td><p>tensorflow-v0</p></td>
 <td><p>Apache 2.0</p></td>
 <td><p>1,985</p></td>
-<td><p>299.7 MB</p></td>
+<td><p>No</p></td>
+<td><p>0.3</p></td>
 </tr>
 </tbody>
 </table>
+<dl class="footnote brackets">
+<dt class="label" id="f1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>A <strong>validatable</strong> dataset is one where the behavior of the benchmarks
+can be checked by compiling the programs to binaries and executing
+them. If the benchmarks crash, or are found to have different behavior,
+then validation fails. This type of validation is used to check that
+the compiler has not broken the semantics of the program.
+See <a class="reference internal" href="../cli.html#module-compiler_gym.bin.validate" title="compiler_gym.bin.validate"><code class="xref py py-mod docutils literal notranslate"><span class="pre">compiler_gym.bin.validate</span></code></a>.</p>
+</dd>
+<dt class="label" id="f2"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
+<dd><p>The <strong>difficulty</strong> of a dataset is an indicator of how likely a random
+policy is to outperform the default compiler policy in a fixed amount
+of time. A lower difficulty shows that a random policy is more likely
+to succeed. It is a crude characterization metric that does not take
+into account factors such as the diversity of programs, the complexity
+of the optimization space, etc. The difficulty values in this table
+were estimated using 2000 random trials and a fixed time budget of 30
+seconds.</p>
+</dd>
+</dl>
 <p>Install these datasets using the <a class="reference internal" href="../cli.html#module-compiler_gym.bin.datasets" title="compiler_gym.bin.datasets"><code class="xref py py-mod docutils literal notranslate"><span class="pre">compiler_gym.bin.datasets</span></code></a> command line
 tool, or programatically using
 <a class="reference internal" href="../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.require_datasets" title="compiler_gym.envs.CompilerEnv.require_datasets"><code class="xref py py-meth docutils literal notranslate"><span class="pre">CompilerEnv.require_datasets()</span></code></a>:</p>
@@ -301,11 +327,11 @@ tool, or programatically using
 </div>
 </div>
 <div class="section" id="observation-spaces">
-<h2><a class="toc-backref" href="#id2">Observation Spaces</a><a class="headerlink" href="#observation-spaces" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id4">Observation Spaces</a><a class="headerlink" href="#observation-spaces" title="Permalink to this headline">¶</a></h2>
 <p>We provide several observation spaces for LLVM based on published compiler
 research.</p>
 <div class="section" id="llvm-ir">
-<h3><a class="toc-backref" href="#id3">LLVM-IR</a><a class="headerlink" href="#llvm-ir" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id5">LLVM-IR</a><a class="headerlink" href="#llvm-ir" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 51%" />
@@ -343,7 +369,7 @@ temporary directory that is removed when <a class="reference internal" href="../
 </div>
 </div>
 <div class="section" id="autophase">
-<h3><a class="toc-backref" href="#id4">Autophase</a><a class="headerlink" href="#autophase" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id6">Autophase</a><a class="headerlink" href="#autophase" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 2%" />
@@ -397,7 +423,7 @@ by the name of each feature.</p>
 </div>
 </div>
 <div class="section" id="inst2vec">
-<h3><a class="toc-backref" href="#id5">Inst2vec</a><a class="headerlink" href="#inst2vec" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id7">Inst2vec</a><a class="headerlink" href="#inst2vec" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 50%" />
@@ -474,7 +500,7 @@ produce a program embedding.</p>
 </div>
 </div>
 <div class="section" id="programl">
-<h3><a class="toc-backref" href="#id6">ProGraML</a><a class="headerlink" href="#programl" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id8">ProGraML</a><a class="headerlink" href="#programl" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 33%" />
@@ -514,7 +540,7 @@ arXiv preprint arXiv:2003.10536.</p>
 </div>
 </div>
 <div class="section" id="hardware-information">
-<h3><a class="toc-backref" href="#id7">Hardware Information</a><a class="headerlink" href="#hardware-information" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id9">Hardware Information</a><a class="headerlink" href="#hardware-information" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 8%" />
@@ -541,7 +567,7 @@ library.</p>
 </div>
 </div>
 <div class="section" id="cost-models">
-<h3><a class="toc-backref" href="#id8">Cost Models</a><a class="headerlink" href="#cost-models" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id10">Cost Models</a><a class="headerlink" href="#cost-models" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 24%" />
@@ -583,7 +609,7 @@ library.</p>
 </div>
 </div>
 <div class="section" id="reward-spaces">
-<span id="reward"></span><h2><a class="toc-backref" href="#id9">Reward Spaces</a><a class="headerlink" href="#reward-spaces" title="Permalink to this headline">¶</a></h2>
+<span id="reward"></span><h2><a class="toc-backref" href="#id11">Reward Spaces</a><a class="headerlink" href="#reward-spaces" title="Permalink to this headline">¶</a></h2>
 <p>The goal of CompilerGym tasks is to minimize a cost function <span class="math notranslate nohighlight">\(C(s)\)</span> which
 takes as input the current program state <span class="math notranslate nohighlight">\(s\)</span> and produces a real-valued
 cost. At a given timestep, reward is the reduction in cost from the previous
@@ -609,7 +635,7 @@ achieved by applying the baseline policy to produce a baseline state
 the reward space <code class="code docutils literal notranslate"><span class="pre">IrInstructionCountO3</span></code> is <code class="code docutils literal notranslate"><span class="pre">IrInstructionCount</span></code>
 reward normalized to the <code class="code docutils literal notranslate"><span class="pre">-O3</span></code> baseline policy.</p>
 <div class="section" id="ir-instruction-count">
-<h3><a class="toc-backref" href="#id10">IR Instruction Count</a><a class="headerlink" href="#ir-instruction-count" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id12">IR Instruction Count</a><a class="headerlink" href="#ir-instruction-count" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 21%" />
@@ -668,7 +694,7 @@ platform-independent, but is not a measure of true codesize reduction as it does
 not take into account the effects of lowering.</p>
 </div>
 <div class="section" id="codesize">
-<h3><a class="toc-backref" href="#id11">Codesize</a><a class="headerlink" href="#codesize" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id13">Codesize</a><a class="headerlink" href="#codesize" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 19%" />
@@ -726,7 +752,7 @@ object file code size depends on the target platform, see
 </div>
 </div>
 <div class="section" id="action-space">
-<h2><a class="toc-backref" href="#id12">Action Space</a><a class="headerlink" href="#action-space" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id14">Action Space</a><a class="headerlink" href="#action-space" title="Permalink to this headline">¶</a></h2>
 <p>The LLVM action space exposes the selection of semantics-preserving optimization
 transforms as a discrete space.</p>
 <table class="docutils align-default">

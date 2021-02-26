@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Changelog &mdash; CompilerGym 0.1.2 documentation</title>
+  <title>Changelog &mdash; CompilerGym 0.1.3 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.2
+                0.1.3
               </div>
             
           
@@ -97,6 +97,7 @@
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#release-0-1-3-2021-02-25">Release 0.1.3 (2021-02-25)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#release-0-1-2-2021-01-25">Release 0.1.2 (2021-01-25)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#release-0-1-1-2020-12-28">Release 0.1.1 (2020-12-28)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#release-0-1-0-2020-12-21">Release 0.1.0 (2020-12-21)</a></li>
@@ -180,12 +181,33 @@
             
   <div class="section" id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="release-0-1-3-2021-02-25">
+<h2>Release 0.1.3 (2021-02-25)<a class="headerlink" href="#release-0-1-3-2021-02-25" title="Permalink to this headline">¶</a></h2>
+<p>This release adds numerous enhancements aimed at improving ease-of-use.
+Thanks to &#64;broune, &#64;hughleat, and &#64;JD-ETH for contributions.</p>
+<ul class="simple">
+<li><p>Added a new <code class="docutils literal notranslate"><span class="pre">env.validate()</span></code> API for validating the state of an
+environment. Added semantics validation for some LLVM benchmarks.</p></li>
+<li><p>Added a <code class="docutils literal notranslate"><span class="pre">env.fork()</span></code> method to efficiently duplicate an environment
+state.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">manual_env</span></code> environment has been improved with new features
+such as hill climbing search and tab completion.</p></li>
+<li><p>Ease of use improvements for string observation space and reward
+space names: Added new getter methods such as
+<code class="docutils literal notranslate"><span class="pre">env.observation.Autophase()</span></code> and generated constants such as
+<code class="docutils literal notranslate"><span class="pre">llvm.observation_spaces.autophase</span></code>.</p></li>
+<li><p><em>Breaking change</em>: Calculation of environment reward has been moved
+to Python. Reward functions have been removed from backend service
+implementations and replaced with equivalent Python classes.</p></li>
+<li><p>Various bug fixes and improvements.</p></li>
+</ul>
+</div>
 <div class="section" id="release-0-1-2-2021-01-25">
 <h2>Release 0.1.2 (2021-01-25)<a class="headerlink" href="#release-0-1-2-2021-01-25" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Add a new
-<code class="docutils literal notranslate"><span class="pre">compiler_gym.views.ObservationView.add_derviced_space(...)</span></code> API
-for constructing derived observation spaces.</p></li>
+<code class="docutils literal notranslate"><span class="pre">compiler_gym.views.ObservationView.add_derived_space(...)</span></code> API for
+constructing derived observation spaces.</p></li>
 <li><p>Added default reward and observation values for <code class="docutils literal notranslate"><span class="pre">env.step()</span></code> in
 case of service failure.</p></li>
 <li><p>Extended the public <code class="docutils literal notranslate"><span class="pre">compiler_gym.datasets</span></code> API for managing

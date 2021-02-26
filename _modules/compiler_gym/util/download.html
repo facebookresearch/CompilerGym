@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.util.download &mdash; CompilerGym 0.1.2 documentation</title>
+  <title>compiler_gym.util.download &mdash; CompilerGym 0.1.3 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.2
+                0.1.3
               </div>
             
           
@@ -190,7 +190,6 @@
         <span class="k">if</span> <span class="n">req</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GET returned status code </span><span class="si">{</span><span class="n">req</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-        <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloaded </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">req</span><span class="o">.</span><span class="n">content</span>
     <span class="k">finally</span><span class="p">:</span>
         <span class="n">req</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -199,7 +198,7 @@
 <span class="c1"># Only a single process may download at a time. The idea here is to prevent</span>
 <span class="c1"># overloading the NIC when, for example, you launch a bunch of simultaneous</span>
 <span class="c1"># learning processes which all require the same dataset.</span>
-<div class="viewcode-block" id="download"><a class="viewcode-back" href="../../../compiler_gym/compiler_gym.html#compiler_gym.download">[docs]</a><span class="nd">@fasteners</span><span class="o">.</span><span class="n">interprocess_locked</span><span class="p">(</span><span class="n">cache_path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;downloads/LOCK&quot;</span><span class="p">))</span>
+<div class="viewcode-block" id="download"><a class="viewcode-back" href="../../../compiler_gym/compiler_gym.html#compiler_gym.download">[docs]</a><span class="nd">@fasteners</span><span class="o">.</span><span class="n">interprocess_locked</span><span class="p">(</span><span class="n">cache_path</span><span class="p">(</span><span class="s2">&quot;downloads/LOCK&quot;</span><span class="p">))</span>
 <span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">sha256</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Download a file and return its contents.</span>
 

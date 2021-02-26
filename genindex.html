@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Index &mdash; CompilerGym 0.1.2 documentation</title>
+  <title>Index &mdash; CompilerGym 0.1.3 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.2
+                0.1.3
               </div>
             
           
@@ -182,10 +182,12 @@
  | <a href="#F"><strong>F</strong></a>
  | <a href="#G"><strong>G</strong></a>
  | <a href="#I"><strong>I</strong></a>
+ | <a href="#J"><strong>J</strong></a>
  | <a href="#L"><strong>L</strong></a>
  | <a href="#M"><strong>M</strong></a>
  | <a href="#N"><strong>N</strong></a>
  | <a href="#O"><strong>O</strong></a>
+ | <a href="#P"><strong>P</strong></a>
  | <a href="#R"><strong>R</strong></a>
  | <a href="#S"><strong>S</strong></a>
  | <a href="#T"><strong>T</strong></a>
@@ -218,6 +220,8 @@
 </li>
         <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.NamedDiscrete.__init__">(compiler_gym.spaces.NamedDiscrete method)</a>
 </li>
+        <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Reward.__init__">(compiler_gym.spaces.Reward method)</a>
+</li>
         <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Scalar.__init__">(compiler_gym.spaces.Scalar method)</a>
 </li>
         <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Sequence.__init__">(compiler_gym.spaces.Sequence method)</a>
@@ -233,11 +237,15 @@
 </li>
       <li><a href="compiler_gym/compiler_gym.html#compiler_gym.ValidationResult.actions_replay_failed">actions_replay_failed (compiler_gym.ValidationResult attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.activate">activate() (in module compiler_gym.datasets)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compiler_gym/views.html#compiler_gym.views.ObservationView.add_derived_space">add_derived_space() (compiler_gym.views.ObservationView method)</a>
+</li>
+      <li><a href="compiler_gym/views.html#compiler_gym.views.RewardView.add_space">add_space() (compiler_gym.views.RewardView method)</a>
+</li>
+      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.apply">apply() (compiler_gym.envs.CompilerEnv method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -245,7 +253,7 @@
 <h2 id="B">B</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnvState.benchmark">benchmark (compiler_gym.envs.CompilerEnvState attribute)</a>
+      <li><a href="compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvState.benchmark">benchmark (compiler_gym.CompilerEnvState attribute)</a>
 </li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.benchmark">benchmark() (compiler_gym.envs.CompilerEnv property)</a>
 </li>
@@ -273,7 +281,7 @@
 </li>
       <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Commandline">Commandline (class in compiler_gym.spaces)</a>
 </li>
-      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnvState.commandline">commandline (compiler_gym.envs.CompilerEnvState attribute)</a>
+      <li><a href="compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvState.commandline">commandline (compiler_gym.CompilerEnvState attribute)</a>
 </li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.commandline">commandline() (compiler_gym.envs.CompilerEnv method)</a>
 
@@ -283,17 +291,16 @@
         <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Commandline.commandline">(compiler_gym.spaces.Commandline method)</a>
 </li>
       </ul></li>
+      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.commandline_to_actions">commandline_to_actions() (compiler_gym.envs.CompilerEnv method)</a>
+
+      <ul>
+        <li><a href="compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.commandline_to_actions">(compiler_gym.envs.LlvmEnv method)</a>
+</li>
+      </ul></li>
       <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.CommandlineFlag">CommandlineFlag (class in compiler_gym.spaces)</a>
 </li>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset.compiler">compiler (compiler_gym.datasets.Dataset attribute)</a>
 </li>
-      <li>
-    compiler_gym
-
-      <ul>
-        <li><a href="compiler_gym/compiler_gym.html#module-compiler_gym">module</a>
-</li>
-      </ul></li>
       <li>
     compiler_gym.bin.datasets
 
@@ -349,7 +356,7 @@
 </li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv">CompilerEnv (class in compiler_gym.envs)</a>
 </li>
-      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnvState">CompilerEnvState (class in compiler_gym.envs)</a>
+      <li><a href="compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvState">CompilerEnvState (class in compiler_gym)</a>
 </li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.CompilerGymServiceConnection">CompilerGymServiceConnection (class in compiler_gym.service)</a>
 </li>
@@ -361,7 +368,7 @@
         <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Sequence.contains">(compiler_gym.spaces.Sequence method)</a>
 </li>
       </ul></li>
-      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnvState.csv_header">csv_header() (compiler_gym.envs.CompilerEnvState static method)</a>
+      <li><a href="compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvState.csv_header">csv_header() (compiler_gym.CompilerEnvState static method)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -391,6 +398,10 @@
 <h2 id="E">E</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.episode_walltime">episode_walltime() (compiler_gym.envs.CompilerEnv property)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compiler_gym/compiler_gym.html#compiler_gym.ValidationResult.error_details">error_details (compiler_gym.ValidationResult attribute)</a>
 </li>
   </ul></td>
@@ -399,17 +410,19 @@
 <h2 id="F">F</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="compiler_gym/compiler_gym.html#compiler_gym.ValidationResult.failed">failed() (compiler_gym.ValidationResult property)</a>
-</li>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset.file_count">file_count (compiler_gym.datasets.Dataset attribute)</a>
 </li>
       <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.CommandlineFlag.flag">flag (compiler_gym.spaces.CommandlineFlag attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.fork">fork() (compiler_gym.envs.CompilerEnv method)</a>
+</li>
       <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Commandline.from_commandline">from_commandline() (compiler_gym.spaces.Commandline method)</a>
 </li>
-      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnvState.from_csv">from_csv() (compiler_gym.envs.CompilerEnvState class method)</a>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvState.from_csv">from_csv() (compiler_gym.CompilerEnvState class method)</a>
+</li>
+      <li><a href="compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvState.from_json">from_json() (compiler_gym.CompilerEnvState class method)</a>
 </li>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset.from_json_file">from_json_file() (compiler_gym.datasets.Dataset class method)</a>
 </li>
@@ -421,6 +434,18 @@
 <h2 id="G">G</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.get_benchmark_validation_callback">get_benchmark_validation_callback() (compiler_gym.envs.CompilerEnv method)</a>
+
+      <ul>
+        <li><a href="compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.get_benchmark_validation_callback">(compiler_gym.envs.LlvmEnv method)</a>
+</li>
+      </ul></li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compiler_gym/compiler_gym.html#compiler_gym.get_debug_level">get_debug_level() (in module compiler_gym)</a>
+</li>
+      <li><a href="compiler_gym/compiler_gym.html#compiler_gym.get_logging_level">get_logging_level() (in module compiler_gym)</a>
+</li>
       <li><a href="llvm/api.html#compiler_gym.envs.llvm.get_system_includes">get_system_includes() (in module compiler_gym.envs.llvm)</a>
 </li>
   </ul></td>
@@ -433,14 +458,28 @@
 </li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.inactive_datasets_site_path">inactive_datasets_site_path() (compiler_gym.envs.CompilerEnv property)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compiler_gym/service.html#compiler_gym.service.ConnectionOpts.init_max_attempts">init_max_attempts (compiler_gym.service.ConnectionOpts attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compiler_gym/service.html#compiler_gym.service.ConnectionOpts.init_max_seconds">init_max_seconds (compiler_gym.service.ConnectionOpts attribute)</a>
 </li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.ir">ir() (compiler_gym.envs.LlvmEnv property)</a>
 </li>
+      <li><a href="compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.ir_sha1">ir_sha1() (compiler_gym.envs.LlvmEnv property)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="J">J</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvState.json">json() (compiler_gym.CompilerEnvState method)</a>
+
+      <ul>
+        <li><a href="compiler_gym/compiler_gym.html#compiler_gym.ValidationResult.json">(compiler_gym.ValidationResult method)</a>
+</li>
+      </ul></li>
   </ul></td>
 </tr></table>
 
@@ -477,8 +516,6 @@
     module
 
       <ul>
-        <li><a href="compiler_gym/compiler_gym.html#module-compiler_gym">compiler_gym</a>
-</li>
         <li><a href="cli.html#module-compiler_gym.bin.datasets">compiler_gym.bin.datasets</a>
 </li>
         <li><a href="cli.html#module-compiler_gym.bin.manual_env">compiler_gym.bin.manual_env</a>
@@ -518,11 +555,21 @@
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.observation_space">observation_space() (compiler_gym.envs.CompilerEnv property)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compiler_gym/views.html#compiler_gym.views.ObservationSpaceSpec">ObservationSpaceSpec (class in compiler_gym.views)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compiler_gym/views.html#compiler_gym.views.ObservationView">ObservationView (class in compiler_gym.views)</a>
+</li>
+      <li><a href="compiler_gym/compiler_gym.html#compiler_gym.ValidationResult.okay">okay() (compiler_gym.ValidationResult method)</a>
+</li>
+  </ul></td>
+</tr></table>
+
+<h2 id="P">P</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset.platforms">platforms (compiler_gym.datasets.Dataset attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -530,6 +577,10 @@
 <h2 id="R">R</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Reward.range">range() (compiler_gym.spaces.Reward property)</a>
+</li>
+      <li><a href="compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvState.read_csv_file">read_csv_file() (compiler_gym.CompilerEnvState class method)</a>
+</li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.register_dataset">register_dataset() (compiler_gym.envs.CompilerEnv method)</a>
 </li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.render">render() (compiler_gym.envs.CompilerEnv method)</a>
@@ -547,16 +598,24 @@
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reset">reset() (compiler_gym.envs.CompilerEnv method)</a>
 
       <ul>
-        <li><a href="compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.reset">(compiler_gym.envs.LlvmEnv method)</a>
+        <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Reward.reset">(compiler_gym.spaces.Reward method)</a>
+</li>
+        <li><a href="compiler_gym/views.html#compiler_gym.views.RewardView.reset">(compiler_gym.views.RewardView method)</a>
 </li>
       </ul></li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.CompilerGymServiceConnection.restart">restart() (compiler_gym.service.CompilerGymServiceConnection method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnvState.reward">reward (compiler_gym.envs.CompilerEnvState attribute)</a>
+      <li><a href="compiler_gym/service.html#compiler_gym.service.ConnectionOpts.retry_wait_backoff_exponent">retry_wait_backoff_exponent (compiler_gym.service.ConnectionOpts attribute)</a>
 </li>
-      <li><a href="compiler_gym/views.html#compiler_gym.views.RewardSpaceSpec.reward_on_error">reward_on_error() (compiler_gym.views.RewardSpaceSpec method)</a>
+      <li><a href="compiler_gym/service.html#compiler_gym.service.ConnectionOpts.retry_wait_seconds">retry_wait_seconds (compiler_gym.service.ConnectionOpts attribute)</a>
+</li>
+      <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Reward">Reward (class in compiler_gym.spaces)</a>
+</li>
+      <li><a href="compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvState.reward">reward (compiler_gym.CompilerEnvState attribute)</a>
+</li>
+      <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Reward.reward_on_error">reward_on_error() (compiler_gym.spaces.Reward method)</a>
 </li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reward_space">reward_space() (compiler_gym.envs.CompilerEnv property)</a>
 </li>
@@ -564,13 +623,13 @@
 </li>
       <li><a href="compiler_gym/compiler_gym.html#compiler_gym.ValidationResult.reward_validation_failed">reward_validation_failed (compiler_gym.ValidationResult attribute)</a>
 </li>
-      <li><a href="compiler_gym/views.html#compiler_gym.views.RewardSpaceSpec">RewardSpaceSpec (class in compiler_gym.views)</a>
-</li>
       <li><a href="compiler_gym/views.html#compiler_gym.views.RewardView">RewardView (class in compiler_gym.views)</a>
 </li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.ConnectionOpts.rpc_call_max_seconds">rpc_call_max_seconds (compiler_gym.service.ConnectionOpts attribute)</a>
 </li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.ConnectionOpts.rpc_init_max_seconds">rpc_init_max_seconds (compiler_gym.service.ConnectionOpts attribute)</a>
+</li>
+      <li><a href="compiler_gym/service.html#compiler_gym.service.ConnectionOpts.rpc_max_retries">rpc_max_retries (compiler_gym.service.ConnectionOpts attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -594,10 +653,12 @@
 </li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.ServiceIsClosed">ServiceIsClosed</a>
 </li>
-      <li><a href="compiler_gym/service.html#compiler_gym.service.ServiceTransportError">ServiceTransportError</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compiler_gym/service.html#compiler_gym.service.ServiceTransportError">ServiceTransportError</a>
+</li>
+      <li><a href="compiler_gym/compiler_gym.html#compiler_gym.set_debug_level">set_debug_level() (in module compiler_gym)</a>
+</li>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset.sha256">sha256 (compiler_gym.datasets.Dataset attribute)</a>
 </li>
       <li><a href="compiler_gym/compiler_gym.html#compiler_gym.site_data_path">site_data_path() (in module compiler_gym)</a>
@@ -609,12 +670,6 @@
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.state">state() (compiler_gym.envs.CompilerEnv property)</a>
 </li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.step">step() (compiler_gym.envs.CompilerEnv method)</a>
-
-      <ul>
-        <li><a href="compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.step">(compiler_gym.envs.LlvmEnv method)</a>
-</li>
-      </ul></li>
-      <li><a href="compiler_gym/compiler_gym.html#compiler_gym.ValidationResult.success">success() (compiler_gym.ValidationResult property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -622,19 +677,25 @@
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnvState.to_csv">to_csv() (compiler_gym.envs.CompilerEnvState method)</a>
+      <li><a href="compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvState.to_csv">to_csv() (compiler_gym.CompilerEnvState method)</a>
+</li>
+      <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset.to_json_file">to_json_file() (compiler_gym.datasets.Dataset method)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset.to_json_file">to_json_file() (compiler_gym.datasets.Dataset method)</a>
-</li>
       <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.NamedDiscrete.to_string">to_string() (compiler_gym.spaces.NamedDiscrete method)</a>
+</li>
+      <li><a href="compiler_gym/compiler_gym.html#compiler_gym.transient_cache_path">transient_cache_path() (in module compiler_gym)</a>
 </li>
   </ul></td>
 </tr></table>
 
 <h2 id="U">U</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Reward.update">update() (compiler_gym.spaces.Reward method)</a>
+</li>
+  </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset.url">url (compiler_gym.datasets.Dataset attribute)</a>
 </li>
@@ -644,14 +705,12 @@
 <h2 id="V">V</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="compiler_gym/compiler_gym.html#compiler_gym.validate_state">validate_state() (in module compiler_gym)</a>
-</li>
       <li><a href="compiler_gym/compiler_gym.html#compiler_gym.validate_states">validate_states() (in module compiler_gym)</a>
+</li>
+      <li><a href="compiler_gym/compiler_gym.html#compiler_gym.ValidationResult">ValidationResult (class in compiler_gym)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="compiler_gym/compiler_gym.html#compiler_gym.ValidationResult">ValidationResult (class in compiler_gym)</a>
-</li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.version">version() (compiler_gym.envs.CompilerEnv property)</a>
 </li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.versions">versions() (compiler_gym.envs.CompilerEnv property)</a>
@@ -662,7 +721,7 @@
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnvState.walltime">walltime (compiler_gym.envs.CompilerEnvState attribute)</a>
+      <li><a href="compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvState.walltime">walltime (compiler_gym.CompilerEnvState attribute)</a>
 
       <ul>
         <li><a href="compiler_gym/compiler_gym.html#compiler_gym.ValidationResult.walltime">(compiler_gym.ValidationResult attribute)</a>
@@ -671,6 +730,8 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.write_bitcode">write_bitcode() (compiler_gym.envs.LlvmEnv method)</a>
+</li>
+      <li><a href="compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.write_ir">write_ir() (compiler_gym.envs.LlvmEnv method)</a>
 </li>
   </ul></td>
 </tr></table>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.util.runfiles_path &mdash; CompilerGym 0.1.2 documentation</title>
+  <title>compiler_gym.util.runfiles_path &mdash; CompilerGym 0.1.3 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.2
+                0.1.3
               </div>
             
           
@@ -178,6 +178,7 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 
+<span class="c1"># NOTE(cummins): Moving this file may require updating this relative path.</span>
 <span class="n">_PACKAGE_ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;../../&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span>
     <span class="n">strict</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
@@ -191,11 +192,11 @@
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># There are three ways of determining a runfiles path:</span>
     <span class="c1">#   1. Set the COMPILER_GYM_RUNFILES environment variable.</span>
-    <span class="c1">#   2. Using pkg_resources to find package data.</span>
-    <span class="c1">#   3. Using bazel&#39;s runfiles library to find data.</span>
-    <span class="c1">#</span>
-    <span class="c1"># The last two options depend on the calling context - whether the code</span>
-    <span class="c1"># was built by bazel or installed using setuptools.</span>
+    <span class="c1">#   2. Using the rules_python library that is provided by bazel. This will</span>
+    <span class="c1">#      fail if not being executed within a bazel sandbox.</span>
+    <span class="c1">#   3. Computing the path relative to the location of this file. This is the</span>
+    <span class="c1">#      fallback approach that is used for when the code has been installed</span>
+    <span class="c1">#      by setuptools.</span>
     <span class="n">runfiles_path</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;COMPILER_GYM_RUNFILES&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">runfiles_path</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">runfiles_path</span><span class="p">)</span> <span class="o">/</span> <span class="n">relpath</span>
@@ -203,12 +204,13 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="kn">from</span> <span class="nn">rules_python.python.runfiles</span> <span class="kn">import</span> <span class="n">runfiles</span>
 
-            <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">runfiles</span><span class="o">.</span><span class="n">Create</span><span class="p">()</span><span class="o">.</span><span class="n">Rlocation</span><span class="p">(</span><span class="n">relpath</span><span class="p">))</span>
-        <span class="k">except</span> <span class="ne">ModuleNotFoundError</span><span class="p">:</span>
-            <span class="c1"># Try to find the files relative to the current file, assuming that</span>
-            <span class="c1"># they are all given as paths &quot;CompilerGym/compiler_gym/foo/bar.txt&quot;</span>
-            <span class="c1"># and such.</span>
-            <span class="k">return</span> <span class="n">_PACKAGE_ROOT</span> <span class="o">/</span> <span class="n">Path</span><span class="p">(</span><span class="o">*</span><span class="n">Path</span><span class="p">(</span><span class="n">relpath</span><span class="p">)</span><span class="o">.</span><span class="n">parts</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+            <span class="k">return</span> <span class="n">Path</span><span class="p">(</span>
+                <span class="n">runfiles</span><span class="o">.</span><span class="n">Create</span><span class="p">()</span><span class="o">.</span><span class="n">Rlocation</span><span class="p">(</span>
+                    <span class="s2">&quot;CompilerGym&quot;</span> <span class="k">if</span> <span class="n">relpath</span> <span class="o">==</span> <span class="s2">&quot;.&quot;</span> <span class="k">else</span> <span class="sa">f</span><span class="s2">&quot;CompilerGym/</span><span class="si">{</span><span class="n">relpath</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">ModuleNotFoundError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="n">_PACKAGE_ROOT</span> <span class="o">/</span> <span class="n">relpath</span>
 
 
 <div class="viewcode-block" id="site_data_path"><a class="viewcode-back" href="../../../compiler_gym/compiler_gym.html#compiler_gym.site_data_path">[docs]</a><span class="k">def</span> <span class="nf">site_data_path</span><span class="p">(</span><span class="n">relpath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
@@ -227,7 +229,7 @@
     <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;~/.local/share/compiler_gym&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span> <span class="o">/</span> <span class="n">relpath</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/tmp/CompilerGym&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">relpath</span></div>
+        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/tmp/compiler_gym/site_data&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">relpath</span></div>
 
 
 <div class="viewcode-block" id="cache_path"><a class="viewcode-back" href="../../../compiler_gym/compiler_gym.html#compiler_gym.cache_path">[docs]</a><span class="k">def</span> <span class="nf">cache_path</span><span class="p">(</span><span class="n">relpath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
@@ -246,7 +248,28 @@
     <span class="k">elif</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">):</span>
         <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;~/.cache/compiler_gym&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span> <span class="o">/</span> <span class="n">relpath</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/tmp/compiler_gym&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">relpath</span></div>
+        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/tmp/compiler_gym/cache&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">relpath</span></div>
+
+
+<div class="viewcode-block" id="transient_cache_path"><a class="viewcode-back" href="../../../compiler_gym/compiler_gym.html#compiler_gym.transient_cache_path">[docs]</a><span class="k">def</span> <span class="nf">transient_cache_path</span><span class="p">(</span><span class="n">relpath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Return a path within the transient cache directory.</span>
+
+<span class="sd">    The transient cache is a directory used to store files that do not need to persist beyond the</span>
+<span class="sd">    lifetime of the current process. When available, the temporary filesystem :code:`/dev/shm` will</span>
+<span class="sd">    be used. Else, :meth:`cache_path() &lt;compiler_gym.cache_path&gt;` is used as a fallback. Set the</span>
+<span class="sd">    environment variable :code:`$COMPILER_GYM_TRANSIENT_CACHE` to override the default location.</span>
+
+<span class="sd">    :param relpath: The relative path within the cache.</span>
+<span class="sd">    :return: The absolute path of the cache.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">forced</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;COMPILER_GYM_TRANSIENT_CACHE&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">forced</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="n">forced</span><span class="p">)</span> <span class="o">/</span> <span class="n">relpath</span>
+    <span class="k">elif</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/dev/shm&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+        <span class="k">return</span> <span class="n">Path</span><span class="p">(</span><span class="s2">&quot;/dev/shm/compiler_gym&quot;</span><span class="p">)</span> <span class="o">/</span> <span class="n">relpath</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Fallback to using the regular cache.</span>
+        <span class="k">return</span> <span class="n">cache_path</span><span class="p">(</span><span class="n">relpath</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Frequently Asked Questions &mdash; CompilerGym 0.1.2 documentation</title>
+  <title>Frequently Asked Questions &mdash; CompilerGym 0.1.3 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.2
+                0.1.3
               </div>
             
           
@@ -102,8 +102,11 @@
 <li class="toctree-l2"><a class="reference internal" href="#i-found-a-bug-how-do-i-report-it">I found a bug. How do I report it?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#do-i-have-to-use-reinforcement-learning">Do I have to use reinforcement learning?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#what-features-are-going-to-be-added-in-the-future">What features are going to be added in the future?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#is-compiler-optimization-really-a-sequential-decision-process">Is compiler optimization really a sequential decision process?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#when-does-a-compiler-enviornment-consider-an-episode-done">When does a compiler enviornment consider an episode “done”?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#how-do-i-run-this-on-my-own-program">How do I run this on my own program?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#i-want-to-add-a-new-program-representation-reward-signal-how-do-i-do-that">I want to add a new program representation / reward signal. How do I do that?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#should-i-always-try-different-actions">Should I always try different actions?</a></li>
 </ul>
 </li>
 </ul>
@@ -183,9 +186,8 @@
             
   <div class="section" id="frequently-asked-questions">
 <h1>Frequently Asked Questions<a class="headerlink" href="#frequently-asked-questions" title="Permalink to this headline">¶</a></h1>
-<p>This page answers some of the commonly asked questions about
-CompilerGym. Have a question not answered here? File an issue on the
-<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/issues">GitHub issue tracker</a>.</p>
+<p>This page answers some of the commonly asked questions about CompilerGym. Have a
+question not answered here? File an issue on the <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/issues">GitHub issue tracker</a>.</p>
 <div class="contents local topic" id="questions">
 <p class="topic-title">Questions:</p>
 <ul class="simple">
@@ -193,20 +195,21 @@ CompilerGym. Have a question not answered here? File an issue on the
 <li><p><a class="reference internal" href="#i-found-a-bug-how-do-i-report-it" id="id3">I found a bug. How do I report it?</a></p></li>
 <li><p><a class="reference internal" href="#do-i-have-to-use-reinforcement-learning" id="id4">Do I have to use reinforcement learning?</a></p></li>
 <li><p><a class="reference internal" href="#what-features-are-going-to-be-added-in-the-future" id="id5">What features are going to be added in the future?</a></p></li>
-<li><p><a class="reference internal" href="#how-do-i-run-this-on-my-own-program" id="id6">How do I run this on my own program?</a></p></li>
-<li><p><a class="reference internal" href="#i-want-to-add-a-new-program-representation-reward-signal-how-do-i-do-that" id="id7">I want to add a new program representation / reward signal. How do I do that?</a></p></li>
+<li><p><a class="reference internal" href="#is-compiler-optimization-really-a-sequential-decision-process" id="id6">Is compiler optimization really a sequential decision process?</a></p></li>
+<li><p><a class="reference internal" href="#when-does-a-compiler-enviornment-consider-an-episode-done" id="id7">When does a compiler enviornment consider an episode “done”?</a></p></li>
+<li><p><a class="reference internal" href="#how-do-i-run-this-on-my-own-program" id="id8">How do I run this on my own program?</a></p></li>
+<li><p><a class="reference internal" href="#i-want-to-add-a-new-program-representation-reward-signal-how-do-i-do-that" id="id9">I want to add a new program representation / reward signal. How do I do that?</a></p></li>
+<li><p><a class="reference internal" href="#should-i-always-try-different-actions" id="id10">Should I always try different actions?</a></p></li>
 </ul>
 </div>
 <div class="section" id="what-can-i-do-with-this">
 <h2><a class="toc-backref" href="#id2">What can I do with this?</a><a class="headerlink" href="#what-can-i-do-with-this" title="Permalink to this headline">¶</a></h2>
-<p>This projects lets you control the decisions that a compiler makes
-when optimizing a program. Currently, it lets you control the
-selection and ordering of optimization passes for LLVM in order to
-minimize the size of the code.</p>
-<p>We wrote a small wrapper around the OpenAI gym environment which lets
-you step through the optimization of a program using a text user
-interface. Have a play around with it to better understand what is
-going on:</p>
+<p>This projects lets you control the decisions that a compiler makes when
+optimizing a program. Currently, it lets you control the selection and ordering
+of optimization passes for LLVM in order to minimize the size of the code.</p>
+<p>We wrote a small wrapper around the OpenAI gym environment which lets you step
+through the optimization of a program using a text user interface. Have a play
+around with it to better understand what is going on:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pythom -m compiler_gym.bin.manual_env --env=llvm-v0
 </pre></div>
 </div>
@@ -218,36 +221,65 @@ going on:</p>
 </div>
 <div class="section" id="do-i-have-to-use-reinforcement-learning">
 <h2><a class="toc-backref" href="#id4">Do I have to use reinforcement learning?</a><a class="headerlink" href="#do-i-have-to-use-reinforcement-learning" title="Permalink to this headline">¶</a></h2>
-<p>No. We think that the the gym provides a useful abstraction for
-sequential decision making. You may use any technique you wish to
-explore the optimization space.</p>
+<p>No. We think that the the gym provides a useful abstraction for sequential
+decision making. You may use any technique you wish to explore the optimization
+space.</p>
 </div>
 <div class="section" id="what-features-are-going-to-be-added-in-the-future">
 <h2><a class="toc-backref" href="#id5">What features are going to be added in the future?</a><a class="headerlink" href="#what-features-are-going-to-be-added-in-the-future" title="Permalink to this headline">¶</a></h2>
 <p>See <a class="reference internal" href="about.html#roadmap"><span class="std std-ref">roadmap</span></a>.</p>
 </div>
+<div class="section" id="is-compiler-optimization-really-a-sequential-decision-process">
+<h2><a class="toc-backref" href="#id6">Is compiler optimization really a sequential decision process?</a><a class="headerlink" href="#is-compiler-optimization-really-a-sequential-decision-process" title="Permalink to this headline">¶</a></h2>
+<p>Compilers frequently package individual transformations as “optimization passes”
+which are then applied in a sequential order. Usually this order is fixed (e.g.
+<a class="reference external" href="https://github.com/llvm/llvm-project/blob/71a8e4e7d6b947c8b954ec0763ff7969b3879d7b/llvm/lib/Transforms/IPO/PassManagerBuilder.cpp#L517-L922">realworld example</a>).
+CompilerGym replaces that fixed order with a sequential decision process where
+any pass may be applied at any stage.</p>
+</div>
+<div class="section" id="when-does-a-compiler-enviornment-consider-an-episode-done">
+<h2><a class="toc-backref" href="#id7">When does a compiler enviornment consider an episode “done”?</a><a class="headerlink" href="#when-does-a-compiler-enviornment-consider-an-episode-done" title="Permalink to this headline">¶</a></h2>
+<p>The compiler itself doesn’t have a signal for termination. Actions are like
+rewrite rules, it is up to the user to decide when no more improvement can be
+achieved from further rewrites. E.g. for simple random search we can use
+<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/blob/8fa65c232d2bf6a7347af44565579c60775162ac/compiler_gym/bin/random_search.py#L33-L40">“patience”</a>.
+The only exception is if the compiler crashes, or the code ends up in an
+unexpected state - we have to abort. This happens.</p>
+</div>
 <div class="section" id="how-do-i-run-this-on-my-own-program">
-<h2><a class="toc-backref" href="#id6">How do I run this on my own program?</a><a class="headerlink" href="#how-do-i-run-this-on-my-own-program" title="Permalink to this headline">¶</a></h2>
-<p>For LLVM, you compile your program to an unoptimized LLVM bitcode
-file. For C/C++ programs, you can do this using clang by running:</p>
+<h2><a class="toc-backref" href="#id8">How do I run this on my own program?</a><a class="headerlink" href="#how-do-i-run-this-on-my-own-program" title="Permalink to this headline">¶</a></h2>
+<p>For LLVM, you compile your program to an unoptimized LLVM bitcode file. This can
+be done automatically for C/C++ programs using the <a class="reference internal" href="llvm/api.html#compiler_gym.envs.llvm.make_benchmark" title="compiler_gym.envs.llvm.make_benchmark"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.make_benchmark()</span></code></a> API, or you can do this yourself using
+clang:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ clang -emit-llvm -c -O0 -Xclang -disable-O0-optnone -Xclang -disable-llvm-passes myapp.c
 </pre></div>
 </div>
-<p>Then pass the path of the generated <cite>.bc</cite> file to the CompilerGym
-commandline tools using the <cite>–program_data</cite> flag, e.g.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ bazel run -c opt //compiler_gym/bin:brute_force -- --env=llvm-v0 \
-    --program_data=file:///$PWD/myapp.bc
+<p>Then pass the path of the generated <cite>.bc</cite> file to the CompilerGym commandline
+tools using the <cite>–benchmark</cite> flag, e.g.</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ bazel run -c opt //compiler_gym/bin:random_search -- --env=llvm-ic-v0 \
+    --benchmark=file:///$PWD/myapp.bc
 </pre></div>
 </div>
 </div>
 <div class="section" id="i-want-to-add-a-new-program-representation-reward-signal-how-do-i-do-that">
-<h2><a class="toc-backref" href="#id7">I want to add a new program representation / reward signal. How do I do that?</a><a class="headerlink" href="#i-want-to-add-a-new-program-representation-reward-signal-how-do-i-do-that" title="Permalink to this headline">¶</a></h2>
-<p>Fork this project and build it from source (see
-<a class="reference internal" href="installation.html"><span class="doc">Installation</span></a>). Then modify the C++ service implementation for
-the compiler that you are interested in. The service codebase is
-located at <code class="code docutils literal notranslate"><span class="pre">compiler_gym/envs/$COMPILER/service</span></code>, where
-<code class="code docutils literal notranslate"><span class="pre">$COMPILER</span></code> is the name of the compiler service you would wish
-to modify, e.g. llvm. Once done, send us a pull request!</p>
+<h2><a class="toc-backref" href="#id9">I want to add a new program representation / reward signal. How do I do that?</a><a class="headerlink" href="#i-want-to-add-a-new-program-representation-reward-signal-how-do-i-do-that" title="Permalink to this headline">¶</a></h2>
+<p>If your program representation can be computed from existing observations,
+consider using the <code class="xref py py-meth docutils literal notranslate"><span class="pre">add_derived_space()</span></code> API to add a derived
+observation or <a class="reference internal" href="compiler_gym/views.html#compiler_gym.views.RewardView.add_space" title="compiler_gym.views.RewardView.add_space"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_space()</span></code></a> to
+add a new reward space.</p>
+<p>If you require modifying the underlying compiler service implementation, fork
+this project and build it from source (see <a class="reference internal" href="installation.html"><span class="doc">Installation</span></a>). Then modify the
+C++ service implementation for the compiler that you are interested in. The
+service codebase is located at <code class="code docutils literal notranslate"><span class="pre">compiler_gym/envs/$COMPILER/service</span></code>,
+where <code class="code docutils literal notranslate"><span class="pre">$COMPILER</span></code> is the name of the compiler service you would wish to
+modify, e.g. llvm. Once done, send us a pull request!</p>
+</div>
+<div class="section" id="should-i-always-try-different-actions">
+<h2><a class="toc-backref" href="#id10">Should I always try different actions?</a><a class="headerlink" href="#should-i-always-try-different-actions" title="Permalink to this headline">¶</a></h2>
+<p>Some optimization actions may be called multiple times after other actions. An
+example of this is <a class="reference external" href="https://en.wikipedia.org/wiki/Dead_code_elimination">dead code elimination</a>, which can be used to
+“clean up mess” generated from a previous action. So repeating the same action
+in different context can bring improvements.</p>
 </div>
 </div>
 
