@@ -1,10 +1,42 @@
 # This package exposes the LLVM optimization pipeline as a CompilerGym service.
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
-cc_binary(
-    name = "compiler_gym-llvm-service",
-    srcs = ["RunService.cc"],
+# Post-build shenanigans to strip the absolute path to LLVMPolly.so.
+genrule(
+    name = "compiler_gym-llvm-service-bin",
+    srcs = [":compiler_gym-llvm-service-prelinked"],
+    outs = ["compiler_gym-llvm-service"],
+    cmd = select({
+        "@llvm//:darwin": (
+            "cp $(location :compiler_gym-llvm-service-prelinked) $@"
+        ),
+        "//conditions:default": (
+            "cp $(location :compiler_gym-llvm-service-prelinked) $@ && " +
+            "chmod 666 $@ && " +
+            "patchelf --set-rpath '$$ORIGIN' $@ && " +
+            "chmod 555 $@"
+        ),
+    }),
     visibility = ["//visibility:public"],
+)
+
+# This target copies the LLVMPolly.so file from LLVM to libLLVMPolly.so.
+genrule(
+    name = "libLLVMPolly",
+    srcs = [
+        "@clang-llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04//:all_files",
+        "@clang-llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04//:clang",
+    ],
+    outs = ["libLLVMPolly.so"],
+    cmd = "cp $$(dirname $(location @clang-llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04//:clang))/../lib/LLVMPolly.so $@",
+    visibility = ["//visibility:public"],
+)
+
+# Do not use this target directly, use the compiler_gym-llvm_service target
+# defined above instead.
+cc_binary(
+    name = "compiler_gym-llvm-service-prelinked",
+    srcs = ["RunService.cc"],
     deps = [
         ":LlvmService",
         "//compiler_gym/util:RunService",

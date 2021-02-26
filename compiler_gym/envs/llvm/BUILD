@@ -12,7 +12,12 @@ py_library(
     ],
     data = [
         "//compiler_gym/envs/llvm/service:compiler_gym-llvm-service",
-    ],
+    ] + select({
+        "@llvm//:darwin": [],
+        "//conditions:default": [
+            "//compiler_gym/envs/llvm/service:libLLVMPolly",
+        ],
+    }),
     visibility = ["//compiler_gym:__subpackages__"],
     deps = [
         ":benchmarks",
