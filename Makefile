@@ -213,7 +213,7 @@ itest:
 	$(IBAZEL) $(BAZEL_OPTS) test $(BAZEL_TEST_OPTS) //...
 
 install-test-datasets:
-	cd .. && python -m compiler_gym.bin.datasets --env=llvm-v0 --download=cBench-v0 >/dev/null
+	cd .. && $(PYTHON) -m compiler_gym.bin.datasets --env=llvm-v0 --download=cBench-v0 >/dev/null
 
 install-test: install-test-datasets
 	mkdir -p /tmp/compiler_gym/wheel_tests
