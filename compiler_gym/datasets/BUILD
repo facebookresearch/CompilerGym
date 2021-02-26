@@ -14,17 +14,10 @@ py_library(
 )
 
 py_library(
-    name = "benchmark",
-    srcs = ["benchmark.py"],
-    visibility = ["//compiler_gym:__subpackages__"],
-)
-
-py_library(
     name = "dataset",
     srcs = ["dataset.py"],
     visibility = ["//compiler_gym:__subpackages__"],
     deps = [
-        ":benchmark",
         "//compiler_gym/util",
     ],
 )
