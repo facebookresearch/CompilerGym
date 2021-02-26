@@ -88,8 +88,10 @@ py_test(
     timeout = "short",
     srcs = ["datasets_test.py"],
     deps = [
+        "//compiler_gym",
         "//compiler_gym/envs/llvm:datasets",
         "//tests:test_main",
+        "//tests/pytest_plugins:common",
     ],
 )
 

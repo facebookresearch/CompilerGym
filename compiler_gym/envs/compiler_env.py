@@ -401,9 +401,24 @@ class CompilerEnv(gym.Env):
             warnings.warn(
                 "Changing the benchmark has no effect until reset() is called."
             )
-        if isinstance(benchmark, str) or benchmark is None:
+        if benchmark is None:
+            self.logger.debug("Unsetting the forced environment")
+            self._user_specified_benchmark_uri = None
+        elif isinstance(benchmark, str):
+            self.logger.debug("Setting benchmark by name: %s", benchmark)
+            # If the user requested a benchmark by URI, e.g.
+            # benchmark://cBench-v0/dijkstra, require the dataset (cBench-v0)
+            # automatically.
+            if self.datasets_site_path:
+                components = benchmark.split("://")
+                if len(components) == 1 or components[0] == "benchmark":
+                    components = components[-1].split("/")
+                    if len(components) > 1:
+                        self.logger.info("Requiring dataset %s", components[0])
+                        self.require_dataset(components[0])
             self._user_specified_benchmark_uri = benchmark
         elif isinstance(benchmark, Benchmark):
+            self.logger.debug("Setting benchmark data: %s", benchmark.uri)
             self._user_specified_benchmark_uri = benchmark.uri
             self._add_custom_benchmarks([benchmark])
         else:
