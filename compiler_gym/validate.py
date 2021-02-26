@@ -48,7 +48,10 @@ def validate_states(
     if datasets:
         env = make_env()
         try:
-            env.require_datasets(datasets)
+            # TODO(github.com/facebookresearch/CompilerGym/issues/45): No longer
+            # required.
+            for dataset in datasets:
+                env.datasets.require(dataset)
         finally:
             env.close()
 

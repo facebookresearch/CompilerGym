@@ -51,8 +51,10 @@ std::unique_ptr<llvm::Module> makeModuleOrDie(llvm::LLVMContext& context, const 
 }  // anonymous namespace
 
 Status readBitcodeFile(const fs::path& path, Bitcode* bitcode) {
-  std::ifstream ifs;
-  ifs.open(path.string());
+  std::ifstream ifs(path.string());
+  if (ifs.fail()) {
+    return Status(StatusCode::NOT_FOUND, fmt::format("File not found: \"{}\"", path.string()));
+  }
 
   ifs.seekg(0, std::ios::end);
   if (ifs.fail()) {
@@ -93,35 +95,30 @@ std::unique_ptr<llvm::Module> makeModule(llvm::LLVMContext& context, const Bitco
 
 // A benchmark is an LLVM module and the LLVM context that owns it.
 Benchmark::Benchmark(const std::string& name, const Bitcode& bitcode,
-                     const fs::path& workingDirectory, std::optional<fs::path> bitcodePath,
-                     const BaselineCosts* baselineCosts)
+                     const fs::path& workingDirectory, const BaselineCosts* baselineCosts)
     : context_(std::make_unique<llvm::LLVMContext>()),
       module_(makeModuleOrDie(*context_, bitcode, name)),
       baselineCosts_(baselineCosts ? *baselineCosts : getBaselineCosts(*module_, workingDirectory)),
       hash_(getModuleHash(*module_)),
       name_(name),
-      bitcodeSize_(bitcode.size()),
-      bitcodePath_(bitcodePath) {}
+      bitcodeSize_(bitcode.size()) {}
 
 Benchmark::Benchmark(const std::string& name, std::unique_ptr<llvm::LLVMContext> context,
                      std::unique_ptr<llvm::Module> module, size_t bitcodeSize,
-                     const fs::path& workingDirectory, std::optional<fs::path> bitcodePath,
-                     const BaselineCosts* baselineCosts)
+                     const fs::path& workingDirectory, const BaselineCosts* baselineCosts)
     : context_(std::move(context)),
       module_(std::move(module)),
       baselineCosts_(baselineCosts ? *baselineCosts : getBaselineCosts(*module_, workingDirectory)),
       hash_(getModuleHash(*module_)),
       name_(name),
-      bitcodeSize_(bitcodeSize),
-      bitcodePath_(bitcodePath) {}
+      bitcodeSize_(bitcodeSize) {}
 
 std::unique_ptr<Benchmark> Benchmark::clone(const fs::path& workingDirectory) const {
   Bitcode bitcode;
   llvm::raw_svector_ostream ostream(bitcode);
   llvm::WriteBitcodeToFile(module(), ostream);
 
-  return std::make_unique<Benchmark>(name(), bitcode, workingDirectory, bitcodePath(),
-                                     &baselineCosts());
+  return std::make_unique<Benchmark>(name(), bitcode, workingDirectory, &baselineCosts());
 }
 
 }  // namespace compiler_gym::llvm_service

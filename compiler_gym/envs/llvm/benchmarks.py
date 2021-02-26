@@ -15,7 +15,7 @@ from pathlib import Path
 from signal import Signals
 from typing import Iterable, List, Optional, Union
 
-from compiler_gym.service.proto import Benchmark, File
+from compiler_gym.datasets import Benchmark
 from compiler_gym.third_party import llvm
 from compiler_gym.util.runfiles_path import cache_path
 
@@ -137,6 +137,42 @@ class ClangInvocation(object):
 
         return cmd
 
+    @classmethod
+    def from_c_file(
+        cls,
+        path: Path,
+        copt: Optional[List[str]] = None,
+        system_includes: bool = True,
+        timeout: int = 600,
+    ):
+        copt = copt or []
+        # NOTE(cummins): There is some discussion about the best way to create a
+        # bitcode that is unoptimized yet does not hinder downstream
+        # optimization opportunities. Here we are using a configuration based on
+        # -O1 in which we prevent the -O1 optimization passes from running. This
+        # is because LLVM produces different function attributes dependening on
+        # the optimization level. E.g. "-O0 -Xclang -disable-llvm-optzns -Xclang
+        # -disable-O0-optnone" will generate code with "noinline" attributes set
+        # on the functions, wheras "-Oz -Xclang -disable-llvm-optzns" will
+        # generate functions with "minsize" and "optsize" attributes set.
+        #
+        # See also:
+        #   <https://lists.llvm.org/pipermail/llvm-dev/2018-August/thread.html#125365>
+        #   <https://github.com/facebookresearch/CompilerGym/issues/110>
+        DEFAULT_COPT = [
+            "-O1",
+            "-Xclang",
+            "-disable-llvm-passes",
+            "-Xclang",
+            "-disable-llvm-optzns",
+        ]
+
+        return cls(
+            [str(path)] + DEFAULT_COPT + copt,
+            system_includes=system_includes,
+            timeout=timeout,
+        )
+
 
 def _run_command(cmd: List[str], timeout: int):
     process = subprocess.Popen(
@@ -226,7 +262,7 @@ def make_benchmark(
         :func:`get_system_includes`.
     :param timeout: The maximum number of seconds to allow clang to run before
         terminating.
-    :return: A :code:`Benchmark` message.
+    :return: A :code:`Benchmark` instance.
     :raises FileNotFoundError: If any input sources are not found.
     :raises TypeError: If the inputs are of unsupported types.
     :raises OSError: If a compilation job fails.
@@ -238,27 +274,6 @@ def make_benchmark(
     clang_jobs: List[ClangInvocation] = []
 
     def _add_path(path: Path):
-        # NOTE(cummins): There is some discussion about the best way to create a
-        # bitcode that is unoptimized yet does not hinder downstream
-        # optimization opportunities. Here we are using a configuration based on
-        # -O1 in which we prevent the -O1 optimization passes from running. This
-        # is because LLVM produces different function attributes dependening on
-        # the optimization level. E.g. "-O0 -Xclang -disable-llvm-optzns -Xclang
-        # -disable-O0-optnone" will generate code with "noinline" attributes set
-        # on the functions, wheras "-Oz -Xclang -disable-llvm-optzns" will
-        # generate functions with "minsize" and "optsize" attributes set.
-        #
-        # See also:
-        #   <https://lists.llvm.org/pipermail/llvm-dev/2018-August/thread.html#125365>
-        #   <https://github.com/facebookresearch/CompilerGym/issues/110>
-        DEFAULT_COPT = [
-            "-O1",
-            "-Xclang",
-            "-disable-llvm-passes",
-            "-Xclang",
-            "-disable-llvm-optzns",
-        ]
-
         if not path.is_file():
             raise FileNotFoundError(path)
 
@@ -266,10 +281,8 @@ def make_benchmark(
             bitcodes.append(path)
         elif path.suffix in {".c", ".cxx", ".cpp", ".cc"}:
             clang_jobs.append(
-                ClangInvocation(
-                    [str(path)] + DEFAULT_COPT + copt,
-                    system_includes=system_includes,
-                    timeout=timeout,
+                ClangInvocation.from_c_file(
+                    path, copt=copt, system_includes=system_includes, timeout=timeout
                 )
             )
         else:
@@ -296,9 +309,7 @@ def make_benchmark(
     # Shortcut if we only have a single pre-compiled bitcode.
     if len(bitcodes) == 1 and not clang_jobs:
         bitcode = bitcodes[0]
-        return Benchmark(
-            uri=f"file:///{bitcode}", program=File(uri=f"file:///{bitcode}")
-        )
+        return Benchmark.from_file(uri=f"file:///{bitcode}", path=bitcode)
 
     tmpdir_root = cache_path(".")
     tmpdir_root.mkdir(exist_ok=True, parents=True)
@@ -341,7 +352,6 @@ def make_benchmark(
             with open(str(list(bitcodes + clang_outs)[0]), "rb") as f:
                 bitcode = f.read()
 
-    timestamp = datetime.now().strftime(f"%Y%m%HT%H%M%S-{random.randrange(16**4):04x}")
-    return Benchmark(
-        uri=f"benchmark://user/{timestamp}", program=File(contents=bitcode)
-    )
+    timestamp = datetime.now().strftime("%Y%m%HT%H%M%S")
+    uri = f"benchmark://user/{timestamp}-{random.randrange(16**4):04x}"
+    return Benchmark.from_file_contents(uri, bitcode)

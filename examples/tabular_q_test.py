@@ -20,7 +20,7 @@ def test_run_tabular_q_smoke_test():
             "--episode_length=5",
             "--episodes=10",
             "--log_every=2",
-            "--benchmark=cBench-v1/crc32",
+            "--benchmark=cbench-v1/crc32",
         ]
     )
     with capture_output() as out:

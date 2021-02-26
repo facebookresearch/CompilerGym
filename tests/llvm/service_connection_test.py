@@ -23,7 +23,7 @@ def env(request) -> CompilerEnv:
     # connections.
     if request.param == "local":
         env = gym.make("llvm-v0")
-        env.require_dataset("cBench-v1")
+        env.require_dataset("cbench-v1")
         try:
             yield env
         finally:
@@ -31,7 +31,7 @@ def env(request) -> CompilerEnv:
     else:
         service = CompilerGymServiceConnection(llvm.LLVM_SERVICE_BINARY)
         env = LlvmEnv(service=service.connection.url)
-        env.require_dataset("cBench-v1")
+        env.require_dataset("cbench-v1")
         try:
             yield env
         finally:
@@ -42,7 +42,7 @@ def env(request) -> CompilerEnv:
 def test_service_env_dies_reset(env: CompilerEnv):
     env.observation_space = "Autophase"
     env.reward_space = "IrInstructionCount"
-    env.reset("cBench-v1/crc32")
+    env.reset("cbench-v1/crc32")
 
     # Kill the service.
     env.service.close()
@@ -57,7 +57,7 @@ def test_service_env_dies_reset(env: CompilerEnv):
     assert reward == 0
 
     # Reset the environment and check that it works.
-    env.reset(benchmark="cBench-v1/crc32")
+    env.reset(benchmark="cbench-v1/crc32")
     assert env.in_episode
 
     observation, reward, done, info = env.step(0)

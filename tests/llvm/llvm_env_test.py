@@ -17,6 +17,7 @@ from compiler_gym.envs import CompilerEnv, llvm
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.service.connection import CompilerGymServiceConnection
 from compiler_gym.util import debug_util as dbg
+from tests.pytest_plugins import llvm as llvm_plugin
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.llvm"]
@@ -27,16 +28,16 @@ def env(request) -> CompilerEnv:
     """Create an LLVM environment."""
     if request.param == "local":
         env = gym.make("llvm-v0")
-        env.require_dataset("cBench-v1")
         try:
+            llvm_plugin.setup_test_datasets(env)
             yield env
         finally:
             env.close()
     else:
         service = CompilerGymServiceConnection(llvm.LLVM_SERVICE_BINARY)
         env = LlvmEnv(service=service.connection.url)
-        env.require_dataset("cBench-v1")
         try:
+            llvm_plugin.setup_test_datasets(env)
             yield env
         finally:
             env.close()
@@ -63,26 +64,26 @@ def test_all_flags_are_unique(env: LlvmEnv):
     assert sorted(env.action_space.flags) == sorted(set(env.action_space.flags))
 
 
-def test_benchmark_names(env: CompilerEnv, benchmark_names: List[str]):
-    # Use a subset check as benchmark_names may exclude certain benchmarks for
-    # testing.
-    assert set(benchmark_names).issubset(set(env.benchmarks))
+@pytest.mark.parametrize("benchmark_name", llvm_plugin.BENCHMARK_NAMES)
+def test_benchmark_names(env: CompilerEnv, benchmark_name: str):
+    """Check that all benchmark names can be found in the datasets."""
+    assert env.datasets.benchmark(benchmark_name)
 
 
 def test_double_reset(env: CompilerEnv):
-    env.reset(benchmark="cBench-v1/crc32")
-    env.reset(benchmark="cBench-v1/crc32")
+    env.reset(benchmark="cbench-v1/crc32")
+    env.reset(benchmark="cbench-v1/crc32")
     assert env.in_episode
 
 
 def test_commandline_no_actions(env: CompilerEnv):
-    env.reset(benchmark="cBench-v1/crc32")
+    env.reset(benchmark="cbench-v1/crc32")
     assert env.commandline() == "opt  input.bc -o output.bc"
     assert env.commandline_to_actions(env.commandline()) == []
 
 
 def test_commandline(env: CompilerEnv):
-    env.reset(benchmark="cBench-v1/crc32")
+    env.reset(benchmark="cbench-v1/crc32")
     env.step(env.action_space.flags.index("-mem2reg"))
     env.step(env.action_space.flags.index("-reg2mem"))
     assert env.commandline() == "opt -mem2reg -reg2mem input.bc -o output.bc"
@@ -92,26 +93,26 @@ def test_commandline(env: CompilerEnv):
     ]
 
 
-def test_uri_substring_candidate_match(env: CompilerEnv):
-    env.reset(benchmark="benchmark://cBench-v1/crc32")
-    assert env.benchmark == "benchmark://cBench-v1/crc32"
+def test_uri_substring_no_match(env: CompilerEnv):
+    env.reset(benchmark="benchmark://cbench-v1/crc32")
+    assert env.benchmark == "benchmark://cbench-v1/crc32"
 
-    env.reset(benchmark="benchmark://cBench-v1/crc3")
-    assert env.benchmark == "benchmark://cBench-v1/crc32"
+    with pytest.raises(LookupError):
+        env.reset(benchmark="benchmark://cbench-v1/crc3")
 
-    env.reset(benchmark="benchmark://cBench-v1/cr")
-    assert env.benchmark == "benchmark://cBench-v1/crc32"
+    with pytest.raises(LookupError):
+        env.reset(benchmark="benchmark://cbench-v1/cr")
 
 
-def test_uri_substring_candidate_match_infer_protocol(env: CompilerEnv):
-    env.reset(benchmark="cBench-v1/crc32")
-    assert env.benchmark == "benchmark://cBench-v1/crc32"
+def test_uri_substring_candidate_no_match_infer_protocol(env: CompilerEnv):
+    env.reset(benchmark="cbench-v1/crc32")
+    assert env.benchmark == "benchmark://cbench-v1/crc32"
 
-    env.reset(benchmark="cBench-v1/crc3")
-    assert env.benchmark == "benchmark://cBench-v1/crc32"
+    with pytest.raises(LookupError):
+        env.reset(benchmark="cbench-v1/crc3")
 
-    env.reset(benchmark="cBench-v1/cr")
-    assert env.benchmark == "benchmark://cBench-v1/crc32"
+    with pytest.raises(LookupError):
+        env.reset(benchmark="cbench-v1/cr")
 
 
 def test_reset_to_force_benchmark(env: CompilerEnv):
@@ -119,45 +120,43 @@ def test_reset_to_force_benchmark(env: CompilerEnv):
     be used for every subsequent episode.
     """
     env.benchmark = None
-    env.reset(benchmark="benchmark://cBench-v1/crc32")
-    assert env.benchmark == "benchmark://cBench-v1/crc32"
+    env.reset(benchmark="benchmark://cbench-v1/crc32")
+    assert env.benchmark == "benchmark://cbench-v1/crc32"
     for _ in range(10):
         env.reset()
-        assert env.benchmark == "benchmark://cBench-v1/crc32"
+        assert env.benchmark == "benchmark://cbench-v1/crc32"
 
 
 def test_unset_forced_benchmark(env: CompilerEnv):
     """Test that setting benchmark to None "unsets" the user benchmark for
     every subsequent episode.
     """
-    env.reset(benchmark="benchmark://cBench-v1/crc32")
-    assert env.benchmark == "benchmark://cBench-v1/crc32"
+    env.reset(benchmark="benchmark://cbench-v1/crc32")
+    assert env.benchmark == "benchmark://cbench-v1/crc32"
     env.benchmark = None
     for _ in range(50):
         env.reset()
-        if env.benchmark != "benchmark://cBench-v1/crc32":
+        if env.benchmark != "benchmark://cbench-v1/crc32":
             break
     else:
-        pytest.fail(
-            "Improbably selected the same benchmark 50 times! " "Expected random."
-        )
+        pytest.fail("Improbably selected the same benchmark 50 times! Expected random.")
 
 
 def test_change_benchmark_mid_episode(env: LlvmEnv):
     """Test that changing the benchmark while in an episode has no effect until
     the next call to reset()."""
-    env.reset(benchmark="benchmark://cBench-v1/crc32")
-    assert env.benchmark == "benchmark://cBench-v1/crc32"
-    env.benchmark = "benchmark://cBench-v1/dijkstra"
-    assert env.benchmark == "benchmark://cBench-v1/crc32"
+    env.reset(benchmark="benchmark://cbench-v1/crc32")
+    assert env.benchmark == "benchmark://cbench-v1/crc32"
+    env.benchmark = "benchmark://cbench-v1/dijkstra"
+    assert env.benchmark == "benchmark://cbench-v1/crc32"
     env.reset()
-    assert env.benchmark == "benchmark://cBench-v1/dijkstra"
+    assert env.benchmark == "benchmark://cbench-v1/dijkstra"
 
 
 def test_set_benchmark_invalid_type(env: LlvmEnv):
     with pytest.raises(TypeError) as ctx:
         env.benchmark = 10
-    assert str(ctx.value) == "Unsupported benchmark type: int"
+    assert str(ctx.value) == "Expected a Benchmark instance, received: 'int'"
 
 
 def test_gym_make_kwargs():
@@ -176,7 +175,7 @@ def test_gym_make_kwargs():
 
 def test_connection_dies_default_reward(env: LlvmEnv):
     env.reward_space = "IrInstructionCount"
-    env.reset(benchmark="cBench-v1/crc32")
+    env.reset(benchmark="cbench-v1/crc32")
 
     env.reward_space.default_negates_returns = False
     env.reward_space.default_value = 2.5
@@ -191,7 +190,7 @@ def test_connection_dies_default_reward(env: LlvmEnv):
 
 def test_connection_dies_default_reward_negated(env: LlvmEnv):
     env.reward_space = "IrInstructionCount"
-    env.reset(benchmark="cBench-v1/crc32")
+    env.reset(benchmark="cbench-v1/crc32")
 
     env.reward_space.default_negates_returns = True
     env.reward_space.default_value = 2.5
@@ -205,7 +204,7 @@ def test_connection_dies_default_reward_negated(env: LlvmEnv):
 
 
 def test_state_to_csv_from_csv(env: LlvmEnv):
-    env.reset(benchmark="cBench-v1/crc32")
+    env.reset(benchmark="cbench-v1/crc32")
     env.episode_reward = 10
 
     state = env.state
@@ -218,7 +217,7 @@ def test_state_to_csv_from_csv(env: LlvmEnv):
 def test_apply_state(env: LlvmEnv):
     """Test that apply() on a clean environment produces same state."""
     env.reward_space = "IrInstructionCount"
-    env.reset(benchmark="cBench-v1/crc32")
+    env.reset(benchmark="cbench-v1/crc32")
     env.step(env.action_space.flags.index("-mem2reg"))
 
     other = gym.make("llvm-v0", reward_space="IrInstructionCount")
@@ -251,7 +250,7 @@ def test_same_reward_after_reset(env: LlvmEnv):
     same reward.
     """
     env.reward_space = "IrInstructionCount"
-    env.benchmark = "cBench-v1/dijkstra"
+    env.benchmark = "cbench-v1/dijkstra"
 
     action = env.action_space.flags.index("-instcombine")
     env.reset()
@@ -265,19 +264,19 @@ def test_same_reward_after_reset(env: LlvmEnv):
 
 
 def test_write_bitcode(env: LlvmEnv, tmpwd: Path):
-    env.reset(benchmark="cBench-v1/crc32")
+    env.reset(benchmark="cbench-v1/crc32")
     env.write_bitcode("file.bc")
     assert Path("file.bc").is_file()
 
 
 def test_write_ir(env: LlvmEnv, tmpwd: Path):
-    env.reset(benchmark="cBench-v1/crc32")
+    env.reset(benchmark="cbench-v1/crc32")
     env.write_bitcode("file.ll")
     assert Path("file.ll").is_file()
 
 
 def test_ir_sha1(env: LlvmEnv, tmpwd: Path):
-    env.reset(benchmark="cBench-v1/crc32")
+    env.reset(benchmark="cbench-v1/crc32")
     before = env.ir_sha1
 
     _, _, done, info = env.step(env.action_space.flags.index("-mem2reg"))
@@ -307,7 +306,7 @@ def test_logging_forced_level():
 
 def test_step_multiple_actions_list(env: LlvmEnv):
     """Pass a list of actions to step()."""
-    env.reset(benchmark="cBench-v1/crc32")
+    env.reset(benchmark="cbench-v1/crc32")
     actions = [
         env.action_space.flags.index("-mem2reg"),
         env.action_space.flags.index("-reg2mem"),
@@ -319,7 +318,7 @@ def test_step_multiple_actions_list(env: LlvmEnv):
 
 def test_step_multiple_actions_generator(env: LlvmEnv):
     """Pass an iterable of actions to step()."""
-    env.reset(benchmark="cBench-v1/crc32")
+    env.reset(benchmark="cbench-v1/crc32")
     actions = (
         env.action_space.flags.index("-mem2reg"),
         env.action_space.flags.index("-reg2mem"),

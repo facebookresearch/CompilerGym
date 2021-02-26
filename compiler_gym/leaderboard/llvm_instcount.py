@@ -28,6 +28,7 @@ Users who wish to create a submission for this leaderboard may use
 automatically evaluate their agent on the test set.
 """
 import logging
+from itertools import islice
 from pathlib import Path
 from threading import Thread
 from time import sleep
@@ -64,7 +65,7 @@ flags.DEFINE_integer(
 flags.DEFINE_integer(
     "n", 10, "The number of repetitions of the search to run for each benchmark."
 )
-flags.DEFINE_string("test_dataset", "cBench-v1", "The dataset to use for the search.")
+flags.DEFINE_string("test_dataset", "cbench-v1", "The dataset to use for the search.")
 flags.DEFINE_boolean("validate", True, "Run validation on the results.")
 flags.DEFINE_boolean(
     "resume",
@@ -232,9 +233,10 @@ def eval_llvm_instcount_policy(policy: Policy) -> None:
             # Install the required dataset and build the list of benchmarks to
             # evaluate.
             env.require_dataset(FLAGS.test_dataset)
-            benchmarks = sorted([b for b in env.benchmarks if FLAGS.test_dataset in b])
+            benchmarks = env.datasets[FLAGS.test_dataset].benchmark_uris()
             if FLAGS.max_benchmarks:
-                benchmarks = benchmarks[: FLAGS.max_benchmarks]
+                benchmarks = islice(benchmarks, FLAGS.max_benchmarks)
+            benchmarks = list(benchmarks)
 
             # Repeat the searches for the requested number of iterations.
             benchmarks *= FLAGS.n

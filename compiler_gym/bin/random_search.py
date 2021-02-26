@@ -17,8 +17,8 @@ space on a Dijkstra benchmark for 60 seconds using:
 
 .. code-block::
 
-    $ python -m compiler_gym.bin.random_search --env=llvm-ic-v0 --benchmark=cBench-v1/dijkstra --runtime=60
-    Started 16 worker threads for benchmark benchmark://cBench-v1/dijkstra (410 instructions) using reward IrInstructionCountOz.
+    $ python -m compiler_gym.bin.random_search --env=llvm-ic-v0 --benchmark=cbench-v1/dijkstra --runtime=60
+    Started 16 worker threads for benchmark benchmark://cbench-v1/dijkstra (410 instructions) using reward IrInstructionCountOz.
     === Running for a minute ===
     Runtime: a minute. Num steps: 470,407 (7,780 / sec). Num episodes: 4,616 (76 / sec). Num restarts: 0.
     Best reward: 101.59% (96 passes, found after 35 seconds)
@@ -58,7 +58,6 @@ from pathlib import Path
 
 from absl import app, flags
 
-import compiler_gym.util.flags.ls_benchmark  # noqa Flag definition.
 import compiler_gym.util.flags.nproc  # noqa Flag definition.
 import compiler_gym.util.flags.output_dir  # noqa Flag definition.
 from compiler_gym.random_search import random_search
@@ -93,11 +92,6 @@ def main(argv):
     if len(argv) != 1:
         raise app.UsageError(f"Unknown command line arguments: {argv[1:]}")
 
-    if FLAGS.ls_benchmark:
-        env = env_from_flags()
-        print("\n".join(sorted(env.benchmarks)))
-        env.close()
-        return
     if FLAGS.ls_reward:
         env = env_from_flags()
         print("\n".join(sorted(env.reward.indices.keys())))

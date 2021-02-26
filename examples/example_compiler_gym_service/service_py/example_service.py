@@ -34,7 +34,7 @@ FLAGS = flags.FLAGS
 logging.basicConfig(level=logging.DEBUG)
 
 # The names of the benchmarks that are supported
-BENCHMARKS = ["foo", "bar"]
+BENCHMARKS = ["benchmark://example-v0/foo", "benchmark://example-v0/bar"]
 
 # The list of actions that are supported by this service. This example uses a
 # static (unchanging) action space, but this could be extended to support a

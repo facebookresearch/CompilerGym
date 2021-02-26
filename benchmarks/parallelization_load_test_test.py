@@ -26,7 +26,7 @@ def test_load_test(env, tmpwd):
         [
             "arv0",
             "--env=llvm-v0",
-            "--benchmark=cBench-v1/crc32",
+            "--benchmark=cbench-v1/crc32",
             "--max_nproc=3",
             "--nproc_increment=1",
             "--num_steps=2",

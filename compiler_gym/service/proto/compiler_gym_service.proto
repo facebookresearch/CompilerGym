@@ -23,7 +23,8 @@ service CompilerGymService {
   rpc GetSpaces(GetSpacesRequest) returns (GetSpacesReply);
   // Start a new CompilerGym service session. This allocates a new session on
   // the service and returns a session ID. To terminate the session, call
-  // EndSession() once done.
+  // EndSession() once done. Raises grpc::StatusCode::NOT_FOUND if the requested
+  // benchmark URI is not found.
   rpc StartSession(StartSessionRequest) returns (StartSessionReply);
   // Fork a session. This creates a new session in exactly the same state. The
   // new session must be terminated with EndSession() once done. This returns
@@ -42,7 +43,7 @@ service CompilerGymService {
   //
   // DEPRECATED(https://github.com/facebookresearch/CompilerGym/issues/45): The
   // GetBenchmarks() operation is deprecated as of CompilerGym v0.1.4 and will
-  // be removed in CompilerGym v0.1.5.
+  // be removed in CompilerGym v0.1.9.
   rpc GetBenchmarks(GetBenchmarksRequest) returns (GetBenchmarksReply);
   // Register a new benchmark.
   rpc AddBenchmark(AddBenchmarkRequest) returns (AddBenchmarkReply);

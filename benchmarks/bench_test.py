@@ -34,14 +34,14 @@ pytest_plugins = ["tests.pytest_plugins.llvm"]
 # adpcm is small and jpeg-d is large. ghostscript is the largest but that
 # one takes too long.
 @pytest.fixture(
-    params=["cBench-v1/crc32", "cBench-v1/jpeg-d"],
+    params=["cbench-v1/crc32", "cbench-v1/jpeg-d"],
     ids=["fast_benchmark", "slow_benchmark"],
 )
 def benchmark_name(request) -> str:
     yield request.param
 
 
-@pytest.fixture(params=["cBench-v1/crc32"], ids=["fast_benchmark"])
+@pytest.fixture(params=["cbench-v1/crc32"], ids=["fast_benchmark"])
 def fast_benchmark_name(request) -> str:
     yield request.param
 

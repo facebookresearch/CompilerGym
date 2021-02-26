@@ -2,7 +2,6 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""This module defines the available LLVM datasets."""
 import enum
 import io
 import logging
@@ -14,25 +13,35 @@ import sys
 import tarfile
 import tempfile
 from collections import defaultdict
-from concurrent.futures import as_completed
 from pathlib import Path
 from threading import Lock
-from typing import Callable, Dict, Iterable, List, NamedTuple, Optional
+from typing import Callable, Dict, List, NamedTuple, Optional
 
 import fasteners
+from deprecated.sphinx import deprecated
 
-from compiler_gym.datasets.dataset import LegacyDataset
+from compiler_gym.datasets import Benchmark, TarDatasetWithManifest
 from compiler_gym.third_party import llvm
-from compiler_gym.util import thread_pool
 from compiler_gym.util.download import download
 from compiler_gym.util.runfiles_path import cache_path, site_data_path
 from compiler_gym.util.timer import Timer
 from compiler_gym.validation_result import ValidationError
 
-_CBENCH_DATA_URL = (
-    "https://dl.fbaipublicfiles.com/compiler_gym/cBench-v0-runtime-data.tar.bz2"
+_CBENCH_TARS = {
+    "macos": (
+        "https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v1-macos.tar.bz2",
+        "90b312b40317d9ee9ed09b4b57d378879f05e8970bb6de80dc8581ad0e36c84f",
+    ),
+    "linux": (
+        "https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v1-linux.tar.bz2",
+        "601fff3944c866f6617e653b6eb5c1521382c935f56ca1f36a9f5cf1a49f3de5",
+    ),
+}
+
+_CBENCH_RUNTOME_DATA = (
+    "https://dl.fbaipublicfiles.com/compiler_gym/cBench-v0-runtime-data.tar.bz2",
+    "a1b5b5d6b115e5809ccaefc2134434494271d184da67e2ee43d7f84d07329055",
 )
-_CBENCH_DATA_SHA256 = "a1b5b5d6b115e5809ccaefc2134434494271d184da67e2ee43d7f84d07329055"
 
 
 if sys.platform == "darwin":
@@ -42,172 +51,6 @@ if sys.platform == "darwin":
     ]
 else:
     _COMPILE_ARGS = []
-
-LLVM_DATASETS = [
-    LegacyDataset(
-        name="blas-v0",
-        url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-blas-v0.tar.bz2",
-        license="BSD 3-Clause",
-        description="https://github.com/spcl/ncc/tree/master/data",
-        compiler="llvm-10.0.0",
-        file_count=300,
-        size_bytes=3969036,
-        sha256="e724a8114709f8480adeb9873d48e426e8d9444b00cddce48e342b9f0f2b096d",
-    ),
-    # The difference between cBench-v0 and cBench-v1 is the arguments passed to
-    # clang when preparing the LLVM bitcodes:
-    #
-    #   - v0: `-O0 -Xclang -disable-O0-optnone`.
-    #   - v1: `-O1 -Xclang -Xclang -disable-llvm-passes`.
-    #
-    # The key difference with is that in v0, the generated IR functions were
-    # annotated with a `noinline` attribute that prevented inline. In v1 that is
-    # no longer the case.
-    LegacyDataset(
-        name="cBench-v0",
-        url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v0-macos.tar.bz2",
-        license="BSD 3-Clause",
-        description="https://github.com/ctuning/ctuning-programs",
-        compiler="llvm-10.0.0",
-        file_count=23,
-        size_bytes=7154448,
-        sha256="072a730c86144a07bba948c49afe543e4f06351f1cb17f7de77f91d5c1a1b120",
-        platforms=["macos"],
-        deprecated_since="v0.1.4",
-    ),
-    LegacyDataset(
-        name="cBench-v0",
-        url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v0-linux.tar.bz2",
-        license="BSD 3-Clause",
-        description="https://github.com/ctuning/ctuning-programs",
-        compiler="llvm-10.0.0",
-        file_count=23,
-        size_bytes=6940416,
-        sha256="9b5838a90895579aab3b9375e8eeb3ed2ae58e0ad354fec7eb4f8b31ecb4a360",
-        platforms=["linux"],
-        deprecated_since="v0.1.4",
-    ),
-    LegacyDataset(
-        name="cBench-v1",
-        url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v1-macos.tar.bz2",
-        license="BSD 3-Clause",
-        description="https://github.com/ctuning/ctuning-programs",
-        compiler="llvm-10.0.0",
-        file_count=23,
-        size_bytes=10292032,
-        sha256="90b312b40317d9ee9ed09b4b57d378879f05e8970bb6de80dc8581ad0e36c84f",
-        platforms=["macos"],
-    ),
-    LegacyDataset(
-        name="cBench-v1",
-        url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v1-linux.tar.bz2",
-        license="BSD 3-Clause",
-        description="https://github.com/ctuning/ctuning-programs",
-        compiler="llvm-10.0.0",
-        file_count=23,
-        size_bytes=10075608,
-        sha256="601fff3944c866f6617e653b6eb5c1521382c935f56ca1f36a9f5cf1a49f3de5",
-        platforms=["linux"],
-    ),
-    LegacyDataset(
-        name="github-v0",
-        url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-github-v0.tar.bz2",
-        license="CC BY 4.0",
-        description="https://zenodo.org/record/4122437",
-        compiler="llvm-10.0.0",
-        file_count=50708,
-        size_bytes=725974100,
-        sha256="880269dd7a5c2508ea222a2e54c318c38c8090eb105c0a87c595e9dd31720764",
-    ),
-    LegacyDataset(
-        name="linux-v0",
-        url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-linux-v0.tar.bz2",
-        license="GPL-2.0",
-        description="https://github.com/spcl/ncc/tree/master/data",
-        compiler="llvm-10.0.0",
-        file_count=13920,
-        size_bytes=516031044,
-        sha256="a1ae5c376af30ab042c9e54dc432f89ce75f9ebaee953bc19c08aff070f12566",
-    ),
-    LegacyDataset(
-        name="mibench-v0",
-        url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-mibench-v0.tar.bz2",
-        license="BSD 3-Clause",
-        description="https://github.com/ctuning/ctuning-programs",
-        compiler="llvm-10.0.0",
-        file_count=40,
-        size_bytes=238480,
-        sha256="128c090c40b955b99fdf766da167a5f642018fb35c16a1d082f63be2e977eb13",
-    ),
-    LegacyDataset(
-        name="npb-v0",
-        url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-npb-v0.tar.bz2",
-        license="NASA Open Source Agreement v1.3",
-        description="https://github.com/spcl/ncc/tree/master/data",
-        compiler="llvm-10.0.0",
-        file_count=122,
-        size_bytes=2287444,
-        sha256="793ac2e7a4f4ed83709e8a270371e65b724da09eaa0095c52e7f4209f63bb1f2",
-    ),
-    LegacyDataset(
-        name="opencv-v0",
-        url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-opencv-v0.tar.bz2",
-        license="Apache 2.0",
-        description="https://github.com/spcl/ncc/tree/master/data",
-        compiler="llvm-10.0.0",
-        file_count=442,
-        size_bytes=21903008,
-        sha256="003df853bd58df93572862ca2f934c7b129db2a3573bcae69a2e59431037205c",
-    ),
-    LegacyDataset(
-        name="poj104-v0",
-        url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-poj104-v0.tar.bz2",
-        license="BSD 3-Clause",
-        description="https://sites.google.com/site/treebasedcnn/",
-        compiler="llvm-10.0.0",
-        file_count=49628,
-        size_bytes=304207752,
-        sha256="6254d629887f6b51efc1177788b0ce37339d5f3456fb8784415ed3b8c25cce27",
-    ),
-    # FIXME(github.com/facebookresearch/CompilerGym/issues/55): Polybench
-    # dataset has `optnone` function attribute set, requires rebuild.
-    # LegacyDataset(
-    #     name="polybench-v0",
-    #     url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-polybench-v0.tar.bz2",
-    #     license="BSD 3-Clause",
-    #     description="https://github.com/ctuning/ctuning-programs",
-    #     compiler="llvm-10.0.0",
-    #     file_count=27,
-    #     size_bytes=162624,
-    #     sha256="968087e68470e5b44dc687dae195143000c7478a23d6631b27055bb3bb3116b1",
-    # ),
-    LegacyDataset(
-        name="tensorflow-v0",
-        url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-tensorflow-v0.tar.bz2",
-        license="Apache 2.0",
-        description="https://github.com/spcl/ncc/tree/master/data",
-        compiler="llvm-10.0.0",
-        file_count=1985,
-        size_bytes=299697312,
-        sha256="f77dd1988c772e8359e1303cc9aba0d73d5eb27e0c98415ac3348076ab94efd1",
-    ),
-]
-
-
-class BenchmarkExecutionResult(NamedTuple):
-    """The result of running a benchmark."""
-
-    walltime_seconds: float
-    """The execution time in seconds."""
-
-    error: Optional[ValidationError] = None
-    """An error."""
-
-    output: Optional[str] = None
-    """The output generated by the benchmark."""
-
-    def json(self):
-        return self._asdict()
 
 
 class LlvmSanitizer(enum.IntEnum):
@@ -226,6 +69,22 @@ _SANITIZER_FLAGS = {
     LlvmSanitizer.MSAN: ["-O1", "-g", "-fsanitize=memory"],
     LlvmSanitizer.UBSAN: ["-fsanitize=undefined"],
 }
+
+
+class BenchmarkExecutionResult(NamedTuple):
+    """The result of running a benchmark."""
+
+    walltime_seconds: float
+    """The execution time in seconds."""
+
+    error: Optional[ValidationError] = None
+    """An error."""
+
+    output: Optional[str] = None
+    """The output generated by the benchmark."""
+
+    def json(self):
+        return self._asdict()
 
 
 def _compile_and_run_bitcode_file(
@@ -370,7 +229,7 @@ def _compile_and_run_bitcode_file(
 
 def download_cBench_runtime_data() -> bool:
     """Download and unpack the cBench runtime dataset."""
-    cbench_data = site_data_path("llvm/cBench-v1-runtime-data/runtime_data")
+    cbench_data = site_data_path("llvm/cbench-v1-runtime-data/runtime_data")
     if (cbench_data / "unpacked").is_file():
         return False
     else:
@@ -378,9 +237,8 @@ def download_cBench_runtime_data() -> bool:
         if cbench_data.is_dir():
             shutil.rmtree(cbench_data)
 
-        tar_contents = io.BytesIO(
-            download(_CBENCH_DATA_URL, sha256=_CBENCH_DATA_SHA256)
-        )
+        url, sha256 = _CBENCH_RUNTOME_DATA
+        tar_contents = io.BytesIO(download(url, sha256))
         with tarfile.open(fileobj=tar_contents, mode="r:bz2") as tar:
             cbench_data.parent.mkdir(parents=True, exist_ok=True)
             tar.extractall(cbench_data.parent)
@@ -419,10 +277,10 @@ def _make_cBench_validator(
     def validator_cb(env: "LlvmEnv") -> Optional[ValidationError]:  # noqa: F821
         """The validation callback."""
         with _CBENCH_DOWNLOAD_THREAD_LOCK:
-            with fasteners.InterProcessLock(cache_path("cBench-v1-runtime-data.LOCK")):
+            with fasteners.InterProcessLock(cache_path("cbench-v1-runtime-data.LOCK")):
                 download_cBench_runtime_data()
 
-        cbench_data = site_data_path("llvm/cBench-v1-runtime-data/runtime_data")
+        cbench_data = site_data_path("llvm/cbench-v1-runtime-data/runtime_data")
         for input_file_name in input_files:
             path = cbench_data / input_file_name
             if not path.is_file():
@@ -559,12 +417,6 @@ def _make_cBench_validator(
     return flaky_wrapped_cb
 
 
-# A map from benchmark name to validation callbacks. Defined below.
-VALIDATORS: Dict[
-    str, List[Callable[["LlvmEnv"], Optional[str]]]  # noqa: F821
-] = defaultdict(list)
-
-
 def validator(
     benchmark: str,
     cmd: str,
@@ -636,42 +488,108 @@ def validator(
     return True
 
 
-def get_llvm_benchmark_validation_callback(
-    env: "LlvmEnv",  # noqa: F821
-) -> Optional[Callable[["LlvmEnv"], Iterable[ValidationError]]]:  # noqa: F821
-    """Return a callback for validating a given environment state.
+class CBenchBenchmark(Benchmark):
+    """A cBench benchmmark."""
 
-    If there is no valid callback, returns :code:`None`.
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
 
-    :param env: An :class:`LlvmEnv` instance.
-    :return: An optional callback that takes an :class:`LlvmEnv` instance as
-        argument and returns an optional string containing a validation error
-        message.
-    """
-    validators = VALIDATORS.get(env.benchmark)
+        for validator in VALIDATORS.get(self.uri, []):
+            self.add_validation_callback(validator)
 
-    # No match.
-    if not validators:
-        return None
+    @property
+    def sources(self) -> Dict[str, str]:
+        raise NotImplementedError("Not yet implemented")
 
-    def composed(env):
-        # Validation callbacks are read-only on the environment so it is
-        # safe to run validators simultaneously in parallel threads.
-        executor = thread_pool.get_thread_pool_executor()
-        futures = (executor.submit(validator, env) for validator in validators)
-        for future in as_completed(futures):
-            result = future.result()
-            if result is not None:
-                yield result
 
-        return None
+class CBenchDataset(TarDatasetWithManifest):
+    def __init__(
+        self,
+        site_data_base: Path,
+        sort_order: int = 0,
+        name="benchmark://cbench-v1",
+        manifest_url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cbench-v1-manifest.gz",
+        manifest_sha256="c33f086df4d306d0a88d8b5b55f8ee664227857780c92b705d0501c93f4c714c",
+        hidden=False,
+    ):
+        platform = {"darwin": "macos"}.get(sys.platform, sys.platform)
+        url, sha256 = _CBENCH_TARS[platform]
+        super().__init__(
+            name=name,
+            description="Runnable C benchmarks",
+            license="BSD 3-Clause",
+            long_description_url="https://github.com/ctuning/ctuning-programs",
+            tar_url=url,
+            tar_sha256=sha256,
+            manifest_url=manifest_url,
+            manifest_sha256=manifest_sha256,
+            strip_prefix="cBench-v1",
+            benchmark_file_suffix=".bc",
+            site_data_base=site_data_base,
+            sort_order=sort_order,
+            benchmark_class=CBenchBenchmark,
+            hidden=hidden,
+        )
 
-    return composed
+
+# URLs of the deprecated cBench datasets.
+_CBENCH_LEGACY_TARS = {
+    "macos": (
+        "https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v0-macos.tar.bz2",
+        "072a730c86144a07bba948c49afe543e4f06351f1cb17f7de77f91d5c1a1b120",
+    ),
+    "linux": (
+        "https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v0-linux.tar.bz2",
+        "9b5838a90895579aab3b9375e8eeb3ed2ae58e0ad354fec7eb4f8b31ecb4a360",
+    ),
+}
+
+
+class CBenchLegacyDataset(TarDatasetWithManifest):
+    # The difference between cbench-v0 and cbench-v1 is the arguments passed to
+    # clang when preparing the LLVM bitcodes:
+    #
+    #   - v0: `-O0 -Xclang -disable-O0-optnone`.
+    #   - v1: `-O1 -Xclang -Xclang -disable-llvm-passes`.
+    #
+    # The key difference with is that in v0, the generated IR functions were
+    # annotated with a `noinline` attribute that prevented inline. In v1 that is
+    # no longer the case.
+    def __init__(self, site_data_base: Path):
+        platform = {"darwin": "macos"}.get(sys.platform, sys.platform)
+        url, sha256 = _CBENCH_LEGACY_TARS[platform]
+        super().__init__(
+            name="benchmark://cBench-v0",
+            description="Runnable C benchmarks",
+            license="BSD 3-Clause",
+            long_description_url="https://github.com/ctuning/ctuning-programs",
+            tar_url=url,
+            tar_sha256=sha256,
+            manifest_url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v0-manifest.gz",
+            manifest_sha256="d3e362b858cb0978a7b974c68a7332ed7b8f2f580cbb083c06313e8fd0009aae",
+            strip_prefix="cBench-v0",
+            benchmark_file_suffix=".bc",
+            site_data_base=site_data_base,
+            hidden=True,  # Hidden because it is deprecated.
+        )
+
+    @deprecated(
+        version="0.1.4",
+        reason=("Dataset 'cBench-v0' is deprecated, please use 'cbench-v1'"),
+    )
+    def install(self) -> None:
+        super().install()
 
 
 # ===============================
 # Definition of cBench validators
 # ===============================
+
+
+# A map from benchmark name to validation callbacks.
+VALIDATORS: Dict[
+    str, List[Callable[["LlvmEnv"], Optional[str]]]  # noqa: F821
+] = defaultdict(list)
 
 
 def validate_sha_output(result: BenchmarkExecutionResult) -> Optional[str]:
@@ -693,7 +611,7 @@ def setup_ghostscript_library_files(dataset_id: int) -> Callable[[Path], None]:
     """Make a pre-execution setup hook for ghostscript."""
 
     def setup(cwd: Path):
-        cbench_data = site_data_path("llvm/cBench-v1-runtime-data/runtime_data")
+        cbench_data = site_data_path("llvm/cbench-v1-runtime-data/runtime_data")
         # Copy the input data file into the current directory since ghostscript
         # doesn't like long input paths.
         shutil.copyfile(
@@ -709,12 +627,12 @@ def setup_ghostscript_library_files(dataset_id: int) -> Callable[[Path], None]:
 
 
 validator(
-    benchmark="benchmark://cBench-v1/bitcount",
+    benchmark="benchmark://cbench-v1/bitcount",
     cmd="$BIN 1125000",
 )
 
 validator(
-    benchmark="benchmark://cBench-v1/bitcount",
+    benchmark="benchmark://cbench-v1/bitcount",
     cmd="$BIN 512",
 )
 
@@ -724,44 +642,44 @@ for i in range(1, 21):
     # needed.
     #
     # validator(
-    #     benchmark="benchmark://cBench-v1/adpcm",
+    #     benchmark="benchmark://cbench-v1/adpcm",
     #     cmd=f"$BIN $D/telecom_data/{i}.adpcm",
     #     data=[f"telecom_data/{i}.adpcm"],
     # )
     #
     # validator(
-    #     benchmark="benchmark://cBench-v1/adpcm",
+    #     benchmark="benchmark://cbench-v1/adpcm",
     #     cmd=f"$BIN $D/telecom_data/{i}.pcm",
     #     data=[f"telecom_data/{i}.pcm"],
     # )
 
     validator(
-        benchmark="benchmark://cBench-v1/blowfish",
+        benchmark="benchmark://cbench-v1/blowfish",
         cmd=f"$BIN d $D/office_data/{i}.benc output.txt 1234567890abcdeffedcba0987654321",
         data=[f"office_data/{i}.benc"],
         outs=["output.txt"],
     )
 
     validator(
-        benchmark="benchmark://cBench-v1/bzip2",
+        benchmark="benchmark://cbench-v1/bzip2",
         cmd=f"$BIN -d -k -f -c $D/bzip2_data/{i}.bz2",
         data=[f"bzip2_data/{i}.bz2"],
     )
 
     validator(
-        benchmark="benchmark://cBench-v1/crc32",
+        benchmark="benchmark://cbench-v1/crc32",
         cmd=f"$BIN $D/telecom_data/{i}.pcm",
         data=[f"telecom_data/{i}.pcm"],
     )
 
     validator(
-        benchmark="benchmark://cBench-v1/dijkstra",
+        benchmark="benchmark://cbench-v1/dijkstra",
         cmd=f"$BIN $D/network_dijkstra_data/{i}.dat",
         data=[f"network_dijkstra_data/{i}.dat"],
     )
 
     validator(
-        benchmark="benchmark://cBench-v1/gsm",
+        benchmark="benchmark://cbench-v1/gsm",
         cmd=f"$BIN -fps -c $D/telecom_gsm_data/{i}.au",
         data=[f"telecom_gsm_data/{i}.au"],
     )
@@ -770,13 +688,13 @@ for i in range(1, 21):
     # under safe optimizations.
     #
     # validator(
-    #     benchmark="benchmark://cBench-v1/ispell",
+    #     benchmark="benchmark://cbench-v1/ispell",
     #     cmd=f"$BIN -a -d americanmed+ $D/office_data/{i}.txt",
     #     data = [f"office_data/{i}.txt"],
     # )
 
     validator(
-        benchmark="benchmark://cBench-v1/jpeg-c",
+        benchmark="benchmark://cbench-v1/jpeg-c",
         cmd=f"$BIN -dct int -progressive -outfile output.jpeg $D/consumer_jpeg_data/{i}.ppm",
         data=[f"consumer_jpeg_data/{i}.ppm"],
         outs=["output.jpeg"],
@@ -786,14 +704,14 @@ for i in range(1, 21):
     )
 
     validator(
-        benchmark="benchmark://cBench-v1/jpeg-d",
+        benchmark="benchmark://cbench-v1/jpeg-d",
         cmd=f"$BIN -dct int -outfile output.ppm $D/consumer_jpeg_data/{i}.jpg",
         data=[f"consumer_jpeg_data/{i}.jpg"],
         outs=["output.ppm"],
     )
 
     validator(
-        benchmark="benchmark://cBench-v1/patricia",
+        benchmark="benchmark://cbench-v1/patricia",
         cmd=f"$BIN $D/network_patricia_data/{i}.udp",
         data=[f"network_patricia_data/{i}.udp"],
         env={
@@ -803,7 +721,7 @@ for i in range(1, 21):
     )
 
     validator(
-        benchmark="benchmark://cBench-v1/qsort",
+        benchmark="benchmark://cbench-v1/qsort",
         cmd=f"$BIN $D/automotive_qsort_data/{i}.dat",
         data=[f"automotive_qsort_data/{i}.dat"],
         outs=["sorted_output.dat"],
@@ -813,20 +731,20 @@ for i in range(1, 21):
     # NOTE(cummins): Rijndael benchmark disabled due to memory errors under
     # basic optimizations.
     #
-    # validator(benchmark="benchmark://cBench-v1/rijndael", cmd=f"$BIN
+    # validator(benchmark="benchmark://cbench-v1/rijndael", cmd=f"$BIN
     #     $D/office_data/{i}.enc output.dec d
     #     1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321",
     #     data=[f"office_data/{i}.enc"], outs=["output.dec"],
     # )
     #
-    # validator(benchmark="benchmark://cBench-v1/rijndael", cmd=f"$BIN
+    # validator(benchmark="benchmark://cbench-v1/rijndael", cmd=f"$BIN
     #     $D/office_data/{i}.txt output.enc e
     #     1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321",
     #     data=[f"office_data/{i}.txt"], outs=["output.enc"],
     # )
 
     validator(
-        benchmark="benchmark://cBench-v1/sha",
+        benchmark="benchmark://cbench-v1/sha",
         cmd=f"$BIN $D/office_data/{i}.txt",
         data=[f"office_data/{i}.txt"],
         compare_output=False,
@@ -834,7 +752,7 @@ for i in range(1, 21):
     )
 
     validator(
-        benchmark="benchmark://cBench-v1/stringsearch",
+        benchmark="benchmark://cbench-v1/stringsearch",
         cmd=f"$BIN $D/office_data/{i}.txt $D/office_data/{i}.s.txt output.txt",
         data=[f"office_data/{i}.txt"],
         outs=["output.txt"],
@@ -850,7 +768,7 @@ for i in range(1, 21):
     # also observed Segmentation fault on gold standard using 4.txt and 6.txt.
     if i == 1:
         validator(
-            benchmark="benchmark://cBench-v1/stringsearch2",
+            benchmark="benchmark://cbench-v1/stringsearch2",
             cmd=f"$BIN $D/office_data/{i}.txt $D/office_data/{i}.s.txt output.txt",
             data=[f"office_data/{i}.txt"],
             outs=["output.txt"],
@@ -864,7 +782,7 @@ for i in range(1, 21):
         )
 
     validator(
-        benchmark="benchmark://cBench-v1/susan",
+        benchmark="benchmark://cbench-v1/susan",
         cmd=f"$BIN $D/automotive_susan_data/{i}.pgm output_large.corners.pgm -c",
         data=[f"automotive_susan_data/{i}.pgm"],
         outs=["output_large.corners.pgm"],
@@ -872,7 +790,7 @@ for i in range(1, 21):
     )
 
     validator(
-        benchmark="benchmark://cBench-v1/tiff2bw",
+        benchmark="benchmark://cbench-v1/tiff2bw",
         cmd=f"$BIN $D/consumer_tiff_data/{i}.tif output.tif",
         data=[f"consumer_tiff_data/{i}.tif"],
         outs=["output.tif"],
@@ -884,7 +802,7 @@ for i in range(1, 21):
     )
 
     validator(
-        benchmark="benchmark://cBench-v1/tiff2rgba",
+        benchmark="benchmark://cbench-v1/tiff2rgba",
         cmd=f"$BIN $D/consumer_tiff_data/{i}.tif output.tif",
         data=[f"consumer_tiff_data/{i}.tif"],
         outs=["output.tif"],
@@ -892,7 +810,7 @@ for i in range(1, 21):
     )
 
     validator(
-        benchmark="benchmark://cBench-v1/tiffdither",
+        benchmark="benchmark://cbench-v1/tiffdither",
         cmd=f"$BIN $D/consumer_tiff_data/{i}.bw.tif out.tif",
         data=[f"consumer_tiff_data/{i}.bw.tif"],
         outs=["out.tif"],
@@ -900,7 +818,7 @@ for i in range(1, 21):
     )
 
     validator(
-        benchmark="benchmark://cBench-v1/tiffmedian",
+        benchmark="benchmark://cbench-v1/tiffmedian",
         cmd=f"$BIN $D/consumer_tiff_data/{i}.nocomp.tif output.tif",
         data=[f"consumer_tiff_data/{i}.nocomp.tif"],
         outs=["output.tif"],
@@ -911,7 +829,7 @@ for i in range(1, 21):
     # hardware instruction error.
     # if sys.platform != "darwin":
     #     validator(
-    #         benchmark="benchmark://cBench-v1/lame",
+    #         benchmark="benchmark://cbench-v1/lame",
     #         cmd=f"$BIN $D/consumer_data/{i}.wav output.mp3",
     #         data=[f"consumer_data/{i}.wav"],
     #         outs=["output.mp3"],
@@ -922,7 +840,7 @@ for i in range(1, 21):
     # NOTE(cummins): Segfault on gold standard.
     #
     #     validator(
-    #         benchmark="benchmark://cBench-v1/ghostscript",
+    #         benchmark="benchmark://cbench-v1/ghostscript",
     #         cmd="$BIN -sDEVICE=ppm -dNOPAUSE -dQUIET -sOutputFile=output.ppm -- input.ps",
     #         data=[f"office_data/{i}.ps"],
     #         outs=["output.ppm"],

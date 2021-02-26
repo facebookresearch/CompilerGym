@@ -5,8 +5,6 @@
 """This module defines the OpenAI gym interface for compilers."""
 import logging
 import numbers
-import os
-import sys
 import warnings
 from collections.abc import Iterable as IterableType
 from copy import deepcopy
@@ -15,13 +13,13 @@ from pathlib import Path
 from time import time
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 
-import fasteners
 import gym
 import numpy as np
+from deprecated.sphinx import deprecated
 from gym.spaces import Space
 
 from compiler_gym.compiler_env_state import CompilerEnvState
-from compiler_gym.datasets.dataset import LegacyDataset, require
+from compiler_gym.datasets import Benchmark, Dataset, Datasets
 from compiler_gym.service import (
     CompilerGymServiceConnection,
     ConnectionOpts,
@@ -32,12 +30,10 @@ from compiler_gym.service import (
 )
 from compiler_gym.service.proto import (
     AddBenchmarkRequest,
-    Benchmark,
     EndSessionReply,
     EndSessionRequest,
     ForkSessionReply,
     ForkSessionRequest,
-    GetBenchmarksRequest,
     GetVersionReply,
     GetVersionRequest,
     StartSessionRequest,
@@ -128,14 +124,6 @@ class CompilerEnv(gym.Env):
         Default range is (-inf, +inf).
     :vartype reward_range: Tuple[float, float]
 
-    :ivar datasets_site_path: The filesystem path used by the service
-        to store benchmarks.
-    :vartype datasets_site_path: Optional[Path]
-
-    :ivar available_datasets: A mapping from dataset name to :class:`LegacyDataset`
-        objects that are available to download.
-    :vartype available_datasets: Dict[str, LegacyDataset]
-
     :ivar observation: A view of the available observation spaces that permits
         on-demand computation of observations.
     :vartype observation: compiler_gym.views.ObservationView
@@ -154,6 +142,7 @@ class CompilerEnv(gym.Env):
         self,
         service: Union[str, Path],
         rewards: Optional[List[Reward]] = None,
+        datasets: Optional[Iterable[Dataset]] = None,
         benchmark: Optional[Union[str, Benchmark]] = None,
         observation_space: Optional[Union[str, ObservationSpaceSpec]] = None,
         reward_space: Optional[Union[str, Reward]] = None,
@@ -222,8 +211,6 @@ class CompilerEnv(gym.Env):
 
         self._service_endpoint: Union[str, Path] = service
         self._connection_settings = connection_settings or ConnectionOpts()
-        self.datasets_site_path: Optional[Path] = None
-        self.available_datasets: Dict[str, LegacyDataset] = {}
 
         self.action_space_name = action_space
 
@@ -232,6 +219,7 @@ class CompilerEnv(gym.Env):
             opts=self._connection_settings,
             logger=self.logger,
         )
+        self.datasets = Datasets(datasets or [])
 
         # If no reward space is specified, generate some from numeric observation spaces
         rewards = rewards or [
@@ -247,12 +235,8 @@ class CompilerEnv(gym.Env):
         # The benchmark that is currently being used, and the benchmark that
         # the user requested. Those do not always correlate, since the user
         # could request a random benchmark.
-        self._benchmark_in_use_uri: Optional[str] = None
-        self._user_specified_benchmark_uri: Optional[str] = None
-        # A map from benchmark URIs to Benchmark messages. We keep track of any
-        # user-provided custom benchmarks so that we can register them with a
-        # reset service.
-        self._custom_benchmarks: Dict[str, Benchmark] = {}
+        self._benchmark_in_use: Optional[Benchmark] = None
+        self._user_specified_benchmark: Optional[Benchmark] = None
         # Normally when the benchmark is changed the updated value is not
         # reflected until the next call to reset(). We make an exception for
         # constructor-time arguments as otherwise the behavior of the benchmark
@@ -268,7 +252,7 @@ class CompilerEnv(gym.Env):
         # By forcing the benchmark-in-use URI at constructor time, the first
         # env.benchmark returns the name as expected.
         self.benchmark = benchmark
-        self._benchmark_in_use_uri = self._user_specified_benchmark_uri
+        self._benchmark_in_use = self._user_specified_benchmark
 
         # Process the available action, observation, and reward spaces.
         self.action_spaces = [
@@ -297,6 +281,17 @@ class CompilerEnv(gym.Env):
         self._default_reward_space: Optional[Reward] = None
         self.observation_space = observation_space
         self.reward_space = reward_space
+
+    @property
+    @deprecated(
+        version="0.1.8",
+        reason=(
+            "Use :meth:`env.datasets.datasets() <compiler_gym.datasets.Datasets.datasets>` instead. "
+            "`More information <https://github.com/facebookresearch/CompilerGym/issues/45>`_."
+        ),
+    )
+    def available_datasets(self) -> Dict[str, Dataset]:
+        return {d.name: d for d in self.datasets}
 
     @property
     def versions(self) -> GetVersionReply:
@@ -363,17 +358,6 @@ class CompilerEnv(gym.Env):
         )
 
     @property
-    def inactive_datasets_site_path(self) -> Optional[Path]:
-        """The filesystem path used to store inactive benchmarks."""
-        if self.datasets_site_path:
-            return (
-                self.datasets_site_path.parent
-                / f"{self.datasets_site_path.name}.inactive"
-            )
-        else:
-            return None
-
-    @property
     def action_space(self) -> NamedDiscrete:
         """The current action space.
 
@@ -393,6 +377,9 @@ class CompilerEnv(gym.Env):
             else 0
         )
         self._action_space: NamedDiscrete = self.action_spaces[index]
+
+    def get_benchmark(self) -> Optional[Benchmark]:
+        return self._benchmark_in_use
 
     @property
     def benchmark(self) -> Optional[str]:
@@ -428,7 +415,7 @@ class CompilerEnv(gym.Env):
         To return to random benchmark selection, set this property to
         :code:`None`:
         """
-        return self._benchmark_in_use_uri
+        return self._benchmark_in_use.uri if self._benchmark_in_use else None
 
     @benchmark.setter
     def benchmark(self, benchmark: Optional[Union[str, Benchmark]]):
@@ -438,26 +425,18 @@ class CompilerEnv(gym.Env):
             )
         if benchmark is None:
             self.logger.debug("Unsetting the forced benchmark")
-            self._user_specified_benchmark_uri = None
+            self._user_specified_benchmark = None
         elif isinstance(benchmark, str):
-            self.logger.debug("Setting benchmark by name: %s", benchmark)
-            # If the user requested a benchmark by URI, e.g.
-            # benchmark://cBench-v1/dijkstra, require the dataset (cBench-v1)
-            # automatically.
-            if self.datasets_site_path:
-                components = benchmark.split("://")
-                if len(components) == 1 or components[0] == "benchmark":
-                    components = components[-1].split("/")
-                    if len(components) > 1:
-                        self.logger.info("Requiring dataset %s", components[0])
-                        self.require_dataset(components[0])
-            self._user_specified_benchmark_uri = benchmark
+            benchmark_object = self.datasets.benchmark(benchmark)
+            self.logger.debug("Setting benchmark by name: %s", benchmark_object)
+            self._user_specified_benchmark = benchmark_object
         elif isinstance(benchmark, Benchmark):
-            self.logger.debug("Setting benchmark data: %s", benchmark.uri)
-            self._user_specified_benchmark_uri = benchmark.uri
-            self._add_custom_benchmarks([benchmark])
+            self.logger.debug("Setting benchmark: %s", benchmark.uri)
+            self._user_specified_benchmark = benchmark
         else:
-            raise TypeError(f"Unsupported benchmark type: {type(benchmark).__name__}")
+            raise TypeError(
+                f"Expected a Benchmark instance, received: '{type(benchmark).__name__}'"
+            )
 
     @property
     def reward_space(self) -> Optional[Reward]:
@@ -557,17 +536,11 @@ class CompilerEnv(gym.Env):
 
         :return: A new environment instance.
         """
-        if not self.in_episode:
-            if self.actions:
-                state_to_replay = self.state
-                self.logger.warning(
-                    "Parent service of fork() has died, replaying state"
-                )
-            else:
-                state_to_replay = None
-            self.reset()
-            if state_to_replay:
-                self.apply(state_to_replay)
+        if self._benchmark_in_use and not self.in_episode:
+            self.logger.warning("Parent service of fork() has died, replaying state")
+            self.apply(self.state)
+        elif not self.in_episode:
+            raise ValueError("Must call reset() before fork()")
 
         request = ForkSessionRequest(session_id=self._session_id)
         reply: ForkSessionReply = self.service(self.service.stub.ForkSession, request)
@@ -584,23 +557,13 @@ class CompilerEnv(gym.Env):
         new_env._session_id = reply.session_id  # pylint: disable=protected-access
         new_env.observation.session_id = reply.session_id
 
-        # Re-register any custom benchmarks with the new environment.
-        if self._custom_benchmarks:
-            new_env._add_custom_benchmarks(  # pylint: disable=protected-access
-                list(self._custom_benchmarks.values()).copy()
-            )
-
         # Now that we have initialized the environment with the current state,
         # set the benchmark so that calls to new_env.reset() will correctly
         # revert the environment to the initial benchmark state.
-        new_env._user_specified_benchmark_uri = (  # pylint: disable=protected-access
-            self.benchmark
-        )
+        new_env._user_specified_benchmark = self._benchmark_in_use
         # Set the "visible" name of the current benchmark to hide the fact that
         # we loaded from a custom bitcode file.
-        new_env._benchmark_in_use_uri = (  # pylint: disable=protected-access
-            self.benchmark
-        )
+        new_env._benchmark_in_use = self._benchmark_in_use
 
         # Create copies of the mutable reward and observation spaces. This
         # is required to correctly calculate incremental updates.
@@ -681,8 +644,6 @@ class CompilerEnv(gym.Env):
             self.service = CompilerGymServiceConnection(
                 self._service_endpoint, self._connection_settings
             )
-            # Re-register the custom benchmarks with the new service.
-            self._add_custom_benchmarks(self._custom_benchmarks.values())
 
         self.action_space_name = action_space or self.action_space_name
 
@@ -694,25 +655,36 @@ class CompilerEnv(gym.Env):
             )
             self._session_id = None
 
-        # Update the user requested benchmark, if provided. NOTE: This means
-        # that env.reset(benchmark=None) does NOT unset a forced benchmark.
+        # Update the user requested benchmark, if provided, or pick one
+        # randomly. NOTE: This means that env.reset(benchmark=None) does NOT
+        # unset a forced benchmark.
         if benchmark:
             self.benchmark = benchmark
+            self._benchmark_in_use = self._user_specified_benchmark
+        elif self._user_specified_benchmark:
+            self._benchmark_in_use = self._user_specified_benchmark
+        else:
+            self._benchmark_in_use = self.datasets.benchmark()
+
+        start_session_request = StartSessionRequest(
+            benchmark=self._benchmark_in_use.uri,
+            action_space=(
+                [a.name for a in self.action_spaces].index(self.action_space_name)
+                if self.action_space_name
+                else 0
+            ),
+        )
 
         try:
-            reply = self.service(
-                self.service.stub.StartSession,
-                StartSessionRequest(
-                    benchmark=self._user_specified_benchmark_uri,
-                    action_space=(
-                        [a.name for a in self.action_spaces].index(
-                            self.action_space_name
-                        )
-                        if self.action_space_name
-                        else 0
-                    ),
-                ),
+            reply = self.service(self.service.stub.StartSession, start_session_request)
+        except FileNotFoundError:
+            # The benchmark was not found, so try adding it and repeating the
+            # request.
+            self.service(
+                self.service.stub.AddBenchmark,
+                AddBenchmarkRequest(benchmark=[self._benchmark_in_use.proto]),
             )
+            reply = self.service(self.service.stub.StartSession, start_session_request)
         except (ServiceError, ServiceTransportError, TimeoutError) as e:
             # Abort and retry on error.
             self.logger.warning("%s on reset(): %s", type(e).__name__, e)
@@ -732,7 +704,6 @@ class CompilerEnv(gym.Env):
                     retry_count=retry_count + 1,
                 )
 
-        self._benchmark_in_use_uri = reply.benchmark
         self._session_id = reply.session_id
         self.observation.session_id = reply.session_id
         self.reward.get_cost = self.observation.__getitem__
@@ -863,10 +834,16 @@ class CompilerEnv(gym.Env):
             raise ValueError(f"Invalid mode: {mode}")
 
     @property
-    def benchmarks(self) -> List[str]:
-        """Enumerate the list of available benchmarks."""
-        reply = self.service(self.service.stub.GetBenchmarks, GetBenchmarksRequest())
-        return list(reply.benchmark)
+    @deprecated(
+        version="0.1.8",
+        reason=(
+            "Use :meth:`env.datasets.benchmarks() <compiler_gym.datasets.Datasets.benchmarks>` instead. "
+            "`More information <https://github.com/facebookresearch/CompilerGym/issues/45>`_."
+        ),
+    )
+    def benchmarks(self) -> Iterable[str]:
+        """Enumerate a (possible unbounded) list of available benchmarks."""
+        return self.datasets.benchmark_uris()
 
     def _make_action_space(self, name: str, entries: List[str]) -> Space:
         """Create an action space from the given values.
@@ -896,7 +873,14 @@ class CompilerEnv(gym.Env):
         """
         return RewardView
 
-    def require_datasets(self, datasets: List[Union[str, LegacyDataset]]) -> bool:
+    @deprecated(
+        version="0.1.8",
+        reason=(
+            "Use :meth:`env.datasets.require() <compiler_gym.datasets.Datasets.require>` instead. "
+            "`More information <https://github.com/facebookresearch/CompilerGym/issues/45>`_."
+        ),
+    )
+    def require_datasets(self, datasets: List[Union[str, Dataset]]) -> bool:
         """Require that the given datasets are available to the environment.
 
         Example usage:
@@ -906,116 +890,73 @@ class CompilerEnv(gym.Env):
             >>> env.benchmarks
             ["npb-v0/1", "npb-v0/2", ...]
 
-        This is equivalent to calling
-        :meth:`require(self, dataset) <compiler_gym.datasets.require>` on
-        the list of datasets.
+        This is equivalent to calling :meth:`require(self, dataset)
+        <compiler_gym.datasets.require>` on the list of datasets.
 
         :param datasets: A list of datasets to require. Each dataset is the name
             of an available dataset, the URL of a dataset to download, or a
-            :class:`LegacyDataset` instance.
+            :class:`Dataset` instance.
+
         :return: :code:`True` if one or more datasets were downloaded, or
             :code:`False` if all datasets were already available.
         """
         self.logger.debug("Requiring datasets: %s", datasets)
         dataset_installed = False
         for dataset in datasets:
-            dataset_installed |= require(self, dataset)
-        if dataset_installed:
-            # Signal to the compiler service that the contents of the site data
-            # directory has changed.
-            self.logger.debug("Initiating service-side scan of dataset directory")
-            self.service(
-                self.service.stub.AddBenchmark,
-                AddBenchmarkRequest(
-                    benchmark=[Benchmark(uri="service://scan-site-data")]
-                ),
-            )
-            self.make_manifest_file()
+            dataset_installed |= self.datasets.require(dataset)
         return dataset_installed
 
-    def require_dataset(self, dataset: Union[str, LegacyDataset]) -> bool:
+    @deprecated(
+        version="0.1.8",
+        reason=(
+            "Use :meth:`env.datasets.require() <compiler_gym.datasets.Datasets.require>` instead. "
+            "`More information <https://github.com/facebookresearch/CompilerGym/issues/45>`_."
+        ),
+    )
+    def require_dataset(self, dataset: Union[str, Dataset]) -> bool:
         """Require that the given dataset is available to the environment.
 
-        Alias for
-        :meth:`env.require_datasets([dataset]) <compiler_gym.envs.CompilerEnv.require_datasets>`.
+        Alias for :meth:`env.require_datasets([dataset])
+        <compiler_gym.envs.CompilerEnv.require_datasets>`.
 
-        :param dataset: The name of the dataset to download, the URL of the dataset, or a
-            :class:`LegacyDataset` instance.
+        :param dataset: The name of the dataset to download, the URL of the
+            dataset, or a :class:`Dataset` instance.
+
         :return: :code:`True` if the dataset was downloaded, or :code:`False` if
             the dataset was already available.
         """
         return self.require_datasets([dataset])
 
-    def make_manifest_file(self) -> Path:
-        """Create the MANIFEST file.
-
-        :return: The path of the manifest file.
-        """
-        with fasteners.InterProcessLock(self.datasets_site_path / "LOCK"):
-            manifest_path = (
-                self.datasets_site_path.parent
-                / f"{self.datasets_site_path.name}.MANIFEST"
-            )
-            with open(str(manifest_path), "w") as f:
-                for root, _, files in os.walk(self.datasets_site_path):
-                    print(
-                        "\n".join(
-                            [
-                                f"{root[len(str(self.datasets_site_path)) + 1:]}/{f}"
-                                for f in files
-                                if not f.endswith(".json") and f != "LOCK"
-                            ]
-                        ),
-                        file=f,
-                    )
-        return manifest_path
-
-    def register_dataset(self, dataset: LegacyDataset) -> bool:
+    @deprecated(
+        version="0.1.8",
+        reason=(
+            "Use :meth:`env.datasets.add() <compiler_gym.datasets.Datasets.require>` instead. "
+            "`More information <https://github.com/facebookresearch/CompilerGym/issues/45>`_."
+        ),
+    )
+    def register_dataset(self, dataset: Dataset) -> bool:
         """Register a new dataset.
 
         After registering, the dataset name may be used by
-        :meth:`require_dataset() <compiler_gym.envs.CompilerEnv.require_dataset>`
-        to install and activate it.
+        :meth:`require_dataset()
+        <compiler_gym.envs.CompilerEnv.require_dataset>` to install and activate
+        it.
 
         Example usage:
 
-            >>> my_dataset = LegacyDataset(name="my-dataset-v0", ...)
+            >>> my_dataset = Dataset(name="my-dataset-v0", ...)
             >>> env = gym.make("llvm-v0")
             >>> env.register_dataset(my_dataset)
             >>> env.require_dataset("my-dataset-v0")
             >>> env.benchmark = "my-dataset-v0/1"
 
-        :param dataset: A :class:`LegacyDataset` instance describing the new dataset.
+        :param dataset: A :class:`Dataset` instance describing the new dataset.
+
         :return: :code:`True` if the dataset was added, else :code:`False`.
+
         :raises ValueError: If a dataset with this name is already registered.
         """
-        platform = {"darwin": "macos"}.get(sys.platform, sys.platform)
-        if platform not in dataset.platforms:
-            return False
-        if dataset.name in self.available_datasets:
-            raise ValueError(f"Dataset already registered with name: {dataset.name}")
-        self.available_datasets[dataset.name] = dataset
-        return True
-
-    def _add_custom_benchmarks(self, benchmarks: List[Benchmark]) -> None:
-        """Register custom benchmarks with the compiler service.
-
-        Benchmark registration occurs automatically using the
-        :meth:`env.benchmark <compiler_gym.envs.CompilerEnv.benchmark>`
-        property, there is usually no need to call this method yourself.
-
-        :param benchmarks: The benchmarks to register.
-        """
-        if not benchmarks:
-            return
-
-        for benchmark in benchmarks:
-            self._custom_benchmarks[benchmark.uri] = benchmark
-
-        self.service(
-            self.service.stub.AddBenchmark,
-            AddBenchmarkRequest(benchmark=benchmarks),
-        )
+        return self.datasets.add(dataset)
 
     def apply(self, state: CompilerEnvState) -> None:  # noqa
         """Replay this state on the given an environment.
@@ -1040,8 +981,21 @@ class CompilerEnv(gym.Env):
             )
 
     def validate(self, state: Optional[CompilerEnvState] = None) -> ValidationResult:
-        in_place = state is not None
-        state = state or self.state
+        """Validate an environment's state.
+
+        :param state: A state to environment. If not provided, the current state
+            is validated.
+
+        :returns: A :class:`ValidationResult`.
+        """
+        if state:
+            self.reset(benchmark=state.benchmark)
+            in_place = False
+        else:
+            state = self.state
+            in_place = True
+
+        assert self.in_episode
 
         errors: ValidationError = []
         validation = {
@@ -1109,13 +1063,10 @@ class CompilerEnv(gym.Env):
                                 )
                             )
 
-                    # TODO(https://github.com/facebookresearch/CompilerGym/issues/45):
-                    # Call the new self.benchmark.validation_callback() method
-                    # once implemented.
-                    validate_semantics = self.get_benchmark_validation_callback()
-                    if validate_semantics:
+                    benchmark = replay_target.get_benchmark()
+                    if benchmark.is_validatable():
                         validation["benchmark_semantics_validated"] = True
-                        semantics_errors = list(validate_semantics(self))
+                        semantics_errors = benchmark.validate(replay_target)
                         if semantics_errors:
                             validation["benchmark_semantics_validation_failed"] = True
                             errors += semantics_errors
@@ -1131,13 +1082,24 @@ class CompilerEnv(gym.Env):
             **validation,
         )
 
+    @deprecated(
+        version="0.1.8",
+        reason=(
+            "Use :meth:`env.get_benchmark().validate() "
+            "<compiler_gym.datasets.Benchmark.validate>` instead. "
+            "`More information <https://github.com/facebookresearch/CompilerGym/issues/45>`_."
+        ),
+    )
     def get_benchmark_validation_callback(
         self,
     ) -> Optional[Callable[["CompilerEnv"], Iterable[ValidationError]]]:
-        """Return a callback that validates benchmark semantics, if available.
+        """Return a callback that validates benchmark semantics, if available."""
 
-        TODO(https://github.com/facebookresearch/CompilerGym/issues/45): This is
-        a temporary placeholder for what will eventually become a method on a
-        new Benchmark class.
-        """
-        return None
+        def composed(env):
+            for validation_cb in self.get_benchmark().validation_callbacks():
+                errors = validation_cb(env)
+                if errors:
+                    yield from errors
+
+        if self.get_benchmark().validation_callbacks():
+            return composed

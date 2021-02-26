@@ -18,42 +18,40 @@ Datasets
 
 We provide several datasets of open-source LLVM-IR benchmarks for download:
 
-+------------------------+--------------+-----------------+---------------------+-------------------+
-| Dataset                | License      | Num. Benchmarks | Validatable? [#f1]_ | Difficulty [#f2]_ |
-+========================+==============+=================+=====================+===================+
-| blas-v0                | BSD 3-Clause | 300             | No                  | 0.3               |
-+------------------------+--------------+-----------------+---------------------+-------------------+
-| cBench-v1              | BSD 3-Clause | 23              | Partial             | 0.8               |
-+------------------------+--------------+-----------------+---------------------+-------------------+
-| github-v0              | CC BY 4.0    | 50,708          | No                  | 0.7               |
-+------------------------+--------------+-----------------+---------------------+-------------------+
-| linux-v0               | GPL-2.0      | 13,920          | No                  | 0.4               |
-+------------------------+--------------+-----------------+---------------------+-------------------+
-| mibench-v0             | BSD 3-Clause | 40              | No                  | 0.8               |
-+------------------------+--------------+-----------------+---------------------+-------------------+
-| npb-v0                 | NASA v1.3    | 122             | No                  | 0.4               |
-+------------------------+--------------+-----------------+---------------------+-------------------+
-| opencv-v0              | Apache 2.0   | 442             | No                  | 0.3               |
-+------------------------+--------------+-----------------+---------------------+-------------------+
-| poj104-v0              | BSD 3-Clause | 49,628          | No                  | 0.7               |
-+------------------------+--------------+-----------------+---------------------+-------------------+
-| tensorflow-v0          | Apache 2.0   | 1,985           | No                  | 0.3               |
-+------------------------+--------------+-----------------+---------------------+-------------------+
++------------------------+---------------------------------------------------------+------------------------+---------------------+
+| Dataset                | Description                                             | Num. Benchmarks [#f1]_ | Validatable? [#f2]_ |
++========================+=========================================================+========================+=====================+
+| anghabench-v0          | Compile-only C/C++ functions extracted from GitHub      | 1,044,021              | No                  |
++------------------------+---------------------------------------------------------+------------------------+---------------------+
+| blas-v0                | Basic linear algebra kernels                            | 300                    | No                  |
++------------------------+---------------------------------------------------------+------------------------+---------------------+
+| cbench-v1              | Runnable C benchmarks                                   | 23                     | Partial             |
++------------------------+---------------------------------------------------------+------------------------+---------------------+
+| github-v0              | Compile-only C/C++ objects from GitHub                  | 50,708                 | No                  |
++------------------------+---------------------------------------------------------+------------------------+---------------------+
+| linux-v0               | Compile-only object files from C Linux kernel           | 13,920                 | No                  |
++------------------------+---------------------------------------------------------+------------------------+---------------------+
+| llvm-stress-v0         | Randomly generated LLVM-IR                              | (2^32)-1               | No                  |
++------------------------+---------------------------------------------------------+------------------------+---------------------+
+| mibench-v0             | C benchmarks                                            | 40                     | No                  |
++------------------------+---------------------------------------------------------+------------------------+---------------------+
+| npb-v0                 | NASA Parallel Benchmarks                                | 122                    | No                  |
++------------------------+---------------------------------------------------------+------------------------+---------------------+
+| opencv-v0              | Compile-only object files from C++ OpenCV library       | 442                    | No                  |
++------------------------+---------------------------------------------------------+------------------------+---------------------+
+| poj104-v0              | Solutions to programming programs                       | 49,628                 | No                  |
++------------------------+---------------------------------------------------------+------------------------+---------------------+
+| tensorflow-v0          | Compile-only object files from C++ TensorFlow library   | 1,985                  | No                  |
++------------------------+---------------------------------------------------------+------------------------+---------------------+
 
-.. [#f1] A **validatable** dataset is one where the behavior of the benchmarks
+.. [#f1] All values are for the Linux dataset releases. There are some
+         variations between the size of the datastes on Linux and macOS.
+.. [#f2] A **validatable** dataset is one where the behavior of the benchmarks
          can be checked by compiling the programs to binaries and executing
          them. If the benchmarks crash, or are found to have different behavior,
          then validation fails. This type of validation is used to check that
          the compiler has not broken the semantics of the program.
          See :mod:`compiler_gym.bin.validate`.
-.. [#f2] The **difficulty** of a dataset is an indicator of how likely a random
-         policy is to outperform the default compiler policy in a fixed amount
-         of time. A lower difficulty shows that a random policy is more likely
-         to succeed. It is a crude characterization metric that does not take
-         into account factors such as the diversity of programs, the complexity
-         of the optimization space, etc. The difficulty values in this table
-         were estimated using 2000 random trials and a fixed time budget of 30
-         seconds.
 
 Install these datasets using the :mod:`compiler_gym.bin.datasets` command line
 tool, or programatically using
@@ -65,10 +63,10 @@ tool, or programatically using
 We characterize the datasets below in radial plots which show, clockwise from
 the top: the average number of instructions per benchmark, the density of
 branching instructions, the density of arithmetic instructions, and the density
-of memory operations. For example, comparing blas-v0 and cBench-v1 shows that
+of memory operations. For example, comparing blas-v0 and cbench-v1 shows that
 blas-v0 consists of smaller programs with a similar density of branches, a
 higher density of arithmetic operations and relatively few memory operations.
-cBench-v1, in contrast to the small linear algebra kernels of blas-v0, contains
+cbench-v1, in contrast to the small linear algebra kernels of blas-v0, contains
 larger programs with a higher density of memory operations and fewer arithmetic
 operations.
 

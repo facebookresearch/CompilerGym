@@ -14,7 +14,7 @@ py_binary(
 
 py_test(
     name = "e_greedy_test",
-    timeout = "short",
+    timeout = "moderate",
     srcs = ["e_greedy_test.py"],
     deps = [
         ":e_greedy",

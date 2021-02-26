@@ -10,8 +10,9 @@ pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
 def test_autophase_crc32_feature_vector(env: CompilerEnv):
-    env.benchmark = "cBench-v1/crc32"
+    env.benchmark = "cbench-v1/crc32"
     env.reset()
+    print(env.benchmark)
     features = env.observation["AutophaseDict"]
     print(features)  # For debugging on failure.
     assert features == {
@@ -75,4 +76,4 @@ def test_autophase_crc32_feature_vector(env: CompilerEnv):
 
 
 if __name__ == "__main__":
-    main()
+    main(debug_level=3)

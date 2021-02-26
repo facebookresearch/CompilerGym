@@ -240,10 +240,10 @@ import cmd
 import random
 import readline
 import sys
+from itertools import islice
 
 from absl import app, flags
 
-import compiler_gym.util.flags.ls_benchmark  # noqa Flag definition.
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.flags.env_from_flags import env_from_flags
@@ -304,7 +304,7 @@ The 'tutorial' command will give a step by step guide."""
         self.init_benchmarks()
 
         # Get the benchmarks
-        self.benchmarks = sorted(self.env.benchmarks)
+        self.benchmarks = sorted(islice(self.env.datasets.benchmark_uris(), 100))
         # Strip default benchmark:// protocol.
         for i, benchmark in enumerate(self.benchmarks):
             if benchmark.startswith("benchmark://"):
@@ -319,6 +319,12 @@ The 'tutorial' command will give a step by step guide."""
         self.stack = []
 
         self.set_prompt()
+
+    def __del__(self):
+        """Tidy up in case postloop() is not called."""
+        if self.env:
+            self.env.close()
+            self.env = None
 
     def do_tutorial(self, arg):
         """Print the turorial"""
@@ -338,7 +344,7 @@ The 'tutorial' command will give a step by step guide."""
     def init_benchmarks(self):
         """Initialise the set of benchmarks"""
         # Get the benchmarks
-        self.benchmarks = sorted(self.env.benchmarks)
+        self.benchmarks = sorted(islice(self.env.datasets.benchmark_uris(), 100))
         # Strip default benchmark:// protocol.
         for i, benchmark in enumerate(self.benchmarks):
             if benchmark.startswith("benchmark://"):
@@ -364,7 +370,7 @@ The 'tutorial' command will give a step by step guide."""
 
     def get_datasets(self):
         """Get the list of available datasets"""
-        return sorted([k for k in self.env.available_datasets])
+        return sorted([k.name for k in self.env.datasets.datasets(inactive=True)])
 
     def do_list_datasets(self, arg):
         """List all of the available datasets"""
@@ -378,23 +384,17 @@ The 'tutorial' command will give a step by step guide."""
         """Require dataset
         The argument is the name of the dataset to require.
         """
-        if self.get_datasets().count(arg):
+        try:
             with Timer(f"Downloaded dataset {arg}"):
-                self.env.require_dataset(arg)
+                self.env.datasets.require(arg)
             self.init_benchmarks()
-        else:
+        except LookupError:
             print("Unknown dataset, '" + arg + "'")
             print("Available datasets are listed with command, list_available_datasets")
 
     def do_list_benchmarks(self, arg):
         """List all of the available benchmarks"""
-        if not self.benchmarks:
-            doc_root_url = "https://facebookresearch.github.io/CompilerGym/"
-            install_url = doc_root_url + "getting_started.html#installing-benchmarks"
-            print("No benchmarks available. See " + install_url)
-            print("Datasets can be installed with command, require_dataset")
-        else:
-            print(", ".join(self.benchmarks))
+        print(", ".join(self.benchmarks))
 
     def complete_set_benchmark(self, text, line, begidx, endidx):
         """Complete the set_benchmark argument"""
@@ -409,27 +409,25 @@ The 'tutorial' command will give a step by step guide."""
         Use '-' for a random benchmark.
         """
         if arg == "-":
-            arg = random.choice(self.benchmarks)
+            arg = self.env.datasets.benchmark().uri
             print(f"set_benchmark {arg}")
 
-        if self.benchmarks.count(arg):
+        try:
+            benchmark = self.env.datasets.benchmark(arg)
             self.stack.clear()
 
             # Set the current benchmark
             with Timer() as timer:
-                observation = self.env.reset(benchmark=arg)
+                observation = self.env.reset(benchmark=benchmark)
             print(f"Reset {self.env.benchmark} environment in {timer}")
 
             if self.env.observation_space and observation is not None:
-                print(
-                    f"Observation: {self.env.observation_space.to_string(observation)}"
-                )
+                print("Observation:", self.env.observation_space.to_string(observation))
 
             self.set_prompt()
-
-        else:
+        except LookupError:
             print("Unknown benchmark, '" + arg + "'")
-            print("Bencmarks are listed with command, list_benchmarks")
+            print("Benchmarks are listed with command, list_benchmarks")
 
     def get_actions(self):
         """Get the list of actions"""
@@ -888,13 +886,6 @@ def main(argv):
     argv = FLAGS(argv)
     if len(argv) != 1:
         raise app.UsageError(f"Unknown command line arguments: {argv[1:]}")
-
-    if FLAGS.ls_benchmark:
-        benchmark = benchmark_from_flags()
-        env = env_from_flags(benchmark)
-        print("\n".join(sorted(env.benchmarks)))
-        env.close()
-        return
 
     with Timer("Initialized environment"):
         # FIXME Chris, I don't seem to actually get a benchmark

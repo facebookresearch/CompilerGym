@@ -173,7 +173,7 @@ count achieved scaled to the reduction achieved by LLVM's builtin `-Oz`
 pipeline.
 
 This leaderboard tracks the results achieved by algorithms on the `llvm-ic-v0`
-environment on the 23 benchmarks in the `cBench-v1` dataset.
+environment on the 23 benchmarks in the `cbench-v1` dataset.
 
 | Author | Algorithm | Links | Date | Walltime (mean) | Codesize Reduction (geomean) |
 | --- | --- | --- | --- | --- | --- |

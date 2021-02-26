@@ -7,6 +7,7 @@ import pytest
 from absl import flags
 
 from compiler_gym.bin.datasets import main
+from compiler_gym.util.capture_output import capture_output
 from tests.test_main import main as _test_main
 
 FLAGS = flags.FLAGS
@@ -18,20 +19,16 @@ def run_main(*args):
     return main(["argv0"])
 
 
-def test_llvm_download_url_404():
-    invalid_url = "https://facebook.com/not/a/valid/url"
-    with pytest.raises(OSError) as ctx:
-        run_main("--env=llvm-v0", "--download", invalid_url)
-    assert str(
-        ctx.value
-    ) == f"GET returned status code 404: {invalid_url}" or "Max retries exceeded with url" in str(
-        ctx.value
-    )
+def test_llvm_summary():
+    with capture_output() as out:
+        run_main("--env=llvm-v0")
+
+    assert "cbench-v1" in out.stdout
 
 
 def test_llvm_download_invalid_protocol():
     invalid_url = "invalid://facebook.com"
-    with pytest.raises(OSError) as ctx:
+    with pytest.raises(LookupError) as ctx:
         run_main("--env=llvm-v0", "--download", invalid_url)
     assert invalid_url in str(ctx.value)
 

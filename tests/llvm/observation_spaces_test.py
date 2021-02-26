@@ -34,7 +34,7 @@ def test_default_observation_space(env: LlvmEnv):
 
 
 def test_observation_spaces(env: LlvmEnv):
-    env.reset("cBench-v1/crc32")
+    env.reset("cbench-v1/crc32")
 
     assert set(env.observation.spaces.keys()) == {
         "Ir",
@@ -62,7 +62,7 @@ def test_observation_spaces(env: LlvmEnv):
 
 
 def test_ir_observation_space(env: LlvmEnv):
-    env.reset("cBench-v1/crc32")
+    env.reset("cbench-v1/crc32")
     key = "Ir"
     space = env.observation.spaces[key]
     assert isinstance(space.space, Sequence)
@@ -79,7 +79,7 @@ def test_ir_observation_space(env: LlvmEnv):
 
 
 def test_bitcode_observation_space(env: LlvmEnv):
-    env.reset("cBench-v1/crc32")
+    env.reset("cbench-v1/crc32")
     key = "BitcodeFile"
     space = env.observation.spaces[key]
     assert isinstance(space.space, Sequence)
@@ -99,7 +99,7 @@ def test_bitcode_observation_space(env: LlvmEnv):
     assert not space.platform_dependent
 
 
-# The Autophase feature vector for benchmark://cBench-v1/crc32 in its initial
+# The Autophase feature vector for benchmark://cbench-v1/crc32 in its initial
 # state.
 AUTOPHASE_CBENCH_CRC32 = [
     0,
@@ -164,13 +164,13 @@ AUTOPHASE_CBENCH_CRC32 = [
 def test_autophase_observation_space_reset(env: LlvmEnv):
     """Test that the intial observation is returned on env.reset()."""
     env.observation_space = "Autophase"
-    observation = env.reset("cBench-v1/crc32")
+    observation = env.reset("cbench-v1/crc32")
     print(observation.tolist())  # For debugging on error.
     np.testing.assert_array_equal(observation, AUTOPHASE_CBENCH_CRC32)
 
 
 def test_instcount_observation_space(env: LlvmEnv):
-    env.reset("cBench-v1/crc32")
+    env.reset("cbench-v1/crc32")
     key = "InstCount"
     space = env.observation.spaces[key]
     assert isinstance(space.space, Box)
@@ -264,7 +264,7 @@ def test_instcount_observation_space(env: LlvmEnv):
 
 
 def test_instcount_dict_observation_space(env: LlvmEnv):
-    env.reset("cBench-v1/crc32")
+    env.reset("cbench-v1/crc32")
     key = "InstCountDict"
     space = env.observation.spaces[key]
     assert isinstance(space.space, DictSpace)
@@ -277,7 +277,7 @@ def test_instcount_dict_observation_space(env: LlvmEnv):
 
 
 def test_instcount_norm_observation_space(env: LlvmEnv):
-    env.reset("cBench-v1/crc32")
+    env.reset("cbench-v1/crc32")
     key = "InstCountNorm"
     space = env.observation.spaces[key]
     assert isinstance(space.space, Box)
@@ -298,7 +298,7 @@ def test_instcount_norm_observation_space(env: LlvmEnv):
 
 
 def test_instcount_norm_dict_observation_space(env: LlvmEnv):
-    env.reset("cBench-v1/crc32")
+    env.reset("cbench-v1/crc32")
     key = "InstCountNormDict"
     space = env.observation.spaces[key]
     assert isinstance(space.space, DictSpace)
@@ -311,7 +311,7 @@ def test_instcount_norm_dict_observation_space(env: LlvmEnv):
 
 
 def test_autophase_observation_space(env: LlvmEnv):
-    env.reset("cBench-v1/crc32")
+    env.reset("cbench-v1/crc32")
     key = "Autophase"
     space = env.observation.spaces[key]
     assert isinstance(space.space, Box)
@@ -329,7 +329,7 @@ def test_autophase_observation_space(env: LlvmEnv):
 
 
 def test_autophase_dict_observation_space(env: LlvmEnv):
-    env.reset("cBench-v1/crc32")
+    env.reset("cbench-v1/crc32")
     key = "AutophaseDict"
     space = env.observation.spaces[key]
     assert isinstance(space.space, DictSpace)
@@ -342,7 +342,7 @@ def test_autophase_dict_observation_space(env: LlvmEnv):
 
 
 def test_programl_observation_space(env: LlvmEnv):
-    env.reset("cBench-v1/crc32")
+    env.reset("cbench-v1/crc32")
     key = "Programl"
     space = env.observation.spaces[key]
     assert isinstance(space.space, Sequence)
@@ -363,7 +363,7 @@ def test_programl_observation_space(env: LlvmEnv):
 
 
 def test_cpuinfo_observation_space(env: LlvmEnv):
-    env.reset("cBench-v1/crc32")
+    env.reset("cbench-v1/crc32")
     key = "CpuInfo"
     space = env.observation.spaces[key]
     assert isinstance(space.space, DictSpace)
@@ -397,7 +397,7 @@ def test_cpuinfo_observation_space(env: LlvmEnv):
 
 @pytest.fixture
 def cbench_crc32_inst2vec_embedding_indices() -> List[int]:
-    """The expected inst2vec embedding indices for cBench-v1/crc32."""
+    """The expected inst2vec embedding indices for cbench-v1/crc32."""
     # The linux/macOS builds of clang produce slightly different bitcodes.
     if sys.platform.lower().startswith("linux"):
         return [
@@ -974,7 +974,7 @@ def cbench_crc32_inst2vec_embedding_indices() -> List[int]:
 def test_inst2vec_preprocessed_observation_space(
     env: LlvmEnv, cbench_crc32_inst2vec_embedding_indices: List[int]
 ):
-    env.reset("cBench-v1/crc32")
+    env.reset("cbench-v1/crc32")
     key = "Inst2vecPreprocessedText"
     space = env.observation.spaces[key]
     assert isinstance(space.space, Sequence)
@@ -995,7 +995,7 @@ def test_inst2vec_preprocessed_observation_space(
 def test_inst2vec_embedding_indices_observation_space(
     env: LlvmEnv, cbench_crc32_inst2vec_embedding_indices: List[int]
 ):
-    env.reset("cBench-v1/crc32")
+    env.reset("cbench-v1/crc32")
     key = "Inst2vecEmbeddingIndices"
     space = env.observation.spaces[key]
     assert isinstance(space.space, Sequence)
@@ -1015,7 +1015,7 @@ def test_inst2vec_embedding_indices_observation_space(
 def test_inst2vec_observation_space(
     env: LlvmEnv, cbench_crc32_inst2vec_embedding_indices: List[int]
 ):
-    env.reset("cBench-v1/crc32")
+    env.reset("cbench-v1/crc32")
     key = "Inst2vec"
     space = env.observation.spaces[key]
     assert isinstance(space.space, Sequence)
@@ -1041,7 +1041,7 @@ def test_inst2vec_observation_space(
 
 
 def test_ir_instruction_count_observation_spaces(env: LlvmEnv):
-    env.reset("cBench-v1/crc32")
+    env.reset("cbench-v1/crc32")
 
     key = "IrInstructionCount"
     space = env.observation.spaces[key]
@@ -1085,7 +1085,7 @@ def test_ir_instruction_count_observation_spaces(env: LlvmEnv):
 
 
 def test_object_text_size_observation_spaces(env: LlvmEnv):
-    env.reset("cBench-v1/crc32")
+    env.reset("cbench-v1/crc32")
 
     # Expected .text sizes for this benchmark: -O0, -O3, -Oz.
     crc32_code_sizes = {"darwin": [1171, 3825, 3289], "linux": [1183, 3961, 3286]}

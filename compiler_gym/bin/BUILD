@@ -22,7 +22,7 @@ py_binary(
     srcs = ["datasets.py"],
     visibility = ["//visibility:public"],
     deps = [
-        "//compiler_gym/datasets:dataset",
+        ":service",
         "//compiler_gym/envs",
         "//compiler_gym/util",
         "//compiler_gym/util/flags:env_from_flags",
@@ -39,7 +39,6 @@ py_binary(
         "//compiler_gym/util",
         "//compiler_gym/util/flags:benchmark_from_flags",
         "//compiler_gym/util/flags:env_from_flags",
-        "//compiler_gym/util/flags:ls_benchmark",
     ],
 )
 
@@ -60,7 +59,6 @@ py_binary(
         "//compiler_gym:random_search",
         "//compiler_gym/util/flags:benchmark_from_flags",
         "//compiler_gym/util/flags:env_from_flags",
-        "//compiler_gym/util/flags:ls_benchmark",
         "//compiler_gym/util/flags:nproc",
         "//compiler_gym/util/flags:output_dir",
     ],
@@ -83,6 +81,7 @@ py_binary(
     srcs = ["service.py"],
     visibility = ["//visibility:public"],
     deps = [
+        "//compiler_gym/datasets",
         "//compiler_gym/envs",
         "//compiler_gym/spaces",
         "//compiler_gym/util",

@@ -11,15 +11,17 @@ from pathlib import Path
 import gym
 import pytest
 
+from compiler_gym.datasets import Benchmark
 from compiler_gym.envs import LlvmEnv, llvm
-from compiler_gym.service.proto import Benchmark, File
+from compiler_gym.service.proto import Benchmark as BenchmarkProto
+from compiler_gym.service.proto import File
 from compiler_gym.util.runfiles_path import runfiles_path
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 EXAMPLE_BITCODE_FILE = runfiles_path(
-    "compiler_gym/third_party/cBench/cBench-v1/crc32.bc"
+    "compiler_gym/third_party/cbench/cbench-v1/crc32.bc"
 )
 EXAMPLE_BITCODE_IR_INSTRUCTION_COUNT = 242
 
@@ -29,12 +31,12 @@ def test_reset_invalid_benchmark(env: LlvmEnv):
     with pytest.raises(ValueError) as ctx:
         env.reset(benchmark=invalid_benchmark)
 
-    assert str(ctx.value) == f'Unknown benchmark "{invalid_benchmark}"'
+    assert str(ctx.value) == f"Invalid benchmark URI: 'benchmark://{invalid_benchmark}'"
 
 
 def test_invalid_benchmark_data(env: LlvmEnv):
-    benchmark = Benchmark(
-        uri="benchmark://new", program=File(contents="Invalid bitcode".encode("utf-8"))
+    benchmark = Benchmark.from_file_contents(
+        "benchmark://new", "Invalid bitcode".encode("utf-8")
     )
 
     with pytest.raises(ValueError) as ctx:
@@ -45,7 +47,9 @@ def test_invalid_benchmark_data(env: LlvmEnv):
 
 def test_invalid_benchmark_missing_file(env: LlvmEnv):
     benchmark = Benchmark(
-        uri="benchmark://new",
+        BenchmarkProto(
+            uri="benchmark://new",
+        )
     )
 
     with pytest.raises(ValueError) as ctx:
@@ -57,9 +61,7 @@ def test_invalid_benchmark_missing_file(env: LlvmEnv):
 def test_benchmark_path_not_found(env: LlvmEnv):
     with tempfile.TemporaryDirectory() as tmpdir:
         tmpdir = Path(tmpdir)
-        benchmark = Benchmark(
-            uri="benchmark://new", program=File(uri=f"file:///{tmpdir}/not_found")
-        )
+        benchmark = Benchmark.from_file("benchmark://new", f"{tmpdir}/not_found")
 
         with pytest.raises(FileNotFoundError) as ctx:
             env.reset(benchmark=benchmark)
@@ -72,9 +74,7 @@ def test_benchmark_path_empty_file(env: LlvmEnv):
         tmpdir = Path(tmpdir)
         (tmpdir / "test.bc").touch()
 
-        benchmark = Benchmark(
-            uri="benchmark://new", program=File(uri=f"file:///{tmpdir}/test.bc")
-        )
+        benchmark = Benchmark.from_file("benchmark://new", tmpdir / "test.bc")
 
         with pytest.raises(ValueError) as ctx:
             env.reset(benchmark=benchmark)
@@ -88,9 +88,7 @@ def test_invalid_benchmark_path_contents(env: LlvmEnv):
         with open(str(tmpdir / "test.bc"), "w") as f:
             f.write("Invalid bitcode")
 
-        benchmark = Benchmark(
-            uri="benchmark://new", program=File(uri=f"file:///{tmpdir}/test.bc")
-        )
+        benchmark = Benchmark.from_file("benchmark://new", tmpdir / "test.bc")
 
         with pytest.raises(ValueError) as ctx:
             env.reset(benchmark=benchmark)
@@ -100,7 +98,9 @@ def test_invalid_benchmark_path_contents(env: LlvmEnv):
 
 def test_benchmark_path_invalid_protocol(env: LlvmEnv):
     benchmark = Benchmark(
-        uri="benchmark://new", program=File(uri="invalid_protocol://test")
+        BenchmarkProto(
+            uri="benchmark://new", program=File(uri="invalid_protocol://test")
+        ),
     )
 
     with pytest.raises(ValueError) as ctx:
@@ -108,22 +108,18 @@ def test_benchmark_path_invalid_protocol(env: LlvmEnv):
 
     assert (
         str(ctx.value)
-        == 'Unsupported benchmark URI protocol: "invalid_protocol://test"'
+        == 'Invalid benchmark data URI. Only the file:/// protocol is supported: "invalid_protocol://test"'
     )
 
 
 def test_custom_benchmark(env: LlvmEnv):
-    benchmark = Benchmark(
-        uri="benchmark://new", program=File(uri=f"file:///{EXAMPLE_BITCODE_FILE}")
-    )
+    benchmark = Benchmark.from_file("benchmark://new", EXAMPLE_BITCODE_FILE)
     env.reset(benchmark=benchmark)
     assert env.benchmark == "benchmark://new"
 
 
 def test_custom_benchmark_constructor():
-    benchmark = Benchmark(
-        uri="benchmark://new", program=File(uri=f"file:///{EXAMPLE_BITCODE_FILE}")
-    )
+    benchmark = Benchmark.from_file("benchmark://new", EXAMPLE_BITCODE_FILE)
     env = gym.make("llvm-v0", benchmark=benchmark)
     try:
         env.reset()
@@ -136,7 +132,7 @@ def test_make_benchmark_single_bitcode(env: LlvmEnv):
     benchmark = llvm.make_benchmark(EXAMPLE_BITCODE_FILE)
 
     assert benchmark.uri == f"file:///{EXAMPLE_BITCODE_FILE}"
-    assert benchmark.program.uri == f"file:///{EXAMPLE_BITCODE_FILE}"
+    assert benchmark.proto.program.uri == f"file:///{EXAMPLE_BITCODE_FILE}"
 
     env.reset(benchmark=benchmark)
     assert env.benchmark == benchmark.uri

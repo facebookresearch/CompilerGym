@@ -32,7 +32,7 @@ def make_cbench_llvm_module(
     benchmark = make_benchmark(inputs=src_files, copt=cflags or [])
     # Write just the bitcode to file.
     with open(output_path, "wb") as f:
-        f.write(benchmark.program.contents)
+        f.write(benchmark.proto.program.contents)
 
 
 def main():

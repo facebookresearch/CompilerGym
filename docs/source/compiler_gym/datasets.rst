@@ -1,35 +1,71 @@
 compiler_gym.datasets
 =====================
 
-An instance of a CompilerGym environment uses a benchmark as the program being
-optimized. Collections of benchmarks are packaged into datasets, storing
-additional metadata such as the license, defined by the
-:class:`Dataset <compiler_gym.datasets.Dataset>` class.
+An instance of a CompilerGym environment uses a :class:`Benchmark
+<compiler_gym.datasets.Benchmark>` as the program being optimized. Collections
+of benchmarks are packaged into a :class:`Dataset <compiler_gym.datasets.Dataset>`, storing additional metadata such as the
+license.
 
-A simple filesystem-based scheme is used to manage datasets:
+.. contents::
+  :local:
 
-* Every top-level directory in an environment's site-data folder is
-  treated as a "dataset".
+.. currentmodule:: compiler_gym.datasets
 
-* A benchmarks.inactive directory contains datasets that the user has
-  downloaded, but are not used by the environment. Moving a directory
-  from <site>/benchmarks to <site>/benchmarks.inactive means that the
-  environment will no longer use it.
 
-* Datasets can be packaged as .tar.bz2 archives and downloaded from
-  the web or local filesystem. Environments may advertise a list of
-  available datasets.
+.. autofunction:: require
 
-Datasets are packaged for each compiler and stored locally in the filesystem.
-The filesystem location can be queries using
-:attr:`CompilerEnv.datasets_site_path <compiler_gym.envs.CompilerEnv.datasets_site_path>`:
+.. autofunction:: activate
 
-    >>> env = gym.make("llvm-v0")
-    >>> env.datasets_site_path
-    /home/user/.local/share/compiler_gym/llvm/10.0.0/bitcode_benchmarks
+.. autofunction:: deactivate
 
-The :mod:`compiler_gym.bin.datasets` module can be used to download and manage
-datasets for an environment.
+.. autofunction:: delete
 
-.. automodule:: compiler_gym.datasets
-   :members:
+
+Benchmark
+---------
+
+.. autoclass:: Benchmark
+ :members:
+
+
+Dataset
+-------
+
+.. autoclass:: Dataset
+ :members:
+
+ .. automethod:: __init__
+
+
+FilesDataset
+-------------
+
+.. autoclass:: FilesDataset
+  :members:
+
+  .. automethod:: __init__
+
+
+TarDataset
+----------
+
+.. autoclass:: Dataset
+  :members:
+
+  .. automethod:: __init__
+
+
+TarDatasetWithManifest
+----------------------
+
+.. autoclass:: Dataset
+  :members:
+
+  .. automethod:: __init__
+
+
+Datasets
+--------
+
+ .. autoclass:: Datasets
+  :members:

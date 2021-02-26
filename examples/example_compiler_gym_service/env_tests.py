@@ -85,8 +85,8 @@ def test_reward_before_reset(env: CompilerEnv):
 
 def test_reset_invalid_benchmark(env: CompilerEnv):
     """Test requesting a specific benchmark."""
-    with pytest.raises(ValueError) as ctx:
-        env.reset(benchmark="foobar")
+    with pytest.raises(LookupError) as ctx:
+        env.reset(benchmark="example-v0/foobar")
     assert str(ctx.value) == "Unknown program name"
 
 
@@ -166,7 +166,10 @@ def test_rewards(env: CompilerEnv):
 
 
 def test_benchmarks(env: CompilerEnv):
-    assert env.benchmarks == ["foo", "bar"]
+    assert list(env.datasets.benchmark_uris()) == [
+        "benchmark://example-v0/foo",
+        "benchmark://example-v0/bar",
+    ]
 
 
 if __name__ == "__main__":

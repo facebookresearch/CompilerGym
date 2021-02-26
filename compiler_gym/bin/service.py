@@ -66,8 +66,12 @@ using:
 
     $ python -m compiler_gym.bin.service --local_service_binary=/path/to/service/binary
 """
+from typing import Iterable
+
+import humanize
 from absl import app, flags
 
+from compiler_gym.datasets import Dataset
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.spaces import Commandline
 from compiler_gym.util.flags.env_from_flags import env_from_flags
@@ -87,18 +91,49 @@ def header(message: str, level: int):
     return f"\n\n{prefix} {message}\n"
 
 
+def shape2str(shape, n: int = 80):
+    string = str(shape)
+    if len(string) > n:
+        return f"`{string[:n-4]}` ..."
+    return f"`{string}`"
+
+
+def summarize_datasets(datasets: Iterable[Dataset]) -> str:
+    rows = []
+    for dataset in datasets:
+        # Raw numeric values here, formatted below.
+        rows.append(
+            (
+                dataset.name,
+                truncate(dataset.description, max_line_len=60),
+                dataset.n,
+                dataset.site_data_size_in_bytes if dataset.installed else 0,
+            )
+        )
+    rows.append(("Total", "", sum(r[2] for r in rows), sum(r[3] for r in rows)))
+    return tabulate(
+        [
+            (
+                n,
+                l,
+                humanize.intcomma(f) if f >= 0 else "∞",
+                humanize.naturalsize(s) if s else "-",
+            )
+            for n, l, f, s in rows
+        ],
+        headers=("Dataset", "Description", "#. Benchmarks", "Size on disk"),
+    )
+
+
 def print_service_capabilities(env: CompilerEnv, base_heading_level: int = 1):
     """Discover and print the capabilities of a CompilerGym service.
 
     :param env: An environment.
     """
     print(header(f"CompilerGym Service `{env.service}`", base_heading_level).strip())
-    print(header("Programs", base_heading_level + 1))
+    print(header("Datasets", base_heading_level + 1))
     print(
-        tabulate(
-            [(p,) for p in sorted(env.benchmarks)],
-            headers=("Benchmark",),
-        )
+        summarize_datasets(env.datasets),
     )
     print(header("Observation Spaces", base_heading_level + 1))
     print(
