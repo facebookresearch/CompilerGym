@@ -83,6 +83,11 @@ class BenchmarkFactory {
 
   size_t numBenchmarks() const;
 
+  // Register the path of a new bitcode file using the given URI. If the URI
+  // already exists, it is replaced.
+  [[nodiscard]] grpc::Status addBitcodeFile(const std::string& uri,
+                                            const boost::filesystem::path& path);
+
  private:
   // Add a directory of bitcode files by reading a MANIFEST file. The manifest
   // file must consist of a single relative path per line.
@@ -93,9 +98,6 @@ class BenchmarkFactory {
   [[nodiscard]] grpc::Status getBenchmarkByUriPrefix(const std::string& uriPrefix,
                                                      const std::string& resolvedUriPrefix,
                                                      std::unique_ptr<Benchmark>* benchmark);
-
-  [[nodiscard]] grpc::Status addBitcodeFile(const std::string& uri,
-                                            const boost::filesystem::path& path);
 
   [[nodiscard]] grpc::Status loadBenchmark(
       std::unordered_map<std::string, boost::filesystem::path>::const_iterator iterator,

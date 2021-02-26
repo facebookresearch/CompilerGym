@@ -2,6 +2,8 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+load("@rules_python//python:defs.bzl", "py_binary", "py_test")
+load("@rules_cc//cc:defs.bzl", "cc_binary")
 
 py_binary(
     name = "actor_critic",
@@ -25,7 +27,6 @@ py_test(
 py_binary(
     name = "brute_force",
     srcs = ["brute_force.py"],
-    data = ["//compiler_gym/envs/llvm/service"],
     visibility = ["//visibility:public"],
     deps = [
         "//compiler_gym/envs",
@@ -89,5 +90,17 @@ py_test(
         ":random_walk",
         "//compiler_gym/util",
         "//tests:test_main",
+    ],
+)
+
+cc_binary(
+    name = "RandomSearch",
+    srcs = ["RandomSearch.cc"],
+    deps = [
+        "//compiler_gym/envs/llvm/service:LlvmService",
+        "@boost//:filesystem",
+        "@gflags",
+        "@glog",
+        "@magic_enum",
     ],
 )

@@ -16,7 +16,7 @@ from pathlib import Path
 
 from absl import app, flags
 
-import compiler_gym.util.flags.output_dir  # Flag definition.
+import compiler_gym.util.flags.output_dir  # noqa Flag definition.
 from compiler_gym.random_replay import replay_actions_from_logs
 from compiler_gym.util import logs
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags

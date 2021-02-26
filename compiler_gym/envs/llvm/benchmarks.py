@@ -16,15 +16,15 @@ from typing import Iterable, List, Optional, Union
 from compiler_gym.service.proto import Benchmark, File
 from compiler_gym.util.runfiles_path import cache_path, runfiles_path
 
-CLANG = runfiles_path("CompilerGym/compiler_gym/third_party/llvm/clang")
-LLVM_LINK = runfiles_path("CompilerGym/compiler_gym/third_party/llvm/llvm-link")
+CLANG = runfiles_path("compiler_gym/third_party/llvm/clang")
+LLVM_LINK = runfiles_path("compiler_gym/third_party/llvm/llvm-link")
 
 
 def _communicate(process, input=None, timeout=None):
     """subprocess.communicate() which kills subprocess on timeout."""
     try:
         return process.communicate(input=input, timeout=timeout)
-    except subprocess.TimeoutExpired as e:
+    except subprocess.TimeoutExpired:
         # kill() was added in Python 3.7.
         if sys.version_info >= (3, 7, 0):
             process.kill()
@@ -56,12 +56,26 @@ def _get_system_includes() -> Iterable[Path]:
             f"Error: {stderr.strip()}"
         )
 
+    # Parse the compiler output that matches the conventional output format
+    # used by clang and GCC:
+    #
+    #     #include <...> search starts here:
+    #     /path/1
+    #     /path/2
+    #     End of search list
     in_search_list = False
     for line in stderr.split("\n"):
         if in_search_list and line.startswith("End of search list"):
             break
         elif in_search_list:
-            yield Path(line.strip())
+            # We have an include path to return.
+            path = Path(line.strip())
+            yield path
+            # Compatibility fix for compiling benchmark sources which use the
+            # '#include <endian.h>' header, which on macOS is located in a
+            # 'machine/endian.h' directory.
+            if (path / "machine").is_dir():
+                yield path / "machine"
         elif line.startswith("#include <...> search starts here:"):
             in_search_list = True
     else:
@@ -71,7 +85,7 @@ def _get_system_includes() -> Iterable[Path]:
         )
 
 
-# Memoized search paths.
+# Memoized search paths. Call get_system_includes() to access them.
 _SYSTEM_INCLUDES = None
 
 

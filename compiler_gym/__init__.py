@@ -18,26 +18,50 @@ is available through :code:`compiler_gym.COMPILER_GYM_ENVS`:
     >>> compiler_gym.COMPILER_GYM_ENVS
     ['llvm-v0', 'llvm-ic-v0', 'llvm-autophase-ic-v0', 'llvm-ir-ic-v0']
 """
-from compiler_gym.util.version import __version__  # isort:skip
+try:
+    from compiler_gym.util.version import __version__  # isort:skip
+except ModuleNotFoundError as e:
+    # NOTE(https://github.com/facebookresearch/CompilerGym/issues/76): Handler
+    # for a particularly unhelpful error message.
+    raise ModuleNotFoundError(
+        f"{e}.\nAre you running in the root of the CompilerGym repository?\n"
+        "If so, please change to a different directory so that `import "
+        "compiler_gym` will work."
+    ) from e
 
+from compiler_gym.compiler_env_state import CompilerEnvState
 from compiler_gym.envs import COMPILER_GYM_ENVS, CompilerEnv, observation_t, step_t
 from compiler_gym.random_search import random_search
+from compiler_gym.util.debug_util import (
+    get_debug_level,
+    get_logging_level,
+    set_debug_level,
+)
 from compiler_gym.util.download import download
-from compiler_gym.util.runfiles_path import cache_path, site_data_path
-from compiler_gym.validate import ValidationResult, validate_state, validate_states
+from compiler_gym.util.runfiles_path import (
+    cache_path,
+    site_data_path,
+    transient_cache_path,
+)
+from compiler_gym.validate import validate_states
+from compiler_gym.validation_result import ValidationResult
 
 # The top-level compiler_gym API.
 __all__ = [
     "__version__",
-    "download",
     "cache_path",
-    "site_data_path",
-    "CompilerEnv",
     "COMPILER_GYM_ENVS",
+    "CompilerEnv",
+    "CompilerEnvState",
+    "download",
+    "get_debug_level",
+    "get_logging_level",
     "observation_t",
-    "step_t",
     "random_search",
-    "ValidationResult",
-    "validate_state",
+    "set_debug_level",
+    "site_data_path",
+    "step_t",
+    "transient_cache_path",
     "validate_states",
+    "ValidationResult",
 ]

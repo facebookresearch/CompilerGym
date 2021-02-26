@@ -34,7 +34,7 @@ import torch.optim as optim
 from absl import app, flags
 from torch.distributions import Categorical
 
-import compiler_gym  # Register environments.
+import compiler_gym  # noqa Register environments.
 
 flags.DEFINE_list(
     "flags",
@@ -127,11 +127,10 @@ class CustomEnv:
             self._actions = [self._env.action_space.flags.index(f) for f in FLAGS.flags]
             self.action_space = [self._env.action_space.flags[a] for a in self._actions]
 
-        except:
+        finally:
             # The program will not terminate until the environment is
             # closed, not even if there is an exception.
             self._env.close()
-            raise
 
     def step(self, action):
         assert 0 <= action and action < len(self._actions)

@@ -2,12 +2,13 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
 
 py_library(
     name = "example_compiler_gym_service",
     srcs = ["__init__.py"],
     data = [
-        "//examples/example_compiler_gym_service/service",
+        "//examples/example_compiler_gym_service/service:compiler_gym-example-service",
     ],
     deps = [
         "//compiler_gym/util",

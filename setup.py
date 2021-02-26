@@ -69,11 +69,12 @@ setuptools.setup(
     package_data={
         "compiler_gym": [
             "envs/llvm/service/passes/*.txt",
-            "envs/llvm/service/service",
+            "envs/llvm/service/compiler_gym-llvm-service",
             "envs/llvm/service/libLLVMPolly.so",
             "third_party/inst2vec/*.pickle",
             "third_party/cBench/benchmarks.txt",
-            "third_party/cBench/cBench/crc32.bc",  # Needed for install-tests.
+            "third_party/cBench/cBench-v0/*",
+            "third_party/cBench/runtime_data/**/*",
             "third_party/llvm/*",
         ]
     },

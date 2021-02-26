@@ -14,6 +14,7 @@
 #include "boost/filesystem.hpp"
 #include "compiler_gym/util/GrpcStatusMacros.h"
 #include "compiler_gym/util/RunfilesPath.h"
+#include "compiler_gym/util/Unreachable.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/Transforms/IPO.h"
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
@@ -172,6 +173,8 @@ double getCost(const LlvmCostFunction& cost, llvm::Module& module,
     }
 #endif
   }
+
+  UNREACHABLE("Unhandled cost");
 }
 
 double getBaselineCost(const BaselineCosts& baselineCosts, LlvmBaselinePolicy policy,
@@ -213,57 +216,6 @@ void setbaselineCosts(const llvm::Module& unoptimizedModule, BaselineCosts* base
       const auto cc = getCost(cost, *baselineModule, workingDirectory);
       (*baselineCosts)[idx] = cc;
     }
-  }
-}
-
-LlvmCostFunction getCostFunction(LlvmRewardSpace space) {
-  switch (space) {
-    case LlvmRewardSpace::IR_INSTRUCTION_COUNT:
-    case LlvmRewardSpace::IR_INSTRUCTION_COUNT_NORM:
-    case LlvmRewardSpace::IR_INSTRUCTION_COUNT_O3:
-    case LlvmRewardSpace::IR_INSTRUCTION_COUNT_Oz:
-      return LlvmCostFunction::IR_INSTRUCTION_COUNT;
-    case LlvmRewardSpace::OBJECT_TEXT_SIZE_BYTES:
-    case LlvmRewardSpace::OBJECT_TEXT_SIZE_NORM:
-    case LlvmRewardSpace::OBJECT_TEXT_SIZE_O3:
-    case LlvmRewardSpace::OBJECT_TEXT_SIZE_Oz:
-      return LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES;
-#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
-    case LlvmRewardSpace::TEXT_SIZE_BYTES:
-    case LlvmRewardSpace::TEXT_SIZE_NORM:
-    case LlvmRewardSpace::TEXT_SIZE_O3:
-    case LlvmRewardSpace::TEXT_SIZE_Oz:
-      return LlvmCostFunction::TEXT_SIZE_BYTES;
-#endif
-  }
-}
-
-std::optional<LlvmBaselinePolicy> getBaselinePolicy(LlvmRewardSpace space) {
-  switch (space) {
-    case LlvmRewardSpace::IR_INSTRUCTION_COUNT:
-    case LlvmRewardSpace::OBJECT_TEXT_SIZE_BYTES:
-#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
-    case LlvmRewardSpace::TEXT_SIZE_BYTES:
-#endif
-      return std::nullopt;
-    case LlvmRewardSpace::IR_INSTRUCTION_COUNT_NORM:
-    case LlvmRewardSpace::OBJECT_TEXT_SIZE_NORM:
-#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
-    case LlvmRewardSpace::TEXT_SIZE__O0:
-#endif
-      return LlvmBaselinePolicy::O0;
-    case LlvmRewardSpace::IR_INSTRUCTION_COUNT_O3:
-    case LlvmRewardSpace::OBJECT_TEXT_SIZE_O3:
-#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
-    case LlvmRewardSpace::TEXT_SIZE_O3:
-#endif
-      return LlvmBaselinePolicy::O3;
-    case LlvmRewardSpace::IR_INSTRUCTION_COUNT_Oz:
-    case LlvmRewardSpace::OBJECT_TEXT_SIZE_Oz:
-#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
-    case LlvmRewardSpace::TEXT_SIZE_Oz:
-#endif
-      return LlvmBaselinePolicy::Oz;
   }
 }
 

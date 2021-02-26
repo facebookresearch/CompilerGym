@@ -2,12 +2,15 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+load("@rules_python//python:defs.bzl", "py_library")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
 py_library(
     name = "util",
     srcs = [
         "__init__.py",
         "capture_output.py",
+        "debug_util.py",
         "download.py",
         "logs.py",
         "registration.py",
@@ -15,6 +18,7 @@ py_library(
         "shell_format.py",
         "statistics.py",
         "tabulate.py",
+        "temporary_working_directory.py",
         "timer.py",
         "user_input.py",
         "version.py",
@@ -42,6 +46,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "@com_github_grpc_grpc//:grpc++",
+        "@glog",
     ],
 )
 
@@ -81,6 +86,12 @@ cc_library(
 cc_library(
     name = "StrLenConstexpr",
     hdrs = ["StrLenConstexpr.h"],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "Unreachable",
+    hdrs = ["Unreachable.h"],
     visibility = ["//visibility:public"],
 )
 

@@ -58,9 +58,9 @@ from pathlib import Path
 
 from absl import app, flags
 
-import compiler_gym.util.flags.ls_benchmark  # Flag definition.
-import compiler_gym.util.flags.nproc  # Flag definition.
-import compiler_gym.util.flags.output_dir  # Flag definition.
+import compiler_gym.util.flags.ls_benchmark  # noqa Flag definition.
+import compiler_gym.util.flags.nproc  # noqa Flag definition.
+import compiler_gym.util.flags.output_dir  # noqa Flag definition.
 from compiler_gym.random_search import random_search
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.flags.env_from_flags import env_from_flags
@@ -104,9 +104,10 @@ def main(argv):
         env.close()
         return
 
-    assert FLAGS.patience > 0, "--patience must be > 0"
+    assert FLAGS.patience >= 0, "--patience must be >= 0"
 
-    make_env = lambda: env_from_flags(benchmark=benchmark_from_flags())
+    def make_env():
+        return env_from_flags(benchmark=benchmark_from_flags())
 
     env = make_env()
     try:

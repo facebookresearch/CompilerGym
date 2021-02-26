@@ -26,11 +26,14 @@ using BenchmarkHash = llvm::ModuleHash;
 
 using Bitcode = llvm::SmallString<0>;
 
+grpc::Status readBitcodeFile(const boost::filesystem::path& path, Bitcode* bitcode);
+
 // Returns nullptr on error and sets status.
 std::unique_ptr<llvm::Module> makeModule(llvm::LLVMContext& context, const Bitcode& bitcode,
                                          const std::string& name, grpc::Status* status);
 
-// A benchmark is an LLVM module and the LLVM context that owns it.
+// A benchmark is an LLVM module and the LLVM context that owns it. A benchmark
+// is mutable and can be changed over the course of a session.
 class Benchmark {
  public:
   Benchmark(const std::string& name, const Bitcode& bitcode,
@@ -57,16 +60,24 @@ class Benchmark {
 
   inline const llvm::Module& module() const { return *module_; }
 
+  inline llvm::LLVMContext& context() { return *context_; }
+
+  inline const llvm::LLVMContext& context() const { return *context_; }
+
   inline const BaselineCosts& baselineCosts() const { return baselineCosts_; }
 
-  // Accessors for the underlying raw pointers. These should rarely be needed,
-  // they are intended for testing. If you really must access the pointers,
-  // consider using release() to take ownership of the objects.
+  // Accessors for the underlying raw pointers.
   inline const llvm::LLVMContext* context_ptr() const { return context_.get(); }
 
   inline const llvm::Module* module_ptr() const { return module_.get(); }
 
   inline const BenchmarkHash hash() const { return hash_; }
+
+  // Replace the benchmark module with a new one. This is to enable
+  // out-of-process modification of the IR by serializing the benchmark to a
+  // file, modifying the file, then loading the modified file and updating the
+  // module pointer here.
+  inline void replaceModule(std::unique_ptr<llvm::Module> module) { module_ = std::move(module); }
 
  private:
   // NOTE(cummins): Order here is important! The LLVMContext must be declared

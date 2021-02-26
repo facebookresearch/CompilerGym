@@ -6,6 +6,7 @@
 import os
 from pathlib import Path
 
+# NOTE(cummins): Moving this file may require updating this relative path.
 _PACKAGE_ROOT = Path(os.path.join(os.path.dirname(__file__), "../../")).resolve(
     strict=True
 )
@@ -19,11 +20,11 @@ def runfiles_path(relpath: str) -> Path:
     """
     # There are three ways of determining a runfiles path:
     #   1. Set the COMPILER_GYM_RUNFILES environment variable.
-    #   2. Using pkg_resources to find package data.
-    #   3. Using bazel's runfiles library to find data.
-    #
-    # The last two options depend on the calling context - whether the code
-    # was built by bazel or installed using setuptools.
+    #   2. Using the rules_python library that is provided by bazel. This will
+    #      fail if not being executed within a bazel sandbox.
+    #   3. Computing the path relative to the location of this file. This is the
+    #      fallback approach that is used for when the code has been installed
+    #      by setuptools.
     runfiles_path = os.environ.get("COMPILER_GYM_RUNFILES")
     if runfiles_path:
         return Path(runfiles_path) / relpath
@@ -31,12 +32,13 @@ def runfiles_path(relpath: str) -> Path:
         try:
             from rules_python.python.runfiles import runfiles
 
-            return Path(runfiles.Create().Rlocation(relpath))
-        except ModuleNotFoundError:
-            # Try to find the files relative to the current file, assuming that
-            # they are all given as paths "CompilerGym/compiler_gym/foo/bar.txt"
-            # and such.
-            return _PACKAGE_ROOT / Path(*Path(relpath).parts[1:])
+            return Path(
+                runfiles.Create().Rlocation(
+                    "CompilerGym" if relpath == "." else f"CompilerGym/{relpath}"
+                )
+            )
+        except (ModuleNotFoundError, TypeError):
+            return _PACKAGE_ROOT / relpath
 
 
 def site_data_path(relpath: str) -> Path:
@@ -55,7 +57,7 @@ def site_data_path(relpath: str) -> Path:
     elif os.environ.get("HOME"):
         return Path("~/.local/share/compiler_gym").expanduser() / relpath
     else:
-        return Path("/tmp/CompilerGym") / relpath
+        return Path("/tmp/compiler_gym/site_data") / relpath
 
 
 def cache_path(relpath: str) -> Path:
@@ -74,4 +76,25 @@ def cache_path(relpath: str) -> Path:
     elif os.environ.get("HOME"):
         return Path("~/.cache/compiler_gym").expanduser() / relpath
     else:
-        return Path("/tmp/compiler_gym") / relpath
+        return Path("/tmp/compiler_gym/cache") / relpath
+
+
+def transient_cache_path(relpath: str) -> Path:
+    """Return a path within the transient cache directory.
+
+    The transient cache is a directory used to store files that do not need to persist beyond the
+    lifetime of the current process. When available, the temporary filesystem :code:`/dev/shm` will
+    be used. Else, :meth:`cache_path() <compiler_gym.cache_path>` is used as a fallback. Set the
+    environment variable :code:`$COMPILER_GYM_TRANSIENT_CACHE` to override the default location.
+
+    :param relpath: The relative path within the cache.
+    :return: The absolute path of the cache.
+    """
+    forced = os.environ.get("COMPILER_GYM_TRANSIENT_CACHE")
+    if forced:
+        return Path(forced) / relpath
+    elif Path("/dev/shm").is_dir():
+        return Path("/dev/shm/compiler_gym") / relpath
+    else:
+        # Fallback to using the regular cache.
+        return cache_path(relpath)

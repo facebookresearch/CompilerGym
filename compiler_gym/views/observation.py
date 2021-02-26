@@ -2,10 +2,10 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-from typing import Callable, List
+from typing import Callable, Dict, List
 
-from compiler_gym.service import observation_t
-from compiler_gym.service.proto import Observation, ObservationRequest, ObservationSpace
+from compiler_gym.service import ServiceError, observation_t
+from compiler_gym.service.proto import ObservationSpace, StepReply, StepRequest
 from compiler_gym.views.observation_space_spec import ObservationSpaceSpec
 
 
@@ -28,17 +28,18 @@ class ObservationView(object):
 
     def __init__(
         self,
-        get_observation: Callable[[ObservationRequest], Observation],
+        get_observation: Callable[[StepRequest], StepReply],
         spaces: List[ObservationSpace],
     ):
         if not spaces:
             raise ValueError("No observation spaces")
-        self.spaces = {
-            s.name: ObservationSpaceSpec.from_proto(i, s) for i, s in enumerate(spaces)
-        }
-        self.session_id = -1
+        self.spaces: Dict[str, ObservationSpaceSpec] = {}
 
         self._get_observation = get_observation
+        self.session_id = -1
+
+        for i, s in enumerate(spaces):
+            self._add_space(ObservationSpaceSpec.from_proto(i, s))
 
     def __getitem__(self, observation_space: str) -> observation_t:
         """Request an observation from the given space.
@@ -48,11 +49,25 @@ class ObservationView(object):
         :raises KeyError: If the requested observation space does not exist.
         """
         space = self.spaces[observation_space]
-        request = ObservationRequest(
+        request = StepRequest(
             session_id=self.session_id,
-            observation_space=space.index,
+            observation_space=[space.index],
         )
-        return space.cb(self._get_observation(request))
+        reply: StepReply = self._get_observation(request)
+        if len(reply.observation) != 1:
+            raise ServiceError(
+                f"Requested 1 observation but received {len(reply.observation)}"
+            )
+        return space.translate(reply.observation[0])
+
+    def _add_space(self, space: ObservationSpaceSpec):
+        """Register a new space."""
+        self.spaces[space.id] = space
+        # Bind a new method to this class that is a callback to compute the
+        # given observation space. E.g. if a new space is added with ID
+        # `FooBar`, this observation can be computed using
+        # env.observation.FooBar().
+        setattr(self, space.id, lambda: self[space.id])
 
     def add_derived_space(
         self,
@@ -69,7 +84,7 @@ class ObservationView(object):
         >>> env.observation.add_derived_space(
             id="src_len",
             base_id="src",
-            cb=lambda src: np.array([len(src)], dtype=np.int32),
+            translate=lambda src: np.array([len(src)], dtype=np.int32),
             shape=Box(shape=(1,), dtype=np.int32),
         )
         >>> env.observation["src_len"]
@@ -78,11 +93,11 @@ class ObservationView(object):
         :param id: The name of the new observation space.
         :param base_id: The name of the observation space that this is derived
             from.
-        :param **kwargs: Arguments passed to
+        :param \\**kwargs: Arguments passed to
             :func:`ObservationSpaceSpec.make_derived_space <compiler_gym.views.ObservationSpaceSpec.make_derived_space>`.
         """
         base_space = self.spaces[base_id]
-        self.spaces[id] = base_space.make_derived_space(id=id, **kwargs)
+        self._add_space(base_space.make_derived_space(id=id, **kwargs))
 
     def __repr__(self):
         return f"ObservationView[{', '.join(sorted(self.spaces.keys()))}]"

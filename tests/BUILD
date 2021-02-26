@@ -2,6 +2,28 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+load("@rules_python//python:defs.bzl", "py_library", "py_test")
+load("@rules_cc//cc:defs.bzl", "cc_library")
+
+py_test(
+    name = "compiler_env_test",
+    srcs = ["compiler_env_test.py"],
+    deps = [
+        "//compiler_gym/datasets",
+        "//compiler_gym/envs",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
+    name = "compiler_env_state_test",
+    srcs = ["compiler_env_state_test.py"],
+    deps = [
+        "//compiler_gym",
+        "//tests:test_main",
+    ],
+)
 
 py_test(
     name = "random_search_test",
@@ -25,6 +47,7 @@ py_library(
     ],
     deps = [
         "//compiler_gym",
+        "//compiler_gym/util",
     ],
 )
 
@@ -53,7 +76,6 @@ cc_library(
 
 py_test(
     name = "validate_test",
-    timeout = "short",
     srcs = ["validate_test.py"],
     deps = [
         ":test_main",

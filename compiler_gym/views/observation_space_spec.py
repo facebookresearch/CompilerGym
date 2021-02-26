@@ -11,7 +11,8 @@ from gym.spaces import Box, Space
 
 from compiler_gym.service import observation_t, scalar_range2tuple
 from compiler_gym.service.proto import Observation, ObservationSpace
-from compiler_gym.spaces import Sequence
+from compiler_gym.spaces.scalar import Scalar
+from compiler_gym.spaces.sequence import Sequence
 
 
 def _json2nx(observation):
@@ -52,7 +53,7 @@ class ObservationSpaceSpec(object):
         id: str,
         index: int,
         space: Space,
-        cb: Callable[[Union[observation_t, Observation]], observation_t],
+        translate: Callable[[Union[observation_t, Observation]], observation_t],
         to_string: Callable[[observation_t], str],
         deterministic: bool,
         platform_dependent: bool,
@@ -65,11 +66,23 @@ class ObservationSpaceSpec(object):
         self.deterministic = deterministic
         self.platform_dependent = platform_dependent
         self.default_value = default_value
-        self.cb = cb
+        self.translate = translate
         self.to_string = to_string
 
     def __repr__(self) -> str:
         return f"ObservationSpaceSpec({self.id})"
+
+    def __eq__(self, rhs) -> bool:
+        """Equality check."""
+        if not isinstance(rhs, ObservationSpaceSpec):
+            return False
+        return (
+            self.id == rhs.id
+            and self.index == rhs.index
+            and self.space == rhs.space
+            and self.platform_dependent == rhs.platform_dependent
+            and self.deterministic == rhs.deterministic
+        )
 
     @classmethod
     def from_proto(cls, index: int, proto: ObservationSpace):
@@ -84,6 +97,12 @@ class ObservationSpaceSpec(object):
                 dtype=dtype,
             )
 
+        def make_scalar(scalar_range, dtype, defaults):
+            scalar_range_tuple = scalar_range2tuple(scalar_range, defaults)
+            return Scalar(
+                min=scalar_range_tuple[0], max=scalar_range_tuple[1], dtype=dtype
+            )
+
         def make_seq(scalar_range, dtype, defaults):
             return Sequence(
                 size_range=scalar_range2tuple(scalar_range, defaults),
@@ -92,67 +111,109 @@ class ObservationSpaceSpec(object):
             )
 
         # Translate from protocol buffer specification to python. There are
-        # three variables to derive: 'space', the gym.Space instance describing
-        # the space. 'cb' is a callback that translates from an Observation
-        # message to a python type. and 'to_string' is a callback that
-        # translates from a python type to a string for printing.
+        # three variables to derive:
+        #   (1) space: the gym.Space instance describing the space.
+        #   (2) translate: is a callback that translates from an Observation
+        #           message to a python type.
+        #   (3) to_string: is a callback that translates from a python type to a
+        #           string for printing.
         if proto.opaque_data_format == "json://networkx/MultiDiGraph":
             # TODO(cummins): Add a Graph space.
             space = make_seq(proto.string_size_range, str, (0, None))
-            cb = lambda observation: nx.readwrite.json_graph.node_link_graph(
-                json.loads(observation.string_value), multigraph=True, directed=True
-            )
-            to_string = lambda observation: json.dumps(
-                nx.readwrite.json_graph.node_link_data(observation), indent=2
-            )
+
+            def translate(observation):
+                return nx.readwrite.json_graph.node_link_graph(
+                    json.loads(observation.string_value), multigraph=True, directed=True
+                )
+
+            def to_string(observation):
+                return json.dumps(
+                    nx.readwrite.json_graph.node_link_data(observation), indent=2
+                )
+
         elif proto.opaque_data_format == "json://":
             space = make_seq(proto.string_size_range, str, (0, None))
-            cb = lambda observation: json.loads(observation.string_value)
-            to_string = lambda observation: json.dumps(observation, indent=2)
+
+            def translate(observation):
+                return json.loads(observation.string_value)
+
+            def to_string(observation):
+                return json.dumps(observation, indent=2)
+
         elif shape_type == "int64_range_list":
             space = make_box(
                 proto.int64_range_list.range,
                 np.int64,
                 (np.iinfo(np.int64).min, np.iinfo(np.int64).max),
             )
-            cb = lambda observation: np.array(
-                observation.int64_list.value, dtype=np.int64
-            )
+
+            def translate(observation):
+                return np.array(observation.int64_list.value, dtype=np.int64)
+
             to_string = str
         elif shape_type == "double_range_list":
             space = make_box(
                 proto.double_range_list.range, np.float64, (-np.inf, np.inf)
             )
-            cb = lambda observation: np.array(
-                observation.double_list.value, dtype=np.float64
-            )
+
+            def translate(observation):
+                return np.array(observation.double_list.value, dtype=np.float64)
+
             to_string = str
         elif shape_type == "string_size_range":
             space = make_seq(proto.string_size_range, str, (0, None))
-            cb = lambda observation: observation.string_value
+
+            def translate(observation):
+                return observation.string_value
+
             to_string = str
         elif shape_type == "binary_size_range":
             space = make_seq(proto.binary_size_range, bytes, (0, None))
-            cb = lambda observation: observation.binary_value
+
+            def translate(observation):
+                return observation.binary_value
+
+            to_string = str
+        elif shape_type == "scalar_int64_range":
+            space = make_scalar(
+                proto.scalar_int64_range,
+                np.int64,
+                (np.iinfo(np.int64).min, np.iinfo(np.int64).max),
+            )
+
+            def translate(observation):
+                return int(observation.scalar_int64)
+
+            to_string = str
+        elif shape_type == "scalar_double_range":
+            space = make_scalar(
+                proto.scalar_double_range, np.float64, (-np.inf, np.inf)
+            )
+
+            def translate(observation):
+                return float(observation.scalar_double)
+
             to_string = str
         else:
-            raise TypeError(f"Cannot determine shape of ObservationSpace: {proto}")
+            raise TypeError(
+                f"Unknown shape '{shape_type}' for ObservationSpace:\n{proto}"
+            )
 
         return cls(
             id=proto.name,
             index=index,
             space=space,
-            cb=cb,
+            translate=translate,
             to_string=to_string,
             deterministic=proto.deterministic,
             platform_dependent=proto.platform_dependent,
-            default_value=cb(proto.default_value),
+            default_value=translate(proto.default_value),
         )
 
     def make_derived_space(
         self,
         id: str,
-        cb: Callable[[observation_t], observation_t],
+        translate: Callable[[observation_t], observation_t],
         space: Optional[Space] = None,
         deterministic: Optional[bool] = None,
         default_value: Optional[observation_t] = None,
@@ -162,7 +223,7 @@ class ObservationSpaceSpec(object):
         """Create a derived observation space.
 
         :param id: The name of the derived observation space.
-        :param cb: A callback function to compute a derived observation
+        :param translate: A callback function to compute a derived observation
             from the base observation.
         :param space: The :code:`gym.Space` describing the observation space.
         :param deterministic: Whether the observation space is deterministic.
@@ -183,10 +244,12 @@ class ObservationSpaceSpec(object):
             id=id,
             index=self.index,
             space=space or self.space,
-            cb=lambda observation: cb(self.cb(observation)),
+            translate=lambda observation: translate(self.translate(observation)),
             to_string=to_string or self.to_string,
             default_value=(
-                cb(self.default_value) if default_value is None else default_value
+                translate(self.default_value)
+                if default_value is None
+                else default_value
             ),
             deterministic=(
                 self.deterministic if deterministic is None else deterministic

@@ -18,7 +18,6 @@ def _download(url: str) -> bytes:
         if req.status_code != 200:
             raise OSError(f"GET returned status code {req.status_code}: {url}")
 
-        logging.info(f"Downloaded {url}")
         return req.content
     finally:
         req.close()
@@ -27,7 +26,7 @@ def _download(url: str) -> bytes:
 # Only a single process may download at a time. The idea here is to prevent
 # overloading the NIC when, for example, you launch a bunch of simultaneous
 # learning processes which all require the same dataset.
-@fasteners.interprocess_locked(cache_path(f"downloads/LOCK"))
+@fasteners.interprocess_locked(cache_path("downloads/LOCK"))
 def download(url: str, sha256: Optional[str] = None) -> bytes:
     """Download a file and return its contents.
 

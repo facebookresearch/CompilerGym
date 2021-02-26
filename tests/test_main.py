@@ -4,14 +4,16 @@
 # LICENSE file in the root directory of this source tree.
 import os
 import sys
+from typing import List, Optional
 
 import gym
 import pytest
 
-import compiler_gym  # Register environments.
+import compiler_gym  # noqa Register environments.
+from compiler_gym.util import debug_util as dbg
 
 
-def main():
+def main(extra_pytest_args: Optional[List[str]] = None, debug_level: int = 3):
     """The main entry point for the pytest runner.
 
     An example file which uses this:
@@ -25,8 +27,16 @@ def main():
             main()
 
     In the above, the single test_foo test will be executed.
+
+    :param extra_pytest_args: A list of additional command line options to pass
+        to pytest.
+    :param debug_level: The debug level to use to run tests. Higher levels are
+        more verbose and may be useful for diagnosing test failures. Normally
+        CompilerGym executes with a debug level of 0.
     """
-    # Use isolated data directories for running tests.
+    dbg.set_debug_level(debug_level)
+
+    # Keep test data isolated from user data.
     os.environ["COMPILER_GYM_SITE_DATA"] = "/tmp/compiler_gym/tests/site_data"
     os.environ["COMPILER_GYM_CACHE"] = "/tmp/compiler_gym/tests/cache"
 
@@ -37,10 +47,6 @@ def main():
         env.require_dataset("cBench-v0")
     finally:
         env.close()
-
-    # Use verbose backend debugging when running tests. If a test fails, the debugging
-    # output will be included in the captured stderr.
-    os.environ["COMPILER_GYM_SERVICE_DEBUG"] = "1"
 
     pytest_args = sys.argv + ["-vv"]
     # Support for sharding. If a py_test target has the shard_count attribute
@@ -53,5 +59,7 @@ def main():
         pytest_args += [f"--shard-id={shard_index}", f"--num-shards={num_shards}"]
     else:
         pytest_args += ["-p", "no:pytest-shard"]
+
+    pytest_args += extra_pytest_args or []
 
     sys.exit(pytest.main(pytest_args))

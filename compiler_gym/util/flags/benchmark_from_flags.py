@@ -12,13 +12,9 @@ from compiler_gym.service.proto import Benchmark, File
 flags.DEFINE_string(
     "benchmark",
     None,
-    "The URI of the benchmark to use.",
-)
-flags.DEFINE_string(
-    "program_data",
-    None,
-    "The URI of a file containing the program data to use. Paths to local "
-    "files are representing in the format file:///absolute/path/to/file",
+    "The URI of the benchmark to use. Use the benchmark:// protocol to "
+    "reference named benchmarks, or the file:/// protocol to reference paths "
+    "to program data. If no protocol is specified, benchmark:// is implied.",
 )
 
 FLAGS = flags.FLAGS
@@ -27,9 +23,10 @@ FLAGS = flags.FLAGS
 def benchmark_from_flags() -> Optional[Union[Benchmark, str]]:
     """Returns either the name of the benchmark, or a Benchmark message."""
     if FLAGS.benchmark:
-        return FLAGS.benchmark
-    elif FLAGS.program_data:
-        return Benchmark(uri=FLAGS.program_data, program=File(uri=FLAGS.program_data))
+        if FLAGS.benchmark.startswith("file:///"):
+            return Benchmark(uri=FLAGS.benchmark, program=File(uri=FLAGS.benchmark))
+        else:
+            return FLAGS.benchmark
     else:
         # No benchmark was specified.
         return None

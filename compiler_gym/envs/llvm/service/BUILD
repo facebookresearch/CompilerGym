@@ -1,7 +1,8 @@
 # This package exposes the LLVM optimization pipeline as a CompilerGym service.
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
 cc_binary(
-    name = "service",
+    name = "compiler_gym-llvm-service",
     srcs = ["RunService.cc"],
     visibility = ["//visibility:public"],
     deps = [
@@ -31,7 +32,10 @@ cc_library(
     name = "Benchmark",
     srcs = ["Benchmark.cc"],
     hdrs = ["Benchmark.h"],
-    visibility = ["//compiler_gym/envs/llvm/service:__subpackages__"],
+    visibility = [
+        "//compiler_gym/envs/llvm/service:__subpackages__",
+        "//tests:__subpackages__",
+    ],
     deps = [
         ":Cost",
         "@boost//:filesystem",
@@ -46,7 +50,10 @@ cc_library(
     name = "BenchmarkFactory",
     srcs = ["BenchmarkFactory.cc"],
     hdrs = ["BenchmarkFactory.h"],
-    visibility = ["//compiler_gym/envs/llvm/service:__subpackages__"],
+    visibility = [
+        "//compiler_gym/envs/llvm/service:__subpackages__",
+        "//tests:__subpackages__",
+    ],
     deps = [
         ":Benchmark",
         "//compiler_gym/util:GrpcStatusMacros",
@@ -69,9 +76,9 @@ cc_library(
         "//compiler_gym/third_party/llvm:llvm-size",
     ],
     deps = [
-        ":RewardSpaces",
         "//compiler_gym/util:GrpcStatusMacros",
         "//compiler_gym/util:RunfilesPath",
+        "//compiler_gym/util:Unreachable",
         "@boost//:filesystem",
         "@com_github_grpc_grpc//:grpc++",
         "@fmt",
@@ -83,12 +90,31 @@ cc_library(
 )
 
 cc_library(
-    name = "LlvmEnvironment",
+    name = "LlvmService",
+    srcs = ["LlvmService.cc"],
+    hdrs = ["LlvmService.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":Benchmark",
+        ":BenchmarkFactory",
+        ":Cost",
+        ":LlvmSession",
+        ":ObservationSpaces",
+        "//compiler_gym/service/proto:compiler_gym_service_cc",
+        "//compiler_gym/util:GrpcStatusMacros",
+        "//compiler_gym/util:Version",
+        "@boost//:filesystem",
+        "@llvm//10.0.0",
+    ],
+)
+
+cc_library(
+    name = "LlvmSession",
     srcs = [
-        "LlvmEnvironment.cc",
+        "LlvmSession.cc",
     ],
     hdrs = [
-        "LlvmEnvironment.h",
+        "LlvmSession.h",
         "//compiler_gym/envs/llvm/service/passes:ActionHeaders.h",
         "//compiler_gym/envs/llvm/service/passes:ActionSwitch.h",
     ],
@@ -96,17 +122,21 @@ cc_library(
         "-DGOOGLE_PROTOBUF_NO_RTTI",
         "-fno-rtti",
     ],
+    data = [
+        "//compiler_gym/third_party/llvm:opt",
+    ],
+    visibility = ["//tests:__subpackages__"],
     deps = [
         ":ActionSpace",
         ":Benchmark",
         ":Cost",
         ":ObservationSpaces",
-        ":RewardSpaces",
         "//compiler_gym/service/proto:compiler_gym_service_cc_grpc",
         "//compiler_gym/third_party/autophase:InstCount",
         "//compiler_gym/third_party/cpuinfo",
         "//compiler_gym/util:EnumUtil",
         "//compiler_gym/util:GrpcStatusMacros",
+        "//compiler_gym/util:RunfilesPath",
         "@boost//:filesystem",
         "@fmt",
         "@glog",
@@ -116,25 +146,7 @@ cc_library(
         "@programl//programl/graph/format:node_link_graph",
         "@programl//programl/ir/llvm",
         "@programl//programl/proto:programl_cc",
-    ],
-)
-
-cc_library(
-    name = "LlvmService",
-    srcs = ["LlvmService.cc"],
-    hdrs = ["LlvmService.h"],
-    deps = [
-        ":Benchmark",
-        ":BenchmarkFactory",
-        ":Cost",
-        ":LlvmEnvironment",
-        ":ObservationSpaces",
-        ":RewardSpaces",
-        "//compiler_gym/service/proto:compiler_gym_service_cc",
-        "//compiler_gym/util:GrpcStatusMacros",
-        "//compiler_gym/util:Version",
-        "@boost//:filesystem",
-        "@llvm//10.0.0",
+        "@subprocess",
     ],
 )
 
@@ -151,17 +163,5 @@ cc_library(
         "@nlohmann_json//:json",
         "@programl//programl/graph/format:node_link_graph",
         "@programl//programl/proto:programl_cc",
-    ],
-)
-
-cc_library(
-    name = "RewardSpaces",
-    srcs = ["RewardSpaces.cc"],
-    hdrs = ["RewardSpaces.h"],
-    visibility = ["//tests:__subpackages__"],
-    deps = [
-        "//compiler_gym/service/proto:compiler_gym_service_cc",
-        "//compiler_gym/util:EnumUtil",
-        "@magic_enum",
     ],
 )

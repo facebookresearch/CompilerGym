@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 #
 # Extensions to OpenAI gym's spaces.
+load("@rules_python//python:defs.bzl", "py_library")
 
 py_library(
     name = "spaces",
@@ -12,6 +13,7 @@ py_library(
     deps = [
         ":commandline",
         ":named_discrete",
+        ":reward",
         ":scalar",
         ":sequence",
     ],
@@ -28,6 +30,15 @@ py_library(
 py_library(
     name = "named_discrete",
     srcs = ["named_discrete.py"],
+)
+
+py_library(
+    name = "reward",
+    srcs = ["reward.py"],
+    deps = [
+        ":scalar",
+        "//compiler_gym/service",
+    ],
 )
 
 py_library(

@@ -16,11 +16,12 @@ import tempfile
 from pathlib import Path
 from typing import List
 
+from compiler_gym.envs.llvm.benchmarks import get_system_includes
 from compiler_gym.util.runfiles_path import runfiles_path
 
 # Path of the LLVM binaries.
-CLANG = Path(runfiles_path("llvm/10.0.0/clang"))
-LLVM_LINK = Path(runfiles_path("llvm/10.0.0/llvm-link"))
+CLANG = Path(runfiles_path("compiler_gym/third_party/llvm/clang"))
+LLVM_LINK = Path(runfiles_path("compiler_gym/third_party/llvm/llvm-link"))
 
 
 def make_cbench_llvm_module(
@@ -30,6 +31,8 @@ def make_cbench_llvm_module(
     cflags = cflags or []
 
     src_dir = benchmark_dir / "src"
+    if not src_dir.is_dir():
+        src_dir = benchmark_dir
     assert src_dir.is_dir(), f"Source directory not found: {src_dir}"
 
     clang_command = [
@@ -48,17 +51,8 @@ def make_cbench_llvm_module(
         "-disable-llvm-passes",
     ] + cflags
 
-    # NOTE(cummins): The LLVM release does not include a full set of standard
-    # includes. Hack around this for macOS.
-    if Path(
-        "/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include"
-    ).is_dir():
-        clang_command += [
-            "-isystem",
-            "/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include",
-            "-isystem",
-            "/Library/Developer/CommandLineTools/SDKs/MacOSX10.15.sdk/usr/include/machine",
-        ]
+    for directory in get_system_includes():
+        clang_command += ["-isystem", str(directory)]
 
     with tempfile.TemporaryDirectory() as tmpdir:
         tmpdir = Path(tmpdir)

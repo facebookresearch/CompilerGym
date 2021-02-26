@@ -2,6 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+load("@rules_python//python:defs.bzl", "py_library")
 
 py_library(
     name = "views",
@@ -10,7 +11,6 @@ py_library(
     deps = [
         ":observation",
         ":reward",
-        ":reward_space_spec",
     ],
 )
 
@@ -39,17 +39,9 @@ py_library(
     srcs = ["reward.py"],
     visibility = ["//compiler_gym:__subpackages__"],
     deps = [
-        ":reward_space_spec",
+        ":observation",
         "//compiler_gym/service",
         "//compiler_gym/service/proto",
-    ],
-)
-
-py_library(
-    name = "reward_space_spec",
-    srcs = ["reward_space_spec.py"],
-    deps = [
-        "//compiler_gym/service",
-        "//compiler_gym/service/proto",
+        "//compiler_gym/spaces",
     ],
 )

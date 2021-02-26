@@ -34,10 +34,6 @@ test --copt -DMAGIC_ENUM_RANGE_MAX=512
 build --cxxopt='-Werror=dangling-else'
 test --cxxopt='-Werror=dangling-else'
 
-# Default to continuing on build error. Override using --keep_going=false.
-build --keep_going
-test --keep_going
-
 # Show test error output. Override using --test_output={summary,full}.
 test --test_output=errors
 
@@ -88,3 +84,7 @@ build:ci --action_env=PATH
 build:ci --keep_going
 build:ci --verbose_failures
 build:ci --test_output=errors
+test:ci --test_env=CI
+# Build warnings unnecessarily clutter the output log, making it harder to
+# diagnose the fault when a test fails. Silence all warnings for test runs.
+test:ci --copt -Wno-everything

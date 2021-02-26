@@ -11,6 +11,7 @@ from compiler_gym.envs.llvm.benchmarks import (
     make_benchmark,
 )
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
+from compiler_gym.envs.llvm.specs import observation_spaces, reward_spaces
 from compiler_gym.util.registration import register
 from compiler_gym.util.runfiles_path import runfiles_path
 
@@ -20,10 +21,12 @@ __all__ = [
     "ClangInvocation",
     "get_system_includes",
     "LLVM_SERVICE_BINARY",
+    "observation_spaces",
+    "reward_spaces",
 ]
 
 LLVM_SERVICE_BINARY = runfiles_path(
-    "CompilerGym/compiler_gym/envs/llvm/service/service"
+    "compiler_gym/envs/llvm/service/compiler_gym-llvm-service"
 )
 
 

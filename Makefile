@@ -17,17 +17,32 @@ Testing
         runs are minimal and fast. Use this as your go-to target for testing
         modifications to the codebase.
 
-    make install-test
-        Build and install the python package (equivalent to 'make install'),
-        then run the full test suite against the installed package, and any
-        other tests that require the python package to be installed. This is
-        expensive and not typically required for local development.
-
     make itest
         Run the test suite continuously on change. This is equivalent to
         manually running `make test` when a source file is modified. Note that
         `make install-test` tests are not run. This requires bazel-watcher.
         See: https://github.com/bazelbuild/bazel-watcher#installation
+
+
+Post-installation Tests
+-----------------------
+
+    make install-test
+        Run the full test suite against an installed CompilerGym package. This
+        requires that the CompilerGym package has been installed (`make
+        install`). This is useful for checking the package contents but is
+        usually not needed for interactive development since `make test` runs
+        the same tests without having to install anything.
+
+    make install-fuzz
+        Run the fuzz testing suite against an installed CompilerGym package.
+        Fuzz tests are tests that generate their own inputs and run in a loop
+        until an error has been found, or until a minimum number of seconds have
+        elapsed. This minimum time is controlled using a FUZZ_SECONDS variable.
+        The default is 300 seconds (5 minutes). Override this value at the
+        command line, for example `FUZZ_SECONDS=60 make install-fuzz` will run
+        the fuzz tests for a minimum of one minute. This requires that the
+        CompilerGym package has been installed (`make install`).
 
 
 Documentation
@@ -124,13 +139,15 @@ DISTTOOLS_OUTS := dist build compiler_gym.egg-info
 LLVM_SERVICE_DIR := $(ROOT)/bazel-bin/package.runfiles/CompilerGym/compiler_gym/envs/llvm/service
 LLVM_POLLY_SO := $(ROOT)/bazel-bin/external/clang-llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04/lib/libLLVMPolly.so
 
-bazel-build:
+bazel-build-pkg:
 	$(BAZEL) $(BAZEL_OPTS) build $(BAZEL_BUILD_OPTS) //:package
+
+bazel-build: bazel-build-pkg
 ifeq ($(OS),Linux)
 	cp -f $(LLVM_POLLY_SO) $(LLVM_SERVICE_DIR)/libLLVMPolly.so
-	chmod 666 $(LLVM_SERVICE_DIR)/service
-	patchelf --set-rpath '$$ORIGIN' $(LLVM_SERVICE_DIR)/service
-	chmod 555 $(LLVM_SERVICE_DIR)/service
+	chmod 666 $(LLVM_SERVICE_DIR)/compiler_gym-llvm-service
+	patchelf --set-rpath '$$ORIGIN' $(LLVM_SERVICE_DIR)/compiler_gym-llvm-service ; \
+	chmod 555 $(LLVM_SERVICE_DIR)/compiler_gym-llvm-service
 endif
 
 bdist_wheel: bazel-build
@@ -145,7 +162,7 @@ bdist_wheel-linux:
 
 all: docs bdist_wheel bdist_wheel-linux
 
-.PHONY: bdist_wheel bdist_wheel-linux
+.PHONY: bazel-build-pkg bazel-build bdist_wheel bdist_wheel-linux
 
 #################
 # Documentation #
@@ -170,11 +187,13 @@ GENERATED_DOCS := \
 	docs/source/installation.rst \
 	$(NULL)
 
-docs: $(GENERATED_DOCS) install
-	$(MAKE) -C docs html
+gendocs: $(GENERATED_DOCS)
 
-livedocs: $(GENERATED_DOCS) install
-	$(MAKE) -C docs livehtml
+docs: gendocs bazel-build
+	PYTHONPATH=$(ROOT)/bazel-bin/package.runfiles/CompilerGym $(MAKE) -C docs html
+
+livedocs: gendocs
+	PYTHONPATH=$(ROOT)/bazel-bin/package.runfiles/CompilerGym $(MAKE) -C docs livehtml
 
 
 ###########
@@ -190,22 +209,30 @@ test:
 itest:
 	$(IBAZEL) $(BAZEL_OPTS) test $(BAZEL_TEST_OPTS) //...
 
-tests-datasets:
+install-test-datasets:
 	cd .. && python -m compiler_gym.bin.datasets --env=llvm-v0 --download=cBench-v0 >/dev/null
 
-pytest:
+install-test: install-test-datasets
 	mkdir -p /tmp/compiler_gym/wheel_tests
 	rm -f /tmp/compiler_gym/wheel_tests/tests
 	ln -s $(ROOT)/tests /tmp/compiler_gym/wheel_tests
-	cd /tmp/compiler_gym/wheel_tests && pytest tests
+	cd /tmp/compiler_gym/wheel_tests && pytest -n auto tests -k "not fuzz"
 
-install-test: | install tests-datasets pytest
+# The minimum number of seconds to run the fuzz tests in a loop for. Override
+# this at the commandline, e.g. `FUZZ_SECONDS=1800 make fuzz`.
+FUZZ_SECONDS ?= 300
+
+install-fuzz: install-test-datasets
+	mkdir -p /tmp/compiler_gym/wheel_fuzz_tests
+	rm -f /tmp/compiler_gym/wheel_fuzz_tests/tests
+	ln -s $(ROOT)/tests /tmp/compiler_gym/wheel_fuzz_tests
+	cd /tmp/compiler_gym/wheel_fuzz_tests && pytest tests -p no:sugar -x -vv -k fuzz --seconds=$(FUZZ_SECONDS)
 
 post-install-test:
 	$(MAKE) -C examples/makefile_integration clean
 	SEARCH_TIME=3 $(MAKE) -C examples/makefile_integration test
 
-.PHONY: test install-test post-install-test
+.PHONY: test post-install-test
 
 
 ################
@@ -222,17 +249,27 @@ install: bazel-build
 # Tidying up #
 ##############
 
-.PHONY: clean distclean uninstall uninstall-purge
+# A list of all filesystem locations that CompilerGym may use for storing
+# files and data.
+COMPILER_GYM_DATA_FILE_LOCATIONS = \
+    $(HOME)/.cache/compiler_gym \
+    $(HOME)/.local/share/compiler_gym \
+    $(HOME)/logs/compiler_gym \
+    /dev/shm/compiler_gym \
+    /tmp/compiler_gym \
+    $(NULL)
+
+.PHONY: clean distclean uninstall purge
 
 clean:
-	$(MAKE) -C docs clean
+	$(MAKE) -C docs clean || true
 	rm -rf $(GENERATED_DOCS) $(DISTTOOLS_OUTS)
 
 distclean: clean
 	bazel clean --expunge
 
 uninstall:
-	$(PYTHON) -m pip uninstall compiler_gym
+	$(PYTHON) -m pip uninstall -y compiler_gym
 
-uninstall-purge: uninstall
-	rm -rf $(HOME)/.cache/compiler_gym $(HOME)/logs/compiler_gym $(HOME)/.local/share/compiler_gym
+purge: distclean uninstall
+	rm -rf $(COMPILER_GYM_DATA_FILE_LOCATIONS)

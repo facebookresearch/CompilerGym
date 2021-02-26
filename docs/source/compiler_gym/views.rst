@@ -37,10 +37,3 @@ RewardView
    :members:
 
    .. automethod:: __getitem__
-
-
-RewardSpaceSpec
----------------
-
-.. autoclass:: RewardSpaceSpec
-   :members:

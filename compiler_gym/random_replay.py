@@ -4,8 +4,6 @@
 # LICENSE file in the root directory of this source tree.
 """Replay the sequence of actions that produced the best reward."""
 import json
-import os
-import shutil
 from pathlib import Path
 from time import time
 from typing import List
@@ -75,7 +73,7 @@ def replay_actions_from_logs(env: CompilerEnv, logdir: Path, benchmark=None) -> 
         meta = json.load(f)
 
     with open(best_actions_path) as f:
-        actions = [l.strip() for l in f.readlines() if l.strip()]
+        actions = [ln.strip() for ln in f.readlines() if ln.strip()]
 
     benchmark = benchmark or meta["benchmark"]
     env.reward_space = meta["reward"]

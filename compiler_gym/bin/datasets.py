@@ -105,7 +105,7 @@ flags, respectively:
 
 .. code-block::
 
-    $ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --activate=npb-v0,github-v0 --deactivate=cbench
+    $ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --activate=npb-v0,github-v0 --deactivate=cBench-v0
 
 The :code:`--activate_all` and :code:`--deactivate_all` flags can be used as a
 shortcut to activate or deactivate every downloaded:
@@ -136,12 +136,10 @@ import sys
 from pathlib import Path
 from typing import Tuple
 
-import fasteners
 import humanize
 from absl import app, flags
 
 from compiler_gym.datasets.dataset import Dataset, activate, deactivate, delete, require
-from compiler_gym.envs import CompilerEnv
 from compiler_gym.util.flags.env_from_flags import env_from_flags
 from compiler_gym.util.tabulate import tabulate
 

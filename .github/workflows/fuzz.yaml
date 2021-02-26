@@ -1,0 +1,56 @@
+---
+# This file defines a GitHub actions job that runs the fuzzing test suite for
+# 10 minutes every weekday against the latest CompilerGym release. The job can
+# also be scheduled manually using the GitHub actions UI.
+#
+# TODO(cummins): Set up https://github.com/JasonEtco/create-an-issue
+# to create a boilerplate issue if `make fuzz` fails.
+name: Release Fuzz
+
+on:
+    workflow_dispatch:
+    schedule:
+        - cron: 0 9 * * 1-5  # every weekday at 9am
+
+jobs:
+    test:
+        runs-on: ${{ matrix.os }}
+
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [ubuntu-latest, macos-latest]
+                python: [3.8]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python ${{ matrix.python }}
+              uses: actions/setup-python@v2
+              with:
+                  python-version: ${{ matrix.python }}
+
+            - name: Install build dependencies (linux)
+              run: |
+                  curl -L "https://github.com/bazelbuild/bazelisk/releases/download/v1.6.1/bazelisk-linux-amd64" > bazel.tmp
+                  sudo mv bazel.tmp /usr/local/bin/bazel
+                  chmod +x /usr/local/bin/bazel
+                  sudo apt install clang-9 patchelf
+                  python -m pip install -r compiler_gym/requirements.txt -r tests/requirements.txt
+              if: matrix.os == 'ubuntu-latest'
+
+            - name: Install build dependencies (macOS)
+              run: |
+                  brew install bazelisk
+                  python -m pip install -r compiler_gym/requirements.txt -r tests/requirements.txt
+              if: matrix.os == 'macos-latest'
+
+            - name: Install
+              run: make install
+              env:
+                  CC: clang
+                  CXX: clang++
+                  BAZEL_TEST_OPTS: --config=ci
+
+            - name: Test
+              run: FUZZ_TIME=600 make fuzz

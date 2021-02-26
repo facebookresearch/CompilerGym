@@ -15,25 +15,29 @@ option java_outer_classname = "CompilerGymServiceProto";
 option java_package = "com.compiler_gym";
 
 service CompilerGymService {
+  // Request version strings from the service.
   rpc GetVersion(GetVersionRequest) returns (GetVersionReply);
-  // Start a CompilerGym service episode. Must be called after Init().
-  rpc StartEpisode(StartEpisodeRequest) returns (StartEpisodeReply);
-  // Make an optimization decision. The set of valid actions is the last
-  // ActionSpace returned by a call to Init() or TakeAction().
-  rpc TakeAction(ActionRequest) returns (ActionReply);
-  // Request an observation of the current state. StartEpisode() must have been
-  // called. If the observation is deterministic, this value will not change
-  // until further TakeAction() calls are made.
-  rpc GetObservation(ObservationRequest) returns (Observation);
-  // Request the reward at the current state. StartEpisode() must have been
-  // called. If the reward is deterministic, the reward will not change between
-  // subsequent calls until TakeAction() is called.
-  rpc GetReward(RewardRequest) returns (Reward);
-  // End a CompilerGym service episode. Must be called after StartEpisode().
-  rpc EndEpisode(EndEpisodeRequest) returns (EndEpisodeReply);
-  // Request the supported service spaces. The service responds with an initial
-  // action space, and a list of available observation and reward spaces.
+  // Request the action and observation spaces that this service supports. The
+  // service responds with an initial action space, and a list of available
+  // observation and reward spaces.
   rpc GetSpaces(GetSpacesRequest) returns (GetSpacesReply);
+  // Start a new CompilerGym service session. This allocates a new session on
+  // the service and returns a session ID. To terminate the session, call
+  // EndSession() once done.
+  rpc StartSession(StartSessionRequest) returns (StartSessionReply);
+  // Fork a session. This creates a new session in exactly the same state. The
+  // new session must be terminated with EndSession() once done. This returns
+  // an error if the session to fork does not exist.
+  rpc ForkSession(ForkSessionRequest) returns (ForkSessionReply);
+  // End a CompilerGym service session. If the requested session does not exist,
+  // this returns an error.
+  rpc EndSession(EndSessionRequest) returns (EndSessionReply);
+  // Apply a list of optimization decisions and compute a list of observations
+  // for a session. Optimization decisions are selected from the last
+  // ActionSpace returned by a call to GetSpaces() or Step(). Valid observations
+  // are queried using GetSpaces(). This returns an error if the requested
+  // session does not exist.
+  rpc Step(StepRequest) returns (StepReply);
   // Enumerate the list of available benchmarks.
   rpc GetBenchmarks(GetBenchmarksRequest) returns (GetBenchmarksReply);
   // Register a new benchmark.
@@ -53,43 +57,67 @@ message GetVersionReply {
 }
 
 // ===========================================================================
-// StartEpisode().
+// StartSession().
 
-message StartEpisodeRequest {
-  // The name of the benchmark to use for this episode. If not
-  // provided, a benchmark is chosen randomly by the service.
+message StartSessionRequest {
+  // The name of the benchmark to use for this session. If not provided, a
+  // benchmark is chosen randomly by the service.
   string benchmark = 1;
-  // An index into the GetSpaces().action_space_list selecting the action space
-  // that is to be used for this episode. Once set, the action space cannot
-  // be changed for the duration of the episode.
+  // An index into the GetSpacesReply.action_space_list selecting the action
+  // space that is to be used for this session. Once set, the action space
+  // cannot be changed for the duration of the session.
   int32 action_space = 2;
-  // Enable eager computation of observation. When set, every call to
-  // takeAction() will return the observation given by this index into
-  // InitReply.observation_space_list.
-  bool use_eager_observation_space = 3;
-  int32 eager_observation_space = 4;
-  // Enable eager computation of reward. When set, every call to
-  // takeAction() will return a reward given by this index into
-  // InitReply.reward_space_list.
-  bool use_eager_reward_space = 5;
-  int32 eager_reward_space = 6;
 }
 
-message StartEpisodeReply {
-  // The ID that has been assigned to the episode. The client must use this ID
-  // in all subsequent interactions with the service for this episode.
+message StartSessionReply {
+  // The ID that has been assigned to the session. The client must use this ID
+  // in all subsequent interactions with the service for this session.
   int64 session_id = 1;
   // The name of the benchmark.
   string benchmark = 2;
-  // A new action space. This is set only if, after initializing the episode,
-  // the action space has changed. If set, the environment should discard the
-  // previous action space returned by InitReply() and replace it with this one.
-  // Else, the action space remains unchanged.
+  // A new action space. This is set only if, after initializing the session,
+  // the action space has changed from the default action space returned by
+  // GetSpaces(). If set, the environment should discard the previous action
+  // space and replace it with this one. Else, the action space remains
+  // unchanged.
   ActionSpace new_action_space = 3;
 }
 
 // ===========================================================================
-// TakeAction().
+// Step().
+
+message StepRequest {
+  // The ID of the session.
+  int64 session_id = 1;
+  // A list of indices into the ActionSpace.action list. Actions are executed
+  // in the order they appear in this list.
+  repeated int32 action = 2;
+  // A list of indices into the GetSpacesReply.observation_space_list
+  repeated int32 observation_space = 3;
+}
+
+message StepReply {
+  // Indicates that the session has ended. This could be because there are no
+  // further actions that can be made, or because the action has led to an
+  // invalid state. Once this field has been set, you should make no further
+  // calls to step(). However, you mays still request reward and new
+  // observations.
+  bool end_of_session = 1;
+  // A service may set this field to true if the action is known not to have
+  // any effect. This allows an agent to assume that observations or rewards
+  // computed before this action remain valid, providing that they are
+  // deterministic.
+  bool action_had_no_effect = 2;
+  // A new action space. This field is set if, as a result of running the
+  // requested action, the action space has changed. Else, the action space
+  // remains unchanged.
+  ActionSpace new_action_space = 3;
+  // Observed states after completing the action.
+  repeated Observation observation = 4;
+}
+
+// ===========================================================================
+// Actions.
 
 message ActionSpace {
   // The name of the action space.
@@ -102,49 +130,19 @@ message ActionSpace {
   repeated string action = 2;
 }
 
-message ActionRequest {
-  // The ID of the session.
-  int64 session_id = 1;
-  // A list of indices into the ActionSpace.action list. Actions are executed
-  // in the order they appear in this list.
-  repeated int32 action = 2;
-}
-
-message ActionReply {
-  // Indicates that the episode has ended. This could be because there are no
-  // further actions that can be made, or because the action has led to an
-  // invalid state. Once this field has been set, you should make no further
-  // calls to takeAction(). However, you mays still request reward and new
-  // observations.
-  bool end_of_episode = 1;
-  // A service may set this field to true if the action is known not to have
-  // any effect. This allows an agent to assume that observations or rewards
-  // computed before this action remain valid, providing that they are
-  // deterministic.
-  bool action_had_no_effect = 2;
-  // A new action space. This field is set if, as a result of running the
-  // requested action, the action space has changed. Else, the action space
-  // remains unchanged.
-  ActionSpace new_action_space = 3;
-  // Observed state after completing the action. Set only if
-  // StartEpisodeRequest.eager_observation_space was set during startEpisode().
-  Observation observation = 5;
-  // Reward after completing the action. Set only if
-  // StartEpisodeRequest.eager_reward_space was set during startEpisode().
-  Reward reward = 6;
-}
-
 // ===========================================================================
-// GetObservation().
+// Observations.
 
 message Observation {
-  // A point in an ObservationSpace is _either_ a vector of integers, a vector
-  // of real values, a string, or an opaque byte array.
+  // A point in an ObservationSpace is _either_ a scalar or vector of integers
+  // or real values, a string, or an opaque byte array.
   oneof value {
     Int64List int64_list = 1;
     DoubleList double_list = 2;
     string string_value = 3;
     bytes binary_value = 4;
+    int64 scalar_int64 = 5;
+    double scalar_scalar = 6;
   }
 }
 
@@ -184,6 +182,10 @@ message ObservationSpace {
     // observations are strings of at least 10 characters in length.
     ScalarRange string_size_range = 4;
     ScalarRange binary_size_range = 5;
+    // For scalar values, the _range field describes the bounds of the scalar
+    // value.
+    ScalarRange scalar_int64_range = 10;
+    ScalarRange scalar_double_range = 11;
   }
   // An optional string describing an opaque data format, e.g. a data structure
   // that is serialized to a string/binary array for transmission back to the
@@ -202,62 +204,31 @@ message ObservationSpace {
   Observation default_value = 9;
 }
 
-message ObservationRequest {
-  // The ID of the session.
+// ===========================================================================
+// Fork().
+
+message ForkSessionRequest {
+  // The ID of the session to fork.
   int64 session_id = 1;
-  // Index into the InitReply.observation_space_list.
-  int32 observation_space = 2;
+}
+
+message ForkSessionReply {
+  // The ID of the newly created session.
+  int64 session_id = 1;
 }
 
 // ===========================================================================
-// GetReward().
+// EndSession().
 
-message RewardSpace {
-  // The name of this reward space.
-  string name = 1;
-  // The range of continuous values in this reward space.
-  ScalarRange range = 2;
-  // The cumulative reward threshold before an episode is considered successful.
-  // For example, episodes where reward is scaled to an existing heuristic can
-  // be considered "successful" when the reward exceeds the existing heuristic.
-  bool has_success_threshold = 3;
-  double success_threshold = 4;
-  // Whether the reward signal is deterministic. Examples of non-deterministic
-  // rewards are those with measurement noise such as program runtime.
-  bool deterministic = 5;
-  // Whether the reward signal depends on execution environment of the service.
-  bool platform_dependent = 6;
-  // A default reward value. This value should be used by the client in lieu
-  // of a true reward value if the compiler service terminates abruptly, such as
-  // a crash while applying an action.
-  double default_value = 7;
-  // If true, offset the default value by the sum of all rewards for the current
-  // episode. For example, given a default reward value of -10.0 and an episode
-  // with prior rewards [0.1, 0.3, -0.15], the default value is:
-  //     -10.0 - sum(0.1, 0.3, -0.15) = -10.25.
-  bool default_negates_returns = 8;
-}
-
-message RewardRequest {
-  // The ID of the session.
-  int64 session_id = 1;
-  // Index into the RewardSpaceList.reward_space list.
-  int32 reward_space = 2;
-}
-
-message Reward {
-  double reward = 1;
-}
-
-// ===========================================================================
-// EndEpisode().
-
-message EndEpisodeRequest {
+message EndSessionRequest {
   // The ID of the session.
   int64 session_id = 1;
 }
 
-message EndEpisodeReply {}
+message EndSessionReply {
+  // The number of sessions that the service currently has.
+  int32 remaining_sessions = 1;
+}
 
 // ===========================================================================
 // GetSpaces().
@@ -265,14 +236,12 @@ message EndEpisodeReply {}
 message GetSpacesRequest {}
 
 message GetSpacesReply {
-  // The initial space of actions. Subsequent calls to takeAction() may produce
+  // The initial space of actions. Subsequent calls to step() may produce
   // a new action space.
   repeated ActionSpace action_space_list = 1;
   // A list of available observation spaces. A service may support one or more
   // observation spaces.
   repeated ObservationSpace observation_space_list = 2;
-  // A list of reward spaces. A service may support one or moe reward spaces.
-  repeated RewardSpace reward_space_list = 3;
 }
 
 // ===========================================================================

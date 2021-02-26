@@ -33,4 +33,4 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Test
-              run: make pytest
+              run: make install-test

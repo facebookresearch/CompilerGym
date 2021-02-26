@@ -4,6 +4,8 @@
 # LICENSE file in the root directory of this source tree.
 #
 # Autophase https://github.com/ucb-bar/autophase
+load("@rules_python//python:defs.bzl", "py_library")
+load("@rules_cc//cc:defs.bzl", "cc_library")
 
 py_library(
     name = "autophase",

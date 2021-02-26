@@ -6,6 +6,8 @@
 // An example implementation of the CompilerGymService interface.
 #pragma once
 
+#include <memory>
+#include <mutex>
 #include <string>
 #include <vector>
 
@@ -15,6 +17,11 @@
 
 namespace compiler_gym::example_service {
 
+// Forward declaration of helper class.
+class ExampleCompilationSession;
+
+// An example compiler service. This class implements all of the RPC endpoints
+// of the CompilerGymService interface.
 class ExampleService final : public CompilerGymService::Service {
  public:
   explicit ExampleService(const boost::filesystem::path& workingDirectory);
@@ -26,38 +33,49 @@ class ExampleService final : public CompilerGymService::Service {
   grpc::Status GetSpaces(grpc::ServerContext* context, const GetSpacesRequest* request,
                          GetSpacesReply* reply) final override;
 
-  grpc::Status StartEpisode(grpc::ServerContext* context, const StartEpisodeRequest* request,
-                            StartEpisodeReply* reply) final override;
+  grpc::Status StartSession(grpc::ServerContext* context, const StartSessionRequest* request,
+                            StartSessionReply* reply) final override;
 
-  grpc::Status EndEpisode(grpc::ServerContext* context, const EndEpisodeRequest* request,
-                          EndEpisodeReply* reply) final override;
+  grpc::Status EndSession(grpc::ServerContext* context, const EndSessionRequest* request,
+                          EndSessionReply* reply) final override;
 
-  grpc::Status TakeAction(grpc::ServerContext* context, const ActionRequest* request,
-                          ActionReply* reply) final override;
-
-  grpc::Status GetObservation(grpc::ServerContext* context, const ObservationRequest* request,
-                              Observation* reply) final override;
-
-  grpc::Status GetReward(grpc::ServerContext* context, const RewardRequest* request,
-                         Reward* reply) final override;
+  grpc::Status Step(grpc::ServerContext* context, const StepRequest* request,
+                    StepReply* reply) final override;
 
   grpc::Status GetBenchmarks(grpc::ServerContext* context, const GetBenchmarksRequest* request,
                              GetBenchmarksReply* reply) final override;
 
  private:
-  [[nodiscard]] grpc::Status setObservation(int32_t observationSpace, Observation* observation);
-  [[nodiscard]] grpc::Status setReward(int32_t rewardSpace, Reward* reward);
+  [[nodiscard]] grpc::Status session(uint64_t id, ExampleCompilationSession** environment);
 
   const boost::filesystem::path workingDirectory_;
-  bool episodeStarted_;
-  std::vector<std::string> programNameList_;
-  std::vector<std::string> actionSpace_;
-  std::vector<ObservationSpace> observationSpaces_;
-  std::vector<RewardSpace> rewardSpaces_;
-  bool eagerObservation_;
-  int32_t eagerObservationSpace_;
-  bool eagerReward_;
-  int32_t eagerRewardSpace_;
+
+  // A single compiler service can support multiple concurrent sessions. This
+  // maps session IDs to objects that represent the individual sessions.
+  std::unordered_map<int, std::unique_ptr<ExampleCompilationSession>> sessions_;
+  // Mutex used to ensure thread safety of creation and destruction of sessions.
+  std::mutex sessionsMutex_;
+
+  std::vector<std::string> benchmarkNameList_;
+  uint64_t nextSessionId_;
 };
+
+// The representation of a compilation session.
+class ExampleCompilationSession {
+ public:
+  ExampleCompilationSession(const std::string& benchmark, ActionSpace actionSpace);
+
+  [[nodiscard]] grpc::Status Step(const StepRequest* request, StepReply* reply);
+
+ private:
+  grpc::Status getObservation(int32_t observationSpace, Observation* reply);
+
+  const std::string benchmark_;
+  ActionSpace actionSpace_;
+};
+
+// Helper functions to describe the available action/observation/reward spaces.
+std::vector<ActionSpace> getActionSpaces();
+std::vector<ObservationSpace> getObservationSpaces();
 
 }  // namespace compiler_gym::example_service

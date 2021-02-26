@@ -1,4 +1,5 @@
 # This package contains a modified implementation of inst2vec.
+load("@rules_python//python:defs.bzl", "py_library")
 
 genrule(
     name = "dictionary",

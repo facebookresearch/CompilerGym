@@ -2,10 +2,11 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-from typing import Callable, List
+import warnings
+from typing import Dict, List
 
-from compiler_gym.service.proto import Reward, RewardRequest, RewardSpace
-from compiler_gym.views.reward_space_spec import RewardSpaceSpec
+from compiler_gym.spaces.reward import Reward
+from compiler_gym.views.observation import ObservationView
 
 
 class RewardView(object):
@@ -21,21 +22,20 @@ class RewardView(object):
     -1243
 
     :ivar spaces: Specifications of available reward spaces.
-    :vartype spaces: Dict[str, RewardSpaceSpec]
+    :vartype spaces: Dict[str, Reward]
     """
 
     def __init__(
         self,
-        get_reward: Callable[[RewardRequest], Reward],
-        spaces: List[RewardSpace],
+        spaces: List[Reward],
+        observation_view: ObservationView,
     ):
-        self._get_reward = get_reward
-        self.session_id = -1
+        self.spaces: Dict[str, Reward] = {}
+        self.previous_action = None
+        self._observation_view = observation_view
 
-        if not spaces:
-            raise ValueError("No reward spaces")
-
-        self.spaces = {s.name: RewardSpaceSpec(i, s) for i, s in enumerate(spaces)}
+        for space in spaces:
+            self._add_space(space)
 
     def __getitem__(self, reward_space: str) -> float:
         """Request an observation from the given space.
@@ -44,7 +44,39 @@ class RewardView(object):
         :return: A reward.
         :raises KeyError: If the requested reward space does not exist.
         """
-        request = RewardRequest(
-            session_id=self.session_id, reward_space=self.spaces[reward_space].index
-        )
-        return self._get_reward(request).reward
+        # TODO(cummins): Since reward is a function from (state, action) -> r
+        # it would be better to make the list of reward to evaluate an argument
+        # to env.step() rather than using this lazy view.
+        if not self.spaces:
+            raise ValueError("No reward spaces")
+        space = self.spaces[reward_space]
+        observations = [self._observation_view[obs] for obs in space.observation_spaces]
+        return space.update(self.previous_action, observations, self._observation_view)
+
+    def reset(self, benchmark: str) -> None:
+        """Reset the rewards space view. This is called on
+        :meth:`env.reset() <compiler_gym.envs.CompilerEnv.reset>`.
+
+        :param benchmark: The URI of the benchmark that is used for this
+            episode.
+        """
+        self.previous_action = None
+        for space in self.spaces.values():
+            space.reset(benchmark=benchmark)
+
+    def add_space(self, space: Reward) -> None:
+        """Register a new :class:`Reward <compiler_gym.spaces.Reward>` space.
+
+        :param space: The reward space to be added.
+        """
+        if space.id in self.spaces:
+            warnings.warn(f"Replacing existing reward space '{space.id}'")
+        self._add_space(space)
+
+    def _add_space(self, space: Reward):
+        """Register a new space."""
+        self.spaces[space.id] = space
+        # Bind a new method to this class that is a callback to compute the
+        # given reward space. E.g. if a new space is added with ID `FooBar`,
+        # this reward can be computed using env.reward.FooBar().
+        setattr(self, space.id, lambda: self[space.id])

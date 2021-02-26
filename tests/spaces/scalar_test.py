@@ -28,5 +28,29 @@ def test_int_contains_no_upper_bound():
     assert space.contains(1000)
 
 
+def test_equality():
+    space_a = Scalar(min=0, max=None, dtype=int)
+    space_b = Scalar(min=0, max=None, dtype=int)
+    assert space_a == space_b
+
+
+def test_dtype_inequality():
+    space_a = Scalar(min=0, max=None, dtype=int)
+    space_b = Scalar(min=0, max=None, dtype=float)
+    assert space_a != space_b
+
+
+def test_upper_bound_inequality():
+    space_a = Scalar(min=0, max=None, dtype=int)
+    space_b = Scalar(min=0, max=5, dtype=int)
+    assert space_a != space_b
+
+
+def test_lower_bound_inequality():
+    space_a = Scalar(min=0, max=None, dtype=int)
+    space_b = Scalar(min=None, max=None, dtype=int)
+    assert space_a != space_b
+
+
 if __name__ == "__main__":
     main()

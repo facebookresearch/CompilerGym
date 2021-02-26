@@ -63,7 +63,7 @@ Status BenchmarkFactory::addBitcode(const std::string& uri, const Bitcode& bitco
     // bounded for loop to prevent infinite loop if we get "unlucky" and
     // have no valid candidates to unload.
     const size_t targetCapacity = maxLoadedBenchmarkSize_ / 2;
-    for (int i = 0; i < benchmarks_.size() * 2; ++i) {
+    for (size_t i = 0; i < benchmarks_.size() * 2; ++i) {
       // We have run out of benchmarks to evict, or have freed up
       // enough capacity.
       if (!benchmarks_.size() || loadedBenchmarksSize_ < targetCapacity) {

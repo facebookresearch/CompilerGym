@@ -11,14 +11,19 @@ from compiler_gym.service.proto import (
     DoubleList,
     Int64List,
     Observation,
-    ObservationRequest,
     ObservationSpace,
     ScalarLimit,
     ScalarRange,
     ScalarRangeList,
+    StepRequest,
 )
 from compiler_gym.views import ObservationView
 from tests.test_main import main
+
+
+class MockGetObservationReply(object):
+    def __init__(self, value):
+        self.observation = [value]
 
 
 class MockGetObservation(object):
@@ -28,11 +33,11 @@ class MockGetObservation(object):
         self.called_observation_spaces = []
         self.ret = list(reversed(ret or []))
 
-    def __call__(self, request: ObservationRequest):
-        self.called_observation_spaces.append(request.observation_space)
+    def __call__(self, request: StepRequest):
+        self.called_observation_spaces.append(request.observation_space[0])
         ret = self.ret[-1]
         del self.ret[-1]
-        return ret
+        return MockGetObservationReply(ret)
 
 
 def test_empty_space():
@@ -107,6 +112,10 @@ def test_observed_value_types():
             Observation(double_list=DoubleList(value=[1.0, 2.0])),
             Observation(int64_list=Int64List(value=[-5, 15])),
             Observation(binary_value=b"Hello, bytes\0"),
+            Observation(string_value="Hello, IR"),
+            Observation(double_list=DoubleList(value=[1.0, 2.0])),
+            Observation(int64_list=Int64List(value=[-5, 15])),
+            Observation(binary_value=b"Hello, bytes\0"),
         ]
     )
     observation = ObservationView(mock, spaces)
@@ -128,6 +137,26 @@ def test_observed_value_types():
 
     # Check that the correct observation_space_list indices were used.
     assert mock.called_observation_spaces == [0, 2, 1, 3]
+    mock.called_observation_spaces = []
+
+    # Repeat the above tests using the generated bound methods.
+    value = observation.ir()
+    assert isinstance(value, str)
+    assert value == "Hello, IR"
+
+    value = observation.dfeat()
+    np.testing.assert_array_almost_equal(value, [1.0, 2.0])
+    assert value.dtype == np.float64
+
+    value = observation.features()
+    np.testing.assert_array_equal(value, [-5, 15])
+    assert value.dtype == np.int64
+
+    value = observation.binary()
+    assert value == b"Hello, bytes\0"
+
+    # Check that the correct observation_space_list indices were used.
+    assert mock.called_observation_spaces == [0, 2, 1, 3]
 
 
 def test_add_derived_space():
@@ -138,19 +167,29 @@ def test_add_derived_space():
         ),
     ]
     mock = MockGetObservation(
-        ret=[Observation(string_value="Hello, world!")],
+        ret=[
+            Observation(string_value="Hello, world!"),
+            Observation(string_value="Hello, world!"),
+        ],
     )
     observation = ObservationView(mock, spaces)
     observation.add_derived_space(
         id="ir_len",
         base_id="ir",
         space=Box(low=0, high=float("inf"), shape=(1,), dtype=int),
-        cb=lambda base: [
+        translate=lambda base: [
             len(base),
         ],
     )
 
     value = observation["ir_len"]
+    assert isinstance(value, list)
+    assert value == [
+        len("Hello, world!"),
+    ]
+
+    # Repeat the above test using the generated bound method.
+    value = observation.ir_len()
     assert isinstance(value, list)
     assert value == [
         len("Hello, world!"),

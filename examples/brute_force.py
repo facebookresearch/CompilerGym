@@ -35,7 +35,7 @@ from typing import List
 import humanize
 from absl import app, flags
 
-import compiler_gym.util.flags.output_dir  # Flag definition.
+import compiler_gym.util.flags.output_dir  # noqa Flag definition.
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.flags.env_from_flags import env_from_flags
@@ -181,7 +181,7 @@ def run_brute_force(
     action_names = action_names or env.action_space.names
 
     if not env.reward_space:
-        raise ValueError("Eager reward must be specified for random search")
+        raise ValueError("A reward space must be specified for random search")
     reward_space_name = env.reward_space.id
 
     actions = [env.action_space.names.index(a) for a in action_names]
