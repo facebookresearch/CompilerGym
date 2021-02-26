@@ -76,9 +76,9 @@ llvm_deps()
 
 http_archive(
     name = "rules_foreign_cc",
-    sha256 = "dd2ccc6ad7227d36586f6bb3efe9bdf8b2b247bd420e36fdc19345369057d991",
-    strip_prefix = "rules_foreign_cc-660ed328733bbc38e03f4b4949f05a14e3eaea4e",
-    url = "https://github.com/ChrisCummins/rules_foreign_cc/archive/660ed328733bbc38e03f4b4949f05a14e3eaea4e.zip",
+    sha256 = "9dcf6f79c37e2e71a02ebcf21eea29f39099f9a779ef81674b1010acd744abba",
+    strip_prefix = "rules_foreign_cc-e285764b78cc91e97cfead87f48d06b9c4d83a81",
+    url = "https://github.com/ChrisCummins/rules_foreign_cc/archive/e285764b78cc91e97cfead87f48d06b9c4d83a81.zip",
 )
 
 load("@rules_foreign_cc//:workspace_definitions.bzl", "rules_foreign_cc_dependencies")
