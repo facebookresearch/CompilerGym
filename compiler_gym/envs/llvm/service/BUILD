@@ -1,7 +1,26 @@
 # This package exposes the LLVM optimization pipeline as a CompilerGym service.
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
-# Post-build shenanigans to strip the absolute path to LLVMPolly.so.
+# This target includes the service binary and its runtime dependencies and
+# libraries.
+filegroup(
+    name = "service",
+    srcs = [
+        ":compiler_gym-llvm-service",
+        "//compiler_gym/third_party/llvm:clang",
+        "//compiler_gym/third_party/llvm:llvm-size",
+        "//compiler_gym/third_party/llvm:opt",
+    ] + select({
+        "@llvm//:darwin": [],
+        "//conditions:default": [
+            "//compiler_gym/envs/llvm/service:libLLVMPolly",
+        ],
+    }),
+    visibility = ["//visibility:public"],
+)
+
+# Post-build shenanigans to strip the absolute path to LLVMPolly.so for linux
+# builds.
 genrule(
     name = "compiler_gym-llvm-service-bin",
     srcs = [":compiler_gym-llvm-service-prelinked"],
@@ -17,7 +36,7 @@ genrule(
             "chmod 555 $@"
         ),
     }),
-    visibility = ["//visibility:public"],
+    visibility = ["//compiler_gym/envs/llvm:__subpackages__"],
 )
 
 # This target copies the LLVMPolly.so file from LLVM to libLLVMPolly.so.
@@ -103,10 +122,6 @@ cc_library(
     name = "Cost",
     srcs = ["Cost.cc"],
     hdrs = ["Cost.h"],
-    data = [
-        "//compiler_gym/third_party/llvm:clang",
-        "//compiler_gym/third_party/llvm:llvm-size",
-    ],
     deps = [
         "//compiler_gym/util:GrpcStatusMacros",
         "//compiler_gym/util:RunfilesPath",
@@ -153,9 +168,6 @@ cc_library(
     copts = [
         "-DGOOGLE_PROTOBUF_NO_RTTI",
         "-fno-rtti",
-    ],
-    data = [
-        "//compiler_gym/third_party/llvm:opt",
     ],
     visibility = ["//tests:__subpackages__"],
     deps = [

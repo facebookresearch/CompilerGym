@@ -10,14 +10,7 @@ py_library(
         "__init__.py",
         ":specs.py",
     ],
-    data = [
-        "//compiler_gym/envs/llvm/service:compiler_gym-llvm-service",
-    ] + select({
-        "@llvm//:darwin": [],
-        "//conditions:default": [
-            "//compiler_gym/envs/llvm/service:libLLVMPolly",
-        ],
-    }),
+    data = ["//compiler_gym/envs/llvm/service"],
     visibility = ["//compiler_gym:__subpackages__"],
     deps = [
         ":benchmarks",
@@ -82,7 +75,10 @@ py_library(
 
 genrule(
     name = "specs",
-    srcs = ["//compiler_gym/envs/llvm/service:compiler_gym-llvm-service"],
+    srcs = [
+        "//compiler_gym/envs/llvm/service",
+        "//compiler_gym/envs/llvm/service:compiler_gym-llvm-service",
+    ],
     outs = ["specs.py"],
     cmd = "$(location :make_specs) $(location //compiler_gym/envs/llvm/service:compiler_gym-llvm-service) $@",
     tools = [":make_specs"],
