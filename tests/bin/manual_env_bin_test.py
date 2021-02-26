@@ -77,8 +77,7 @@ def test_download_cBench(cBench_dataset):
     del cBench_dataset  # unused
     io_check(
         """require_dataset cBench-v0""",
-        r"""compilergym:NO-BENCHMARK> Downloaded dataset cBench-v0 in [0-9.mu]*s
-Application must be restarted to make changes visible.""",
+        r"""compilergym:NO-BENCHMARK> Downloaded dataset cBench-v0 in [0-9.mu]*s""",
     )
 
 

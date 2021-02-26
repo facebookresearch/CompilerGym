@@ -864,6 +864,7 @@ class CompilerEnv(gym.Env):
         if dataset_installed:
             # Signal to the compiler service that the contents of the site data
             # directory has changed.
+            self.logger.debug("Initiating service-side scan of dataset directory")
             self.service(
                 self.service.stub.AddBenchmark,
                 AddBenchmarkRequest(
