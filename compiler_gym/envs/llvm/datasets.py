@@ -245,16 +245,23 @@ def _compile_and_run_bitcode_file(
 @fasteners.interprocess_locked(cache_path("cBench-v0-runtime-data.LOCK"))
 def download_cBench_runtime_data() -> bool:
     """Download and unpack the cBench runtime dataset."""
-    if _CBENCH_DATA.is_dir():
+    if (_CBENCH_DATA / "unpacked").is_file():
         return False
     else:
+        # Clean up any partially-extracted data directory.
+        if _CBENCH_DATA.is_dir():
+            shutil.rmtree(_CBENCH_DATA)
+
         tar_contents = io.BytesIO(
             download(_CBENCH_DATA_URL, sha256=_CBENCH_DATA_SHA256)
         )
         with tarfile.open(fileobj=tar_contents, mode="r:bz2") as tar:
-            _CBENCH_DATA.parent.mkdir(parents=True)
+            _CBENCH_DATA.parent.mkdir(parents=True, exist_ok=True)
             tar.extractall(_CBENCH_DATA.parent)
         assert _CBENCH_DATA.is_dir()
+        # Create the marker file to indicate that the directory is unpacked
+        # and ready to go.
+        (_CBENCH_DATA / "unpacked").touch()
         return True
 
 
