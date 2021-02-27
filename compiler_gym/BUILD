@@ -43,6 +43,7 @@ py_library(
     deps = [
         ":random_replay",
         "//compiler_gym/envs",
+        "//compiler_gym/service:connection",
         "//compiler_gym/util",
     ],
 )

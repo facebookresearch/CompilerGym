@@ -14,6 +14,7 @@ import humanize
 
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.random_replay import replay_actions
+from compiler_gym.service.connection import ServiceError
 from compiler_gym.util import logs
 from compiler_gym.util.logs import create_logging_dir
 
@@ -246,7 +247,12 @@ def random_search(
     for worker in workers:
         worker.alive = False
     for worker in workers:
-        worker.join()
+        try:
+            worker.join()
+        except ServiceError:
+            # Service error can be raised on abrupt service termination causing
+            # RPC errors.
+            pass
     print("done")
 
     print("Replaying actions from best solution found:")
