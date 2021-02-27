@@ -8,6 +8,7 @@ import re
 import tempfile
 from pathlib import Path
 
+import gym
 import pytest
 
 from compiler_gym.envs import LlvmEnv, llvm
@@ -117,6 +118,18 @@ def test_custom_benchmark(env: LlvmEnv):
     )
     env.reset(benchmark=benchmark)
     assert env.benchmark == "benchmark://new"
+
+
+def test_custom_benchmark_constructor():
+    benchmark = Benchmark(
+        uri="benchmark://new", program=File(uri=f"file:///{EXAMPLE_BITCODE_FILE}")
+    )
+    env = gym.make("llvm-v0", benchmark=benchmark)
+    try:
+        env.reset()
+        assert env.benchmark == "benchmark://new"
+    finally:
+        env.close()
 
 
 def test_make_benchmark_single_bitcode(env: LlvmEnv):

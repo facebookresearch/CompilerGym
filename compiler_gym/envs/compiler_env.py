@@ -201,12 +201,28 @@ class CompilerEnv(gym.Env):
         # The benchmark that is currently being used, and the benchmark that
         # the user requested. Those do not always correlate, since the user
         # could request a random benchmark.
-        self._benchmark_in_use_uri: Optional[str] = benchmark
-        self._user_specified_benchmark_uri: Optional[str] = benchmark
+        self._benchmark_in_use_uri: Optional[str] = None
+        self._user_specified_benchmark_uri: Optional[str] = None
         # A map from benchmark URIs to Benchmark messages. We keep track of any
         # user-provided custom benchmarks so that we can register them with a
         # reset service.
         self._custom_benchmarks: Dict[str, Benchmark] = {}
+        # Normally when the benchmark is changed the updated value is not
+        # reflected until the next call to reset(). We make an exception for
+        # constructor-time arguments as otherwise the behavior of the benchmark
+        # property is counter-intuitive:
+        #
+        #     >>> env = gym.make("example-v0", benchmark="foo")
+        #     >>> env.benchmark
+        #     None
+        #     >>> env.reset()
+        #     >>> env.benchmark
+        #     "foo"
+        #
+        # By forcing the benchmark-in-use URI at constructor time, the first
+        # env.benchmark returns the name as expected.
+        self.benchmark = benchmark
+        self._benchmark_in_use_uri = self._user_specified_benchmark_uri
 
         self.action_space_name = action_space
 
