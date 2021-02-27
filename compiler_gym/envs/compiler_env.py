@@ -198,6 +198,14 @@ class CompilerEnv(gym.Env):
         self.datasets_site_path: Optional[Path] = None
         self.available_datasets: Dict[str, Dataset] = {}
 
+        self.action_space_name = action_space
+
+        self.service = service_connection or CompilerGymServiceConnection(
+            endpoint=self._service_endpoint,
+            opts=self._connection_settings,
+            logger=self.logger,
+        )
+
         # The benchmark that is currently being used, and the benchmark that
         # the user requested. Those do not always correlate, since the user
         # could request a random benchmark.
@@ -223,14 +231,6 @@ class CompilerEnv(gym.Env):
         # env.benchmark returns the name as expected.
         self.benchmark = benchmark
         self._benchmark_in_use_uri = self._user_specified_benchmark_uri
-
-        self.action_space_name = action_space
-
-        self.service = service_connection or CompilerGymServiceConnection(
-            endpoint=self._service_endpoint,
-            opts=self._connection_settings,
-            logger=self.logger,
-        )
 
         # Process the available action, observation, and reward spaces.
         self.action_spaces = [
