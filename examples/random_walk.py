@@ -7,11 +7,12 @@
 Example usage:
 
     # Run a random walk on cBench example program using instruction count reward.
-    $ python3 examples/random_walk.py --env=llvm-v0 --step_min=100 --step_max=100 \
-        --benchmark=cBench-v0/dijkstra --reward=IrInstructionCount
+    $ python3 examples/random_walk.py --env=llvm-v0 --step_min=100 --step_max=100
+    --benchmark=benchmark://cBench-v0/dijkstra --reward=IrInstructionCount
 """
 import random
-import hashlib
+from typing import List
+
 import humanize
 from absl import app, flags
 
@@ -39,15 +40,11 @@ def run_random_walk(env: CompilerEnv, step_count: int) -> None:
         fewer steps will be performed if any of the actions lead the
         environment to end the episode.
     """
+    rewards, actions = [],[]
 
-    "Use hashes of the environment to record its internal state"
-    hashes, actions, rewards = [], [], []
-    def encode_env_state(env):
-        return hashlib.sha1(env.ir.encode("utf-8")).hexdigest()
     step_num = 0
     with Timer() as episode_time:
         env.reset()
-        hashes.append(encode_env_state(env))
         for step_num in range(1, step_count + 1):
             action_index = env.action_space.sample()
             with Timer() as step_time:
@@ -57,9 +54,8 @@ def run_random_walk(env: CompilerEnv, step_count: int) -> None:
                 f"Action:       {env.action_space.names[action_index]} "
                 f"(changed={not info.get('action_had_no_effect')})"
             )
-            hashes.append(encode_env_state(env))
-            actions.append(env.action_space.names[action_index])
             rewards.append(reward)
+            actions.append(env.action_space.names[action_index])
             print(f"Reward:       {reward}")
             if env._eager_observation:
                 print(f"Observation:\n{observation}")
@@ -84,38 +80,10 @@ def run_random_walk(env: CompilerEnv, step_count: int) -> None:
         f"Max reward:   {max(rewards)} ({reward_percentage(max(rewards), rewards)} "
         f"at step {humanize.intcomma(rewards.index(max(rewards)) + 1)})"
     )
-
-    def minimize_action_sequence(hashes, actions):
-        """First pass removes actions that did not change the internal states"""
-        actions = [actions[i] for i in range(len(actions)) if hashes[i] != hashes[i+1]]
-        """Second pass removes cancelling actions in the trajectory"""
-        cancelling_dict = {"mem2reg": "reg2mem"}
-        for act, counteract in cancelling_dict.items():
-            """For each pair, runs through actions once and find pairs to be removed"""
-            cancelling_state = 0
-            last_act_ind = -1
-            remove_ind = []
-            for i, a in enumerate(actions):
-                "Cancel actions if the opposite was found last. After cancelling, reset to neutral."
-                if a == act:
-                    if cancelling_state < 0:
-                        remove_ind += [last_act_ind, i]
-                        cancelling_state = 0
-                    else:
-                        cancelling_state = 1
-                        last_act_ind = i
-                elif a == counteract:
-                    if cancelling_state > 0:
-                        remove_ind += [last_act_ind, i]
-                        cancelling_state = 0
-                    else:
-                        cancelling_state = -1
-                        last_act_ind = i
-        return [a for i, a in enumerate(actions) if i not in set(remove_ind)]
-
-    actions = minimize_action_sequence(hashes, actions)
+    def remove_no_change(rewards, actions):
+        return [a for (r, a) in zip(rewards, actions) if r != 0]
+    actions = remove_no_change(rewards, actions)
     print("Effective actions from trajectory: " + ", ".join(actions))
-
 
 def main(argv):
     """Main entry point."""
