@@ -11,7 +11,6 @@ Example usage:
     --benchmark=benchmark://cBench-v0/dijkstra --reward=IrInstructionCount
 """
 import random
-from typing import List
 
 import humanize
 from absl import app, flags
@@ -40,7 +39,7 @@ def run_random_walk(env: CompilerEnv, step_count: int) -> None:
         fewer steps will be performed if any of the actions lead the
         environment to end the episode.
     """
-    rewards, actions = [],[]
+    rewards, actions = [], []
 
     step_num = 0
     with Timer() as episode_time:
@@ -80,10 +79,13 @@ def run_random_walk(env: CompilerEnv, step_count: int) -> None:
         f"Max reward:   {max(rewards)} ({reward_percentage(max(rewards), rewards)} "
         f"at step {humanize.intcomma(rewards.index(max(rewards)) + 1)})"
     )
+
     def remove_no_change(rewards, actions):
         return [a for (r, a) in zip(rewards, actions) if r != 0]
+
     actions = remove_no_change(rewards, actions)
     print("Effective actions from trajectory: " + ", ".join(actions))
+
 
 def main(argv):
     """Main entry point."""
