@@ -232,19 +232,25 @@ def make_benchmark(
     clang_jobs: List[ClangInvocation] = []
 
     def _add_path(path: Path):
-        # NOTE(cummins): There is some discussion about the best way to create
-        # a bitcode that is unoptimized yet does not hinder downstream
-        # optimization opportunities. Here we are using a configuration based
-        # on -O0, yet there is a suggestion that an optimized configuration
-        # can produce better results if the optimizations themselves are
-        # explicitly disabled, as in: ["-Oz", "-Xclang", "-disable-llvm-optzns"]
-        # See: https://lists.llvm.org/pipermail/llvm-dev/2018-August/thread.html#125365
+        # NOTE(cummins): There is some discussion about the best way to create a
+        # bitcode that is unoptimized yet does not hinder downstream
+        # optimization opportunities. Here we are using a configuration based on
+        # -O1 in which we prevent the -O1 optimization passes from running. This
+        # is because LLVM produces different function attributes dependening on
+        # the optimization level. E.g. "-O0 -Xclang -disable-llvm-optzns -Xclang
+        # -disable-O0-optnone" will generate code with "noinline" attributes set
+        # on the functions, wheras "-Oz -Xclang -disable-llvm-optzns" will
+        # generate functions with "minsize" and "optsize" attributes set.
+        #
+        # See also:
+        #   <https://lists.llvm.org/pipermail/llvm-dev/2018-August/thread.html#125365>
+        #   <https://github.com/facebookresearch/CompilerGym/issues/110>
         DEFAULT_COPT = [
-            "-O",
-            "-Xclang",
-            "-disable-O0-optnone",
+            "-O1",
             "-Xclang",
             "-disable-llvm-passes",
+            "-Xclang",
+            "-disable-llvm-optzns",
         ]
 
         if not path.is_file():
