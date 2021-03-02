@@ -1006,7 +1006,16 @@ class CompilerEnv(gym.Env):
                         error_messages.append(str(e))
                         break
 
-                    if self.reward_space and self.reward_space.deterministic:
+                    if state.reward is not None and self.reward_space is None:
+                        warnings.warn(
+                            "Validating state with reward, but "
+                            "environment has no reward space set"
+                        )
+                    elif (
+                        state.reward is not None
+                        and self.reward_space
+                        and self.reward_space.deterministic
+                    ):
                         validation["reward_validated"] = True
                         # If reward deviates from the expected amount record the
                         # error but continue with the remainder of the validation.
