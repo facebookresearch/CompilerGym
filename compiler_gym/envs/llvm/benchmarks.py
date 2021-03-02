@@ -3,13 +3,14 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """This module defines a utility function for constructing LLVM benchmarks."""
-import multiprocessing
 import os
 import random
 import subprocess
 import sys
 import tempfile
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
+from multiprocessing import cpu_count
 from pathlib import Path
 from typing import Iterable, List, Optional, Union
 
@@ -138,8 +139,7 @@ class ClangInvocation(object):
         return cmd
 
 
-def _run_command(args):
-    cmd, timeout = args
+def _run_command(cmd: List[str], timeout: int):
     process = subprocess.Popen(
         cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, universal_newlines=True
     )
@@ -297,17 +297,18 @@ def make_benchmark(
         clang_outs = [
             working_dir / f"out-{i}.bc" for i in range(1, len(clang_jobs) + 1)
         ]
-        clang_cmds = [
-            (job.command(out), job.timeout) for job, out in zip(clang_jobs, clang_outs)
-        ]
-        with multiprocessing.Pool() as pool:
-            list(pool.imap_unordered(_run_command, clang_cmds))
+        with ThreadPoolExecutor(max_workers=cpu_count()) as executor:
+            futures = (
+                executor.submit(_run_command, job.command(out), job.timeout)
+                for job, out in zip(clang_jobs, clang_outs)
+            )
+            list(future.result() for future in as_completed(futures))
 
         # Check that the expected files were generated.
         for i, b in enumerate(clang_outs):
             if not b.is_file():
                 raise OSError(
-                    f"Clang invocation failed to produce a file: {' '.join(clang_cmds[i])}"
+                    f"Clang invocation failed to produce a file: {' '.join(clang_jobs[i].command(clang_outs[i]))}"
                 )
 
         if len(bitcodes + clang_outs) > 1:
