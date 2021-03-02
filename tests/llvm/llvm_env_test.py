@@ -305,5 +305,32 @@ def test_logging_forced_level():
         env.close()
 
 
+def test_step_multiple_actions_list(env: LlvmEnv):
+    """Pass a list of actions to step()."""
+    env.reset(benchmark="cBench-v0/crc32")
+    actions = [
+        env.action_space.flags.index("-mem2reg"),
+        env.action_space.flags.index("-reg2mem"),
+    ]
+    _, _, done, _ = env.step(actions)
+    assert not done
+    assert env.actions == actions
+
+
+def test_step_multiple_actions_generator(env: LlvmEnv):
+    """Pass an iterable of actions to step()."""
+    env.reset(benchmark="cBench-v0/crc32")
+    actions = (
+        env.action_space.flags.index("-mem2reg"),
+        env.action_space.flags.index("-reg2mem"),
+    )
+    _, _, done, _ = env.step(actions)
+    assert not done
+    assert env.actions == [
+        env.action_space.flags.index("-mem2reg"),
+        env.action_space.flags.index("-reg2mem"),
+    ]
+
+
 if __name__ == "__main__":
     main()

@@ -7,11 +7,14 @@ import logging
 import os
 import sys
 import warnings
+from collections.abc import Iterable
 from copy import deepcopy
 from math import isclose
 from pathlib import Path
 from time import time
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict
+from typing import Iterable as IterableT
+from typing import List, Optional, Tuple, Union
 
 import fasteners
 import gym
@@ -693,16 +696,19 @@ class CompilerEnv(gym.Env):
         if self.observation_space:
             return self.observation[self.observation_space.id]
 
-    def step(self, action: int) -> step_t:
+    def step(self, action: Union[int, IterableT[int]]) -> step_t:
         """Take a step.
 
-        :param action: Value from the action_space.
+        :param action: An action, or a sequence of actions. When multiple
+            actions are provided the observation and reward are returned
+            after running all of the actions.
         :return: A tuple of observation, reward, done, and info. Observation and
             reward are None if default observation/reward is not set. If done
             is True, observation and reward may also be None (e.g. because the
             service failed).
         """
         assert self.in_episode, "Must call reset() before step()"
+        actions = action if isinstance(action, Iterable) else [action]
         observation, reward = None, None
 
         # Build the list of observations that must be computed by the backend
@@ -721,13 +727,13 @@ class CompilerEnv(gym.Env):
             ]
             observation_spaces += self.reward_space.observation_spaces
 
-        # Record the action.
-        self.actions.append(action)
+        # Record the actions.
+        self.actions += actions
 
         # Send the request to the backend service.
         request = StepRequest(
             session_id=self._session_id,
-            action=[action],
+            action=actions,
             observation_space=observation_indices,
         )
         try:
