@@ -204,3 +204,14 @@ py_test(
         "//tests:test_main",
     ],
 )
+
+py_test(
+    name = "validation_regression_test",
+    srcs = ["validation_regression_test.py"],
+    deps = [
+        "//compiler_gym",
+        "//tests:test_main",
+        "//tests/pytest_plugins:common",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
