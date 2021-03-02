@@ -8,7 +8,7 @@ genrule(
     name = "cBench_tar",
     srcs = [":cBench"],
     outs = ["llvm_bitcodes-10.0.0-cBench.tar.bz2"],
-    cmd = "tar cjfh $@ -C $(@D) cBench-v0",
+    cmd = "tar cjfh $@ -C $(@D) cBench-v1",
     visibility = ["//visibility:public"],
 )
 
@@ -94,7 +94,7 @@ genrule(
         "@cBench//:all",
         "@cBench//:readme",
     ],
-    outs = ["cBench-v0/crc32.bc"],
+    outs = ["cBench-v1/crc32.bc"],
     cmd = "mkdir -p $(@D) && $(location :make_llvm_module) $$(dirname $(location @cBench//:readme))/telecom_CRC32 $@",
     tools = [":make_llvm_module"],
     visibility = ["//visibility:public"],
@@ -106,7 +106,7 @@ genrule(
         "@ctuning-ai//:all",
         "@ctuning-ai//:readme",
     ],
-    outs = ["cBench-v0/jpeg-c.bc"],
+    outs = ["cBench-v1/jpeg-c.bc"],
     cmd = "mkdir -p $(@D) && $(location :make_llvm_module) $$(dirname $(location @ctuning-ai//:readme))/program/cbench-consumer-jpeg-c $@",
     tools = [
         ":make_llvm_module",
@@ -119,7 +119,7 @@ genrule(
         "@ctuning-ai//:all",
         "@ctuning-ai//:readme",
     ],
-    outs = ["cBench-v0/jpeg-d.bc"],
+    outs = ["cBench-v1/jpeg-d.bc"],
     cmd = "mkdir -p $(@D) && $(location :make_llvm_module) $$(dirname $(location @ctuning-ai//:readme))/program/cbench-consumer-jpeg-d $@",
     tools = [
         ":make_llvm_module",
@@ -132,7 +132,7 @@ genrule(
         "@ctuning-ai//:all",
         "@ctuning-ai//:readme",
     ],
-    outs = ["cBench-v0/stringsearch2.bc"],
+    outs = ["cBench-v1/stringsearch2.bc"],
     cmd = "mkdir -p $(@D) && $(location :make_llvm_module) $$(dirname $(location @ctuning-ai//:readme))/program/cbench-office-stringsearch2 $@",
     tools = [
         ":make_llvm_module",
@@ -145,7 +145,7 @@ genrule(
         "@cBench//:all",
         "@cBench//:readme",
     ],
-    outs = ["cBench-v0/adpcm.bc"],
+    outs = ["cBench-v1/adpcm.bc"],
     cmd = "mkdir -p $(@D) && $(location :make_llvm_module) $$(dirname $(location @cBench//:readme))/telecom_adpcm_c $@",
     tools = [":make_llvm_module"],
     visibility = ["//visibility:public"],
@@ -157,7 +157,7 @@ genrule(
         "@cBench//:all",
         "@cBench//:readme",
     ],
-    outs = ["cBench-v0/bitcount.bc"],
+    outs = ["cBench-v1/bitcount.bc"],
     cmd = "mkdir -p $(@D) && $(location :make_llvm_module) $$(dirname $(location @cBench//:readme))/automotive_bitcount $@",
     tools = [":make_llvm_module"],
 )
@@ -168,7 +168,7 @@ genrule(
         "@cBench//:all",
         "@cBench//:readme",
     ],
-    outs = ["cBench-v0/blowfish.bc"],
+    outs = ["cBench-v1/blowfish.bc"],
     cmd = "mkdir -p $(@D) && $(location :make_llvm_module) $$(dirname $(location @cBench//:readme))/security_blowfish_d $@",
     tools = [":make_llvm_module"],
 )
@@ -179,7 +179,7 @@ genrule(
         "@cBench//:all",
         "@cBench//:readme",
     ],
-    outs = ["cBench-v0/bzip2.bc"],
+    outs = ["cBench-v1/bzip2.bc"],
     cmd = "mkdir -p $(@D) && $(location :make_llvm_module) $$(dirname $(location @cBench//:readme))/bzip2d $@",
     tools = [":make_llvm_module"],
 )
@@ -190,7 +190,7 @@ genrule(
         "@cBench//:all",
         "@cBench//:readme",
     ],
-    outs = ["cBench-v0/dijkstra.bc"],
+    outs = ["cBench-v1/dijkstra.bc"],
     cmd = "mkdir -p $(@D) && $(location :make_llvm_module) $$(dirname $(location @cBench//:readme))/network_dijkstra $@",
     tools = [":make_llvm_module"],
 )
@@ -203,7 +203,7 @@ genrule(
         "cBench-ghostscript-std.h.patch",
         "cBench-ghostscript-idebug.c.patch",
     ],
-    outs = ["cBench-v0/ghostscript.bc"],
+    outs = ["cBench-v1/ghostscript.bc"],
     cmd = (
         "mkdir -p $(@D) && rsync -rL $$(dirname $(location @cBench//:readme))/office_ghostscript/ $(@D)/office_ghostscript_src/ &&" +
         "patch --quiet --forward $(@D)/office_ghostscript_src/src/idebug.c < $(location cBench-ghostscript-idebug.c.patch);" +
@@ -220,7 +220,7 @@ genrule(
         "@cBench//:readme",
         "cBench-gsm-add.c.patch",
     ],
-    outs = ["cBench-v0/gsm.bc"],
+    outs = ["cBench-v1/gsm.bc"],
     cmd = (
         "mkdir -p $(@D) &&rsync -rL $$(dirname $(location @cBench//:readme))/telecom_gsm/ $(@D)/telecom_gsm_src/ &&" +
         "patch --quiet --forward $(@D)/telecom_gsm_src/src/add.c < $(location cBench-gsm-add.c.patch);" +
@@ -236,7 +236,7 @@ genrule(
         "@cBench//:readme",
         "cBench-ispell-correct.c.patch",
     ],
-    outs = ["cBench-v0/ispell.bc"],
+    outs = ["cBench-v1/ispell.bc"],
     cmd = (
         "mkdir -p $(@D) &&rsync -rL $$(dirname $(location @cBench//:readme))/office_ispell/ $(@D)/office_ispell_src/ &&" +
         "patch --quiet --forward $(@D)/office_ispell_src/src/correct.c < $(location cBench-ispell-correct.c.patch);" +
@@ -251,7 +251,7 @@ genrule(
         "@cBench//:all",
         "@cBench//:readme",
     ],
-    outs = ["cBench-v0/lame.bc"],
+    outs = ["cBench-v1/lame.bc"],
     cmd = "mkdir -p $(@D) && $(location :make_llvm_module) $$(dirname $(location @cBench//:readme))/consumer_lame $@ -DLAMESNDFILE -DHAVEMPGLIB -DLAMEPARSE",
     tools = [":make_llvm_module"],
 )
@@ -262,7 +262,7 @@ genrule(
         "@cBench//:all",
         "@cBench//:readme",
     ],
-    outs = ["cBench-v0/patricia.bc"],
+    outs = ["cBench-v1/patricia.bc"],
     cmd = (
         "mkdir -p $(@D) && $(location :make_llvm_module) $$(dirname $(location @cBench//:readme))/network_patricia/ $@"
     ),
@@ -275,7 +275,7 @@ genrule(
         "@cBench//:all",
         "@cBench//:readme",
     ],
-    outs = ["cBench-v0/qsort.bc"],
+    outs = ["cBench-v1/qsort.bc"],
     cmd = "mkdir -p $(@D) && $(location :make_llvm_module) $$(dirname $(location @cBench//:readme))/automotive_qsort1 $@",
     tools = [":make_llvm_module"],
 )
@@ -286,7 +286,7 @@ genrule(
         "@cBench//:all",
         "@cBench//:readme",
     ],
-    outs = ["cBench-v0/rijndael.bc"],
+    outs = ["cBench-v1/rijndael.bc"],
     cmd = "mkdir -p $(@D) && $(location :make_llvm_module) $$(dirname $(location @cBench//:readme))/security_rijndael_d $@",
     tools = [":make_llvm_module"],
 )
@@ -297,7 +297,7 @@ genrule(
         "@cBench//:all",
         "@cBench//:readme",
     ],
-    outs = ["cBench-v0/sha.bc"],
+    outs = ["cBench-v1/sha.bc"],
     cmd = "mkdir -p $(@D) && $(location :make_llvm_module) $$(dirname $(location @cBench//:readme))/security_sha $@",
     tools = [":make_llvm_module"],
 )
@@ -308,7 +308,7 @@ genrule(
         "@cBench//:all",
         "@cBench//:readme",
     ],
-    outs = ["cBench-v0/stringsearch.bc"],
+    outs = ["cBench-v1/stringsearch.bc"],
     cmd = "mkdir -p $(@D) && $(location :make_llvm_module) $$(dirname $(location @cBench//:readme))/office_stringsearch1 $@",
     tools = [":make_llvm_module"],
 )
@@ -319,7 +319,7 @@ genrule(
         "@cBench//:all",
         "@cBench//:readme",
     ],
-    outs = ["cBench-v0/susan.bc"],
+    outs = ["cBench-v1/susan.bc"],
     cmd = "mkdir -p $(@D) && $(location :make_llvm_module) $$(dirname $(location @cBench//:readme))/automotive_susan_c $@",
     tools = [":make_llvm_module"],
 )
@@ -330,7 +330,7 @@ genrule(
         "@cBench//:all",
         "@cBench//:readme",
     ],
-    outs = ["cBench-v0/tiff2bw.bc"],
+    outs = ["cBench-v1/tiff2bw.bc"],
     cmd = "mkdir -p $(@D) && $(location :make_llvm_module) $$(dirname $(location @cBench//:readme))/consumer_tiff2bw $@",
     tools = [":make_llvm_module"],
 )
@@ -341,7 +341,7 @@ genrule(
         "@cBench//:all",
         "@cBench//:readme",
     ],
-    outs = ["cBench-v0/tiff2rgba.bc"],
+    outs = ["cBench-v1/tiff2rgba.bc"],
     cmd = "mkdir -p $(@D) && $(location :make_llvm_module) $$(dirname $(location @cBench//:readme))/consumer_tiff2rgba $@",
     tools = [":make_llvm_module"],
 )
@@ -352,7 +352,7 @@ genrule(
         "@cBench//:all",
         "@cBench//:readme",
     ],
-    outs = ["cBench-v0/tiffdither.bc"],
+    outs = ["cBench-v1/tiffdither.bc"],
     cmd = "mkdir -p $(@D) && $(location :make_llvm_module) $$(dirname $(location @cBench//:readme))/consumer_tiffdither $@",
     tools = [":make_llvm_module"],
 )
@@ -363,7 +363,7 @@ genrule(
         "@cBench//:all",
         "@cBench//:readme",
     ],
-    outs = ["cBench-v0/tiffmedian.bc"],
+    outs = ["cBench-v1/tiffmedian.bc"],
     cmd = "mkdir -p $(@D) && $(location :make_llvm_module) $$(dirname $(location @cBench//:readme))/consumer_tiffmedian $@",
     tools = [":make_llvm_module"],
     visibility = ["//visibility:public"],

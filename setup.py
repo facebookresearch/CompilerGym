@@ -73,7 +73,7 @@ setuptools.setup(
             "envs/llvm/service/libLLVMPolly.so",
             "third_party/inst2vec/*.pickle",
             "third_party/cBench/benchmarks.txt",
-            "third_party/cBench/cBench-v0/*",
+            "third_party/cBench/cBench-v*/*",
             "third_party/cBench/runtime_data/**/*",
             "third_party/llvm/*",
         ]

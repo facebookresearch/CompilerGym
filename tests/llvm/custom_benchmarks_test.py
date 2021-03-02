@@ -19,7 +19,7 @@ from tests.test_main import main
 pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 EXAMPLE_BITCODE_FILE = runfiles_path(
-    "compiler_gym/third_party/cBench/cBench-v0/crc32.bc"
+    "compiler_gym/third_party/cBench/cBench-v1/crc32.bc"
 )
 EXAMPLE_BITCODE_IR_INSTRUCTION_COUNT = 242
 
