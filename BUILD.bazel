@@ -7,7 +7,6 @@ load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 exports_files([
     "README.md",
     "VERSION",
-    "empty.py",
 ])
 
 # This top-level target describes the entire set of targets that will be
@@ -40,4 +39,10 @@ py_binary(
     deps = [
         ":CompilerGym",
     ],
+)
+
+genrule(
+    name = "make_empty_python_file",
+    outs = ["empty.py"],
+    cmd = "touch $@",
 )
