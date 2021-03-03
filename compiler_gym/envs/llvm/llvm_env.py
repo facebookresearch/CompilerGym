@@ -48,9 +48,14 @@ def _read_list_file(path: Path) -> Iterable[str]:
                 yield action.strip()
 
 
+# TODO(github.com/facebookresearch/CompilerGym/issues/122): Replace text file
+# parsing with build-generated python modules and import them.
 _ACTIONS = list(_read_list_file(_ACTIONS_LIST))
 _FLAGS = dict(zip(_ACTIONS, _read_list_file(_FLAGS_LIST)))
 _DESCRIPTIONS = dict(zip(_ACTIONS, _read_list_file(_DESCRIPTIONS_LIST)))
+
+# TODO(github.com/facebookresearch/CompilerGym/issues/122): Lazily instantiate
+# inst2vec encoder.
 _INST2VEC_ENCODER = Inst2vecEncoder()
 
 
