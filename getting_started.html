@@ -190,7 +190,7 @@
             
   <div class="section" id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
-<a class="reference external image-reference" href="https://colab.research.google.com/github/facebookresearch/CompilerGym/blob/development/examples/getting-started.ipynb"><img alt="https://colab.research.google.com/assets/colab-badge.svg" src="https://colab.research.google.com/assets/colab-badge.svg" /></a>
+<a class="reference external image-reference" href="https://colab.research.google.com/github/facebookresearch/CompilerGym/blob/stable/examples/getting-started.ipynb"><img alt="https://colab.research.google.com/assets/colab-badge.svg" src="https://colab.research.google.com/assets/colab-badge.svg" /></a>
 <p>CompilerGym is a toolkit for applying reinforcement learning to compiler
 optimization tasks. This document provides a short walkthrough of the key
 concepts, using the codesize reduction task of a production-grade compiler
@@ -399,9 +399,9 @@ The <a class="reference internal" href="llvm/index.html#action-space"><span clas
 <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.observation_space" title="compiler_gym.envs.CompilerEnv.observation_space"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.observation_space</span></code></a>.
 The <a class="reference internal" href="llvm/index.html#autophase"><span class="std std-ref">Autophase</span></a> observation space is a 56-dimension
 vector of integers:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">shape</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">shape</span>
 <span class="go">(56,)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">dtype</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">dtype</span>
 <span class="go">dtype(&#39;int64&#39;)</span>
 </pre></div>
 </div>
