@@ -6,7 +6,7 @@
 import pytest
 
 from compiler_gym.envs import LlvmEnv
-from tests.pytest_plugins.common import linux_only
+from tests.pytest_plugins.common import linux_only, skip_on_ci
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
@@ -25,6 +25,7 @@ def test_validate_strucutrizecfg_stringsearch(env: LlvmEnv):
     assert env.validate().okay()
 
 
+@skip_on_ci
 @linux_only
 @pytest.mark.xfail(
     strict=True, reason="github.com/facebookresearch/CompilerGym/issues/103"
