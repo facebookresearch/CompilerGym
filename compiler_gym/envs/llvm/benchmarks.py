@@ -288,7 +288,9 @@ def make_benchmark(
             uri=f"file:///{bitcode}", program=File(uri=f"file:///{bitcode}")
         )
 
-    with tempfile.TemporaryDirectory(dir=cache_path(".")) as d:
+    tmpdir_root = cache_path(".")
+    tmpdir_root.mkdir(exist_ok=True, parents=True)
+    with tempfile.TemporaryDirectory(dir=tmpdir_root) as d:
         working_dir = Path(d)
 
         # Run the clang invocations in parallel.
