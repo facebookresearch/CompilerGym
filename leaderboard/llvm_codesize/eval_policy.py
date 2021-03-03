@@ -109,19 +109,16 @@ def _summarize_duplicates(iterable: Iterable[str]) -> Iterable[str]:
             yield gpu
 
 
-def _print_hardarwe_info(logfile):
+def _get_hardarwe_info() -> str:
     """Print a summary of system hardware to file."""
-    print(
-        tabulate(
-            [
-                ("OS", _get_os()),
-                ("CPU", _get_cpu()),
-                ("Memory", _get_memory()),
-                ("GPU", ", ".join(_summarize_duplicates(_get_gpus()))),
-            ],
-            headers=("", "Hardware Specification"),
-        ),
-        file=logfile,
+    return tabulate(
+        [
+            ("OS", _get_os()),
+            ("CPU", _get_cpu()),
+            ("Memory", _get_memory()),
+            ("GPU", ", ".join(_summarize_duplicates(_get_gpus()))),
+        ],
+        headers=("", "Hardware Specification"),
     )
 
 
@@ -183,7 +180,7 @@ def eval_policy(policy: Policy) -> None:
         )
 
         with open(FLAGS.hardware_info, "w") as f:
-            _print_hardarwe_info(f)
+            print(_get_hardarwe_info(), file=f)
 
         env = gym.make("llvm-ic-v0")
         try:
