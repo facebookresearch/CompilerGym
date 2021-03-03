@@ -23,6 +23,9 @@ around with it to better understand what is going on:
 
     $ pythom -m compiler_gym.bin.manual_env --env=llvm-v0
 
+Once you get the hang of things, try submitting your best algorithm to our
+`leaderboards <https://github.com/facebookresearch/CompilerGym#leaderboards>`_!
+
 
 I found a bug. How do I report it?
 ----------------------------------

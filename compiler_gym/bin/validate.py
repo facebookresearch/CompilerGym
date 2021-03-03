@@ -57,11 +57,9 @@ Else if validation fails, the output is:
 
     ❌  <benchmark_name>  <error_details>
 """
-import csv
 import json
 import re
 import sys
-from typing import Iterable
 
 import numpy as np
 from absl import app, flags
@@ -105,29 +103,6 @@ flags.DEFINE_string(
 FLAGS = flags.FLAGS
 
 
-def read_states(in_file) -> Iterable[CompilerEnvState]:
-    """Read the CSV states from stdin."""
-    data = in_file.readlines()
-    for line in csv.DictReader(data):
-        try:
-            line["reward"] = float(line["reward"]) if line.get("reward") else None
-            line["walltime"] = float(line["walltime"]) if line.get("walltime") else None
-            yield CompilerEnvState(**line)
-        except (TypeError, KeyError) as e:
-            print(f"Failed to parse input: `{e}`", file=sys.stderr)
-            sys.exit(1)
-
-
-def read_states_from_paths(paths: Iterable[str]) -> Iterable[CompilerEnvState]:
-    """Read the states from the given input paths."""
-    for path in paths:
-        if path == "-":
-            yield from read_states(sys.stdin)
-        else:
-            with open(path) as f:
-                yield from read_states(f)
-
-
 def state_name(state: CompilerEnvState) -> str:
     """Get the string name for a state."""
     return re.sub(r"^benchmark://", "", state.benchmark)
@@ -161,7 +136,18 @@ def stdev(values):
 def main(argv):
     """Main entry point."""
     # Parse the input states from the user.
-    states = list(read_states_from_paths(argv[1:]))
+    states = []
+    for path in argv[1:]:
+        try:
+            if path == "-":
+                states += list(CompilerEnvState.read_csv_file(sys.stdin))
+            else:
+                with open(path) as f:
+                    states += list(CompilerEnvState.read_csv_file(f))
+        except ValueError as e:
+            print(e, file=sys.stderr)
+            sys.exit(1)
+
     if not states:
         print(
             "No inputs to validate. Pass a CSV file path as an argument, or "
