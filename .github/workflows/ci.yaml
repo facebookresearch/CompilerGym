@@ -49,24 +49,6 @@ jobs:
                   python -m pip install -r compiler_gym/requirements.txt -r examples/requirements.txt -r tests/requirements.txt
               if: matrix.os == 'macos-latest'
 
-            - name: Persist bazel cache (linux)
-              uses: actions/cache@v2
-              with:
-                  path: ~/.cache/bazel/_bazel_runner
-                  key: ${{ runner.os }}-test-${{ matrix.python }}-${{ hashFiles('**/BUILD') }}
-                  restore-keys: |
-                      ${{ runner.os }}-test-${{ matrix.python }}-
-              if: matrix.os == 'ubuntu-latest'
-
-            - name: Persist bazel cache (macOS)
-              uses: actions/cache@v2
-              with:
-                  path: /private/var/tmp/_bazel_runner
-                  key: ${{ runner.os }}-test-${{ matrix.python }}-${{ hashFiles('**/BUILD') }}
-                  restore-keys: |
-                      ${{ runner.os }}-test-${{ matrix.python }}-
-              if: matrix.os == 'macos-latest'
-
             - name: Test
               run: make test
               env:
@@ -105,24 +87,6 @@ jobs:
               run: |
                   brew install bazelisk
                   python -m pip install -r compiler_gym/requirements.txt -r examples/requirements.txt -r tests/requirements.txt
-              if: matrix.os == 'macos-latest'
-
-            - name: Persist bazel cache (linux)
-              uses: actions/cache@v2
-              with:
-                  path: ~/.cache/bazel/_bazel_runner
-                  key: ${{ runner.os }}-install-${{ matrix.python }}-${{ hashFiles('**/BUILD') }}
-                  restore-keys: |
-                      ${{ runner.os }}-install-${{ matrix.python }}-
-              if: matrix.os == 'ubuntu-latest'
-
-            - name: Persist bazel cache (macOS)
-              uses: actions/cache@v2
-              with:
-                  path: /private/var/tmp/_bazel_runner
-                  key: ${{ runner.os }}-install-${{ matrix.python }}-${{ hashFiles('**/BUILD') }}
-                  restore-keys: |
-                      ${{ runner.os }}-install-${{ matrix.python }}-
               if: matrix.os == 'macos-latest'
 
             - name: Install
