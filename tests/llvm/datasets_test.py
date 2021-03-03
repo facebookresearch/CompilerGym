@@ -37,14 +37,17 @@ def test_default_cBench_dataset_require(tmpwd, temporary_environ):
 
     os.environ["COMPILER_GYM_SITE_DATA"] = str(tmpwd / "site_data")
     env = gym.make("llvm-v0")
-    assert not env.benchmarks, "Sanity check"
+    try:
+        assert not env.benchmarks, "Sanity check"
 
-    # Datasaet is downloaded.
-    assert env.require_dataset("cBench-v0")
-    assert env.benchmarks
+        # Datasaet is downloaded.
+        assert env.require_dataset("cBench-v0")
+        assert env.benchmarks
 
-    # Dataset is already downloaded.
-    assert not env.require_dataset("cBench-v0")
+        # Dataset is already downloaded.
+        assert not env.require_dataset("cBench-v0")
+    finally:
+        env.close()
 
 
 def test_default_cBench_on_reset(tmpwd, temporary_environ):
@@ -53,11 +56,14 @@ def test_default_cBench_on_reset(tmpwd, temporary_environ):
 
     os.environ["COMPILER_GYM_SITE_DATA"] = str(tmpwd / "site_data")
     env = gym.make("llvm-v0")
-    assert not env.benchmarks, "Sanity check"
+    try:
+        assert not env.benchmarks, "Sanity check"
 
-    env.reset()
-    assert env.benchmarks
-    assert env.benchmark.startswith("benchmark://cBench-v0/")
+        env.reset()
+        assert env.benchmarks
+        assert env.benchmark.startswith("benchmark://cBench-v0/")
+    finally:
+        env.close()
 
 
 @pytest.mark.parametrize("benchmark_name", ["benchmark://npb-v0/1", "npb-v0/1"])
@@ -67,11 +73,13 @@ def test_dataset_required(tmpwd, temporary_environ, benchmark_name):
 
     os.environ["COMPILER_GYM_SITE_DATA"] = str(tmpwd / "site_data")
     env = gym.make("llvm-v0")
+    try:
+        env.reset(benchmark=benchmark_name)
 
-    env.reset(benchmark=benchmark_name)
-
-    assert env.benchmarks
-    assert env.benchmark.startswith("benchmark://npb-v0/")
+        assert env.benchmarks
+        assert env.benchmark.startswith("benchmark://npb-v0/")
+    finally:
+        env.close()
 
 
 if __name__ == "__main__":
