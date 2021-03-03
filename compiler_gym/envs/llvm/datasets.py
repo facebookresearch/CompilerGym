@@ -501,15 +501,19 @@ def get_llvm_benchmark_validation_callback(
 # ===============================
 
 
-def validate_sha_output(result: BenchmarkExecutionResult):
+def validate_sha_output(result: BenchmarkExecutionResult) -> Optional[str]:
     """SHA benchmark prints 5 random hex strings. Normally these hex strings are
     16 characters but occasionally they are less (presumably becuase of a
     leading zero being omitted).
     """
-    assert re.match(
-        r"[0-9a-f]{0,16} [0-9a-f]{0,16} [0-9a-f]{0,16} [0-9a-f]{0,16} [0-9a-f]{0,16}",
-        result.output.decode("utf-8").rstrip(),
-    )
+    try:
+        if not re.match(
+            r"[0-9a-f]{0,16} [0-9a-f]{0,16} [0-9a-f]{0,16} [0-9a-f]{0,16} [0-9a-f]{0,16}",
+            result.output.decode("utf-8").rstrip(),
+        ):
+            return "Failed to parse hex output"
+    except UnicodeDecodeError:
+        return "Failed to parse unicode output"
 
 
 def setup_ghostscript_library_files(cwd: Path):
