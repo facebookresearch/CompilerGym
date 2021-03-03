@@ -412,8 +412,7 @@ class UnmanagedConnection(Connection):
         else:
             raise TimeoutError(
                 f"Failed to connect to {url} after "
-                f"{rpc_init_max_seconds:.1f} seconds "
-                f"({attempts} attempts made)"
+                f"{rpc_init_max_seconds:.1f} seconds"
             )
 
         super().__init__(channel, url, logger)
@@ -563,7 +562,7 @@ class CompilerGymServiceConnection(object):
         raise TimeoutError(
             f"Failed to create connection to {endpoint_name} after "
             f"{time() - start_time:.1f} seconds "
-            f"({attempts}/{opts.init_max_attempts} attempts made)"
+            f"({attempts} attempts made)"
         )
 
     def __repr__(self):
