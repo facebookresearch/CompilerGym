@@ -2,7 +2,7 @@ Getting Started
 ===============
 
 .. image:: https://colab.research.google.com/assets/colab-badge.svg
-   :target: https://colab.research.google.com/github/facebookresearch/CompilerGym/blob/development/examples/getting-started.ipynb
+   :target: https://colab.research.google.com/github/facebookresearch/CompilerGym/blob/stable/examples/getting-started.ipynb
 
 CompilerGym is a toolkit for applying reinforcement learning to compiler
 optimization tasks. This document provides a short walkthrough of the key
