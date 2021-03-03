@@ -104,7 +104,7 @@ def _summarize_duplicates(iterable: Iterable[str]) -> Iterable[str]:
     freq = sorted(Counter(iterable).items(), key=lambda x: -x[1])
     for gpu, count in freq:
         if count > 1:
-            yield f"{count}× {gpu}"
+            yield f"{count}x {gpu}"
         else:
             yield gpu
 
