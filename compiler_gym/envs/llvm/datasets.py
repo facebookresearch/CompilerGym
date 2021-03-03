@@ -24,7 +24,7 @@ from compiler_gym.util.download import download
 from compiler_gym.util.runfiles_path import cache_path, runfiles_path, site_data_path
 from compiler_gym.util.timer import Timer
 
-_CLANG = runfiles_path("compiler_gym/third_party/llvm/clang")
+_CLANG = runfiles_path("compiler_gym/third_party/llvm/bin/clang")
 
 _CBENCH_DATA = site_data_path("llvm/cBench-v0-runtime-data/runtime_data")
 _CBENCH_DATA_URL = (

@@ -75,7 +75,7 @@ setuptools.setup(
             "third_party/cBench/benchmarks.txt",
             "third_party/cBench/cBench-v*/*",
             "third_party/cBench/runtime_data/**/*",
-            "third_party/llvm/*",
+            "third_party/llvm/**/*",
         ]
     },
     install_requires=requirements,

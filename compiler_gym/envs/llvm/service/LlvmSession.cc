@@ -217,7 +217,7 @@ Status LlvmSession::runOptWithArgs(const std::vector<std::string>& optArgs) {
   RETURN_IF_ERROR(writeBitcodeToFile(benchmark().module(), before_path));
 
   // Build a command line invocation: `opt input.bc -o output.bc <optArgs...>`.
-  const auto optPath = util::getRunfilesPath("compiler_gym/third_party/llvm/opt");
+  const auto optPath = util::getRunfilesPath("compiler_gym/third_party/llvm/bin/opt");
   std::vector<std::string> optCmd{optPath.string(), before_path.string(), "-o",
                                   after_path.string()};
   optCmd.insert(optCmd.end(), optArgs.begin(), optArgs.end());

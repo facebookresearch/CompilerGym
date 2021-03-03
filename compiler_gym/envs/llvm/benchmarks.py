@@ -17,8 +17,8 @@ from typing import Iterable, List, Optional, Union
 from compiler_gym.service.proto import Benchmark, File
 from compiler_gym.util.runfiles_path import cache_path, runfiles_path
 
-CLANG = runfiles_path("compiler_gym/third_party/llvm/clang")
-LLVM_LINK = runfiles_path("compiler_gym/third_party/llvm/llvm-link")
+CLANG = runfiles_path("compiler_gym/third_party/llvm/bin/clang")
+LLVM_LINK = runfiles_path("compiler_gym/third_party/llvm/bin/llvm-link")
 
 
 def _communicate(process, input=None, timeout=None):

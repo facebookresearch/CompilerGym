@@ -70,8 +70,8 @@ Status getTextSizeInBytes(llvm::Module& module, int64_t* value,
 #else
 Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& workingDirectory) {
 #endif
-  const auto clangPath = util::getRunfilesPath("compiler_gym/third_party/llvm/clang");
-  const auto llvmSizePath = util::getRunfilesPath("compiler_gym/third_party/llvm/llvm-size");
+  const auto clangPath = util::getRunfilesPath("compiler_gym/third_party/llvm/bin/clang");
+  const auto llvmSizePath = util::getRunfilesPath("compiler_gym/third_party/llvm/bin/llvm-size");
   DCHECK(fs::exists(clangPath)) << "File not found: " << clangPath.string();
   DCHECK(fs::exists(llvmSizePath)) << "File not found: " << llvmSizePath.string();
 
