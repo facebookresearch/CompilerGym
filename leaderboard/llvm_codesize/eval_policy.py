@@ -86,7 +86,7 @@ def _get_cpu() -> str:
     """Return CPU info string."""
     cpuinfo = get_cpu_info()
     brand = cpuinfo["brand_raw"].replace("(R)", "")
-    return f"{brand} ({cpuinfo['count']}× core)"
+    return f"{brand} ({cpuinfo['count']}x core)"
 
 
 def _get_memory() -> str:
