@@ -161,9 +161,9 @@ The observation space is described by
 The :ref:`Autophase <llvm/index:Autophase>` observation space is a 56-dimension
 vector of integers:
 
-    >>> env.observation_space.shape
+    >>> env.observation_space.space.shape
     (56,)
-    >>> env.observation_space.dtype
+    >>> env.observation_space.space.dtype
     dtype('int64')
 
 The upper and lower bounds of the reward signal are described by
