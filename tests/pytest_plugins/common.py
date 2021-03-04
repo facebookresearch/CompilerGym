@@ -23,3 +23,14 @@ def tmpwd() -> Path:
             yield Path(d)
         finally:
             os.chdir(pwd)
+
+
+@pytest.fixture(scope="function")
+def temporary_environ():
+    """A fixture that allows you to modify os.environ without affecting other tests."""
+    old_env = os.environ.copy()
+    try:
+        yield
+    finally:
+        os.environ.clear()
+        os.environ.update(old_env)

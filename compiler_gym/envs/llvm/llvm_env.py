@@ -222,6 +222,24 @@ class LlvmEnv(CompilerEnv):
             },
         )
 
+    def reset(self, *args, **kwargs):
+        # The BenchmarkFactory::getBenchmark() method raises an error if there
+        # are no benchmarks to select from. Install the cBench dataset as a
+        # fallback.
+        #
+        # TODO(github.com/facebookresearch/CompilerGym/issues/45): Remove this
+        # once the dataset API has been refactored so that service-side datasets
+        # are no longer an issue.
+        try:
+            super().reset(*args, **kwargs)
+        except FileNotFoundError:
+            self.logger.warning(
+                "reset() called on servie with no benchmarks available. "
+                "Installing cBench-v0"
+            )
+            self.require_dataset("cBench-v0")
+            super().reset(*args, **kwargs)
+
     @staticmethod
     def make_benchmark(*args, **kwargs):
         """Alias to :func:`llvm.make_benchmark() <compiler_gym.envs.llvm.make_benchmark>`."""
