@@ -17,6 +17,10 @@ from absl import app, flags
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.flags.env_from_flags import env_from_flags
 
+from compiler_gym.util.debug import set_debug_level
+
+set_debug_level(3)
+
 flags.DEFINE_list(
     "actions",
     ["-sroa", "-mem2reg", "-newgvn"],
