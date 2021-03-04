@@ -61,3 +61,12 @@ py_test(
         "//tests:test_main",
     ],
 )
+
+py_test(
+    name = "truncate_test",
+    srcs = ["truncate_test.py"],
+    deps = [
+        "//compiler_gym/util",
+        "//tests:test_main",
+    ],
+)
