@@ -17,19 +17,19 @@ from absl import app, flags
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.flags.env_from_flags import env_from_flags
 
-from compiler_gym.util.debug import set_debug_level
+# from compiler_gym.util.debug_util import set_debug_level
 
-set_debug_level(3)
+# set_debug_level(3)
 
 flags.DEFINE_list(
     "actions",
     ["-sroa", "-mem2reg", "-newgvn"],
     "A list of action names to explore from.",
 )
-flags.DEFINE_float("discount", 0.99, "The discount factor.")
+flags.DEFINE_float("discount", 1.0, "The discount factor.")
 flags.DEFINE_list(
     "features_indices",
-    [15, 18, 24],
+    [19, 22, 51],
     "Indices of Alphaphase features that are used to construct a state",
 )
 flags.DEFINE_float("learning_rate", 0.1, "learning rate of the q-learning.")
@@ -53,7 +53,9 @@ def select_action(q_table, ob, epsilon=0.0):
     qs = [q_table.get(hash_state_action(ob, act), -1) for act in FLAGS.actions]
     if random.random() < epsilon:
         return random.choice(FLAGS.actions)
-    return FLAGS.actions[qs.index(max(qs))]
+    max_indices = [i for i, x in enumerate(qs) if x == max(qs)]
+    # Breaking ties at random by selecting any of the indices.
+    return FLAGS.actions[random.choice(max_indices)]
 
 
 def get_max_q_value(q_table, ob):
@@ -74,6 +76,7 @@ def train(q_table):
         current_length = 0
         env = get_env()
         obs = env.reset()
+        # obs_prev = obs.copy()
         while current_length < FLAGS.episode_length:
             # Run Epsilon greedy policy.
             a = select_action(q_table, obs, FLAGS.epsilon)
@@ -82,6 +85,8 @@ def train(q_table):
                 q_table[hashed] = 0
 
             obs, reward, done, info = env.step(env.action_space.flags.index(a))
+            # print({i:obs[i]-obs_prev[i] for i in range(obs.shape[0])}, reward, a)
+            # obs_prev = obs.copy()
             current_length += 1
             # Get max q at new state.
             target = reward + FLAGS.discount * get_max_q_value(q_table, obs)
@@ -91,7 +96,7 @@ def train(q_table):
                 + (1 - FLAGS.learning_rate) * q_table[hashed]
             )
 
-        if i % 100 == 0:
+        if i % 10 == 0:
             print(f"Running episode {i}, current Q table: ", q_table)
 
             def compare_qs(q_old, q_new):
