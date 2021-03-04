@@ -5,7 +5,7 @@
  {
  	if (a == MIN_WORD && b == MIN_WORD) return MAX_WORD;
 -	else return SASR( (longword)a * (longword)b, 15 );
-+	SASR(a, 15);
++	return SASR(a, 15);
  }
 
  word gsm_mult_r P2((a,b), word a, word b)

@@ -117,16 +117,16 @@ def cBench_dataset():
 @pytest.fixture(scope="module")
 def llvm_opt() -> Path:
     """Test fixture that yields the path of opt."""
-    return runfiles_path("compiler_gym/third_party/llvm/opt")
+    return runfiles_path("compiler_gym/third_party/llvm/bin/opt")
 
 
 @pytest.fixture(scope="module")
 def llvm_diff() -> Path:
     """Test fixture that yields the path of llvm-diff."""
-    return runfiles_path("compiler_gym/third_party/llvm/llvm-diff")
+    return runfiles_path("compiler_gym/third_party/llvm/bin/llvm-diff")
 
 
 @pytest.fixture(scope="module")
 def clang() -> Path:
     """Test fixture that yields the path of clang."""
-    return runfiles_path("compiler_gym/third_party/llvm/clang")
+    return runfiles_path("compiler_gym/third_party/llvm/bin/clang")

@@ -24,7 +24,7 @@ from compiler_gym.util.download import download
 from compiler_gym.util.runfiles_path import cache_path, runfiles_path, site_data_path
 from compiler_gym.util.timer import Timer
 
-_CLANG = runfiles_path("compiler_gym/third_party/llvm/clang")
+_CLANG = runfiles_path("compiler_gym/third_party/llvm/bin/clang")
 
 _CBENCH_DATA = site_data_path("llvm/cBench-v0-runtime-data/runtime_data")
 _CBENCH_DATA_URL = (
@@ -516,18 +516,22 @@ def validate_sha_output(result: BenchmarkExecutionResult) -> Optional[str]:
         return "Failed to parse unicode output"
 
 
-def setup_ghostscript_library_files(cwd: Path):
-    """Pre-execution setup hook for ghostscript."""
-    # Copy input data into current directory since ghostscript doesn't like long
-    # input paths.
-    for path in (_CBENCH_DATA / "office_data").iterdir():
-        if path.name.endswith(".ps"):
-            shutil.copyfile(path, cwd / path.name)
-    # Ghostscript doesn't like the library files being symlinks so copy them
-    # into the working directory as regular files.
-    for path in (_CBENCH_DATA / "ghostscript").iterdir():
-        if path.name.endswith(".ps"):
-            shutil.copyfile(path, cwd / path.name)
+def setup_ghostscript_library_files(dataset_id: int) -> Callable[[Path], None]:
+    """Make a pre-execution setup hook for ghostscript."""
+
+    def setup(cwd: Path):
+        # Copy the input data file into the current directory since ghostscript
+        # doesn't like long input paths.
+        shutil.copyfile(
+            _CBENCH_DATA / "office_data" / f"{dataset_id}.ps", cwd / "input.ps"
+        )
+        # Ghostscript doesn't like the library files being symlinks so copy them
+        # into the working directory as regular files.
+        for path in (_CBENCH_DATA / "ghostscript").iterdir():
+            if path.name.endswith(".ps"):
+                shutil.copyfile(path, cwd / path.name)
+
+    return setup
 
 
 validator(
@@ -714,9 +718,9 @@ for i in range(1, 21):
 
         validator(
             benchmark="benchmark://cBench-v0/ghostscript",
-            cmd=f"$BIN -sDEVICE=ppm -dNOPAUSE -dQUIET -sOutputFile=output.ppm -- {i}.ps",
+            cmd="$BIN -sDEVICE=ppm -dNOPAUSE -dQUIET -sOutputFile=output.ppm -- input.ps",
             data=[f"office_data/{i}.ps"],
             outs=["output.ppm"],
             linkopts=["-lm", "-lz"],
-            pre_execution_callback=setup_ghostscript_library_files,
+            pre_execution_callback=setup_ghostscript_library_files(i),
         )

@@ -20,6 +20,7 @@ py_library(
         "tabulate.py",
         "temporary_working_directory.py",
         "timer.py",
+        "truncate.py",
         "user_input.py",
         "version.py",
     ],
