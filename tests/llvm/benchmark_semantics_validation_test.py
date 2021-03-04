@@ -93,6 +93,45 @@ def test_no_validation_callback_for_custom_benchmark(env: LlvmEnv):
     assert validation_cb is None
 
 
+def test_validate_state_without_env_reward():
+    """Validating state when environment has no reward space."""
+    state = CompilerEnvState(
+        benchmark="cBench-v0/crc32",
+        walltime=1,
+        reward=0,
+        commandline="opt  input.bc -o output.bc",
+    )
+    env = gym.make("llvm-v0")
+    try:
+        env.require_dataset("cBench-v0")
+        result = env.validate(state)
+    finally:
+        env.close()
+
+    assert result.okay()
+    assert not result.reward_validated
+    assert not result.reward_validation_failed
+
+
+def test_validate_state_without_state_reward():
+    """Validating state when state has no reward value."""
+    state = CompilerEnvState(
+        benchmark="cBench-v0/crc32",
+        walltime=1,
+        commandline="opt  input.bc -o output.bc",
+    )
+    env = gym.make("llvm-v0", reward_space="IrInstructionCount")
+    try:
+        env.require_dataset("cBench-v0")
+        result = env.validate(state)
+    finally:
+        env.close()
+
+    assert result.okay()
+    assert not result.reward_validated
+    assert not result.reward_validation_failed
+
+
 def test_validate_benchmark_semantics(env: LlvmEnv, validatable_benchmark_name: str):
     """Run the validation routine on all benchmarks."""
     env.reward_space = "IrInstructionCount"

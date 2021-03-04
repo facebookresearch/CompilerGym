@@ -20,6 +20,7 @@ py_test(
     deps = [
         "//compiler_gym/util",
         "//tests:test_main",
+        "//tests/pytest_plugins:common",
     ],
 )
 
@@ -56,6 +57,15 @@ py_test(
 py_test(
     name = "timer_test",
     srcs = ["timer_test.py"],
+    deps = [
+        "//compiler_gym/util",
+        "//tests:test_main",
+    ],
+)
+
+py_test(
+    name = "truncate_test",
+    srcs = ["truncate_test.py"],
     deps = [
         "//compiler_gym/util",
         "//tests:test_main",

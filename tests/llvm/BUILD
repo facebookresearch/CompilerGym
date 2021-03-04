@@ -84,6 +84,18 @@ py_test(
 )
 
 py_test(
+    name = "datasets_test",
+    timeout = "short",
+    srcs = ["datasets_test.py"],
+    deps = [
+        "//compiler_gym",
+        "//compiler_gym/envs/llvm:datasets",
+        "//tests:test_main",
+        "//tests/pytest_plugins:common",
+    ],
+)
+
+py_test(
     name = "fork_env_test",
     timeout = "short",
     srcs = ["fork_env_test.py"],
@@ -202,5 +214,16 @@ py_test(
     deps = [
         "//compiler_gym",
         "//tests:test_main",
+    ],
+)
+
+py_test(
+    name = "validation_regression_test",
+    srcs = ["validation_regression_test.py"],
+    deps = [
+        "//compiler_gym",
+        "//tests:test_main",
+        "//tests/pytest_plugins:common",
+        "//tests/pytest_plugins:llvm",
     ],
 )

@@ -23,8 +23,6 @@ def tabulate(
         see: https://github.com/astanin/python-tabulate#table-format.
     :return: A formatted table as a string.
     """
-    tablefmt
-
     if tablefmt == "tsv" or tablefmt == "csv":
         sep = {"tsv": "\t", "csv": ","}[tablefmt]
         buf = StringIO()

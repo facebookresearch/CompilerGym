@@ -275,7 +275,7 @@ class ManagedConnection(Connection):
             cmd.append("--alsologtostderr")
             cmd.append(f"-v={debug_level - 1}")
 
-        logger.debug("$ %s", " ".join(cmd))
+        logger.debug("Exec %s", cmd)
         self.process = subprocess.Popen(
             cmd,
             env=env,

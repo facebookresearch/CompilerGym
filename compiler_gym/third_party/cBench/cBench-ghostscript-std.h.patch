@@ -1,11 +1,11 @@
---- ../std.h	2020-06-18 01:30:45.000000000 +0100
-+++ std.h	2020-06-18 01:35:05.000000000 +0100
-@@ -125,8 +125,6 @@
+--- std.h.original	2021-03-02 20:18:52.168273018 +0000
++++ std.h	2021-03-02 20:13:56.311728271 +0000
+@@ -125,7 +125,7 @@
 
  #define dputc(chr) dprintf1("%c", chr)
  #define dputs(str) dprintf1("%s", str)
 -#define dprintf(str)\
--  fprintf(dstderr, str)
++#define dprintf0(str)\
+   fprintf(dstderr, str)
  #define dprintf1(str,arg1)\
    fprintf(dstderr, str, arg1)
- #define dprintf2(str,arg1,arg2)\

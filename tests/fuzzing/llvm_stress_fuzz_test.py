@@ -14,7 +14,7 @@ from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
 
-LLVM_STRESS = runfiles_path("compiler_gym/third_party/llvm/llvm-stress")
+LLVM_STRESS = runfiles_path("compiler_gym/third_party/llvm/bin/llvm-stress")
 
 # The uniform range for trajectory lengths.
 RANDOM_TRAJECTORY_LENGTH_RANGE = (1, 10)

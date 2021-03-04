@@ -7,11 +7,14 @@ import logging
 import os
 import sys
 import warnings
+from collections.abc import Iterable
 from copy import deepcopy
 from math import isclose
 from pathlib import Path
 from time import time
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict
+from typing import Iterable as IterableT
+from typing import List, Optional, Tuple, Union
 
 import fasteners
 import gym
@@ -398,9 +401,24 @@ class CompilerEnv(gym.Env):
             warnings.warn(
                 "Changing the benchmark has no effect until reset() is called."
             )
-        if isinstance(benchmark, str) or benchmark is None:
+        if benchmark is None:
+            self.logger.debug("Unsetting the forced environment")
+            self._user_specified_benchmark_uri = None
+        elif isinstance(benchmark, str):
+            self.logger.debug("Setting benchmark by name: %s", benchmark)
+            # If the user requested a benchmark by URI, e.g.
+            # benchmark://cBench-v0/dijkstra, require the dataset (cBench-v0)
+            # automatically.
+            if self.datasets_site_path:
+                components = benchmark.split("://")
+                if len(components) == 1 or components[0] == "benchmark":
+                    components = components[-1].split("/")
+                    if len(components) > 1:
+                        self.logger.info("Requiring dataset %s", components[0])
+                        self.require_dataset(components[0])
             self._user_specified_benchmark_uri = benchmark
         elif isinstance(benchmark, Benchmark):
+            self.logger.debug("Setting benchmark data: %s", benchmark.uri)
             self._user_specified_benchmark_uri = benchmark.uri
             self._add_custom_benchmarks([benchmark])
         else:
@@ -693,16 +711,19 @@ class CompilerEnv(gym.Env):
         if self.observation_space:
             return self.observation[self.observation_space.id]
 
-    def step(self, action: int) -> step_t:
+    def step(self, action: Union[int, IterableT[int]]) -> step_t:
         """Take a step.
 
-        :param action: Value from the action_space.
+        :param action: An action, or a sequence of actions. When multiple
+            actions are provided the observation and reward are returned
+            after running all of the actions.
         :return: A tuple of observation, reward, done, and info. Observation and
             reward are None if default observation/reward is not set. If done
             is True, observation and reward may also be None (e.g. because the
             service failed).
         """
         assert self.in_episode, "Must call reset() before step()"
+        actions = action if isinstance(action, Iterable) else [action]
         observation, reward = None, None
 
         # Build the list of observations that must be computed by the backend
@@ -721,13 +742,13 @@ class CompilerEnv(gym.Env):
             ]
             observation_spaces += self.reward_space.observation_spaces
 
-        # Record the action.
-        self.actions.append(action)
+        # Record the actions.
+        self.actions += actions
 
         # Send the request to the backend service.
         request = StepRequest(
             session_id=self._session_id,
-            action=[action],
+            action=actions,
             observation_space=observation_indices,
         )
         try:
@@ -834,7 +855,7 @@ class CompilerEnv(gym.Env):
         """
         return RewardView
 
-    def require_datasets(self, datasets: List[Union[str, Dataset]]) -> None:
+    def require_datasets(self, datasets: List[Union[str, Dataset]]) -> bool:
         """Require that the given datasets are available to the environment.
 
         Example usage:
@@ -851,6 +872,8 @@ class CompilerEnv(gym.Env):
         :param datasets: A list of datasets to require. Each dataset is the name
             of an available dataset, the URL of a dataset to download, or a
             :class:`Dataset` instance.
+        :return: :code:`True` if one or more datasets were downloaded, or
+            :code:`False` if all datasets were already available.
         """
         dataset_installed = False
         for dataset in datasets:
@@ -858,6 +881,7 @@ class CompilerEnv(gym.Env):
         if dataset_installed:
             # Signal to the compiler service that the contents of the site data
             # directory has changed.
+            self.logger.debug("Initiating service-side scan of dataset directory")
             self.service(
                 self.service.stub.AddBenchmark,
                 AddBenchmarkRequest(
@@ -865,8 +889,9 @@ class CompilerEnv(gym.Env):
                 ),
             )
             self.make_manifest_file()
+        return dataset_installed
 
-    def require_dataset(self, dataset: Union[str, Dataset]) -> None:
+    def require_dataset(self, dataset: Union[str, Dataset]) -> bool:
         """Require that the given dataset is available to the environment.
 
         Alias for
@@ -874,6 +899,8 @@ class CompilerEnv(gym.Env):
 
         :param dataset: The name of the dataset to download, the URL of the dataset, or a
             :class:`Dataset` instance.
+        :return: :code:`True` if the dataset was downloaded, or :code:`False` if
+            the dataset was already available.
         """
         return self.require_datasets([dataset])
 
@@ -1000,7 +1027,16 @@ class CompilerEnv(gym.Env):
                         error_messages.append(str(e))
                         break
 
-                    if self.reward_space and self.reward_space.deterministic:
+                    if state.reward is not None and self.reward_space is None:
+                        warnings.warn(
+                            "Validating state with reward, but "
+                            "environment has no reward space set"
+                        )
+                    elif (
+                        state.reward is not None
+                        and self.reward_space
+                        and self.reward_space.deterministic
+                    ):
                         validation["reward_validated"] = True
                         # If reward deviates from the expected amount record the
                         # error but continue with the remainder of the validation.
