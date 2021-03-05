@@ -322,7 +322,9 @@ class ManagedConnection(Connection):
                 channel_ready.result(timeout=wait_secs)
                 break
             except (grpc.FutureTimeoutError, grpc.RpcError) as e:
-                logger.debug("Connection attempt %d = %s", attempts, e)
+                logger.debug(
+                    "Connection attempt %d = %s %s", attempts, type(e).__name__, str(e)
+                )
                 wait_secs *= 1.2
         else:
             self.process.kill()
@@ -375,7 +377,9 @@ class UnmanagedConnection(Connection):
                 channel_ready.result(timeout=wait_secs)
                 break
             except (grpc.FutureTimeoutError, grpc.RpcError) as e:
-                logger.debug("Connection attempt %d = %s", attempts, e)
+                logger.debug(
+                    "Connection attempt %d = %s %s", attempts, type(e).__name__, str(e)
+                )
                 wait_secs *= 1.2
         else:
             raise TimeoutError(
