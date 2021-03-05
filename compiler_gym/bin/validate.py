@@ -68,7 +68,7 @@ import compiler_gym.util.flags.dataset  # noqa Flag definition.
 import compiler_gym.util.flags.nproc  # noqa Flag definition.
 from compiler_gym.envs.compiler_env import CompilerEnvState
 from compiler_gym.util.flags.env_from_flags import env_from_flags
-from compiler_gym.util.shell_format import emph
+from compiler_gym.util.shell_format import emph, plural
 from compiler_gym.util.statistics import geometric_mean
 from compiler_gym.validate import ValidationResult, validate_states
 
@@ -226,9 +226,6 @@ def main(argv):
 
     else:
         intermediate_print = print
-
-    def plural(quantity, singular, plural):
-        return singular if quantity == 1 else plural
 
     def progress_message(i):
         intermediate_print(
