@@ -333,7 +333,6 @@ class ManagedConnection(Connection):
             raise TimeoutError(
                 "Failed to connect to RPC service after "
                 f"{process_exit_max_seconds:.1f} seconds"
-                f"({attempts} attempts made)"
             )
 
         super().__init__(channel, url, logger)
