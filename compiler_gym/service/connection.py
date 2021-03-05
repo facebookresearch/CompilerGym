@@ -25,6 +25,7 @@ from compiler_gym.service.proto import (
 )
 from compiler_gym.util.debug_util import get_debug_level
 from compiler_gym.util.runfiles_path import runfiles_path, transient_cache_path
+from compiler_gym.util.shell_format import plural
 from compiler_gym.util.truncate import truncate_lines
 
 GRPC_CHANNEL_OPTIONS = [
@@ -190,11 +191,13 @@ class Connection(object):
                         raise ServiceTransportError(
                             f"{self.url} {e.details()} ({max_retries} retries)"
                         ) from None
+                    remaining = max_retries - attempt
                     self.logger.warning(
-                        "%s %s (%d attempts remaining)",
+                        "%s %s (%d %s remaining)",
                         self.url,
                         e.details(),
-                        max_retries - attempt,
+                        remaining,
+                        plural(remaining, "attempt", "attempts"),
                     )
                     sleep(retry_wait_seconds)
                     retry_wait_seconds *= retry_wait_backoff_exponent
@@ -562,7 +565,7 @@ class CompilerGymServiceConnection(object):
         raise TimeoutError(
             f"Failed to create connection to {endpoint_name} after "
             f"{time() - start_time:.1f} seconds "
-            f"({attempts} attempts made)"
+            f"({attempts} {plural(attempts, 'attempt', 'attempts')} made)"
         )
 
     def __repr__(self):
