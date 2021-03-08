@@ -402,7 +402,7 @@ class CompilerEnv(gym.Env):
                 "Changing the benchmark has no effect until reset() is called."
             )
         if benchmark is None:
-            self.logger.debug("Unsetting the forced environment")
+            self.logger.debug("Unsetting the forced benchmark")
             self._user_specified_benchmark_uri = None
         elif isinstance(benchmark, str):
             self.logger.debug("Setting benchmark by name: %s", benchmark)
