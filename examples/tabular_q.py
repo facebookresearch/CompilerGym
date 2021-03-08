@@ -11,7 +11,9 @@ program as gym environment, find the best action sequence using online q learnin
 """
 
 import random
+from time import time
 
+import humanize
 from absl import app, flags
 
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
@@ -49,7 +51,7 @@ flags.DEFINE_list(
     "Indices of Alphaphase features that are used to construct a state",
 )
 flags.DEFINE_float("learning_rate", 0.1, "learning rate of the q-learning.")
-flags.DEFINE_integer("episodes", 1000, "number of episodes used to learn.")
+flags.DEFINE_integer("episodes", 10000, "number of episodes used to learn.")
 flags.DEFINE_float("epsilon", 0.2, "Epsilon rate of exploration. ")
 flags.DEFINE_integer("episode_length", 5, "The number of steps in each episode.")
 FLAGS = flags.FLAGS
@@ -84,13 +86,12 @@ def get_max_q_value(q_table, ob):
     return max_q
 
 
-def train(q_table):
+def train(q_table, env):
     # Buffer an old version of q table to inspect training progress
     prev_q = {}
 
     for i in range(FLAGS.episodes):
         current_length = 0
-        env = get_env()
         obs = env.reset()
         while current_length < FLAGS.episode_length:
             # Run Epsilon greedy policy.
@@ -110,17 +111,16 @@ def train(q_table):
             )
 
         if i % 50 == 0:
-            print(f"Running episode {i}, current Q table: ", q_table)
+            print(f"Running episode {i}")
 
             def compare_qs(q_old, q_new):
                 diff = [q_new[k] - v for k, v in q_old.items()]
                 return sum(diff) / len(diff) if diff else "NaN"
 
+            difference = compare_qs(prev_q, q_table)
             print(
-                f"Newly added Q entries {len(q_table)-len(prev_q)}, averaged diff {compare_qs(prev_q, q_table)}"
+                f"Newly added Q entries {len(q_table)-len(prev_q)}, averaged diff {difference}"
             )
-            if compare_qs(prev_q, q_table) < 0.1:
-                break
             prev_q = q_table.copy()
 
 
@@ -128,17 +128,19 @@ def setup_env():
     FLAGS.observation = "Autophase"
     FLAGS.reward = "IrInstructionCount"
     FLAGS.benchmark = "cBench-v0/dijkstra"
-    FLAGS.env = "llvm-v0"
+    FLAGS.env = "llvm-ic-v0"
 
 
 def main(argv):
     setup_env()
     # Train a Q table.
     q_table = {}
+    env = get_env()
     try:
-        train(q_table)
+        started = time()
+        train(q_table, env)
+        print(f"Time spent training {humanize.naturaldelta(time() - started)}")
         # Rollout based on the Max-Q policy.
-        env = get_env()
         ob = env.reset()
         # Roll out one episode and report the resulting policy.
         action_seq, rewards = [], []
@@ -146,11 +148,18 @@ def main(argv):
             a = select_action(q_table, ob)
             action_seq.append(a)
             ob, reward, done, info = env.step(env.action_space.flags.index(a))
-
             rewards.append(reward)
         print(
-            "Resulting sequence: ", ",".join(action_seq), f"total reward{sum(rewards)}"
+            "Resulting sequence: ", ",".join(action_seq), f"total reward {sum(rewards)}"
         )
+        # Rollout the best episode
+        best = ["-gvn", "-structurizecfg", "-structurizecfg", "-reg2mem", "-mem2reg"]
+        rewards = []
+        env.reset()
+        for a in best:
+            _, r, _, _ = env.step(env.action_space.flags.index(a))
+            rewards.append(r)
+        print(f"Best achievable result {sum(rewards)}")
     finally:
         env.close()
 

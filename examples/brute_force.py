@@ -278,7 +278,7 @@ def run_brute_force(
                 print(
                     f"\r\033[KRuntime: {humanize.naturaldelta(time() - started)}. "
                     f"Progress: {chunk_count/expected_chunk_count:.2%}. "
-                    f"Best reward found: {best_reward:.4%}.",
+                    f"Best reward found: {best_reward}.",
                     file=sys.stderr,
                     flush=True,
                     end="",
@@ -286,8 +286,8 @@ def run_brute_force(
                 for actions, rewards in chunk:
                     print(*actions, *rewards, sep=",", file=f, flush=True)
                     if rewards and rewards[-1] is not None:
-                        if rewards[-1] > best_reward:
-                            best_reward = rewards[-1]
+                        if sum(rewards) > best_reward:
+                            best_reward = sum(rewards)
                             best_action_sequence = actions
     except KeyboardInterrupt:
         print("\nkeyboard interrupt", end="", flush=True)
