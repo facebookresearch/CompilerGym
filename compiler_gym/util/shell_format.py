@@ -23,3 +23,8 @@ class ShellFormatCodes(object):
 def emph(stringable: Any) -> str:
     """Emphasize a string."""
     return f"{ShellFormatCodes.BOLD}{ShellFormatCodes.BLUE}{stringable}{ShellFormatCodes.END}"
+
+
+def plural(quantity: int, singular: str, plural: str) -> str:
+    """Return the singular or plural word."""
+    return singular if quantity == 1 else plural
