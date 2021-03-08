@@ -60,9 +60,9 @@ def test_double_register_dataset(env: CompilerEnv):
 def test_benchmark_constructor_arg(env: CompilerEnv):
     env.close()  # Fixture only required to pull in dataset.
 
-    env = gym.make("llvm-v0", benchmark="cBench-v0/dijkstra")
+    env = gym.make("llvm-v0", benchmark="cBench-v1/dijkstra")
     try:
-        assert env.benchmark == "cBench-v0/dijkstra"
+        assert env.benchmark == "cBench-v1/dijkstra"
     finally:
         env.close()
 

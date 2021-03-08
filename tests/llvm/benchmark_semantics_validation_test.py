@@ -18,32 +18,32 @@ pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 def test_validate_state_no_reward():
     state = CompilerEnvState(
-        benchmark="cBench-v0/crc32",
+        benchmark="benchmark://cBench-v1/crc32",
         walltime=1,
         commandline="opt  input.bc -o output.bc",
     )
     env = gym.make("llvm-v0")
     try:
-        env.require_dataset("cBench-v0")
+        env.require_dataset("cBench-v1")
         result = env.validate(state)
     finally:
         env.close()
 
     assert result.okay()
     assert not result.reward_validated
-    assert str(result) == "✅  cBench-v0/crc32"
+    assert str(result) == "✅  cBench-v1/crc32"
 
 
 def test_validate_state_with_reward():
     state = CompilerEnvState(
-        benchmark="cBench-v0/crc32",
+        benchmark="benchmark://cBench-v1/crc32",
         walltime=1,
         reward=0,
         commandline="opt  input.bc -o output.bc",
     )
     env = gym.make("llvm-v0", reward_space="IrInstructionCount")
     try:
-        env.require_dataset("cBench-v0")
+        env.require_dataset("cBench-v1")
         result = env.validate(state)
     finally:
         env.close()
@@ -51,19 +51,19 @@ def test_validate_state_with_reward():
     assert result.okay()
     assert result.reward_validated
     assert not result.reward_validation_failed
-    assert str(result) == "✅  cBench-v0/crc32  0.0000"
+    assert str(result) == "✅  cBench-v1/crc32  0.0000"
 
 
 def test_validate_state_invalid_reward():
     state = CompilerEnvState(
-        benchmark="cBench-v0/crc32",
+        benchmark="benchmark://cBench-v1/crc32",
         walltime=1,
         reward=1,
         commandline="opt  input.bc -o output.bc",
     )
     env = gym.make("llvm-v0", reward_space="IrInstructionCount")
     try:
-        env.require_dataset("cBench-v0")
+        env.require_dataset("cBench-v1")
         result = env.validate(state)
     finally:
         env.close()
@@ -73,7 +73,7 @@ def test_validate_state_invalid_reward():
     assert result.reward_validation_failed
     assert (
         str(result)
-        == "❌  cBench-v0/crc32  Expected reward 1.0000 but received reward 0.0000"
+        == "❌  cBench-v1/crc32  Expected reward 1.0000 but received reward 0.0000"
     )
 
 
@@ -96,14 +96,14 @@ def test_no_validation_callback_for_custom_benchmark(env: LlvmEnv):
 def test_validate_state_without_env_reward():
     """Validating state when environment has no reward space."""
     state = CompilerEnvState(
-        benchmark="cBench-v0/crc32",
+        benchmark="benchmark://cBench-v1/crc32",
         walltime=1,
         reward=0,
         commandline="opt  input.bc -o output.bc",
     )
     env = gym.make("llvm-v0")
     try:
-        env.require_dataset("cBench-v0")
+        env.require_dataset("cBench-v1")
         result = env.validate(state)
     finally:
         env.close()
@@ -116,13 +116,13 @@ def test_validate_state_without_env_reward():
 def test_validate_state_without_state_reward():
     """Validating state when state has no reward value."""
     state = CompilerEnvState(
-        benchmark="cBench-v0/crc32",
+        benchmark="benchmark://cBench-v1/crc32",
         walltime=1,
         commandline="opt  input.bc -o output.bc",
     )
     env = gym.make("llvm-v0", reward_space="IrInstructionCount")
     try:
-        env.require_dataset("cBench-v0")
+        env.require_dataset("cBench-v1")
         result = env.validate(state)
     finally:
         env.close()

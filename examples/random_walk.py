@@ -8,7 +8,7 @@ Example usage:
 
     # Run a random walk on cBench example program using instruction count reward.
     $ python3 examples/random_walk.py --env=llvm-v0 --step_min=100 --step_max=100 \
-      --benchmark=cBench-v0/dijkstra --reward=IrInstructionCount
+      --benchmark=cBench-v1/dijkstra --reward=IrInstructionCount
 """
 import random
 

@@ -10,10 +10,10 @@ length and evaluates them, logging the incremental rewards of each.
 Example usage:
 
     $ $ python -m compiler_gym.bin.brute_force \
-       --env=llvm-ic-v0 --benchmark=cBench-v0/dijkstra \
+       --env=llvm-ic-v0 --benchmark=cBench-v1/dijkstra \
        --episode_length=10 --actions=-sroa,-mem2reg,-newgvn
     Enumerating all episodes of 3 actions × 10 steps
-    Started 24 brute force workers for benchmark cBench-v0/dijkstra using reward IrInstructionCountOz.
+    Started 24 brute force workers for benchmark cBench-v1/dijkstra using reward IrInstructionCountOz.
     === Running 59,049 trials ===
     Runtime: 3 minutes. Progress: 100.00%. Best reward found: 101.1905%.
     Ending jobs ... completed 59,049 of 59,049 trials (100.000%)

@@ -22,7 +22,7 @@ def test_run_action_sensitivity_analysis():
     actions = [0, 1]
     env = "llvm-v0"
     reward = "IrInstructionCountO3"
-    benchmark = "cBench-v0/crc32"
+    benchmark = "cBench-v1/crc32"
 
     flags.FLAGS.unparse_flags()
     flags.FLAGS(["argv0", f"--env={env}", f"--benchmark={benchmark}"])

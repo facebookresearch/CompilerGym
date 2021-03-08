@@ -40,7 +40,7 @@ developers to expose new optimization problems for AI.
   - [Trying it out](#trying-it-out)
 - [Leaderboards](#leaderboards)
   - [llvm-ic-v0](#llvm-ic-v0)
-    - [cBench-v0](#cbench-v0)
+    - [cBench-v1](#cBench-v1)
 - [Contributing](#contributing)
 - [Citation](#citation)
 
@@ -147,10 +147,10 @@ sequence of optimizations that lead to the greatest reduction in instruction
 count in the program being compiled. Reward is the reduction in codesize
 achieved scaled to the reduction achieved by LLVM's builtin `-Oz` pipeline.
 
-### cBench-v0
+### cBench-v1
 
 This leaderboard tracks the results achieved by algorithms on the `llvm-ic-v0`
-environment on the 23 benchmarks in the `cBench-v0` dataset.
+environment on the 23 benchmarks in the `cBench-v1` dataset.
 
 | Author | Algorithm | Links | Walltime (mean) | Codesize Reduction (geomean) |
 | --- | --- | --- | --- | --- |

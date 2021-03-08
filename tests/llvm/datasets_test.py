@@ -41,11 +41,11 @@ def test_default_cBench_dataset_require(tmpwd, temporary_environ):
         assert not env.benchmarks, "Sanity check"
 
         # Datasaet is downloaded.
-        assert env.require_dataset("cBench-v0")
+        assert env.require_dataset("cBench-v1")
         assert env.benchmarks
 
         # Dataset is already downloaded.
-        assert not env.require_dataset("cBench-v0")
+        assert not env.require_dataset("cBench-v1")
     finally:
         env.close()
 
@@ -61,7 +61,7 @@ def test_default_cBench_on_reset(tmpwd, temporary_environ):
 
         env.reset()
         assert env.benchmarks
-        assert env.benchmark.startswith("benchmark://cBench-v0/")
+        assert env.benchmark.startswith("benchmark://cBench-v1/")
     finally:
         env.close()
 

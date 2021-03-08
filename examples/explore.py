@@ -11,7 +11,7 @@ the search space. Can also be configured to do a beam search.
 
 Example usage:
 
-    $ python explore.py --env=llvm-ic-v0 --benchmark=cBench-v0/dijkstra \
+    $ python explore.py --env=llvm-ic-v0 --benchmark=cBench-v1/dijkstra \
        --episode_length=10 --actions=-simplifycfg,-instcombine,-mem2reg,-newgvn
 
 Use --help to list the configurable options.

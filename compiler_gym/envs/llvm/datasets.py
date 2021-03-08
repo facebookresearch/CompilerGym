@@ -26,7 +26,7 @@ from compiler_gym.util.timer import Timer
 
 _CLANG = runfiles_path("compiler_gym/third_party/llvm/bin/clang")
 
-_CBENCH_DATA = site_data_path("llvm/cBench-v0-runtime-data/runtime_data")
+_CBENCH_DATA = site_data_path("llvm/cBench-v1-runtime-data/runtime_data")
 _CBENCH_DATA_URL = (
     "https://dl.fbaipublicfiles.com/compiler_gym/cBench-v0-runtime-data.tar.bz2"
 )
@@ -72,6 +72,28 @@ LLVM_DATASETS = [
         file_count=23,
         size_bytes=6940416,
         sha256="9b5838a90895579aab3b9375e8eeb3ed2ae58e0ad354fec7eb4f8b31ecb4a360",
+        platforms=["linux"],
+    ),
+    Dataset(
+        name="cBench-v1",
+        url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v1-macos.tar.bz2",
+        license="BSD 3-Clause",
+        description="https://github.com/ctuning/ctuning-programs",
+        compiler="llvm-10.0.0",
+        file_count=23,
+        size_bytes=10292032,
+        sha256="90b312b40317d9ee9ed09b4b57d378879f05e8970bb6de80dc8581ad0e36c84f",
+        platforms=["macos"],
+    ),
+    Dataset(
+        name="cBench-v1",
+        url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v1-linux.tar.bz2",
+        license="BSD 3-Clause",
+        description="https://github.com/ctuning/ctuning-programs",
+        compiler="llvm-10.0.0",
+        file_count=23,
+        size_bytes=10075608,
+        sha256="601fff3944c866f6617e653b6eb5c1521382c935f56ca1f36a9f5cf1a49f3de5",
         platforms=["linux"],
     ),
     Dataset(
@@ -242,7 +264,7 @@ def _compile_and_run_bitcode_file(
     return BenchmarkExecutionResult(walltime_seconds=timer.time, output=stdout)
 
 
-@fasteners.interprocess_locked(cache_path("cBench-v0-runtime-data.LOCK"))
+@fasteners.interprocess_locked(cache_path("cBench-v1-runtime-data.LOCK"))
 def download_cBench_runtime_data() -> bool:
     """Download and unpack the cBench runtime dataset."""
     if (_CBENCH_DATA / "unpacked").is_file():
@@ -535,31 +557,31 @@ def setup_ghostscript_library_files(dataset_id: int) -> Callable[[Path], None]:
 
 
 validator(
-    benchmark="benchmark://cBench-v0/bitcount",
+    benchmark="benchmark://cBench-v1/bitcount",
     cmd="$BIN 1125000",
 )
 
 validator(
-    benchmark="benchmark://cBench-v0/bitcount",
+    benchmark="benchmark://cBench-v1/bitcount",
     cmd="$BIN 512",
 )
 
 for i in range(1, 21):
     # TODO(cummins): Investigate.
     # validator(
-    #     benchmark="benchmark://cBench-v0/adpcm",
+    #     benchmark="benchmark://cBench-v1/adpcm",
     #     cmd=f"$BIN $D/telecom_data/{i}.adpcm",
     #     data=[f"telecom_data/{i}.adpcm"],
     # )
 
     # validator(
-    #     benchmark="benchmark://cBench-v0/adpcm",
+    #     benchmark="benchmark://cBench-v1/adpcm",
     #     cmd=f"$BIN $D/telecom_data/{i}.pcm",
     #     data=[f"telecom_data/{i}.pcm"],
     # )
 
     validator(
-        benchmark="benchmark://cBench-v0/blowfish",
+        benchmark="benchmark://cBench-v1/blowfish",
         cmd=f"$BIN d $D/office_data/{i}.benc output.txt 1234567890abcdeffedcba0987654321",
         data=[f"office_data/{i}.benc"],
         outs=["output.txt"],
@@ -567,40 +589,40 @@ for i in range(1, 21):
 
     # TODO(cummins): Investigate.
     # validator(
-    #     benchmark="benchmark://cBench-v0/bzip2",
+    #     benchmark="benchmark://cBench-v1/bzip2",
     #     cmd=f"$BIN -d -k -f -c $D/bzip2_data/{i}.bz2",
     #     data=[f"bzip2_data/{i}.bz2"],
     # )
 
     validator(
-        benchmark="benchmark://cBench-v0/crc32",
+        benchmark="benchmark://cBench-v1/crc32",
         cmd=f"$BIN $D/telecom_data/{i}.pcm",
         data=[f"telecom_data/{i}.pcm"],
     )
 
     validator(
-        benchmark="benchmark://cBench-v0/dijkstra",
+        benchmark="benchmark://cBench-v1/dijkstra",
         cmd=f"$BIN $D/network_dijkstra_data/{i}.dat",
         data=[f"network_dijkstra_data/{i}.dat"],
     )
 
     # TODO(cummins): Investigate.
     # validator(
-    #     benchmark="benchmark://cBench-v0/gsm",
+    #     benchmark="benchmark://cBench-v1/gsm",
     #     cmd=f"$BIN -fps -c $D/telecom_gsm_data/{i}.au",
     #     data=[f"telecom_gsm_data/{i}.au"],
     # )
 
     # TODO(cummins): ispell executable appears broken. Investigation needed.
     # validator(
-    #     benchmark="benchmark://cBench-v0/ispell",
+    #     benchmark="benchmark://cBench-v1/ispell",
     #     cmd=f"$BIN -a -d americanmed+ $D/office_data/{i}.txt",
     #     data = [f"office_data/{i}.txt"],
     # )
 
     # TODO(cummins): Investigate.
     # validator(
-    #     benchmark="benchmark://cBench-v0/jpeg-c",
+    #     benchmark="benchmark://cBench-v1/jpeg-c",
     #     cmd=f"$BIN -dct int -progressive -outfile output.jpeg $D/consumer_jpeg_data/{i}.ppm",
     #     data=[f"consumer_jpeg_data/{i}.ppm"],
     #     outs=["output.jpeg"],
@@ -608,20 +630,20 @@ for i in range(1, 21):
 
     # TODO(cummins): Investigate.
     # validator(
-    #     benchmark="benchmark://cBench-v0/jpeg-d",
+    #     benchmark="benchmark://cBench-v1/jpeg-d",
     #     cmd=f"$BIN -dct int -outfile output.ppm $D/consumer_jpeg_data/{i}.jpg",
     #     data=[f"consumer_jpeg_data/{i}.jpg"],
     #     outs=["output.ppm"],
     # )
 
     validator(
-        benchmark="benchmark://cBench-v0/patricia",
+        benchmark="benchmark://cBench-v1/patricia",
         cmd=f"$BIN $D/network_patricia_data/{i}.udp",
         data=[f"network_patricia_data/{i}.udp"],
     )
 
     validator(
-        benchmark="benchmark://cBench-v0/qsort",
+        benchmark="benchmark://cBench-v1/qsort",
         cmd=f"$BIN $D/automotive_qsort_data/{i}.dat",
         data=[f"automotive_qsort_data/{i}.dat"],
         outs=["sorted_output.dat"],
@@ -629,14 +651,14 @@ for i in range(1, 21):
     )
 
     validator(
-        benchmark="benchmark://cBench-v0/rijndael",
+        benchmark="benchmark://cBench-v1/rijndael",
         cmd=f"$BIN $D/office_data/{i}.enc output.dec d 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321",
         data=[f"office_data/{i}.enc"],
         outs=["output.dec"],
     )
 
     validator(
-        benchmark="benchmark://cBench-v0/sha",
+        benchmark="benchmark://cBench-v1/sha",
         cmd=f"$BIN $D/office_data/{i}.txt",
         data=[f"office_data/{i}.txt"],
         compare_output=False,
@@ -644,7 +666,7 @@ for i in range(1, 21):
     )
 
     validator(
-        benchmark="benchmark://cBench-v0/stringsearch",
+        benchmark="benchmark://cBench-v1/stringsearch",
         cmd=f"$BIN $D/office_data/{i}.txt $D/office_data/{i}.s.txt output.txt",
         data=[f"office_data/{i}.txt"],
         outs=["output.txt"],
@@ -653,14 +675,14 @@ for i in range(1, 21):
 
     # TODO(cummins): Sporadic segfaults.
     # validator(
-    #     benchmark="benchmark://cBench-v0/stringsearch2",
+    #     benchmark="benchmark://cBench-v1/stringsearch2",
     #     cmd=f"$BIN $D/office_data/{i}.txt $D/office_data/{i}.s.txt output.txt",
     #     data=[f"office_data/{i}.txt"],
     #     outs=["output.txt"],
     # )
 
     validator(
-        benchmark="benchmark://cBench-v0/susan",
+        benchmark="benchmark://cBench-v1/susan",
         cmd=f"$BIN $D/automotive_susan_data/{i}.pgm output_large.corners.pgm -c",
         data=[f"automotive_susan_data/{i}.pgm"],
         outs=["output_large.corners.pgm"],
@@ -669,7 +691,7 @@ for i in range(1, 21):
 
     # TODO(cummins): Investigate.
     # validator(
-    #     benchmark="benchmark://cBench-v0/tiff2bw",
+    #     benchmark="benchmark://cBench-v1/tiff2bw",
     #     cmd=f"$BIN $D/consumer_tiff_data/{i}.tif output.tif",
     #     data=[f"consumer_tiff_data/{i}.tif"],
     #     outs=["output.tif"],
@@ -678,7 +700,7 @@ for i in range(1, 21):
 
     # TODO(cummins): Investigate.
     # validator(
-    #     benchmark="benchmark://cBench-v0/tiff2rgba",
+    #     benchmark="benchmark://cBench-v1/tiff2rgba",
     #     cmd=f"$BIN $D/consumer_tiff_data/{i}.tif output.tif",
     #     data=[f"consumer_tiff_data/{i}.tif"],
     #     outs=["output.tif"],
@@ -687,7 +709,7 @@ for i in range(1, 21):
 
     # TODO(cummins): Investigate.
     # validator(
-    #     benchmark="benchmark://cBench-v0/tiffdither",
+    #     benchmark="benchmark://cBench-v1/tiffdither",
     #     cmd=f"$BIN $D/consumer_tiff_data/{i}.bw.tif out.tif",
     #     data=[f"consumer_tiff_data/{i}.bw.tif"],
     #     outs=["out.tif"],
@@ -696,7 +718,7 @@ for i in range(1, 21):
 
     # TODO(cummins): Investigate.
     # validator(
-    #     benchmark="benchmark://cBench-v0/tiffmedian",
+    #     benchmark="benchmark://cBench-v1/tiffmedian",
     #     cmd=f"$BIN $D/consumer_tiff_data/{i}.nocomp.tif output.tif",
     #     data=[f"consumer_tiff_data/{i}.nocomp.tif"],
     #     outs=["output.tif"],
@@ -708,7 +730,7 @@ for i in range(1, 21):
     if sys.platform != "darwin":
         # TODO(cummins): Investigate.
         # validator(
-        #     benchmark="benchmark://cBench-v0/lame",
+        #     benchmark="benchmark://cBench-v1/lame",
         #     cmd=f"$BIN $D/consumer_data/{i}.wav output.mp3",
         #     data=[f"consumer_data/{i}.wav"],
         #     outs=["output.mp3"],
@@ -717,7 +739,7 @@ for i in range(1, 21):
         # )
 
         validator(
-            benchmark="benchmark://cBench-v0/ghostscript",
+            benchmark="benchmark://cBench-v1/ghostscript",
             cmd="$BIN -sDEVICE=ppm -dNOPAUSE -dQUIET -sOutputFile=output.ppm -- input.ps",
             data=[f"office_data/{i}.ps"],
             outs=["output.ppm"],
