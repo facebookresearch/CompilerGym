@@ -64,9 +64,9 @@ exclude_patterns = []
 html_theme = "sphinx_rtd_theme"
 
 html_theme_options = {
+    "analytics_id": "G-T95G5EVYXM",
     "collapse_navigation": True,
     "display_version": True,
-    # TODO(cummins): Enable Google Analytics "analytics_id": "UA-XXXXXXX-1",
 }
 
 html_css_files = [
