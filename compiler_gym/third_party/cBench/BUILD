@@ -14,7 +14,7 @@ genrule(
             "cBench-v1-linux.json",
         ],
     }),
-    outs = ["llvm_bitcodes-10.0.0-cBench.tar.bz2"],
+    outs = ["llvm_bitcodes-10.0.0-cBench-v1.tar.bz2"],
     cmd = select({
         "@llvm//:darwin": "mv $(location cBench-v1-macos.json) $(@D)/cBench-v1.json",
         "//conditions:default": "mv $(location cBench-v1-linux.json) $(@D)/cBench-v1.json",
