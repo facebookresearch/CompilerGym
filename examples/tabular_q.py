@@ -23,7 +23,23 @@ from compiler_gym.util.flags.env_from_flags import env_from_flags
 
 flags.DEFINE_list(
     "actions",
-    ["-sroa", "-mem2reg", "-newgvn"],
+    [
+        "-simplifycfg",
+        "-reg2mem",
+        "-early-cse-memssa",
+        "-gvn-hoist",
+        "-gvn",
+        "-instsimplify",
+        "-instcombine",
+        "-jump-threading",
+        "-loop-extract",
+        "-loop-reduce",
+        "-loop-versioning",
+        "-newgvn",
+        "-mem2reg",
+        "-sroa",
+        "-structurizecfg",
+    ],
     "A list of action names to explore from.",
 )
 flags.DEFINE_float("discount", 1.0, "The discount factor.")
@@ -76,17 +92,14 @@ def train(q_table):
         current_length = 0
         env = get_env()
         obs = env.reset()
-        # obs_prev = obs.copy()
         while current_length < FLAGS.episode_length:
             # Run Epsilon greedy policy.
             a = select_action(q_table, obs, FLAGS.epsilon)
             hashed = hash_state_action(obs, a)
             if hashed not in q_table:
                 q_table[hashed] = 0
-
             obs, reward, done, info = env.step(env.action_space.flags.index(a))
             # print({i:obs[i]-obs_prev[i] for i in range(obs.shape[0])}, reward, a)
-            # obs_prev = obs.copy()
             current_length += 1
             # Get max q at new state.
             target = reward + FLAGS.discount * get_max_q_value(q_table, obs)
@@ -96,7 +109,7 @@ def train(q_table):
                 + (1 - FLAGS.learning_rate) * q_table[hashed]
             )
 
-        if i % 10 == 0:
+        if i % 50 == 0:
             print(f"Running episode {i}, current Q table: ", q_table)
 
             def compare_qs(q_old, q_new):
@@ -106,6 +119,8 @@ def train(q_table):
             print(
                 f"Newly added Q entries {len(q_table)-len(prev_q)}, averaged diff {compare_qs(prev_q, q_table)}"
             )
+            if compare_qs(prev_q, q_table) < 0.1:
+                break
             prev_q = q_table.copy()
 
 
@@ -120,19 +135,24 @@ def main(argv):
     setup_env()
     # Train a Q table.
     q_table = {}
-    train(q_table)
-    # Rollout based on the Max-Q policy.
-    env = get_env()
-    ob = env.reset()
-    # Roll out one episode and report the resulting policy.
-    action_seq, rewards = [], []
-    for _ in range(FLAGS.episode_length):
-        a = select_action(q_table, ob)
-        action_seq.append(a)
-        ob, reward, done, info = env.step(env.action_space.flags.index(a))
+    try:
+        train(q_table)
+        # Rollout based on the Max-Q policy.
+        env = get_env()
+        ob = env.reset()
+        # Roll out one episode and report the resulting policy.
+        action_seq, rewards = [], []
+        for _ in range(FLAGS.episode_length):
+            a = select_action(q_table, ob)
+            action_seq.append(a)
+            ob, reward, done, info = env.step(env.action_space.flags.index(a))
 
-        rewards.append(reward)
-    print("Resulting sequence: ", ",".join(action_seq), f"total reward{sum(rewards)}")
+            rewards.append(reward)
+        print(
+            "Resulting sequence: ", ",".join(action_seq), f"total reward{sum(rewards)}"
+        )
+    finally:
+        env.close()
 
 
 if __name__ == "__main__":

@@ -43,7 +43,23 @@ from compiler_gym.util.logs import create_logging_dir
 
 flags.DEFINE_list(
     "actions",
-    [],
+    [
+        "-simplifycfg",
+        "-reg2mem",
+        "-early-cse-memssa",
+        "-gvn-hoist",
+        "-gvn",
+        "-instsimplify",
+        "-instcombine",
+        "-jump-threading",
+        "-loop-extract",
+        "-loop-reduce",
+        "-loop-versioning",
+        "-newgvn",
+        "-mem2reg",
+        "-sroa",
+        "-structurizecfg",
+    ],
     "A list of action names to enumerate. If not provided, all actions are used "
     "(warning: this might make a long time!)",
 )
