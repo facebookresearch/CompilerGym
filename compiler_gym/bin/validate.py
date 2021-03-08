@@ -234,7 +234,7 @@ def main(argv):
             flush=True,
         )
 
-    progress_message(0)
+    progress_message(len(states))
     json_log = []
 
     def dump_json_log():
