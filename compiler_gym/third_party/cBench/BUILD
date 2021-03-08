@@ -6,9 +6,19 @@ load("@rules_python//python:defs.bzl", "py_binary")
 
 genrule(
     name = "cBench_tar",
-    srcs = [":cBench"],
+    srcs = [":cBench"] + select({
+        "@llvm//:darwin": [
+            "cBench-v1-macos.json",
+        ],
+        "//conditions:default": [
+            "cBench-v1-linux.json",
+        ],
+    }),
     outs = ["llvm_bitcodes-10.0.0-cBench.tar.bz2"],
-    cmd = "tar cjfh $@ -C $(@D) cBench-v1",
+    cmd = select({
+        "@llvm//:darwin": "mv $(location cBench-v1-macos.json) $(@D)/cBench-v1.json",
+        "//conditions:default": "mv $(location cBench-v1-linux.json) $(@D)/cBench-v1.json",
+    }) + " && tar cvjfh $@ -C $(@D) cBench-v1 cBench-v1.json",
     visibility = ["//visibility:public"],
 )
 
