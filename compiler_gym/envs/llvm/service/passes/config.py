@@ -184,8 +184,11 @@ _EXCLUDED_PASSES = {
     "BarrierNoop",  # Used for debugging pass manager.
     "StripNonLineTableDebugInfoPass",  # Debug stripping.
     "StripDeadDebugInfoPass",  # Debug stripping.
+    "LoopExtractorPass",  # Pulls out loops into functions. Changes semantics.
+    "SingleLoopExtractorPass",  # Pulls out loops into functions. Changes semantics.
+    "BlockExtractorPass",  # Pulls out blocks into functions. Changes semantics.
     # Unwanted instrumentation passes.
-    "BoundsCheckingLegacy",
+    "BoundsCheckingLegacyPass",  # Inserts traps on illegal access. Changes semantics.
     "ASanGlobalsMetadataWrapperPass",
     "AddressSanitizerLegacyPass",
     "HWAddressSanitizerLegacyPass",
