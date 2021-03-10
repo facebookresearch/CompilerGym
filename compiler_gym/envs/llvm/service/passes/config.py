@@ -162,10 +162,12 @@ _EXCLUDED_PASSES = {
     "PlaceBackedgeSafepointsImpl",
     "PlaceSafepointsPass",
     # Irrelevant Objective-C Automatic Reference Counting passes.
-    "ObjCarcapelimPass",
-    "ObjCarccontractPass",
-    "ObjCarcexpandPass",
-    "ObjCarcoptPass",
+    "ObjCARCAAWrapperPass",
+    "ObjCARCAPElim",
+    "ObjCARCAPElimPass",
+    "ObjCARCContractPass",
+    "ObjCARCExpandPass",
+    "ObjCARCOptPass",
     # Doesn't use legacy pass constructor API, or requires additional
     # constructor arguments that are not available.
     "WholeProgramDevirt",
