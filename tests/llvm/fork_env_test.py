@@ -90,9 +90,12 @@ def test_fork_before_reset(env: LlvmEnv):
     """Test that fork() before reset() starts an episode."""
     assert not env.in_episode
     fkd = env.fork()
-    assert env.in_episode
-    assert fkd.in_episode
-    assert env.benchmark == fkd.benchmark
+    try:
+        assert env.in_episode
+        assert fkd.in_episode
+        assert env.benchmark == fkd.benchmark
+    finally:
+        fkd.close()
 
 
 def test_fork_closed_service(env: LlvmEnv):
@@ -168,8 +171,8 @@ def test_fork_custom_benchmark(env: LlvmEnv):
         """Strip the ModuleID line from IR."""
         return "\n".join(env.ir.split("\n")[1:])
 
+    new_env = env.fork()
     try:
-        new_env = env.fork()
         assert ir(env) == ir(new_env)
 
         new_env.reset()
@@ -182,15 +185,13 @@ def test_fork_twice_test(env: LlvmEnv):
     """Test that fork() on a forked environment works."""
     env.reset(benchmark="cBench-v1/crc32")
     fork_a = env.fork()
+    fork_b = fork_a.fork()
     try:
-        fork_b = fork_a.fork()
-        try:
-            assert env.state == fork_a.state
-            assert fork_a.state == fork_b.state
-        finally:
-            fork_b.close()
+        assert env.state == fork_a.state
+        assert fork_a.state == fork_b.state
     finally:
         fork_a.close()
+        fork_b.close()
 
 
 def test_fork_modified_ir_is_the_same(env: LlvmEnv):
