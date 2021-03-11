@@ -211,6 +211,8 @@ _EXCLUDED_PASSES = {
     "PgomemOpsizeOptLegacyPass",
     "InstrProfilingLegacyPass",
     "ControlHeightReductionLegacyPass",
+    # Unneeded symbol rewriting pass.
+    "RewriteSymbolsPass",
     # Microsoft's Control Flow Guard checks on Windows targets.
     # https://llvm.org/doxygen/CFGuard_8cpp.html
     "CFGuardCheckPass",
