@@ -161,6 +161,7 @@ _EXCLUDED_PASSES = {
     "StripGCRelocates",
     "PlaceBackedgeSafepointsImpl",
     "PlaceSafepointsPass",
+    "RewriteStatepointsForGclegacyPass",
     # Irrelevant Objective-C Automatic Reference Counting passes.
     "ObjCARCAAWrapperPass",
     "ObjCARCAPElim",
