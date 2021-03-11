@@ -13,7 +13,7 @@ import compiler_gym  # noqa Register environments.
 from compiler_gym.util import debug_util as dbg
 
 
-def main(extra_pytest_args: Optional[List[str]] = None, debug_level: int = 3):
+def main(extra_pytest_args: Optional[List[str]] = None, debug_level: int = 1):
     """The main entry point for the pytest runner.
 
     An example file which uses this:
