@@ -93,6 +93,76 @@ def test_bitcode_observation_space(env: LlvmEnv):
     assert not space.platform_dependent
 
 
+# The Autophase feature vector for benchmark://cBench-v1/crc32 in its initial
+# state.
+AUTOPHASE_CBENCH_CRC32 = [
+    0,
+    0,
+    16,
+    12,
+    2,
+    16,
+    8,
+    2,
+    4,
+    8,
+    0,
+    0,
+    0,
+    29,
+    0,
+    24,
+    9,
+    2,
+    32,
+    44,
+    41,
+    14,
+    36,
+    16,
+    13,
+    0,
+    5,
+    26,
+    3,
+    5,
+    24,
+    20,
+    24,
+    33,
+    5,
+    10,
+    3,
+    51,
+    0,
+    1,
+    0,
+    5,
+    0,
+    0,
+    0,
+    42,
+    0,
+    1,
+    8,
+    5,
+    29,
+    242,
+    157,
+    15,
+    0,
+    103,
+]
+
+
+def test_autophase_observation_space_reset(env: LlvmEnv):
+    """Test that the intial observation is returned on env.reset()."""
+    env.observation_space = "Autophase"
+    observation = env.reset("cBench-v1/crc32")
+    print(observation.tolist())  # For debugging on error.
+    np.testing.assert_array_equal(observation, AUTOPHASE_CBENCH_CRC32)
+
+
 def test_autophase_observation_space(env: LlvmEnv):
     env.reset("cBench-v1/crc32")
     key = "Autophase"
@@ -106,68 +176,7 @@ def test_autophase_observation_space(env: LlvmEnv):
     assert space.deterministic
     assert not space.platform_dependent
 
-    np.testing.assert_array_equal(
-        value,
-        [
-            0,
-            0,
-            16,
-            12,
-            2,
-            16,
-            8,
-            2,
-            4,
-            8,
-            0,
-            0,
-            0,
-            29,
-            0,
-            24,
-            9,
-            2,
-            32,
-            44,
-            41,
-            14,
-            36,
-            16,
-            13,
-            0,
-            5,
-            26,
-            3,
-            5,
-            24,
-            20,
-            24,
-            33,
-            5,
-            10,
-            3,
-            51,
-            0,
-            1,
-            0,
-            5,
-            0,
-            0,
-            0,
-            42,
-            0,
-            1,
-            8,
-            5,
-            29,
-            242,
-            157,
-            15,
-            0,
-            103,
-        ],
-    )
-
+    np.testing.assert_array_equal(value, AUTOPHASE_CBENCH_CRC32)
     assert space.space.contains(value)
 
 
