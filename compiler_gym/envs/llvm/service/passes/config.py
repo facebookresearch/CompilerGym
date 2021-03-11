@@ -217,6 +217,10 @@ _EXCLUDED_PASSES = {
     "CFGuardDispatchPass",
     # We don't want to change the visibility of symbols.
     "InternalizePass",
+    # NOTE(github.com/facebookresearch/CompilerGym/issues/103): The
+    # -structurizecg has been found to break the semantics of cBench benchmarks
+    # ghostscript and tiff2bw.
+    "StructurizeCFGPass",
     # NOTE(github.com/facebookresearch/CompilerGym/issues/46): The -gvn-sink
     # pass has been found to produce different states when run multiple times
     # on the same input.
