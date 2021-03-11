@@ -66,6 +66,7 @@ def test_ir_observation_space(env: LlvmEnv):
     assert space.space.size_range == (0, None)
 
     value: str = env.observation[key]
+    print(value)  # For debugging in case of error.
     assert isinstance(value, str)
     assert space.space.contains(value)
 
@@ -82,6 +83,7 @@ def test_bitcode_observation_space(env: LlvmEnv):
     assert space.space.size_range == (0, 4096)
 
     value: str = env.observation[key]
+    print(value)  # For debugging in case of error.
     try:
         assert isinstance(value, str)
         assert os.path.isfile(value)
@@ -170,6 +172,7 @@ def test_autophase_observation_space(env: LlvmEnv):
     assert isinstance(space.space, Box)
 
     value: np.ndarray = env.observation[key]
+    print(value.tolist())  # For debugging in case of error.
     assert isinstance(value, np.ndarray)
     assert value.shape == (56,)
 
@@ -186,6 +189,7 @@ def test_autophase_dict_observation_space(env: LlvmEnv):
     space = env.observation.spaces[key]
     assert isinstance(space.space, DictSpace)
     value: Dict[str, int] = env.observation[key]
+    print(value)  # For debugging in case of error.
     assert len(value) == 56
 
     assert space.deterministic
@@ -219,6 +223,7 @@ def test_cpuinfo_observation_space(env: LlvmEnv):
     space = env.observation.spaces[key]
     assert isinstance(space.space, DictSpace)
     value: Dict[str, Any] = env.observation[key]
+    print(value)  # For debugging in case of error.
     assert isinstance(value, dict)
     # Test each expected key, removing it as we go.
     assert isinstance(value.pop("name"), str)
@@ -835,6 +840,7 @@ def test_inst2vec_preprocessed_observation_space(
         assert isinstance(item, str)
     unk = env.inst2vec.vocab["!UNK"]
     indices = [env.inst2vec.vocab.get(item, unk) for item in value]
+    print(indices)  # For debugging in case of error.
     assert indices == cbench_crc32_inst2vec_embedding_indices
 
     assert space.deterministic
@@ -849,6 +855,7 @@ def test_inst2vec_embedding_indices_observation_space(
     space = env.observation.spaces[key]
     assert isinstance(space.space, Sequence)
     value: List[int] = env.observation[key]
+    print(value)  # For debugging in case of error.
 
     print(value)
     assert isinstance(value, list)
@@ -868,6 +875,7 @@ def test_inst2vec_observation_space(
     space = env.observation.spaces[key]
     assert isinstance(space.space, Sequence)
     value: np.ndarray = env.observation[key]
+    print(value)  # For debugging in case of error.
 
     assert isinstance(value, np.ndarray)
     assert value.dtype == np.float32
@@ -896,6 +904,7 @@ def test_ir_instruction_count_observation_spaces(env: LlvmEnv):
     assert space.deterministic
     assert not space.platform_dependent
     value: int = env.observation[key]
+    print(value)  # For debugging in case of error.
     assert isinstance(value, int)
     assert value == 242
 
@@ -905,6 +914,7 @@ def test_ir_instruction_count_observation_spaces(env: LlvmEnv):
     assert space.deterministic
     assert not space.platform_dependent
     value: int = env.observation[key]
+    print(value)  # For debugging in case of error.
     assert isinstance(value, int)
     assert value == 242
 
@@ -914,6 +924,7 @@ def test_ir_instruction_count_observation_spaces(env: LlvmEnv):
     assert space.deterministic
     assert not space.platform_dependent
     value: int = env.observation[key]
+    print(value)  # For debugging in case of error.
     assert isinstance(value, int)
     assert value == 164
 
@@ -923,6 +934,7 @@ def test_ir_instruction_count_observation_spaces(env: LlvmEnv):
     assert space.deterministic
     assert not space.platform_dependent
     value: int = env.observation[key]
+    print(value)  # For debugging in case of error.
     assert isinstance(value, int)
     assert value == 114
 
@@ -939,6 +951,7 @@ def test_object_text_size_observation_spaces(env: LlvmEnv):
     assert space.deterministic
     assert space.platform_dependent
     value: int = env.observation[key]
+    print(value)  # For debugging in case of error.
     assert isinstance(value, int)
     assert value == crc32_code_sizes[sys.platform][0]
 
@@ -948,6 +961,7 @@ def test_object_text_size_observation_spaces(env: LlvmEnv):
     assert space.deterministic
     assert space.platform_dependent
     value: int = env.observation[key]
+    print(value)  # For debugging in case of error.
     assert isinstance(value, int)
     assert value == crc32_code_sizes[sys.platform][0]
 
@@ -957,6 +971,7 @@ def test_object_text_size_observation_spaces(env: LlvmEnv):
     assert space.deterministic
     assert space.platform_dependent
     value: int = env.observation[key]
+    print(value)  # For debugging in case of error.
     assert isinstance(value, int)
     assert value == crc32_code_sizes[sys.platform][1]
 
@@ -966,6 +981,7 @@ def test_object_text_size_observation_spaces(env: LlvmEnv):
     assert space.deterministic
     assert space.platform_dependent
     value: int = env.observation[key]
+    print(value)  # For debugging in case of error.
     assert isinstance(value, int)
     assert value == crc32_code_sizes[sys.platform][2]
 
