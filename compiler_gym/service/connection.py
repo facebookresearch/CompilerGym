@@ -303,9 +303,14 @@ class ManagedConnection(Connection):
                 shutil.rmtree(self.working_dir)
                 raise ServiceError(f"Service terminated with returncode: {returncode}")
             if port_path.is_file():
-                with open(port_path) as f:
-                    self.port = int(f.read().rstrip())
-                break
+                try:
+                    with open(port_path) as f:
+                        self.port = int(f.read().rstrip())
+                    break
+                except ValueError:
+                    # ValueError is raised by int(...) on invalid input. In that
+                    # case, wait for longer.
+                    pass
             sleep(wait_secs)
             wait_secs *= 1.2
         else:
