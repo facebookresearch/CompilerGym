@@ -42,7 +42,6 @@ int createAndRunService(const boost::filesystem::path& workingDirectory,
   // Start the server.
   std::unique_ptr<grpc::Server> server(builder.BuildAndStart());
   CHECK(server) << "Failed to build RPC service";
-  LOG(INFO) << "LLVM service listening on " << port;
 
   {
     // Write the port to a <working_dir>/port.txt file, which an external
@@ -53,7 +52,6 @@ int createAndRunService(const boost::filesystem::path& workingDirectory,
     out << std::to_string(port) << std::endl;
     out.close();
     boost::filesystem::rename(portPath.string() + ".tmp", portPath);
-    LOG(INFO) << "Wrote " << portPath.string();
   }
 
   {
@@ -65,6 +63,8 @@ int createAndRunService(const boost::filesystem::path& workingDirectory,
     out << std::to_string(getpid()) << std::endl;
     out.close();
   }
+
+  LOG(INFO) << "Service " << workingDirectory << " listening on " << port << ", PID = " << getpid();
 
   server->Wait();
   return 0;
