@@ -13,6 +13,7 @@ py_library(
         "debug_util.py",
         "download.py",
         "logs.py",
+        "minimize_trajectory.py",
         "registration.py",
         "runfiles_path.py",
         "shell_format.py",
