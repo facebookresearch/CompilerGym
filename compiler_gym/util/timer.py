@@ -50,17 +50,25 @@ class Timer(object):
     def __init__(
         self, label: Optional[str] = None, print_fn: Callable[[str], None] = print
     ):
-        self.time = None
+        self._start_time = None
+        self._elapsed = None
         self.label = label
         self.print_fn = print_fn
 
     def __enter__(self):
-        self.time = time()
+        self._start_time = time()
         return self
+
+    @property
+    def time(self) -> float:
+        if self._elapsed:
+            return self._elapsed
+        else:
+            return time() - self._start_time
 
     @skip_log_prefix
     def __exit__(self, *args):
-        self.time = time() - self.time
+        self._elapsed = time() - self._start_time
         if self.label:
             self.print_fn(f"{self.label} in {self}")
 
