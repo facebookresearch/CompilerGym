@@ -7,14 +7,12 @@ import logging
 import os
 import sys
 import warnings
-from collections.abc import Iterable
+from collections.abc import Iterable as IterableType
 from copy import deepcopy
 from math import isclose
 from pathlib import Path
 from time import time
-from typing import Any, Callable, Dict
-from typing import Iterable as IterableT
-from typing import List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 
 import fasteners
 import gym
@@ -712,7 +710,7 @@ class CompilerEnv(gym.Env):
         if self.observation_space:
             return self.observation[self.observation_space.id]
 
-    def step(self, action: Union[int, IterableT[int]]) -> step_t:
+    def step(self, action: Union[int, Iterable[int]]) -> step_t:
         """Take a step.
 
         :param action: An action, or a sequence of actions. When multiple
@@ -724,7 +722,7 @@ class CompilerEnv(gym.Env):
             service failed).
         """
         assert self.in_episode, "Must call reset() before step()"
-        actions = action if isinstance(action, Iterable) else [action]
+        actions = action if isinstance(action, IterableType) else [action]
         observation, reward = None, None
 
         # Build the list of observations that must be computed by the backend
