@@ -60,6 +60,7 @@ Else if validation fails, the output is:
 import json
 import re
 import sys
+from typing import Iterable
 
 import numpy as np
 from absl import app, flags
@@ -133,20 +134,22 @@ def stdev(values):
     return np.std(values or [0])
 
 
+def read_states_from_paths(paths: Iterable[str]) -> Iterable[CompilerEnvState]:
+    for path in paths:
+        if path == "-":
+            yield from CompilerEnvState.read_csv_file(sys.stdin)
+        else:
+            with open(path) as f:
+                yield from CompilerEnvState.read_csv_file(f)
+
+
 def main(argv):
     """Main entry point."""
-    # Parse the input states from the user.
-    states = []
-    for path in argv[1:]:
-        try:
-            if path == "-":
-                states += list(CompilerEnvState.read_csv_file(sys.stdin))
-            else:
-                with open(path) as f:
-                    states += list(CompilerEnvState.read_csv_file(f))
-        except ValueError as e:
-            print(e, file=sys.stderr)
-            sys.exit(1)
+    try:
+        states = list(read_states_from_paths(argv[1:]))
+    except ValueError as e:
+        print(e, file=sys.stderr)
+        sys.exit(1)
 
     if not states:
         print(
