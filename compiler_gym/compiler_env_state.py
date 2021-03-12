@@ -35,6 +35,11 @@ class CompilerEnvState(NamedTuple):
     reward: Optional[float] = None
     """The cumulative reward for this episode."""
 
+    @property
+    def has_reward(self) -> bool:
+        """Return whether the state has a reward value."""
+        return self.reward is not None
+
     @staticmethod
     def csv_header() -> str:
         """Return the header string for the CSV-format.
@@ -101,10 +106,8 @@ class CompilerEnvState(NamedTuple):
         if not isinstance(rhs, CompilerEnvState):
             return False
         epsilon = 1e-5
-        # If only one benchmark has a reward the states cannot be equal.
-        if (self.reward is None) != (rhs.reward is None):
-            return False
-        if (self.reward is None) and (rhs.reward is None):
+        # Only compare reward if both states have it.
+        if not (self.has_reward and rhs.has_reward):
             reward_equal = True
         else:
             reward_equal = abs(self.reward - rhs.reward) < epsilon
