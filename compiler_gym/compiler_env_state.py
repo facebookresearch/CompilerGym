@@ -91,6 +91,9 @@ class CompilerEnvState(NamedTuple):
         :returns: A generator of :class:`CompilerEnvState` instances.
         :raises ValueError: If input parsing fails.
         """
+        # TODO(cummins): Check schema of DictReader and, on failure, fallback
+        # to from_csv() per-line.
+        # TODO(cummins): Accept a URL for in_file and read from web.
         data = in_file.readlines()
         for line in csv.DictReader(data):
             try:
