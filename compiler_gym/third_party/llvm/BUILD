@@ -20,6 +20,12 @@ filegroup(
 )
 
 filegroup(
+    name = "lli",
+    srcs = ["bin/lli"],
+    visibility = ["//visibility:public"],
+)
+
+filegroup(
     name = "llvm-diff",
     srcs = ["bin/llvm-diff"],
     visibility = ["//visibility:public"],
@@ -60,6 +66,20 @@ genrule(
         ],
     }),
     outs = ["bin/clang"],
+    cmd = "mkdir -p $$(dirname $@) && cp $< $@",
+)
+
+genrule(
+    name = "make_lli",
+    srcs = select({
+        "@llvm//:darwin": [
+            "@clang-llvm-10.0.0-x86_64-apple-darwin//:lli",
+        ],
+        "//conditions:default": [
+            "@clang-llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04//:lli",
+        ],
+    }),
+    outs = ["bin/lli"],
     cmd = "mkdir -p $$(dirname $@) && cp $< $@",
 )
 

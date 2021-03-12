@@ -77,7 +77,7 @@ benchmark://cBench-v1/crc32,0.5,opt  input.bc -o output.bc,0.3
             main(["argv0", "-"])
 
     assert (
-        "❌  cBench-v1/crc32  Expected reward 0.5000 but received reward 0.0000\n"
+        "❌  cBench-v1/crc32  Expected reward 0.5 but received reward 0.0\n"
         in out.stdout
     )
     assert not out.stderr

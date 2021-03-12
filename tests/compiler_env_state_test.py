@@ -76,5 +76,53 @@ def test_state_from_json_empty():
         CompilerEnvState.from_json({})
 
 
+def test_state_equality_different_types():
+    state = CompilerEnvState(benchmark="foo", walltime=10, commandline="-a -b -c")
+    assert not state == 5  # noqa testing __eq__
+    assert state != 5  # testing __ne__
+
+
+def test_state_equality_same():
+    a = CompilerEnvState(benchmark="foo", walltime=10, commandline="-a -b -c")
+    b = CompilerEnvState(benchmark="foo", walltime=10, commandline="-a -b -c")
+    assert a == b  # testing __eq__
+    assert not a != b  # noqa testing __ne__
+
+
+def test_state_equality_differnt_walltime():
+    """Test that walltime is not compared."""
+    a = CompilerEnvState(benchmark="foo", walltime=10, commandline="-a -b -c")
+    b = CompilerEnvState(benchmark="foo", walltime=5, commandline="-a -b -c")
+    assert a == b  # testing __eq__
+    assert not a != b  # noqa testing __ne__
+
+
+def test_state_equality_one_sided_reward():
+    a = CompilerEnvState(benchmark="foo", walltime=5, commandline="-a -b -c", reward=2)
+    b = CompilerEnvState(benchmark="foo", walltime=5, commandline="-a -b -c")
+    assert a == b  # testing __eq__
+    assert b == a  # testing __eq__
+    assert not a != b  # noqa testing __ne__
+    assert not b != a  # noqa testing __ne__
+
+
+def test_state_equality_equal_reward():
+    a = CompilerEnvState(benchmark="foo", walltime=5, commandline="-a -b -c", reward=2)
+    b = CompilerEnvState(benchmark="foo", walltime=5, commandline="-a -b -c", reward=2)
+    assert a == b  # testing __eq__
+    assert b == a  # testing __eq__
+    assert not a != b  # noqa testing __ne__
+    assert not b != a  # noqa testing __ne__
+
+
+def test_state_equality_unequal_reward():
+    a = CompilerEnvState(benchmark="foo", walltime=5, commandline="-a -b -c", reward=2)
+    b = CompilerEnvState(benchmark="foo", walltime=5, commandline="-a -b -c", reward=3)
+    assert not a == b  # noqa testing __eq__
+    assert not b == a  # noqatesting __eq__
+    assert a != b  # testing __ne__
+    assert b != a  # testing __ne__
+
+
 if __name__ == "__main__":
     main()

@@ -85,6 +85,15 @@ py_test(
 )
 
 py_test(
+    name = "validation_result_test",
+    srcs = ["validation_result_test.py"],
+    deps = [
+        ":test_main",
+        "//compiler_gym",
+    ],
+)
+
+py_test(
     name = "version_test",
     timeout = "short",
     srcs = ["version_test.py"],

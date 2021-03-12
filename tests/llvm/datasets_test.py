@@ -17,17 +17,13 @@ pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.llvm"]
 def test_validate_sha_output_okay():
     output = datasets.BenchmarkExecutionResult(
         walltime_seconds=0,
-        output="1234567890abcdef 1234567890abcd 1234567890abc 1234567890 12345".encode(
-            "utf-8"
-        ),
+        output="1234567890abcdef 1234567890abcd 1234567890abc 1234567890 12345",
     )
     assert datasets.validate_sha_output(output) is None
 
 
 def test_validate_sha_output_invalid():
-    output = datasets.BenchmarkExecutionResult(
-        walltime_seconds=0, output="abcd".encode("utf-8")
-    )
+    output = datasets.BenchmarkExecutionResult(walltime_seconds=0, output="abcd")
     assert datasets.validate_sha_output(output)
 
 
