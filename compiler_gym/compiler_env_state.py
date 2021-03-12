@@ -119,3 +119,6 @@ class CompilerEnvState(NamedTuple):
             and reward_equal
             and self.commandline == rhs.commandline
         )
+
+    def __ne__(self, rhs) -> bool:
+        return not self == rhs
