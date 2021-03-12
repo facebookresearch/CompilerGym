@@ -19,6 +19,7 @@ py_library(
         "statistics.py",
         "tabulate.py",
         "temporary_working_directory.py",
+        "thread_pool.py",
         "timer.py",
         "truncate.py",
         "user_input.py",
