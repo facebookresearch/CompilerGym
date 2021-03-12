@@ -991,12 +991,11 @@ class CompilerEnv(gym.Env):
             )
 
         actions = self.commandline_to_actions(state.commandline)
-        for action in actions:
-            _, _, done, info = self.step(action)
-            if done:
-                raise ValueError(
-                    f"Environment terminated with error: `{info.get('error_details')}`"
-                )
+        _, _, done, info = self.step(actions)
+        if done:
+            raise ValueError(
+                f"Environment terminated with error: `{info.get('error_details')}`"
+            )
 
     def validate(self, state: Optional[CompilerEnvState] = None) -> ValidationResult:
         in_place = state is not None
