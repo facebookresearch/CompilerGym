@@ -52,6 +52,15 @@ LLVM_DATASETS = [
         size_bytes=3969036,
         sha256="e724a8114709f8480adeb9873d48e426e8d9444b00cddce48e342b9f0f2b096d",
     ),
+    # The difference between cBench-v0 and cBench-v1 is the arguments passed to
+    # clang when preparing the LLVM bitcodes:
+    #
+    #   - v0: `-O0 -Xclang -disable-O0-optnone`.
+    #   - v1: `-O1 -Xclang -Xclang -disable-llvm-passes`.
+    #
+    # The key difference with is that in v0, the generated IR functions were
+    # annotated with a `noinline` attribute that prevented inline. In v1 that is
+    # no longer the case.
     Dataset(
         name="cBench-v0",
         url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v0-macos.tar.bz2",
