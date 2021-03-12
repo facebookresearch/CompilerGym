@@ -681,8 +681,9 @@ class CompilerEnv(gym.Env):
                     ),
                 ),
             )
-        except (ServiceError, ServiceTransportError):
+        except (ServiceError, ServiceTransportError, TimeoutError) as e:
             # Abort and retry on error.
+            self.logger.warning("%s on reset(): %s", type(e).__name__, e)
             self.service.close()
             self.service = None
             return self.reset(
