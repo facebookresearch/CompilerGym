@@ -74,7 +74,7 @@ class CompilerEnvState(NamedTuple):
         return cls(
             benchmark=benchmark,
             reward=None if reward == "" else float(reward),
-            walltime=float(walltime),
+            walltime=0 if walltime == "" else float(walltime),
             commandline=commandline,
         )
 
