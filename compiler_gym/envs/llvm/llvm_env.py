@@ -240,9 +240,9 @@ class LlvmEnv(CompilerEnv):
         except FileNotFoundError:
             self.logger.warning(
                 "reset() called on servie with no benchmarks available. "
-                "Installing cBench-v0"
+                "Installing cBench-v1"
             )
-            self.require_dataset("cBench-v0")
+            self.require_dataset("cBench-v1")
             super().reset(*args, **kwargs)
 
     @staticmethod

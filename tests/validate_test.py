@@ -11,7 +11,7 @@ from tests.test_main import main
 
 def test_validate_states_lambda_callback():
     state = CompilerEnvState(
-        benchmark="cBench-v0/crc32",
+        benchmark="cBench-v1/crc32",
         walltime=1,
         commandline="opt  input.bc -o output.bc",
     )

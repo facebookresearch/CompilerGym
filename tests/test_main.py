@@ -44,7 +44,7 @@ def main(extra_pytest_args: Optional[List[str]] = None, debug_level: int = 3):
     # reset() will fail.
     env = gym.make("llvm-v0")
     try:
-        env.require_dataset("cBench-v0")
+        env.require_dataset("cBench-v1")
     finally:
         env.close()
 

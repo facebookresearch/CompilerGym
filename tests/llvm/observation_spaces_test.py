@@ -34,7 +34,7 @@ def test_default_observation_space(env: LlvmEnv):
 
 
 def test_observation_spaces(env: LlvmEnv):
-    env.reset("cBench-v0/crc32")
+    env.reset("cBench-v1/crc32")
 
     assert set(env.observation.spaces.keys()) == {
         "Ir",
@@ -58,7 +58,7 @@ def test_observation_spaces(env: LlvmEnv):
 
 
 def test_ir_observation_space(env: LlvmEnv):
-    env.reset("cBench-v0/crc32")
+    env.reset("cBench-v1/crc32")
     key = "Ir"
     space = env.observation.spaces[key]
     assert isinstance(space.space, Sequence)
@@ -74,7 +74,7 @@ def test_ir_observation_space(env: LlvmEnv):
 
 
 def test_bitcode_observation_space(env: LlvmEnv):
-    env.reset("cBench-v0/crc32")
+    env.reset("cBench-v1/crc32")
     key = "BitcodeFile"
     space = env.observation.spaces[key]
     assert isinstance(space.space, Sequence)
@@ -94,7 +94,7 @@ def test_bitcode_observation_space(env: LlvmEnv):
 
 
 def test_autophase_observation_space(env: LlvmEnv):
-    env.reset("cBench-v0/crc32")
+    env.reset("cBench-v1/crc32")
     key = "Autophase"
     space = env.observation.spaces[key]
     assert isinstance(space.space, Box)
@@ -128,21 +128,21 @@ def test_autophase_observation_space(env: LlvmEnv):
             9,
             2,
             32,
-            38,
-            21,
+            44,
+            41,
             14,
-            30,
+            36,
             16,
             13,
             0,
             5,
-            24,
-            3,
-            3,
             26,
-            0,
+            3,
+            5,
             24,
-            13,
+            20,
+            24,
+            33,
             5,
             10,
             3,
@@ -154,17 +154,17 @@ def test_autophase_observation_space(env: LlvmEnv):
             0,
             0,
             0,
-            38,
+            42,
             0,
             1,
             8,
             5,
             29,
-            196,
-            131,
-            13,
+            242,
+            157,
+            15,
             0,
-            81,
+            103,
         ],
     )
 
@@ -172,7 +172,7 @@ def test_autophase_observation_space(env: LlvmEnv):
 
 
 def test_autophase_dict_observation_space(env: LlvmEnv):
-    env.reset("cBench-v0/crc32")
+    env.reset("cBench-v1/crc32")
     key = "AutophaseDict"
     space = env.observation.spaces[key]
     assert isinstance(space.space, DictSpace)
@@ -184,15 +184,15 @@ def test_autophase_dict_observation_space(env: LlvmEnv):
 
 
 def test_programl_observation_space(env: LlvmEnv):
-    env.reset("cBench-v0/crc32")
+    env.reset("cBench-v1/crc32")
     key = "Programl"
     space = env.observation.spaces[key]
     assert isinstance(space.space, Sequence)
     graph: nx.MultiDiGraph = env.observation[key]
     assert isinstance(graph, nx.MultiDiGraph)
 
-    assert graph.number_of_nodes() == 419
-    assert graph.number_of_edges() == 703
+    assert graph.number_of_nodes() == 512
+    assert graph.number_of_edges() == 907
     assert graph.nodes[0] == {
         "block": 0,
         "function": 0,
@@ -205,7 +205,7 @@ def test_programl_observation_space(env: LlvmEnv):
 
 
 def test_cpuinfo_observation_space(env: LlvmEnv):
-    env.reset("cBench-v0/crc32")
+    env.reset("cBench-v1/crc32")
     key = "CpuInfo"
     space = env.observation.spaces[key]
     assert isinstance(space.space, DictSpace)
@@ -238,7 +238,7 @@ def test_cpuinfo_observation_space(env: LlvmEnv):
 
 @pytest.fixture
 def cbench_crc32_inst2vec_embedding_indices() -> List[int]:
-    """The expected inst2vec embedding indices for cBench-v0/crc32."""
+    """The expected inst2vec embedding indices for cBench-v1/crc32."""
     # The linux/macOS builds of clang produce slightly different bitcodes.
     if sys.platform.lower().startswith("linux"):
         return [
@@ -277,9 +277,16 @@ def cbench_crc32_inst2vec_embedding_indices() -> List[int]:
             8564,
             178,
             289,
+            289,
             200,
             1412,
             1412,
+            8564,
+            3032,
+            180,
+            3032,
+            293,
+            3032,
             205,
             415,
             205,
@@ -291,6 +298,7 @@ def cbench_crc32_inst2vec_embedding_indices() -> List[int]:
             8564,
             213,
             215,
+            364,
             364,
             216,
             8564,
@@ -339,8 +347,15 @@ def cbench_crc32_inst2vec_embedding_indices() -> List[int]:
             415,
             214,
             364,
+            364,
             216,
             8564,
+            293,
+            3032,
+            180,
+            3032,
+            8564,
+            3032,
             295,
             257,
             8564,
@@ -349,6 +364,8 @@ def cbench_crc32_inst2vec_embedding_indices() -> List[int]:
             178,
             200,
             214,
+            180,
+            3032,
             205,
             216,
             8564,
@@ -380,6 +397,8 @@ def cbench_crc32_inst2vec_embedding_indices() -> List[int]:
             8564,
             182,
             961,
+            180,
+            3032,
             2298,
             8564,
             289,
@@ -391,6 +410,12 @@ def cbench_crc32_inst2vec_embedding_indices() -> List[int]:
             311,
             594,
             311,
+            180,
+            3032,
+            180,
+            3032,
+            293,
+            3032,
             364,
             216,
             8564,
@@ -424,6 +449,12 @@ def cbench_crc32_inst2vec_embedding_indices() -> List[int]:
             295,
             634,
             612,
+            293,
+            3032,
+            180,
+            3032,
+            180,
+            3032,
             257,
             8564,
             289,
@@ -432,10 +463,17 @@ def cbench_crc32_inst2vec_embedding_indices() -> List[int]:
             8564,
             178,
             178,
+            289,
             364,
             311,
             594,
             8564,
+            3032,
+            8564,
+            180,
+            3032,
+            180,
+            3032,
             8564,
             8564,
             8564,
@@ -443,6 +481,7 @@ def cbench_crc32_inst2vec_embedding_indices() -> List[int]:
             8564,
             8564,
             8564,
+            364,
             364,
             216,
             8564,
@@ -474,8 +513,15 @@ def cbench_crc32_inst2vec_embedding_indices() -> List[int]:
             216,
             8564,
             364,
+            364,
             216,
             8564,
+            180,
+            3032,
+            180,
+            3032,
+            8564,
+            3032,
             295,
             257,
         ]
@@ -514,9 +560,16 @@ def cbench_crc32_inst2vec_embedding_indices() -> List[int]:
             8564,
             178,
             289,
+            289,
             200,
             1412,
             1412,
+            8564,
+            3032,
+            180,
+            3032,
+            293,
+            3032,
             205,
             415,
             205,
@@ -528,6 +581,7 @@ def cbench_crc32_inst2vec_embedding_indices() -> List[int]:
             8564,
             213,
             215,
+            364,
             364,
             216,
             8564,
@@ -576,8 +630,15 @@ def cbench_crc32_inst2vec_embedding_indices() -> List[int]:
             415,
             214,
             364,
+            364,
             216,
             8564,
+            293,
+            3032,
+            180,
+            3032,
+            8564,
+            3032,
             295,
             257,
             8564,
@@ -586,6 +647,8 @@ def cbench_crc32_inst2vec_embedding_indices() -> List[int]:
             178,
             200,
             214,
+            180,
+            3032,
             205,
             216,
             8564,
@@ -617,6 +680,8 @@ def cbench_crc32_inst2vec_embedding_indices() -> List[int]:
             8564,
             182,
             961,
+            180,
+            3032,
             2298,
             8564,
             289,
@@ -628,6 +693,12 @@ def cbench_crc32_inst2vec_embedding_indices() -> List[int]:
             311,
             594,
             311,
+            180,
+            3032,
+            180,
+            3032,
+            293,
+            3032,
             364,
             216,
             8564,
@@ -661,6 +732,12 @@ def cbench_crc32_inst2vec_embedding_indices() -> List[int]:
             295,
             634,
             612,
+            293,
+            3032,
+            180,
+            3032,
+            180,
+            3032,
             257,
             8564,
             289,
@@ -669,10 +746,17 @@ def cbench_crc32_inst2vec_embedding_indices() -> List[int]:
             8564,
             178,
             178,
+            289,
             364,
             311,
             594,
             8564,
+            3032,
+            8564,
+            180,
+            3032,
+            180,
+            3032,
             8564,
             8564,
             5666,
@@ -680,6 +764,7 @@ def cbench_crc32_inst2vec_embedding_indices() -> List[int]:
             8564,
             5391,
             8564,
+            364,
             364,
             216,
             8564,
@@ -711,8 +796,15 @@ def cbench_crc32_inst2vec_embedding_indices() -> List[int]:
             216,
             8564,
             364,
+            364,
             216,
             8564,
+            180,
+            3032,
+            180,
+            3032,
+            8564,
+            3032,
             295,
             257,
         ]
@@ -723,7 +815,7 @@ def cbench_crc32_inst2vec_embedding_indices() -> List[int]:
 def test_inst2vec_preprocessed_observation_space(
     env: LlvmEnv, cbench_crc32_inst2vec_embedding_indices: List[int]
 ):
-    env.reset("cBench-v0/crc32")
+    env.reset("cBench-v1/crc32")
     key = "Inst2vecPreprocessedText"
     space = env.observation.spaces[key]
     assert isinstance(space.space, Sequence)
@@ -743,7 +835,7 @@ def test_inst2vec_preprocessed_observation_space(
 def test_inst2vec_embedding_indices_observation_space(
     env: LlvmEnv, cbench_crc32_inst2vec_embedding_indices: List[int]
 ):
-    env.reset("cBench-v0/crc32")
+    env.reset("cBench-v1/crc32")
     key = "Inst2vecEmbeddingIndices"
     space = env.observation.spaces[key]
     assert isinstance(space.space, Sequence)
@@ -762,7 +854,7 @@ def test_inst2vec_embedding_indices_observation_space(
 def test_inst2vec_observation_space(
     env: LlvmEnv, cbench_crc32_inst2vec_embedding_indices: List[int]
 ):
-    env.reset("cBench-v0/crc32")
+    env.reset("cBench-v1/crc32")
     key = "Inst2vec"
     space = env.observation.spaces[key]
     assert isinstance(space.space, Sequence)
@@ -787,7 +879,7 @@ def test_inst2vec_observation_space(
 
 
 def test_ir_instruction_count_observation_spaces(env: LlvmEnv):
-    env.reset("cBench-v0/crc32")
+    env.reset("cBench-v1/crc32")
 
     key = "IrInstructionCount"
     space = env.observation.spaces[key]
@@ -796,7 +888,7 @@ def test_ir_instruction_count_observation_spaces(env: LlvmEnv):
     assert not space.platform_dependent
     value: int = env.observation[key]
     assert isinstance(value, int)
-    assert value == 196
+    assert value == 242
 
     key = "IrInstructionCountO0"
     space = env.observation.spaces[key]
@@ -805,7 +897,7 @@ def test_ir_instruction_count_observation_spaces(env: LlvmEnv):
     assert not space.platform_dependent
     value: int = env.observation[key]
     assert isinstance(value, int)
-    assert value == 196
+    assert value == 242
 
     key = "IrInstructionCountO3"
     space = env.observation.spaces[key]
@@ -814,7 +906,7 @@ def test_ir_instruction_count_observation_spaces(env: LlvmEnv):
     assert not space.platform_dependent
     value: int = env.observation[key]
     assert isinstance(value, int)
-    assert value == 125
+    assert value == 164
 
     key = "IrInstructionCountOz"
     space = env.observation.spaces[key]
@@ -823,17 +915,14 @@ def test_ir_instruction_count_observation_spaces(env: LlvmEnv):
     assert not space.platform_dependent
     value: int = env.observation[key]
     assert isinstance(value, int)
-    assert value == 105
+    assert value == 114
 
 
 def test_object_text_size_observation_spaces(env: LlvmEnv):
-    env.reset("cBench-v0/crc32")
+    env.reset("cBench-v1/crc32")
 
     # Expected .text sizes for this benchmark: -O0, -O3, -Oz.
-    crc32_code_sizes = {"darwin": [1141, 3502, 3265], "linux": [1111, 3480, 3251]}
-    print("ObjectTextSizeO0", env.observation["ObjectTextSizeO0"])
-    print("ObjectTextSizeO3", env.observation["ObjectTextSizeO3"])
-    print("ObjectTextSizeOz", env.observation["ObjectTextSizeOz"])
+    crc32_code_sizes = {"darwin": [1171, 3825, 3289], "linux": [1183, 3961, 3286]}
 
     key = "ObjectTextSizeBytes"
     space = env.observation.spaces[key]

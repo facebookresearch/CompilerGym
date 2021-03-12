@@ -58,7 +58,7 @@ flags.DEFINE_list(
     "List of optimizatins to explore.",
 )
 flags.DEFINE_string("reward", "IrInstructionCount", "The reward function to optimize.")
-flags.DEFINE_string("benchmark", "cBench-v0/dijkstra", "Benchmark to optimize.")
+flags.DEFINE_string("benchmark", "cBench-v1/dijkstra", "Benchmark to optimize.")
 flags.DEFINE_integer("episode_len", 5, "Number of transitions per episode.")
 flags.DEFINE_integer("hidden_size", 64, "Latent vector size.")
 flags.DEFINE_integer("episodes", 1000, "Number of episodes to run and train on.")
@@ -119,7 +119,7 @@ class CustomEnv:
     def __init__(self):
         self._env = gym.make("llvm-v0", reward_space=FLAGS.reward)
         try:
-            self._env.require_dataset("cBench-v0")
+            self._env.require_dataset("cBench-v1")
             self._env.reset(benchmark=FLAGS.benchmark)
 
             # Project onto the subset of transformations that have

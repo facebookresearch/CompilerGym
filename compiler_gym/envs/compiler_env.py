@@ -407,7 +407,7 @@ class CompilerEnv(gym.Env):
         elif isinstance(benchmark, str):
             self.logger.debug("Setting benchmark by name: %s", benchmark)
             # If the user requested a benchmark by URI, e.g.
-            # benchmark://cBench-v0/dijkstra, require the dataset (cBench-v0)
+            # benchmark://cBench-v1/dijkstra, require the dataset (cBench-v1)
             # automatically.
             if self.datasets_site_path:
                 components = benchmark.split("://")
