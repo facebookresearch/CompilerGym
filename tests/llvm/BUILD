@@ -221,10 +221,10 @@ py_test(
 py_test(
     name = "validation_regression_test",
     srcs = ["validation_regression_test.py"],
+    shard_count = 4,
     deps = [
         "//compiler_gym",
         "//tests:test_main",
-        "//tests/pytest_plugins:common",
         "//tests/pytest_plugins:llvm",
     ],
 )

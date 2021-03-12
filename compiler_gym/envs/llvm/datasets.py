@@ -16,6 +16,7 @@ import tempfile
 from collections import defaultdict
 from concurrent.futures import as_completed
 from pathlib import Path
+from threading import Lock
 from typing import Callable, Dict, Iterable, List, NamedTuple, Optional
 
 import fasteners
@@ -389,9 +390,16 @@ def download_cBench_runtime_data() -> bool:
         return True
 
 
+# Thread lock to prevent race on download_cBench_runtime_data() from
+# multi-threading. This works in tandem with the inter-process file lock - both
+# are required.
+_CBENCH_DOWNLOAD_THREAD_LOCK = Lock()
+
+
 def _make_cBench_validator(
     cmd: str,
     linkopts: List[str],
+    os_env: Dict[str, str],
     num_runs: int = 1,
     compare_output: bool = True,
     input_files: Optional[List[Path]] = None,
@@ -408,18 +416,20 @@ def _make_cBench_validator(
 
     def validator_cb(env):
         """The validation callback."""
+        with _CBENCH_DOWNLOAD_THREAD_LOCK:
+            download_cBench_runtime_data()
+
         for path in input_files:
             if not path.is_file():
                 raise FileNotFoundError(f"Required benchmark input not found: {path}")
 
-        # Expand shell variable substitutions in the benchmark command.
-        expanded_command = cmd.replace("$BIN", "./a.out").replace(
-            "$D", str(_CBENCH_DATA)
-        )
-
         # Create a temporary working directory to execute the benchmark in.
         with tempfile.TemporaryDirectory(dir=env.service.connection.working_dir) as d:
             cwd = Path(d)
+
+            # Expand shell variable substitutions in the benchmark command.
+            expanded_command = cmd.replace("$D", str(_CBENCH_DATA))
+
             # Translate the output file names into paths inside the working
             # directory.
             output_paths = [cwd / o for o in output_files]
@@ -440,8 +450,12 @@ def _make_cBench_validator(
                         cmd=expanded_command,
                         cwd=cwd,
                         num_runs=1,
-                        linkopts=linkopts,
+                        # Use default optimizations for gold standard.
+                        linkopts=linkopts + ["-O2"],
+                        # Always assume safe.
+                        sanitizer=None,
                         logger=env.logger,
+                        env=os_env,
                     )
                     if gold_standard.error:
                         return ValidationError(
@@ -478,6 +492,7 @@ def _make_cBench_validator(
                 linkopts=linkopts,
                 sanitizer=sanitizer,
                 logger=env.logger,
+                env=os_env,
             )
 
             if outcome.error:
@@ -539,8 +554,10 @@ def validator(
     validate_result: Optional[
         Callable[[BenchmarkExecutionResult], Optional[str]]
     ] = None,
-    linkopts: List[str] = None,
+    linkopts: Optional[List[str]] = None,
+    env: Optional[Dict[str, str]] = None,
     pre_execution_callback: Optional[Callable[[], None]] = None,
+    sanitizers: Optional[List[LlvmSanitizer]] = None,
 ) -> bool:
     """Declare a new benchmark validator.
 
@@ -561,6 +578,9 @@ def validator(
     infiles = [_CBENCH_DATA / p for p in data or []]
     outfiles = [Path(p) for p in outs or []]
     linkopts = linkopts or []
+    env = env or {}
+    if sanitizers is None:
+        sanitizers = LlvmSanitizer
 
     VALIDATORS[benchmark].append(
         _make_cBench_validator(
@@ -570,13 +590,14 @@ def validator(
             compare_output=compare_output,
             validate_result=validate_result,
             linkopts=linkopts,
+            os_env=env,
             pre_execution_callback=pre_execution_callback,
         )
     )
 
     # Register additional validators using the sanitizers.
     if sys.platform.startswith("linux"):
-        for sanitizer in LlvmSanitizer:
+        for sanitizer in sanitizers:
             VALIDATORS[benchmark].append(
                 _make_cBench_validator(
                     cmd=cmd,
@@ -585,6 +606,7 @@ def validator(
                     compare_output=compare_output,
                     validate_result=validate_result,
                     linkopts=linkopts,
+                    os_env=env,
                     pre_execution_callback=pre_execution_callback,
                     sanitizer=sanitizer,
                 )
@@ -612,8 +634,6 @@ def get_llvm_benchmark_validation_callback(
         return None
 
     def composed(env):
-        download_cBench_runtime_data()
-
         # Validation callbacks are read-only on the environment so it is
         # safe to run validators simultaneously in parallel threads.
         executor = thread_pool.get_thread_pool_executor()
@@ -677,13 +697,16 @@ validator(
 )
 
 for i in range(1, 21):
-    # TODO(cummins): Investigate.
+
+    # NOTE(cummins): Disabled due to timeout errors, further investigation
+    # needed.
+    #
     # validator(
     #     benchmark="benchmark://cBench-v1/adpcm",
     #     cmd=f"$BIN $D/telecom_data/{i}.adpcm",
     #     data=[f"telecom_data/{i}.adpcm"],
     # )
-
+    #
     # validator(
     #     benchmark="benchmark://cBench-v1/adpcm",
     #     cmd=f"$BIN $D/telecom_data/{i}.pcm",
@@ -697,12 +720,11 @@ for i in range(1, 21):
         outs=["output.txt"],
     )
 
-    # TODO(cummins): Investigate.
-    # validator(
-    #     benchmark="benchmark://cBench-v1/bzip2",
-    #     cmd=f"$BIN -d -k -f -c $D/bzip2_data/{i}.bz2",
-    #     data=[f"bzip2_data/{i}.bz2"],
-    # )
+    validator(
+        benchmark="benchmark://cBench-v1/bzip2",
+        cmd=f"$BIN -d -k -f -c $D/bzip2_data/{i}.bz2",
+        data=[f"bzip2_data/{i}.bz2"],
+    )
 
     validator(
         benchmark="benchmark://cBench-v1/crc32",
@@ -716,40 +738,46 @@ for i in range(1, 21):
         data=[f"network_dijkstra_data/{i}.dat"],
     )
 
-    # TODO(cummins): Investigate.
-    # validator(
-    #     benchmark="benchmark://cBench-v1/gsm",
-    #     cmd=f"$BIN -fps -c $D/telecom_gsm_data/{i}.au",
-    #     data=[f"telecom_gsm_data/{i}.au"],
-    # )
+    validator(
+        benchmark="benchmark://cBench-v1/gsm",
+        cmd=f"$BIN -fps -c $D/telecom_gsm_data/{i}.au",
+        data=[f"telecom_gsm_data/{i}.au"],
+    )
 
-    # TODO(cummins): ispell executable appears broken. Investigation needed.
+    # NOTE(cummins): ispell fails with returncode 1 and no output when run
+    # under safe optimizations.
+    #
     # validator(
     #     benchmark="benchmark://cBench-v1/ispell",
     #     cmd=f"$BIN -a -d americanmed+ $D/office_data/{i}.txt",
     #     data = [f"office_data/{i}.txt"],
     # )
 
-    # TODO(cummins): Investigate.
-    # validator(
-    #     benchmark="benchmark://cBench-v1/jpeg-c",
-    #     cmd=f"$BIN -dct int -progressive -outfile output.jpeg $D/consumer_jpeg_data/{i}.ppm",
-    #     data=[f"consumer_jpeg_data/{i}.ppm"],
-    #     outs=["output.jpeg"],
-    # )
+    validator(
+        benchmark="benchmark://cBench-v1/jpeg-c",
+        cmd=f"$BIN -dct int -progressive -outfile output.jpeg $D/consumer_jpeg_data/{i}.ppm",
+        data=[f"consumer_jpeg_data/{i}.ppm"],
+        outs=["output.jpeg"],
+        # NOTE(cummins): AddressSanitizer disabled because of
+        # global-buffer-overflow in regular build.
+        sanitizers=[LlvmSanitizer.TSAN, LlvmSanitizer.UBSAN],
+    )
 
-    # TODO(cummins): Investigate.
-    # validator(
-    #     benchmark="benchmark://cBench-v1/jpeg-d",
-    #     cmd=f"$BIN -dct int -outfile output.ppm $D/consumer_jpeg_data/{i}.jpg",
-    #     data=[f"consumer_jpeg_data/{i}.jpg"],
-    #     outs=["output.ppm"],
-    # )
+    validator(
+        benchmark="benchmark://cBench-v1/jpeg-d",
+        cmd=f"$BIN -dct int -outfile output.ppm $D/consumer_jpeg_data/{i}.jpg",
+        data=[f"consumer_jpeg_data/{i}.jpg"],
+        outs=["output.ppm"],
+    )
 
     validator(
         benchmark="benchmark://cBench-v1/patricia",
         cmd=f"$BIN $D/network_patricia_data/{i}.udp",
         data=[f"network_patricia_data/{i}.udp"],
+        env={
+            # NOTE(cummins): Benchmark leaks when executed with safe optimizations.
+            "ASAN_OPTIONS": "detect_leaks=0",
+        },
     )
 
     validator(
@@ -760,12 +788,20 @@ for i in range(1, 21):
         linkopts=["-lm"],
     )
 
-    validator(
-        benchmark="benchmark://cBench-v1/rijndael",
-        cmd=f"$BIN $D/office_data/{i}.enc output.dec d 1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321",
-        data=[f"office_data/{i}.enc"],
-        outs=["output.dec"],
-    )
+    # NOTE(cummins): Rijndael benchmark disabled due to memory errors under
+    # basic optimizations.
+    #
+    # validator(benchmark="benchmark://cBench-v1/rijndael", cmd=f"$BIN
+    #     $D/office_data/{i}.enc output.dec d
+    #     1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321",
+    #     data=[f"office_data/{i}.enc"], outs=["output.dec"],
+    # )
+    #
+    # validator(benchmark="benchmark://cBench-v1/rijndael", cmd=f"$BIN
+    #     $D/office_data/{i}.txt output.enc e
+    #     1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321",
+    #     data=[f"office_data/{i}.txt"], outs=["output.enc"],
+    # )
 
     validator(
         benchmark="benchmark://cBench-v1/sha",
@@ -780,16 +816,30 @@ for i in range(1, 21):
         cmd=f"$BIN $D/office_data/{i}.txt $D/office_data/{i}.s.txt output.txt",
         data=[f"office_data/{i}.txt"],
         outs=["output.txt"],
+        env={
+            # NOTE(cummins): Benchmark leaks when executed with safe optimizations.
+            "ASAN_OPTIONS": "detect_leaks=0",
+        },
         linkopts=["-lm"],
     )
 
-    # TODO(cummins): Sporadic segfaults.
-    # validator(
-    #     benchmark="benchmark://cBench-v1/stringsearch2",
-    #     cmd=f"$BIN $D/office_data/{i}.txt $D/office_data/{i}.s.txt output.txt",
-    #     data=[f"office_data/{i}.txt"],
-    #     outs=["output.txt"],
-    # )
+    # NOTE(cummins): The stringsearch2 benchmark has a very long execution time.
+    # Use only a single input to keep the validation time reasonable. I have
+    # also observed Segmentation fault on gold standard using 4.txt and 6.txt.
+    if i == 1:
+        validator(
+            benchmark="benchmark://cBench-v1/stringsearch2",
+            cmd=f"$BIN $D/office_data/{i}.txt $D/office_data/{i}.s.txt output.txt",
+            data=[f"office_data/{i}.txt"],
+            outs=["output.txt"],
+            env={
+                # NOTE(cummins): Benchmark leaks when executed with safe optimizations.
+                "ASAN_OPTIONS": "detect_leaks=0",
+            },
+            # TSAN disabled because of extremely long execution leading to
+            # timeouts.
+            sanitizers=[LlvmSanitizer.ASAN, LlvmSanitizer.MSAN, LlvmSanitizer.UBSAN],
+        )
 
     validator(
         benchmark="benchmark://cBench-v1/susan",
@@ -799,60 +849,61 @@ for i in range(1, 21):
         linkopts=["-lm"],
     )
 
-    # TODO(cummins): Investigate.
-    # validator(
-    #     benchmark="benchmark://cBench-v1/tiff2bw",
-    #     cmd=f"$BIN $D/consumer_tiff_data/{i}.tif output.tif",
-    #     data=[f"consumer_tiff_data/{i}.tif"],
-    #     outs=["output.tif"],
-    #     linkopts=["-lm"],
-    # )
+    validator(
+        benchmark="benchmark://cBench-v1/tiff2bw",
+        cmd=f"$BIN $D/consumer_tiff_data/{i}.tif output.tif",
+        data=[f"consumer_tiff_data/{i}.tif"],
+        outs=["output.tif"],
+        linkopts=["-lm"],
+        env={
+            # NOTE(cummins): Benchmark leaks when executed with safe optimizations.
+            "ASAN_OPTIONS": "detect_leaks=0",
+        },
+    )
 
-    # TODO(cummins): Investigate.
-    # validator(
-    #     benchmark="benchmark://cBench-v1/tiff2rgba",
-    #     cmd=f"$BIN $D/consumer_tiff_data/{i}.tif output.tif",
-    #     data=[f"consumer_tiff_data/{i}.tif"],
-    #     outs=["output.tif"],
-    #     linkopts=["-lm"],
-    # )
+    validator(
+        benchmark="benchmark://cBench-v1/tiff2rgba",
+        cmd=f"$BIN $D/consumer_tiff_data/{i}.tif output.tif",
+        data=[f"consumer_tiff_data/{i}.tif"],
+        outs=["output.tif"],
+        linkopts=["-lm"],
+    )
 
-    # TODO(cummins): Investigate.
-    # validator(
-    #     benchmark="benchmark://cBench-v1/tiffdither",
-    #     cmd=f"$BIN $D/consumer_tiff_data/{i}.bw.tif out.tif",
-    #     data=[f"consumer_tiff_data/{i}.bw.tif"],
-    #     outs=["out.tif"],
-    #     linkopts=["-lm"],
-    # )
+    validator(
+        benchmark="benchmark://cBench-v1/tiffdither",
+        cmd=f"$BIN $D/consumer_tiff_data/{i}.bw.tif out.tif",
+        data=[f"consumer_tiff_data/{i}.bw.tif"],
+        outs=["out.tif"],
+        linkopts=["-lm"],
+    )
 
-    # TODO(cummins): Investigate.
-    # validator(
-    #     benchmark="benchmark://cBench-v1/tiffmedian",
-    #     cmd=f"$BIN $D/consumer_tiff_data/{i}.nocomp.tif output.tif",
-    #     data=[f"consumer_tiff_data/{i}.nocomp.tif"],
-    #     outs=["output.tif"],
-    #     linkopts=["-lm"],
-    # )
+    validator(
+        benchmark="benchmark://cBench-v1/tiffmedian",
+        cmd=f"$BIN $D/consumer_tiff_data/{i}.nocomp.tif output.tif",
+        data=[f"consumer_tiff_data/{i}.nocomp.tif"],
+        outs=["output.tif"],
+        linkopts=["-lm"],
+    )
 
     # NOTE(cummins): On macOS the following benchmarks abort with an illegal
     # hardware instruction error.
-    if sys.platform != "darwin":
-        # TODO(cummins): Investigate.
-        # validator(
-        #     benchmark="benchmark://cBench-v1/lame",
-        #     cmd=f"$BIN $D/consumer_data/{i}.wav output.mp3",
-        #     data=[f"consumer_data/{i}.wav"],
-        #     outs=["output.mp3"],
-        #     compare_output=False,
-        #     linkopts=["-lm"],
-        # )
+    # if sys.platform != "darwin":
+    #     validator(
+    #         benchmark="benchmark://cBench-v1/lame",
+    #         cmd=f"$BIN $D/consumer_data/{i}.wav output.mp3",
+    #         data=[f"consumer_data/{i}.wav"],
+    #         outs=["output.mp3"],
+    #         compare_output=False,
+    #         linkopts=["-lm"],
+    #     )
 
-        validator(
-            benchmark="benchmark://cBench-v1/ghostscript",
-            cmd="$BIN -sDEVICE=ppm -dNOPAUSE -dQUIET -sOutputFile=output.ppm -- input.ps",
-            data=[f"office_data/{i}.ps"],
-            outs=["output.ppm"],
-            linkopts=["-lm", "-lz"],
-            pre_execution_callback=setup_ghostscript_library_files(i),
-        )
+    # NOTE(cummins): Segfault on gold standard.
+    #
+    #     validator(
+    #         benchmark="benchmark://cBench-v1/ghostscript",
+    #         cmd="$BIN -sDEVICE=ppm -dNOPAUSE -dQUIET -sOutputFile=output.ppm -- input.ps",
+    #         data=[f"office_data/{i}.ps"],
+    #         outs=["output.ppm"],
+    #         linkopts=["-lm", "-lz"],
+    #         pre_execution_callback=setup_ghostscript_library_files(i),
+    #     )
