@@ -8,10 +8,10 @@ import os
 import gym
 import pytest
 
-from compiler_gym.envs.llvm import datasets
+from compiler_gym.envs.llvm import LlvmEnv, datasets
 from tests.test_main import main
 
-pytest_plugins = ["tests.pytest_plugins.common"]
+pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.llvm"]
 
 
 def test_validate_sha_output_okay():
@@ -80,6 +80,17 @@ def test_dataset_required(tmpwd, temporary_environ, benchmark_name):
         assert env.benchmark.startswith("benchmark://npb-v0/")
     finally:
         env.close()
+
+
+def test_cBench_v0_deprecation(env: LlvmEnv):
+    """Test that cBench-v0 emits a deprecation warning when used."""
+    with pytest.deprecated_call(
+        match=(
+            "Dataset 'cBench-v0' is deprecated as of CompilerGym release "
+            "v0.1.4, please update to the latest available version"
+        )
+    ):
+        env.require_dataset("cBench-v0")
 
 
 if __name__ == "__main__":

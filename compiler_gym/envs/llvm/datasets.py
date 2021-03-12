@@ -62,6 +62,7 @@ LLVM_DATASETS = [
         size_bytes=7154448,
         sha256="072a730c86144a07bba948c49afe543e4f06351f1cb17f7de77f91d5c1a1b120",
         platforms=["macos"],
+        deprecated_since="v0.1.4",
     ),
     Dataset(
         name="cBench-v0",
@@ -73,6 +74,7 @@ LLVM_DATASETS = [
         size_bytes=6940416,
         sha256="9b5838a90895579aab3b9375e8eeb3ed2ae58e0ad354fec7eb4f8b31ecb4a360",
         platforms=["linux"],
+        deprecated_since="v0.1.4",
     ),
     Dataset(
         name="cBench-v1",
