@@ -205,9 +205,10 @@ def eval_policy(policy: Policy) -> None:
                 if FLAGS.resume:
                     with open(FLAGS.logfile, "r") as f:
                         for state in CompilerEnvState.read_csv_file(f):
-                            init += 1
-                            benchmarks.remove(state.benchmark)
-                            print_header = False
+                            if state.benchmark in benchmarks:
+                                init += 1
+                                benchmarks.remove(state.benchmark)
+                                print_header = False
                 else:
                     Path(FLAGS.logfile).unlink()
 

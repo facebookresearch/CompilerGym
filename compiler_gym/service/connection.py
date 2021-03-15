@@ -371,11 +371,13 @@ class ManagedConnection(Connection):
 
     def close(self):
         """Terminate a local subprocess and close the connection."""
-        self.process.kill()
         try:
+            self.process.kill()
             self.process.communicate(timeout=self.process_exit_max_seconds)
+        except ProcessLookupError:
+            self.logger.warning("Service process not found at %s", self.working_dir)
         except subprocess.TimeoutExpired:
-            self.logger.warning("Abandoning orphan process at %s", self.working_dir)
+            self.logger.warning("Abandoning orphan service at %s", self.working_dir)
         shutil.rmtree(self.working_dir, ignore_errors=True)
         super().close()
 

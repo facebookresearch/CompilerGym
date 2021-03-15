@@ -1,5 +1,6 @@
 # This package contains scripts for extracting passes from the LLVM source tree
 # and converting them to an action space for reinforcement learning.
+load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 
 genrule(
     name = "passes_list",
