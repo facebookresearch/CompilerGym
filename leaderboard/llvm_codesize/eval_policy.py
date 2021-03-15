@@ -134,7 +134,6 @@ class _BenchmarkRunner(Thread):
     def run(self):
         with open(FLAGS.logfile, "a") as logfile:
             for benchmark in self.benchmarks:
-                self.n += 1
                 self.env.reset(benchmark=benchmark)
                 with Timer() as timer:
                     self.policy(self.env)
@@ -161,6 +160,7 @@ class _BenchmarkRunner(Thread):
                     print(self.env.state.csv_header(), file=logfile)
                     self.print_header = False
                 print(state.to_csv(), file=logfile, flush=True)
+                self.n += 1
 
 
 def eval_policy(policy: Policy) -> None:
