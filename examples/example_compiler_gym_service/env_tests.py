@@ -15,9 +15,11 @@ from compiler_gym.spaces import NamedDiscrete, Scalar, Sequence
 from tests.test_main import main
 
 
-@pytest.fixture(scope="function")
-def env() -> CompilerEnv:
-    env = gym.make("example-v0")
+# Given that the C++ and Python service implementations have identical
+# featuresets, we can parameterize the tests and run them against both backends.
+@pytest.fixture(scope="function", params=["example-cc-v0", "example-py-v0"])
+def env(request) -> CompilerEnv:
+    env = gym.make(request.param)
     try:
         yield env
     finally:

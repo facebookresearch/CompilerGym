@@ -9,6 +9,7 @@ py_library(
     srcs = ["__init__.py"],
     data = [
         "//examples/example_compiler_gym_service/service_cc:compiler_gym-example-service-cc",
+        "//examples/example_compiler_gym_service/service_py:compiler_gym-example-service-py",
     ],
     deps = [
         "//compiler_gym/util",

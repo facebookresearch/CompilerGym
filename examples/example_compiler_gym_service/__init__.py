@@ -43,11 +43,22 @@ class RuntimeReward(Reward):
 # Register the example service on module import. After importing this module,
 # the example-v0 environment will be available to gym.make(...).
 register(
-    id="example-v0",
+    id="example-cc-v0",
     entry_point="compiler_gym.envs:CompilerEnv",
     kwargs={
         "service": runfiles_path(
             "examples/example_compiler_gym_service/service_cc/compiler_gym-example-service-cc"
+        ),
+        "rewards": [RuntimeReward()],
+    },
+)
+
+register(
+    id="example-py-v0",
+    entry_point="compiler_gym.envs:CompilerEnv",
+    kwargs={
+        "service": runfiles_path(
+            "examples/example_compiler_gym_service/service_py/compiler_gym-example-service-py"
         ),
         "rewards": [RuntimeReward()],
     },
