@@ -236,7 +236,7 @@ class LlvmEnv(CompilerEnv):
         # once the dataset API has been refactored so that service-side datasets
         # are no longer an issue.
         try:
-            super().reset(*args, **kwargs)
+            return super().reset(*args, **kwargs)
         except FileNotFoundError:
             self.logger.warning(
                 "reset() called on servie with no benchmarks available. "
