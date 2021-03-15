@@ -31,6 +31,7 @@ from compiler_gym.service.proto.compiler_gym_service_pb2 import (
     StepRequest,
 )
 from compiler_gym.service.proto.compiler_gym_service_pb2_grpc import (
+    CompilerGymServiceServicer,
     CompilerGymServiceStub,
 )
 
@@ -41,6 +42,7 @@ __all__ = [
     "Benchmark",
     "CompilerGymServiceConnection",
     "CompilerGymServiceStub",
+    "CompilerGymServiceServicer",
     "ConnectionOpts",
     "DoubleList",
     "EndSessionReply",
