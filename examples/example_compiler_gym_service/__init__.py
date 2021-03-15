@@ -8,34 +8,35 @@ from compiler_gym.util.registration import register
 from compiler_gym.util.runfiles_path import runfiles_path
 
 
-class CodesizeReward(Reward):
-    """An example reward that uses changes in the "codesize" observation value
+class RuntimeReward(Reward):
+    """An example reward that uses changes in the "runtime" observation value
     to compute incremental reward.
     """
 
     def __init__(self):
         super().__init__(
-            id="codesize",
-            observation_spaces=["codesize"],
+            id="runtime",
+            observation_spaces=["runtime"],
             default_value=0,
             default_negates_returns=True,
-            deterministic=True,
-            platform_dependent=False,
+            deterministic=False,
+            platform_dependent=True,
         )
-        self.previous_codesize = None
+        self.previous_runtime = None
 
     def reset(self, benchmark: str):
         del benchmark  # unused
-        self.previous_codesize = None
+        self.previous_runtime = None
 
     def update(self, action, observations, observation_view):
         del action
         del observation_view
 
-        if self.previous_codesize is None:
-            self.previous_codesize = observations[0]
-        reward = float(self.previous_codesize - observations[0])
-        self.previous_codesize = observations[0]
+        if self.previous_runtime is None:
+            self.previous_runtime = observations[0]
+
+        reward = float(self.previous_runtime - observations[0])
+        self.previous_runtime = observations[0]
         return reward
 
 
@@ -46,8 +47,8 @@ register(
     entry_point="compiler_gym.envs:CompilerEnv",
     kwargs={
         "service": runfiles_path(
-            "examples/example_compiler_gym_service/service/compiler_gym-example-service"
+            "examples/example_compiler_gym_service/service_cc/compiler_gym-example-service-cc"
         ),
-        "rewards": [CodesizeReward()],
+        "rewards": [RuntimeReward()],
     },
 )

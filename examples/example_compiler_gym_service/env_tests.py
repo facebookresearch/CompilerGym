@@ -43,22 +43,22 @@ def test_action_space(env: CompilerEnv):
 def test_observation_spaces(env: CompilerEnv):
     """Test that the environment reports the service's observation spaces."""
     env.reset()
-    assert env.observation.spaces.keys() == {"ir", "features", "codesize"}
+    assert env.observation.spaces.keys() == {"ir", "features", "runtime"}
     assert env.observation.spaces["ir"].space == Sequence(
         size_range=(0, None), dtype=str, opaque_data_format=""
     )
     assert env.observation.spaces["features"].space == Box(
         shape=(3,), low=-100, high=100, dtype=np.int64
     )
-    assert env.observation.spaces["codesize"].space == Scalar(
-        min=0, max=np.iinfo(np.int64).max, dtype=np.int64
+    assert env.observation.spaces["runtime"].space == Scalar(
+        min=0, max=np.inf, dtype=np.float64
     )
 
 
 def test_reward_spaces(env: CompilerEnv):
     """Test that the environment reports the service's reward spaces."""
     env.reset()
-    assert env.reward.spaces.keys() == {"codesize"}
+    assert env.reward.spaces.keys() == {"runtime"}
 
 
 def test_step_before_reset(env: CompilerEnv):
@@ -77,7 +77,7 @@ def test_observation_before_reset(env: CompilerEnv):
 def test_reward_before_reset(env: CompilerEnv):
     """Taking a reward before reset() is illegal."""
     with pytest.raises(ValueError) as ctx:
-        _ = env.reward["codesize"]
+        _ = env.reward["runtime"]
     assert str(ctx.value) == "Session ID not found"
 
 
@@ -142,7 +142,7 @@ def test_default_features_observation(env: CompilerEnv):
 
 def test_default_reward(env: CompilerEnv):
     """Test default reward space."""
-    env.reward_space = "codesize"
+    env.reward_space = "runtime"
     env.reset()
     observation, reward, done, info = env.step(0)
     assert observation is None
@@ -160,7 +160,7 @@ def test_observations(env: CompilerEnv):
 def test_rewards(env: CompilerEnv):
     """Test reward spaces."""
     env.reset()
-    assert env.reward["codesize"] == 0
+    assert env.reward["runtime"] == 0
 
 
 def test_benchmarks(env: CompilerEnv):

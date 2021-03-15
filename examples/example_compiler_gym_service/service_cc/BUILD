@@ -5,7 +5,7 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
 cc_binary(
-    name = "compiler_gym-example-service",
+    name = "compiler_gym-example-service-cc",
     srcs = ["RunService.cc"],
     visibility = ["//visibility:public"],
     deps = [
