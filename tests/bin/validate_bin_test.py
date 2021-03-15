@@ -96,6 +96,7 @@ def test_invalid_csv_format(monkeypatch):
     assert "Failed to parse input:" in out.stderr
 
 
+@skip_on_ci
 def test_multiple_valid_inputs(monkeypatch):
     stdin = """
 benchmark,reward,walltime,commandline

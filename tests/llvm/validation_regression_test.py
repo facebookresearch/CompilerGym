@@ -7,6 +7,7 @@ import pytest
 
 from compiler_gym import CompilerEnvState
 from compiler_gym.envs import LlvmEnv
+from tests.pytest_plugins.common import skip_on_ci
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
@@ -67,6 +68,7 @@ def test_validate_known_bad_trajectory(env: LlvmEnv, state):
             pytest.fail(f"Validation failed: {result}\n{result.json()}")
 
 
+@skip_on_ci
 @pytest.mark.parametrize(
     "state", REGRESSION_TEST_STATES, ids=REGRESSION_TEST_STATE_NAMES
 )
@@ -77,6 +79,7 @@ def test_validate_known_good_trajectory(env: LlvmEnv, state):
             pytest.fail(f"Validation failed: {result}\n{result.json()}")
 
 
+@skip_on_ci
 @pytest.mark.xfail(
     strict=True, reason="github.com/facebookresearch/CompilerGym/issues/105"
 )
