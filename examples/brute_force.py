@@ -43,23 +43,7 @@ from compiler_gym.util.logs import create_logging_dir
 
 flags.DEFINE_list(
     "actions",
-    [
-        "-simplifycfg",
-        "-reg2mem",
-        "-early-cse-memssa",
-        "-gvn-hoist",
-        "-gvn",
-        "-instsimplify",
-        "-instcombine",
-        "-jump-threading",
-        "-loop-extract",
-        "-loop-reduce",
-        "-loop-versioning",
-        "-newgvn",
-        "-mem2reg",
-        "-sroa",
-        "-structurizecfg",
-    ],
+    [],
     "A list of action names to enumerate. If not provided, all actions are used "
     "(warning: this might make a long time!)",
 )
@@ -307,12 +291,11 @@ def run_brute_force(
 
     num_trials = sum(worker.num_trials for worker in workers)
     env: CompilerEnv = make_env()
-    env.reset()
     print(
         f"completed {humanize.intcomma(num_trials)} of "
         f"{humanize.intcomma(expected_trial_count)} trials "
         f"({num_trials / expected_trial_count:.3%}), best sequence",
-        ",".join([env.action_space.flags[i] for i in best_action_sequence]),
+        " ".join([env.action_space.flags[i] for i in best_action_sequence]),
     )
     env.close()
 

@@ -11,32 +11,32 @@ program as gym environment, find the best action sequence using online q learnin
 """
 
 import random
-from time import time
+from typing import Dict, NamedTuple
 
-import humanize
+import gym
 from absl import app, flags
 
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
-from compiler_gym.util.flags.env_from_flags import env_from_flags
+from compiler_gym.util.timer import Timer
 
 flags.DEFINE_list(
     "actions",
     [
-        "-simplifycfg",
-        "-reg2mem",
+        "-break-crit-edges",
         "-early-cse-memssa",
         "-gvn-hoist",
         "-gvn",
-        "-instsimplify",
         "-instcombine",
+        "-instsimplify",
         "-jump-threading",
-        "-loop-extract",
         "-loop-reduce",
+        "-loop-rotate",
         "-loop-versioning",
-        "-newgvn",
         "-mem2reg",
+        "-newgvn",
+        "-reg2mem",
+        "-simplifycfg",
         "-sroa",
-        "-structurizecfg",
     ],
     "A list of action names to explore from.",
 )
@@ -48,27 +48,50 @@ flags.DEFINE_list(
 )
 flags.DEFINE_float("learning_rate", 0.1, "learning rate of the q-learning.")
 flags.DEFINE_integer("episodes", 5000, "number of episodes used to learn.")
+flags.DEFINE_integer(
+    "log_every", 50, "number of episode interval where progress is reported."
+)
 flags.DEFINE_float("epsilon", 0.2, "Epsilon rate of exploration. ")
 flags.DEFINE_integer("episode_length", 5, "The number of steps in each episode.")
 FLAGS = flags.FLAGS
 
 
-def hash_state_action(autophase_feature, action, step):
-    return tuple(
-        (
-            tuple(autophase_feature[FLAGS.features_indices]),
-            step,
-            FLAGS.actions.index(action),
-        )
-    )
+class StateActionTuple(NamedTuple):
+    """An state action tuple used as q-table keys"""
+
+    autophase0: int
+    autophase1: int
+    autophase2: int
+    cur_step: int
+    action_index: int
 
 
-def get_env():
-    return env_from_flags(benchmark_from_flags())
+def make_q_table_key(autophase_feature, action, step):
+    """Create a hashable Q-table key.
+
+    For tabular learning we will be constructing a Q-table which maps a
+    (state, action) pair to an expected (remaining) reward. The purpose of this
+    function is to convert the (state, action) properties into a hashable tuple
+    that can be used as a key for a Q-table dictionary.
+
+    In the CompilerGym setup, encoding the true state the program is not obvious,
+    and this solution turns to use the observations from Autophase features instead.
+    The default arguments handpicked 3 indices from the Autophase feature that
+    appear to change a lot during optimization.
+
+    In addition, the current step in the episode is added to the state representation
+    as well. In the current fixed-episode-length setup, we need to differentiate
+    reaching a state at different steps, as they can lead to different final rewards,
+    depending on the remaining optimization steps.
+
+    Finally, we add the action index to the key.
+    """
+
+    return *autophase_feature[FLAGS.features_indices], step, FLAGS.actions.index(action)
 
 
 def select_action(q_table, ob, step, epsilon=0.0):
-    qs = [q_table.get(hash_state_action(ob, act, step), -1) for act in FLAGS.actions]
+    qs = [q_table.get(make_q_table_key(ob, act, step), -1) for act in FLAGS.actions]
     if random.random() < epsilon:
         return random.choice(FLAGS.actions)
     max_indices = [i for i, x in enumerate(qs) if x == max(qs)]
@@ -79,40 +102,71 @@ def select_action(q_table, ob, step, epsilon=0.0):
 def get_max_q_value(q_table, ob, step):
     max_q = 0
     for act in FLAGS.actions:
-        hashed = hash_state_action(ob, act, step)
+        hashed = make_q_table_key(ob, act, step)
         if hashed not in q_table:
             q_table[hashed] = 0
         max_q = max(q_table[hashed], max_q)
     return max_q
 
 
+def rollout(qtable, env, printout=False):
+    # rollout the policy using a given Q table greedily.
+    observation = env.reset()
+    action_seq, rewards = [], []
+    for i in range(FLAGS.episode_length):
+        a = select_action(qtable, observation, i)
+        action_seq.append(a)
+        observation, reward, done, info = env.step(env.action_space.flags.index(a))
+        rewards.append(reward)
+    if printout:
+        print(
+            "Resulting sequence: ", ",".join(action_seq), f"total reward {sum(rewards)}"
+        )
+    return sum(rewards)
+
+
 def train(q_table, env):
-    # Buffer an old version of q table to inspect training progress
+    # Buffer an old version of q table to inspect training progress.
     prev_q = {}
 
-    for i in range(FLAGS.episodes):
+    # Run the training process "online", where the policy evaluation and
+    # policy improvement happens directly after one another.
+    for i in range(1, FLAGS.episodes + 1):
         current_length = 0
         obs = env.reset()
         while current_length < FLAGS.episode_length:
-            # Run Epsilon greedy policy.
+            # Run epsilon greedy policy to allow exploration.
             a = select_action(q_table, obs, current_length, FLAGS.epsilon)
-            hashed = hash_state_action(obs, a, current_length)
+            hashed = make_q_table_key(obs, a, current_length)
             if hashed not in q_table:
                 q_table[hashed] = 0
+            # Take a stap in the environment, record the reward and state transition.
+            # Effectively we are evaluating the policy by taking a step in the
+            # environment.
             obs, reward, done, info = env.step(env.action_space.flags.index(a))
             current_length += 1
-            # Get max q at new state.
+
+            # Compute the target value of the current state, by using the current
+            # step-reward and bootstrapping from the next state. In Q-learning,
+            # a greedy policy is implied by the Q-table, thus we can approximate
+            # the expected reward at the next state as the maximum value of
+            # all the associated state-action pair rewards (Q values). A discount
+            # can be used to emphasize on immediate early rewards, and encourage
+            # the agent to achieve higher rewards sooner than later.
             target = reward + FLAGS.discount * get_max_q_value(
                 q_table, obs, current_length
             )
-            # Update Q value at current state action pair.
+
+            # Update Q value. Instead of replacing the Q value at the current
+            # state action pair directly, a learning rate is introduced to interpolate
+            # between the current value and target value, effectively damping the
+            # changes. By updating the Q-table, we effectively updated the policy.
             q_table[hashed] = (
                 FLAGS.learning_rate * target
                 + (1 - FLAGS.learning_rate) * q_table[hashed]
             )
 
-        if i % 50 == 0:
-            print(f"Running episode {i}")
+        if i % FLAGS.log_every == 0:
 
             def compare_qs(q_old, q_new):
                 diff = [q_new[k] - v for k, v in q_old.items()]
@@ -120,47 +174,26 @@ def train(q_table, env):
 
             difference = compare_qs(prev_q, q_table)
             print(
-                f"Newly added Q entries {len(q_table)-len(prev_q)}, averaged diff {difference}"
+                f"episode={i:4d}, cur_reward={rollout(q_table, env):4d}, Q-table_entries {len(q_table):5d}, Q-table_diff {difference:.7f}"
             )
             prev_q = q_table.copy()
 
 
-def setup_env():
-    FLAGS.observation = "Autophase"
-    FLAGS.reward = "IrInstructionCount"
-    FLAGS.benchmark = "cBench-v0/dijkstra"
-    FLAGS.env = "llvm-ic-v0"
-
-
 def main(argv):
-    setup_env()
-    # Train a Q table.
-    q_table = {}
-    env = get_env()
+    # Initialize a Q table.
+    q_table: Dict[StateActionTuple, int] = {}
+    benchmark = benchmark_from_flags()
+    assert benchmark, "You must specify a benchmark using the --benchmark flag"
+    env = gym.make("llvm-autophase-ic-v0", benchmark=benchmark)
+
     try:
-        started = time()
-        train(q_table, env)
-        print(f"Time spent training {humanize.naturaldelta(time() - started)}")
-        # Rollout based on the Max-Q policy.
-        ob = env.reset()
-        # Roll out one episode and report the resulting policy.
-        action_seq, rewards = [], []
-        for i in range(FLAGS.episode_length):
-            a = select_action(q_table, ob, i)
-            action_seq.append(a)
-            ob, reward, done, info = env.step(env.action_space.flags.index(a))
-            rewards.append(reward)
-        print(
-            "Resulting sequence: ", ",".join(action_seq), f"total reward {sum(rewards)}"
-        )
-        # Rollout the best episode from brute force solution.
-        best = ["-gvn-hoist", "-newgvn", "-instcombine", "-mem2reg", "-simplifycfg"]
-        rewards = []
-        env.reset()
-        for a in best:
-            _, r, _, _ = env.step(env.action_space.flags.index(a))
-            rewards.append(r)
-        print(f"Best achievable result {sum(rewards)}")
+        # Train a Q-table.
+        with Timer("Constructing Q-table"):
+            train(q_table, env)
+
+        # Rollout resulting policy.
+        rollout(q_table, env, True)
+
     finally:
         env.close()
 

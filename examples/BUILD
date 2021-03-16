@@ -72,6 +72,25 @@ py_test(
 )
 
 py_binary(
+    name = "tabular_q",
+    srcs = ["tabular_q.py"],
+    deps = [
+        "//compiler_gym",
+    ],
+)
+
+py_test(
+    name = "tabular_q_test",
+    timeout = "short",
+    srcs = ["tabular_q_test.py"],
+    deps = [
+        ":tabular_q",
+        "//compiler_gym/util",
+        "//tests:test_main",
+    ],
+)
+
+py_binary(
     name = "random_walk",
     srcs = ["random_walk.py"],
     visibility = ["//visibility:public"],
