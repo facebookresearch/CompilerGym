@@ -42,9 +42,9 @@ py_test(
 
 py_test(
     name = "benchmark_semantics_validation_test",
-    timeout = "long",
+    timeout = "eternal",
     srcs = ["benchmark_semantics_validation_test.py"],
-    shard_count = 5,
+    shard_count = 10,
     deps = [
         "//compiler_gym",
         "//compiler_gym/datasets",
@@ -98,7 +98,7 @@ py_test(
 
 py_test(
     name = "fork_env_test",
-    timeout = "short",
+    timeout = "long",
     srcs = ["fork_env_test.py"],
     data = [
         "//compiler_gym/third_party/cBench:crc32",
@@ -220,8 +220,9 @@ py_test(
 
 py_test(
     name = "validation_regression_test",
+    timeout = "long",
     srcs = ["validation_regression_test.py"],
-    shard_count = 4,
+    shard_count = 6,
     deps = [
         "//compiler_gym",
         "//tests:test_main",
