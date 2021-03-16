@@ -12,7 +12,7 @@ from tests.test_main import main as _test_main
 FLAGS = flags.FLAGS
 
 
-def test_run_actor_critic_smoke_test():
+def test_run_tabular_q_smoke_test():
     FLAGS.unparse_flags()
     FLAGS(
         [

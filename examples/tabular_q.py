@@ -117,6 +117,7 @@ def rollout(qtable, env, printout=False):
         a = select_action(qtable, observation, i)
         action_seq.append(a)
         observation, reward, done, info = env.step(env.action_space.flags.index(a))
+        print(f"{i} step reward: {reward}")
         rewards.append(reward)
     if printout:
         print(
@@ -170,18 +171,20 @@ def train(q_table, env):
 
             def compare_qs(q_old, q_new):
                 diff = [q_new[k] - v for k, v in q_old.items()]
-                return sum(diff) / len(diff) if diff else "NaN"
+                return sum(diff) / len(diff) if diff else 0.0
 
             difference = compare_qs(prev_q, q_table)
+            # Evaluate the current policy
+            cur_rewards = rollout(q_table, env)
             print(
-                f"episode={i:4d}, cur_reward={rollout(q_table, env):4d}, Q-table_entries {len(q_table):5d}, Q-table_diff {difference:.7f}"
+                f"episode={i:4d}, cur_reward={cur_rewards:.5f}, Q-table_entries {len(q_table):5d}, Q-table_diff {difference:.7f}"
             )
             prev_q = q_table.copy()
 
 
 def main(argv):
     # Initialize a Q table.
-    q_table: Dict[StateActionTuple, int] = {}
+    q_table: Dict[StateActionTuple, float] = {}
     benchmark = benchmark_from_flags()
     assert benchmark, "You must specify a benchmark using the --benchmark flag"
     env = gym.make("llvm-autophase-ic-v0", benchmark=benchmark)
