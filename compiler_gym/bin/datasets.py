@@ -27,9 +27,9 @@ are activate, inactive, and available to download. For example:
     +-------------------+--------------+-----------------+----------------+
     | Active Datasets   | License      |   #. Benchmarks | Size on disk   |
     +===================+==============+=================+================+
-    | cBench-v0         | BSD 3-Clause |              23 | 7.2 MB         |
+    | cBench-v1         | BSD 3-Clause |              23 | 10.1 MB        |
     +-------------------+--------------+-----------------+----------------+
-    | Total             |              |              23 | 7.2 MB         |
+    | Total             |              |              23 | 10.1 MB        |
     +-------------------+--------------+-----------------+----------------+
     These benchmarks are ready for use. Deactivate them using `--deactivate=<name>`.
 
@@ -105,7 +105,7 @@ flags, respectively:
 
 .. code-block::
 
-    $ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --activate=npb-v0,github-v0 --deactivate=cBench-v0
+    $ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --activate=npb-v0,github-v0 --deactivate=cBench-v1
 
 The :code:`--activate_all` and :code:`--deactivate_all` flags can be used as a
 shortcut to activate or deactivate every downloaded:

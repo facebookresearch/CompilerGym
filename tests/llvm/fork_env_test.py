@@ -18,7 +18,7 @@ EXAMPLE_BITCODE_IR_INSTRUCTION_COUNT = 196
 
 
 def test_fork_child_process_is_not_orphaned(env: LlvmEnv):
-    env.reset("cBench-v0/crc32")
+    env.reset("cBench-v1/crc32")
     fkd = env.fork()
     try:
         # Check that both environments share the same service.
@@ -49,7 +49,7 @@ def test_fork_child_process_is_not_orphaned(env: LlvmEnv):
 
 
 def test_fork_chain_child_processes_are_not_orphaned(env: LlvmEnv):
-    env.reset("cBench-v0/crc32")
+    env.reset("cBench-v1/crc32")
 
     # Create a chain of forked environments.
     a = env.fork()
@@ -90,13 +90,16 @@ def test_fork_before_reset(env: LlvmEnv):
     """Test that fork() before reset() starts an episode."""
     assert not env.in_episode
     fkd = env.fork()
-    assert env.in_episode
-    assert fkd.in_episode
-    assert env.benchmark == fkd.benchmark
+    try:
+        assert env.in_episode
+        assert fkd.in_episode
+        assert env.benchmark == fkd.benchmark
+    finally:
+        fkd.close()
 
 
 def test_fork_closed_service(env: LlvmEnv):
-    env.reset(benchmark="cBench-v0/crc32")
+    env.reset(benchmark="cBench-v1/crc32")
 
     _, _, done, _ = env.step(0)
     assert not done
@@ -116,7 +119,7 @@ def test_fork_closed_service(env: LlvmEnv):
 def test_fork_spaces_are_same(env: LlvmEnv):
     env.observation_space = "Autophase"
     env.reward_space = "IrInstructionCount"
-    env.reset(benchmark="cBench-v0/crc32")
+    env.reset(benchmark="cBench-v1/crc32")
 
     fkd = env.fork()
     try:
@@ -128,7 +131,7 @@ def test_fork_spaces_are_same(env: LlvmEnv):
 
 
 def test_fork_state(env: LlvmEnv):
-    env.reset("cBench-v0/crc32")
+    env.reset("cBench-v1/crc32")
     env.step(0)
     assert env.actions == [0]
 
@@ -141,7 +144,7 @@ def test_fork_state(env: LlvmEnv):
 
 
 def test_fork_reset(env: LlvmEnv):
-    env.reset("cBench-v0/crc32")
+    env.reset("cBench-v1/crc32")
     env.step(0)
     env.step(1)
     env.step(2)
@@ -168,8 +171,8 @@ def test_fork_custom_benchmark(env: LlvmEnv):
         """Strip the ModuleID line from IR."""
         return "\n".join(env.ir.split("\n")[1:])
 
+    new_env = env.fork()
     try:
-        new_env = env.fork()
         assert ir(env) == ir(new_env)
 
         new_env.reset()
@@ -180,22 +183,20 @@ def test_fork_custom_benchmark(env: LlvmEnv):
 
 def test_fork_twice_test(env: LlvmEnv):
     """Test that fork() on a forked environment works."""
-    env.reset(benchmark="cBench-v0/crc32")
+    env.reset(benchmark="cBench-v1/crc32")
     fork_a = env.fork()
+    fork_b = fork_a.fork()
     try:
-        fork_b = fork_a.fork()
-        try:
-            assert env.state == fork_a.state
-            assert fork_a.state == fork_b.state
-        finally:
-            fork_b.close()
+        assert env.state == fork_a.state
+        assert fork_a.state == fork_b.state
     finally:
         fork_a.close()
+        fork_b.close()
 
 
 def test_fork_modified_ir_is_the_same(env: LlvmEnv):
     """Test that the IR of a forked environment is the same."""
-    env.reset("cBench-v0/crc32")
+    env.reset("cBench-v1/crc32")
 
     # Apply an action that modifies the benchmark.
     _, _, done, info = env.step(env.action_space.flags.index("-mem2reg"))
@@ -221,7 +222,7 @@ def test_fork_modified_ir_is_the_same(env: LlvmEnv):
 def test_fork_rewards(env: LlvmEnv, reward_space: str):
     """Test that rewards are equal after fork() is called."""
     env.reward_space = reward_space
-    env.reset("cBench-v0/dijkstra")
+    env.reset("cBench-v1/dijkstra")
 
     actions = [env.action_space.flags.index(n) for n in ["-mem2reg", "-simplifycfg"]]
 
@@ -239,7 +240,7 @@ def test_fork_rewards(env: LlvmEnv, reward_space: str):
 
 def test_fork_previous_cost_reward_update(env: LlvmEnv):
     env.reward_space = "IrInstructionCount"
-    env.reset("cBench-v0/crc32")
+    env.reset("cBench-v1/crc32")
 
     env.step(env.action_space.flags.index("-mem2reg"))
     fkd = env.fork()
@@ -252,7 +253,7 @@ def test_fork_previous_cost_reward_update(env: LlvmEnv):
 
 
 def test_fork_previous_cost_lazy_reward_update(env: LlvmEnv):
-    env.reset("cBench-v0/crc32")
+    env.reset("cBench-v1/crc32")
 
     env.step(env.action_space.flags.index("-mem2reg"))
     env.reward["IrInstructionCount"]

@@ -35,6 +35,16 @@ cc_test(
     ],
 )
 
+py_test(
+    name = "statistics_test",
+    timeout = "short",
+    srcs = ["statistics_test.py"],
+    deps = [
+        "//compiler_gym/util",
+        "//tests:test_main",
+    ],
+)
+
 cc_test(
     name = "StrLenConstexprTest",
     srcs = ["StrLenConstexprTest.cc"],

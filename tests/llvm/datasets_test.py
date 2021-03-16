@@ -8,10 +8,10 @@ import os
 import gym
 import pytest
 
-from compiler_gym.envs.llvm import datasets
+from compiler_gym.envs.llvm import LlvmEnv, datasets
 from tests.test_main import main
 
-pytest_plugins = ["tests.pytest_plugins.common"]
+pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.llvm"]
 
 
 def test_validate_sha_output_okay():
@@ -41,11 +41,11 @@ def test_default_cBench_dataset_require(tmpwd, temporary_environ):
         assert not env.benchmarks, "Sanity check"
 
         # Datasaet is downloaded.
-        assert env.require_dataset("cBench-v0")
+        assert env.require_dataset("cBench-v1")
         assert env.benchmarks
 
         # Dataset is already downloaded.
-        assert not env.require_dataset("cBench-v0")
+        assert not env.require_dataset("cBench-v1")
     finally:
         env.close()
 
@@ -61,7 +61,7 @@ def test_default_cBench_on_reset(tmpwd, temporary_environ):
 
         env.reset()
         assert env.benchmarks
-        assert env.benchmark.startswith("benchmark://cBench-v0/")
+        assert env.benchmark.startswith("benchmark://cBench-v1/")
     finally:
         env.close()
 
@@ -80,6 +80,17 @@ def test_dataset_required(tmpwd, temporary_environ, benchmark_name):
         assert env.benchmark.startswith("benchmark://npb-v0/")
     finally:
         env.close()
+
+
+def test_cBench_v0_deprecation(env: LlvmEnv):
+    """Test that cBench-v0 emits a deprecation warning when used."""
+    with pytest.deprecated_call(
+        match=(
+            "Dataset 'cBench-v0' is deprecated as of CompilerGym release "
+            "v0.1.4, please update to the latest available version"
+        )
+    ):
+        env.require_dataset("cBench-v0")
 
 
 if __name__ == "__main__":

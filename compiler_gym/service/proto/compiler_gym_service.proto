@@ -142,7 +142,7 @@ message Observation {
     string string_value = 3;
     bytes binary_value = 4;
     int64 scalar_int64 = 5;
-    double scalar_scalar = 6;
+    double scalar_double = 6;
   }
 }
 

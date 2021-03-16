@@ -43,6 +43,7 @@ repos:
           - id: check-symlinks
           - id: end-of-file-fixer
           - id: pretty-format-json
+            args: [--autofix, --indent=2, --no-sort-keys]
           - id: requirements-txt-fixer
           - id: trailing-whitespace
     - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt

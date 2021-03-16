@@ -34,7 +34,7 @@ BENCHMARK_NAMES = list(_read_list_file(BENCHMARKS_LIST))
 # Skip ghostscript on CI as it is just too heavy.
 if bool(os.environ.get("CI")):
     BENCHMARK_NAMES = [
-        b for b in BENCHMARK_NAMES if b != "benchmark://cBench-v0/ghostscript"
+        b for b in BENCHMARK_NAMES if b != "benchmark://cBench-v1/ghostscript"
     ]
 
 _env = gym.make("llvm-v0")
@@ -97,7 +97,7 @@ def non_validatable_benchmark_name(request) -> str:
 def env() -> CompilerEnv:
     """Create an LLVM environment."""
     env = gym.make("llvm-v0")
-    env.require_dataset("cBench-v0")
+    env.require_dataset("cBench-v1")
     try:
         yield env
     finally:
@@ -109,7 +109,7 @@ def cBench_dataset():
     """Test fixture that ensures that cBench is available."""
     env = gym.make("llvm-v0")
     try:
-        env.require_dataset("cBench-v0")
+        env.require_dataset("cBench-v1")
     finally:
         env.close()
 

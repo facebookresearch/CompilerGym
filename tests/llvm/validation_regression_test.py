@@ -17,7 +17,7 @@ pytest_plugins = ["tests.pytest_plugins.llvm"]
 )
 def test_validate_strucutrizecfg_stringsearch(env: LlvmEnv):
     # Regression test for a failure caused by -structurizecfg.
-    env.reset("cBench-v0/stringsearch")
+    env.reset("cBench-v1/stringsearch")
     env.step(env.action_space["-instcombine"])
     env.step(env.action_space["-jump-threading"])
     env.step(env.action_space["-loop-interchange"])
@@ -32,7 +32,7 @@ def test_validate_strucutrizecfg_stringsearch(env: LlvmEnv):
 )
 def test_validate_strucutrizecfg_ghostscript(env: LlvmEnv):
     # Regression test for a failure caused by -structurizecfg.
-    env.reset("cBench-v0/ghostscript")
+    env.reset("cBench-v1/ghostscript")
     env.step(env.action_space["-structurizecfg"])
     assert env.validate().okay()
 
@@ -41,7 +41,7 @@ def test_validate_strucutrizecfg_ghostscript(env: LlvmEnv):
     strict=True, reason="github.com/facebookresearch/CompilerGym/issues/105"
 )
 def test_validate_susan_a(env: LlvmEnv):
-    env.reset("cBench-v0/susan")
+    env.reset("cBench-v1/susan")
     env.step(env.action_space["-structurizecfg"])
     env.step(env.action_space["-loop-extract"])
     env.step(env.action_space["-mergereturn"])
@@ -55,7 +55,7 @@ def test_validate_susan_a(env: LlvmEnv):
     strict=True, reason="github.com/facebookresearch/CompilerGym/issues/105"
 )
 def test_validate_susan_b(env: LlvmEnv):
-    env.reset("cBench-v0/susan")
+    env.reset("cBench-v1/susan")
     env.step(env.action_space["-mem2reg"])
     env.step(env.action_space["-simplifycfg"])
     env.step(env.action_space["-lcssa"])

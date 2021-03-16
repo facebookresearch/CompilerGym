@@ -161,11 +161,14 @@ _EXCLUDED_PASSES = {
     "StripGCRelocates",
     "PlaceBackedgeSafepointsImpl",
     "PlaceSafepointsPass",
+    "RewriteStatepointsForGclegacyPass",
     # Irrelevant Objective-C Automatic Reference Counting passes.
-    "ObjCarcapelimPass",
-    "ObjCarccontractPass",
-    "ObjCarcexpandPass",
-    "ObjCarcoptPass",
+    "ObjCARCAAWrapperPass",
+    "ObjCARCAPElim",
+    "ObjCARCAPElimPass",
+    "ObjCARCContractPass",
+    "ObjCARCExpandPass",
+    "ObjCARCOptPass",
     # Doesn't use legacy pass constructor API, or requires additional
     # constructor arguments that are not available.
     "WholeProgramDevirt",
@@ -182,8 +185,11 @@ _EXCLUDED_PASSES = {
     "BarrierNoop",  # Used for debugging pass manager.
     "StripNonLineTableDebugInfoPass",  # Debug stripping.
     "StripDeadDebugInfoPass",  # Debug stripping.
+    "LoopExtractorPass",  # Pulls out loops into functions. Changes semantics.
+    "SingleLoopExtractorPass",  # Pulls out loops into functions. Changes semantics.
+    "BlockExtractorPass",  # Pulls out blocks into functions. Changes semantics.
     # Unwanted instrumentation passes.
-    "BoundsCheckingLegacy",
+    "BoundsCheckingLegacyPass",  # Inserts traps on illegal access. Changes semantics.
     "ASanGlobalsMetadataWrapperPass",
     "AddressSanitizerLegacyPass",
     "HWAddressSanitizerLegacyPass",
@@ -205,12 +211,18 @@ _EXCLUDED_PASSES = {
     "PgomemOpsizeOptLegacyPass",
     "InstrProfilingLegacyPass",
     "ControlHeightReductionLegacyPass",
+    # Unneeded symbol rewriting pass.
+    "RewriteSymbolsPass",
     # Microsoft's Control Flow Guard checks on Windows targets.
     # https://llvm.org/doxygen/CFGuard_8cpp.html
     "CFGuardCheckPass",
     "CFGuardDispatchPass",
     # We don't want to change the visibility of symbols.
     "InternalizePass",
+    # NOTE(github.com/facebookresearch/CompilerGym/issues/103): The
+    # -structurizecg has been found to break the semantics of cBench benchmarks
+    # ghostscript and tiff2bw.
+    "StructurizeCFGPass",
     # NOTE(github.com/facebookresearch/CompilerGym/issues/46): The -gvn-sink
     # pass has been found to produce different states when run multiple times
     # on the same input.

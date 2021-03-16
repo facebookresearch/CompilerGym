@@ -58,7 +58,7 @@ flags.DEFINE_integer(
 flags.DEFINE_integer(
     "n", 10, "The number of repetitions of the search to run for each benchmark."
 )
-flags.DEFINE_string("test_dataset", "cBench-v0", "The dataset to use for the search.")
+flags.DEFINE_string("test_dataset", "cBench-v1", "The dataset to use for the search.")
 flags.DEFINE_boolean("validate", True, "Run validation on the results.")
 flags.DEFINE_boolean(
     "resume",
@@ -205,9 +205,10 @@ def eval_policy(policy: Policy) -> None:
                 if FLAGS.resume:
                     with open(FLAGS.logfile, "r") as f:
                         for state in CompilerEnvState.read_csv_file(f):
-                            init += 1
-                            benchmarks.remove(state.benchmark)
-                            print_header = False
+                            if state.benchmark in benchmarks:
+                                init += 1
+                                benchmarks.remove(state.benchmark)
+                                print_header = False
                 else:
                     Path(FLAGS.logfile).unlink()
 

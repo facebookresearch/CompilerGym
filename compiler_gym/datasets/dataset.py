@@ -7,6 +7,7 @@ import json
 import os
 import shutil
 import tarfile
+import warnings
 from pathlib import Path
 from typing import List, NamedTuple, Optional, Union
 
@@ -46,6 +47,14 @@ class Dataset(NamedTuple):
 
     platforms: List[str] = ["macos", "linux"]
     """A list of platforms supported by this dataset. Allowed platforms 'macos' and 'linux'."""
+
+    deprecated_since: str = ""
+    """The CompilerGym release in which this dataset was deprecated."""
+
+    @property
+    def deprecated(self) -> bool:
+        """Whether the dataset is deprecated."""
+        return bool(self.deprecated_since)
 
     @classmethod
     def from_json_file(cls, path: Path) -> "Dataset":
@@ -204,15 +213,24 @@ def require(env, dataset: Union[str, Dataset]) -> bool:
             # Check if we have already downloaded the dataset.
             if "://" in dataset:
                 name, url = None, dataset
+                dataset: Optional[Dataset] = None
             else:
                 try:
-                    dataset = env.available_datasets[dataset]
+                    dataset: Optional[Dataset] = env.available_datasets[dataset]
                 except KeyError:
                     raise ValueError(f"Dataset not found: {dataset}")
                 name, url, sha256 = dataset.name, dataset.url, dataset.sha256
         else:
             raise TypeError(
                 f"require() called with unsupported type: {type(dataset).__name__}"
+            )
+
+        if dataset and dataset.deprecated:
+            warnings.warn(
+                f"Dataset '{dataset.name}' is deprecated as of CompilerGym "
+                f"release {dataset.deprecated_since}, please update to the "
+                "latest available version",
+                DeprecationWarning,
             )
 
         # Check if we have already downloaded the dataset.

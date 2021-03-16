@@ -18,7 +18,7 @@ genrule(
     cmd = select({
         "@llvm//:darwin": "mv $(location cBench-v1-macos.json) $(@D)/cBench-v1.json",
         "//conditions:default": "mv $(location cBench-v1-linux.json) $(@D)/cBench-v1.json",
-    }) + " && tar cvjfh $@ -C $(@D) cBench-v1 cBench-v1.json",
+    }) + " && tar cjfh $@ -C $(@D) cBench-v1 cBench-v1.json",
     visibility = ["//visibility:public"],
 )
 
