@@ -87,7 +87,9 @@ def make_q_table_key(autophase_feature, action, step):
     Finally, we add the action index to the key.
     """
 
-    return *autophase_feature[FLAGS.features_indices], step, FLAGS.actions.index(action)
+    return StateActionTuple(
+        *autophase_feature[FLAGS.features_indices], step, FLAGS.actions.index(action)
+    )
 
 
 def select_action(q_table, ob, step, epsilon=0.0):
@@ -117,7 +119,6 @@ def rollout(qtable, env, printout=False):
         a = select_action(qtable, observation, i)
         action_seq.append(a)
         observation, reward, done, info = env.step(env.action_space.flags.index(a))
-        print(f"{i} step reward: {reward}")
         rewards.append(reward)
     if printout:
         print(
@@ -177,7 +178,7 @@ def train(q_table, env):
             # Evaluate the current policy
             cur_rewards = rollout(q_table, env)
             print(
-                f"episode={i:4d}, cur_reward={cur_rewards:.5f}, Q-table_entries {len(q_table):5d}, Q-table_diff {difference:.7f}"
+                f"episode={i:4d}, cur_reward={cur_rewards:.5f}, Q-table_entries={len(q_table):5d}, Q-table_diff={difference:.7f}"
             )
             prev_q = q_table.copy()
 
