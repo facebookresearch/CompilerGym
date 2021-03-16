@@ -76,6 +76,8 @@ py_binary(
     srcs = ["tabular_q.py"],
     deps = [
         "//compiler_gym",
+        "//compiler_gym/util",
+        "//compiler_gym/util/flags:benchmark_from_flags",
     ],
 )
 
