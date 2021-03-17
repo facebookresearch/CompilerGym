@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 """This module defines the OpenAI gym interface for compilers."""
 import logging
+import numbers
 import os
 import sys
 import warnings
@@ -53,6 +54,33 @@ from compiler_gym.views import ObservationSpaceSpec, ObservationView, RewardView
 # Type hints.
 info_t = Dict[str, Any]
 step_t = Tuple[Optional[observation_t], Optional[float], bool, info_t]
+
+
+class DefaultRewardFromObservation(Reward):
+    def __init__(self, observation_name: str, **kwargs):
+        super().__init__(
+            observation_spaces=[observation_name], id=observation_name, **kwargs
+        )
+        self.previous_value: Optional[observation_t] = None
+
+    def reset(self, benchmark: str) -> None:
+        """Called on env.reset(). Reset incremental progress."""
+        del benchmark  # unused
+        self.previous_value = None
+
+    def update(
+        self,
+        action: int,
+        observations: List[observation_t],
+        observation_view: ObservationView,
+    ) -> float:
+        """Called on env.step(). Compute and return new reward."""
+        value: float = observations[0]
+        if self.previous_value is None:
+            self.previous_value = 0
+        reward = float(value - self.previous_value)
+        self.previous_value = value
+        return reward
 
 
 class CompilerEnv(gym.Env):
@@ -182,8 +210,6 @@ class CompilerEnv(gym.Env):
         :raises TimeoutError: If the compiler service fails to initialize
             within the parameters provided in :code:`connection_settings`.
         """
-        rewards = rewards or []
-
         self.metadata = {"render.modes": ["human", "ansi"]}
 
         # Set up logging.
@@ -208,6 +234,17 @@ class CompilerEnv(gym.Env):
             opts=self._connection_settings,
             logger=self.logger,
         )
+
+        # If no reward space is specified, generate some from numeric observation spaces
+        rewards = rewards or [
+            DefaultRewardFromObservation(obs.name)
+            for obs in self.service.observation_spaces
+            if obs.default_value.WhichOneof("value")
+            and isinstance(
+                getattr(obs.default_value, obs.default_value.WhichOneof("value")),
+                numbers.Number,
+            )
+        ]
 
         # The benchmark that is currently being used, and the benchmark that
         # the user requested. Those do not always correlate, since the user
