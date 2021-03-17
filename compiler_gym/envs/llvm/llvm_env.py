@@ -27,6 +27,7 @@ from compiler_gym.spaces import Commandline, CommandlineFlag, Scalar, Sequence
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_NAMES
 from compiler_gym.third_party.inst2vec import Inst2vecEncoder
 from compiler_gym.util.runfiles_path import runfiles_path, site_data_path
+from compiler_gym.validation_result import ValidationError
 
 _ACTIONS_LIST = Path(
     runfiles_path("compiler_gym/envs/llvm/service/passes/actions_list.txt")
@@ -352,7 +353,7 @@ class LlvmEnv(CompilerEnv):
 
     def get_benchmark_validation_callback(
         self,
-    ) -> Optional[Callable[[CompilerEnv], Optional[str]]]:
+    ) -> Optional[Callable[[CompilerEnv], Iterable[ValidationError]]]:
         """Return a callback for validating a given environment state.
 
         If there is no valid callback, returns :code:`None`.

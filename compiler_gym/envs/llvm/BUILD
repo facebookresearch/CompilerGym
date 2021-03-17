@@ -38,6 +38,7 @@ py_library(
     srcs = ["datasets.py"],
     data = [
         "//compiler_gym/third_party/llvm:clang",
+        "//compiler_gym/third_party/llvm:lli",
     ],
     visibility = ["//tests:__subpackages__"],
     deps = [

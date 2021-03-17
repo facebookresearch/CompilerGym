@@ -45,7 +45,7 @@ from compiler_gym.service.proto import (
 from compiler_gym.spaces import NamedDiscrete, Reward
 from compiler_gym.util.debug_util import get_logging_level
 from compiler_gym.util.timer import Timer
-from compiler_gym.validation_result import ValidationResult
+from compiler_gym.validation_result import ValidationError, ValidationResult
 from compiler_gym.views import ObservationSpaceSpec, ObservationView, RewardView
 
 # Type hints.
@@ -1000,7 +1000,7 @@ class CompilerEnv(gym.Env):
         in_place = state is not None
         state = state or self.state
 
-        error_messages = []
+        errors: ValidationError = []
         validation = {
             "state": state,
             "actions_replay_failed": False,
@@ -1022,7 +1022,15 @@ class CompilerEnv(gym.Env):
                         replay_target.apply(state)
                     except (ValueError, OSError) as e:
                         validation["actions_replay_failed"] = True
-                        error_messages.append(str(e))
+                        errors.append(
+                            ValidationError(
+                                type="Action replay failed",
+                                data={
+                                    "exception": str(e),
+                                    "exception_type": type(e).__name__,
+                                },
+                            )
+                        )
                         break
 
                     if state.reward is not None and self.reward_space is None:
@@ -1045,9 +1053,17 @@ class CompilerEnv(gym.Env):
                             abs_tol=1e-10,
                         ):
                             validation["reward_validation_failed"] = True
-                            error_messages.append(
-                                f"Expected reward {state.reward:.4f} but "
-                                f"received reward {replay_target.episode_reward:.4f}"
+                            errors.append(
+                                ValidationError(
+                                    type=(
+                                        f"Expected reward {state.reward} but "
+                                        f"received reward {replay_target.episode_reward}"
+                                    ),
+                                    data={
+                                        "expected_reward": state.reward,
+                                        "actual_reward": replay_target.episode_reward,
+                                    },
+                                )
                             )
 
                     # TODO(https://github.com/facebookresearch/CompilerGym/issues/45):
@@ -1056,10 +1072,10 @@ class CompilerEnv(gym.Env):
                     validate_semantics = self.get_benchmark_validation_callback()
                     if validate_semantics:
                         validation["benchmark_semantics_validated"] = True
-                        semantics_error = validate_semantics(self)
-                        if semantics_error:
+                        semantics_errors = list(validate_semantics(self))
+                        if semantics_errors:
                             validation["benchmark_semantics_validation_failed"] = True
-                            error_messages.append(semantics_error)
+                            errors += semantics_errors
 
                     # Finished all checks, break the loop.
                     break
@@ -1068,13 +1084,13 @@ class CompilerEnv(gym.Env):
 
         return ValidationResult(
             walltime=walltime.time,
-            error_details="\n".join(error_messages),
+            errors=errors,
             **validation,
         )
 
     def get_benchmark_validation_callback(
         self,
-    ) -> Optional[Callable[["CompilerEnv"], Optional[str]]]:
+    ) -> Optional[Callable[["CompilerEnv"], Iterable[ValidationError]]]:
         """Return a callback that validates benchmark semantics, if available.
 
         TODO(https://github.com/facebookresearch/CompilerGym/issues/45): This is
