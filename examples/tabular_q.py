@@ -4,7 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 
 """Simple compiler gym tabular q learning example.
-Usage python tabular_q.py
+Usage python tabular_q.py --benchmark=<benchmark>
 
 Using selected features from Autophase observation space, given a specific training
 program as gym environment, find the best action sequence using online q learning.
