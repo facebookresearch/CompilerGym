@@ -7,14 +7,12 @@ import logging
 import os
 import sys
 import warnings
-from collections.abc import Iterable
+from collections.abc import Iterable as IterableType
 from copy import deepcopy
 from math import isclose
 from pathlib import Path
 from time import time
-from typing import Any, Callable, Dict
-from typing import Iterable as IterableT
-from typing import List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 
 import fasteners
 import gym
@@ -681,8 +679,9 @@ class CompilerEnv(gym.Env):
                     ),
                 ),
             )
-        except (ServiceError, ServiceTransportError):
+        except (ServiceError, ServiceTransportError, TimeoutError) as e:
             # Abort and retry on error.
+            self.logger.warning("%s on reset(): %s", type(e).__name__, e)
             self.service.close()
             self.service = None
             return self.reset(
@@ -711,7 +710,7 @@ class CompilerEnv(gym.Env):
         if self.observation_space:
             return self.observation[self.observation_space.id]
 
-    def step(self, action: Union[int, IterableT[int]]) -> step_t:
+    def step(self, action: Union[int, Iterable[int]]) -> step_t:
         """Take a step.
 
         :param action: An action, or a sequence of actions. When multiple
@@ -723,7 +722,7 @@ class CompilerEnv(gym.Env):
             service failed).
         """
         assert self.in_episode, "Must call reset() before step()"
-        actions = action if isinstance(action, Iterable) else [action]
+        actions = action if isinstance(action, IterableType) else [action]
         observation, reward = None, None
 
         # Build the list of observations that must be computed by the backend
@@ -991,12 +990,11 @@ class CompilerEnv(gym.Env):
             )
 
         actions = self.commandline_to_actions(state.commandline)
-        for action in actions:
-            _, _, done, info = self.step(action)
-            if done:
-                raise ValueError(
-                    f"Environment terminated with error: `{info.get('error_details')}`"
-                )
+        _, _, done, info = self.step(actions)
+        if done:
+            raise ValueError(
+                f"Environment terminated with error: `{info.get('error_details')}`"
+            )
 
     def validate(self, state: Optional[CompilerEnvState] = None) -> ValidationResult:
         in_place = state is not None

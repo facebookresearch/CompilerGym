@@ -35,6 +35,11 @@ class CompilerEnvState(NamedTuple):
     reward: Optional[float] = None
     """The cumulative reward for this episode."""
 
+    @property
+    def has_reward(self) -> bool:
+        """Return whether the state has a reward value."""
+        return self.reward is not None
+
     @staticmethod
     def csv_header() -> str:
         """Return the header string for the CSV-format.
@@ -74,7 +79,7 @@ class CompilerEnvState(NamedTuple):
         return cls(
             benchmark=benchmark,
             reward=None if reward == "" else float(reward),
-            walltime=float(walltime),
+            walltime=0 if walltime == "" else float(walltime),
             commandline=commandline,
         )
 
@@ -86,6 +91,9 @@ class CompilerEnvState(NamedTuple):
         :returns: A generator of :class:`CompilerEnvState` instances.
         :raises ValueError: If input parsing fails.
         """
+        # TODO(cummins): Check schema of DictReader and, on failure, fallback
+        # to from_csv() per-line.
+        # TODO(cummins): Accept a URL for in_file and read from web.
         data = in_file.readlines()
         for line in csv.DictReader(data):
             try:
@@ -101,10 +109,8 @@ class CompilerEnvState(NamedTuple):
         if not isinstance(rhs, CompilerEnvState):
             return False
         epsilon = 1e-5
-        # If only one benchmark has a reward the states cannot be equal.
-        if (self.reward is None) != (rhs.reward is None):
-            return False
-        if (self.reward is None) and (rhs.reward is None):
+        # Only compare reward if both states have it.
+        if not (self.has_reward and rhs.has_reward):
             reward_equal = True
         else:
             reward_equal = abs(self.reward - rhs.reward) < epsilon
@@ -116,3 +122,6 @@ class CompilerEnvState(NamedTuple):
             and reward_equal
             and self.commandline == rhs.commandline
         )
+
+    def __ne__(self, rhs) -> bool:
+        return not self == rhs

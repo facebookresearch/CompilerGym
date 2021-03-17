@@ -19,7 +19,7 @@ from tests.test_main import main as _test_main
 def test_okay_llvm_result(monkeypatch):
     stdin = """
 benchmark,reward,commandline,walltime
-benchmark://cBench-v1/dijkstra,0,opt  input.bc -o output.bc,0.3
+benchmark://cBench-v1/crc32,0,opt  input.bc -o output.bc,0.3
 """.strip()
     flags.FLAGS.unparse_flags()
     flags.FLAGS(["argv0", "--env=llvm-ic-v0", "--dataset=cBench-v1"])
@@ -28,7 +28,7 @@ benchmark://cBench-v1/dijkstra,0,opt  input.bc -o output.bc,0.3
     with capture_output() as out:
         main(["argv0", "-"])
 
-    assert "✅  cBench-v1/dijkstra " in out.stdout
+    assert "✅  cBench-v1/crc32 " in out.stdout
     assert not out.stderr
 
 
@@ -39,7 +39,7 @@ def test_okay_llvm_result_file_input():
             f.write(
                 """
 benchmark,reward,commandline,walltime
-benchmark://cBench-v1/dijkstra,0,opt  input.bc -o output.bc,0.3
+benchmark://cBench-v1/crc32,0,opt  input.bc -o output.bc,0.3
 """.strip()
             )
         flags.FLAGS.unparse_flags()
@@ -48,7 +48,7 @@ benchmark://cBench-v1/dijkstra,0,opt  input.bc -o output.bc,0.3
         with capture_output() as out:
             main(["argv0", str(path)])
 
-    assert "✅  cBench-v1/dijkstra " in out.stdout
+    assert "✅  cBench-v1/crc32 " in out.stdout
     assert not out.stderr
 
 
@@ -67,7 +67,7 @@ def test_no_input(monkeypatch):
 def test_invalid_reward_llvm_result(monkeypatch):
     stdin = """
 benchmark,reward,commandline,walltime
-benchmark://cBench-v1/dijkstra,0.5,opt  input.bc -o output.bc,0.3
+benchmark://cBench-v1/crc32,0.5,opt  input.bc -o output.bc,0.3
 """.strip()
     flags.FLAGS.unparse_flags()
     flags.FLAGS(["argv0", "--env=llvm-ic-v0", "--dataset=cBench-v1"])
@@ -77,7 +77,7 @@ benchmark://cBench-v1/dijkstra,0.5,opt  input.bc -o output.bc,0.3
             main(["argv0", "-"])
 
     assert (
-        "❌  cBench-v1/dijkstra  Expected reward 0.5000 but received reward 0.0000\n"
+        "❌  cBench-v1/crc32  Expected reward 0.5000 but received reward 0.0000\n"
         in out.stdout
     )
     assert not out.stderr
