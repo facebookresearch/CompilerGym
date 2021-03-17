@@ -154,8 +154,7 @@ environment on the 23 benchmarks in the `cBench-v1` dataset.
 
 | Author | Algorithm | Links | Walltime (mean) | Codesize Reduction (geomean) |
 | --- | --- | --- | --- | --- |
-| ⚠️ Under Construction | Lorem Ipsum | write-up, results | **123.123s** | **1.234x** |
-
+| Facebook | Greedy search | [write-up](leaderboard/llvm_codesize/e_greedy/README.md), [results](leaderboard/llvm_codesize/e_greedy/results_e0.csv) | **145.705s** | **1.042×** |
 
 # Contributing
 
