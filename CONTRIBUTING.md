@@ -72,7 +72,9 @@ and file a [Pull Request](#pull-requests). Please include:
 3. A write-up of your approach. You may use the
    [submission template](/leaderboard/SUBMISSION_TEMPLATE.md) as a guide.
 
-<!-- TODO(cummins): Add a link to an example submission pull request. -->
+Please [take a look
+here](https://github.com/facebookresearch/CompilerGym/pull/127) for an example
+of a well-formed pull request submission.
 
 ## Contributor License Agreement ("CLA")
 
