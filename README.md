@@ -152,9 +152,10 @@ achieved scaled to the reduction achieved by LLVM's builtin `-Oz` pipeline.
 This leaderboard tracks the results achieved by algorithms on the `llvm-ic-v0`
 environment on the 23 benchmarks in the `cBench-v1` dataset.
 
-| Author | Algorithm | Links | Walltime (mean) | Codesize Reduction (geomean) |
-| --- | --- | --- | --- | --- |
-| Facebook | Greedy search | [write-up](leaderboard/llvm_codesize/e_greedy/README.md), [results](leaderboard/llvm_codesize/e_greedy/results_e0.csv) | **145.705s** | **1.042×** |
+| Author | Algorithm | Links | Date | Walltime (mean) | Codesize Reduction (geomean) |
+| --- | --- | --- | --- | --- | --- |
+| Facebook | Greedy search | [write-up](leaderboard/llvm_codesize/e_greedy/README.md), [results](leaderboard/llvm_codesize/e_greedy/results_e0.csv) | 2021-03 | 169.237s | 1.055× |
+| Facebook | e-Greedy search (e=0.1) | [write-up](leaderboard/llvm_codesize/e_greedy/README.md), [results](leaderboard/llvm_codesize/e_greedy/results_e10.csv) | 2021-03 | 152.579s | 1.041× |
 
 # Contributing
 
