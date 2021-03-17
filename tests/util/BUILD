@@ -36,6 +36,17 @@ cc_test(
 )
 
 py_test(
+    name = "minimize_trajectory_test",
+    timeout = "short",
+    srcs = ["minimize_trajectory_test.py"],
+    deps = [
+        "//compiler_gym/util",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "statistics_test",
     timeout = "short",
     srcs = ["statistics_test.py"],
