@@ -12,6 +12,7 @@ from pathlib import Path
 from typing import List, NamedTuple, Optional, Union
 
 import fasteners
+from deprecated.sphinx import deprecated
 
 from compiler_gym.util.download import download
 
@@ -92,6 +93,13 @@ class LegacyDataset(NamedTuple):
         return path
 
 
+@deprecated(
+    version="0.1.4",
+    reason=(
+        "Activating datasets will be removed in v0.1.5. "
+        "`More information <https://github.com/facebookresearch/CompilerGym/issues/45>`_."
+    ),
+)
 def activate(env, name: str) -> bool:
     """Move a directory from the inactive to active benchmark directory.
 
@@ -114,6 +122,13 @@ def activate(env, name: str) -> bool:
         return True
 
 
+@deprecated(
+    version="0.1.4",
+    reason=(
+        "Deleting datasets will be removed in v0.1.5. "
+        "`More information <https://github.com/facebookresearch/CompilerGym/issues/45>`_."
+    ),
+)
 def delete(env, name: str) -> bool:
     """Delete a directory in the inactive benchmark directory.
 
@@ -134,6 +149,13 @@ def delete(env, name: str) -> bool:
         return deleted
 
 
+@deprecated(
+    version="0.1.4",
+    reason=(
+        "Deactivating datasets will be removed in v0.1.5. "
+        "`More information <https://github.com/facebookresearch/CompilerGym/issues/45>`_."
+    ),
+)
 def deactivate(env, name: str) -> bool:
     """Move a directory from active to the inactive benchmark directory.
 
