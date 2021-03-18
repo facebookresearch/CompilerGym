@@ -17,7 +17,14 @@ from compiler_gym.util.download import download
 
 
 class LegacyDataset(NamedTuple):
-    """A collection of benchmarks for use by an environment."""
+    """A collection of benchmarks for use by an environment.
+
+    .. deprecated:: 0.1.4
+       The next release of CompilerGym will introduce a new API for describing
+       datasets with extended functionality. See
+       `here <https://github.com/facebookresearch/CompilerGym/issues/45>`_ for
+       more information.
+    """
 
     name: str
     """The name of the dataset."""
@@ -215,10 +222,10 @@ def require(env, dataset: Union[str, LegacyDataset]) -> bool:
             # Check if we have already downloaded the dataset.
             if "://" in dataset:
                 name, url = None, dataset
-                dataset: Optional[Dataset] = None
+                dataset: Optional[LegacyDataset] = None
             else:
                 try:
-                    dataset: Optional[Dataset] = env.available_datasets[dataset]
+                    dataset: Optional[LegacyDataset] = env.available_datasets[dataset]
                 except KeyError:
                     raise ValueError(f"Dataset not found: {dataset}")
                 name, url, sha256 = dataset.name, dataset.url, dataset.sha256

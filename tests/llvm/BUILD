@@ -89,7 +89,7 @@ py_test(
     srcs = ["datasets_test.py"],
     deps = [
         "//compiler_gym",
-        "//compiler_gym/envs/llvm:datasets",
+        "//compiler_gym/envs/llvm:legacy_datasets",
         "//tests:test_main",
         "//tests/pytest_plugins:common",
         "//tests/pytest_plugins:llvm",

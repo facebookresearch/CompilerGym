@@ -2,29 +2,29 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""Tests for //compiler_gym/envs/llvm:datasets."""
+"""Tests for //compiler_gym/envs/llvm:legacy_datasets."""
 import os
 
 import gym
 import pytest
 
-from compiler_gym.envs.llvm import LlvmEnv, datasets
+from compiler_gym.envs.llvm import LlvmEnv, legacy_datasets
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.llvm"]
 
 
 def test_validate_sha_output_okay():
-    output = datasets.BenchmarkExecutionResult(
+    output = legacy_datasets.BenchmarkExecutionResult(
         walltime_seconds=0,
         output="1234567890abcdef 1234567890abcd 1234567890abc 1234567890 12345",
     )
-    assert datasets.validate_sha_output(output) is None
+    assert legacy_datasets.validate_sha_output(output) is None
 
 
 def test_validate_sha_output_invalid():
-    output = datasets.BenchmarkExecutionResult(walltime_seconds=0, output="abcd")
-    assert datasets.validate_sha_output(output)
+    output = legacy_datasets.BenchmarkExecutionResult(walltime_seconds=0, output="abcd")
+    assert legacy_datasets.validate_sha_output(output)
 
 
 def test_default_cBench_dataset_require(tmpwd, temporary_environ):

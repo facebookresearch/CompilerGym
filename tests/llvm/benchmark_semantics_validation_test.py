@@ -10,7 +10,9 @@ import gym
 
 from compiler_gym import CompilerEnvState, ValidationResult
 from compiler_gym.envs import LlvmEnv
-from compiler_gym.envs.llvm.datasets import get_llvm_benchmark_validation_callback
+from compiler_gym.envs.llvm.legacy_datasets import (
+    get_llvm_benchmark_validation_callback,
+)
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]

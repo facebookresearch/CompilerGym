@@ -34,8 +34,8 @@ py_library(
 )
 
 py_library(
-    name = "datasets",
-    srcs = ["datasets.py"],
+    name = "legacy_datasets",
+    srcs = ["legacy_datasets.py"],
     data = [
         "//compiler_gym/third_party/llvm:clang",
         "//compiler_gym/third_party/llvm:lli",
@@ -55,7 +55,7 @@ py_library(
     ],
     deps = [
         ":benchmarks",
-        ":datasets",
+        ":legacy_datasets",
         ":llvm_rewards",
         "//compiler_gym/envs:compiler_env",
         "//compiler_gym/spaces",
