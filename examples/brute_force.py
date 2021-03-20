@@ -233,7 +233,7 @@ def run_brute_force(
     expected_chunk_count = math.ceil(expected_trial_count / chunksize)
     chunk_count = 0
     best_reward = -float("inf")
-
+    best_action_sequence = []
     print(
         f"Enumerating all episodes of {len(actions)} actions × {episode_length} steps"
     )
@@ -262,7 +262,7 @@ def run_brute_force(
                 print(
                     f"\r\033[KRuntime: {humanize.naturaldelta(time() - started)}. "
                     f"Progress: {chunk_count/expected_chunk_count:.2%}. "
-                    f"Best reward found: {best_reward:.4%}.",
+                    f"Best reward found: {best_reward}.",
                     file=sys.stderr,
                     flush=True,
                     end="",
@@ -270,7 +270,9 @@ def run_brute_force(
                 for actions, rewards in chunk:
                     print(*actions, *rewards, sep=",", file=f, flush=True)
                     if rewards and rewards[-1] is not None:
-                        best_reward = max(best_reward, rewards[-1])
+                        if sum(rewards) > best_reward:
+                            best_reward = sum(rewards)
+                            best_action_sequence = actions
     except KeyboardInterrupt:
         print("\nkeyboard interrupt", end="", flush=True)
 
@@ -288,11 +290,14 @@ def run_brute_force(
         worker.join()
 
     num_trials = sum(worker.num_trials for worker in workers)
+    env: CompilerEnv = make_env()
     print(
         f"completed {humanize.intcomma(num_trials)} of "
         f"{humanize.intcomma(expected_trial_count)} trials "
-        f"({num_trials / expected_trial_count:.3%})"
+        f"({num_trials / expected_trial_count:.3%}), best sequence",
+        " ".join([env.action_space.flags[i] for i in best_action_sequence]),
     )
+    env.close()
 
 
 def main(argv):
