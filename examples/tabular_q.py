@@ -105,9 +105,7 @@ def get_max_q_value(q_table, ob, step):
     max_q = 0
     for act in FLAGS.actions:
         hashed = make_q_table_key(ob, act, step)
-        if hashed not in q_table:
-            q_table[hashed] = 0
-        max_q = max(q_table[hashed], max_q)
+        max_q = max(q_table.get(hashed, 0), max_q)
     return max_q
 
 
