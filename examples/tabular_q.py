@@ -86,7 +86,6 @@ def make_q_table_key(autophase_feature, action, step):
 
     Finally, we add the action index to the key.
     """
-
     return StateActionTuple(
         *autophase_feature[FLAGS.features_indices], step, FLAGS.actions.index(action)
     )

@@ -5,17 +5,19 @@
 """Evaluate tabular_q policy for leaderboard."""
 from typing import Dict
 
+from absl import app
+
 from compiler_gym.envs import LlvmEnv
-from examples.tabular_q import StateActionTuple, rollout, train_q
+from examples.tabular_q import StateActionTuple, rollout, train
 from leaderboard.llvm_codesize.eval_policy import eval_policy
 
 
 def train_and_run(env: LlvmEnv) -> None:
     """ Run tabular Q learning on an environment """
     q_table: Dict[StateActionTuple, float] = {}
-    train_q(q_table, env.fork())
+    train(q_table, env.fork())
     rollout(q_table, env, True)
 
 
 if __name__ == "__main__":
-    eval_policy(train_and_run)
+    app.run(eval_policy(train_and_run))
