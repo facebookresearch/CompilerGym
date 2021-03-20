@@ -139,7 +139,13 @@ from typing import Tuple
 import humanize
 from absl import app, flags
 
-from compiler_gym.datasets.dataset import Dataset, activate, deactivate, delete, require
+from compiler_gym.datasets.dataset import (
+    LegacyDataset,
+    activate,
+    deactivate,
+    delete,
+    require,
+)
 from compiler_gym.util.flags.env_from_flags import env_from_flags
 from compiler_gym.util.tabulate import tabulate
 
@@ -183,7 +189,7 @@ def enumerate_directory(name: str, path: Path):
     for path in path.iterdir():
         if not path.is_file() or not path.name.endswith(".json"):
             continue
-        dataset = Dataset.from_json_file(path)
+        dataset = LegacyDataset.from_json_file(path)
         rows.append(
             (dataset.name, dataset.license, dataset.file_count, dataset.size_bytes)
         )

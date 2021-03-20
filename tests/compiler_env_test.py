@@ -8,14 +8,14 @@ import sys
 import gym
 import pytest
 
-from compiler_gym.datasets import Dataset
+from compiler_gym.datasets import LegacyDataset
 from compiler_gym.envs import CompilerEnv
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
-def make_dataset(**kwargs) -> Dataset:
+def make_dataset(**kwargs) -> LegacyDataset:
     default_kwargs = {
         "name": "test-dataset-v0",
         "url": "https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-blas-v0.tar.bz2",
@@ -27,7 +27,7 @@ def make_dataset(**kwargs) -> Dataset:
         "sha256": "e724a8114709f8480adeb9873d48e426e8d9444b00cddce48e342b9f0f2b096d",
     }
     default_kwargs.update(kwargs)
-    return Dataset(**default_kwargs)
+    return LegacyDataset(**default_kwargs)
 
 
 def test_register_dataset(env: CompilerEnv):

@@ -21,7 +21,7 @@ from typing import Callable, Dict, Iterable, List, NamedTuple, Optional
 
 import fasteners
 
-from compiler_gym.datasets.dataset import Dataset
+from compiler_gym.datasets.dataset import LegacyDataset
 from compiler_gym.util import thread_pool
 from compiler_gym.util.download import download
 from compiler_gym.util.runfiles_path import cache_path, runfiles_path, site_data_path
@@ -47,7 +47,7 @@ else:
     _COMPILE_ARGS = []
 
 LLVM_DATASETS = [
-    Dataset(
+    LegacyDataset(
         name="blas-v0",
         url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-blas-v0.tar.bz2",
         license="BSD 3-Clause",
@@ -66,7 +66,7 @@ LLVM_DATASETS = [
     # The key difference with is that in v0, the generated IR functions were
     # annotated with a `noinline` attribute that prevented inline. In v1 that is
     # no longer the case.
-    Dataset(
+    LegacyDataset(
         name="cBench-v0",
         url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v0-macos.tar.bz2",
         license="BSD 3-Clause",
@@ -78,7 +78,7 @@ LLVM_DATASETS = [
         platforms=["macos"],
         deprecated_since="v0.1.4",
     ),
-    Dataset(
+    LegacyDataset(
         name="cBench-v0",
         url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v0-linux.tar.bz2",
         license="BSD 3-Clause",
@@ -90,7 +90,7 @@ LLVM_DATASETS = [
         platforms=["linux"],
         deprecated_since="v0.1.4",
     ),
-    Dataset(
+    LegacyDataset(
         name="cBench-v1",
         url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v1-macos.tar.bz2",
         license="BSD 3-Clause",
@@ -101,7 +101,7 @@ LLVM_DATASETS = [
         sha256="90b312b40317d9ee9ed09b4b57d378879f05e8970bb6de80dc8581ad0e36c84f",
         platforms=["macos"],
     ),
-    Dataset(
+    LegacyDataset(
         name="cBench-v1",
         url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v1-linux.tar.bz2",
         license="BSD 3-Clause",
@@ -112,7 +112,7 @@ LLVM_DATASETS = [
         sha256="601fff3944c866f6617e653b6eb5c1521382c935f56ca1f36a9f5cf1a49f3de5",
         platforms=["linux"],
     ),
-    Dataset(
+    LegacyDataset(
         name="github-v0",
         url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-github-v0.tar.bz2",
         license="CC BY 4.0",
@@ -122,7 +122,7 @@ LLVM_DATASETS = [
         size_bytes=725974100,
         sha256="880269dd7a5c2508ea222a2e54c318c38c8090eb105c0a87c595e9dd31720764",
     ),
-    Dataset(
+    LegacyDataset(
         name="linux-v0",
         url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-linux-v0.tar.bz2",
         license="GPL-2.0",
@@ -132,7 +132,7 @@ LLVM_DATASETS = [
         size_bytes=516031044,
         sha256="a1ae5c376af30ab042c9e54dc432f89ce75f9ebaee953bc19c08aff070f12566",
     ),
-    Dataset(
+    LegacyDataset(
         name="mibench-v0",
         url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-mibench-v0.tar.bz2",
         license="BSD 3-Clause",
@@ -142,7 +142,7 @@ LLVM_DATASETS = [
         size_bytes=238480,
         sha256="128c090c40b955b99fdf766da167a5f642018fb35c16a1d082f63be2e977eb13",
     ),
-    Dataset(
+    LegacyDataset(
         name="npb-v0",
         url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-npb-v0.tar.bz2",
         license="NASA Open Source Agreement v1.3",
@@ -152,7 +152,7 @@ LLVM_DATASETS = [
         size_bytes=2287444,
         sha256="793ac2e7a4f4ed83709e8a270371e65b724da09eaa0095c52e7f4209f63bb1f2",
     ),
-    Dataset(
+    LegacyDataset(
         name="opencv-v0",
         url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-opencv-v0.tar.bz2",
         license="Apache 2.0",
@@ -162,7 +162,7 @@ LLVM_DATASETS = [
         size_bytes=21903008,
         sha256="003df853bd58df93572862ca2f934c7b129db2a3573bcae69a2e59431037205c",
     ),
-    Dataset(
+    LegacyDataset(
         name="poj104-v0",
         url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-poj104-v0.tar.bz2",
         license="BSD 3-Clause",
@@ -172,7 +172,7 @@ LLVM_DATASETS = [
         size_bytes=304207752,
         sha256="6254d629887f6b51efc1177788b0ce37339d5f3456fb8784415ed3b8c25cce27",
     ),
-    Dataset(
+    LegacyDataset(
         name="polybench-v0",
         url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-polybench-v0.tar.bz2",
         license="BSD 3-Clause",
@@ -182,7 +182,7 @@ LLVM_DATASETS = [
         size_bytes=162624,
         sha256="968087e68470e5b44dc687dae195143000c7478a23d6631b27055bb3bb3116b1",
     ),
-    Dataset(
+    LegacyDataset(
         name="tensorflow-v0",
         url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-tensorflow-v0.tar.bz2",
         license="Apache 2.0",

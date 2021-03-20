@@ -11,7 +11,7 @@ import gym
 import pytest
 
 from compiler_gym.envs import CompilerEnv
-from compiler_gym.envs.llvm.datasets import VALIDATORS
+from compiler_gym.envs.llvm.legacy_datasets import VALIDATORS
 from compiler_gym.util.runfiles_path import runfiles_path
 
 ACTIONS_LIST = Path(

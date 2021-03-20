@@ -12,12 +12,20 @@ from pathlib import Path
 from typing import List, NamedTuple, Optional, Union
 
 import fasteners
+from deprecated.sphinx import deprecated
 
 from compiler_gym.util.download import download
 
 
-class Dataset(NamedTuple):
-    """A collection of benchmarks for use by an environment."""
+class LegacyDataset(NamedTuple):
+    """A collection of benchmarks for use by an environment.
+
+    .. deprecated:: 0.1.4
+       The next release of CompilerGym will introduce a new API for describing
+       datasets with extended functionality. See
+       `here <https://github.com/facebookresearch/CompilerGym/issues/45>`_ for
+       more information.
+    """
 
     name: str
     """The name of the dataset."""
@@ -57,11 +65,11 @@ class Dataset(NamedTuple):
         return bool(self.deprecated_since)
 
     @classmethod
-    def from_json_file(cls, path: Path) -> "Dataset":
+    def from_json_file(cls, path: Path) -> "LegacyDataset":
         """Construct a dataset form a JSON metadata file.
 
         :param path: Path of the JSON metadata.
-        :return: A Dataset instance.
+        :return: A LegacyDataset instance.
         """
         try:
             with open(str(path), "rb") as f:
@@ -85,6 +93,13 @@ class Dataset(NamedTuple):
         return path
 
 
+@deprecated(
+    version="0.1.4",
+    reason=(
+        "Activating datasets will be removed in v0.1.5. "
+        "`More information <https://github.com/facebookresearch/CompilerGym/issues/45>`_."
+    ),
+)
 def activate(env, name: str) -> bool:
     """Move a directory from the inactive to active benchmark directory.
 
@@ -107,6 +122,13 @@ def activate(env, name: str) -> bool:
         return True
 
 
+@deprecated(
+    version="0.1.4",
+    reason=(
+        "Deleting datasets will be removed in v0.1.5. "
+        "`More information <https://github.com/facebookresearch/CompilerGym/issues/45>`_."
+    ),
+)
 def delete(env, name: str) -> bool:
     """Delete a directory in the inactive benchmark directory.
 
@@ -127,6 +149,13 @@ def delete(env, name: str) -> bool:
         return deleted
 
 
+@deprecated(
+    version="0.1.4",
+    reason=(
+        "Deactivating datasets will be removed in v0.1.5. "
+        "`More information <https://github.com/facebookresearch/CompilerGym/issues/45>`_."
+    ),
+)
 def deactivate(env, name: str) -> bool:
     """Move a directory from active to the inactive benchmark directory.
 
@@ -145,7 +174,7 @@ def deactivate(env, name: str) -> bool:
         return True
 
 
-def require(env, dataset: Union[str, Dataset]) -> bool:
+def require(env, dataset: Union[str, LegacyDataset]) -> bool:
     """Require that the given dataset is available to the environment.
 
     This will download and activate the dataset if it is not already installed.
@@ -160,12 +189,14 @@ def require(env, dataset: Union[str, Dataset]) -> bool:
 
     :param env: The environment that this dataset is required for.
     :param dataset: The name of the dataset to download, the URL of the dataset,
-        or a :class:`Dataset` instance.
+        or a :class:`LegacyDataset` instance.
     :return: :code:`True` if the dataset was downloaded, or :code:`False` if the
         dataset was already available.
     """
 
-    def download_and_unpack_archive(url: str, sha256: Optional[str] = None) -> Dataset:
+    def download_and_unpack_archive(
+        url: str, sha256: Optional[str] = None
+    ) -> LegacyDataset:
         json_files_before = {
             f
             for f in env.inactive_datasets_site_path.iterdir()
@@ -182,9 +213,9 @@ def require(env, dataset: Union[str, Dataset]) -> bool:
         new_json = json_files_after - json_files_before
         if not len(new_json):
             raise OSError(f"Downloaded dataset {url} contains no metadata JSON file")
-        return Dataset.from_json_file(list(new_json)[0])
+        return LegacyDataset.from_json_file(list(new_json)[0])
 
-    def unpack_local_archive(path: Path) -> Dataset:
+    def unpack_local_archive(path: Path) -> LegacyDataset:
         if not path.is_file():
             raise FileNotFoundError(f"File not found: {path}")
         json_files_before = {
@@ -202,21 +233,21 @@ def require(env, dataset: Union[str, Dataset]) -> bool:
         new_json = json_files_after - json_files_before
         if not len(new_json):
             raise OSError(f"Downloaded dataset {url} contains no metadata JSON file")
-        return Dataset.from_json_file(list(new_json)[0])
+        return LegacyDataset.from_json_file(list(new_json)[0])
 
     with fasteners.InterProcessLock(env.datasets_site_path / "LOCK"):
         # Resolve the name and URL of the dataset.
         sha256 = None
-        if isinstance(dataset, Dataset):
+        if isinstance(dataset, LegacyDataset):
             name, url = dataset.name, dataset.url
         elif isinstance(dataset, str):
             # Check if we have already downloaded the dataset.
             if "://" in dataset:
                 name, url = None, dataset
-                dataset: Optional[Dataset] = None
+                dataset: Optional[LegacyDataset] = None
             else:
                 try:
-                    dataset: Optional[Dataset] = env.available_datasets[dataset]
+                    dataset: Optional[LegacyDataset] = env.available_datasets[dataset]
                 except KeyError:
                     raise ValueError(f"Dataset not found: {dataset}")
                 name, url, sha256 = dataset.name, dataset.url, dataset.sha256

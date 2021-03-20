@@ -14,7 +14,7 @@ from gym.spaces import Dict as DictSpace
 
 from compiler_gym.envs.compiler_env import CompilerEnv
 from compiler_gym.envs.llvm.benchmarks import make_benchmark
-from compiler_gym.envs.llvm.datasets import (
+from compiler_gym.envs.llvm.legacy_datasets import (
     LLVM_DATASETS,
     get_llvm_benchmark_validation_callback,
 )
