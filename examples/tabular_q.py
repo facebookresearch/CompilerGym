@@ -47,7 +47,7 @@ flags.DEFINE_list(
     "Indices of Alphaphase features that are used to construct a state",
 )
 flags.DEFINE_float("learning_rate", 0.1, "learning rate of the q-learning.")
-flags.DEFINE_integer("episodes", 5000, "number of episodes used to learn.")
+flags.DEFINE_integer("episodes", 2000, "number of episodes used to learn.")
 flags.DEFINE_integer(
     "log_every", 50, "number of episode interval where progress is reported."
 )
