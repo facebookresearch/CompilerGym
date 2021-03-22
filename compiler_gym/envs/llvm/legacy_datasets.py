@@ -29,7 +29,6 @@ from compiler_gym.util.runfiles_path import cache_path, site_data_path
 from compiler_gym.util.timer import Timer
 from compiler_gym.validation_result import ValidationError
 
-_CBENCH_DATA = site_data_path("llvm/cBench-v1-runtime-data/runtime_data")
 _CBENCH_DATA_URL = (
     "https://dl.fbaipublicfiles.com/compiler_gym/cBench-v0-runtime-data.tar.bz2"
 )
@@ -369,26 +368,26 @@ def _compile_and_run_bitcode_file(
     return BenchmarkExecutionResult(walltime_seconds=timer.time, output=output)
 
 
-@fasteners.interprocess_locked(cache_path("cBench-v1-runtime-data.LOCK"))
 def download_cBench_runtime_data() -> bool:
     """Download and unpack the cBench runtime dataset."""
-    if (_CBENCH_DATA / "unpacked").is_file():
+    cbench_data = site_data_path("llvm/cBench-v1-runtime-data/runtime_data")
+    if (cbench_data / "unpacked").is_file():
         return False
     else:
         # Clean up any partially-extracted data directory.
-        if _CBENCH_DATA.is_dir():
-            shutil.rmtree(_CBENCH_DATA)
+        if cbench_data.is_dir():
+            shutil.rmtree(cbench_data)
 
         tar_contents = io.BytesIO(
             download(_CBENCH_DATA_URL, sha256=_CBENCH_DATA_SHA256)
         )
         with tarfile.open(fileobj=tar_contents, mode="r:bz2") as tar:
-            _CBENCH_DATA.parent.mkdir(parents=True, exist_ok=True)
-            tar.extractall(_CBENCH_DATA.parent)
-        assert _CBENCH_DATA.is_dir()
+            cbench_data.parent.mkdir(parents=True, exist_ok=True)
+            tar.extractall(cbench_data.parent)
+        assert cbench_data.is_dir()
         # Create the marker file to indicate that the directory is unpacked
         # and ready to go.
-        (_CBENCH_DATA / "unpacked").touch()
+        (cbench_data / "unpacked").touch()
         return True
 
 
@@ -420,9 +419,12 @@ def _make_cBench_validator(
     def validator_cb(env: "LlvmEnv") -> Optional[ValidationError]:  # noqa: F821
         """The validation callback."""
         with _CBENCH_DOWNLOAD_THREAD_LOCK:
-            download_cBench_runtime_data()
+            with fasteners.InterProcessLock(cache_path("cBench-v1-runtime-data.LOCK")):
+                download_cBench_runtime_data()
 
-        for path in input_files:
+        cbench_data = site_data_path("llvm/cBench-v1-runtime-data/runtime_data")
+        for input_file_name in input_files:
+            path = cbench_data / input_file_name
             if not path.is_file():
                 raise FileNotFoundError(f"Required benchmark input not found: {path}")
 
@@ -431,7 +433,7 @@ def _make_cBench_validator(
             cwd = Path(d)
 
             # Expand shell variable substitutions in the benchmark command.
-            expanded_command = cmd.replace("$D", str(_CBENCH_DATA))
+            expanded_command = cmd.replace("$D", str(cbench_data))
 
             # Translate the output file names into paths inside the working
             # directory.
@@ -594,7 +596,7 @@ def validator(
     platforms = platforms or ["linux", "macos"]
     if {"darwin": "macos"}.get(sys.platform, sys.platform) not in platforms:
         return False
-    infiles = [_CBENCH_DATA / p for p in data or []]
+    infiles = data or []
     outfiles = [Path(p) for p in outs or []]
     linkopts = linkopts or []
     env = env or {}
@@ -691,14 +693,15 @@ def setup_ghostscript_library_files(dataset_id: int) -> Callable[[Path], None]:
     """Make a pre-execution setup hook for ghostscript."""
 
     def setup(cwd: Path):
+        cbench_data = site_data_path("llvm/cBench-v1-runtime-data/runtime_data")
         # Copy the input data file into the current directory since ghostscript
         # doesn't like long input paths.
         shutil.copyfile(
-            _CBENCH_DATA / "office_data" / f"{dataset_id}.ps", cwd / "input.ps"
+            cbench_data / "office_data" / f"{dataset_id}.ps", cwd / "input.ps"
         )
         # Ghostscript doesn't like the library files being symlinks so copy them
         # into the working directory as regular files.
-        for path in (_CBENCH_DATA / "ghostscript").iterdir():
+        for path in (cbench_data / "ghostscript").iterdir():
             if path.name.endswith(".ps"):
                 shutil.copyfile(path, cwd / path.name)
 
