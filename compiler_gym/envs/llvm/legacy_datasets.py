@@ -172,16 +172,18 @@ LLVM_DATASETS = [
         size_bytes=304207752,
         sha256="6254d629887f6b51efc1177788b0ce37339d5f3456fb8784415ed3b8c25cce27",
     ),
-    LegacyDataset(
-        name="polybench-v0",
-        url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-polybench-v0.tar.bz2",
-        license="BSD 3-Clause",
-        description="https://github.com/ctuning/ctuning-programs",
-        compiler="llvm-10.0.0",
-        file_count=27,
-        size_bytes=162624,
-        sha256="968087e68470e5b44dc687dae195143000c7478a23d6631b27055bb3bb3116b1",
-    ),
+    # FIXME(github.com/facebookresearch/CompilerGym/issues/55): Polybench
+    # dataset has `optnone` function attribute set, requires rebuild.
+    # LegacyDataset(
+    #     name="polybench-v0",
+    #     url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-polybench-v0.tar.bz2",
+    #     license="BSD 3-Clause",
+    #     description="https://github.com/ctuning/ctuning-programs",
+    #     compiler="llvm-10.0.0",
+    #     file_count=27,
+    #     size_bytes=162624,
+    #     sha256="968087e68470e5b44dc687dae195143000c7478a23d6631b27055bb3bb3116b1",
+    # ),
     LegacyDataset(
         name="tensorflow-v0",
         url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-tensorflow-v0.tar.bz2",
