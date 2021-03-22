@@ -15,8 +15,14 @@ _PACKAGE_ROOT = Path(os.path.join(os.path.dirname(__file__), "../../")).resolve(
 def runfiles_path(relpath: str) -> Path:
     """Resolve the path to a runfiles data path.
 
+    No checks are to made to ensure that the path, or the containing directory,
+    exist.
+
     Use environment variable COMPILER_GYM_RUNFILES=/path/to/runfiles if running
     outside of bazel.
+
+    :param relpath: The relative path within the runfiles tres.
+    :return: An absolute path.
     """
     # There are three ways of determining a runfiles path:
     #   1. Set the COMPILER_GYM_RUNFILES environment variable.
@@ -47,6 +53,12 @@ def site_data_path(relpath: str) -> Path:
     CompilerGym uses a directory to store persistent site data files in, such as benchmark datasets.
     The default location is :code:`~/.local/share/compiler_gym`. Set the environment variable
     :code:`$COMPILER_GYM_SITE_DATA` to override this default location.
+
+    No checks are to made to ensure that the path, or the containing directory,
+    exist.
+
+    :param relpath: The relative path within the site data tree.
+    :return: An absolute path.
     """
     # NOTE(cummins): This function has a matching implementation in the C++
     # sources, compiler_gym::service::getSiteDataPath(). Any change to behavior
@@ -63,12 +75,16 @@ def site_data_path(relpath: str) -> Path:
 def cache_path(relpath: str) -> Path:
     """Return a path within the cache directory.
 
-    CompilerGym uses a directory to cache files in, such as downloaded content. The default location
-    for this cache is :code:`~/.cache/compiler_gym`. Set the environment variable
-    :code:`$COMPILER_GYM_CACHE` to override this default location.
+    CompilerGym uses a directory to cache files in, such as downloaded content.
+    The default location for this cache is :code:`~/.cache/compiler_gym`. Set
+    the environment variable :code:`$COMPILER_GYM_CACHE` to override this
+    default location.
 
-    :param relpath: The relative path within the cache.
-    :return: The absolute path of the cache.
+    No checks are to made to ensure that the path, or the containing directory,
+    exist.
+
+    :param relpath: The relative path within the cache tree. :return: An
+    absolute path.
     """
     forced = os.environ.get("COMPILER_GYM_CACHE")
     if forced:
@@ -82,13 +98,18 @@ def cache_path(relpath: str) -> Path:
 def transient_cache_path(relpath: str) -> Path:
     """Return a path within the transient cache directory.
 
-    The transient cache is a directory used to store files that do not need to persist beyond the
-    lifetime of the current process. When available, the temporary filesystem :code:`/dev/shm` will
-    be used. Else, :meth:`cache_path() <compiler_gym.cache_path>` is used as a fallback. Set the
-    environment variable :code:`$COMPILER_GYM_TRANSIENT_CACHE` to override the default location.
+    The transient cache is a directory used to store files that do not need to
+    persist beyond the lifetime of the current process. When available, the
+    temporary filesystem :code:`/dev/shm` will be used. Else,
+    :meth:`cache_path() <compiler_gym.cache_path>` is used as a fallback. Set
+    the environment variable :code:`$COMPILER_GYM_TRANSIENT_CACHE` to override
+    the default location.
 
-    :param relpath: The relative path within the cache.
-    :return: The absolute path of the cache.
+    No checks are to made to ensure that the path, or the containing directory,
+    exist.
+
+    :param relpath: The relative path within the cache tree. :return: An
+    absolute path.
     """
     forced = os.environ.get("COMPILER_GYM_TRANSIENT_CACHE")
     if forced:
