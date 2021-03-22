@@ -39,6 +39,10 @@ service CompilerGymService {
   // session does not exist.
   rpc Step(StepRequest) returns (StepReply);
   // Enumerate the list of available benchmarks.
+  //
+  // DEPRECATED(https://github.com/facebookresearch/CompilerGym/issues/45): The
+  // GetBenchmarks() operation is deprecated as of CompilerGym v0.1.4 and will
+  // be removed in CompilerGym v0.1.5.
   rpc GetBenchmarks(GetBenchmarksRequest) returns (GetBenchmarksReply);
   // Register a new benchmark.
   rpc AddBenchmark(AddBenchmarkRequest) returns (AddBenchmarkReply);
@@ -142,7 +146,7 @@ message Observation {
     string string_value = 3;
     bytes binary_value = 4;
     int64 scalar_int64 = 5;
-    double scalar_scalar = 6;
+    double scalar_double = 6;
   }
 }
 

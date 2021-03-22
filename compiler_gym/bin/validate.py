@@ -10,7 +10,7 @@ Example usage:
 
     $ cat << EOF |
     benchmark,reward,walltime,commandline
-    cBench-v0/crc32,0,1.2,opt  input.bc -o output.bc
+    cBench-v1/crc32,0,1.2,opt  input.bc -o output.bc
     EOF
     python -m compiler_gym.bin.validate --env=llvm-ic-v0 -
 
@@ -38,7 +38,7 @@ Full example:
 >>> print(env.state.csv_header())
 benchmark,reward,walltime,commandline
 >>> print(env.state.to_csv())
-benchmark://cBench-v0/rijndael,,20.53565216064453,opt -add-discriminators input.bc -o output.bc
+benchmark://cBench-v1/rijndael,,20.53565216064453,opt -add-discriminators input.bc -o output.bc
 %
 
 Output Format
@@ -57,11 +57,10 @@ Else if validation fails, the output is:
 
     ❌  <benchmark_name>  <error_details>
 """
-import csv
 import json
 import re
 import sys
-from typing import Iterator
+from typing import Iterable
 
 import numpy as np
 from absl import app, flags
@@ -70,7 +69,7 @@ import compiler_gym.util.flags.dataset  # noqa Flag definition.
 import compiler_gym.util.flags.nproc  # noqa Flag definition.
 from compiler_gym.envs.compiler_env import CompilerEnvState
 from compiler_gym.util.flags.env_from_flags import env_from_flags
-from compiler_gym.util.shell_format import emph
+from compiler_gym.util.shell_format import emph, plural
 from compiler_gym.util.statistics import geometric_mean
 from compiler_gym.validate import ValidationResult, validate_states
 
@@ -105,19 +104,6 @@ flags.DEFINE_string(
 FLAGS = flags.FLAGS
 
 
-def read_states(in_file) -> Iterator[CompilerEnvState]:
-    """Read the CSV states from stdin."""
-    data = in_file.readlines()
-    for line in csv.DictReader(data):
-        try:
-            line["reward"] = float(line["reward"]) if line.get("reward") else None
-            line["walltime"] = float(line["walltime"]) if line.get("walltime") else None
-            yield CompilerEnvState(**line)
-        except (TypeError, KeyError) as e:
-            print(f"Failed to parse input: `{e}`", file=sys.stderr)
-            sys.exit(1)
-
-
 def state_name(state: CompilerEnvState) -> str:
     """Get the string name for a state."""
     return re.sub(r"^benchmark://", "", state.benchmark)
@@ -148,16 +134,22 @@ def stdev(values):
     return np.std(values or [0])
 
 
-def main(argv):
-    """Main entry point."""
-    # Parse the input states from the user.
-    states = []
-    for path in argv[1:]:
+def read_states_from_paths(paths: Iterable[str]) -> Iterable[CompilerEnvState]:
+    for path in paths:
         if path == "-":
-            states += list(read_states(sys.stdin))
+            yield from CompilerEnvState.read_csv_file(sys.stdin)
         else:
             with open(path) as f:
-                states += list(read_states(f))
+                yield from CompilerEnvState.read_csv_file(f)
+
+
+def main(argv):
+    """Main entry point."""
+    try:
+        states = list(read_states_from_paths(argv[1:]))
+    except ValueError as e:
+        print(e, file=sys.stderr)
+        sys.exit(1)
 
     if not states:
         print(
@@ -238,9 +230,6 @@ def main(argv):
     else:
         intermediate_print = print
 
-    def plural(quantity, singular, plural):
-        return singular if quantity == 1 else plural
-
     def progress_message(i):
         intermediate_print(
             f"{i} remaining {plural(i, 'state', 'states')} to validate ... ",
@@ -248,7 +237,7 @@ def main(argv):
             flush=True,
         )
 
-    progress_message(0)
+    progress_message(len(states))
     json_log = []
 
     def dump_json_log():

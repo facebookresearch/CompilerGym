@@ -19,6 +19,9 @@ Validation
 .. autoclass:: ValidationResult
    :members:
 
+.. autoclass:: ValidationError
+   :members:
+
 .. autofunction:: validate_states
 
 Filesystem Paths

@@ -27,9 +27,9 @@ are activate, inactive, and available to download. For example:
     +-------------------+--------------+-----------------+----------------+
     | Active Datasets   | License      |   #. Benchmarks | Size on disk   |
     +===================+==============+=================+================+
-    | cBench-v0         | BSD 3-Clause |              23 | 7.2 MB         |
+    | cBench-v1         | BSD 3-Clause |              23 | 10.1 MB        |
     +-------------------+--------------+-----------------+----------------+
-    | Total             |              |              23 | 7.2 MB         |
+    | Total             |              |              23 | 10.1 MB        |
     +-------------------+--------------+-----------------+----------------+
     These benchmarks are ready for use. Deactivate them using `--deactivate=<name>`.
 
@@ -105,7 +105,7 @@ flags, respectively:
 
 .. code-block::
 
-    $ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --activate=npb-v0,github-v0 --deactivate=cBench-v0
+    $ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --activate=npb-v0,github-v0 --deactivate=cBench-v1
 
 The :code:`--activate_all` and :code:`--deactivate_all` flags can be used as a
 shortcut to activate or deactivate every downloaded:
@@ -139,7 +139,13 @@ from typing import Tuple
 import humanize
 from absl import app, flags
 
-from compiler_gym.datasets.dataset import Dataset, activate, deactivate, delete, require
+from compiler_gym.datasets.dataset import (
+    LegacyDataset,
+    activate,
+    deactivate,
+    delete,
+    require,
+)
 from compiler_gym.util.flags.env_from_flags import env_from_flags
 from compiler_gym.util.tabulate import tabulate
 
@@ -183,7 +189,7 @@ def enumerate_directory(name: str, path: Path):
     for path in path.iterdir():
         if not path.is_file() or not path.name.endswith(".json"):
             continue
-        dataset = Dataset.from_json_file(path)
+        dataset = LegacyDataset.from_json_file(path)
         rows.append(
             (dataset.name, dataset.license, dataset.file_count, dataset.size_bytes)
         )

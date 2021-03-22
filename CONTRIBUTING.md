@@ -62,6 +62,20 @@ Other common sense rules we encourage are:
   easy-to-write.
 
 
+## Leaderboard Submissions
+
+To add a new result to the leaderboard, add a new entry to the leaderboard table
+and file a [Pull Request](#pull-requests). Please include:
+
+1. A list of all authors.
+2. A CSV file of your results.
+3. A write-up of your approach. You may use the
+   [submission template](/leaderboard/SUBMISSION_TEMPLATE.md) as a guide.
+
+Please [take a look
+here](https://github.com/facebookresearch/CompilerGym/pull/127) for an example
+of a well-formed pull request submission.
+
 ## Contributor License Agreement ("CLA")
 
 In order to accept your pull request, we need you to submit a CLA. You

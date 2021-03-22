@@ -191,7 +191,7 @@ Status BenchmarkFactory::addDirectoryOfBitcodes(const boost::filesystem::path& r
 
 Status BenchmarkFactory::getBenchmark(std::unique_ptr<Benchmark>* benchmark) {
   if (!benchmarks_.size() && !unloadedBitcodePaths_.size()) {
-    return Status(StatusCode::INTERNAL,
+    return Status(StatusCode::NOT_FOUND,
                   fmt::format("No benchmarks registered. Site data directory: `{}`",
                               kSiteBenchmarksDir.string()));
   }

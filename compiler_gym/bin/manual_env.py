@@ -44,10 +44,6 @@ this command:
 
     compilergym:NO-BENCHMARK> list_datasets
 
-Due to a current limitation in the software, you must quit the shell
-(:code:`exit` command or :code:`Ctrl-d`), before then benchmarks in the dataset
-are recognised.
-
 Setting a Benchmark, Reward and Observation
 -------------------------------------------
 The CompilerGym operates on a program or benchmark. If not set on the command
@@ -248,7 +244,6 @@ import sys
 from absl import app, flags
 
 import compiler_gym.util.flags.ls_benchmark  # noqa Flag definition.
-from compiler_gym.datasets.dataset import require
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.flags.env_from_flags import env_from_flags
@@ -385,11 +380,8 @@ The 'tutorial' command will give a step by step guide."""
         """
         if self.get_datasets().count(arg):
             with Timer(f"Downloaded dataset {arg}"):
-                require(self.env, arg)
+                self.env.require_dataset(arg)
             self.init_benchmarks()
-            # FIXME CHRIS, why can't I get it to update the list of benchmarks?
-            # I have to restart
-            print("Application must be restarted to make changes visible.")
         else:
             print("Unknown dataset, '" + arg + "'")
             print("Available datasets are listed with command, list_available_datasets")

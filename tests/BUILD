@@ -43,6 +43,7 @@ py_library(
     srcs = ["test_main.py"],
     visibility = [
         "//examples:__subpackages__",
+        "//leaderboard:__subpackages__",
         "//tests:__subpackages__",
     ],
     deps = [
@@ -77,6 +78,15 @@ cc_library(
 py_test(
     name = "validate_test",
     srcs = ["validate_test.py"],
+    deps = [
+        ":test_main",
+        "//compiler_gym",
+    ],
+)
+
+py_test(
+    name = "validation_result_test",
+    srcs = ["validation_result_test.py"],
     deps = [
         ":test_main",
         "//compiler_gym",

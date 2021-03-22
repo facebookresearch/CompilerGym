@@ -6,25 +6,15 @@
 import logging
 import os
 
-import pytest
-
 from compiler_gym.util import debug_util as dbg
 from tests.test_main import main
 
-
-@pytest.fixture(scope="function")
-def temporary_environ():
-    old_env = os.environ.copy()
-    os.environ.clear()
-    try:
-        yield
-    finally:
-        os.environ.clear()
-        os.environ.update(old_env)
+pytest_plugins = ["tests.pytest_plugins.common"]
 
 
 def test_get_debug_level_environment_variable(temporary_environ):
     del temporary_environ
+    os.environ.clear()
     os.environ["COMPILER_GYM_DEBUG"] = "0"
     assert dbg.get_debug_level() == 0
     os.environ["COMPILER_GYM_DEBUG"] = "1"
@@ -33,6 +23,7 @@ def test_get_debug_level_environment_variable(temporary_environ):
 
 def test_get_and_set_debug_level(temporary_environ):
     del temporary_environ
+    os.environ.clear()
     dbg.set_debug_level(0)
     assert dbg.get_debug_level() == 0
     dbg.set_debug_level(1)
@@ -41,18 +32,21 @@ def test_get_and_set_debug_level(temporary_environ):
 
 def test_negative_debug_level(temporary_environ):
     del temporary_environ
+    os.environ.clear()
     dbg.set_debug_level(-1)
     assert dbg.get_debug_level() == 0
 
 
 def test_out_of_range_debug_level(temporary_environ):
     del temporary_environ
+    os.environ.clear()
     dbg.set_debug_level(15)
     assert dbg.get_debug_level() == 15
 
 
 def test_get_logging_level(temporary_environ):
     del temporary_environ
+    os.environ.clear()
     dbg.set_debug_level(0)
     assert dbg.get_logging_level() == logging.ERROR
     dbg.set_debug_level(1)

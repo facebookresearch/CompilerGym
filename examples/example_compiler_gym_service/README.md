@@ -7,7 +7,8 @@ handles the actual compilation. The backend exposes a
 [CompilerGymService](https://github.com/facebookresearch/CompilerGym/blob/development/compiler_gym/service/proto/compiler_gym_service.proto)
 RPC interface that the frontend interacts with.
 
-This directory contains an an example backend service. It doesn't do any actual
+This directory contains an example backend service implemented in C++ and
+Python. Both implementations have the same features. They don't do any actual
 compilation, but can be used as a starting point for writing new services, or
 for debugging and testing frontend code.
 
@@ -22,13 +23,14 @@ Features:
 * There are two observation spaces:
     * `ir` which returns the string "Hello, world!".
     * `features` which returns an `int64_list` of `[0, 0, 0]`.
-* There is a single reward space `codesize` which returns 0.
+* There is a single reward space `runtime` which returns 0.
 * Supports default observation and reward spaces.
 
-See [service/ExampleService.h](service/ExampleService.h) for the service
-implementation, [__init__.py](__init__.py) for a python module that
-registers this service with the gym on import, and [env_tests.py](env_tests.py)
-for tests.
+See [service_cc/ExampleService.h](service_cc/ExampleService.h) for the C++
+service implementation,
+[service_py/example_service.py](service_py/example_service.py) for the Python
+version, [__init__.py](__init__.py) for a python module that registers this
+service with the gym on import, and [env_tests.py](env_tests.py) for tests.
 
 
 ## Usage

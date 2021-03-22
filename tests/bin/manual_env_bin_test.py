@@ -76,21 +76,20 @@ compilergym:[a-zA-Z0-9/-]+> Exiting
 def test_download_cBench(cBench_dataset):
     del cBench_dataset  # unused
     io_check(
-        """require_dataset cBench-v0""",
-        r"""compilergym:NO-BENCHMARK> Downloaded dataset cBench-v0 in [0-9.mu]*s
-Application must be restarted to make changes visible.""",
+        """require_dataset cBench-v1""",
+        r"""compilergym:NO-BENCHMARK> Downloaded dataset cBench-v[0-9]+ in [0-9.mu]*s""",
     )
 
 
 def test_list_datasets(cBench_dataset):
     del cBench_dataset  # unused
-    io_check("""list_datasets""", r"""compilergym:NO-BENCHMARK> .*cBench-v0.*""")
+    io_check("""list_datasets""", r"""compilergym:NO-BENCHMARK> .*cBench-v[0-9]+.*""")
 
 
 def test_list_benchmarks(cBench_dataset):
     del cBench_dataset  # unused
     io_check(
-        """list_benchmarks""", r"""compilergym:NO-BENCHMARK> .*cBench-v0/adpcm.*"""
+        """list_benchmarks""", r"""compilergym:NO-BENCHMARK> .*cBench-v[0-9]+/adpcm.*"""
     )
 
 
@@ -115,37 +114,37 @@ def test_list_observations():
 def test_set_benchmark(cBench_dataset):
     del cBench_dataset  # unused
     io_check(
-        """set_benchmark cBench-v0/adpcm""",
-        r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s""",
+        """set_benchmark cBench-v1/adpcm""",
+        r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v[0-9]+/adpcm environment in [0-9.mu]*s""",
     )
 
 
 def test_actions_stack_back_stack(cBench_dataset):
     del cBench_dataset  # unused
     io_check(
-        """set_benchmark cBench-v0/adpcm
+        """set_benchmark cBench-v1/adpcm
         action -mem2reg -adce -adce
         stack
         back
         stack""",
-        r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s
+        r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v[0-9]+/adpcm environment in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm> Action -mem2reg
+compilergym:cBench-v[0-9]+/adpcm> Action -mem2reg
 Action -adce
 Action -adce
 No effect
 Actions -mem2reg -adce -adce in [0-9.mu]*s with reward 0.
 
-compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   | Reward   |   Cumulative Reward
+compilergym:cBench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   | Reward   |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        3 | -adce    | False    | False  | -        |                   0
        2 | -adce    | True     | False  | -        |                   0
        1 | -mem2reg | True     | False  | -        |                   0
        0 | <init>   | False    | False  | 0        |                   0
 
-compilergym:cBench-v0/adpcm> Undid -adce in [0-9.mu]*s
+compilergym:cBench-v[0-9]+/adpcm> Undid -adce in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   | Reward   |   Cumulative Reward
+compilergym:cBench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   | Reward   |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        2 | -adce    | True     | False  | -        |                   0
        1 | -mem2reg | True     | False  | -        |                   0
@@ -156,62 +155,58 @@ compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   | Reward   
 def test_reward(cBench_dataset):
     del cBench_dataset  # unused
     io_check(
-        """set_benchmark cBench-v0/adpcm
+        """set_benchmark cBench-v1/adpcm
         set_default_reward IrInstructionCount
         action -mem2reg
         reward
         reward IrInstructionCountNorm
         stack""",
-        r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s
+        r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v[0-9]+/adpcm environment in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm> Reward IrInstructionCount in [0-9.mu]*s
+compilergym:cBench-v[0-9]+/adpcm> Reward IrInstructionCount in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm> Action -mem2reg
-Reward: 181.000000
-Actions -mem2reg in [0-9.mu]*s with reward 181.0.
+compilergym:cBench-v[0-9]+/adpcm> Action -mem2reg
+Reward: 287.000000
+Actions -mem2reg in [0-9.mu]*s with reward 287.0.
 
-compilergym:cBench-v0/adpcm> 0.000000
+compilergym:cBench-v[0-9]+/adpcm> 0.000000
 Reward IrInstructionCount in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm> 0.404018
+compilergym:cBench-v[0-9]+/adpcm> 0.506173
 Reward IrInstructionCountNorm in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
+compilergym:cBench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
-       1 | -mem2reg | True     | False  |      181 |                 181
+       1 | -mem2reg | True     | False  |      287 |                 287
        0 | <init>   | False    | False  |        0 |                   0
-
-compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
----------+----------+----------+--------+----------+---------------------
-       1 | -mem2reg | True     | False  |      181 |                 181
-       0 | <init>   | False    | False  |        0 |                   0""",
+""",
     )
 
 
 def test_observation(cBench_dataset):
     del cBench_dataset  # unused
     io_check(
-        """set_benchmark cBench-v0/adpcm
+        """set_benchmark cBench-v1/adpcm
         set_default_observation IrInstructionCount
         action -mem2reg
         observation
         observation IrInstructionCountOz
         """,
-        r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s
+        r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v[0-9]+/adpcm environment in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm> Observation IrInstructionCount in [0-9.mu]*s
+compilergym:cBench-v[0-9]+/adpcm> Observation IrInstructionCount in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm> Action -mem2reg
-Observation: 267
+compilergym:cBench-v[0-9]+/adpcm> Action -mem2reg
+Observation: 280
 Actions -mem2reg in [0-9.mu]*s with reward 0.
 
-compilergym:cBench-v0/adpcm> 267
+compilergym:cBench-v[0-9]+/adpcm> 280
 Observation IrInstructionCount in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm> 206
+compilergym:cBench-v[0-9]+/adpcm> 209
 Observation IrInstructionCountOz in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm> 206
+compilergym:cBench-v[0-9]+/adpcm> 209
 Observation IrInstructionCountOz in [0-9.mu]*s""",
     )
 
@@ -219,14 +214,14 @@ Observation IrInstructionCountOz in [0-9.mu]*s""",
 def test_try_all_actions(cBench_dataset):
     del cBench_dataset  # unused
     io_check(
-        """set_benchmark cBench-v0/adpcm
+        """set_benchmark cBench-v1/adpcm
         set_default_reward IrInstructionCount
         try_all_actions""",
-        r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s
+        r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v[0-9]+/adpcm environment in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm> Reward IrInstructionCount in [0-9.mu]*s
+compilergym:cBench-v[0-9]+/adpcm> Reward IrInstructionCount in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm> Action: -add-discriminators Reward: 0.000000
+compilergym:cBench-v[0-9]+/adpcm> Action: -add-discriminators Reward: 0.000000
 Action: -adce Reward: 1.000000
 (.|\n)*
 Got actions in [0-9.mu]*s
@@ -245,29 +240,29 @@ Got actions in [0-9.mu]*s
 def test_simplify_stack(cBench_dataset):
     del cBench_dataset  # unused
     io_check(
-        """set_benchmark cBench-v0/adpcm
+        """set_benchmark cBench-v1/adpcm
         set_default_reward IrInstructionCount
         action -mem2reg -adce -adce
         simplify_stack
         stack""",
-        r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s
+        r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v[0-9]+/adpcm environment in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm> Reward IrInstructionCount in [0-9.mu]*s
+compilergym:cBench-v[0-9]+/adpcm> Reward IrInstructionCount in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm> Action -mem2reg
-Reward: 181.000000
+compilergym:cBench-v[0-9]+/adpcm> Action -mem2reg
+Reward: 287.000000
 Action -adce
 Reward: 2.000000
 Action -adce
 Reward: 0.000000
 No effect
-Actions -mem2reg -adce -adce in [0-9.mu]*s with reward 183.0.
+Actions -mem2reg -adce -adce in [0-9.mu]*s with reward 289.0.
 
-compilergym:cBench-v0/adpcm>
-compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
+compilergym:cBench-v[0-9]+/adpcm>
+compilergym:cBench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
-       2 | -adce    | True     | False  |        2 |                 183
-       1 | -mem2reg | True     | False  |      181 |                 181
+       2 | -adce    | True     | False  |        2 |                 289
+       1 | -mem2reg | True     | False  |      287 |                 287
        0 | <init>   | False    | False  |        0 |                   0""",
     )
 
@@ -275,20 +270,20 @@ compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward 
 def test_simplify_stack_no_reward(cBench_dataset):
     del cBench_dataset  # unused
     io_check(
-        """set_benchmark cBench-v0/adpcm
+        """set_benchmark cBench-v1/adpcm
         action -mem2reg -adce -adce
         simplify_stack
         stack""",
-        r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s
+        r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v[0-9]+/adpcm environment in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm> Action -mem2reg
+compilergym:cBench-v[0-9]+/adpcm> Action -mem2reg
 Action -adce
 Action -adce
 No effect
 Actions -mem2reg -adce -adce in [0-9.mu]*s with reward 0.
 
-compilergym:cBench-v0/adpcm>
-compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   | Reward   |   Cumulative Reward
+compilergym:cBench-v[0-9]+/adpcm>
+compilergym:cBench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   | Reward   |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        2 | -adce    | True     | False  | -        |                   0
        1 | -mem2reg | True     | False  | -        |                   0
@@ -308,19 +303,19 @@ def test_hill_climb(monkeypatch, cBench_dataset):
     monkeypatch.setattr("random.randrange", lambda _: incr())
 
     io_check(
-        """set_benchmark cBench-v0/adpcm
+        """set_benchmark cBench-v1/adpcm
         set_default_reward IrInstructionCount
         hill_climb 2
         stack""",
-        r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s
+        r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v[0-9]+/adpcm environment in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm> Reward IrInstructionCount in [0-9.mu]*s
+compilergym:cBench-v[0-9]+/adpcm> Reward IrInstructionCount in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm> Step: 1 Action: -adce Reward: 1.000000 Accept: True
+compilergym:cBench-v[0-9]+/adpcm> Step: 1 Action: -adce Reward: 1.000000 Accept: True
 Step: 2 Action: -aggressive-instcombine Reward: 0.000000 Accept: False
 Hill climb complete in [0-9.mu]*s. Accepted 1 of 2 steps for total reward of 1.0.
 
-compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
+compilergym:cBench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        1 | -adce    | True     | False  |        1 |                   1
        0 | <init>   | False    | False  |        0 |                   0""",
@@ -330,24 +325,24 @@ compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward 
 def test_greedy(cBench_dataset):
     del cBench_dataset  # unused
     io_check(
-        """set_benchmark cBench-v0/adpcm
+        """set_benchmark cBench-v1/adpcm
         set_default_reward IrInstructionCount
         greedy
         stack""",
-        r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s
+        r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v[0-9]+/adpcm environment in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm> Reward IrInstructionCount in [0-9.mu]*s
+compilergym:cBench-v[0-9]+/adpcm> Reward IrInstructionCount in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm> Action: -add-discriminators Reward: 0.000000
+compilergym:cBench-v[0-9]+/adpcm> Action: -add-discriminators Reward: 0.000000
 Action: -adce Reward: 1.000000
 (.|\n)*
-Action: -mem2reg Reward: 181.000000
+Action: -mem2reg Reward: 287.000000
 (.|\n)*
 Action: -mergereturn Reward: -1.000000
-Step: 1 Selected action: -mem2reg Reward: 181.000000
+Step: 1 Selected action: -mem2reg Reward: 287.000000
 Greedy 1 steps in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
+compilergym:cBench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        1 | -mem2reg | True     | False  |      181 |                 181
        0 | <init>   | False    | False  |        0 |                   0""",
@@ -357,35 +352,35 @@ compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward 
 def test_commandline(cBench_dataset):
     del cBench_dataset  # unused
     io_check(
-        """set_benchmark cBench-v0/adpcm
+        """set_benchmark cBench-v1/adpcm
         action -mem2reg -adce
         commandline""",
-        r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s
+        r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v[0-9]+/adpcm environment in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm> Action -mem2reg
+compilergym:cBench-v[0-9]+/adpcm> Action -mem2reg
 Action -adce
 Actions -mem2reg -adce in [0-9.mu]*s with reward 0.
 
-compilergym:cBench-v0/adpcm> \$ opt -mem2reg -adce input.bc -o output.bc""",
+compilergym:cBench-v[0-9]+/adpcm> \$ opt -mem2reg -adce input.bc -o output.bc""",
     )
 
 
 def test_reset(cBench_dataset):
     del cBench_dataset  # unused
     io_check(
-        """set_benchmark cBench-v0/adpcm
+        """set_benchmark cBench-v1/adpcm
         action -mem2reg -adce
         reset
         stack""",
-        r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v0/adpcm environment in [0-9.mu]*s
+        r"""compilergym:NO-BENCHMARK> Reset benchmark://cBench-v[0-9]+/adpcm environment in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm> Action -mem2reg
+compilergym:cBench-v[0-9]+/adpcm> Action -mem2reg
 Action -adce
 Actions -mem2reg -adce in [0-9.mu]*s with reward 0.
 
-compilergym:cBench-v0/adpcm> Reset in [0-9.mu]*s
+compilergym:cBench-v[0-9]+/adpcm> Reset in [0-9.mu]*s
 
-compilergym:cBench-v0/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
+compilergym:cBench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        0 | <init>   | False    | False  |        0 |                   0""",
     )

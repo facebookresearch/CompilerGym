@@ -10,9 +10,7 @@ py_library(
         "__init__.py",
         ":specs.py",
     ],
-    data = [
-        "//compiler_gym/envs/llvm/service:compiler_gym-llvm-service",
-    ],
+    data = ["//compiler_gym/envs/llvm/service"],
     visibility = ["//compiler_gym:__subpackages__"],
     deps = [
         ":benchmarks",
@@ -24,26 +22,21 @@ py_library(
 py_library(
     name = "benchmarks",
     srcs = ["benchmarks.py"],
-    data = [
-        "//compiler_gym/third_party/llvm:clang",
-        "//compiler_gym/third_party/llvm:llvm-link",
-    ],
     visibility = ["//compiler_gym:__subpackages__"],
     deps = [
         "//compiler_gym/service/proto",
+        "//compiler_gym/third_party/llvm",
         "//compiler_gym/util",
     ],
 )
 
 py_library(
-    name = "datasets",
-    srcs = ["datasets.py"],
-    data = [
-        "//compiler_gym/third_party/llvm:clang",
-    ],
+    name = "legacy_datasets",
+    srcs = ["legacy_datasets.py"],
     visibility = ["//tests:__subpackages__"],
     deps = [
         "//compiler_gym/datasets:dataset",
+        "//compiler_gym/third_party/llvm",
         "//compiler_gym/util",
     ],
 )
@@ -56,7 +49,7 @@ py_library(
     ],
     deps = [
         ":benchmarks",
-        ":datasets",
+        ":legacy_datasets",
         ":llvm_rewards",
         "//compiler_gym/envs:compiler_env",
         "//compiler_gym/spaces",
@@ -77,7 +70,10 @@ py_library(
 
 genrule(
     name = "specs",
-    srcs = ["//compiler_gym/envs/llvm/service:compiler_gym-llvm-service"],
+    srcs = [
+        "//compiler_gym/envs/llvm/service",
+        "//compiler_gym/envs/llvm/service:compiler_gym-llvm-service",
+    ],
     outs = ["specs.py"],
     cmd = "$(location :make_specs) $(location //compiler_gym/envs/llvm/service:compiler_gym-llvm-service) $@",
     tools = [":make_specs"],

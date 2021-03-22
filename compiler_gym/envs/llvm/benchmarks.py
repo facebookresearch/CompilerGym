@@ -3,21 +3,20 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """This module defines a utility function for constructing LLVM benchmarks."""
-import multiprocessing
 import os
 import random
 import subprocess
 import sys
 import tempfile
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
+from multiprocessing import cpu_count
 from pathlib import Path
 from typing import Iterable, List, Optional, Union
 
 from compiler_gym.service.proto import Benchmark, File
-from compiler_gym.util.runfiles_path import cache_path, runfiles_path
-
-CLANG = runfiles_path("compiler_gym/third_party/llvm/clang")
-LLVM_LINK = runfiles_path("compiler_gym/third_party/llvm/llvm-link")
+from compiler_gym.third_party import llvm
+from compiler_gym.util.runfiles_path import cache_path
 
 
 def _communicate(process, input=None, timeout=None):
@@ -127,7 +126,7 @@ class ClangInvocation(object):
         self.timeout = timeout
 
     def command(self, outpath: Path) -> List[str]:
-        cmd = [str(CLANG)]
+        cmd = [str(llvm.clang_path())]
         if self.system_includes:
             for directory in get_system_includes():
                 cmd += ["-isystem", str(directory)]
@@ -138,8 +137,7 @@ class ClangInvocation(object):
         return cmd
 
 
-def _run_command(args):
-    cmd, timeout = args
+def _run_command(cmd: List[str], timeout: int):
     process = subprocess.Popen(
         cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, universal_newlines=True
     )
@@ -232,19 +230,25 @@ def make_benchmark(
     clang_jobs: List[ClangInvocation] = []
 
     def _add_path(path: Path):
-        # NOTE(cummins): There is some discussion about the best way to create
-        # a bitcode that is unoptimized yet does not hinder downstream
-        # optimization opportunities. Here we are using a configuration based
-        # on -O0, yet there is a suggestion that an optimized configuration
-        # can produce better results if the optimizations themselves are
-        # explicitly disabled, as in: ["-Oz", "-Xclang", "-disable-llvm-optzns"]
-        # See: https://lists.llvm.org/pipermail/llvm-dev/2018-August/thread.html#125365
+        # NOTE(cummins): There is some discussion about the best way to create a
+        # bitcode that is unoptimized yet does not hinder downstream
+        # optimization opportunities. Here we are using a configuration based on
+        # -O1 in which we prevent the -O1 optimization passes from running. This
+        # is because LLVM produces different function attributes dependening on
+        # the optimization level. E.g. "-O0 -Xclang -disable-llvm-optzns -Xclang
+        # -disable-O0-optnone" will generate code with "noinline" attributes set
+        # on the functions, wheras "-Oz -Xclang -disable-llvm-optzns" will
+        # generate functions with "minsize" and "optsize" attributes set.
+        #
+        # See also:
+        #   <https://lists.llvm.org/pipermail/llvm-dev/2018-August/thread.html#125365>
+        #   <https://github.com/facebookresearch/CompilerGym/issues/110>
         DEFAULT_COPT = [
-            "-O",
-            "-Xclang",
-            "-disable-O0-optnone",
+            "-O1",
             "-Xclang",
             "-disable-llvm-passes",
+            "-Xclang",
+            "-disable-llvm-optzns",
         ]
 
         if not path.is_file():
@@ -288,29 +292,32 @@ def make_benchmark(
             uri=f"file:///{bitcode}", program=File(uri=f"file:///{bitcode}")
         )
 
-    with tempfile.TemporaryDirectory(dir=cache_path(".")) as d:
+    tmpdir_root = cache_path(".")
+    tmpdir_root.mkdir(exist_ok=True, parents=True)
+    with tempfile.TemporaryDirectory(dir=tmpdir_root) as d:
         working_dir = Path(d)
 
         # Run the clang invocations in parallel.
         clang_outs = [
             working_dir / f"out-{i}.bc" for i in range(1, len(clang_jobs) + 1)
         ]
-        clang_cmds = [
-            (job.command(out), job.timeout) for job, out in zip(clang_jobs, clang_outs)
-        ]
-        with multiprocessing.Pool() as pool:
-            list(pool.imap_unordered(_run_command, clang_cmds))
+        with ThreadPoolExecutor(max_workers=cpu_count()) as executor:
+            futures = (
+                executor.submit(_run_command, job.command(out), job.timeout)
+                for job, out in zip(clang_jobs, clang_outs)
+            )
+            list(future.result() for future in as_completed(futures))
 
         # Check that the expected files were generated.
         for i, b in enumerate(clang_outs):
             if not b.is_file():
                 raise OSError(
-                    f"Clang invocation failed to produce a file: {' '.join(clang_cmds[i])}"
+                    f"Clang invocation failed to produce a file: {' '.join(clang_jobs[i].command(clang_outs[i]))}"
                 )
 
         if len(bitcodes + clang_outs) > 1:
             # Link all of the bitcodes into a single module.
-            llvm_link_cmd = [str(LLVM_LINK), "-o", "-"] + [
+            llvm_link_cmd = [str(llvm.llvm_link_path()), "-o", "-"] + [
                 str(path) for path in bitcodes + clang_outs
             ]
             llvm_link = subprocess.Popen(

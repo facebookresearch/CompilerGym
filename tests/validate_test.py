@@ -4,20 +4,27 @@
 # LICENSE file in the root directory of this source tree.
 """Unit tests for //compiler_gym:validate."""
 import gym
+import pytest
 
 from compiler_gym import CompilerEnvState, validate_states
 from tests.test_main import main
 
 
-def test_validate_states_lambda_callback():
+@pytest.mark.parametrize("inorder", (False, True))
+@pytest.mark.parametrize("nproc", (1, 2))
+def test_validate_states_lambda_callback(inorder, nproc):
     state = CompilerEnvState(
-        benchmark="cBench-v0/crc32",
+        benchmark="cBench-v1/crc32",
         walltime=1,
         commandline="opt  input.bc -o output.bc",
     )
     results = list(
         validate_states(
-            make_env=lambda: gym.make("llvm-v0"), states=[state], datasets=["cBench-v0"]
+            make_env=lambda: gym.make("llvm-v0"),
+            states=[state],
+            datasets=["cBench-v1"],
+            inorder=inorder,
+            nproc=nproc,
         )
     )
     assert len(results) == 1

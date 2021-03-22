@@ -7,9 +7,10 @@ import numpy as np
 
 def geometric_mean(iterable):
     vals = np.array(iterable)
-    # Shortcut to return 0 when any element of the input is zero without
-    # performaning (and printing a warning about) a division by zero below.
-    if not np.all(vals):
+    if not len(vals):
+        return 0
+    # Shortcut to return 0 when any element of the input is not positive.
+    if not np.all(vals > 0):
         return 0
     a = np.log(vals)
     return np.exp(a.sum() / len(a))

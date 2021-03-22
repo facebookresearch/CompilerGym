@@ -18,6 +18,7 @@ py_library(
 py_library(
     name = "connection",
     srcs = ["connection.py"],
+    visibility = ["//visibility:public"],
     deps = [
         "//compiler_gym/service/proto",
         "//compiler_gym/util",

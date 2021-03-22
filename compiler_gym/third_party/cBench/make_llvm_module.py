@@ -10,77 +10,33 @@
 # This compiles the code from <in_dir> and generates an LLVM bitcode module at
 # the given <outpath>, using any additional <cflags> as clang arguments.
 
-import subprocess
 import sys
-import tempfile
 from pathlib import Path
 from typing import List
 
-from compiler_gym.envs.llvm.benchmarks import get_system_includes
-from compiler_gym.util.runfiles_path import runfiles_path
-
-# Path of the LLVM binaries.
-CLANG = Path(runfiles_path("compiler_gym/third_party/llvm/clang"))
-LLVM_LINK = Path(runfiles_path("compiler_gym/third_party/llvm/llvm-link"))
+from compiler_gym.envs.llvm.benchmarks import make_benchmark
 
 
 def make_cbench_llvm_module(
     benchmark_dir: Path, cflags: List[str], output_path: Path
 ) -> str:
     """Compile a cBench benchmark into an unoptimized LLVM bitcode file."""
-    cflags = cflags or []
-
     src_dir = benchmark_dir / "src"
     if not src_dir.is_dir():
         src_dir = benchmark_dir
     assert src_dir.is_dir(), f"Source directory not found: {src_dir}"
 
-    clang_command = [
-        str(CLANG),
-        "-w",
-        "-emit-llvm",
-        "-c",
-        "-isystem",
-        str(src_dir),
-        # Defer optimizations but prevent clang from adding `optnone` function
-        # annotations. See: https://bugs.llvm.org/show_bug.cgi?id=35950
-        "-O0",
-        "-Xclang",
-        "-disable-O0-optnone",
-        "-Xclang",
-        "-disable-llvm-passes",
-    ] + cflags
+    src_files = [path for path in src_dir.iterdir() if path.name.endswith(".c")]
+    assert src_files, f"No source files in {src_dir}"
 
-    for directory in get_system_includes():
-        clang_command += ["-isystem", str(directory)]
-
-    with tempfile.TemporaryDirectory() as tmpdir:
-        tmpdir = Path(tmpdir)
-
-        # Build a list of all C sources.
-        src_files = [path for path in src_dir.iterdir() if path.name.endswith(".c")]
-        assert src_files, f"No source files in {src_dir}"
-
-        ir_files = []
-        # Compile a bitcode file for each C source.
-        for path in src_files:
-            ir_file = tmpdir / f"{len(ir_files)}.bc"
-            subprocess.check_call(clang_command + [str(path), "-o", str(ir_file)])
-            ir_files.append(str(ir_file))
-        assert len(ir_files) == len(src_files)
-
-        # Link the bitcode files to produce the LLVM-IR.
-        output_path.parent.mkdir(exist_ok=True, parents=True)
-        return subprocess.check_call(
-            [str(LLVM_LINK), "-o", str(output_path)] + ir_files
-        )
+    benchmark = make_benchmark(inputs=src_files, copt=cflags or [])
+    # Write just the bitcode to file.
+    with open(output_path, "wb") as f:
+        f.write(benchmark.program.contents)
 
 
 def main():
     """Main entry point."""
-    assert CLANG.is_file(), f"clang not found: {CLANG}"
-    assert LLVM_LINK.is_file(), f"llvm-link not found: {LLVM_LINK}"
-
     # Parse arguments.
     benchmark_dir, output_path, *cflags = sys.argv[1:]
     benchmark_dir = Path(benchmark_dir).absolute().resolve()

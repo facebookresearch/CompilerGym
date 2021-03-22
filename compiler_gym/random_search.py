@@ -14,6 +14,7 @@ import humanize
 
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.random_replay import replay_actions
+from compiler_gym.service.connection import ServiceError
 from compiler_gym.util import logs
 from compiler_gym.util.logs import create_logging_dir
 
@@ -95,7 +96,10 @@ class RandomAgentWorker(Thread):
                 patience = self._patience
                 self.best_returns = total_returns
                 self.best_actions = actions.copy()
-                self.best_commandline = env.commandline()
+                try:
+                    self.best_commandline = env.commandline()
+                except NotImplementedError:
+                    self.best_commandline = ""
                 self.best_found_at_time = time()
 
         return True
@@ -128,7 +132,6 @@ def random_search(
         reward_space_name = env.reward_space.id
 
         action_space_names = list(env.action_space.names)
-        num_instructions = int(env.observation["IrInstructionCount"])
 
         metadata_path = outdir / logs.METADATA_NAME
         progress_path = outdir / logs.PROGRESS_LOG_NAME
@@ -141,11 +144,10 @@ def random_search(
 
         # Write a metadata file.
         metadata = {
-            "env": env.spec.id,
+            "env": env.spec.id if env.spec else "",
             "benchmark": benchmark_name,
             "reward": reward_space_name,
             "patience": patience,
-            "num_instructions": num_instructions,
         }
         with open(str(metadata_path), "w") as f:
             json.dump(metadata, f, sort_keys=True, indent=2)
@@ -163,7 +165,6 @@ def random_search(
 
     print(
         f"Started {len(workers)} worker threads for "
-        f"{benchmark_name} ({humanize.intcomma(metadata['num_instructions'])} instructions) "
         f"using reward {reward_space_name}."
     )
     print(f"Writing logs to {outdir}")
@@ -246,7 +247,12 @@ def random_search(
     for worker in workers:
         worker.alive = False
     for worker in workers:
-        worker.join()
+        try:
+            worker.join()
+        except ServiceError:
+            # Service error can be raised on abrupt service termination causing
+            # RPC errors.
+            pass
     print("done")
 
     print("Replaying actions from best solution found:")

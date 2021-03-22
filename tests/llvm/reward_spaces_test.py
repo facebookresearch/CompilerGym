@@ -11,16 +11,16 @@ from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
 
-# Instruction counts for cBench-v0/crc32 benchmark that are used for testing
+# Instruction counts for cBench-v1/crc32 benchmark that are used for testing
 # reward signals.
-CRC32_INSTRUCTION_COUNT = 196
-CRC32_INSTRUCTION_COUNT_AFTER_REG2MEM = 203
-CRC32_INSTRUCTION_COUNT_O3 = 125
-CRC32_INSTRUCTION_COUNT_OZ = 105
+CRC32_INSTRUCTION_COUNT = 242
+CRC32_INSTRUCTION_COUNT_AFTER_REG2MEM = 249
+CRC32_INSTRUCTION_COUNT_O3 = 164
+CRC32_INSTRUCTION_COUNT_OZ = 114
 
 
 def test_instruction_count_reward(env: LlvmEnv):
-    env.reset(benchmark="cBench-v0/crc32")
+    env.reset(benchmark="cBench-v1/crc32")
 
     assert env.observation.IrInstructionCount() == CRC32_INSTRUCTION_COUNT
     action = env.action_space.flags.index("-reg2mem")
@@ -52,7 +52,7 @@ def test_reward_space(env: LlvmEnv):
 
 
 def test_invalid_reward_space_name(env: LlvmEnv):
-    env.reset(benchmark="cBench-v0/crc32")
+    env.reset(benchmark="cBench-v1/crc32")
     invalid = "invalid value"
     with pytest.raises(KeyError) as ctx:
         _ = env.reward[invalid]
@@ -60,7 +60,7 @@ def test_invalid_reward_space_name(env: LlvmEnv):
 
 
 def test_reward_spaces(env: LlvmEnv):
-    env.reset(benchmark="cBench-v0/crc32")
+    env.reset(benchmark="cBench-v1/crc32")
 
     assert set(env.reward.spaces.keys()) == {
         "IrInstructionCount",
@@ -75,7 +75,7 @@ def test_reward_spaces(env: LlvmEnv):
 
 
 def test_instruction_count_reward_spaces(env: LlvmEnv):
-    env.reset(benchmark="cBench-v0/crc32")
+    env.reset(benchmark="cBench-v1/crc32")
 
     key = "IrInstructionCount"
     space = env.reward.spaces[key]
@@ -119,7 +119,7 @@ def test_instruction_count_reward_spaces(env: LlvmEnv):
 
 
 def test_native_test_size_reward_spaces(env: LlvmEnv):
-    env.reset(benchmark="cBench-v0/crc32")
+    env.reset(benchmark="cBench-v1/crc32")
 
     key = "ObjectTextSizeBytes"
     space = env.reward.spaces[key]

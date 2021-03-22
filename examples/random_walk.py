@@ -4,26 +4,13 @@
 # LICENSE file in the root directory of this source tree.
 """Perform a random walk of the action space of a CompilerGym environment.
 
-This program launches a CompilerGym service and runs a random number of steps, at
-each step selecting a random action, and recording the observations and rewards
-to stdout.
-
 Example usage:
 
-    # Build the CompilerGym service binary that you want to use.
-    $ bazel build -c opt //examples/example_compiler_gym_service
-
-    # Run a random walk.
-    $ bazel run -c opt //compiler_gym/bin:random_walk -- \
-        --local_service_binary=$PWD/bazel-bin/examples/example_compiler_gym_service/service/service \
-        --program=foo \
-        --observation=features \
-        --reward=codesize \
-        --step_min=100 \
-        --step_max=100
+    # Run a random walk on cBench example program using instruction count reward.
+    $ python3 examples/random_walk.py --env=llvm-v0 --step_min=100 --step_max=100 \
+      --benchmark=cBench-v1/dijkstra --reward=IrInstructionCount
 """
 import random
-from typing import List
 
 import humanize
 from absl import app, flags
@@ -44,16 +31,15 @@ flags.DEFINE_integer("step_max", 256, "The maximum number of steps.")
 FLAGS = flags.FLAGS
 
 
-def run_random_walk(env: CompilerEnv, step_count: int) -> List[float]:
+def run_random_walk(env: CompilerEnv, step_count: int) -> None:
     """Perform a random walk of the action space.
 
     :param env: The environment to use.
     :param step_count: The number of steps to run. This value is an upper bound -
         fewer steps will be performed if any of the actions lead the
         environment to end the episode.
-    :return: The list of observed rewards.
     """
-    rewards = []
+    rewards, actions = [], []
 
     step_num = 0
     with Timer() as episode_time:
@@ -68,6 +54,7 @@ def run_random_walk(env: CompilerEnv, step_count: int) -> List[float]:
                 f"(changed={not info.get('action_had_no_effect')})"
             )
             rewards.append(reward)
+            actions.append(env.action_space.names[action_index])
             print(f"Reward:       {reward}")
             if env._default_observation:
                 print(f"Observation:\n{observation}")
@@ -77,21 +64,27 @@ def run_random_walk(env: CompilerEnv, step_count: int) -> List[float]:
                 break
         env.close()
 
-    def reward_delta(reward):
-        delta = rewards[0] / max(reward, 1e-9) - 1
-        return emph(f"{'+' if delta >= 0 else ''}{delta:.2%}")
+    def reward_percentage(reward, rewards):
+        if sum(rewards) == 0:
+            return 0
+        percentage = reward / sum(rewards)
+        return emph(f"{'+' if percentage >= 0 else ''}{percentage:.2%}")
 
     print(
         f"\nCompleted {emph(humanize.intcomma(step_num))} steps in {episode_time} "
         f"({step_num / episode_time.time:.1f} steps / sec)."
     )
-    print(f"Init reward:  {rewards[0]}")
-    print(f"Final reward: {rewards[-1]} ({reward_delta(rewards[-1])})")
+    print(f"Total reward: {sum(rewards)}")
     print(
-        f"Max reward:   {max(rewards)} ({reward_delta(max(rewards))} "
+        f"Max reward:   {max(rewards)} ({reward_percentage(max(rewards), rewards)} "
         f"at step {humanize.intcomma(rewards.index(max(rewards)) + 1)})"
     )
-    return rewards
+
+    def remove_no_change(rewards, actions):
+        return [a for (r, a) in zip(rewards, actions) if r != 0]
+
+    actions = remove_no_change(rewards, actions)
+    print("Effective actions from trajectory: " + ", ".join(actions))
 
 
 def main(argv):

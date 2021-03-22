@@ -4,14 +4,16 @@
 # LICENSE file in the root directory of this source tree.
 """This module defines the OpenAI gym interface for compilers."""
 import logging
+import numbers
 import os
 import sys
 import warnings
+from collections.abc import Iterable as IterableType
 from copy import deepcopy
 from math import isclose
 from pathlib import Path
 from time import time
-from typing import Any, Callable, Dict, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 
 import fasteners
 import gym
@@ -19,7 +21,7 @@ import numpy as np
 from gym.spaces import Space
 
 from compiler_gym.compiler_env_state import CompilerEnvState
-from compiler_gym.datasets.dataset import Dataset, require
+from compiler_gym.datasets.dataset import LegacyDataset, require
 from compiler_gym.service import (
     CompilerGymServiceConnection,
     ConnectionOpts,
@@ -44,12 +46,39 @@ from compiler_gym.service.proto import (
 from compiler_gym.spaces import NamedDiscrete, Reward
 from compiler_gym.util.debug_util import get_logging_level
 from compiler_gym.util.timer import Timer
-from compiler_gym.validation_result import ValidationResult
+from compiler_gym.validation_result import ValidationError, ValidationResult
 from compiler_gym.views import ObservationSpaceSpec, ObservationView, RewardView
 
 # Type hints.
 info_t = Dict[str, Any]
 step_t = Tuple[Optional[observation_t], Optional[float], bool, info_t]
+
+
+class DefaultRewardFromObservation(Reward):
+    def __init__(self, observation_name: str, **kwargs):
+        super().__init__(
+            observation_spaces=[observation_name], id=observation_name, **kwargs
+        )
+        self.previous_value: Optional[observation_t] = None
+
+    def reset(self, benchmark: str) -> None:
+        """Called on env.reset(). Reset incremental progress."""
+        del benchmark  # unused
+        self.previous_value = None
+
+    def update(
+        self,
+        action: int,
+        observations: List[observation_t],
+        observation_view: ObservationView,
+    ) -> float:
+        """Called on env.step(). Compute and return new reward."""
+        value: float = observations[0]
+        if self.previous_value is None:
+            self.previous_value = 0
+        reward = float(value - self.previous_value)
+        self.previous_value = value
+        return reward
 
 
 class CompilerEnv(gym.Env):
@@ -103,9 +132,9 @@ class CompilerEnv(gym.Env):
         to store benchmarks.
     :vartype datasets_site_path: Optional[Path]
 
-    :ivar available_datasets: A mapping from dataset name to :class:`Dataset`
+    :ivar available_datasets: A mapping from dataset name to :class:`LegacyDataset`
         objects that are available to download.
-    :vartype available_datasets: Dict[str, Dataset]
+    :vartype available_datasets: Dict[str, LegacyDataset]
 
     :ivar observation: A view of the available observation spaces that permits
         on-demand computation of observations.
@@ -179,8 +208,6 @@ class CompilerEnv(gym.Env):
         :raises TimeoutError: If the compiler service fails to initialize
             within the parameters provided in :code:`connection_settings`.
         """
-        rewards = rewards or []
-
         self.metadata = {"render.modes": ["human", "ansi"]}
 
         # Set up logging.
@@ -196,17 +223,7 @@ class CompilerEnv(gym.Env):
         self._service_endpoint: Union[str, Path] = service
         self._connection_settings = connection_settings or ConnectionOpts()
         self.datasets_site_path: Optional[Path] = None
-        self.available_datasets: Dict[str, Dataset] = {}
-
-        # The benchmark that is currently being used, and the benchmark that
-        # the user requested. Those do not always correlate, since the user
-        # could request a random benchmark.
-        self._benchmark_in_use_uri: Optional[str] = benchmark
-        self._user_specified_benchmark_uri: Optional[str] = benchmark
-        # A map from benchmark URIs to Benchmark messages. We keep track of any
-        # user-provided custom benchmarks so that we can register them with a
-        # reset service.
-        self._custom_benchmarks: Dict[str, Benchmark] = {}
+        self.available_datasets: Dict[str, LegacyDataset] = {}
 
         self.action_space_name = action_space
 
@@ -215,6 +232,43 @@ class CompilerEnv(gym.Env):
             opts=self._connection_settings,
             logger=self.logger,
         )
+
+        # If no reward space is specified, generate some from numeric observation spaces
+        rewards = rewards or [
+            DefaultRewardFromObservation(obs.name)
+            for obs in self.service.observation_spaces
+            if obs.default_value.WhichOneof("value")
+            and isinstance(
+                getattr(obs.default_value, obs.default_value.WhichOneof("value")),
+                numbers.Number,
+            )
+        ]
+
+        # The benchmark that is currently being used, and the benchmark that
+        # the user requested. Those do not always correlate, since the user
+        # could request a random benchmark.
+        self._benchmark_in_use_uri: Optional[str] = None
+        self._user_specified_benchmark_uri: Optional[str] = None
+        # A map from benchmark URIs to Benchmark messages. We keep track of any
+        # user-provided custom benchmarks so that we can register them with a
+        # reset service.
+        self._custom_benchmarks: Dict[str, Benchmark] = {}
+        # Normally when the benchmark is changed the updated value is not
+        # reflected until the next call to reset(). We make an exception for
+        # constructor-time arguments as otherwise the behavior of the benchmark
+        # property is counter-intuitive:
+        #
+        #     >>> env = gym.make("example-v0", benchmark="foo")
+        #     >>> env.benchmark
+        #     None
+        #     >>> env.reset()
+        #     >>> env.benchmark
+        #     "foo"
+        #
+        # By forcing the benchmark-in-use URI at constructor time, the first
+        # env.benchmark returns the name as expected.
+        self.benchmark = benchmark
+        self._benchmark_in_use_uri = self._user_specified_benchmark_uri
 
         # Process the available action, observation, and reward spaces.
         self.action_spaces = [
@@ -382,9 +436,24 @@ class CompilerEnv(gym.Env):
             warnings.warn(
                 "Changing the benchmark has no effect until reset() is called."
             )
-        if isinstance(benchmark, str) or benchmark is None:
+        if benchmark is None:
+            self.logger.debug("Unsetting the forced benchmark")
+            self._user_specified_benchmark_uri = None
+        elif isinstance(benchmark, str):
+            self.logger.debug("Setting benchmark by name: %s", benchmark)
+            # If the user requested a benchmark by URI, e.g.
+            # benchmark://cBench-v1/dijkstra, require the dataset (cBench-v1)
+            # automatically.
+            if self.datasets_site_path:
+                components = benchmark.split("://")
+                if len(components) == 1 or components[0] == "benchmark":
+                    components = components[-1].split("/")
+                    if len(components) > 1:
+                        self.logger.info("Requiring dataset %s", components[0])
+                        self.require_dataset(components[0])
             self._user_specified_benchmark_uri = benchmark
         elif isinstance(benchmark, Benchmark):
+            self.logger.debug("Setting benchmark data: %s", benchmark.uri)
             self._user_specified_benchmark_uri = benchmark.uri
             self._add_custom_benchmarks([benchmark])
         else:
@@ -647,8 +716,9 @@ class CompilerEnv(gym.Env):
                     ),
                 ),
             )
-        except (ServiceError, ServiceTransportError):
+        except (ServiceError, ServiceTransportError, TimeoutError) as e:
             # Abort and retry on error.
+            self.logger.warning("%s on reset(): %s", type(e).__name__, e)
             self.service.close()
             self.service = None
             return self.reset(
@@ -677,16 +747,19 @@ class CompilerEnv(gym.Env):
         if self.observation_space:
             return self.observation[self.observation_space.id]
 
-    def step(self, action: int) -> step_t:
+    def step(self, action: Union[int, Iterable[int]]) -> step_t:
         """Take a step.
 
-        :param action: Value from the action_space.
+        :param action: An action, or a sequence of actions. When multiple
+            actions are provided the observation and reward are returned
+            after running all of the actions.
         :return: A tuple of observation, reward, done, and info. Observation and
             reward are None if default observation/reward is not set. If done
             is True, observation and reward may also be None (e.g. because the
             service failed).
         """
         assert self.in_episode, "Must call reset() before step()"
+        actions = action if isinstance(action, IterableType) else [action]
         observation, reward = None, None
 
         # Build the list of observations that must be computed by the backend
@@ -705,13 +778,13 @@ class CompilerEnv(gym.Env):
             ]
             observation_spaces += self.reward_space.observation_spaces
 
-        # Record the action.
-        self.actions.append(action)
+        # Record the actions.
+        self.actions += actions
 
         # Send the request to the backend service.
         request = StepRequest(
             session_id=self._session_id,
-            action=[action],
+            action=actions,
             observation_space=observation_indices,
         )
         try:
@@ -818,7 +891,7 @@ class CompilerEnv(gym.Env):
         """
         return RewardView
 
-    def require_datasets(self, datasets: List[Union[str, Dataset]]) -> None:
+    def require_datasets(self, datasets: List[Union[str, LegacyDataset]]) -> bool:
         """Require that the given datasets are available to the environment.
 
         Example usage:
@@ -834,14 +907,18 @@ class CompilerEnv(gym.Env):
 
         :param datasets: A list of datasets to require. Each dataset is the name
             of an available dataset, the URL of a dataset to download, or a
-            :class:`Dataset` instance.
+            :class:`LegacyDataset` instance.
+        :return: :code:`True` if one or more datasets were downloaded, or
+            :code:`False` if all datasets were already available.
         """
+        self.logger.debug("Requiring datasets: %s", datasets)
         dataset_installed = False
         for dataset in datasets:
             dataset_installed |= require(self, dataset)
         if dataset_installed:
             # Signal to the compiler service that the contents of the site data
             # directory has changed.
+            self.logger.debug("Initiating service-side scan of dataset directory")
             self.service(
                 self.service.stub.AddBenchmark,
                 AddBenchmarkRequest(
@@ -849,15 +926,18 @@ class CompilerEnv(gym.Env):
                 ),
             )
             self.make_manifest_file()
+        return dataset_installed
 
-    def require_dataset(self, dataset: Union[str, Dataset]) -> None:
+    def require_dataset(self, dataset: Union[str, LegacyDataset]) -> bool:
         """Require that the given dataset is available to the environment.
 
         Alias for
         :meth:`env.require_datasets([dataset]) <compiler_gym.envs.CompilerEnv.require_datasets>`.
 
         :param dataset: The name of the dataset to download, the URL of the dataset, or a
-            :class:`Dataset` instance.
+            :class:`LegacyDataset` instance.
+        :return: :code:`True` if the dataset was downloaded, or :code:`False` if
+            the dataset was already available.
         """
         return self.require_datasets([dataset])
 
@@ -885,7 +965,7 @@ class CompilerEnv(gym.Env):
                     )
         return manifest_path
 
-    def register_dataset(self, dataset: Dataset) -> bool:
+    def register_dataset(self, dataset: LegacyDataset) -> bool:
         """Register a new dataset.
 
         After registering, the dataset name may be used by
@@ -894,13 +974,13 @@ class CompilerEnv(gym.Env):
 
         Example usage:
 
-            >>> my_dataset = Dataset(name="my-dataset-v0", ...)
+            >>> my_dataset = LegacyDataset(name="my-dataset-v0", ...)
             >>> env = gym.make("llvm-v0")
             >>> env.register_dataset(my_dataset)
             >>> env.require_dataset("my-dataset-v0")
             >>> env.benchmark = "my-dataset-v0/1"
 
-        :param dataset: A :class:`Dataset` instance describing the new dataset.
+        :param dataset: A :class:`LegacyDataset` instance describing the new dataset.
         :return: :code:`True` if the dataset was added, else :code:`False`.
         :raises ValueError: If a dataset with this name is already registered.
         """
@@ -948,18 +1028,17 @@ class CompilerEnv(gym.Env):
             )
 
         actions = self.commandline_to_actions(state.commandline)
-        for action in actions:
-            _, _, done, info = self.step(action)
-            if done:
-                raise ValueError(
-                    f"Environment terminated with error: `{info.get('error_details')}`"
-                )
+        _, _, done, info = self.step(actions)
+        if done:
+            raise ValueError(
+                f"Environment terminated with error: `{info.get('error_details')}`"
+            )
 
     def validate(self, state: Optional[CompilerEnvState] = None) -> ValidationResult:
         in_place = state is not None
         state = state or self.state
 
-        error_messages = []
+        errors: ValidationError = []
         validation = {
             "state": state,
             "actions_replay_failed": False,
@@ -981,10 +1060,27 @@ class CompilerEnv(gym.Env):
                         replay_target.apply(state)
                     except (ValueError, OSError) as e:
                         validation["actions_replay_failed"] = True
-                        error_messages.append(str(e))
+                        errors.append(
+                            ValidationError(
+                                type="Action replay failed",
+                                data={
+                                    "exception": str(e),
+                                    "exception_type": type(e).__name__,
+                                },
+                            )
+                        )
                         break
 
-                    if self.reward_space and self.reward_space.deterministic:
+                    if state.reward is not None and self.reward_space is None:
+                        warnings.warn(
+                            "Validating state with reward, but "
+                            "environment has no reward space set"
+                        )
+                    elif (
+                        state.reward is not None
+                        and self.reward_space
+                        and self.reward_space.deterministic
+                    ):
                         validation["reward_validated"] = True
                         # If reward deviates from the expected amount record the
                         # error but continue with the remainder of the validation.
@@ -995,9 +1091,17 @@ class CompilerEnv(gym.Env):
                             abs_tol=1e-10,
                         ):
                             validation["reward_validation_failed"] = True
-                            error_messages.append(
-                                f"Expected reward {state.reward:.4f} but "
-                                f"received reward {replay_target.episode_reward:.4f}"
+                            errors.append(
+                                ValidationError(
+                                    type=(
+                                        f"Expected reward {state.reward} but "
+                                        f"received reward {replay_target.episode_reward}"
+                                    ),
+                                    data={
+                                        "expected_reward": state.reward,
+                                        "actual_reward": replay_target.episode_reward,
+                                    },
+                                )
                             )
 
                     # TODO(https://github.com/facebookresearch/CompilerGym/issues/45):
@@ -1006,10 +1110,10 @@ class CompilerEnv(gym.Env):
                     validate_semantics = self.get_benchmark_validation_callback()
                     if validate_semantics:
                         validation["benchmark_semantics_validated"] = True
-                        semantics_error = validate_semantics(self)
-                        if semantics_error:
+                        semantics_errors = list(validate_semantics(self))
+                        if semantics_errors:
                             validation["benchmark_semantics_validation_failed"] = True
-                            error_messages.append(semantics_error)
+                            errors += semantics_errors
 
                     # Finished all checks, break the loop.
                     break
@@ -1018,13 +1122,13 @@ class CompilerEnv(gym.Env):
 
         return ValidationResult(
             walltime=walltime.time,
-            error_details="\n".join(error_messages),
+            errors=errors,
             **validation,
         )
 
     def get_benchmark_validation_callback(
         self,
-    ) -> Optional[Callable[["CompilerEnv"], Optional[str]]]:
+    ) -> Optional[Callable[["CompilerEnv"], Iterable[ValidationError]]]:
         """Return a callback that validates benchmark semantics, if available.
 
         TODO(https://github.com/facebookresearch/CompilerGym/issues/45): This is

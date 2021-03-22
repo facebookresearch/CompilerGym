@@ -38,11 +38,12 @@ py_library(
 py_library(
     name = "random_search",
     srcs = ["random_search.py"],
-    data = ["//compiler_gym/envs/llvm/service:compiler_gym-llvm-service"],
+    data = ["//compiler_gym/envs/llvm/service"],
     visibility = ["//visibility:public"],
     deps = [
         ":random_replay",
         "//compiler_gym/envs",
+        "//compiler_gym/service:connection",
         "//compiler_gym/util",
     ],
 )
@@ -54,7 +55,6 @@ py_library(
     deps = [
         ":validation_result",
         "//compiler_gym/envs:compiler_env",
-        "//compiler_gym/envs/llvm",
         "//compiler_gym/spaces",
         "//compiler_gym/util",
     ],
@@ -66,5 +66,6 @@ py_library(
     visibility = ["//compiler_gym:__subpackages__"],
     deps = [
         ":compiler_env_state",
+        "//compiler_gym/util",
     ],
 )

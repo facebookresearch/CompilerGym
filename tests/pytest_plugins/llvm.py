@@ -11,7 +11,8 @@ import gym
 import pytest
 
 from compiler_gym.envs import CompilerEnv
-from compiler_gym.envs.llvm.datasets import VALIDATORS
+from compiler_gym.envs.llvm.legacy_datasets import VALIDATORS
+from compiler_gym.third_party import llvm
 from compiler_gym.util.runfiles_path import runfiles_path
 
 ACTIONS_LIST = Path(
@@ -34,7 +35,7 @@ BENCHMARK_NAMES = list(_read_list_file(BENCHMARKS_LIST))
 # Skip ghostscript on CI as it is just too heavy.
 if bool(os.environ.get("CI")):
     BENCHMARK_NAMES = [
-        b for b in BENCHMARK_NAMES if b != "benchmark://cBench-v0/ghostscript"
+        b for b in BENCHMARK_NAMES if b != "benchmark://cBench-v1/ghostscript"
     ]
 
 _env = gym.make("llvm-v0")
@@ -97,7 +98,7 @@ def non_validatable_benchmark_name(request) -> str:
 def env() -> CompilerEnv:
     """Create an LLVM environment."""
     env = gym.make("llvm-v0")
-    env.require_dataset("cBench-v0")
+    env.require_dataset("cBench-v1")
     try:
         yield env
     finally:
@@ -109,7 +110,7 @@ def cBench_dataset():
     """Test fixture that ensures that cBench is available."""
     env = gym.make("llvm-v0")
     try:
-        env.require_dataset("cBench-v0")
+        env.require_dataset("cBench-v1")
     finally:
         env.close()
 
@@ -117,16 +118,16 @@ def cBench_dataset():
 @pytest.fixture(scope="module")
 def llvm_opt() -> Path:
     """Test fixture that yields the path of opt."""
-    return runfiles_path("compiler_gym/third_party/llvm/opt")
+    return llvm.opt_path()
 
 
 @pytest.fixture(scope="module")
 def llvm_diff() -> Path:
     """Test fixture that yields the path of llvm-diff."""
-    return runfiles_path("compiler_gym/third_party/llvm/llvm-diff")
+    return llvm.llvm_diff_path()
 
 
 @pytest.fixture(scope="module")
 def clang() -> Path:
     """Test fixture that yields the path of clang."""
-    return runfiles_path("compiler_gym/third_party/llvm/clang")
+    return llvm.clang_path()
