@@ -22,14 +22,12 @@ from typing import Callable, Dict, Iterable, List, NamedTuple, Optional
 import fasteners
 
 from compiler_gym.datasets.dataset import LegacyDataset
+from compiler_gym.third_party import llvm
 from compiler_gym.util import thread_pool
 from compiler_gym.util.download import download
-from compiler_gym.util.runfiles_path import cache_path, runfiles_path, site_data_path
+from compiler_gym.util.runfiles_path import cache_path, site_data_path
 from compiler_gym.util.timer import Timer
 from compiler_gym.validation_result import ValidationError
-
-_CLANG = runfiles_path("compiler_gym/third_party/llvm/bin/clang")
-_LLI = runfiles_path("compiler_gym/third_party/llvm/bin/lli")
 
 _CBENCH_DATA = site_data_path("llvm/cBench-v1-runtime-data/runtime_data")
 _CBENCH_DATA_URL = (
@@ -265,11 +263,12 @@ def _compile_and_run_bitcode_file(
     error_data = {}
 
     if sanitizer:
+        clang_path = llvm.clang_path()
         binary = cwd / "a.out"
         error_data["run_cmd"] = cmd.replace("$BIN", "./a.out")
         # Generate the a.out binary file.
         compile_cmd = (
-            [_CLANG.name, str(bitcode_file), "-o", str(binary)]
+            [clang_path.name, str(bitcode_file), "-o", str(binary)]
             + _COMPILE_ARGS
             + list(linkopts)
             + _SANITIZER_FLAGS.get(sanitizer, [])
@@ -282,7 +281,7 @@ def _compile_and_run_bitcode_file(
             stdout=subprocess.PIPE,
             stderr=subprocess.STDOUT,
             universal_newlines=True,
-            env={"PATH": f"{_CLANG.parent}:{os.environ.get('PATH', '')}"},
+            env={"PATH": f"{clang_path.parent}:{os.environ.get('PATH', '')}"},
         )
         try:
             output, _ = clang.communicate(timeout=compilation_timeout_seconds)
@@ -307,8 +306,9 @@ def _compile_and_run_bitcode_file(
             )
         assert binary.is_file()
     else:
-        error_data["run_cmd"] = cmd.replace("$BIN", f"{_LLI.name} benchmark.bc")
-        run_env["PATH"] = str(_LLI.parent)
+        lli_path = llvm.lli_path()
+        error_data["run_cmd"] = cmd.replace("$BIN", f"{lli_path.name} benchmark.bc")
+        run_env["PATH"] = str(lli_path.parent)
 
     try:
         logger.debug("exec: %s", error_data["run_cmd"])

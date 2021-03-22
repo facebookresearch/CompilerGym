@@ -7,9 +7,6 @@ filegroup(
     name = "service",
     srcs = [
         ":compiler_gym-llvm-service",
-        "//compiler_gym/third_party/llvm:clang",
-        "//compiler_gym/third_party/llvm:llvm-size",
-        "//compiler_gym/third_party/llvm:opt",
     ] + select({
         "@llvm//:darwin": [],
         "//conditions:default": [

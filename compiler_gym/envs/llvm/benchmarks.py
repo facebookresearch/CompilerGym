@@ -15,10 +15,8 @@ from pathlib import Path
 from typing import Iterable, List, Optional, Union
 
 from compiler_gym.service.proto import Benchmark, File
-from compiler_gym.util.runfiles_path import cache_path, runfiles_path
-
-CLANG = runfiles_path("compiler_gym/third_party/llvm/bin/clang")
-LLVM_LINK = runfiles_path("compiler_gym/third_party/llvm/bin/llvm-link")
+from compiler_gym.third_party import llvm
+from compiler_gym.util.runfiles_path import cache_path
 
 
 def _communicate(process, input=None, timeout=None):
@@ -128,7 +126,7 @@ class ClangInvocation(object):
         self.timeout = timeout
 
     def command(self, outpath: Path) -> List[str]:
-        cmd = [str(CLANG)]
+        cmd = [str(llvm.clang_path())]
         if self.system_includes:
             for directory in get_system_includes():
                 cmd += ["-isystem", str(directory)]
@@ -319,7 +317,7 @@ def make_benchmark(
 
         if len(bitcodes + clang_outs) > 1:
             # Link all of the bitcodes into a single module.
-            llvm_link_cmd = [str(LLVM_LINK), "-o", "-"] + [
+            llvm_link_cmd = [str(llvm.llvm_link_path()), "-o", "-"] + [
                 str(path) for path in bitcodes + clang_outs
             ]
             llvm_link = subprocess.Popen(
