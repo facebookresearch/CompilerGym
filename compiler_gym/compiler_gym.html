@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym &mdash; CompilerGym 0.1.4 documentation</title>
+  <title>compiler_gym &mdash; CompilerGym 0.1.5 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.4
+                0.1.5
               </div>
             
           
@@ -467,17 +467,18 @@ differ from the input states.</p>
 <dt id="compiler_gym.cache_path">
 <code class="sig-prename descclassname">compiler_gym.</code><code class="sig-name descname">cache_path</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">relpath</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; pathlib.Path<a class="reference internal" href="../_modules/compiler_gym/util/runfiles_path.html#cache_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.cache_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a path within the cache directory.</p>
-<p>CompilerGym uses a directory to cache files in, such as downloaded content. The default location
-for this cache is <code class="code docutils literal notranslate"><span class="pre">~/.cache/compiler_gym</span></code>. Set the environment variable
-<code class="code docutils literal notranslate"><span class="pre">$COMPILER_GYM_CACHE</span></code> to override this default location.</p>
+<p>CompilerGym uses a directory to cache files in, such as downloaded content.
+The default location for this cache is <code class="code docutils literal notranslate"><span class="pre">~/.cache/compiler_gym</span></code>. Set
+the environment variable <code class="code docutils literal notranslate"><span class="pre">$COMPILER_GYM_CACHE</span></code> to override this
+default location.</p>
+<p>No checks are to made to ensure that the path, or the containing directory,
+exist.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>relpath</strong> – The relative path within the cache.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The absolute path of the cache.</p>
+<dd class="field-odd"><p><strong>relpath</strong> – The relative path within the cache tree. :return: An</p>
 </dd>
 </dl>
+<p>absolute path.</p>
 </dd></dl>
 
 <dl class="py function">
@@ -487,24 +488,36 @@ for this cache is <code class="code docutils literal notranslate"><span class="p
 <p>CompilerGym uses a directory to store persistent site data files in, such as benchmark datasets.
 The default location is <code class="code docutils literal notranslate"><span class="pre">~/.local/share/compiler_gym</span></code>. Set the environment variable
 <code class="code docutils literal notranslate"><span class="pre">$COMPILER_GYM_SITE_DATA</span></code> to override this default location.</p>
+<p>No checks are to made to ensure that the path, or the containing directory,
+exist.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>relpath</strong> – The relative path within the site data tree.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An absolute path.</p>
+</dd>
+</dl>
 </dd></dl>
 
 <dl class="py function">
 <dt id="compiler_gym.transient_cache_path">
 <code class="sig-prename descclassname">compiler_gym.</code><code class="sig-name descname">transient_cache_path</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">relpath</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; pathlib.Path<a class="reference internal" href="../_modules/compiler_gym/util/runfiles_path.html#transient_cache_path"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.transient_cache_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return a path within the transient cache directory.</p>
-<p>The transient cache is a directory used to store files that do not need to persist beyond the
-lifetime of the current process. When available, the temporary filesystem <code class="code docutils literal notranslate"><span class="pre">/dev/shm</span></code> will
-be used. Else, <a class="reference internal" href="#compiler_gym.cache_path" title="compiler_gym.cache_path"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cache_path()</span></code></a> is used as a fallback. Set the
-environment variable <code class="code docutils literal notranslate"><span class="pre">$COMPILER_GYM_TRANSIENT_CACHE</span></code> to override the default location.</p>
+<p>The transient cache is a directory used to store files that do not need to
+persist beyond the lifetime of the current process. When available, the
+temporary filesystem <code class="code docutils literal notranslate"><span class="pre">/dev/shm</span></code> will be used. Else,
+<a class="reference internal" href="#compiler_gym.cache_path" title="compiler_gym.cache_path"><code class="xref py py-meth docutils literal notranslate"><span class="pre">cache_path()</span></code></a> is used as a fallback. Set
+the environment variable <code class="code docutils literal notranslate"><span class="pre">$COMPILER_GYM_TRANSIENT_CACHE</span></code> to override
+the default location.</p>
+<p>No checks are to made to ensure that the path, or the containing directory,
+exist.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>relpath</strong> – The relative path within the cache.</p>
-</dd>
-<dt class="field-even">Returns</dt>
-<dd class="field-even"><p>The absolute path of the cache.</p>
+<dd class="field-odd"><p><strong>relpath</strong> – The relative path within the cache tree. :return: An</p>
 </dd>
 </dl>
+<p>absolute path.</p>
 </dd></dl>
 
 <dl class="py function">

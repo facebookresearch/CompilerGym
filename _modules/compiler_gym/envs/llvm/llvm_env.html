@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.envs.llvm.llvm_env &mdash; CompilerGym 0.1.4 documentation</title>
+  <title>compiler_gym.envs.llvm.llvm_env &mdash; CompilerGym 0.1.5 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.4
+                0.1.5
               </div>
             
           
@@ -198,6 +198,7 @@
 <span class="kn">from</span> <span class="nn">compiler_gym.spaces</span> <span class="kn">import</span> <span class="n">Commandline</span><span class="p">,</span> <span class="n">CommandlineFlag</span><span class="p">,</span> <span class="n">Scalar</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.third_party.autophase</span> <span class="kn">import</span> <span class="n">AUTOPHASE_FEATURE_NAMES</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.third_party.inst2vec</span> <span class="kn">import</span> <span class="n">Inst2vecEncoder</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.third_party.llvm</span> <span class="kn">import</span> <span class="n">download_llvm_files</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">runfiles_path</span><span class="p">,</span> <span class="n">site_data_path</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.validation_result</span> <span class="kn">import</span> <span class="n">ValidationError</span>
 
@@ -250,6 +251,9 @@
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="c1"># First perform a one-time download of LLVM binaries that are needed by</span>
+        <span class="c1"># the LLVM service and are not included by the pip-installed package.</span>
+        <span class="n">download_llvm_files</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="o">*</span><span class="n">args</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>

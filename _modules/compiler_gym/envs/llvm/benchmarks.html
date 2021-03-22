@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.envs.llvm.benchmarks &mdash; CompilerGym 0.1.4 documentation</title>
+  <title>compiler_gym.envs.llvm.benchmarks &mdash; CompilerGym 0.1.5 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.4
+                0.1.5
               </div>
             
           
@@ -187,10 +187,8 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">File</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">cache_path</span><span class="p">,</span> <span class="n">runfiles_path</span>
-
-<span class="n">CLANG</span> <span class="o">=</span> <span class="n">runfiles_path</span><span class="p">(</span><span class="s2">&quot;compiler_gym/third_party/llvm/bin/clang&quot;</span><span class="p">)</span>
-<span class="n">LLVM_LINK</span> <span class="o">=</span> <span class="n">runfiles_path</span><span class="p">(</span><span class="s2">&quot;compiler_gym/third_party/llvm/bin/llvm-link&quot;</span><span class="p">)</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.third_party</span> <span class="kn">import</span> <span class="n">llvm</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">cache_path</span>
 
 
 <span class="k">def</span> <span class="nf">_communicate</span><span class="p">(</span><span class="n">process</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -300,7 +298,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="n">timeout</span></div>
 
     <span class="k">def</span> <span class="nf">command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outpath</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">CLANG</span><span class="p">)]</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">llvm</span><span class="o">.</span><span class="n">clang_path</span><span class="p">())]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_includes</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">directory</span> <span class="ow">in</span> <span class="n">get_system_includes</span><span class="p">():</span>
                 <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;-isystem&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">directory</span><span class="p">)]</span>
@@ -491,7 +489,7 @@
 
         <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bitcodes</span> <span class="o">+</span> <span class="n">clang_outs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
             <span class="c1"># Link all of the bitcodes into a single module.</span>
-            <span class="n">llvm_link_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">LLVM_LINK</span><span class="p">),</span> <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span>
+            <span class="n">llvm_link_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">llvm</span><span class="o">.</span><span class="n">llvm_link_path</span><span class="p">()),</span> <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span>
                 <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">bitcodes</span> <span class="o">+</span> <span class="n">clang_outs</span>
             <span class="p">]</span>
             <span class="n">llvm_link</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>

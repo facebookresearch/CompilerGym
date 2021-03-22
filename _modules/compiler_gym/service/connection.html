@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.service.connection &mdash; CompilerGym 0.1.4 documentation</title>
+  <title>compiler_gym.service.connection &mdash; CompilerGym 0.1.5 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.4
+                0.1.5
               </div>
             
           
@@ -196,7 +196,11 @@
     <span class="n">ObservationSpace</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.debug_util</span> <span class="kn">import</span> <span class="n">get_debug_level</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">runfiles_path</span><span class="p">,</span> <span class="n">transient_cache_path</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">runfiles_path</span><span class="p">,</span>
+    <span class="n">site_data_path</span><span class="p">,</span>
+    <span class="n">transient_cache_path</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.shell_format</span> <span class="kn">import</span> <span class="n">plural</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.truncate</span> <span class="kn">import</span> <span class="n">truncate_lines</span>
 
@@ -449,6 +453,7 @@
         <span class="c1"># Set the root of the runfiles directory.</span>
         <span class="n">env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
         <span class="n">env</span><span class="p">[</span><span class="s2">&quot;COMPILER_GYM_RUNFILES&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">runfiles_path</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">))</span>
+        <span class="n">env</span><span class="p">[</span><span class="s2">&quot;COMPILER_GYM_SITE_DATA&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">site_data_path</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">))</span>
 
         <span class="c1"># Set the verbosity of the service. The logging level of the service</span>
         <span class="c1"># is the debug level - 1, so that COMPILER_GYM_DEUG=3 will cause VLOG(2)</span>

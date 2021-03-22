@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.util.runfiles_path &mdash; CompilerGym 0.1.4 documentation</title>
+  <title>compiler_gym.util.runfiles_path &mdash; CompilerGym 0.1.5 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.4
+                0.1.5
               </div>
             
           
@@ -187,8 +187,14 @@
 <span class="k">def</span> <span class="nf">runfiles_path</span><span class="p">(</span><span class="n">relpath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Resolve the path to a runfiles data path.</span>
 
+<span class="sd">    No checks are to made to ensure that the path, or the containing directory,</span>
+<span class="sd">    exist.</span>
+
 <span class="sd">    Use environment variable COMPILER_GYM_RUNFILES=/path/to/runfiles if running</span>
 <span class="sd">    outside of bazel.</span>
+
+<span class="sd">    :param relpath: The relative path within the runfiles tres.</span>
+<span class="sd">    :return: An absolute path.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># There are three ways of determining a runfiles path:</span>
     <span class="c1">#   1. Set the COMPILER_GYM_RUNFILES environment variable.</span>
@@ -219,6 +225,12 @@
 <span class="sd">    CompilerGym uses a directory to store persistent site data files in, such as benchmark datasets.</span>
 <span class="sd">    The default location is :code:`~/.local/share/compiler_gym`. Set the environment variable</span>
 <span class="sd">    :code:`$COMPILER_GYM_SITE_DATA` to override this default location.</span>
+
+<span class="sd">    No checks are to made to ensure that the path, or the containing directory,</span>
+<span class="sd">    exist.</span>
+
+<span class="sd">    :param relpath: The relative path within the site data tree.</span>
+<span class="sd">    :return: An absolute path.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># NOTE(cummins): This function has a matching implementation in the C++</span>
     <span class="c1"># sources, compiler_gym::service::getSiteDataPath(). Any change to behavior</span>
@@ -235,12 +247,16 @@
 <div class="viewcode-block" id="cache_path"><a class="viewcode-back" href="../../../compiler_gym/compiler_gym.html#compiler_gym.cache_path">[docs]</a><span class="k">def</span> <span class="nf">cache_path</span><span class="p">(</span><span class="n">relpath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Return a path within the cache directory.</span>
 
-<span class="sd">    CompilerGym uses a directory to cache files in, such as downloaded content. The default location</span>
-<span class="sd">    for this cache is :code:`~/.cache/compiler_gym`. Set the environment variable</span>
-<span class="sd">    :code:`$COMPILER_GYM_CACHE` to override this default location.</span>
+<span class="sd">    CompilerGym uses a directory to cache files in, such as downloaded content.</span>
+<span class="sd">    The default location for this cache is :code:`~/.cache/compiler_gym`. Set</span>
+<span class="sd">    the environment variable :code:`$COMPILER_GYM_CACHE` to override this</span>
+<span class="sd">    default location.</span>
 
-<span class="sd">    :param relpath: The relative path within the cache.</span>
-<span class="sd">    :return: The absolute path of the cache.</span>
+<span class="sd">    No checks are to made to ensure that the path, or the containing directory,</span>
+<span class="sd">    exist.</span>
+
+<span class="sd">    :param relpath: The relative path within the cache tree. :return: An</span>
+<span class="sd">    absolute path.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">forced</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;COMPILER_GYM_CACHE&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">forced</span><span class="p">:</span>
@@ -254,13 +270,18 @@
 <div class="viewcode-block" id="transient_cache_path"><a class="viewcode-back" href="../../../compiler_gym/compiler_gym.html#compiler_gym.transient_cache_path">[docs]</a><span class="k">def</span> <span class="nf">transient_cache_path</span><span class="p">(</span><span class="n">relpath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Return a path within the transient cache directory.</span>
 
-<span class="sd">    The transient cache is a directory used to store files that do not need to persist beyond the</span>
-<span class="sd">    lifetime of the current process. When available, the temporary filesystem :code:`/dev/shm` will</span>
-<span class="sd">    be used. Else, :meth:`cache_path() &lt;compiler_gym.cache_path&gt;` is used as a fallback. Set the</span>
-<span class="sd">    environment variable :code:`$COMPILER_GYM_TRANSIENT_CACHE` to override the default location.</span>
+<span class="sd">    The transient cache is a directory used to store files that do not need to</span>
+<span class="sd">    persist beyond the lifetime of the current process. When available, the</span>
+<span class="sd">    temporary filesystem :code:`/dev/shm` will be used. Else,</span>
+<span class="sd">    :meth:`cache_path() &lt;compiler_gym.cache_path&gt;` is used as a fallback. Set</span>
+<span class="sd">    the environment variable :code:`$COMPILER_GYM_TRANSIENT_CACHE` to override</span>
+<span class="sd">    the default location.</span>
 
-<span class="sd">    :param relpath: The relative path within the cache.</span>
-<span class="sd">    :return: The absolute path of the cache.</span>
+<span class="sd">    No checks are to made to ensure that the path, or the containing directory,</span>
+<span class="sd">    exist.</span>
+
+<span class="sd">    :param relpath: The relative path within the cache tree. :return: An</span>
+<span class="sd">    absolute path.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">forced</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;COMPILER_GYM_TRANSIENT_CACHE&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">forced</span><span class="p">:</span>

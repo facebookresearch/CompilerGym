@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>LLVM Environment Reference &mdash; CompilerGym 0.1.4 documentation</title>
+  <title>LLVM Environment Reference &mdash; CompilerGym 0.1.5 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.4
+                0.1.5
               </div>
             
           
@@ -787,308 +787,308 @@ transforms as a discrete space.</p>
 <tr class="row-even"><td><p><cite>-attributor</cite></p></td>
 <td><p>Deduce and propagate attributes</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-bdce</cite></p></td>
+<tr class="row-odd"><td><p><cite>-barrier</cite></p></td>
+<td><p>A No-Op Barrier Pass</p></td>
+</tr>
+<tr class="row-even"><td><p><cite>-bdce</cite></p></td>
 <td><p>Bit-Tracking Dead Code Elimination</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-break-crit-edges</cite></p></td>
+<tr class="row-odd"><td><p><cite>-break-crit-edges</cite></p></td>
 <td><p>Break critical edges in CFG</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-simplifycfg</cite></p></td>
+<tr class="row-even"><td><p><cite>-simplifycfg</cite></p></td>
 <td><p>Simplify the CFG</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-callsite-splitting</cite></p></td>
+<tr class="row-odd"><td><p><cite>-callsite-splitting</cite></p></td>
 <td><p>Call-site splitting</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-called-value-propagation</cite></p></td>
+<tr class="row-even"><td><p><cite>-called-value-propagation</cite></p></td>
 <td><p>Called Value Propagation</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-canonicalize-aliases</cite></p></td>
+<tr class="row-odd"><td><p><cite>-canonicalize-aliases</cite></p></td>
 <td><p>Canonicalize aliases</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-consthoist</cite></p></td>
+<tr class="row-even"><td><p><cite>-consthoist</cite></p></td>
 <td><p>Constant Hoisting</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-constmerge</cite></p></td>
+<tr class="row-odd"><td><p><cite>-constmerge</cite></p></td>
 <td><p>Merge Duplicate Global Constants</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-constprop</cite></p></td>
+<tr class="row-even"><td><p><cite>-constprop</cite></p></td>
 <td><p>Simple constant propagation</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-coro-cleanup</cite></p></td>
+<tr class="row-odd"><td><p><cite>-coro-cleanup</cite></p></td>
 <td><p>Lower all coroutine related intrinsics</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-coro-early</cite></p></td>
+<tr class="row-even"><td><p><cite>-coro-early</cite></p></td>
 <td><p>Lower early coroutine intrinsics</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-coro-elide</cite></p></td>
+<tr class="row-odd"><td><p><cite>-coro-elide</cite></p></td>
 <td><p>Coroutine frame allocation elision and indirect calls replacement</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-coro-split</cite></p></td>
+<tr class="row-even"><td><p><cite>-coro-split</cite></p></td>
 <td><p>Split coroutine into a set of functions driving its state machine</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-correlated-propagation</cite></p></td>
+<tr class="row-odd"><td><p><cite>-correlated-propagation</cite></p></td>
 <td><p>Value Propagation</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-cross-dso-cfi</cite></p></td>
+<tr class="row-even"><td><p><cite>-cross-dso-cfi</cite></p></td>
 <td><p>Cross-DSO CFI</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-deadargelim</cite></p></td>
+<tr class="row-odd"><td><p><cite>-deadargelim</cite></p></td>
 <td><p>Dead Argument Elimination</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-dce</cite></p></td>
+<tr class="row-even"><td><p><cite>-dce</cite></p></td>
 <td><p>Dead Code Elimination</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-die</cite></p></td>
+<tr class="row-odd"><td><p><cite>-die</cite></p></td>
 <td><p>Dead Instruction Elimination</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-dse</cite></p></td>
+<tr class="row-even"><td><p><cite>-dse</cite></p></td>
 <td><p>Dead Store Elimination</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-reg2mem</cite></p></td>
+<tr class="row-odd"><td><p><cite>-reg2mem</cite></p></td>
 <td><p>Demote all values to stack slots</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-div-rem-pairs</cite></p></td>
+<tr class="row-even"><td><p><cite>-div-rem-pairs</cite></p></td>
 <td><p>Hoist/decompose integer division and remainder</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-early-cse-memssa</cite></p></td>
+<tr class="row-odd"><td><p><cite>-early-cse-memssa</cite></p></td>
 <td><p>Early CSE w/ MemorySSA</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-elim-avail-extern</cite></p></td>
+<tr class="row-even"><td><p><cite>-elim-avail-extern</cite></p></td>
 <td><p>Eliminate Available Externally Globals</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-ee-instrument</cite></p></td>
+<tr class="row-odd"><td><p><cite>-ee-instrument</cite></p></td>
 <td><p>Instrument function entry/exit with calls to e.g. mcount()(pre inlining)</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-flattencfg</cite></p></td>
+<tr class="row-even"><td><p><cite>-flattencfg</cite></p></td>
 <td><p>Flatten the CFG</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-float2int</cite></p></td>
+<tr class="row-odd"><td><p><cite>-float2int</cite></p></td>
 <td><p>Float to int</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-forceattrs</cite></p></td>
+<tr class="row-even"><td><p><cite>-forceattrs</cite></p></td>
 <td><p>Force set function attributes</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-inline</cite></p></td>
+<tr class="row-odd"><td><p><cite>-inline</cite></p></td>
 <td><p>Function Integration/Inlining</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-insert-gcov-profiling</cite></p></td>
+<tr class="row-even"><td><p><cite>-insert-gcov-profiling</cite></p></td>
 <td><p>Insert instrumentation for GCOV profiling</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-gvn-hoist</cite></p></td>
+<tr class="row-odd"><td><p><cite>-gvn-hoist</cite></p></td>
 <td><p>Early GVN Hoisting of Expressions</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-gvn</cite></p></td>
+<tr class="row-even"><td><p><cite>-gvn</cite></p></td>
 <td><p>Global Value Numbering</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-globaldce</cite></p></td>
+<tr class="row-odd"><td><p><cite>-globaldce</cite></p></td>
 <td><p>Dead Global Elimination</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-globalopt</cite></p></td>
+<tr class="row-even"><td><p><cite>-globalopt</cite></p></td>
 <td><p>Global Variable Optimizer</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-globalsplit</cite></p></td>
+<tr class="row-odd"><td><p><cite>-globalsplit</cite></p></td>
 <td><p>Global splitter</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-guard-widening</cite></p></td>
+<tr class="row-even"><td><p><cite>-guard-widening</cite></p></td>
 <td><p>Widen guards</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-hotcoldsplit</cite></p></td>
+<tr class="row-odd"><td><p><cite>-hotcoldsplit</cite></p></td>
 <td><p>Hot Cold Splitting</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-ipconstprop</cite></p></td>
+<tr class="row-even"><td><p><cite>-ipconstprop</cite></p></td>
 <td><p>Interprocedural constant propagation</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-ipsccp</cite></p></td>
+<tr class="row-odd"><td><p><cite>-ipsccp</cite></p></td>
 <td><p>Interprocedural Sparse Conditional Constant Propagation</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-indvars</cite></p></td>
+<tr class="row-even"><td><p><cite>-indvars</cite></p></td>
 <td><p>Induction Variable Simplification</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-irce</cite></p></td>
+<tr class="row-odd"><td><p><cite>-irce</cite></p></td>
 <td><p>Inductive range check elimination</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-infer-address-spaces</cite></p></td>
+<tr class="row-even"><td><p><cite>-infer-address-spaces</cite></p></td>
 <td><p>Infer address spaces</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-inferattrs</cite></p></td>
+<tr class="row-odd"><td><p><cite>-inferattrs</cite></p></td>
 <td><p>Infer set function attributes</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-inject-tli-mappings</cite></p></td>
+<tr class="row-even"><td><p><cite>-inject-tli-mappings</cite></p></td>
 <td><p>Inject TLI Mappings</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-instsimplify</cite></p></td>
+<tr class="row-odd"><td><p><cite>-instsimplify</cite></p></td>
 <td><p>Remove redundant instructions</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-instcombine</cite></p></td>
+<tr class="row-even"><td><p><cite>-instcombine</cite></p></td>
 <td><p>Combine redundant instructions</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-instnamer</cite></p></td>
+<tr class="row-odd"><td><p><cite>-instnamer</cite></p></td>
 <td><p>Assign names to anonymous instructions</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-jump-threading</cite></p></td>
+<tr class="row-even"><td><p><cite>-jump-threading</cite></p></td>
 <td><p>Jump Threading</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-lcssa</cite></p></td>
+<tr class="row-odd"><td><p><cite>-lcssa</cite></p></td>
 <td><p>Loop-Closed SSA Form Pass</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-licm</cite></p></td>
+<tr class="row-even"><td><p><cite>-licm</cite></p></td>
 <td><p>Loop Invariant Code Motion</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-libcalls-shrinkwrap</cite></p></td>
+<tr class="row-odd"><td><p><cite>-libcalls-shrinkwrap</cite></p></td>
 <td><p>Conditionally eliminate dead library calls</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-load-store-vectorizer</cite></p></td>
+<tr class="row-even"><td><p><cite>-load-store-vectorizer</cite></p></td>
 <td><p>Vectorize load and Store instructions</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-loop-data-prefetch</cite></p></td>
+<tr class="row-odd"><td><p><cite>-loop-data-prefetch</cite></p></td>
 <td><p>Loop Data Prefetch</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-loop-deletion</cite></p></td>
+<tr class="row-even"><td><p><cite>-loop-deletion</cite></p></td>
 <td><p>Delete dead loops</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-loop-distribute</cite></p></td>
+<tr class="row-odd"><td><p><cite>-loop-distribute</cite></p></td>
 <td><p>Loop Distribution</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-loop-fusion</cite></p></td>
+<tr class="row-even"><td><p><cite>-loop-fusion</cite></p></td>
 <td><p>Loop Fusion</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-loop-guard-widening</cite></p></td>
+<tr class="row-odd"><td><p><cite>-loop-guard-widening</cite></p></td>
 <td><p>Widen guards (within a single loop, as a loop pass)</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-loop-idiom</cite></p></td>
+<tr class="row-even"><td><p><cite>-loop-idiom</cite></p></td>
 <td><p>Recognize loop idioms</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-loop-instsimplify</cite></p></td>
+<tr class="row-odd"><td><p><cite>-loop-instsimplify</cite></p></td>
 <td><p>Simplify instructions in loops</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-loop-interchange</cite></p></td>
+<tr class="row-even"><td><p><cite>-loop-interchange</cite></p></td>
 <td><p>Interchanges loops for cache reuse</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-loop-load-elim</cite></p></td>
+<tr class="row-odd"><td><p><cite>-loop-load-elim</cite></p></td>
 <td><p>Loop Load Elimination</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-loop-predication</cite></p></td>
+<tr class="row-even"><td><p><cite>-loop-predication</cite></p></td>
 <td><p>Loop predication</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-loop-reroll</cite></p></td>
+<tr class="row-odd"><td><p><cite>-loop-reroll</cite></p></td>
 <td><p>Reroll loops</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-loop-rotate</cite></p></td>
+<tr class="row-even"><td><p><cite>-loop-rotate</cite></p></td>
 <td><p>Rotate Loops</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-loop-simplifycfg</cite></p></td>
+<tr class="row-odd"><td><p><cite>-loop-simplifycfg</cite></p></td>
 <td><p>Simplify loop CFG</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-loop-simplify</cite></p></td>
+<tr class="row-even"><td><p><cite>-loop-simplify</cite></p></td>
 <td><p>Canonicalize natural loops</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-loop-sink</cite></p></td>
+<tr class="row-odd"><td><p><cite>-loop-sink</cite></p></td>
 <td><p>Loop Sink</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-loop-reduce</cite></p></td>
+<tr class="row-even"><td><p><cite>-loop-reduce</cite></p></td>
 <td><p>Loop Strength Reduction</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-loop-unroll-and-jam</cite></p></td>
+<tr class="row-odd"><td><p><cite>-loop-unroll-and-jam</cite></p></td>
 <td><p>Unroll and Jam loops</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-loop-unroll</cite></p></td>
+<tr class="row-even"><td><p><cite>-loop-unroll</cite></p></td>
 <td><p>Unroll loops</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-loop-unswitch</cite></p></td>
+<tr class="row-odd"><td><p><cite>-loop-unswitch</cite></p></td>
 <td><p>Unswitch loops</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-loop-vectorize</cite></p></td>
+<tr class="row-even"><td><p><cite>-loop-vectorize</cite></p></td>
 <td><p>Loop Vectorization</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-loop-versioning-licm</cite></p></td>
+<tr class="row-odd"><td><p><cite>-loop-versioning-licm</cite></p></td>
 <td><p>Loop Versioning For LICM</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-loop-versioning</cite></p></td>
+<tr class="row-even"><td><p><cite>-loop-versioning</cite></p></td>
 <td><p>Loop Versioning</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-loweratomic</cite></p></td>
+<tr class="row-odd"><td><p><cite>-loweratomic</cite></p></td>
 <td><p>Lower atomic intrinsics to non-atomic form</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-lower-constant-intrinsics</cite></p></td>
+<tr class="row-even"><td><p><cite>-lower-constant-intrinsics</cite></p></td>
 <td><p>Lower constant intrinsics</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-lower-expect</cite></p></td>
+<tr class="row-odd"><td><p><cite>-lower-expect</cite></p></td>
 <td><p>Lower ‘expect’ Intrinsics</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-lower-guard-intrinsic</cite></p></td>
+<tr class="row-even"><td><p><cite>-lower-guard-intrinsic</cite></p></td>
 <td><p>Lower the guard intrinsic to normal control flow</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-lowerinvoke</cite></p></td>
+<tr class="row-odd"><td><p><cite>-lowerinvoke</cite></p></td>
 <td><p>Lower invoke and unwind, for unwindless code generators</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-lower-matrix-intrinsics</cite></p></td>
+<tr class="row-even"><td><p><cite>-lower-matrix-intrinsics</cite></p></td>
 <td><p>Lower the matrix intrinsics</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-lowerswitch</cite></p></td>
+<tr class="row-odd"><td><p><cite>-lowerswitch</cite></p></td>
 <td><p>Lower SwitchInst’s to branches</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-lower-widenable-condition</cite></p></td>
+<tr class="row-even"><td><p><cite>-lower-widenable-condition</cite></p></td>
 <td><p>Lower the widenable condition to default true value</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-memcpyopt</cite></p></td>
+<tr class="row-odd"><td><p><cite>-memcpyopt</cite></p></td>
 <td><p>MemCpy Optimization</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-mergefunc</cite></p></td>
+<tr class="row-even"><td><p><cite>-mergefunc</cite></p></td>
 <td><p>Merge Functions</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-mergeicmps</cite></p></td>
+<tr class="row-odd"><td><p><cite>-mergeicmps</cite></p></td>
 <td><p>Merge contiguous icmps into a memcmp</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-mldst-motion</cite></p></td>
+<tr class="row-even"><td><p><cite>-mldst-motion</cite></p></td>
 <td><p>MergedLoadStoreMotion</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-sancov</cite></p></td>
+<tr class="row-odd"><td><p><cite>-sancov</cite></p></td>
 <td><p>Pass for instrumenting coverage on functions</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-name-anon-globals</cite></p></td>
+<tr class="row-even"><td><p><cite>-name-anon-globals</cite></p></td>
 <td><p>Provide a name to nameless globals</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-nary-reassociate</cite></p></td>
+<tr class="row-odd"><td><p><cite>-nary-reassociate</cite></p></td>
 <td><p>Nary reassociation</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-newgvn</cite></p></td>
+<tr class="row-even"><td><p><cite>-newgvn</cite></p></td>
 <td><p>Global Value Numbering</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-pgo-memop-opt</cite></p></td>
+<tr class="row-odd"><td><p><cite>-pgo-memop-opt</cite></p></td>
 <td><p>Optimize memory intrinsic using its size value profile</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-partial-inliner</cite></p></td>
+<tr class="row-even"><td><p><cite>-partial-inliner</cite></p></td>
 <td><p>Partial Inliner</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-partially-inline-libcalls</cite></p></td>
+<tr class="row-odd"><td><p><cite>-partially-inline-libcalls</cite></p></td>
 <td><p>Partially inline calls to library functions</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-post-inline-ee-instrument</cite></p></td>
+<tr class="row-even"><td><p><cite>-post-inline-ee-instrument</cite></p></td>
 <td><p>Instrument function entry/exit with calls to e.g. mcount()” “(post inlining)</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-functionattrs</cite></p></td>
+<tr class="row-odd"><td><p><cite>-functionattrs</cite></p></td>
 <td><p>Deduce function attributes</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-mem2reg</cite></p></td>
+<tr class="row-even"><td><p><cite>-mem2reg</cite></p></td>
 <td><p>Promote Memory to ” “Register</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-prune-eh</cite></p></td>
+<tr class="row-odd"><td><p><cite>-prune-eh</cite></p></td>
 <td><p>Remove unused exception handling info</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-reassociate</cite></p></td>
+<tr class="row-even"><td><p><cite>-reassociate</cite></p></td>
 <td><p>Reassociate expressions</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-redundant-dbg-inst-elim</cite></p></td>
+<tr class="row-odd"><td><p><cite>-redundant-dbg-inst-elim</cite></p></td>
 <td><p>Redundant Dbg Instruction Elimination</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-rpo-functionattrs</cite></p></td>
+<tr class="row-even"><td><p><cite>-rpo-functionattrs</cite></p></td>
 <td><p>Deduce function attributes in RPO</p></td>
 </tr>
-<tr class="row-even"><td><p><cite>-rewrite-statepoints-for-gc</cite></p></td>
+<tr class="row-odd"><td><p><cite>-rewrite-statepoints-for-gc</cite></p></td>
 <td><p>Make relocations explicit at statepoints</p></td>
-</tr>
-<tr class="row-odd"><td><p><cite>-rewrite-symbols</cite></p></td>
-<td><p>Rewrite Symbols</p></td>
 </tr>
 <tr class="row-even"><td><p><cite>-sccp</cite></p></td>
 <td><p>Sparse Conditional Constant Propagation</p></td>
@@ -1129,13 +1129,10 @@ transforms as a discrete space.</p>
 <tr class="row-even"><td><p><cite>-strip</cite></p></td>
 <td><p>Strip all symbols from a module</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-structurizecfg</cite></p></td>
-<td><p>Structurize the CFG</p></td>
-</tr>
-<tr class="row-even"><td><p><cite>-tailcallelim</cite></p></td>
+<tr class="row-odd"><td><p><cite>-tailcallelim</cite></p></td>
 <td><p>Tail Call Elimination</p></td>
 </tr>
-<tr class="row-odd"><td><p><cite>-mergereturn</cite></p></td>
+<tr class="row-even"><td><p><cite>-mergereturn</cite></p></td>
 <td><p>Unify function exit nodes</p></td>
 </tr>
 </tbody>
