@@ -15,7 +15,7 @@ pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 # The maximum number of times to call validate() on a state to check for an
 # error.
-VALIDATION_FLAKINESS = 10
+VALIDATION_FLAKINESS = 3
 
 # A list of CSV states that should pass validation, to be used as regression
 # tests.
