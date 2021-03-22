@@ -12,6 +12,7 @@ import pytest
 
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.envs.llvm.legacy_datasets import VALIDATORS
+from compiler_gym.third_party import llvm
 from compiler_gym.util.runfiles_path import runfiles_path
 
 ACTIONS_LIST = Path(
@@ -117,16 +118,16 @@ def cBench_dataset():
 @pytest.fixture(scope="module")
 def llvm_opt() -> Path:
     """Test fixture that yields the path of opt."""
-    return runfiles_path("compiler_gym/third_party/llvm/bin/opt")
+    return llvm.opt_path()
 
 
 @pytest.fixture(scope="module")
 def llvm_diff() -> Path:
     """Test fixture that yields the path of llvm-diff."""
-    return runfiles_path("compiler_gym/third_party/llvm/bin/llvm-diff")
+    return llvm.llvm_diff_path()
 
 
 @pytest.fixture(scope="module")
 def clang() -> Path:
     """Test fixture that yields the path of clang."""
-    return runfiles_path("compiler_gym/third_party/llvm/bin/clang")
+    return llvm.clang_path()

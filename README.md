@@ -130,7 +130,7 @@ tutorials, further details, and API reference.
 
 # Leaderboards
 
-🚧 **Under construction** 🚧 As of CompilerGym v0.1.3 we are not yet accepting
+🚧 **Under construction** 🚧 As of CompilerGym v0.1.4 we are not yet accepting
 submissions for these leaderboards. Please check back soon!
 
 These leaderboards track the performance of user-submitted algorithms for
