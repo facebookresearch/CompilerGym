@@ -85,7 +85,6 @@ py_test(
 
 py_test(
     name = "datasets_test",
-    timeout = "short",
     srcs = ["datasets_test.py"],
     deps = [
         "//compiler_gym",

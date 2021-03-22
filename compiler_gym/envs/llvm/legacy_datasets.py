@@ -411,12 +411,13 @@ def _make_cBench_validator(
     ] = None,
     pre_execution_callback: Optional[Callable[[Path], None]] = None,
     sanitizer: Optional[LlvmSanitizer] = None,
+    flakiness: int = 5,
 ) -> Callable[["LlvmEnv"], Optional[ValidationError]]:  # noqa: F821
     """Construct a validation callback for a cBench benchmark. See validator() for usage."""
     input_files = input_files or []
     output_files = output_files or []
 
-    def validator_cb(env):
+    def validator_cb(env: "LlvmEnv") -> Optional[ValidationError]:  # noqa: F821
         """The validation callback."""
         with _CBENCH_DOWNLOAD_THREAD_LOCK:
             download_cBench_runtime_data()
@@ -537,7 +538,23 @@ def _make_cBench_validator(
                             data={"path": path.name, "diff": "<binary>"},
                         )
 
-    return validator_cb
+    def flaky_wrapped_cb(env: "LlvmEnv") -> Optional[ValidationError]:  # noqa: F821
+        """Wrap the validation callback in a flakiness retry loop."""
+        for i in range(1, max(flakiness, 1) + 1):
+            try:
+                error = validator_cb(env)
+                if not error:
+                    return
+            except TimeoutError:
+                # Timeout errors can be raised by the environment in case of a
+                # slow step / observation, and should be retried.
+                pass
+            env.logger.warning(
+                "Validation callback failed, attempt=%d/%d", i, flakiness
+            )
+        return error
+
+    return flaky_wrapped_cb
 
 
 # A map from benchmark name to validation callbacks. Defined below.
