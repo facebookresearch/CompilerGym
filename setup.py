@@ -6,13 +6,16 @@
 # LICENSE file in the root directory of this source tree.
 
 import distutils.util
+import io
 
 import setuptools
 
 with open("VERSION") as f:
     version = f.read().strip()
 with open("README.md") as f:
-    long_description = f.read()
+    # Force UTF-8 file encoding to support non-ascii characters in the readme.
+    with io.open("README.md", encoding="utf-8") as f:
+        long_description = f.read()
 with open("compiler_gym/requirements.txt") as f:
     requirements = [ln.split("#")[0].rstrip() for ln in f.readlines()]
 
