@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.compiler_env_state &mdash; CompilerGym 0.1.3 documentation</title>
+  <title>compiler_gym.compiler_env_state &mdash; CompilerGym 0.1.4 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.3
+                0.1.4
               </div>
             
           
@@ -207,6 +207,11 @@
     <span class="n">reward</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
     <span class="sd">&quot;&quot;&quot;The cumulative reward for this episode.&quot;&quot;&quot;</span>
 
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">has_reward</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return whether the state has a reward value.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
 <div class="viewcode-block" id="CompilerEnvState.csv_header"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvState.csv_header">[docs]</a>    <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">csv_header</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return the header string for the CSV-format.</span>
@@ -246,7 +251,7 @@
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="n">benchmark</span><span class="o">=</span><span class="n">benchmark</span><span class="p">,</span>
             <span class="n">reward</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">reward</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">reward</span><span class="p">),</span>
-            <span class="n">walltime</span><span class="o">=</span><span class="nb">float</span><span class="p">(</span><span class="n">walltime</span><span class="p">),</span>
+            <span class="n">walltime</span><span class="o">=</span><span class="mi">0</span> <span class="k">if</span> <span class="n">walltime</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">walltime</span><span class="p">),</span>
             <span class="n">commandline</span><span class="o">=</span><span class="n">commandline</span><span class="p">,</span>
         <span class="p">)</span></div>
 
@@ -258,6 +263,9 @@
 <span class="sd">        :returns: A generator of :class:`CompilerEnvState` instances.</span>
 <span class="sd">        :raises ValueError: If input parsing fails.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># TODO(cummins): Check schema of DictReader and, on failure, fallback</span>
+        <span class="c1"># to from_csv() per-line.</span>
+        <span class="c1"># TODO(cummins): Accept a URL for in_file and read from web.</span>
         <span class="n">data</span> <span class="o">=</span> <span class="n">in_file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
         <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictReader</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
             <span class="k">try</span><span class="p">:</span>
@@ -273,10 +281,8 @@
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">CompilerEnvState</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
         <span class="n">epsilon</span> <span class="o">=</span> <span class="mf">1e-5</span>
-        <span class="c1"># If only one benchmark has a reward the states cannot be equal.</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reward</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="o">!=</span> <span class="p">(</span><span class="n">rhs</span><span class="o">.</span><span class="n">reward</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reward</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">)</span> <span class="ow">and</span> <span class="p">(</span><span class="n">rhs</span><span class="o">.</span><span class="n">reward</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">):</span>
+        <span class="c1"># Only compare reward if both states have it.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">has_reward</span> <span class="ow">and</span> <span class="n">rhs</span><span class="o">.</span><span class="n">has_reward</span><span class="p">):</span>
             <span class="n">reward_equal</span> <span class="o">=</span> <span class="kc">True</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="n">reward_equal</span> <span class="o">=</span> <span class="nb">abs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reward</span> <span class="o">-</span> <span class="n">rhs</span><span class="o">.</span><span class="n">reward</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">epsilon</span>
@@ -287,7 +293,10 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">benchmark</span>
             <span class="ow">and</span> <span class="n">reward_equal</span>
             <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">commandline</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">commandline</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">rhs</span></div>
 </pre></div>
 
            </div>

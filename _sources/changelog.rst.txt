@@ -4,6 +4,42 @@
 Changelog
 =========
 
+Release 0.1.4 (2021-03-22)
+--------------------------
+
+This release focuses on hardening the LLVM environments, providing
+improved semantics validation, and improving the datasets. Many thanks
+to @JD-at-work, @bwasti, and @mostafaelhoushi for code contributions.
+
+-  [llvm] Added a new ``cBench-v1`` dataset which changes the function
+   attributes of the IR to permit inlining. ``cBench-v0`` is deprecated
+   and will be removed no earlier than v0.1.6.
+-  [llvm] Removed 15 passes from the LLVM action space:
+   ``-bounds-checking``, ``-chr``, ``-extract-blocks``, ``-gvn-sink``,
+   ``-loop-extract-single``, ``-loop-extract``, ``-objc-arc-apelim``,
+   ``-objc-arc-contract``, ``-objc-arc-expand``, ``-objc-arc``,
+   ``-place-safepoints``, ``-rewrite-symbols``,
+   ``-strip-dead-debug-info``, ``-strip-nonlinetable-debuginfo``,
+   ``-structurizecfg``. Passes are removed if they are: irrelevant
+   (e.g. used only debugging), if they change the program semantics
+   (e.g. inserting runtimes bound checking), or if they have been found
+   to have nondeterministic behavior between runs.
+-  Extended ``env.step()`` so that it can take a list of actions that
+   are all performed in a single batch. This improve efficiency.
+-  Added default reward spaces for ``CompilerEnv`` that are derived from
+   scalar observations (thanks @bwasti!)
+-  Added a new Q learning example (thanks @JD-at-work!).
+-  *Deprecation:* The next release v0.1.5 will introduce a new datasets
+   API that is easier to use and more flexible. In preparation for this,
+   the ``Dataset`` class has been renamed to ``LegacyDataset``, the
+   following dataset operations have been marked deprecated:
+   ``activate()``, ``deactivate()``, and ``delete()``. The
+   ``GetBenchmarks()`` RPC interface method has also been marked
+   deprecated..
+-  [llvm] Improved semantics validation using LLVM’s memory, thread,
+   address, and undefined behavior sanitizers.
+-  Numerous bug fixes and improvements.
+
 Release 0.1.3 (2021-02-25)
 --------------------------
 

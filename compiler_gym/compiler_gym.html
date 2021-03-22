@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym &mdash; CompilerGym 0.1.3 documentation</title>
+  <title>compiler_gym &mdash; CompilerGym 0.1.4 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.3
+                0.1.4
               </div>
             
           
@@ -234,6 +234,12 @@ contains the information required to reproduce the result.</p>
 </dd></dl>
 
 <dl class="py method">
+<dt id="compiler_gym.CompilerEnvState.has_reward">
+<em class="property">property </em><code class="sig-name descname">has_reward</code><a class="headerlink" href="#compiler_gym.CompilerEnvState.has_reward" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return whether the state has a reward value.</p>
+</dd></dl>
+
+<dl class="py method">
 <dt id="compiler_gym.CompilerEnvState.json">
 <code class="sig-name descname">json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/compiler_env_state.html#CompilerEnvState.json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.CompilerEnvState.json" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the state as JSON.</p>
@@ -286,7 +292,7 @@ contains the information required to reproduce the result.</p>
 <h2><a class="toc-backref" href="#id2">Validation</a><a class="headerlink" href="#validation" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="compiler_gym.ValidationResult">
-<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.</code><code class="sig-name descname">ValidationResult</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span><span class="p">:</span> <span class="n">compiler_gym.compiler_env_state.CompilerEnvState</span></em>, <em class="sig-param"><span class="n">walltime</span><span class="p">:</span> <span class="n">float</span></em>, <em class="sig-param"><span class="n">reward_validated</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">actions_replay_failed</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">reward_validation_failed</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">benchmark_semantics_validated</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">benchmark_semantics_validation_failed</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">error_details</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/validation_result.html#ValidationResult"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.ValidationResult" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.</code><code class="sig-name descname">ValidationResult</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">state</span><span class="p">:</span> <span class="n">compiler_gym.compiler_env_state.CompilerEnvState</span></em>, <em class="sig-param"><span class="n">walltime</span><span class="p">:</span> <span class="n">float</span></em>, <em class="sig-param"><span class="n">reward_validated</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">actions_replay_failed</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">reward_validation_failed</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">benchmark_semantics_validated</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">benchmark_semantics_validation_failed</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em>, <em class="sig-param"><span class="n">errors</span><span class="p">:</span> <span class="n">List<span class="p">[</span>compiler_gym.validation_result.ValidationError<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">[]</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/validation_result.html#ValidationResult"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.ValidationResult" title="Permalink to this definition">¶</a></dt>
 <dd><p>A tuple that represents the result of validating a compiler environment state.</p>
 <dl class="py attribute">
 <dt id="compiler_gym.ValidationResult.actions_replay_failed">
@@ -306,10 +312,36 @@ contains the information required to reproduce the result.</p>
 <dd><p>Whether the semantics of the benchmark were found to have changed.</p>
 </dd></dl>
 
-<dl class="py attribute">
+<dl class="py method">
 <dt id="compiler_gym.ValidationResult.error_details">
-<code class="sig-name descname">error_details</code><em class="property">: str</em><a class="headerlink" href="#compiler_gym.ValidationResult.error_details" title="Permalink to this definition">¶</a></dt>
-<dd><p>A description of any validation errors.</p>
+<em class="property">property </em><code class="sig-name descname">error_details</code><a class="headerlink" href="#compiler_gym.ValidationResult.error_details" title="Permalink to this definition">¶</a></dt>
+<dd><p>A summary description of the validation errors.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="compiler_gym.ValidationResult.errors">
+<code class="sig-name descname">errors</code><em class="property">: List<span class="p">[</span>compiler_gym.validation_result.ValidationError<span class="p">]</span></em><a class="headerlink" href="#compiler_gym.ValidationResult.errors" title="Permalink to this definition">¶</a></dt>
+<dd><p>A list of <a class="reference internal" href="#compiler_gym.ValidationError" title="compiler_gym.ValidationError"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValidationError</span></code></a></p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compiler_gym.ValidationResult.from_json">
+<em class="property">classmethod </em><code class="sig-name descname">from_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span> &#x2192; compiler_gym.validation_result.ValidationResult<a class="reference internal" href="../_modules/compiler_gym/validation_result.html#ValidationResult.from_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.ValidationResult.from_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a validation result from JSON data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> – A JSON dict.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A validation result instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compiler_gym.ValidationResult.join">
+<em class="property">classmethod </em><code class="sig-name descname">join</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">results</span><span class="p">:</span> <span class="n">Iterable<span class="p">[</span><a class="reference internal" href="#compiler_gym.ValidationResult" title="compiler_gym.ValidationResult">ValidationResult</a><span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/validation_result.html#ValidationResult.join"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.ValidationResult.join" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a validation result that is the union join of multiple results.</p>
 </dd></dl>
 
 <dl class="py method">
@@ -351,6 +383,55 @@ contains the information required to reproduce the result.</p>
 <dt id="compiler_gym.ValidationResult.walltime">
 <code class="sig-name descname">walltime</code><em class="property">: float</em><a class="headerlink" href="#compiler_gym.ValidationResult.walltime" title="Permalink to this definition">¶</a></dt>
 <dd><p>The wall time in seconds that the validation took.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt id="compiler_gym.ValidationError">
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.</code><code class="sig-name descname">ValidationError</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">type</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">data</span><span class="p">:</span> <span class="n">Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">{}</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/validation_result.html#ValidationError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.ValidationError" title="Permalink to this definition">¶</a></dt>
+<dd><p>A ValidationError describes an error encountered in a call to
+<code class="xref py py-meth docutils literal notranslate"><span class="pre">env.validate()</span></code>.</p>
+<dl class="py attribute">
+<dt id="compiler_gym.ValidationError.data">
+<code class="sig-name descname">data</code><em class="property">: Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span></em><a class="headerlink" href="#compiler_gym.ValidationError.data" title="Permalink to this definition">¶</a></dt>
+<dd><p>A JSON-serialized dictionary of data that further describes the error.
+This data dictionary can contain any information that may be relevant for
+diagnosing the underlying issue, such as a stack trace or an error line
+number. There is no specified schema for this data, validators are free to
+return whatever data they like. Setting this field is optional.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compiler_gym.ValidationError.from_json">
+<em class="property">classmethod </em><code class="sig-name descname">from_json</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">data</span></em><span class="sig-paren">)</span> &#x2192; compiler_gym.validation_result.ValidationResult<a class="reference internal" href="../_modules/compiler_gym/validation_result.html#ValidationError.from_json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.ValidationError.from_json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a validation error from JSON data.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>data</strong> – A JSON dict.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A validation error.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt id="compiler_gym.ValidationError.json">
+<code class="sig-name descname">json</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/validation_result.html#ValidationError.json"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.ValidationError.json" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the error as a JSON-serializable dictionary.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A JSON dict.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt id="compiler_gym.ValidationError.type">
+<code class="sig-name descname">type</code><em class="property">: str</em><a class="headerlink" href="#compiler_gym.ValidationError.type" title="Permalink to this definition">¶</a></dt>
+<dd><p>A short name describing the type of error that occured. E.g.
+<code class="code docutils literal notranslate"><span class="pre">&quot;Runtime</span> <span class="pre">crash&quot;</span></code>.</p>
 </dd></dl>
 
 </dd></dl>

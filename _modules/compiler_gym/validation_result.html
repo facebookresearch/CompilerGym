@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.validation_result &mdash; CompilerGym 0.1.3 documentation</title>
+  <title>compiler_gym.validation_result &mdash; CompilerGym 0.1.4 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.3
+                0.1.4
               </div>
             
           
@@ -175,10 +175,49 @@
 <span class="c1"># This source code is licensed under the MIT license found in the</span>
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
 <span class="sd">&quot;&quot;&quot;This module defines the validation result tuple.&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">itertools</span>
 <span class="kn">import</span> <span class="nn">re</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">NamedTuple</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span>
 
 <span class="kn">from</span> <span class="nn">compiler_gym.compiler_env_state</span> <span class="kn">import</span> <span class="n">CompilerEnvState</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.shell_format</span> <span class="kn">import</span> <span class="n">plural</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.truncate</span> <span class="kn">import</span> <span class="n">truncate</span>
+
+
+<div class="viewcode-block" id="ValidationError"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.ValidationError">[docs]</a><span class="k">class</span> <span class="nc">ValidationError</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A ValidationError describes an error encountered in a call to</span>
+<span class="sd">    :meth:`env.validate() &lt;compiler_gym.envs.CompilerEnv.validate&gt;`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="nb">type</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="sd">&quot;&quot;&quot;A short name describing the type of error that occured. E.g.</span>
+<span class="sd">    :code:`&quot;Runtime crash&quot;`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="sd">&quot;&quot;&quot;A JSON-serialized dictionary of data that further describes the error.</span>
+<span class="sd">    This data dictionary can contain any information that may be relevant for</span>
+<span class="sd">    diagnosing the underlying issue, such as a stack trace or an error line</span>
+<span class="sd">    number. There is no specified schema for this data, validators are free to</span>
+<span class="sd">    return whatever data they like. Setting this field is optional.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="ValidationError.json"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.ValidationError.json">[docs]</a>    <span class="k">def</span> <span class="nf">json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Get the error as a JSON-serializable dictionary.</span>
+
+<span class="sd">        :return: A JSON dict.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()</span>  <span class="c1"># pylint: disable=no-member</span></div>
+
+<div class="viewcode-block" id="ValidationError.from_json"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.ValidationError.from_json">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ValidationResult&quot;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Create a validation error from JSON data.</span>
+
+<span class="sd">        :param data: A JSON dict.</span>
+<span class="sd">        :return: A validation error.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span></div></div>
 
 
 <div class="viewcode-block" id="ValidationResult"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.ValidationResult">[docs]</a><span class="k">class</span> <span class="nc">ValidationResult</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
@@ -205,8 +244,64 @@
     <span class="n">benchmark_semantics_validation_failed</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="sd">&quot;&quot;&quot;Whether the semantics of the benchmark were found to have changed.&quot;&quot;&quot;</span>
 
-    <span class="n">error_details</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="sd">&quot;&quot;&quot;A description of any validation errors.&quot;&quot;&quot;</span>
+    <span class="n">errors</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ValidationError</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="sd">&quot;&quot;&quot;A list of :class:`ValidationError` &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Equality comparison.</span>
+
+<span class="sd">        Validation results are *not* compared on walltime, and are insensitive</span>
+<span class="sd">        to the order of errors.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">ValidationResult</span><span class="p">):</span>
+            <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">state</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">state</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_validated</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">reward_validated</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">actions_replay_failed</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">actions_replay_failed</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_validation_failed</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">reward_validation_failed</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark_semantics_validated</span> <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">benchmark_semantics_validated</span>
+            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark_semantics_validation_failed</span>
+            <span class="o">==</span> <span class="n">rhs</span><span class="o">.</span><span class="n">benchmark_semantics_validation_failed</span>
+            <span class="ow">and</span> <span class="nb">sorted</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span> <span class="o">==</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">rhs</span><span class="o">.</span><span class="n">errors</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">rhs</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">error_details</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;A summary description of the validation errors.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">:</span>
+            <span class="k">return</span> <span class="s2">&quot;&quot;</span>
+
+        <span class="n">msg</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">error_types</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">type</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">]</span>
+        <span class="n">freq</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">Counter</span><span class="p">(</span><span class="n">error_types</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="c1"># Shortcut for when there is just a single message to aggregate. Use</span>
+        <span class="c1"># format: &quot;${error_msg}&quot; if there is a single error or &quot;${n}×</span>
+        <span class="c1"># ${error_msg}&quot; if there are multiple copies of the same error.</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">message</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">error_types</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+            <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">error_types</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">message</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">error_types</span><span class="p">)</span><span class="si">}</span><span class="s2">× </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span>
+
+        <span class="c1"># If there are multiple error messages, number them using the format:</span>
+        <span class="c1"># &quot;[${i}/${j}] ${n}× ${error_msg}&quot;. E.g. &quot;[1/3] 18× Memory leak&quot;.</span>
+        <span class="k">for</span> <span class="n">j</span><span class="p">,</span> <span class="p">(</span><span class="n">message</span><span class="p">,</span> <span class="n">count</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">freq</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">msg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2">× </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">msg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;[</span><span class="si">{</span><span class="n">j</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span><span class="si">}</span><span class="s2">] </span><span class="si">{</span><span class="n">message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">remaining</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">freq</span><span class="p">)</span> <span class="o">-</span> <span class="n">j</span>
+            <span class="k">if</span> <span class="n">j</span> <span class="o">&gt;=</span> <span class="mi">3</span> <span class="ow">and</span> <span class="n">remaining</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span>
+                <span class="n">msg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;... (</span><span class="si">{</span><span class="n">remaining</span><span class="si">}</span><span class="s2"> more </span><span class="si">{</span><span class="n">plural</span><span class="p">(</span><span class="n">remaining</span><span class="p">,</span> <span class="s1">&#39;error&#39;</span><span class="p">,</span> <span class="s1">&#39;errors&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="p">)</span>
+                <span class="k">break</span>
+        <span class="k">return</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
 
 <div class="viewcode-block" id="ValidationResult.okay"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.ValidationResult.okay">[docs]</a>    <span class="k">def</span> <span class="nf">okay</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Whether validation succeeded.&quot;&quot;&quot;</span>
@@ -222,7 +317,7 @@
 
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">okay</span><span class="p">():</span>
             <span class="n">msg</span> <span class="o">=</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">error_details</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">))</span>
-            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;❌  </span><span class="si">{</span><span class="n">benchmark</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;❌  </span><span class="si">{</span><span class="n">benchmark</span><span class="si">}</span><span class="s2">  </span><span class="si">{</span><span class="n">truncate</span><span class="p">(</span><span class="n">msg</span><span class="p">,</span> <span class="n">max_lines</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">max_line_len</span><span class="o">=</span><span class="mi">50</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">reward</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;✅  </span><span class="si">{</span><span class="n">benchmark</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">else</span><span class="p">:</span>
@@ -234,8 +329,45 @@
 <span class="sd">        :return: A JSON dict.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">data</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()</span>  <span class="c1"># pylint: disable=no-member</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;errors&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">e</span><span class="o">.</span><span class="n">json</span><span class="p">()</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">errors</span><span class="p">]</span>
         <span class="n">data</span><span class="p">[</span><span class="s2">&quot;state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
-        <span class="k">return</span> <span class="n">data</span></div></div>
+        <span class="k">return</span> <span class="n">data</span></div>
+
+<div class="viewcode-block" id="ValidationResult.from_json"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.ValidationResult.from_json">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ValidationResult&quot;</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Create a validation result from JSON data.</span>
+
+<span class="sd">        :param data: A JSON dict.</span>
+<span class="sd">        :return: A validation result instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;state&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">CompilerEnvState</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">data</span><span class="p">[</span><span class="s2">&quot;state&quot;</span><span class="p">])</span>
+        <span class="n">data</span><span class="p">[</span><span class="s2">&quot;errors&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="n">ValidationError</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="k">for</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">data</span><span class="p">[</span><span class="s2">&quot;errors&quot;</span><span class="p">]]</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="ValidationResult.join"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.ValidationResult.join">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">join</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">results</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="s2">&quot;ValidationResult&quot;</span><span class="p">]):</span>
+        <span class="sd">&quot;&quot;&quot;Create a validation result that is the union join of multiple results.&quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">results</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No states to join&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">state</span> <span class="o">!=</span> <span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">state</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;All states must be the same&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="c1"># NOTE: No checking that states are the same.</span>
+            <span class="n">state</span><span class="o">=</span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">state</span><span class="p">,</span>
+            <span class="n">walltime</span><span class="o">=</span><span class="nb">sum</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">walltime</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">),</span>
+            <span class="n">reward_validated</span><span class="o">=</span><span class="nb">any</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">reward_validated</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">),</span>
+            <span class="n">actions_replay_failed</span><span class="o">=</span><span class="nb">any</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">actions_replay_failed</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">),</span>
+            <span class="n">reward_validation_failed</span><span class="o">=</span><span class="nb">any</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">reward_validation_failed</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">),</span>
+            <span class="n">benchmark_semantics_validated</span><span class="o">=</span><span class="nb">any</span><span class="p">(</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">benchmark_semantics_validated</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span>
+            <span class="p">),</span>
+            <span class="n">benchmark_semantics_validation_failed</span><span class="o">=</span><span class="nb">any</span><span class="p">(</span>
+                <span class="n">r</span><span class="o">.</span><span class="n">benchmark_semantics_validation_failed</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span>
+            <span class="p">),</span>
+            <span class="n">errors</span><span class="o">=</span><span class="nb">list</span><span class="p">(</span><span class="n">itertools</span><span class="o">.</span><span class="n">chain</span><span class="o">.</span><span class="n">from_iterable</span><span class="p">(</span><span class="n">r</span><span class="o">.</span><span class="n">errors</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">results</span><span class="p">)),</span>
+        <span class="p">)</span></div></div>
 </pre></div>
 
            </div>

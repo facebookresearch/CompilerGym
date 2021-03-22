@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Frequently Asked Questions &mdash; CompilerGym 0.1.3 documentation</title>
+  <title>Frequently Asked Questions &mdash; CompilerGym 0.1.4 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.3
+                0.1.4
               </div>
             
           
@@ -107,6 +107,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#how-do-i-run-this-on-my-own-program">How do I run this on my own program?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#i-want-to-add-a-new-program-representation-reward-signal-how-do-i-do-that">I want to add a new program representation / reward signal. How do I do that?</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#should-i-always-try-different-actions">Should I always try different actions?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#i-updated-with-git-pull-and-now-it-doesn-t-work">I updated with “git pull” and now it doesn’t work</a></li>
 </ul>
 </li>
 </ul>
@@ -200,6 +201,7 @@ question not answered here? File an issue on the <a class="reference external" h
 <li><p><a class="reference internal" href="#how-do-i-run-this-on-my-own-program" id="id8">How do I run this on my own program?</a></p></li>
 <li><p><a class="reference internal" href="#i-want-to-add-a-new-program-representation-reward-signal-how-do-i-do-that" id="id9">I want to add a new program representation / reward signal. How do I do that?</a></p></li>
 <li><p><a class="reference internal" href="#should-i-always-try-different-actions" id="id10">Should I always try different actions?</a></p></li>
+<li><p><a class="reference internal" href="#i-updated-with-git-pull-and-now-it-doesn-t-work" id="id11">I updated with “git pull” and now it doesn’t work</a></p></li>
 </ul>
 </div>
 <div class="section" id="what-can-i-do-with-this">
@@ -213,6 +215,8 @@ around with it to better understand what is going on:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pythom -m compiler_gym.bin.manual_env --env=llvm-v0
 </pre></div>
 </div>
+<p>Once you get the hang of things, try submitting your best algorithm to our
+<a class="reference external" href="https://github.com/facebookresearch/CompilerGym#leaderboards">leaderboards</a>!</p>
 </div>
 <div class="section" id="i-found-a-bug-how-do-i-report-it">
 <h2><a class="toc-backref" href="#id3">I found a bug. How do I report it?</a><a class="headerlink" href="#i-found-a-bug-how-do-i-report-it" title="Permalink to this headline">¶</a></h2>
@@ -280,6 +284,20 @@ modify, e.g. llvm. Once done, send us a pull request!</p>
 example of this is <a class="reference external" href="https://en.wikipedia.org/wiki/Dead_code_elimination">dead code elimination</a>, which can be used to
 “clean up mess” generated from a previous action. So repeating the same action
 in different context can bring improvements.</p>
+</div>
+<div class="section" id="i-updated-with-git-pull-and-now-it-doesn-t-work">
+<h2><a class="toc-backref" href="#id11">I updated with “git pull” and now it doesn’t work</a><a class="headerlink" href="#i-updated-with-git-pull-and-now-it-doesn-t-work" title="Permalink to this headline">¶</a></h2>
+<p>The first thing to is to re-run <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">init</span></code> to ensure that you have the
+correct development depencies installed, as those can change between releases.</p>
+<p>If that doesn’t fix the problem, feel free to
+<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/issues">file an issue</a>, but
+note that the
+<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/commits/development">development</a>
+branch is the bleeding edge and may contain features that have not yet reached
+stability. If you would like to build from source but do not require the
+latest feature set, use the
+<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/commits/stable">stable</a>
+branch which lags to the latest release with hotfixes.</p>
 </div>
 </div>
 

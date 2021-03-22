@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Changelog &mdash; CompilerGym 0.1.3 documentation</title>
+  <title>Changelog &mdash; CompilerGym 0.1.4 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.3
+                0.1.4
               </div>
             
           
@@ -97,6 +97,7 @@
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#release-0-1-4-2021-03-22">Release 0.1.4 (2021-03-22)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#release-0-1-3-2021-02-25">Release 0.1.3 (2021-02-25)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#release-0-1-2-2021-01-25">Release 0.1.2 (2021-01-25)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#release-0-1-1-2020-12-28">Release 0.1.1 (2020-12-28)</a></li>
@@ -181,6 +182,42 @@
             
   <div class="section" id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="release-0-1-4-2021-03-22">
+<h2>Release 0.1.4 (2021-03-22)<a class="headerlink" href="#release-0-1-4-2021-03-22" title="Permalink to this headline">¶</a></h2>
+<p>This release focuses on hardening the LLVM environments, providing
+improved semantics validation, and improving the datasets. Many thanks
+to &#64;JD-at-work, &#64;bwasti, and &#64;mostafaelhoushi for code contributions.</p>
+<ul class="simple">
+<li><p>[llvm] Added a new <code class="docutils literal notranslate"><span class="pre">cBench-v1</span></code> dataset which changes the function
+attributes of the IR to permit inlining. <code class="docutils literal notranslate"><span class="pre">cBench-v0</span></code> is deprecated
+and will be removed no earlier than v0.1.6.</p></li>
+<li><p>[llvm] Removed 15 passes from the LLVM action space:
+<code class="docutils literal notranslate"><span class="pre">-bounds-checking</span></code>, <code class="docutils literal notranslate"><span class="pre">-chr</span></code>, <code class="docutils literal notranslate"><span class="pre">-extract-blocks</span></code>, <code class="docutils literal notranslate"><span class="pre">-gvn-sink</span></code>,
+<code class="docutils literal notranslate"><span class="pre">-loop-extract-single</span></code>, <code class="docutils literal notranslate"><span class="pre">-loop-extract</span></code>, <code class="docutils literal notranslate"><span class="pre">-objc-arc-apelim</span></code>,
+<code class="docutils literal notranslate"><span class="pre">-objc-arc-contract</span></code>, <code class="docutils literal notranslate"><span class="pre">-objc-arc-expand</span></code>, <code class="docutils literal notranslate"><span class="pre">-objc-arc</span></code>,
+<code class="docutils literal notranslate"><span class="pre">-place-safepoints</span></code>, <code class="docutils literal notranslate"><span class="pre">-rewrite-symbols</span></code>,
+<code class="docutils literal notranslate"><span class="pre">-strip-dead-debug-info</span></code>, <code class="docutils literal notranslate"><span class="pre">-strip-nonlinetable-debuginfo</span></code>,
+<code class="docutils literal notranslate"><span class="pre">-structurizecfg</span></code>. Passes are removed if they are: irrelevant
+(e.g. used only debugging), if they change the program semantics
+(e.g. inserting runtimes bound checking), or if they have been found
+to have nondeterministic behavior between runs.</p></li>
+<li><p>Extended <code class="docutils literal notranslate"><span class="pre">env.step()</span></code> so that it can take a list of actions that
+are all performed in a single batch. This improve efficiency.</p></li>
+<li><p>Added default reward spaces for <code class="docutils literal notranslate"><span class="pre">CompilerEnv</span></code> that are derived from
+scalar observations (thanks &#64;bwasti!)</p></li>
+<li><p>Added a new Q learning example (thanks &#64;JD-at-work!).</p></li>
+<li><p><em>Deprecation:</em> The next release v0.1.5 will introduce a new datasets
+API that is easier to use and more flexible. In preparation for this,
+the <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> class has been renamed to <code class="docutils literal notranslate"><span class="pre">LegacyDataset</span></code>, the
+following dataset operations have been marked deprecated:
+<code class="docutils literal notranslate"><span class="pre">activate()</span></code>, <code class="docutils literal notranslate"><span class="pre">deactivate()</span></code>, and <code class="docutils literal notranslate"><span class="pre">delete()</span></code>. The
+<code class="docutils literal notranslate"><span class="pre">GetBenchmarks()</span></code> RPC interface method has also been marked
+deprecated..</p></li>
+<li><p>[llvm] Improved semantics validation using LLVM’s memory, thread,
+address, and undefined behavior sanitizers.</p></li>
+<li><p>Numerous bug fixes and improvements.</p></li>
+</ul>
+</div>
 <div class="section" id="release-0-1-3-2021-02-25">
 <h2>Release 0.1.3 (2021-02-25)<a class="headerlink" href="#release-0-1-3-2021-02-25" title="Permalink to this headline">¶</a></h2>
 <p>This release adds numerous enhancements aimed at improving ease-of-use.

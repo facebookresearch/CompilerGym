@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.envs.compiler_env &mdash; CompilerGym 0.1.3 documentation</title>
+  <title>compiler_gym.envs.compiler_env &mdash; CompilerGym 0.1.4 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.3
+                0.1.4
               </div>
             
           
@@ -176,14 +176,16 @@
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
 <span class="sd">&quot;&quot;&quot;This module defines the OpenAI gym interface for compilers.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">numbers</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span> <span class="k">as</span> <span class="n">IterableType</span>
 <span class="kn">from</span> <span class="nn">copy</span> <span class="kn">import</span> <span class="n">deepcopy</span>
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">isclose</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">fasteners</span>
 <span class="kn">import</span> <span class="nn">gym</span>
@@ -191,7 +193,7 @@
 <span class="kn">from</span> <span class="nn">gym.spaces</span> <span class="kn">import</span> <span class="n">Space</span>
 
 <span class="kn">from</span> <span class="nn">compiler_gym.compiler_env_state</span> <span class="kn">import</span> <span class="n">CompilerEnvState</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.datasets.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">require</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets.dataset</span> <span class="kn">import</span> <span class="n">LegacyDataset</span><span class="p">,</span> <span class="n">require</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CompilerGymServiceConnection</span><span class="p">,</span>
     <span class="n">ConnectionOpts</span><span class="p">,</span>
@@ -216,12 +218,39 @@
 <span class="kn">from</span> <span class="nn">compiler_gym.spaces</span> <span class="kn">import</span> <span class="n">NamedDiscrete</span><span class="p">,</span> <span class="n">Reward</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.debug_util</span> <span class="kn">import</span> <span class="n">get_logging_level</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.timer</span> <span class="kn">import</span> <span class="n">Timer</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.validation_result</span> <span class="kn">import</span> <span class="n">ValidationResult</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.validation_result</span> <span class="kn">import</span> <span class="n">ValidationError</span><span class="p">,</span> <span class="n">ValidationResult</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.views</span> <span class="kn">import</span> <span class="n">ObservationSpaceSpec</span><span class="p">,</span> <span class="n">ObservationView</span><span class="p">,</span> <span class="n">RewardView</span>
 
 <span class="c1"># Type hints.</span>
 <span class="n">info_t</span> <span class="o">=</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
 <span class="n">step_t</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">observation_t</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">info_t</span><span class="p">]</span>
+
+
+<span class="k">class</span> <span class="nc">DefaultRewardFromObservation</span><span class="p">(</span><span class="n">Reward</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observation_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">observation_spaces</span><span class="o">=</span><span class="p">[</span><span class="n">observation_name</span><span class="p">],</span> <span class="nb">id</span><span class="o">=</span><span class="n">observation_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">observation_t</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">benchmark</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Called on env.reset(). Reset incremental progress.&quot;&quot;&quot;</span>
+        <span class="k">del</span> <span class="n">benchmark</span>  <span class="c1"># unused</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_value</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">action</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">observations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">observation_t</span><span class="p">],</span>
+        <span class="n">observation_view</span><span class="p">:</span> <span class="n">ObservationView</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Called on env.step(). Compute and return new reward.&quot;&quot;&quot;</span>
+        <span class="n">value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">observations</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">previous_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">previous_value</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">reward</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">previous_value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="n">reward</span>
 
 
 <div class="viewcode-block" id="CompilerEnv"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv">[docs]</a><span class="k">class</span> <span class="nc">CompilerEnv</span><span class="p">(</span><span class="n">gym</span><span class="o">.</span><span class="n">Env</span><span class="p">):</span>
@@ -275,9 +304,9 @@
 <span class="sd">        to store benchmarks.</span>
 <span class="sd">    :vartype datasets_site_path: Optional[Path]</span>
 
-<span class="sd">    :ivar available_datasets: A mapping from dataset name to :class:`Dataset`</span>
+<span class="sd">    :ivar available_datasets: A mapping from dataset name to :class:`LegacyDataset`</span>
 <span class="sd">        objects that are available to download.</span>
-<span class="sd">    :vartype available_datasets: Dict[str, Dataset]</span>
+<span class="sd">    :vartype available_datasets: Dict[str, LegacyDataset]</span>
 
 <span class="sd">    :ivar observation: A view of the available observation spaces that permits</span>
 <span class="sd">        on-demand computation of observations.</span>
@@ -351,8 +380,6 @@
 <span class="sd">        :raises TimeoutError: If the compiler service fails to initialize</span>
 <span class="sd">            within the parameters provided in :code:`connection_settings`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">rewards</span> <span class="o">=</span> <span class="n">rewards</span> <span class="ow">or</span> <span class="p">[]</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;render.modes&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;human&quot;</span><span class="p">,</span> <span class="s2">&quot;ansi&quot;</span><span class="p">]}</span>
 
         <span class="c1"># Set up logging.</span>
@@ -368,17 +395,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_service_endpoint</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="n">service</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_connection_settings</span> <span class="o">=</span> <span class="n">connection_settings</span> <span class="ow">or</span> <span class="n">ConnectionOpts</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">datasets_site_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-
-        <span class="c1"># The benchmark that is currently being used, and the benchmark that</span>
-        <span class="c1"># the user requested. Those do not always correlate, since the user</span>
-        <span class="c1"># could request a random benchmark.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use_uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">benchmark</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_user_specified_benchmark_uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">benchmark</span>
-        <span class="c1"># A map from benchmark URIs to Benchmark messages. We keep track of any</span>
-        <span class="c1"># user-provided custom benchmarks so that we can register them with a</span>
-        <span class="c1"># reset service.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_custom_benchmarks</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Benchmark</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LegacyDataset</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">action_space_name</span> <span class="o">=</span> <span class="n">action_space</span>
 
@@ -387,6 +404,43 @@
             <span class="n">opts</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_connection_settings</span><span class="p">,</span>
             <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
         <span class="p">)</span>
+
+        <span class="c1"># If no reward space is specified, generate some from numeric observation spaces</span>
+        <span class="n">rewards</span> <span class="o">=</span> <span class="n">rewards</span> <span class="ow">or</span> <span class="p">[</span>
+            <span class="n">DefaultRewardFromObservation</span><span class="p">(</span><span class="n">obs</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">observation_spaces</span>
+            <span class="k">if</span> <span class="n">obs</span><span class="o">.</span><span class="n">default_value</span><span class="o">.</span><span class="n">WhichOneof</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)</span>
+            <span class="ow">and</span> <span class="nb">isinstance</span><span class="p">(</span>
+                <span class="nb">getattr</span><span class="p">(</span><span class="n">obs</span><span class="o">.</span><span class="n">default_value</span><span class="p">,</span> <span class="n">obs</span><span class="o">.</span><span class="n">default_value</span><span class="o">.</span><span class="n">WhichOneof</span><span class="p">(</span><span class="s2">&quot;value&quot;</span><span class="p">)),</span>
+                <span class="n">numbers</span><span class="o">.</span><span class="n">Number</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="c1"># The benchmark that is currently being used, and the benchmark that</span>
+        <span class="c1"># the user requested. Those do not always correlate, since the user</span>
+        <span class="c1"># could request a random benchmark.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use_uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_user_specified_benchmark_uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="c1"># A map from benchmark URIs to Benchmark messages. We keep track of any</span>
+        <span class="c1"># user-provided custom benchmarks so that we can register them with a</span>
+        <span class="c1"># reset service.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_custom_benchmarks</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Benchmark</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+        <span class="c1"># Normally when the benchmark is changed the updated value is not</span>
+        <span class="c1"># reflected until the next call to reset(). We make an exception for</span>
+        <span class="c1"># constructor-time arguments as otherwise the behavior of the benchmark</span>
+        <span class="c1"># property is counter-intuitive:</span>
+        <span class="c1">#</span>
+        <span class="c1">#     &gt;&gt;&gt; env = gym.make(&quot;example-v0&quot;, benchmark=&quot;foo&quot;)</span>
+        <span class="c1">#     &gt;&gt;&gt; env.benchmark</span>
+        <span class="c1">#     None</span>
+        <span class="c1">#     &gt;&gt;&gt; env.reset()</span>
+        <span class="c1">#     &gt;&gt;&gt; env.benchmark</span>
+        <span class="c1">#     &quot;foo&quot;</span>
+        <span class="c1">#</span>
+        <span class="c1"># By forcing the benchmark-in-use URI at constructor time, the first</span>
+        <span class="c1"># env.benchmark returns the name as expected.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">=</span> <span class="n">benchmark</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use_uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_specified_benchmark_uri</span>
 
         <span class="c1"># Process the available action, observation, and reward spaces.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">action_spaces</span> <span class="o">=</span> <span class="p">[</span>
@@ -554,9 +608,24 @@
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="s2">&quot;Changing the benchmark has no effect until reset() is called.&quot;</span>
             <span class="p">)</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">benchmark</span><span class="p">,</span> <span class="nb">str</span><span class="p">)</span> <span class="ow">or</span> <span class="n">benchmark</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">benchmark</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Unsetting the forced benchmark&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_user_specified_benchmark_uri</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">benchmark</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Setting benchmark by name: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">benchmark</span><span class="p">)</span>
+            <span class="c1"># If the user requested a benchmark by URI, e.g.</span>
+            <span class="c1"># benchmark://cBench-v1/dijkstra, require the dataset (cBench-v1)</span>
+            <span class="c1"># automatically.</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets_site_path</span><span class="p">:</span>
+                <span class="n">components</span> <span class="o">=</span> <span class="n">benchmark</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;://&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">components</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">or</span> <span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">==</span> <span class="s2">&quot;benchmark&quot;</span><span class="p">:</span>
+                    <span class="n">components</span> <span class="o">=</span> <span class="n">components</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">components</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Requiring dataset </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">require_dataset</span><span class="p">(</span><span class="n">components</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_user_specified_benchmark_uri</span> <span class="o">=</span> <span class="n">benchmark</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">benchmark</span><span class="p">,</span> <span class="n">Benchmark</span><span class="p">):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Setting benchmark data: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">benchmark</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_user_specified_benchmark_uri</span> <span class="o">=</span> <span class="n">benchmark</span><span class="o">.</span><span class="n">uri</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_add_custom_benchmarks</span><span class="p">([</span><span class="n">benchmark</span><span class="p">])</span>
         <span class="k">else</span><span class="p">:</span>
@@ -819,8 +888,9 @@
                     <span class="p">),</span>
                 <span class="p">),</span>
             <span class="p">)</span>
-        <span class="k">except</span> <span class="p">(</span><span class="n">ServiceError</span><span class="p">,</span> <span class="n">ServiceTransportError</span><span class="p">):</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">ServiceError</span><span class="p">,</span> <span class="n">ServiceTransportError</span><span class="p">,</span> <span class="ne">TimeoutError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="c1"># Abort and retry on error.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> on reset(): </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="kc">None</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span>
@@ -849,16 +919,19 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="p">:</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">id</span><span class="p">]</span></div>
 
-<div class="viewcode-block" id="CompilerEnv.step"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.step">[docs]</a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">step_t</span><span class="p">:</span>
+<div class="viewcode-block" id="CompilerEnv.step"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.step">[docs]</a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">step_t</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Take a step.</span>
 
-<span class="sd">        :param action: Value from the action_space.</span>
+<span class="sd">        :param action: An action, or a sequence of actions. When multiple</span>
+<span class="sd">            actions are provided the observation and reward are returned</span>
+<span class="sd">            after running all of the actions.</span>
 <span class="sd">        :return: A tuple of observation, reward, done, and info. Observation and</span>
 <span class="sd">            reward are None if default observation/reward is not set. If done</span>
 <span class="sd">            is True, observation and reward may also be None (e.g. because the</span>
 <span class="sd">            service failed).</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">,</span> <span class="s2">&quot;Must call reset() before step()&quot;</span>
+        <span class="n">actions</span> <span class="o">=</span> <span class="n">action</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">IterableType</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">action</span><span class="p">]</span>
         <span class="n">observation</span><span class="p">,</span> <span class="n">reward</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
 
         <span class="c1"># Build the list of observations that must be computed by the backend</span>
@@ -877,13 +950,13 @@
             <span class="p">]</span>
             <span class="n">observation_spaces</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="o">.</span><span class="n">observation_spaces</span>
 
-        <span class="c1"># Record the action.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">actions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
+        <span class="c1"># Record the actions.</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">actions</span> <span class="o">+=</span> <span class="n">actions</span>
 
         <span class="c1"># Send the request to the backend service.</span>
         <span class="n">request</span> <span class="o">=</span> <span class="n">StepRequest</span><span class="p">(</span>
             <span class="n">session_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">,</span>
-            <span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="n">action</span><span class="p">],</span>
+            <span class="n">action</span><span class="o">=</span><span class="n">actions</span><span class="p">,</span>
             <span class="n">observation_space</span><span class="o">=</span><span class="n">observation_indices</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
@@ -990,7 +1063,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">RewardView</span>
 
-<div class="viewcode-block" id="CompilerEnv.require_datasets"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.require_datasets">[docs]</a>    <span class="k">def</span> <span class="nf">require_datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datasets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="CompilerEnv.require_datasets"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.require_datasets">[docs]</a>    <span class="k">def</span> <span class="nf">require_datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datasets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LegacyDataset</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Require that the given datasets are available to the environment.</span>
 
 <span class="sd">        Example usage:</span>
@@ -1006,30 +1079,37 @@
 
 <span class="sd">        :param datasets: A list of datasets to require. Each dataset is the name</span>
 <span class="sd">            of an available dataset, the URL of a dataset to download, or a</span>
-<span class="sd">            :class:`Dataset` instance.</span>
+<span class="sd">            :class:`LegacyDataset` instance.</span>
+<span class="sd">        :return: :code:`True` if one or more datasets were downloaded, or</span>
+<span class="sd">            :code:`False` if all datasets were already available.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Requiring datasets: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">datasets</span><span class="p">)</span>
         <span class="n">dataset_installed</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">:</span>
             <span class="n">dataset_installed</span> <span class="o">|=</span> <span class="n">require</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">dataset_installed</span><span class="p">:</span>
             <span class="c1"># Signal to the compiler service that the contents of the site data</span>
             <span class="c1"># directory has changed.</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Initiating service-side scan of dataset directory&quot;</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">AddBenchmark</span><span class="p">,</span>
                 <span class="n">AddBenchmarkRequest</span><span class="p">(</span>
                     <span class="n">benchmark</span><span class="o">=</span><span class="p">[</span><span class="n">Benchmark</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="s2">&quot;service://scan-site-data&quot;</span><span class="p">)]</span>
                 <span class="p">),</span>
             <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">make_manifest_file</span><span class="p">()</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">make_manifest_file</span><span class="p">()</span>
+        <span class="k">return</span> <span class="n">dataset_installed</span></div>
 
-<div class="viewcode-block" id="CompilerEnv.require_dataset"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.require_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">require_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="CompilerEnv.require_dataset"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.require_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">require_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LegacyDataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Require that the given dataset is available to the environment.</span>
 
 <span class="sd">        Alias for</span>
 <span class="sd">        :meth:`env.require_datasets([dataset]) &lt;compiler_gym.envs.CompilerEnv.require_datasets&gt;`.</span>
 
 <span class="sd">        :param dataset: The name of the dataset to download, the URL of the dataset, or a</span>
-<span class="sd">            :class:`Dataset` instance.</span>
+<span class="sd">            :class:`LegacyDataset` instance.</span>
+<span class="sd">        :return: :code:`True` if the dataset was downloaded, or :code:`False` if</span>
+<span class="sd">            the dataset was already available.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">require_datasets</span><span class="p">([</span><span class="n">dataset</span><span class="p">])</span></div>
 
@@ -1057,7 +1137,7 @@
                     <span class="p">)</span>
         <span class="k">return</span> <span class="n">manifest_path</span></div>
 
-<div class="viewcode-block" id="CompilerEnv.register_dataset"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.register_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">register_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<div class="viewcode-block" id="CompilerEnv.register_dataset"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.register_dataset">[docs]</a>    <span class="k">def</span> <span class="nf">register_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">LegacyDataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Register a new dataset.</span>
 
 <span class="sd">        After registering, the dataset name may be used by</span>
@@ -1066,13 +1146,13 @@
 
 <span class="sd">        Example usage:</span>
 
-<span class="sd">            &gt;&gt;&gt; my_dataset = Dataset(name=&quot;my-dataset-v0&quot;, ...)</span>
+<span class="sd">            &gt;&gt;&gt; my_dataset = LegacyDataset(name=&quot;my-dataset-v0&quot;, ...)</span>
 <span class="sd">            &gt;&gt;&gt; env = gym.make(&quot;llvm-v0&quot;)</span>
 <span class="sd">            &gt;&gt;&gt; env.register_dataset(my_dataset)</span>
 <span class="sd">            &gt;&gt;&gt; env.require_dataset(&quot;my-dataset-v0&quot;)</span>
 <span class="sd">            &gt;&gt;&gt; env.benchmark = &quot;my-dataset-v0/1&quot;</span>
 
-<span class="sd">        :param dataset: A :class:`Dataset` instance describing the new dataset.</span>
+<span class="sd">        :param dataset: A :class:`LegacyDataset` instance describing the new dataset.</span>
 <span class="sd">        :return: :code:`True` if the dataset was added, else :code:`False`.</span>
 <span class="sd">        :raises ValueError: If a dataset with this name is already registered.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1120,18 +1200,17 @@
             <span class="p">)</span>
 
         <span class="n">actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">commandline_to_actions</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">commandline</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">:</span>
-            <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">done</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Environment terminated with error: `</span><span class="si">{</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;error_details&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">`&quot;</span>
-                <span class="p">)</span></div>
+        <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">actions</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">done</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Environment terminated with error: `</span><span class="si">{</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;error_details&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">`&quot;</span>
+            <span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CompilerEnvState</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ValidationResult</span><span class="p">:</span>
         <span class="n">in_place</span> <span class="o">=</span> <span class="n">state</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
         <span class="n">state</span> <span class="o">=</span> <span class="n">state</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">state</span>
 
-        <span class="n">error_messages</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">errors</span><span class="p">:</span> <span class="n">ValidationError</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">validation</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;state&quot;</span><span class="p">:</span> <span class="n">state</span><span class="p">,</span>
             <span class="s2">&quot;actions_replay_failed&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">,</span>
@@ -1153,10 +1232,27 @@
                         <span class="n">replay_target</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
                     <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                         <span class="n">validation</span><span class="p">[</span><span class="s2">&quot;actions_replay_failed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-                        <span class="n">error_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+                        <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                            <span class="n">ValidationError</span><span class="p">(</span>
+                                <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;Action replay failed&quot;</span><span class="p">,</span>
+                                <span class="n">data</span><span class="o">=</span><span class="p">{</span>
+                                    <span class="s2">&quot;exception&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
+                                    <span class="s2">&quot;exception_type&quot;</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                                <span class="p">},</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
                         <span class="k">break</span>
 
-                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="o">.</span><span class="n">deterministic</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">reward</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                        <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                            <span class="s2">&quot;Validating state with reward, but &quot;</span>
+                            <span class="s2">&quot;environment has no reward space set&quot;</span>
+                        <span class="p">)</span>
+                    <span class="k">elif</span> <span class="p">(</span>
+                        <span class="n">state</span><span class="o">.</span><span class="n">reward</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+                        <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span>
+                        <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="o">.</span><span class="n">deterministic</span>
+                    <span class="p">):</span>
                         <span class="n">validation</span><span class="p">[</span><span class="s2">&quot;reward_validated&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
                         <span class="c1"># If reward deviates from the expected amount record the</span>
                         <span class="c1"># error but continue with the remainder of the validation.</span>
@@ -1167,9 +1263,17 @@
                             <span class="n">abs_tol</span><span class="o">=</span><span class="mf">1e-10</span><span class="p">,</span>
                         <span class="p">):</span>
                             <span class="n">validation</span><span class="p">[</span><span class="s2">&quot;reward_validation_failed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-                            <span class="n">error_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                                <span class="sa">f</span><span class="s2">&quot;Expected reward </span><span class="si">{</span><span class="n">state</span><span class="o">.</span><span class="n">reward</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2"> but &quot;</span>
-                                <span class="sa">f</span><span class="s2">&quot;received reward </span><span class="si">{</span><span class="n">replay_target</span><span class="o">.</span><span class="n">episode_reward</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">&quot;</span>
+                            <span class="n">errors</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                                <span class="n">ValidationError</span><span class="p">(</span>
+                                    <span class="nb">type</span><span class="o">=</span><span class="p">(</span>
+                                        <span class="sa">f</span><span class="s2">&quot;Expected reward </span><span class="si">{</span><span class="n">state</span><span class="o">.</span><span class="n">reward</span><span class="si">}</span><span class="s2"> but &quot;</span>
+                                        <span class="sa">f</span><span class="s2">&quot;received reward </span><span class="si">{</span><span class="n">replay_target</span><span class="o">.</span><span class="n">episode_reward</span><span class="si">}</span><span class="s2">&quot;</span>
+                                    <span class="p">),</span>
+                                    <span class="n">data</span><span class="o">=</span><span class="p">{</span>
+                                        <span class="s2">&quot;expected_reward&quot;</span><span class="p">:</span> <span class="n">state</span><span class="o">.</span><span class="n">reward</span><span class="p">,</span>
+                                        <span class="s2">&quot;actual_reward&quot;</span><span class="p">:</span> <span class="n">replay_target</span><span class="o">.</span><span class="n">episode_reward</span><span class="p">,</span>
+                                    <span class="p">},</span>
+                                <span class="p">)</span>
                             <span class="p">)</span>
 
                     <span class="c1"># TODO(https://github.com/facebookresearch/CompilerGym/issues/45):</span>
@@ -1178,10 +1282,10 @@
                     <span class="n">validate_semantics</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">get_benchmark_validation_callback</span><span class="p">()</span>
                     <span class="k">if</span> <span class="n">validate_semantics</span><span class="p">:</span>
                         <span class="n">validation</span><span class="p">[</span><span class="s2">&quot;benchmark_semantics_validated&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-                        <span class="n">semantics_error</span> <span class="o">=</span> <span class="n">validate_semantics</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">semantics_error</span><span class="p">:</span>
+                        <span class="n">semantics_errors</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">validate_semantics</span><span class="p">(</span><span class="bp">self</span><span class="p">))</span>
+                        <span class="k">if</span> <span class="n">semantics_errors</span><span class="p">:</span>
                             <span class="n">validation</span><span class="p">[</span><span class="s2">&quot;benchmark_semantics_validation_failed&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">True</span>
-                            <span class="n">error_messages</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">semantics_error</span><span class="p">)</span>
+                            <span class="n">errors</span> <span class="o">+=</span> <span class="n">semantics_errors</span>
 
                     <span class="c1"># Finished all checks, break the loop.</span>
                     <span class="k">break</span>
@@ -1190,13 +1294,13 @@
 
         <span class="k">return</span> <span class="n">ValidationResult</span><span class="p">(</span>
             <span class="n">walltime</span><span class="o">=</span><span class="n">walltime</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-            <span class="n">error_details</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">error_messages</span><span class="p">),</span>
+            <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">,</span>
             <span class="o">**</span><span class="n">validation</span><span class="p">,</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="CompilerEnv.get_benchmark_validation_callback"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.get_benchmark_validation_callback">[docs]</a>    <span class="k">def</span> <span class="nf">get_benchmark_validation_callback</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="s2">&quot;CompilerEnv&quot;</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="s2">&quot;CompilerEnv&quot;</span><span class="p">],</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ValidationError</span><span class="p">]]]:</span>
         <span class="sd">&quot;&quot;&quot;Return a callback that validates benchmark semantics, if available.</span>
 
 <span class="sd">        TODO(https://github.com/facebookresearch/CompilerGym/issues/45): This is</span>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Command Line Reference &mdash; CompilerGym 0.1.3 documentation</title>
+  <title>Command Line Reference &mdash; CompilerGym 0.1.4 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.3
+                0.1.4
               </div>
             
           
@@ -336,9 +336,9 @@ llvm-v0 benchmarks site dir: /home/user/.local/share/compiler_gym/llvm/10.0.0/bi
 +-------------------+--------------+-----------------+----------------+
 | Active Datasets   | License      |   #. Benchmarks | Size on disk   |
 +===================+==============+=================+================+
-| cBench-v0         | BSD 3-Clause |              23 | 7.2 MB         |
+| cBench-v1         | BSD 3-Clause |              23 | 10.1 MB        |
 +-------------------+--------------+-----------------+----------------+
-| Total             |              |              23 | 7.2 MB         |
+| Total             |              |              23 | 10.1 MB        |
 +-------------------+--------------+-----------------+----------------+
 These benchmarks are ready for use. Deactivate them using `--deactivate=&lt;name&gt;`.
 
@@ -400,7 +400,7 @@ This be useful if you have many datasets downloaded and you would to limit the
 benchmarks that can be selected randomly by an environment.</p>
 <p>Activate or deactivate datasets using the <code class="code docutils literal notranslate"><span class="pre">--activate</span></code> and <code class="code docutils literal notranslate"><span class="pre">--deactivate</span></code>
 flags, respectively:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --activate=npb-v0,github-v0 --deactivate=cBench-v0
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --activate=npb-v0,github-v0 --deactivate=cBench-v1
 </pre></div>
 </div>
 <p>The <code class="code docutils literal notranslate"><span class="pre">--activate_all</span></code> and <code class="code docutils literal notranslate"><span class="pre">--deactivate_all</span></code> flags can be used as a
@@ -454,9 +454,6 @@ this command:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compilergym</span><span class="p">:</span><span class="n">NO</span><span class="o">-</span><span class="n">BENCHMARK</span><span class="o">&gt;</span> <span class="n">list_datasets</span>
 </pre></div>
 </div>
-<p>Due to a current limitation in the software, you must quit the shell
-(<code class="code docutils literal notranslate"><span class="pre">exit</span></code> command or <code class="code docutils literal notranslate"><span class="pre">Ctrl-d</span></code>), before then benchmarks in the dataset
-are recognised.</p>
 </div>
 <div class="section" id="setting-a-benchmark-reward-and-observation">
 <h4><a class="toc-backref" href="#id12">Setting a Benchmark, Reward and Observation</a><a class="headerlink" href="#setting-a-benchmark-reward-and-observation" title="Permalink to this headline">¶</a></h4>
@@ -614,8 +611,8 @@ benchmark. The best reward, and sequence of actions that produced this, are
 logged to file.</p>
 <p>For example, run a random search of the LLVM instruction count optimization
 space on a Dijkstra benchmark for 60 seconds using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.random_search --env=llvm-ic-v0 --benchmark=cBench-v0/dijkstra --runtime=60
-Started 16 worker threads for benchmark benchmark://cBench-v0/dijkstra (410 instructions) using reward IrInstructionCountOz.
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.random_search --env=llvm-ic-v0 --benchmark=cBench-v1/dijkstra --runtime=60
+Started 16 worker threads for benchmark benchmark://cBench-v1/dijkstra (410 instructions) using reward IrInstructionCountOz.
 === Running for a minute ===
 Runtime: a minute. Num steps: 470,407 (7,780 / sec). Num episodes: 4,616 (76 / sec). Num restarts: 0.
 Best reward: 101.59% (96 passes, found after 35 seconds)
@@ -664,7 +661,7 @@ incremental reward of each action.</p>
 <p>Example usage:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cat &lt;&lt; EOF |
 benchmark,reward,walltime,commandline
-cBench-v0/crc32,0,1.2,opt  input.bc -o output.bc
+cBench-v1/crc32,0,1.2,opt  input.bc -o output.bc
 EOF
 python -m compiler_gym.bin.validate --env=llvm-ic-v0 -
 </pre></div>
@@ -689,7 +686,7 @@ using
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">csv_header</span><span class="p">())</span>
 <span class="go">benchmark,reward,walltime,commandline</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">to_csv</span><span class="p">())</span>
-<span class="go">benchmark://cBench-v0/rijndael,,20.53565216064453,opt -add-discriminators input.bc -o output.bc</span>
+<span class="go">benchmark://cBench-v1/rijndael,,20.53565216064453,opt -add-discriminators input.bc -o output.bc</span>
 <span class="go">%</span>
 </pre></div>
 </div>
