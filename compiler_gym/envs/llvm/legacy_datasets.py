@@ -539,9 +539,14 @@ def _make_cBench_validator(
     def flaky_wrapped_cb(env: "LlvmEnv") -> Optional[ValidationError]:  # noqa: F821
         """Wrap the validation callback in a flakiness retry loop."""
         for i in range(1, max(flakiness, 1) + 1):
-            error = validator_cb(env)
-            if not error:
-                return
+            try:
+                error = validator_cb(env)
+                if not error:
+                    return
+            except TimeoutError:
+                # Timeout errors can be raised by the environment in case of a
+                # slow step / observation, and should be retried.
+                pass
             env.logger.warning(
                 "Validation callback failed, attempt=%d/%d", i, flakiness
             )
