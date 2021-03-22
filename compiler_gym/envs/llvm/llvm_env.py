@@ -26,6 +26,7 @@ from compiler_gym.envs.llvm.llvm_rewards import (
 from compiler_gym.spaces import Commandline, CommandlineFlag, Scalar, Sequence
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_NAMES
 from compiler_gym.third_party.inst2vec import Inst2vecEncoder
+from compiler_gym.third_party.llvm import download_llvm_files
 from compiler_gym.util.runfiles_path import runfiles_path, site_data_path
 from compiler_gym.validation_result import ValidationError
 
@@ -78,6 +79,9 @@ class LlvmEnv(CompilerEnv):
     """
 
     def __init__(self, *args, **kwargs):
+        # First perform a one-time download of LLVM binaries that are needed by
+        # the LLVM service and are not included by the pip-installed package.
+        download_llvm_files()
         super().__init__(
             *args,
             **kwargs,

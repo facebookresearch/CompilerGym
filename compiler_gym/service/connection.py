@@ -24,7 +24,11 @@ from compiler_gym.service.proto import (
     ObservationSpace,
 )
 from compiler_gym.util.debug_util import get_debug_level
-from compiler_gym.util.runfiles_path import runfiles_path, transient_cache_path
+from compiler_gym.util.runfiles_path import (
+    runfiles_path,
+    site_data_path,
+    transient_cache_path,
+)
 from compiler_gym.util.shell_format import plural
 from compiler_gym.util.truncate import truncate_lines
 
@@ -277,6 +281,7 @@ class ManagedConnection(Connection):
         # Set the root of the runfiles directory.
         env = os.environ.copy()
         env["COMPILER_GYM_RUNFILES"] = str(runfiles_path("."))
+        env["COMPILER_GYM_SITE_DATA"] = str(site_data_path("."))
 
         # Set the verbosity of the service. The logging level of the service
         # is the debug level - 1, so that COMPILER_GYM_DEUG=3 will cause VLOG(2)
