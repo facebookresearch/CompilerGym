@@ -118,3 +118,20 @@ example of this is `dead code elimination
 <https://en.wikipedia.org/wiki/Dead_code_elimination>`_, which can be used to
 "clean up mess" generated from a previous action. So repeating the same action
 in different context can bring improvements.
+
+
+I updated with "git pull" and now it doesn't work
+-------------------------------------------------
+
+The first thing to is to re-run :code:`make init` to ensure that you have the
+correct development depencies installed, as those can change between releases.
+
+If that doesn't fix the problem, feel free to
+`file an issue <https://github.com/facebookresearch/CompilerGym/issues>`_, but
+note that the
+`development <https://github.com/facebookresearch/CompilerGym/commits/development>`_
+branch is the bleeding edge and may contain features that have not yet reached
+stability. If you would like to build from source but do not require the
+latest feature set, use the
+`stable <https://github.com/facebookresearch/CompilerGym/commits/stable>`_
+branch which lags to the latest release with hotfixes.
