@@ -566,6 +566,7 @@ class CompilerGymServiceConnection(object):
         start_time = time()
         end_time = start_time + opts.init_max_seconds
         attempts = 0
+        last_exception = None
         while time() < end_time and attempts < opts.init_max_attempts:
             attempts += 1
             try:
@@ -592,12 +593,17 @@ class CompilerGymServiceConnection(object):
                 #   ServiceError: raised by an RPC method returning an error status.
                 #   NotImplementedError: raised if an RPC method is accessed before the RPC service
                 #       has initialized.
+                last_exception = e
                 logger.warning("%s %s (attempt %d)", type(e).__name__, e, attempts)
 
-        raise TimeoutError(
+        exception_class = (
+            ServiceError if attempts >= opts.init_max_attempts else TimeoutError
+        )
+        raise exception_class(
             f"Failed to create connection to {endpoint_name} after "
             f"{time() - start_time:.1f} seconds "
-            f"({attempts} {plural(attempts, 'attempt', 'attempts')} made)"
+            f"({attempts} {plural(attempts, 'attempt', 'attempts')} made).\n"
+            f"Last error ({type(last_exception).__name__}): {last_exception}"
         )
 
     def __repr__(self):
