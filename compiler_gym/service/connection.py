@@ -316,8 +316,15 @@ class ManagedConnection(Connection):
         while time() < end_time:
             returncode = self.process.poll()
             if returncode is not None:
-                shutil.rmtree(self.working_dir)
-                raise ServiceError(f"Service terminated with returncode: {returncode}")
+                msg = f"Service terminated with returncode: {returncode}"
+                # Attach any logs from the service if available.
+                logs = truncate_lines(
+                    self.loglines(), max_line_len=100, max_lines=25, tail=True
+                )
+                if logs:
+                    msg = f"{msg}\nService logs:\n{logs}"
+                shutil.rmtree(self.working_dir, ignore_errors=True)
+                raise ServiceError(msg)
             if port_path.is_file():
                 try:
                     with open(port_path) as f:
