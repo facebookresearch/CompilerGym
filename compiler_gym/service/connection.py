@@ -384,6 +384,8 @@ class ManagedConnection(Connection):
         """
         # Compiler services write log files in the logs directory. Iterate over
         # them and return their contents.
+        if not (self.working_dir / "logs").is_dir():
+            return ()
         for path in sorted((self.working_dir / "logs").iterdir()):
             if not path.is_file():
                 continue
