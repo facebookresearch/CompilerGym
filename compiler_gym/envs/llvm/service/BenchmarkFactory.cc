@@ -294,8 +294,10 @@ Status BenchmarkFactory::loadBenchmark(
   VLOG(2) << "loadBenchmark(" << path << ")";
 
   Bitcode bitcode;
-  std::ifstream ifs;
-  ifs.open(path);
+  std::ifstream ifs(path);
+  if (ifs.fail()) {
+    return Status(StatusCode::NOT_FOUND, fmt::format("File not found: \"{}\"", path));
+  }
 
   ifs.seekg(0, std::ios::end);
   if (ifs.fail()) {
