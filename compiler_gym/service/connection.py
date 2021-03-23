@@ -11,6 +11,7 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
+from signal import Signals
 from time import sleep, time
 from typing import Iterable, List, NamedTuple, Optional, TypeVar, Union
 
@@ -316,6 +317,12 @@ class ManagedConnection(Connection):
         while time() < end_time:
             returncode = self.process.poll()
             if returncode is not None:
+                try:
+                    # Try and decode the name of a signal. Signal returncodes
+                    # are negative.
+                    returncode = f"{returncode} ({Signals(abs(returncode)).name})"
+                except ValueError:
+                    pass
                 msg = f"Service terminated with returncode: {returncode}"
                 # Attach any logs from the service if available.
                 logs = truncate_lines(
