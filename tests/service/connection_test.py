@@ -7,7 +7,11 @@ import gym
 import pytest
 
 import compiler_gym.envs  # noqa Register LLVM environments.
-from compiler_gym.service import CompilerGymServiceConnection, ConnectionOpts
+from compiler_gym.service import (
+    CompilerGymServiceConnection,
+    ConnectionOpts,
+    ServiceError,
+)
 from compiler_gym.service.proto import GetSpacesRequest
 from tests.test_main import main
 
@@ -45,7 +49,7 @@ def test_create_invalid_options():
 def test_create_channel_failed_subprocess(
     dead_connection: CompilerGymServiceConnection,
 ):
-    with pytest.raises(OSError) as ctx:
+    with pytest.raises(ServiceError) as ctx:
         CompilerGymServiceConnection(
             f"{dead_connection.connection.url}",
             ConnectionOpts(
