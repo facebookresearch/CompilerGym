@@ -218,6 +218,9 @@ Status LlvmSession::runOptWithArgs(const std::vector<std::string>& optArgs) {
 
   // Build a command line invocation: `opt input.bc -o output.bc <optArgs...>`.
   const auto optPath = util::getSiteDataPath("llvm/10.0.0/bin/opt");
+  if (!fs::exists(optPath)) {
+    return Status(StatusCode::INTERNAL, fmt::format("File not found: {}", optPath.string()));
+  }
   std::vector<std::string> optCmd{optPath.string(), before_path.string(), "-o",
                                   after_path.string()};
   optCmd.insert(optCmd.end(), optArgs.begin(), optArgs.end());
