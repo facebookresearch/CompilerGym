@@ -7,7 +7,11 @@ import gym
 import pytest
 
 import compiler_gym.envs  # noqa Register LLVM environments.
-from compiler_gym.service import CompilerGymServiceConnection, ConnectionOpts
+from compiler_gym.service import (
+    CompilerGymServiceConnection,
+    ConnectionOpts,
+    ServiceError,
+)
 from compiler_gym.service.proto import GetSpacesRequest
 from tests.test_main import main
 
@@ -45,7 +49,7 @@ def test_create_invalid_options():
 def test_create_channel_failed_subprocess(
     dead_connection: CompilerGymServiceConnection,
 ):
-    with pytest.raises(OSError) as ctx:
+    with pytest.raises(ServiceError) as ctx:
         CompilerGymServiceConnection(
             f"{dead_connection.connection.url}",
             ConnectionOpts(
@@ -56,7 +60,7 @@ def test_create_channel_failed_subprocess(
         )
 
     assert str(ctx.value).startswith("Failed to create connection to localhost:")
-    assert str(ctx.value).endswith(" (2 attempts made)")
+    assert " (2 attempts made)" in str(ctx.value)
 
 
 def test_create_channel_failed_subprocess_rpc_timeout(
@@ -76,7 +80,7 @@ def test_create_channel_failed_subprocess_rpc_timeout(
         )
 
     assert str(ctx.value).startswith("Failed to create connection to localhost:")
-    assert str(ctx.value).endswith(" (1 attempt made)")
+    assert " (1 attempt made)" in str(ctx.value)
 
 
 def test_call_stub_invalid_type(connection: CompilerGymServiceConnection):

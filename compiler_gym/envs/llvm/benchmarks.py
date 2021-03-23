@@ -12,6 +12,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from datetime import datetime
 from multiprocessing import cpu_count
 from pathlib import Path
+from signal import Signals
 from typing import Iterable, List, Optional, Union
 
 from compiler_gym.service.proto import Benchmark, File
@@ -143,8 +144,15 @@ def _run_command(cmd: List[str], timeout: int):
     )
     _, stderr = _communicate(process, timeout=timeout)
     if process.returncode:
+        returncode = process.returncode
+        try:
+            # Try and decode the name of a signal. Signal returncodes
+            # are negative.
+            returncode = f"{returncode} ({Signals(abs(returncode)).name})"
+        except ValueError:
+            pass
         raise OSError(
-            f"Compilation job failed with returncode {process.returncode}\n"
+            f"Compilation job failed with returncode {returncode}\n"
             f"Command: {' '.join(cmd)}\n"
             f"Stderr: {stderr.strip()}"
         )

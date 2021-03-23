@@ -676,9 +676,6 @@ class CompilerEnv(gym.Env):
             If no aciton space is provided, the default action space is used.
         :return: The initial observation.
         """
-        if retry_count > self._connection_settings.init_max_attempts:
-            raise OSError(f"Failed to reset environment after {retry_count} attempts")
-
         # Start a new service if required.
         if self.service is None:
             self.service = CompilerGymServiceConnection(
@@ -721,11 +718,18 @@ class CompilerEnv(gym.Env):
             self.logger.warning("%s on reset(): %s", type(e).__name__, e)
             self.service.close()
             self.service = None
-            return self.reset(
-                benchmark=benchmark,
-                action_space=action_space,
-                retry_count=retry_count + 1,
-            )
+
+            if retry_count >= self._connection_settings.init_max_attempts:
+                raise OSError(
+                    f"Failed to reset environment after {retry_count - 1} attempts.\n"
+                    f"Last error ({type(e).__name__}): {e}"
+                ) from e
+            else:
+                return self.reset(
+                    benchmark=benchmark,
+                    action_space=action_space,
+                    retry_count=retry_count + 1,
+                )
 
         self._benchmark_in_use_uri = reply.benchmark
         self._session_id = reply.session_id

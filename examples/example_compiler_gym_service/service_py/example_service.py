@@ -25,6 +25,7 @@ flags.DEFINE_string(
 )
 flags.DEFINE_integer("port", 0, "The service listening port")
 flags.DEFINE_integer("nproc", cpu_count(), "The number of server worker threads")
+flags.DEFINE_integer("logbuflevel", 0, "Flag for compatability with C++ service.")
 FLAGS = flags.FLAGS
 
 # For development / debugging, set environment variable COMPILER_GYM_DEBUG=3.

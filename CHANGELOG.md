@@ -1,4 +1,4 @@
-## Release 0.1.5 (2021-03-22)
+## Release 0.1.6 (2021-03-22)
 
 This release focuses on hardening the LLVM environments, providing improved
 semantics validation, and improving the datasets. Many thanks to @JD-at-work,

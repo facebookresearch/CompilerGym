@@ -58,6 +58,10 @@ def download_llvm_files() -> Path:
     # Fast path for repeated calls.
     if _LLVM_DOWNLOADED:
         return unpacked_location
+    # Fast path for first call. This check will be repeated inside the locked
+    # region if required.
+    if (unpacked_location / ".unpacked").is_file():
+        return unpacked_location
 
     with _LLVM_DOWNLOAD_LOCK:
         with fasteners.InterProcessLock(cache_path("llvm-download.LOCK")):
