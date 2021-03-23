@@ -302,6 +302,10 @@ class ManagedConnection(Connection):
         if debug_level > 0:
             cmd.append("--alsologtostderr")
             cmd.append(f"-v={debug_level - 1}")
+            # If we are debugging the backend, set the logbuflevel to a low
+            # value to disable buffering of logging messages. This makes it
+            # easier to `LOG(INFO) << "..."` debug things.
+            cmd.append("--logbuflevel=-1")
 
         logger.debug("Exec %s", cmd)
         self.process = subprocess.Popen(
