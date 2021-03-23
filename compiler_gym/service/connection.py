@@ -218,6 +218,17 @@ class Connection(object):
                     ) from None
                 elif e.code() == grpc.StatusCode.DATA_LOSS:
                     raise ServiceError(e.details()) from None
+                elif e.code() == grpc.StatusCode.UNKNOWN:
+                    # By default, GRPC provides no context if an exception is
+                    # raised in an RPC handler as this could lead to an
+                    # information leak. Unfortunately for us this makes
+                    # debugging a little more difficult, so be verbose about the
+                    # possible causes of this error.
+                    raise ServiceError(
+                        "Service returned an unknown error. Possibly an "
+                        "unhandled exception in a C++ RPC handler, see "
+                        "<https://github.com/grpc/grpc/issues/13706>."
+                    ) from None
                 else:
                     raise ServiceError(
                         f"RPC call returned status code {e.code()} and error `{e.details()}`"
