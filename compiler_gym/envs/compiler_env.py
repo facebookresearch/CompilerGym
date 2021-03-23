@@ -677,7 +677,9 @@ class CompilerEnv(gym.Env):
         :return: The initial observation.
         """
         if retry_count > self._connection_settings.init_max_attempts:
-            raise OSError(f"Failed to reset environment after {retry_count} attempts")
+            raise OSError(
+                f"Failed to reset environment after {retry_count - 1} attempts"
+            )
 
         # Start a new service if required.
         if self.service is None:
