@@ -60,7 +60,7 @@ def test_create_channel_failed_subprocess(
         )
 
     assert str(ctx.value).startswith("Failed to create connection to localhost:")
-    assert str(ctx.value).endswith(" (2 attempts made)")
+    assert " (2 attempts made)" in str(ctx.value)
 
 
 def test_create_channel_failed_subprocess_rpc_timeout(
@@ -80,7 +80,7 @@ def test_create_channel_failed_subprocess_rpc_timeout(
         )
 
     assert str(ctx.value).startswith("Failed to create connection to localhost:")
-    assert str(ctx.value).endswith(" (1 attempt made)")
+    assert " (1 attempt made)" in str(ctx.value)
 
 
 def test_call_stub_invalid_type(connection: CompilerGymServiceConnection):
