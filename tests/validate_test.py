@@ -14,7 +14,7 @@ from tests.test_main import main
 @pytest.mark.parametrize("nproc", (1, 2))
 def test_validate_states_lambda_callback(inorder, nproc):
     state = CompilerEnvState(
-        benchmark="cBench-v1/crc32",
+        benchmark="benchmark://cBench-v1/crc32",
         walltime=1,
         commandline="opt  input.bc -o output.bc",
     )
