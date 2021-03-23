@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.envs.compiler_env &mdash; CompilerGym 0.1.5 documentation</title>
+  <title>compiler_gym.envs.compiler_env &mdash; CompilerGym 0.1.6 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.5
+                0.1.6
               </div>
             
           
@@ -848,9 +848,6 @@
 <span class="sd">            If no aciton space is provided, the default action space is used.</span>
 <span class="sd">        :return: The initial observation.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">retry_count</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection_settings</span><span class="o">.</span><span class="n">init_max_attempts</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to reset environment after </span><span class="si">{</span><span class="n">retry_count</span><span class="si">}</span><span class="s2"> attempts&quot;</span><span class="p">)</span>
-
         <span class="c1"># Start a new service if required.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="n">CompilerGymServiceConnection</span><span class="p">(</span>
@@ -893,11 +890,18 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> on reset(): </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span>
-                <span class="n">benchmark</span><span class="o">=</span><span class="n">benchmark</span><span class="p">,</span>
-                <span class="n">action_space</span><span class="o">=</span><span class="n">action_space</span><span class="p">,</span>
-                <span class="n">retry_count</span><span class="o">=</span><span class="n">retry_count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
-            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">retry_count</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection_settings</span><span class="o">.</span><span class="n">init_max_attempts</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Failed to reset environment after </span><span class="si">{</span><span class="n">retry_count</span> <span class="o">-</span> <span class="mi">1</span><span class="si">}</span><span class="s2"> attempts.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Last error (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span>
+                    <span class="n">benchmark</span><span class="o">=</span><span class="n">benchmark</span><span class="p">,</span>
+                    <span class="n">action_space</span><span class="o">=</span><span class="n">action_space</span><span class="p">,</span>
+                    <span class="n">retry_count</span><span class="o">=</span><span class="n">retry_count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use_uri</span> <span class="o">=</span> <span class="n">reply</span><span class="o">.</span><span class="n">benchmark</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span> <span class="o">=</span> <span class="n">reply</span><span class="o">.</span><span class="n">session_id</span>

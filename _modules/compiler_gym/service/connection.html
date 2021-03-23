@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.service.connection &mdash; CompilerGym 0.1.5 documentation</title>
+  <title>compiler_gym.service.connection &mdash; CompilerGym 0.1.6 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.5
+                0.1.6
               </div>
             
           
@@ -183,6 +183,7 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">signal</span> <span class="kn">import</span> <span class="n">Signals</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span><span class="p">,</span> <span class="n">time</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span>
 
@@ -390,6 +391,17 @@
                     <span class="p">)</span> <span class="kn">from</span> <span class="bp">None</span>
                 <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">DATA_LOSS</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">())</span> <span class="kn">from</span> <span class="bp">None</span>
+                <span class="k">elif</span> <span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span> <span class="o">==</span> <span class="n">grpc</span><span class="o">.</span><span class="n">StatusCode</span><span class="o">.</span><span class="n">UNKNOWN</span><span class="p">:</span>
+                    <span class="c1"># By default, GRPC provides no context if an exception is</span>
+                    <span class="c1"># raised in an RPC handler as this could lead to an</span>
+                    <span class="c1"># information leak. Unfortunately for us this makes</span>
+                    <span class="c1"># debugging a little more difficult, so be verbose about the</span>
+                    <span class="c1"># possible causes of this error.</span>
+                    <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span>
+                        <span class="s2">&quot;Service returned an unknown error. Possibly an &quot;</span>
+                        <span class="s2">&quot;unhandled exception in a C++ RPC handler, see &quot;</span>
+                        <span class="s2">&quot;&lt;https://github.com/grpc/grpc/issues/13706&gt;.&quot;</span>
+                    <span class="p">)</span> <span class="kn">from</span> <span class="bp">None</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span>
                         <span class="sa">f</span><span class="s2">&quot;RPC call returned status code </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">code</span><span class="p">()</span><span class="si">}</span><span class="s2"> and error `</span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">()</span><span class="si">}</span><span class="s2">`&quot;</span>
@@ -462,6 +474,10 @@
         <span class="k">if</span> <span class="n">debug_level</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--alsologtostderr&quot;</span><span class="p">)</span>
             <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-v=</span><span class="si">{</span><span class="n">debug_level</span> <span class="o">-</span> <span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># If we are debugging the backend, set the logbuflevel to a low</span>
+            <span class="c1"># value to disable buffering of logging messages. This makes it</span>
+            <span class="c1"># easier to `LOG(INFO) &lt;&lt; &quot;...&quot;` debug things.</span>
+            <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--logbuflevel=-1&quot;</span><span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Exec </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
@@ -477,8 +493,21 @@
         <span class="k">while</span> <span class="n">time</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">end_time</span><span class="p">:</span>
             <span class="n">returncode</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">returncode</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
-                <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>
-                <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Service terminated with returncode: </span><span class="si">{</span><span class="n">returncode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c1"># Try and decode the name of a signal. Signal returncodes</span>
+                    <span class="c1"># are negative.</span>
+                    <span class="n">returncode</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">returncode</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">Signals</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">returncode</span><span class="p">))</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+                    <span class="k">pass</span>
+                <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Service terminated with returncode: </span><span class="si">{</span><span class="n">returncode</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="c1"># Attach any logs from the service if available.</span>
+                <span class="n">logs</span> <span class="o">=</span> <span class="n">truncate_lines</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">loglines</span><span class="p">(),</span> <span class="n">max_line_len</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span> <span class="n">max_lines</span><span class="o">=</span><span class="mi">25</span><span class="p">,</span> <span class="n">tail</span><span class="o">=</span><span class="kc">True</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">logs</span><span class="p">:</span>
+                    <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">msg</span><span class="si">}</span><span class="se">\n</span><span class="s2">Service logs:</span><span class="se">\n</span><span class="si">{</span><span class="n">logs</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">port_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
                 <span class="k">try</span><span class="p">:</span>
                     <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">port_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -545,6 +574,8 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Compiler services write log files in the logs directory. Iterate over</span>
         <span class="c1"># them and return their contents.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">/</span> <span class="s2">&quot;logs&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="k">return</span> <span class="p">()</span>
         <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">((</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span> <span class="o">/</span> <span class="s2">&quot;logs&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()):</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
                 <span class="k">continue</span>
@@ -718,6 +749,7 @@
         <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="p">()</span>
         <span class="n">end_time</span> <span class="o">=</span> <span class="n">start_time</span> <span class="o">+</span> <span class="n">opts</span><span class="o">.</span><span class="n">init_max_seconds</span>
         <span class="n">attempts</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">last_exception</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">while</span> <span class="n">time</span><span class="p">()</span> <span class="o">&lt;</span> <span class="n">end_time</span> <span class="ow">and</span> <span class="n">attempts</span> <span class="o">&lt;</span> <span class="n">opts</span><span class="o">.</span><span class="n">init_max_attempts</span><span class="p">:</span>
             <span class="n">attempts</span> <span class="o">+=</span> <span class="mi">1</span>
             <span class="k">try</span><span class="p">:</span>
@@ -744,12 +776,17 @@
                 <span class="c1">#   ServiceError: raised by an RPC method returning an error status.</span>
                 <span class="c1">#   NotImplementedError: raised if an RPC method is accessed before the RPC service</span>
                 <span class="c1">#       has initialized.</span>
+                <span class="n">last_exception</span> <span class="o">=</span> <span class="n">e</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> (attempt </span><span class="si">%d</span><span class="s2">)&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">e</span><span class="p">,</span> <span class="n">attempts</span><span class="p">)</span>
 
-        <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
+        <span class="n">exception_class</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">ServiceError</span> <span class="k">if</span> <span class="n">attempts</span> <span class="o">&gt;=</span> <span class="n">opts</span><span class="o">.</span><span class="n">init_max_attempts</span> <span class="k">else</span> <span class="ne">TimeoutError</span>
+        <span class="p">)</span>
+        <span class="k">raise</span> <span class="n">exception_class</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Failed to create connection to </span><span class="si">{</span><span class="n">endpoint_name</span><span class="si">}</span><span class="s2"> after &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">time</span><span class="p">()</span> <span class="o">-</span> <span class="n">start_time</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> seconds &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">attempts</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">plural</span><span class="p">(</span><span class="n">attempts</span><span class="p">,</span> <span class="s1">&#39;attempt&#39;</span><span class="p">,</span> <span class="s1">&#39;attempts&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> made)&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">attempts</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">plural</span><span class="p">(</span><span class="n">attempts</span><span class="p">,</span> <span class="s1">&#39;attempt&#39;</span><span class="p">,</span> <span class="s1">&#39;attempts&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> made).</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Last error (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">last_exception</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">last_exception</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
