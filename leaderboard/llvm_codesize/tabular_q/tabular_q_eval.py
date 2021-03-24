@@ -15,7 +15,10 @@ from leaderboard.llvm_codesize.eval_policy import eval_policy
 def train_and_run(env: LlvmEnv) -> None:
     """ Run tabular Q learning on an environment """
     q_table: Dict[StateActionTuple, float] = {}
-    train(q_table, env.fork())
+    env.observation_space = "Autophase"
+    training_env = env.fork()
+    train(q_table, training_env)
+    training_env.close()
     rollout(q_table, env, True)
 
 

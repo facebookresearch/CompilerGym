@@ -116,6 +116,7 @@ def rollout(qtable, env, printout=False):
         a = select_action(qtable, observation, i)
         action_seq.append(a)
         observation, reward, done, info = env.step(env.action_space.flags.index(a))
+        observation = env.observation["Autophase"]
         rewards.append(reward)
     if printout:
         print(
@@ -132,17 +133,17 @@ def train(q_table, env):
     # policy improvement happens directly after one another.
     for i in range(1, FLAGS.episodes + 1):
         current_length = 0
-        obs = env.reset()
+        observation = env.reset()
         while current_length < FLAGS.episode_length:
             # Run epsilon greedy policy to allow exploration.
-            a = select_action(q_table, obs, current_length, FLAGS.epsilon)
-            hashed = make_q_table_key(obs, a, current_length)
+            a = select_action(q_table, observation, current_length, FLAGS.epsilon)
+            hashed = make_q_table_key(observation, a, current_length)
             if hashed not in q_table:
                 q_table[hashed] = 0
             # Take a stap in the environment, record the reward and state transition.
             # Effectively we are evaluating the policy by taking a step in the
             # environment.
-            obs, reward, done, info = env.step(env.action_space.flags.index(a))
+            observation, reward, done, info = env.step(env.action_space.flags.index(a))
             current_length += 1
 
             # Compute the target value of the current state, by using the current
@@ -153,7 +154,7 @@ def train(q_table, env):
             # can be used to emphasize on immediate early rewards, and encourage
             # the agent to achieve higher rewards sooner than later.
             target = reward + FLAGS.discount * get_max_q_value(
-                q_table, obs, current_length
+                q_table, observation, current_length
             )
 
             # Update Q value. Instead of replacing the Q value at the current
@@ -185,7 +186,8 @@ def main(argv):
     q_table: Dict[StateActionTuple, float] = {}
     benchmark = benchmark_from_flags()
     assert benchmark, "You must specify a benchmark using the --benchmark flag"
-    env = gym.make("llvm-autophase-ic-v0", benchmark=benchmark)
+    env = gym.make("llvm-ic-v0", benchmark=benchmark)
+    env.observation_space = "Autophase"
 
     try:
         # Train a Q-table.
