@@ -72,6 +72,7 @@ from compiler_gym.envs import CompilerEnv
 from compiler_gym.spaces import Commandline
 from compiler_gym.util.flags.env_from_flags import env_from_flags
 from compiler_gym.util.tabulate import tabulate
+from compiler_gym.util.truncate import truncate
 
 flags.DEFINE_integer(
     "heading_level",
@@ -84,13 +85,6 @@ FLAGS = flags.FLAGS
 def header(message: str, level: int):
     prefix = "#" * level
     return f"\n\n{prefix} {message}\n"
-
-
-def shape2str(shape, n: int = 80):
-    string = str(shape)
-    if len(string) > n:
-        return f"`{string[:n-4]}` ..."
-    return f"`{string}`"
 
 
 def print_service_capabilities(env: CompilerEnv, base_heading_level: int = 1):
@@ -111,7 +105,7 @@ def print_service_capabilities(env: CompilerEnv, base_heading_level: int = 1):
         tabulate(
             sorted(
                 [
-                    (space, shape2str(shape))
+                    (space, f"`{truncate(shape.space, max_line_len=80)}`")
                     for space, shape in env.observation.spaces.items()
                 ]
             ),
