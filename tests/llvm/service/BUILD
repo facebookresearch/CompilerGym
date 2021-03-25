@@ -34,14 +34,3 @@ cc_test(
 #         "@gtest",
 #     ],
 # )
-
-cc_test(
-    name = "ObservationSpacesTest",
-    srcs = ["ObservationSpacesTest.cc"],
-    deps = [
-        "//compiler_gym/envs/llvm/service:ObservationSpaces",
-        "//tests:TestMain",
-        "@gtest",
-        "@magic_enum",
-    ],
-)

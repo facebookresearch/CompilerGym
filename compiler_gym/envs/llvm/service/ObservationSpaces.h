@@ -26,6 +26,8 @@ enum class LlvmObservationSpace {
   // Write the bitcode to a file. Returns a string, which is the path of the
   // written file.
   BITCODE_FILE,
+  // The counts of all instructions in a program.
+  INST_COUNT,
   // The Autophase feature vector from:
   //
   //   Huang, Q., Haj-Ali, A., Moses, W., Xiang, J., Stoica, I., Asanovic, K., &

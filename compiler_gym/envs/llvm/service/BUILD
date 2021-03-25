@@ -198,6 +198,7 @@ cc_library(
     visibility = ["//tests:__subpackages__"],
     deps = [
         "//compiler_gym/service/proto:compiler_gym_service_cc",
+        "//compiler_gym/third_party/llvm:InstCount",
         "//compiler_gym/util:EnumUtil",
         "@glog",
         "@magic_enum",

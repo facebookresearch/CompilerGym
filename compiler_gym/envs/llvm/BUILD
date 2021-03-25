@@ -55,6 +55,8 @@ py_library(
         "//compiler_gym/spaces",
         "//compiler_gym/third_party/autophase",
         "//compiler_gym/third_party/inst2vec",
+        "//compiler_gym/third_party/llvm",
+        "//compiler_gym/third_party/llvm:instcount",
     ],
 )
 
