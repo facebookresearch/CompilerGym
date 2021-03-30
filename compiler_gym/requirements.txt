@@ -3,7 +3,7 @@ deprecated>=1.2.12
 fasteners==0.15
 # Version should be kept in step with @com_github_grpc_grpc in WORKSPACE.
 grpcio>=1.36.0
-gym>=0.17.2
+gym>=0.18.0
 humanize>=2.6.0
 networkx==2.5
 numpy>=1.19.3
