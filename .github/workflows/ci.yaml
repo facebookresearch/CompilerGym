@@ -36,16 +36,16 @@ jobs:
 
             - name: Install dependencies (linux)
               run: |
-                  curl -L "https://github.com/bazelbuild/bazelisk/releases/download/v1.6.1/bazelisk-linux-amd64" > bazel.tmp
-                  sudo mv bazel.tmp /usr/local/bin/bazel
-                  chmod +x /usr/local/bin/bazel
+                  curl -L "https://github.com/bazelbuild/bazelisk/releases/download/v1.6.1/bazelisk-linux-amd64" > bazel
+                  chmod +x bazel
+                  sudo mv bazel /usr/local/bin/bazel
                   sudo apt install clang-9 patchelf
                   python -m pip install -r compiler_gym/requirements.txt -r examples/requirements.txt -r leaderboard/requirements.txt -r tests/requirements.txt
               if: matrix.os == 'ubuntu-latest'
 
             - name: Install dependencies (macOS)
               run: |
-                  brew install bazelisk
+                  brew install bazelisk zlib
                   python -m pip install -r compiler_gym/requirements.txt -r examples/requirements.txt -r leaderboard/requirements.txt -r tests/requirements.txt
               if: matrix.os == 'macos-latest'
 
@@ -76,9 +76,9 @@ jobs:
 
             - name: Install dependencies (linux)
               run: |
-                  curl -L "https://github.com/bazelbuild/bazelisk/releases/download/v1.6.1/bazelisk-linux-amd64" > bazel.tmp
-                  sudo mv bazel.tmp /usr/local/bin/bazel
-                  chmod +x /usr/local/bin/bazel
+                  curl -L "https://github.com/bazelbuild/bazelisk/releases/download/v1.6.1/bazelisk-linux-amd64" > bazel
+                  chmod +x bazel
+                  sudo mv bazel /usr/local/bin/bazel
                   sudo apt install clang-9 patchelf
                   python -m pip install -r compiler_gym/requirements.txt -r examples/requirements.txt -r leaderboard/requirements.txt -r tests/requirements.txt
               if: matrix.os == 'ubuntu-latest'
