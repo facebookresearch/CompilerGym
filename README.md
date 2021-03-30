@@ -76,7 +76,7 @@ On macOS you can use the system compiler and install
 
 On linux, install the required toolchain using:
 
-    $ sudo apt install clang libtinfo5 patchelf
+    $ sudo apt install clang libtinfo5 libjpeg-dev patchelf
     $ wget https://github.com/bazelbuild/bazelisk/releases/download/v1.7.5/bazelisk-linux-amd64 -O bazel && chmod +x bazel
     $ sudo mv bazel /usr/local/bin
     $ export CC=clang
