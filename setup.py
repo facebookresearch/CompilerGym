@@ -84,7 +84,7 @@ setuptools.setup(
     include_package_data=True,
     python_requires=">=3.6",
     classifiers=[
-        "Development Status :: 2 - Pre-Alpha",
+        "Development Status :: 3 - Alpha",
         "Environment :: Console",
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
