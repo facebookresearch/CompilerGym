@@ -2,20 +2,27 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""This module defines a helper function for evaluating LLVM codesize reduction
-policies.
+"""LLVM is a popular open source compiler used widely in industry and research.
+This environment exposes the optimization pipeline as a set of actions that can
+be applied to a particular program. The goal of the agent is to select the
+sequence of optimizations that lead to the greatest reduction in instruction
+count in the program being compiled. Reward is the reduction in codesize
+achieved scaled to the reduction achieved by LLVM's builtin -Oz pipeline. Users
+who wish to create a submission for this leaderboard should consider using the
+:func:`eval_llvm_codesize_policy()
+<compiler_gym.leaderboard.llvm_codesize.eval_llvm_codesize_policy>` helper.
 
-Usage:
-
-    from compiler_gym.envs import LlvmEnv
-    from eval_policy import eval_policy
-
-    class MyLlvmCodesizePolicy:
-        def __call__(env: LlvmEnv) -> None:
-            pass # ...
-
-    if __name__ == "__main__":
-        eval_policy(MyLlvmCodesizePolicy())
++--------------------+------------------------------------------------------+
+| Property           | Value                                                |
++====================+======================================================+
+| Environment        | :class:`LlvmEnv <compiler_gym.envs.LlvmEnv>`.        |
++--------------------+------------------------------------------------------+
+| Observation Space  | Any.                                                 |
++--------------------+------------------------------------------------------+
+| Reward Space       | Instruction count reduction relative to :code:`-Oz`. |
++--------------------+------------------------------------------------------+
+| Test Dataset       | The 23 cBench benchmarks.                            |
++--------------------+------------------------------------------------------+
 """
 import platform
 import sys
@@ -33,9 +40,9 @@ from absl import app, flags
 from cpuinfo import get_cpu_info
 from tqdm import tqdm
 
-import compiler_gym  # noqa Register environments.
-from compiler_gym import CompilerEnvState
+import compiler_gym.envs  # noqa Register environments.
 from compiler_gym.bin.validate import main as validate
+from compiler_gym.compiler_env_state import CompilerEnvState
 from compiler_gym.envs import LlvmEnv
 from compiler_gym.util.tabulate import tabulate
 from compiler_gym.util.timer import Timer
@@ -163,11 +170,71 @@ class _BenchmarkRunner(Thread):
                 self.n += 1
 
 
-def eval_policy(policy: Policy) -> None:
-    """Evaluate a policy on a target dataset.
+def eval_llvm_codesize_policy(policy: Policy) -> None:
+    """Evaluate an LLVM codesize policy and generate results for a leaderboard
+    submission.
 
-    A policy is a function that takes as input an LlvmEnv environment and
-    performs a set of actions on it.
+    To use it, you define your policy as a function that takes an
+    :class:`LlvmEnv <compiler_gym.envs.LlvmEnv>` instance as input and modifies
+    it in place. For example, for a trivial random policy:
+
+        >>> from compiler_gym.envs import LlvmEnv
+        >>> def my_policy(env: LlvmEnv) -> None:
+        ....   # Defines a policy that takes 10 random steps.
+        ...    for _ in range(10):
+        ...        _, _, done, _ = env.step(env.action_space.sample())
+        ...        if done: break
+
+    If you would like a stateful policy, you could use a class and override the
+    :code:`__call__()` method:
+
+        >>> class MyPolicy:
+        ...     def __call__(env: LlvmEnv) -> None:
+        ...         pass # ... do fun stuff!
+        >>> my_policy = MyPolicy()
+
+    You then call the :func:`eval_llvm_codesize_policy()
+    <compiler_gym.leaderboard.llvm_codesize.eval_llvm_codesize_policy>` helper
+    function, passing it your policy as its only argument:
+
+    >>> eval_llvm_codesize_policy(my_policy)
+
+    Put together as a complete example this is what an example leaderboard
+    submission script looks like:
+
+    .. code-block:: python
+
+        # my_policy.py
+        from compiler_gym.leaderboard.llvm_codesize import eval_llvm_codesize_policy
+        from compiler_gym.envs import LlvmEnv
+
+        def my_policy(env: LlvmEnv) -> None:
+            pass # ... do fun stuff!
+
+        if __name__ == "__main__":
+            eval_llvm_codesize_policy(my_policy)
+
+    The :func:`eval_llvm_codesize_policy()
+    <compiler_gym.leaderboard.llvm_codesize.eval_llvm_codesize_policy>` helper
+    defines a number of commandline flags that can be overriden to control the
+    behavior of the evaluation. For example the flag :code:`--n` determines the
+    number of times the policy is run on each benchmark (default is 10), and
+    :code:`--logfile` determines the path of the generated results file:
+
+    .. code-block::
+
+        $ python my_policy.py --n=5 --logfile=my_policy_results.csv
+
+    You can use :code:`--helpfull` flag to list all of the flags that are
+    defined:
+
+    .. code-block::
+
+        $ python my_policy.py --helpfull
+
+    Once you are happy with your approach, see the `contributing guide
+    <https://github.com/facebookresearch/CompilerGym/blob/development/CONTRIBUTING.md#leaderboard-submissions>`_
+    for instructions on preparing a submission to the leaderboard.
     """
 
     def main(argv):
