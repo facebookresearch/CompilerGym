@@ -68,11 +68,13 @@ newer equivalents).
 If you prefer, you may build from source. This requires a modern C++ toolchain
 and bazel.
 
-On macOS you can use the system compiler and install
-[bazelisk](https://github.com/bazelbuild/bazelisk) using
+On macOS the required dependencies can be installed using
 [homebrew](https://docs.brew.sh/Installation):
 
-    $ brew install bazelisk
+    $ brew install bazelisk zlib
+    $ export LDFLAGS="-L/usr/local/opt/zlib/lib"
+    $ export CPPFLAGS="-I/usr/local/opt/zlib/include"
+    $ export PKG_CONFIG_PATH="/usr/local/opt/zlib/lib/pkgconfig"
 
 On linux, install the required toolchain using:
 

@@ -47,6 +47,10 @@ jobs:
               run: |
                   brew install bazelisk zlib
                   python -m pip install -r compiler_gym/requirements.txt -r examples/requirements.txt -r leaderboard/requirements.txt -r tests/requirements.txt
+              env:
+                  LDFLAGS: -L/usr/local/opt/zlib/lib
+                  CPPFLAGS: -I/usr/local/opt/zlib/include
+                  PKG_CONFIG_PATH: /usr/local/opt/zlib/lib/pkgconfig
               if: matrix.os == 'macos-latest'
 
             - name: Test
@@ -85,8 +89,12 @@ jobs:
 
             - name: Install dependencies (macos)
               run: |
-                  brew install bazelisk
+                  brew install bazelisk zlib
                   python -m pip install -r compiler_gym/requirements.txt -r examples/requirements.txt -r leaderboard/requirements.txt -r tests/requirements.txt
+              env:
+                  LDFLAGS: -L/usr/local/opt/zlib/lib
+                  CPPFLAGS: -I/usr/local/opt/zlib/include
+                  PKG_CONFIG_PATH: /usr/local/opt/zlib/lib/pkgconfig
               if: matrix.os == 'macos-latest'
 
             - name: Install
