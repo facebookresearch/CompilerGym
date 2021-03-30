@@ -53,7 +53,7 @@ We do not require that you submit the source code for your approach. Once you
 submit your pull request we will validate your results CSV files and may ask
 clarifying questions if we feel that those would be useful to improve
 reproducibility. Please [take a look
-here](https://github.com/facebookresearch/CompilerGym/pull/127) for an example
+here](https://github.com/facebookresearch/CompilerGym/pull/117) for an example
 of a well-formed pull request submission.
 
 
