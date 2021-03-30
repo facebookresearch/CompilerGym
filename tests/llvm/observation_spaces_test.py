@@ -39,6 +39,10 @@ def test_observation_spaces(env: LlvmEnv):
     assert set(env.observation.spaces.keys()) == {
         "Ir",
         "BitcodeFile",
+        "InstCount",
+        "InstCountDict",
+        "InstCountNorm",
+        "InstCountNormDict",
         "Autophase",
         "AutophaseDict",
         "Programl",
@@ -163,6 +167,147 @@ def test_autophase_observation_space_reset(env: LlvmEnv):
     observation = env.reset("cBench-v1/crc32")
     print(observation.tolist())  # For debugging on error.
     np.testing.assert_array_equal(observation, AUTOPHASE_CBENCH_CRC32)
+
+
+def test_instcount_observation_space(env: LlvmEnv):
+    env.reset("cBench-v1/crc32")
+    key = "InstCount"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Box)
+    assert space.space.dtype == np.int64
+    assert space.space.shape == (70,)
+    assert space.deterministic
+    assert not space.platform_dependent
+
+    value: np.ndarray = env.observation[key]
+    print(value.tolist())  # For debugging in case of error.
+
+    expected_values = [
+        242,
+        29,
+        15,
+        5,
+        24,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        5,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        3,
+        0,
+        3,
+        1,
+        8,
+        26,
+        51,
+        42,
+        5,
+        0,
+        0,
+        0,
+        1,
+        5,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        20,
+        0,
+        0,
+        0,
+        10,
+        0,
+        0,
+        33,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+    ]
+
+    np.testing.assert_array_equal(value, expected_values)
+    assert value.dtype == np.int64
+
+    # The first value is the total number of instructions. This should equal the
+    # number of instructions.
+    assert sum(value[3:]) == value[0]
+
+
+def test_instcount_dict_observation_space(env: LlvmEnv):
+    env.reset("cBench-v1/crc32")
+    key = "InstCountDict"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, DictSpace)
+    assert space.deterministic
+    assert not space.platform_dependent
+
+    value: Dict[str, int] = env.observation[key]
+    print(value)  # For debugging in case of error.
+    assert len(value) == 70
+
+
+def test_instcount_norm_observation_space(env: LlvmEnv):
+    env.reset("cBench-v1/crc32")
+    key = "InstCountNorm"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Box)
+    assert space.space.dtype == np.float32
+    assert space.space.shape == (69,)
+    assert space.deterministic
+    assert not space.platform_dependent
+
+    value: np.ndarray = env.observation[key]
+    print(value.tolist())  # For debugging in case of error.
+
+    assert value.shape == (69,)
+    assert value.dtype == np.float32
+
+    # Assert that the normalized instruction counts sum to 1. Note that the
+    # first two features (#blocks and #funcs) must be excluded.
+    assert pytest.approx(sum(value[2:]), 1.0)
+
+
+def test_instcount_norm_dict_observation_space(env: LlvmEnv):
+    env.reset("cBench-v1/crc32")
+    key = "InstCountNormDict"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, DictSpace)
+    assert space.deterministic
+    assert not space.platform_dependent
+
+    value: Dict[str, int] = env.observation[key]
+    print(value)  # For debugging in case of error.
+    assert len(value) == 69
 
 
 def test_autophase_observation_space(env: LlvmEnv):

@@ -17,6 +17,7 @@
 #include "compiler_gym/envs/llvm/service/passes/ActionHeaders.h"
 #include "compiler_gym/envs/llvm/service/passes/ActionSwitch.h"
 #include "compiler_gym/third_party/autophase/InstCount.h"
+#include "compiler_gym/third_party/llvm/InstCount.h"
 #include "compiler_gym/util/EnumUtil.h"
 #include "compiler_gym/util/GrpcStatusMacros.h"
 #include "compiler_gym/util/RunfilesPath.h"
@@ -274,6 +275,11 @@ Status LlvmSession::getObservation(LlvmObservationSpace space, Observation* repl
       const auto outpath = fs::unique_path(workingDirectory_ / "module-%%%%%%%%.bc");
       RETURN_IF_ERROR(writeBitcodeToFile(benchmark().module(), outpath));
       reply->set_string_value(outpath.string());
+      break;
+    }
+    case LlvmObservationSpace::INST_COUNT: {
+      const auto features = InstCount::getFeatureVector(benchmark().module());
+      *reply->mutable_int64_list()->mutable_value() = {features.begin(), features.end()};
       break;
     }
     case LlvmObservationSpace::AUTOPHASE: {
