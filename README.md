@@ -65,11 +65,20 @@ newer equivalents).
 
 ### Building from Source
 
-If you prefer, you may build from source. This requires a modern C++ toolchain.
-On macOS you can use the system compiler. On linux, install the required
-toolchain using:
+If you prefer, you may build from source. This requires a modern C++ toolchain
+and bazel.
+
+On macOS you can use the system compiler and install
+[bazelisk](https://github.com/bazelbuild/bazelisk) using
+[homebrew](https://docs.brew.sh/Installation):
+
+    $ brew install bazelisk
+
+On linux, install the required toolchain using:
 
     $ sudo apt install clang libtinfo5 patchelf
+    $ wget https://github.com/bazelbuild/bazelisk/releases/download/v1.7.5/bazelisk-linux-amd64 -O bazel && chmod +x bazel
+    $ sudo mv bazel /usr/local/bin
     $ export CC=clang
     $ export CXX=clang++
 
@@ -78,7 +87,7 @@ We recommend using
 to manage the remaining build dependencies. First create a conda environment
 with the required dependencies:
 
-    $ conda create -n compiler_gym python=3.8 bazel=3.1.0 cmake pandoc
+    $ conda create -n compiler_gym python=3.8 cmake pandoc
     $ conda activate compiler_gym
 
 Then clone the CompilerGym source code using:
