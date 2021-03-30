@@ -89,7 +89,7 @@ We recommend using
 to manage the remaining build dependencies. First create a conda environment
 with the required dependencies:
 
-    $ conda create -n compiler_gym python=3.8 cmake pandoc
+    $ conda create -n compiler_gym python=3.9 cmake pandoc
     $ conda activate compiler_gym
 
 Then clone the CompilerGym source code using:
