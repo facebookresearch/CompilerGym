@@ -48,7 +48,7 @@ from compiler_gym.util.tabulate import tabulate
 from compiler_gym.util.timer import Timer
 
 flags.DEFINE_string(
-    "logfile", "results.csv", "The path of the file to write results to."
+    "results_logfile", "results.csv", "The path of the file to write results to."
 )
 flags.DEFINE_string(
     "hardware_info",
@@ -70,8 +70,8 @@ flags.DEFINE_boolean("validate", True, "Run validation on the results.")
 flags.DEFINE_boolean(
     "resume",
     False,
-    "If true, read the --logfile first and run only the policy evaluations not "
-    "already in the logfile.",
+    "If true, read the --results_logfile first and run only the policy "
+    "evaluations not already in the logfile.",
 )
 FLAGS = flags.FLAGS
 
@@ -139,7 +139,7 @@ class _BenchmarkRunner(Thread):
         self.n = 0
 
     def run(self):
-        with open(FLAGS.logfile, "a") as logfile:
+        with open(FLAGS.results_logfile, "a") as logfile:
             for benchmark in self.benchmarks:
                 self.env.reset(benchmark=benchmark)
                 with Timer() as timer:
@@ -219,11 +219,12 @@ def eval_llvm_codesize_policy(policy: Policy) -> None:
     defines a number of commandline flags that can be overriden to control the
     behavior of the evaluation. For example the flag :code:`--n` determines the
     number of times the policy is run on each benchmark (default is 10), and
-    :code:`--logfile` determines the path of the generated results file:
+    :code:`--results_logfile` determines the path of the generated results
+    file:
 
     .. code-block::
 
-        $ python my_policy.py --n=5 --logfile=my_policy_results.csv
+        $ python my_policy.py --n=5 --results_logfile=my_policy_results.csv
 
     You can use :code:`--helpfull` flag to list all of the flags that are
     defined:
@@ -242,7 +243,7 @@ def eval_llvm_codesize_policy(policy: Policy) -> None:
         assert FLAGS.n > 0, "n must be > 0"
 
         print(
-            f"Writing inference results to '{FLAGS.logfile}' and "
+            f"Writing inference results to '{FLAGS.results_logfile}' and "
             f"hardware summary to '{FLAGS.hardware_info}'"
         )
 
@@ -268,16 +269,16 @@ def eval_llvm_codesize_policy(policy: Policy) -> None:
             # of benchmarks to evaluate.
             print_header = True
             init = 0
-            if Path(FLAGS.logfile).is_file():
+            if Path(FLAGS.results_logfile).is_file():
                 if FLAGS.resume:
-                    with open(FLAGS.logfile, "r") as f:
+                    with open(FLAGS.results_logfile, "r") as f:
                         for state in CompilerEnvState.read_csv_file(f):
                             if state.benchmark in benchmarks:
                                 init += 1
                                 benchmarks.remove(state.benchmark)
                                 print_header = False
                 else:
-                    Path(FLAGS.logfile).unlink()
+                    Path(FLAGS.results_logfile).unlink()
 
             # Run the benchmark loop in background so that we can asynchronously
             # log progress.
@@ -293,6 +294,6 @@ def eval_llvm_codesize_policy(policy: Policy) -> None:
 
         if FLAGS.validate:
             FLAGS.env = "llvm-ic-v0"
-            validate(["argv0", FLAGS.logfile])
+            validate(["argv0", FLAGS.results_logfile])
 
     app.run(main)

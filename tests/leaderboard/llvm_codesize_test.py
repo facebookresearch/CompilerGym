@@ -39,15 +39,15 @@ def test_eval_llvm_codesize_policy_resume(tmpwd):
             "--max_benchmarks=1",
             "--novalidate",
             "--resume",
-            "--logfile=test.log",
+            "--results_logfile=test.csv",
         ]
     )
     with pytest.raises(SystemExit):
         eval_llvm_codesize_policy(null_policy)
 
     # Check that the log has a single entry (and a header row.)
-    assert Path("test.log").is_file()
-    with open("test.log") as f:
+    assert Path("test.csv").is_file()
+    with open("test.csv") as f:
         log = f.read()
     assert len(log.rstrip().split("\n")) == 2
     init_logfile = log
@@ -60,15 +60,15 @@ def test_eval_llvm_codesize_policy_resume(tmpwd):
             "--max_benchmarks=2",
             "--novalidate",
             "--resume",
-            "--logfile=test.log",
+            "--results_logfile=test.csv",
         ]
     )
     with pytest.raises(SystemExit):
         eval_llvm_codesize_policy(null_policy)
 
     # Check that the log extends the original.
-    assert Path("test.log").is_file()
-    with open("test.log") as f:
+    assert Path("test.csv").is_file()
+    with open("test.csv") as f:
         log = f.read()
     assert log.startswith(init_logfile)
     assert len(log.rstrip().split("\n")) == 3
@@ -82,15 +82,15 @@ def test_eval_llvm_codesize_policy_resume(tmpwd):
             "--max_benchmarks=2",
             "--novalidate",
             "--resume",
-            "--logfile=test.log",
+            "--results_logfile=test.csv",
         ]
     )
     with pytest.raises(SystemExit):
         eval_llvm_codesize_policy(null_policy)
 
     # Check that the log extends the original.
-    assert Path("test.log").is_file()
-    with open("test.log") as f:
+    assert Path("test.csv").is_file()
+    with open("test.csv") as f:
         log = f.read()
     assert log.startswith(init_logfile)
     assert len(log.rstrip().split("\n")) == 5
