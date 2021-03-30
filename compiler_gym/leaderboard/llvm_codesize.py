@@ -193,7 +193,18 @@ def eval_llvm_codesize_policy(policy: Policy) -> None:
         ...         pass # ... do fun stuff!
         >>> my_policy = MyPolicy()
 
-    You then call the :func:`eval_llvm_codesize_policy()
+    The role of your policy to perform actions on the supplied environment that
+    it thinks provides the best possible cumulative reward. The policy may set
+    the observation space as it likes:
+
+        >>> env.observation_space = "InstCount"  # Set a new space for env.step()
+        >>> env.observation["InstCount"]  # Calculate a one-off observation.
+
+    However, the policy may not change the reward space of the environment, or
+    the benchmark.
+
+    Once you have defined your policy, call the
+    :func:`eval_llvm_codesize_policy()
     <compiler_gym.leaderboard.llvm_codesize.eval_llvm_codesize_policy>` helper
     function, passing it your policy as its only argument:
 
@@ -219,8 +230,7 @@ def eval_llvm_codesize_policy(policy: Policy) -> None:
     defines a number of commandline flags that can be overriden to control the
     behavior of the evaluation. For example the flag :code:`--n` determines the
     number of times the policy is run on each benchmark (default is 10), and
-    :code:`--results_logfile` determines the path of the generated results
-    file:
+    :code:`--results_logfile` determines the path of the generated results file:
 
     .. code-block::
 
