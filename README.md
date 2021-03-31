@@ -51,7 +51,7 @@ for an overview of the key concepts.
 
 Install the latest CompilerGym release using:
 
-    $ pip install compiler_gym
+    $ pip install -U compiler_gym
 
 The binary works on macOS and Linux (on Ubuntu 18.04, Fedora 28, Debian 10 or
 newer equivalents).
