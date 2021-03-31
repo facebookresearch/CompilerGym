@@ -66,21 +66,25 @@ and bazel.
 On macOS the required dependencies can be installed using
 [homebrew](https://docs.brew.sh/Installation):
 
-    $ brew install bazelisk zlib
-    $ export LDFLAGS="-L/usr/local/opt/zlib/lib"
-    $ export CPPFLAGS="-I/usr/local/opt/zlib/include"
-    $ export PKG_CONFIG_PATH="/usr/local/opt/zlib/lib/pkgconfig"
+```sh
+$ brew install bazelisk zlib
+$ export LDFLAGS="-L/usr/local/opt/zlib/lib"
+$ export CPPFLAGS="-I/usr/local/opt/zlib/include"
+$ export PKG_CONFIG_PATH="/usr/local/opt/zlib/lib/pkgconfig"
+```
 
 #### Linux  <!-- omit in toc -->
 
 On debian-based linux systems, install the required toolchain using:
 
-    $ sudo apt install clang libtinfo5 libjpeg-dev patchelf
-    $ wget https://github.com/bazelbuild/bazelisk/releases/download/v1.7.5/bazelisk-linux-amd64 -O bazel && chmod +x bazel
-    $ mkdir -p ~/.local/bin && mv bazel ~/.local/bin
-    $ export PATH="$HOME/.local/bin:$PATH"
-    $ export CC=clang
-    $ export CXX=clang++
+```sh
+$ sudo apt install clang libtinfo5 libjpeg-dev patchelf
+$ wget https://github.com/bazelbuild/bazelisk/releases/download/v1.7.5/bazelisk-linux-amd64 -O bazel
+$ chmod +x bazel && mkdir -p ~/.local/bin && mv -v bazel ~/.local/bin
+$ export PATH="$HOME/.local/bin:$PATH"
+$ export CC=clang
+$ export CXX=clang++
+```
 
 #### All platforms  <!-- omit in toc -->
 
