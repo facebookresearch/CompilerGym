@@ -32,20 +32,13 @@ developers to expose new optimization problems for AI.
 
 **Table of Contents**
 
-<!-- MarkdownTOC -->
-
 - [Getting Started](#getting-started)
   - [Installation](#installation)
-    - [Building from Source](#building-from-source)
   - [Trying it out](#trying-it-out)
 - [Leaderboards](#leaderboards)
   - [llvm-ic-v0](#llvm-ic-v0)
-    - [cBench-v1](#cBench-v1)
 - [Contributing](#contributing)
 - [Citation](#citation)
-
-<!-- /MarkdownTOC -->
-
 # Getting Started
 
 Starting with CompilerGym is simple. If you not already familiar with the gym
@@ -63,12 +56,12 @@ Install the latest CompilerGym release using:
 The binary works on macOS and Linux (on Ubuntu 18.04, Fedora 28, Debian 10 or
 newer equivalents).
 
-### Building from Source
+### Building from Source  <!-- omit in toc -->
 
 If you prefer, you may build from source. This requires a modern C++ toolchain
 and bazel.
 
-#### macOS
+#### macOS  <!-- omit in toc -->
 
 On macOS the required dependencies can be installed using
 [homebrew](https://docs.brew.sh/Installation):
@@ -78,7 +71,7 @@ On macOS the required dependencies can be installed using
     $ export CPPFLAGS="-I/usr/local/opt/zlib/include"
     $ export PKG_CONFIG_PATH="/usr/local/opt/zlib/lib/pkgconfig"
 
-#### Linux
+#### Linux  <!-- omit in toc -->
 
 On debian-based linux systems, install the required toolchain using:
 
@@ -89,7 +82,7 @@ On debian-based linux systems, install the required toolchain using:
     $ export CC=clang
     $ export CXX=clang++
 
-#### All platforms
+#### All platforms  <!-- omit in toc -->
 
 We recommend using
 [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/)
@@ -165,7 +158,7 @@ sequence of optimizations that lead to the greatest reduction in instruction
 count in the program being compiled. Reward is the reduction in codesize
 achieved scaled to the reduction achieved by LLVM's builtin `-Oz` pipeline.
 
-### cBench-v1
+### cBench-v1  <!-- omit in toc -->
 
 This leaderboard tracks the results achieved by algorithms on the `llvm-ic-v0`
 environment on the 23 benchmarks in the `cBench-v1` dataset.
