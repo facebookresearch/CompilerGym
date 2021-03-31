@@ -152,9 +152,6 @@ tutorials, further details, and API reference.
 
 # Leaderboards
 
-🚧 **Under construction** 🚧 As of CompilerGym v0.1.6 we are not yet accepting
-submissions for these leaderboards. Please check back soon!
-
 These leaderboards track the performance of user-submitted algorithms for
 CompilerGym tasks. To submit a result please see
 [this document](https://github.com/facebookresearch/CompilerGym/blob/development/CONTRIBUTING.md#leaderboard-submissions).
