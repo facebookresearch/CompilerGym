@@ -3,14 +3,12 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """LLVM is a popular open source compiler used widely in industry and research.
-This environment exposes the optimization pipeline as a set of actions that can
-be applied to a particular program. The goal of the agent is to select the
-sequence of optimizations that lead to the greatest reduction in instruction
-count in the program being compiled. Reward is the reduction in codesize
-achieved scaled to the reduction achieved by LLVM's builtin -Oz pipeline. Users
-who wish to create a submission for this leaderboard should consider using the
-:func:`eval_llvm_codesize_policy()
-<compiler_gym.leaderboard.llvm_codesize.eval_llvm_codesize_policy>` helper.
+The :code:`llvm-ic-v0` environment exposes LLVM's optimizing passes as a set of
+actions that can be applied to a particular program. The goal of the agent is to
+select the sequence of optimizations that lead to the greatest reduction in
+instruction count in the program being compiled. Reward is the reduction in
+instruction count achieved scaled to the reduction achieved by LLVM's builtin
+:code:`-Oz` pipeline.
 
 +--------------------+------------------------------------------------------+
 | Property           | Value                                                |
@@ -23,6 +21,11 @@ who wish to create a submission for this leaderboard should consider using the
 +--------------------+------------------------------------------------------+
 | Test Dataset       | The 23 cBench benchmarks.                            |
 +--------------------+------------------------------------------------------+
+
+Users who wish to create a submission for this leaderboard may use
+:func:`eval_llvm_instcount_policy()
+<compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy>` to
+automatically evaluate their agent on the test set.
 """
 import platform
 import sys
@@ -170,7 +173,7 @@ class _BenchmarkRunner(Thread):
                 self.n += 1
 
 
-def eval_llvm_codesize_policy(policy: Policy) -> None:
+def eval_llvm_instcount_policy(policy: Policy) -> None:
     """Evaluate an LLVM codesize policy and generate results for a leaderboard
     submission.
 
@@ -185,17 +188,21 @@ def eval_llvm_codesize_policy(policy: Policy) -> None:
         ...        _, _, done, _ = env.step(env.action_space.sample())
         ...        if done: break
 
-    If you would like a stateful policy, you could use a class and override the
+    If your policy is stateful, you can use a class and override the
     :code:`__call__()` method:
 
         >>> class MyPolicy:
-        ...     def __call__(env: LlvmEnv) -> None:
+        ...     def __init__(self):
+        ...         self.my_stateful_vars = {}  # or similar
+        ...     def __call__(self, env: LlvmEnv) -> None:
         ...         pass # ... do fun stuff!
         >>> my_policy = MyPolicy()
 
-    The role of your policy to perform actions on the supplied environment that
-    it thinks provides the best possible cumulative reward. The policy may set
-    the observation space as it likes:
+    The role of your policy is to perform a sequence of actions on the supplied
+    environment so as to maximize cumulative reward. By default, no observation
+    space is set on the environment, so :meth:`env.step()
+    <compiler_gym.envs.CompilerEnv.step>` will return :code:`None` for the
+    observation. You may set a new observation space:
 
         >>> env.observation_space = "InstCount"  # Set a new space for env.step()
         >>> env.observation["InstCount"]  # Calculate a one-off observation.
@@ -204,29 +211,30 @@ def eval_llvm_codesize_policy(policy: Policy) -> None:
     the benchmark.
 
     Once you have defined your policy, call the
-    :func:`eval_llvm_codesize_policy()
-    <compiler_gym.leaderboard.llvm_codesize.eval_llvm_codesize_policy>` helper
+    :func:`eval_llvm_instcount_policy()
+    <compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy>` helper
     function, passing it your policy as its only argument:
 
-    >>> eval_llvm_codesize_policy(my_policy)
+    >>> eval_llvm_instcount_policy(my_policy)
 
-    Put together as a complete example this is what an example leaderboard
-    submission script looks like:
+    Put together as a complete example, a leaderboard submission script may look
+    like:
 
     .. code-block:: python
 
         # my_policy.py
-        from compiler_gym.leaderboard.llvm_codesize import eval_llvm_codesize_policy
+        from compiler_gym.leaderboard.llvm_instcount import eval_llvm_instcount_policy
         from compiler_gym.envs import LlvmEnv
 
         def my_policy(env: LlvmEnv) -> None:
+            env.observation_space = "InstCount"  # we're going to use instcount space
             pass # ... do fun stuff!
 
         if __name__ == "__main__":
-            eval_llvm_codesize_policy(my_policy)
+            eval_llvm_instcount_policy(my_policy)
 
-    The :func:`eval_llvm_codesize_policy()
-    <compiler_gym.leaderboard.llvm_codesize.eval_llvm_codesize_policy>` helper
+    The :func:`eval_llvm_instcount_policy()
+    <compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy>` helper
     defines a number of commandline flags that can be overriden to control the
     behavior of the evaluation. For example the flag :code:`--n` determines the
     number of times the policy is run on each benchmark (default is 10), and

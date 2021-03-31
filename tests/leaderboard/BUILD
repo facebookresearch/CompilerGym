@@ -5,10 +5,10 @@
 load("@rules_python//python:defs.bzl", "py_test")
 
 py_test(
-    name = "llvm_codesize_test",
-    srcs = ["llvm_codesize_test.py"],
+    name = "llvm_instcount_test",
+    srcs = ["llvm_instcount_test.py"],
     deps = [
-        "//compiler_gym/leaderboard:llvm_codesize",
+        "//compiler_gym/leaderboard:llvm_instcount",
         "//tests:test_main",
         "//tests/pytest_plugins:common",
     ],

@@ -9,13 +9,13 @@ py_library(
     srcs = ["__init__.py"],
     visibility = ["//visibility:public"],
     deps = [
-        ":llvm_codesize",
+        ":llvm_instcount",
     ],
 )
 
 py_library(
-    name = "llvm_codesize",
-    srcs = ["llvm_codesize.py"],
+    name = "llvm_instcount",
+    srcs = ["llvm_instcount.py"],
     visibility = ["//visibility:public"],
     deps = [
         "//compiler_gym:compiler_env_state",

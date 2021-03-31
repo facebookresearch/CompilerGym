@@ -11,7 +11,7 @@ from typing import NamedTuple
 from absl import flags
 
 from compiler_gym.envs import CompilerEnv, LlvmEnv
-from compiler_gym.leaderboard.llvm_codesize import eval_llvm_codesize_policy
+from compiler_gym.leaderboard.llvm_instcount import eval_llvm_instcount_policy
 
 flags.DEFINE_float(
     "epsilon", 0, "The ratio of patience to the size of the action space. "
@@ -108,4 +108,4 @@ def e_greedy_search(env: LlvmEnv) -> None:
 
 
 if __name__ == "__main__":
-    eval_llvm_codesize_policy(e_greedy_search)
+    eval_llvm_instcount_policy(e_greedy_search)
