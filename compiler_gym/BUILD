@@ -15,6 +15,7 @@ py_library(
         ":random_search",
         ":validate",
         "//compiler_gym/envs",
+        "//compiler_gym/leaderboard",
         "//compiler_gym/util",
     ],
 )
