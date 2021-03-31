@@ -73,6 +73,8 @@ export CPPFLAGS="-I/usr/local/opt/zlib/include"
 export PKG_CONFIG_PATH="/usr/local/opt/zlib/lib/pkgconfig"
 ```
 
+Now proceed to [All platforms](#all-platforms) below.
+
 #### Linux  <!-- omit in toc -->
 
 On debian-based linux systems, install the required toolchain using:
