@@ -36,9 +36,11 @@ developers to expose new optimization problems for AI.
   - [Installation](#installation)
   - [Trying it out](#trying-it-out)
 - [Leaderboards](#leaderboards)
-  - [llvm-ic-v0](#llvm-ic-v0)
+  - [LLVM Instruction Count](#llvm-instruction-count)
 - [Contributing](#contributing)
 - [Citation](#citation)
+
+
 # Getting Started
 
 Starting with CompilerGym is simple. If you not already familiar with the gym
@@ -158,24 +160,23 @@ CompilerGym tasks. To submit a result please see
 [this document](https://github.com/facebookresearch/CompilerGym/blob/development/CONTRIBUTING.md#leaderboard-submissions).
 
 
-## llvm-ic-v0
+## LLVM Instruction Count
 
-LLVM is a popular open source compiler used widely in industry and research.
-This environment exposes the optimization pipeline as a set of actions that can
-be applied to a particular program. The goal of the agent is to select the
-sequence of optimizations that lead to the greatest reduction in instruction
-count in the program being compiled. Reward is the reduction in codesize
-achieved scaled to the reduction achieved by LLVM's builtin `-Oz` pipeline.
-
-### cBench-v1  <!-- omit in toc -->
+LLVM is a popular open source compiler used widely in industry and research. The
+`llvm-ic-v0` environment exposes LLVM's optimizing passes as a set of actions
+that can be applied to a particular program. The goal of the agent is to select
+the sequence of optimizations that lead to the greatest reduction in instruction
+count in the program being compiled. Reward is the reduction in instruction
+count achieved scaled to the reduction achieved by LLVM's builtin `-Oz`
+pipeline.
 
 This leaderboard tracks the results achieved by algorithms on the `llvm-ic-v0`
 environment on the 23 benchmarks in the `cBench-v1` dataset.
 
 | Author | Algorithm | Links | Date | Walltime (mean) | Codesize Reduction (geomean) |
 | --- | --- | --- | --- | --- | --- |
-| Facebook | Greedy search | [write-up](leaderboard/llvm_codesize/e_greedy/README.md), [results](leaderboard/llvm_codesize/e_greedy/results_e0.csv) | 2021-03 | 169.237s | 1.055× |
-| Facebook | e-Greedy search (e=0.1) | [write-up](leaderboard/llvm_codesize/e_greedy/README.md), [results](leaderboard/llvm_codesize/e_greedy/results_e10.csv) | 2021-03 | 152.579s | 1.041× |
+| Facebook | Greedy search | [write-up](leaderboard/llvm_instcount/e_greedy/README.md), [results](leaderboard/llvm_instcount/e_greedy/results_e0.csv) | 2021-03 | 169.237s | 1.055× |
+| Facebook | e-Greedy search (e=0.1) | [write-up](leaderboard/llvm_instcount/e_greedy/README.md), [results](leaderboard/llvm_instcount/e_greedy/results_e10.csv) | 2021-03 | 152.579s | 1.041× |
 
 # Contributing
 

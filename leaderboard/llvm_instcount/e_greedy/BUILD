@@ -8,7 +8,7 @@ py_library(
     name = "e_greedy",
     srcs = ["e_greedy.py"],
     deps = [
-        "//leaderboard/llvm_codesize:eval_policy",
+        "//compiler_gym/leaderboard:llvm_instcount",
     ],
 )
 
@@ -18,6 +18,7 @@ py_test(
     srcs = ["e_greedy_test.py"],
     deps = [
         ":e_greedy",
+        "//compiler_gym/leaderboard:llvm_instcount",
         "//tests:test_main",
         "//tests/pytest_plugins:llvm",
     ],

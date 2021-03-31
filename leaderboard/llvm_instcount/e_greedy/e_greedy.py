@@ -4,19 +4,14 @@
 # LICENSE file in the root directory of this source tree.
 """ϵ-greedy policy for LLVM codesize."""
 import logging
-import os
 import random
-import sys
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import NamedTuple
 
 from absl import flags
 
 from compiler_gym.envs import CompilerEnv, LlvmEnv
-
-# Import the ../eval_policy.py helper.
-sys.path.insert(0, os.path.dirname(os.path.realpath(__file__)) + "/..")
-from eval_policy import eval_policy  # noqa pylint: disable=wrong-import-position
+from compiler_gym.leaderboard.llvm_instcount import eval_llvm_instcount_policy
 
 flags.DEFINE_float(
     "epsilon", 0, "The ratio of patience to the size of the action space. "
@@ -113,4 +108,4 @@ def e_greedy_search(env: LlvmEnv) -> None:
 
 
 if __name__ == "__main__":
-    eval_policy(e_greedy_search)
+    eval_llvm_instcount_policy(e_greedy_search)

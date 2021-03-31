@@ -15,6 +15,7 @@ py_library(
         ":random_search",
         ":validate",
         "//compiler_gym/envs",
+        "//compiler_gym/leaderboard",
         "//compiler_gym/util",
     ],
 )
@@ -22,7 +23,7 @@ py_library(
 py_library(
     name = "compiler_env_state",
     srcs = ["compiler_env_state.py"],
-    visibility = ["//compiler_gym/envs:__subpackages__"],
+    visibility = ["//compiler_gym:__subpackages__"],
 )
 
 py_library(
