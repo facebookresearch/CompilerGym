@@ -113,9 +113,9 @@ To build and install the python package, run:
 
     $ make install
 
-**NOTE:** To use the python code that is installed by `make install` you must
-leave the root directory of this repository. Attempting to import `compiler_gym`
-while in the root of this repository will cause import errors.
+**NOTE:** To use the `compiler_gym` package that is installed by `make install`
+you must leave the root directory of this repository. Attempting to import
+`compiler_gym` while in the root of this repository will cause import errors.
 
 When you are finished, you can deactivate and delete the conda
 environment using:
