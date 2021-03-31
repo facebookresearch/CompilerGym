@@ -68,6 +68,8 @@ newer equivalents).
 If you prefer, you may build from source. This requires a modern C++ toolchain
 and bazel.
 
+#### macOS
+
 On macOS the required dependencies can be installed using
 [homebrew](https://docs.brew.sh/Installation):
 
@@ -76,13 +78,18 @@ On macOS the required dependencies can be installed using
     $ export CPPFLAGS="-I/usr/local/opt/zlib/include"
     $ export PKG_CONFIG_PATH="/usr/local/opt/zlib/lib/pkgconfig"
 
-On linux, install the required toolchain using:
+#### Linux
+
+On debian-based linux systems, install the required toolchain using:
 
     $ sudo apt install clang libtinfo5 libjpeg-dev patchelf
     $ wget https://github.com/bazelbuild/bazelisk/releases/download/v1.7.5/bazelisk-linux-amd64 -O bazel && chmod +x bazel
-    $ sudo mv bazel /usr/local/bin
+    $ mkdir -p ~/.local/bin && mv bazel ~/.local/bin
+    $ export PATH="$HOME/.local/bin:$PATH"
     $ export CC=clang
     $ export CXX=clang++
+
+#### All platforms
 
 We recommend using
 [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/)
