@@ -51,7 +51,7 @@ for an overview of the key concepts.
 
 Install the latest CompilerGym release using:
 
-    $ pip install -U compiler_gym
+    pip install -U compiler_gym
 
 The binary works on macOS and Linux (on Ubuntu 18.04, Fedora 28, Debian 10 or
 newer equivalents).
@@ -67,10 +67,10 @@ On macOS the required dependencies can be installed using
 [homebrew](https://docs.brew.sh/Installation):
 
 ```sh
-$ brew install bazelisk zlib
-$ export LDFLAGS="-L/usr/local/opt/zlib/lib"
-$ export CPPFLAGS="-I/usr/local/opt/zlib/include"
-$ export PKG_CONFIG_PATH="/usr/local/opt/zlib/lib/pkgconfig"
+brew install bazelisk zlib
+export LDFLAGS="-L/usr/local/opt/zlib/lib"
+export CPPFLAGS="-I/usr/local/opt/zlib/include"
+export PKG_CONFIG_PATH="/usr/local/opt/zlib/lib/pkgconfig"
 ```
 
 #### Linux  <!-- omit in toc -->
@@ -78,12 +78,12 @@ $ export PKG_CONFIG_PATH="/usr/local/opt/zlib/lib/pkgconfig"
 On debian-based linux systems, install the required toolchain using:
 
 ```sh
-$ sudo apt install clang libtinfo5 libjpeg-dev patchelf
-$ wget https://github.com/bazelbuild/bazelisk/releases/download/v1.7.5/bazelisk-linux-amd64 -O bazel
-$ chmod +x bazel && mkdir -p ~/.local/bin && mv -v bazel ~/.local/bin
-$ export PATH="$HOME/.local/bin:$PATH"
-$ export CC=clang
-$ export CXX=clang++
+sudo apt install clang libtinfo5 libjpeg-dev patchelf
+wget https://github.com/bazelbuild/bazelisk/releases/download/v1.7.5/bazelisk-linux-amd64 -O bazel
+chmod +x bazel && mkdir -p ~/.local/bin && mv -v bazel ~/.local/bin
+export PATH="$HOME/.local/bin:$PATH"
+export CC=clang
+export CXX=clang++
 ```
 
 #### All platforms  <!-- omit in toc -->
@@ -93,25 +93,28 @@ We recommend using
 to manage the remaining build dependencies. First create a conda environment
 with the required dependencies:
 
-    $ conda create -n compiler_gym python=3.9 cmake pandoc
-    $ conda activate compiler_gym
+    conda create -n compiler_gym python=3.9 cmake pandoc
+    conda activate compiler_gym
 
 Then clone the CompilerGym source code using:
 
-    $ git clone https://github.com/facebookresearch/CompilerGym.git
-    $ cd CompilerGym
+    git clone https://github.com/facebookresearch/CompilerGym.git
+    cd CompilerGym
 
 Install the python development dependencies using:
 
-    $ make init
+    make init
 
-Then run the test suite to confirm that everything is working:
+The `make init` target only needs to be run once on initial setup, or when
+upgrading to a different CompilerGym release.
 
-    $ make test
+Run the test suite to confirm that everything is working:
 
-To build and install the python package, run:
+    make test
 
-    $ make install
+To build and install the `compiler_gym` python package, run:
+
+    make install
 
 **NOTE:** To use the `compiler_gym` package that is installed by `make install`
 you must leave the root directory of this repository. Attempting to import
@@ -120,8 +123,8 @@ you must leave the root directory of this repository. Attempting to import
 When you are finished, you can deactivate and delete the conda
 environment using:
 
-    $ conda deactivate
-    $ conda env remove -n compiler_gym
+    conda deactivate
+    conda env remove -n compiler_gym
 
 
 ## Trying it out
