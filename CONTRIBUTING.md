@@ -37,6 +37,26 @@ We actively welcome your pull requests.
    ("CLA").
 
 
+## Leaderboard Submissions
+
+To add a new result to the leaderboard, add a new entry to the leaderboard table
+and file a [Pull Request](#pull-requests). Please include:
+
+1. A list of all authors.
+2. A CSV file of your results. The
+   [compiler_gym.leaderboard](https://facebookresearch.github.io/CompilerGym/compiler_gym/leaderboard.html)
+   package provides utilities to help generate results using your agent.
+3. A write-up of your approach. You may use the
+   [submission template](/leaderboard/SUBMISSION_TEMPLATE.md) as a guide.
+
+We do not require that you submit the source code for your approach. Once you
+submit your pull request we will validate your results CSV files and may ask
+clarifying questions if we feel that those would be useful to improve
+reproducibility. Please [take a look
+here](https://github.com/facebookresearch/CompilerGym/pull/127) for an example
+of a well-formed pull request submission.
+
+
 ## Code Style
 
 We want to ease the burden of code formatting using tools. Our code style
@@ -61,20 +81,6 @@ Other common sense rules we encourage are:
 * Prefer easy-to-use code over easy-to-read, and easy-to-read code over
   easy-to-write.
 
-
-## Leaderboard Submissions
-
-To add a new result to the leaderboard, add a new entry to the leaderboard table
-and file a [Pull Request](#pull-requests). Please include:
-
-1. A list of all authors.
-2. A CSV file of your results.
-3. A write-up of your approach. You may use the
-   [submission template](/leaderboard/SUBMISSION_TEMPLATE.md) as a guide.
-
-Please [take a look
-here](https://github.com/facebookresearch/CompilerGym/pull/127) for an example
-of a well-formed pull request submission.
 
 ## Contributor License Agreement ("CLA")
 
