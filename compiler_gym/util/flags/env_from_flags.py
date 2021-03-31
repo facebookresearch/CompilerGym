@@ -124,13 +124,15 @@ def env_from_flags(benchmark: Optional[Union[str, Benchmark]] = None) -> Compile
         local_service_binary = (
             Path(FLAGS.local_service_binary) if FLAGS.local_service_binary else None
         )
-        return CompilerEnv(
+        env = CompilerEnv(
             service=local_service_binary or FLAGS.service,
             connection_settings=connection_settings,
             benchmark=benchmark,
             observation_space=FLAGS.observation,
             reward_space=FLAGS.reward,
         )
+        env.reset()
+        return env
     else:
         raise app.UsageError("Neither --env or --local_service_binary is set")
 

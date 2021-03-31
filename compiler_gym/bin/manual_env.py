@@ -853,6 +853,7 @@ The 'tutorial' command will give a step by step guide."""
         self.stack.clear()
         with Timer("Reset"):
             self.env.reset()
+        self.set_prompt()
 
     def do_back(self, arg):
         """Undo the last action, if any"""

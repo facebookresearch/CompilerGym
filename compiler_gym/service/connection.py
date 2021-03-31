@@ -11,6 +11,7 @@ import subprocess
 import sys
 from datetime import datetime
 from pathlib import Path
+from signal import Signals
 from time import sleep, time
 from typing import Iterable, List, NamedTuple, Optional, TypeVar, Union
 
@@ -24,7 +25,11 @@ from compiler_gym.service.proto import (
     ObservationSpace,
 )
 from compiler_gym.util.debug_util import get_debug_level
-from compiler_gym.util.runfiles_path import runfiles_path, transient_cache_path
+from compiler_gym.util.runfiles_path import (
+    runfiles_path,
+    site_data_path,
+    transient_cache_path,
+)
 from compiler_gym.util.shell_format import plural
 from compiler_gym.util.truncate import truncate_lines
 
@@ -214,6 +219,17 @@ class Connection(object):
                     ) from None
                 elif e.code() == grpc.StatusCode.DATA_LOSS:
                     raise ServiceError(e.details()) from None
+                elif e.code() == grpc.StatusCode.UNKNOWN:
+                    # By default, GRPC provides no context if an exception is
+                    # raised in an RPC handler as this could lead to an
+                    # information leak. Unfortunately for us this makes
+                    # debugging a little more difficult, so be verbose about the
+                    # possible causes of this error.
+                    raise ServiceError(
+                        "Service returned an unknown error. Possibly an "
+                        "unhandled exception in a C++ RPC handler, see "
+                        "<https://github.com/grpc/grpc/issues/13706>."
+                    ) from None
                 else:
                     raise ServiceError(
                         f"RPC call returned status code {e.code()} and error `{e.details()}`"
@@ -277,6 +293,7 @@ class ManagedConnection(Connection):
         # Set the root of the runfiles directory.
         env = os.environ.copy()
         env["COMPILER_GYM_RUNFILES"] = str(runfiles_path("."))
+        env["COMPILER_GYM_SITE_DATA"] = str(site_data_path("."))
 
         # Set the verbosity of the service. The logging level of the service
         # is the debug level - 1, so that COMPILER_GYM_DEUG=3 will cause VLOG(2)
@@ -285,6 +302,10 @@ class ManagedConnection(Connection):
         if debug_level > 0:
             cmd.append("--alsologtostderr")
             cmd.append(f"-v={debug_level - 1}")
+            # If we are debugging the backend, set the logbuflevel to a low
+            # value to disable buffering of logging messages. This makes it
+            # easier to `LOG(INFO) << "..."` debug things.
+            cmd.append("--logbuflevel=-1")
 
         logger.debug("Exec %s", cmd)
         self.process = subprocess.Popen(
@@ -300,8 +321,21 @@ class ManagedConnection(Connection):
         while time() < end_time:
             returncode = self.process.poll()
             if returncode is not None:
-                shutil.rmtree(self.working_dir)
-                raise ServiceError(f"Service terminated with returncode: {returncode}")
+                try:
+                    # Try and decode the name of a signal. Signal returncodes
+                    # are negative.
+                    returncode = f"{returncode} ({Signals(abs(returncode)).name})"
+                except ValueError:
+                    pass
+                msg = f"Service terminated with returncode: {returncode}"
+                # Attach any logs from the service if available.
+                logs = truncate_lines(
+                    self.loglines(), max_line_len=100, max_lines=25, tail=True
+                )
+                if logs:
+                    msg = f"{msg}\nService logs:\n{logs}"
+                shutil.rmtree(self.working_dir, ignore_errors=True)
+                raise ServiceError(msg)
             if port_path.is_file():
                 try:
                     with open(port_path) as f:
@@ -368,6 +402,8 @@ class ManagedConnection(Connection):
         """
         # Compiler services write log files in the logs directory. Iterate over
         # them and return their contents.
+        if not (self.working_dir / "logs").is_dir():
+            return ()
         for path in sorted((self.working_dir / "logs").iterdir()):
             if not path.is_file():
                 continue
@@ -541,6 +577,7 @@ class CompilerGymServiceConnection(object):
         start_time = time()
         end_time = start_time + opts.init_max_seconds
         attempts = 0
+        last_exception = None
         while time() < end_time and attempts < opts.init_max_attempts:
             attempts += 1
             try:
@@ -567,12 +604,17 @@ class CompilerGymServiceConnection(object):
                 #   ServiceError: raised by an RPC method returning an error status.
                 #   NotImplementedError: raised if an RPC method is accessed before the RPC service
                 #       has initialized.
+                last_exception = e
                 logger.warning("%s %s (attempt %d)", type(e).__name__, e, attempts)
 
-        raise TimeoutError(
+        exception_class = (
+            ServiceError if attempts >= opts.init_max_attempts else TimeoutError
+        )
+        raise exception_class(
             f"Failed to create connection to {endpoint_name} after "
             f"{time() - start_time:.1f} seconds "
-            f"({attempts} {plural(attempts, 'attempt', 'attempts')} made)"
+            f"({attempts} {plural(attempts, 'attempt', 'attempts')} made).\n"
+            f"Last error ({type(last_exception).__name__}): {last_exception}"
         )
 
     def __repr__(self):

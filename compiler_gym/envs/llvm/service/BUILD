@@ -7,9 +7,6 @@ filegroup(
     name = "service",
     srcs = [
         ":compiler_gym-llvm-service",
-        "//compiler_gym/third_party/llvm:clang",
-        "//compiler_gym/third_party/llvm:llvm-size",
-        "//compiler_gym/third_party/llvm:opt",
     ] + select({
         "@llvm//:darwin": [],
         "//conditions:default": [
@@ -201,6 +198,7 @@ cc_library(
     visibility = ["//tests:__subpackages__"],
     deps = [
         "//compiler_gym/service/proto:compiler_gym_service_cc",
+        "//compiler_gym/third_party/llvm:InstCount",
         "//compiler_gym/util:EnumUtil",
         "@glog",
         "@magic_enum",

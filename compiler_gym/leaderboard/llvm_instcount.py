@@ -2,20 +2,30 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""This module defines a helper function for evaluating LLVM codesize reduction
-policies.
+"""LLVM is a popular open source compiler used widely in industry and research.
+The :code:`llvm-ic-v0` environment exposes LLVM's optimizing passes as a set of
+actions that can be applied to a particular program. The goal of the agent is to
+select the sequence of optimizations that lead to the greatest reduction in
+instruction count in the program being compiled. Reward is the reduction in
+instruction count achieved scaled to the reduction achieved by LLVM's builtin
+:code:`-Oz` pipeline.
 
-Usage:
++--------------------+------------------------------------------------------+
+| Property           | Value                                                |
++====================+======================================================+
+| Environment        | :class:`LlvmEnv <compiler_gym.envs.LlvmEnv>`.        |
++--------------------+------------------------------------------------------+
+| Observation Space  | Any.                                                 |
++--------------------+------------------------------------------------------+
+| Reward Space       | Instruction count reduction relative to :code:`-Oz`. |
++--------------------+------------------------------------------------------+
+| Test Dataset       | The 23 cBench benchmarks.                            |
++--------------------+------------------------------------------------------+
 
-    from compiler_gym.envs import LlvmEnv
-    from eval_policy import eval_policy
-
-    class MyLlvmCodesizePolicy:
-        def __call__(env: LlvmEnv) -> None:
-            pass # ...
-
-    if __name__ == "__main__":
-        eval_policy(MyLlvmCodesizePolicy())
+Users who wish to create a submission for this leaderboard may use
+:func:`eval_llvm_instcount_policy()
+<compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy>` to
+automatically evaluate their agent on the test set.
 """
 import platform
 import sys
@@ -33,15 +43,15 @@ from absl import app, flags
 from cpuinfo import get_cpu_info
 from tqdm import tqdm
 
-import compiler_gym  # noqa Register environments.
-from compiler_gym import CompilerEnvState
+import compiler_gym.envs  # noqa Register environments.
 from compiler_gym.bin.validate import main as validate
+from compiler_gym.compiler_env_state import CompilerEnvState
 from compiler_gym.envs import LlvmEnv
 from compiler_gym.util.tabulate import tabulate
 from compiler_gym.util.timer import Timer
 
 flags.DEFINE_string(
-    "logfile", "results.csv", "The path of the file to write results to."
+    "results_logfile", "results.csv", "The path of the file to write results to."
 )
 flags.DEFINE_string(
     "hardware_info",
@@ -63,8 +73,8 @@ flags.DEFINE_boolean("validate", True, "Run validation on the results.")
 flags.DEFINE_boolean(
     "resume",
     False,
-    "If true, read the --logfile first and run only the policy evaluations not "
-    "already in the logfile.",
+    "If true, read the --results_logfile first and run only the policy "
+    "evaluations not already in the logfile.",
 )
 FLAGS = flags.FLAGS
 
@@ -132,7 +142,7 @@ class _BenchmarkRunner(Thread):
         self.n = 0
 
     def run(self):
-        with open(FLAGS.logfile, "a") as logfile:
+        with open(FLAGS.results_logfile, "a") as logfile:
             for benchmark in self.benchmarks:
                 self.env.reset(benchmark=benchmark)
                 with Timer() as timer:
@@ -163,11 +173,87 @@ class _BenchmarkRunner(Thread):
                 self.n += 1
 
 
-def eval_policy(policy: Policy) -> None:
-    """Evaluate a policy on a target dataset.
+def eval_llvm_instcount_policy(policy: Policy) -> None:
+    """Evaluate an LLVM codesize policy and generate results for a leaderboard
+    submission.
 
-    A policy is a function that takes as input an LlvmEnv environment and
-    performs a set of actions on it.
+    To use it, you define your policy as a function that takes an
+    :class:`LlvmEnv <compiler_gym.envs.LlvmEnv>` instance as input and modifies
+    it in place. For example, for a trivial random policy:
+
+        >>> from compiler_gym.envs import LlvmEnv
+        >>> def my_policy(env: LlvmEnv) -> None:
+        ....   # Defines a policy that takes 10 random steps.
+        ...    for _ in range(10):
+        ...        _, _, done, _ = env.step(env.action_space.sample())
+        ...        if done: break
+
+    If your policy is stateful, you can use a class and override the
+    :code:`__call__()` method:
+
+        >>> class MyPolicy:
+        ...     def __init__(self):
+        ...         self.my_stateful_vars = {}  # or similar
+        ...     def __call__(self, env: LlvmEnv) -> None:
+        ...         pass # ... do fun stuff!
+        >>> my_policy = MyPolicy()
+
+    The role of your policy is to perform a sequence of actions on the supplied
+    environment so as to maximize cumulative reward. By default, no observation
+    space is set on the environment, so :meth:`env.step()
+    <compiler_gym.envs.CompilerEnv.step>` will return :code:`None` for the
+    observation. You may set a new observation space:
+
+        >>> env.observation_space = "InstCount"  # Set a new space for env.step()
+        >>> env.observation["InstCount"]  # Calculate a one-off observation.
+
+    However, the policy may not change the reward space of the environment, or
+    the benchmark.
+
+    Once you have defined your policy, call the
+    :func:`eval_llvm_instcount_policy()
+    <compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy>` helper
+    function, passing it your policy as its only argument:
+
+    >>> eval_llvm_instcount_policy(my_policy)
+
+    Put together as a complete example, a leaderboard submission script may look
+    like:
+
+    .. code-block:: python
+
+        # my_policy.py
+        from compiler_gym.leaderboard.llvm_instcount import eval_llvm_instcount_policy
+        from compiler_gym.envs import LlvmEnv
+
+        def my_policy(env: LlvmEnv) -> None:
+            env.observation_space = "InstCount"  # we're going to use instcount space
+            pass # ... do fun stuff!
+
+        if __name__ == "__main__":
+            eval_llvm_instcount_policy(my_policy)
+
+    The :func:`eval_llvm_instcount_policy()
+    <compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy>` helper
+    defines a number of commandline flags that can be overriden to control the
+    behavior of the evaluation. For example the flag :code:`--n` determines the
+    number of times the policy is run on each benchmark (default is 10), and
+    :code:`--results_logfile` determines the path of the generated results file:
+
+    .. code-block::
+
+        $ python my_policy.py --n=5 --results_logfile=my_policy_results.csv
+
+    You can use :code:`--helpfull` flag to list all of the flags that are
+    defined:
+
+    .. code-block::
+
+        $ python my_policy.py --helpfull
+
+    Once you are happy with your approach, see the `contributing guide
+    <https://github.com/facebookresearch/CompilerGym/blob/development/CONTRIBUTING.md#leaderboard-submissions>`_
+    for instructions on preparing a submission to the leaderboard.
     """
 
     def main(argv):
@@ -175,7 +261,7 @@ def eval_policy(policy: Policy) -> None:
         assert FLAGS.n > 0, "n must be > 0"
 
         print(
-            f"Writing inference results to '{FLAGS.logfile}' and "
+            f"Writing inference results to '{FLAGS.results_logfile}' and "
             f"hardware summary to '{FLAGS.hardware_info}'"
         )
 
@@ -201,16 +287,16 @@ def eval_policy(policy: Policy) -> None:
             # of benchmarks to evaluate.
             print_header = True
             init = 0
-            if Path(FLAGS.logfile).is_file():
+            if Path(FLAGS.results_logfile).is_file():
                 if FLAGS.resume:
-                    with open(FLAGS.logfile, "r") as f:
+                    with open(FLAGS.results_logfile, "r") as f:
                         for state in CompilerEnvState.read_csv_file(f):
                             if state.benchmark in benchmarks:
                                 init += 1
                                 benchmarks.remove(state.benchmark)
                                 print_header = False
                 else:
-                    Path(FLAGS.logfile).unlink()
+                    Path(FLAGS.results_logfile).unlink()
 
             # Run the benchmark loop in background so that we can asynchronously
             # log progress.
@@ -226,6 +312,6 @@ def eval_policy(policy: Policy) -> None:
 
         if FLAGS.validate:
             FLAGS.env = "llvm-ic-v0"
-            validate(["argv0", FLAGS.logfile])
+            validate(["argv0", FLAGS.results_logfile])
 
     app.run(main)

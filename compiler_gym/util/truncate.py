@@ -27,7 +27,10 @@ def truncate(
     :return: A (possibly truncated) string.
     """
     return truncate_lines(
-        string.split("\n"), max_line_len=max_line_len, max_lines=max_lines, tail=tail
+        str(string).split("\n"),
+        max_line_len=max_line_len,
+        max_lines=max_lines,
+        tail=tail,
     )
 
 
@@ -73,9 +76,9 @@ def truncate_lines(
 
     lines = iter(lines)
 
-    truncated_lines = [_truncate_line(ln) for ln in _consume(lines, max_lines)]
+    truncated_lines = [_truncate_line(str(ln)) for ln in _consume(lines, max_lines)]
 
-    # Truncate the final line if rquired.
+    # Truncate the final line if required.
     try:
         next(lines)
         truncated_lines[-1] = _truncate_line(f"{truncated_lines[-1]}...")

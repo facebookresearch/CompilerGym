@@ -22,13 +22,10 @@ py_library(
 py_library(
     name = "benchmarks",
     srcs = ["benchmarks.py"],
-    data = [
-        "//compiler_gym/third_party/llvm:clang",
-        "//compiler_gym/third_party/llvm:llvm-link",
-    ],
     visibility = ["//compiler_gym:__subpackages__"],
     deps = [
         "//compiler_gym/service/proto",
+        "//compiler_gym/third_party/llvm",
         "//compiler_gym/util",
     ],
 )
@@ -36,13 +33,10 @@ py_library(
 py_library(
     name = "legacy_datasets",
     srcs = ["legacy_datasets.py"],
-    data = [
-        "//compiler_gym/third_party/llvm:clang",
-        "//compiler_gym/third_party/llvm:lli",
-    ],
     visibility = ["//tests:__subpackages__"],
     deps = [
         "//compiler_gym/datasets:dataset",
+        "//compiler_gym/third_party/llvm",
         "//compiler_gym/util",
     ],
 )
@@ -61,6 +55,8 @@ py_library(
         "//compiler_gym/spaces",
         "//compiler_gym/third_party/autophase",
         "//compiler_gym/third_party/inst2vec",
+        "//compiler_gym/third_party/llvm",
+        "//compiler_gym/third_party/llvm:instcount",
     ],
 )
 

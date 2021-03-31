@@ -6,13 +6,16 @@
 # LICENSE file in the root directory of this source tree.
 
 import distutils.util
+import io
 
 import setuptools
 
 with open("VERSION") as f:
     version = f.read().strip()
 with open("README.md") as f:
-    long_description = f.read()
+    # Force UTF-8 file encoding to support non-ascii characters in the readme.
+    with io.open("README.md", encoding="utf-8") as f:
+        long_description = f.read()
 with open("compiler_gym/requirements.txt") as f:
     requirements = [ln.split("#")[0].rstrip() for ln in f.readlines()]
 
@@ -45,23 +48,24 @@ setuptools.setup(
     url="https://github.com/facebookresearch/CompilerGym",
     license="MIT",
     packages=[
-        "compiler_gym",
         "compiler_gym.bin",
         "compiler_gym.datasets",
-        "compiler_gym.envs",
-        "compiler_gym.envs.llvm",
-        "compiler_gym.envs.llvm.service",
         "compiler_gym.envs.llvm.service.passes",
-        "compiler_gym.service",
+        "compiler_gym.envs.llvm.service",
+        "compiler_gym.envs.llvm",
+        "compiler_gym.envs",
+        "compiler_gym.leaderboard",
         "compiler_gym.service.proto",
+        "compiler_gym.service",
         "compiler_gym.spaces",
-        "compiler_gym.third_party",
         "compiler_gym.third_party.autophase",
-        "compiler_gym.third_party.llvm",
         "compiler_gym.third_party.inst2vec",
-        "compiler_gym.util",
+        "compiler_gym.third_party.llvm",
+        "compiler_gym.third_party",
         "compiler_gym.util.flags",
+        "compiler_gym.util",
         "compiler_gym.views",
+        "compiler_gym",
     ],
     package_dir={
         "": "bazel-bin/package.runfiles/CompilerGym",
@@ -75,19 +79,22 @@ setuptools.setup(
             "third_party/cBench/benchmarks.txt",
             "third_party/cBench/cBench-v*/*",
             "third_party/cBench/runtime_data/**/*",
-            "third_party/llvm/bin/*",
-            "third_party/llvm/lib/clang/10.0.0/lib/linux/*.a",
         ]
     },
     install_requires=requirements,
     include_package_data=True,
     python_requires=">=3.6",
     classifiers=[
-        "Development Status :: 2 - Pre-Alpha",
+        "Development Status :: 3 - Alpha",
         "Environment :: Console",
         "Intended Audience :: Developers",
         "Intended Audience :: Science/Research",
         "License :: OSI Approved :: MIT License",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.8",
+        "Programming Language :: Python :: 3.9",
+        "Programming Language :: Python :: 3",
         "Topic :: Scientific/Engineering :: Artificial Intelligence",
         "Topic :: Software Development :: Compilers",
     ],
