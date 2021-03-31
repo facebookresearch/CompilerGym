@@ -58,7 +58,7 @@ Begin by firing up a python interpreter:
 
 .. code-block::
 
-    $ python
+    python
 
 To start with we import the gym module and the CompilerGym environments:
 

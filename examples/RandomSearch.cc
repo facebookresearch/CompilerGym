@@ -136,7 +136,7 @@ Status runSearch(const fs::path& workingDir, std::vector<int>* bestActions, int6
 }
 
 void runThread(std::vector<int>* bestActions, int64_t* bestCost) {
-  const fs::path workingDir = workingDir / fs::unique_path();
+  const fs::path workingDir = fs::unique_path();
   fs::create_directories(workingDir);
   if (!runSearch(workingDir, bestActions, bestCost).ok()) {
     LOG(ERROR) << "Search failed";

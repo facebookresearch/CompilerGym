@@ -118,12 +118,13 @@ rules_proto_toolchains()
 
 # === GRPC ===
 
+# Version should be kept in step with compiler_gym/requirements.txt.
 http_archive(
     name = "com_github_grpc_grpc",
-    sha256 = "7372a881122cd85a7224435a1d58bc5e11c88d4fb98a64b83f36f3d1c2f16d39",
-    strip_prefix = "grpc-1.34.0",
+    sha256 = "1a5127c81487f4e3e57973bb332f04b9159f94d860c207e096d8a587d371edbd",
+    strip_prefix = "grpc-1.36.0",
     urls = [
-        "https://github.com/grpc/grpc/archive/v1.34.0.tar.gz",
+        "https://github.com/grpc/grpc/archive/v1.36.0.tar.gz",
     ],
 )
 
