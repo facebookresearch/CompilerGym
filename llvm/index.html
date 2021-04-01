@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>LLVM Environment Reference &mdash; CompilerGym 0.1.6 documentation</title>
+  <title>LLVM Environment Reference &mdash; CompilerGym 0.1.7 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.6
+                0.1.7
               </div>
             
           
@@ -96,6 +96,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#datasets">Datasets</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#observation-spaces">Observation Spaces</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#llvm-ir">LLVM-IR</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#instcount">InstCount</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#autophase">Autophase</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#inst2vec">Inst2vec</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#programl">ProGraML</a></li>
@@ -123,6 +124,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/envs.html">compiler_gym.envs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="api.html">compiler_gym.envs.llvm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/views.html">compiler_gym.views</a></li>
@@ -202,28 +204,29 @@ languages.</p>
 <div class="contents local topic" id="overview">
 <p class="topic-title">Overview:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#datasets" id="id3">Datasets</a></p></li>
-<li><p><a class="reference internal" href="#observation-spaces" id="id4">Observation Spaces</a></p>
+<li><p><a class="reference internal" href="#datasets" id="id4">Datasets</a></p></li>
+<li><p><a class="reference internal" href="#observation-spaces" id="id5">Observation Spaces</a></p>
 <ul>
-<li><p><a class="reference internal" href="#llvm-ir" id="id5">LLVM-IR</a></p></li>
-<li><p><a class="reference internal" href="#autophase" id="id6">Autophase</a></p></li>
-<li><p><a class="reference internal" href="#inst2vec" id="id7">Inst2vec</a></p></li>
-<li><p><a class="reference internal" href="#programl" id="id8">ProGraML</a></p></li>
-<li><p><a class="reference internal" href="#hardware-information" id="id9">Hardware Information</a></p></li>
-<li><p><a class="reference internal" href="#cost-models" id="id10">Cost Models</a></p></li>
+<li><p><a class="reference internal" href="#llvm-ir" id="id6">LLVM-IR</a></p></li>
+<li><p><a class="reference internal" href="#instcount" id="id7">InstCount</a></p></li>
+<li><p><a class="reference internal" href="#autophase" id="id8">Autophase</a></p></li>
+<li><p><a class="reference internal" href="#inst2vec" id="id9">Inst2vec</a></p></li>
+<li><p><a class="reference internal" href="#programl" id="id10">ProGraML</a></p></li>
+<li><p><a class="reference internal" href="#hardware-information" id="id11">Hardware Information</a></p></li>
+<li><p><a class="reference internal" href="#cost-models" id="id12">Cost Models</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#reward-spaces" id="id11">Reward Spaces</a></p>
+<li><p><a class="reference internal" href="#reward-spaces" id="id13">Reward Spaces</a></p>
 <ul>
-<li><p><a class="reference internal" href="#ir-instruction-count" id="id12">IR Instruction Count</a></p></li>
-<li><p><a class="reference internal" href="#codesize" id="id13">Codesize</a></p></li>
+<li><p><a class="reference internal" href="#ir-instruction-count" id="id14">IR Instruction Count</a></p></li>
+<li><p><a class="reference internal" href="#codesize" id="id15">Codesize</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#action-space" id="id14">Action Space</a></p></li>
+<li><p><a class="reference internal" href="#action-space" id="id16">Action Space</a></p></li>
 </ul>
 </div>
 <div class="section" id="datasets">
-<h2><a class="toc-backref" href="#id3">Datasets</a><a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id4">Datasets</a><a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h2>
 <p>We provide several datasets of open-source LLVM-IR benchmarks for download:</p>
 <table class="docutils align-default">
 <colgroup>
@@ -325,13 +328,23 @@ tool, or programatically using
 <span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">require_datasets</span><span class="p">([</span><span class="s2">&quot;tensorflow-v0&quot;</span><span class="p">,</span> <span class="s2">&quot;npb-v0&quot;</span><span class="p">])</span>
 </pre></div>
 </div>
+<p>We characterize the datasets below in radial plots which show, clockwise from
+the top: the average number of instructions per benchmark, the density of
+branching instructions, the density of arithmetic instructions, and the density
+of memory operations. For example, comparing blas-v0 and cBench-v1 shows that
+blas-v0 consists of smaller programs with a similar density of branches, a
+higher density of arithmetic operations and relatively few memory operations.
+cBench-v1, in contrast to the small linear algebra kernels of blas-v0, contains
+larger programs with a higher density of memory operations and fewer arithmetic
+operations.</p>
+<img alt="../_images/datasets.png" src="../_images/datasets.png" />
 </div>
 <div class="section" id="observation-spaces">
-<h2><a class="toc-backref" href="#id4">Observation Spaces</a><a class="headerlink" href="#observation-spaces" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id5">Observation Spaces</a><a class="headerlink" href="#observation-spaces" title="Permalink to this headline">¶</a></h2>
 <p>We provide several observation spaces for LLVM based on published compiler
 research.</p>
 <div class="section" id="llvm-ir">
-<h3><a class="toc-backref" href="#id5">LLVM-IR</a><a class="headerlink" href="#llvm-ir" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id6">LLVM-IR</a><a class="headerlink" href="#llvm-ir" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 51%" />
@@ -368,8 +381,409 @@ the <code class="code docutils literal notranslate"><span class="pre">Ir</span><
 temporary directory that is removed when <a class="reference internal" href="../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.close" title="compiler_gym.envs.CompilerEnv.close"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.close()</span></code></a> is called.</p>
 </div>
 </div>
+<div class="section" id="instcount">
+<h3><a class="toc-backref" href="#id7">InstCount</a><a class="headerlink" href="#instcount" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 1%" />
+<col style="width: 99%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Observation space</p></th>
+<th class="head"><p>Shape</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>InstCount</p></td>
+<td><p><cite>Box(0, 9223372036854775807, (70,), int64)</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>InstCountDict</p></td>
+<td><p><cite>Dict(AShrCount:int&lt;0,inf&gt;, AddCount:int&lt;0,inf&gt;, AddrSpaceCastCount:int&lt;0,inf&gt;, AllocaCount:int&lt;0,inf&gt;, AndCount:int&lt;0,inf&gt;, AtomicCmpXchgCount:int&lt;0,inf&gt;, AtomicRMWCount:int&lt;0,inf&gt;, BitCastCount:int&lt;0,inf&gt;, BrCount:int&lt;0,inf&gt;, CallBrCount:int&lt;0,inf&gt;, CallCount:int&lt;0,inf&gt;, CatchPadCount:int&lt;0,inf&gt;, CatchRetCount:int&lt;0,inf&gt;, CatchSwitchCount:int&lt;0,inf&gt;, CleanupPadCount:int&lt;0,inf&gt;, CleanupRetCount:int&lt;0,inf&gt;, ExtractElementCount:int&lt;0,inf&gt;, ExtractValueCount:int&lt;0,inf&gt;, FAddCount:int&lt;0,inf&gt;, FCmpCount:int&lt;0,inf&gt;, FDivCount:int&lt;0,inf&gt;, FMulCount:int&lt;0,inf&gt;, FNegCount:int&lt;0,inf&gt;, FPExtCount:int&lt;0,inf&gt;, FPToSICount:int&lt;0,inf&gt;, FPToUICount:int&lt;0,inf&gt;, FPTruncCount:int&lt;0,inf&gt;, FRemCount:int&lt;0,inf&gt;, FSubCount:int&lt;0,inf&gt;, FenceCount:int&lt;0,inf&gt;, FreezeCount:int&lt;0,inf&gt;, GetElementPtrCount:int&lt;0,inf&gt;, ICmpCount:int&lt;0,inf&gt;, IndirectBrCount:int&lt;0,inf&gt;, InsertElementCount:int&lt;0,inf&gt;, InsertValueCount:int&lt;0,inf&gt;, IntToPtrCount:int&lt;0,inf&gt;, InvokeCount:int&lt;0,inf&gt;, LShrCount:int&lt;0,inf&gt;, LandingPadCount:int&lt;0,inf&gt;, LoadCount:int&lt;0,inf&gt;, MulCount:int&lt;0,inf&gt;, OrCount:int&lt;0,inf&gt;, PHICount:int&lt;0,inf&gt;, PtrToIntCount:int&lt;0,inf&gt;, ResumeCount:int&lt;0,inf&gt;, RetCount:int&lt;0,inf&gt;, SDivCount:int&lt;0,inf&gt;, SExtCount:int&lt;0,inf&gt;, SIToFPCount:int&lt;0,inf&gt;, SRemCount:int&lt;0,inf&gt;, SelectCount:int&lt;0,inf&gt;, ShlCount:int&lt;0,inf&gt;, ShuffleVectorCount:int&lt;0,inf&gt;, StoreCount:int&lt;0,inf&gt;, SubCount:int&lt;0,inf&gt;, SwitchCount:int&lt;0,inf&gt;, TotalBlocksCount:int&lt;0,inf&gt;, TotalFuncsCount:int&lt;0,inf&gt;, TotalInstsCount:int&lt;0,inf&gt;, TruncCount:int&lt;0,inf&gt;, UDivCount:int&lt;0,inf&gt;, UIToFPCount:int&lt;0,inf&gt;, URemCount:int&lt;0,inf&gt;, UnreachableCount:int&lt;0,inf&gt;, UserOp1Count:int&lt;0,inf&gt;, UserOp2Count:int&lt;0,inf&gt;, VAArgCount:int&lt;0,inf&gt;, XorCount:int&lt;0,inf&gt;, ZExtCount:int&lt;0,inf&gt;)</cite></p></td>
+</tr>
+<tr class="row-even"><td><p>InstCountNorm</p></td>
+<td><p><cite>Box(0.0, 1.0, (69,), float32)</cite></p></td>
+</tr>
+<tr class="row-odd"><td><p>InstCountNormDict</p></td>
+<td><p><cite>Dict(AShrDensity:int&lt;0,inf&gt;, AddDensity:int&lt;0,inf&gt;, AddrSpaceCastDensity:int&lt;0,inf&gt;, AllocaDensity:int&lt;0,inf&gt;, AndDensity:int&lt;0,inf&gt;, AtomicCmpXchgDensity:int&lt;0,inf&gt;, AtomicRMWDensity:int&lt;0,inf&gt;, BitCastDensity:int&lt;0,inf&gt;, BrDensity:int&lt;0,inf&gt;, CallBrDensity:int&lt;0,inf&gt;, CallDensity:int&lt;0,inf&gt;, CatchPadDensity:int&lt;0,inf&gt;, CatchRetDensity:int&lt;0,inf&gt;, CatchSwitchDensity:int&lt;0,inf&gt;, CleanupPadDensity:int&lt;0,inf&gt;, CleanupRetDensity:int&lt;0,inf&gt;, ExtractElementDensity:int&lt;0,inf&gt;, ExtractValueDensity:int&lt;0,inf&gt;, FAddDensity:int&lt;0,inf&gt;, FCmpDensity:int&lt;0,inf&gt;, FDivDensity:int&lt;0,inf&gt;, FMulDensity:int&lt;0,inf&gt;, FNegDensity:int&lt;0,inf&gt;, FPExtDensity:int&lt;0,inf&gt;, FPToSIDensity:int&lt;0,inf&gt;, FPToUIDensity:int&lt;0,inf&gt;, FPTruncDensity:int&lt;0,inf&gt;, FRemDensity:int&lt;0,inf&gt;, FSubDensity:int&lt;0,inf&gt;, FenceDensity:int&lt;0,inf&gt;, FreezeDensity:int&lt;0,inf&gt;, GetElementPtrDensity:int&lt;0,inf&gt;, ICmpDensity:int&lt;0,inf&gt;, IndirectBrDensity:int&lt;0,inf&gt;, InsertElementDensity:int&lt;0,inf&gt;, InsertValueDensity:int&lt;0,inf&gt;, IntToPtrDensity:int&lt;0,inf&gt;, InvokeDensity:int&lt;0,inf&gt;, LShrDensity:int&lt;0,inf&gt;, LandingPadDensity:int&lt;0,inf&gt;, LoadDensity:int&lt;0,inf&gt;, MulDensity:int&lt;0,inf&gt;, OrDensity:int&lt;0,inf&gt;, PHIDensity:int&lt;0,inf&gt;, PtrToIntDensity:int&lt;0,inf&gt;, ResumeDensity:int&lt;0,inf&gt;, RetDensity:int&lt;0,inf&gt;, SDivDensity:int&lt;0,inf&gt;, SExtDensity:int&lt;0,inf&gt;, SIToFPDensity:int&lt;0,inf&gt;, SRemDensity:int&lt;0,inf&gt;, SelectDensity:int&lt;0,inf&gt;, ShlDensity:int&lt;0,inf&gt;, ShuffleVectorDensity:int&lt;0,inf&gt;, StoreDensity:int&lt;0,inf&gt;, SubDensity:int&lt;0,inf&gt;, SwitchDensity:int&lt;0,inf&gt;, TotalBlocksDensity:int&lt;0,inf&gt;, TotalFuncsDensity:int&lt;0,inf&gt;, TruncDensity:int&lt;0,inf&gt;, UDivDensity:int&lt;0,inf&gt;, UIToFPDensity:int&lt;0,inf&gt;, URemDensity:int&lt;0,inf&gt;, UnreachableDensity:int&lt;0,inf&gt;, UserOp1Density:int&lt;0,inf&gt;, UserOp2Density:int&lt;0,inf&gt;, VAArgDensity:int&lt;0,inf&gt;, XorDensity:int&lt;0,inf&gt;, ZExtDensity:int&lt;0,inf&gt;)</cite></p></td>
+</tr>
+</tbody>
+</table>
+<p>The InstCount observation space is a 70-dimension integer feature vector in the
+range [0,∞]. The first three features are the total number of instructions, the
+total number of basic blocks, and the total number of functions. The remaining
+features are the number of instructions of each of the 67 different types in the
+program.</p>
+<p>Use the <code class="code docutils literal notranslate"><span class="pre">InstCount</span></code> observation space to access the feature vectors as an
+<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html">np.array</a>,
+and <code class="code docutils literal notranslate"><span class="pre">InstCountDict</span></code> to receive them as a self-documented dictionary, keyed
+by the name of each feature.</p>
+<p>The table below provides a description of each of the 70 features, with the
+index in which they appear in the <code class="code docutils literal notranslate"><span class="pre">InstCount</span></code> and <code class="code docutils literal notranslate"><span class="pre">InstCountNorm</span></code>
+spaces, and their name as they appear in the keys of the <code class="code docutils literal notranslate"><span class="pre">InstCountDict</span></code>
+and <code class="code docutils literal notranslate"><span class="pre">InstCountNormDict</span></code> spaces. See the <a class="reference external" href="https://llvm.org/docs/LangRef.html#instruction-reference">LLVM instruction reference</a> for the meaning of
+the counted instructions.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 11%" />
+<col style="width: 34%" />
+<col style="width: 54%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Index</p></th>
+<th class="head"><p>Name</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>TotalInsts</p></td>
+<td><p>Total instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>TotalBlocks</p></td>
+<td><p>Basic block count</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>TotalFuncs</p></td>
+<td><p>Function count</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>Ret</p></td>
+<td><p>Ret instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>Br</p></td>
+<td><p>Br instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>Switch</p></td>
+<td><p>Switch instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>IndirectBr</p></td>
+<td><p>IndirectBr instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>7</p></td>
+<td><p>Invoke</p></td>
+<td><p>Invoke instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>8</p></td>
+<td><p>Resume</p></td>
+<td><p>Resume instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>9</p></td>
+<td><p>Unreachable</p></td>
+<td><p>Unreachable instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>10</p></td>
+<td><p>CleanupRet</p></td>
+<td><p>CleanupRet instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>11</p></td>
+<td><p>CatchRet</p></td>
+<td><p>CatchRet instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>12</p></td>
+<td><p>CatchSwitch</p></td>
+<td><p>CatchSwitch instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>13</p></td>
+<td><p>CallBr</p></td>
+<td><p>CallBr instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>14</p></td>
+<td><p>FNeg</p></td>
+<td><p>FNeg instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>15</p></td>
+<td><p>Add</p></td>
+<td><p>Add instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>16</p></td>
+<td><p>FAdd</p></td>
+<td><p>FAdd instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>17</p></td>
+<td><p>Sub</p></td>
+<td><p>Sub instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>18</p></td>
+<td><p>FSub</p></td>
+<td><p>FSub instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>19</p></td>
+<td><p>Mul</p></td>
+<td><p>Mul instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>20</p></td>
+<td><p>FMul</p></td>
+<td><p>FMul instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>21</p></td>
+<td><p>UDiv</p></td>
+<td><p>UDiv instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>22</p></td>
+<td><p>SDiv</p></td>
+<td><p>SDiv instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>23</p></td>
+<td><p>FDiv</p></td>
+<td><p>FDiv instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>24</p></td>
+<td><p>URem</p></td>
+<td><p>URem instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>25</p></td>
+<td><p>SRem</p></td>
+<td><p>SRem instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>26</p></td>
+<td><p>FRem</p></td>
+<td><p>FRem instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>27</p></td>
+<td><p>Shl</p></td>
+<td><p>Shl instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>28</p></td>
+<td><p>LShr</p></td>
+<td><p>LShr instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>29</p></td>
+<td><p>AShr</p></td>
+<td><p>AShr instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>30</p></td>
+<td><p>And</p></td>
+<td><p>And instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>31</p></td>
+<td><p>Or</p></td>
+<td><p>Or instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>32</p></td>
+<td><p>Xor</p></td>
+<td><p>Xor instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>33</p></td>
+<td><p>Alloca</p></td>
+<td><p>Alloca instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>34</p></td>
+<td><p>Load</p></td>
+<td><p>Load instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>35</p></td>
+<td><p>Store</p></td>
+<td><p>Store instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>36</p></td>
+<td><p>GetElementPtr</p></td>
+<td><p>GetElementPtr instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>37</p></td>
+<td><p>Fence</p></td>
+<td><p>Fence instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>38</p></td>
+<td><p>AtomicCmpXchg</p></td>
+<td><p>AtomicCmpXchg instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>39</p></td>
+<td><p>AtomicRMW</p></td>
+<td><p>AtomicRMW instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>40</p></td>
+<td><p>Trunc</p></td>
+<td><p>Trunc instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>41</p></td>
+<td><p>ZExt</p></td>
+<td><p>ZExt instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>42</p></td>
+<td><p>SExt</p></td>
+<td><p>SExt instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>43</p></td>
+<td><p>FPToUI</p></td>
+<td><p>FPToUI instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>44</p></td>
+<td><p>FPToSI</p></td>
+<td><p>FPToSI instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>45</p></td>
+<td><p>UIToFP</p></td>
+<td><p>UIToFP instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>46</p></td>
+<td><p>SIToFP</p></td>
+<td><p>SIToFP instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>47</p></td>
+<td><p>FPTrunc</p></td>
+<td><p>FPTrunc instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>48</p></td>
+<td><p>FPExt</p></td>
+<td><p>FPExt instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>49</p></td>
+<td><p>PtrToInt</p></td>
+<td><p>PtrToInt instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>50</p></td>
+<td><p>IntToPtr</p></td>
+<td><p>IntToPtr instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>51</p></td>
+<td><p>BitCast</p></td>
+<td><p>BitCast instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>52</p></td>
+<td><p>AddrSpaceCast</p></td>
+<td><p>AddrSpaceCast instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>53</p></td>
+<td><p>CleanupPad</p></td>
+<td><p>CleanupPad instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>54</p></td>
+<td><p>CatchPad</p></td>
+<td><p>CatchPad instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>55</p></td>
+<td><p>ICmp</p></td>
+<td><p>ICmp instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>56</p></td>
+<td><p>FCmp</p></td>
+<td><p>FCmp instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>57</p></td>
+<td><p>PHI</p></td>
+<td><p>PHI instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>58</p></td>
+<td><p>Call</p></td>
+<td><p>Call instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>59</p></td>
+<td><p>Select</p></td>
+<td><p>Select instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>60</p></td>
+<td><p>UserOp1</p></td>
+<td><p>UserOp1 instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>61</p></td>
+<td><p>UserOp2</p></td>
+<td><p>UserOp2 instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>62</p></td>
+<td><p>VAArg</p></td>
+<td><p>VAArg instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>63</p></td>
+<td><p>ExtractElement</p></td>
+<td><p>ExtractElement instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>64</p></td>
+<td><p>InsertElement</p></td>
+<td><p>InsertElement instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>65</p></td>
+<td><p>ShuffleVector</p></td>
+<td><p>ShuffleVector instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>66</p></td>
+<td><p>ExtractValue</p></td>
+<td><p>ExtractValue instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>67</p></td>
+<td><p>InsertValue</p></td>
+<td><p>InsertValue instruction count</p></td>
+</tr>
+<tr class="row-even"><td><p>68</p></td>
+<td><p>LandingPad</p></td>
+<td><p>LandingPad instruction count</p></td>
+</tr>
+<tr class="row-odd"><td><p>69</p></td>
+<td><p>Freeze</p></td>
+<td><p>Freeze instruction count</p></td>
+</tr>
+</tbody>
+</table>
+<p>Example values:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;InstCount&quot;</span><span class="p">]</span>
+<span class="go">array([406198,  46981,   3795,   3712,  41629,   1489,      0,      0,</span>
+<span class="go">            0,    151,      0,      0,      0,      0,     49,   5393,</span>
+<span class="go">          301,   3548,    157,   1132,    748,    152,    296,    270,</span>
+<span class="go">           42,     72,      0,   1228,    408,   1251,   2433,    878,</span>
+<span class="go">         1022,  22963, 107948,  53284,  59136,      0,      0,      0,</span>
+<span class="go">         2815,   7711,   3082,     14,    327,     16,    566,    328,</span>
+<span class="go">          888,    844,      0,  32345,      0,      0,      0,  14341,</span>
+<span class="go">          682,   1622,  30668,    257,      0,      0,      0,      0,</span>
+<span class="go">            0,      0,      0,      0,      0,      0])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;InstCountDict&quot;</span><span class="p">]</span>
+<span class="go">{&#39;TotalInstsCount&#39;: 406198, &#39;TotalBlocksCount&#39;: 46981, &#39;TotalFuncsCount&#39;:</span>
+<span class="go">3795, &#39;RetCount&#39;: 3712, &#39;BrCount&#39;: 41629, &#39;SwitchCount&#39;: 1489,</span>
+<span class="go">&#39;IndirectBrCount&#39;: 0, &#39;InvokeCount&#39;: 0, &#39;ResumeCount&#39;: 0,</span>
+<span class="go">&#39;UnreachableCount&#39;: 151, &#39;CleanupRetCount&#39;: 0, &#39;CatchRetCount&#39;: 0,</span>
+<span class="go">&#39;CatchSwitchCount&#39;: 0, &#39;CallBrCount&#39;: 0, &#39;FNegCount&#39;: 49, &#39;AddCount&#39;: 5393,</span>
+<span class="go">&#39;FAddCount&#39;: 301, &#39;SubCount&#39;: 3548, &#39;FSubCount&#39;: 157, &#39;MulCount&#39;: 1132,</span>
+<span class="go">&#39;FMulCount&#39;: 748, &#39;UDivCount&#39;: 152, &#39;SDivCount&#39;: 296, &#39;FDivCount&#39;: 270,</span>
+<span class="go">&#39;URemCount&#39;: 42, &#39;SRemCount&#39;: 72, &#39;FRemCount&#39;: 0, &#39;ShlCount&#39;: 1228,</span>
+<span class="go">&#39;LShrCount&#39;: 408, &#39;AShrCount&#39;: 1251, &#39;AndCount&#39;: 2433, &#39;OrCount&#39;: 878,</span>
+<span class="go">&#39;XorCount&#39;: 1022, &#39;AllocaCount&#39;: 22963, &#39;LoadCount&#39;: 107948, &#39;StoreCount&#39;:</span>
+<span class="go">53284, &#39;GetElementPtrCount&#39;: 59136, &#39;FenceCount&#39;: 0, &#39;AtomicCmpXchgCount&#39;:</span>
+<span class="go">0, &#39;AtomicRMWCount&#39;: 0, &#39;TruncCount&#39;: 2815, &#39;ZExtCount&#39;: 7711, &#39;SExtCount&#39;:</span>
+<span class="go">3082, &#39;FPToUICount&#39;: 14, &#39;FPToSICount&#39;: 327, &#39;UIToFPCount&#39;: 16,</span>
+<span class="go">&#39;SIToFPCount&#39;: 566, &#39;FPTruncCount&#39;: 328, &#39;FPExtCount&#39;: 888, &#39;PtrToIntCount&#39;:</span>
+<span class="go">844, &#39;IntToPtrCount&#39;: 0, &#39;BitCastCount&#39;: 32345, &#39;AddrSpaceCastCount&#39;: 0,</span>
+<span class="go">&#39;CleanupPadCount&#39;: 0, &#39;CatchPadCount&#39;: 0, &#39;ICmpCount&#39;: 14341, &#39;FCmpCount&#39;:</span>
+<span class="go">682, &#39;PHICount&#39;: 1622, &#39;CallCount&#39;: 30668, &#39;SelectCount&#39;: 257,</span>
+<span class="go">&#39;UserOp1Count&#39;: 0, &#39;UserOp2Count&#39;: 0, &#39;VAArgCount&#39;: 0,</span>
+<span class="go">&#39;ExtractElementCount&#39;: 0, &#39;InsertElementCount&#39;: 0, &#39;ShuffleVectorCount&#39;: 0,</span>
+<span class="go">&#39;ExtractValueCount&#39;: 0, &#39;InsertValueCount&#39;: 0, &#39;LandingPadCount&#39;: 0,</span>
+<span class="go">&#39;FreezeCount&#39;: 0}</span>
+</pre></div>
+</div>
+<p>The derived spaces <code class="code docutils literal notranslate"><span class="pre">InstCountNorm</span></code> and <code class="code docutils literal notranslate"><span class="pre">InstCountNormDict</span></code> return
+the instruction counts normalized to the total number of instructions (index 0
+in the table above). The first feature is omitted, yield a 69-dimensionality
+feature vector:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;InstCountNorm&quot;</span><span class="p">]</span>
+<span class="go">array([1.1566034e-01, 9.3427347e-03, 9.1384007e-03, 1.0248450e-01,</span>
+<span class="go">    3.6657001e-03, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00,</span>
+<span class="go">    3.7173988e-04, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00,</span>
+<span class="go">    0.0000000e+00, 1.2063082e-04, 1.3276776e-02, 7.4101792e-04,</span>
+<span class="go">    8.7346565e-03, 3.8651100e-04, 2.7868182e-03, 1.8414665e-03,</span>
+<span class="go">    3.7420174e-04, 7.2870863e-04, 6.6470046e-04, 1.0339785e-04,</span>
+<span class="go">    1.7725346e-04, 0.0000000e+00, 3.0231562e-03, 1.0044363e-03,</span>
+<span class="go">    3.0797787e-03, 5.9896898e-03, 2.1615075e-03, 2.5160143e-03,</span>
+<span class="go">    5.6531545e-02, 2.6575217e-01, 1.3117741e-01, 1.4558417e-01,</span>
+<span class="go">    0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 6.9301180e-03,</span>
+<span class="go">    1.8983353e-02, 7.5874329e-03, 3.4465949e-05, 8.0502609e-04,</span>
+<span class="go">    3.9389659e-05, 1.3934091e-03, 8.0748799e-04, 2.1861261e-03,</span>
+<span class="go">    2.0778044e-03, 0.0000000e+00, 7.9628654e-02, 0.0000000e+00,</span>
+<span class="go">    0.0000000e+00, 0.0000000e+00, 3.5305440e-02, 1.6789841e-03,</span>
+<span class="go">    3.9931266e-03, 7.5500123e-02, 6.3269638e-04, 0.0000000e+00,</span>
+<span class="go">    0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00,</span>
+<span class="go">    0.0000000e+00, 0.0000000e+00, 0.0000000e+00, 0.0000000e+00,</span>
+<span class="go">    0.0000000e+00], dtype=float32)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">math</span><span class="o">.</span><span class="n">isclose</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;InstCountNorm&quot;</span><span class="p">][</span><span class="mi">2</span><span class="p">:]</span><span class="o">.</span><span class="n">sum</span><span class="p">(),</span> <span class="mi">1</span><span class="p">)</span>
+<span class="go">True</span>
+</pre></div>
+</div>
+<p>The InstCount observation space and its derivatives are cheap to compute,
+deterministic, and platform independent.</p>
+</div>
 <div class="section" id="autophase">
-<h3><a class="toc-backref" href="#id6">Autophase</a><a class="headerlink" href="#autophase" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id8">Autophase</a><a class="headerlink" href="#autophase" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 2%" />
@@ -401,6 +815,248 @@ Proceedings of Machine Learning and Systems, 2, 70-81.</p>
 <a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.array.html">np.array</a>,
 and <code class="code docutils literal notranslate"><span class="pre">AutophaseDict</span></code> to receive them as a self-documented dictionary, keyed
 by the name of each feature.</p>
+<p>The table below provides a description of each of the 56 features, with the
+index in which they appear in the <code class="code docutils literal notranslate"><span class="pre">Autophase</span></code> vector, and their name as
+they appear in the keys of the <code class="code docutils literal notranslate"><span class="pre">AutophaseDict</span></code> dictionary.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 8%" />
+<col style="width: 25%" />
+<col style="width: 67%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Index</p></th>
+<th class="head"><p>Name</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>0</p></td>
+<td><p>BBNumArgsHi</p></td>
+<td><p>Number of BB where total args for phi nodes is gt 5</p></td>
+</tr>
+<tr class="row-odd"><td><p>1</p></td>
+<td><p>BBNumArgsLo</p></td>
+<td><p>Number of BB where total args for phi nodes is [1, 5]</p></td>
+</tr>
+<tr class="row-even"><td><p>2</p></td>
+<td><p>onePred</p></td>
+<td><p>Number of basic blocks with 1 predecessor</p></td>
+</tr>
+<tr class="row-odd"><td><p>3</p></td>
+<td><p>onePredOneSuc</p></td>
+<td><p>Number of basic blocks with 1 predecessor and 1 successor</p></td>
+</tr>
+<tr class="row-even"><td><p>4</p></td>
+<td><p>onePredTwoSuc</p></td>
+<td><p>Number of basic blocks with 1 predecessor and 2 successors</p></td>
+</tr>
+<tr class="row-odd"><td><p>5</p></td>
+<td><p>oneSuccessor</p></td>
+<td><p>Number of basic blocks with 1 successor</p></td>
+</tr>
+<tr class="row-even"><td><p>6</p></td>
+<td><p>twoPred</p></td>
+<td><p>Number of basic blocks with 2 predecessors</p></td>
+</tr>
+<tr class="row-odd"><td><p>7</p></td>
+<td><p>twoPredOneSuc</p></td>
+<td><p>Number of basic blocks with 2 predecessors and 1 successor</p></td>
+</tr>
+<tr class="row-even"><td><p>8</p></td>
+<td><p>twoEach</p></td>
+<td><p>Number of basic blocks with 2 predecessors and successors</p></td>
+</tr>
+<tr class="row-odd"><td><p>9</p></td>
+<td><p>twoSuccessor</p></td>
+<td><p>Number of basic blocks with 2 successors</p></td>
+</tr>
+<tr class="row-even"><td><p>10</p></td>
+<td><p>morePreds</p></td>
+<td><p>Number of basic blocks with gt. 2 predecessors</p></td>
+</tr>
+<tr class="row-odd"><td><p>11</p></td>
+<td><p>BB03Phi</p></td>
+<td><p>Number of basic blocks with Phi node count in range (0, 3]</p></td>
+</tr>
+<tr class="row-even"><td><p>12</p></td>
+<td><p>BBHiPhi</p></td>
+<td><p>Number of basic blocks with more than 3 Phi nodes</p></td>
+</tr>
+<tr class="row-odd"><td><p>13</p></td>
+<td><p>BBNoPhi</p></td>
+<td><p>Number of basic blocks with no Phi nodes</p></td>
+</tr>
+<tr class="row-even"><td><p>14</p></td>
+<td><p>BeginPhi</p></td>
+<td><p>Number of Phi-nodes at beginning of BB</p></td>
+</tr>
+<tr class="row-odd"><td><p>15</p></td>
+<td><p>BranchCount</p></td>
+<td><p>Number of branches</p></td>
+</tr>
+<tr class="row-even"><td><p>16</p></td>
+<td><p>returnInt</p></td>
+<td><p>Number of calls that return an int</p></td>
+</tr>
+<tr class="row-odd"><td><p>17</p></td>
+<td><p>CriticalCount</p></td>
+<td><p>Number of critical edges</p></td>
+</tr>
+<tr class="row-even"><td><p>18</p></td>
+<td><p>NumEdges</p></td>
+<td><p>Number of edges</p></td>
+</tr>
+<tr class="row-odd"><td><p>19</p></td>
+<td><p>const32Bit</p></td>
+<td><p>Number of occurrences of 32-bit integer constants</p></td>
+</tr>
+<tr class="row-even"><td><p>20</p></td>
+<td><p>const64Bit</p></td>
+<td><p>Number of occurrences of 64-bit integer constants</p></td>
+</tr>
+<tr class="row-odd"><td><p>21</p></td>
+<td><p>numConstZeroes</p></td>
+<td><p>Number of occurrences of constant 0</p></td>
+</tr>
+<tr class="row-even"><td><p>22</p></td>
+<td><p>numConstOnes</p></td>
+<td><p>Number of occurrences of constant 1</p></td>
+</tr>
+<tr class="row-odd"><td><p>23</p></td>
+<td><p>UncondBranches</p></td>
+<td><p>Number of unconditional branches</p></td>
+</tr>
+<tr class="row-even"><td><p>24</p></td>
+<td><p>binaryConstArg</p></td>
+<td><p>Binary operations with a constant operand</p></td>
+</tr>
+<tr class="row-odd"><td><p>25</p></td>
+<td><p>NumAShrInst</p></td>
+<td><p>Number of AShr instructions</p></td>
+</tr>
+<tr class="row-even"><td><p>26</p></td>
+<td><p>NumAddInst</p></td>
+<td><p>Number of Add instructions</p></td>
+</tr>
+<tr class="row-odd"><td><p>27</p></td>
+<td><p>NumAllocaInst</p></td>
+<td><p>Number of Alloca instructions</p></td>
+</tr>
+<tr class="row-even"><td><p>28</p></td>
+<td><p>NumAndInst</p></td>
+<td><p>Number of And instructions</p></td>
+</tr>
+<tr class="row-odd"><td><p>29</p></td>
+<td><p>BlockMid</p></td>
+<td><p>Number of basic blocks with instructions between [15, 500]</p></td>
+</tr>
+<tr class="row-even"><td><p>30</p></td>
+<td><p>BlockLow</p></td>
+<td><p>Number of basic blocks with less than 15 instructions</p></td>
+</tr>
+<tr class="row-odd"><td><p>31</p></td>
+<td><p>NumBitCastInst</p></td>
+<td><p>Number of BitCast instructions</p></td>
+</tr>
+<tr class="row-even"><td><p>32</p></td>
+<td><p>NumBrInst</p></td>
+<td><p>Number of Br instructions</p></td>
+</tr>
+<tr class="row-odd"><td><p>33</p></td>
+<td><p>NumCallInst</p></td>
+<td><p>Number of Call instructions</p></td>
+</tr>
+<tr class="row-even"><td><p>34</p></td>
+<td><p>NumGetElementPtrInst</p></td>
+<td><p>Number of GetElementPtr instructions</p></td>
+</tr>
+<tr class="row-odd"><td><p>35</p></td>
+<td><p>NumICmpInst</p></td>
+<td><p>Number of ICmp instructions</p></td>
+</tr>
+<tr class="row-even"><td><p>36</p></td>
+<td><p>NumLShrInst</p></td>
+<td><p>Number of LShr instructions</p></td>
+</tr>
+<tr class="row-odd"><td><p>37</p></td>
+<td><p>NumLoadInst</p></td>
+<td><p>Number of Load instructions</p></td>
+</tr>
+<tr class="row-even"><td><p>38</p></td>
+<td><p>NumMulInst</p></td>
+<td><p>Number of Mul instructions</p></td>
+</tr>
+<tr class="row-odd"><td><p>39</p></td>
+<td><p>NumOrInst</p></td>
+<td><p>Number of Or instructions</p></td>
+</tr>
+<tr class="row-even"><td><p>40</p></td>
+<td><p>NumPHIInst</p></td>
+<td><p>Number of PHI instructions</p></td>
+</tr>
+<tr class="row-odd"><td><p>41</p></td>
+<td><p>NumRetInst</p></td>
+<td><p>Number of Ret instructions</p></td>
+</tr>
+<tr class="row-even"><td><p>42</p></td>
+<td><p>NumSExtInst</p></td>
+<td><p>Number of SExt instructions</p></td>
+</tr>
+<tr class="row-odd"><td><p>43</p></td>
+<td><p>NumSelectInst</p></td>
+<td><p>Number of Select instructions</p></td>
+</tr>
+<tr class="row-even"><td><p>44</p></td>
+<td><p>NumShlInst</p></td>
+<td><p>Number of Shl instructions</p></td>
+</tr>
+<tr class="row-odd"><td><p>45</p></td>
+<td><p>NumStoreInst</p></td>
+<td><p>Number of Store instructions</p></td>
+</tr>
+<tr class="row-even"><td><p>46</p></td>
+<td><p>NumSubInst</p></td>
+<td><p>Number of Sub instructions</p></td>
+</tr>
+<tr class="row-odd"><td><p>47</p></td>
+<td><p>NumTruncInst</p></td>
+<td><p>Number of Trunc instructions</p></td>
+</tr>
+<tr class="row-even"><td><p>48</p></td>
+<td><p>NumXorInst</p></td>
+<td><p>Number of Xor instructions</p></td>
+</tr>
+<tr class="row-odd"><td><p>49</p></td>
+<td><p>NumZExtInst</p></td>
+<td><p>Number of ZExt instructions</p></td>
+</tr>
+<tr class="row-even"><td><p>50</p></td>
+<td><p>TotalBlocks</p></td>
+<td><p>Number of basic blocks</p></td>
+</tr>
+<tr class="row-odd"><td><p>51</p></td>
+<td><p>TotalInsts</p></td>
+<td><p>Number of instructions (of all types)</p></td>
+</tr>
+<tr class="row-even"><td><p>52</p></td>
+<td><p>TotalMemInst</p></td>
+<td><p>Number of memory instructions</p></td>
+</tr>
+<tr class="row-odd"><td><p>53</p></td>
+<td><p>TotalFuncs</p></td>
+<td><p>Number of non-external functions</p></td>
+</tr>
+<tr class="row-even"><td><p>54</p></td>
+<td><p>ArgsPhi</p></td>
+<td><p>Total arguments to Phi nodes</p></td>
+</tr>
+<tr class="row-odd"><td><p>55</p></td>
+<td><p>testUnary</p></td>
+<td><p>Number of Unary operations</p></td>
+</tr>
+</tbody>
+</table>
 <p>Example values:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;Autophase&quot;</span><span class="p">]</span>
 <span class="go">array([   0,    0,   26,   25,    1,   26,   10,    1,    8,   10,    0,</span>
@@ -423,7 +1079,7 @@ by the name of each feature.</p>
 </div>
 </div>
 <div class="section" id="inst2vec">
-<h3><a class="toc-backref" href="#id7">Inst2vec</a><a class="headerlink" href="#inst2vec" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id9">Inst2vec</a><a class="headerlink" href="#inst2vec" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 50%" />
@@ -500,7 +1156,7 @@ produce a program embedding.</p>
 </div>
 </div>
 <div class="section" id="programl">
-<h3><a class="toc-backref" href="#id8">ProGraML</a><a class="headerlink" href="#programl" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id10">ProGraML</a><a class="headerlink" href="#programl" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 33%" />
@@ -526,6 +1182,18 @@ ProGraML is described in:</p>
 <a class="reference external" href="https://arxiv.org/pdf/2003.10536.pdf">ProGraML: Graph-based Deep Learning for Program Optimization and Analysis</a>.
 arXiv preprint arXiv:2003.10536.</p>
 </div></blockquote>
+<p>Each node in the graph represents an instruction, a variable, or a constant. A
+text attribute on each node can be used to produce an initial node embedding.
+Each edge in the graph has a type and a position. There are three types of
+edges: call edges, data edges, and control edges. An edge position is a positive
+integer which encodes the operand order for data edges and the branch number for
+control edges. The diagram below visualizes the ProGraML graph for a small
+program.</p>
+<img alt="../_images/programl.png" src="../_images/programl.png" />
+<p>In the above diagram, each blue rectangular node represents an instruction, the
+red diamonds are variables, the red ovals are constants, and the edges between
+the nodes represent relations: blue edges are control flow, red edges are data
+flow, and green edges are call flow.</p>
 <p>Example usage:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">G</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;Programl&quot;</span><span class="p">]</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">G</span>
@@ -540,7 +1208,7 @@ arXiv preprint arXiv:2003.10536.</p>
 </div>
 </div>
 <div class="section" id="hardware-information">
-<h3><a class="toc-backref" href="#id9">Hardware Information</a><a class="headerlink" href="#hardware-information" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id11">Hardware Information</a><a class="headerlink" href="#hardware-information" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 8%" />
@@ -560,6 +1228,8 @@ arXiv preprint arXiv:2003.10536.</p>
 <p>Essential performance information about the host CPU can be accessed as JSON
 dictionary, extracted using the <a class="reference external" href="https://github.com/pytorch/cpuinfo">cpuinfo</a>
 library.</p>
+<p>This observation space is used for obtaining information about the target
+hardware. The values are independent of the compiler and program state.</p>
 <p>Example usage:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;CpuInfo&quot;</span><span class="p">]</span>
 <span class="go">{&#39;cores_count&#39;: 8, &#39;l1d_cache_count&#39;: 8, ...}</span>
@@ -567,7 +1237,7 @@ library.</p>
 </div>
 </div>
 <div class="section" id="cost-models">
-<h3><a class="toc-backref" href="#id10">Cost Models</a><a class="headerlink" href="#cost-models" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id12">Cost Models</a><a class="headerlink" href="#cost-models" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 24%" />
@@ -609,7 +1279,7 @@ library.</p>
 </div>
 </div>
 <div class="section" id="reward-spaces">
-<span id="reward"></span><h2><a class="toc-backref" href="#id11">Reward Spaces</a><a class="headerlink" href="#reward-spaces" title="Permalink to this headline">¶</a></h2>
+<span id="reward"></span><h2><a class="toc-backref" href="#id13">Reward Spaces</a><a class="headerlink" href="#reward-spaces" title="Permalink to this headline">¶</a></h2>
 <p>The goal of CompilerGym tasks is to minimize a cost function <span class="math notranslate nohighlight">\(C(s)\)</span> which
 takes as input the current program state <span class="math notranslate nohighlight">\(s\)</span> and produces a real-valued
 cost. At a given timestep, reward is the reduction in cost from the previous
@@ -635,7 +1305,7 @@ achieved by applying the baseline policy to produce a baseline state
 the reward space <code class="code docutils literal notranslate"><span class="pre">IrInstructionCountO3</span></code> is <code class="code docutils literal notranslate"><span class="pre">IrInstructionCount</span></code>
 reward normalized to the <code class="code docutils literal notranslate"><span class="pre">-O3</span></code> baseline policy.</p>
 <div class="section" id="ir-instruction-count">
-<h3><a class="toc-backref" href="#id12">IR Instruction Count</a><a class="headerlink" href="#ir-instruction-count" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id14">IR Instruction Count</a><a class="headerlink" href="#ir-instruction-count" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 21%" />
@@ -694,7 +1364,7 @@ platform-independent, but is not a measure of true codesize reduction as it does
 not take into account the effects of lowering.</p>
 </div>
 <div class="section" id="codesize">
-<h3><a class="toc-backref" href="#id13">Codesize</a><a class="headerlink" href="#codesize" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id15">Codesize</a><a class="headerlink" href="#codesize" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
 <col style="width: 19%" />
@@ -752,7 +1422,7 @@ object file code size depends on the target platform, see
 </div>
 </div>
 <div class="section" id="action-space">
-<h2><a class="toc-backref" href="#id14">Action Space</a><a class="headerlink" href="#action-space" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id16">Action Space</a><a class="headerlink" href="#action-space" title="Permalink to this headline">¶</a></h2>
 <p>The LLVM action space exposes the selection of semantics-preserving optimization
 transforms as a discrete space.</p>
 <table class="docutils align-default">

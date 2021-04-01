@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Getting Started &mdash; CompilerGym 0.1.6 documentation</title>
+  <title>Getting Started &mdash; CompilerGym 0.1.7 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.6
+                0.1.7
               </div>
             
           
@@ -94,7 +94,12 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#key-concepts">Key Concepts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#building-from-source">Building from Source</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#building-from-source">Building from Source</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#macos">macOS</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#linux">Linux</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#all-platforms">All platforms</a></li>
+</ul>
+</li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#using-compilergym">Using CompilerGym</a><ul>
@@ -120,6 +125,7 @@
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/datasets.html">compiler_gym.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/envs.html">compiler_gym.envs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="llvm/api.html">compiler_gym.envs.llvm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/views.html">compiler_gym.views</a></li>
@@ -202,16 +208,22 @@ started!</p>
 <li><p><a class="reference internal" href="#key-concepts" id="id3">Key Concepts</a></p></li>
 <li><p><a class="reference internal" href="#installation" id="id4">Installation</a></p>
 <ul>
-<li><p><a class="reference internal" href="#building-from-source" id="id5">Building from Source</a></p></li>
+<li><p><a class="reference internal" href="#building-from-source" id="id5">Building from Source</a></p>
+<ul>
+<li><p><a class="reference internal" href="#macos" id="id6">macOS</a></p></li>
+<li><p><a class="reference internal" href="#linux" id="id7">Linux</a></p></li>
+<li><p><a class="reference internal" href="#all-platforms" id="id8">All platforms</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#using-compilergym" id="id6">Using CompilerGym</a></p>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#using-compilergym" id="id9">Using CompilerGym</a></p>
 <ul>
-<li><p><a class="reference internal" href="#selecting-an-environment" id="id7">Selecting an environment</a></p></li>
-<li><p><a class="reference internal" href="#installing-benchmarks" id="id8">Installing benchmarks</a></p></li>
-<li><p><a class="reference internal" href="#the-compiler-environment" id="id9">The compiler environment</a></p></li>
-<li><p><a class="reference internal" href="#interacting-with-the-environment" id="id10">Interacting with the environment</a></p></li>
-<li><p><a class="reference internal" href="#using-the-command-line-tools" id="id11">Using the command line tools</a></p></li>
+<li><p><a class="reference internal" href="#selecting-an-environment" id="id10">Selecting an environment</a></p></li>
+<li><p><a class="reference internal" href="#installing-benchmarks" id="id11">Installing benchmarks</a></p></li>
+<li><p><a class="reference internal" href="#the-compiler-environment" id="id12">The compiler environment</a></p></li>
+<li><p><a class="reference internal" href="#interacting-with-the-environment" id="id13">Interacting with the environment</a></p></li>
+<li><p><a class="reference internal" href="#using-the-command-line-tools" id="id14">Using the command line tools</a></p></li>
 </ul>
 </li>
 </ul>
@@ -246,7 +258,7 @@ cumulative reward from these environments so as to produce the best programs.</p
 <div class="section" id="installation">
 <h2><a class="toc-backref" href="#id4">Installation</a><a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
 <p>Install the latest CompilerGym release using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ pip install compiler_gym
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">pip</span> <span class="n">install</span> <span class="o">-</span><span class="n">U</span> <span class="n">compiler_gym</span>
 </pre></div>
 </div>
 <p>The binary works on macOS and Linux (on Ubuntu 18.04, Fedora 28, Debian
@@ -254,54 +266,77 @@ cumulative reward from these environments so as to produce the best programs.</p
 <div class="section" id="building-from-source">
 <h3><a class="toc-backref" href="#id5">Building from Source</a><a class="headerlink" href="#building-from-source" title="Permalink to this headline">¶</a></h3>
 <p>If you prefer, you may build from source. This requires a modern C++
-toolchain. On macOS you can use the system compiler. On linux, install
-the required toolchain using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ sudo apt install clang libtinfo5 patchelf
-$ export CC=clang
-$ export CXX=clang++
+toolchain and bazel.</p>
+<div class="section" id="macos">
+<h4><a class="toc-backref" href="#id6">macOS</a><a class="headerlink" href="#macos" title="Permalink to this headline">¶</a></h4>
+<p>On macOS the required dependencies can be installed using
+<a class="reference external" href="https://docs.brew.sh/Installation">homebrew</a>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>brew install bazelisk zlib
+<span class="nb">export</span> <span class="nv">LDFLAGS</span><span class="o">=</span><span class="s2">&quot;-L/usr/local/opt/zlib/lib&quot;</span>
+<span class="nb">export</span> <span class="nv">CPPFLAGS</span><span class="o">=</span><span class="s2">&quot;-I/usr/local/opt/zlib/include&quot;</span>
+<span class="nb">export</span> <span class="nv">PKG_CONFIG_PATH</span><span class="o">=</span><span class="s2">&quot;/usr/local/opt/zlib/lib/pkgconfig&quot;</span>
 </pre></div>
 </div>
+<p>Now proceed to <a class="reference external" href="#all-platforms">All platforms</a> below.</p>
+</div>
+<div class="section" id="linux">
+<h4><a class="toc-backref" href="#id7">Linux</a><a class="headerlink" href="#linux" title="Permalink to this headline">¶</a></h4>
+<p>On debian-based linux systems, install the required toolchain using:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sudo apt install clang libtinfo5 libjpeg-dev patchelf
+wget https://github.com/bazelbuild/bazelisk/releases/download/v1.7.5/bazelisk-linux-amd64 -O bazel
+chmod +x bazel <span class="o">&amp;&amp;</span> mkdir -p ~/.local/bin <span class="o">&amp;&amp;</span> mv -v bazel ~/.local/bin
+<span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.local/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
+<span class="nb">export</span> <span class="nv">CC</span><span class="o">=</span>clang
+<span class="nb">export</span> <span class="nv">CXX</span><span class="o">=</span>clang++
+</pre></div>
+</div>
+</div>
+<div class="section" id="all-platforms">
+<h4><a class="toc-backref" href="#id8">All platforms</a><a class="headerlink" href="#all-platforms" title="Permalink to this headline">¶</a></h4>
 <p>We recommend using
 <a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/">conda</a>
 to manage the remaining build dependencies. First create a conda
 environment with the required dependencies:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda create -n compiler_gym python=3.8 bazel=3.1.0 cmake pandoc
-$ conda activate compiler_gym
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">compiler_gym</span> <span class="n">python</span><span class="o">=</span><span class="mf">3.9</span> <span class="n">cmake</span> <span class="n">pandoc</span>
+<span class="n">conda</span> <span class="n">activate</span> <span class="n">compiler_gym</span>
 </pre></div>
 </div>
 <p>Then clone the CompilerGym source code using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ git clone https://github.com/facebookresearch/CompilerGym.git
-$ cd CompilerGym
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">facebookresearch</span><span class="o">/</span><span class="n">CompilerGym</span><span class="o">.</span><span class="n">git</span>
+<span class="n">cd</span> <span class="n">CompilerGym</span>
 </pre></div>
 </div>
 <p>Install the python development dependencies using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make init
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">init</span>
 </pre></div>
 </div>
-<p>Then run the test suite to confirm that everything is working:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make test
+<p>The <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">init</span></code> target only needs to be run once on initial setup, or
+when upgrading to a different CompilerGym release.</p>
+<p>Run the test suite to confirm that everything is working:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">test</span>
 </pre></div>
 </div>
-<p>To build and install the python package, run:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ make install
+<p>To build and install the <code class="docutils literal notranslate"><span class="pre">compiler_gym</span></code> python package, run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">install</span>
 </pre></div>
 </div>
-<p><strong>NOTE:</strong> To use the python code that is installed by <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">install</span></code>
-you must leave the root directory of this repository. Attempting to
-import <code class="docutils literal notranslate"><span class="pre">compiler_gym</span></code> while in the root of this repository will cause
-import errors.</p>
+<p><strong>NOTE:</strong> To use the <code class="docutils literal notranslate"><span class="pre">compiler_gym</span></code> package that is installed by
+<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">install</span></code> you must leave the root directory of this repository.
+Attempting to import <code class="docutils literal notranslate"><span class="pre">compiler_gym</span></code> while in the root of this
+repository will cause import errors.</p>
 <p>When you are finished, you can deactivate and delete the conda
 environment using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ conda deactivate
-$ conda env remove -n compiler_gym
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">deactivate</span>
+<span class="n">conda</span> <span class="n">env</span> <span class="n">remove</span> <span class="o">-</span><span class="n">n</span> <span class="n">compiler_gym</span>
 </pre></div>
+</div>
 </div>
 </div>
 </div>
 <div class="section" id="using-compilergym">
-<h2><a class="toc-backref" href="#id6">Using CompilerGym</a><a class="headerlink" href="#using-compilergym" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id9">Using CompilerGym</a><a class="headerlink" href="#using-compilergym" title="Permalink to this headline">¶</a></h2>
 <p>Begin by firing up a python interpreter:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span>
 </pre></div>
 </div>
 <p>To start with we import the gym module and the CompilerGym environments:</p>
@@ -316,7 +351,7 @@ $ conda env remove -n compiler_gym
 </pre></div>
 </div>
 <div class="section" id="selecting-an-environment">
-<h3><a class="toc-backref" href="#id7">Selecting an environment</a><a class="headerlink" href="#selecting-an-environment" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id10">Selecting an environment</a><a class="headerlink" href="#selecting-an-environment" title="Permalink to this headline">¶</a></h3>
 <p>CompilerGym environments are named using one of the following formats:</p>
 <ol class="arabic simple">
 <li><p><code class="code docutils literal notranslate"><span class="pre">&lt;compiler&gt;-&lt;observation&gt;-&lt;reward&gt;-&lt;version&gt;</span></code></p></li>
@@ -349,7 +384,7 @@ further details.</p>
 </div>
 </div>
 <div class="section" id="installing-benchmarks">
-<h3><a class="toc-backref" href="#id8">Installing benchmarks</a><a class="headerlink" href="#installing-benchmarks" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id11">Installing benchmarks</a><a class="headerlink" href="#installing-benchmarks" title="Permalink to this headline">¶</a></h3>
 <p>A compiler requires a program as input. For the purposes of CompilerGym we call
 these input programs <em>benchmarks</em>, and collections of benchmarks are assembled
 into <em>datasets</em>. You may provide your own programs to use as benchmarks, or
@@ -379,7 +414,7 @@ the 123 benchmarks that comprise the dataset we just installed:</p>
 </div>
 </div>
 <div class="section" id="the-compiler-environment">
-<h3><a class="toc-backref" href="#id9">The compiler environment</a><a class="headerlink" href="#the-compiler-environment" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id12">The compiler environment</a><a class="headerlink" href="#the-compiler-environment" title="Permalink to this headline">¶</a></h3>
 <p>If you have experience using <a class="reference external" href="https://gym.openai.com/">OpenAI Gym</a>, the
 CompilerGym environments will be familiar. If not, you can call <code class="code docutils literal notranslate"><span class="pre">help()</span></code>
 on any function, object, or method to query the documentation:</p>
@@ -447,7 +482,7 @@ name of the benchmark as an argument to
 </div>
 </div>
 <div class="section" id="interacting-with-the-environment">
-<h3><a class="toc-backref" href="#id10">Interacting with the environment</a><a class="headerlink" href="#interacting-with-the-environment" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id13">Interacting with the environment</a><a class="headerlink" href="#interacting-with-the-environment" title="Permalink to this headline">¶</a></h3>
 <p>Once an environment has been initialized, you interact with it in the same way
 that you would with any other <a class="reference external" href="https://gym.openai.com/">OpenAI Gym</a>
 environment. <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.render" title="compiler_gym.envs.LlvmEnv.render"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.render()</span></code></a> prints
@@ -546,7 +581,7 @@ instance:</p>
 </div>
 </div>
 <div class="section" id="using-the-command-line-tools">
-<h3><a class="toc-backref" href="#id11">Using the command line tools</a><a class="headerlink" href="#using-the-command-line-tools" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id14">Using the command line tools</a><a class="headerlink" href="#using-the-command-line-tools" title="Permalink to this headline">¶</a></h3>
 <p>CompilerGym includes a set of useful <a class="reference internal" href="cli.html"><span class="doc">command line tools</span></a>. Each of
 the steps above could be replicated from the command line.</p>
 <p>For example, <a class="reference internal" href="cli.html#module-compiler_gym.bin.service" title="compiler_gym.bin.service"><code class="xref py py-mod docutils literal notranslate"><span class="pre">compiler_gym.bin.service</span></code></a> can be used to list the available

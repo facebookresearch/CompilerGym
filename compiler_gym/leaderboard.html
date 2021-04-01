@@ -1,0 +1,372 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>compiler_gym.leaderboard &mdash; CompilerGym 0.1.7 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="compiler_gym.service" href="service.html" />
+    <link rel="prev" title="compiler_gym.envs.llvm" href="../llvm/api.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> CompilerGym
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.7
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../llvm/index.html">LLVM Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym.html">compiler_gym</a></li>
+<li class="toctree-l1"><a class="reference internal" href="datasets.html">compiler_gym.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../llvm/api.html">compiler_gym.envs.llvm</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">compiler_gym.leaderboard</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-compiler_gym.leaderboard.llvm_instcount">LLVM Instruction Count</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="spaces.html">compiler_gym.spaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="views.html">compiler_gym.views</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CompilerGym</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>compiler_gym.leaderboard</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="../_sources/compiler_gym/leaderboard.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="module-compiler_gym.leaderboard">
+<span id="compiler-gym-leaderboard"></span><h1>compiler_gym.leaderboard<a class="headerlink" href="#module-compiler_gym.leaderboard" title="Permalink to this headline">¶</a></h1>
+<p>This package contains modules that can be used for preparing leaderboard
+submissions.</p>
+<p>We provide <a class="reference external" href="https://github.com/facebookresearch/CompilerGym#leaderboards">leaderboards</a> to track the
+performance of user-submitted algorithms on compiler optimization tasks. The
+goal of the leaderboards is to provide a venue for researchers to promote their
+work, and to provide a common framework for evaluating and comparing different
+approaches. We accept submissions to the leaderboards through pull requests, see
+<a class="reference external" href="https://facebookresearch.github.io/CompilerGym/contributing.html#leaderboard-submissions">here</a>
+for instructions.</p>
+<div class="section" id="module-compiler_gym.leaderboard.llvm_instcount">
+<span id="llvm-instruction-count"></span><h2>LLVM Instruction Count<a class="headerlink" href="#module-compiler_gym.leaderboard.llvm_instcount" title="Permalink to this headline">¶</a></h2>
+<p>LLVM is a popular open source compiler used widely in industry and research.
+The <code class="code docutils literal notranslate"><span class="pre">llvm-ic-v0</span></code> environment exposes LLVM’s optimizing passes as a set of
+actions that can be applied to a particular program. The goal of the agent is to
+select the sequence of optimizations that lead to the greatest reduction in
+instruction count in the program being compiled. Reward is the reduction in
+instruction count achieved scaled to the reduction achieved by LLVM’s builtin
+<code class="code docutils literal notranslate"><span class="pre">-Oz</span></code> pipeline.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 27%" />
+<col style="width: 73%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Property</p></th>
+<th class="head"><p>Value</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>Environment</p></td>
+<td><p><a class="reference internal" href="envs.html#compiler_gym.envs.LlvmEnv" title="compiler_gym.envs.LlvmEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">LlvmEnv</span></code></a>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Observation Space</p></td>
+<td><p>Any.</p></td>
+</tr>
+<tr class="row-even"><td><p>Reward Space</p></td>
+<td><p>Instruction count reduction relative to <code class="code docutils literal notranslate"><span class="pre">-Oz</span></code>.</p></td>
+</tr>
+<tr class="row-odd"><td><p>Test Dataset</p></td>
+<td><p>The 23 cBench benchmarks.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Users who wish to create a submission for this leaderboard may use
+<a class="reference internal" href="#compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy" title="compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy"><code class="xref py py-func docutils literal notranslate"><span class="pre">eval_llvm_instcount_policy()</span></code></a> to
+automatically evaluate their agent on the test set.</p>
+<dl class="py function">
+<dt id="compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy">
+<code class="sig-prename descclassname">compiler_gym.leaderboard.llvm_instcount.</code><code class="sig-name descname">eval_llvm_instcount_policy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">policy</span><span class="p">:</span> <span class="n">Callable<span class="p">[</span><span class="p">[</span>compiler_gym.envs.llvm.llvm_env.LlvmEnv<span class="p">]</span><span class="p">, </span>None<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/compiler_gym/leaderboard/llvm_instcount.html#eval_llvm_instcount_policy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evaluate an LLVM codesize policy and generate results for a leaderboard
+submission.</p>
+<p>To use it, you define your policy as a function that takes an
+<a class="reference internal" href="envs.html#compiler_gym.envs.LlvmEnv" title="compiler_gym.envs.LlvmEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">LlvmEnv</span></code></a> instance as input and modifies
+it in place. For example, for a trivial random policy:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">compiler_gym.envs</span> <span class="kn">import</span> <span class="n">LlvmEnv</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">def</span> <span class="nf">my_policy</span><span class="p">(</span><span class="n">env</span><span class="p">:</span> <span class="n">LlvmEnv</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="go">....   # Defines a policy that takes 10 random steps.</span>
+<span class="gp">... </span>   <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">10</span><span class="p">):</span>
+<span class="gp">... </span>       <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">sample</span><span class="p">())</span>
+<span class="gp">... </span>       <span class="k">if</span> <span class="n">done</span><span class="p">:</span> <span class="k">break</span>
+</pre></div>
+</div>
+<p>If your policy is stateful, you can use a class and override the
+<code class="code docutils literal notranslate"><span class="pre">__call__()</span></code> method:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">class</span> <span class="nc">MyPolicy</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+<span class="gp">... </span>        <span class="bp">self</span><span class="o">.</span><span class="n">my_stateful_vars</span> <span class="o">=</span> <span class="p">{}</span>  <span class="c1"># or similar</span>
+<span class="gp">... </span>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">:</span> <span class="n">LlvmEnv</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="k">pass</span> <span class="c1"># ... do fun stuff!</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">my_policy</span> <span class="o">=</span> <span class="n">MyPolicy</span><span class="p">()</span>
+</pre></div>
+</div>
+<p>The role of your policy is to perform a sequence of actions on the supplied
+environment so as to maximize cumulative reward. By default, no observation
+space is set on the environment, so <a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv.step" title="compiler_gym.envs.CompilerEnv.step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.step()</span></code></a> will return <code class="code docutils literal notranslate"><span class="pre">None</span></code> for the
+observation. You may set a new observation space:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation_space</span> <span class="o">=</span> <span class="s2">&quot;InstCount&quot;</span>  <span class="c1"># Set a new space for env.step()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;InstCount&quot;</span><span class="p">]</span>  <span class="c1"># Calculate a one-off observation.</span>
+</pre></div>
+</div>
+<p>However, the policy may not change the reward space of the environment, or
+the benchmark.</p>
+<p>Once you have defined your policy, call the
+<a class="reference internal" href="#compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy" title="compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy"><code class="xref py py-func docutils literal notranslate"><span class="pre">eval_llvm_instcount_policy()</span></code></a> helper
+function, passing it your policy as its only argument:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">eval_llvm_instcount_policy</span><span class="p">(</span><span class="n">my_policy</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Put together as a complete example, a leaderboard submission script may look
+like:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># my_policy.py</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.leaderboard.llvm_instcount</span> <span class="kn">import</span> <span class="n">eval_llvm_instcount_policy</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.envs</span> <span class="kn">import</span> <span class="n">LlvmEnv</span>
+
+<span class="k">def</span> <span class="nf">my_policy</span><span class="p">(</span><span class="n">env</span><span class="p">:</span> <span class="n">LlvmEnv</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+    <span class="n">env</span><span class="o">.</span><span class="n">observation_space</span> <span class="o">=</span> <span class="s2">&quot;InstCount&quot;</span>  <span class="c1"># we&#39;re going to use instcount space</span>
+    <span class="k">pass</span> <span class="c1"># ... do fun stuff!</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">eval_llvm_instcount_policy</span><span class="p">(</span><span class="n">my_policy</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The <a class="reference internal" href="#compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy" title="compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy"><code class="xref py py-func docutils literal notranslate"><span class="pre">eval_llvm_instcount_policy()</span></code></a> helper
+defines a number of commandline flags that can be overriden to control the
+behavior of the evaluation. For example the flag <code class="code docutils literal notranslate"><span class="pre">--n</span></code> determines the
+number of times the policy is run on each benchmark (default is 10), and
+<code class="code docutils literal notranslate"><span class="pre">--results_logfile</span></code> determines the path of the generated results file:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python my_policy.py --n=5 --results_logfile=my_policy_results.csv
+</pre></div>
+</div>
+<p>You can use <code class="code docutils literal notranslate"><span class="pre">--helpfull</span></code> flag to list all of the flags that are
+defined:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python my_policy.py --helpfull
+</pre></div>
+</div>
+<p>Once you are happy with your approach, see the <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/blob/development/CONTRIBUTING.md#leaderboard-submissions">contributing guide</a>
+for instructions on preparing a submission to the leaderboard.</p>
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+        <a href="service.html" class="btn btn-neutral float-right" title="compiler_gym.service" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="../llvm/api.html" class="btn btn-neutral float-left" title="compiler_gym.envs.llvm" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright Facebook AI Research
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    <!-- Theme Analytics -->
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'G-T95G5EVYXM', 'auto');
+    ga('send', 'pageview');
+    </script>
+
+    
+   
+
+</body>
+</html>

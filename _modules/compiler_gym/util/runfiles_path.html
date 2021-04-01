@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.util.runfiles_path &mdash; CompilerGym 0.1.6 documentation</title>
+  <title>compiler_gym.util.runfiles_path &mdash; CompilerGym 0.1.7 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.6
+                0.1.7
               </div>
             
           
@@ -103,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/envs.html">compiler_gym.envs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/views.html">compiler_gym.views</a></li>
@@ -193,7 +194,8 @@
 <span class="sd">    Use environment variable COMPILER_GYM_RUNFILES=/path/to/runfiles if running</span>
 <span class="sd">    outside of bazel.</span>
 
-<span class="sd">    :param relpath: The relative path within the runfiles tres.</span>
+<span class="sd">    :param relpath: The relative path within the runfiles tree.</span>
+
 <span class="sd">    :return: An absolute path.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># There are three ways of determining a runfiles path:</span>
@@ -230,6 +232,7 @@
 <span class="sd">    exist.</span>
 
 <span class="sd">    :param relpath: The relative path within the site data tree.</span>
+
 <span class="sd">    :return: An absolute path.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># NOTE(cummins): This function has a matching implementation in the C++</span>
@@ -255,8 +258,9 @@
 <span class="sd">    No checks are to made to ensure that the path, or the containing directory,</span>
 <span class="sd">    exist.</span>
 
-<span class="sd">    :param relpath: The relative path within the cache tree. :return: An</span>
-<span class="sd">    absolute path.</span>
+<span class="sd">    :param relpath: The relative path within the cache tree.</span>
+
+<span class="sd">    :return: An absolute path.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">forced</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;COMPILER_GYM_CACHE&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">forced</span><span class="p">:</span>
@@ -280,8 +284,9 @@
 <span class="sd">    No checks are to made to ensure that the path, or the containing directory,</span>
 <span class="sd">    exist.</span>
 
-<span class="sd">    :param relpath: The relative path within the cache tree. :return: An</span>
-<span class="sd">    absolute path.</span>
+<span class="sd">    :param relpath: The relative path within the cache tree.</span>
+
+<span class="sd">    :return: An absolute path.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="n">forced</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;COMPILER_GYM_TRANSIENT_CACHE&quot;</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">forced</span><span class="p">:</span>

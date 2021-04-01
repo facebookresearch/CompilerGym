@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Contributing &mdash; CompilerGym 0.1.6 documentation</title>
+  <title>Contributing &mdash; CompilerGym 0.1.7 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.6
+                0.1.7
               </div>
             
           
@@ -97,8 +97,8 @@
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Contributing</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#pull-requests">Pull Requests</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#code-style">Code Style</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#leaderboard-submissions">Leaderboard Submissions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#code-style">Code Style</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#contributor-license-agreement-cla">Contributor License Agreement (“CLA”)</a></li>
 </ul>
 </li>
@@ -111,6 +111,7 @@
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/datasets.html">compiler_gym.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/envs.html">compiler_gym.envs</a></li>
 <li class="toctree-l1"><a class="reference internal" href="llvm/api.html">compiler_gym.envs.llvm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/views.html">compiler_gym.views</a></li>
@@ -226,6 +227,26 @@ to set up your environment.</p></li>
 (“CLA”).</p></li>
 </ol>
 </div>
+<div class="section" id="leaderboard-submissions">
+<h2>Leaderboard Submissions<a class="headerlink" href="#leaderboard-submissions" title="Permalink to this headline">¶</a></h2>
+<p>To add a new result to the leaderboard, add a new entry to the
+leaderboard table and file a <a class="reference external" href="#pull-requests">Pull Request</a>. Please
+include:</p>
+<ol class="arabic simple">
+<li><p>A list of all authors.</p></li>
+<li><p>A CSV file of your results. The
+<a class="reference external" href="https://facebookresearch.github.io/CompilerGym/compiler_gym/leaderboard.html">compiler_gym.leaderboard</a>
+package provides utilities to help generate results using your agent.</p></li>
+<li><p>A write-up of your approach. You may use the <a class="reference external" href="/leaderboard/SUBMISSION_TEMPLATE.md">submission
+template</a> as a guide.</p></li>
+</ol>
+<p>We do not require that you submit the source code for your approach.
+Once you submit your pull request we will validate your results CSV
+files and may ask clarifying questions if we feel that those would be
+useful to improve reproducibility. Please <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/117">take a look
+here</a> for
+an example of a well-formed pull request submission.</p>
+</div>
 <div class="section" id="code-style">
 <h2>Code Style<a class="headerlink" href="#code-style" title="Permalink to this headline">¶</a></h2>
 <p>We want to ease the burden of code formatting using tools. Our code
@@ -249,21 +270,6 @@ pre-commit to ensure the code is correctly formatted.</p>
 <li><p>Prefer easy-to-use code over easy-to-read, and easy-to-read code over
 easy-to-write.</p></li>
 </ul>
-</div>
-<div class="section" id="leaderboard-submissions">
-<h2>Leaderboard Submissions<a class="headerlink" href="#leaderboard-submissions" title="Permalink to this headline">¶</a></h2>
-<p>To add a new result to the leaderboard, add a new entry to the
-leaderboard table and file a <a class="reference external" href="#pull-requests">Pull Request</a>. Please
-include:</p>
-<ol class="arabic simple">
-<li><p>A list of all authors.</p></li>
-<li><p>A CSV file of your results.</p></li>
-<li><p>A write-up of your approach. You may use the <a class="reference external" href="/leaderboard/SUBMISSION_TEMPLATE.md">submission
-template</a> as a guide.</p></li>
-</ol>
-<p>Please <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/127">take a look
-here</a> for
-an example of a well-formed pull request submission.</p>
 </div>
 <div class="section" id="contributor-license-agreement-cla">
 <h2>Contributor License Agreement (“CLA”)<a class="headerlink" href="#contributor-license-agreement-cla" title="Permalink to this headline">¶</a></h2>
