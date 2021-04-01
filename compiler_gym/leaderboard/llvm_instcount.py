@@ -274,6 +274,8 @@ def eval_llvm_instcount_policy(policy: Policy) -> None:
             # evaluate.
             env.require_dataset(FLAGS.test_dataset)
             benchmarks = sorted([b for b in env.benchmarks if FLAGS.test_dataset in b])
+            # Temporarily remove ghostScript
+            benchmarks.remove("cBench-v1/ghostscript")
             if FLAGS.max_benchmarks:
                 benchmarks = benchmarks[: FLAGS.max_benchmarks]
 
