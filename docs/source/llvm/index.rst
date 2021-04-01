@@ -62,6 +62,18 @@ tool, or programatically using
     >>> env = gym.make("llvm-v0")
     >>> env.require_datasets(["tensorflow-v0", "npb-v0"])
 
+We characterize the datasets below in radial plots which show, clockwise from
+the top: the average number of instructions per benchmark, the density of
+branching instructions, the density of arithmetic instructions, and the density
+of memory operations. For example, comparing blas-v0 and cBench-v1 shows that
+blas-v0 consists of smaller programs with a similar density of branches, a
+higher density of arithmetic operations and relatively few memory operations.
+cBench-v1, in contrast to the small linear algebra kernels of blas-v0, contains
+larger programs with a higher density of memory operations and fewer arithmetic
+operations.
+
+.. image:: /_static/img/datasets.png
+
 
 Observation Spaces
 ------------------
@@ -123,6 +135,157 @@ Use the :code:`InstCount` observation space to access the feature vectors as an
 and :code:`InstCountDict` to receive them as a self-documented dictionary, keyed
 by the name of each feature.
 
+The table below provides a description of each of the 70 features, with the
+index in which they appear in the :code:`InstCount` and :code:`InstCountNorm`
+spaces, and their name as they appear in the keys of the :code:`InstCountDict`
+and :code:`InstCountNormDict` spaces. See the `LLVM instruction reference
+<https://llvm.org/docs/LangRef.html#instruction-reference>`_ for the meaning of
+the counted instructions.
+
++-------+---------------------+---------------------------------+
+| Index | Name                | Description                     |
++=======+=====================+=================================+
+| 0     | TotalInsts          | Total instruction count         |
++-------+---------------------+---------------------------------+
+| 1     | TotalBlocks         | Basic block count               |
++-------+---------------------+---------------------------------+
+| 2     | TotalFuncs          | Function count                  |
++-------+---------------------+---------------------------------+
+| 3     | Ret                 | Ret instruction count           |
++-------+---------------------+---------------------------------+
+| 4     | Br                  | Br instruction count            |
++-------+---------------------+---------------------------------+
+| 5     | Switch              | Switch instruction count        |
++-------+---------------------+---------------------------------+
+| 6     | IndirectBr          | IndirectBr instruction count    |
++-------+---------------------+---------------------------------+
+| 7     | Invoke              | Invoke instruction count        |
++-------+---------------------+---------------------------------+
+| 8     | Resume              | Resume instruction count        |
++-------+---------------------+---------------------------------+
+| 9     | Unreachable         | Unreachable instruction count   |
++-------+---------------------+---------------------------------+
+| 10    | CleanupRet          | CleanupRet instruction count    |
++-------+---------------------+---------------------------------+
+| 11    | CatchRet            | CatchRet instruction count      |
++-------+---------------------+---------------------------------+
+| 12    | CatchSwitch         | CatchSwitch instruction count   |
++-------+---------------------+---------------------------------+
+| 13    | CallBr              | CallBr instruction count        |
++-------+---------------------+---------------------------------+
+| 14    | FNeg                | FNeg instruction count          |
++-------+---------------------+---------------------------------+
+| 15    | Add                 | Add instruction count           |
++-------+---------------------+---------------------------------+
+| 16    | FAdd                | FAdd instruction count          |
++-------+---------------------+---------------------------------+
+| 17    | Sub                 | Sub instruction count           |
++-------+---------------------+---------------------------------+
+| 18    | FSub                | FSub instruction count          |
++-------+---------------------+---------------------------------+
+| 19    | Mul                 | Mul instruction count           |
++-------+---------------------+---------------------------------+
+| 20    | FMul                | FMul instruction count          |
++-------+---------------------+---------------------------------+
+| 21    | UDiv                | UDiv instruction count          |
++-------+---------------------+---------------------------------+
+| 22    | SDiv                | SDiv instruction count          |
++-------+---------------------+---------------------------------+
+| 23    | FDiv                | FDiv instruction count          |
++-------+---------------------+---------------------------------+
+| 24    | URem                | URem instruction count          |
++-------+---------------------+---------------------------------+
+| 25    | SRem                | SRem instruction count          |
++-------+---------------------+---------------------------------+
+| 26    | FRem                | FRem instruction count          |
++-------+---------------------+---------------------------------+
+| 27    | Shl                 | Shl instruction count           |
++-------+---------------------+---------------------------------+
+| 28    | LShr                | LShr instruction count          |
++-------+---------------------+---------------------------------+
+| 29    | AShr                | AShr instruction count          |
++-------+---------------------+---------------------------------+
+| 30    | And                 | And instruction count           |
++-------+---------------------+---------------------------------+
+| 31    | Or                  | Or instruction count            |
++-------+---------------------+---------------------------------+
+| 32    | Xor                 | Xor instruction count           |
++-------+---------------------+---------------------------------+
+| 33    | Alloca              | Alloca instruction count        |
++-------+---------------------+---------------------------------+
+| 34    | Load                | Load instruction count          |
++-------+---------------------+---------------------------------+
+| 35    | Store               | Store instruction count         |
++-------+---------------------+---------------------------------+
+| 36    | GetElementPtr       | GetElementPtr instruction count |
++-------+---------------------+---------------------------------+
+| 37    | Fence               | Fence instruction count         |
++-------+---------------------+---------------------------------+
+| 38    | AtomicCmpXchg       | AtomicCmpXchg instruction count |
++-------+---------------------+---------------------------------+
+| 39    | AtomicRMW           | AtomicRMW instruction count     |
++-------+---------------------+---------------------------------+
+| 40    | Trunc               | Trunc instruction count         |
++-------+---------------------+---------------------------------+
+| 41    | ZExt                | ZExt instruction count          |
++-------+---------------------+---------------------------------+
+| 42    | SExt                | SExt instruction count          |
++-------+---------------------+---------------------------------+
+| 43    | FPToUI              | FPToUI instruction count        |
++-------+---------------------+---------------------------------+
+| 44    | FPToSI              | FPToSI instruction count        |
++-------+---------------------+---------------------------------+
+| 45    | UIToFP              | UIToFP instruction count        |
++-------+---------------------+---------------------------------+
+| 46    | SIToFP              | SIToFP instruction count        |
++-------+---------------------+---------------------------------+
+| 47    | FPTrunc             | FPTrunc instruction count       |
++-------+---------------------+---------------------------------+
+| 48    | FPExt               | FPExt instruction count         |
++-------+---------------------+---------------------------------+
+| 49    | PtrToInt            | PtrToInt instruction count      |
++-------+---------------------+---------------------------------+
+| 50    | IntToPtr            | IntToPtr instruction count      |
++-------+---------------------+---------------------------------+
+| 51    | BitCast             | BitCast instruction count       |
++-------+---------------------+---------------------------------+
+| 52    | AddrSpaceCast       | AddrSpaceCast instruction count |
++-------+---------------------+---------------------------------+
+| 53    | CleanupPad          | CleanupPad instruction count    |
++-------+---------------------+---------------------------------+
+| 54    | CatchPad            | CatchPad instruction count      |
++-------+---------------------+---------------------------------+
+| 55    | ICmp                | ICmp instruction count          |
++-------+---------------------+---------------------------------+
+| 56    | FCmp                | FCmp instruction count          |
++-------+---------------------+---------------------------------+
+| 57    | PHI                 | PHI instruction count           |
++-------+---------------------+---------------------------------+
+| 58    | Call                | Call instruction count          |
++-------+---------------------+---------------------------------+
+| 59    | Select              | Select instruction count        |
++-------+---------------------+---------------------------------+
+| 60    | UserOp1             | UserOp1 instruction count       |
++-------+---------------------+---------------------------------+
+| 61    | UserOp2             | UserOp2 instruction count       |
++-------+---------------------+---------------------------------+
+| 62    | VAArg               | VAArg instruction count         |
++-------+---------------------+---------------------------------+
+| 63    | ExtractElement      | ExtractElement instruction count|
++-------+---------------------+---------------------------------+
+| 64    | InsertElement       | InsertElement instruction count |
++-------+---------------------+---------------------------------+
+| 65    | ShuffleVector       | ShuffleVector instruction count |
++-------+---------------------+---------------------------------+
+| 66    | ExtractValue        | ExtractValue instruction count  |
++-------+---------------------+---------------------------------+
+| 67    | InsertValue         | InsertValue instruction count   |
++-------+---------------------+---------------------------------+
+| 68    | LandingPad          | LandingPad instruction count    |
++-------+---------------------+---------------------------------+
+| 69    | Freeze              | Freeze instruction count        |
++-------+---------------------+---------------------------------+
+
 Example values:
 
     >>> env.observation["InstCount"]
@@ -158,8 +321,10 @@ Example values:
     'ExtractValueCount': 0, 'InsertValueCount': 0, 'LandingPadCount': 0,
     'FreezeCount': 0}
 
-The derived :code:`InstCountNorm` space returns the instruction counts
-normalized to the total number of instructions:
+The derived spaces :code:`InstCountNorm` and :code:`InstCountNormDict` return
+the instruction counts normalized to the total number of instructions (index 0
+in the table above). The first feature is omitted, yield a 69-dimensionality
+feature vector:
 
     >>> env.observation["InstCountNorm"]
     array([1.1566034e-01, 9.3427347e-03, 9.1384007e-03, 1.0248450e-01,
@@ -182,9 +347,6 @@ normalized to the total number of instructions:
         0.0000000e+00], dtype=float32)
     >>> math.isclose(env.observation["InstCountNorm"][2:].sum(), 1)
     True
-
-The corresponding :code:`InstCountNormDict` space returns these values as a
-dictionary of named features.
 
 The InstCount observation space and its derivatives are cheap to compute,
 deterministic, and platform independent.
@@ -214,6 +376,126 @@ Use the :code:`Autophase` observation space to access the feature vectors as an
 and :code:`AutophaseDict` to receive them as a self-documented dictionary, keyed
 by the name of each feature.
 
+The table below provides a description of each of the 56 features, with the
+index in which they appear in the :code:`Autophase` vector, and their name as
+they appear in the keys of the :code:`AutophaseDict` dictionary.
+
++-------+----------------------+------------------------------------------------------------+
+| Index | Name                 | Description                                                |
++=======+======================+============================================================+
+|     0 | BBNumArgsHi          | Number of BB where total args for phi nodes is gt 5        |
++-------+----------------------+------------------------------------------------------------+
+|     1 | BBNumArgsLo          | Number of BB where total args for phi nodes is [1, 5]      |
++-------+----------------------+------------------------------------------------------------+
+|     2 | onePred              | Number of basic blocks with 1 predecessor                  |
++-------+----------------------+------------------------------------------------------------+
+|     3 | onePredOneSuc        | Number of basic blocks with 1 predecessor and 1 successor  |
++-------+----------------------+------------------------------------------------------------+
+|     4 | onePredTwoSuc        | Number of basic blocks with 1 predecessor and 2 successors |
++-------+----------------------+------------------------------------------------------------+
+|     5 | oneSuccessor         | Number of basic blocks with 1 successor                    |
++-------+----------------------+------------------------------------------------------------+
+|     6 | twoPred              | Number of basic blocks with 2 predecessors                 |
++-------+----------------------+------------------------------------------------------------+
+|     7 | twoPredOneSuc        | Number of basic blocks with 2 predecessors and 1 successor |
++-------+----------------------+------------------------------------------------------------+
+|     8 | twoEach              | Number of basic blocks with 2 predecessors and successors  |
++-------+----------------------+------------------------------------------------------------+
+|     9 | twoSuccessor         | Number of basic blocks with 2 successors                   |
++-------+----------------------+------------------------------------------------------------+
+|    10 | morePreds            | Number of basic blocks with gt. 2 predecessors             |
++-------+----------------------+------------------------------------------------------------+
+|    11 | BB03Phi              | Number of basic blocks with Phi node count in range (0, 3] |
++-------+----------------------+------------------------------------------------------------+
+|    12 | BBHiPhi              | Number of basic blocks with more than 3 Phi nodes          |
++-------+----------------------+------------------------------------------------------------+
+|    13 | BBNoPhi              | Number of basic blocks with no Phi nodes                   |
++-------+----------------------+------------------------------------------------------------+
+|    14 | BeginPhi             | Number of Phi-nodes at beginning of BB                     |
++-------+----------------------+------------------------------------------------------------+
+|    15 | BranchCount          | Number of branches                                         |
++-------+----------------------+------------------------------------------------------------+
+|    16 | returnInt            | Number of calls that return an int                         |
++-------+----------------------+------------------------------------------------------------+
+|    17 | CriticalCount        | Number of critical edges                                   |
++-------+----------------------+------------------------------------------------------------+
+|    18 | NumEdges             | Number of edges                                            |
++-------+----------------------+------------------------------------------------------------+
+|    19 | const32Bit           | Number of occurrences of 32-bit integer constants          |
++-------+----------------------+------------------------------------------------------------+
+|    20 | const64Bit           | Number of occurrences of 64-bit integer constants          |
++-------+----------------------+------------------------------------------------------------+
+|    21 | numConstZeroes       | Number of occurrences of constant 0                        |
++-------+----------------------+------------------------------------------------------------+
+|    22 | numConstOnes         | Number of occurrences of constant 1                        |
++-------+----------------------+------------------------------------------------------------+
+|    23 | UncondBranches       | Number of unconditional branches                           |
++-------+----------------------+------------------------------------------------------------+
+|    24 | binaryConstArg       | Binary operations with a constant operand                  |
++-------+----------------------+------------------------------------------------------------+
+|    25 | NumAShrInst          | Number of AShr instructions                                |
++-------+----------------------+------------------------------------------------------------+
+|    26 | NumAddInst           | Number of Add instructions                                 |
++-------+----------------------+------------------------------------------------------------+
+|    27 | NumAllocaInst        | Number of Alloca instructions                              |
++-------+----------------------+------------------------------------------------------------+
+|    28 | NumAndInst           | Number of And instructions                                 |
++-------+----------------------+------------------------------------------------------------+
+|    29 | BlockMid             | Number of basic blocks with instructions between [15, 500] |
++-------+----------------------+------------------------------------------------------------+
+|    30 | BlockLow             | Number of basic blocks with less than 15 instructions      |
++-------+----------------------+------------------------------------------------------------+
+|    31 | NumBitCastInst       | Number of BitCast instructions                             |
++-------+----------------------+------------------------------------------------------------+
+|    32 | NumBrInst            | Number of Br instructions                                  |
++-------+----------------------+------------------------------------------------------------+
+|    33 | NumCallInst          | Number of Call instructions                                |
++-------+----------------------+------------------------------------------------------------+
+|    34 | NumGetElementPtrInst | Number of GetElementPtr instructions                       |
++-------+----------------------+------------------------------------------------------------+
+|    35 | NumICmpInst          | Number of ICmp instructions                                |
++-------+----------------------+------------------------------------------------------------+
+|    36 | NumLShrInst          | Number of LShr instructions                                |
++-------+----------------------+------------------------------------------------------------+
+|    37 | NumLoadInst          | Number of Load instructions                                |
++-------+----------------------+------------------------------------------------------------+
+|    38 | NumMulInst           | Number of Mul instructions                                 |
++-------+----------------------+------------------------------------------------------------+
+|    39 | NumOrInst            | Number of Or instructions                                  |
++-------+----------------------+------------------------------------------------------------+
+|    40 | NumPHIInst           | Number of PHI instructions                                 |
++-------+----------------------+------------------------------------------------------------+
+|    41 | NumRetInst           | Number of Ret instructions                                 |
++-------+----------------------+------------------------------------------------------------+
+|    42 | NumSExtInst          | Number of SExt instructions                                |
++-------+----------------------+------------------------------------------------------------+
+|    43 | NumSelectInst        | Number of Select instructions                              |
++-------+----------------------+------------------------------------------------------------+
+|    44 | NumShlInst           | Number of Shl instructions                                 |
++-------+----------------------+------------------------------------------------------------+
+|    45 | NumStoreInst         | Number of Store instructions                               |
++-------+----------------------+------------------------------------------------------------+
+|    46 | NumSubInst           | Number of Sub instructions                                 |
++-------+----------------------+------------------------------------------------------------+
+|    47 | NumTruncInst         | Number of Trunc instructions                               |
++-------+----------------------+------------------------------------------------------------+
+|    48 | NumXorInst           | Number of Xor instructions                                 |
++-------+----------------------+------------------------------------------------------------+
+|    49 | NumZExtInst          | Number of ZExt instructions                                |
++-------+----------------------+------------------------------------------------------------+
+|    50 | TotalBlocks          | Number of basic blocks                                     |
++-------+----------------------+------------------------------------------------------------+
+|    51 | TotalInsts           | Number of instructions (of all types)                      |
++-------+----------------------+------------------------------------------------------------+
+|    52 | TotalMemInst         | Number of memory instructions                              |
++-------+----------------------+------------------------------------------------------------+
+|    53 | TotalFuncs           | Number of non-external functions                           |
++-------+----------------------+------------------------------------------------------------+
+|    54 | ArgsPhi              | Total arguments to Phi nodes                               |
++-------+----------------------+------------------------------------------------------------+
+|    55 | testUnary            | Number of Unary operations                                 |
++-------+----------------------+------------------------------------------------------------+
+
 Example values:
 
 
@@ -234,6 +516,7 @@ Example values:
      'UncondBranches': 26, 'binaryConstArg': 193, 'NumAShrInst': 0,
      'NumAddInst': 59, 'NumAllocaInst': 6, 'NumAndInst': 0, 'BlockMid': 3,
      'BlockLow': 32, 'NumBitCastInst': 0, 'NumBrInst': 36, 'NumCallInst': 10, ... }
+
 
 Inst2vec
 ~~~~~~~~
@@ -322,6 +605,21 @@ ProGraML is described in:
     `ProGraML: Graph-based Deep Learning for Program Optimization and Analysis <https://arxiv.org/pdf/2003.10536.pdf>`_.
     arXiv preprint arXiv:2003.10536.
 
+Each node in the graph represents an instruction, a variable, or a constant. A
+text attribute on each node can be used to produce an initial node embedding.
+Each edge in the graph has a type and a position. There are three types of
+edges: call edges, data edges, and control edges. An edge position is a positive
+integer which encodes the operand order for data edges and the branch number for
+control edges. The diagram below visualizes the ProGraML graph for a small
+program.
+
+.. image:: /_static/img/programl.png
+
+In the above diagram, each blue rectangular node represents an instruction, the
+red diamonds are variables, the red ovals are constants, and the edges between
+the nodes represent relations: blue edges are control flow, red edges are data
+flow, and green edges are call flow.
+
 Example usage:
 
     >>> G = env.observation["Programl"]
@@ -347,6 +645,9 @@ Hardware Information
 Essential performance information about the host CPU can be accessed as JSON
 dictionary, extracted using the `cpuinfo <https://github.com/pytorch/cpuinfo>`_
 library.
+
+This observation space is used for obtaining information about the target
+hardware. The values are independent of the compiler and program state.
 
 Example usage:
 
