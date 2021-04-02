@@ -66,8 +66,10 @@ class Timer(object):
     def time(self) -> float:
         if self._elapsed:
             return self._elapsed
-        else:
+        elif self._start_time:
             return time() - self._start_time
+        else:
+            return 0
 
     @skip_log_prefix
     def __exit__(self, *args):
