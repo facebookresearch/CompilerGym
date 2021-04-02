@@ -70,7 +70,7 @@ import compiler_gym.util.flags.nproc  # noqa Flag definition.
 from compiler_gym.envs.compiler_env import CompilerEnvState
 from compiler_gym.util.flags.env_from_flags import env_from_flags
 from compiler_gym.util.shell_format import emph, plural
-from compiler_gym.util.statistics import geometric_mean
+from compiler_gym.util.statistics import arithmetic_mean, geometric_mean, stdev
 from compiler_gym.validate import ValidationResult, validate_states
 
 flags.DEFINE_boolean(
@@ -120,18 +120,6 @@ def to_string(result: ValidationResult, name_col_width: int) -> str:
         return f"✅  {name}"
     else:
         return f"✅  {name:<{name_col_width}}  {result.state.reward:9.4f}"
-
-
-def arithmetic_mean(values):
-    """Zero-length-safe arithmetic mean."""
-    if not values:
-        return 0
-    return sum(values) / len(values)
-
-
-def stdev(values):
-    """Zero-length-safe standard deviation."""
-    return np.std(values or [0])
 
 
 def read_states_from_paths(paths: Iterable[str]) -> Iterable[CompilerEnvState]:
