@@ -1,6 +1,5 @@
 -r compiler_gym/requirements.txt
 -r docs/requirements.txt
 -r examples/requirements.txt
--r leaderboard/requirements.txt
 -r requirements_pre_commit.txt
 -r tests/requirements.txt

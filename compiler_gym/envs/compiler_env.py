@@ -716,7 +716,8 @@ class CompilerEnv(gym.Env):
         except (ServiceError, ServiceTransportError, TimeoutError) as e:
             # Abort and retry on error.
             self.logger.warning("%s on reset(): %s", type(e).__name__, e)
-            self.service.close()
+            if self.service:
+                self.service.close()
             self.service = None
 
             if retry_count >= self._connection_settings.init_max_attempts:
