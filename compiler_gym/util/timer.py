@@ -55,9 +55,12 @@ class Timer(object):
         self.label = label
         self.print_fn = print_fn
 
-    def __enter__(self):
+    def reset(self) -> "Timer":
         self._start_time = time()
         return self
+
+    def __enter__(self) -> "Timer":
+        return self.reset()
 
     @property
     def time(self) -> float:
