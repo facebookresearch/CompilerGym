@@ -27,36 +27,24 @@ Users who wish to create a submission for this leaderboard may use
 <compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy>` to
 automatically evaluate their agent on the test set.
 """
-import platform
 import sys
-from collections import Counter
 from pathlib import Path
 from threading import Thread
 from time import sleep
 from typing import Callable, Iterable
 
-import GPUtil
 import gym
 import humanize
-import psutil
 from absl import app, flags
-from cpuinfo import get_cpu_info
-from tqdm import tqdm
 
 import compiler_gym.envs  # noqa Register environments.
 from compiler_gym.bin.validate import main as validate
 from compiler_gym.compiler_env_state import CompilerEnvState
 from compiler_gym.envs import LlvmEnv
-from compiler_gym.util.tabulate import tabulate
 from compiler_gym.util.timer import Timer
 
 flags.DEFINE_string(
     "results_logfile", "results.csv", "The path of the file to write results to."
-)
-flags.DEFINE_string(
-    "hardware_info",
-    "hardware.txt",
-    "The path of the file to write a hardware summary to.",
 )
 flags.DEFINE_integer(
     "max_benchmarks",
@@ -83,53 +71,6 @@ FLAGS = flags.FLAGS
 Policy = Callable[[LlvmEnv], None]
 
 
-def _get_gpus() -> Iterable[str]:
-    """Return GPU info strings."""
-    gpus = GPUtil.getGPUs()
-    if gpus:
-        yield from (gpu.name for gpu in gpus)
-    else:
-        yield "None"
-
-
-def _get_cpu() -> str:
-    """Return CPU info string."""
-    cpuinfo = get_cpu_info()
-    brand = cpuinfo["brand_raw"].replace("(R)", "")
-    return f"{brand} ({cpuinfo['count']}x core)"
-
-
-def _get_memory() -> str:
-    """Return system memory info string."""
-    return humanize.naturalsize(psutil.virtual_memory().total, binary=True)
-
-
-def _get_os() -> str:
-    """Return operating system name as a string."""
-    return platform.platform()
-
-
-def _summarize_duplicates(iterable: Iterable[str]) -> Iterable[str]:
-    """Aggregate duplicates in a list of strings."""
-    freq = sorted(Counter(iterable).items(), key=lambda x: -x[1])
-    for gpu, count in freq:
-        if count > 1:
-            yield f"{count}x {gpu}"
-        else:
-            yield gpu
-
-
-def _get_hardarwe_info() -> str:
-    """Print a summary of system hardware to file."""
-    return tabulate(
-        [
-            ("OS", _get_os()),
-            ("CPU", _get_cpu()),
-            ("Memory", _get_memory()),
-            ("GPU", ", ".join(_summarize_duplicates(_get_gpus()))),
-        ],
-        headers=("", "Hardware Specification"),
-    )
 
 
 class _BenchmarkRunner(Thread):
@@ -259,14 +200,6 @@ def eval_llvm_instcount_policy(policy: Policy) -> None:
     def main(argv):
         assert len(argv) == 1, f"Unknown args: {argv[:1]}"
         assert FLAGS.n > 0, "n must be > 0"
-
-        print(
-            f"Writing inference results to '{FLAGS.results_logfile}' and "
-            f"hardware summary to '{FLAGS.hardware_info}'"
-        )
-
-        with open(FLAGS.hardware_info, "w") as f:
-            print(_get_hardarwe_info(), file=f)
 
         env = gym.make("llvm-ic-v0")
         try:
