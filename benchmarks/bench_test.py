@@ -7,14 +7,14 @@
 To run these benchmarks within bazel, compile with optimiztions and stream the
 test output:
 
-    $ bazel test -c opt --test_output=streamed //tests/benchmarks:bench_test
+    $ bazel test -c opt --test_output=streamed //benchamrks:bench_test
 
 A record of the benchmark results is stored in
 /tmp/compiler_gym/benchmarks/<device>/<run>_bench_test.json
 Compare multiple runs using:
 
     $ pytest-benchmark compare --group-by=name --sort=fullname \
-        /tests/benchmarks/*_bench_test.json
+        /tmp/compiler_gym/benchamrks/*_bench_test.json
 """
 # pylint: disable=redefined-outer-name
 import gym

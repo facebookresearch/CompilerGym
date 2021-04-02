@@ -2,13 +2,13 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""Smoke test for //tests/benchmarks:parallelization_load_test."""
+"""Smoke test for //benchamrks:parallelization_load_test."""
 from pathlib import Path
 
 from absl import flags
 
+from benchmarks.parallelization_load_test import main as load_test
 from compiler_gym.util.capture_output import capture_output
-from tests.benchmarks.parallelization_load_test import main as load_test
 from tests.pytest_plugins.common import skip_on_ci
 from tests.test_main import main
 
