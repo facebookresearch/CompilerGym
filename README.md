@@ -34,6 +34,7 @@ developers to expose new optimization problems for AI.
 
 - [Getting Started](#getting-started)
   - [Installation](#installation)
+    - [Building from Source](#building-from-source)
   - [Trying it out](#trying-it-out)
 - [Leaderboards](#leaderboards)
   - [LLVM Instruction Count](#llvm-instruction-count)
@@ -58,7 +59,7 @@ Install the latest CompilerGym release using:
 The binary works on macOS and Linux (on Ubuntu 18.04, Fedora 28, Debian 10 or
 newer equivalents).
 
-### Building from Source  <!-- omit in toc -->
+### Building from Source
 
 If you prefer, you may build from source. This requires a modern C++ toolchain
 and bazel.
@@ -151,9 +152,6 @@ tutorials, further details, and API reference.
 
 
 # Leaderboards
-
-🚧 **Under construction** 🚧 As of CompilerGym v0.1.6 we are not yet accepting
-submissions for these leaderboards. Please check back soon!
 
 These leaderboards track the performance of user-submitted algorithms for
 CompilerGym tasks. To submit a result please see

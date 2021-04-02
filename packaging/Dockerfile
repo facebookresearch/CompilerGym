@@ -23,7 +23,7 @@ RUN apt-get update \
 
 RUN curl -L "https://github.com/bazelbuild/bazelisk/releases/download/v1.6.1/bazelisk-linux-amd64" > bazel.tmp && mv bazel.tmp /usr/bin/bazel && chmod +x /usr/bin/bazel
 
-RUN python3 -m pip install 'setuptools==50.3.2' 'wheel==0.36.0'
+RUN python3 -m pip install --no-cache-dir 'setuptools==50.3.2' 'wheel==0.36.0'
 
 # Building grpc requires python 2.
 # Known issue: https://github.com/grpc/grpc/pull/24407
