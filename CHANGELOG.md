@@ -1,3 +1,29 @@
+## Release 0.1.7 (2021-04-01)
+
+This release introduces [public
+leaderboards](https://github.com/facebookresearch/CompilerGym#leaderboards) to
+track the performance of user-submitted algorithms on compiler optimization
+tasks.
+
+- Added a new `compiler_gym.leaderboard` package which contains utilities for
+  preparing leaderboard submissions
+  [(#161)](https://github.com/facebookresearch/CompilerGym/pull/161).
+- Added a LLVM instruction count leaderboard and seeded it with a random search
+  baseline [(#117)](https://github.com/facebookresearch/CompilerGym/pull/117).
+- Added support for Python 3.9, extending the set of supported python versions to
+  3.6, 3.7, 3.8, and 3.9
+  [(#160)](https://github.com/facebookresearch/CompilerGym/pull/160).
+- [llvm] Added a new `InstCount` observation space that contains the counts of
+  each type of instruction
+  [(#159)](https://github.com/facebookresearch/CompilerGym/pull/159).
+
+**Build dependencies update notice:** If you are building from source and
+upgrading from an older version of CompilerGym, your build environment will need
+to be updated. The easiest way to do that is to remove your existing conda
+environment using `conda remove --name compiler_gym --all` and to repeat the
+steps in [building from
+source](https://github.com/facebookresearch/CompilerGym#building-from-source).
+
 ## Release 0.1.6 (2021-03-22)
 
 This release focuses on hardening the LLVM environments, providing improved

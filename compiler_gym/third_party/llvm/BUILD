@@ -12,6 +12,33 @@ py_library(
     ],
 )
 
+py_library(
+    name = "instcount",
+    srcs = ["instcount.py"],
+    visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "InstCount",
+    srcs = ["InstCount.cc"],
+    hdrs = ["InstCount.h"],
+    copts = [
+        "-DGOOGLE_PROTOBUF_NO_RTTI",
+        "-fno-rtti",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@glog",
+        "@llvm//10.0.0",
+    ],
+)
+
+cc_binary(
+    name = "PrintInstCountFeatureNames",
+    srcs = ["PrintInstCountFeatureNames.cc"],
+    deps = [":InstCount"],
+)
+
 # The following targets define the rules for how to assemble and compress the
 # tarball of LLVM data that is downloaded at runtime by the ":llvm" library.
 # It is commented out to prevent globs like "bazel test //..." from running

@@ -97,8 +97,10 @@ py_test(
     name = "version_test",
     timeout = "short",
     srcs = ["version_test.py"],
+    data = ["//:VERSION"],
     deps = [
         ":test_main",
         "//compiler_gym",
+        "//tests/pytest_plugins:common",
     ],
 )

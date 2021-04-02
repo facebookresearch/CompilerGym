@@ -21,7 +21,8 @@ def runfiles_path(relpath: str) -> Path:
     Use environment variable COMPILER_GYM_RUNFILES=/path/to/runfiles if running
     outside of bazel.
 
-    :param relpath: The relative path within the runfiles tres.
+    :param relpath: The relative path within the runfiles tree.
+
     :return: An absolute path.
     """
     # There are three ways of determining a runfiles path:
@@ -58,6 +59,7 @@ def site_data_path(relpath: str) -> Path:
     exist.
 
     :param relpath: The relative path within the site data tree.
+
     :return: An absolute path.
     """
     # NOTE(cummins): This function has a matching implementation in the C++
@@ -83,8 +85,9 @@ def cache_path(relpath: str) -> Path:
     No checks are to made to ensure that the path, or the containing directory,
     exist.
 
-    :param relpath: The relative path within the cache tree. :return: An
-    absolute path.
+    :param relpath: The relative path within the cache tree.
+
+    :return: An absolute path.
     """
     forced = os.environ.get("COMPILER_GYM_CACHE")
     if forced:
@@ -108,8 +111,9 @@ def transient_cache_path(relpath: str) -> Path:
     No checks are to made to ensure that the path, or the containing directory,
     exist.
 
-    :param relpath: The relative path within the cache tree. :return: An
-    absolute path.
+    :param relpath: The relative path within the cache tree.
+
+    :return: An absolute path.
     """
     forced = os.environ.get("COMPILER_GYM_TRANSIENT_CACHE")
     if forced:

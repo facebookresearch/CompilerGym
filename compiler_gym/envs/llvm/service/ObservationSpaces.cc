@@ -8,6 +8,7 @@
 
 #include <magic_enum.hpp>
 
+#include "compiler_gym/third_party/llvm/InstCount.h"
 #include "compiler_gym/util/EnumUtil.h"
 #include "nlohmann/json.hpp"
 #include "programl/graph/format/node_link_graph.h"
@@ -45,6 +46,19 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
         // deterministic.
         space.set_deterministic(false);
         space.set_platform_dependent(false);
+        break;
+      }
+      case LlvmObservationSpace::INST_COUNT: {
+        ScalarRange featureSize;
+        featureSize.mutable_min()->set_value(0);
+        std::vector<ScalarRange> featureSizes(kInstCountFeatureDimensionality, featureSize);
+        *space.mutable_int64_range_list()->mutable_range() = {featureSizes.begin(),
+                                                              featureSizes.end()};
+        space.set_deterministic(true);
+        space.set_platform_dependent(false);
+        std::vector<int64_t> defaultValue(kInstCountFeatureDimensionality, 0);
+        *space.mutable_default_value()->mutable_int64_list()->mutable_value() = {
+            defaultValue.begin(), defaultValue.end()};
         break;
       }
       case LlvmObservationSpace::AUTOPHASE: {

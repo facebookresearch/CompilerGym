@@ -10,6 +10,7 @@ from pathlib import Path
 from typing import Callable, Iterable, List, Optional, Union, cast
 
 import numpy as np
+from gym.spaces import Box
 from gym.spaces import Dict as DictSpace
 
 from compiler_gym.envs.compiler_env import CompilerEnv
@@ -27,6 +28,7 @@ from compiler_gym.spaces import Commandline, CommandlineFlag, Scalar, Sequence
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_NAMES
 from compiler_gym.third_party.inst2vec import Inst2vecEncoder
 from compiler_gym.third_party.llvm import download_llvm_files
+from compiler_gym.third_party.llvm.instcount import INST_COUNT_FEATURE_NAMES
 from compiler_gym.util.runfiles_path import runfiles_path, site_data_path
 from compiler_gym.validation_result import ValidationError
 
@@ -215,6 +217,50 @@ class LlvmEnv(CompilerEnv):
             default_value=np.vstack(
                 [self.inst2vec.embeddings[self.inst2vec.vocab["!UNK"]]]
             ),
+        )
+
+        self.observation.add_derived_space(
+            id="InstCountDict",
+            base_id="InstCount",
+            space=DictSpace(
+                {
+                    f"{name}Count": Scalar(min=0, max=None, dtype=int)
+                    for name in INST_COUNT_FEATURE_NAMES
+                }
+            ),
+            translate=lambda base_observation: {
+                f"{name}Count": val
+                for name, val in zip(INST_COUNT_FEATURE_NAMES, base_observation)
+            },
+        )
+
+        self.observation.add_derived_space(
+            id="InstCountNorm",
+            base_id="InstCount",
+            space=Box(
+                low=0,
+                high=1,
+                shape=(len(INST_COUNT_FEATURE_NAMES) - 1,),
+                dtype=np.float32,
+            ),
+            translate=lambda base_observation: (
+                base_observation[1:] / max(base_observation[0], 1)
+            ).astype(np.float32),
+        )
+
+        self.observation.add_derived_space(
+            id="InstCountNormDict",
+            base_id="InstCountNorm",
+            space=DictSpace(
+                {
+                    f"{name}Density": Scalar(min=0, max=None, dtype=int)
+                    for name in INST_COUNT_FEATURE_NAMES[1:]
+                }
+            ),
+            translate=lambda base_observation: {
+                f"{name}Density": val
+                for name, val in zip(INST_COUNT_FEATURE_NAMES[1:], base_observation)
+            },
         )
 
         self.observation.add_derived_space(

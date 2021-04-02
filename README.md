@@ -32,19 +32,15 @@ developers to expose new optimization problems for AI.
 
 **Table of Contents**
 
-<!-- MarkdownTOC -->
-
 - [Getting Started](#getting-started)
   - [Installation](#installation)
     - [Building from Source](#building-from-source)
   - [Trying it out](#trying-it-out)
 - [Leaderboards](#leaderboards)
-  - [llvm-ic-v0](#llvm-ic-v0)
-    - [cBench-v1](#cBench-v1)
+  - [LLVM Instruction Count](#llvm-instruction-count)
 - [Contributing](#contributing)
 - [Citation](#citation)
 
-<!-- /MarkdownTOC -->
 
 # Getting Started
 
@@ -58,55 +54,82 @@ for an overview of the key concepts.
 
 Install the latest CompilerGym release using:
 
-    $ pip install compiler_gym
+    pip install -U compiler_gym
 
 The binary works on macOS and Linux (on Ubuntu 18.04, Fedora 28, Debian 10 or
 newer equivalents).
 
 ### Building from Source
 
-If you prefer, you may build from source. This requires a modern C++ toolchain.
-On macOS you can use the system compiler. On linux, install the required
-toolchain using:
+If you prefer, you may build from source. This requires a modern C++ toolchain
+and bazel.
 
-    $ sudo apt install clang libtinfo5 patchelf
-    $ export CC=clang
-    $ export CXX=clang++
+#### macOS  <!-- omit in toc -->
+
+On macOS the required dependencies can be installed using
+[homebrew](https://docs.brew.sh/Installation):
+
+```sh
+brew install bazelisk zlib
+export LDFLAGS="-L/usr/local/opt/zlib/lib"
+export CPPFLAGS="-I/usr/local/opt/zlib/include"
+export PKG_CONFIG_PATH="/usr/local/opt/zlib/lib/pkgconfig"
+```
+
+Now proceed to [All platforms](#all-platforms) below.
+
+#### Linux  <!-- omit in toc -->
+
+On debian-based linux systems, install the required toolchain using:
+
+```sh
+sudo apt install clang libtinfo5 libjpeg-dev patchelf
+wget https://github.com/bazelbuild/bazelisk/releases/download/v1.7.5/bazelisk-linux-amd64 -O bazel
+chmod +x bazel && mkdir -p ~/.local/bin && mv -v bazel ~/.local/bin
+export PATH="$HOME/.local/bin:$PATH"
+export CC=clang
+export CXX=clang++
+```
+
+#### All platforms  <!-- omit in toc -->
 
 We recommend using
 [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/)
 to manage the remaining build dependencies. First create a conda environment
 with the required dependencies:
 
-    $ conda create -n compiler_gym python=3.8 bazel=3.1.0 cmake pandoc
-    $ conda activate compiler_gym
+    conda create -n compiler_gym python=3.9 cmake pandoc
+    conda activate compiler_gym
 
 Then clone the CompilerGym source code using:
 
-    $ git clone https://github.com/facebookresearch/CompilerGym.git
-    $ cd CompilerGym
+    git clone https://github.com/facebookresearch/CompilerGym.git
+    cd CompilerGym
 
 Install the python development dependencies using:
 
-    $ make init
+    make init
 
-Then run the test suite to confirm that everything is working:
+The `make init` target only needs to be run once on initial setup, or when
+upgrading to a different CompilerGym release.
 
-    $ make test
+Run the test suite to confirm that everything is working:
 
-To build and install the python package, run:
+    make test
 
-    $ make install
+To build and install the `compiler_gym` python package, run:
 
-**NOTE:** To use the python code that is installed by `make install` you must
-leave the root directory of this repository. Attempting to import `compiler_gym`
-while in the root of this repository will cause import errors.
+    make install
+
+**NOTE:** To use the `compiler_gym` package that is installed by `make install`
+you must leave the root directory of this repository. Attempting to import
+`compiler_gym` while in the root of this repository will cause import errors.
 
 When you are finished, you can deactivate and delete the conda
 environment using:
 
-    $ conda deactivate
-    $ conda env remove -n compiler_gym
+    conda deactivate
+    conda env remove -n compiler_gym
 
 
 ## Trying it out
@@ -130,32 +153,33 @@ tutorials, further details, and API reference.
 
 # Leaderboards
 
-🚧 **Under construction** 🚧 As of CompilerGym v0.1.6 we are not yet accepting
-submissions for these leaderboards. Please check back soon!
-
 These leaderboards track the performance of user-submitted algorithms for
 CompilerGym tasks. To submit a result please see
 [this document](https://github.com/facebookresearch/CompilerGym/blob/development/CONTRIBUTING.md#leaderboard-submissions).
 
 
-## llvm-ic-v0
+## LLVM Instruction Count
 
-LLVM is a popular open source compiler used widely in industry and research.
-This environment exposes the optimization pipeline as a set of actions that can
-be applied to a particular program. The goal of the agent is to select the
-sequence of optimizations that lead to the greatest reduction in instruction
-count in the program being compiled. Reward is the reduction in codesize
-achieved scaled to the reduction achieved by LLVM's builtin `-Oz` pipeline.
-
-### cBench-v1
+LLVM is a popular open source compiler used widely in industry and research. The
+`llvm-ic-v0` environment exposes LLVM's optimizing passes as a set of actions
+that can be applied to a particular program. The goal of the agent is to select
+the sequence of optimizations that lead to the greatest reduction in instruction
+count in the program being compiled. Reward is the reduction in instruction
+count achieved scaled to the reduction achieved by LLVM's builtin `-Oz`
+pipeline.
 
 This leaderboard tracks the results achieved by algorithms on the `llvm-ic-v0`
 environment on the 23 benchmarks in the `cBench-v1` dataset.
 
 | Author | Algorithm | Links | Date | Walltime (mean) | Codesize Reduction (geomean) |
 | --- | --- | --- | --- | --- | --- |
-| Facebook | Greedy search | [write-up](leaderboard/llvm_codesize/e_greedy/README.md), [results](leaderboard/llvm_codesize/e_greedy/results_e0.csv) | 2021-03 | 169.237s | 1.055× |
-| Facebook | e-Greedy search (e=0.1) | [write-up](leaderboard/llvm_codesize/e_greedy/README.md), [results](leaderboard/llvm_codesize/e_greedy/results_e10.csv) | 2021-03 | 152.579s | 1.041× |
+| Facebook | Random search (t=10800) | [write-up](leaderboard/llvm_instcount/random_search/README.md), [results](leaderboard/llvm_instcount/random_search/results_p125_t10800.csv) | 2021-03 | 10,512.356s | **1.062×** |
+| Facebook | Random search (t=3600) | [write-up](leaderboard/llvm_instcount/random_search/README.md), [results](leaderboard/llvm_instcount/random_search/results_p125_t3600.csv) | 2021-03 | 3,630.821s | 1.061× |
+| Facebook | Greedy search | [write-up](leaderboard/llvm_instcount/e_greedy/README.md), [results](leaderboard/llvm_instcount/e_greedy/results_e0.csv) | 2021-03 | 169.237s | 1.055× |
+| Facebook | Random search (t=60) | [write-up](leaderboard/llvm_instcount/random_search/README.md), [results](leaderboard/llvm_instcount/random_search/results_p125_t60.csv) | 2021-03 | 91.215s | 1.045× |
+| Facebook | e-Greedy search (e=0.1) | [write-up](leaderboard/llvm_instcount/e_greedy/README.md), [results](leaderboard/llvm_instcount/e_greedy/results_e10.csv) | 2021-03 | 152.579s | 1.041× |
+| Facebook | Random search (t=10) | [write-up](leaderboard/llvm_instcount/random_search/README.md), [results](leaderboard/llvm_instcount/random_search/results_p125_t10.csv) | 2021-03 | **42.939s** | 1.031× |
+
 
 # Contributing
 
