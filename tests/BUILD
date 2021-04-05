@@ -42,6 +42,7 @@ py_library(
     testonly = 1,
     srcs = ["test_main.py"],
     visibility = [
+        "//benchmarks:__subpackages__",
         "//examples:__subpackages__",
         "//leaderboard:__subpackages__",
         "//tests:__subpackages__",
