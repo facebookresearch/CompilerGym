@@ -22,6 +22,10 @@
 <a href="https://tldrlegal.com/license/mit-license">
     <img src="https://img.shields.io/pypi/l/compiler-gym" alt="License" height="20">
 </a>
+<!-- Getting started colab -->
+<a href="https://colab.research.google.com/github/facebookresearch/CompilerGym/blob/stable/examples/getting-started.ipynb">
+    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Colab" height="20">
+</a>
 
 CompilerGym is a toolkit for exposing compiler optimization problems
 for reinforcement learning. It allows machine learning researchers to
