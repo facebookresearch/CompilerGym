@@ -28,7 +28,8 @@ using Bitcode = llvm::SmallString<0>;
 
 grpc::Status readBitcodeFile(const boost::filesystem::path& path, Bitcode* bitcode);
 
-// Returns nullptr on error and sets status.
+// Parses the given bitcode into a module and strips the identifying ModuleID
+// and source_filename attributes. Returns nullptr on error and sets status.
 std::unique_ptr<llvm::Module> makeModule(llvm::LLVMContext& context, const Bitcode& bitcode,
                                          const std::string& name, grpc::Status* status);
 
