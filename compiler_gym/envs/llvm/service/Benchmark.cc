@@ -83,7 +83,15 @@ std::unique_ptr<llvm::Module> makeModule(llvm::LLVMContext& context, const Bitco
       llvm::parseBitcodeFile(buffer, context);
   if (moduleOrError) {
     *status = Status::OK;
-    return std::move(moduleOrError.get());
+    std::unique_ptr<llvm::Module> module = std::move(moduleOrError.get());
+
+    // Strip the module identifiers and source file names from the module to
+    // anonymize them. This is to deter learning algorithms from overfitting to
+    // benchmarks by their name.
+    module->setModuleIdentifier("-");
+    module->setSourceFileName("-");
+
+    return module;
   } else {
     *status = Status(StatusCode::INVALID_ARGUMENT,
                      fmt::format("Failed to parse LLVM bitcode: \"{}\"", name));
