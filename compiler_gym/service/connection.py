@@ -390,7 +390,7 @@ class ManagedConnection(Connection):
             shutil.rmtree(self.working_dir)
             raise TimeoutError(
                 "Failed to connect to RPC service after "
-                f"{process_exit_max_seconds:.1f} seconds.{logs_message}"
+                f"{rpc_init_max_seconds:.1f} seconds.{logs_message}"
             )
 
         super().__init__(channel, url, logger)
