@@ -27,6 +27,7 @@ py_binary(
 
 py_test(
     name = "parallelization_load_test_test",
+    timeout = "moderate",
     srcs = ["parallelization_load_test_test.py"],
     deps = [
         ":parallelization_load_test",
