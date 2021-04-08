@@ -65,7 +65,6 @@ from typing import Iterable
 import numpy as np
 from absl import app, flags
 
-import compiler_gym.util.flags.dataset  # noqa Flag definition.
 import compiler_gym.util.flags.nproc  # noqa Flag definition.
 from compiler_gym.envs.compiler_env import CompilerEnvState
 from compiler_gym.util.flags.env_from_flags import env_from_flags
@@ -165,7 +164,6 @@ def main(argv):
         validation_results = validate_states(
             env_from_flags,
             states,
-            datasets=FLAGS.dataset,
             nproc=FLAGS.nproc,
             inorder=FLAGS.inorder,
         )

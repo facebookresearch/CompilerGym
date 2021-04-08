@@ -58,7 +58,6 @@ from pathlib import Path
 
 from absl import app, flags
 
-import compiler_gym.util.flags.ls_benchmark  # noqa Flag definition.
 import compiler_gym.util.flags.nproc  # noqa Flag definition.
 import compiler_gym.util.flags.output_dir  # noqa Flag definition.
 from compiler_gym.random_search import random_search
@@ -93,11 +92,6 @@ def main(argv):
     if len(argv) != 1:
         raise app.UsageError(f"Unknown command line arguments: {argv[1:]}")
 
-    if FLAGS.ls_benchmark:
-        env = env_from_flags()
-        print("\n".join(sorted(env.benchmarks)))
-        env.close()
-        return
     if FLAGS.ls_reward:
         env = env_from_flags()
         print("\n".join(sorted(env.reward.indices.keys())))
