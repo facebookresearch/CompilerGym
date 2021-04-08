@@ -86,14 +86,14 @@ Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& 
   const auto tmpFile = fs::unique_path(workingDirectory / "obj-%%%%");
 
 #ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
-  std::vector<std::string> clangCmd{clangPath.string(), "-xir", "-", "-o", tmpFile.string()};
+  std::vector<std::string> clangCmd{clangPath.string(), "-w", "-xir", "-", "-o", tmpFile.string()};
   clangCmd.insert(clangCmd.end(), clangArgs.begin(), clangArgs.end());
   auto clang =
       subprocess::Popen(clangCmd, subprocess::input{subprocess::PIPE},
                         subprocess::output{subprocess::PIPE}, subprocess::error{subprocess::PIPE});
 #else
   auto clang =
-      subprocess::Popen({clangPath.string(), "-xir", "-", "-o", tmpFile.string(), "-c"},
+      subprocess::Popen({clangPath.string(), "-w", "-xir", "-", "-o", tmpFile.string(), "-c"},
                         subprocess::input{subprocess::PIPE}, subprocess::output{subprocess::PIPE},
                         subprocess::error{subprocess::PIPE});
 #endif
