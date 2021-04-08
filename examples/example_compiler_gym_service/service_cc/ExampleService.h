@@ -74,8 +74,4 @@ class ExampleCompilationSession {
   ActionSpace actionSpace_;
 };
 
-// Helper functions to describe the available action/observation/reward spaces.
-std::vector<ActionSpace> getActionSpaces();
-std::vector<ObservationSpace> getObservationSpaces();
-
 }  // namespace compiler_gym::example_service

@@ -320,6 +320,12 @@ The 'tutorial' command will give a step by step guide."""
 
         self.set_prompt()
 
+    def __del__(self):
+        """Tidy up in case postloop() is not called."""
+        if self.env:
+            self.env.close()
+            self.env = None
+
     def do_tutorial(self, arg):
         """Print the turorial"""
         print(tutorial)

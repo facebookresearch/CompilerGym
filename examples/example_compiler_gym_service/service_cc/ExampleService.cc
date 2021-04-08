@@ -27,8 +27,6 @@ template <typename T>
   return Status::OK;
 }
 
-}  // namespace
-
 std::vector<std::string> getBenchmarks() { return {"foo", "bar"}; }
 
 std::vector<ActionSpace> getActionSpaces() {
@@ -68,6 +66,8 @@ std::vector<ObservationSpace> getObservationSpaces() {
 
   return {ir, features, runtime};
 }
+
+}  // namespace
 
 ExampleService::ExampleService(const fs::path& workingDirectory)
     : workingDirectory_(workingDirectory), nextSessionId_(0) {}

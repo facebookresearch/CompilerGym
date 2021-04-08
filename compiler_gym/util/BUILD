@@ -11,6 +11,7 @@ py_library(
         "__init__.py",
         "capture_output.py",
         "debug_util.py",
+        "decorators.py",
         "download.py",
         "logs.py",
         "minimize_trajectory.py",

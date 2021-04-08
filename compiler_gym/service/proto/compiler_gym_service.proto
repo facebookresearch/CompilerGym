@@ -42,7 +42,7 @@ service CompilerGymService {
   //
   // DEPRECATED(https://github.com/facebookresearch/CompilerGym/issues/45): The
   // GetBenchmarks() operation is deprecated as of CompilerGym v0.1.4 and will
-  // be removed in CompilerGym v0.1.5.
+  // be removed in CompilerGym v0.1.9.
   rpc GetBenchmarks(GetBenchmarksRequest) returns (GetBenchmarksReply);
   // Register a new benchmark.
   rpc AddBenchmark(AddBenchmarkRequest) returns (AddBenchmarkReply);
