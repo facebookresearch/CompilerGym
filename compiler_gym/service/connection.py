@@ -306,6 +306,12 @@ class ManagedConnection(Connection):
             # value to disable buffering of logging messages. This makes it
             # easier to `LOG(INFO) << "..."` debug things.
             cmd.append("--logbuflevel=-1")
+        else:
+            # Silence the gRPC logs as we will do our own error reporting, but
+            # don't override any existing value so that the user may debug the
+            # gRPC backend by setting GRPC_VERBOSITY to ERROR, INFO, or DEBUG.
+            if not os.environ.get("GRPC_VERBOSITY"):
+                os.environ["GRPC_VERBOSITY"] = "NONE"
 
         logger.debug("Exec %s", cmd)
         self.process = subprocess.Popen(
