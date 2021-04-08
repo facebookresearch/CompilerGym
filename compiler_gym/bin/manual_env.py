@@ -243,7 +243,6 @@ import sys
 
 from absl import app, flags
 
-import compiler_gym.util.flags.ls_benchmark  # noqa Flag definition.
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.flags.env_from_flags import env_from_flags
@@ -894,13 +893,6 @@ def main(argv):
     argv = FLAGS(argv)
     if len(argv) != 1:
         raise app.UsageError(f"Unknown command line arguments: {argv[1:]}")
-
-    if FLAGS.ls_benchmark:
-        benchmark = benchmark_from_flags()
-        env = env_from_flags(benchmark)
-        print("\n".join(sorted(env.benchmarks)))
-        env.close()
-        return
 
     with Timer("Initialized environment"):
         # FIXME Chris, I don't seem to actually get a benchmark
