@@ -117,6 +117,8 @@ def rollout(qtable, env, printout=False):
         a = select_action(qtable, observation, i)
         action_seq.append(a)
         observation, reward, done, info = env.step(env.action_space.flags.index(a))
+        if done:
+            break
         rewards.append(reward)
     if printout:
         print(
@@ -144,6 +146,8 @@ def train(q_table, env):
             # Effectively we are evaluating the policy by taking a step in the
             # environment.
             obs, reward, done, info = env.step(env.action_space.flags.index(a))
+            if done:
+                break
             current_length += 1
 
             # Compute the target value of the current state, by using the current
@@ -166,7 +170,7 @@ def train(q_table, env):
                 + (1 - FLAGS.learning_rate) * q_table[hashed]
             )
 
-        if i % FLAGS.log_every == 0:
+        if FLAGS.log_every and i % FLAGS.log_every == 0:
 
             def compare_qs(q_old, q_new):
                 diff = [q_new[k] - v for k, v in q_old.items()]
@@ -194,7 +198,7 @@ def main(argv):
             train(q_table, env)
 
         # Rollout resulting policy.
-        rollout(q_table, env, True)
+        rollout(q_table, env, printout=True)
 
     finally:
         env.close()
