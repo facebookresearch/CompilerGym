@@ -243,13 +243,12 @@ class Connection(object):
         yield from ()
 
 
-def make_working_dir():
-    """Make a working directory for a service. The calling code is responsible for
-    removing this directory when done.
+def make_working_dir() -> Path:
+    """Make a working directory for a service. The calling code is responsible
+    for removing this directory when done.
     """
-    timestamp = datetime.now().isoformat()
     random_hash = random.getrandbits(16)
-    service_name = f"service-{timestamp}-{random_hash:04x}"
+    service_name = datetime.now().strftime(f"s/%m%dT%H%M%S-%f-{random_hash:04x}")
     working_dir = transient_cache_path(service_name)
     (working_dir / "logs").mkdir(parents=True, exist_ok=False)
     return working_dir
