@@ -22,7 +22,7 @@ benchmark,reward,commandline,walltime
 benchmark://cBench-v1/crc32,0,opt  input.bc -o output.bc,0.3
 """.strip()
     flags.FLAGS.unparse_flags()
-    flags.FLAGS(["argv0", "--env=llvm-ic-v0", "--dataset=cBench-v1"])
+    flags.FLAGS(["argv0", "--env=llvm-ic-v0"])
     monkeypatch.setattr("sys.stdin", StringIO(stdin))
 
     with capture_output() as out:
@@ -43,7 +43,7 @@ benchmark://cBench-v1/crc32,0,opt  input.bc -o output.bc,0.3
 """.strip()
             )
         flags.FLAGS.unparse_flags()
-        flags.FLAGS(["argv0", "--env=llvm-ic-v0", "--dataset=cBench-v1"])
+        flags.FLAGS(["argv0", "--env=llvm-ic-v0"])
 
         with capture_output() as out:
             main(["argv0", str(path)])
@@ -54,7 +54,7 @@ benchmark://cBench-v1/crc32,0,opt  input.bc -o output.bc,0.3
 
 def test_no_input(monkeypatch):
     flags.FLAGS.unparse_flags()
-    flags.FLAGS(["argv0", "--env=llvm-ic-v0", "--dataset=cBench-v1"])
+    flags.FLAGS(["argv0", "--env=llvm-ic-v0"])
     monkeypatch.setattr("sys.stdin", StringIO(""))
 
     with capture_output() as out:
@@ -70,7 +70,7 @@ benchmark,reward,commandline,walltime
 benchmark://cBench-v1/crc32,0.5,opt  input.bc -o output.bc,0.3
 """.strip()
     flags.FLAGS.unparse_flags()
-    flags.FLAGS(["argv0", "--env=llvm-ic-v0", "--dataset=cBench-v1"])
+    flags.FLAGS(["argv0", "--env=llvm-ic-v0"])
     monkeypatch.setattr("sys.stdin", StringIO(stdin))
     with capture_output() as out:
         with pytest.raises(SystemExit):
@@ -86,7 +86,7 @@ benchmark://cBench-v1/crc32,0.5,opt  input.bc -o output.bc,0.3
 def test_invalid_csv_format(monkeypatch):
     stdin = "invalid\ncsv\nformat"
     flags.FLAGS.unparse_flags()
-    flags.FLAGS(["argv0", "--env=llvm-ic-v0", "--dataset=cBench-v1"])
+    flags.FLAGS(["argv0", "--env=llvm-ic-v0"])
     monkeypatch.setattr("sys.stdin", StringIO(stdin))
 
     with capture_output() as out:
@@ -105,7 +105,7 @@ benchmark://cBench-v1/crc32,,0,opt  input.bc -o output.bc
 benchmark://cBench-v1/crc32,,0,opt  input.bc -o output.bc
 """.strip()
     flags.FLAGS.unparse_flags()
-    flags.FLAGS(["argv0", "--env=llvm-v0", "--dataset=cBench-v1"])
+    flags.FLAGS(["argv0", "--env=llvm-v0"])
     monkeypatch.setattr("sys.stdin", StringIO(stdin))
 
     with capture_output() as out:
@@ -144,7 +144,7 @@ benchmark://cBench-v1/tiffmedian,,0,opt  input.bc -o output.bc
 benchmark://cBench-v1/susan,,0,opt  input.bc -o output.bc
 """.strip()
     flags.FLAGS.unparse_flags()
-    flags.FLAGS(["argv0", "--env=llvm-v0", "--dataset=cBench-v1"])
+    flags.FLAGS(["argv0", "--env=llvm-v0"])
     monkeypatch.setattr("sys.stdin", StringIO(stdin))
 
     with capture_output() as out:
