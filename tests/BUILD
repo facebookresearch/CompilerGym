@@ -42,6 +42,7 @@ py_library(
     testonly = 1,
     srcs = ["test_main.py"],
     visibility = [
+        "//benchmarks:__subpackages__",
         "//examples:__subpackages__",
         "//leaderboard:__subpackages__",
         "//tests:__subpackages__",
@@ -97,8 +98,10 @@ py_test(
     name = "version_test",
     timeout = "short",
     srcs = ["version_test.py"],
+    data = ["//:VERSION"],
     deps = [
         ":test_main",
         "//compiler_gym",
+        "//tests/pytest_plugins:common",
     ],
 )

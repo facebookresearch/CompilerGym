@@ -10,7 +10,7 @@ from typing import List
 import gym
 import pytest
 
-from compiler_gym import CompilerEnv
+from compiler_gym.envs import LlvmEnv
 from tests.test_main import main
 
 
@@ -27,7 +27,7 @@ def process_worker(env_name: str, benchmark: str, actions: List[int], queue: mp.
     env.close()
 
 
-def process_worker_with_env(env: CompilerEnv, actions: List[int], queue: mp.Queue):
+def process_worker_with_env(env: LlvmEnv, actions: List[int], queue: mp.Queue):
     assert actions
 
     for action in actions:
@@ -85,7 +85,7 @@ def test_port_collision_test():
     env_a = gym.make("llvm-autophase-ic-v0")
     env_a.reset(benchmark="cBench-v1/crc32")
 
-    env_b = CompilerEnv(service=env_a.service.connection.url)
+    env_b = LlvmEnv(service=env_a.service.connection.url)
     env_b.reset(benchmark="cBench-v1/crc32")
 
     env_b.close()

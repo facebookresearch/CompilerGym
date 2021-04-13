@@ -164,6 +164,18 @@ py_test(
 )
 
 py_test(
+    name = "module_id_test",
+    timeout = "short",
+    srcs = ["module_id_test.py"],
+    deps = [
+        "//compiler_gym",
+        "//tests:test_main",
+        "//tests/pytest_plugins:common",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "multiprocessing_test",
     timeout = "short",
     srcs = ["multiprocessing_test.py"],

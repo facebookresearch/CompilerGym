@@ -39,7 +39,7 @@ def test_eval_llvm_instcount_policy_resume(tmpwd):
             "--max_benchmarks=1",
             "--novalidate",
             "--resume",
-            "--results_logfile=test.csv",
+            "--leaderboard_results=test.csv",
         ]
     )
     with pytest.raises(SystemExit):
@@ -60,7 +60,7 @@ def test_eval_llvm_instcount_policy_resume(tmpwd):
             "--max_benchmarks=2",
             "--novalidate",
             "--resume",
-            "--results_logfile=test.csv",
+            "--leaderboard_results=test.csv",
         ]
     )
     with pytest.raises(SystemExit):
@@ -82,7 +82,7 @@ def test_eval_llvm_instcount_policy_resume(tmpwd):
             "--max_benchmarks=2",
             "--novalidate",
             "--resume",
-            "--results_logfile=test.csv",
+            "--leaderboard_results=test.csv",
         ]
     )
     with pytest.raises(SystemExit):

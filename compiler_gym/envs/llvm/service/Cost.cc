@@ -72,12 +72,8 @@ Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& 
 #endif
   const auto clangPath = util::getSiteDataPath("llvm/10.0.0/bin/clang");
   const auto llvmSizePath = util::getSiteDataPath("llvm/10.0.0/bin/llvm-size");
-  if (!fs::exists(clangPath)) {
-    return Status(StatusCode::INTERNAL, fmt::format("File not found: {}", clangPath.string()));
-  }
-  if (!fs::exists(llvmSizePath)) {
-    return Status(StatusCode::INTERNAL, fmt::format("File not found: {}", llvmSizePath.string()));
-  }
+  DCHECK(fs::exists(clangPath)) << fmt::format("File not found: {}", clangPath.string());
+  DCHECK(fs::exists(llvmSizePath)) << fmt::format("File not found: {}", llvmSizePath.string());
 
   // Lower the module to an object file using clang and extract the .text
   // section size using llvm-size.
@@ -86,14 +82,14 @@ Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& 
   const auto tmpFile = fs::unique_path(workingDirectory / "obj-%%%%");
 
 #ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
-  std::vector<std::string> clangCmd{clangPath.string(), "-xir", "-", "-o", tmpFile.string()};
+  std::vector<std::string> clangCmd{clangPath.string(), "-w", "-xir", "-", "-o", tmpFile.string()};
   clangCmd.insert(clangCmd.end(), clangArgs.begin(), clangArgs.end());
   auto clang =
       subprocess::Popen(clangCmd, subprocess::input{subprocess::PIPE},
                         subprocess::output{subprocess::PIPE}, subprocess::error{subprocess::PIPE});
 #else
   auto clang =
-      subprocess::Popen({clangPath.string(), "-xir", "-", "-o", tmpFile.string(), "-c"},
+      subprocess::Popen({clangPath.string(), "-w", "-xir", "-", "-o", tmpFile.string(), "-c"},
                         subprocess::input{subprocess::PIPE}, subprocess::output{subprocess::PIPE},
                         subprocess::error{subprocess::PIPE});
 #endif

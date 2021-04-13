@@ -27,36 +27,32 @@ Users who wish to create a submission for this leaderboard may use
 <compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy>` to
 automatically evaluate their agent on the test set.
 """
-import platform
-import sys
-from collections import Counter
+import logging
 from pathlib import Path
 from threading import Thread
 from time import sleep
-from typing import Callable, Iterable
+from typing import Callable, List
 
-import GPUtil
 import gym
 import humanize
-import psutil
 from absl import app, flags
-from cpuinfo import get_cpu_info
-from tqdm import tqdm
 
 import compiler_gym.envs  # noqa Register environments.
 from compiler_gym.bin.validate import main as validate
 from compiler_gym.compiler_env_state import CompilerEnvState
 from compiler_gym.envs import LlvmEnv
-from compiler_gym.util.tabulate import tabulate
-from compiler_gym.util.timer import Timer
+from compiler_gym.util.statistics import arithmetic_mean, geometric_mean
+from compiler_gym.util.timer import Timer, humanize_duration_hms
 
 flags.DEFINE_string(
-    "results_logfile", "results.csv", "The path of the file to write results to."
+    "leaderboard_results",
+    "llvm_instcount-results.csv",
+    "The path of the file to write results to.",
 )
 flags.DEFINE_string(
-    "hardware_info",
-    "hardware.txt",
-    "The path of the file to write a hardware summary to.",
+    "leaderboard_logfile",
+    "llvm_instcount-results.log",
+    "The path of a file to stream CompilerGym logs to.",
 )
 flags.DEFINE_integer(
     "max_benchmarks",
@@ -73,8 +69,8 @@ flags.DEFINE_boolean("validate", True, "Run validation on the results.")
 flags.DEFINE_boolean(
     "resume",
     False,
-    "If true, read the --results_logfile first and run only the policy "
-    "evaluations not already in the logfile.",
+    "If true, read the --leaderboard_results file first and run only the "
+    "evaluations not already in the results file.",
 )
 FLAGS = flags.FLAGS
 
@@ -83,66 +79,25 @@ FLAGS = flags.FLAGS
 Policy = Callable[[LlvmEnv], None]
 
 
-def _get_gpus() -> Iterable[str]:
-    """Return GPU info strings."""
-    gpus = GPUtil.getGPUs()
-    if gpus:
-        yield from (gpu.name for gpu in gpus)
-    else:
-        yield "None"
+class _EvalPolicyWorker(Thread):
+    """Worker thread to evaluate a policy."""
 
-
-def _get_cpu() -> str:
-    """Return CPU info string."""
-    cpuinfo = get_cpu_info()
-    brand = cpuinfo["brand_raw"].replace("(R)", "")
-    return f"{brand} ({cpuinfo['count']}x core)"
-
-
-def _get_memory() -> str:
-    """Return system memory info string."""
-    return humanize.naturalsize(psutil.virtual_memory().total, binary=True)
-
-
-def _get_os() -> str:
-    """Return operating system name as a string."""
-    return platform.platform()
-
-
-def _summarize_duplicates(iterable: Iterable[str]) -> Iterable[str]:
-    """Aggregate duplicates in a list of strings."""
-    freq = sorted(Counter(iterable).items(), key=lambda x: -x[1])
-    for gpu, count in freq:
-        if count > 1:
-            yield f"{count}x {gpu}"
-        else:
-            yield gpu
-
-
-def _get_hardarwe_info() -> str:
-    """Print a summary of system hardware to file."""
-    return tabulate(
-        [
-            ("OS", _get_os()),
-            ("CPU", _get_cpu()),
-            ("Memory", _get_memory()),
-            ("GPU", ", ".join(_summarize_duplicates(_get_gpus()))),
-        ],
-        headers=("", "Hardware Specification"),
-    )
-
-
-class _BenchmarkRunner(Thread):
-    def __init__(self, env, benchmarks, policy, print_header):
+    def __init__(
+        self,
+        env: LlvmEnv,
+        benchmarks: List[str],
+        policy: Policy,
+        init_states: List[CompilerEnvState],
+    ):
         super().__init__()
         self.env = env
         self.benchmarks = benchmarks
         self.policy = policy
-        self.print_header = print_header
-        self.n = 0
+        self.states: List[CompilerEnvState] = init_states
+        self.alive = True
 
     def run(self):
-        with open(FLAGS.results_logfile, "a") as logfile:
+        with open(FLAGS.leaderboard_results, "a") as logfile:
             for benchmark in self.benchmarks:
                 self.env.reset(benchmark=benchmark)
                 with Timer() as timer:
@@ -166,11 +121,11 @@ class _BenchmarkRunner(Thread):
                     walltime=timer.time,
                     commandline=self.env.state.commandline,
                 )
-                if self.print_header:
-                    print(self.env.state.csv_header(), file=logfile)
-                    self.print_header = False
                 print(state.to_csv(), file=logfile, flush=True)
-                self.n += 1
+                self.states.append(state)
+
+                if not self.alive:
+                    return
 
 
 def eval_llvm_instcount_policy(policy: Policy) -> None:
@@ -238,11 +193,11 @@ def eval_llvm_instcount_policy(policy: Policy) -> None:
     defines a number of commandline flags that can be overriden to control the
     behavior of the evaluation. For example the flag :code:`--n` determines the
     number of times the policy is run on each benchmark (default is 10), and
-    :code:`--results_logfile` determines the path of the generated results file:
+    :code:`--leaderboard_results` determines the path of the generated results file:
 
     .. code-block::
 
-        $ python my_policy.py --n=5 --results_logfile=my_policy_results.csv
+        $ python my_policy.py --n=5 --leaderboard_results=my_policy_results.csv
 
     You can use :code:`--helpfull` flag to list all of the flags that are
     defined:
@@ -260,15 +215,19 @@ def eval_llvm_instcount_policy(policy: Policy) -> None:
         assert len(argv) == 1, f"Unknown args: {argv[:1]}"
         assert FLAGS.n > 0, "n must be > 0"
 
-        print(
-            f"Writing inference results to '{FLAGS.results_logfile}' and "
-            f"hardware summary to '{FLAGS.hardware_info}'"
-        )
-
-        with open(FLAGS.hardware_info, "w") as f:
-            print(_get_hardarwe_info(), file=f)
-
         env = gym.make("llvm-ic-v0")
+
+        # Stream verbose CompilerGym logs to file.
+        logger = logging.getLogger("compiler_gym")
+        logger.setLevel(logging.DEBUG)
+        env.logger.setLevel(logging.DEBUG)
+        log_handler = logging.FileHandler(FLAGS.leaderboard_logfile)
+        logger.addHandler(log_handler)
+        logger.propagate = False
+
+        print(f"Writing results to {FLAGS.leaderboard_results}")
+        print(f"Writing logs to {FLAGS.leaderboard_logfile}")
+
         try:
             # Install the required dataset and build the list of benchmarks to
             # evaluate.
@@ -282,38 +241,69 @@ def eval_llvm_instcount_policy(policy: Policy) -> None:
             # Repeat the searches for the requested number of iterations.
             benchmarks *= FLAGS.n
             benchmarks = sorted(benchmarks)
-            total = len(benchmarks)
+            total_count = len(benchmarks)
 
             # If we are resuming from a previous job, read the states that have
             # already been proccessed and remove those benchmarks from the list
             # of benchmarks to evaluate.
-            print_header = True
-            init = 0
-            if Path(FLAGS.results_logfile).is_file():
-                if FLAGS.resume:
-                    with open(FLAGS.results_logfile, "r") as f:
-                        for state in CompilerEnvState.read_csv_file(f):
-                            if state.benchmark in benchmarks:
-                                init += 1
-                                benchmarks.remove(state.benchmark)
-                                print_header = False
-                else:
-                    Path(FLAGS.results_logfile).unlink()
+            init_states = []
+            if FLAGS.resume and Path(FLAGS.leaderboard_results).is_file():
+                with open(FLAGS.leaderboard_results, "r") as f:
+                    for state in CompilerEnvState.read_csv_file(f):
+                        init_states.append(state)
+                        if state.benchmark in benchmarks:
+                            benchmarks.remove(state.benchmark)
+
+            # Print the CSV header if we need to.
+            if not init_states:
+                with open(FLAGS.leaderboard_results, "w") as f:
+                    print(CompilerEnvState.csv_header(), file=f)
 
             # Run the benchmark loop in background so that we can asynchronously
             # log progress.
-            pbar = tqdm(initial=init, total=total, file=sys.stderr, unit=" benchmark")
-            benchmark_runner = _BenchmarkRunner(env, benchmarks, policy, print_header)
-            benchmark_runner.start()
-            while benchmark_runner.is_alive():
-                pbar.n = benchmark_runner.n + init
-                pbar.refresh()
-                sleep(1)
+            worker = _EvalPolicyWorker(env, benchmarks, policy, init_states)
+            worker.start()
+            timer = Timer().reset()
+            try:
+                print(
+                    f"=== Evaluating policy on "
+                    f"{humanize.intcomma(total_count)} "
+                    f"{FLAGS.test_dataset} benchmarks ==="
+                    "\n\n"  # Blank lines will be filled below
+                )
+                while worker.is_alive():
+                    done_count = len(worker.states)
+                    remaining_count = total_count - done_count
+                    time = timer.time
+                    gmean_reward = geometric_mean([s.reward for s in worker.states])
+                    mean_walltime = (
+                        arithmetic_mean([s.walltime for s in worker.states]) or time
+                    )
+                    print(
+                        "\r\033[2A"
+                        "\033[K"
+                        f"Runtime: {humanize_duration_hms(time)}. "
+                        f"Estimated completion: {humanize_duration_hms(time + mean_walltime * remaining_count)}. "
+                        f"Completed: {humanize.intcomma(done_count)} / {humanize.intcomma(total_count)} "
+                        f"({done_count / total_count:.1%})."
+                        "\n\033[K"
+                        f"Current mean walltime: {mean_walltime:.3f}s / benchmark."
+                        "\n\033[K"
+                        f"Current geomean reward: {gmean_reward:.4f}.",
+                        flush=True,
+                        end="",
+                    )
+                    sleep(1)
+            except KeyboardInterrupt:
+                print("\nkeyboard interrupt", flush=True)
+                worker.alive = False
+                # User interrupt, don't validate.
+                FLAGS.validate = False
         finally:
             env.close()
 
         if FLAGS.validate:
             FLAGS.env = "llvm-ic-v0"
-            validate(["argv0", FLAGS.results_logfile])
+            validate(["argv0", FLAGS.leaderboard_results])
 
     app.run(main)

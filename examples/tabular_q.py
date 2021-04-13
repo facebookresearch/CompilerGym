@@ -166,7 +166,7 @@ def train(q_table, env):
                 + (1 - FLAGS.learning_rate) * q_table[hashed]
             )
 
-        if i % FLAGS.log_every == 0:
+        if FLAGS.log_every and i % FLAGS.log_every == 0:
 
             def compare_qs(q_old, q_new):
                 diff = [q_new[k] - v for k, v in q_old.items()]
@@ -195,7 +195,7 @@ def main(argv):
             train(q_table, env)
 
         # Rollout resulting policy.
-        rollout(q_table, env, True)
+        rollout(q_table, env, printout=True)
 
     finally:
         env.close()

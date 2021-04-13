@@ -40,13 +40,13 @@ jobs:
                   chmod +x bazel
                   sudo mv bazel /usr/local/bin/bazel
                   sudo apt install clang-9 patchelf
-                  python -m pip install -r compiler_gym/requirements.txt -r examples/requirements.txt -r leaderboard/requirements.txt -r tests/requirements.txt
+                  python -m pip install -r compiler_gym/requirements.txt -r examples/requirements.txt -r tests/requirements.txt
               if: matrix.os == 'ubuntu-latest'
 
             - name: Install dependencies (macOS)
               run: |
                   brew install bazelisk zlib
-                  python -m pip install -r compiler_gym/requirements.txt -r examples/requirements.txt -r leaderboard/requirements.txt -r tests/requirements.txt
+                  python -m pip install -r compiler_gym/requirements.txt -r examples/requirements.txt -r tests/requirements.txt
               env:
                   LDFLAGS: -L/usr/local/opt/zlib/lib
                   CPPFLAGS: -I/usr/local/opt/zlib/include
@@ -58,7 +58,7 @@ jobs:
               env:
                   CC: clang
                   CXX: clang++
-                  BAZEL_TEST_OPTS: --config=ci
+                  BAZEL_TEST_OPTS: --config=ci --test_timeout=300,900,1800,7200
 
 
     install_test:
@@ -84,13 +84,13 @@ jobs:
                   chmod +x bazel
                   sudo mv bazel /usr/local/bin/bazel
                   sudo apt install clang-9 patchelf
-                  python -m pip install -r compiler_gym/requirements.txt -r examples/requirements.txt -r leaderboard/requirements.txt -r tests/requirements.txt
+                  python -m pip install -r compiler_gym/requirements.txt -r examples/requirements.txt -r tests/requirements.txt
               if: matrix.os == 'ubuntu-latest'
 
             - name: Install dependencies (macos)
               run: |
                   brew install bazelisk zlib
-                  python -m pip install -r compiler_gym/requirements.txt -r examples/requirements.txt -r leaderboard/requirements.txt -r tests/requirements.txt
+                  python -m pip install -r compiler_gym/requirements.txt -r examples/requirements.txt -r tests/requirements.txt
               env:
                   LDFLAGS: -L/usr/local/opt/zlib/lib
                   CPPFLAGS: -I/usr/local/opt/zlib/include

@@ -34,7 +34,7 @@ def env(request) -> CompilerEnv:
             env.close()
     else:
         service = CompilerGymServiceConnection(llvm.LLVM_SERVICE_BINARY)
-        env = LlvmEnv(service=service.connection.url, benchmark="foo")
+        env = LlvmEnv(service=service.connection.url)
         env.require_dataset("cBench-v1")
         try:
             yield env

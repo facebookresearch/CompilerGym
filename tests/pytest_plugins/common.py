@@ -23,6 +23,11 @@ macos_only = pytest.mark.skipif(
     not sys.platform.lower().startswith("darwin"), reason="macOS only"
 )
 
+# Decorator to mark a test as skipped if not running under bazel.
+bazel_only = pytest.mark.skipif(
+    os.environ.get("TEST_WORKSPACE", "") == "", reason="bazel only"
+)
+
 
 @pytest.fixture(scope="function")
 def tmpwd() -> Path:
