@@ -12,3 +12,15 @@ py_binary(
         "//examples:tabular_q",
     ],
 )
+
+py_test(
+    name = "tabular_q_test",
+    timeout = "moderate",
+    srcs = ["tabular_q_test.py"],
+    deps = [
+        ":tabular_q_eval",
+        "//compiler_gym/leaderboard:llvm_instcount",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)

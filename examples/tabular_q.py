@@ -116,8 +116,9 @@ def rollout(qtable, env, printout=False):
         a = select_action(qtable, observation, i)
         action_seq.append(a)
         observation, reward, done, info = env.step(env.action_space.flags.index(a))
-        observation = env.observation["Autophase"]
         rewards.append(reward)
+        if done:
+            break
     if printout:
         print(
             "Resulting sequence: ", ",".join(action_seq), f"total reward {sum(rewards)}"
@@ -144,6 +145,8 @@ def train(q_table, env):
             # Effectively we are evaluating the policy by taking a step in the
             # environment.
             observation, reward, done, info = env.step(env.action_space.flags.index(a))
+            if done:
+                break
             current_length += 1
 
             # Compute the target value of the current state, by using the current
