@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 import os
+import subprocess
 import sys
 from typing import List, Optional
 
@@ -52,4 +53,9 @@ def main(extra_pytest_args: Optional[List[str]] = None, debug_level: int = 1):
 
     pytest_args += extra_pytest_args or []
 
-    sys.exit(pytest.main(pytest_args))
+    # Run the tests in a subprocess rather than directly invoking pytest.main()
+    # as pytest uses import-time hooks that fail if the module has already been
+    # imported.
+    process = subprocess.Popen(["pytest"] + pytest_args)
+    process.communicate()
+    sys.exit(process.returncode)
