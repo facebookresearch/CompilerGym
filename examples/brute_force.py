@@ -173,6 +173,7 @@ def run_brute_force(
     results_path = outdir / "results.csv"
 
     env: CompilerEnv = make_env()
+    assert env.benchmark, "Brute force requires that a benchmark is set"
     env.reset()
 
     action_names = action_names or env.action_space.names

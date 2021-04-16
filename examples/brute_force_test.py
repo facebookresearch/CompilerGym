@@ -16,7 +16,7 @@ def test_run_brute_force_smoke_test():
     with tempfile.TemporaryDirectory() as tmp:
         outdir = Path(tmp)
         run_brute_force(
-            make_env=lambda: gym.make("llvm-ic-v0"),
+            make_env=lambda: gym.make("llvm-ic-v0", benchmark="cbench-v1/crc32"),
             action_names=["-sroa", "-mem2reg"],
             episode_length=2,
             outdir=outdir,
@@ -29,4 +29,4 @@ def test_run_brute_force_smoke_test():
 
 
 if __name__ == "__main__":
-    main()
+    main(extra_pytest_args=["-s"], debug_level=2)  # Don't capture stdout/stderr.
