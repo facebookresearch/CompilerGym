@@ -94,7 +94,7 @@ py_binary(
     name = "make_llvm_module",
     srcs = ["make_llvm_module.py"],
     deps = [
-        "//compiler_gym/envs/llvm:benchmarks",
+        "//compiler_gym/envs/llvm:llvm_benchmark",
     ],
 )
 

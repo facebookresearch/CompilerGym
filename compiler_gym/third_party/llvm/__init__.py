@@ -17,12 +17,12 @@ from compiler_gym.util.runfiles_path import cache_path, site_data_path
 # (url, sha256) tuples for the LLVM download data packs.
 _LLVM_URLS = {
     "darwin": (
-        "https://dl.fbaipublicfiles.com/compiler_gym/llvm-10.0.0-macos.tar.bz2",
-        "ff74da7a5423528de0e25d1c79926f2ddd95e02b5c25d1b501637af63b29dba6",
+        "https://dl.fbaipublicfiles.com/compiler_gym/llvm-10.0.0-v0-macos.tar.bz2",
+        "ab89ccfe3841b16251deb495af68dcd121fec39f70c67281e521d8cc331b9d71",
     ),
     "linux": (
-        "https://dl.fbaipublicfiles.com/compiler_gym/llvm-10.0.0-linux.tar.bz2",
-        "c9bf5bfda3c2fa1d1a9e7ebc93da4398a6f6841c28b5d368e0eb29a153856a93",
+        "https://dl.fbaipublicfiles.com/compiler_gym/llvm-10.0.0-v0-linux.tar.bz2",
+        "995aea899b6adfb075cfe1fbebe53a33165e9e106766d979de0a9717335bab08",
     ),
 }
 
@@ -73,14 +73,24 @@ def clang_path() -> Path:
     return download_llvm_files() / "bin/clang"
 
 
+def lli_path() -> Path:
+    """Return the path of lli."""
+    return download_llvm_files() / "bin/lli"
+
+
+def llvm_as_path() -> Path:
+    """Return the path of llvm-as."""
+    return download_llvm_files() / "bin/llvm-as"
+
+
 def llvm_link_path() -> Path:
     """Return the path of llvm-link."""
     return download_llvm_files() / "bin/llvm-link"
 
 
-def lli_path() -> Path:
-    """Return the path of lli."""
-    return download_llvm_files() / "bin/lli"
+def llvm_stress_path() -> Path:
+    """Return the path of llvm-stress."""
+    return download_llvm_files() / "bin/llvm-stress"
 
 
 def opt_path() -> Path:
