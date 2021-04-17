@@ -5,6 +5,7 @@
 import hashlib
 import logging
 import os
+import random
 from typing import List, Optional, Union
 
 import fasteners
@@ -47,10 +48,11 @@ def _do_download_attempt(url: str, sha256: Optional[str]) -> bytes:
         # Cache the downloaded file.
         cache_path("downloads").mkdir(parents=True, exist_ok=True)
         # Atomic write by writing to a temporary file and renaming.
-        manifest_path = cache_path(f"downloads/{sha256}")
-        with open(f"{manifest_path}.tmp", "wb") as f:
+        path = cache_path(f"downloads/{sha256}")
+        tmp_path = f"{path}-{random.getrandbits(16):04x}"
+        with open(tmp_path, "wb") as f:
             f.write(content)
-        os.rename(f"{manifest_path}.tmp", str(manifest_path))
+        os.rename(tmp_path, str(path))
 
     logging.debug(f"Downloaded {url}")
     return content
