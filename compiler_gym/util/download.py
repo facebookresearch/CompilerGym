@@ -76,7 +76,6 @@ def _download(urls: List[str], sha256: Optional[str], max_retries: int = 3) -> b
     raise last_exception
 
 
-@fasteners.interprocess_locked(cache_path("downloads/LOCK"))
 def download(
     urls: Union[str, List[str]], sha256: Optional[str] = None, max_retries: int = 3
 ) -> bytes:
