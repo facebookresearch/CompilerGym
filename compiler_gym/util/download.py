@@ -106,7 +106,7 @@ def download(
     # and download the same resource. If we don't have an ID for the resource
     # then we just lock globally to reduce NIC thrashing.
     if sha256:
-        with fasteners.InterProcessLock(cache_path("downloads/{sha256}.lock")):
+        with fasteners.InterProcessLock(cache_path(f"downloads/{sha256}.lock")):
             return _download(urls, sha256, max_retries)
     else:
         with fasteners.InterProcessLock(cache_path("downloads/LOCK")):
