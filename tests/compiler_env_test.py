@@ -8,7 +8,8 @@ import logging
 import gym
 import pytest
 
-from compiler_gym.envs import CompilerEnv
+from compiler_gym.envs import CompilerEnv, llvm
+from compiler_gym.service.connection import CompilerGymServiceConnection
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
@@ -139,6 +140,27 @@ def test_step_session_id_not_found(env: CompilerEnv):
     assert observation is None
     assert reward is None
     assert not env.in_episode
+
+
+@pytest.fixture(scope="function")
+def remote_env() -> CompilerEnv:
+    """A test fixture that yields a connection to a remote service."""
+    service = CompilerGymServiceConnection(llvm.LLVM_SERVICE_BINARY)
+    env = CompilerEnv(service=service.connection.url)
+    try:
+        yield env
+    finally:
+        env.close()
+        service.close()
+
+
+def test_base_class_has_no_benchmark(remote_env: CompilerEnv):
+    """Test that when instantiating the base CompilerEnv class there are no
+    datasets available.
+    """
+    assert remote_env.benchmark is None
+    with pytest.raises(TypeError, match="No benchmark set"):
+        remote_env.reset()
 
 
 if __name__ == "__main__":
