@@ -160,7 +160,7 @@ class CompilerEnv(gym.Env):
         action_space: Optional[str] = None,
         connection_settings: Optional[ConnectionOpts] = None,
         service_connection: Optional[CompilerGymServiceConnection] = None,
-        logging_level: Optional[int] = None,
+        logger: Optional[logging.Logger] = None,
     ):
         """Construct and initialize a CompilerGym service environment.
 
@@ -199,10 +199,10 @@ class CompilerEnv(gym.Env):
             with the remote service.
         :param service_connection: An existing compiler gym service connection
             to use.
-        :param logging_level: The integer logging level to use for logging. By
-            default, the value reported by
-            :func:`get_logging_level() <compiler_gym.get_logging_level>` is
-            used.
+        :param logger: The logger to use for this environment. If not provided,
+            a :code:`compiler_gym.envs` logger is used and assigned the
+            verbosity returned by
+            :func:`get_logging_level() <compiler_gym.get_logging_level>`.
         :raises FileNotFoundError: If service is a path to a file that is not
             found.
         :raises TimeoutError: If the compiler service fails to initialize
@@ -210,11 +210,10 @@ class CompilerEnv(gym.Env):
         """
         self.metadata = {"render.modes": ["human", "ansi"]}
 
-        # Set up logging.
-        self.logger = logging.getLogger("compiler_gym.envs")
-        if logging_level is None:
-            logging_level = get_logging_level()
-        self.logger.setLevel(logging_level)
+        if logger is None:
+            logger = logging.getLogger("compiler_gym.envs")
+            logger.setLevel(get_logging_level())
+        self.logger = logger
 
         # A compiler service supports multiple simultaneous environments. This
         # session ID is used to identify this environment.
