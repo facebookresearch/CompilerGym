@@ -36,6 +36,16 @@ cc_test(
 )
 
 py_test(
+    name = "filesystem_test",
+    srcs = ["filesystem_test.py"],
+    deps = [
+        "//compiler_gym/util",
+        "//tests:test_main",
+        "//tests/pytest_plugins:common",
+    ],
+)
+
+py_test(
     name = "minimize_trajectory_test",
     timeout = "short",
     srcs = ["minimize_trajectory_test.py"],
