@@ -220,9 +220,10 @@ install-test-datasets:
 
 install-test: install-test-datasets
 	mkdir -p /tmp/compiler_gym/wheel_tests
-	rm -f /tmp/compiler_gym/wheel_tests/tests
+	rm -f /tmp/compiler_gym/wheel_tests/tests /tmp/compiler_gym/wheel_tests/tox.ini
 	ln -s $(ROOT)/tests /tmp/compiler_gym/wheel_tests
-	cd /tmp/compiler_gym/wheel_tests && pytest tests -n auto -k "not fuzz"
+	ln -s $(ROOT)/tox.ini /tmp/compiler_gym/wheel_tests
+	cd /tmp/compiler_gym/wheel_tests && pytest tests --benchmark-disable -n auto -k "not fuzz"
 
 # The minimum number of seconds to run the fuzz tests in a loop for. Override
 # this at the commandline, e.g. `FUZZ_SECONDS=1800 make fuzz`.
