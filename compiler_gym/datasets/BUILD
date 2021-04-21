@@ -10,6 +10,7 @@ py_library(
         "__init__.py",
         "benchmark.py",
         "dataset.py",
+        "datasets.py",
         "files_dataset.py",
         "tar_dataset.py",
     ],
