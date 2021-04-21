@@ -71,6 +71,8 @@ message StartSessionRequest {
   // space that is to be used for this session. Once set, the action space
   // cannot be changed for the duration of the session.
   int32 action_space = 2;
+  // A list of indices into the GetSpacesReply.observation_space_list
+  repeated int32 observation_space = 3;
 }
 
 message StartSessionReply {
@@ -85,6 +87,8 @@ message StartSessionReply {
   // space and replace it with this one. Else, the action space remains
   // unchanged.
   ActionSpace new_action_space = 3;
+  // Observed states after completing the action.
+  repeated Observation observation = 4;
 }
 
 // ===========================================================================

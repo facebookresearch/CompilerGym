@@ -51,13 +51,13 @@ class LlvmSession {
   // since the start of the session. This is just for logging and has no effect.
   inline int actionCount() const { return actionCount_; }
 
- protected:
   // Run the requested action.
   [[nodiscard]] grpc::Status runAction(LlvmAction action, StepReply* reply);
 
   // Compute the requested observation.
   [[nodiscard]] grpc::Status getObservation(LlvmObservationSpace space, Observation* reply);
 
+ protected:
   // Run the given pass, possibly modifying the underlying LLVM module.
   void runPass(llvm::Pass* pass, StepReply* reply);
   void runPass(llvm::FunctionPass* pass, StepReply* reply);

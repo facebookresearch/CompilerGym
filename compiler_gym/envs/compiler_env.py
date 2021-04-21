@@ -710,6 +710,11 @@ class CompilerEnv(gym.Env):
                         if self.action_space_name
                         else 0
                     ),
+                    observation_space=(
+                        [self.observation_space.index]
+                        if self.observation_space
+                        else None
+                    ),
                 ),
             )
         except (ServiceError, ServiceTransportError, TimeoutError) as e:
@@ -749,7 +754,13 @@ class CompilerEnv(gym.Env):
             self.episode_reward = 0
 
         if self.observation_space:
-            return self.observation[self.observation_space.id]
+            if len(reply.observation) != 1:
+                raise OSError(
+                    f"Expected one observation from service, received {len(reply.observation)}"
+                )
+            return self.observation.spaces[self.observation_space.id].translate(
+                reply.observation[0]
+            )
 
     def step(self, action: Union[int, Iterable[int]]) -> step_t:
         """Take a step.

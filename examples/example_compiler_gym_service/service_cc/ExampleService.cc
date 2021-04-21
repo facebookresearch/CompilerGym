@@ -112,8 +112,18 @@ Status ExampleService::StartSession(ServerContext* /* unused*/, const StartSessi
   const auto actionSpace = actionSpaces[request->action_space()];
 
   // Create the new compilation session given.
+  auto session = std::make_unique<ExampleCompilationSession>(benchmark, actionSpace);
+
+  // Generate initial observations.
+  for (int i = 0; i < request->observation_space_size(); ++i) {
+    RETURN_IF_ERROR(rangeCheck(request->observation_space(i), 0,
+                               static_cast<int32_t>(getObservationSpaces().size()) - 1));
+    RETURN_IF_ERROR(
+        session->getObservation(request->observation_space(i), reply->add_observation()));
+  }
+
   reply->set_session_id(nextSessionId_);
-  sessions_[nextSessionId_] = std::make_unique<ExampleCompilationSession>(benchmark, actionSpace);
+  sessions_[nextSessionId_] = std::move(session);
   ++nextSessionId_;
 
   return Status::OK;
@@ -170,8 +180,7 @@ Status ExampleCompilationSession::Step(const StepRequest* request, StepReply* re
   for (int i = 0; i < request->observation_space_size(); ++i) {
     RETURN_IF_ERROR(rangeCheck(request->observation_space(i), 0,
                                static_cast<int32_t>(getObservationSpaces().size()) - 1));
-    auto observation = reply->add_observation();
-    RETURN_IF_ERROR(getObservation(request->observation_space(i), observation));
+    RETURN_IF_ERROR(getObservation(request->observation_space(i), reply->add_observation()));
   }
 
   return Status::OK;
