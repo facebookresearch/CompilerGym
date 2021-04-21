@@ -67,9 +67,19 @@ Status LlvmService::StartSession(ServerContext* /* unused */, const StartSession
   RETURN_IF_ERROR(util::intToEnum(request->action_space(), &actionSpace));
 
   // Construct the environment.
-  reply->set_session_id(nextSessionId_);
-  sessions_[nextSessionId_] =
+  auto session =
       std::make_unique<LlvmSession>(std::move(benchmark), actionSpace, workingDirectory_);
+
+  // Compute the initial observations.
+  for (int i = 0; i < request->observation_space_size(); ++i) {
+    LlvmObservationSpace observationSpace;
+    RETURN_IF_ERROR(util::intToEnum(request->observation_space(i), &observationSpace));
+    auto observation = reply->add_observation();
+    RETURN_IF_ERROR(session->getObservation(observationSpace, observation));
+  }
+
+  reply->set_session_id(nextSessionId_);
+  sessions_[nextSessionId_] = std::move(session);
   ++nextSessionId_;
 
   return Status::OK;

@@ -67,9 +67,9 @@ class ExampleCompilationSession {
 
   [[nodiscard]] grpc::Status Step(const StepRequest* request, StepReply* reply);
 
- private:
   grpc::Status getObservation(int32_t observationSpace, Observation* reply);
 
+ private:
   const std::string benchmark_;
   ActionSpace actionSpace_;
 };
