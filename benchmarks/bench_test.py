@@ -10,11 +10,11 @@ test output:
     $ bazel test -c opt --test_output=streamed //benchamrks:bench_test
 
 A record of the benchmark results is stored in
-/tmp/compiler_gym/benchmarks/<device>/<run>_bench_test.json
-Compare multiple runs using:
+/tmp/compiler_gym/pytest_benchmark/<device>/<run_id>_bench_test.json. Compare
+multiple runs using:
 
     $ pytest-benchmark compare --group-by=name --sort=fullname \
-        /tmp/compiler_gym/benchamrks/*_bench_test.json
+        /tmp/compiler_gym/pytest_benchmark/*_bench_test.json
 """
 # pylint: disable=redefined-outer-name
 import gym
@@ -97,7 +97,7 @@ def test_fork(benchmark, env: CompilerEnv, benchmark_name):
 if __name__ == "__main__":
     main(
         extra_pytest_args=[
-            "--benchmark-storage=/tmp/compiler_gym/benchmarks",
+            "--benchmark-storage=/tmp/compiler_gym/pytest_benchmark",
             "--benchmark-save=bench_test",
             "-x",
         ],
