@@ -64,10 +64,14 @@ def test_make_service(benchmark):
 
 
 def test_reset(benchmark, env: CompilerEnv, benchmark_name):
+    env.observation_space = "Autophase"
     benchmark(env.reset, benchmark_name)
 
 
 def test_step(benchmark, env: CompilerEnv, benchmark_name, action_name):
+    env.observation_space = "Autophase"
+    env.reward_space = "IrInstructionCount"
+
     env.reset(benchmark_name)
     action = env.action_space.flags.index(action_name)
     benchmark(env.step, action)
