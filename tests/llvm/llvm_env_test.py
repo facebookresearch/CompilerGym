@@ -3,7 +3,6 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Integrations tests for the LLVM CompilerGym environments."""
-import logging
 from enum import Enum
 from pathlib import Path
 from typing import List
@@ -295,14 +294,6 @@ def test_generate_enum_declarations(env: LlvmEnv):
 
 def test_logging_default_level(env: LlvmEnv):
     assert env.logger.level == dbg.get_logging_level()
-
-
-def test_logging_forced_level():
-    env = gym.make("llvm-v0", logging_level=logging.INFO)
-    try:
-        assert env.logger.level == logging.INFO
-    finally:
-        env.close()
 
 
 def test_step_multiple_actions_list(env: LlvmEnv):

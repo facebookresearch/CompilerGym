@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Unit tests for //compiler_gym/envs."""
+import logging
 import sys
 
 import gym
@@ -65,6 +66,18 @@ def test_benchmark_constructor_arg(env: CompilerEnv):
         assert env.benchmark == "cBench-v1/dijkstra"
     finally:
         env.close()
+
+
+def test_logger_forced():
+    logger = logging.getLogger("test_logger")
+    env_a = gym.make("llvm-v0")
+    env_b = gym.make("llvm-v0", logger=logger)
+    try:
+        assert env_a.logger != logger
+        assert env_b.logger == logger
+    finally:
+        env_a.close()
+        env_b.close()
 
 
 if __name__ == "__main__":
