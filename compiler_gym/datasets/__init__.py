@@ -17,6 +17,8 @@ from compiler_gym.datasets.dataset import (
     delete,
     require,
 )
+from compiler_gym.datasets.files_dataset import FilesDataset
+from compiler_gym.datasets.tar_dataset import TarDataset, TarDatasetWithManifest
 
 __all__ = [
     "activate",
@@ -27,6 +29,9 @@ __all__ = [
     "DatasetInitError",
     "deactivate",
     "delete",
+    "FilesDataset",
     "LegacyDataset",
     "require",
+    "TarDataset",
+    "TarDatasetWithManifest",
 ]

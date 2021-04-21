@@ -10,6 +10,8 @@ py_library(
         "__init__.py",
         "benchmark.py",
         "dataset.py",
+        "files_dataset.py",
+        "tar_dataset.py",
     ],
     visibility = ["//visibility:public"],
     deps = [
