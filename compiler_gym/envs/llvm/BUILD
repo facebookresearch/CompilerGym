@@ -35,7 +35,7 @@ py_library(
     srcs = ["legacy_datasets.py"],
     visibility = ["//tests:__subpackages__"],
     deps = [
-        "//compiler_gym/datasets:dataset",
+        "//compiler_gym/datasets",
         "//compiler_gym/third_party/llvm",
         "//compiler_gym/util",
     ],

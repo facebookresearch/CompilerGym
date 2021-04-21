@@ -18,12 +18,3 @@ py_library(
         "//compiler_gym/util",
     ],
 )
-
-py_library(
-    name = "dataset",
-    srcs = ["dataset.py"],
-    visibility = ["//compiler_gym:__subpackages__"],
-    deps = [
-        "//compiler_gym/util",
-    ],
-)

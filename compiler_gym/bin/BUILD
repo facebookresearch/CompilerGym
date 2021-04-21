@@ -22,7 +22,7 @@ py_binary(
     srcs = ["datasets.py"],
     visibility = ["//visibility:public"],
     deps = [
-        "//compiler_gym/datasets:dataset",
+        "//compiler_gym/datasets",
         "//compiler_gym/envs",
         "//compiler_gym/util",
         "//compiler_gym/util/flags:env_from_flags",
