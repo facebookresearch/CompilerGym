@@ -4,13 +4,12 @@
 # LICENSE file in the root directory of this source tree.
 import hashlib
 import logging
-import os
-import random
 from typing import List, Optional, Union
 
 import fasteners
 import requests
 
+from compiler_gym.util.filesystem import atomic_file_write
 from compiler_gym.util.runfiles_path import cache_path
 
 
@@ -46,13 +45,10 @@ def _do_download_attempt(url: str, sha256: Optional[str]) -> bytes:
             )
 
         # Cache the downloaded file.
-        cache_path("downloads").mkdir(parents=True, exist_ok=True)
-        # Atomic write by writing to a temporary file and renaming.
         path = cache_path(f"downloads/{sha256}")
-        tmp_path = f"{path}-{random.getrandbits(16):04x}"
-        with open(tmp_path, "wb") as f:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with atomic_file_write(path, fileobj=True) as f:
             f.write(content)
-        os.rename(tmp_path, str(path))
 
     logging.debug(f"Downloaded {url}")
     return content
