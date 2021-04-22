@@ -110,12 +110,15 @@ Then clone the CompilerGym source code using:
     git clone https://github.com/facebookresearch/CompilerGym.git
     cd CompilerGym
 
-Install the python development dependencies using:
+There are two primary git branches: `stable` tracks the latest release;
+`development` is for bleeding edge features that may not yet be mature. Checkout
+your preferred branch and install the python development dependencies using:
 
+    git checkout stable
     make init
 
 The `make init` target only needs to be run once on initial setup, or when
-upgrading to a different CompilerGym release.
+pulling remote changes to the CompilerGym repository.
 
 Run the test suite to confirm that everything is working:
 
