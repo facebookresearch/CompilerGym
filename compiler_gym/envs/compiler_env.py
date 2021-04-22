@@ -21,7 +21,7 @@ import numpy as np
 from gym.spaces import Space
 
 from compiler_gym.compiler_env_state import CompilerEnvState
-from compiler_gym.datasets.dataset import LegacyDataset, require
+from compiler_gym.datasets import Benchmark, LegacyDataset, require
 from compiler_gym.service import (
     CompilerGymServiceConnection,
     ConnectionOpts,
@@ -30,9 +30,9 @@ from compiler_gym.service import (
     ServiceTransportError,
     observation_t,
 )
+from compiler_gym.service.proto import AddBenchmarkRequest
+from compiler_gym.service.proto import Benchmark as BenchmarkProto
 from compiler_gym.service.proto import (
-    AddBenchmarkRequest,
-    Benchmark,
     EndSessionReply,
     EndSessionRequest,
     ForkSessionReply,
@@ -251,7 +251,7 @@ class CompilerEnv(gym.Env):
         # A map from benchmark URIs to Benchmark messages. We keep track of any
         # user-provided custom benchmarks so that we can register them with a
         # reset service.
-        self._custom_benchmarks: Dict[str, Benchmark] = {}
+        self._custom_benchmarks: Dict[str, BenchmarkProto] = {}
         # Normally when the benchmark is changed the updated value is not
         # reflected until the next call to reset(). We make an exception for
         # constructor-time arguments as otherwise the behavior of the benchmark
@@ -451,10 +451,14 @@ class CompilerEnv(gym.Env):
                         self.logger.info("Requiring dataset %s", components[0])
                         self.require_dataset(components[0])
             self._user_specified_benchmark_uri = benchmark
-        elif isinstance(benchmark, Benchmark):
+        elif isinstance(benchmark, BenchmarkProto):
             self.logger.debug("Setting benchmark data: %s", benchmark.uri)
             self._user_specified_benchmark_uri = benchmark.uri
             self._add_custom_benchmarks([benchmark])
+        elif isinstance(benchmark, Benchmark):
+            self.logger.debug("Setting benchmark: %s", benchmark)
+            self._user_specified_benchmark_uri = benchmark.uri
+            self._add_custom_benchmarks([benchmark.proto])
         else:
             raise TypeError(f"Unsupported benchmark type: {type(benchmark).__name__}")
 
@@ -937,7 +941,7 @@ class CompilerEnv(gym.Env):
             self.service(
                 self.service.stub.AddBenchmark,
                 AddBenchmarkRequest(
-                    benchmark=[Benchmark(uri="service://scan-site-data")]
+                    benchmark=[BenchmarkProto(uri="service://scan-site-data")]
                 ),
             )
             self.make_manifest_file()
@@ -1007,7 +1011,7 @@ class CompilerEnv(gym.Env):
         self.available_datasets[dataset.name] = dataset
         return True
 
-    def _add_custom_benchmarks(self, benchmarks: List[Benchmark]) -> None:
+    def _add_custom_benchmarks(self, benchmarks: List[BenchmarkProto]) -> None:
         """Register custom benchmarks with the compiler service.
 
         Benchmark registration occurs automatically using the

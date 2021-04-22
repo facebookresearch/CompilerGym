@@ -13,12 +13,13 @@ import numpy as np
 from gym.spaces import Box
 from gym.spaces import Dict as DictSpace
 
+from compiler_gym.datasets import Benchmark
 from compiler_gym.envs.compiler_env import CompilerEnv
-from compiler_gym.envs.llvm.benchmarks import make_benchmark
 from compiler_gym.envs.llvm.legacy_datasets import (
     LLVM_DATASETS,
     get_llvm_benchmark_validation_callback,
 )
+from compiler_gym.envs.llvm.llvm_benchmark import ClangInvocation, make_benchmark
 from compiler_gym.envs.llvm.llvm_rewards import (
     BaselineImprovementNormalizedReward,
     CostFunctionReward,
@@ -296,10 +297,101 @@ class LlvmEnv(CompilerEnv):
             self.require_dataset("cBench-v1")
             super().reset(*args, **kwargs)
 
-    @staticmethod
-    def make_benchmark(*args, **kwargs):
-        """Alias to :func:`llvm.make_benchmark() <compiler_gym.envs.llvm.make_benchmark>`."""
-        return make_benchmark(*args, **kwargs)
+    def make_benchmark(
+        self,
+        inputs: Union[
+            str, Path, ClangInvocation, List[Union[str, Path, ClangInvocation]]
+        ],
+        copt: Optional[List[str]] = None,
+        system_includes: bool = True,
+        timeout: int = 600,
+    ) -> Benchmark:
+        """Create a benchmark for use with this environment.
+
+        This function takes one or more inputs and uses them to create a
+        benchmark that can be passed to :meth:`compiler_gym.envs.LlvmEnv.reset`.
+
+        For single-source C/C++ programs, you can pass the path of the source
+        file:
+
+            >>> benchmark = make_benchmark('my_app.c')
+            >>> env = gym.make("llvm-v0")
+            >>> env.reset(benchmark=benchmark)
+
+        The clang invocation used is roughly equivalent to:
+
+        .. code-block::
+
+            $ clang my_app.c -O0 -c -emit-llvm -o benchmark.bc
+
+        Additional compile-time arguments to clang can be provided using the
+        :code:`copt` argument:
+
+            >>> benchmark = make_benchmark('/path/to/my_app.cpp', copt=['-O2'])
+
+        If you need more fine-grained control over the options, you can directly
+        construct a :class:`ClangInvocation
+        <compiler_gym.envs.llvm.ClangInvocation>` to pass a list of arguments to
+        clang:
+
+            >>> benchmark = make_benchmark(
+                ClangInvocation(['/path/to/my_app.c'], timeout=10)
+            )
+
+        For multi-file programs, pass a list of inputs that will be compiled
+        separately and then linked to a single module:
+
+            >>> benchmark = make_benchmark([
+                'main.c',
+                'lib.cpp',
+                'lib2.bc',
+            ])
+
+        If you already have prepared bitcode files, those can be linked and used
+        directly:
+
+            >>> benchmark = make_benchmark([
+                'bitcode1.bc',
+                'bitcode2.bc',
+            ])
+
+        .. note::
+
+            LLVM bitcode compatibility is
+            `not guaranteed <https://llvm.org/docs/DeveloperPolicy.html#ir-backwards-compatibility>`_,
+            so you must ensure that any precompiled bitcodes are compatible with the
+            LLVM version used by CompilerGym, which can be queried using
+            :func:`LlvmEnv.compiler_version <compiler_gym.envs.CompilerEnv.compiler_version>`.
+
+        :param inputs: An input, or list of inputs.
+
+        :param copt: A list of command line options to pass to clang when
+            compiling source files.
+
+        :param system_includes: Whether to include the system standard libraries
+            during compilation jobs. This requires a system toolchain. See
+            :func:`get_system_includes`.
+
+        :param timeout: The maximum number of seconds to allow clang to run
+            before terminating.
+
+        :return: A :code:`Benchmark` instance.
+
+        :raises FileNotFoundError: If any input sources are not found.
+
+        :raises TypeError: If the inputs are of unsupported types.
+
+        :raises OSError: If a compilation job fails.
+
+        :raises TimeoutExpired: If a compilation job exceeds :code:`timeout`
+            seconds.
+        """
+        return make_benchmark(
+            inputs=inputs,
+            copt=copt,
+            system_includes=system_includes,
+            timeout=timeout,
+        )
 
     def _make_action_space(self, name: str, entries: List[str]) -> Commandline:
         flags = [

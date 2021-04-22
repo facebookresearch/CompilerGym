@@ -72,6 +72,7 @@ py_test(
     name = "custom_benchmarks_test",
     srcs = ["custom_benchmarks_test.py"],
     data = [
+        "invalid_ir.ll",
         "//compiler_gym/third_party/cBench:crc32",
     ],
     deps = [
@@ -79,6 +80,7 @@ py_test(
         "//compiler_gym/service/proto",
         "//compiler_gym/util",
         "//tests:test_main",
+        "//tests/pytest_plugins:common",
         "//tests/pytest_plugins:llvm",
     ],
 )

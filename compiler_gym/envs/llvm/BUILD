@@ -11,19 +11,20 @@ py_library(
         ":specs.py",
     ],
     data = ["//compiler_gym/envs/llvm/service"],
-    visibility = ["//compiler_gym:__subpackages__"],
+    visibility = ["//visibility:public"],
     deps = [
-        ":benchmarks",
+        ":llvm_benchmark",
         ":llvm_env",
         "//compiler_gym/util",
     ],
 )
 
 py_library(
-    name = "benchmarks",
-    srcs = ["benchmarks.py"],
+    name = "llvm_benchmark",
+    srcs = ["llvm_benchmark.py"],
     visibility = ["//compiler_gym:__subpackages__"],
     deps = [
+        "//compiler_gym/datasets",
         "//compiler_gym/service/proto",
         "//compiler_gym/third_party/llvm",
         "//compiler_gym/util",
@@ -48,8 +49,8 @@ py_library(
         "//compiler_gym/envs/llvm/service/passes:actions_genfiles",
     ],
     deps = [
-        ":benchmarks",
         ":legacy_datasets",
+        ":llvm_benchmark",
         ":llvm_rewards",
         "//compiler_gym/envs:compiler_env",
         "//compiler_gym/spaces",
