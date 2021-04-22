@@ -6,10 +6,16 @@ load("@rules_python//python:defs.bzl", "py_library")
 
 py_library(
     name = "datasets",
-    srcs = ["__init__.py"],
+    srcs = [
+        "__init__.py",
+        "benchmark.py",
+        "dataset.py",
+    ],
     visibility = ["//visibility:public"],
     deps = [
-        ":dataset",
+        "//compiler_gym:validation_result",
+        "//compiler_gym/service/proto",
+        "//compiler_gym/util",
     ],
 )
 
