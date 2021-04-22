@@ -47,6 +47,7 @@ extensions = [
     "sphinx.ext.viewcode",
     "sphinx_rtd_theme",
     "sphinx.ext.autosectionlabel",
+    "sphinxemoji.sphinxemoji",
 ]
 
 autosectionlabel_prefix_document = True
