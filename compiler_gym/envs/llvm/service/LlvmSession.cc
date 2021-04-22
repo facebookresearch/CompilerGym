@@ -218,7 +218,7 @@ Status LlvmSession::runOptWithArgs(const std::vector<std::string>& optArgs) {
   RETURN_IF_ERROR(writeBitcodeToFile(benchmark().module(), before_path));
 
   // Build a command line invocation: `opt input.bc -o output.bc <optArgs...>`.
-  const auto optPath = util::getSiteDataPath("llvm/10.0.0/bin/opt");
+  const auto optPath = util::getSiteDataPath("llvm-v0/bin/opt");
   if (!fs::exists(optPath)) {
     return Status(StatusCode::INTERNAL, fmt::format("File not found: {}", optPath.string()));
   }
