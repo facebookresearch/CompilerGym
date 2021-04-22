@@ -150,9 +150,12 @@ In Python, import `compiler_gym` to use the environments:
 >>> env.step(env.action_space.sample())     # applies a random optimization, updates state/reward/actions
 ```
 
-See the
-[documentation website](http://facebookresearch.github.io/CompilerGym/) for
-tutorials, further details, and API reference.
+See the [documentation website](http://facebookresearch.github.io/CompilerGym/)
+for tutorials, further details, and API reference. Our
+[roadmap](https://facebookresearch.github.io/CompilerGym/about.html#roadmap) of
+planned features is public, and the
+[changelog](https://github.com/facebookresearch/CompilerGym/blob/development/CHANGELOG.md)
+summarizes shipped features.
 
 
 # Leaderboards
