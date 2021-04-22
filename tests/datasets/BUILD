@@ -25,3 +25,14 @@ py_test(
         "//tests/pytest_plugins:common",
     ],
 )
+
+py_test(
+    name = "files_dataset_test",
+    timeout = "short",
+    srcs = ["files_dataset_test.py"],
+    deps = [
+        "//compiler_gym/datasets",
+        "//tests:test_main",
+        "//tests/pytest_plugins:common",
+    ],
+)
