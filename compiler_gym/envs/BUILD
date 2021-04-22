@@ -21,7 +21,7 @@ py_library(
     deps = [
         "//compiler_gym:compiler_env_state",
         "//compiler_gym:validation_result",
-        "//compiler_gym/datasets:dataset",
+        "//compiler_gym/datasets",
         "//compiler_gym/service",
         "//compiler_gym/service/proto",
         "//compiler_gym/spaces",

@@ -9,6 +9,8 @@ from compiler_gym.datasets.benchmark import (
     BenchmarkSource,
 )
 from compiler_gym.datasets.dataset import (
+    Dataset,
+    DatasetInitError,
     LegacyDataset,
     activate,
     deactivate,
@@ -21,6 +23,8 @@ __all__ = [
     "Benchmark",
     "BenchmarkInitError",
     "BenchmarkSource",
+    "Dataset",
+    "DatasetInitError",
     "deactivate",
     "delete",
     "LegacyDataset",
