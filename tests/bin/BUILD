@@ -10,6 +10,7 @@ py_test(
     deps = [
         "//compiler_gym/bin:datasets",
         "//tests:test_main",
+        "//tests/pytest_plugins:common",
     ],
 )
 

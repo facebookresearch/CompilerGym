@@ -7,14 +7,14 @@ from absl import flags
 
 from compiler_gym.util.capture_output import capture_output
 from examples.actor_critic import main
+from tests.pytest_plugins.common import set_command_line_flags
 from tests.test_main import main as _test_main
 
 FLAGS = flags.FLAGS
 
 
 def test_run_actor_critic_smoke_test():
-    FLAGS.unparse_flags()
-    FLAGS(
+    set_command_line_flags(
         [
             "argv0",
             "--seed=0",

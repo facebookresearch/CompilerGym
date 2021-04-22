@@ -8,11 +8,10 @@ from io import StringIO
 from pathlib import Path
 
 import pytest
-from absl import flags
 
 from compiler_gym.bin.validate import main
 from compiler_gym.util.capture_output import capture_output
-from tests.pytest_plugins.common import skip_on_ci
+from tests.pytest_plugins.common import set_command_line_flags, skip_on_ci
 from tests.test_main import main as _test_main
 
 
@@ -21,8 +20,7 @@ def test_okay_llvm_result(monkeypatch):
 benchmark,reward,commandline,walltime
 benchmark://cBench-v1/crc32,0,opt  input.bc -o output.bc,0.3
 """.strip()
-    flags.FLAGS.unparse_flags()
-    flags.FLAGS(["argv0", "--env=llvm-ic-v0"])
+    set_command_line_flags(["argv0", "--env=llvm-ic-v0"])
     monkeypatch.setattr("sys.stdin", StringIO(stdin))
 
     with capture_output() as out:
@@ -42,8 +40,7 @@ benchmark,reward,commandline,walltime
 benchmark://cBench-v1/crc32,0,opt  input.bc -o output.bc,0.3
 """.strip()
             )
-        flags.FLAGS.unparse_flags()
-        flags.FLAGS(["argv0", "--env=llvm-ic-v0"])
+        set_command_line_flags(["argv0", "--env=llvm-ic-v0"])
 
         with capture_output() as out:
             main(["argv0", str(path)])
@@ -53,8 +50,7 @@ benchmark://cBench-v1/crc32,0,opt  input.bc -o output.bc,0.3
 
 
 def test_no_input(monkeypatch):
-    flags.FLAGS.unparse_flags()
-    flags.FLAGS(["argv0", "--env=llvm-ic-v0"])
+    set_command_line_flags(["argv0", "--env=llvm-ic-v0"])
     monkeypatch.setattr("sys.stdin", StringIO(""))
 
     with capture_output() as out:
@@ -69,8 +65,7 @@ def test_invalid_reward_llvm_result(monkeypatch):
 benchmark,reward,commandline,walltime
 benchmark://cBench-v1/crc32,0.5,opt  input.bc -o output.bc,0.3
 """.strip()
-    flags.FLAGS.unparse_flags()
-    flags.FLAGS(["argv0", "--env=llvm-ic-v0"])
+    set_command_line_flags(["argv0", "--env=llvm-ic-v0"])
     monkeypatch.setattr("sys.stdin", StringIO(stdin))
     with capture_output() as out:
         with pytest.raises(SystemExit):
@@ -85,8 +80,7 @@ benchmark://cBench-v1/crc32,0.5,opt  input.bc -o output.bc,0.3
 
 def test_invalid_csv_format(monkeypatch):
     stdin = "invalid\ncsv\nformat"
-    flags.FLAGS.unparse_flags()
-    flags.FLAGS(["argv0", "--env=llvm-ic-v0"])
+    set_command_line_flags(["argv0", "--env=llvm-ic-v0"])
     monkeypatch.setattr("sys.stdin", StringIO(stdin))
 
     with capture_output() as out:
@@ -104,8 +98,7 @@ benchmark://cBench-v1/crc32,,0,opt  input.bc -o output.bc
 benchmark://cBench-v1/crc32,,0,opt  input.bc -o output.bc
 benchmark://cBench-v1/crc32,,0,opt  input.bc -o output.bc
 """.strip()
-    flags.FLAGS.unparse_flags()
-    flags.FLAGS(["argv0", "--env=llvm-v0"])
+    set_command_line_flags(["argv0", "--env=llvm-v0"])
     monkeypatch.setattr("sys.stdin", StringIO(stdin))
 
     with capture_output() as out:
@@ -143,8 +136,7 @@ benchmark://cBench-v1/tiff2bw,,0,opt  input.bc -o output.bc
 benchmark://cBench-v1/tiffmedian,,0,opt  input.bc -o output.bc
 benchmark://cBench-v1/susan,,0,opt  input.bc -o output.bc
 """.strip()
-    flags.FLAGS.unparse_flags()
-    flags.FLAGS(["argv0", "--env=llvm-v0"])
+    set_command_line_flags(["argv0", "--env=llvm-v0"])
     monkeypatch.setattr("sys.stdin", StringIO(stdin))
 
     with capture_output() as out:
