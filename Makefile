@@ -185,7 +185,7 @@ docs/source/contributing.rst: CONTRIBUTING.md
 
 docs/source/installation.rst: README.md
 	echo "..\n  Generated from $<. Do not edit!\n" > $@
-	sed -n '/^## Installation/,$$p' $< | sed -n '/^## Trying/q;p' | $(PANDOC) --from=markdown --to=rst >> $@
+	sed -n '/^## Installation/,$$p' $< | sed -n '/^### Building/q;p' | $(PANDOC) --from=markdown --to=rst >> $@
 
 GENERATED_DOCS := \
 	docs/source/changelog.rst \

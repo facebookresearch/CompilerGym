@@ -4,17 +4,14 @@
 # LICENSE file in the root directory of this source tree.
 """End-to-end tests for //compiler_gym/bin:benchmarks."""
 import pytest
-from absl import flags
 
 from compiler_gym.bin.datasets import main
+from tests.pytest_plugins.common import set_command_line_flags
 from tests.test_main import main as _test_main
-
-FLAGS = flags.FLAGS
 
 
 def run_main(*args):
-    FLAGS.unparse_flags()
-    FLAGS(["argv"] + list(args))
+    set_command_line_flags(["argv"] + list(args))
     return main(["argv0"])
 
 

@@ -19,5 +19,6 @@ py_test(
     deps = [
         ":random_search",
         "//tests:test_main",
+        "//tests/pytest_plugins:common",
     ],
 )

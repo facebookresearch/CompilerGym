@@ -4,20 +4,17 @@
 # LICENSE file in the root directory of this source tree.
 """Tests for //leaderboard/llvm_instcount/random_search."""
 import pytest
-from absl import flags
 
 from leaderboard.llvm_instcount.random_search.random_search import (
     eval_llvm_instcount_policy,
     random_search,
 )
+from tests.pytest_plugins.common import set_command_line_flags
 from tests.test_main import main as _test_main
-
-FLAGS = flags.FLAGS
 
 
 def test_random_search():
-    FLAGS.unparse_flags()
-    FLAGS(
+    set_command_line_flags(
         [
             "argv0",
             "--n=1",

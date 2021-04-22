@@ -29,6 +29,7 @@ py_test(
     name = "parallelization_load_test_test",
     timeout = "moderate",
     srcs = ["parallelization_load_test_test.py"],
+    flaky = 1,
     deps = [
         ":parallelization_load_test",
         "//tests:test_main",

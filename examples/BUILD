@@ -21,6 +21,7 @@ py_test(
         ":actor_critic",
         "//compiler_gym/util",
         "//tests:test_main",
+        "//tests/pytest_plugins:common",
     ],
 )
 
@@ -90,6 +91,7 @@ py_test(
         ":tabular_q",
         "//compiler_gym/util",
         "//tests:test_main",
+        "//tests/pytest_plugins:common",
     ],
 )
 
