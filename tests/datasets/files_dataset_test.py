@@ -59,7 +59,7 @@ def test_dataset_is_installed(empty_dataset: FilesDataset):
 
 
 def test_empty_dataset(empty_dataset: FilesDataset):
-    assert empty_dataset.n == 0
+    assert empty_dataset.size == 0
     assert list(empty_dataset.benchmark_uris()) == []
     assert list(empty_dataset.benchmarks()) == []
 
@@ -84,7 +84,7 @@ def test_populated_dataset(populated_dataset: FilesDataset):
             "benchmark://test-v0/b/c.txt",
             "benchmark://test-v0/b/d.jpg",
         ]
-        assert populated_dataset.n == 9
+        assert populated_dataset.size == 9
 
 
 def test_populated_dataset_benchmark_lookup(populated_dataset: FilesDataset):
@@ -116,7 +116,7 @@ def test_populated_dataset_with_file_extension_filter(populated_dataset: FilesDa
         "benchmark://test-v0/g",
         "benchmark://test-v0/b/d",
     ]
-    assert populated_dataset.n == 2
+    assert populated_dataset.size == 2
 
 
 @pytest.mark.parametrize(

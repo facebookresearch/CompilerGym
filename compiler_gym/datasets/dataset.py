@@ -31,9 +31,10 @@ class Dataset(object):
     The Dataset class is an abstract base for implementing datasets. At a
     minimum, subclasses must implement the :meth:`benchmark()
     <compiler_gym.datasets.Dataset.benchmark>` and :meth:`benchmark_uris()
-    <compiler_gym.datasets.Dataset.benchmark_uris>` methods. Other methods such
-    as :meth:`install() <compiler_gym.datasets.Dataset.install>` may be used
-    where helpful.
+    <compiler_gym.datasets.Dataset.benchmark_uris>` methods, and :meth:`size
+    <compiler_gym.datasets.Dataset.size>`. Other methods such as
+    :meth:`install() <compiler_gym.datasets.Dataset.install>` may be used where
+    helpful.
     """
 
     def __init__(
@@ -241,16 +242,28 @@ class Dataset(object):
             )
         return total_size
 
+    # We use Union[int, float] to represent the size because infinite size is
+    # represented by math.inf, which is a float. For all other sizes this should
+    # be an int.
     @property
-    def n(self) -> int:
-        """The number of benchmarks in the dataset. This value is negative if
-        the number of benchmarks in the dataset is unbounded, for example
-        because the dataset represents a program generator that can produce an
-        infinite number of programs.
+    def size(self) -> Union[int, float]:
+        """The number of benchmarks in the dataset. If the number of benchmarks
+        is unbounded, for example because the dataset represents a program
+        generator that can produce an infinite number of programs, the value is
+        :code:`math.inf`.
 
-        :type: int
+        :type: Union[int, float]
         """
         return 0
+
+    def __len__(self) -> Union[int, float]:
+        """The number of benchmarks in the dataset.
+
+        Equivalent to :meth:`Dataset.size <compiler_gym.datasets.Dataset.size>`.
+
+        :return: An integer, or :code:`math.float`.
+        """
+        return self.size
 
     @property
     def installed(self) -> bool:
@@ -290,12 +303,27 @@ class Dataset(object):
         :meth:`benchmark_uris() <compiler_gym.datasets.Dataset.benchmark_uris>`
         is the same.
 
+        If the number of benchmarks in the dataset is infinite
+        (:code:`len(dataset) == math.inf`), the iterable returned by this method
+        will continue indefinitely.
+
         :return: An iterable sequence of :class:`Benchmark
             <compiler_gym.datasets.Benchmark>` instances.
         """
         # Default implementation. Subclasses may wish to provide an alternative
         # implementation that is optimized to specific use cases.
         yield from (self.benchmark(uri) for uri in self.benchmark_uris())
+
+    def __iter__(self) -> Iterable[Benchmark]:
+        """Enumerate the (possibly infinite) benchmarks lazily.
+
+        Equivalent to :meth:`Dataset.benchmarks()
+        <compiler_gym.datasets.Dataset.benchmarks>`.
+
+        :return: An iterable sequence of :meth:`Benchmark
+            <compiler_gym.datasets.Benchmark>` instances.
+        """
+        yield from self.benchmarks()
 
     def benchmark_uris(self) -> Iterable[str]:
         """Enumerate the (possibly infinite) benchmark URIs.
@@ -328,6 +356,19 @@ class Dataset(object):
         :raise LookupError: If :code:`uri` is provided but does not exist.
         """
         raise NotImplementedError("abstract class")
+
+    def __getitem__(self, uri: str) -> Benchmark:
+        """Select a benchmark by URI.
+
+        Equivalent to :meth:`Dataset.benchmark(uri)
+        <compiler_gym.datasets.Dataset.benchmark>`.
+
+        :return: A :class:`Benchmark <compiler_gym.datasets.Benchmark>`
+            instance.
+
+        :raise LookupError: If :code:`uri` does not exist.
+        """
+        return self.benchmark(uri)
 
 
 class DatasetInitError(OSError):
