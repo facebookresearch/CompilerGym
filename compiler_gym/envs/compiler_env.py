@@ -21,7 +21,7 @@ import numpy as np
 from gym.spaces import Space
 
 from compiler_gym.compiler_env_state import CompilerEnvState
-from compiler_gym.datasets import Benchmark, LegacyDataset, require
+from compiler_gym.datasets import Benchmark, Dataset, Datasets, LegacyDataset, require
 from compiler_gym.service import (
     CompilerGymServiceConnection,
     ConnectionOpts,
@@ -154,6 +154,7 @@ class CompilerEnv(gym.Env):
         self,
         service: Union[str, Path],
         rewards: Optional[List[Reward]] = None,
+        datasets: Optional[Iterable[Dataset]] = None,
         benchmark: Optional[Union[str, Benchmark]] = None,
         observation_space: Optional[Union[str, ObservationSpaceSpec]] = None,
         reward_space: Optional[Union[str, Reward]] = None,
@@ -231,6 +232,7 @@ class CompilerEnv(gym.Env):
             opts=self._connection_settings,
             logger=self.logger,
         )
+        self.datasets = Datasets(datasets or [])
 
         # If no reward space is specified, generate some from numeric observation spaces
         rewards = rewards or [
