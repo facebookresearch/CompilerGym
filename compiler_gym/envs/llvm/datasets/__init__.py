@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Iterable, Optional
 
 from compiler_gym.datasets import Dataset, TarDatasetWithManifest
+from compiler_gym.envs.llvm.datasets.anghabench import AnghaBenchDataset
 from compiler_gym.envs.llvm.datasets.clgen import CLgenDataset
 from compiler_gym.envs.llvm.datasets.csmith import CsmithBenchmark, CsmithDataset
 from compiler_gym.envs.llvm.datasets.llvm_stress import LlvmStressDataset
@@ -202,6 +203,7 @@ class TensorflowDataset(TarDatasetWithManifest):
 def get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset]:
     site_data_base = site_data_base or site_data_path("llvm-v0")
 
+    yield AnghaBenchDataset(site_data_base=site_data_base, sort_order=0)
     yield BlasDataset(site_data_base=site_data_base, sort_order=0)
     yield CLgenDataset(site_data_base=site_data_base, sort_order=0)
     yield CsmithDataset(site_data_base=site_data_base, sort_order=0)
@@ -217,6 +219,7 @@ def get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset
 
 
 __all__ = [
+    "AnghaBenchDataset",
     "BlasDataset",
     "CLgenDataset",
     "CsmithDataset",
