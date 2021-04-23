@@ -80,5 +80,21 @@ def test_logger_forced():
         env_b.close()
 
 
+def test_set_seed(env: CompilerEnv):
+    assert env.seed(1) == [1]
+    assert env.seed(2) == [2]
+
+
+def test_choose_random_seed_different_values(env: CompilerEnv):
+    a, b = env.seed(), env.seed()
+    assert a != b, f"{a} != {b}"
+
+
+def test_choose_random_seed_unique_values(env: CompilerEnv):
+    """Check that calling seed multiple times returns unique values."""
+    seeds = [env.seed()[0] for _ in range(10)]
+    assert len(seeds) == len(set(seeds)), seeds
+
+
 if __name__ == "__main__":
     main()

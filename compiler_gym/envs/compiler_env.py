@@ -318,6 +318,19 @@ class CompilerEnv(gym.Env):
         """The version string of the underlying compiler that this service supports."""
         return self.versions.compiler_version
 
+    def seed(self, seed: Optional[int] = None) -> List[int]:
+        """Sets the seed for this environment's random number generator.
+
+        :return: A list containing a single seed value that is used for the
+            environment's random number generators. This value is equal to the
+            input argument :code:`seed`, unless :code:`seed=None`.
+        """
+        if seed is None:
+            seed = np.random.default_rng().integers((2 ** 63))
+
+        self.datasets.seed(seed)
+        return [seed]
+
     def commandline(self) -> str:
         """Interface for :class:`CompilerEnv` subclasses to provide an equivalent
         commandline invocation to the current environment state.
