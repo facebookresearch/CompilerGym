@@ -148,7 +148,7 @@ class TarDatasetWithManifest(TarDataset):
         self._manifest_lock = Lock()
         self._manifest_lockfile = self.site_data_path / "manifest.LOCK"
 
-    def _read_manifest(self, manifest_data: bytes) -> List[str]:
+    def _read_manifest(self, manifest_data: str) -> List[str]:
         """Read the manifest data into a list of URIs. Does not validate the
         manifest contents.
         """
@@ -202,7 +202,7 @@ class TarDatasetWithManifest(TarDataset):
             with atomic_file_write(self._manifest_path, fileobj=True) as f:
                 f.write(manifest_data)
 
-            uris = self._read_manifest(manifest_data)
+            uris = self._read_manifest(manifest_data.decode("utf-8"))
             self.logger.debug(
                 "Downloaded %s manifest, %d entries", self.name, len(uris)
             )
