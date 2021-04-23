@@ -68,7 +68,7 @@ class FilesDataset(Dataset):
         self._memoized_uris = None
 
     @memoized_property
-    def n(self) -> int:  # pylint: disable=invalid-overriden-method
+    def size(self) -> int:  # pylint: disable=invalid-overriden-method
         self.install()
         return sum(
             sum(1 for f in files if f.endswith(self.benchmark_file_suffix))
@@ -111,9 +111,9 @@ class FilesDataset(Dataset):
     def benchmark(self, uri: Optional[str] = None) -> Benchmark:
         self.install()
         if uri is None or len(uri) <= len(self.name) + 1:
-            if not self.n:
+            if not self.size:
                 raise ValueError("No benchmarks")
-            return self._get_benchmark_by_index(self.random.integers(self.n))
+            return self._get_benchmark_by_index(self.random.integers(self.size))
 
         relpath = f"{uri[len(self.name) + 1:]}{self.benchmark_file_suffix}"
         abspath = self.dataset_root / relpath
@@ -160,4 +160,4 @@ class FilesDataset(Dataset):
 
         # "Unreachable". _get_benchmark_by_index() should always be called with
         # in-bounds values. Perhaps files have been deleted from site_data_path?
-        raise IndexError(f"Could not find benchmark with index {n} / {self.n}")
+        raise IndexError(f"Could not find benchmark with index {n} / {self.size}")

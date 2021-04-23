@@ -209,7 +209,7 @@ class TarDatasetWithManifest(TarDataset):
             return uris
 
     @memoized_property
-    def n(self) -> int:
+    def size(self) -> int:
         return len(self._benchmark_uris)
 
     def benchmark_uris(self) -> Iterable[str]:

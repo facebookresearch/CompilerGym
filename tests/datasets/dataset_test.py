@@ -134,5 +134,53 @@ def test_dataset_site_data_directory(tmpwd: Path):
     assert not dataset.site_data_path.is_dir()  # Dir is not created until needed.
 
 
+class TestDataset(Dataset):
+    """A dataset to use for testing."""
+
+    def __init__(self, benchmarks=None):
+        super().__init__(
+            name="benchmark://test-v0",
+            description="A test dataset",
+            license="MIT",
+            site_data_base="test",
+        )
+        self._benchmarks = benchmarks or {
+            "benchmark://test-v0/a": 1,
+            "benchmark://test-v0/b": 2,
+            "benchmark://test-v0/c": 3,
+        }
+
+    def benchmark_uris(self):
+        return sorted(self._benchmarks)
+
+    def benchmark(self, uri):
+        if uri:
+            return self._benchmarks[uri]
+        else:
+            return next(iter(self._benchmarks.values()))
+
+    @property
+    def size(self):
+        return len(self._benchmarks)
+
+
+def test_dataset_size():
+    dataset = TestDataset()
+    assert dataset.size == 3
+    assert len(dataset) == 3
+
+
+def test_benchmarks_lookup_by_uri():
+    dataset = TestDataset()
+    assert dataset.benchmark("benchmark://test-v0/b") == 2
+    assert dataset["benchmark://test-v0/b"] == 2
+
+
+def test_benchmarks_iter():
+    dataset = TestDataset()
+    assert list(dataset.benchmarks()) == [1, 2, 3]
+    assert list(dataset) == [1, 2, 3]
+
+
 if __name__ == "__main__":
     main()
