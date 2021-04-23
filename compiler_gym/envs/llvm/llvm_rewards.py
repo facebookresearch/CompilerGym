@@ -70,7 +70,7 @@ class NormalizedReward(CostFunctionReward):
         """Called on env.reset(). Reset incremental progress."""
         super().reset(benchmark)
         # The benchmark has changed so we must compute a new cost normalization
-        # value. If the benchamrk has not changed then the previously computed
+        # value. If the benchmark has not changed then the previously computed
         # value is still valid.
         if self.benchmark != benchmark:
             self.cost_norm = None

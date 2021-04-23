@@ -2,7 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""Smoke test for //benchamrks:parallelization_load_test."""
+"""Smoke test for //benchmarks:parallelization_load_test."""
 from pathlib import Path
 
 from absl import flags
