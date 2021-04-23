@@ -17,7 +17,7 @@ benchmark:
 
     $ bazel run -c opt //compiler_gym/bin:action_sensitivity_analysis -- \
         --env=llvm-v0 --reward=IrInstructionCountO3 \
-        --benchmark=cBench-v1/crc32 --num_trials=100 \
+        --benchmark=cbench-v1/crc32 --num_trials=100 \
         --action=AddDiscriminatorsPass,AggressiveDcepass,AggressiveInstCombinerPass
 
 Evaluate the single-step reward delta of all actions on LLVM codesize:

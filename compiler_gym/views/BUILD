@@ -40,6 +40,7 @@ py_library(
     visibility = ["//compiler_gym:__subpackages__"],
     deps = [
         ":observation",
+        "//compiler_gym/datasets",
         "//compiler_gym/service",
         "//compiler_gym/service/proto",
         "//compiler_gym/spaces",

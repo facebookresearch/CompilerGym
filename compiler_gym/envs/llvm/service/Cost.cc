@@ -97,7 +97,8 @@ Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& 
   if (clang.retcode()) {
     fs::remove(tmpFile);
     const std::string error(clangOutput.second.buf.begin(), clangOutput.second.buf.end());
-    return Status(StatusCode::INTERNAL, error);
+    return Status(StatusCode::INVALID_ARGUMENT,
+                  fmt::format("Failed to compute .text size cost.\nError from clang:\n{}", error));
   }
 
   auto llvmSize =
@@ -107,7 +108,9 @@ Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& 
   fs::remove(tmpFile);
   if (llvmSize.retcode()) {
     const std::string error(sizeOutput.second.buf.begin(), sizeOutput.second.buf.end());
-    return Status(StatusCode::INTERNAL, error);
+    return Status(
+        StatusCode::INVALID_ARGUMENT,
+        fmt::format("Failed to compute .text size cost.\nError from llvm-size:\n{}", error));
   }
 
   // The output of llvm-size is in berkley format, e.g.:
@@ -141,20 +144,22 @@ inline size_t getBaselineCostIndex(LlvmBaselinePolicy policy, LlvmCostFunction c
 
 }  // anonymous namespace
 
-double getCost(const LlvmCostFunction& cost, llvm::Module& module,
-               const fs::path& workingDirectory) {
-  switch (cost) {
-    case LlvmCostFunction::IR_INSTRUCTION_COUNT:
-      return static_cast<double>(module.getInstructionCount());
+Status setCost(const LlvmCostFunction& costFunction, llvm::Module& module,
+               const fs::path& workingDirectory, double* cost) {
+  switch (costFunction) {
+    case LlvmCostFunction::IR_INSTRUCTION_COUNT: {
+      *cost = static_cast<double>(module.getInstructionCount());
+      break;
+    }
     case LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES: {
       int64_t size;
 #ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
-      const auto status = getTextSizeInBytes(module, &size, {"-c"}, workingDirectory);
+      RETURN_IF_ERROR(getTextSizeInBytes(module, &size, {"-c"}, workingDirectory));
 #else
-      const auto status = getTextSizeInBytes(module, &size, workingDirectory);
+      RETURN_IF_ERROR(getTextSizeInBytes(module, &size, workingDirectory));
 #endif
-      CHECK(status.ok()) << status.error_message();
-      return static_cast<double>(size);
+      *cost = static_cast<double>(size);
+      break;
     }
 #ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
 
@@ -167,14 +172,15 @@ double getCost(const LlvmCostFunction& cost, llvm::Module& module,
 #endif
     case LlvmCostFunction::TEXT_SIZE_BYTES: {
       int64_t size;
-      const auto status = getTextSizeInBytes(module, &size, {SYSTEM_LIBRARIES}, workingDirectory);
-      CHECK(status.ok()) << status.error_message();
-      return static_cast<double>(size);
+      RETURN_IF_ERROR(getTextSizeInBytes(module, &size, {SYSTEM_LIBRARIES}, workingDirectory));
+      *cost = static_cast<double>(size);
+      break;
     }
 #endif
+    default:
+      UNREACHABLE(fmt::format("Unhandled cost function: {}", costFunction));
   }
-
-  UNREACHABLE("Unhandled cost");
+  return Status::OK;
 }
 
 double getBaselineCost(const BaselineCosts& baselineCosts, LlvmBaselinePolicy policy,
@@ -182,12 +188,12 @@ double getBaselineCost(const BaselineCosts& baselineCosts, LlvmBaselinePolicy po
   return baselineCosts[getBaselineCostIndex(policy, cost)];
 }
 
-void setbaselineCosts(const llvm::Module& unoptimizedModule, BaselineCosts* baselineCosts,
-                      const fs::path& workingDirectory) {
+Status setBaselineCosts(llvm::Module& unoptimizedModule, BaselineCosts* baselineCosts,
+                        const fs::path& workingDirectory) {
+  llvm::Module* moduleO0 = &unoptimizedModule;
+
   // Create a copy of the unoptimized module and apply the default set of LLVM
   // optimizations.
-  std::unique_ptr<llvm::Module> moduleO0 = llvm::CloneModule(unoptimizedModule);
-
   std::unique_ptr<llvm::Module> moduleOz = llvm::CloneModule(unoptimizedModule);
   applyBaselineOptimizations(moduleOz.get(), /*optLevel=*/2, /*sizeLevel=*/2);
 
@@ -199,7 +205,7 @@ void setbaselineCosts(const llvm::Module& unoptimizedModule, BaselineCosts* base
     llvm::Module* baselineModule{nullptr};
     switch (policy) {
       case LlvmBaselinePolicy::O0:
-        baselineModule = moduleO0.get();
+        baselineModule = moduleO0;
         break;
       case LlvmBaselinePolicy::O3:
         baselineModule = moduleO3.get();
@@ -207,16 +213,19 @@ void setbaselineCosts(const llvm::Module& unoptimizedModule, BaselineCosts* base
       case LlvmBaselinePolicy::Oz:
         baselineModule = moduleOz.get();
         break;
+      default:
+        UNREACHABLE("Unknown baseline policy");
     }
     DCHECK(baselineModule);
 
     // Compute and set the baseline costs.
     for (const auto cost : magic_enum::enum_values<LlvmCostFunction>()) {
       const auto idx = getBaselineCostIndex(policy, cost);
-      const auto cc = getCost(cost, *baselineModule, workingDirectory);
-      (*baselineCosts)[idx] = cc;
+      RETURN_IF_ERROR(setCost(cost, *baselineModule, workingDirectory, &(*baselineCosts)[idx]));
     }
   }
+
+  return Status::OK;
 }
 
 }  // namespace compiler_gym::llvm_service

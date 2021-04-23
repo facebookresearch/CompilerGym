@@ -22,7 +22,7 @@ cc_test(
 # cc_test(
 #     name = "GvnSinkTest",
 #     srcs = ["GvnSinkTest.cc"],
-#     data = ["//compiler_gym/third_party/cBench:blowfish"],
+#     data = ["//compiler_gym/third_party/cbench:blowfish"],
 #     deps = [
 #         "//compiler_gym/envs/llvm/service:BenchmarkFactory",
 #         "//compiler_gym/envs/llvm/service:LlvmSession",

@@ -21,7 +21,7 @@ def test_run_action_sensitivity_analysis():
     actions = [0, 1]
     env = "llvm-v0"
     reward = "IrInstructionCountO3"
-    benchmark = "cBench-v1/crc32"
+    benchmark = "cbench-v1/crc32"
 
     set_command_line_flags(["argv0", f"--env={env}", f"--benchmark={benchmark}"])
 

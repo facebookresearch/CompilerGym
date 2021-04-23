@@ -35,7 +35,7 @@ py_test(
     name = "cbench_validate_test",
     timeout = "eternal",
     srcs = ["cbench_validate_test.py"],
-    shard_count = 8,
+    shard_count = 6,
     deps = [
         "//compiler_gym",
         "//compiler_gym/datasets",

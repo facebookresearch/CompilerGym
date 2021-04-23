@@ -34,6 +34,7 @@ py_test(
         "//compiler_gym:random_replay",
         "//compiler_gym:random_search",
         "//tests:test_main",
+        "//tests/pytest_plugins:common",
     ],
 )
 
@@ -48,7 +49,6 @@ py_library(
         "//tests:__subpackages__",
     ],
     deps = [
-        "//compiler_gym",
         "//compiler_gym/util",
     ],
 )

@@ -3,9 +3,12 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """This module demonstrates how to """
+from typing import Optional
+
+from compiler_gym.datasets import Benchmark, Dataset
 from compiler_gym.spaces import Reward
 from compiler_gym.util.registration import register
-from compiler_gym.util.runfiles_path import runfiles_path
+from compiler_gym.util.runfiles_path import runfiles_path, site_data_path
 
 
 class RuntimeReward(Reward):
@@ -40,6 +43,35 @@ class RuntimeReward(Reward):
         return reward
 
 
+class ExampleDataset(Dataset):
+    def __init__(self, *args, **kwargs):
+        super().__init__(
+            name="benchmark://example-v0",
+            license="MIT",
+            description="An example dataset",
+            site_data_base=site_data_path("example_dataset"),
+        )
+        self._benchmarks = {
+            "benchmark://example-v0/foo": Benchmark.from_file_contents(
+                "benchmark://example-v0/foo", "Ir data".encode("utf-8")
+            ),
+            "benchmark://example-v0/bar": Benchmark.from_file_contents(
+                "benchmark://example-v0/bar", "Ir data".encode("utf-8")
+            ),
+        }
+
+    def benchmark_uris(self):
+        yield from self._benchmarks.keys()
+
+    def benchmark(self, uri: Optional[str] = None):
+        if uri is None or len(uri) <= len(self.name) + 1:
+            return self.random.choice(list(self._benchmarks.values()))
+        elif uri in self._benchmarks:
+            return self._benchmarks[uri]
+        else:
+            raise LookupError("Unknown program name")
+
+
 # Register the example service on module import. After importing this module,
 # the example-v0 environment will be available to gym.make(...).
 register(
@@ -50,6 +82,7 @@ register(
             "examples/example_compiler_gym_service/service_cc/compiler_gym-example-service-cc"
         ),
         "rewards": [RuntimeReward()],
+        "datasets": [ExampleDataset()],
     },
 )
 
@@ -61,5 +94,6 @@ register(
             "examples/example_compiler_gym_service/service_py/compiler_gym-example-service-py"
         ),
         "rewards": [RuntimeReward()],
+        "datasets": [ExampleDataset()],
     },
 )

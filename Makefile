@@ -215,10 +215,7 @@ test:
 itest:
 	$(IBAZEL) $(BAZEL_OPTS) test $(BAZEL_TEST_OPTS) //...
 
-install-test-datasets:
-	cd .. && $(PYTHON) -m compiler_gym.bin.datasets --env=llvm-v0 --download=cBench-v1 >/dev/null
-
-install-test: install-test-datasets
+install-test:
 	mkdir -p /tmp/compiler_gym/wheel_tests
 	rm -f /tmp/compiler_gym/wheel_tests/tests /tmp/compiler_gym/wheel_tests/tox.ini
 	ln -s $(ROOT)/tests /tmp/compiler_gym/wheel_tests
@@ -229,7 +226,7 @@ install-test: install-test-datasets
 # this at the commandline, e.g. `FUZZ_SECONDS=1800 make fuzz`.
 FUZZ_SECONDS ?= 300
 
-install-fuzz: install-test-datasets
+install-fuzz:
 	mkdir -p /tmp/compiler_gym/wheel_fuzz_tests
 	rm -f /tmp/compiler_gym/wheel_fuzz_tests/tests
 	ln -s $(ROOT)/tests /tmp/compiler_gym/wheel_fuzz_tests

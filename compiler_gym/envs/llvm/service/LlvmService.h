@@ -48,9 +48,6 @@ class LlvmService final : public CompilerGymService::Service {
   grpc::Status AddBenchmark(grpc::ServerContext* context, const AddBenchmarkRequest* request,
                             AddBenchmarkReply* reply) final override;
 
-  grpc::Status GetBenchmarks(grpc::ServerContext* context, const GetBenchmarksRequest* request,
-                             GetBenchmarksReply* reply) final override;
-
  protected:
   grpc::Status session(uint64_t id, LlvmSession** environment);
   grpc::Status session(uint64_t id, const LlvmSession** environment) const;

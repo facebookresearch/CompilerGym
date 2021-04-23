@@ -22,6 +22,7 @@ py_binary(
     srcs = ["datasets.py"],
     visibility = ["//visibility:public"],
     deps = [
+        ":service",
         "//compiler_gym/datasets",
         "//compiler_gym/envs",
         "//compiler_gym/util",
@@ -81,6 +82,7 @@ py_binary(
     srcs = ["service.py"],
     visibility = ["//visibility:public"],
     deps = [
+        "//compiler_gym/datasets",
         "//compiler_gym/envs",
         "//compiler_gym/spaces",
         "//compiler_gym/util",

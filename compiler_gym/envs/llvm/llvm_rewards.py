@@ -5,6 +5,7 @@
 """This module defines reward spaces used by the LLVM environment."""
 from typing import List, Optional
 
+from compiler_gym.datasets import Benchmark
 from compiler_gym.service import observation_t
 from compiler_gym.spaces.reward import Reward
 from compiler_gym.views.observation import ObservationView
@@ -35,7 +36,7 @@ class CostFunctionReward(Reward):
         self.init_cost_function: str = init_cost_function
         self.previous_cost: Optional[observation_t] = None
 
-    def reset(self, benchmark: str) -> None:
+    def reset(self, benchmark: Benchmark) -> None:
         """Called on env.reset(). Reset incremental progress."""
         del benchmark  # unused
         self.previous_cost = None
@@ -64,7 +65,7 @@ class NormalizedReward(CostFunctionReward):
         """Constructor."""
         super().__init__(**kwargs)
         self.cost_norm: Optional[observation_t] = None
-        self.benchmark = None
+        self.benchmark: Benchmark = None
 
     def reset(self, benchmark: str) -> None:
         """Called on env.reset(). Reset incremental progress."""

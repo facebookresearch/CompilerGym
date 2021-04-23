@@ -13,11 +13,6 @@ compiler_gym.bin.service
 
 .. automodule:: compiler_gym.bin.service
 
-compiler_gym.bin.datasets
--------------------------
-
-.. automodule:: compiler_gym.bin.datasets
-
 compiler_gym.bin.manual_env
 ---------------------------
 

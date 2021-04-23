@@ -4,6 +4,8 @@
 // LICENSE file in the root directory of this source tree.
 #pragma once
 
+#include <grpcpp/grpcpp.h>
+
 #include <magic_enum.hpp>
 #include <optional>
 
@@ -40,15 +42,18 @@ using PreviousCosts = std::array<std::optional<double>, numCosts>;
 // by returning a grpc::Status.
 
 // Compute the cost using a given cost function. A lower cost is better.
-double getCost(const LlvmCostFunction& cost, llvm::Module& module,
-               const boost::filesystem::path& workingDirectory);
+[[nodiscard]] grpc::Status setCost(const LlvmCostFunction& costFunction, llvm::Module& module,
+                                   const boost::filesystem::path& workingDirectory, double* cost);
 
 // Return a baseline cost.
 double getBaselineCost(const BaselineCosts& baselineCosts, LlvmBaselinePolicy policy,
                        LlvmCostFunction cost);
 
-// Compute the costs of baseline policies.
-void setbaselineCosts(const llvm::Module& unoptimizedModule, BaselineCosts* baselineCosts,
-                      const boost::filesystem::path& workingDirectory);
+// Compute the costs of baseline policies. The unoptimizedModule parameter is
+// unmodified, but is not const because various LLVM API calls require a mutable
+// reference.
+[[nodiscard]] grpc::Status setBaselineCosts(llvm::Module& unoptimizedModule,
+                                            BaselineCosts* baselineCosts,
+                                            const boost::filesystem::path& workingDirectory);
 
 }  // namespace compiler_gym::llvm_service

@@ -11,7 +11,7 @@ def test_run_explore_smoke_test(capsys):
         [
             "explore",
             "--env=llvm-ic-v0",
-            "--benchmark=cBench-v1/dijkstra",
+            "--benchmark=cbench-v1/dijkstra",
             "--episode_length=2",
             "--actions=-newgvn,-instcombine,-mem2reg",
             "--nproc=2",

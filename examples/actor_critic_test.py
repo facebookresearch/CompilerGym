@@ -21,7 +21,7 @@ def test_run_actor_critic_smoke_test():
             "--episode_len=2",
             "--episodes=10",
             "--log_interval=5",
-            "--benchmark=cBench-v1/crc32",
+            "--benchmark=cbench-v1/crc32",
         ]
     )
     with capture_output() as out:

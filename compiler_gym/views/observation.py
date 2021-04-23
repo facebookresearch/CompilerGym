@@ -14,16 +14,16 @@ class ObservationView(object):
 
     Example usage:
 
-    >>> env = gym.make("llvm-v0")
-    >>> env.reset()
-    >>> env.observation.spaces.keys()
-    ["Autophase", "Ir"]
-    >>> env.observation.spaces["Autophase"].space
-    Box(56,)
-    >>> env.observation["Autophase"]
-    [0, 1, ..., 2]
-    >>> observation["Ir"]
-    int main() {...}
+        >>> env = gym.make("llvm-v0")
+        >>> env.reset()
+        >>> env.observation.spaces.keys()
+        ["Autophase", "Ir"]
+        >>> env.observation.spaces["Autophase"].space
+        Box(56,)
+        >>> env.observation["Autophase"]
+        [0, 1, ..., 2]
+        >>> observation["Ir"]
+        int main() {...}
     """
 
     def __init__(
@@ -45,8 +45,13 @@ class ObservationView(object):
         """Request an observation from the given space.
 
         :param observation_space: The observation space to query.
+
         :return: An observation.
+
         :raises KeyError: If the requested observation space does not exist.
+
+        :raises SessionNotFound: If :meth:`env.reset()
+            <compiler_gym.envs.CompilerEnv.reset>` has not been called.
         """
         space = self.spaces[observation_space]
         request = StepRequest(
@@ -75,26 +80,29 @@ class ObservationView(object):
         base_id: str,
         **kwargs,
     ) -> None:
-        """Alias to
-        :func:`ObservationSpaceSpec.make_derived_space() <compiler_gym.views.ObservationSpaceSpec.make_derived_space>`
-        that adds the derived space to the observation view.
+        """Alias to :func:`ObservationSpaceSpec.make_derived_space()
+        <compiler_gym.views.ObservationSpaceSpec.make_derived_space>` that adds
+        the derived space to the observation view.
 
         Example usage:
 
-        >>> env.observation.add_derived_space(
-            id="src_len",
-            base_id="src",
-            translate=lambda src: np.array([len(src)], dtype=np.int32),
-            shape=Box(shape=(1,), dtype=np.int32),
-        )
-        >>> env.observation["src_len"]
-        1029
+            >>> env.observation.add_derived_space(
+                id="src_len",
+                base_id="src",
+                translate=lambda src: np.array([len(src)], dtype=np.int32),
+                shape=Box(shape=(1,), dtype=np.int32),
+            )
+            >>> env.observation["src_len"]
+            1029
 
         :param id: The name of the new observation space.
+
         :param base_id: The name of the observation space that this is derived
             from.
+
         :param \\**kwargs: Arguments passed to
-            :func:`ObservationSpaceSpec.make_derived_space <compiler_gym.views.ObservationSpaceSpec.make_derived_space>`.
+            :func:`ObservationSpaceSpec.make_derived_space
+            <compiler_gym.views.ObservationSpaceSpec.make_derived_space>`.
         """
         base_space = self.spaces[base_id]
         self._add_space(base_space.make_derived_space(id=id, **kwargs))

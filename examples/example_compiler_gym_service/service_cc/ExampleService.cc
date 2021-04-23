@@ -29,7 +29,9 @@ template <typename T>
   return Status::OK;
 }
 
-std::vector<std::string> getBenchmarks() { return {"foo", "bar"}; }
+std::vector<std::string> getBenchmarkUris() {
+  return {"benchmark://example-v0/foo", "benchmark://example-v0/bar"};
+}
 
 std::vector<ActionSpace> getActionSpaces() {
   ActionSpace space;
@@ -97,7 +99,7 @@ Status ExampleService::StartSession(ServerContext* /* unused*/, const StartSessi
 
   // Determine the benchmark to use.
   std::string benchmark = request->benchmark();
-  const auto benchmarks = getBenchmarks();
+  const auto benchmarks = getBenchmarkUris();
   if (!benchmark.empty() &&
       std::find(benchmarks.begin(), benchmarks.end(), benchmark) == benchmarks.end()) {
     return Status(StatusCode::INVALID_ARGUMENT, "Unknown program name");
@@ -148,14 +150,6 @@ Status ExampleService::Step(ServerContext* /* unused*/, const StepRequest* reque
   ExampleCompilationSession* sess;
   RETURN_IF_ERROR(session(request->session_id(), &sess));
   return sess->Step(request, reply);
-}
-
-Status ExampleService::GetBenchmarks(grpc::ServerContext* /*unused*/,
-                                     const GetBenchmarksRequest* /*unused*/,
-                                     GetBenchmarksReply* reply) {
-  const auto benchmarks = getBenchmarks();
-  *reply->mutable_benchmark() = {benchmarks.begin(), benchmarks.end()};
-  return Status::OK;
 }
 
 Status ExampleService::session(uint64_t id, ExampleCompilationSession** sess) {

@@ -234,11 +234,11 @@ def get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset
 __all__ = [
     "AnghaBenchDataset",
     "BlasDataset",
-    "CLgenDataset",
     "CBenchDataset",
     "CBenchLegacyDataset",
-    "CsmithDataset",
+    "CLgenDataset",
     "CsmithBenchmark",
+    "CsmithDataset",
     "get_llvm_datasets",
     "GitHubDataset",
     "LinuxDataset",

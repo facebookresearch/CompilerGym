@@ -17,8 +17,8 @@ space on a Dijkstra benchmark for 60 seconds using:
 
 .. code-block::
 
-    $ python -m compiler_gym.bin.random_search --env=llvm-ic-v0 --benchmark=cBench-v1/dijkstra --runtime=60
-    Started 16 worker threads for benchmark benchmark://cBench-v1/dijkstra (410 instructions) using reward IrInstructionCountOz.
+    $ python -m compiler_gym.bin.random_search --env=llvm-ic-v0 --benchmark=cbench-v1/dijkstra --runtime=60
+    Started 16 worker threads for benchmark benchmark://cbench-v1/dijkstra (410 instructions) using reward IrInstructionCountOz.
     === Running for a minute ===
     Runtime: a minute. Num steps: 470,407 (7,780 / sec). Num episodes: 4,616 (76 / sec). Num restarts: 0.
     Best reward: 101.59% (96 passes, found after 35 seconds)
@@ -106,8 +106,6 @@ def main(argv):
     env = make_env()
     try:
         env.reset()
-        if not env.benchmark:
-            raise app.UsageError("No benchmark specified.")
     finally:
         env.close()
 
