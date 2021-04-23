@@ -7,6 +7,8 @@ from pathlib import Path
 from typing import Iterable, Optional
 
 from compiler_gym.datasets import Dataset, TarDatasetWithManifest
+from compiler_gym.envs.llvm.datasets.csmith import CsmithBenchmark, CsmithDataset
+from compiler_gym.envs.llvm.datasets.llvm_stress import LlvmStressDataset
 from compiler_gym.envs.llvm.datasets.poj104 import POJ104Dataset, POJ104LegacyDataset
 from compiler_gym.util.runfiles_path import site_data_path
 
@@ -200,8 +202,10 @@ def get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset
     site_data_base = site_data_base or site_data_path("llvm-v0")
 
     yield BlasDataset(site_data_base=site_data_base, sort_order=0)
+    yield CsmithDataset(site_data_base=site_data_base, sort_order=0)
     yield GitHubDataset(site_data_base=site_data_base, sort_order=0)
     yield LinuxDataset(site_data_base=site_data_base, sort_order=0)
+    yield LlvmStressDataset(site_data_base=site_data_base, sort_order=0)
     yield MibenchDataset(site_data_base=site_data_base, sort_order=0)
     yield NPBDataset(site_data_base=site_data_base, sort_order=0)
     yield OpenCVDataset(site_data_base=site_data_base, sort_order=0)
@@ -212,9 +216,12 @@ def get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset
 
 __all__ = [
     "BlasDataset",
+    "CsmithDataset",
+    "CsmithBenchmark",
     "get_llvm_datasets",
     "GitHubDataset",
     "LinuxDataset",
+    "LlvmStressDataset",
     "MibenchDataset",
     "NPBDataset",
     "OpenCVDataset",
