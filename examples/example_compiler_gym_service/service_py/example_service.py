@@ -203,8 +203,8 @@ class ExampleCompilerGymService(proto.CompilerGymServiceServicer):
     def Step(self, request: proto.StepRequest, context) -> proto.StepReply:
         logging.debug("Step()")
         if request.session_id not in self.sessions:
-            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-            context.set_details("Session ID not found")
+            context.set_code(grpc.StatusCode.NOT_FOUND)
+            context.set_details(f"Session not found: {request.session_id}")
             return
 
         return self.sessions[request.session_id].step(request, context)

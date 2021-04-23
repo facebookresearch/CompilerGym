@@ -5,6 +5,8 @@
 
 #include "examples/example_compiler_gym_service/service_cc/ExampleService.h"
 
+#include <fmt/format.h>
+
 #include "compiler_gym/service/proto/compiler_gym_service.pb.h"
 #include "compiler_gym/util/GrpcStatusMacros.h"
 #include "compiler_gym/util/Version.h"
@@ -159,7 +161,7 @@ Status ExampleService::GetBenchmarks(grpc::ServerContext* /*unused*/,
 Status ExampleService::session(uint64_t id, ExampleCompilationSession** sess) {
   auto it = sessions_.find(id);
   if (it == sessions_.end()) {
-    return Status(StatusCode::INVALID_ARGUMENT, "Session ID not found");
+    return Status(StatusCode::NOT_FOUND, fmt::format("Session not found: {}", id));
   }
   *sess = it->second.get();
   return Status::OK;

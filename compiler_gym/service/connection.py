@@ -86,6 +86,10 @@ class ServiceError(Exception):
     """Error raised from the service."""
 
 
+class SessionNotFound(ServiceError):
+    """Requested session ID not found in service."""
+
+
 class ServiceOSError(ServiceError, OSError):
     """System error raised from the service."""
 

@@ -28,6 +28,7 @@ from compiler_gym.service import (
     ServiceError,
     ServiceOSError,
     ServiceTransportError,
+    SessionNotFound,
     observation_t,
 )
 from compiler_gym.service.proto import AddBenchmarkRequest
@@ -41,6 +42,7 @@ from compiler_gym.service.proto import (
     GetVersionReply,
     GetVersionRequest,
     StartSessionRequest,
+    StepReply,
     StepRequest,
 )
 from compiler_gym.spaces import DefaultRewardFromObservation, NamedDiscrete, Reward
@@ -52,6 +54,18 @@ from compiler_gym.views import ObservationSpaceSpec, ObservationView, RewardView
 # Type hints.
 info_t = Dict[str, Any]
 step_t = Tuple[Optional[observation_t], Optional[float], bool, info_t]
+
+
+def _wrapped_step(
+    service: CompilerGymServiceConnection, request: StepRequest
+) -> StepReply:
+    """Call the Step() RPC endpoint."""
+    try:
+        return service(service.stub.Step, request)
+    except FileNotFoundError as e:
+        if str(e).startswith("Session not found"):
+            raise SessionNotFound(str(e))
+        raise
 
 
 class CompilerEnv(gym.Env):
@@ -250,7 +264,7 @@ class CompilerEnv(gym.Env):
             for space in self.service.action_spaces
         ]
         self.observation = self._observation_view_type(
-            get_observation=lambda req: self.service(self.service.stub.Step, req),
+            get_observation=lambda req: _wrapped_step(self.service, req),
             spaces=self.service.observation_spaces,
         )
         self.reward = self._reward_view_type(rewards, self.observation)
@@ -782,10 +796,22 @@ class CompilerEnv(gym.Env):
             observation_space=observation_indices,
         )
         try:
-            reply = self.service(self.service.stub.Step, request)
-        except (ServiceError, ServiceTransportError, ServiceOSError, TimeoutError) as e:
+            reply = _wrapped_step(self.service, request)
+        except (
+            ServiceError,
+            ServiceTransportError,
+            ServiceOSError,
+            TimeoutError,
+            SessionNotFound,
+        ) as e:
+            # Gracefully handle "expected" error types. These non-fatal errors
+            # end the current episode and provide some diagnostic information to
+            # the user through the `info` dict.
             self.close()
-            info = {"error_details": str(e)}
+            info = {
+                "error_type": type(e).__name__,
+                "error_details": str(e),
+            }
             if self.reward_space:
                 reward = self.reward_space.reward_on_error(self.episode_reward)
             if self.observation_space:
