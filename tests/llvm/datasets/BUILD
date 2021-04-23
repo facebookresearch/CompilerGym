@@ -19,6 +19,33 @@ py_test(
 )
 
 py_test(
+    name = "cbench_test",
+    timeout = "moderate",
+    srcs = ["cbench_test.py"],
+    deps = [
+        "//compiler_gym/envs/llvm",
+        "//compiler_gym/envs/llvm/datasets",
+        "//tests:test_main",
+        "//tests/pytest_plugins:common",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
+    name = "cbench_validate_test",
+    timeout = "eternal",
+    srcs = ["cbench_validate_test.py"],
+    shard_count = 8,
+    deps = [
+        "//compiler_gym",
+        "//compiler_gym/datasets",
+        "//compiler_gym/envs",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "clgen_test",
     timeout = "moderate",
     srcs = ["clgen_test.py"],
@@ -57,6 +84,16 @@ py_test(
         "//tests:test_main",
         "//tests/pytest_plugins:common",
         "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
+    name = "llvm_datasets_test",
+    timeout = "short",
+    srcs = ["llvm_datasets_test.py"],
+    deps = [
+        "//compiler_gym/envs/llvm",
+        "//tests:test_main",
     ],
 )
 
