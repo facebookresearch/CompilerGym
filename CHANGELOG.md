@@ -46,11 +46,11 @@ semantics validation, and improving the datasets. Many thanks to @JD-at-work,
 - Added default reward spaces for `CompilerEnv` that are derived from scalar
   observations (thanks @bwasti!)
 - Added a new Q learning example (thanks @JD-at-work!).
-- *Deprecation:* The v0.1.9 release will introduce a new datasets API that is
+- *Deprecation:* The v0.1.8 release will introduce a new datasets API that is
   easier to use and more flexible. In preparation for this, the `Dataset` class
   has been renamed to `LegacyDataset`, the following dataset operations have
   been marked deprecated: `activate()`, `deactivate()`, and `delete()`. The
-  `GetBenchmarks()` RPC interface method has also been marked deprecated..
+  `GetBenchmarks()` RPC interface method has also been marked deprecated.
 - [llvm] Improved semantics validation using LLVM's memory, thread, address, and
   undefined behavior sanitizers.
 - Numerous bug fixes and improvements.
