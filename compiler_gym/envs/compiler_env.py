@@ -783,7 +783,7 @@ class CompilerEnv(gym.Env):
 
         # Build the list of observations that must be computed by the backend
         # service to generate the user-requested observation and reward.
-        # TODO(cummins): We could de-duplicate this list to improve effiency
+        # TODO(cummins): We could de-duplicate this list to improve efficiency
         # when multiple redundant copies of the same observation space are
         # requested.
         observation_indices, observation_spaces = [], []
