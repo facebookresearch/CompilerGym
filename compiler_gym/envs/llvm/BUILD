@@ -53,6 +53,7 @@ py_library(
         ":llvm_benchmark",
         ":llvm_rewards",
         "//compiler_gym/envs:compiler_env",
+        "//compiler_gym/envs/llvm/datasets",
         "//compiler_gym/spaces",
         "//compiler_gym/third_party/autophase",
         "//compiler_gym/third_party/inst2vec",

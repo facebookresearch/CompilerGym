@@ -50,6 +50,7 @@ setuptools.setup(
     packages=[
         "compiler_gym.bin",
         "compiler_gym.datasets",
+        "compiler_gym.envs.llvm.datasets",
         "compiler_gym.envs.llvm.service.passes",
         "compiler_gym.envs.llvm.service",
         "compiler_gym.envs.llvm",
