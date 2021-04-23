@@ -33,9 +33,9 @@ class FilesDataset(Dataset):
 
         >>> list(dataset.benchmark_uris())
         [
-            "benchamrk://ds-v0/a",
-            "benchamrk://ds-v0/subdir/subdir/b",
-            "benchamrk://ds-v0/subdir/subdir/c",
+            "benchmark://ds-v0/a",
+            "benchmark://ds-v0/subdir/subdir/b",
+            "benchmark://ds-v0/subdir/subdir/c",
         ]
     """
 

@@ -7,7 +7,7 @@
 To run these benchmarks within bazel, compile with optimiztions and stream the
 test output:
 
-    $ bazel test -c opt --test_output=streamed //benchamrks:bench_test
+    $ bazel test -c opt --test_output=streamed //benchmarks:bench_test
 
 A record of the benchmark results is stored in
 /tmp/compiler_gym/pytest_benchmark/<device>/<run_id>_bench_test.json. Compare
