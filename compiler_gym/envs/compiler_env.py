@@ -43,7 +43,7 @@ from compiler_gym.service.proto import (
     StartSessionRequest,
     StepRequest,
 )
-from compiler_gym.spaces import NamedDiscrete, Reward
+from compiler_gym.spaces import DefaultRewardFromObservation, NamedDiscrete, Reward
 from compiler_gym.util.debug_util import get_logging_level
 from compiler_gym.util.timer import Timer
 from compiler_gym.validation_result import ValidationError, ValidationResult
@@ -52,33 +52,6 @@ from compiler_gym.views import ObservationSpaceSpec, ObservationView, RewardView
 # Type hints.
 info_t = Dict[str, Any]
 step_t = Tuple[Optional[observation_t], Optional[float], bool, info_t]
-
-
-class DefaultRewardFromObservation(Reward):
-    def __init__(self, observation_name: str, **kwargs):
-        super().__init__(
-            observation_spaces=[observation_name], id=observation_name, **kwargs
-        )
-        self.previous_value: Optional[observation_t] = None
-
-    def reset(self, benchmark: str) -> None:
-        """Called on env.reset(). Reset incremental progress."""
-        del benchmark  # unused
-        self.previous_value = None
-
-    def update(
-        self,
-        action: int,
-        observations: List[observation_t],
-        observation_view: ObservationView,
-    ) -> float:
-        """Called on env.step(). Compute and return new reward."""
-        value: float = observations[0]
-        if self.previous_value is None:
-            self.previous_value = 0
-        reward = float(value - self.previous_value)
-        self.previous_value = value
-        return reward
 
 
 class CompilerEnv(gym.Env):
