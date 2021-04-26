@@ -3,9 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 from collections import deque
-from typing import Dict, Iterable, Optional, Set, TypeVar, Union
-
-import numpy as np
+from typing import Dict, Iterable, Set, TypeVar
 
 from compiler_gym.datasets.benchmark import (
     BENCHMARK_URI_RE,
@@ -76,46 +74,16 @@ class Datasets(object):
     If you want to exclude a dataset, delete it:
 
         >>> del env.datasets["benchmark://b-v0"]
-
-    To iterate over the benchmarks in a random order, use :meth:`benchmark()`
-    and omit the URI:
-
-        >>> for i in range(100):
-        ...     benchmark = env.datasets.benchmark()
-
-    This uses uniform random selection to sample across datasets. For finite
-    datasets, you could weight the sample by the size of each dataset:
-
-        >>> weights = [len(d) for d in env.datasets]
-        >>> np.random.choice(list(env.datasets), p=weights).benchmark()
     """
 
     def __init__(
         self,
         datasets: Iterable[Dataset],
-        random: Optional[np.random.Generator] = None,
     ):
         self._datasets: Dict[str, Dataset] = {d.name: d for d in datasets}
         self._visible_datasets: Set[str] = set(
             name for name, dataset in self._datasets.items() if not dataset.hidden
         )
-        self.random = random or np.random.default_rng()
-
-    def seed(self, seed: Optional[int] = None) -> None:
-        """Set the random state.
-
-        Setting a random state will fix the order that
-        :meth:`datasets.benchmark() <compiler_gym.datasets.Datasets.benchmark>`
-        returns benchmarks when called without arguments.
-
-        Calling this method recursively calls :meth:`seed()
-        <compiler_gym.datasets.Dataset.seed>` on all member datasets.
-
-        :param seed: An optional seed value.
-        """
-        self.random = np.random.default_rng(seed)
-        for dataset in self._datasets.values():
-            dataset.seed(seed)
 
     def datasets(self, with_deprecated: bool = False) -> Iterable[Dataset]:
         """Enumerate the datasets.
@@ -147,46 +115,30 @@ class Datasets(object):
         """
         return self.datasets()
 
-    def dataset(self, dataset: Optional[Union[str, Dataset]] = None) -> Dataset:
+    def dataset(self, dataset: str) -> Dataset:
         """Get a dataset.
 
-        If a name is given, return the corresponding :meth:`Dataset
-        <compiler_gym.datasets.Dataset>`. Else, return a dataset uniformly
-        randomly from the set of available datasets.
+        Return the corresponding :meth:`Dataset
+        <compiler_gym.datasets.Dataset>`. Name lookup will succeed whether or
+        not the dataset is deprecated.
 
-        Use :meth:`seed() <compiler_gym.datasets.Dataset.seed>` to force a
-        reproducible order for randomly selected datasets.
-
-        Name lookup will succeed whether or not the dataset is deprecated.
-
-        :param dataset: A dataset name, a :class:`Dataset` instance, or
-            :code:`None` to select a dataset randomly.
+        :param dataset: A dataset name.
 
         :return: A :meth:`Dataset <compiler_gym.datasets.Dataset>` instance.
 
         :raises LookupError: If :code:`dataset` is not found.
         """
-        if dataset is None:
-            if not self._visible_datasets:
-                raise ValueError("No datasets")
-
-            return self._datasets[self.random.choice(list(self._visible_datasets))]
-
-        if isinstance(dataset, Dataset):
-            dataset_name = dataset.name
-        else:
-            dataset_name = resolve_uri_protocol(dataset)
+        dataset_name = resolve_uri_protocol(dataset)
 
         if dataset_name not in self._datasets:
             raise LookupError(f"Dataset not found: {dataset_name}")
 
         return self._datasets[dataset_name]
 
-    def __getitem__(self, dataset: Union[str, Dataset]) -> Dataset:
+    def __getitem__(self, dataset: str) -> Dataset:
         """Lookup a dataset.
 
-        :param dataset: A dataset name, a :class:`Dataset` instance, or
-            :code:`None` to select a dataset randomly.
+        :param dataset: A dataset name.
 
         :return: A :meth:`Dataset <compiler_gym.datasets.Dataset>` instance.
 
@@ -195,29 +147,30 @@ class Datasets(object):
         return self.dataset(dataset)
 
     def __setitem__(self, key: str, dataset: Dataset):
-        self._datasets[key] = dataset
-        if not dataset.hidden:
-            self._visible_datasets.add(dataset.name)
+        dataset_name = resolve_uri_protocol(key)
 
-    def __delitem__(self, dataset: Union[str, Dataset]):
+        self._datasets[dataset_name] = dataset
+        if not dataset.hidden:
+            self._visible_datasets.add(dataset_name)
+
+    def __delitem__(self, dataset: str):
         """Remove a dataset from the collection.
 
         This does not affect any underlying storage used by dataset. See
         :meth:`uninstall() <compiler_gym.datasets.Datasets.uninstall>` to clean
         up.
 
-        :param dataset: A :meth:`Dataset <compiler_gym.datasets.Dataset>`
-            instance, or the name of a dataset.
+        :param dataset: The name of a dataset.
 
         :return: :code:`True` if the dataset was removed, :code:`False` if it
             was already removed.
         """
-        dataset_name: str = self.dataset(dataset).name
+        dataset_name = resolve_uri_protocol(dataset)
         if dataset_name in self._visible_datasets:
             self._visible_datasets.remove(dataset_name)
         del self._datasets[dataset_name]
 
-    def __contains__(self, dataset: Union[str, Dataset]) -> bool:
+    def __contains__(self, dataset: str) -> bool:
         """Returns whether the dataset is contained."""
         try:
             self.dataset(dataset)
@@ -261,37 +214,18 @@ class Datasets(object):
             (d.benchmark_uris() for d in self.datasets(with_deprecated=with_deprecated))
         )
 
-    def benchmark(self, uri: Optional[str] = None) -> Benchmark:
+    def benchmark(self, uri: str) -> Benchmark:
         """Select a benchmark.
 
-        If a benchmark URI is given, the corresponding :class:`Benchmark
-        <compiler_gym.datasets.Benchmark>` is returned, regardless of whether
-        the containing dataset is installed or deprecated.
+        Returns the corresponding :class:`Benchmark
+        <compiler_gym.datasets.Benchmark>`, regardless of whether the containing
+        dataset is installed or deprecated.
 
-        If no URI is given, a benchmark is selected randomly. First, a dataset
-        is selected uniformly randomly from the set of available datasets. Then
-        a benchmark is selected randomly from the chosen dataset.
-
-        Calling :code:`benchmark()` will yield benchmarks from all available
-        datasets with equal probability, regardless of how many benchmarks are
-        in each dataset. Given a pool of available datasets of differing sizes,
-        smaller datasets will be overrepresented and large datasets will be
-        underrepresented.
-
-        Use :meth:`seed() <compiler_gym.datasets.Dataset.seed>` to force a
-        reproducible order for randomly selected benchmarks.
-
-        :param uri: The URI of the benchmark to return. If :code:`None`, select
-            a benchmark randomly using :code:`self.random`.
+        :param uri: The URI of the benchmark to return.
 
         :return: A :class:`Benchmark <compiler_gym.datasets.Benchmark>`
             instance.
         """
-        if uri is None and not self._visible_datasets:
-            raise ValueError("No datasets")
-        elif uri is None:
-            return self.dataset().benchmark()
-
         uri = resolve_uri_protocol(uri)
 
         match = BENCHMARK_URI_RE.match(uri)
@@ -301,10 +235,7 @@ class Datasets(object):
         dataset_name = match.group("dataset")
         dataset = self._datasets[dataset_name]
 
-        if len(uri) > len(dataset_name) + 1:
-            return dataset.benchmark(uri)
-        else:
-            return dataset.benchmark()
+        return dataset.benchmark(uri)
 
     @property
     def size(self) -> int:

@@ -17,7 +17,6 @@ class MockDataset:
     def __init__(self, name):
         self.name = name
         self.installed = False
-        self.seed_value = None
         self.hidden = False
         self.benchmark_values = []
         self.sort_order = 0
@@ -27,9 +26,6 @@ class MockDataset:
 
     def uninstall(self):
         self.installed = False
-
-    def seed(self, seed):
-        self.seed_value = seed
 
     def benchmark_uris(self):
         return (b.uri for b in self.benchmark_values)
@@ -57,21 +53,6 @@ class MockBenchmark:
 
     def __repr__(self):
         return str(self.name)
-
-
-def test_seed_datasets_value():
-    """Test that random seed is propagated to datasets."""
-    da = MockDataset("a")
-    db = MockDataset("b")
-    datasets = Datasets((da, db))
-
-    datasets.seed(123)
-
-    for dataset in datasets:
-        assert dataset.seed_value == 123
-
-    assert da.seed_value == 123
-    assert db.seed_value == 123
 
 
 def test_enumerate_datasets_empty():
@@ -173,24 +154,6 @@ def test_datasets_get_item_lookup_miss():
     assert str(e_ctx.value) == "Dataset not found: benchmark://bar-v0"
 
 
-def test_dataset_empty():
-    datasets = Datasets([])
-
-    with pytest.raises(ValueError) as e_ctx:
-        datasets.dataset()
-
-    assert str(e_ctx.value) == "No datasets"
-
-
-def test_benchmark_empty():
-    datasets = Datasets([])
-
-    with pytest.raises(ValueError) as e_ctx:
-        datasets.benchmark()
-
-    assert str(e_ctx.value) == "No datasets"
-
-
 def test_benchmark_lookup_by_uri():
     da = MockDataset("benchmark://foo-v0")
     db = MockDataset("benchmark://bar-v0")
@@ -278,50 +241,6 @@ def test_benchmarks_iter_deprecated():
         "benchmark://bar-v0/123",
         "benchmark://foo-v0/123",
     ]
-
-
-def test_benchmark_select_randomly():
-    da = MockDataset("benchmark://foo-v0")
-    db = MockDataset("benchmark://bar-v0")
-    ba = MockBenchmark(uri="benchmark://foo-v0/abc")
-    bb = MockBenchmark(uri="benchmark://bar-v0/abc")
-    da.benchmark_values.append(ba)
-    db.benchmark_values.append(bb)
-    datasets = Datasets([da, db])
-
-    # Create three lists of randomly selected benchmarks. Two using the same
-    # seed, the third using a different seed. It is unlikely that the two
-    # different seeds will produce the same lists.
-    datasets.seed(1)
-    benchmarks_a = [datasets.benchmark() for i in range(50)]
-    datasets.seed(1)
-    benchmarks_b = [datasets.benchmark() for i in range(50)]
-    datasets.seed(2)
-    benchmarks_c = [datasets.benchmark() for i in range(50)]
-
-    assert benchmarks_a == benchmarks_b
-    assert benchmarks_a != benchmarks_c
-    assert len(set(benchmarks_a)) == 2
-
-
-def test_dataset_select_randomly():
-    da = MockDataset("benchmark://foo-v0")
-    db = MockDataset("benchmark://bar-v0")
-    datasets = Datasets([da, db])
-
-    # Create three lists of randomly selected datasets. Two using the same seed,
-    # the third using a different seed. It is unlikely that the two different
-    # seeds will produce the same lists.
-    datasets.seed(1)
-    datasets_a = [datasets.dataset() for i in range(50)]
-    datasets.seed(1)
-    datasets_b = [datasets.dataset() for i in range(50)]
-    datasets.seed(2)
-    datasets_c = [datasets.dataset() for i in range(50)]
-
-    assert datasets_a == datasets_b
-    assert datasets_a != datasets_c
-    assert len(set(datasets_a)) == 2
 
 
 if __name__ == "__main__":
