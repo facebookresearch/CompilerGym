@@ -13,8 +13,9 @@ import numpy as np
 from gym.spaces import Box
 from gym.spaces import Dict as DictSpace
 
-from compiler_gym.datasets import Benchmark
+from compiler_gym.datasets import Benchmark, Dataset
 from compiler_gym.envs.compiler_env import CompilerEnv
+from compiler_gym.envs.llvm.datasets import get_llvm_datasets
 from compiler_gym.envs.llvm.legacy_datasets import (
     LLVM_DATASETS,
     get_llvm_benchmark_validation_callback,
@@ -64,6 +65,21 @@ _DESCRIPTIONS = dict(zip(_ACTIONS, _read_list_file(_DESCRIPTIONS_LIST)))
 _INST2VEC_ENCODER = Inst2vecEncoder()
 
 
+_LLVM_DATASETS: Optional[List[Dataset]] = None
+
+
+def _get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset]:
+    """Get the LLVM datasets. Use a singleton value when site_data_base is the
+    default value.
+    """
+    global _LLVM_DATASETS
+    if site_data_base is None:
+        if _LLVM_DATASETS is None:
+            _LLVM_DATASETS = list(get_llvm_datasets(site_data_base=site_data_base))
+        return _LLVM_DATASETS
+    return get_llvm_datasets(site_data_base=site_data_base)
+
+
 class LlvmEnv(CompilerEnv):
     """A specialized CompilerEnv for LLVM.
 
@@ -81,13 +97,14 @@ class LlvmEnv(CompilerEnv):
     :vartype actions: List[int]
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, datasets_site_path: Optional[Path] = None, **kwargs):
         # First perform a one-time download of LLVM binaries that are needed by
         # the LLVM service and are not included by the pip-installed package.
         download_llvm_files()
         super().__init__(
             *args,
             **kwargs,
+            datasets=_get_llvm_datasets(site_data_base=datasets_site_path),
             rewards=[
                 CostFunctionReward(
                     id="IrInstructionCount",
