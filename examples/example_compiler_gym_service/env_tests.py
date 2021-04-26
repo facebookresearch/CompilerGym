@@ -11,6 +11,7 @@ from gym.spaces import Box
 import compiler_gym
 import examples.example_compiler_gym_service  # noqa Register environments.
 from compiler_gym.envs import CompilerEnv
+from compiler_gym.service import SessionNotFound
 from compiler_gym.spaces import NamedDiscrete, Scalar, Sequence
 from tests.test_main import main
 
@@ -71,16 +72,16 @@ def test_step_before_reset(env: CompilerEnv):
 
 def test_observation_before_reset(env: CompilerEnv):
     """Taking an observation before reset() is illegal."""
-    with pytest.raises(ValueError) as ctx:
+    with pytest.raises(SessionNotFound) as ctx:
         _ = env.observation["ir"]
-    assert str(ctx.value) == "Session ID not found"
+    assert str(ctx.value).startswith("Session not found")
 
 
 def test_reward_before_reset(env: CompilerEnv):
     """Taking a reward before reset() is illegal."""
-    with pytest.raises(ValueError) as ctx:
+    with pytest.raises(SessionNotFound) as ctx:
         _ = env.reward["runtime"]
-    assert str(ctx.value) == "Session ID not found"
+    assert str(ctx.value).startswith("Session not found")
 
 
 def test_reset_invalid_benchmark(env: CompilerEnv):

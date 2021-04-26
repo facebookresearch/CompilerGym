@@ -181,7 +181,7 @@ Status LlvmService::GetBenchmarks(ServerContext* /* unused */,
 Status LlvmService::session(uint64_t id, LlvmSession** environment) {
   auto it = sessions_.find(id);
   if (it == sessions_.end()) {
-    return Status(StatusCode::INVALID_ARGUMENT, fmt::format("Session not found: {}", id));
+    return Status(StatusCode::NOT_FOUND, fmt::format("Session not found: {}", id));
   }
 
   *environment = it->second.get();
@@ -191,7 +191,7 @@ Status LlvmService::session(uint64_t id, LlvmSession** environment) {
 Status LlvmService::session(uint64_t id, const LlvmSession** environment) const {
   auto it = sessions_.find(id);
   if (it == sessions_.end()) {
-    return Status(StatusCode::INVALID_ARGUMENT, fmt::format("Session not found: {}", id));
+    return Status(StatusCode::NOT_FOUND, fmt::format("Session not found: {}", id));
   }
 
   *environment = it->second.get();

@@ -25,5 +25,6 @@ cc_library(
         "//compiler_gym/util:Version",
         "@boost//:filesystem",
         "@com_github_grpc_grpc//:grpc++",
+        "@fmt",
     ],
 )
