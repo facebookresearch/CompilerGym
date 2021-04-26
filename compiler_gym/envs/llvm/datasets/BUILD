@@ -8,6 +8,7 @@ py_library(
     name = "datasets",
     srcs = [
         "__init__.py",
+        "poj104.py",
     ],
     visibility = ["//visibility:public"],
     deps = [

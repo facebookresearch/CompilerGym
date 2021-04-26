@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Iterable, Optional
 
 from compiler_gym.datasets import Dataset, TarDatasetWithManifest
+from compiler_gym.envs.llvm.datasets.poj104 import POJ104Dataset, POJ104LegacyDataset
 from compiler_gym.util.runfiles_path import site_data_path
 
 
@@ -204,6 +205,8 @@ def get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset
     yield MibenchDataset(site_data_base=site_data_base, sort_order=0)
     yield NPBDataset(site_data_base=site_data_base, sort_order=0)
     yield OpenCVDataset(site_data_base=site_data_base, sort_order=0)
+    yield POJ104Dataset(site_data_base=site_data_base, sort_order=0)
+    yield POJ104LegacyDataset(site_data_base=site_data_base, sort_order=100)
     yield TensorflowDataset(site_data_base=site_data_base, sort_order=0)
 
 
@@ -215,5 +218,7 @@ __all__ = [
     "MibenchDataset",
     "NPBDataset",
     "OpenCVDataset",
+    "POJ104Dataset",
+    "POJ104LegacyDataset",
     "TensorflowDataset",
 ]
