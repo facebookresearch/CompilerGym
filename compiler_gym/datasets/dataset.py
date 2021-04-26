@@ -13,7 +13,6 @@ from pathlib import Path
 from typing import Dict, Iterable, List, NamedTuple, Optional, Union
 
 import fasteners
-import numpy as np
 from deprecated.sphinx import deprecated
 
 from compiler_gym.datasets.benchmark import DATASET_NAME_RE, Benchmark
@@ -45,7 +44,6 @@ class Dataset(object):
         site_data_base: Path,
         benchmark_class=Benchmark,
         references: Optional[Dict[str, str]] = None,
-        random: Optional[np.random.Generator] = None,
         hidden: bool = False,
         sort_order: int = 0,
         logger: Optional[logging.Logger] = None,
@@ -69,8 +67,6 @@ class Dataset(object):
 
         :param references: A dictionary containing URLs for this dataset, keyed
             by their name. E.g. :code:`references["Paper"] = "https://..."`.
-
-        :param random: A source of randomness for selecting benchmarks.
 
         :param hidden: Whether the dataset should be excluded from the
             :meth:`datasets() <compiler_gym.datasets.Datasets.dataset>` iterator
@@ -103,7 +99,6 @@ class Dataset(object):
         self._hidden = hidden
         self._validatable = validatable
 
-        self.random = random or np.random.default_rng()
         self._logger = logger
         self.sort_order = sort_order
         self.benchmark_class = benchmark_class
@@ -114,17 +109,6 @@ class Dataset(object):
 
     def __repr__(self):
         return self.name
-
-    def seed(self, seed: int):
-        """Set the random state.
-
-        Setting a random state will fix the order that
-        :meth:`dataset.benchmark() <compiler_gym.datasets.Dataset.benchmark>`
-        returns benchmarks when called without arguments.
-
-        :param seed: A number.
-        """
-        self.random = np.random.default_rng(seed)
 
     @property
     def logger(self) -> logging.Logger:
@@ -337,23 +321,15 @@ class Dataset(object):
         """
         raise NotImplementedError("abstract class")
 
-    def benchmark(self, uri: Optional[str] = None) -> Benchmark:
+    def benchmark(self, uri: str) -> Benchmark:
         """Select a benchmark.
 
-        If a URI is given, the corresponding :class:`Benchmark
-        <compiler_gym.datasets.Benchmark>` is returned. Otherwise, a benchmark
-        is selected uniformly randomly.
-
-        Use :meth:`seed() <compiler_gym.datasets.Dataset.seed>` to force a
-        reproducible order for randomly selected benchmarks.
-
-        :param uri: The URI of the benchmark to return. If :code:`None`, select
-            a benchmark randomly using :code:`self.random`.
+        :param uri: The URI of the benchmark to return.
 
         :return: A :class:`Benchmark <compiler_gym.datasets.Benchmark>`
             instance.
 
-        :raise LookupError: If :code:`uri` is provided but does not exist.
+        :raise LookupError: If :code:`uri` is not found.
         """
         raise NotImplementedError("abstract class")
 
