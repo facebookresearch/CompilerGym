@@ -5,7 +5,6 @@
 """Unit tests for //compiler_gym/datasets:files_dataset_test."""
 import tempfile
 from pathlib import Path
-from typing import Optional
 
 import pytest
 
@@ -64,13 +63,6 @@ def test_empty_dataset(empty_dataset: FilesDataset):
     assert list(empty_dataset.benchmarks()) == []
 
 
-def test_empty_dataset_benchmark(empty_dataset: FilesDataset):
-    with pytest.raises(ValueError) as e_ctx:
-        empty_dataset.benchmark()
-
-    assert str(e_ctx.value) == "No benchmarks"
-
-
 def test_populated_dataset(populated_dataset: FilesDataset):
     for _ in range(2):
         assert list(populated_dataset.benchmark_uris()) == [
@@ -117,86 +109,6 @@ def test_populated_dataset_with_file_extension_filter(populated_dataset: FilesDa
         "benchmark://test-v0/b/d",
     ]
     assert populated_dataset.size == 2
-
-
-@pytest.mark.parametrize(
-    "requested_uri", (None, "benchmark://test-v0", "benchmark://test-v0/")
-)
-def test_populated_dataset_random_benchmark(
-    populated_dataset: FilesDataset, requested_uri: Optional[str]
-):
-    populated_dataset.benchmark_file_suffix = ".jpg"
-
-    populated_dataset.seed(1)
-    benchmarks_a = [populated_dataset.benchmark(requested_uri).uri for _ in range(50)]
-    populated_dataset.seed(1)
-    benchmarks_b = [populated_dataset.benchmark(requested_uri).uri for _ in range(50)]
-    populated_dataset.seed(2)
-    benchmarks_c = [populated_dataset.benchmark(requested_uri).uri for _ in range(50)]
-
-    assert benchmarks_a == benchmarks_b
-    assert benchmarks_b != benchmarks_c
-
-    assert set(benchmarks_a) == set(populated_dataset.benchmark_uris())
-    assert set(benchmarks_c) == set(populated_dataset.benchmark_uris())
-
-
-def test_populated_dataset_get_benchmark_by_index(populated_dataset: FilesDataset):
-    # pylint: disable=protected-access
-
-    i = 0
-    benchmark = populated_dataset._get_benchmark_by_index(i)
-    assert benchmark.uri == "benchmark://test-v0/e.txt"
-    assert Path(benchmark.proto.program.uri[len("file:///") :]).is_file()
-
-    i += 1
-    benchmark = populated_dataset._get_benchmark_by_index(i)
-    assert benchmark.uri == "benchmark://test-v0/f.txt"
-    assert Path(benchmark.proto.program.uri[len("file:///") :]).is_file()
-
-    i += 1
-    benchmark = populated_dataset._get_benchmark_by_index(i)
-    assert benchmark.uri == "benchmark://test-v0/g.jpg"
-    assert Path(benchmark.proto.program.uri[len("file:///") :]).is_file()
-
-    i += 1
-    benchmark = populated_dataset._get_benchmark_by_index(i)
-    assert benchmark.uri == "benchmark://test-v0/a/a.txt"
-    assert Path(benchmark.proto.program.uri[len("file:///") :]).is_file()
-
-    i += 1
-    benchmark = populated_dataset._get_benchmark_by_index(i)
-    assert benchmark.uri == "benchmark://test-v0/a/b.txt"
-    assert Path(benchmark.proto.program.uri[len("file:///") :]).is_file()
-
-    i += 1
-    benchmark = populated_dataset._get_benchmark_by_index(i)
-    assert benchmark.uri == "benchmark://test-v0/b/a.txt"
-    assert Path(benchmark.proto.program.uri[len("file:///") :]).is_file()
-
-    i += 1
-    benchmark = populated_dataset._get_benchmark_by_index(i)
-    assert benchmark.uri == "benchmark://test-v0/b/b.txt"
-    assert Path(benchmark.proto.program.uri[len("file:///") :]).is_file()
-
-    i += 1
-    benchmark = populated_dataset._get_benchmark_by_index(i)
-    assert benchmark.uri == "benchmark://test-v0/b/c.txt"
-    assert Path(benchmark.proto.program.uri[len("file:///") :]).is_file()
-
-    i += 1
-    benchmark = populated_dataset._get_benchmark_by_index(i)
-    assert benchmark.uri == "benchmark://test-v0/b/d.jpg"
-    assert Path(benchmark.proto.program.uri[len("file:///") :]).is_file()
-
-
-def test_populated_dataset_get_benchmark_by_index_out_of_range(
-    populated_dataset: FilesDataset,
-):
-    # pylint: disable=protected-access
-    with pytest.raises(IndexError):
-        populated_dataset._get_benchmark_by_index(-1)
-        populated_dataset._get_benchmark_by_index(10)
 
 
 if __name__ == "__main__":
