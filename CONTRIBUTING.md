@@ -63,10 +63,11 @@ and file a [Pull Request](#pull-requests). Please include:
 3. A write-up of your approach. You may use the
    [submission template](/leaderboard/SUBMISSION_TEMPLATE.md) as a guide.
 
-We do not require that you submit the source code for your approach. Once you
-submit your pull request we will validate your results CSV files and may ask
-clarifying questions if we feel that those would be useful to improve
-reproducibility. Please [take a look
+Please make sure to update to the latest CompilerGym release prior to
+submission. We do not require that you submit the source code for your approach.
+Once you submit your pull request we will validate your results CSV files and
+may ask clarifying questions if we feel that those would be useful to improve
+reproducibility. [Take a look
 here](https://github.com/facebookresearch/CompilerGym/pull/117) for an example
 of a well-formed pull request submission.
 
