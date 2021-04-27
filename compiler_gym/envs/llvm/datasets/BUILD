@@ -9,6 +9,7 @@ py_library(
     srcs = [
         "__init__.py",
         "anghabench.py",
+        "cbench.py",
         "clgen.py",
         "csmith.py",
         "llvm_stress.py",

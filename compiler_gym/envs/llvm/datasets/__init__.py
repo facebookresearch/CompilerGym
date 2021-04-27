@@ -8,6 +8,7 @@ from typing import Iterable, Optional
 
 from compiler_gym.datasets import Dataset, TarDatasetWithManifest
 from compiler_gym.envs.llvm.datasets.anghabench import AnghaBenchDataset
+from compiler_gym.envs.llvm.datasets.cbench import CBenchDataset, CBenchLegacyDataset
 from compiler_gym.envs.llvm.datasets.clgen import CLgenDataset
 from compiler_gym.envs.llvm.datasets.csmith import CsmithBenchmark, CsmithDataset
 from compiler_gym.envs.llvm.datasets.llvm_stress import LlvmStressDataset
@@ -206,6 +207,18 @@ def get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset
     yield AnghaBenchDataset(site_data_base=site_data_base, sort_order=0)
     yield BlasDataset(site_data_base=site_data_base, sort_order=0)
     yield CLgenDataset(site_data_base=site_data_base, sort_order=0)
+    yield CBenchDataset(site_data_base=site_data_base, sort_order=-1)
+    # Add legacy version of cbench-v1 in which the 'b' was capitalized. This
+    # is deprecated and will be removed no earlier than v0.1.10.
+    yield CBenchDataset(
+        site_data_base=site_data_base,
+        name="benchmark://cBench-v1",
+        hidden=True,
+        manifest_url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v1-manifest.bz2",
+        manifest_sha256="635b94eeb2784dfedb3b53fd8f84517c3b4b95d851ddb662d4c1058c72dc81e0",
+        sort_order=100,
+    )
+    yield CBenchLegacyDataset(site_data_base=site_data_base)
     yield CsmithDataset(site_data_base=site_data_base, sort_order=0)
     yield GitHubDataset(site_data_base=site_data_base, sort_order=0)
     yield LinuxDataset(site_data_base=site_data_base, sort_order=0)
@@ -222,6 +235,8 @@ __all__ = [
     "AnghaBenchDataset",
     "BlasDataset",
     "CLgenDataset",
+    "CBenchDataset",
+    "CBenchLegacyDataset",
     "CsmithDataset",
     "CsmithBenchmark",
     "get_llvm_datasets",
