@@ -86,6 +86,17 @@ py_test(
 )
 
 py_test(
+    name = "download_llvm_test",
+    srcs = ["download_llvm_test.py"],
+    deps = [
+        "//compiler_gym/third_party/llvm",
+        "//compiler_gym/util",
+        "//tests:test_main",
+        "//tests/pytest_plugins:common",
+    ],
+)
+
+py_test(
     name = "fork_env_test",
     timeout = "long",
     srcs = ["fork_env_test.py"],

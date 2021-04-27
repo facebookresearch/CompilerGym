@@ -50,7 +50,7 @@ def temporary_environ():
     """A fixture that allows you to modify os.environ without affecting other tests."""
     old_env = os.environ.copy()
     try:
-        yield
+        yield os.environ
     finally:
         os.environ.clear()
         os.environ.update(old_env)

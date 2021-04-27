@@ -34,22 +34,20 @@ _LLVM_DOWNLOAD_LOCK = Lock()
 _LLVM_DOWNLOADED = False
 
 
-def _download_llvm_files(unpacked_location: Path) -> Path:
+def _download_llvm_files(destination: Path) -> Path:
     """Download and unpack the LLVM data pack."""
     # Tidy up an incomplete unpack.
-    shutil.rmtree(unpacked_location, ignore_errors=True)
+    shutil.rmtree(destination, ignore_errors=True)
 
     tar_contents = io.BytesIO(download(_LLVM_URL, sha256=_LLVM_SHA256))
-    unpacked_location.parent.mkdir(parents=True, exist_ok=True)
+    destination.parent.mkdir(parents=True, exist_ok=True)
     with tarfile.open(fileobj=tar_contents, mode="r:bz2") as tar:
-        tar.extractall(unpacked_location)
-    assert unpacked_location.is_dir()
-    assert (unpacked_location / "LICENSE").is_file()
-    # Create the marker file to indicate that the directory is unpacked
-    # and ready to go.
-    (unpacked_location / ".unpacked").touch()
+        tar.extractall(destination)
 
-    return unpacked_location
+    assert destination.is_dir()
+    assert (destination / "LICENSE").is_file()
+
+    return destination
 
 
 def download_llvm_files() -> Path:
@@ -67,11 +65,16 @@ def download_llvm_files() -> Path:
         _LLVM_DOWNLOADED = True
         return unpacked_location
 
-    with _LLVM_DOWNLOAD_LOCK, InterProcessLock(cache_path("llvm-download.LOCK")):
+    with _LLVM_DOWNLOAD_LOCK, InterProcessLock(cache_path(".llvm-v0-install.LOCK")):
         # Now that the lock is acquired, repeat the check to see if it is
         # necessary to download the dataset.
-        if not (unpacked_location / ".unpacked").is_file():
-            _download_llvm_files(unpacked_location)
+        if (unpacked_location / ".unpacked").is_file():
+            return unpacked_location
+
+        _download_llvm_files(unpacked_location)
+        # Create the marker file to indicate that the directory is unpacked
+        # and ready to go.
+        (unpacked_location / ".unpacked").touch()
         _LLVM_DOWNLOADED = True
 
     return unpacked_location
