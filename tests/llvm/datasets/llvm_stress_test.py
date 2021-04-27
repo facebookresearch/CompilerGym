@@ -3,6 +3,8 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Tests for the AnghaBench dataset."""
+from itertools import islice
+
 import gym
 import pytest
 
@@ -30,12 +32,12 @@ def test_llvm_stress_size(llvm_stress_dataset: LlvmStressDataset):
 
 
 @skip_on_ci
-@pytest.mark.parametrize("seed", range(250))
+@pytest.mark.parametrize("index", range(250))
 def test_llvm_stress_random_select(
-    env: LlvmEnv, llvm_stress_dataset: LlvmStressDataset, seed: int
+    env: LlvmEnv, llvm_stress_dataset: LlvmStressDataset, index: int
 ):
-    llvm_stress_dataset.seed(seed)
-    benchmark = llvm_stress_dataset.benchmark()
+    uri = next(islice(llvm_stress_dataset.benchmark_uris(), index, None))
+    benchmark = llvm_stress_dataset.benchmark(uri)
     env.observation_space = "InstCountDict"
     instcount = env.reset(benchmark=benchmark)
     print(env.ir)  # For debugging in case of error.
