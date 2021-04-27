@@ -24,6 +24,9 @@ py_library(
     name = "compiler_env_state",
     srcs = ["compiler_env_state.py"],
     visibility = ["//compiler_gym:__subpackages__"],
+    deps = [
+        "//compiler_gym/datasets:uri",
+    ],
 )
 
 py_library(
@@ -54,6 +57,7 @@ py_library(
     srcs = ["validate.py"],
     visibility = ["//compiler_gym:__subpackages__"],
     deps = [
+        ":validation_error",
         ":validation_result",
         "//compiler_gym/envs:compiler_env",
         "//compiler_gym/spaces",
@@ -62,11 +66,18 @@ py_library(
 )
 
 py_library(
+    name = "validation_error",
+    srcs = ["validation_error.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
+)
+
+py_library(
     name = "validation_result",
     srcs = ["validation_result.py"],
     visibility = ["//compiler_gym:__subpackages__"],
     deps = [
         ":compiler_env_state",
+        ":validation_error",
         "//compiler_gym/util",
     ],
 )

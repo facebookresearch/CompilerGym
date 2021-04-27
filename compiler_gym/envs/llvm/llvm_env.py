@@ -32,7 +32,7 @@ from compiler_gym.third_party.inst2vec import Inst2vecEncoder
 from compiler_gym.third_party.llvm import download_llvm_files
 from compiler_gym.third_party.llvm.instcount import INST_COUNT_FEATURE_NAMES
 from compiler_gym.util.runfiles_path import runfiles_path, site_data_path
-from compiler_gym.validation_result import ValidationError
+from compiler_gym.validation_error import ValidationError
 
 _ACTIONS_LIST = Path(
     runfiles_path("compiler_gym/envs/llvm/service/passes/actions_list.txt")

@@ -48,7 +48,8 @@ from compiler_gym.service.proto import (
 from compiler_gym.spaces import DefaultRewardFromObservation, NamedDiscrete, Reward
 from compiler_gym.util.debug_util import get_logging_level
 from compiler_gym.util.timer import Timer
-from compiler_gym.validation_result import ValidationError, ValidationResult
+from compiler_gym.validation_error import ValidationError
+from compiler_gym.validation_result import ValidationResult
 from compiler_gym.views import ObservationSpaceSpec, ObservationView, RewardView
 
 # Type hints.

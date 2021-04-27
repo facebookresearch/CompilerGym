@@ -115,12 +115,8 @@ class _EvalPolicyWorker(Thread):
                 ), "Policy changed environment reward space"
 
                 # Override walltime in the generated state.
-                state = CompilerEnvState(
-                    benchmark=self.env.state.benchmark,
-                    reward=self.env.state.reward,
-                    walltime=timer.time,
-                    commandline=self.env.state.commandline,
-                )
+                state = self.env.state.copy()
+                state.walltime = timer.time
                 print(state.to_csv(), file=logfile, flush=True)
                 self.states.append(state)
 

@@ -5,7 +5,13 @@
 """This module defines a class to represent a compiler environment state."""
 import csv
 from io import StringIO
-from typing import Any, Dict, Iterable, NamedTuple, Optional
+from typing import Iterable, Optional
+
+from pydantic import BaseModel, Field
+from pydantic import ValidationError as PydanticValidationError
+from pydantic import validator
+
+from compiler_gym.datasets.uri import BENCHMARK_URI_PATTERN
 
 
 def _to_csv(*columns) -> str:
@@ -15,7 +21,7 @@ def _to_csv(*columns) -> str:
     return buf.getvalue().rstrip()
 
 
-class CompilerEnvState(NamedTuple):
+class CompilerEnvState(BaseModel):
     """The representation of a compiler environment state.
 
     The state of an environment is defined as a benchmark and a sequence of
@@ -23,17 +29,34 @@ class CompilerEnvState(NamedTuple):
     contains the information required to reproduce the result.
     """
 
-    benchmark: str
-    """The name of the benchmark used for this episode."""
+    benchmark: str = Field(
+        allow_mutation=False,
+        regex=BENCHMARK_URI_PATTERN,
+        examples=[
+            "benchmark://cbench-v1/crc32",
+            "generator://csmith-v0/0",
+        ],
+    )
+    """The URI of the benchmark used for this episode."""
 
     commandline: str
     """The list of actions that produced this state, as a commandline."""
 
     walltime: float
-    """The walltime of the episode."""
+    """The walltime of the episode in seconds. Must be nonnegative. Optional."""
 
-    reward: Optional[float] = None
-    """The cumulative reward for this episode."""
+    reward: Optional[float] = Field(
+        required=False,
+        default=None,
+        allow_mutation=True,
+    )
+    """The cumulative reward for this episode. Optional."""
+
+    @validator("walltime")
+    def walltime_nonnegative(cls, v):
+        if v is not None:
+            assert v >= 0, "Walltime cannot be negative"
+        return v
 
     @property
     def has_reward(self) -> bool:
@@ -48,21 +71,12 @@ class CompilerEnvState(NamedTuple):
         """
         return _to_csv("benchmark", "reward", "walltime", "commandline")
 
-    def json(self):
-        """Return the state as JSON."""
-        return self._asdict()  # pylint: disable=no-member
-
     def to_csv(self) -> str:
         """Serialize a state to a comma separated list of values.
 
         :return: A comma-separated string.
         """
         return _to_csv(self.benchmark, self.reward, self.walltime, self.commandline)
-
-    @classmethod
-    def from_json(cls, data: Dict[str, Any]) -> "CompilerEnvState":
-        """Construct a state from a JSON dictionary."""
-        return cls(**data)
 
     @classmethod
     def from_csv(cls, csv_string: str) -> "CompilerEnvState":
@@ -72,7 +86,7 @@ class CompilerEnvState(NamedTuple):
             try:
                 benchmark, reward, walltime, commandline = line
                 break
-            except ValueError as e:
+            except (ValueError, PydanticValidationError) as e:
                 raise ValueError(f"Failed to parse input: `{csv_string}`: {e}") from e
         else:
             raise ValueError(f"Failed to parse input: `{csv_string}`")
@@ -102,7 +116,7 @@ class CompilerEnvState(NamedTuple):
                     float(line["walltime"]) if line.get("walltime") else None
                 )
                 yield CompilerEnvState(**line)
-            except (TypeError, KeyError) as e:
+            except (TypeError, KeyError, PydanticValidationError) as e:
                 raise ValueError(f"Failed to parse input: `{e}`") from e
 
     def __eq__(self, rhs) -> bool:
@@ -125,3 +139,6 @@ class CompilerEnvState(NamedTuple):
 
     def __ne__(self, rhs) -> bool:
         return not self == rhs
+
+    class Config:
+        validate_assignment = True

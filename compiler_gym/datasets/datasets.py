@@ -5,12 +5,9 @@
 from collections import deque
 from typing import Dict, Iterable, Set, TypeVar
 
-from compiler_gym.datasets.benchmark import (
-    BENCHMARK_URI_RE,
-    Benchmark,
-    resolve_uri_protocol,
-)
+from compiler_gym.datasets.benchmark import Benchmark
 from compiler_gym.datasets.dataset import Dataset
+from compiler_gym.datasets.uri import BENCHMARK_URI_RE, resolve_uri_protocol
 
 T = TypeVar("T")
 

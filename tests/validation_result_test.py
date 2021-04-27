@@ -45,7 +45,7 @@ def test_validation_error_json():
 def test_validation_result_json():
     result = ValidationResult(
         state=CompilerEnvState(
-            benchmark="benchmark://example/test",
+            benchmark="benchmark://example-v0/test",
             commandline="test",
             walltime=1,
         ),
@@ -64,7 +64,7 @@ def test_validation_result_json():
 def test_validation_result_equality_different_states():
     a = ValidationResult(
         state=CompilerEnvState(
-            benchmark="benchmark://example/test/a",
+            benchmark="benchmark://example-v0/test/a",
             commandline="test",
             walltime=1,
         ),
@@ -72,7 +72,7 @@ def test_validation_result_equality_different_states():
     )
     b = ValidationResult(
         state=CompilerEnvState(
-            benchmark="benchmark://example/test/b",
+            benchmark="benchmark://example-v0/test/b",
             commandline="test",
             walltime=1,
         ),
@@ -84,7 +84,7 @@ def test_validation_result_equality_different_states():
 def test_validation_result_equality_different_walltimes():
     a = ValidationResult(
         state=CompilerEnvState(
-            benchmark="benchmark://example/test",
+            benchmark="benchmark://example-v0/test",
             commandline="test",
             walltime=1,
         ),
@@ -92,7 +92,7 @@ def test_validation_result_equality_different_walltimes():
     )
     b = ValidationResult(
         state=CompilerEnvState(
-            benchmark="benchmark://example/test",
+            benchmark="benchmark://example-v0/test",
             commandline="test",
             walltime=10,
         ),
@@ -104,7 +104,7 @@ def test_validation_result_equality_different_walltimes():
 def test_validation_result_equality_different_errors_order():
     a = ValidationResult(
         state=CompilerEnvState(
-            benchmark="benchmark://example/test",
+            benchmark="benchmark://example-v0/test",
             commandline="test",
             walltime=1,
         ),
@@ -122,7 +122,7 @@ def test_validation_result_equality_different_errors_order():
     )
     b = ValidationResult(
         state=CompilerEnvState(
-            benchmark="benchmark://example/test",
+            benchmark="benchmark://example-v0/test",
             commandline="test",
             walltime=1,
         ),
@@ -150,7 +150,7 @@ def test_validation_result_join_no_inputs():
 def test_validation_result_join_one_input():
     result = ValidationResult(
         state=CompilerEnvState(
-            benchmark="benchmark://example/test",
+            benchmark="benchmark://example-v0/test",
             commandline="test",
             walltime=1,
         ),
@@ -170,7 +170,7 @@ def test_validation_result_join_one_input():
 def test_validation_result_join_two_inputs_different_errors():
     a = ValidationResult(
         state=CompilerEnvState(
-            benchmark="benchmark://example/test",
+            benchmark="benchmark://example-v0/test",
             commandline="test",
             walltime=1,
         ),
@@ -184,7 +184,7 @@ def test_validation_result_join_two_inputs_different_errors():
     )
     b = ValidationResult(
         state=CompilerEnvState(
-            benchmark="benchmark://example/test",
+            benchmark="benchmark://example-v0/test",
             commandline="test",
             walltime=10,
         ),
@@ -200,7 +200,7 @@ def test_validation_result_join_two_inputs_different_errors():
     c = ValidationResult.join([a, b])
     assert c == ValidationResult(
         state=CompilerEnvState(
-            benchmark="benchmark://example/test",
+            benchmark="benchmark://example-v0/test",
             commandline="test",
             walltime=10,
         ),

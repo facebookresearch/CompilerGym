@@ -16,8 +16,15 @@ py_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":uri",
         "//compiler_gym:validation_result",
         "//compiler_gym/service/proto",
         "//compiler_gym/util",
     ],
+)
+
+py_library(
+    name = "uri",
+    srcs = ["uri.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
 )

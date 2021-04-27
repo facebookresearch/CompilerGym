@@ -74,7 +74,7 @@ def test_validate_state_invalid_reward():
     assert result.reward_validated
     assert result.reward_validation_failed
     assert (
-        str(result) == "❌  cBench-v1/crc32  Expected reward 1 but received reward 0.0"
+        str(result) == "❌  cBench-v1/crc32  Expected reward 1.0 but received reward 0.0"
     )
 
 
