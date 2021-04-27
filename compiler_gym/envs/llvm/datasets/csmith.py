@@ -103,7 +103,7 @@ class CsmithDataset(Dataset):
 
         self._installed = False
         self._build_lock = Lock()
-        self._build_lockfile = self.site_data_path / "build.LOCK"
+        self._build_lockfile = self.site_data_path / ".build.LOCK"
         self._build_markerfile = self.site_data_path / ".built"
 
         # The command that is used to compile an LLVM-IR bitcode file from a
@@ -132,12 +132,13 @@ class CsmithDataset(Dataset):
         if self.installed:
             return
 
-        with self._build_lock, InterProcessLock(self._build_lock):
+        with self._build_lock, InterProcessLock(self._build_lockfile):
             # Repeat the check to see if we have already installed the dataset
             # now that we have acquired the lock.
             if not self.installed:
                 self.logger.info("Downloading and building Csmith")
                 self._build_csmith(self.site_data_path, self.logger)
+                self._build_markerfile.touch()
 
     @staticmethod
     def _build_csmith(install_root: Path, logger: logging.Logger):
@@ -209,8 +210,6 @@ class CsmithDataset(Dataset):
                         ]
                     )
                 )
-
-            (install_root / ".built").touch()
 
     @property
     def size(self) -> int:
