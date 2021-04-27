@@ -26,6 +26,9 @@ py_library(
     name = "common",
     testonly = 1,
     srcs = ["common.py"],
+    deps = [
+        "//compiler_gym/util",
+    ],
 )
 
 py_library(
