@@ -347,7 +347,9 @@ class BenchmarkWithSource(Benchmark):
         return benchmark
 
     @memoized_property
-    def sources(self) -> Iterable[BenchmarkSource]:
+    def sources(  # pylint: disable=invalid-overridden-method
+        self,
+    ) -> Iterable[BenchmarkSource]:
         with open(self._src_path, "rb") as f:
             return [
                 BenchmarkSource(filename=self._src_name, contents=f.read()),

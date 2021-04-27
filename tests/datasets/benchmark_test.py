@@ -98,6 +98,7 @@ def test_benchmark_attribute_outside_init():
     """Test that new attributes cannot be added to Benchmark."""
     benchmark = Benchmark(None)
     with pytest.raises(AttributeError):
+        # pylint: disable=assigning-non-slot
         benchmark.foobar = 123  # noqa
 
 
@@ -108,7 +109,7 @@ def test_benchmark_subclass_attribute_outside_init():
         pass
 
     benchmark = TestBenchmark(None)
-    benchmark.foobar = 123
+    benchmark.foobar = 123  # pylint: disable=attribute-defined-outside-init
     assert benchmark.foobar == 123
 
 
@@ -212,6 +213,7 @@ def test_validation_callback_flaky():
 
     def a(env):
         nonlocal flaky
+        del env
         if flaky:
             yield ValidationError(type="Runtime Error")
 
