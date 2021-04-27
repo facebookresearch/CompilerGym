@@ -8,6 +8,7 @@ py_library(
     name = "datasets",
     srcs = [
         "__init__.py",
+        "clgen.py",
         "csmith.py",
         "llvm_stress.py",
         "poj104.py",
