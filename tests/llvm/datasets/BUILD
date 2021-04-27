@@ -5,6 +5,20 @@
 load("@rules_python//python:defs.bzl", "py_test")
 
 py_test(
+    name = "anghabench_test",
+    timeout = "long",
+    srcs = ["anghabench_test.py"],
+    shard_count = 8,
+    deps = [
+        "//compiler_gym/envs/llvm",
+        "//compiler_gym/envs/llvm/datasets",
+        "//tests:test_main",
+        "//tests/pytest_plugins:common",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "clgen_test",
     timeout = "moderate",
     srcs = ["clgen_test.py"],
