@@ -5,10 +5,37 @@
 load("@rules_python//python:defs.bzl", "py_test")
 
 py_test(
+    name = "csmith_test",
+    timeout = "long",
+    srcs = ["csmith_test.py"],
+    shard_count = 8,
+    deps = [
+        "//compiler_gym/envs/llvm",
+        "//compiler_gym/envs/llvm/datasets",
+        "//tests:test_main",
+        "//tests/pytest_plugins:common",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "github_test",
     timeout = "long",
     srcs = ["github_test.py"],
     shard_count = 8,
+    deps = [
+        "//compiler_gym/envs/llvm",
+        "//compiler_gym/envs/llvm/datasets",
+        "//tests:test_main",
+        "//tests/pytest_plugins:common",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
+    name = "llvm_stress_test",
+    timeout = "long",
+    srcs = ["llvm_stress_test.py"],
     deps = [
         "//compiler_gym/envs/llvm",
         "//compiler_gym/envs/llvm/datasets",

@@ -8,6 +8,8 @@ py_library(
     name = "datasets",
     srcs = [
         "__init__.py",
+        "csmith.py",
+        "llvm_stress.py",
         "poj104.py",
     ],
     visibility = ["//visibility:public"],

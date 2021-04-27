@@ -145,7 +145,7 @@ class POJ104Dataset(TarDatasetWithManifest):
             header = download(
                 "https://raw.githubusercontent.com/tekfyl/bits-stdc-.h-for-mac/e1193f4470514d82ea19c3cc1357116fadaa2a4e/stdc%2B%2B.h",
                 sha256="b4d9b031d56d89a2b58b5ed80fa9943aa92420d6aed0835747c9a5584469afeb",
-            )
+            ).decode("utf-8")
 
         # These defines provide values for commonly undefined symbols. Defining
         # these macros increases the number of POJ-104 programs that compile
