@@ -22,9 +22,9 @@ ValidationCallback = Callable[["CompilerEnv"], Iterable[ValidationError]]  # noq
 # Regular expression that matches the full two-part URI prefix of a dataset:
 #     {{protocol}}://{{dataset}}
 #
-# A trailing slash is permitted.
+# An optional trailing slash is permitted.
 #
-# Example matches: "benchmark://foo-v0", "benchmark://foo-v0/".
+# Example matches: "benchmark://foo-v0", "generator://bar-v0/".
 DATASET_NAME_RE = re.compile(
     r"(?P<dataset>(?P<dataset_protocol>[a-zA-z0-9-_]+)://(?P<dataset_name>[a-zA-z0-9-_]+-v(?P<dataset_version>[0-9]+)))/?"
 )
@@ -32,11 +32,9 @@ DATASET_NAME_RE = re.compile(
 # Regular expression that matches the full three-part format of a benchmark URI:
 #     {{protocol}}://{{dataset}}/{{id}}
 #
-# The {{id}} is optional.
-#
-# Example matches: "benchmark://foo-v0/" or "benchmark://foo-v0/program".
+# Example matches: "benchmark://foo-v0/foo" or "generator://bar-v1/foo/bar.txt".
 BENCHMARK_URI_RE = re.compile(
-    r"(?P<dataset>(?P<dataset_protocol>[a-zA-z0-9-_]+)://(?P<dataset_name>[a-zA-z0-9-_]+-v(?P<dataset_version>[0-9]+)))(/(?P<benchmark_name>[^\s]*))?$"
+    r"(?P<dataset>(?P<dataset_protocol>[a-zA-z0-9-_]+)://(?P<dataset_name>[a-zA-z0-9-_]+-v(?P<dataset_version>[0-9]+)))/(?P<benchmark_name>[^\s]+)$"
 )
 
 

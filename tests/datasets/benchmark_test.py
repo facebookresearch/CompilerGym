@@ -28,54 +28,58 @@ def _rgx_match(regex, groupname, string) -> str:
     return match.group(groupname)
 
 
-@pytest.mark.parametrize("regex", (DATASET_NAME_RE, BENCHMARK_URI_RE))
-def test_benchmark_uri_protocol(regex):
-    assert not regex.match("B?://cbench-v1/")  # Invalid characters
-    assert not regex.match("cbench-v1/")  # Missing protocol
+def test_benchmark_uri_protocol():
+    assert (
+        _rgx_match(DATASET_NAME_RE, "dataset_protocol", "benchmark://cbench-v1/")
+        == "benchmark"
+    )
+    assert (
+        _rgx_match(DATASET_NAME_RE, "dataset_protocol", "Generator13://gen-v11/")
+        == "Generator13"
+    )
 
-    assert (
-        _rgx_match(regex, "dataset_protocol", "benchmark://cbench-v1/") == "benchmark"
-    )
-    assert (
-        _rgx_match(regex, "dataset_protocol", "Generator13://gen-v11/") == "Generator13"
-    )
+
+def test_invalid_benchmark_uris():
+    # Invalid protocol
+    assert not DATASET_NAME_RE.match("B?://cbench-v1/")  # Invalid characters
+    assert not DATASET_NAME_RE.match("cbench-v1/")  # Missing protocol
+
+    # Invalid dataset name
+    assert not BENCHMARK_URI_RE.match("benchmark://cbench?v0/foo")  # Invalid character
+    assert not BENCHMARK_URI_RE.match(
+        "benchmark://cbench/foo"
+    )  # Missing version suffix
+    assert not BENCHMARK_URI_RE.match("benchmark://cbench-v0")  # Missing benchmark ID
+    assert not BENCHMARK_URI_RE.match("benchmark://cbench-v0/")  # Missing benchmark ID
+
+    # Invalid benchmark ID
+    assert not BENCHMARK_URI_RE.match("benchmark://cbench-v1/ whitespace")  # Whitespace
+    assert not BENCHMARK_URI_RE.match("benchmark://cbench-v1/\t")  # Whitespace
 
 
 def test_benchmark_uri_dataset():
-    assert not BENCHMARK_URI_RE.match("benchmark://cBench?v0/")  # Invalid character
-    assert not BENCHMARK_URI_RE.match("benchmark://cBench/")  # Missing version suffix
-
     assert (
-        _rgx_match(BENCHMARK_URI_RE, "dataset_name", "benchmark://cbench-v1/")
+        _rgx_match(BENCHMARK_URI_RE, "dataset_name", "benchmark://cbench-v1/foo")
         == "cbench-v1"
     )
     assert (
-        _rgx_match(BENCHMARK_URI_RE, "dataset_name", "Generator13://gen-v11/")
+        _rgx_match(BENCHMARK_URI_RE, "dataset_name", "Generator13://gen-v11/foo")
         == "gen-v11"
     )
 
 
 def test_benchmark_dataset_name():
     assert (
-        _rgx_match(BENCHMARK_URI_RE, "dataset", "benchmark://cbench-v1/")
+        _rgx_match(BENCHMARK_URI_RE, "dataset", "benchmark://cbench-v1/foo")
         == "benchmark://cbench-v1"
     )
     assert (
-        _rgx_match(BENCHMARK_URI_RE, "dataset", "Generator13://gen-v11/")
+        _rgx_match(BENCHMARK_URI_RE, "dataset", "Generator13://gen-v11/foo")
         == "Generator13://gen-v11"
     )
 
 
 def test_benchmark_uri_id():
-    assert not BENCHMARK_URI_RE.match("benchmark://cbench-v1/ whitespace")  # Whitespace
-    assert not BENCHMARK_URI_RE.match("benchmark://cbench-v1/\t")  # Whitespace
-
-    assert (
-        _rgx_match(BENCHMARK_URI_RE, "benchmark_name", "benchmark://cbench-v1") is None
-    )
-    assert (
-        _rgx_match(BENCHMARK_URI_RE, "benchmark_name", "benchmark://cbench-v1/") == ""
-    )
     assert (
         _rgx_match(BENCHMARK_URI_RE, "benchmark_name", "benchmark://cbench-v1/foo")
         == "foo"
@@ -83,6 +87,12 @@ def test_benchmark_uri_id():
     assert (
         _rgx_match(BENCHMARK_URI_RE, "benchmark_name", "benchmark://cbench-v1/foo/123")
         == "foo/123"
+    )
+    assert (
+        _rgx_match(
+            BENCHMARK_URI_RE, "benchmark_name", "benchmark://cbench-v1/foo/123.txt"
+        )
+        == "foo/123.txt"
     )
     assert (
         _rgx_match(
