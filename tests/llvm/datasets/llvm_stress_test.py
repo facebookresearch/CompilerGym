@@ -9,6 +9,7 @@ import gym
 import pytest
 
 import compiler_gym.envs.llvm  # noqa register environments
+from compiler_gym.datasets import BenchmarkInitError
 from compiler_gym.envs.llvm import LlvmEnv
 from compiler_gym.envs.llvm.datasets import LlvmStressDataset
 from tests.pytest_plugins.common import skip_on_ci
@@ -36,12 +37,25 @@ def test_llvm_stress_size(llvm_stress_dataset: LlvmStressDataset):
 def test_llvm_stress_random_select(
     env: LlvmEnv, llvm_stress_dataset: LlvmStressDataset, index: int
 ):
+    env.observation_space = "InstCountDict"
+
     uri = next(islice(llvm_stress_dataset.benchmark_uris(), index, None))
     benchmark = llvm_stress_dataset.benchmark(uri)
-    env.observation_space = "InstCountDict"
-    instcount = env.reset(benchmark=benchmark)
-    print(env.ir)  # For debugging in case of error.
-    assert instcount["TotalInstsCount"] > 0
+
+    # As of the current version (LLVM 10.0.0), programs generated with the
+    # following seeds emit an error when compiled: "Cannot emit physreg copy
+    # instruction".
+    FAILING_SEEDS = {173, 239}
+
+    if index in FAILING_SEEDS:
+        with pytest.raises(
+            BenchmarkInitError, match="Cannot emit physreg copy instruction"
+        ):
+            env.reset(benchmark=benchmark)
+    else:
+        instcount = env.reset(benchmark=benchmark)
+        print(env.ir)  # For debugging in case of error.
+        assert instcount["TotalInstsCount"] > 0
 
 
 if __name__ == "__main__":
