@@ -16,59 +16,60 @@ CompilerGym exposes the LLVM IR optimizer for reinforcement learning through an
 Datasets
 --------
 
-We provide several datasets of open-source LLVM-IR benchmarks for download:
+We provide several datasets of open-source LLVM-IR benchmarks for use:
 
-+------------------------+--------------+-----------------+---------------------+-------------------+
-| Dataset                | License      | Num. Benchmarks | Validatable? [#f1]_ | Difficulty [#f2]_ |
-+========================+==============+=================+=====================+===================+
-| blas-v0                | BSD 3-Clause | 300             | No                  | 0.3               |
-+------------------------+--------------+-----------------+---------------------+-------------------+
-| cBench-v1              | BSD 3-Clause | 23              | Partial             | 0.8               |
-+------------------------+--------------+-----------------+---------------------+-------------------+
-| github-v0              | CC BY 4.0    | 50,708          | No                  | 0.7               |
-+------------------------+--------------+-----------------+---------------------+-------------------+
-| linux-v0               | GPL-2.0      | 13,920          | No                  | 0.4               |
-+------------------------+--------------+-----------------+---------------------+-------------------+
-| mibench-v0             | BSD 3-Clause | 40              | No                  | 0.8               |
-+------------------------+--------------+-----------------+---------------------+-------------------+
-| npb-v0                 | NASA v1.3    | 122             | No                  | 0.4               |
-+------------------------+--------------+-----------------+---------------------+-------------------+
-| opencv-v0              | Apache 2.0   | 442             | No                  | 0.3               |
-+------------------------+--------------+-----------------+---------------------+-------------------+
-| poj104-v0              | BSD 3-Clause | 49,628          | No                  | 0.7               |
-+------------------------+--------------+-----------------+---------------------+-------------------+
-| tensorflow-v0          | Apache 2.0   | 1,985           | No                  | 0.3               |
-+------------------------+--------------+-----------------+---------------------+-------------------+
++----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
+| Dataset                    | Num. Benchmarks [#f1]_   | Description                                                                                                                                                                                                        | Validatable [#f2]_   |
++============================+==========================+====================================================================================================================================================================================================================+======================+
+| benchmark://anghabench-v0  | 1,042,976                | Compile-only C/C++ functions extracted from GitHub [`Homepage <http://cuda.dcc.ufmg.br/angha/>`__, `Paper <https://homepages.dcc.ufmg.br/~fernando/publications/papers/FaustinoCGO21.pdf>`__]                      | No                   |
++----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
+| benchmark://blas-v0        | 300                      | Basic linear algebra kernels [`Homepage <http://www.netlib.org/blas/>`__, `Paper <https://strum355.netsoc.co/books/PDF/Basic%20Linear%20Algebra%20Subprograms%20for%20Fortran%20Usage%20-%20BLAS%20(1979).pdf>`__] | No                   |
++----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
+| benchmark://cbench-v1      | 23                       | Runnable C benchmarks [`Homepage <https://ctuning.org/wiki/index.php/CTools:CBench>`__, `Paper <https://arxiv.org/pdf/1407.3487.pdf>`__]                                                                           | Partially            |
++----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
+| benchmark://clgen-v0       | 996                      | Synthetically generated OpenCL kernels [`Homepage <https://github.com/ChrisCummins/clgen>`__, `Paper <https://chriscummins.cc/pub/2017-cgo.pdf>`__]                                                                | No                   |
++----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
+| benchmark://github-v0      | 49,738                   | Compile-only C/C++ objects from GitHub [`Paper <https://arxiv.org/pdf/2012.01470.pdf>`__]                                                                                                                          | No                   |
++----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
+| benchmark://linux-v0       | 13,894                   | Compile-only object files from C Linux kernel [`Homepage <https://www.linux.org/>`__]                                                                                                                              | No                   |
++----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
+| benchmark://mibench-v0     | 40                       | C benchmarks [`Paper <http://vhosts.eecs.umich.edu/mibench/Publications/MiBench.pdf>`__]                                                                                                                           | No                   |
++----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
+| benchmark://npb-v0         | 122                      | NASA Parallel Benchmarks [`Paper <http://optout.csc.ncsu.edu/~mueller/codeopt/codeopt05/projects/www4.ncsu.edu/~pgauria/csc791a/papers/NAS-95-020.pdf>`__]                                                         | No                   |
++----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
+| benchmark://opencv-v0      | 442                      | Compile-only object files from C++ OpenCV library [`Homepage <https://opencv.org/>`__, `Paper <https://mipro-proceedings.com/sites/mipro-proceedings.com/files/upload/sp/sp_008.pdf>`__]                           | No                   |
++----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
+| benchmark://poj104-v1      | 49,816                   | Solutions to programming programs [`Homepage <https://sites.google.com/site/treebasedcnn/>`__, `Paper <https://ojs.aaai.org/index.php/AAAI/article/download/10139/9998>`__]                                        | No                   |
++----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
+| benchmark://tensorflow-v0  | 1,985                    | Compile-only object files from C++ TensorFlow library [`Homepage <https://www.tensorflow.org/>`__, `Paper <https://www.usenix.org/system/files/conference/osdi16/osdi16-abadi.pdf>`__]                             | No                   |
++----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
+| generator://csmith-v0      | ∞                        | Random conformant C99 programs [`Homepage <https://embed.cs.utah.edu/csmith/>`__, `Paper <http://web.cse.ohio-state.edu/~rountev.1/5343/pdf/pldi11.pdf>`__]                                                        | No                   |
++----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
+| generator://llvm-stress-v0 | ∞                        | Randomly generated LLVM-IR [`Documentation <https://llvm.org/docs/CommandGuide/llvm-stress.html>`__]                                                                                                               | No                   |
++----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
+| Total                      | 1,160,330                |                                                                                                                                                                                                                    |                      |
++----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
 
-.. [#f1] A **validatable** dataset is one where the behavior of the benchmarks
+.. [#f1] Values are for the Linux datasets. Some of the datasets contain fewer
+         benchmarks on macOS.
+.. [#f2] A **validatable** dataset is one where the behavior of the benchmarks
          can be checked by compiling the programs to binaries and executing
          them. If the benchmarks crash, or are found to have different behavior,
          then validation fails. This type of validation is used to check that
          the compiler has not broken the semantics of the program.
          See :mod:`compiler_gym.bin.validate`.
-.. [#f2] The **difficulty** of a dataset is an indicator of how likely a random
-         policy is to outperform the default compiler policy in a fixed amount
-         of time. A lower difficulty shows that a random policy is more likely
-         to succeed. It is a crude characterization metric that does not take
-         into account factors such as the diversity of programs, the complexity
-         of the optimization space, etc. The difficulty values in this table
-         were estimated using 2000 random trials and a fixed time budget of 30
-         seconds.
 
-Install these datasets using the :mod:`compiler_gym.bin.datasets` command line
-tool, or programatically using
-:meth:`CompilerEnv.require_datasets() <compiler_gym.envs.CompilerEnv.require_datasets>`:
-
-    >>> env = gym.make("llvm-v0")
-    >>> env.require_datasets(["tensorflow-v0", "npb-v0"])
+All of the above datasets are available for use with the LLVM environment. Use
+:class:`env.datasets <compiler_gym.datasets.Datasets>` if you wish to manage
+which are available.
 
 We characterize the datasets below in radial plots which show, clockwise from
 the top: the average number of instructions per benchmark, the density of
 branching instructions, the density of arithmetic instructions, and the density
-of memory operations. For example, comparing blas-v0 and cBench-v1 shows that
+of memory operations. For example, comparing blas-v0 and cbench-v1 shows that
 blas-v0 consists of smaller programs with a similar density of branches, a
 higher density of arithmetic operations and relatively few memory operations.
-cBench-v1, in contrast to the small linear algebra kernels of blas-v0, contains
+cbench-v1, in contrast to the small linear algebra kernels of blas-v0, contains
 larger programs with a higher density of memory operations and fewer arithmetic
 operations.
 

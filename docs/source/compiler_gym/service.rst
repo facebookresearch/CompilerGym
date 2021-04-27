@@ -49,3 +49,5 @@ inheriting from a base :class:`ServiceError` class:
 .. autoexception:: ServiceTransportError
 
 .. autoexception:: ServiceIsClosed
+
+.. autoexception:: SessionNotFound

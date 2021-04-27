@@ -10,7 +10,7 @@ Example usage:
 
     $ cat << EOF |
     benchmark,reward,walltime,commandline
-    cBench-v1/crc32,0,1.2,opt  input.bc -o output.bc
+    cbench-v1/crc32,0,1.2,opt  input.bc -o output.bc
     EOF
     python -m compiler_gym.bin.validate --env=llvm-ic-v0 -
 
@@ -38,7 +38,7 @@ Full example:
 >>> print(env.state.csv_header())
 benchmark,reward,walltime,commandline
 >>> print(env.state.to_csv())
-benchmark://cBench-v1/rijndael,,20.53565216064453,opt -add-discriminators input.bc -o output.bc
+benchmark://cbench-v1/rijndael,,20.53565216064453,opt -add-discriminators input.bc -o output.bc
 %
 
 Output Format

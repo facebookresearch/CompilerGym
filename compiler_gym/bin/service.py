@@ -20,47 +20,53 @@ Query the capabilities of a service using:
 
 .. code-block::
 
-    $ python -m compiler_gym.bin.service --env=<env> [--heading_level=<num>]
+    $ python -m compiler_gym.bin.service --env=<env>
 
 For example:
 
 .. code-block::
 
     $ python -m compiler_gym.bin.service --env=llvm-v0
-    # CompilerGym Service `/path/to/compiler_gym/envs/llvm/service/compiler_gym-llvm-service`
 
-    ## Programs
+    Datasets
+    --------
 
-    +------------------------+
-    | Benchmark              |
-    +========================+
-    | benchmark://npb-v0/1   |
-    +------------------------+
-
+    +----------------------------+--------------------------+------------------------------+
+    | Dataset                    | Num. Benchmarks [#f1]_   | Description                  |
+    +============================+==========================+==============================+
+    | benchmark://anghabench-v0  | 1,042,976                | Compile-only C/C++ functions |
+    +----------------------------+--------------------------+------------------------------+
+    | benchmark://blas-v0        | 300                      | Basic linear algebra kernels |
+    +----------------------------+--------------------------+------------------------------+
     ...
 
-    ## Action Spaces
+    Observation Spaces
+    ------------------
 
-
-    ### `PassesAll` (Commandline)
-
-    +---------------------------------------+-----------------------------------+-------------------------------+
-    | Action                                | Flag                              | Description                   |
-    +=======================================+===================================+===============================+
-    | AddDiscriminatorsPass                 | `-add-discriminators`             | Add DWARF path discriminators |
-    +---------------------------------------+-----------------------------------+-------------------------------+
+    +--------------------------+----------------------------------------------+
+    | Observation space        | Shape                                        |
+    +==========================+==============================================+
+    | Autophase                | `Box(0, 9223372036854775807, (56,), int64)`  |
+    +--------------------------+----------------------------------------------+
+    | AutophaseDict            | `Dict(ArgsPhi:int<0,inf>, BB03Phi:int<0,...` |
+    +--------------------------+----------------------------------------------+
+    | BitcodeFile              | `str_list<>[0,4096.0])`                      |
+    +--------------------------+----------------------------------------------+
     ...
 
-The capabilities of an unmanaged service can be queried using the
-:code:`--service` flag. For example, query a service running at
-:code:`localhost:8080`:
+The output is tabular summaries of the environment's datasets, observation
+spaces, reward spaces, and action spaces, using reStructuredText syntax
+(https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html#tables).
+
+To query the capabilities of an unmanaged service, use :code:`--service`. For
+example, query a service running at :code:`localhost:8080` using:
 
 .. code-block::
 
     $ python -m compiler_gym.bin.service --service=localhost:8080
 
-Or query the capabilities of a binary that implements the RPC service interface
-using:
+To query the capability of a binary that implements the RPC service interface,
+use the :code:`--local_service_binary` flag:
 
 .. code-block::
 

@@ -6,11 +6,8 @@
 
 .. code-block::
 
-    $ python -m compiler_gym.bin.datasets --env=<env> [command...]
-
-Where :code:`command` is one of :code:`--download=<dataset...>`,
-:code:`--activate=<dataset...>`, :code:`--deactivate=<dataset...>`,
-and :code:`--delete=<dataset...>`.
+    $ python -m compiler_gym.bin.datasets --env=<env> \
+        [--download=<dataset...>] [--delete=<dataset...>]
 
 
 Listing installed datasets
@@ -22,38 +19,21 @@ are activate, inactive, and available to download. For example:
 .. code-block::
 
     $ python -m comiler_gym.bin.benchmarks --env=llvm-v0
-    llvm-v0 benchmarks site dir: /home/user/.local/share/compiler_gym/llvm/10.0.0/bitcode_benchmarks
 
-    +-------------------+--------------+-----------------+----------------+
-    | Active Datasets   | License      |   #. Benchmarks | Size on disk   |
-    +===================+==============+=================+================+
-    | cBench-v1         | BSD 3-Clause |              23 | 10.1 MB        |
-    +-------------------+--------------+-----------------+----------------+
-    | Total             |              |              23 | 10.1 MB        |
-    +-------------------+--------------+-----------------+----------------+
-    These benchmarks are ready for use. Deactivate them using `--deactivate=<name>`.
-
-    +---------------------+-----------+-----------------+----------------+
-    | Inactive Datasets   | License   |   #. Benchmarks | Size on disk   |
-    +=====================+===========+=================+================+
-    | Total               |           |               0 | 0 Bytes        |
-    +---------------------+-----------+-----------------+----------------+
-    These benchmarks may be activated using `--activate=<name>`.
-
-    +------------------------+---------------------------------+-----------------+----------------+
-    | Downloadable Dataset   | License                         | #. Benchmarks   | Size on disk   |
-    +========================+=================================+=================+================+
-    | blas-v0                | BSD 3-Clause                    | 300             | 4.0 MB         |
-    +------------------------+---------------------------------+-----------------+----------------+
-    | polybench-v0           | BSD 3-Clause                    | 27              | 162.6 kB       |
-    +------------------------+---------------------------------+-----------------+----------------+
-    These benchmarks may be installed using `--download=<name> --activate=<name>`.
+    +-------------------+---------------------+-----------------+----------------+
+    | Active Datasets   | Description         |   #. Benchmarks | Size on disk   |
+    +===================+=====================+=================+================+
+    | cbench-v1         | Runnable C programs |              23 | 10.1 MB        |
+    +-------------------+---------------------+-----------------+----------------+
+    | Total             |                     |              23 | 10.1 MB        |
+    +-------------------+---------------------+-----------------+----------------+
 
 
 Downloading datasets
 --------------------
 
-Use :code:`--download` to download a dataset from the list of available datasets:
+Use :code:`--download` to download a dataset from the list of available
+datasets:
 
 .. code-block::
 
@@ -73,24 +53,12 @@ The flag :code:`--download_all` can be used to download every available dataset:
 
     $ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --download_all
 
-:code:`--download` accepts the URL of any :code:`.tar.bz2` file to support custom datasets:
-
-.. code-block::
-
-    $ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --download=https://example.com/dataset.tar.bz2
-
 Or use the :code:`file:///` URI to install a local archive file:
 
 .. code-block::
 
     $ python -m compiler_gym.bin.benchmarks --env=llvm-v0 --download=file:////tmp/dataset.tar.bz2
 
-The list of datasets that are available to download may be extended by calling
-:meth:`CompilerEnv.register_dataset() <compiler_gym.envs.CompilerEnv.register_dataset>`
-on a :code:`CompilerEnv` instance.
-
-To programmatically download datasets, see
-:meth:`CompilerEnv.require_dataset() <compiler_gym.envs.CompilerEnv.require_dataset>`.
 
 Activating and deactivating datasets
 ------------------------------------
@@ -100,12 +68,12 @@ locally on the filesystem, but is excluded from use by CompilerGym environments.
 This be useful if you have many datasets downloaded and you would to limit the
 benchmarks that can be selected randomly by an environment.
 
-Activate or deactivate datasets using the :code:`--activate` and :code:`--deactivate`
-flags, respectively:
+Activate or deactivate datasets using the :code:`--activate` and
+:code:`--deactivate` flags, respectively:
 
 .. code-block::
 
-    $ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --activate=npb-v0,github-v0 --deactivate=cBench-v1
+    $ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --activate=npb-v0,github-v0 --deactivate=cbench-v1
 
 The :code:`--activate_all` and :code:`--deactivate_all` flags can be used as a
 shortcut to activate or deactivate every downloaded:
