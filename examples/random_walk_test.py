@@ -13,7 +13,7 @@ from tests.test_main import main
 def test_run_random_walk_smoke_test():
     flags.FLAGS(["argv0"])
     env = gym.make("llvm-autophase-ic-v0")
-    env.benchmark = "cBench-v1/crc32"
+    env.benchmark = "cbench-v1/crc32"
     try:
         run_random_walk(env=env, step_count=5)
     finally:

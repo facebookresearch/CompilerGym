@@ -5,7 +5,7 @@
 """Validate environment states."""
 import random
 from concurrent.futures import as_completed
-from typing import Callable, Iterable, List, Optional
+from typing import Callable, Iterable, Optional
 
 from compiler_gym.compiler_env_state import CompilerEnvState
 from compiler_gym.envs.compiler_env import CompilerEnv
@@ -27,7 +27,6 @@ def _validate_states_worker(
 def validate_states(
     make_env: Callable[[], CompilerEnv],
     states: Iterable[CompilerEnvState],
-    datasets: Optional[List[str]] = None,
     nproc: Optional[int] = None,
     inorder: bool = False,
 ) -> Iterable[ValidationResult]:
@@ -37,21 +36,12 @@ def validate_states(
 
     :param make_env: A callback which instantiates a compiler environment.
     :param states: A sequence of compiler environment states to validate.
-    :param datasets: An optional list of datasets that are required.
     :param nproc: The number of parallel worker processes to run.
     :param inorder: Whether to return results in the order they were provided,
         or in the order that they are available.
     :return: An iterator over validation results. The order of results may
         differ from the input states.
     """
-    # Ensure that the required datasets are available.
-    if datasets:
-        env = make_env()
-        try:
-            env.require_datasets(datasets)
-        finally:
-            env.close()
-
     executor = thread_pool.get_thread_pool_executor()
 
     if nproc == 1:

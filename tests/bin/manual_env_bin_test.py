@@ -18,8 +18,6 @@ from tests.test_main import main as _test_main
 
 FLAGS = flags.FLAGS
 
-pytest_plugins = ["tests.pytest_plugins.llvm"]
-
 
 def io_check(input, output, rnd_seed=100):
     """Run the shell with the given input and check the output matches the
@@ -46,7 +44,7 @@ The 'tutorial' command will give a step by step guide.
             + output
             + r"""
 
-compilergym:[a-zA-Z0-9/-]+> Exiting
+compiler_gym:[a-zA-Z0-9/-]+> Exiting
 """
         )
 
@@ -73,92 +71,71 @@ compilergym:[a-zA-Z0-9/-]+> Exiting
         sys.stdin = old_stdin
 
 
-def test_download_cBench(cBench_dataset):
-    del cBench_dataset  # unused
+def test_list_datasets():
     io_check(
-        """require_dataset cBench-v1""",
-        # FIXME(cummins): Prompt should be compilergym:NO-BENCHMARK, but I've
-        # seen compilergym:cBench-v1/crc32 instead. Not sure why.
-        r"""compilergym:.+> Downloaded dataset cBench-v[0-9]+ in [0-9.mu]*s""",
+        """list_datasets""", r"""compiler_gym:cbench-v1/qsort> .*cbench-v[0-9]+.*"""
     )
 
 
-def test_list_datasets(cBench_dataset):
-    del cBench_dataset  # unused
-    # FIXME(cummins): Prompt should be compilergym:NO-BENCHMARK, but I've
-    # seen compilergym:cBench-v1/crc32 instead. Not sure why.
-    io_check("""list_datasets""", r"""compilergym:.+> .*cBench-v[0-9]+.*""")
-
-
-def test_list_benchmarks(cBench_dataset):
-    del cBench_dataset  # unused
-    # FIXME(cummins): Prompt should be compilergym:NO-BENCHMARK, but I've
-    # seen compilergym:cBench-v1/crc32 instead. Not sure why.
-    io_check("""list_benchmarks""", r"""compilergym:.+> .*cBench-v[0-9]+/adpcm.*""")
+def test_list_benchmarks():
+    io_check(
+        """list_benchmarks""",
+        r"""compiler_gym:cbench-v1/qsort> .*cbench-v[0-9]+/adpcm.*""",
+    )
 
 
 def test_list_actions():
-    # FIXME(cummins): Prompt should be compilergym:NO-BENCHMARK, but I've
-    # seen compilergym:cBench-v1/crc32 instead. Not sure why.
-    io_check("""list_actions""", r"""compilergym:.+> .*-adce.* -strip.*""")
+    io_check(
+        """list_actions""", r"""compiler_gym:cbench-v1/qsort> .*-adce.* -strip.*"""
+    )
 
 
 def test_list_rewards():
-    # FIXME(cummins): Prompt should be compilergym:NO-BENCHMARK, but I've
-    # seen compilergym:cBench-v1/crc32 instead. Not sure why.
     io_check(
         """list_rewards""",
-        r"""compilergym:.+> .*IrInstructionCount.* ObjectTextSizeOz.*""",
+        r"""compiler_gym:cbench-v1/qsort> .*IrInstructionCount.* ObjectTextSizeOz.*""",
     )
 
 
 def test_list_observations():
-    # FIXME(cummins): Prompt should be compilergym:NO-BENCHMARK, but I've
-    # seen compilergym:cBench-v1/crc32 instead. Not sure why.
     io_check(
         """list_observations""",
-        r"""compilergym:.+> Autophase, .*, Programl""",
+        r"""compiler_gym:cbench-v1/qsort> Autophase, .*, Programl""",
     )
 
 
-def test_set_benchmark(cBench_dataset):
-    del cBench_dataset  # unused
-    # FIXME(cummins): Prompt should be compilergym:NO-BENCHMARK, but I've
-    # seen compilergym:cBench-v1/crc32 instead. Not sure why.
+def test_set_benchmark():
     io_check(
-        """set_benchmark cBench-v1/adpcm""",
-        r"""compilergym:.+> Reset benchmark://cBench-v[0-9]+/adpcm environment in [0-9.mu]*s""",
+        """set_benchmark cbench-v1/adpcm""",
+        r"""compiler_gym:cbench-v1/qsort> Reset benchmark://cbench-v[0-9]+/adpcm environment in [0-9.mu]*s""",
     )
 
 
-def test_actions_stack_back_stack(cBench_dataset):
-    del cBench_dataset  # unused
-    # FIXME(cummins): Prompt should be compilergym:NO-BENCHMARK, but I've
-    # seen compilergym:cBench-v1/crc32 instead. Not sure why.
+def test_actions_stack_back_stack():
     io_check(
-        """set_benchmark cBench-v1/adpcm
+        """set_benchmark cbench-v1/adpcm
         action -mem2reg -adce -adce
         stack
         back
         stack""",
-        r"""compilergym:.+> Reset benchmark://cBench-v[0-9]+/adpcm environment in [0-9.mu]*s
+        r"""compiler_gym:cbench-v1/qsort> Reset benchmark://cbench-v[0-9]+/adpcm environment in [0-9.mu]*s
 
-compilergym:cBench-v[0-9]+/adpcm> Action -mem2reg
+compiler_gym:cbench-v[0-9]+/adpcm> Action -mem2reg
 Action -adce
 Action -adce
 No effect
 Actions -mem2reg -adce -adce in [0-9.mu]*s with reward 0.
 
-compilergym:cBench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   | Reward   |   Cumulative Reward
+compiler_gym:cbench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   | Reward   |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        3 | -adce    | False    | False  | -        |                   0
        2 | -adce    | True     | False  | -        |                   0
        1 | -mem2reg | True     | False  | -        |                   0
        0 | <init>   | False    | False  | 0        |                   0
 
-compilergym:cBench-v[0-9]+/adpcm> Undid -adce in [0-9.mu]*s
+compiler_gym:cbench-v[0-9]+/adpcm> Undid -adce in [0-9.mu]*s
 
-compilergym:cBench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   | Reward   |   Cumulative Reward
+compiler_gym:cbench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   | Reward   |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        2 | -adce    | True     | False  | -        |                   0
        1 | -mem2reg | True     | False  | -        |                   0
@@ -166,32 +143,29 @@ compilergym:cBench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   | Rewa
     )
 
 
-def test_reward(cBench_dataset):
-    del cBench_dataset  # unused
+def test_reward():
     io_check(
-        """set_benchmark cBench-v1/adpcm
+        """set_benchmark cbench-v1/adpcm
         set_default_reward IrInstructionCount
         action -mem2reg
         reward
         reward IrInstructionCountNorm
         stack""",
-        # FIXME(cummins): Prompt should be compilergym:NO-BENCHMARK, but I've
-        # seen compilergym:cBench-v1/crc32 instead. Not sure why.
-        r"""compilergym:.+> Reset benchmark://cBench-v[0-9]+/adpcm environment in [0-9.mu]*s
+        r"""compiler_gym:cbench-v1/qsort> Reset benchmark://cbench-v[0-9]+/adpcm environment in [0-9.mu]*s
 
-compilergym:cBench-v[0-9]+/adpcm> Reward IrInstructionCount in [0-9.mu]*s
+compiler_gym:cbench-v[0-9]+/adpcm> Reward IrInstructionCount in [0-9.mu]*s
 
-compilergym:cBench-v[0-9]+/adpcm> Action -mem2reg
+compiler_gym:cbench-v[0-9]+/adpcm> Action -mem2reg
 Reward: 287.000000
 Actions -mem2reg in [0-9.mu]*s with reward 287.0.
 
-compilergym:cBench-v[0-9]+/adpcm> 0.000000
+compiler_gym:cbench-v[0-9]+/adpcm> 0.000000
 Reward IrInstructionCount in [0-9.mu]*s
 
-compilergym:cBench-v[0-9]+/adpcm> 0.506173
+compiler_gym:cbench-v[0-9]+/adpcm> 0.506173
 Reward IrInstructionCountNorm in [0-9.mu]*s
 
-compilergym:cBench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
+compiler_gym:cbench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        1 | -mem2reg | True     | False  |      287 |                 287
        0 | <init>   | False    | False  |        0 |                   0
@@ -199,49 +173,43 @@ compilergym:cBench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   |   Re
     )
 
 
-def test_observation(cBench_dataset):
-    del cBench_dataset  # unused
+def test_observation():
     io_check(
-        """set_benchmark cBench-v1/adpcm
+        """set_benchmark cbench-v1/adpcm
         set_default_observation IrInstructionCount
         action -mem2reg
         observation
         observation IrInstructionCountOz
         """,
-        # FIXME(cummins): Prompt should be compilergym:NO-BENCHMARK, but I've
-        # seen compilergym:cBench-v1/crc32 instead. Not sure why.
-        r"""compilergym:.+> Reset benchmark://cBench-v[0-9]+/adpcm environment in [0-9.mu]*s
+        r"""compiler_gym:cbench-v1/qsort> Reset benchmark://cbench-v[0-9]+/adpcm environment in [0-9.mu]*s
 
-compilergym:cBench-v[0-9]+/adpcm> Observation IrInstructionCount in [0-9.mu]*s
+compiler_gym:cbench-v[0-9]+/adpcm> Observation IrInstructionCount in [0-9.mu]*s
 
-compilergym:cBench-v[0-9]+/adpcm> Action -mem2reg
+compiler_gym:cbench-v[0-9]+/adpcm> Action -mem2reg
 Observation: 280
 Actions -mem2reg in [0-9.mu]*s with reward 0.
 
-compilergym:cBench-v[0-9]+/adpcm> 280
+compiler_gym:cbench-v[0-9]+/adpcm> 280
 Observation IrInstructionCount in [0-9.mu]*s
 
-compilergym:cBench-v[0-9]+/adpcm> 209
+compiler_gym:cbench-v[0-9]+/adpcm> 209
 Observation IrInstructionCountOz in [0-9.mu]*s
 
-compilergym:cBench-v[0-9]+/adpcm> 209
+compiler_gym:cbench-v[0-9]+/adpcm> 209
 Observation IrInstructionCountOz in [0-9.mu]*s""",
     )
 
 
-def test_try_all_actions(cBench_dataset):
-    del cBench_dataset  # unused
+def test_try_all_actions():
     io_check(
-        """set_benchmark cBench-v1/adpcm
+        """set_benchmark cbench-v1/adpcm
         set_default_reward IrInstructionCount
         try_all_actions""",
-        # FIXME(cummins): Prompt should be compilergym:NO-BENCHMARK, but I've
-        # seen compilergym:cBench-v1/crc32 instead. Not sure why.
-        r"""compilergym:.+> Reset benchmark://cBench-v[0-9]+/adpcm environment in [0-9.mu]*s
+        r"""compiler_gym:cbench-v1/qsort> Reset benchmark://cbench-v[0-9]+/adpcm environment in [0-9.mu]*s
 
-compilergym:cBench-v[0-9]+/adpcm> Reward IrInstructionCount in [0-9.mu]*s
+compiler_gym:cbench-v[0-9]+/adpcm> Reward IrInstructionCount in [0-9.mu]*s
 
-compilergym:cBench-v[0-9]+/adpcm> Action: -add-discriminators Reward: 0.000000
+compiler_gym:cbench-v[0-9]+/adpcm> Action: -add-discriminators Reward: 0.000000
 Action: -adce Reward: 1.000000
 (.|\n)*
 Got actions in [0-9.mu]*s
@@ -257,21 +225,18 @@ Got actions in [0-9.mu]*s
     )
 
 
-def test_simplify_stack(cBench_dataset):
-    del cBench_dataset  # unused
+def test_simplify_stack():
     io_check(
-        """set_benchmark cBench-v1/adpcm
+        """set_benchmark cbench-v1/adpcm
         set_default_reward IrInstructionCount
         action -mem2reg -adce -adce
         simplify_stack
         stack""",
-        # FIXME(cummins): Prompt should be compilergym:NO-BENCHMARK, but I've
-        # seen compilergym:cBench-v1/crc32 instead. Not sure why.
-        r"""compilergym:.+> Reset benchmark://cBench-v[0-9]+/adpcm environment in [0-9.mu]*s
+        r"""compiler_gym:cbench-v1/qsort> Reset benchmark://cbench-v[0-9]+/adpcm environment in [0-9.mu]*s
 
-compilergym:cBench-v[0-9]+/adpcm> Reward IrInstructionCount in [0-9.mu]*s
+compiler_gym:cbench-v[0-9]+/adpcm> Reward IrInstructionCount in [0-9.mu]*s
 
-compilergym:cBench-v[0-9]+/adpcm> Action -mem2reg
+compiler_gym:cbench-v[0-9]+/adpcm> Action -mem2reg
 Reward: 287.000000
 Action -adce
 Reward: 2.000000
@@ -280,8 +245,8 @@ Reward: 0.000000
 No effect
 Actions -mem2reg -adce -adce in [0-9.mu]*s with reward 289.0.
 
-compilergym:cBench-v[0-9]+/adpcm>
-compilergym:cBench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
+compiler_gym:cbench-v[0-9]+/adpcm>
+compiler_gym:cbench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        2 | -adce    | True     | False  |        2 |                 289
        1 | -mem2reg | True     | False  |      287 |                 287
@@ -289,25 +254,22 @@ compilergym:cBench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   |   Re
     )
 
 
-def test_simplify_stack_no_reward(cBench_dataset):
-    del cBench_dataset  # unused
+def test_simplify_stack_no_reward():
     io_check(
-        """set_benchmark cBench-v1/adpcm
+        """set_benchmark cbench-v1/adpcm
         action -mem2reg -adce -adce
         simplify_stack
         stack""",
-        # FIXME(cummins): Prompt should be compilergym:NO-BENCHMARK, but I've
-        # seen compilergym:cBench-v1/crc32 instead. Not sure why.
-        r"""compilergym:.+> Reset benchmark://cBench-v[0-9]+/adpcm environment in [0-9.mu]*s
+        r"""compiler_gym:cbench-v1/qsort> Reset benchmark://cbench-v[0-9]+/adpcm environment in [0-9.mu]*s
 
-compilergym:cBench-v[0-9]+/adpcm> Action -mem2reg
+compiler_gym:cbench-v[0-9]+/adpcm> Action -mem2reg
 Action -adce
 Action -adce
 No effect
 Actions -mem2reg -adce -adce in [0-9.mu]*s with reward 0.
 
-compilergym:cBench-v[0-9]+/adpcm>
-compilergym:cBench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   | Reward   |   Cumulative Reward
+compiler_gym:cbench-v[0-9]+/adpcm>
+compiler_gym:cbench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   | Reward   |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        2 | -adce    | True     | False  | -        |                   0
        1 | -mem2reg | True     | False  | -        |                   0
@@ -315,8 +277,7 @@ compilergym:cBench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   | Rewa
     )
 
 
-def test_hill_climb(monkeypatch, cBench_dataset):
-    del cBench_dataset  # unused
+def test_hill_climb(monkeypatch):
     i = 0
 
     def incr():
@@ -327,41 +288,36 @@ def test_hill_climb(monkeypatch, cBench_dataset):
     monkeypatch.setattr("random.randrange", lambda _: incr())
 
     io_check(
-        """set_benchmark cBench-v1/adpcm
+        """set_benchmark cbench-v1/adpcm
         set_default_reward IrInstructionCount
         hill_climb 2
         stack""",
-        # FIXME(cummins): Prompt should be compilergym:NO-BENCHMARK, but I've
-        # seen compilergym:cBench-v1/crc32 instead. Not sure why.
-        r"""compilergym:.+> Reset benchmark://cBench-v[0-9]+/adpcm environment in [0-9.mu]*s
+        r"""compiler_gym:cbench-v1/qsort> Reset benchmark://cbench-v[0-9]+/adpcm environment in [0-9.mu]*s
 
-compilergym:cBench-v[0-9]+/adpcm> Reward IrInstructionCount in [0-9.mu]*s
+compiler_gym:cbench-v[0-9]+/adpcm> Reward IrInstructionCount in [0-9.mu]*s
 
-compilergym:cBench-v[0-9]+/adpcm> Step: 1 Action: -adce Reward: 1.000000 Accept: True
+compiler_gym:cbench-v[0-9]+/adpcm> Step: 1 Action: -adce Reward: 1.000000 Accept: True
 Step: 2 Action: -aggressive-instcombine Reward: 0.000000 Accept: False
 Hill climb complete in [0-9.mu]*s. Accepted 1 of 2 steps for total reward of 1.0.
 
-compilergym:cBench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
+compiler_gym:cbench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        1 | -adce    | True     | False  |        1 |                   1
        0 | <init>   | False    | False  |        0 |                   0""",
     )
 
 
-def test_greedy(cBench_dataset):
-    del cBench_dataset  # unused
+def test_greedy():
     io_check(
-        """set_benchmark cBench-v1/adpcm
+        """set_benchmark cbench-v1/adpcm
         set_default_reward IrInstructionCount
         greedy
         stack""",
-        # FIXME(cummins): Prompt should be compilergym:NO-BENCHMARK, but I've
-        # seen compilergym:cBench-v1/crc32 instead. Not sure why.
-        r"""compilergym:.+> Reset benchmark://cBench-v[0-9]+/adpcm environment in [0-9.mu]*s
+        r"""compiler_gym:cbench-v1/qsort> Reset benchmark://cbench-v[0-9]+/adpcm environment in [0-9.mu]*s
 
-compilergym:cBench-v[0-9]+/adpcm> Reward IrInstructionCount in [0-9.mu]*s
+compiler_gym:cbench-v[0-9]+/adpcm> Reward IrInstructionCount in [0-9.mu]*s
 
-compilergym:cBench-v[0-9]+/adpcm> Action: -add-discriminators Reward: 0.000000
+compiler_gym:cbench-v[0-9]+/adpcm> Action: -add-discriminators Reward: 0.000000
 Action: -adce Reward: 1.000000
 (.|\n)*
 Action: -mem2reg Reward: 287.000000
@@ -370,49 +326,43 @@ Action: -mergereturn Reward: -1.000000
 Step: 1 Selected action: -mem2reg Reward: 287.000000
 Greedy 1 steps in [0-9.mu]*s
 
-compilergym:cBench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
+compiler_gym:cbench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        1 | -mem2reg | True     | False  |      181 |                 181
        0 | <init>   | False    | False  |        0 |                   0""",
     )
 
 
-def test_commandline(cBench_dataset):
-    del cBench_dataset  # unused
+def test_commandline():
     io_check(
-        """set_benchmark cBench-v1/adpcm
+        """set_benchmark cbench-v1/adpcm
         action -mem2reg -adce
         commandline""",
-        # FIXME(cummins): Prompt should be compilergym:NO-BENCHMARK, but I've
-        # seen compilergym:cBench-v1/crc32 instead. Not sure why.
-        r"""compilergym:.+> Reset benchmark://cBench-v[0-9]+/adpcm environment in [0-9.mu]*s
+        r"""compiler_gym:cbench-v1/qsort> Reset benchmark://cbench-v[0-9]+/adpcm environment in [0-9.mu]*s
 
-compilergym:cBench-v[0-9]+/adpcm> Action -mem2reg
+compiler_gym:cbench-v[0-9]+/adpcm> Action -mem2reg
 Action -adce
 Actions -mem2reg -adce in [0-9.mu]*s with reward 0.
 
-compilergym:cBench-v[0-9]+/adpcm> \$ opt -mem2reg -adce input.bc -o output.bc""",
+compiler_gym:cbench-v[0-9]+/adpcm> \$ opt -mem2reg -adce input.bc -o output.bc""",
     )
 
 
-def test_reset(cBench_dataset):
-    del cBench_dataset  # unused
+def test_reset():
     io_check(
-        """set_benchmark cBench-v1/adpcm
+        """set_benchmark cbench-v1/adpcm
         action -mem2reg -adce
         reset
         stack""",
-        # FIXME(cummins): Prompt should be compilergym:NO-BENCHMARK, but I've
-        # seen compilergym:cBench-v1/crc32 instead. Not sure why.
-        r"""compilergym:.+> Reset benchmark://cBench-v[0-9]+/adpcm environment in [0-9.mu]*s
+        r"""compiler_gym:cbench-v1/qsort> Reset benchmark://cbench-v[0-9]+/adpcm environment in [0-9.mu]*s
 
-compilergym:cBench-v[0-9]+/adpcm> Action -mem2reg
+compiler_gym:cbench-v[0-9]+/adpcm> Action -mem2reg
 Action -adce
 Actions -mem2reg -adce in [0-9.mu]*s with reward 0.
 
-compilergym:cBench-v[0-9]+/adpcm> Reset in [0-9.mu]*s
+compiler_gym:cbench-v[0-9]+/adpcm> Reset in [0-9.mu]*s
 
-compilergym:cBench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
+compiler_gym:cbench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   |   Reward |   Cumulative Reward
 ---------+----------+----------+--------+----------+---------------------
        0 | <init>   | False    | False  |        0 |                   0""",
     )

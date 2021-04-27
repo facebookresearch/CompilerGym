@@ -99,23 +99,14 @@ Once deleted, a dataset must be downloaded before it can be used again.
 A :code:`--delete_all` flag can be used to delete all of the locally installed
 datasets.
 """
-import os
 import sys
-from pathlib import Path
-from typing import Tuple
 
-import humanize
 from absl import app, flags
+from deprecated.sphinx import deprecated
 
-from compiler_gym.datasets.dataset import (
-    LegacyDataset,
-    activate,
-    deactivate,
-    delete,
-    require,
-)
+from compiler_gym.bin.service import summarize_datasets
+from compiler_gym.datasets.dataset import activate, deactivate, delete
 from compiler_gym.util.flags.env_from_flags import env_from_flags
-from compiler_gym.util.tabulate import tabulate
 
 flags.DEFINE_list(
     "download",
@@ -143,31 +134,15 @@ flags.DEFINE_boolean("deactivate_all", False, "Deactivate all active datasets")
 FLAGS = flags.FLAGS
 
 
-def get_count_and_size_of_directory_contents(root: Path) -> Tuple[int, int]:
-    """Return the number of files and combined size of a directory."""
-    count, size = 0, 0
-    for root, _, files in os.walk(str(root)):
-        count += len(files)
-        size += sum(os.path.getsize(f"{root}/{file}") for file in files)
-    return count, size
-
-
-def enumerate_directory(name: str, path: Path):
-    rows = []
-    for path in path.iterdir():
-        if not path.is_file() or not path.name.endswith(".json"):
-            continue
-        dataset = LegacyDataset.from_json_file(path)
-        rows.append(
-            (dataset.name, dataset.license, dataset.file_count, dataset.size_bytes)
-        )
-    rows.append(("Total", "", sum(r[2] for r in rows), sum(r[3] for r in rows)))
-    return tabulate(
-        [(n, l, humanize.intcomma(f), humanize.naturalsize(s)) for n, l, f, s in rows],
-        headers=(name, "License", "#. Benchmarks", "Size on disk"),
-    )
-
-
+@deprecated(
+    version="0.1.8",
+    reason=(
+        "Command-line management of datasets is deprecated. Please use "
+        ":mod:`compiler_gym.bin.service` to print a tabular overview of the "
+        "available datasets. For management of datasets, use the "
+        ":class:`env.datasets <compiler_gym.env>` property."
+    ),
+)
 def main(argv):
     """Main entry point."""
     if len(argv) != 1:
@@ -175,28 +150,20 @@ def main(argv):
 
     env = env_from_flags()
     try:
-        if not env.datasets_site_path:
-            raise app.UsageError("Environment has no benchmarks site path")
-
-        env.datasets_site_path.mkdir(parents=True, exist_ok=True)
-        env.inactive_datasets_site_path.mkdir(parents=True, exist_ok=True)
-
         invalidated_manifest = False
 
         for name_or_url in FLAGS.download:
-            require(env, name_or_url)
+            env.datasets.install(name_or_url)
 
         if FLAGS.download_all:
-            for dataset in env.available_datasets:
-                require(env, dataset)
+            for dataset in env.datasets:
+                dataset.install()
 
         for name in FLAGS.activate:
             activate(env, name)
             invalidated_manifest = True
 
         if FLAGS.activate_all:
-            for path in env.inactive_datasets_site_path.iterdir():
-                activate(env, path.name)
             invalidated_manifest = True
 
         for name in FLAGS.deactivate:
@@ -204,8 +171,6 @@ def main(argv):
             invalidated_manifest = True
 
         if FLAGS.deactivate_all:
-            for path in env.datasets_site_path.iterdir():
-                deactivate(env, path.name)
             invalidated_manifest = True
 
         for name in FLAGS.delete:
@@ -214,41 +179,8 @@ def main(argv):
         if invalidated_manifest:
             env.make_manifest_file()
 
-        print(f"{env.spec.id} benchmarks site dir: {env.datasets_site_path}")
-        print()
         print(
-            enumerate_directory("Active Datasets", env.datasets_site_path),
-        )
-        print(
-            "These benchmarks are ready for use. Deactivate them using `--deactivate=<name>`."
-        )
-        print()
-        print(enumerate_directory("Inactive Datasets", env.inactive_datasets_site_path))
-        print("These benchmarks may be activated using `--activate=<name>`.")
-        print()
-        print(
-            tabulate(
-                sorted(
-                    [
-                        (
-                            d.name,
-                            d.license,
-                            humanize.intcomma(d.file_count),
-                            humanize.naturalsize(d.size_bytes),
-                        )
-                        for d in env.available_datasets.values()
-                    ]
-                ),
-                headers=(
-                    "Downloadable Dataset",
-                    "License",
-                    "#. Benchmarks",
-                    "Size on disk",
-                ),
-            )
-        )
-        print(
-            "These benchmarks may be installed using `--download=<name> --activate=<name>`."
+            summarize_datasets(env.datasets),
         )
     finally:
         env.close()

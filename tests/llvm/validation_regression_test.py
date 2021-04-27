@@ -20,14 +20,14 @@ VALIDATION_FLAKINESS = 3
 # A list of CSV states that should pass validation, to be used as regression
 # tests.
 REGRESSION_TEST_STATES = """
-benchmark://cBench-v1/rijndael,,,opt -gvn -loop-unroll -instcombine -gvn -loop-unroll -instcombine input.bc -o output.bc
-benchmark://cBench-v1/rijndael,,,opt -gvn -loop-unroll -mem2reg -loop-rotate -gvn -loop-unroll -mem2reg -loop-rotate input.bc -o output.bc
-benchmark://cBench-v1/rijndael,,,opt -gvn-hoist input.bc -o output.bc
-benchmark://cBench-v1/rijndael,,,opt -jump-threading -sink -partial-inliner -mem2reg -inline -jump-threading -sink -partial-inliner -mem2reg -inline input.bc -o output.bc
-benchmark://cBench-v1/rijndael,,,opt -mem2reg -indvars -loop-unroll -simplifycfg -mem2reg -indvars -loop-unroll -simplifycfg input.bc -o output.bc
-benchmark://cBench-v1/rijndael,,,opt -mem2reg -instcombine -early-cse-memssa -loop-unroll input.bc -o output.bc
-benchmark://cBench-v1/rijndael,,,opt -reg2mem -licm -reg2mem -licm -reg2mem -licm input.bc -o output.bc
-benchmark://cBench-v1/rijndael,,,opt -sroa -simplifycfg -partial-inliner input.bc -o output.bc
+benchmark://cbench-v1/rijndael,,,opt -gvn -loop-unroll -instcombine -gvn -loop-unroll -instcombine input.bc -o output.bc
+benchmark://cbench-v1/rijndael,,,opt -gvn -loop-unroll -mem2reg -loop-rotate -gvn -loop-unroll -mem2reg -loop-rotate input.bc -o output.bc
+benchmark://cbench-v1/rijndael,,,opt -gvn-hoist input.bc -o output.bc
+benchmark://cbench-v1/rijndael,,,opt -jump-threading -sink -partial-inliner -mem2reg -inline -jump-threading -sink -partial-inliner -mem2reg -inline input.bc -o output.bc
+benchmark://cbench-v1/rijndael,,,opt -mem2reg -indvars -loop-unroll -simplifycfg -mem2reg -indvars -loop-unroll -simplifycfg input.bc -o output.bc
+benchmark://cbench-v1/rijndael,,,opt -mem2reg -instcombine -early-cse-memssa -loop-unroll input.bc -o output.bc
+benchmark://cbench-v1/rijndael,,,opt -reg2mem -licm -reg2mem -licm -reg2mem -licm input.bc -o output.bc
+benchmark://cbench-v1/rijndael,,,opt -sroa -simplifycfg -partial-inliner input.bc -o output.bc
 """
 REGRESSION_TEST_STATES = [
     CompilerEnvState.from_csv(s) for s in REGRESSION_TEST_STATES.strip().split("\n")
@@ -38,7 +38,7 @@ REGRESSION_TEST_STATE_NAMES = [
 
 # A list of CSV states that are known to fail validation.
 KNOWN_BAD_STATES = """
-benchmark://cBench-v1/susan,0.40581008446378297,6.591785192489624,opt -mem2reg -reg2mem -gvn -reg2mem -gvn -newgvn input.bc -o output.bc
+benchmark://cbench-v1/susan,0.40581008446378297,6.591785192489624,opt -mem2reg -reg2mem -gvn -reg2mem -gvn -newgvn input.bc -o output.bc
 """
 KNOWN_BAD_STATES = [
     CompilerEnvState.from_csv(s) for s in KNOWN_BAD_STATES.strip().split("\n") if s
@@ -48,10 +48,10 @@ KNOWN_BAD_STATE_NAMES = [f"{s.benchmark},{s.commandline}" for s in KNOWN_BAD_STA
 # NOTE(github.com/facebookresearch/CompilerGym/issues/103): The following
 # regresison tests are deprecated after -structurizecfg was deactivated:
 #
-# benchmark://cBench-v1/tiff2bw,,,opt -structurizecfg input.bc -o output.bc
-# benchmark://cBench-v1/tiff2rgba,,,opt -structurizecfg input.bc -o output.bc
-# benchmark://cBench-v1/tiffdither,,,opt -structurizecfg input.bc -o output.bc
-# benchmark://cBench-v1/tiffmedian,,,opt -structurizecfg input.bc -o output.bc
+# benchmark://cbench-v1/tiff2bw,,,opt -structurizecfg input.bc -o output.bc
+# benchmark://cbench-v1/tiff2rgba,,,opt -structurizecfg input.bc -o output.bc
+# benchmark://cbench-v1/tiffdither,,,opt -structurizecfg input.bc -o output.bc
+# benchmark://cbench-v1/tiffmedian,,,opt -structurizecfg input.bc -o output.bc
 
 
 @skip_on_ci

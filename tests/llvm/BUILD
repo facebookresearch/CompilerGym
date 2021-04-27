@@ -41,20 +41,6 @@ py_test(
 )
 
 py_test(
-    name = "benchmark_semantics_validation_test",
-    timeout = "eternal",
-    srcs = ["benchmark_semantics_validation_test.py"],
-    shard_count = 10,
-    deps = [
-        "//compiler_gym",
-        "//compiler_gym/datasets",
-        "//compiler_gym/envs",
-        "//tests:test_main",
-        "//tests/pytest_plugins:llvm",
-    ],
-)
-
-py_test(
     name = "benchmarks_random_actions_test",
     timeout = "long",
     srcs = ["benchmarks_random_actions_test.py"],
@@ -73,7 +59,7 @@ py_test(
     srcs = ["custom_benchmarks_test.py"],
     data = [
         "invalid_ir.ll",
-        "//compiler_gym/third_party/cBench:crc32",
+        "//compiler_gym/third_party/cbench:crc32",
     ],
     deps = [
         "//compiler_gym/envs",
@@ -101,7 +87,7 @@ py_test(
     timeout = "long",
     srcs = ["fork_env_test.py"],
     data = [
-        "//compiler_gym/third_party/cBench:crc32",
+        "//compiler_gym/third_party/cbench:crc32",
     ],
     deps = [
         "//compiler_gym/envs",
@@ -148,6 +134,18 @@ py_test(
     deps = [
         "//compiler_gym",
         "//tests:test_main",
+    ],
+)
+
+py_test(
+    name = "invalid_ir_test",
+    srcs = ["invalid_ir_test.py"],
+    data = ["invalid_ir.ll"],
+    deps = [
+        "//compiler_gym/util",
+        "//tests:test_main",
+        "//tests/pytest_plugins:common",
+        "//tests/pytest_plugins:llvm",
     ],
 )
 
@@ -234,6 +232,7 @@ py_test(
     name = "threading_test",
     timeout = "short",
     srcs = ["threading_test.py"],
+    flaky = 1,
     deps = [
         "//compiler_gym",
         "//tests:test_main",
@@ -241,10 +240,23 @@ py_test(
 )
 
 py_test(
+    name = "validate_test",
+    timeout = "moderate",
+    srcs = ["validate_test.py"],
+    deps = [
+        "//compiler_gym",
+        "//compiler_gym/datasets",
+        "//compiler_gym/envs",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "validation_regression_test",
     timeout = "long",
     srcs = ["validation_regression_test.py"],
-    shard_count = 6,
+    shard_count = 4,
     deps = [
         "//compiler_gym",
         "//tests:test_main",

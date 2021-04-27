@@ -18,7 +18,7 @@ pytest_plugins = [
 
 @pytest.mark.xfail(reason="-separate-const-offset-from-gep", strict=True)
 def test_regression_test_const_offset_from_gep(env, tmpwd, llvm_diff, llvm_opt):
-    env.reset(benchmark="benchmark://cBench-v1/blowfish")
+    env.reset(benchmark="benchmark://cbench-v1/blowfish")
     env.write_ir("input.ll")
     # FIXME: Removing the -separate-const-offset-from-gep actions from the below
     # commandline "fixes" the test.

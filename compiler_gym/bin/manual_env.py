@@ -224,6 +224,7 @@ import cmd
 import random
 import readline
 import sys
+from itertools import islice
 
 from absl import app, flags
 
@@ -284,10 +285,12 @@ The 'tutorial' command will give a step by step guide."""
 
         self.env = env
 
-        self.init_benchmarks()
-
         # Get the benchmarks
-        self.benchmarks = sorted(self.env.benchmarks)
+        self.benchmarks = []
+        for dataset in self.env.datasets:
+            self.benchmarks += islice(dataset.benchmark_uris(), 50)
+        self.benchmarks.sort()
+
         # Strip default benchmark:// protocol.
         for i, benchmark in enumerate(self.benchmarks):
             if benchmark.startswith("benchmark://"):
@@ -324,24 +327,12 @@ The 'tutorial' command will give a step by step guide."""
         self.env.close()
         self.env = None
 
-    def init_benchmarks(self):
-        """Initialise the set of benchmarks"""
-        # Get the benchmarks
-        self.benchmarks = sorted(self.env.benchmarks)
-        # Strip default benchmark:// protocol.
-        for i, benchmark in enumerate(self.benchmarks):
-            if benchmark.startswith("benchmark://"):
-                self.benchmarks[i] = benchmark[len("benchmark://") :]
-
     def set_prompt(self):
         """Set the prompt - shows the benchmark name"""
-        if self.env.benchmark:
-            bname = self.env.benchmark
-            if bname.startswith("benchmark://"):
-                bname = bname[len("benchmark://") :]
-        else:
-            bname = "NO-BENCHMARK"
-        prompt = f"compilergym:{bname}>"
+        benchmark_name = self.env.benchmark.uri
+        if benchmark_name.startswith("benchmark://"):
+            benchmark_name = benchmark_name[len("benchmark://") :]
+        prompt = f"compiler_gym:{benchmark_name}>"
         self.prompt = f"\n{emph(prompt)} "
 
     def simple_complete(self, text, options):
@@ -352,38 +343,16 @@ The 'tutorial' command will give a step by step guide."""
             return options
 
     def get_datasets(self):
-        """Get the list of available datasets"""
-        return sorted([k for k in self.env.available_datasets])
+        """Get the list of datasets"""
+        return sorted([k.name for k in self.env.datasets.datasets()])
 
     def do_list_datasets(self, arg):
-        """List all of the available datasets"""
+        """List all of the datasets"""
         print(", ".join(self.get_datasets()))
 
-    def complete_require_dataset(self, text, line, begidx, endidx):
-        """Complete the require_benchmark argument"""
-        return self.simple_complete(text, self.get_datasets())
-
-    def do_require_dataset(self, arg):
-        """Require dataset
-        The argument is the name of the dataset to require.
-        """
-        if self.get_datasets().count(arg):
-            with Timer(f"Downloaded dataset {arg}"):
-                self.env.require_dataset(arg)
-            self.init_benchmarks()
-        else:
-            print("Unknown dataset, '" + arg + "'")
-            print("Available datasets are listed with command, list_available_datasets")
-
     def do_list_benchmarks(self, arg):
-        """List all of the available benchmarks"""
-        if not self.benchmarks:
-            doc_root_url = "https://facebookresearch.github.io/CompilerGym/"
-            install_url = doc_root_url + "getting_started.html#installing-benchmarks"
-            print("No benchmarks available. See " + install_url)
-            print("Datasets can be installed with command, require_dataset")
-        else:
-            print(", ".join(self.benchmarks))
+        """List the benchmarks"""
+        print(", ".join(self.benchmarks))
 
     def complete_set_benchmark(self, text, line, begidx, endidx):
         """Complete the set_benchmark argument"""
@@ -398,15 +367,16 @@ The 'tutorial' command will give a step by step guide."""
         Use '-' for a random benchmark.
         """
         if arg == "-":
-            arg = random.choice(self.benchmarks)
+            arg = self.env.datasets.benchmark().uri
             print(f"set_benchmark {arg}")
 
-        if self.benchmarks.count(arg):
+        try:
+            benchmark = self.env.datasets.benchmark(arg)
             self.stack.clear()
 
             # Set the current benchmark
             with Timer() as timer:
-                observation = self.env.reset(benchmark=arg)
+                observation = self.env.reset(benchmark=benchmark)
             print(f"Reset {self.env.benchmark} environment in {timer}")
 
             if self.env.observation_space and observation is not None:
@@ -415,10 +385,9 @@ The 'tutorial' command will give a step by step guide."""
                 )
 
             self.set_prompt()
-
-        else:
+        except LookupError:
             print("Unknown benchmark, '" + arg + "'")
-            print("Bencmarks are listed with command, list_benchmarks")
+            print("Benchmarks are listed with command, list_benchmarks")
 
     def get_actions(self):
         """Get the list of actions"""
@@ -440,10 +409,6 @@ The 'tutorial' command will give a step by step guide."""
         Tab completion will be used if available.
         Use '-' for a random action.
         """
-        if not self.env.benchmark:
-            print("No benchmark set, please call the set_benchmark command")
-            return
-
         if self.stack and self.stack[-1].done:
             print(
                 "No action possible, last action ended by the environment with error:",
@@ -546,10 +511,6 @@ The 'tutorial' command will give a step by step guide."""
         An argument, if given, should be the number of steps to take.
         The search will try to improve the default reward. Please call set_default_reward if needed.
         """
-        if not self.env.benchmark:
-            print("No benchmark set, please call the set_benchmark command")
-            return
-
         if not self.env.reward_space:
             print("No default reward set. Call set_default_reward")
             return
@@ -606,10 +567,6 @@ The 'tutorial' command will give a step by step guide."""
 
     def do_try_all_actions(self, args):
         """Tries all actions from this position and reports the results in sorted order by reward"""
-        if not self.env.benchmark:
-            print("No benchmark set, please call the set_benchmark command")
-            return
-
         if not self.env.reward_space:
             print("No default reward set. Call set_default_reward")
             return
@@ -635,10 +592,6 @@ The 'tutorial' command will give a step by step guide."""
         An argument, if given, should be the number of steps to take.
         The search will try to improve the default reward. Please call set_default_reward if needed.
         """
-        if not self.env.benchmark:
-            print("No benchmark set, please call the set_benchmark command")
-            return
-
         if not self.env.reward_space:
             print("No default reward set. Call set_default_reward")
             return
@@ -679,10 +632,6 @@ The 'tutorial' command will give a step by step guide."""
         The name should come from the list of observations printed by the command list_observations.
         Tab completion will be used if available.
         """
-        if not self.env.benchmark:
-            print("No benchmark set, please call the set_benchmark command")
-            return
-
         if arg == "" and self.env.observation_space:
             arg = self.env.observation_space_spec.id
 
@@ -707,10 +656,6 @@ The 'tutorial' command will give a step by step guide."""
         With no argument it will set to None.
         This command will rerun the actions on the stack.
         """
-        if not self.env.benchmark:
-            print("No benchmark set, please call the set_benchmark command")
-            return
-
         arg = arg.strip()
         if not arg or self.observations.count(arg):
             with Timer() as timer:
@@ -735,10 +680,6 @@ The 'tutorial' command will give a step by step guide."""
         The name should come from the list of rewards printed by the command list_rewards.
         Tab completion will be used if available.
         """
-        if not self.env.benchmark:
-            print("No benchmark set, please call the set_benchmark command")
-            return
-
         if arg == "" and self.env.reward_space:
             arg = self.env.reward_space.id
 
@@ -761,10 +702,6 @@ The 'tutorial' command will give a step by step guide."""
         With no argument it will set to None.
         This command will rerun the actions on the stack.
         """
-        if not self.env.benchmark:
-            print("No benchmark set, please call the set_benchmark command")
-            return
-
         arg = arg.strip()
         if not arg or self.rewards.count(arg):
             with Timer(f"Reward {arg}"):
@@ -780,10 +717,6 @@ The 'tutorial' command will give a step by step guide."""
 
     def do_stack(self, arg):
         """Show the environments on the stack. The current environment is the first shown."""
-        if not self.env.benchmark:
-            print("No benchmark set, please call the set_benchmark command")
-            return
-
         rows = []
         total = 0
         for i, hist in enumerate(self.stack):
@@ -810,10 +743,6 @@ The 'tutorial' command will give a step by step guide."""
         being removed that previously had a negative reward being necessary for a later action to
         have a positive reward. This means you might see non-positive rewards on the stack afterwards.
         """
-        if not self.env.benchmark:
-            print("No benchmark set, please call the set_benchmark command")
-            return
-
         self.env.reset()
         old_stack = self.stack
         self.stack = []
@@ -879,7 +808,6 @@ def main(argv):
         raise app.UsageError(f"Unknown command line arguments: {argv[1:]}")
 
     with Timer("Initialized environment"):
-        # FIXME Chris, I don't seem to actually get a benchmark
         benchmark = benchmark_from_flags()
         env = env_from_flags(benchmark)
 

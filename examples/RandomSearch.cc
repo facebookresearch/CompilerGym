@@ -25,7 +25,7 @@
 #include "compiler_gym/envs/llvm/service/ObservationSpaces.h"
 #include "compiler_gym/util/GrpcStatusMacros.h"
 
-DEFINE_string(benchmark, "benchmark://cBench-v1/crc32", "The benchmark to use.");
+DEFINE_string(benchmark, "benchmark://cbench-v1/crc32", "The benchmark to use.");
 DEFINE_int32(step_count, 100, "The number of steps to run for each random search");
 DEFINE_int32(nproc, std::max(1u, std::thread::hardware_concurrency()),
              "The number of parallel search threads to use");

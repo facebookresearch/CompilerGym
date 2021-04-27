@@ -6,10 +6,7 @@
 import random
 
 from compiler_gym.envs import LlvmEnv
-from compiler_gym.envs.llvm.legacy_datasets import (
-    get_llvm_benchmark_validation_callback,
-)
-from tests.pytest_plugins.llvm import VALIDATABLE_BENCHMARKS
+from tests.pytest_plugins.llvm import VALIDATABLE_CBENCH_URIS
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
@@ -21,7 +18,7 @@ RANDOM_TRAJECTORY_LENGTH_RANGE = (1, 50)
 
 def test_fuzz(env: LlvmEnv):
     """This test generates a random trajectory and validates the semantics."""
-    benchmark = random.choice(VALIDATABLE_BENCHMARKS)
+    benchmark = random.choice(VALIDATABLE_CBENCH_URIS)
     num_actions = random.randint(*RANDOM_TRAJECTORY_LENGTH_RANGE)
 
     while True:
@@ -32,9 +29,7 @@ def test_fuzz(env: LlvmEnv):
                 break  # Broken trajectory, retry.
         else:
             print(f"Validating state {env.state}")
-            validation_cb = get_llvm_benchmark_validation_callback(env)
-            assert validation_cb
-            assert validation_cb(env) is None
+            assert env.validate() == []
             # Stop the test.
             break
 

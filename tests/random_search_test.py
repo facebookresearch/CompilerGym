@@ -7,25 +7,23 @@ import tempfile
 from pathlib import Path
 
 import gym
-from absl import flags
 
 from compiler_gym.random_replay import replay_actions_from_logs
 from compiler_gym.random_search import random_search
+from tests.pytest_plugins.common import set_command_line_flags
 from tests.test_main import main
 
 
 def make_env():
     env = gym.make("llvm-autophase-ic-v0")
-    env.require_dataset("cBench-v1")
-    env.benchmark = "cBench-v1/dijkstra"
+    env.benchmark = "cbench-v1/dijkstra"
     return env
 
 
 def test_random_search_smoke_test():
     with tempfile.TemporaryDirectory() as tmp:
         outdir = Path(tmp)
-        flags.FLAGS.unparse_flags()
-        flags.FLAGS(["argv0"])
+        set_command_line_flags(["argv0"])
         random_search(
             make_env=make_env,
             outdir=outdir,

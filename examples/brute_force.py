@@ -10,10 +10,10 @@ length and evaluates them, logging the incremental rewards of each.
 Example usage:
 
     $ $ python -m compiler_gym.bin.brute_force \
-       --env=llvm-ic-v0 --benchmark=cBench-v1/dijkstra \
+       --env=llvm-ic-v0 --benchmark=cbench-v1/dijkstra \
        --episode_length=10 --actions=-sroa,-mem2reg,-newgvn
-    Enumerating all episodes of 3 actions × 10 steps
-    Started 24 brute force workers for benchmark cBench-v1/dijkstra using reward IrInstructionCountOz.
+    Enumerating all episodes of 3 actions x 10 steps
+    Started 24 brute force workers for benchmark cbench-v1/dijkstra using reward IrInstructionCountOz.
     === Running 59,049 trials ===
     Runtime: 3 minutes. Progress: 100.00%. Best reward found: 101.1905%.
     Ending jobs ... completed 59,049 of 59,049 trials (100.000%)
@@ -84,11 +84,8 @@ class BruteForceProducer(Thread):
         self.alive = True  # Set this to False to signal the thread to stop.
 
     def run(self):
-        for i, chunk in enumerate(
-            grouper(
-                itertools.product(*[self.actions] * self.episode_length), self.chunksize
-            ),
-            start=1,
+        for chunk in grouper(
+            itertools.product(*[self.actions] * self.episode_length), self.chunksize
         ):
             if not self.alive:
                 break
@@ -108,13 +105,13 @@ class BruteForceWorker(Thread):
 
     def __init__(
         self,
-        id: int,
+        worker_id: int,
         in_q: Queue,
         out_q: Queue,
         env: CompilerEnv,
     ):
         super().__init__()
-        self.id = id
+        self.id = worker_id
         self.in_q = in_q
         self.out_q = out_q
         self.env = env
@@ -185,12 +182,12 @@ def run_brute_force(
     reward_space_name = env.reward_space.id
 
     actions = [env.action_space.names.index(a) for a in action_names]
-    benchmark_name = env.benchmark
+    benchmark_uri = env.benchmark.uri
 
     meta = {
         "env": env.spec.id,
         "action_names": action_names,
-        "benchmark": benchmark_name,
+        "benchmark": benchmark_uri,
         "reward": reward_space_name,
         "init_reward": env.reward[reward_space_name],
         "episode_length": episode_length,
@@ -220,7 +217,7 @@ def run_brute_force(
 
     # Worker threads that will consume the action sequences and produce rewards.
     workers = [
-        BruteForceWorker(id=i, env=make_env(), in_q=in_q, out_q=out_q)
+        BruteForceWorker(worker_id=i, env=make_env(), in_q=in_q, out_q=out_q)
         for i in range(1, nproc + 1)
     ]
     for worker in workers:
@@ -235,11 +232,11 @@ def run_brute_force(
     best_reward = -float("inf")
     best_action_sequence = []
     print(
-        f"Enumerating all episodes of {len(actions)} actions × {episode_length} steps"
+        f"Enumerating all episodes of {len(actions)} actions x {episode_length} steps"
     )
     print(
         f"Started {len(workers)} brute force workers for benchmark "
-        f"{benchmark_name} using reward {reward_space_name}."
+        f"{benchmark_uri} using reward {reward_space_name}."
     )
     print(f"=== Running {humanize.intcomma(expected_trial_count)} trials ===")
     try:
@@ -315,11 +312,10 @@ def main(argv):
     env = env_from_flags(benchmark)
     env.reset()
     benchmark = env.benchmark
-    sanitized_benchmark_name = "/".join(benchmark.split("/")[-2:])
+    sanitized_benchmark_uri = "/".join(benchmark.split("/")[-2:])
     env.close()
     logs_dir = Path(
-        FLAGS.output_dir
-        or create_logging_dir(f"brute_force/{sanitized_benchmark_name}")
+        FLAGS.output_dir or create_logging_dir(f"brute_force/{sanitized_benchmark_uri}")
     )
 
     run_brute_force(

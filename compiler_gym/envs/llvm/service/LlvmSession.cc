@@ -331,8 +331,9 @@ Status LlvmSession::getObservation(LlvmObservationSpace space, Observation* repl
       break;
     }
     case LlvmObservationSpace::IR_INSTRUCTION_COUNT: {
-      const auto cost =
-          getCost(LlvmCostFunction::IR_INSTRUCTION_COUNT, benchmark().module(), workingDirectory_);
+      double cost;
+      RETURN_IF_ERROR(setCost(LlvmCostFunction::IR_INSTRUCTION_COUNT, benchmark().module(),
+                              workingDirectory_, &cost));
       reply->set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
@@ -355,8 +356,9 @@ Status LlvmSession::getObservation(LlvmObservationSpace space, Observation* repl
       break;
     }
     case LlvmObservationSpace::OBJECT_TEXT_SIZE_BYTES: {
-      const auto cost = getCost(LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES, benchmark().module(),
-                                workingDirectory_);
+      double cost;
+      RETURN_IF_ERROR(setCost(LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES, benchmark().module(),
+                              workingDirectory_, &cost));
       reply->set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
@@ -380,8 +382,9 @@ Status LlvmSession::getObservation(LlvmObservationSpace space, Observation* repl
     }
 #ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
     case LlvmObservationSpace::TEXT_SIZE_BYTES: {
-      const auto cost =
-          getCost(LlvmCostFunction::TEXT_SIZE_BYTES, benchmark().module(), workingDirectory_);
+      double cost;
+      RETURN_IF_ERROR(setCost(LlvmCostFunction::TEXT_SIZE_BYTES, benchmark().module(),
+                              workingDirectory_, &cost));
       reply->set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
