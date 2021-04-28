@@ -56,7 +56,7 @@ def run_random_walk(env: CompilerEnv, step_count: int) -> None:
             rewards.append(reward)
             actions.append(env.action_space.names[action_index])
             print(f"Reward:       {reward}")
-            if env._default_observation:
+            if env.observation_space:
                 print(f"Observation:\n{observation}")
             print(f"Step time:    {step_time}")
             if done:

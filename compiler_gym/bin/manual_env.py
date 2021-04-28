@@ -411,7 +411,7 @@ The 'tutorial' command will give a step by step guide."""
 
             if self.env.observation_space and observation is not None:
                 print(
-                    f"Observation: {self.env.observation_space.to_string(observation)}"
+                    f"Observation: {self.env.observation_space_spec.to_string(observation)}"
                 )
 
             self.set_prompt()
@@ -486,7 +486,7 @@ The 'tutorial' command will give a step by step guide."""
                 # Print the observation, if available.
                 if self.env.observation_space and observation is not None:
                     print(
-                        f"Observation: {self.env.observation_space.to_string(observation)}"
+                        f"Observation: {self.env.observation_space_spec.to_string(observation)}"
                     )
 
                 # Print the reward, if available.
@@ -684,7 +684,7 @@ The 'tutorial' command will give a step by step guide."""
             return
 
         if arg == "" and self.env.observation_space:
-            arg = self.env.observation_space.id
+            arg = self.env.observation_space_spec.id
 
         if self.observations.count(arg):
             with Timer() as timer:

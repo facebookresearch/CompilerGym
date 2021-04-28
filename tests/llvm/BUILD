@@ -142,6 +142,16 @@ py_test(
 )
 
 py_test(
+    name = "gym_interface_compatability",
+    timeout = "short",
+    srcs = ["gym_interface_compatability.py"],
+    deps = [
+        "//compiler_gym",
+        "//tests:test_main",
+    ],
+)
+
+py_test(
     name = "llvm_benchmarks_test",
     srcs = ["llvm_benchmarks_test.py"],
     deps = [
