@@ -11,6 +11,7 @@ py_library(
         "//examples/example_compiler_gym_service/service_cc:compiler_gym-example-service-cc",
         "//examples/example_compiler_gym_service/service_py:compiler_gym-example-service-py",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "//compiler_gym/util",
     ],

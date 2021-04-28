@@ -3,9 +3,19 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """This module demonstrates how to """
+from pathlib import Path
+
 from compiler_gym.spaces import Reward
 from compiler_gym.util.registration import register
 from compiler_gym.util.runfiles_path import runfiles_path
+
+EXAMPLE_CC_SERVICE_BINARY: Path = runfiles_path(
+    "examples/example_compiler_gym_service/service_cc/compiler_gym-example-service-cc"
+)
+
+EXAMPLE_PY_SERVICE_BINARY: Path = runfiles_path(
+    "examples/example_compiler_gym_service/service_py/compiler_gym-example-service-py"
+)
 
 
 class RuntimeReward(Reward):
@@ -46,9 +56,7 @@ register(
     id="example-cc-v0",
     entry_point="compiler_gym.envs:CompilerEnv",
     kwargs={
-        "service": runfiles_path(
-            "examples/example_compiler_gym_service/service_cc/compiler_gym-example-service-cc"
-        ),
+        "service": EXAMPLE_CC_SERVICE_BINARY,
         "rewards": [RuntimeReward()],
     },
 )
@@ -57,9 +65,7 @@ register(
     id="example-py-v0",
     entry_point="compiler_gym.envs:CompilerEnv",
     kwargs={
-        "service": runfiles_path(
-            "examples/example_compiler_gym_service/service_py/compiler_gym-example-service-py"
-        ),
+        "service": EXAMPLE_PY_SERVICE_BINARY,
         "rewards": [RuntimeReward()],
     },
 )
