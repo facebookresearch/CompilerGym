@@ -273,17 +273,18 @@ class CompilerEnv(gym.Env):
         # Lazily evaluated version strings.
         self._versions: Optional[GetVersionReply] = None
 
-        # Mutable state initialized in reset().
         self.action_space: Optional[Space] = None
         self.observation_space: Optional[Space] = None
+
+        # Mutable state initialized in reset().
         self.reward_range: Tuple[float, float] = (-np.inf, np.inf)
         self.episode_reward: Optional[float] = None
         self.episode_start_time: float = time()
         self.actions: List[int] = []
 
         # Initialize the default observation/reward spaces.
-        self._default_observation_space: Optional[ObservationSpaceSpec] = None
-        self._default_reward_space: Optional[Reward] = None
+        self.observation_space_spec: Optional[ObservationSpaceSpec] = None
+        self.reward_space_spec: Optional[Reward] = None
         self.observation_space = observation_space
         self.reward_space = reward_space
 
@@ -461,26 +462,27 @@ class CompilerEnv(gym.Env):
             or :code:`None` if not set.
         :setter: Set the default reward space.
         """
-        return self._default_reward_space
+        return self.reward_space_spec
 
     @reward_space.setter
     def reward_space(self, reward_space: Optional[Union[str, Reward]]) -> None:
-        if isinstance(reward_space, str) and reward_space not in self.reward.spaces:
-            raise LookupError(f"Reward space not found: {reward_space}")
-
-        reward_space_name = (
+        # Coerce the observation space into a string.
+        reward_space: Optional[str] = (
             reward_space.id if isinstance(reward_space, Reward) else reward_space
         )
 
-        self._default_reward: bool = reward_space is not None
-        self._default_reward_space: Optional[Reward] = None
-        if self._default_reward:
-            self._default_reward_space = self.reward.spaces[reward_space_name]
+        if reward_space:
+            if reward_space not in self.reward.spaces:
+                raise LookupError(f"Reward space not found: {reward_space}")
+            self.reward_space_spec = self.reward.spaces[reward_space]
             self.reward_range = (
-                self._default_reward_space.min,
-                self._default_reward_space.max,
+                self.reward_space_spec.min,
+                self.reward_space_spec.max,
             )
         else:
+            # If no reward space is being used then set the reward range to
+            # unbounded.
+            self.reward_space_spec = None
             self.reward_range = (-np.inf, np.inf)
 
     @property
@@ -501,30 +503,26 @@ class CompilerEnv(gym.Env):
             :code:`None` if not set.
         :setter: Set the default observation space.
         """
-        return self._default_observation_space
+        if self.observation_space_spec:
+            return self.observation_space_spec.space
 
     @observation_space.setter
     def observation_space(
         self, observation_space: Optional[Union[str, ObservationSpaceSpec]]
     ) -> None:
-        if (
-            isinstance(observation_space, str)
-            and observation_space not in self.observation.spaces
-        ):
-            raise LookupError(f"Observation space not found: {observation_space}")
-
-        observation_space_name = (
+        # Coerce the observation space into a string.
+        observation_space: Optional[str] = (
             observation_space.id
             if isinstance(observation_space, ObservationSpaceSpec)
             else observation_space
         )
 
-        self._default_observation = observation_space is not None
-        self._default_observation_space: Optional[ObservationSpaceSpec] = None
-        if self._default_observation:
-            self._default_observation_space = self.observation.spaces[
-                observation_space_name
-            ]
+        if observation_space:
+            if observation_space not in self.observation.spaces:
+                raise LookupError(f"Observation space not found: {observation_space}")
+            self.observation_space_spec = self.observation.spaces[observation_space]
+        else:
+            self.observation_space_spec = None
 
     def fork(self) -> "CompilerEnv":
         """Fork a new environment with exactly the same state.
@@ -603,7 +601,7 @@ class CompilerEnv(gym.Env):
         # Set the default observation and reward types. Note the use of IDs here
         # to prevent passing the spaces by reference.
         if self.observation_space:
-            new_env.observation_space = self.observation_space.id
+            new_env.observation_space = self.observation_space_spec.id
         if self.reward_space:
             new_env.reward_space = self.reward_space.id
 
@@ -705,7 +703,7 @@ class CompilerEnv(gym.Env):
                         else 0
                     ),
                     observation_space=(
-                        [self.observation_space.index]
+                        [self.observation_space_spec.index]
                         if self.observation_space
                         else None
                     ),
@@ -752,7 +750,7 @@ class CompilerEnv(gym.Env):
                 raise OSError(
                     f"Expected one observation from service, received {len(reply.observation)}"
                 )
-            return self.observation.spaces[self.observation_space.id].translate(
+            return self.observation.spaces[self.observation_space_spec.id].translate(
                 reply.observation[0]
             )
 
@@ -778,8 +776,8 @@ class CompilerEnv(gym.Env):
         # requested.
         observation_indices, observation_spaces = [], []
         if self.observation_space:
-            observation_indices.append(self.observation_space.index)
-            observation_spaces.append(self.observation_space.id)
+            observation_indices.append(self.observation_space_spec.index)
+            observation_spaces.append(self.observation_space_spec.id)
         if self.reward_space:
             observation_indices += [
                 self.observation.spaces[obs].index
@@ -816,7 +814,7 @@ class CompilerEnv(gym.Env):
             if self.reward_space:
                 reward = self.reward_space.reward_on_error(self.episode_reward)
             if self.observation_space:
-                observation = self.observation_space.default_value
+                observation = self.observation_space_spec.default_value
             return observation, reward, True, info
 
         # If the action space has changed, update it.
@@ -870,7 +868,7 @@ class CompilerEnv(gym.Env):
         """
         if not self.observation_space:
             raise ValueError("Cannot call render() when no observation space is used")
-        observation = self.observation[self.observation_space.id]
+        observation = self.observation[self.observation_space_spec.id]
         if mode == "human":
             print(observation)
         elif mode == "ansi":

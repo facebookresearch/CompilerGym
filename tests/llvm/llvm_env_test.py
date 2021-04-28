@@ -167,7 +167,7 @@ def test_gym_make_kwargs():
         "llvm-v0", observation_space="Autophase", reward_space="IrInstructionCount"
     )
     try:
-        assert env.observation_space.id == "Autophase"
+        assert env.observation_space_spec.id == "Autophase"
         assert env.reward_space.id == "IrInstructionCount"
     finally:
         env.close()

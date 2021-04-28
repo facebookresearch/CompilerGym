@@ -22,15 +22,16 @@ pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 def test_default_observation_space(env: LlvmEnv):
     env.observation_space = "Autophase"
-    assert env.observation_space.id == "Autophase"
+    assert env.observation_space.shape == (56,)
+    assert env.observation_space_spec.id == "Autophase"
 
     env.observation_space = None
     assert env.observation_space is None
+    assert env.observation_space_spec is None
 
     invalid = "invalid value"
-    with pytest.raises(LookupError) as ctx:
+    with pytest.raises(LookupError, match=f"Observation space not found: {invalid}"):
         env.observation_space = invalid
-    assert str(ctx.value) == f"Observation space not found: {invalid}"
 
 
 def test_observation_spaces(env: LlvmEnv):
