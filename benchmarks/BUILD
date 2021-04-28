@@ -10,6 +10,7 @@ py_test(
     shard_count = 8,
     deps = [
         "//compiler_gym",
+        "//examples/example_compiler_gym_service",
         "//tests:test_main",
         "//tests/pytest_plugins:llvm",
     ],

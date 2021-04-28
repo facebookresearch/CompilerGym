@@ -38,10 +38,9 @@ if bool(os.environ.get("CI")):
         b for b in BENCHMARK_NAMES if b != "benchmark://cBench-v1/ghostscript"
     ]
 
-_env = gym.make("llvm-v0")
-OBSERVATION_SPACE_NAMES = sorted(_env.observation.spaces.keys())
-REWARD_SPACE_NAMES = sorted(_env.reward.spaces.keys())
-_env.close()
+with gym.make("llvm-v0") as env:
+    OBSERVATION_SPACE_NAMES = sorted(env.observation.spaces.keys())
+    REWARD_SPACE_NAMES = sorted(env.reward.spaces.keys())
 
 
 @pytest.fixture(scope="module")
