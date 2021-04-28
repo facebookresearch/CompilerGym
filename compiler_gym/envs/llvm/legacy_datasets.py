@@ -27,7 +27,7 @@ from compiler_gym.util import thread_pool
 from compiler_gym.util.download import download
 from compiler_gym.util.runfiles_path import cache_path, site_data_path
 from compiler_gym.util.timer import Timer
-from compiler_gym.validation_result import ValidationError
+from compiler_gym.validation_error import ValidationError
 
 _CBENCH_DATA_URL = (
     "https://dl.fbaipublicfiles.com/compiler_gym/cBench-v0-runtime-data.tar.bz2"

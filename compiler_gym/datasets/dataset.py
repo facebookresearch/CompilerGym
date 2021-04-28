@@ -15,7 +15,8 @@ from typing import Dict, Iterable, List, NamedTuple, Optional, Union
 import fasteners
 from deprecated.sphinx import deprecated
 
-from compiler_gym.datasets.benchmark import DATASET_NAME_RE, Benchmark
+from compiler_gym.datasets.benchmark import Benchmark
+from compiler_gym.datasets.uri import DATASET_NAME_RE
 from compiler_gym.util.debug_util import get_logging_level
 from compiler_gym.util.download import download
 
