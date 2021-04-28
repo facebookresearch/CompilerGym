@@ -147,8 +147,8 @@ In Python, import `compiler_gym` to use the environments:
 >>> import gym
 >>> import compiler_gym                     # imports the CompilerGym environments
 >>> env = gym.make("llvm-autophase-ic-v0")  # starts a new environment
->>> env.require_dataset("npb-v0")           # downloads a set of programs
->>> env.reset()                             # starts a new compilation session with a random program
+>>> env.benchmark = "benchmark://cbench-v1/qsort"  # select a program to compile
+>>> env.reset()                             # starts a new compilation session
 >>> env.render()                            # prints the IR of the program
 >>> env.step(env.action_space.sample())     # applies a random optimization, updates state/reward/actions
 ```
@@ -179,7 +179,7 @@ count achieved scaled to the reduction achieved by LLVM's builtin `-Oz`
 pipeline.
 
 This leaderboard tracks the results achieved by algorithms on the `llvm-ic-v0`
-environment on the 23 benchmarks in the `cBench-v1` dataset.
+environment on the 23 benchmarks in the `cbench-v1` dataset.
 
 | Author | Algorithm | Links | Date | Walltime (mean) | Codesize Reduction (geomean) |
 | --- | --- | --- | --- | --- | --- |
