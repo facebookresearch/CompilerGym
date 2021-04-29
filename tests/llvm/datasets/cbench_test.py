@@ -68,15 +68,20 @@ def test_validate_sha_output_invalid():
 
 def test_cbench_v0_deprecation(env: LlvmEnv):
     """Test that cBench-v0 emits a deprecation warning when used."""
-    with pytest.deprecated_call(
-        match="Dataset 'cBench-v0' is deprecated, please use 'cbench-v1'"
-    ):
+    with pytest.deprecated_call(match="Please use 'benchmark://cbench-v1'"):
         env.datasets["cBench-v0"].install()
 
-    with pytest.deprecated_call(
-        match="Dataset 'cBench-v0' is deprecated, please use 'cbench-v1'"
-    ):
+    with pytest.deprecated_call(match="Please use 'benchmark://cbench-v1'"):
         env.datasets.benchmark("benchmark://cBench-v0/crc32")
+
+
+def test_cbench_v1_deprecation(env: LlvmEnv):
+    """Test that cBench-v1 emits a deprecation warning when used."""
+    with pytest.deprecated_call(match="Please use 'benchmark://cbench-v1'"):
+        env.datasets["cBench-v1"].install()
+
+    with pytest.deprecated_call(match="Please use 'benchmark://cbench-v1'"):
+        env.datasets.benchmark("benchmark://cBench-v1/crc32")
 
 
 if __name__ == "__main__":

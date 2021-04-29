@@ -213,7 +213,10 @@ def get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset
     yield CBenchDataset(
         site_data_base=site_data_base,
         name="benchmark://cBench-v1",
-        hidden=True,
+        deprecated=(
+            "Please use 'benchmark://cbench-v1' (note the lowercase name). "
+            "The dataset is the same, only the name has changed"
+        ),
         manifest_url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v1-manifest.bz2",
         manifest_sha256="635b94eeb2784dfedb3b53fd8f84517c3b4b95d851ddb662d4c1058c72dc81e0",
         sort_order=100,

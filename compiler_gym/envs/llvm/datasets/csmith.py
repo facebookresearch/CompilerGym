@@ -129,6 +129,8 @@ class CsmithDataset(Dataset):
 
     def install(self) -> None:
         """Download and build the Csmith binary."""
+        super().install()
+
         if self.installed:
             return
 
