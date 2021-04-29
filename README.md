@@ -78,6 +78,9 @@ features:
 * **Competition:** provides [leaderboards](#leaderboards) for you to submit your
   results.
 
+For a glimpse of what's to come, check out [our
+roadmap](https://github.com/facebookresearch/CompilerGym/projects/1).
+
 # Getting Started
 
 Starting with CompilerGym is simple. If you not already familiar with the gym
