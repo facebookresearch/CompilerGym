@@ -49,7 +49,9 @@ def test_create_invalid_options():
 def test_create_channel_failed_subprocess(
     dead_connection: CompilerGymServiceConnection,
 ):
-    with pytest.raises(ServiceError) as ctx:
+    with pytest.raises(
+        (ServiceError, TimeoutError), match="Failed to create connection to localhost:"
+    ):
         CompilerGymServiceConnection(
             f"{dead_connection.connection.url}",
             ConnectionOpts(
@@ -58,9 +60,6 @@ def test_create_channel_failed_subprocess(
                 rpc_init_max_seconds=0.1,
             ),
         )
-
-    assert str(ctx.value).startswith("Failed to create connection to localhost:")
-    assert " (2 attempts made)" in str(ctx.value)
 
 
 def test_create_channel_failed_subprocess_rpc_timeout(
