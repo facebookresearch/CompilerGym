@@ -73,7 +73,7 @@ def test_validate_known_good_trajectory(env: LlvmEnv, state):
     for _ in range(VALIDATION_FLAKINESS):
         result = env.validate()
         if not result.okay():
-            pytest.fail(f"Validation failed: {result}\n{result.json()}")
+            pytest.fail(f"Validation failed: {result}\n{result.dict()}")
 
 
 if __name__ == "__main__":

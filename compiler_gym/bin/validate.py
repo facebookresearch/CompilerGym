@@ -224,16 +224,16 @@ def main(argv):
         )
 
     progress_message(len(states))
-    json_log = []
+    result_dicts = []
 
-    def dump_json_log():
+    def dump_result_dicst_to_json():
         with open(FLAGS.validation_logfile, "w") as f:
-            json.dump(json_log, f)
+            json.dump(result_dicts, f)
 
     for i, result in enumerate(validation_results, start=1):
         intermediate_print("\r\033[K", to_string(result, name_col_width), sep="")
         progress_message(len(states) - i)
-        json_log.append(result.json())
+        result_dicts.append(result.dict())
 
         if not result.okay():
             error_count += 1
@@ -242,9 +242,9 @@ def main(argv):
             walltimes.append(result.state.walltime)
 
         if not i % 10:
-            dump_json_log()
+            dump_result_dicst_to_json()
 
-    dump_json_log()
+    dump_result_dicst_to_json()
 
     # Print a summary footer.
     intermediate_print("\r\033[K----", "-" * name_col_width, "-----------", sep="")

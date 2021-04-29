@@ -3,6 +3,8 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Unit tests for //compiler_gym:validation_result."""
+import json
+
 import pytest
 
 from compiler_gym import CompilerEnvState, ValidationError, ValidationResult
@@ -39,7 +41,7 @@ def test_validation_error_json():
         data={"data": [1, 2, 3]},
     )
 
-    assert ValidationError.from_json(error.json()) == error
+    assert ValidationError(**json.loads(error.json())) == error
 
 
 def test_validation_result_json():
@@ -58,7 +60,7 @@ def test_validation_result_json():
         ],
     )
 
-    assert ValidationResult.from_json(result.json()) == result
+    assert ValidationResult(**json.loads(result.json())) == result
 
 
 def test_validation_result_equality_different_states():
