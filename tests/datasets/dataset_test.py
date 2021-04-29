@@ -148,7 +148,7 @@ def test_dataset_deprecation_message(tmpwd: Path):
         dataset.install()
 
 
-class TestDataset(Dataset):
+class DatasetForTesting(Dataset):
     """A dataset to use for testing."""
 
     def __init__(self, benchmarks=None):
@@ -179,19 +179,19 @@ class TestDataset(Dataset):
 
 
 def test_dataset_size():
-    dataset = TestDataset()
+    dataset = DatasetForTesting()
     assert dataset.size == 3
     assert len(dataset) == 3
 
 
 def test_benchmarks_lookup_by_uri():
-    dataset = TestDataset()
+    dataset = DatasetForTesting()
     assert dataset.benchmark("benchmark://test-v0/b") == 2
     assert dataset["benchmark://test-v0/b"] == 2
 
 
 def test_benchmarks_iter():
-    dataset = TestDataset()
+    dataset = DatasetForTesting()
     assert list(dataset.benchmarks()) == [1, 2, 3]
     assert list(dataset) == [1, 2, 3]
 
