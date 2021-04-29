@@ -92,10 +92,9 @@ and :code:`<reward>` is the reward signal.
 
 .. note::
 
-    A key concept is that
-    CompilerGym environments enables **lazy evaluation** of observations and
-    reward signals. This makes the environment much more computationally
-    efficient for scenarios in which you do not need to compute a reward or
+    A key concept is that CompilerGym environments enables **lazy evaluation**
+    of observations and reward signals. This increases computational efficiency
+    sampling for scenarios in which you do not need to compute a reward or
     observation for every step. If an environment omits a :code:`<observation>`
     or :code:`<reward>` tag, this means that no observation or reward is
     provided by default. See :doc:`compiler_gym.views <compiler_gym/views>` for
@@ -114,12 +113,12 @@ Create an instance of this environment using:
 .. note::
 
     The first time you run :code:`gym.make()` you may see a logging message
-    "Downloading <url> ..." and a delay of 1-2 minutes. This is the
-    CompilerGym environment downloading dependencies that are specific to LLVM.
-    Environment-specific dependencies are not installed by default to keep the
-    size of the package down. Other operations that have this one-off penalty
-    include lazily installing datasets (described below). These costs are
-    one-off, future calls will have no delay.
+    "Downloading <url> ..." followed by a delay of 1-2 minutes. This is
+    CompilerGym downloading large environment-specific dependencies that are not
+    shipped by default to keep the size of the package down. This is a one-off
+    download that occurs only the first time the environment is used. Other
+    operations that require one-off downloads include installing datasets
+    (described below).
 
 
 The compiler environment
@@ -178,9 +177,8 @@ environment using :attr:`env.benchmark
     >>> env.benchmark
     benchmark://cbench-v1/qsort
 
-If we want the environment to use a different benchmark, we can pass the name of
-the benchmark as an argument to :meth:`env.reset()
-<compiler_gym.envs.CompilerEnv.reset>`:
+If we want to compile a different program, we can pass the name of a benchmark
+to :meth:`env.reset() <compiler_gym.envs.CompilerEnv.reset>`:
 
     >>> env.reset(benchmark="benchmark://npb-v0/50")
     array([   0,    0,   26,   25,    1,   26,   10,    1,    8,   10,    0,
@@ -192,8 +190,8 @@ the benchmark as an argument to :meth:`env.reset()
 
 We provide over :ref:`a million benchmarks for the LLVM environments
 <llvm/index:Datasets>` that can be used for training agents and evaluating the
-generalization of strategies across unseen benchmarks. Benchmarks are grouped
-into *datasets* , which are managed using :class:`env.datasets
+generalization of strategies across unseen programs. Benchmarks are grouped into
+*datasets* , which are managed using :class:`env.datasets
 <compiler_gym.datasets.Datasets>`. You may also provide your own programs to use
 as benchmarks, see :meth:`env.make_benchmark()
 <compiler_gym.envs.LlvmEnv.make_benchmark>` for details.
@@ -286,18 +284,37 @@ the sequence of actions we just run:
     >>> env.commandline()
     'opt -consthoist -sancov -inferattrs ... -place-safepoints input.bc -o output.bc'
 
-We can also save the program for future reference:
+We can also save the program in its current state for future reference:
 
     >>> env.write_bitcode("~/program.bc")
 
 Once we are finished, we must close the environment to end the compiler
-instance:
+session:
 
     >>> env.close()
 
 And finally we are done with our python session:
 
     >>> exit()
+
+
+.. note::
+
+    Internally, CompilerGym environments may launch subprocesses and use
+    temporary files to communicate between the environment and the underlying
+    compiler (see :doc:`compiler_gym.service <compiler_gym/service>` for
+    details). This means it is important to call :meth:`env.close()
+    <compiler_gym.envs.CompilerEnv.close>` after use to free up resources and
+    prevent orphan subprocesses or files. We recommend using the :code:`with`
+    statement pattern for creating environments:
+
+        >>> with gym.make("llvm-autophase-ic-v0") as env:
+        ...    env.reset()
+        ...    # use env how you like
+
+    This removes the need to call :meth:`env.close()
+    <compiler_gym.envs.CompilerEnv.close>` yourself.
+
 
 Using the command line tools
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -346,8 +363,8 @@ And to describe the capabilities of each environment:
     +--------------------------+----------------------------------------------+
     ...
 
-The :mod:`compiler_gym.bin.manual_env` module provides a thin text user
-interface around the environment for interactive sessions:
+The :mod:`compiler_gym.bin.manual_env` module provides an interactive text user
+interface for CompilerGym environments:
 
 .. code-block::
 
@@ -406,11 +423,10 @@ Next Steps
 
 Now that you have got to grips with the compiler environment, take a browse
 through the `examples directory
-<https://github.com/facebookresearch/CompilerGym/tree/stable/examples>`_ for a
-sample of what can be done, or check out `the documentation
+<https://github.com/facebookresearch/CompilerGym/tree/stable/examples>`_ for
+pytorch integration, agent implementations, etc. Then check out `the
+leaderboards <https://github.com/facebookresearch/CompilerGym#leaderboards>`_ to
+see what the best performing algorithms are, and `the documentation
 <https://facebookresearch.github.io/CompilerGym/>`_ for details of the APIs and
-environments, then go to `the leaderboards
-<https://github.com/facebookresearch/CompilerGym#leaderboards>`_ to see what the
-best performing algorithms are. We love feedback, bug reports, and feature
-requests - please `file an issue
-<https://github.com/facebookresearch/CompilerGym/issues/new/choose>`_!
+environments. We love feedback, bug reports, and feature requests - please `file
+an issue <https://github.com/facebookresearch/CompilerGym/issues/new/choose>`_!
