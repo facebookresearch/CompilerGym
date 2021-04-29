@@ -17,7 +17,7 @@ class MockDataset:
     def __init__(self, name):
         self.name = name
         self.installed = False
-        self.hidden = False
+        self.deprecated = False
         self.benchmark_values = []
         self.sort_order = 0
 
@@ -52,7 +52,7 @@ class MockBenchmark:
         self.uri = uri
 
     def __repr__(self):
-        return str(self.name)
+        return str(self.uri)
 
 
 def test_enumerate_datasets_empty():
@@ -78,20 +78,20 @@ def test_enumerate_datasets_with_custom_sort_order():
     assert list(datasets) == [db, da]
 
 
-def test_enumerate_hidden_datasets():
+def test_enumerate_deprecated_datasets():
     da = MockDataset("benchmark://a")
     db = MockDataset("benchmark://b")
     datasets = Datasets((da, db))
 
-    db.hidden = True
+    db.deprecated = True
     assert list(datasets) == [da]
     assert list(datasets.datasets(with_deprecated=True)) == [da, db]
 
 
-def test_enumerate_datasets_hidden_at_construction_time():
+def test_enumerate_datasets_deprecated_at_construction_time():
     da = MockDataset("benchmark://a")
     db = MockDataset("benchmark://b")
-    db.hidden = True
+    db.deprecated = True
     datasets = Datasets((da, db))
 
     assert list(datasets) == [da]
@@ -107,11 +107,11 @@ def test_datasets_add_dataset():
     assert list(datasets) == [da]
 
 
-def test_datasets_add_hidden_dataset():
+def test_datasets_add_deprecated_dataset():
     datasets = Datasets([])
 
     da = MockDataset("benchmark://a")
-    da.hidden = True
+    da.deprecated = True
     datasets["benchmark://foo-v0"] = da
 
     assert list(datasets) == []
@@ -213,7 +213,7 @@ def test_benchmark_uris_order():
 def test_benchmarks_iter_deprecated():
     da = MockDataset("benchmark://foo-v0")
     db = MockDataset("benchmark://bar-v0")
-    db.hidden = True
+    db.deprecated = True
     ba = MockBenchmark(uri="benchmark://foo-v0/abc")
     bb = MockBenchmark(uri="benchmark://foo-v0/123")
     bc = MockBenchmark(uri="benchmark://bar-v0/abc")

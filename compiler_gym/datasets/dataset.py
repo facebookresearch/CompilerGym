@@ -5,10 +5,11 @@
 import logging
 import os
 import shutil
+import warnings
 from pathlib import Path
 from typing import Dict, Iterable, Optional, Union
 
-from deprecated.sphinx import deprecated
+from deprecated.sphinx import deprecated as mark_deprecated
 
 from compiler_gym.datasets.benchmark import Benchmark
 from compiler_gym.datasets.uri import DATASET_NAME_RE
@@ -39,7 +40,7 @@ class Dataset(object):
         site_data_base: Path,
         benchmark_class=Benchmark,
         references: Optional[Dict[str, str]] = None,
-        hidden: bool = False,
+        deprecated: Optional[str] = None,
         sort_order: int = 0,
         logger: Optional[logging.Logger] = None,
         validatable: str = "No",
@@ -63,9 +64,11 @@ class Dataset(object):
         :param references: A dictionary containing URLs for this dataset, keyed
             by their name. E.g. :code:`references["Paper"] = "https://..."`.
 
-        :param hidden: Whether the dataset should be excluded from the
-            :meth:`datasets() <compiler_gym.datasets.Datasets.dataset>` iterator
-            of any :class:`Datasets <compiler_gym.datasets.Datasets>` container.
+        :param deprecated: Mark the dataset as deprecated and issue a warning
+            when :meth:`install() <compiler_gym.datasets.Dataset.install>`,
+            including the given method. Deprecated datasets are excluded from
+            the :meth:`datasets() <compiler_gym.datasets.Datasets.dataset>`
+            iterator by default.
 
         :param sort_order: An optional numeric value that should be used to
             order this dataset relative to others. Lowest value sorts first.
@@ -91,7 +94,7 @@ class Dataset(object):
         self._protocol = components.group("dataset_protocol")
         self._version = int(components.group("dataset_version"))
         self._references = references or {}
-        self._hidden = hidden
+        self._deprecation_message = deprecated
         self._validatable = validatable
 
         self._logger = logger
@@ -170,14 +173,14 @@ class Dataset(object):
         return self._references
 
     @property
-    def hidden(self) -> str:
+    def deprecated(self) -> bool:
         """Whether the dataset is included in the iterable sequence of datasets
         of a containing :class:`Datasets <compiler_gym.datasets.Datasets>`
         collection.
 
         :type: bool
         """
-        return self._hidden
+        return self._deprecation_message is not None
 
     @property
     def validatable(self) -> str:
@@ -257,12 +260,19 @@ class Dataset(object):
     def install(self) -> None:
         """Install this dataset locally.
 
-        Implementing this method is optional.
+        Implementing this method is optional. If implementing this method, you
+        must call :code:`super().install()` first.
 
         This method should not perform redundant work - it should detect whether
         any work needs to be done so that repeated calls to install will
         complete quickly.
         """
+        if self.deprecated:
+            warnings.warn(
+                f"Dataset '{self.name}' is marked as deprecated. {self._deprecation_message}",
+                category=DeprecationWarning,
+                stacklevel=2,
+            )
 
     def uninstall(self) -> None:
         """Remove any local data for this benchmark.
@@ -346,7 +356,7 @@ class DatasetInitError(OSError):
     """Base class for errors raised if a dataset fails to initialize."""
 
 
-@deprecated(
+@mark_deprecated(
     version="0.1.4",
     reason=(
         "Datasets are now automatically activated. "
@@ -367,7 +377,7 @@ def activate(env, dataset: Union[str, Dataset]) -> bool:
     return False
 
 
-@deprecated(
+@mark_deprecated(
     version="0.1.4",
     reason=(
         "Please use :meth:`del env.datasets[dataset] <compiler_gym.datasets.Datasets.__delitem__>`. "
@@ -390,7 +400,7 @@ def delete(env, dataset: Union[str, Dataset]) -> bool:
     return False
 
 
-@deprecated(
+@mark_deprecated(
     version="0.1.4",
     reason=(
         "Please use :meth:`env.datasets.deactivate() <compiler_gym.datasets.Datasets.deactivate>`. "
@@ -413,7 +423,7 @@ def deactivate(env, dataset: Union[str, Dataset]) -> bool:
     return False
 
 
-@deprecated(
+@mark_deprecated(
     version="0.1.7",
     reason=(
         "Datasets are now installed automatically, there is no need to call :code:`require()`. "

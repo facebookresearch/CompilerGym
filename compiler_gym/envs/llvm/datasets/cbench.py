@@ -18,7 +18,6 @@ from threading import Lock
 from typing import Callable, Dict, List, NamedTuple, Optional
 
 import fasteners
-from deprecated.sphinx import deprecated
 
 from compiler_gym.datasets import Benchmark, TarDatasetWithManifest
 from compiler_gym.third_party import llvm
@@ -506,7 +505,7 @@ class CBenchDataset(TarDatasetWithManifest):
         name="benchmark://cbench-v1",
         manifest_url="https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cbench-v1-manifest.bz2",
         manifest_sha256="eeffd7593aeb696a160fd22e6b0c382198a65d0918b8440253ea458cfe927741",
-        hidden=False,
+        deprecated=None,
     ):
         platform = {"darwin": "macos"}.get(sys.platform, sys.platform)
         url, sha256 = _CBENCH_TARS[platform]
@@ -527,7 +526,7 @@ class CBenchDataset(TarDatasetWithManifest):
             site_data_base=site_data_base,
             sort_order=sort_order,
             benchmark_class=CBenchBenchmark,
-            hidden=hidden,
+            deprecated=deprecated,
             validatable="Partially",
         )
 
@@ -575,15 +574,8 @@ class CBenchLegacyDataset(TarDatasetWithManifest):
             strip_prefix="cBench-v0",
             benchmark_file_suffix=".bc",
             site_data_base=site_data_base,
-            hidden=True,  # Hidden because it is deprecated.
+            deprecated="Please use 'benchmark://cbench-v1'",
         )
-
-    @deprecated(
-        version="0.1.4",
-        reason=("Dataset 'cBench-v0' is deprecated, please use 'cbench-v1'"),
-    )
-    def install(self) -> None:
-        super().install()
 
 
 # ===============================

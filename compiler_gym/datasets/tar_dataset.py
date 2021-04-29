@@ -73,6 +73,8 @@ class TarDataset(FilesDataset):
         return self._installed
 
     def install(self) -> None:
+        super().install()
+
         if self.installed:
             return
 

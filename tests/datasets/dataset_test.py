@@ -60,7 +60,7 @@ def test_dataset_optional_properties():
     )
 
     assert dataset.references == {}  # Default value.
-    assert not dataset.hidden
+    assert not dataset.deprecated
     assert dataset.sort_order == 0
     assert dataset.validatable == "No"
 
@@ -73,7 +73,7 @@ def test_dataset_optional_properties_explicit_values():
         license="MIT",
         site_data_base="test",
         references={"GitHub": "https://github.com/facebookresearch/CompilerGym"},
-        hidden=True,
+        deprecated="Deprecation message",
         sort_order=10,
         validatable="Yes",
     )
@@ -81,7 +81,7 @@ def test_dataset_optional_properties_explicit_values():
     assert dataset.references == {
         "GitHub": "https://github.com/facebookresearch/CompilerGym"
     }
-    assert dataset.hidden
+    assert dataset.deprecated
     assert dataset.sort_order == 10
     assert dataset.validatable == "Yes"
 
@@ -132,6 +132,20 @@ def test_dataset_site_data_directory(tmpwd: Path):
         str(tmpwd / "test" / "benchmark" / "test-v0")
     )
     assert not dataset.site_data_path.is_dir()  # Dir is not created until needed.
+
+
+def test_dataset_deprecation_message(tmpwd: Path):
+    """Test that a deprecation warning is emitted on install()."""
+    dataset = Dataset(
+        name="benchmark://test-v0",
+        description="A test dataset",
+        license="MIT",
+        site_data_base="test",
+        deprecated="The cat sat on the mat",
+    )
+
+    with pytest.warns(DeprecationWarning, match="The cat sat on the mat"):
+        dataset.install()
 
 
 class TestDataset(Dataset):

@@ -8,8 +8,6 @@ from concurrent.futures import as_completed
 from pathlib import Path
 from typing import Optional
 
-from deprecated.sphinx import deprecated
-
 from compiler_gym.datasets import Benchmark, BenchmarkInitError, TarDatasetWithManifest
 from compiler_gym.datasets.benchmark import BenchmarkWithSource
 from compiler_gym.envs.llvm.llvm_benchmark import ClangInvocation
@@ -191,12 +189,5 @@ class POJ104LegacyDataset(TarDatasetWithManifest):
             benchmark_file_suffix=".bc",
             site_data_base=site_data_base,
             sort_order=sort_order,
-            hidden=True,
+            deprecated="Please update to benchmark://poj104-v1.",
         )
-
-    @deprecated(
-        version="0.1.8",
-        reason=("Dataset 'poj104-v0' is deprecated, please use 'poj104-v1'"),
-    )
-    def install(self) -> None:
-        super().install()

@@ -79,7 +79,7 @@ class Datasets(object):
     ):
         self._datasets: Dict[str, Dataset] = {d.name: d for d in datasets}
         self._visible_datasets: Set[str] = set(
-            name for name, dataset in self._datasets.items() if not dataset.hidden
+            name for name, dataset in self._datasets.items() if not dataset.deprecated
         )
 
     def datasets(self, with_deprecated: bool = False) -> Iterable[Dataset]:
@@ -95,7 +95,7 @@ class Datasets(object):
         """
         datasets = self._datasets.values()
         if not with_deprecated:
-            datasets = (d for d in datasets if not d.hidden)
+            datasets = (d for d in datasets if not d.deprecated)
         yield from sorted(datasets, key=lambda d: (d.sort_order, d.name))
 
     def __iter__(self) -> Iterable[Dataset]:
@@ -147,7 +147,7 @@ class Datasets(object):
         dataset_name = resolve_uri_protocol(key)
 
         self._datasets[dataset_name] = dataset
-        if not dataset.hidden:
+        if not dataset.deprecated:
             self._visible_datasets.add(dataset_name)
 
     def __delitem__(self, dataset: str):
