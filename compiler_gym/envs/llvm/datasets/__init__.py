@@ -176,7 +176,7 @@ class OpenCVDataset(TarDatasetWithManifest):
         )
 
 
-class TensorflowDataset(TarDatasetWithManifest):
+class TensorFlowDataset(TarDatasetWithManifest):
     def __init__(self, site_data_base: Path, sort_order: int = 0):
         super().__init__(
             name="benchmark://tensorflow-v0",
@@ -231,7 +231,7 @@ def get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset
     yield OpenCVDataset(site_data_base=site_data_base, sort_order=0)
     yield POJ104Dataset(site_data_base=site_data_base, sort_order=0)
     yield POJ104LegacyDataset(site_data_base=site_data_base, sort_order=100)
-    yield TensorflowDataset(site_data_base=site_data_base, sort_order=0)
+    yield TensorFlowDataset(site_data_base=site_data_base, sort_order=0)
 
 
 __all__ = [
@@ -251,5 +251,5 @@ __all__ = [
     "OpenCVDataset",
     "POJ104Dataset",
     "POJ104LegacyDataset",
-    "TensorflowDataset",
+    "TensorFlowDataset",
 ]
