@@ -21,6 +21,11 @@ ValidationCallback = Callable[["CompilerEnv"], Iterable[ValidationError]]  # noq
 class BenchmarkSource(NamedTuple):
     """A source file that is used to generate a benchmark. A benchmark may
     comprise many source files.
+
+    .. warning::
+
+        The :class:`BenchmarkSource <compiler_gym.datasets.BenchmarkSource>`
+        class is new and is likely to change in the future.
     """
 
     filename: str
@@ -124,6 +129,12 @@ class Benchmark(object):
         :return: A sequence of source files.
 
         :type: :code:`Iterable[BenchmarkSource]`
+
+        .. warning::
+
+            The :meth:`Benchmark.sources
+            <compiler_gym.datasets.Benchmark.sources>` property is new and is
+            likely to change in the future.
         """
         return (BenchmarkSource(*x) for x in self._sources)
 
