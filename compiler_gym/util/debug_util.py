@@ -55,11 +55,15 @@ def get_logging_level() -> int:
 def set_debug_level(level: int) -> None:
     """Set a new debugging level.
 
+    See :func:`get_debug_level` for a description of the debug levels.
+
     The debugging level should be set first when interacting with CompilerGym as
     many CompilerGym objects will check the debug level only at initialization
     time and not throughout their lifetime.
 
-    See :func:`get_debug_level` for a description of the debug levels.
+    Setting the debug level affects the entire process and is not thread safe.
+    For granular control of logging information, consider instead setting a
+    :code:`logging.Logger` instance on :code:`CompilerEnv.logger`.
 
     :param level: The debugging level to use.
     """

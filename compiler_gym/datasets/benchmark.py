@@ -41,16 +41,8 @@ class Benchmark(object):
     comprises the data that is fed into the compiler, identified by a URI.
 
     Benchmarks are not normally instantiated directly. Instead, benchmarks are
-    instantiated using :meth:`env.datasets.benchmark()
+    instantiated using :meth:`env.datasets.benchmark(uri)
     <compiler_gym.datasets.Datasets.benchmark>`:
-
-        >>> env.datasets.benchmark()
-        benchmark://npb-v0/20
-
-    Calling :meth:`env.datasets.benchmark()
-    <compiler_gym.datasets.Datasets.benchmark>` with no arguments will select a
-    benchmark randomly from the available datasets. To select a specific
-    benchmark, pass the URI as argument:
 
         >>> env.datasets.benchmark("benchmark://npb-v0/20")
         benchmark://npb-v0/20
@@ -59,29 +51,31 @@ class Benchmark(object):
     :meth:`env.datasets.benchmark_uris()
     <compiler_gym.datasets.Datasets.benchmark_uris>`.
 
+        >>> next(env.datasets.benchmark_uris())
+        'benchmark://cbench-v1/adpcm'
+
     Compiler environments may provide additional helper functions for generating
     benchmarks, such as :meth:`env.make_benchmark()
     <compiler_gym.envs.LlvmEnv.make_benchmark>` for LLVM.
 
-    The data underlying a Benchmark instance should be considered immutable. New
-    attributes cannot be assigned to Benchmark instances.
+    A Benchmark instance wraps an instance of the :code:`Benchmark` protocol
+    buffer from the `RPC interface
+    <https://github.com/facebookresearch/CompilerGym/blob/development/compiler_gym/service/proto/compiler_gym_service.proto>`_
+    with additional functionality. The data underlying benchmarks should be
+    considered immutable. New attributes cannot be assigned to Benchmark
+    instances.
 
-    Benchmarks may provide additional functionality such as runtime checks or
-    methods for validating the semantics of a benchmark. The benchmark for an
-    environment can be set during :meth:`env.reset()
+    The benchmark for an environment can be set during :meth:`env.reset()
     <compiler_gym.envs.CompilerEnv.reset>`. The currently active benchmark can
     be queried using :attr:`env.benchmark
     <compiler_gym.envs.CompilerEnv.benchmark>`:
 
         >>> env = gym.make("llvm-v0")
-        >>> env.reset(benchmark="cbench-v1/crc32")
+        >>> env.reset(benchmark="benchmark://cbench-v1/crc32")
         >>> env.benchmark
-        cbench-v1/crc32
+        benchmark://cbench-v1/crc32
 
-    A Benchmark instance wraps an instance of the :code:`Benchmark` protocol
-    buffer from the `RPC interface
-    <https://github.com/facebookresearch/CompilerGym/blob/development/compiler_gym/service/proto/compiler_gym_service.proto>`_
-    with additional functionality.
+
     """
 
     __slots__ = ["_proto", "_validation_callbacks", "_sources"]
@@ -123,11 +117,11 @@ class Benchmark(object):
 
     @property
     def sources(self) -> Iterable[BenchmarkSource]:
-        """The original source code used to produce this benchmark.
+        """The original source code used to produce this benchmark, as a list of
+        :class:`BenchmarkSource <compiler_gym.datasets.BenchmarkSource>`
+        instances.
 
-        :return: An iterable sequence of :class:`BenchmarkSource
-            <compiler_gym.datasets.BenchmarkSource>` tuples, comprising relative
-            file paths and file contents.
+        :return: A sequence of source files.
 
         :type: :code:`Iterable[BenchmarkSource]`
         """
@@ -142,7 +136,7 @@ class Benchmark(object):
         return self._validation_callbacks != []
 
     def validate(self, env: "CompilerEnv") -> List[ValidationError]:  # noqa: F821
-        """Run any validation callbacks and return any errors.
+        """Run the validation callbacks and return any errors.
 
         If no errors are returned, validation has succeeded:
 
@@ -176,7 +170,7 @@ class Benchmark(object):
         return list(self.ivalidate(env))
 
     def ivalidate(self, env: "CompilerEnv") -> Iterable[ValidationError]:  # noqa: F821
-        """Run any validation callbacks and return a generator of errors.
+        """Run the validation callbacks and return a generator of errors.
 
         This is an asynchronous version of :meth:`validate()
         <compiler_gym.datasets.Benchmark.validate>` that returns immediately.
@@ -210,7 +204,7 @@ class Benchmark(object):
         """Register a new source file for this benchmark.
 
         :param source: The :class:`BenchmarkSource
-            <compiler_gym.envs.datasets.BenchmarkSource>` to register.
+            <compiler_gym.datasets.BenchmarkSource>` to register.
         """
         self._sources.append(source)
 
@@ -235,6 +229,8 @@ class Benchmark(object):
         This writes each of the :attr:`benchmark.sources
         <compiler_gym.datasets.Benchmark.sources>` files to disk.
 
+        If the benchmark has no sources, no files are written.
+
         :param directory: The directory to write results to. If it does not
             exist, it is created.
 
@@ -254,7 +250,7 @@ class Benchmark(object):
 
     @classmethod
     def from_file(cls, uri: str, path: Path):
-        """Construct a benchmark from the path to a file.
+        """Construct a benchmark from a file.
 
         :param uri: The URI of the benchmark.
 
@@ -276,7 +272,7 @@ class Benchmark(object):
 
     @classmethod
     def from_file_contents(cls, uri: str, data: bytes):
-        """Construct a benchmark from a raw data array.
+        """Construct a benchmark from raw data.
 
         :param uri: The URI of the benchmark.
 

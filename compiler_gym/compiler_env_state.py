@@ -43,7 +43,7 @@ class CompilerEnvState(BaseModel):
     """The list of actions that produced this state, as a commandline."""
 
     walltime: float
-    """The walltime of the episode in seconds. Must be nonnegative. Optional."""
+    """The walltime of the episode in seconds. Must be non-negative."""
 
     reward: Optional[float] = Field(
         required=False,
