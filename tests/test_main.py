@@ -6,10 +6,8 @@ import os
 import sys
 from typing import List, Optional
 
-import gym
 import pytest
 
-import compiler_gym  # noqa Register environments.
 from compiler_gym.util import debug_util as dbg
 
 
@@ -39,14 +37,6 @@ def main(extra_pytest_args: Optional[List[str]] = None, debug_level: int = 1):
     # Keep test data isolated from user data.
     os.environ["COMPILER_GYM_SITE_DATA"] = "/tmp/compiler_gym/tests/site_data"
     os.environ["COMPILER_GYM_CACHE"] = "/tmp/compiler_gym/tests/cache"
-
-    # Install some benchmarks for the LLVM environment as otherwise
-    # reset() will fail.
-    env = gym.make("llvm-v0")
-    try:
-        env.require_dataset("cBench-v1")
-    finally:
-        env.close()
 
     pytest_args = sys.argv + ["-vv"]
     # Support for sharding. If a py_test target has the shard_count attribute

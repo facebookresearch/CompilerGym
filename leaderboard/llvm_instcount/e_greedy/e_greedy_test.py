@@ -38,7 +38,7 @@ def test_select_best_action_closed_environment(env: LlvmEnv):
     """Test that select_best_action() recovers from an environment whose service
     has closed."""
     env.reward_space = "IrInstructionCount"
-    env.reset(benchmark="cBench-v1/crc32")
+    env.reset(benchmark="cbench-v1/crc32")
     with ThreadPoolExecutor() as executor:
         best_a = select_best_action(env, executor)
         env.close()

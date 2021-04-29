@@ -24,7 +24,7 @@ pytest_plugins = ["tests.pytest_plugins.llvm"]
 # The path of an IR file that assembles but does not compile.
 INVALID_IR_PATH = runfiles_path("tests/llvm/invalid_ir.ll")
 EXAMPLE_BITCODE_FILE = runfiles_path(
-    "compiler_gym/third_party/cBench/cBench-v1/crc32.bc"
+    "compiler_gym/third_party/cbench/cbench-v1/crc32.bc"
 )
 EXAMPLE_BITCODE_IR_INSTRUCTION_COUNT = 242
 
@@ -34,7 +34,7 @@ def test_reset_invalid_benchmark(env: LlvmEnv):
     with pytest.raises(ValueError) as ctx:
         env.reset(benchmark=invalid_benchmark)
 
-    assert str(ctx.value) == f'Unknown benchmark "{invalid_benchmark}"'
+    assert str(ctx.value) == f"Invalid benchmark URI: 'benchmark://{invalid_benchmark}'"
 
 
 def test_invalid_benchmark_data(env: LlvmEnv):
@@ -100,7 +100,7 @@ def test_benchmark_path_invalid_protocol(env: LlvmEnv):
 
     assert (
         str(ctx.value)
-        == 'Unsupported benchmark URI protocol: "invalid_protocol://test"'
+        == 'Invalid benchmark data URI. Only the file:/// protocol is supported: "invalid_protocol://test"'
     )
 
 

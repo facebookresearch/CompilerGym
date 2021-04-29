@@ -17,7 +17,8 @@ Features:
 * Enforces the service contract, e.g. `StartSession()` must be called before
   `EndSession()`, list indices must be in-bounds, etc.
 * Implements all of the RPC endpoints.
-* It has two programs "foo" and "bar".
+* It has a single dataset "benchmark://example-v0" with two programs "foo" and
+  "bar".
 * It has a static action space with three items: `["a", "b", "c"]`. The action
   space never changes. Actions never end the episode.
 * There are two observation spaces:

@@ -14,6 +14,7 @@
 #include "compiler_gym/service/proto/compiler_gym_service.pb.h"
 #include "compiler_gym/util/EnumUtil.h"
 #include "compiler_gym/util/GrpcStatusMacros.h"
+#include "compiler_gym/util/StrLenConstexpr.h"
 #include "compiler_gym/util/Version.h"
 #include "llvm/ADT/Triple.h"
 #include "llvm/Config/llvm-config.h"
@@ -53,12 +54,12 @@ Status LlvmService::StartSession(ServerContext* /* unused */, const StartSession
                                  StartSessionReply* reply) {
   const std::lock_guard<std::mutex> lock(sessionsMutex_);
 
-  std::unique_ptr<Benchmark> benchmark;
-  if (request->benchmark().size()) {
-    RETURN_IF_ERROR(benchmarkFactory_.getBenchmark(request->benchmark(), &benchmark));
-  } else {
-    RETURN_IF_ERROR(benchmarkFactory_.getBenchmark(&benchmark));
+  if (!request->benchmark().size()) {
+    return Status(StatusCode::INVALID_ARGUMENT, "No benchmark URI set for StartSession()");
   }
+
+  std::unique_ptr<Benchmark> benchmark;
+  RETURN_IF_ERROR(benchmarkFactory_.getBenchmark(request->benchmark(), &benchmark));
 
   reply->set_benchmark(benchmark->name());
   VLOG(1) << "StartSession(" << benchmark->name() << "), [" << nextSessionId_ << "]";
@@ -148,31 +149,25 @@ Status LlvmService::addBenchmark(const ::compiler_gym::Benchmark& request) {
     return Status(StatusCode::INVALID_ARGUMENT, "Benchmark must have a URI");
   }
 
-  if (uri == "service://scan-site-data") {
-    return benchmarkFactory_.scanSiteDataDirectory();
-  }
-
   const auto& programFile = request.program();
   switch (programFile.data_case()) {
     case ::compiler_gym::File::DataCase::kContents:
-      RETURN_IF_ERROR(benchmarkFactory_.addBitcode(
-          uri, llvm::SmallString<0>(programFile.contents().begin(), programFile.contents().end())));
-      break;
-    case ::compiler_gym::File::DataCase::kUri:
-      RETURN_IF_ERROR(benchmarkFactory_.addBitcodeUriAlias(uri, programFile.uri()));
-      break;
+      return benchmarkFactory_.addBitcode(
+          uri, llvm::SmallString<0>(programFile.contents().begin(), programFile.contents().end()));
+    case ::compiler_gym::File::DataCase::kUri: {
+      // Check that protocol of the benmchmark URI.
+      if (programFile.uri().find("file:///") != 0) {
+        return Status(StatusCode::INVALID_ARGUMENT,
+                      fmt::format("Invalid benchmark data URI. "
+                                  "Only the file:/// protocol is supported: \"{}\"",
+                                  programFile.uri()));
+      }
+
+      const fs::path path(programFile.uri().substr(util::strLen("file:///"), std::string::npos));
+      return benchmarkFactory_.addBitcode(uri, path);
+    }
     case ::compiler_gym::File::DataCase::DATA_NOT_SET:
       return Status(StatusCode::INVALID_ARGUMENT, "No program set");
-  }
-
-  return Status::OK;
-}
-
-Status LlvmService::GetBenchmarks(ServerContext* /* unused */,
-                                  const GetBenchmarksRequest* /* unused */,
-                                  GetBenchmarksReply* reply) {
-  for (const auto& benchmark : benchmarkFactory_.getBenchmarkNames()) {
-    reply->add_benchmark(benchmark);
   }
 
   return Status::OK;

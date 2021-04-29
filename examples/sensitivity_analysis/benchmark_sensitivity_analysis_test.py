@@ -20,7 +20,7 @@ from tests.test_main import main
 def test_run_benchmark_sensitivity_analysis():
     env = "llvm-v0"
     reward = "IrInstructionCountO3"
-    benchmarks = ["cBench-v1/crc32"]
+    benchmarks = ["cbench-v1/crc32"]
 
     set_command_line_flags(["argv0", f"--env={env}"])
 

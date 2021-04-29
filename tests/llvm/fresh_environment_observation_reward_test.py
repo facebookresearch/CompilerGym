@@ -14,7 +14,7 @@ def test_step(env: CompilerEnv, observation_space: str, reward_space: str):
     """Request every combination of observation and reward in a fresh environment."""
     env.reward_space = None
     env.observation_space = None
-    env.reset(benchmark="cBench-v1/crc32")
+    env.reset(benchmark="cbench-v1/crc32")
 
     observation = env.observation[observation_space]
     assert observation is not None

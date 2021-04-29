@@ -98,7 +98,10 @@ class Reward(Scalar):
         pass
 
     def update(
-        self, action: int, observations: List[observation_t], observation_view
+        self,
+        action: int,
+        observations: List[observation_t],
+        observation_view: "compiler_gym.views.ObservationView",  # noqa: F821
     ) -> float:
         """Calculate a reward for the given action.
 

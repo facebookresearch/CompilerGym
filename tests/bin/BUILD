@@ -18,11 +18,11 @@ py_test(
     name = "manual_env_bin_test",
     timeout = "short",
     srcs = ["manual_env_bin_test.py"],
+    flaky = 1,
     deps = [
         "//compiler_gym/bin:manual_env",
         "//compiler_gym/util",
         "//tests:test_main",
-        "//tests/pytest_plugins:llvm",
     ],
 )
 
@@ -40,6 +40,7 @@ py_test(
     name = "validate_bin_test",
     timeout = "long",
     srcs = ["validate_bin_test.py"],
+    shard_count = 4,
     deps = [
         "//compiler_gym",
         "//compiler_gym/bin:validate",

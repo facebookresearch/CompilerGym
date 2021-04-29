@@ -106,8 +106,6 @@ def main(argv):
     env = make_env()
     try:
         env.reset()
-        if not env.benchmark:
-            raise app.UsageError("No benchmark specified.")
     finally:
         env.close()
 

@@ -11,7 +11,6 @@ from compiler_gym.datasets.benchmark import (
 from compiler_gym.datasets.dataset import (
     Dataset,
     DatasetInitError,
-    LegacyDataset,
     activate,
     deactivate,
     delete,
@@ -32,7 +31,6 @@ __all__ = [
     "deactivate",
     "delete",
     "FilesDataset",
-    "LegacyDataset",
     "require",
     "TarDataset",
     "TarDatasetWithManifest",

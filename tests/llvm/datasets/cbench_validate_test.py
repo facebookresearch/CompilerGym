@@ -10,10 +10,10 @@ from tests.test_main import main
 pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
-def test_validate_benchmark_semantics(env: LlvmEnv, validatable_benchmark_name: str):
+def test_validate_benchmark_semantics(env: LlvmEnv, validatable_cbench_uri: str):
     """Run the validation routine on all benchmarks."""
     env.reward_space = "IrInstructionCount"
-    env.reset(benchmark=validatable_benchmark_name)
+    env.reset(benchmark=validatable_cbench_uri)
 
     # Run a single step.
     env.step(env.action_space.flags.index("-mem2reg"))
@@ -30,11 +30,11 @@ def test_validate_benchmark_semantics(env: LlvmEnv, validatable_benchmark_name: 
 
 
 def test_non_validatable_benchmark_validate(
-    env: LlvmEnv, non_validatable_benchmark_name: str
+    env: LlvmEnv, non_validatable_cbench_uri: str
 ):
     """Run the validation routine on all benchmarks."""
     env.reward_space = "IrInstructionCount"
-    env.reset(benchmark=non_validatable_benchmark_name)
+    env.reset(benchmark=non_validatable_cbench_uri)
 
     # Run a single step.
     env.step(env.action_space.flags.index("-mem2reg"))

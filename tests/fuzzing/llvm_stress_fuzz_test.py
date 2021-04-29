@@ -25,7 +25,7 @@ def test_fuzz(env: LlvmEnv, observation_space: str, reward_space: str):
     seed = random.randint(0, 2 << 31)
     llvm_ir = subprocess.check_output([str(llvm.llvm_stress_path()), f"--seed={seed}"])
     print(f"llvm-stress --seed={seed}")  # For debugging in case of failure.
-    env.benchamrk = Benchmark(uri="stress", program=File(contents=llvm_ir))
+    env.benchmark = Benchmark(uri="stress", program=File(contents=llvm_ir))
 
     env.observation_space = observation_space
     env.reward_space = reward_space

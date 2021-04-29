@@ -34,7 +34,7 @@ FLAGS = flags.FLAGS
 logging.basicConfig(level=logging.DEBUG)
 
 # The names of the benchmarks that are supported
-BENCHMARKS = ["foo", "bar"]
+BENCHMARKS = ["benchmark://example-v0/foo", "benchmark://example-v0/bar"]
 
 # The list of actions that are supported by this service. This example uses a
 # static (unchanging) action space, but this could be extended to support a
@@ -152,14 +152,6 @@ class ExampleCompilerGymService(proto.CompilerGymServiceServicer):
             action_space_list=[ACTION_SPACE],
             observation_space_list=OBSERVATION_SPACES,
         )
-
-    def GetBenchmarks(
-        self, request: proto.GetBenchmarksRequest, context
-    ) -> proto.GetBenchmarksReply:
-        del context  # Unused
-        # Report the available benchmarks to the user.
-        logging.debug("GetBenchmarks()")
-        return proto.GetBenchmarksReply(benchmark=BENCHMARKS)
 
     def StartSession(
         self, request: proto.StartSessionRequest, context

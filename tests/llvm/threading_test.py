@@ -57,7 +57,7 @@ def test_running_environment_in_background_thread():
     """Test launching and running an LLVM environment in a background thread."""
     thread = ThreadedWorker(
         env_name="llvm-autophase-ic-v0",
-        benchmark="cBench-v1/crc32",
+        benchmark="cbench-v1/crc32",
         actions=[0, 0, 0],
     )
     thread.start()
@@ -74,7 +74,7 @@ def test_moving_environment_to_background_thread():
     is made in the main thread and used in the background thread.
     """
     env = gym.make("llvm-autophase-ic-v0")
-    env.reset(benchmark="cBench-v1/crc32")
+    env.reset(benchmark="cbench-v1/crc32")
 
     thread = ThreadedWorkerWithEnv(env=env, actions=[0, 0, 0])
     thread.start()

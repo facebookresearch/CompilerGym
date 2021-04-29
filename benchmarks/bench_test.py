@@ -41,31 +41,6 @@ def env(request) -> CompilerEnv:
     yield request.param
 
 
-# Redefine this fixture since running all of the benchmarks in cBench would
-# take too long, but we do want to use at least one small and one large
-# benchmark to see both per-invocation overhead and overhead that is a result
-# of the size of the fixture.
-#
-# adpcm is small and jpeg-d is large. ghostscript is the largest but that
-# one takes too long.
-@pytest.fixture(
-    params=["cBench-v1/crc32", "cBench-v1/jpeg-d"],
-    ids=["fast_benchmark", "slow_benchmark"],
-)
-def benchmark_name(request) -> str:
-    yield request.param
-
-
-# @pytest.fixture(params=["cBench-v1/crc32"], ids=["fast_benchmark"])
-# def fast_benchmark_name(request) -> str:
-#     yield request.param
-
-
-# @pytest.fixture(params=["-globaldce", "-gvn"], ids=["fast_action", "slow_action"])
-# def action_name(request) -> str:
-#     yield request.param
-
-
 @pytest.mark.parametrize(
     "env_id",
     ["llvm-v0", "example-cc-v0", "example-py-v0"],
@@ -96,8 +71,8 @@ def test_make_service(benchmark, args):
 @pytest.mark.parametrize(
     "make_env",
     [
-        lambda: gym.make("llvm-autophase-ic-v0", benchmark="cBench-v1/crc32"),
-        lambda: gym.make("llvm-autophase-ic-v0", benchmark="cBench-v1/jpeg-d"),
+        lambda: gym.make("llvm-autophase-ic-v0", benchmark="cbench-v1/crc32"),
+        lambda: gym.make("llvm-autophase-ic-v0", benchmark="cbench-v1/jpeg-d"),
         lambda: gym.make("example-cc-v0"),
         lambda: gym.make("example-py-v0"),
     ],
@@ -112,16 +87,16 @@ def test_reset(benchmark, make_env: CompilerEnv):
     "args",
     [
         (
-            lambda: gym.make("llvm-autophase-ic-v0", benchmark="cBench-v1/crc32"),
+            lambda: gym.make("llvm-autophase-ic-v0", benchmark="cbench-v1/crc32"),
             "-globaldce",
         ),
-        (lambda: gym.make("llvm-autophase-ic-v0", benchmark="cBench-v1/crc32"), "-gvn"),
+        (lambda: gym.make("llvm-autophase-ic-v0", benchmark="cbench-v1/crc32"), "-gvn"),
         (
-            lambda: gym.make("llvm-autophase-ic-v0", benchmark="cBench-v1/jpeg-d"),
+            lambda: gym.make("llvm-autophase-ic-v0", benchmark="cbench-v1/jpeg-d"),
             "-globaldce",
         ),
         (
-            lambda: gym.make("llvm-autophase-ic-v0", benchmark="cBench-v1/jpeg-d"),
+            lambda: gym.make("llvm-autophase-ic-v0", benchmark="cbench-v1/jpeg-d"),
             "-gvn",
         ),
         (lambda: gym.make("example-cc-v0"), "a"),
@@ -146,7 +121,7 @@ def test_step(benchmark, args):
 
 _args = dict(
     {
-        f"llvm;{obs}": (lambda: gym.make("llvm-v0", benchmark="cBench-v1/qsort"), obs)
+        f"llvm;{obs}": (lambda: gym.make("llvm-v0", benchmark="cbench-v1/qsort"), obs)
         for obs in OBSERVATION_SPACE_NAMES
     },
     **{
@@ -167,7 +142,7 @@ def test_observation(benchmark, args):
 _args = dict(
     {
         f"llvm;{reward}": (
-            lambda: gym.make("llvm-v0", benchmark="cBench-v1/qsort"),
+            lambda: gym.make("llvm-v0", benchmark="cbench-v1/qsort"),
             reward,
         )
         for reward in REWARD_SPACE_NAMES
@@ -190,8 +165,8 @@ def test_reward(benchmark, args):
 @pytest.mark.parametrize(
     "make_env",
     [
-        lambda: gym.make("llvm-autophase-ic-v0", benchmark="cBench-v1/crc32"),
-        lambda: gym.make("llvm-autophase-ic-v0", benchmark="cBench-v1/jpeg-d"),
+        lambda: gym.make("llvm-autophase-ic-v0", benchmark="cbench-v1/crc32"),
+        lambda: gym.make("llvm-autophase-ic-v0", benchmark="cbench-v1/jpeg-d"),
         # TODO: Example service does not yet support fork() operator.
         # lambda: gym.make("example-cc-v0"),
         # lambda: gym.make("example-py-v0"),

@@ -36,12 +36,12 @@ class GvnSinkTest : public ::testing::Test {
 
 TEST_F(GvnSinkTest, runGvnSinkOnBlowfish) {
   const auto blowfish =
-      util::getRunfilesPath("compiler_gym/third_party/cBench/cBench-v1/blowfish.bc");
+      util::getRunfilesPath("compiler_gym/third_party/cbench/cbench-v1/blowfish.bc");
 
   BenchmarkFactory factory(workingDirectory_);
-  ASSERT_OK(factory.addBitcodeFile("benchmark://cBench-v1/blowfish", blowfish));
+  ASSERT_OK(factory.addBitcodeFile("benchmark://cbench-v1/blowfish", blowfish));
   std::unique_ptr<Benchmark> benchmark;
-  ASSERT_OK(factory.getBenchmark("benchmark://cBench-v1/blowfish", &benchmark));
+  ASSERT_OK(factory.getBenchmark("benchmark://cbench-v1/blowfish", &benchmark));
 
   LlvmSession env(std::move(benchmark), LlvmActionSpace::PASSES_ALL, LlvmObservationSpace::IR,
                   std::nullopt, workingDirectory_);

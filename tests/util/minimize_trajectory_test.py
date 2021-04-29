@@ -150,7 +150,7 @@ def test_random_minimization_no_effect():
 
 def test_minimize_trajectory_iteratively_llvm_crc32(env):
     """Test trajectory minimization on a real environment."""
-    env.reset(benchmark="cBench-v1/crc32")
+    env.reset(benchmark="cbench-v1/crc32")
     env.step(
         [
             env.action_space["-mem2reg"],
