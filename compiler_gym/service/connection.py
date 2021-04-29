@@ -13,9 +13,10 @@ from datetime import datetime
 from pathlib import Path
 from signal import Signals
 from time import sleep, time
-from typing import Iterable, List, NamedTuple, Optional, TypeVar, Union
+from typing import Iterable, List, Optional, TypeVar, Union
 
 import grpc
+from pydantic import BaseModel
 
 from compiler_gym.service.proto import (
     ActionSpace,
@@ -42,7 +43,7 @@ GRPC_CHANNEL_OPTIONS = [
 ]
 
 
-class ConnectionOpts(NamedTuple):
+class ConnectionOpts(BaseModel):
     """The options used to configure a connection to a service."""
 
     rpc_call_max_seconds: float = 300
