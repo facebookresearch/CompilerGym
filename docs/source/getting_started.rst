@@ -15,7 +15,7 @@ started!
 
 
 Key Concepts
---------------------
+------------
 
 CompilerGym exposes compiler optimization problems as environments for
 reinforcement learning. It uses the `OpenAI Gym <https://gym.openai.com/>`_
