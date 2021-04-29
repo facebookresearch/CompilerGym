@@ -202,6 +202,13 @@ class TensorFlowDataset(TarDatasetWithManifest):
 
 
 def get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset]:
+    """Instantiate the builtin LLVM datasets.
+
+    :param site_data_base: The root of the site data path.
+
+    :return: An iterable sequence of :class:`Dataset
+        <compiler_gym.datasets.Dataset>` instances.
+    """
     site_data_base = site_data_base or site_data_path("llvm-v0")
 
     yield AnghaBenchDataset(site_data_base=site_data_base, sort_order=0)

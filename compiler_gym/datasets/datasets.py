@@ -107,6 +107,10 @@ class Datasets(object):
         <compiler_gym.datasets.Dataset.datasets>`, but without the ability to
         iterate over the deprecated datasets.
 
+        If the number of benchmarks in any of the datasets is infinite
+        (:code:`len(dataset) == math.inf`), the iterable returned by this method
+        will continue indefinitely.
+
         :return: An iterable sequence of :meth:`Dataset
             <compiler_gym.datasets.Dataset>` instances.
         """
@@ -144,6 +148,11 @@ class Datasets(object):
         return self.dataset(dataset)
 
     def __setitem__(self, key: str, dataset: Dataset):
+        """Add a dataset to the collection.
+
+        :param key: The name of the dataset.
+        :param dataset: The dataset to add.
+        """
         dataset_name = resolve_uri_protocol(key)
 
         self._datasets[dataset_name] = dataset
@@ -184,6 +193,10 @@ class Datasets(object):
         <compiler_gym.datasets.Datasets.benchmarks>` and :meth:`benchmark_uris()
         <compiler_gym.datasets.Datasets.benchmark_uris>` is the same.
 
+        If the number of benchmarks in any of the datasets is infinite
+        (:code:`len(dataset) == math.inf`), the iterable returned by this method
+        will continue indefinitely.
+
         :param with_deprecated: If :code:`True`, include benchmarks from
             datasets that have been marked deprecated.
 
@@ -201,6 +214,10 @@ class Datasets(object):
         returned in round robin order. The order of :meth:`benchmarks()
         <compiler_gym.datasets.Datasets.benchmarks>` and :meth:`benchmark_uris()
         <compiler_gym.datasets.Datasets.benchmark_uris>` is the same.
+
+        If the number of benchmarks in any of the datasets is infinite
+        (:code:`len(dataset) == math.inf`), the iterable returned by this method
+        will continue indefinitely.
 
         :param with_deprecated: If :code:`True`, include benchmarks from
             datasets that have been marked deprecated.
@@ -239,4 +256,5 @@ class Datasets(object):
         return len(self._visible_datasets)
 
     def __len__(self) -> int:
+        """The number of datasets in the collection."""
         return self.size

@@ -61,8 +61,8 @@ class Dataset(object):
             It must have the same constructor signature as :class:`Benchmark
             <compiler_gym.datasets.Benchmark>`.
 
-        :param references: A dictionary containing URLs for this dataset, keyed
-            by their name. E.g. :code:`references["Paper"] = "https://..."`.
+        :param references: A dictionary of useful named URLs for this dataset
+            containing extra information, download links, papers, etc.
 
         :param deprecated: Mark the dataset as deprecated and issue a warning
             when :meth:`install() <compiler_gym.datasets.Dataset.install>`,
@@ -81,6 +81,8 @@ class Dataset(object):
             compiler has not broken the semantics of the program. This value
             takes a string and is used for documentation purposes only.
             Suggested values are "Yes", "No", or "Partial".
+
+        :raises ValueError: If :code:`name` does not match the expected type.
         """
         self._name = name
         components = DATASET_NAME_RE.match(name)
@@ -157,7 +159,7 @@ class Dataset(object):
 
     @property
     def version(self) -> int:
-        """A version tag for this dataset.
+        """The version tag for this dataset.
 
         :type: int
         """
@@ -165,8 +167,14 @@ class Dataset(object):
 
     @property
     def references(self) -> Dict[str, str]:
-        """A dictionary containing URLs for this dataset, keyed by their name.
-        E.g. :code:`references["Paper"] = "https://..."`.
+        """A dictionary of useful named URLs for this dataset containing extra
+        information, download links, papers, etc.
+
+        For example:
+
+            >>> dataset.references
+            {'Paper': 'https://arxiv.org/pdf/1407.3487.pdf',
+            'Homepage': 'https://ctuning.org/wiki/index.php/CTools:CBench'}
 
         :type: Dict[str, str]
         """
@@ -241,7 +249,11 @@ class Dataset(object):
     def __len__(self) -> Union[int, float]:
         """The number of benchmarks in the dataset.
 
-        Equivalent to :meth:`Dataset.size <compiler_gym.datasets.Dataset.size>`.
+        This is the same as :meth:`Dataset.size
+        <compiler_gym.datasets.Dataset.size>`:
+
+            >>> len(dataset) == dataset.size
+            True
 
         :return: An integer, or :code:`math.float`.
         """
@@ -263,9 +275,9 @@ class Dataset(object):
         Implementing this method is optional. If implementing this method, you
         must call :code:`super().install()` first.
 
-        This method should not perform redundant work - it should detect whether
-        any work needs to be done so that repeated calls to install will
-        complete quickly.
+        This method should not perform redundant work. This method should first
+        detect whether any work needs to be done so that repeated calls to
+        :code:`install()` will complete quickly.
         """
         if self.deprecated:
             warnings.warn(
@@ -277,9 +289,9 @@ class Dataset(object):
     def uninstall(self) -> None:
         """Remove any local data for this benchmark.
 
-        The dataset can still be used after calling this method. This method
-        just undoes the work of :meth:`install()
-        <compiler_gym.datasets.Dataset.install>`.
+        This method undoes the work of :meth:`install()
+        <compiler_gym.datasets.Dataset.install>`. The dataset can still be used
+        after calling this method.
         """
         if self.site_data_path.is_dir():
             shutil.rmtree(self.site_data_path)
@@ -287,7 +299,7 @@ class Dataset(object):
     def benchmarks(self) -> Iterable[Benchmark]:
         """Enumerate the (possibly infinite) benchmarks lazily.
 
-        Benchmark order is consistent across runs. The order of
+        Iteration order is consistent across runs. The order of
         :meth:`benchmarks() <compiler_gym.datasets.Dataset.benchmarks>` and
         :meth:`benchmark_uris() <compiler_gym.datasets.Dataset.benchmark_uris>`
         is the same.
@@ -306,8 +318,12 @@ class Dataset(object):
     def __iter__(self) -> Iterable[Benchmark]:
         """Enumerate the (possibly infinite) benchmarks lazily.
 
-        Equivalent to :meth:`Dataset.benchmarks()
-        <compiler_gym.datasets.Dataset.benchmarks>`.
+        This is the same as :meth:`Dataset.benchmarks()
+        <compiler_gym.datasets.Dataset.benchmarks>`:
+
+            >>> from itertools import islice
+            >>> list(islice(dataset, 100)) == list(islice(datset.benchmarks(), 100))
+            True
 
         :return: An iterable sequence of :meth:`Benchmark
             <compiler_gym.datasets.Benchmark>` instances.
@@ -317,10 +333,14 @@ class Dataset(object):
     def benchmark_uris(self) -> Iterable[str]:
         """Enumerate the (possibly infinite) benchmark URIs.
 
-        Benchmark URI order is consistent across runs. The order of
+        Iteration order is consistent across runs. The order of
         :meth:`benchmarks() <compiler_gym.datasets.Dataset.benchmarks>` and
         :meth:`benchmark_uris() <compiler_gym.datasets.Dataset.benchmark_uris>`
         is the same.
+
+        If the number of benchmarks in the dataset is infinite
+        (:code:`len(dataset) == math.inf`), the iterable returned by this method
+        will continue indefinitely.
 
         :return: An iterable sequence of benchmark URI strings.
         """
@@ -341,8 +361,11 @@ class Dataset(object):
     def __getitem__(self, uri: str) -> Benchmark:
         """Select a benchmark by URI.
 
-        Equivalent to :meth:`Dataset.benchmark(uri)
-        <compiler_gym.datasets.Dataset.benchmark>`.
+        This is the same as :meth:`Dataset.benchmark(uri)
+        <compiler_gym.datasets.Dataset.benchmark>`:
+
+            >>> dataset["benchmark://cbench-v1/crc32"] == dataset.benchmark("benchmark://cbench-v1/crc32")
+            True
 
         :return: A :class:`Benchmark <compiler_gym.datasets.Benchmark>`
             instance.

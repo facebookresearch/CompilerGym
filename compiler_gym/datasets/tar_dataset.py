@@ -108,13 +108,14 @@ class TarDataset(FilesDataset):
 
 
 class TarDatasetWithManifest(TarDataset):
-    """A tarball-based dataset that uses a separate file to list benchmark URIs.
+    """A tarball-based dataset that reads the benchmark URIs from a separate
+    manifest file.
 
-    The idea is to allow the list of benchmark URIs to be enumerated in a more
-    lightweight manner than downloading and unpacking the entire dataset. It
-    does this by downloading a "manifest", which is a plain text file containing
-    a list of benchmark names, one per line, and only downloads the actual
-    tarball containing the benchmarks when it is needed.
+    A manifest file is a plain text file containing a list of benchmark names,
+    one per line, and is shipped separately from the tar file. The idea is to
+    allow the list of benchmark URIs to be enumerated in a more lightweight
+    manner than downloading and unpacking the entire dataset. It does this by
+    downloading and unpacking only the manifest to iterate over the URIs.
 
     The manifest file is assumed to be correct and is not validated.
     """
