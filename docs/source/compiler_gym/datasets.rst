@@ -31,6 +31,12 @@ Dataset
 
  .. automethod:: __init__
 
+ .. automethod:: __len__
+
+ .. automethod:: __getitem__
+
+ .. automethod:: __iter__
+
 .. autoclass:: DatasetInitError
 
 FilesDataset
@@ -65,3 +71,15 @@ Datasets
 
  .. autoclass:: Datasets
   :members:
+
+  .. automethod:: __len__
+
+  .. automethod:: __getitem__
+
+  .. automethod:: __setitem__
+
+  .. automethod:: __delitem__
+
+  .. automethod:: __contains__
+
+  .. automethod:: __iter__
