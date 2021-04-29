@@ -262,7 +262,8 @@ class Benchmark(object):
 
         :raise FileNotFoundError: If the path does not exist.
 
-        :return: A :class:`Benchmark <compiler_gym.datasets.Benchmark>` instance.
+        :return: A :class:`Benchmark <compiler_gym.datasets.Benchmark>`
+            instance.
         """
         path = Path(path)
         if not path.is_file():

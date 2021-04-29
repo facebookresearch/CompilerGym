@@ -29,7 +29,6 @@ from compiler_gym.third_party.llvm import download_llvm_files
 from compiler_gym.third_party.llvm.instcount import INST_COUNT_FEATURE_NAMES
 from compiler_gym.util.runfiles_path import runfiles_path
 
-
 _ACTIONS_LIST = Path(
     runfiles_path("compiler_gym/envs/llvm/service/passes/actions_list.txt")
 )
@@ -77,17 +76,18 @@ def _get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Datase
 class LlvmEnv(CompilerEnv):
     """A specialized CompilerEnv for LLVM.
 
-    This extends the default :class:`CompilerEnv` environment, adding extra LLVM
-    functionality. Specifically, the actions use the
-    :class:`CommandlineFlag <compiler_gym.spaces.CommandlineFlag>` space, which
-    is a type of :code:`Discrete` space that provides additional documentation
-    about each action, and the
-    :meth:`LlvmEnv.commandline() <compiler_gym.envs.LlvmEnv.commandline>` method
-    can be used to produce an equivalent LLVM opt invocation for the current
-    environment state.
+    This extends the default :class:`CompilerEnv
+    <compiler_gym.envs.CompilerEnv>` environment, adding extra LLVM
+    functionality. Specifically, the actions use the :class:`CommandlineFlag
+    <compiler_gym.spaces.CommandlineFlag>` space, which is a type of
+    :code:`Discrete` space that provides additional documentation about each
+    action, and the :meth:`LlvmEnv.commandline()
+    <compiler_gym.envs.LlvmEnv.commandline>` method can be used to produce an
+    equivalent LLVM opt invocation for the current environment state.
 
     :ivar actions: The list of actions that have been performed since the
         previous call to :func:`reset`.
+
     :vartype actions: List[int]
     """
 

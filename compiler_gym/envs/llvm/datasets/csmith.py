@@ -70,8 +70,8 @@ class CsmithDataset(Dataset):
     Note that Csmith is a tool that is used to find errors in compilers. As
     such, there is a higher likelihood that the benchmark cannot be used for an
     environment and that :meth:`env.reset()
-    <compiler_gym.envs.CompilerEnv.reset>` will raise
-    :class:`compiler_gym.datasets.BenchmarkInitError`.
+    <compiler_gym.envs.CompilerEnv.reset>` will raise :class:`BenchmarkInitError
+    <compiler_gym.datasets.BenchmarkInitError>`.
 
     Installation
     ------------
@@ -80,9 +80,11 @@ class CsmithDataset(Dataset):
     This is done automatically on the first call to :code:`install()`. Building
     Csmith requires a working C++ toolchain. Install the required dependencies
     using: :code:`sudo apt install -y g++ m4` on Linux, or :code:`brew install
-    m4` on macOS. :class:`DatasetInitError` is raised if compilation fails. See
-    the `Csmith repo <https://github.com/csmith-project/csmith#install-csmith>`_
-    for further details.
+    m4` on macOS. :class:`DatasetInitError
+    <compiler_gym.datasets.DatasetInitError>` is raised if compilation fails.
+    See the `Csmith repo
+    <https://github.com/csmith-project/csmith#install-csmith>`_ for further
+    details.
     """
 
     def __init__(self, site_data_base: Path, sort_order: int = 0):

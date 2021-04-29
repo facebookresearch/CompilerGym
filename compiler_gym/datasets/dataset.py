@@ -366,8 +366,8 @@ class DatasetInitError(OSError):
 def activate(env, dataset: Union[str, Dataset]) -> bool:
     """Deprecated function for managing datasets.
 
-    :param dataset: The name of the dataset to download, or a :class:`Dataset`
-        instance.
+    :param dataset: The name of the dataset to download, or a :class:`Dataset
+        <compiler_gym.datasets.Dataset>` instance.
 
     :return: :code:`True` if the dataset was activated, else :code:`False` if
         already active.
@@ -390,8 +390,8 @@ def delete(env, dataset: Union[str, Dataset]) -> bool:
     Please use :meth:`del env.datasets[dataset]
     <compiler_gym.datasets.Datasets.__delitem__>`.
 
-    :param dataset: The name of the dataset to download, or a :class:`Dataset`
-        instance.
+    :param dataset: The name of the dataset to download, or a :class:`Dataset
+        <compiler_gym.datasets.Dataset>` instance.
 
     :return: :code:`True` if the dataset was deleted, else :code:`False` if
         already deleted.
@@ -413,8 +413,8 @@ def deactivate(env, dataset: Union[str, Dataset]) -> bool:
     Please use :meth:`del env.datasets[dataset]
     <compiler_gym.datasets.Datasets.__delitem__>`.
 
-    :param dataset: The name of the dataset to download, or a :class:`Dataset`
-        instance.
+    :param dataset: The name of the dataset to download, or a :class:`Dataset
+        <compiler_gym.datasets.Dataset>` instance.
 
     :return: :code:`True` if the dataset was deactivated, else :code:`False` if
         already inactive.
@@ -438,8 +438,8 @@ def require(env, dataset: Union[str, Dataset]) -> bool:
 
     :param env: The environment that this dataset is required for.
 
-    :param dataset: The name of the dataset to download, or a :class:`Dataset`
-        instance.
+    :param dataset: The name of the dataset to download, or a :class:`Dataset
+        <compiler_gym.datasets.Dataset>` instance.
 
     :return: :code:`True` if the dataset was downloaded, or :code:`False` if the
         dataset was already available.

@@ -40,7 +40,7 @@ class ValidationResult(NamedTuple):
     """Whether the semantics of the benchmark were found to have changed."""
 
     errors: List[ValidationError] = []
-    """A list of :class:`ValidationError` """
+    """A list of :class:`ValidationError <compiler_gym.ValidationError>` """
 
     def __eq__(self, rhs):
         """Equality comparison.

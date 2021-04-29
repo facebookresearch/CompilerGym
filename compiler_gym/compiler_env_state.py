@@ -102,7 +102,10 @@ class CompilerEnvState(BaseModel):
         """Read states from a CSV file.
 
         :param in_file: A file object.
-        :returns: A generator of :class:`CompilerEnvState` instances.
+
+        :returns: A generator of :class:`CompilerEnvState
+            <compiler_gym.CompilerEnvState>` instances.
+
         :raises ValueError: If input parsing fails.
         """
         # TODO(cummins): Check schema of DictReader and, on failure, fallback

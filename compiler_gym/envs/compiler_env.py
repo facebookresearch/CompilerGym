@@ -152,7 +152,8 @@ class CompilerEnv(gym.Env):
             details.
 
         :param benchmark: The benchmark to use for this environment. Either a
-            URI string, or a :class:`Benchmark` instance. If not provided, the
+            URI string, or a :class:`Benchmark
+            <compiler_gym.datasets.Benchmark>` instance. If not provided, the
             first benchmark as returned by
             :code:`next(env.datasets.benchmarks())` will be used as the default.
 
@@ -319,13 +320,15 @@ class CompilerEnv(gym.Env):
         return self.versions.compiler_version
 
     def commandline(self) -> str:
-        """Interface for :class:`CompilerEnv` subclasses to provide an equivalent
-        commandline invocation to the current environment state.
+        """Interface for :class:`CompilerEnv <compiler_gym.envs.CompilerEnv>`
+        subclasses to provide an equivalent commandline invocation to the
+        current environment state.
 
-        See also
-        :meth:`commandline_to_actions() <compiler_gym.envs.CompilerEnv.commandline_to_actions>`.
+        See also :meth:`commandline_to_actions()
+        <compiler_gym.envs.CompilerEnv.commandline_to_actions>`.
 
-        Calling this method on a :class:`CompilerEnv` instance raises
+        Calling this method on a :class:`CompilerEnv
+        <compiler_gym.envs.CompilerEnv>` instance raises
         :code:`NotImplementedError`.
 
         :return: A string commandline invocation.
@@ -333,13 +336,15 @@ class CompilerEnv(gym.Env):
         raise NotImplementedError("abstract method")
 
     def commandline_to_actions(self, commandline: str) -> List[int]:
-        """Interface for :class:`CompilerEnv` subclasses to convert from a
-        commandline invocation to a sequence of actions.
+        """Interface for :class:`CompilerEnv <compiler_gym.envs.CompilerEnv>`
+        subclasses to convert from a commandline invocation to a sequence of
+        actions.
 
-        See also
-        :meth:`commandline() <compiler_gym.envs.CompilerEnv.commandline>`.
+        See also :meth:`commandline()
+        <compiler_gym.envs.CompilerEnv.commandline>`.
 
-        Calling this method on a :class:`CompilerEnv` instance raises
+        Calling this method on a :class:`CompilerEnv
+        <compiler_gym.envs.CompilerEnv>` instance raises
         :code:`NotImplementedError`.
 
         :return: A list of actions.
@@ -388,10 +393,12 @@ class CompilerEnv(gym.Env):
     def benchmark(self) -> Benchmark:
         """Get or set the benchmark to use.
 
-        :getter: Get :class:`Benchmark` that is currently in use.
+        :getter: Get :class:`Benchmark <compiler_gym.datasets.Benchmark>` that
+            is currently in use.
 
-        :setter: Set the benchmark to use. Either a :class:`Benchmark` instance,
-            or the URI of a benchmark as in :meth:`env.datasets.benchmark_uris()
+        :setter: Set the benchmark to use. Either a :class:`Benchmark
+            <compiler_gym.datasets.Benchmark>` instance, or the URI of a
+            benchmark as in :meth:`env.datasets.benchmark_uris()
             <compiler_gym.datasets.Datasets.benchmark_uris>`.
 
         .. note::
@@ -907,7 +914,7 @@ class CompilerEnv(gym.Env):
 
         :param datasets: A list of datasets to require. Each dataset is the name
             of an available dataset, the URL of a dataset to download, or a
-            :class:`Dataset` instance.
+            :class:`Dataset <compiler_gym.datasets.Dataset>` instance.
 
         :return: :code:`True` if one or more datasets were downloaded, or
             :code:`False` if all datasets were already available.
@@ -928,7 +935,8 @@ class CompilerEnv(gym.Env):
         <compiler_gym.datasets.Datasets>`.
 
         :param dataset: The name of the dataset to download, the URL of the
-            dataset, or a :class:`Dataset` instance.
+            dataset, or a :class:`Dataset <compiler_gym.datasets.Dataset>`
+            instance.
 
         :return: :code:`True` if the dataset was downloaded, or :code:`False` if
             the dataset was already available.
@@ -952,7 +960,8 @@ class CompilerEnv(gym.Env):
             >>> env.register_dataset(my_dataset)
             >>> env.benchmark = "my-dataset-v0/1"
 
-        :param dataset: A :class:`Dataset` instance describing the new dataset.
+        :param dataset: A :class:`Dataset <compiler_gym.datasets.Dataset>`
+            instance describing the new dataset.
 
         :return: :code:`True` if the dataset was added, else :code:`False`.
 
@@ -963,7 +972,9 @@ class CompilerEnv(gym.Env):
     def apply(self, state: CompilerEnvState) -> None:  # noqa
         """Replay this state on the given an environment.
 
-        :param env: A :class:`CompilerEnv` instance.
+        :param env: A :class:`CompilerEnv <compiler_gym.envs.CompilerEnv>`
+            instance.
+
         :raises ValueError: If this state cannot be applied.
         """
         if not self.in_episode:
@@ -988,7 +999,7 @@ class CompilerEnv(gym.Env):
         :param state: A state to environment. If not provided, the current state
             is validated.
 
-        :returns: A :class:`ValidationResult`.
+        :returns: A :class:`ValidationResult <compiler_gym.ValidationResult>`.
         """
         if state:
             self.reset(benchmark=state.benchmark)

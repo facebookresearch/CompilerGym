@@ -21,9 +21,9 @@ from compiler_gym.util.filesystem import atomic_file_write
 class TarDataset(FilesDataset):
     """A dataset comprising a files tree stored in a tar archive.
 
-    This extends the :class:`FilesDataset` class by adding support for
-    compressed archives of files. The archive is downloaded and unpacked
-    on-demand.
+    This extends the :class:`FilesDataset <compiler_gym.datasets.FilesDataset>`
+    class by adding support for compressed archives of files. The archive is
+    downloaded and unpacked on-demand.
     """
 
     def __init__(
