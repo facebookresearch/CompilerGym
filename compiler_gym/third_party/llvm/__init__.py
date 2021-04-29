@@ -9,6 +9,7 @@ import sys
 import tarfile
 from pathlib import Path
 from threading import Lock
+from typing import Optional
 
 from fasteners import InterProcessLock
 
@@ -31,7 +32,7 @@ _LLVM_URL, _LLVM_SHA256 = {
 # Thread lock to prevent race on download_llvm_files() from multi-threading.
 # This works in tandem with the inter-process file lock - both are required.
 _LLVM_DOWNLOAD_LOCK = Lock()
-_LLVM_DOWNLOADED = False
+_LLVM_UNPACKED_LOCATION: Optional[Path] = None
 
 
 def _download_llvm_files(destination: Path) -> Path:
@@ -52,32 +53,33 @@ def _download_llvm_files(destination: Path) -> Path:
 
 def download_llvm_files() -> Path:
     """Download and unpack the LLVM data pack."""
-    global _LLVM_DOWNLOADED
+    global _LLVM_UNPACKED_LOCATION
 
     unpacked_location = site_data_path("llvm-v0")
     # Fast path for repeated calls.
-    if _LLVM_DOWNLOADED:
+    if _LLVM_UNPACKED_LOCATION == unpacked_location:
         return unpacked_location
 
-    # Fast path for first call. This check will be repeated inside the locked
-    # region if required.
-    if (unpacked_location / ".unpacked").is_file():
-        _LLVM_DOWNLOADED = True
-        return unpacked_location
-
-    with _LLVM_DOWNLOAD_LOCK, InterProcessLock(cache_path(".llvm-v0-install.LOCK")):
-        # Now that the lock is acquired, repeat the check to see if it is
-        # necessary to download the dataset.
+    with _LLVM_DOWNLOAD_LOCK:
+        # Fast path for first call. This check will be repeated inside the locked
+        # region if required.
         if (unpacked_location / ".unpacked").is_file():
+            _LLVM_UNPACKED_LOCATION = unpacked_location
             return unpacked_location
 
-        _download_llvm_files(unpacked_location)
-        # Create the marker file to indicate that the directory is unpacked
-        # and ready to go.
-        (unpacked_location / ".unpacked").touch()
-        _LLVM_DOWNLOADED = True
+        with InterProcessLock(cache_path(".llvm-v0-install.LOCK")):
+            # Now that the lock is acquired, repeat the check to see if it is
+            # necessary to download the dataset.
+            if (unpacked_location / ".unpacked").is_file():
+                return unpacked_location
 
-    return unpacked_location
+            _download_llvm_files(unpacked_location)
+            # Create the marker file to indicate that the directory is unpacked
+            # and ready to go.
+            (unpacked_location / ".unpacked").touch()
+            _LLVM_UNPACKED_LOCATION = unpacked_location
+
+        return unpacked_location
 
 
 def clang_path() -> Path:
