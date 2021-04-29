@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 """Integrations tests for the LLVM CompilerGym environments."""
 from enum import Enum
+from io import StringIO
 from pathlib import Path
 from typing import List
 
@@ -11,7 +12,10 @@ import gym
 import pytest
 
 import compiler_gym
-from compiler_gym.compiler_env_state import CompilerEnvState
+from compiler_gym.compiler_env_state import (
+    CompilerEnvStateReader,
+    CompilerEnvStateWriter,
+)
 from compiler_gym.envs import CompilerEnv, llvm
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.service.connection import CompilerGymServiceConnection
@@ -120,13 +124,18 @@ def test_connection_dies_default_reward_negated(env: LlvmEnv):
     assert reward == -7.5  # negates reward.
 
 
-def test_state_to_csv_from_csv(env: LlvmEnv):
+def test_state_serialize_deserialize_equality(env: LlvmEnv):
     env.reset(benchmark="cbench-v1/crc32")
     env.episode_reward = 10
 
     state = env.state
     assert state.reward == 10
-    state_from_csv = CompilerEnvState.from_csv(env.state.to_csv())
+
+    buf = StringIO()
+    CompilerEnvStateWriter(buf).write_state(state)
+    buf.seek(0)  # Rewind the buffer for reading.
+    state_from_csv = next(iter(CompilerEnvStateReader(buf)))
+
     assert state_from_csv.reward == 10
     assert state == state_from_csv
 

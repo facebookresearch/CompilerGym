@@ -124,6 +124,9 @@ class ValidationResult(BaseModel):
         else:
             return f"✅  {benchmark}  {self.state.reward:.4f}"
 
+    def __str__(self):
+        return repr(self)
+
     @classmethod
     def join(cls, results: Iterable["ValidationResult"]):
         """Create a validation result that is the union join of multiple results."""

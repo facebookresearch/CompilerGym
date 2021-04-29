@@ -19,7 +19,7 @@ class ValidationError(BaseModel):
     """
 
     data: Dict[str, Any] = {}
-    """A JSON-serialized dictionary of data that further describes the error.
+    """A JSON-serializable dictionary of data that further describes the error.
     This data dictionary can contain any information that may be relevant for
     diagnosing the underlying issue, such as a stack trace or an error line
     number. There is no specified schema for this data, validators are free to
