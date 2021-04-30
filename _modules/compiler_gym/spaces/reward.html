@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.spaces.reward &mdash; CompilerGym 0.1.7 documentation</title>
+  <title>compiler_gym.spaces.reward &mdash; CompilerGym 0.1.8 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.7
+                0.1.8
               </div>
             
           
@@ -271,7 +271,10 @@
         <span class="k">pass</span></div>
 
 <div class="viewcode-block" id="Reward.update"><a class="viewcode-back" href="../../../compiler_gym/spaces.html#compiler_gym.spaces.Reward.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">observations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">observation_t</span><span class="p">],</span> <span class="n">observation_view</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">action</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">observations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">observation_t</span><span class="p">],</span>
+        <span class="n">observation_view</span><span class="p">:</span> <span class="s2">&quot;compiler_gym.views.ObservationView&quot;</span><span class="p">,</span>  <span class="c1"># noqa: F821</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Calculate a reward for the given action.</span>
 
@@ -306,6 +309,35 @@
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span></div>
+
+
+<span class="k">class</span> <span class="nc">DefaultRewardFromObservation</span><span class="p">(</span><span class="n">Reward</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observation_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">observation_spaces</span><span class="o">=</span><span class="p">[</span><span class="n">observation_name</span><span class="p">],</span> <span class="nb">id</span><span class="o">=</span><span class="n">observation_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">observation_t</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">benchmark</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Called on env.reset(). Reset incremental progress.&quot;&quot;&quot;</span>
+        <span class="k">del</span> <span class="n">benchmark</span>  <span class="c1"># unused</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_value</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">action</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">observations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">observation_t</span><span class="p">],</span>
+        <span class="n">observation_view</span><span class="p">:</span> <span class="s2">&quot;compiler_gym.views.ObservationView&quot;</span><span class="p">,</span>  <span class="c1"># noqa: F821</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Called on env.step(). Compute and return new reward.&quot;&quot;&quot;</span>
+        <span class="k">del</span> <span class="n">action</span>  <span class="c1"># unused</span>
+        <span class="k">del</span> <span class="n">observation_view</span>  <span class="c1"># unused</span>
+        <span class="n">value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">observations</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">previous_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">previous_value</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">reward</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">previous_value</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_value</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="k">return</span> <span class="n">reward</span>
 </pre></div>
 
            </div>

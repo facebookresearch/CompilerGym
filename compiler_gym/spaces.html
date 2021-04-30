@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.spaces &mdash; CompilerGym 0.1.7 documentation</title>
+  <title>compiler_gym.spaces &mdash; CompilerGym 0.1.8 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.7
+                0.1.8
               </div>
             
           
@@ -325,7 +325,7 @@ space has a name. Additionally, the space itself may have a name.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Variables</dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><a class="reference internal" href="datasets.html#compiler_gym.datasets.LegacyDataset.name" title="compiler_gym.datasets.LegacyDataset.name"><strong>name</strong></a> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The name of the space. <code class="code docutils literal notranslate"><span class="pre">None</span></code> if the space has no name.</p></li>
+<li><p><a class="reference internal" href="datasets.html#compiler_gym.datasets.Dataset.name" title="compiler_gym.datasets.Dataset.name"><strong>name</strong></a> (<em>Optional</em><em>[</em><em>str</em><em>]</em>) – The name of the space. <code class="code docutils literal notranslate"><span class="pre">None</span></code> if the space has no name.</p></li>
 <li><p><strong>names</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – A list of names for each element in the space.</p></li>
 </ul>
 </dd>
@@ -409,8 +409,8 @@ space has a name. Additionally, the space itself may have a name.</p>
 <dl class="py class">
 <dt id="compiler_gym.spaces.Commandline">
 <em class="property">class </em><code class="sig-prename descclassname">compiler_gym.spaces.</code><code class="sig-name descname">Commandline</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">items</span><span class="p">:</span> <span class="n">Iterable<span class="p">[</span>compiler_gym.spaces.commandline.CommandlineFlag<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">name</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/spaces/commandline.html#Commandline"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.spaces.Commandline" title="Permalink to this definition">¶</a></dt>
-<dd><p>A <a class="reference internal" href="#compiler_gym.spaces.NamedDiscrete" title="compiler_gym.spaces.NamedDiscrete"><code class="xref py py-class docutils literal notranslate"><span class="pre">NamedDiscrete</span></code></a> space where each element represents a
-commandline flag.</p>
+<dd><p>A <a class="reference internal" href="#compiler_gym.spaces.NamedDiscrete" title="compiler_gym.spaces.NamedDiscrete"><code class="xref py py-class docutils literal notranslate"><span class="pre">NamedDiscrete</span></code></a> space where
+each element represents a commandline flag.</p>
 <p>Example usage:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">space</span> <span class="o">=</span> <span class="n">Commandline</span><span class="p">([</span>
 <span class="go">    CommandlineFlag(&quot;a&quot;, &quot;-a&quot;, &quot;A flag&quot;),</span>
@@ -604,7 +604,7 @@ crashed or the connection has dropped.</p>
 
 <dl class="py method">
 <dt id="compiler_gym.spaces.Reward.update">
-<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">action</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">observations</span><span class="p">:</span> <span class="n">List<span class="p">[</span>Union<span class="p">[</span>numpy.ndarray<span class="p">, </span>str<span class="p">, </span>bytes<span class="p">, </span>int<span class="p">, </span>float<span class="p">, </span>List<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">, </span>networkx.classes.digraph.DiGraph<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">observation_view</span></em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="../_modules/compiler_gym/spaces/reward.html#Reward.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.spaces.Reward.update" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">action</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">observations</span><span class="p">:</span> <span class="n">List<span class="p">[</span>Union<span class="p">[</span>numpy.ndarray<span class="p">, </span>str<span class="p">, </span>bytes<span class="p">, </span>int<span class="p">, </span>float<span class="p">, </span>List<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">, </span>networkx.classes.digraph.DiGraph<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">observation_view</span><span class="p">:</span> <span class="n"><a class="reference internal" href="views.html#compiler_gym.views.ObservationView" title="compiler_gym.views.ObservationView">compiler_gym.views.ObservationView</a></span></em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="../_modules/compiler_gym/spaces/reward.html#Reward.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.spaces.Reward.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate a reward for the given action.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>

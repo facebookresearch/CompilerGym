@@ -1,0 +1,1082 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>compiler_gym.envs.llvm.datasets.cbench &mdash; CompilerGym 0.1.8 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/css/custom.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+        <script src="../../../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="author" title="About these documents" href="../../../../../about.html" />
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home" alt="Documentation Home"> CompilerGym
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.8
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../llvm/index.html">LLVM Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../cli.html">Command Line Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/views.html">compiler_gym.views</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">CompilerGym</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../datasets.html">compiler_gym.envs.llvm.datasets</a> &raquo;</li>
+        
+      <li>compiler_gym.envs.llvm.datasets.cbench</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for compiler_gym.envs.llvm.datasets.cbench</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) Facebook, Inc. and its affiliates.</span>
+<span class="c1">#</span>
+<span class="c1"># This source code is licensed under the MIT license found in the</span>
+<span class="c1"># LICENSE file in the root directory of this source tree.</span>
+<span class="kn">import</span> <span class="nn">enum</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">import</span> <span class="nn">tarfile</span>
+<span class="kn">import</span> <span class="nn">tempfile</span>
+<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Lock</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">import</span> <span class="nn">fasteners</span>
+
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">TarDatasetWithManifest</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.third_party</span> <span class="kn">import</span> <span class="n">llvm</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.download</span> <span class="kn">import</span> <span class="n">download</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">cache_path</span><span class="p">,</span> <span class="n">site_data_path</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.timer</span> <span class="kn">import</span> <span class="n">Timer</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.validation_result</span> <span class="kn">import</span> <span class="n">ValidationError</span>
+
+<span class="n">_CBENCH_TARS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;macos&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v1-macos.tar.bz2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;90b312b40317d9ee9ed09b4b57d378879f05e8970bb6de80dc8581ad0e36c84f&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="s2">&quot;linux&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v1-linux.tar.bz2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;601fff3944c866f6617e653b6eb5c1521382c935f56ca1f36a9f5cf1a49f3de5&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">}</span>
+
+<span class="n">_CBENCH_RUNTOME_DATA</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/cBench-v0-runtime-data.tar.bz2&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;a1b5b5d6b115e5809ccaefc2134434494271d184da67e2ee43d7f84d07329055&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+
+<span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;darwin&quot;</span><span class="p">:</span>
+    <span class="n">_COMPILE_ARGS</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="s2">&quot;-L&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib&quot;</span><span class="p">,</span>
+    <span class="p">]</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">_COMPILE_ARGS</span> <span class="o">=</span> <span class="p">[]</span>
+
+
+<span class="k">class</span> <span class="nc">LlvmSanitizer</span><span class="p">(</span><span class="n">enum</span><span class="o">.</span><span class="n">IntEnum</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The LLVM sanitizers.&quot;&quot;&quot;</span>
+
+    <span class="n">ASAN</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="n">TSAN</span> <span class="o">=</span> <span class="mi">2</span>
+    <span class="n">MSAN</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">UBSAN</span> <span class="o">=</span> <span class="mi">4</span>
+
+
+<span class="c1"># Compiler flags that are enabled by sanitizers.</span>
+<span class="n">_SANITIZER_FLAGS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="n">LlvmSanitizer</span><span class="o">.</span><span class="n">ASAN</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;-O1&quot;</span><span class="p">,</span> <span class="s2">&quot;-g&quot;</span><span class="p">,</span> <span class="s2">&quot;-fsanitize=address&quot;</span><span class="p">,</span> <span class="s2">&quot;-fno-omit-frame-pointer&quot;</span><span class="p">],</span>
+    <span class="n">LlvmSanitizer</span><span class="o">.</span><span class="n">TSAN</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;-O1&quot;</span><span class="p">,</span> <span class="s2">&quot;-g&quot;</span><span class="p">,</span> <span class="s2">&quot;-fsanitize=thread&quot;</span><span class="p">],</span>
+    <span class="n">LlvmSanitizer</span><span class="o">.</span><span class="n">MSAN</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;-O1&quot;</span><span class="p">,</span> <span class="s2">&quot;-g&quot;</span><span class="p">,</span> <span class="s2">&quot;-fsanitize=memory&quot;</span><span class="p">],</span>
+    <span class="n">LlvmSanitizer</span><span class="o">.</span><span class="n">UBSAN</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;-fsanitize=undefined&quot;</span><span class="p">],</span>
+<span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">BenchmarkExecutionResult</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The result of running a benchmark.&quot;&quot;&quot;</span>
+
+    <span class="n">walltime_seconds</span><span class="p">:</span> <span class="nb">float</span>
+    <span class="sd">&quot;&quot;&quot;The execution time in seconds.&quot;&quot;&quot;</span>
+
+    <span class="n">error</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ValidationError</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="sd">&quot;&quot;&quot;An error.&quot;&quot;&quot;</span>
+
+    <span class="n">output</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="sd">&quot;&quot;&quot;The output generated by the benchmark.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()</span>  <span class="c1"># pylint: disable=no-member</span>
+
+
+<span class="k">def</span> <span class="nf">_compile_and_run_bitcode_file</span><span class="p">(</span>
+    <span class="n">bitcode_file</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">cmd</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">cwd</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+    <span class="n">linkopts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">env</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+    <span class="n">num_runs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+    <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span>
+    <span class="n">sanitizer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LlvmSanitizer</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">timeout_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span>
+    <span class="n">compilation_timeout_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BenchmarkExecutionResult</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Run the given cBench benchmark.&quot;&quot;&quot;</span>
+    <span class="c1"># cBench benchmarks expect that a file _finfo_dataset exists in the</span>
+    <span class="c1"># current working directory and contains the number of benchmark</span>
+    <span class="c1"># iterations in it.</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">cwd</span> <span class="o">/</span> <span class="s2">&quot;_finfo_dataset&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">num_runs</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="c1"># Create a barebones execution environment for the benchmark.</span>
+    <span class="n">run_env</span> <span class="o">=</span> <span class="p">{</span>
+        <span class="s2">&quot;TMPDIR&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;TMPDIR&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;HOME&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;HOME&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+        <span class="s2">&quot;USER&quot;</span><span class="p">:</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;USER&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">),</span>
+        <span class="c1"># Disable all logging from GRPC. In the past I have had false-positive</span>
+        <span class="c1"># &quot;Wrong output&quot; errors caused by GRPC error messages being logged to</span>
+        <span class="c1"># stderr.</span>
+        <span class="s2">&quot;GRPC_VERBOSITY&quot;</span><span class="p">:</span> <span class="s2">&quot;NONE&quot;</span><span class="p">,</span>
+    <span class="p">}</span>
+    <span class="n">run_env</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+
+    <span class="n">error_data</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">if</span> <span class="n">sanitizer</span><span class="p">:</span>
+        <span class="n">clang_path</span> <span class="o">=</span> <span class="n">llvm</span><span class="o">.</span><span class="n">clang_path</span><span class="p">()</span>
+        <span class="n">binary</span> <span class="o">=</span> <span class="n">cwd</span> <span class="o">/</span> <span class="s2">&quot;a.out&quot;</span>
+        <span class="n">error_data</span><span class="p">[</span><span class="s2">&quot;run_cmd&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;$BIN&quot;</span><span class="p">,</span> <span class="s2">&quot;./a.out&quot;</span><span class="p">)</span>
+        <span class="c1"># Generate the a.out binary file.</span>
+        <span class="n">compile_cmd</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="p">[</span><span class="n">clang_path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">bitcode_file</span><span class="p">),</span> <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">binary</span><span class="p">)]</span>
+            <span class="o">+</span> <span class="n">_COMPILE_ARGS</span>
+            <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="n">linkopts</span><span class="p">)</span>
+            <span class="o">+</span> <span class="n">_SANITIZER_FLAGS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">sanitizer</span><span class="p">,</span> <span class="p">[])</span>
+        <span class="p">)</span>
+        <span class="n">error_data</span><span class="p">[</span><span class="s2">&quot;compile_cmd&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">compile_cmd</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;compile: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">compile_cmd</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">binary</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span>
+        <span class="n">clang</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+            <span class="n">compile_cmd</span><span class="p">,</span>
+            <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+            <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
+            <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">env</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;PATH&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">clang_path</span><span class="o">.</span><span class="n">parent</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;PATH&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">},</span>
+        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">output</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">clang</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">compilation_timeout_seconds</span><span class="p">)</span>
+        <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
+            <span class="n">clang</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+            <span class="n">error_data</span><span class="p">[</span><span class="s2">&quot;timeout&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">compilation_timeout_seconds</span>
+            <span class="k">return</span> <span class="n">BenchmarkExecutionResult</span><span class="p">(</span>
+                <span class="n">walltime_seconds</span><span class="o">=</span><span class="n">timeout_seconds</span><span class="p">,</span>
+                <span class="n">error</span><span class="o">=</span><span class="n">ValidationError</span><span class="p">(</span>
+                    <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;Compilation timeout&quot;</span><span class="p">,</span>
+                    <span class="n">data</span><span class="o">=</span><span class="n">error_data</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">clang</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
+            <span class="n">error_data</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span>
+            <span class="k">return</span> <span class="n">BenchmarkExecutionResult</span><span class="p">(</span>
+                <span class="n">walltime_seconds</span><span class="o">=</span><span class="n">timeout_seconds</span><span class="p">,</span>
+                <span class="n">error</span><span class="o">=</span><span class="n">ValidationError</span><span class="p">(</span>
+                    <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;Compilation failed&quot;</span><span class="p">,</span>
+                    <span class="n">data</span><span class="o">=</span><span class="n">error_data</span><span class="p">,</span>
+                <span class="p">),</span>
+            <span class="p">)</span>
+        <span class="k">assert</span> <span class="n">binary</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">lli_path</span> <span class="o">=</span> <span class="n">llvm</span><span class="o">.</span><span class="n">lli_path</span><span class="p">()</span>
+        <span class="n">error_data</span><span class="p">[</span><span class="s2">&quot;run_cmd&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;$BIN&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lli_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> benchmark.bc&quot;</span><span class="p">)</span>
+        <span class="n">run_env</span><span class="p">[</span><span class="s2">&quot;PATH&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">lli_path</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;exec: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">error_data</span><span class="p">[</span><span class="s2">&quot;run_cmd&quot;</span><span class="p">])</span>
+        <span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+            <span class="n">error_data</span><span class="p">[</span><span class="s2">&quot;run_cmd&quot;</span><span class="p">],</span>
+            <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+            <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
+            <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+            <span class="n">env</span><span class="o">=</span><span class="n">run_env</span><span class="p">,</span>
+            <span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">with</span> <span class="n">Timer</span><span class="p">()</span> <span class="k">as</span> <span class="n">timer</span><span class="p">:</span>
+            <span class="n">stdout</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout_seconds</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
+        <span class="n">process</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+        <span class="n">error_data</span><span class="p">[</span><span class="s2">&quot;timeout_seconds&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timeout_seconds</span>
+        <span class="k">return</span> <span class="n">BenchmarkExecutionResult</span><span class="p">(</span>
+            <span class="n">walltime_seconds</span><span class="o">=</span><span class="n">timeout_seconds</span><span class="p">,</span>
+            <span class="n">error</span><span class="o">=</span><span class="n">ValidationError</span><span class="p">(</span>
+                <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;Execution timeout&quot;</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">error_data</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+    <span class="k">finally</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">sanitizer</span><span class="p">:</span>
+            <span class="n">binary</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
+        <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;&lt;binary&gt;&quot;</span>
+
+    <span class="k">if</span> <span class="n">process</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
+        <span class="c1"># Runtime error.</span>
+        <span class="k">if</span> <span class="n">sanitizer</span> <span class="o">==</span> <span class="n">LlvmSanitizer</span><span class="o">.</span><span class="n">ASAN</span> <span class="ow">and</span> <span class="s2">&quot;LeakSanitizer&quot;</span> <span class="ow">in</span> <span class="n">output</span><span class="p">:</span>
+            <span class="n">error_type</span> <span class="o">=</span> <span class="s2">&quot;Memory leak&quot;</span>
+        <span class="k">elif</span> <span class="n">sanitizer</span> <span class="o">==</span> <span class="n">LlvmSanitizer</span><span class="o">.</span><span class="n">ASAN</span> <span class="ow">and</span> <span class="s2">&quot;AddressSanitizer&quot;</span> <span class="ow">in</span> <span class="n">output</span><span class="p">:</span>
+            <span class="n">error_type</span> <span class="o">=</span> <span class="s2">&quot;Memory error&quot;</span>
+        <span class="k">elif</span> <span class="n">sanitizer</span> <span class="o">==</span> <span class="n">LlvmSanitizer</span><span class="o">.</span><span class="n">MSAN</span> <span class="ow">and</span> <span class="s2">&quot;MemorySanitizer&quot;</span> <span class="ow">in</span> <span class="n">output</span><span class="p">:</span>
+            <span class="n">error_type</span> <span class="o">=</span> <span class="s2">&quot;Memory error&quot;</span>
+        <span class="k">elif</span> <span class="s2">&quot;Segmentation fault&quot;</span> <span class="ow">in</span> <span class="n">output</span><span class="p">:</span>
+            <span class="n">error_type</span> <span class="o">=</span> <span class="s2">&quot;Segmentation fault&quot;</span>
+        <span class="k">elif</span> <span class="s2">&quot;Illegal Instruction&quot;</span> <span class="ow">in</span> <span class="n">output</span><span class="p">:</span>
+            <span class="n">error_type</span> <span class="o">=</span> <span class="s2">&quot;Illegal Instruction&quot;</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">error_type</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Runtime error (</span><span class="si">{</span><span class="n">process</span><span class="o">.</span><span class="n">returncode</span><span class="si">}</span><span class="s2">)&quot;</span>
+
+        <span class="n">error_data</span><span class="p">[</span><span class="s2">&quot;return_code&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">returncode</span>
+        <span class="n">error_data</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span>
+        <span class="k">return</span> <span class="n">BenchmarkExecutionResult</span><span class="p">(</span>
+            <span class="n">walltime_seconds</span><span class="o">=</span><span class="n">timer</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
+            <span class="n">error</span><span class="o">=</span><span class="n">ValidationError</span><span class="p">(</span>
+                <span class="nb">type</span><span class="o">=</span><span class="n">error_type</span><span class="p">,</span>
+                <span class="n">data</span><span class="o">=</span><span class="n">error_data</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">)</span>
+    <span class="k">return</span> <span class="n">BenchmarkExecutionResult</span><span class="p">(</span><span class="n">walltime_seconds</span><span class="o">=</span><span class="n">timer</span><span class="o">.</span><span class="n">time</span><span class="p">,</span> <span class="n">output</span><span class="o">=</span><span class="n">output</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">download_cBench_runtime_data</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Download and unpack the cBench runtime dataset.&quot;&quot;&quot;</span>
+    <span class="n">cbench_data</span> <span class="o">=</span> <span class="n">site_data_path</span><span class="p">(</span><span class="s2">&quot;llvm-v0/cbench-v1-runtime-data/runtime_data&quot;</span><span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="n">cbench_data</span> <span class="o">/</span> <span class="s2">&quot;unpacked&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="c1"># Clean up any partially-extracted data directory.</span>
+        <span class="k">if</span> <span class="n">cbench_data</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="n">cbench_data</span><span class="p">)</span>
+
+        <span class="n">url</span><span class="p">,</span> <span class="n">sha256</span> <span class="o">=</span> <span class="n">_CBENCH_RUNTOME_DATA</span>
+        <span class="n">tar_contents</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">download</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">sha256</span><span class="p">))</span>
+        <span class="k">with</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fileobj</span><span class="o">=</span><span class="n">tar_contents</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r:bz2&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">tar</span><span class="p">:</span>
+            <span class="n">cbench_data</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">tar</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">cbench_data</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="n">cbench_data</span><span class="o">.</span><span class="n">is_dir</span><span class="p">()</span>
+        <span class="c1"># Create the marker file to indicate that the directory is unpacked</span>
+        <span class="c1"># and ready to go.</span>
+        <span class="p">(</span><span class="n">cbench_data</span> <span class="o">/</span> <span class="s2">&quot;unpacked&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">touch</span><span class="p">()</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+
+<span class="c1"># Thread lock to prevent race on download_cBench_runtime_data() from</span>
+<span class="c1"># multi-threading. This works in tandem with the inter-process file lock - both</span>
+<span class="c1"># are required.</span>
+<span class="n">_CBENCH_DOWNLOAD_THREAD_LOCK</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">()</span>
+
+
+<span class="k">def</span> <span class="nf">_make_cBench_validator</span><span class="p">(</span>
+    <span class="n">cmd</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">linkopts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+    <span class="n">os_env</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
+    <span class="n">num_runs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
+    <span class="n">compare_output</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">input_files</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">output_files</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">validate_result</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
+        <span class="n">Callable</span><span class="p">[[</span><span class="n">BenchmarkExecutionResult</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">pre_execution_callback</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Path</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">sanitizer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LlvmSanitizer</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">flakiness</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="s2">&quot;LlvmEnv&quot;</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ValidationError</span><span class="p">]]:</span>  <span class="c1"># noqa: F821</span>
+    <span class="sd">&quot;&quot;&quot;Construct a validation callback for a cBench benchmark. See validator() for usage.&quot;&quot;&quot;</span>
+    <span class="n">input_files</span> <span class="o">=</span> <span class="n">input_files</span> <span class="ow">or</span> <span class="p">[]</span>
+    <span class="n">output_files</span> <span class="o">=</span> <span class="n">output_files</span> <span class="ow">or</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">validator_cb</span><span class="p">(</span><span class="n">env</span><span class="p">:</span> <span class="s2">&quot;LlvmEnv&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ValidationError</span><span class="p">]:</span>  <span class="c1"># noqa: F821</span>
+        <span class="sd">&quot;&quot;&quot;The validation callback.&quot;&quot;&quot;</span>
+        <span class="k">with</span> <span class="n">_CBENCH_DOWNLOAD_THREAD_LOCK</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">fasteners</span><span class="o">.</span><span class="n">InterProcessLock</span><span class="p">(</span><span class="n">cache_path</span><span class="p">(</span><span class="s2">&quot;cbench-v1-runtime-data.LOCK&quot;</span><span class="p">)):</span>
+                <span class="n">download_cBench_runtime_data</span><span class="p">()</span>
+
+        <span class="n">cbench_data</span> <span class="o">=</span> <span class="n">site_data_path</span><span class="p">(</span><span class="s2">&quot;llvm-v0/cbench-v1-runtime-data/runtime_data&quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">input_file_name</span> <span class="ow">in</span> <span class="n">input_files</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">cbench_data</span> <span class="o">/</span> <span class="n">input_file_name</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Required benchmark input not found: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Create a temporary working directory to execute the benchmark in.</span>
+        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
+            <span class="n">cwd</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+
+            <span class="c1"># Expand shell variable substitutions in the benchmark command.</span>
+            <span class="n">expanded_command</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;$D&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">cbench_data</span><span class="p">))</span>
+
+            <span class="c1"># Translate the output file names into paths inside the working</span>
+            <span class="c1"># directory.</span>
+            <span class="n">output_paths</span> <span class="o">=</span> <span class="p">[</span><span class="n">cwd</span> <span class="o">/</span> <span class="n">o</span> <span class="k">for</span> <span class="n">o</span> <span class="ow">in</span> <span class="n">output_files</span><span class="p">]</span>
+
+            <span class="k">if</span> <span class="n">pre_execution_callback</span><span class="p">:</span>
+                <span class="n">pre_execution_callback</span><span class="p">(</span><span class="n">cwd</span><span class="p">)</span>
+
+            <span class="c1"># Produce a gold-standard output using a reference version of</span>
+            <span class="c1"># the benchmark.</span>
+            <span class="k">if</span> <span class="n">compare_output</span> <span class="ow">or</span> <span class="n">output_files</span><span class="p">:</span>
+                <span class="n">gs_env</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">fork</span><span class="p">()</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="c1"># Reset to the original benchmark state and compile it.</span>
+                    <span class="n">gs_env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">benchmark</span><span class="p">)</span>
+                    <span class="n">gs_env</span><span class="o">.</span><span class="n">write_bitcode</span><span class="p">(</span><span class="n">cwd</span> <span class="o">/</span> <span class="s2">&quot;benchmark.bc&quot;</span><span class="p">)</span>
+                    <span class="n">gold_standard</span> <span class="o">=</span> <span class="n">_compile_and_run_bitcode_file</span><span class="p">(</span>
+                        <span class="n">bitcode_file</span><span class="o">=</span><span class="n">cwd</span> <span class="o">/</span> <span class="s2">&quot;benchmark.bc&quot;</span><span class="p">,</span>
+                        <span class="n">cmd</span><span class="o">=</span><span class="n">expanded_command</span><span class="p">,</span>
+                        <span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">,</span>
+                        <span class="n">num_runs</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="c1"># Use default optimizations for gold standard.</span>
+                        <span class="n">linkopts</span><span class="o">=</span><span class="n">linkopts</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;-O2&quot;</span><span class="p">],</span>
+                        <span class="c1"># Always assume safe.</span>
+                        <span class="n">sanitizer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+                        <span class="n">logger</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                        <span class="n">env</span><span class="o">=</span><span class="n">os_env</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">gold_standard</span><span class="o">.</span><span class="n">error</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">ValidationError</span><span class="p">(</span>
+                            <span class="nb">type</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Gold standard: </span><span class="si">{</span><span class="n">gold_standard</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">type</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                            <span class="n">data</span><span class="o">=</span><span class="n">gold_standard</span><span class="o">.</span><span class="n">error</span><span class="o">.</span><span class="n">data</span><span class="p">,</span>
+                        <span class="p">)</span>
+                <span class="k">finally</span><span class="p">:</span>
+                    <span class="n">gs_env</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+                <span class="c1"># Check that the reference run produced the expected output</span>
+                <span class="c1"># files.</span>
+                <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">output_paths</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">output</span> <span class="o">=</span> <span class="n">gold_standard</span><span class="o">.</span><span class="n">output</span>
+                        <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
+                            <span class="n">output</span> <span class="o">=</span> <span class="s2">&quot;&lt;binary&gt;&quot;</span>
+                        <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span>
+                            <span class="sa">f</span><span class="s2">&quot;Expected file &#39;</span><span class="si">{</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; not generated</span><span class="se">\n</span><span class="s2">&quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;Benchmark: </span><span class="si">{</span><span class="n">env</span><span class="o">.</span><span class="n">benchmark</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;Command: </span><span class="si">{</span><span class="n">cmd</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                            <span class="sa">f</span><span class="s2">&quot;Output: </span><span class="si">{</span><span class="n">output</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="p">)</span>
+                    <span class="n">path</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.gold_standard&quot;</span><span class="p">)</span>
+
+            <span class="c1"># Serialize the benchmark to a bitcode file that will then be</span>
+            <span class="c1"># compiled to a binary.</span>
+            <span class="n">env</span><span class="o">.</span><span class="n">write_bitcode</span><span class="p">(</span><span class="n">cwd</span> <span class="o">/</span> <span class="s2">&quot;benchmark.bc&quot;</span><span class="p">)</span>
+            <span class="n">outcome</span> <span class="o">=</span> <span class="n">_compile_and_run_bitcode_file</span><span class="p">(</span>
+                <span class="n">bitcode_file</span><span class="o">=</span><span class="n">cwd</span> <span class="o">/</span> <span class="s2">&quot;benchmark.bc&quot;</span><span class="p">,</span>
+                <span class="n">cmd</span><span class="o">=</span><span class="n">expanded_command</span><span class="p">,</span>
+                <span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">,</span>
+                <span class="n">num_runs</span><span class="o">=</span><span class="n">num_runs</span><span class="p">,</span>
+                <span class="n">linkopts</span><span class="o">=</span><span class="n">linkopts</span><span class="p">,</span>
+                <span class="n">sanitizer</span><span class="o">=</span><span class="n">sanitizer</span><span class="p">,</span>
+                <span class="n">logger</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
+                <span class="n">env</span><span class="o">=</span><span class="n">os_env</span><span class="p">,</span>
+            <span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">outcome</span><span class="o">.</span><span class="n">error</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">outcome</span><span class="o">.</span><span class="n">error</span>
+
+            <span class="c1"># Run a user-specified validation hook.</span>
+            <span class="k">if</span> <span class="n">validate_result</span><span class="p">:</span>
+                <span class="n">validate_result</span><span class="p">(</span><span class="n">outcome</span><span class="p">)</span>
+
+            <span class="c1"># Difftest the console output.</span>
+            <span class="k">if</span> <span class="n">compare_output</span> <span class="ow">and</span> <span class="n">gold_standard</span><span class="o">.</span><span class="n">output</span> <span class="o">!=</span> <span class="n">outcome</span><span class="o">.</span><span class="n">output</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">ValidationError</span><span class="p">(</span>
+                    <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;Wrong output&quot;</span><span class="p">,</span>
+                    <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;expected&quot;</span><span class="p">:</span> <span class="n">gold_standard</span><span class="o">.</span><span class="n">output</span><span class="p">,</span> <span class="s2">&quot;actual&quot;</span><span class="p">:</span> <span class="n">outcome</span><span class="o">.</span><span class="n">output</span><span class="p">},</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Difftest the output files.</span>
+            <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">output_paths</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                    <span class="k">return</span> <span class="n">ValidationError</span><span class="p">(</span>
+                        <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;Output not generated&quot;</span><span class="p">,</span>
+                        <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="n">cmd</span><span class="p">},</span>
+                    <span class="p">)</span>
+                <span class="n">diff</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+                    <span class="p">[</span><span class="s2">&quot;diff&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.gold_standard&quot;</span><span class="p">],</span>
+                    <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                    <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">stdout</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">diff</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
+                <span class="k">if</span> <span class="n">diff</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">stdout</span> <span class="o">=</span> <span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+                        <span class="k">return</span> <span class="n">ValidationError</span><span class="p">(</span>
+                            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;Wrong output (file)&quot;</span><span class="p">,</span>
+                            <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;diff&quot;</span><span class="p">:</span> <span class="n">stdout</span><span class="p">},</span>
+                        <span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
+                        <span class="k">return</span> <span class="n">ValidationError</span><span class="p">(</span>
+                            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;Wrong output (file)&quot;</span><span class="p">,</span>
+                            <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;diff&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;binary&gt;&quot;</span><span class="p">},</span>
+                        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">flaky_wrapped_cb</span><span class="p">(</span><span class="n">env</span><span class="p">:</span> <span class="s2">&quot;LlvmEnv&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ValidationError</span><span class="p">]:</span>  <span class="c1"># noqa: F821</span>
+        <span class="sd">&quot;&quot;&quot;Wrap the validation callback in a flakiness retry loop.&quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">flakiness</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">):</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="n">validator_cb</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">error</span><span class="p">:</span>
+                    <span class="k">return</span>
+            <span class="k">except</span> <span class="ne">TimeoutError</span><span class="p">:</span>
+                <span class="c1"># Timeout errors can be raised by the environment in case of a</span>
+                <span class="c1"># slow step / observation, and should be retried.</span>
+                <span class="k">pass</span>
+            <span class="n">env</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Validation callback failed, attempt=</span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">flakiness</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="n">error</span>
+
+    <span class="k">return</span> <span class="n">flaky_wrapped_cb</span>
+
+
+<span class="k">def</span> <span class="nf">validator</span><span class="p">(</span>
+    <span class="n">benchmark</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">cmd</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+    <span class="n">data</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">outs</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">platforms</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">compare_output</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">validate_result</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span>
+        <span class="n">Callable</span><span class="p">[[</span><span class="n">BenchmarkExecutionResult</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">linkopts</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">env</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">pre_execution_callback</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[],</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">sanitizers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">LlvmSanitizer</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Declare a new benchmark validator.</span>
+
+<span class="sd">    TODO(cummins): Pull this out into a public API.</span>
+
+<span class="sd">    :param benchmark: The name of the benchmark that this validator supports.</span>
+<span class="sd">    :cmd: The shell command to run the validation. Variable substitution is</span>
+<span class="sd">        applied to this value as follows: :code:`$BIN` is replaced by the path</span>
+<span class="sd">        of the compiled binary and :code:`$D` is replaced with the path to the</span>
+<span class="sd">        benchmark&#39;s runtime data directory.</span>
+<span class="sd">    :data: A list of paths to input files.</span>
+<span class="sd">    :outs: A list of paths to output files.</span>
+<span class="sd">    :return: :code:`True` if the new validator was registered, else :code:`False`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">platforms</span> <span class="o">=</span> <span class="n">platforms</span> <span class="ow">or</span> <span class="p">[</span><span class="s2">&quot;linux&quot;</span><span class="p">,</span> <span class="s2">&quot;macos&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="p">{</span><span class="s2">&quot;darwin&quot;</span><span class="p">:</span> <span class="s2">&quot;macos&quot;</span><span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">)</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">platforms</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+    <span class="n">infiles</span> <span class="o">=</span> <span class="n">data</span> <span class="ow">or</span> <span class="p">[]</span>
+    <span class="n">outfiles</span> <span class="o">=</span> <span class="p">[</span><span class="n">Path</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">outs</span> <span class="ow">or</span> <span class="p">[]]</span>
+    <span class="n">linkopts</span> <span class="o">=</span> <span class="n">linkopts</span> <span class="ow">or</span> <span class="p">[]</span>
+    <span class="n">env</span> <span class="o">=</span> <span class="n">env</span> <span class="ow">or</span> <span class="p">{}</span>
+    <span class="k">if</span> <span class="n">sanitizers</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="n">sanitizers</span> <span class="o">=</span> <span class="n">LlvmSanitizer</span>
+
+    <span class="n">VALIDATORS</span><span class="p">[</span><span class="n">benchmark</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="n">_make_cBench_validator</span><span class="p">(</span>
+            <span class="n">cmd</span><span class="o">=</span><span class="n">cmd</span><span class="p">,</span>
+            <span class="n">input_files</span><span class="o">=</span><span class="n">infiles</span><span class="p">,</span>
+            <span class="n">output_files</span><span class="o">=</span><span class="n">outfiles</span><span class="p">,</span>
+            <span class="n">compare_output</span><span class="o">=</span><span class="n">compare_output</span><span class="p">,</span>
+            <span class="n">validate_result</span><span class="o">=</span><span class="n">validate_result</span><span class="p">,</span>
+            <span class="n">linkopts</span><span class="o">=</span><span class="n">linkopts</span><span class="p">,</span>
+            <span class="n">os_env</span><span class="o">=</span><span class="n">env</span><span class="p">,</span>
+            <span class="n">pre_execution_callback</span><span class="o">=</span><span class="n">pre_execution_callback</span><span class="p">,</span>
+        <span class="p">)</span>
+    <span class="p">)</span>
+
+    <span class="c1"># Register additional validators using the sanitizers.</span>
+    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;linux&quot;</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">sanitizer</span> <span class="ow">in</span> <span class="n">sanitizers</span><span class="p">:</span>
+            <span class="n">VALIDATORS</span><span class="p">[</span><span class="n">benchmark</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="n">_make_cBench_validator</span><span class="p">(</span>
+                    <span class="n">cmd</span><span class="o">=</span><span class="n">cmd</span><span class="p">,</span>
+                    <span class="n">input_files</span><span class="o">=</span><span class="n">infiles</span><span class="p">,</span>
+                    <span class="n">output_files</span><span class="o">=</span><span class="n">outfiles</span><span class="p">,</span>
+                    <span class="n">compare_output</span><span class="o">=</span><span class="n">compare_output</span><span class="p">,</span>
+                    <span class="n">validate_result</span><span class="o">=</span><span class="n">validate_result</span><span class="p">,</span>
+                    <span class="n">linkopts</span><span class="o">=</span><span class="n">linkopts</span><span class="p">,</span>
+                    <span class="n">os_env</span><span class="o">=</span><span class="n">env</span><span class="p">,</span>
+                    <span class="n">pre_execution_callback</span><span class="o">=</span><span class="n">pre_execution_callback</span><span class="p">,</span>
+                    <span class="n">sanitizer</span><span class="o">=</span><span class="n">sanitizer</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+
+    <span class="k">return</span> <span class="kc">True</span>
+
+
+<span class="k">class</span> <span class="nc">CBenchBenchmark</span><span class="p">(</span><span class="n">Benchmark</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A cBench benchmmark.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">VALIDATORS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">,</span> <span class="p">[]):</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">add_validation_callback</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+
+<div class="viewcode-block" id="CBenchDataset"><a class="viewcode-back" href="../../../../../llvm/api.html#compiler_gym.envs.llvm.datasets.CBenchDataset">[docs]</a><span class="k">class</span> <span class="nc">CBenchDataset</span><span class="p">(</span><span class="n">TarDatasetWithManifest</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">site_data_base</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+        <span class="n">sort_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;benchmark://cbench-v1&quot;</span><span class="p">,</span>
+        <span class="n">manifest_url</span><span class="o">=</span><span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cbench-v1-manifest.bz2&quot;</span><span class="p">,</span>
+        <span class="n">manifest_sha256</span><span class="o">=</span><span class="s2">&quot;eeffd7593aeb696a160fd22e6b0c382198a65d0918b8440253ea458cfe927741&quot;</span><span class="p">,</span>
+        <span class="n">deprecated</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">platform</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;darwin&quot;</span><span class="p">:</span> <span class="s2">&quot;macos&quot;</span><span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">)</span>
+        <span class="n">url</span><span class="p">,</span> <span class="n">sha256</span> <span class="o">=</span> <span class="n">_CBENCH_TARS</span><span class="p">[</span><span class="n">platform</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Runnable C benchmarks&quot;</span><span class="p">,</span>
+            <span class="n">license</span><span class="o">=</span><span class="s2">&quot;BSD 3-Clause&quot;</span><span class="p">,</span>
+            <span class="n">references</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;Paper&quot;</span><span class="p">:</span> <span class="s2">&quot;https://arxiv.org/pdf/1407.3487.pdf&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Homepage&quot;</span><span class="p">:</span> <span class="s2">&quot;https://ctuning.org/wiki/index.php/CTools:CBench&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">tar_urls</span><span class="o">=</span><span class="p">[</span><span class="n">url</span><span class="p">],</span>
+            <span class="n">tar_sha256</span><span class="o">=</span><span class="n">sha256</span><span class="p">,</span>
+            <span class="n">manifest_urls</span><span class="o">=</span><span class="p">[</span><span class="n">manifest_url</span><span class="p">],</span>
+            <span class="n">manifest_sha256</span><span class="o">=</span><span class="n">manifest_sha256</span><span class="p">,</span>
+            <span class="n">strip_prefix</span><span class="o">=</span><span class="s2">&quot;cBench-v1&quot;</span><span class="p">,</span>
+            <span class="n">benchmark_file_suffix</span><span class="o">=</span><span class="s2">&quot;.bc&quot;</span><span class="p">,</span>
+            <span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span>
+            <span class="n">sort_order</span><span class="o">=</span><span class="n">sort_order</span><span class="p">,</span>
+            <span class="n">benchmark_class</span><span class="o">=</span><span class="n">CBenchBenchmark</span><span class="p">,</span>
+            <span class="n">deprecated</span><span class="o">=</span><span class="n">deprecated</span><span class="p">,</span>
+            <span class="n">validatable</span><span class="o">=</span><span class="s2">&quot;Partially&quot;</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<span class="c1"># URLs of the deprecated cBench datasets.</span>
+<span class="n">_CBENCH_LEGACY_TARS</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s2">&quot;macos&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v0-macos.tar.bz2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;072a730c86144a07bba948c49afe543e4f06351f1cb17f7de77f91d5c1a1b120&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="s2">&quot;linux&quot;</span><span class="p">:</span> <span class="p">(</span>
+        <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v0-linux.tar.bz2&quot;</span><span class="p">,</span>
+        <span class="s2">&quot;9b5838a90895579aab3b9375e8eeb3ed2ae58e0ad354fec7eb4f8b31ecb4a360&quot;</span><span class="p">,</span>
+    <span class="p">),</span>
+<span class="p">}</span>
+
+
+<span class="k">class</span> <span class="nc">CBenchLegacyDataset</span><span class="p">(</span><span class="n">TarDatasetWithManifest</span><span class="p">):</span>
+    <span class="c1"># The difference between cbench-v0 and cbench-v1 is the arguments passed to</span>
+    <span class="c1"># clang when preparing the LLVM bitcodes:</span>
+    <span class="c1">#</span>
+    <span class="c1">#   - v0: `-O0 -Xclang -disable-O0-optnone`.</span>
+    <span class="c1">#   - v1: `-O1 -Xclang -Xclang -disable-llvm-passes`.</span>
+    <span class="c1">#</span>
+    <span class="c1"># The key difference with is that in v0, the generated IR functions were</span>
+    <span class="c1"># annotated with a `noinline` attribute that prevented inline. In v1 that is</span>
+    <span class="c1"># no longer the case.</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_data_base</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+        <span class="n">platform</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;darwin&quot;</span><span class="p">:</span> <span class="s2">&quot;macos&quot;</span><span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">)</span>
+        <span class="n">url</span><span class="p">,</span> <span class="n">sha256</span> <span class="o">=</span> <span class="n">_CBENCH_LEGACY_TARS</span><span class="p">[</span><span class="n">platform</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;benchmark://cBench-v0&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Runnable C benchmarks&quot;</span><span class="p">,</span>
+            <span class="n">license</span><span class="o">=</span><span class="s2">&quot;BSD 3-Clause&quot;</span><span class="p">,</span>
+            <span class="n">references</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;Paper&quot;</span><span class="p">:</span> <span class="s2">&quot;https://arxiv.org/pdf/1407.3487.pdf&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Homepage&quot;</span><span class="p">:</span> <span class="s2">&quot;https://ctuning.org/wiki/index.php/CTools:CBench&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">tar_urls</span><span class="o">=</span><span class="p">[</span><span class="n">url</span><span class="p">],</span>
+            <span class="n">tar_sha256</span><span class="o">=</span><span class="n">sha256</span><span class="p">,</span>
+            <span class="n">manifest_urls</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v0-manifest.bz2&quot;</span>
+            <span class="p">],</span>
+            <span class="n">manifest_sha256</span><span class="o">=</span><span class="s2">&quot;635b94eeb2784dfedb3b53fd8f84517c3b4b95d851ddb662d4c1058c72dc81e0&quot;</span><span class="p">,</span>
+            <span class="n">strip_prefix</span><span class="o">=</span><span class="s2">&quot;cBench-v0&quot;</span><span class="p">,</span>
+            <span class="n">benchmark_file_suffix</span><span class="o">=</span><span class="s2">&quot;.bc&quot;</span><span class="p">,</span>
+            <span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span>
+            <span class="n">deprecated</span><span class="o">=</span><span class="s2">&quot;Please use &#39;benchmark://cbench-v1&#39;&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+
+<span class="c1"># ===============================</span>
+<span class="c1"># Definition of cBench validators</span>
+<span class="c1"># ===============================</span>
+
+
+<span class="c1"># A map from benchmark name to validation callbacks.</span>
+<span class="n">VALIDATORS</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span>
+    <span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="s2">&quot;LlvmEnv&quot;</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span>  <span class="c1"># noqa: F821</span>
+<span class="p">]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">validate_sha_output</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">BenchmarkExecutionResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;SHA benchmark prints 5 random hex strings. Normally these hex strings are</span>
+<span class="sd">    16 characters but occasionally they are less (presumably because of a</span>
+<span class="sd">    leading zero being omitted).</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">re</span><span class="o">.</span><span class="n">match</span><span class="p">(</span>
+            <span class="sa">r</span><span class="s2">&quot;[0-9a-f]{0,16} [0-9a-f]{0,16} [0-9a-f]{0,16} [0-9a-f]{0,16} [0-9a-f]{0,16}&quot;</span><span class="p">,</span>
+            <span class="n">result</span><span class="o">.</span><span class="n">output</span><span class="o">.</span><span class="n">rstrip</span><span class="p">(),</span>
+        <span class="p">):</span>
+            <span class="k">return</span> <span class="s2">&quot;Failed to parse hex output&quot;</span>
+    <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;Failed to parse unicode output&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">setup_ghostscript_library_files</span><span class="p">(</span><span class="n">dataset_id</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Path</span><span class="p">],</span> <span class="kc">None</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Make a pre-execution setup hook for ghostscript.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">setup</span><span class="p">(</span><span class="n">cwd</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+        <span class="n">cbench_data</span> <span class="o">=</span> <span class="n">site_data_path</span><span class="p">(</span><span class="s2">&quot;llvm-v0/cbench-v1-runtime-data/runtime_data&quot;</span><span class="p">)</span>
+        <span class="c1"># Copy the input data file into the current directory since ghostscript</span>
+        <span class="c1"># doesn&#39;t like long input paths.</span>
+        <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span>
+            <span class="n">cbench_data</span> <span class="o">/</span> <span class="s2">&quot;office_data&quot;</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">dataset_id</span><span class="si">}</span><span class="s2">.ps&quot;</span><span class="p">,</span> <span class="n">cwd</span> <span class="o">/</span> <span class="s2">&quot;input.ps&quot;</span>
+        <span class="p">)</span>
+        <span class="c1"># Ghostscript doesn&#39;t like the library files being symlinks so copy them</span>
+        <span class="c1"># into the working directory as regular files.</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="p">(</span><span class="n">cbench_data</span> <span class="o">/</span> <span class="s2">&quot;ghostscript&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">iterdir</span><span class="p">():</span>
+            <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.ps&quot;</span><span class="p">):</span>
+                <span class="n">shutil</span><span class="o">.</span><span class="n">copyfile</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">cwd</span> <span class="o">/</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">setup</span>
+
+
+<span class="n">validator</span><span class="p">(</span>
+    <span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;benchmark://cbench-v1/bitcount&quot;</span><span class="p">,</span>
+    <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;$BIN 1125000&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">validator</span><span class="p">(</span>
+    <span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;benchmark://cbench-v1/bitcount&quot;</span><span class="p">,</span>
+    <span class="n">cmd</span><span class="o">=</span><span class="s2">&quot;$BIN 512&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">21</span><span class="p">):</span>
+
+    <span class="c1"># NOTE(cummins): Disabled due to timeout errors, further investigation</span>
+    <span class="c1"># needed.</span>
+    <span class="c1">#</span>
+    <span class="c1"># validator(</span>
+    <span class="c1">#     benchmark=&quot;benchmark://cbench-v1/adpcm&quot;,</span>
+    <span class="c1">#     cmd=f&quot;$BIN $D/telecom_data/{i}.adpcm&quot;,</span>
+    <span class="c1">#     data=[f&quot;telecom_data/{i}.adpcm&quot;],</span>
+    <span class="c1"># )</span>
+    <span class="c1">#</span>
+    <span class="c1"># validator(</span>
+    <span class="c1">#     benchmark=&quot;benchmark://cbench-v1/adpcm&quot;,</span>
+    <span class="c1">#     cmd=f&quot;$BIN $D/telecom_data/{i}.pcm&quot;,</span>
+    <span class="c1">#     data=[f&quot;telecom_data/{i}.pcm&quot;],</span>
+    <span class="c1"># )</span>
+
+    <span class="n">validator</span><span class="p">(</span>
+        <span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;benchmark://cbench-v1/blowfish&quot;</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;$BIN d $D/office_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.benc output.txt 1234567890abcdeffedcba0987654321&quot;</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;office_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.benc&quot;</span><span class="p">],</span>
+        <span class="n">outs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;output.txt&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="n">validator</span><span class="p">(</span>
+        <span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;benchmark://cbench-v1/bzip2&quot;</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;$BIN -d -k -f -c $D/bzip2_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.bz2&quot;</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;bzip2_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.bz2&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="n">validator</span><span class="p">(</span>
+        <span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;benchmark://cbench-v1/crc32&quot;</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;$BIN $D/telecom_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.pcm&quot;</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;telecom_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.pcm&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="n">validator</span><span class="p">(</span>
+        <span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;benchmark://cbench-v1/dijkstra&quot;</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;$BIN $D/network_dijkstra_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.dat&quot;</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;network_dijkstra_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.dat&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="n">validator</span><span class="p">(</span>
+        <span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;benchmark://cbench-v1/gsm&quot;</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;$BIN -fps -c $D/telecom_gsm_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.au&quot;</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;telecom_gsm_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.au&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="c1"># NOTE(cummins): ispell fails with returncode 1 and no output when run</span>
+    <span class="c1"># under safe optimizations.</span>
+    <span class="c1">#</span>
+    <span class="c1"># validator(</span>
+    <span class="c1">#     benchmark=&quot;benchmark://cbench-v1/ispell&quot;,</span>
+    <span class="c1">#     cmd=f&quot;$BIN -a -d americanmed+ $D/office_data/{i}.txt&quot;,</span>
+    <span class="c1">#     data = [f&quot;office_data/{i}.txt&quot;],</span>
+    <span class="c1"># )</span>
+
+    <span class="n">validator</span><span class="p">(</span>
+        <span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;benchmark://cbench-v1/jpeg-c&quot;</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;$BIN -dct int -progressive -outfile output.jpeg $D/consumer_jpeg_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.ppm&quot;</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;consumer_jpeg_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.ppm&quot;</span><span class="p">],</span>
+        <span class="n">outs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;output.jpeg&quot;</span><span class="p">],</span>
+        <span class="c1"># NOTE(cummins): AddressSanitizer disabled because of</span>
+        <span class="c1"># global-buffer-overflow in regular build.</span>
+        <span class="n">sanitizers</span><span class="o">=</span><span class="p">[</span><span class="n">LlvmSanitizer</span><span class="o">.</span><span class="n">TSAN</span><span class="p">,</span> <span class="n">LlvmSanitizer</span><span class="o">.</span><span class="n">UBSAN</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="n">validator</span><span class="p">(</span>
+        <span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;benchmark://cbench-v1/jpeg-d&quot;</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;$BIN -dct int -outfile output.ppm $D/consumer_jpeg_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.jpg&quot;</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;consumer_jpeg_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.jpg&quot;</span><span class="p">],</span>
+        <span class="n">outs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;output.ppm&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="n">validator</span><span class="p">(</span>
+        <span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;benchmark://cbench-v1/patricia&quot;</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;$BIN $D/network_patricia_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.udp&quot;</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;network_patricia_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.udp&quot;</span><span class="p">],</span>
+        <span class="n">env</span><span class="o">=</span><span class="p">{</span>
+            <span class="c1"># NOTE(cummins): Benchmark leaks when executed with safe optimizations.</span>
+            <span class="s2">&quot;ASAN_OPTIONS&quot;</span><span class="p">:</span> <span class="s2">&quot;detect_leaks=0&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="n">validator</span><span class="p">(</span>
+        <span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;benchmark://cbench-v1/qsort&quot;</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;$BIN $D/automotive_qsort_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.dat&quot;</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;automotive_qsort_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.dat&quot;</span><span class="p">],</span>
+        <span class="n">outs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;sorted_output.dat&quot;</span><span class="p">],</span>
+        <span class="n">linkopts</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;-lm&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="c1"># NOTE(cummins): Rijndael benchmark disabled due to memory errors under</span>
+    <span class="c1"># basic optimizations.</span>
+    <span class="c1">#</span>
+    <span class="c1"># validator(benchmark=&quot;benchmark://cbench-v1/rijndael&quot;, cmd=f&quot;$BIN</span>
+    <span class="c1">#     $D/office_data/{i}.enc output.dec d</span>
+    <span class="c1">#     1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321&quot;,</span>
+    <span class="c1">#     data=[f&quot;office_data/{i}.enc&quot;], outs=[&quot;output.dec&quot;],</span>
+    <span class="c1"># )</span>
+    <span class="c1">#</span>
+    <span class="c1"># validator(benchmark=&quot;benchmark://cbench-v1/rijndael&quot;, cmd=f&quot;$BIN</span>
+    <span class="c1">#     $D/office_data/{i}.txt output.enc e</span>
+    <span class="c1">#     1234567890abcdeffedcba09876543211234567890abcdeffedcba0987654321&quot;,</span>
+    <span class="c1">#     data=[f&quot;office_data/{i}.txt&quot;], outs=[&quot;output.enc&quot;],</span>
+    <span class="c1"># )</span>
+
+    <span class="n">validator</span><span class="p">(</span>
+        <span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;benchmark://cbench-v1/sha&quot;</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;$BIN $D/office_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.txt&quot;</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;office_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.txt&quot;</span><span class="p">],</span>
+        <span class="n">compare_output</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">validate_result</span><span class="o">=</span><span class="n">validate_sha_output</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">validator</span><span class="p">(</span>
+        <span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;benchmark://cbench-v1/stringsearch&quot;</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;$BIN $D/office_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.txt $D/office_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.s.txt output.txt&quot;</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;office_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.txt&quot;</span><span class="p">],</span>
+        <span class="n">outs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;output.txt&quot;</span><span class="p">],</span>
+        <span class="n">env</span><span class="o">=</span><span class="p">{</span>
+            <span class="c1"># NOTE(cummins): Benchmark leaks when executed with safe optimizations.</span>
+            <span class="s2">&quot;ASAN_OPTIONS&quot;</span><span class="p">:</span> <span class="s2">&quot;detect_leaks=0&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+        <span class="n">linkopts</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;-lm&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="c1"># NOTE(cummins): The stringsearch2 benchmark has a very long execution time.</span>
+    <span class="c1"># Use only a single input to keep the validation time reasonable. I have</span>
+    <span class="c1"># also observed Segmentation fault on gold standard using 4.txt and 6.txt.</span>
+    <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">validator</span><span class="p">(</span>
+            <span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;benchmark://cbench-v1/stringsearch2&quot;</span><span class="p">,</span>
+            <span class="n">cmd</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;$BIN $D/office_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.txt $D/office_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.s.txt output.txt&quot;</span><span class="p">,</span>
+            <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;office_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.txt&quot;</span><span class="p">],</span>
+            <span class="n">outs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;output.txt&quot;</span><span class="p">],</span>
+            <span class="n">env</span><span class="o">=</span><span class="p">{</span>
+                <span class="c1"># NOTE(cummins): Benchmark leaks when executed with safe optimizations.</span>
+                <span class="s2">&quot;ASAN_OPTIONS&quot;</span><span class="p">:</span> <span class="s2">&quot;detect_leaks=0&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="c1"># TSAN disabled because of extremely long execution leading to</span>
+            <span class="c1"># timeouts.</span>
+            <span class="n">sanitizers</span><span class="o">=</span><span class="p">[</span><span class="n">LlvmSanitizer</span><span class="o">.</span><span class="n">ASAN</span><span class="p">,</span> <span class="n">LlvmSanitizer</span><span class="o">.</span><span class="n">MSAN</span><span class="p">,</span> <span class="n">LlvmSanitizer</span><span class="o">.</span><span class="n">UBSAN</span><span class="p">],</span>
+        <span class="p">)</span>
+
+    <span class="n">validator</span><span class="p">(</span>
+        <span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;benchmark://cbench-v1/susan&quot;</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;$BIN $D/automotive_susan_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.pgm output_large.corners.pgm -c&quot;</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;automotive_susan_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.pgm&quot;</span><span class="p">],</span>
+        <span class="n">outs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;output_large.corners.pgm&quot;</span><span class="p">],</span>
+        <span class="n">linkopts</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;-lm&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="n">validator</span><span class="p">(</span>
+        <span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;benchmark://cbench-v1/tiff2bw&quot;</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;$BIN $D/consumer_tiff_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.tif output.tif&quot;</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;consumer_tiff_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.tif&quot;</span><span class="p">],</span>
+        <span class="n">outs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;output.tif&quot;</span><span class="p">],</span>
+        <span class="n">linkopts</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;-lm&quot;</span><span class="p">],</span>
+        <span class="n">env</span><span class="o">=</span><span class="p">{</span>
+            <span class="c1"># NOTE(cummins): Benchmark leaks when executed with safe optimizations.</span>
+            <span class="s2">&quot;ASAN_OPTIONS&quot;</span><span class="p">:</span> <span class="s2">&quot;detect_leaks=0&quot;</span><span class="p">,</span>
+        <span class="p">},</span>
+    <span class="p">)</span>
+
+    <span class="n">validator</span><span class="p">(</span>
+        <span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;benchmark://cbench-v1/tiff2rgba&quot;</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;$BIN $D/consumer_tiff_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.tif output.tif&quot;</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;consumer_tiff_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.tif&quot;</span><span class="p">],</span>
+        <span class="n">outs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;output.tif&quot;</span><span class="p">],</span>
+        <span class="n">linkopts</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;-lm&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="n">validator</span><span class="p">(</span>
+        <span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;benchmark://cbench-v1/tiffdither&quot;</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;$BIN $D/consumer_tiff_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.bw.tif out.tif&quot;</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;consumer_tiff_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.bw.tif&quot;</span><span class="p">],</span>
+        <span class="n">outs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;out.tif&quot;</span><span class="p">],</span>
+        <span class="n">linkopts</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;-lm&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="n">validator</span><span class="p">(</span>
+        <span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;benchmark://cbench-v1/tiffmedian&quot;</span><span class="p">,</span>
+        <span class="n">cmd</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;$BIN $D/consumer_tiff_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.nocomp.tif output.tif&quot;</span><span class="p">,</span>
+        <span class="n">data</span><span class="o">=</span><span class="p">[</span><span class="sa">f</span><span class="s2">&quot;consumer_tiff_data/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.nocomp.tif&quot;</span><span class="p">],</span>
+        <span class="n">outs</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;output.tif&quot;</span><span class="p">],</span>
+        <span class="n">linkopts</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;-lm&quot;</span><span class="p">],</span>
+    <span class="p">)</span>
+
+    <span class="c1"># NOTE(cummins): On macOS the following benchmarks abort with an illegal</span>
+    <span class="c1"># hardware instruction error.</span>
+    <span class="c1"># if sys.platform != &quot;darwin&quot;:</span>
+    <span class="c1">#     validator(</span>
+    <span class="c1">#         benchmark=&quot;benchmark://cbench-v1/lame&quot;,</span>
+    <span class="c1">#         cmd=f&quot;$BIN $D/consumer_data/{i}.wav output.mp3&quot;,</span>
+    <span class="c1">#         data=[f&quot;consumer_data/{i}.wav&quot;],</span>
+    <span class="c1">#         outs=[&quot;output.mp3&quot;],</span>
+    <span class="c1">#         compare_output=False,</span>
+    <span class="c1">#         linkopts=[&quot;-lm&quot;],</span>
+    <span class="c1">#     )</span>
+
+    <span class="c1"># NOTE(cummins): Segfault on gold standard.</span>
+    <span class="c1">#</span>
+    <span class="c1">#     validator(</span>
+    <span class="c1">#         benchmark=&quot;benchmark://cbench-v1/ghostscript&quot;,</span>
+    <span class="c1">#         cmd=&quot;$BIN -sDEVICE=ppm -dNOPAUSE -dQUIET -sOutputFile=output.ppm -- input.ps&quot;,</span>
+    <span class="c1">#         data=[f&quot;office_data/{i}.ps&quot;],</span>
+    <span class="c1">#         outs=[&quot;output.ppm&quot;],</span>
+    <span class="c1">#         linkopts=[&quot;-lm&quot;, &quot;-lz&quot;],</span>
+    <span class="c1">#         pre_execution_callback=setup_ghostscript_library_files(i),</span>
+    <span class="c1">#     )</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright Facebook AI Research
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    <!-- Theme Analytics -->
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'G-T95G5EVYXM', 'auto');
+    ga('send', 'pageview');
+    </script>
+
+    
+   
+
+</body>
+</html>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Getting Started &mdash; CompilerGym 0.1.7 documentation</title>
+  <title>Getting Started &mdash; CompilerGym 0.1.8 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.7
+                0.1.8
               </div>
             
           
@@ -93,23 +93,15 @@
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#key-concepts">Key Concepts</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#building-from-source">Building from Source</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#macos">macOS</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#linux">Linux</a></li>
-<li class="toctree-l4"><a class="reference internal" href="#all-platforms">All platforms</a></li>
-</ul>
-</li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#using-compilergym">Using CompilerGym</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#selecting-an-environment">Selecting an environment</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#installing-benchmarks">Installing benchmarks</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#the-compiler-environment">The compiler environment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#interacting-with-the-environment">Interacting with the environment</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#using-the-command-line-tools">Using the command line tools</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#next-steps">Next Steps</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environment Reference</a></li>
@@ -206,26 +198,16 @@ started!</p>
 <p class="topic-title">Topics covered:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#key-concepts" id="id3">Key Concepts</a></p></li>
-<li><p><a class="reference internal" href="#installation" id="id4">Installation</a></p>
+<li><p><a class="reference internal" href="#installation" id="id4">Installation</a></p></li>
+<li><p><a class="reference internal" href="#using-compilergym" id="id5">Using CompilerGym</a></p>
 <ul>
-<li><p><a class="reference internal" href="#building-from-source" id="id5">Building from Source</a></p>
-<ul>
-<li><p><a class="reference internal" href="#macos" id="id6">macOS</a></p></li>
-<li><p><a class="reference internal" href="#linux" id="id7">Linux</a></p></li>
-<li><p><a class="reference internal" href="#all-platforms" id="id8">All platforms</a></p></li>
+<li><p><a class="reference internal" href="#selecting-an-environment" id="id6">Selecting an environment</a></p></li>
+<li><p><a class="reference internal" href="#the-compiler-environment" id="id7">The compiler environment</a></p></li>
+<li><p><a class="reference internal" href="#interacting-with-the-environment" id="id8">Interacting with the environment</a></p></li>
+<li><p><a class="reference internal" href="#using-the-command-line-tools" id="id9">Using the command line tools</a></p></li>
 </ul>
 </li>
-</ul>
-</li>
-<li><p><a class="reference internal" href="#using-compilergym" id="id9">Using CompilerGym</a></p>
-<ul>
-<li><p><a class="reference internal" href="#selecting-an-environment" id="id10">Selecting an environment</a></p></li>
-<li><p><a class="reference internal" href="#installing-benchmarks" id="id11">Installing benchmarks</a></p></li>
-<li><p><a class="reference internal" href="#the-compiler-environment" id="id12">The compiler environment</a></p></li>
-<li><p><a class="reference internal" href="#interacting-with-the-environment" id="id13">Interacting with the environment</a></p></li>
-<li><p><a class="reference internal" href="#using-the-command-line-tools" id="id14">Using the command line tools</a></p></li>
-</ul>
-</li>
+<li><p><a class="reference internal" href="#next-steps" id="id10">Next Steps</a></p></li>
 </ul>
 </div>
 <div class="section" id="key-concepts">
@@ -263,78 +245,11 @@ cumulative reward from these environments so as to produce the best programs.</p
 </div>
 <p>The binary works on macOS and Linux (on Ubuntu 18.04, Fedora 28, Debian
 10 or newer equivalents).</p>
-<div class="section" id="building-from-source">
-<h3><a class="toc-backref" href="#id5">Building from Source</a><a class="headerlink" href="#building-from-source" title="Permalink to this headline">¶</a></h3>
-<p>If you prefer, you may build from source. This requires a modern C++
-toolchain and bazel.</p>
-<div class="section" id="macos">
-<h4><a class="toc-backref" href="#id6">macOS</a><a class="headerlink" href="#macos" title="Permalink to this headline">¶</a></h4>
-<p>On macOS the required dependencies can be installed using
-<a class="reference external" href="https://docs.brew.sh/Installation">homebrew</a>:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>brew install bazelisk zlib
-<span class="nb">export</span> <span class="nv">LDFLAGS</span><span class="o">=</span><span class="s2">&quot;-L/usr/local/opt/zlib/lib&quot;</span>
-<span class="nb">export</span> <span class="nv">CPPFLAGS</span><span class="o">=</span><span class="s2">&quot;-I/usr/local/opt/zlib/include&quot;</span>
-<span class="nb">export</span> <span class="nv">PKG_CONFIG_PATH</span><span class="o">=</span><span class="s2">&quot;/usr/local/opt/zlib/lib/pkgconfig&quot;</span>
-</pre></div>
-</div>
-<p>Now proceed to <a class="reference external" href="#all-platforms">All platforms</a> below.</p>
-</div>
-<div class="section" id="linux">
-<h4><a class="toc-backref" href="#id7">Linux</a><a class="headerlink" href="#linux" title="Permalink to this headline">¶</a></h4>
-<p>On debian-based linux systems, install the required toolchain using:</p>
-<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sudo apt install clang libtinfo5 libjpeg-dev patchelf
-wget https://github.com/bazelbuild/bazelisk/releases/download/v1.7.5/bazelisk-linux-amd64 -O bazel
-chmod +x bazel <span class="o">&amp;&amp;</span> mkdir -p ~/.local/bin <span class="o">&amp;&amp;</span> mv -v bazel ~/.local/bin
-<span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.local/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
-<span class="nb">export</span> <span class="nv">CC</span><span class="o">=</span>clang
-<span class="nb">export</span> <span class="nv">CXX</span><span class="o">=</span>clang++
-</pre></div>
-</div>
-</div>
-<div class="section" id="all-platforms">
-<h4><a class="toc-backref" href="#id8">All platforms</a><a class="headerlink" href="#all-platforms" title="Permalink to this headline">¶</a></h4>
-<p>We recommend using
-<a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/">conda</a>
-to manage the remaining build dependencies. First create a conda
-environment with the required dependencies:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">compiler_gym</span> <span class="n">python</span><span class="o">=</span><span class="mf">3.9</span> <span class="n">cmake</span> <span class="n">pandoc</span>
-<span class="n">conda</span> <span class="n">activate</span> <span class="n">compiler_gym</span>
-</pre></div>
-</div>
-<p>Then clone the CompilerGym source code using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">facebookresearch</span><span class="o">/</span><span class="n">CompilerGym</span><span class="o">.</span><span class="n">git</span>
-<span class="n">cd</span> <span class="n">CompilerGym</span>
-</pre></div>
-</div>
-<p>Install the python development dependencies using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">init</span>
-</pre></div>
-</div>
-<p>The <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">init</span></code> target only needs to be run once on initial setup, or
-when upgrading to a different CompilerGym release.</p>
-<p>Run the test suite to confirm that everything is working:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">test</span>
-</pre></div>
-</div>
-<p>To build and install the <code class="docutils literal notranslate"><span class="pre">compiler_gym</span></code> python package, run:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">install</span>
-</pre></div>
-</div>
-<p><strong>NOTE:</strong> To use the <code class="docutils literal notranslate"><span class="pre">compiler_gym</span></code> package that is installed by
-<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">install</span></code> you must leave the root directory of this repository.
-Attempting to import <code class="docutils literal notranslate"><span class="pre">compiler_gym</span></code> while in the root of this
-repository will cause import errors.</p>
-<p>When you are finished, you can deactivate and delete the conda
-environment using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">deactivate</span>
-<span class="n">conda</span> <span class="n">env</span> <span class="n">remove</span> <span class="o">-</span><span class="n">n</span> <span class="n">compiler_gym</span>
-</pre></div>
-</div>
-</div>
-</div>
+<p>See <a class="reference external" href="https://github.com/facebookresearch/CompilerGym#building-from-source">the Readme file</a> for
+alternative installation methods.</p>
 </div>
 <div class="section" id="using-compilergym">
-<h2><a class="toc-backref" href="#id9">Using CompilerGym</a><a class="headerlink" href="#using-compilergym" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id5">Using CompilerGym</a><a class="headerlink" href="#using-compilergym" title="Permalink to this headline">¶</a></h2>
 <p>Begin by firing up a python interpreter:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span>
 </pre></div>
@@ -351,7 +266,7 @@ environment using:</p>
 </pre></div>
 </div>
 <div class="section" id="selecting-an-environment">
-<h3><a class="toc-backref" href="#id10">Selecting an environment</a><a class="headerlink" href="#selecting-an-environment" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id6">Selecting an environment</a><a class="headerlink" href="#selecting-an-environment" title="Permalink to this headline">¶</a></h3>
 <p>CompilerGym environments are named using one of the following formats:</p>
 <ol class="arabic simple">
 <li><p><code class="code docutils literal notranslate"><span class="pre">&lt;compiler&gt;-&lt;observation&gt;-&lt;reward&gt;-&lt;version&gt;</span></code></p></li>
@@ -363,10 +278,9 @@ environment using:</p>
 and <code class="code docutils literal notranslate"><span class="pre">&lt;reward&gt;</span></code> is the reward signal.</p>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-<p>A key concept is that
-CompilerGym environments enables <strong>lazy evaluation</strong> of observations and
-reward signals. This makes the environment much more computationally
-efficient for scenarios in which you do not need to compute a reward or
+<p>A key concept is that CompilerGym environments enables <strong>lazy evaluation</strong>
+of observations and reward signals. This increases computational efficiency
+sampling for scenarios in which you do not need to compute a reward or
 observation for every step. If an environment omits a <code class="code docutils literal notranslate"><span class="pre">&lt;observation&gt;</span></code>
 or <code class="code docutils literal notranslate"><span class="pre">&lt;reward&gt;</span></code> tag, this means that no observation or reward is
 provided by default. See <a class="reference internal" href="compiler_gym/views.html"><span class="doc">compiler_gym.views</span></a> for
@@ -382,43 +296,23 @@ further details.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-autophase-ic-v0&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
-</div>
-<div class="section" id="installing-benchmarks">
-<h3><a class="toc-backref" href="#id11">Installing benchmarks</a><a class="headerlink" href="#installing-benchmarks" title="Permalink to this headline">¶</a></h3>
-<p>A compiler requires a program as input. For the purposes of CompilerGym we call
-these input programs <em>benchmarks</em>, and collections of benchmarks are assembled
-into <em>datasets</em>. You may provide your own programs to use as benchmarks, or
-download one of our pre-assembled datasets.</p>
-<p>The benchmarks that are available to an environment can be queried using
-<a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.benchmarks" title="compiler_gym.envs.CompilerEnv.benchmarks"><code class="xref py py-attr docutils literal notranslate"><span class="pre">env.benchmarks</span></code></a>:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">benchmarks</span>
-<span class="go">[]</span>
-</pre></div>
-</div>
-<p>As you can see, there are no benchmarks installed by default. We have provided
-a collection of pre-assembled
-<a class="reference internal" href="llvm/index.html#datasets"><span class="std std-ref">LLVM benchmark datasets</span></a> that can be
-installed using
-<a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.require_dataset" title="compiler_gym.envs.CompilerEnv.require_dataset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.require_dataset()</span></code></a>.
-For this tutorial we will use the
-<a class="reference external" href="https://www.nas.nasa.gov/publications/npb.html">NAS Parallel Benchmarks</a>
-dataset:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">require_dataset</span><span class="p">(</span><span class="s2">&quot;npb-v0&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Now, <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.benchmarks" title="compiler_gym.envs.CompilerEnv.benchmarks"><code class="xref py py-attr docutils literal notranslate"><span class="pre">env.benchmarks</span></code></a> lists
-the 123 benchmarks that comprise the dataset we just installed:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">benchmarks</span>
-<span class="go">[&#39;benchmark://npb-v0/46&#39;, &#39;benchmark://npb-v0/17&#39;, ...]</span>
-</pre></div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The first time you run <code class="code docutils literal notranslate"><span class="pre">gym.make()</span></code> you may see a logging message
+“Downloading &lt;url&gt; …” followed by a delay of 1-2 minutes. This is
+CompilerGym downloading large environment-specific dependencies that are not
+shipped by default to keep the size of the package down. This is a one-off
+download that occurs only the first time the environment is used. Other
+operations that require one-off downloads include installing datasets
+(described below).</p>
 </div>
 </div>
 <div class="section" id="the-compiler-environment">
-<h3><a class="toc-backref" href="#id12">The compiler environment</a><a class="headerlink" href="#the-compiler-environment" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id7">The compiler environment</a><a class="headerlink" href="#the-compiler-environment" title="Permalink to this headline">¶</a></h3>
 <p>If you have experience using <a class="reference external" href="https://gym.openai.com/">OpenAI Gym</a>, the
 CompilerGym environments will be familiar. If not, you can call <code class="code docutils literal notranslate"><span class="pre">help()</span></code>
 on any function, object, or method to query the documentation:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">help</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">help</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>The action space is described by
@@ -434,9 +328,9 @@ The <a class="reference internal" href="llvm/index.html#action-space"><span clas
 <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.observation_space" title="compiler_gym.envs.CompilerEnv.observation_space"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.observation_space</span></code></a>.
 The <a class="reference internal" href="llvm/index.html#autophase"><span class="std std-ref">Autophase</span></a> observation space is a 56-dimension
 vector of integers:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">shape</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">shape</span>
 <span class="go">(56,)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">space</span><span class="o">.</span><span class="n">dtype</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation_space</span><span class="o">.</span><span class="n">dtype</span>
 <span class="go">dtype(&#39;int64&#39;)</span>
 </pre></div>
 </div>
@@ -446,31 +340,27 @@ vector of integers:</p>
 <span class="go">(0.0, inf)</span>
 </pre></div>
 </div>
-<p>As with other Gym environments,
-<a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code></a>
-must be called before a CompilerGym environment may be used:</p>
+<p>As with other Gym environments, <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code></a> must be called before a CompilerGym
+environment may be used.</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
-<span class="go">array([   0,    0,  399,  381,   10,  399,  147,    8,  137,  147,    0,</span>
-<span class="go">          0,    0,  556,    0,  546,    0,   15,  693,  574, 1214, 1180,</span>
-<span class="go">        384,  399,  214,    0,  120,  116,    0,   88,  468,    8,  546,</span>
-<span class="go">         16, 1073,  147,    0, 1551,    0,    0,    0,   10,  766,    0,</span>
-<span class="go">          0,  505,   46,    0,    0,    0,  556, 5075, 3261,   13,    0,</span>
-<span class="go">       2441])</span>
+<span class="go">array([  0,   4,  54,  39,  12,  46,  23,   6,  12,  31,   2,   4,   0,</span>
+<span class="go">        81,   4,  77,  13,  15, 108, 106,  75,  51,  71,  46,  15,   0,</span>
+<span class="go">         9,  46,   0,  13,  72,  51,  77,  81,  39,  31,   0, 163,   2,</span>
+<span class="go">         0,   4,   6,  13,   1,   0,  73,   8,   1,   0,  15,  85, 638,</span>
+<span class="go">       402,  16,  10, 298])</span>
 </pre></div>
 </div>
-<p>The numpy array that is returned here is the initial
-<a class="reference internal" href="llvm/index.html#autophase"><span class="std std-ref">Autophase</span></a> observation. Calling
-<a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.reset()</span></code></a> starts an
-instance of the compiler and selects a random benchmark to use. You can see
-which benchmark is currently being used by an environment using
-<a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.benchmark" title="compiler_gym.envs.CompilerEnv.benchmark"><code class="xref py py-attr docutils literal notranslate"><span class="pre">env.benchmark</span></code></a>:</p>
+<p>The numpy array that is returned by <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code></a> is the initial observation of the program
+state. This value, along with the entire dynamics of the environment, depends on
+the particular program that is being compiled. In CompilerGym these programs are
+called <strong>benchmarks</strong>. You can see which benchmark is currently being used by an
+environment using <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.benchmark" title="compiler_gym.envs.CompilerEnv.benchmark"><code class="xref py py-attr docutils literal notranslate"><span class="pre">env.benchmark</span></code></a>:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">benchmark</span>
-<span class="go">&#39;benchmark://npb-v0/90&#39;</span>
+<span class="go">benchmark://cbench-v1/qsort</span>
 </pre></div>
 </div>
-<p>If we want to force the environment to use a specific benchmark, we can pass the
-name of the benchmark as an argument to
-<a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.reset()</span></code></a>:</p>
+<p>If we want to compile a different program, we can pass the name of a benchmark
+to <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.reset()</span></code></a>:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;benchmark://npb-v0/50&quot;</span><span class="p">)</span>
 <span class="go">array([   0,    0,   26,   25,    1,   26,   10,    1,    8,   10,    0,</span>
 <span class="go">          0,    0,   37,    0,   36,    0,    2,   46,  175, 1664, 1212,</span>
@@ -480,9 +370,13 @@ name of the benchmark as an argument to
 <span class="go">       1262])</span>
 </pre></div>
 </div>
+<p>We provide over <a class="reference internal" href="llvm/index.html#datasets"><span class="std std-ref">a million benchmarks for the LLVM environments</span></a> that can be used for training agents and evaluating the
+generalization of strategies across unseen programs. Benchmarks are grouped into
+<em>datasets</em> , which are managed using <a class="reference internal" href="compiler_gym/datasets.html#compiler_gym.datasets.Datasets" title="compiler_gym.datasets.Datasets"><code class="xref py py-class docutils literal notranslate"><span class="pre">env.datasets</span></code></a>. You may also provide your own programs to use
+as benchmarks, see <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.make_benchmark" title="compiler_gym.envs.LlvmEnv.make_benchmark"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.make_benchmark()</span></code></a> for details.</p>
 </div>
 <div class="section" id="interacting-with-the-environment">
-<h3><a class="toc-backref" href="#id13">Interacting with the environment</a><a class="headerlink" href="#interacting-with-the-environment" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id8">Interacting with the environment</a><a class="headerlink" href="#interacting-with-the-environment" title="Permalink to this headline">¶</a></h3>
 <p>Once an environment has been initialized, you interact with it in the same way
 that you would with any other <a class="reference external" href="https://gym.openai.com/">OpenAI Gym</a>
 environment. <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.render" title="compiler_gym.envs.LlvmEnv.render"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.render()</span></code></a> prints
@@ -566,12 +460,12 @@ the sequence of actions we just run:</p>
 <span class="go">&#39;opt -consthoist -sancov -inferattrs ... -place-safepoints input.bc -o output.bc&#39;</span>
 </pre></div>
 </div>
-<p>We can also save the program for future reference:</p>
+<p>We can also save the program in its current state for future reference:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">write_bitcode</span><span class="p">(</span><span class="s2">&quot;~/program.bc&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <p>Once we are finished, we must close the environment to end the compiler
-instance:</p>
+session:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 </pre></div>
 </div>
@@ -579,9 +473,24 @@ instance:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">exit</span><span class="p">()</span>
 </pre></div>
 </div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Internally, CompilerGym environments may launch subprocesses and use
+temporary files to communicate between the environment and the underlying
+compiler (see <a class="reference internal" href="compiler_gym/service.html"><span class="doc">compiler_gym.service</span></a> for
+details). This means it is important to call <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.close" title="compiler_gym.envs.CompilerEnv.close"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.close()</span></code></a> after use to free up resources and
+prevent orphan subprocesses or files. We recommend using the <code class="code docutils literal notranslate"><span class="pre">with</span></code>
+statement pattern for creating environments:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-autophase-ic-v0&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">env</span><span class="p">:</span>
+<span class="gp">... </span>   <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+<span class="gp">... </span>   <span class="c1"># use env how you like</span>
+</pre></div>
+</div>
+<p>This removes the need to call <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.close" title="compiler_gym.envs.CompilerEnv.close"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.close()</span></code></a> yourself.</p>
+</div>
 </div>
 <div class="section" id="using-the-command-line-tools">
-<h3><a class="toc-backref" href="#id14">Using the command line tools</a><a class="headerlink" href="#using-the-command-line-tools" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id9">Using the command line tools</a><a class="headerlink" href="#using-the-command-line-tools" title="Permalink to this headline">¶</a></h3>
 <p>CompilerGym includes a set of useful <a class="reference internal" href="cli.html"><span class="doc">command line tools</span></a>. Each of
 the steps above could be replicated from the command line.</p>
 <p>For example, <a class="reference internal" href="cli.html#module-compiler_gym.bin.service" title="compiler_gym.bin.service"><code class="xref py py-mod docutils literal notranslate"><span class="pre">compiler_gym.bin.service</span></code></a> can be used to list the available
@@ -593,66 +502,95 @@ llvm-v0
 </div>
 <p>And to describe the capabilities of each environment:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.service --env=llvm-v0
-# CompilerGym Service `/path/to/compiler_gym/envs/llvm/service/compiler_gym-llvm-service`
 
-## Programs
+Datasets
+--------
 
-+------------------------+
-| Benchmark              |
-+========================+
-| benchmark://npb-v0/1   |
-+------------------------+
-
++----------------------------+--------------------------+------------------------------+
+| Dataset                    | Num. Benchmarks [#f1]_   | Description                  |
++============================+==========================+==============================+
+| benchmark://anghabench-v0  | 1,042,976                | Compile-only C/C++ functions |
++----------------------------+--------------------------+------------------------------+
+| benchmark://blas-v0        | 300                      | Basic linear algebra kernels |
++----------------------------+--------------------------+------------------------------+
 ...
 
-## Action Spaces
+Observation Spaces
+------------------
 
-
-### `PassesAll` (Commandline)
-
-+---------------------------------------+-----------------------------------+-------------------------------+
-| Action                                | Flag                              | Description                   |
-+=======================================+===================================+===============================+
-| AddDiscriminatorsPass                 | `-add-discriminators`             | Add DWARF path discriminators |
-+---------------------------------------+-----------------------------------+-------------------------------+
++--------------------------+----------------------------------------------+
+| Observation space        | Shape                                        |
++==========================+==============================================+
+| Autophase                | `Box(0, 9223372036854775807, (56,), int64)`  |
++--------------------------+----------------------------------------------+
+| AutophaseDict            | `Dict(ArgsPhi:int&lt;0,inf&gt;, BB03Phi:int&lt;0,...` |
++--------------------------+----------------------------------------------+
+| BitcodeFile              | `str_list&lt;&gt;[0,4096.0])`                      |
++--------------------------+----------------------------------------------+
 ...
 </pre></div>
 </div>
-<p>The <a class="reference internal" href="cli.html#module-compiler_gym.bin.manual_env" title="compiler_gym.bin.manual_env"><code class="xref py py-mod docutils literal notranslate"><span class="pre">compiler_gym.bin.manual_env</span></code></a> module provides a thin text user
-interface around the environment for interactive sessions:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.manual_env --env=llvm-autophase-ic-v0 --benchmark=npb-v0/50
-Initialized environment in 264.9ms
-Reset benchmark://npb-v0/50 environment in 27.6ms
-Observation: [  0   0  11  10   1  11   5   1   3   5   0   0   0  17   0  16   0   2
-  21  20  50  44  18  11   6   0   3  10   0   1  16   0  16   2  40   5
-   0  59   0   0   0   1  30   0   0  18   0   0   0   0  17 193 129   4
-   0  99]
+<p>The <a class="reference internal" href="cli.html#module-compiler_gym.bin.manual_env" title="compiler_gym.bin.manual_env"><code class="xref py py-mod docutils literal notranslate"><span class="pre">compiler_gym.bin.manual_env</span></code></a> module provides an interactive text user
+interface for CompilerGym environments:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.manual_env --env=llvm-v0
+Initialized environment in 144.3ms
+Welcome to the CompilerGym Shell!
+---------------------------------
+Type help or ? for more information.
+The &#39;tutorial&#39; command will give a step by step guide.
+
+compiler_gym:cbench-v1/qsort&gt; help
+
+Documented commands (type help &lt;topic&gt;):
+========================================
+action       help               list_rewards     set_default_observation
+back         hill_climb         observation      set_default_reward
+breakpoint   list_actions       require_dataset  simplify_stack
+commandline  list_benchmarks    reset            stack
+exit         list_datasets      reward           try_all_actions
+greedy       list_observations  set_benchmark    tutorial
 </pre></div>
 </div>
-<p>Finally, the <a class="reference internal" href="cli.html#module-compiler_gym.bin.random_search" title="compiler_gym.bin.random_search"><code class="xref py py-mod docutils literal notranslate"><span class="pre">compiler_gym.bin.random_search</span></code></a> module provides a simple
-but powerful strategy for randomly searching the optimization space:</p>
+<p>Finally, the <a class="reference internal" href="cli.html#module-compiler_gym.bin.random_search" title="compiler_gym.bin.random_search"><code class="xref py py-mod docutils literal notranslate"><span class="pre">compiler_gym.bin.random_search</span></code></a> module provides a simple but
+efficient implementation for randomly searching the optimization space:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.random_search --env=llvm-autophase-ic-v0 --benchmark=npb-v0/50 --runtime=10
-
-Started 16 worker threads for benchmark://npb-v0/50 (3,008 instructions) using reward IrInstructionCountOz.
-Writing logs to /home/user/logs/compiler_gym/random/npb-v0/50/2020-12-03T17:24:17.304887
+Started 24 worker threads for using reward IrInstructionCountOz.
+Writing logs to /home/user/logs/compiler_gym/random/npb-v0/50/2021-04-21T16:42:41.038447
 === Running for 10 seconds ===
-Runtime: 10 seconds. Num steps: 32,287 (3,206 / sec). Num episodes: 285 (28 / sec). Num restarts: 0.
-Best reward: 107.85% (69 passes, found after 9 seconds)
+Runtime: 10 seconds. Num steps: 21,563 (2,105 / sec). Num episodes: 141 (13 / sec). Num restarts: 0.
+Best reward: 1.0228 (141 passes, found after 4 seconds)
 
 Ending worker threads ... done
 Replaying actions from best solution found:
-Step [000 / 069]: reward=31.52%
-Step [001 / 069]: reward=31.52%, change=0.00%, action=SlpvectorizerPass
-Step [002 / 069]: reward=37.09%, change=5.57%, action=Sroapass
+Step [001 / 141]: reward=0.0000         episode=0.0000          action=-hotcoldsplit
+Step [002 / 141]: reward=0.0000         episode=0.0000          action=-scalarizer
+Step [003 / 141]: reward=0.0000         episode=0.0000          action=-redundant-dbg-inst-elim
 ...
-Step [067 / 069]: reward=107.60%, change=0.00%, action=InductiveRangeCheckEliminationPass
-Step [068 / 069]: reward=107.60%, change=0.00%, action=LoopDeletionPass
-Step [069 / 069]: reward=107.85%, change=0.24%, action=Gvnpass
+Step [139 / 141]: reward=0.0000         episode=1.0218          action=-barrier
+Step [140 / 141]: reward=0.0000         episode=1.0218          action=-sink
+Step [141 / 141]: reward=0.0010         episode=1.0228          action=-loop-simplifycfg
++---------------------------+-------+-------+---------+
+|                           |   -O0 |   -Oz |   final |
++===========================+=======+=======+=========+
+| IR instruction count      |  3008 |   948 |     901 |
++---------------------------+-------+-------+---------+
+| Object .text size (bytes) | 13047 | 10991 |   10399 |
++---------------------------+-------+-------+---------+
 </pre></div>
 </div>
-<p>To beat the compiler by 7.85% after 10 seconds of random trials is not bad
+<p>To beat the compiler by 2.28% after 10 seconds of random trials is not bad
 going!</p>
 </div>
+</div>
+<div class="section" id="next-steps">
+<h2><a class="toc-backref" href="#id10">Next Steps</a><a class="headerlink" href="#next-steps" title="Permalink to this headline">¶</a></h2>
+<p>Now that you have got to grips with the compiler environment, take a browse
+through the <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/tree/stable/examples">examples directory</a> for
+pytorch integration, agent implementations, etc. Then check out <a class="reference external" href="https://github.com/facebookresearch/CompilerGym#leaderboards">the
+leaderboards</a> to
+see what the best performing algorithms are, and <a class="reference external" href="https://facebookresearch.github.io/CompilerGym/">the documentation</a> for details of the APIs and
+environments. We love feedback, bug reports, and feature requests - please <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/issues/new/choose">file
+an issue</a>!</p>
 </div>
 </div>
 

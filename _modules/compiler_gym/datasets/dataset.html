@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.datasets.dataset &mdash; CompilerGym 0.1.7 documentation</title>
+  <title>compiler_gym.datasets.dataset &mdash; CompilerGym 0.1.8 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.7
+                0.1.8
               </div>
             
           
@@ -175,283 +175,472 @@
 <span class="c1">#</span>
 <span class="c1"># This source code is licensed under the MIT license found in the</span>
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
-<span class="kn">import</span> <span class="nn">io</span>
-<span class="kn">import</span> <span class="nn">json</span>
+<span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
-<span class="kn">import</span> <span class="nn">tarfile</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">fasteners</span>
-<span class="kn">from</span> <span class="nn">deprecated.sphinx</span> <span class="kn">import</span> <span class="n">deprecated</span>
+<span class="kn">from</span> <span class="nn">deprecated.sphinx</span> <span class="kn">import</span> <span class="n">deprecated</span> <span class="k">as</span> <span class="n">mark_deprecated</span>
 
-<span class="kn">from</span> <span class="nn">compiler_gym.util.download</span> <span class="kn">import</span> <span class="n">download</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets.benchmark</span> <span class="kn">import</span> <span class="n">Benchmark</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets.uri</span> <span class="kn">import</span> <span class="n">DATASET_NAME_RE</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.debug_util</span> <span class="kn">import</span> <span class="n">get_logging_level</span>
 
 
-<div class="viewcode-block" id="LegacyDataset"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.LegacyDataset">[docs]</a><span class="k">class</span> <span class="nc">LegacyDataset</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A collection of benchmarks for use by an environment.</span>
+<div class="viewcode-block" id="Dataset"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Dataset">[docs]</a><span class="k">class</span> <span class="nc">Dataset</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A dataset is a collection of benchmarks.</span>
 
-<span class="sd">    .. deprecated:: 0.1.4</span>
-<span class="sd">       The next release of CompilerGym will introduce a new API for describing</span>
-<span class="sd">       datasets with extended functionality. See</span>
-<span class="sd">       `here &lt;https://github.com/facebookresearch/CompilerGym/issues/45&gt;`_ for</span>
-<span class="sd">       more information.</span>
+<span class="sd">    The Dataset class has methods for installing and managing groups of</span>
+<span class="sd">    benchmarks, for listing the available benchmark URIs, and for instantiating</span>
+<span class="sd">    :class:`Benchmark &lt;compiler_gym.datasets.Benchmark&gt;` objects.</span>
+
+<span class="sd">    The Dataset class is an abstract base for implementing datasets. At a</span>
+<span class="sd">    minimum, subclasses must implement the :meth:`benchmark()</span>
+<span class="sd">    &lt;compiler_gym.datasets.Dataset.benchmark&gt;` and :meth:`benchmark_uris()</span>
+<span class="sd">    &lt;compiler_gym.datasets.Dataset.benchmark_uris&gt;` methods, and :meth:`size</span>
+<span class="sd">    &lt;compiler_gym.datasets.Dataset.size&gt;`. Other methods such as</span>
+<span class="sd">    :meth:`install() &lt;compiler_gym.datasets.Dataset.install&gt;` may be used where</span>
+<span class="sd">    helpful.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">name</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="sd">&quot;&quot;&quot;The name of the dataset.&quot;&quot;&quot;</span>
+<div class="viewcode-block" id="Dataset.__init__"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Dataset.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">license</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>  <span class="c1"># pylint: disable=redefined-builtin</span>
+        <span class="n">site_data_base</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+        <span class="n">benchmark_class</span><span class="o">=</span><span class="n">Benchmark</span><span class="p">,</span>
+        <span class="n">references</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">deprecated</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">sort_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">logger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">validatable</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;No&quot;</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor.</span>
 
-    <span class="n">license</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="sd">&quot;&quot;&quot;The license of the dataset.&quot;&quot;&quot;</span>
+<span class="sd">        :param name: The name of the dataset. Must conform to the pattern</span>
+<span class="sd">            :code:`{{protocol}}://{{name}}-v{{version}}`.</span>
 
-    <span class="n">file_count</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="sd">&quot;&quot;&quot;The number of files in the unpacked dataset.&quot;&quot;&quot;</span>
+<span class="sd">        :param description: A short human-readable description of the dataset.</span>
 
-    <span class="n">size_bytes</span><span class="p">:</span> <span class="nb">int</span>
-    <span class="sd">&quot;&quot;&quot;The size of the unpacked dataset in bytes.&quot;&quot;&quot;</span>
+<span class="sd">        :param license: The name of the dataset&#39;s license.</span>
 
-    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="sd">&quot;&quot;&quot;A URL where the dataset can be downloaded from. May be an empty string.&quot;&quot;&quot;</span>
+<span class="sd">        :param site_data_base: The base path of a directory that will be used to</span>
+<span class="sd">            store installed files.</span>
 
-    <span class="n">sha256</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="sd">&quot;&quot;&quot;The sha256 checksum of the dataset archive. If provided, this is used to</span>
-<span class="sd">    verify the contents of the dataset upon download.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
+<span class="sd">        :param benchmark_class: The class to use when instantiating benchmarks.</span>
+<span class="sd">            It must have the same constructor signature as :class:`Benchmark</span>
+<span class="sd">            &lt;compiler_gym.datasets.Benchmark&gt;`.</span>
 
-    <span class="n">compiler</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="sd">&quot;&quot;&quot;The name of the compiler that this dataset supports.&quot;&quot;&quot;</span>
+<span class="sd">        :param references: A dictionary of useful named URLs for this dataset</span>
+<span class="sd">            containing extra information, download links, papers, etc.</span>
 
-    <span class="n">description</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="sd">&quot;&quot;&quot;An optional human-readable description of the dataset.&quot;&quot;&quot;</span>
+<span class="sd">        :param deprecated: Mark the dataset as deprecated and issue a warning</span>
+<span class="sd">            when :meth:`install() &lt;compiler_gym.datasets.Dataset.install&gt;`,</span>
+<span class="sd">            including the given method. Deprecated datasets are excluded from</span>
+<span class="sd">            the :meth:`datasets() &lt;compiler_gym.datasets.Datasets.dataset&gt;`</span>
+<span class="sd">            iterator by default.</span>
 
-    <span class="n">platforms</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;macos&quot;</span><span class="p">,</span> <span class="s2">&quot;linux&quot;</span><span class="p">]</span>
-    <span class="sd">&quot;&quot;&quot;A list of platforms supported by this dataset. Allowed platforms &#39;macos&#39; and &#39;linux&#39;.&quot;&quot;&quot;</span>
+<span class="sd">        :param sort_order: An optional numeric value that should be used to</span>
+<span class="sd">            order this dataset relative to others. Lowest value sorts first.</span>
 
-    <span class="n">deprecated_since</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
-    <span class="sd">&quot;&quot;&quot;The CompilerGym release in which this dataset was deprecated.&quot;&quot;&quot;</span>
+<span class="sd">        :param validatable: Whether the dataset is validatable. A validatable</span>
+<span class="sd">            dataset is one where the behavior of the benchmarks can be checked</span>
+<span class="sd">            by compiling the programs to binaries and executing them. If the</span>
+<span class="sd">            benchmarks crash, or are found to have different behavior, then</span>
+<span class="sd">            validation fails. This type of validation is used to check that the</span>
+<span class="sd">            compiler has not broken the semantics of the program. This value</span>
+<span class="sd">            takes a string and is used for documentation purposes only.</span>
+<span class="sd">            Suggested values are &quot;Yes&quot;, &quot;No&quot;, or &quot;Partial&quot;.</span>
+
+<span class="sd">        :raises ValueError: If :code:`name` does not match the expected type.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="n">components</span> <span class="o">=</span> <span class="n">DATASET_NAME_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">components</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Invalid dataset name: &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
+                <span class="s2">&quot;Dataset name must be in the form: &#39;{{protocol}}://{{name}}-v{{version}}&#39;&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="o">=</span> <span class="n">description</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_license</span> <span class="o">=</span> <span class="n">license</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span> <span class="o">=</span> <span class="n">components</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;dataset_protocol&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_version</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">components</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;dataset_version&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_references</span> <span class="o">=</span> <span class="n">references</span> <span class="ow">or</span> <span class="p">{}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_deprecation_message</span> <span class="o">=</span> <span class="n">deprecated</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validatable</span> <span class="o">=</span> <span class="n">validatable</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">sort_order</span> <span class="o">=</span> <span class="n">sort_order</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">benchmark_class</span> <span class="o">=</span> <span class="n">benchmark_class</span>
+
+        <span class="c1"># Set up the site data name.</span>
+        <span class="n">basename</span> <span class="o">=</span> <span class="n">components</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;dataset_name&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_site_data_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">site_data_base</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol</span> <span class="o">/</span> <span class="n">basename</span></div>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">logger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;The logger for this dataset.</span>
+
+<span class="sd">        :type: logging.Logger</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># NOTE(cummins): Default logger instantiation is deferred since in</span>
+        <span class="c1"># Python 3.6 the Logger instance contains an un-pickle-able Rlock()</span>
+        <span class="c1"># which can prevent gym.make() from working. This is a workaround that</span>
+        <span class="c1"># can be removed once Python 3.6 support is dropped.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;compiler_gym.datasets&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">get_logging_level</span><span class="p">())</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;The name of the dataset.</span>
+
+<span class="sd">        :type: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_name</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">description</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;A short human-readable description of the dataset.</span>
+
+<span class="sd">        :type: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_description</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">license</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;The name of the license of the dataset.</span>
+
+<span class="sd">        :type: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_license</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">protocol</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;The URI protocol that is used to identify benchmarks in this dataset.</span>
+
+<span class="sd">        :type: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;The version tag for this dataset.</span>
+
+<span class="sd">        :type: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_version</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">references</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;A dictionary of useful named URLs for this dataset containing extra</span>
+<span class="sd">        information, download links, papers, etc.</span>
+
+<span class="sd">        For example:</span>
+
+<span class="sd">            &gt;&gt;&gt; dataset.references</span>
+<span class="sd">            {&#39;Paper&#39;: &#39;https://arxiv.org/pdf/1407.3487.pdf&#39;,</span>
+<span class="sd">            &#39;Homepage&#39;: &#39;https://ctuning.org/wiki/index.php/CTools:CBench&#39;}</span>
+
+<span class="sd">        :type: Dict[str, str]</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_references</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">deprecated</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Whether the dataset is deprecated.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">bool</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">deprecated_since</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;Whether the dataset is included in the iterable sequence of datasets</span>
+<span class="sd">        of a containing :class:`Datasets &lt;compiler_gym.datasets.Datasets&gt;`</span>
+<span class="sd">        collection.</span>
 
-<div class="viewcode-block" id="LegacyDataset.from_json_file"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.LegacyDataset.from_json_file">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_json_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;LegacyDataset&quot;</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Construct a dataset form a JSON metadata file.</span>
-
-<span class="sd">        :param path: Path of the JSON metadata.</span>
-<span class="sd">        :return: A LegacyDataset instance.</span>
+<span class="sd">        :type: bool</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
-        <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">decoder</span><span class="o">.</span><span class="n">JSONDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Failed to read dataset metadata file:</span><span class="se">\n</span><span class="s2">&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Path: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_deprecation_message</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">validatable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Whether the dataset is validatable. A validatable dataset is one</span>
+<span class="sd">        where the behavior of the benchmarks can be checked by compiling the</span>
+<span class="sd">        programs to binaries and executing them. If the benchmarks crash, or are</span>
+<span class="sd">        found to have different behavior, then validation fails. This type of</span>
+<span class="sd">        validation is used to check that the compiler has not broken the</span>
+<span class="sd">        semantics of the program.</span>
+
+<span class="sd">        This property takes a string and is used for documentation purposes</span>
+<span class="sd">        only. Suggested values are &quot;Yes&quot;, &quot;No&quot;, or &quot;Partial&quot;.</span>
+
+<span class="sd">        :type: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validatable</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">site_data_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;The filesystem path used to store persistent dataset files.</span>
+
+<span class="sd">        This directory may not exist.</span>
+
+<span class="sd">        :type: Path</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_site_data_path</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">site_data_size_in_bytes</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;The total size of the on-disk data used by this dataset.</span>
+
+<span class="sd">        :type: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_data_path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="k">return</span> <span class="mi">0</span>
+
+        <span class="n">total_size</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">for</span> <span class="n">dirname</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">filenames</span> <span class="ow">in</span> <span class="n">os</span><span class="o">.</span><span class="n">walk</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">site_data_path</span><span class="p">):</span>
+            <span class="n">total_size</span> <span class="o">+=</span> <span class="nb">sum</span><span class="p">(</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">getsize</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">dirname</span><span class="p">,</span> <span class="n">f</span><span class="p">))</span> <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">filenames</span>
             <span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="n">total_size</span>
 
-<div class="viewcode-block" id="LegacyDataset.to_json_file"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.LegacyDataset.to_json_file">[docs]</a>    <span class="k">def</span> <span class="nf">to_json_file</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Write the dataset metadata to a JSON file.</span>
+    <span class="c1"># We use Union[int, float] to represent the size because infinite size is</span>
+    <span class="c1"># represented by math.inf, which is a float. For all other sizes this should</span>
+    <span class="c1"># be an int.</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;The number of benchmarks in the dataset. If the number of benchmarks</span>
+<span class="sd">        is unbounded, for example because the dataset represents a program</span>
+<span class="sd">        generator that can produce an infinite number of programs, the value is</span>
+<span class="sd">        :code:`math.inf`.</span>
 
-<span class="sd">        :param path: Path of the file to write.</span>
-<span class="sd">        :return: The path of the written file.</span>
+<span class="sd">        :type: Union[int, float]</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_asdict</span><span class="p">(),</span> <span class="n">f</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">path</span></div></div>
+        <span class="k">return</span> <span class="mi">0</span>
+
+<div class="viewcode-block" id="Dataset.__len__"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Dataset.__len__">[docs]</a>    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;The number of benchmarks in the dataset.</span>
+
+<span class="sd">        This is the same as :meth:`Dataset.size</span>
+<span class="sd">        &lt;compiler_gym.datasets.Dataset.size&gt;`:</span>
+
+<span class="sd">            &gt;&gt;&gt; len(dataset) == dataset.size</span>
+<span class="sd">            True</span>
+
+<span class="sd">        :return: An integer, or :code:`math.float`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">size</span></div>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">installed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Whether the dataset is installed locally. Installation occurs</span>
+<span class="sd">        automatically on first use, or by calling :meth:`install()</span>
+<span class="sd">        &lt;compiler_gym.datasets.Dataset.install&gt;`.</span>
+
+<span class="sd">        :type: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+<div class="viewcode-block" id="Dataset.install"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Dataset.install">[docs]</a>    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Install this dataset locally.</span>
+
+<span class="sd">        Implementing this method is optional. If implementing this method, you</span>
+<span class="sd">        must call :code:`super().install()` first.</span>
+
+<span class="sd">        This method should not perform redundant work. This method should first</span>
+<span class="sd">        detect whether any work needs to be done so that repeated calls to</span>
+<span class="sd">        :code:`install()` will complete quickly.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">deprecated</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Dataset &#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; is marked as deprecated. </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_deprecation_message</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">,</span>
+                <span class="n">stacklevel</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Dataset.uninstall"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Dataset.uninstall">[docs]</a>    <span class="k">def</span> <span class="nf">uninstall</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Remove any local data for this benchmark.</span>
+
+<span class="sd">        This method undoes the work of :meth:`install()</span>
+<span class="sd">        &lt;compiler_gym.datasets.Dataset.install&gt;`. The dataset can still be used</span>
+<span class="sd">        after calling this method.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_data_path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">site_data_path</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Dataset.benchmarks"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Dataset.benchmarks">[docs]</a>    <span class="k">def</span> <span class="nf">benchmarks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Benchmark</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Enumerate the (possibly infinite) benchmarks lazily.</span>
+
+<span class="sd">        Iteration order is consistent across runs. The order of</span>
+<span class="sd">        :meth:`benchmarks() &lt;compiler_gym.datasets.Dataset.benchmarks&gt;` and</span>
+<span class="sd">        :meth:`benchmark_uris() &lt;compiler_gym.datasets.Dataset.benchmark_uris&gt;`</span>
+<span class="sd">        is the same.</span>
+
+<span class="sd">        If the number of benchmarks in the dataset is infinite</span>
+<span class="sd">        (:code:`len(dataset) == math.inf`), the iterable returned by this method</span>
+<span class="sd">        will continue indefinitely.</span>
+
+<span class="sd">        :return: An iterable sequence of :class:`Benchmark</span>
+<span class="sd">            &lt;compiler_gym.datasets.Benchmark&gt;` instances.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Default implementation. Subclasses may wish to provide an alternative</span>
+        <span class="c1"># implementation that is optimized to specific use cases.</span>
+        <span class="k">yield from</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span> <span class="k">for</span> <span class="n">uri</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark_uris</span><span class="p">())</span></div>
+
+<div class="viewcode-block" id="Dataset.__iter__"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Dataset.__iter__">[docs]</a>    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Benchmark</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Enumerate the (possibly infinite) benchmarks lazily.</span>
+
+<span class="sd">        This is the same as :meth:`Dataset.benchmarks()</span>
+<span class="sd">        &lt;compiler_gym.datasets.Dataset.benchmarks&gt;`:</span>
+
+<span class="sd">            &gt;&gt;&gt; from itertools import islice</span>
+<span class="sd">            &gt;&gt;&gt; list(islice(dataset, 100)) == list(islice(datset.benchmarks(), 100))</span>
+<span class="sd">            True</span>
+
+<span class="sd">        :return: An iterable sequence of :meth:`Benchmark</span>
+<span class="sd">            &lt;compiler_gym.datasets.Benchmark&gt;` instances.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmarks</span><span class="p">()</span></div>
+
+<div class="viewcode-block" id="Dataset.benchmark_uris"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Dataset.benchmark_uris">[docs]</a>    <span class="k">def</span> <span class="nf">benchmark_uris</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Enumerate the (possibly infinite) benchmark URIs.</span>
+
+<span class="sd">        Iteration order is consistent across runs. The order of</span>
+<span class="sd">        :meth:`benchmarks() &lt;compiler_gym.datasets.Dataset.benchmarks&gt;` and</span>
+<span class="sd">        :meth:`benchmark_uris() &lt;compiler_gym.datasets.Dataset.benchmark_uris&gt;`</span>
+<span class="sd">        is the same.</span>
+
+<span class="sd">        If the number of benchmarks in the dataset is infinite</span>
+<span class="sd">        (:code:`len(dataset) == math.inf`), the iterable returned by this method</span>
+<span class="sd">        will continue indefinitely.</span>
+
+<span class="sd">        :return: An iterable sequence of benchmark URI strings.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract class&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Dataset.benchmark"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Dataset.benchmark">[docs]</a>    <span class="k">def</span> <span class="nf">benchmark</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Select a benchmark.</span>
+
+<span class="sd">        :param uri: The URI of the benchmark to return.</span>
+
+<span class="sd">        :return: A :class:`Benchmark &lt;compiler_gym.datasets.Benchmark&gt;`</span>
+<span class="sd">            instance.</span>
+
+<span class="sd">        :raise LookupError: If :code:`uri` is not found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract class&quot;</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Dataset.__getitem__"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Dataset.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Select a benchmark by URI.</span>
+
+<span class="sd">        This is the same as :meth:`Dataset.benchmark(uri)</span>
+<span class="sd">        &lt;compiler_gym.datasets.Dataset.benchmark&gt;`:</span>
+
+<span class="sd">            &gt;&gt;&gt; dataset[&quot;benchmark://cbench-v1/crc32&quot;] == dataset.benchmark(&quot;benchmark://cbench-v1/crc32&quot;)</span>
+<span class="sd">            True</span>
+
+<span class="sd">        :return: A :class:`Benchmark &lt;compiler_gym.datasets.Benchmark&gt;`</span>
+<span class="sd">            instance.</span>
+
+<span class="sd">        :raise LookupError: If :code:`uri` does not exist.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span></div></div>
 
 
-<div class="viewcode-block" id="activate"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.activate">[docs]</a><span class="nd">@deprecated</span><span class="p">(</span>
+<div class="viewcode-block" id="DatasetInitError"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.DatasetInitError">[docs]</a><span class="k">class</span> <span class="nc">DatasetInitError</span><span class="p">(</span><span class="ne">OSError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for errors raised if a dataset fails to initialize.&quot;&quot;&quot;</span></div>
+
+
+<span class="nd">@mark_deprecated</span><span class="p">(</span>
     <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.1.4&quot;</span><span class="p">,</span>
     <span class="n">reason</span><span class="o">=</span><span class="p">(</span>
-        <span class="s2">&quot;Activating datasets will be removed in v0.1.5. &quot;</span>
+        <span class="s2">&quot;Datasets are now automatically activated. &quot;</span>
         <span class="s2">&quot;`More information &lt;https://github.com/facebookresearch/CompilerGym/issues/45&gt;`_.&quot;</span>
     <span class="p">),</span>
 <span class="p">)</span>
-<span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Move a directory from the inactive to active benchmark directory.</span>
+<span class="k">def</span> <span class="nf">activate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Deprecated function for managing datasets.</span>
 
-<span class="sd">    :param: The name of a dataset.</span>
+<span class="sd">    :param dataset: The name of the dataset to download, or a :class:`Dataset</span>
+<span class="sd">        &lt;compiler_gym.datasets.Dataset&gt;` instance.</span>
+
 <span class="sd">    :return: :code:`True` if the dataset was activated, else :code:`False` if</span>
 <span class="sd">        already active.</span>
+
 <span class="sd">    :raises ValueError: If there is no dataset with that name.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="n">fasteners</span><span class="o">.</span><span class="n">InterProcessLock</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="s2">&quot;LOCK&quot;</span><span class="p">):</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-            <span class="c1"># There is already an active benchmark set with this name.</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Inactive dataset not found: </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">)</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
-            <span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">,</span>
-            <span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="kc">True</span></div>
+    <span class="k">return</span> <span class="kc">False</span>
 
 
-<div class="viewcode-block" id="delete"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.delete">[docs]</a><span class="nd">@deprecated</span><span class="p">(</span>
+<span class="nd">@mark_deprecated</span><span class="p">(</span>
     <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.1.4&quot;</span><span class="p">,</span>
     <span class="n">reason</span><span class="o">=</span><span class="p">(</span>
-        <span class="s2">&quot;Deleting datasets will be removed in v0.1.5. &quot;</span>
+        <span class="s2">&quot;Please use :meth:`del env.datasets[dataset] &lt;compiler_gym.datasets.Datasets.__delitem__&gt;`. &quot;</span>
         <span class="s2">&quot;`More information &lt;https://github.com/facebookresearch/CompilerGym/issues/45&gt;`_.&quot;</span>
     <span class="p">),</span>
 <span class="p">)</span>
-<span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Delete a directory in the inactive benchmark directory.</span>
+<span class="k">def</span> <span class="nf">delete</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Deprecated function for managing datasets.</span>
 
-<span class="sd">    :param: The name of a dataset.</span>
+<span class="sd">    Please use :meth:`del env.datasets[dataset]</span>
+<span class="sd">    &lt;compiler_gym.datasets.Datasets.__delitem__&gt;`.</span>
+
+<span class="sd">    :param dataset: The name of the dataset to download, or a :class:`Dataset</span>
+<span class="sd">        &lt;compiler_gym.datasets.Dataset&gt;` instance.</span>
+
 <span class="sd">    :return: :code:`True` if the dataset was deleted, else :code:`False` if</span>
 <span class="sd">        already deleted.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="n">fasteners</span><span class="o">.</span><span class="n">InterProcessLock</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="s2">&quot;LOCK&quot;</span><span class="p">):</span>
-        <span class="n">deleted</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">))</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">))</span>
-            <span class="n">deleted</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">if</span> <span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">))</span>
-            <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">))</span>
-            <span class="n">deleted</span> <span class="o">=</span> <span class="kc">True</span>
-        <span class="k">return</span> <span class="n">deleted</span></div>
+    <span class="k">del</span> <span class="n">env</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span>
+    <span class="k">return</span> <span class="kc">False</span>
 
 
-<div class="viewcode-block" id="deactivate"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.deactivate">[docs]</a><span class="nd">@deprecated</span><span class="p">(</span>
+<span class="nd">@mark_deprecated</span><span class="p">(</span>
     <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.1.4&quot;</span><span class="p">,</span>
     <span class="n">reason</span><span class="o">=</span><span class="p">(</span>
-        <span class="s2">&quot;Deactivating datasets will be removed in v0.1.5. &quot;</span>
+        <span class="s2">&quot;Please use :meth:`env.datasets.deactivate() &lt;compiler_gym.datasets.Datasets.deactivate&gt;`. &quot;</span>
         <span class="s2">&quot;`More information &lt;https://github.com/facebookresearch/CompilerGym/issues/45&gt;`_.&quot;</span>
     <span class="p">),</span>
 <span class="p">)</span>
-<span class="k">def</span> <span class="nf">deactivate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Move a directory from active to the inactive benchmark directory.</span>
+<span class="k">def</span> <span class="nf">deactivate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Deprecated function for managing datasets.</span>
 
-<span class="sd">    :param: The name of a dataset.</span>
+<span class="sd">    Please use :meth:`del env.datasets[dataset]</span>
+<span class="sd">    &lt;compiler_gym.datasets.Datasets.__delitem__&gt;`.</span>
+
+<span class="sd">    :param dataset: The name of the dataset to download, or a :class:`Dataset</span>
+<span class="sd">        &lt;compiler_gym.datasets.Dataset&gt;` instance.</span>
+
 <span class="sd">    :return: :code:`True` if the dataset was deactivated, else :code:`False` if</span>
 <span class="sd">        already inactive.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">with</span> <span class="n">fasteners</span><span class="o">.</span><span class="n">InterProcessLock</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="s2">&quot;LOCK&quot;</span><span class="p">):</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
-            <span class="k">return</span> <span class="kc">False</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">,</span> <span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">)</span>
-        <span class="n">os</span><span class="o">.</span><span class="n">rename</span><span class="p">(</span>
-            <span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">,</span>
-            <span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">.json&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="k">return</span> <span class="kc">True</span></div>
+    <span class="k">del</span> <span class="n">env</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span>
+    <span class="k">return</span> <span class="kc">False</span>
 
 
-<div class="viewcode-block" id="require"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.require">[docs]</a><span class="k">def</span> <span class="nf">require</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">LegacyDataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Require that the given dataset is available to the environment.</span>
+<span class="nd">@mark_deprecated</span><span class="p">(</span>
+    <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.1.7&quot;</span><span class="p">,</span>
+    <span class="n">reason</span><span class="o">=</span><span class="p">(</span>
+        <span class="s2">&quot;Datasets are now installed automatically, there is no need to call :code:`require()`. &quot;</span>
+        <span class="s2">&quot;`More information &lt;https://github.com/facebookresearch/CompilerGym/issues/45&gt;`_.&quot;</span>
+    <span class="p">),</span>
+<span class="p">)</span>
+<span class="k">def</span> <span class="nf">require</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Deprecated function for managing datasets.</span>
 
-<span class="sd">    This will download and activate the dataset if it is not already installed.</span>
-<span class="sd">    After calling this function, benchmarks from the dataset will be available</span>
-<span class="sd">    to use.</span>
-
-<span class="sd">    Example usage:</span>
-
-<span class="sd">        &gt;&gt;&gt; env = gym.make(&quot;llvm-v0&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; require(env, &quot;blas-v0&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; env.reset(benchmark=&quot;blas-v0/1&quot;)</span>
+<span class="sd">    Datasets are now installed automatically. See :class:`env.datasets</span>
+<span class="sd">        &lt;compiler_gym.datasets.Datasets&gt;`.</span>
 
 <span class="sd">    :param env: The environment that this dataset is required for.</span>
-<span class="sd">    :param dataset: The name of the dataset to download, the URL of the dataset,</span>
-<span class="sd">        or a :class:`LegacyDataset` instance.</span>
+
+<span class="sd">    :param dataset: The name of the dataset to download, or a :class:`Dataset</span>
+<span class="sd">        &lt;compiler_gym.datasets.Dataset&gt;` instance.</span>
+
 <span class="sd">    :return: :code:`True` if the dataset was downloaded, or :code:`False` if the</span>
 <span class="sd">        dataset was already available.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="nf">download_and_unpack_archive</span><span class="p">(</span>
-        <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">sha256</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LegacyDataset</span><span class="p">:</span>
-        <span class="n">json_files_before</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">f</span>
-            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span> <span class="ow">and</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.json&quot;</span><span class="p">)</span>
-        <span class="p">}</span>
-        <span class="n">tar_data</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span><span class="n">download</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">sha256</span><span class="p">))</span>
-        <span class="k">with</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fileobj</span><span class="o">=</span><span class="n">tar_data</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r:bz2&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">arc</span><span class="p">:</span>
-            <span class="n">arc</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span><span class="p">))</span>
-        <span class="n">json_files_after</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">f</span>
-            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span> <span class="ow">and</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.json&quot;</span><span class="p">)</span>
-        <span class="p">}</span>
-        <span class="n">new_json</span> <span class="o">=</span> <span class="n">json_files_after</span> <span class="o">-</span> <span class="n">json_files_before</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_json</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloaded dataset </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2"> contains no metadata JSON file&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">LegacyDataset</span><span class="o">.</span><span class="n">from_json_file</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">new_json</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
-
-    <span class="k">def</span> <span class="nf">unpack_local_archive</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">LegacyDataset</span><span class="p">:</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;File not found: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="n">json_files_before</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">f</span>
-            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span> <span class="ow">and</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.json&quot;</span><span class="p">)</span>
-        <span class="p">}</span>
-        <span class="k">with</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="s2">&quot;r:bz2&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">arc</span><span class="p">:</span>
-            <span class="n">arc</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span><span class="p">))</span>
-        <span class="n">json_files_after</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="n">f</span>
-            <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span><span class="o">.</span><span class="n">iterdir</span><span class="p">()</span>
-            <span class="k">if</span> <span class="n">f</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span> <span class="ow">and</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;.json&quot;</span><span class="p">)</span>
-        <span class="p">}</span>
-        <span class="n">new_json</span> <span class="o">=</span> <span class="n">json_files_after</span> <span class="o">-</span> <span class="n">json_files_before</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">len</span><span class="p">(</span><span class="n">new_json</span><span class="p">):</span>
-            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloaded dataset </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2"> contains no metadata JSON file&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">LegacyDataset</span><span class="o">.</span><span class="n">from_json_file</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">new_json</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span>
-
-    <span class="k">with</span> <span class="n">fasteners</span><span class="o">.</span><span class="n">InterProcessLock</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="s2">&quot;LOCK&quot;</span><span class="p">):</span>
-        <span class="c1"># Resolve the name and URL of the dataset.</span>
-        <span class="n">sha256</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="n">LegacyDataset</span><span class="p">):</span>
-            <span class="n">name</span><span class="p">,</span> <span class="n">url</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">url</span>
-        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">dataset</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
-            <span class="c1"># Check if we have already downloaded the dataset.</span>
-            <span class="k">if</span> <span class="s2">&quot;://&quot;</span> <span class="ow">in</span> <span class="n">dataset</span><span class="p">:</span>
-                <span class="n">name</span><span class="p">,</span> <span class="n">url</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">dataset</span>
-                <span class="n">dataset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LegacyDataset</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">try</span><span class="p">:</span>
-                    <span class="n">dataset</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LegacyDataset</span><span class="p">]</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">available_datasets</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span>
-                <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset not found: </span><span class="si">{</span><span class="n">dataset</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-                <span class="n">name</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">sha256</span> <span class="o">=</span> <span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">dataset</span><span class="o">.</span><span class="n">sha256</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;require() called with unsupported type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">dataset</span> <span class="ow">and</span> <span class="n">dataset</span><span class="o">.</span><span class="n">deprecated</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Dataset &#39;</span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39; is deprecated as of CompilerGym &quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;release </span><span class="si">{</span><span class="n">dataset</span><span class="o">.</span><span class="n">deprecated_since</span><span class="si">}</span><span class="s2">, please update to the &quot;</span>
-                <span class="s2">&quot;latest available version&quot;</span><span class="p">,</span>
-                <span class="ne">DeprecationWarning</span><span class="p">,</span>
-            <span class="p">)</span>
-
-        <span class="c1"># Check if we have already downloaded the dataset.</span>
-        <span class="k">if</span> <span class="n">name</span><span class="p">:</span>
-            <span class="k">if</span> <span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
-                <span class="c1"># Dataset is already downloaded and active.</span>
-                <span class="k">return</span> <span class="kc">False</span>
-            <span class="k">elif</span> <span class="ow">not</span> <span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span> <span class="o">/</span> <span class="n">name</span><span class="p">)</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
-                <span class="c1"># Dataset is downloaded but inactive.</span>
-                <span class="n">name</span> <span class="o">=</span> <span class="n">download_and_unpack_archive</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">sha256</span><span class="o">=</span><span class="n">sha256</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
-        <span class="k">elif</span> <span class="n">url</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;file:///&quot;</span><span class="p">):</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="n">unpack_local_archive</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">url</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;file:///&quot;</span><span class="p">)</span> <span class="p">:]))</span><span class="o">.</span><span class="n">name</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">name</span> <span class="o">=</span> <span class="n">download_and_unpack_archive</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">sha256</span><span class="o">=</span><span class="n">sha256</span><span class="p">)</span><span class="o">.</span><span class="n">name</span>
-
-        <span class="n">activate</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
-        <span class="k">return</span> <span class="kc">True</span></div>
+    <span class="k">return</span> <span class="kc">False</span>
 </pre></div>
 
            </div>

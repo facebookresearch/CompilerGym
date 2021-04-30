@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.views.reward &mdash; CompilerGym 0.1.7 documentation</title>
+  <title>compiler_gym.views.reward &mdash; CompilerGym 0.1.8 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.7
+                0.1.8
               </div>
             
           
@@ -178,6 +178,7 @@
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
 
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.spaces.reward</span> <span class="kn">import</span> <span class="n">Reward</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.views.observation</span> <span class="kn">import</span> <span class="n">ObservationView</span>
 
@@ -187,14 +188,15 @@
 
 <span class="sd">    Example usage:</span>
 
-<span class="sd">    &gt;&gt;&gt; env = gym.make(&quot;llvm-v0&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; env.reset()</span>
-<span class="sd">    &gt;&gt;&gt; env.reward.spaces[&quot;codesize&quot;].range</span>
-<span class="sd">    (-np.inf, 0)</span>
-<span class="sd">    &gt;&gt;&gt; env.reward[&quot;codesize&quot;]</span>
-<span class="sd">    -1243</span>
+<span class="sd">        &gt;&gt;&gt; env = gym.make(&quot;llvm-v0&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; env.reset()</span>
+<span class="sd">        &gt;&gt;&gt; env.reward.spaces[&quot;codesize&quot;].range</span>
+<span class="sd">        (-np.inf, 0)</span>
+<span class="sd">        &gt;&gt;&gt; env.reward[&quot;codesize&quot;]</span>
+<span class="sd">        -1243</span>
 
 <span class="sd">    :ivar spaces: Specifications of available reward spaces.</span>
+
 <span class="sd">    :vartype spaces: Dict[str, Reward]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -214,11 +216,16 @@
         <span class="sd">&quot;&quot;&quot;Request an observation from the given space.</span>
 
 <span class="sd">        :param reward_space: The reward space to query.</span>
+
 <span class="sd">        :return: A reward.</span>
+
 <span class="sd">        :raises KeyError: If the requested reward space does not exist.</span>
+
+<span class="sd">        :raises SessionNotFound: If :meth:`env.reset()</span>
+<span class="sd">            &lt;compiler_gym.envs.CompilerEnv.reset&gt;` has not been called.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># TODO(cummins): Since reward is a function from (state, action) -&gt; r</span>
-        <span class="c1"># it would be better to make the list of reward to evaluate an argument</span>
+        <span class="c1"># it would be better to make the list of rewards to evaluate an argument</span>
         <span class="c1"># to env.step() rather than using this lazy view.</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No reward spaces&quot;</span><span class="p">)</span>
@@ -226,12 +233,11 @@
         <span class="n">observations</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_observation_view</span><span class="p">[</span><span class="n">obs</span><span class="p">]</span> <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="n">space</span><span class="o">.</span><span class="n">observation_spaces</span><span class="p">]</span>
         <span class="k">return</span> <span class="n">space</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">previous_action</span><span class="p">,</span> <span class="n">observations</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_observation_view</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="RewardView.reset"><a class="viewcode-back" href="../../../compiler_gym/views.html#compiler_gym.views.RewardView.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">benchmark</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<div class="viewcode-block" id="RewardView.reset"><a class="viewcode-back" href="../../../compiler_gym/views.html#compiler_gym.views.RewardView.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">benchmark</span><span class="p">:</span> <span class="n">Benchmark</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Reset the rewards space view. This is called on</span>
 <span class="sd">        :meth:`env.reset() &lt;compiler_gym.envs.CompilerEnv.reset&gt;`.</span>
 
-<span class="sd">        :param benchmark: The URI of the benchmark that is used for this</span>
-<span class="sd">            episode.</span>
+<span class="sd">        :param benchmark: The benchmark that is used for this episode.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">previous_action</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">for</span> <span class="n">space</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="o">.</span><span class="n">values</span><span class="p">():</span>

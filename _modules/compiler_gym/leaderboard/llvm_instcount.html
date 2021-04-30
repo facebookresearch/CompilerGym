@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.leaderboard.llvm_instcount &mdash; CompilerGym 0.1.7 documentation</title>
+  <title>compiler_gym.leaderboard.llvm_instcount &mdash; CompilerGym 0.1.8 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.7
+                0.1.8
               </div>
             
           
@@ -200,36 +200,38 @@
 <span class="sd">&lt;compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy&gt;` to</span>
 <span class="sd">automatically evaluate their agent on the test set.</span>
 <span class="sd">&quot;&quot;&quot;</span>
-<span class="kn">import</span> <span class="nn">platform</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">Counter</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">islice</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Thread</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">List</span>
 
-<span class="kn">import</span> <span class="nn">GPUtil</span>
 <span class="kn">import</span> <span class="nn">gym</span>
 <span class="kn">import</span> <span class="nn">humanize</span>
-<span class="kn">import</span> <span class="nn">psutil</span>
 <span class="kn">from</span> <span class="nn">absl</span> <span class="kn">import</span> <span class="n">app</span><span class="p">,</span> <span class="n">flags</span>
-<span class="kn">from</span> <span class="nn">cpuinfo</span> <span class="kn">import</span> <span class="n">get_cpu_info</span>
-<span class="kn">from</span> <span class="nn">tqdm</span> <span class="kn">import</span> <span class="n">tqdm</span>
 
 <span class="kn">import</span> <span class="nn">compiler_gym.envs</span>  <span class="c1"># noqa Register environments.</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.bin.validate</span> <span class="kn">import</span> <span class="n">main</span> <span class="k">as</span> <span class="n">validate</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.compiler_env_state</span> <span class="kn">import</span> <span class="n">CompilerEnvState</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.compiler_env_state</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CompilerEnvState</span><span class="p">,</span>
+    <span class="n">CompilerEnvStateReader</span><span class="p">,</span>
+    <span class="n">CompilerEnvStateWriter</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.envs</span> <span class="kn">import</span> <span class="n">LlvmEnv</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.util.tabulate</span> <span class="kn">import</span> <span class="n">tabulate</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.util.timer</span> <span class="kn">import</span> <span class="n">Timer</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.statistics</span> <span class="kn">import</span> <span class="n">arithmetic_mean</span><span class="p">,</span> <span class="n">geometric_mean</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.timer</span> <span class="kn">import</span> <span class="n">Timer</span><span class="p">,</span> <span class="n">humanize_duration_hms</span>
 
 <span class="n">flags</span><span class="o">.</span><span class="n">DEFINE_string</span><span class="p">(</span>
-    <span class="s2">&quot;results_logfile&quot;</span><span class="p">,</span> <span class="s2">&quot;results.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;The path of the file to write results to.&quot;</span>
+    <span class="s2">&quot;leaderboard_results&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;llvm_instcount-results.csv&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;The path of the file to write results to.&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">flags</span><span class="o">.</span><span class="n">DEFINE_string</span><span class="p">(</span>
-    <span class="s2">&quot;hardware_info&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;hardware.txt&quot;</span><span class="p">,</span>
-    <span class="s2">&quot;The path of the file to write a hardware summary to.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;leaderboard_logfile&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;llvm_instcount-results.log&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;The path of a file to stream CompilerGym logs to.&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">flags</span><span class="o">.</span><span class="n">DEFINE_integer</span><span class="p">(</span>
     <span class="s2">&quot;max_benchmarks&quot;</span><span class="p">,</span>
@@ -241,13 +243,13 @@
 <span class="n">flags</span><span class="o">.</span><span class="n">DEFINE_integer</span><span class="p">(</span>
     <span class="s2">&quot;n&quot;</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="s2">&quot;The number of repetitions of the search to run for each benchmark.&quot;</span>
 <span class="p">)</span>
-<span class="n">flags</span><span class="o">.</span><span class="n">DEFINE_string</span><span class="p">(</span><span class="s2">&quot;test_dataset&quot;</span><span class="p">,</span> <span class="s2">&quot;cBench-v1&quot;</span><span class="p">,</span> <span class="s2">&quot;The dataset to use for the search.&quot;</span><span class="p">)</span>
+<span class="n">flags</span><span class="o">.</span><span class="n">DEFINE_string</span><span class="p">(</span><span class="s2">&quot;test_dataset&quot;</span><span class="p">,</span> <span class="s2">&quot;cbench-v1&quot;</span><span class="p">,</span> <span class="s2">&quot;The dataset to use for the search.&quot;</span><span class="p">)</span>
 <span class="n">flags</span><span class="o">.</span><span class="n">DEFINE_boolean</span><span class="p">(</span><span class="s2">&quot;validate&quot;</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="s2">&quot;Run validation on the results.&quot;</span><span class="p">)</span>
 <span class="n">flags</span><span class="o">.</span><span class="n">DEFINE_boolean</span><span class="p">(</span>
     <span class="s2">&quot;resume&quot;</span><span class="p">,</span>
     <span class="kc">False</span><span class="p">,</span>
-    <span class="s2">&quot;If true, read the --results_logfile first and run only the policy &quot;</span>
-    <span class="s2">&quot;evaluations not already in the logfile.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;If true, read the --leaderboard_results file first and run only the &quot;</span>
+    <span class="s2">&quot;evaluations not already in the results file.&quot;</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="n">FLAGS</span> <span class="o">=</span> <span class="n">flags</span><span class="o">.</span><span class="n">FLAGS</span>
 
@@ -256,66 +258,32 @@
 <span class="n">Policy</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">LlvmEnv</span><span class="p">],</span> <span class="kc">None</span><span class="p">]</span>
 
 
-<span class="k">def</span> <span class="nf">_get_gpus</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Return GPU info strings.&quot;&quot;&quot;</span>
-    <span class="n">gpus</span> <span class="o">=</span> <span class="n">GPUtil</span><span class="o">.</span><span class="n">getGPUs</span><span class="p">()</span>
-    <span class="k">if</span> <span class="n">gpus</span><span class="p">:</span>
-        <span class="k">yield from</span> <span class="p">(</span><span class="n">gpu</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">gpu</span> <span class="ow">in</span> <span class="n">gpus</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">yield</span> <span class="s2">&quot;None&quot;</span>
+<span class="k">class</span> <span class="nc">_EvalPolicyWorker</span><span class="p">(</span><span class="n">Thread</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Worker thread to evaluate a policy.&quot;&quot;&quot;</span>
 
-
-<span class="k">def</span> <span class="nf">_get_cpu</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Return CPU info string.&quot;&quot;&quot;</span>
-    <span class="n">cpuinfo</span> <span class="o">=</span> <span class="n">get_cpu_info</span><span class="p">()</span>
-    <span class="n">brand</span> <span class="o">=</span> <span class="n">cpuinfo</span><span class="p">[</span><span class="s2">&quot;brand_raw&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;(R)&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">brand</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">cpuinfo</span><span class="p">[</span><span class="s1">&#39;count&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">x core)&quot;</span>
-
-
-<span class="k">def</span> <span class="nf">_get_memory</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Return system memory info string.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">humanize</span><span class="o">.</span><span class="n">naturalsize</span><span class="p">(</span><span class="n">psutil</span><span class="o">.</span><span class="n">virtual_memory</span><span class="p">()</span><span class="o">.</span><span class="n">total</span><span class="p">,</span> <span class="n">binary</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_get_os</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Return operating system name as a string.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">platform</span><span class="o">.</span><span class="n">platform</span><span class="p">()</span>
-
-
-<span class="k">def</span> <span class="nf">_summarize_duplicates</span><span class="p">(</span><span class="n">iterable</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Aggregate duplicates in a list of strings.&quot;&quot;&quot;</span>
-    <span class="n">freq</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">Counter</span><span class="p">(</span><span class="n">iterable</span><span class="p">)</span><span class="o">.</span><span class="n">items</span><span class="p">(),</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="o">-</span><span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
-    <span class="k">for</span> <span class="n">gpu</span><span class="p">,</span> <span class="n">count</span> <span class="ow">in</span> <span class="n">freq</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">count</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">count</span><span class="si">}</span><span class="s2">x </span><span class="si">{</span><span class="n">gpu</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">yield</span> <span class="n">gpu</span>
-
-
-<span class="k">def</span> <span class="nf">_get_hardarwe_info</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Print a summary of system hardware to file.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="n">tabulate</span><span class="p">(</span>
-        <span class="p">[</span>
-            <span class="p">(</span><span class="s2">&quot;OS&quot;</span><span class="p">,</span> <span class="n">_get_os</span><span class="p">()),</span>
-            <span class="p">(</span><span class="s2">&quot;CPU&quot;</span><span class="p">,</span> <span class="n">_get_cpu</span><span class="p">()),</span>
-            <span class="p">(</span><span class="s2">&quot;Memory&quot;</span><span class="p">,</span> <span class="n">_get_memory</span><span class="p">()),</span>
-            <span class="p">(</span><span class="s2">&quot;GPU&quot;</span><span class="p">,</span> <span class="s2">&quot;, &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">_summarize_duplicates</span><span class="p">(</span><span class="n">_get_gpus</span><span class="p">()))),</span>
-        <span class="p">],</span>
-        <span class="n">headers</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="s2">&quot;Hardware Specification&quot;</span><span class="p">),</span>
-    <span class="p">)</span>
-
-
-<span class="k">class</span> <span class="nc">_BenchmarkRunner</span><span class="p">(</span><span class="n">Thread</span><span class="p">):</span>
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">,</span> <span class="n">benchmarks</span><span class="p">,</span> <span class="n">policy</span><span class="p">,</span> <span class="n">print_header</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">env</span><span class="p">:</span> <span class="n">LlvmEnv</span><span class="p">,</span>
+        <span class="n">benchmarks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">policy</span><span class="p">:</span> <span class="n">Policy</span><span class="p">,</span>
+        <span class="n">init_states</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">CompilerEnvState</span><span class="p">],</span>
+    <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="n">env</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">benchmarks</span> <span class="o">=</span> <span class="n">benchmarks</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">policy</span> <span class="o">=</span> <span class="n">policy</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">print_header</span> <span class="o">=</span> <span class="n">print_header</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">CompilerEnvState</span><span class="p">]</span> <span class="o">=</span> <span class="n">init_states</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">alive</span> <span class="o">=</span> <span class="kc">True</span>
 
     <span class="k">def</span> <span class="nf">run</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">FLAGS</span><span class="o">.</span><span class="n">results_logfile</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">logfile</span><span class="p">:</span>
+        <span class="c1"># Determine if we need to print a header.</span>
+        <span class="n">header</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="ow">not</span> <span class="n">Path</span><span class="p">(</span><span class="n">FLAGS</span><span class="o">.</span><span class="n">leaderboard_results</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span>
+            <span class="ow">or</span> <span class="n">os</span><span class="o">.</span><span class="n">stat</span><span class="p">(</span><span class="n">FLAGS</span><span class="o">.</span><span class="n">leaderboard_results</span><span class="p">)</span><span class="o">.</span><span class="n">st_size</span> <span class="o">==</span> <span class="mi">0</span>
+        <span class="p">)</span>
+        <span class="k">with</span> <span class="n">CompilerEnvStateWriter</span><span class="p">(</span>
+            <span class="nb">open</span><span class="p">(</span><span class="n">FLAGS</span><span class="o">.</span><span class="n">leaderboard_results</span><span class="p">,</span> <span class="s2">&quot;a&quot;</span><span class="p">),</span> <span class="n">header</span><span class="o">=</span><span class="n">header</span>
+        <span class="p">)</span> <span class="k">as</span> <span class="n">writer</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">benchmark</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmarks</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="n">benchmark</span><span class="p">)</span>
                 <span class="k">with</span> <span class="n">Timer</span><span class="p">()</span> <span class="k">as</span> <span class="n">timer</span><span class="p">:</span>
@@ -324,7 +292,7 @@
                 <span class="c1"># Sanity check that the policy didn&#39;t change the expected</span>
                 <span class="c1"># experimental setup.</span>
                 <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">in_episode</span><span class="p">,</span> <span class="s2">&quot;Environment is no longer in an episode&quot;</span>
-                <span class="k">assert</span> <span class="p">(</span>
+                <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">benchmark</span> <span class="ow">and</span> <span class="p">(</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">==</span> <span class="n">benchmark</span>
                 <span class="p">),</span> <span class="s2">&quot;Policy changed environment benchmark&quot;</span>
                 <span class="k">assert</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">reward_space</span><span class="p">,</span> <span class="s2">&quot;Policy unset environment reward space&quot;</span>
@@ -333,17 +301,14 @@
                 <span class="p">),</span> <span class="s2">&quot;Policy changed environment reward space&quot;</span>
 
                 <span class="c1"># Override walltime in the generated state.</span>
-                <span class="n">state</span> <span class="o">=</span> <span class="n">CompilerEnvState</span><span class="p">(</span>
-                    <span class="n">benchmark</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">benchmark</span><span class="p">,</span>
-                    <span class="n">reward</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">reward</span><span class="p">,</span>
-                    <span class="n">walltime</span><span class="o">=</span><span class="n">timer</span><span class="o">.</span><span class="n">time</span><span class="p">,</span>
-                    <span class="n">commandline</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">commandline</span><span class="p">,</span>
-                <span class="p">)</span>
-                <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">print_header</span><span class="p">:</span>
-                    <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">csv_header</span><span class="p">(),</span> <span class="n">file</span><span class="o">=</span><span class="n">logfile</span><span class="p">)</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">print_header</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="nb">print</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(),</span> <span class="n">file</span><span class="o">=</span><span class="n">logfile</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">n</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">state</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+                <span class="n">state</span><span class="o">.</span><span class="n">walltime</span> <span class="o">=</span> <span class="n">timer</span><span class="o">.</span><span class="n">time</span>
+
+                <span class="n">writer</span><span class="o">.</span><span class="n">write_state</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">states</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">alive</span><span class="p">:</span>
+                    <span class="k">return</span>
 
 
 <div class="viewcode-block" id="eval_llvm_instcount_policy"><a class="viewcode-back" href="../../../compiler_gym/leaderboard.html#compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy">[docs]</a><span class="k">def</span> <span class="nf">eval_llvm_instcount_policy</span><span class="p">(</span><span class="n">policy</span><span class="p">:</span> <span class="n">Policy</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
@@ -411,11 +376,11 @@
 <span class="sd">    defines a number of commandline flags that can be overriden to control the</span>
 <span class="sd">    behavior of the evaluation. For example the flag :code:`--n` determines the</span>
 <span class="sd">    number of times the policy is run on each benchmark (default is 10), and</span>
-<span class="sd">    :code:`--results_logfile` determines the path of the generated results file:</span>
+<span class="sd">    :code:`--leaderboard_results` determines the path of the generated results file:</span>
 
 <span class="sd">    .. code-block::</span>
 
-<span class="sd">        $ python my_policy.py --n=5 --results_logfile=my_policy_results.csv</span>
+<span class="sd">        $ python my_policy.py --n=5 --leaderboard_results=my_policy_results.csv</span>
 
 <span class="sd">    You can use :code:`--helpfull` flag to list all of the flags that are</span>
 <span class="sd">    defined:</span>
@@ -433,59 +398,88 @@
         <span class="k">assert</span> <span class="nb">len</span><span class="p">(</span><span class="n">argv</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;Unknown args: </span><span class="si">{</span><span class="n">argv</span><span class="p">[:</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="k">assert</span> <span class="n">FLAGS</span><span class="o">.</span><span class="n">n</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;n must be &gt; 0&quot;</span>
 
-        <span class="nb">print</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Writing inference results to &#39;</span><span class="si">{</span><span class="n">FLAGS</span><span class="o">.</span><span class="n">results_logfile</span><span class="si">}</span><span class="s2">&#39; and &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;hardware summary to &#39;</span><span class="si">{</span><span class="n">FLAGS</span><span class="o">.</span><span class="n">hardware_info</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
-        <span class="p">)</span>
-
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">FLAGS</span><span class="o">.</span><span class="n">hardware_info</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="n">_get_hardarwe_info</span><span class="p">(),</span> <span class="n">file</span><span class="o">=</span><span class="n">f</span><span class="p">)</span>
-
         <span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-ic-v0&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Stream verbose CompilerGym logs to file.</span>
+        <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;compiler_gym&quot;</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+        <span class="n">env</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+        <span class="n">log_handler</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">FileHandler</span><span class="p">(</span><span class="n">FLAGS</span><span class="o">.</span><span class="n">leaderboard_logfile</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">addHandler</span><span class="p">(</span><span class="n">log_handler</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">propagate</span> <span class="o">=</span> <span class="kc">False</span>
+
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Writing results to </span><span class="si">{</span><span class="n">FLAGS</span><span class="o">.</span><span class="n">leaderboard_results</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Writing logs to </span><span class="si">{</span><span class="n">FLAGS</span><span class="o">.</span><span class="n">leaderboard_logfile</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
         <span class="k">try</span><span class="p">:</span>
-            <span class="c1"># Install the required dataset and build the list of benchmarks to</span>
-            <span class="c1"># evaluate.</span>
-            <span class="n">env</span><span class="o">.</span><span class="n">require_dataset</span><span class="p">(</span><span class="n">FLAGS</span><span class="o">.</span><span class="n">test_dataset</span><span class="p">)</span>
-            <span class="n">benchmarks</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">([</span><span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">env</span><span class="o">.</span><span class="n">benchmarks</span> <span class="k">if</span> <span class="n">FLAGS</span><span class="o">.</span><span class="n">test_dataset</span> <span class="ow">in</span> <span class="n">b</span><span class="p">])</span>
+            <span class="c1"># Build the list of benchmarks to evaluate.</span>
+            <span class="n">benchmarks</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">datasets</span><span class="p">[</span><span class="n">FLAGS</span><span class="o">.</span><span class="n">test_dataset</span><span class="p">]</span><span class="o">.</span><span class="n">benchmark_uris</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">FLAGS</span><span class="o">.</span><span class="n">max_benchmarks</span><span class="p">:</span>
-                <span class="n">benchmarks</span> <span class="o">=</span> <span class="n">benchmarks</span><span class="p">[:</span> <span class="n">FLAGS</span><span class="o">.</span><span class="n">max_benchmarks</span><span class="p">]</span>
+                <span class="n">benchmarks</span> <span class="o">=</span> <span class="n">islice</span><span class="p">(</span><span class="n">benchmarks</span><span class="p">,</span> <span class="n">FLAGS</span><span class="o">.</span><span class="n">max_benchmarks</span><span class="p">)</span>
+            <span class="n">benchmarks</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">benchmarks</span><span class="p">)</span>
 
             <span class="c1"># Repeat the searches for the requested number of iterations.</span>
             <span class="n">benchmarks</span> <span class="o">*=</span> <span class="n">FLAGS</span><span class="o">.</span><span class="n">n</span>
             <span class="n">benchmarks</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">benchmarks</span><span class="p">)</span>
-            <span class="n">total</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">benchmarks</span><span class="p">)</span>
+            <span class="n">total_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">benchmarks</span><span class="p">)</span>
 
             <span class="c1"># If we are resuming from a previous job, read the states that have</span>
             <span class="c1"># already been proccessed and remove those benchmarks from the list</span>
             <span class="c1"># of benchmarks to evaluate.</span>
-            <span class="n">print_header</span> <span class="o">=</span> <span class="kc">True</span>
-            <span class="n">init</span> <span class="o">=</span> <span class="mi">0</span>
-            <span class="k">if</span> <span class="n">Path</span><span class="p">(</span><span class="n">FLAGS</span><span class="o">.</span><span class="n">results_logfile</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-                <span class="k">if</span> <span class="n">FLAGS</span><span class="o">.</span><span class="n">resume</span><span class="p">:</span>
-                    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">FLAGS</span><span class="o">.</span><span class="n">results_logfile</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                        <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">CompilerEnvState</span><span class="o">.</span><span class="n">read_csv_file</span><span class="p">(</span><span class="n">f</span><span class="p">):</span>
-                            <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">benchmark</span> <span class="ow">in</span> <span class="n">benchmarks</span><span class="p">:</span>
-                                <span class="n">init</span> <span class="o">+=</span> <span class="mi">1</span>
-                                <span class="n">benchmarks</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">benchmark</span><span class="p">)</span>
-                                <span class="n">print_header</span> <span class="o">=</span> <span class="kc">False</span>
-                <span class="k">else</span><span class="p">:</span>
-                    <span class="n">Path</span><span class="p">(</span><span class="n">FLAGS</span><span class="o">.</span><span class="n">results_logfile</span><span class="p">)</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
+            <span class="n">init_states</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">if</span> <span class="n">FLAGS</span><span class="o">.</span><span class="n">resume</span> <span class="ow">and</span> <span class="n">Path</span><span class="p">(</span><span class="n">FLAGS</span><span class="o">.</span><span class="n">leaderboard_results</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                <span class="k">with</span> <span class="n">CompilerEnvStateReader</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="n">FLAGS</span><span class="o">.</span><span class="n">leaderboard_results</span><span class="p">))</span> <span class="k">as</span> <span class="n">reader</span><span class="p">:</span>
+                    <span class="k">for</span> <span class="n">state</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
+                        <span class="n">init_states</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
+                        <span class="k">if</span> <span class="n">state</span><span class="o">.</span><span class="n">benchmark</span> <span class="ow">in</span> <span class="n">benchmarks</span><span class="p">:</span>
+                            <span class="n">benchmarks</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">benchmark</span><span class="p">)</span>
 
             <span class="c1"># Run the benchmark loop in background so that we can asynchronously</span>
             <span class="c1"># log progress.</span>
-            <span class="n">pbar</span> <span class="o">=</span> <span class="n">tqdm</span><span class="p">(</span><span class="n">initial</span><span class="o">=</span><span class="n">init</span><span class="p">,</span> <span class="n">total</span><span class="o">=</span><span class="n">total</span><span class="p">,</span> <span class="n">file</span><span class="o">=</span><span class="n">sys</span><span class="o">.</span><span class="n">stderr</span><span class="p">,</span> <span class="n">unit</span><span class="o">=</span><span class="s2">&quot; benchmark&quot;</span><span class="p">)</span>
-            <span class="n">benchmark_runner</span> <span class="o">=</span> <span class="n">_BenchmarkRunner</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">benchmarks</span><span class="p">,</span> <span class="n">policy</span><span class="p">,</span> <span class="n">print_header</span><span class="p">)</span>
-            <span class="n">benchmark_runner</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
-            <span class="k">while</span> <span class="n">benchmark_runner</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
-                <span class="n">pbar</span><span class="o">.</span><span class="n">n</span> <span class="o">=</span> <span class="n">benchmark_runner</span><span class="o">.</span><span class="n">n</span> <span class="o">+</span> <span class="n">init</span>
-                <span class="n">pbar</span><span class="o">.</span><span class="n">refresh</span><span class="p">()</span>
-                <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">worker</span> <span class="o">=</span> <span class="n">_EvalPolicyWorker</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">benchmarks</span><span class="p">,</span> <span class="n">policy</span><span class="p">,</span> <span class="n">init_states</span><span class="p">)</span>
+            <span class="n">worker</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+            <span class="n">timer</span> <span class="o">=</span> <span class="n">Timer</span><span class="p">()</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;=== Evaluating policy on &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">humanize</span><span class="o">.</span><span class="n">intcomma</span><span class="p">(</span><span class="n">total_count</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">FLAGS</span><span class="o">.</span><span class="n">test_dataset</span><span class="si">}</span><span class="s2"> benchmarks ===&quot;</span>
+                    <span class="s2">&quot;</span><span class="se">\n\n</span><span class="s2">&quot;</span>  <span class="c1"># Blank lines will be filled below</span>
+                <span class="p">)</span>
+                <span class="k">while</span> <span class="n">worker</span><span class="o">.</span><span class="n">is_alive</span><span class="p">():</span>
+                    <span class="n">done_count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">worker</span><span class="o">.</span><span class="n">states</span><span class="p">)</span>
+                    <span class="n">remaining_count</span> <span class="o">=</span> <span class="n">total_count</span> <span class="o">-</span> <span class="n">done_count</span>
+                    <span class="n">time</span> <span class="o">=</span> <span class="n">timer</span><span class="o">.</span><span class="n">time</span>
+                    <span class="n">gmean_reward</span> <span class="o">=</span> <span class="n">geometric_mean</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">reward</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">worker</span><span class="o">.</span><span class="n">states</span><span class="p">])</span>
+                    <span class="n">mean_walltime</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="n">arithmetic_mean</span><span class="p">([</span><span class="n">s</span><span class="o">.</span><span class="n">walltime</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">worker</span><span class="o">.</span><span class="n">states</span><span class="p">])</span> <span class="ow">or</span> <span class="n">time</span>
+                    <span class="p">)</span>
+                    <span class="nb">print</span><span class="p">(</span>
+                        <span class="s2">&quot;</span><span class="se">\r\033</span><span class="s2">[2A&quot;</span>
+                        <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[K&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;Runtime: </span><span class="si">{</span><span class="n">humanize_duration_hms</span><span class="p">(</span><span class="n">time</span><span class="p">)</span><span class="si">}</span><span class="s2">. &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;Estimated completion: </span><span class="si">{</span><span class="n">humanize_duration_hms</span><span class="p">(</span><span class="n">time</span> <span class="o">+</span> <span class="n">mean_walltime</span> <span class="o">*</span> <span class="n">remaining_count</span><span class="p">)</span><span class="si">}</span><span class="s2">. &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;Completed: </span><span class="si">{</span><span class="n">humanize</span><span class="o">.</span><span class="n">intcomma</span><span class="p">(</span><span class="n">done_count</span><span class="p">)</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">humanize</span><span class="o">.</span><span class="n">intcomma</span><span class="p">(</span><span class="n">total_count</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">done_count</span> <span class="o">/</span> <span class="n">total_count</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">).&quot;</span>
+                        <span class="s2">&quot;</span><span class="se">\n\033</span><span class="s2">[K&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;Current mean walltime: </span><span class="si">{</span><span class="n">mean_walltime</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s / benchmark.&quot;</span>
+                        <span class="s2">&quot;</span><span class="se">\n\033</span><span class="s2">[K&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;Current geomean reward: </span><span class="si">{</span><span class="n">gmean_reward</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">,</span>
+                        <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                        <span class="n">end</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                    <span class="n">sleep</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">KeyboardInterrupt</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">keyboard interrupt&quot;</span><span class="p">,</span> <span class="n">flush</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">worker</span><span class="o">.</span><span class="n">alive</span> <span class="o">=</span> <span class="kc">False</span>
+                <span class="c1"># User interrupt, don&#39;t validate.</span>
+                <span class="n">FLAGS</span><span class="o">.</span><span class="n">validate</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="n">env</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
         <span class="k">if</span> <span class="n">FLAGS</span><span class="o">.</span><span class="n">validate</span><span class="p">:</span>
             <span class="n">FLAGS</span><span class="o">.</span><span class="n">env</span> <span class="o">=</span> <span class="s2">&quot;llvm-ic-v0&quot;</span>
-            <span class="n">validate</span><span class="p">([</span><span class="s2">&quot;argv0&quot;</span><span class="p">,</span> <span class="n">FLAGS</span><span class="o">.</span><span class="n">results_logfile</span><span class="p">])</span>
+            <span class="n">validate</span><span class="p">([</span><span class="s2">&quot;argv0&quot;</span><span class="p">,</span> <span class="n">FLAGS</span><span class="o">.</span><span class="n">leaderboard_results</span><span class="p">])</span>
 
     <span class="n">app</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">main</span><span class="p">)</span></div>
 </pre></div>

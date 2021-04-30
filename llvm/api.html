@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.envs.llvm &mdash; CompilerGym 0.1.7 documentation</title>
+  <title>compiler_gym.envs.llvm &mdash; CompilerGym 0.1.8 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.7
+                0.1.8
               </div>
             
           
@@ -104,7 +104,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/envs.html">compiler_gym.envs</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">compiler_gym.envs.llvm</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">compiler_gym.envs.llvm</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#constructing-benchmarks">Constructing Benchmarks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#datasets">Datasets</a></li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
@@ -176,11 +180,19 @@
             
   <div class="section" id="compiler-gym-envs-llvm">
 <h1>compiler_gym.envs.llvm<a class="headerlink" href="#compiler-gym-envs-llvm" title="Permalink to this headline">¶</a></h1>
-<p>The <code class="code docutils literal notranslate"><span class="pre">compiler_gym.envs.llvm</span></code> module contains supporting APIs for the
-<a class="reference internal" href="index.html"><span class="doc">LLVM Environments</span></a>.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">compiler_gym.envs.llvm</span></code> module contains datasets and API extensions
+for the <a class="reference internal" href="index.html"><span class="doc">LLVM Environments</span></a>. See <a class="reference internal" href="../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv" title="compiler_gym.envs.LlvmEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">LlvmEnv</span></code></a> for the class definition.</p>
+<div class="contents local topic" id="contents">
+<ul class="simple">
+<li><p><a class="reference internal" href="#constructing-benchmarks" id="id1">Constructing Benchmarks</a></p></li>
+<li><p><a class="reference internal" href="#datasets" id="id2">Datasets</a></p></li>
+</ul>
+</div>
+<div class="section" id="constructing-benchmarks">
+<h2><a class="toc-backref" href="#id1">Constructing Benchmarks</a><a class="headerlink" href="#constructing-benchmarks" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="compiler_gym.envs.llvm.make_benchmark">
-<code class="sig-prename descclassname">compiler_gym.envs.llvm.</code><code class="sig-name descname">make_benchmark</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inputs</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">, </span>compiler_gym.envs.llvm.benchmarks.ClangInvocation<span class="p">, </span>List<span class="p">[</span>Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">, </span>compiler_gym.envs.llvm.benchmarks.ClangInvocation<span class="p">]</span><span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">copt</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">system_includes</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">timeout</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">600</span></em><span class="sig-paren">)</span> &#x2192; compiler_gym.service.proto.compiler_gym_service_pb2.Benchmark<a class="reference internal" href="../_modules/compiler_gym/envs/llvm/benchmarks.html#make_benchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.make_benchmark" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">compiler_gym.envs.llvm.</code><code class="sig-name descname">make_benchmark</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">inputs</span><span class="p">:</span> <span class="n">Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">, </span>compiler_gym.envs.llvm.llvm_benchmark.ClangInvocation<span class="p">, </span>List<span class="p">[</span>Union<span class="p">[</span>str<span class="p">, </span>pathlib.Path<span class="p">, </span>compiler_gym.envs.llvm.llvm_benchmark.ClangInvocation<span class="p">]</span><span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">copt</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>List<span class="p">[</span>str<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">system_includes</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">timeout</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">600</span></em><span class="sig-paren">)</span> &#x2192; compiler_gym.datasets.benchmark.Benchmark<a class="reference internal" href="../_modules/compiler_gym/envs/llvm/llvm_benchmark.html#make_benchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.make_benchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a benchmark for use by LLVM environments.</p>
 <p>This function takes one or more inputs and uses them to create a benchmark
 that can be passed to <a class="reference internal" href="../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.reset" title="compiler_gym.envs.LlvmEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">compiler_gym.envs.LlvmEnv.reset()</span></code></a>.</p>
@@ -200,8 +212,8 @@ that can be passed to <a class="reference internal" href="../compiler_gym/envs.h
 </pre></div>
 </div>
 <p>If you need more fine-grained control over the options, you can directly
-construct a <a class="reference internal" href="#compiler_gym.envs.llvm.ClangInvocation" title="compiler_gym.envs.llvm.ClangInvocation"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClangInvocation</span></code></a>
-to pass a list of arguments to clang:</p>
+construct a <a class="reference internal" href="#compiler_gym.envs.llvm.ClangInvocation" title="compiler_gym.envs.llvm.ClangInvocation"><code class="xref py py-class docutils literal notranslate"><span class="pre">ClangInvocation</span></code></a> to pass a list of arguments to
+clang:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">benchmark</span> <span class="o">=</span> <span class="n">make_benchmark</span><span class="p">(</span>
 <span class="go">    ClangInvocation([&#39;/path/to/my_app.c&#39;], timeout=10)</span>
 <span class="go">)</span>
@@ -224,13 +236,17 @@ directly:</p>
 <span class="go">])</span>
 </pre></div>
 </div>
+<p>Text-format LLVM assembly can also be used:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">benchmark</span> <span class="o">=</span> <span class="n">make_benchmark</span><span class="p">(</span><span class="s1">&#39;module.ll&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>LLVM bitcode compatibility is
 <a class="reference external" href="https://llvm.org/docs/DeveloperPolicy.html#ir-backwards-compatibility">not guaranteed</a>,
 so you must ensure that any precompiled bitcodes are compatible with the
 LLVM version used by CompilerGym, which can be queried using
-<a class="reference internal" href="../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.compiler_version" title="compiler_gym.envs.CompilerEnv.compiler_version"><code class="xref py py-func docutils literal notranslate"><span class="pre">LlvmEnv.compiler_version</span></code></a>.</p>
+<a class="reference internal" href="../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.compiler_version" title="compiler_gym.envs.CompilerEnv.compiler_version"><code class="xref py py-func docutils literal notranslate"><span class="pre">env.compiler_version</span></code></a>.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -246,14 +262,15 @@ terminating.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns</dt>
-<dd class="field-even"><p>A <code class="code docutils literal notranslate"><span class="pre">Benchmark</span></code> message.</p>
+<dd class="field-even"><p>A <code class="code docutils literal notranslate"><span class="pre">Benchmark</span></code> instance.</p>
 </dd>
 <dt class="field-odd">Raises</dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>FileNotFoundError</strong> – If any input sources are not found.</p></li>
 <li><p><strong>TypeError</strong> – If the inputs are of unsupported types.</p></li>
 <li><p><strong>OSError</strong> – If a compilation job fails.</p></li>
-<li><p><strong>TimeoutExpired</strong> – If a compilation job exceeds <code class="code docutils literal notranslate"><span class="pre">timeout</span></code> seconds.</p></li>
+<li><p><strong>TimeoutExpired</strong> – If a compilation job exceeds <code class="code docutils literal notranslate"><span class="pre">timeout</span></code>
+seconds.</p></li>
 </ul>
 </dd>
 </dl>
@@ -261,11 +278,11 @@ terminating.</p></li>
 
 <dl class="py class">
 <dt id="compiler_gym.envs.llvm.ClangInvocation">
-<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.envs.llvm.</code><code class="sig-name descname">ClangInvocation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">args</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">system_includes</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">timeout</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">600</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/benchmarks.html#ClangInvocation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.ClangInvocation" title="Permalink to this definition">¶</a></dt>
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.envs.llvm.</code><code class="sig-name descname">ClangInvocation</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">args</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">system_includes</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">timeout</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">600</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/llvm_benchmark.html#ClangInvocation"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.ClangInvocation" title="Permalink to this definition">¶</a></dt>
 <dd><p>Class to represent a single invocation of the clang compiler.</p>
 <dl class="py method">
 <dt id="compiler_gym.envs.llvm.ClangInvocation.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">args</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">system_includes</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">timeout</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">600</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/benchmarks.html#ClangInvocation.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.ClangInvocation.__init__" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">args</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">system_includes</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="n">timeout</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">600</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/llvm_benchmark.html#ClangInvocation.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.ClangInvocation.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Create a clang invocation.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -285,7 +302,7 @@ before terminating.</p></li>
 
 <dl class="py function">
 <dt id="compiler_gym.envs.llvm.get_system_includes">
-<code class="sig-prename descclassname">compiler_gym.envs.llvm.</code><code class="sig-name descname">get_system_includes</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>pathlib.Path<span class="p">]</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/benchmarks.html#get_system_includes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.get_system_includes" title="Permalink to this definition">¶</a></dt>
+<code class="sig-prename descclassname">compiler_gym.envs.llvm.</code><code class="sig-name descname">get_system_includes</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>pathlib.Path<span class="p">]</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/llvm_benchmark.html#get_system_includes"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.get_system_includes" title="Permalink to this definition">¶</a></dt>
 <dd><p>Determine the system include paths for C/C++ compilation jobs.</p>
 <p>This uses the system compiler to determine the search paths for C/C++ system
 headers. By default, <code class="code docutils literal notranslate"><span class="pre">c++</span></code> is invoked. This can be overridden by
@@ -301,6 +318,170 @@ determined.</p>
 </dl>
 </dd></dl>
 
+</div>
+<div class="section" id="datasets">
+<h2><a class="toc-backref" href="#id2">Datasets</a><a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt id="compiler_gym.envs.llvm.datasets.get_llvm_datasets">
+<code class="sig-prename descclassname">compiler_gym.envs.llvm.datasets.</code><code class="sig-name descname">get_llvm_datasets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">site_data_base</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>pathlib.Path<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; Iterable<span class="p">[</span>compiler_gym.datasets.dataset.Dataset<span class="p">]</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/datasets.html#get_llvm_datasets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.datasets.get_llvm_datasets" title="Permalink to this definition">¶</a></dt>
+<dd><p>Instantiate the builtin LLVM datasets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>site_data_base</strong> – The root of the site data path.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>An iterable sequence of <a class="reference internal" href="../compiler_gym/datasets.html#compiler_gym.datasets.Dataset" title="compiler_gym.datasets.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> instances.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py class">
+<dt id="compiler_gym.envs.llvm.datasets.AnghaBenchDataset">
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.envs.llvm.datasets.</code><code class="sig-name descname">AnghaBenchDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">site_data_base</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">sort_order</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/datasets/anghabench.html#AnghaBenchDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.datasets.AnghaBenchDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dataset of C programs curated from GitHub source code.</p>
+<p>The dataset is from:</p>
+<blockquote>
+<div><p>da Silva, Anderson Faustino, Bruno Conde Kind, José Wesley de Souza
+Magalhaes, Jerônimo Nunes Rocha, Breno Campos Ferreira Guimaraes, and
+Fernando Magno Quinão Pereira. “ANGHABENCH: A Suite with One Million
+Compilable C Benchmarks for Code-Size Reduction.” In 2021 IEEE/ACM
+International Symposium on Code Generation and Optimization (CGO),
+pp. 378-390. IEEE, 2021.</p>
+</div></blockquote>
+<p>And is available at:</p>
+<blockquote>
+<div><p><a class="reference external" href="http://cuda.dcc.ufmg.br/angha/home">http://cuda.dcc.ufmg.br/angha/home</a></p>
+</div></blockquote>
+<p>The AnghaBench dataset consists of C functions that are compiled to LLVM-IR
+on-demand and cached. The first time each benchmark is used there is an
+overhead of compiling it from C to bitcode. This is a one-off cost.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="compiler_gym.envs.llvm.datasets.BlasDataset">
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.envs.llvm.datasets.</code><code class="sig-name descname">BlasDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">site_data_base</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">sort_order</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/datasets.html#BlasDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.datasets.BlasDataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="compiler_gym.envs.llvm.datasets.CBenchDataset">
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.envs.llvm.datasets.</code><code class="sig-name descname">CBenchDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">site_data_base</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">sort_order</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em>, <em class="sig-param"><span class="n">name</span><span class="o">=</span><span class="default_value">'benchmark://cbench-v1'</span></em>, <em class="sig-param"><span class="n">manifest_url</span><span class="o">=</span><span class="default_value">'https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cbench-v1-manifest.bz2'</span></em>, <em class="sig-param"><span class="n">manifest_sha256</span><span class="o">=</span><span class="default_value">'eeffd7593aeb696a160fd22e6b0c382198a65d0918b8440253ea458cfe927741'</span></em>, <em class="sig-param"><span class="n">deprecated</span><span class="o">=</span><span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/datasets/cbench.html#CBenchDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.datasets.CBenchDataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="compiler_gym.envs.llvm.datasets.CLgenDataset">
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.envs.llvm.datasets.</code><code class="sig-name descname">CLgenDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">site_data_base</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">sort_order</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/datasets/clgen.html#CLgenDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.datasets.CLgenDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>The CLgen dataset contains 1000 synthetically generated OpenCL kernels.</p>
+<p>The dataset is from:</p>
+<blockquote>
+<div><p>Cummins, Chris, Pavlos Petoumenos, Zheng Wang, and Hugh Leather.
+“Synthesizing benchmarks for predictive modeling.” In 2017 IEEE/ACM
+International Symposium on Code Generation and Optimization (CGO),
+pp. 86-99. IEEE, 2017.</p>
+</div></blockquote>
+<p>And is available at:</p>
+<blockquote>
+<div><p><a class="reference external" href="https://github.com/ChrisCummins/paper-synthesizing-benchmarks">https://github.com/ChrisCummins/paper-synthesizing-benchmarks</a></p>
+</div></blockquote>
+<p>The CLgen dataset consists of OpenCL kernels that are compiled to LLVM-IR
+on-demand and cached. The first time each benchmark is used there is an
+overhead of compiling it from OpenCL to bitcode. This is a one-off cost.
+Compiling OpenCL to bitcode requires third party headers that are downloaded
+on the first call to <code class="code docutils literal notranslate"><span class="pre">install()</span></code>.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="compiler_gym.envs.llvm.datasets.CsmithDataset">
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.envs.llvm.datasets.</code><code class="sig-name descname">CsmithDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">site_data_base</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">sort_order</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/datasets/csmith.html#CsmithDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.datasets.CsmithDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dataset which uses Csmith to generate programs.</p>
+<p>Csmith is a tool that can generate random conformant C99 programs. It is
+described in the publication:</p>
+<blockquote>
+<div><p>Yang, Xuejun, Yang Chen, Eric Eide, and John Regehr. “Finding and
+understanding bugs in C compilers.” In Proceedings of the 32nd ACM
+SIGPLAN conference on Programming Language Design and Implementation
+(PLDI), pp. 283-294. 2011.</p>
+</div></blockquote>
+<p>For up-to-date information about Csmith, see:</p>
+<blockquote>
+<div><p><a class="reference external" href="https://embed.cs.utah.edu/csmith/">https://embed.cs.utah.edu/csmith/</a></p>
+</div></blockquote>
+<p>Note that Csmith is a tool that is used to find errors in compilers. As
+such, there is a higher likelihood that the benchmark cannot be used for an
+environment and that <a class="reference internal" href="../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.reset()</span></code></a> will raise <a class="reference internal" href="../compiler_gym/datasets.html#compiler_gym.datasets.BenchmarkInitError" title="compiler_gym.datasets.BenchmarkInitError"><code class="xref py py-class docutils literal notranslate"><span class="pre">BenchmarkInitError</span></code></a>.</p>
+<p>Using the CsmithDataset requires building the Csmith binary from source.
+This is done automatically on the first call to <code class="code docutils literal notranslate"><span class="pre">install()</span></code>. Building
+Csmith requires a working C++ toolchain. Install the required dependencies
+using: <code class="code docutils literal notranslate"><span class="pre">sudo</span> <span class="pre">apt</span> <span class="pre">install</span> <span class="pre">-y</span> <span class="pre">g++</span> <span class="pre">m4</span></code> on Linux, or <code class="code docutils literal notranslate"><span class="pre">brew</span> <span class="pre">install</span>
+<span class="pre">m4</span></code> on macOS. <a class="reference internal" href="../compiler_gym/datasets.html#compiler_gym.datasets.DatasetInitError" title="compiler_gym.datasets.DatasetInitError"><code class="xref py py-class docutils literal notranslate"><span class="pre">DatasetInitError</span></code></a> is raised if compilation fails.
+See the <a class="reference external" href="https://github.com/csmith-project/csmith#install-csmith">Csmith repo</a> for further
+details.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="compiler_gym.envs.llvm.datasets.GitHubDataset">
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.envs.llvm.datasets.</code><code class="sig-name descname">GitHubDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">site_data_base</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">sort_order</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/datasets.html#GitHubDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.datasets.GitHubDataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="compiler_gym.envs.llvm.datasets.LinuxDataset">
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.envs.llvm.datasets.</code><code class="sig-name descname">LinuxDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">site_data_base</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">sort_order</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/datasets.html#LinuxDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.datasets.LinuxDataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="compiler_gym.envs.llvm.datasets.LlvmStressDataset">
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.envs.llvm.datasets.</code><code class="sig-name descname">LlvmStressDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">site_data_base</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">sort_order</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/datasets/llvm_stress.html#LlvmStressDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.datasets.LlvmStressDataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>A dataset which uses llvm-stress to generate programs.</p>
+<p><a class="reference external" href="https://llvm.org/docs/CommandGuide/llvm-stress.html">llvm-stress</a> is a
+tool for generating random LLVM-IR files.</p>
+<p>This dataset forces reproducible results by setting the input seed to the
+generator. The benchmark’s URI is the seed, e.g.
+“generator://llvm-stress-v0/10” is the benchmark generated by llvm-stress
+using seed 10. The total number of unique seeds is 2^32 - 1.</p>
+<p>Note that llvm-stress is a tool that is used to find errors in LLVM. As
+such, there is a higher likelihood that the benchmark cannot be used for an
+environment and that <a class="reference internal" href="../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.reset()</span></code></a> will raise
+<a class="reference internal" href="../compiler_gym/datasets.html#compiler_gym.datasets.BenchmarkInitError" title="compiler_gym.datasets.BenchmarkInitError"><code class="xref py py-class docutils literal notranslate"><span class="pre">BenchmarkInitError</span></code></a>.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt id="compiler_gym.envs.llvm.datasets.MibenchDataset">
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.envs.llvm.datasets.</code><code class="sig-name descname">MibenchDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">site_data_base</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">sort_order</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/datasets.html#MibenchDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.datasets.MibenchDataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="compiler_gym.envs.llvm.datasets.NPBDataset">
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.envs.llvm.datasets.</code><code class="sig-name descname">NPBDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">site_data_base</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">sort_order</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/datasets.html#NPBDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.datasets.NPBDataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="compiler_gym.envs.llvm.datasets.OpenCVDataset">
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.envs.llvm.datasets.</code><code class="sig-name descname">OpenCVDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">site_data_base</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">sort_order</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/datasets.html#OpenCVDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.datasets.OpenCVDataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+<dl class="py class">
+<dt id="compiler_gym.envs.llvm.datasets.POJ104Dataset">
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.envs.llvm.datasets.</code><code class="sig-name descname">POJ104Dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">site_data_base</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">sort_order</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/datasets/poj104.html#POJ104Dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.datasets.POJ104Dataset" title="Permalink to this definition">¶</a></dt>
+<dd><p>The POJ-104 dataset contains 52000 C++ programs implementing 104
+different algorithms with 500 examples of each.</p>
+<p>The dataset is from:</p>
+<blockquote>
+<div><p>Lili Mou, Ge Li, Lu Zhang, Tao Wang, Zhi Jin. “Convolutional neural
+networks over tree structures for programming language processing.” To
+appear in Proceedings of 30th AAAI Conference on Artificial
+Intelligence, 2016.</p>
+</div></blockquote>
+<p>And is available at:</p>
+<blockquote>
+<div><p><a class="reference external" href="https://sites.google.com/site/treebasedcnn/">https://sites.google.com/site/treebasedcnn/</a></p>
+</div></blockquote>
+</dd></dl>
+
+<dl class="py class">
+<dt id="compiler_gym.envs.llvm.datasets.TensorFlowDataset">
+<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.envs.llvm.datasets.</code><code class="sig-name descname">TensorFlowDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">site_data_base</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">sort_order</span><span class="p">:</span> <span class="n">int</span> <span class="o">=</span> <span class="default_value">0</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/datasets.html#TensorFlowDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.envs.llvm.datasets.TensorFlowDataset" title="Permalink to this definition">¶</a></dt>
+<dd></dd></dl>
+
+</div>
 </div>
 
 

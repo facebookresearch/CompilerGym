@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.views &mdash; CompilerGym 0.1.7 documentation</title>
+  <title>compiler_gym.views &mdash; CompilerGym 0.1.8 documentation</title>
   
 
   
@@ -63,7 +63,7 @@
             
             
               <div class="version">
-                0.1.7
+                0.1.8
               </div>
             
           
@@ -219,7 +219,10 @@ respectively.</p>
 <dd class="field-even"><p>An observation.</p>
 </dd>
 <dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><strong>KeyError</strong> – If the requested observation space does not exist.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>KeyError</strong> – If the requested observation space does not exist.</p></li>
+<li><p><a class="reference internal" href="service.html#compiler_gym.service.SessionNotFound" title="compiler_gym.service.SessionNotFound"><strong>SessionNotFound</strong></a> – If <a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.reset()</span></code></a> has not been called.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -227,9 +230,8 @@ respectively.</p>
 <dl class="py method">
 <dt id="compiler_gym.views.ObservationView.add_derived_space">
 <code class="sig-name descname">add_derived_space</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">base_id</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">kwargs</span></em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/compiler_gym/views/observation.html#ObservationView.add_derived_space"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.views.ObservationView.add_derived_space" title="Permalink to this definition">¶</a></dt>
-<dd><p>Alias to
-<a class="reference internal" href="#compiler_gym.views.ObservationSpaceSpec.make_derived_space" title="compiler_gym.views.ObservationSpaceSpec.make_derived_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">ObservationSpaceSpec.make_derived_space()</span></code></a>
-that adds the derived space to the observation view.</p>
+<dd><p>Alias to <a class="reference internal" href="#compiler_gym.views.ObservationSpaceSpec.make_derived_space" title="compiler_gym.views.ObservationSpaceSpec.make_derived_space"><code class="xref py py-func docutils literal notranslate"><span class="pre">ObservationSpaceSpec.make_derived_space()</span></code></a> that adds
+the derived space to the observation view.</p>
 <p>Example usage:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">add_derived_space</span><span class="p">(</span>
 <span class="go">    id=&quot;src_len&quot;,</span>
@@ -346,7 +348,10 @@ base observation space.</p></li>
 <dd class="field-even"><p>A reward.</p>
 </dd>
 <dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><strong>KeyError</strong> – If the requested reward space does not exist.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>KeyError</strong> – If the requested reward space does not exist.</p></li>
+<li><p><a class="reference internal" href="service.html#compiler_gym.service.SessionNotFound" title="compiler_gym.service.SessionNotFound"><strong>SessionNotFound</strong></a> – If <a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.reset()</span></code></a> has not been called.</p></li>
+</ul>
 </dd>
 </dl>
 </dd></dl>
@@ -364,13 +369,12 @@ base observation space.</p></li>
 
 <dl class="py method">
 <dt id="compiler_gym.views.RewardView.reset">
-<code class="sig-name descname">reset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">benchmark</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/compiler_gym/views/reward.html#RewardView.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.views.RewardView.reset" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">reset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">benchmark</span><span class="p">:</span> <span class="n">compiler_gym.datasets.benchmark.Benchmark</span></em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/compiler_gym/views/reward.html#RewardView.reset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.views.RewardView.reset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Reset the rewards space view. This is called on
 <a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.reset()</span></code></a>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>benchmark</strong> – The URI of the benchmark that is used for this
-episode.</p>
+<dd class="field-odd"><p><strong>benchmark</strong> – The benchmark that is used for this episode.</p>
 </dd>
 </dl>
 </dd></dl>

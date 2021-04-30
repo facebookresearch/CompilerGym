@@ -123,3 +123,40 @@ that we expose in four phases:
      - Code Rewrite Rule
      - What instruction should I replace this code with to make it
        better?
+
+.. _stability:
+
+Feature Stability
+-----------------
+
+CompilerGym is in an early stage of development. Our goal is to maintain a
+*stable user-facing API* to support developing agents, while achieving a fast
+pace of development by permitting a *volatile implementation for backend
+features*. This table summarizes our stability guarantees by component, starting
+at the user-facing APIs and working down to the backend service implementations:
+
++-----------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------+
+| Component                                                                                                                                                 | Stability                                                                            |
++===========================================================================================================================================================+======================================================================================+
+| | Core Python API.                                                                                                                                        | | |:white_check_mark:| **Stable**. We provide full compatibility with the OpenAI     |
+| | *e.g.* :meth:`env.step() <compiler_gym.envs.CompilerEnv.step>`, :meth:`env.reset() <compiler_gym.envs.CompilerEnv.reset>`.                              | | gym interface. Should OpenAI change this interface,                                |
+|                                                                                                                                                           | | we will update and maintain backwards compatability                                |
+|                                                                                                                                                           | | for a minimum of five releases.                                                    |
++-----------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------+
+| | Python API Extensions.                                                                                                                                  | | |:building_construction:| **Stable with dreprecations**. Breaking changes will be  |
+| | *e.g.* :meth:`env.fork() <compiler_gym.envs.CompilerEnv.fork>`, :meth:`env.validate() <compiler_gym.envs.CompilerEnv.validate>`.                        | | used sparingly where they lead to clear improvements                               |
+|                                                                                                                                                           | | in usability or performance. Any breaking change will                              |
+|                                                                                                                                                           | | be preceded by runtime deprecation warnings for a                                  |
+|                                                                                                                                                           | | minimum of two releases.                                                           |
++-----------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------+
+| | Compiler Service RPC interface.                                                                                                                         | | |:warning:| **Somewhat stable.** Breaking changes are planned, and                 |
+| | *e.g.* `CompilerGymService <https://github.com/facebookresearch/CompilerGym/blob/development/compiler_gym/service/proto/compiler_gym_service.proto>`__. | | will be preceded by deprecation notices in the source                              |
+|                                                                                                                                                           | | code for a minimum of one release. We recommend                                    |
+|                                                                                                                                                           | | upstreaming new compiler support early to alleviate                                |
+|                                                                                                                                                           | | maintenance burden.                                                                |
++-----------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------+
+| | Compiler Service Implementations.                                                                                                                       | | |:stop_sign:| **Not Stable.** Breaking changes can happen at any time.             |
+| | *e.g.* :doc:`the LLVM C++ codebase <llvm/index>`.                                                                                                       | | There is no API stability guarantees. If you are modifying                         |
+|                                                                                                                                                           | | a compiler service it is strongly recommended to upstream                          |
+|                                                                                                                                                           | | your work to ease the maintenance burden.                                          |
++-----------------------------------------------------------------------------------------------------------------------------------------------------------+--------------------------------------------------------------------------------------+

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>About &mdash; CompilerGym 0.1.7 documentation</title>
+  <title>About &mdash; CompilerGym 0.1.8 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.7
+                0.1.8
               </div>
             
           
@@ -101,6 +101,7 @@
 <li class="toctree-l3"><a class="reference internal" href="#enabling-increasingly-granular-control-over-optimization-decisions">Enabling increasingly-granular control over optimization decisions</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#feature-stability">Feature Stability</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
@@ -199,6 +200,7 @@ expose new optimization problems for AI.</p>
 <li><p><a class="reference internal" href="#enabling-increasingly-granular-control-over-optimization-decisions" id="id5">Enabling increasingly-granular control over optimization decisions</a></p></li>
 </ul>
 </li>
+<li><p><a class="reference internal" href="#feature-stability" id="id6">Feature Stability</a></p></li>
 </ul>
 </div>
 <div class="section" id="motivation">
@@ -318,6 +320,81 @@ better?</p></td>
 </tbody>
 </table>
 </div>
+</div>
+<div class="section" id="feature-stability">
+<span id="stability"></span><h2><a class="toc-backref" href="#id6">Feature Stability</a><a class="headerlink" href="#feature-stability" title="Permalink to this headline">¶</a></h2>
+<p>CompilerGym is in an early stage of development. Our goal is to maintain a
+<em>stable user-facing API</em> to support developing agents, while achieving a fast
+pace of development by permitting a <em>volatile implementation for backend
+features</em>. This table summarizes our stability guarantees by component, starting
+at the user-facing APIs and working down to the backend service implementations:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 64%" />
+<col style="width: 36%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Component</p></th>
+<th class="head"><p>Stability</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><div class="line-block">
+<div class="line">Core Python API.</div>
+<div class="line"><em>e.g.</em> <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.step" title="compiler_gym.envs.CompilerEnv.step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.step()</span></code></a>, <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.reset()</span></code></a>.</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">✅ <strong>Stable</strong>. We provide full compatibility with the OpenAI</div>
+<div class="line">gym interface. Should OpenAI change this interface,</div>
+<div class="line">we will update and maintain backwards compatability</div>
+<div class="line">for a minimum of five releases.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line">Python API Extensions.</div>
+<div class="line"><em>e.g.</em> <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.fork" title="compiler_gym.envs.CompilerEnv.fork"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.fork()</span></code></a>, <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.validate" title="compiler_gym.envs.CompilerEnv.validate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.validate()</span></code></a>.</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">🏗️ <strong>Stable with dreprecations</strong>. Breaking changes will be</div>
+<div class="line">used sparingly where they lead to clear improvements</div>
+<div class="line">in usability or performance. Any breaking change will</div>
+<div class="line">be preceded by runtime deprecation warnings for a</div>
+<div class="line">minimum of two releases.</div>
+</div>
+</td>
+</tr>
+<tr class="row-even"><td><div class="line-block">
+<div class="line">Compiler Service RPC interface.</div>
+<div class="line"><em>e.g.</em> <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/blob/development/compiler_gym/service/proto/compiler_gym_service.proto">CompilerGymService</a>.</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">⚠️ <strong>Somewhat stable.</strong> Breaking changes are planned, and</div>
+<div class="line">will be preceded by deprecation notices in the source</div>
+<div class="line">code for a minimum of one release. We recommend</div>
+<div class="line">upstreaming new compiler support early to alleviate</div>
+<div class="line">maintenance burden.</div>
+</div>
+</td>
+</tr>
+<tr class="row-odd"><td><div class="line-block">
+<div class="line">Compiler Service Implementations.</div>
+<div class="line"><em>e.g.</em> <a class="reference internal" href="llvm/index.html"><span class="doc">the LLVM C++ codebase</span></a>.</div>
+</div>
+</td>
+<td><div class="line-block">
+<div class="line">🛑 <strong>Not Stable.</strong> Breaking changes can happen at any time.</div>
+<div class="line">There is no API stability guarantees. If you are modifying</div>
+<div class="line">a compiler service it is strongly recommended to upstream</div>
+<div class="line">your work to ease the maintenance burden.</div>
+</div>
+</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 

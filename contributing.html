@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Contributing &mdash; CompilerGym 0.1.7 documentation</title>
+  <title>Contributing &mdash; CompilerGym 0.1.8 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.7
+                0.1.8
               </div>
             
           
@@ -96,6 +96,7 @@
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Contributing</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#how-to-contribute">How to Contribute</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#pull-requests">Pull Requests</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#leaderboard-submissions">Leaderboard Submissions</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#code-style">Code Style</a></li>
@@ -182,6 +183,18 @@
             
   <div class="section" id="contributing">
 <h1>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h1>
+<p><strong>Table of Contents</strong></p>
+<ul class="simple">
+<li><p><a class="reference external" href="#how-to-contribute">How to Contribute</a></p></li>
+<li><p><a class="reference external" href="#pull-requests">Pull Requests</a></p></li>
+<li><p><a class="reference external" href="#leaderboard-submissions">Leaderboard Submissions</a></p></li>
+<li><p><a class="reference external" href="#code-style">Code Style</a></p></li>
+<li><p><a class="reference external" href="#contributor-license-agreement-cla">Contributor License Agreement
+(“CLA”)</a></p></li>
+</ul>
+<hr class="docutils" />
+<div class="section" id="how-to-contribute">
+<h2>How to Contribute<a class="headerlink" href="#how-to-contribute" title="Permalink to this headline">¶</a></h2>
 <p>We want to make contributing to CompilerGym as easy and transparent as
 possible. The most helpful ways to contribute are:</p>
 <ol class="arabic simple">
@@ -204,12 +217,14 @@ not well supported, including as much detail as possible.</p></li>
 <li><p>Pull requests. Please see below for details. The easiest way to
 get stuck is to grab an <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/issues?q=is%3Aopen+is%3Aissue+no%3Aassignee+label%3A%22Good+first+issue%22">unassigned “Good first issue”
 ticket</a>!</p></li>
-<li><p>Add new features not on the roadmap. Examples could include adding
-support for new compilers, producing research results using
-CompilerGym, etc.</p></li>
+<li><p>Add new features not on <a class="reference external" href="https://facebookresearch.github.io/CompilerGym/about.html#roadmap">the
+roadmap</a>.
+Examples could include adding support for new compilers, producing
+research results using CompilerGym, etc.</p></li>
 </ul>
 </li>
 </ol>
+</div>
 <div class="section" id="pull-requests">
 <h2>Pull Requests<a class="headerlink" href="#pull-requests" title="Permalink to this headline">¶</a></h2>
 <p>We actively welcome your pull requests.</p>
@@ -222,9 +237,9 @@ to set up your environment.</p></li>
 <li><p>If you’ve added code that should be tested, add tests.</p></li>
 <li><p>If you’ve changed APIs, update the <a class="reference external" href="/docs/source">documentation</a>.</p></li>
 <li><p>Ensure the <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span></code> suite passes.</p></li>
-<li><p>Make sure your code lints (see “Code Style” below).</p></li>
-<li><p>If you haven’t already, complete the Contributor License Agreement
-(“CLA”).</p></li>
+<li><p>Make sure your code lints (see <a class="reference external" href="#code-style">Code Style</a> below).</p></li>
+<li><p>If you haven’t already, complete the <a class="reference external" href="#contributor-license-agreement-cla">Contributor License Agreement
+(“CLA”)</a>.</p></li>
 </ol>
 </div>
 <div class="section" id="leaderboard-submissions">
@@ -240,10 +255,12 @@ package provides utilities to help generate results using your agent.</p></li>
 <li><p>A write-up of your approach. You may use the <a class="reference external" href="/leaderboard/SUBMISSION_TEMPLATE.md">submission
 template</a> as a guide.</p></li>
 </ol>
-<p>We do not require that you submit the source code for your approach.
-Once you submit your pull request we will validate your results CSV
-files and may ask clarifying questions if we feel that those would be
-useful to improve reproducibility. Please <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/117">take a look
+<p>Please make sure to update to the latest CompilerGym release prior to
+submission. We do not require that you submit the source code for your
+approach, though we encourage that you make it publicly available. Once
+you submit your pull request we will validate your results CSV files and
+may ask clarifying questions if we feel that those would be useful to
+improve reproducibility. <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/117">Take a look
 here</a> for
 an example of a well-formed pull request submission.</p>
 </div>
@@ -259,14 +276,16 @@ and <a class="reference external" href="https://pypi.org/project/isort/">isort</
 style</a> with 100
 character line length and <code class="docutils literal notranslate"><span class="pre">camelCaseFunctionNames()</span></code>.</p></li>
 </ul>
-<p>We use <a class="reference external" href="/.pre-commit-config.yaml">pre-commit</a> to format our code to
-enforce these rules. Before submitting pull requests, please run
-pre-commit to ensure the code is correctly formatted.</p>
+<p>We use <a class="reference external" href="https://pre-commit.com/">pre-commit</a> to ensure that code is
+formatted prior to committing. Before submitting pull requests, please
+run pre-commit. See the <a class="reference external" href="/.pre-commit-config.yaml">config file</a> for
+installation and usage instructions.</p>
 <p>Other common sense rules we encourage are:</p>
 <ul class="simple">
 <li><p>Prefer descriptive names over short ones.</p></li>
 <li><p>Split complex code into small units.</p></li>
 <li><p>When writing new features, add tests.</p></li>
+<li><p>Make tests deterministic.</p></li>
 <li><p>Prefer easy-to-use code over easy-to-read, and easy-to-read code over
 easy-to-write.</p></li>
 </ul>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.envs.llvm.benchmarks &mdash; CompilerGym 0.1.7 documentation</title>
+  <title>compiler_gym.envs.llvm.llvm_benchmark &mdash; CompilerGym 0.1.8 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.7
+                0.1.8
               </div>
             
           
@@ -155,7 +155,7 @@
         
           <li><a href="../../../index.html">Module code</a> &raquo;</li>
         
-      <li>compiler_gym.envs.llvm.benchmarks</li>
+      <li>compiler_gym.envs.llvm.llvm_benchmark</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -170,7 +170,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <h1>Source code for compiler_gym.envs.llvm.benchmarks</h1><div class="highlight"><pre>
+  <h1>Source code for compiler_gym.envs.llvm.llvm_benchmark</h1><div class="highlight"><pre>
 <span></span><span class="c1"># Copyright (c) Facebook, Inc. and its affiliates.</span>
 <span class="c1">#</span>
 <span class="c1"># This source code is licensed under the MIT license found in the</span>
@@ -181,16 +181,16 @@
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
-<span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">ThreadPoolExecutor</span><span class="p">,</span> <span class="n">as_completed</span>
+<span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">as_completed</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
-<span class="kn">from</span> <span class="nn">multiprocessing</span> <span class="kn">import</span> <span class="n">cpu_count</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">signal</span> <span class="kn">import</span> <span class="n">Signals</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">File</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">BenchmarkInitError</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.third_party</span> <span class="kn">import</span> <span class="n">llvm</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">cache_path</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">transient_cache_path</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.thread_pool</span> <span class="kn">import</span> <span class="n">get_thread_pool_executor</span>
 
 
 <span class="k">def</span> <span class="nf">_communicate</span><span class="p">(</span><span class="n">process</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
@@ -308,109 +308,17 @@
         <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
         <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;-c&quot;</span><span class="p">,</span> <span class="s2">&quot;-emit-llvm&quot;</span><span class="p">,</span> <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">outpath</span><span class="p">)]</span>
 
-        <span class="k">return</span> <span class="n">cmd</span></div>
+        <span class="k">return</span> <span class="n">cmd</span>
 
-
-<span class="k">def</span> <span class="nf">_run_command</span><span class="p">(</span><span class="n">cmd</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
-    <span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
-        <span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">DEVNULL</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span>
-    <span class="n">_</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">_communicate</span><span class="p">(</span><span class="n">process</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">process</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
-        <span class="n">returncode</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">returncode</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="c1"># Try and decode the name of a signal. Signal returncodes</span>
-            <span class="c1"># are negative.</span>
-            <span class="n">returncode</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">returncode</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">Signals</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">returncode</span><span class="p">))</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">)&quot;</span>
-        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
-            <span class="k">pass</span>
-        <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Compilation job failed with returncode </span><span class="si">{</span><span class="n">returncode</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Command: </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Stderr: </span><span class="si">{</span><span class="n">stderr</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
-
-
-<div class="viewcode-block" id="make_benchmark"><a class="viewcode-back" href="../../../../llvm/api.html#compiler_gym.envs.llvm.make_benchmark">[docs]</a><span class="k">def</span> <span class="nf">make_benchmark</span><span class="p">(</span>
-    <span class="n">inputs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">ClangInvocation</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">ClangInvocation</span><span class="p">]]],</span>
-    <span class="n">copt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-    <span class="n">system_includes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Create a benchmark for use by LLVM environments.</span>
-
-<span class="sd">    This function takes one or more inputs and uses them to create a benchmark</span>
-<span class="sd">    that can be passed to :meth:`compiler_gym.envs.LlvmEnv.reset`.</span>
-
-<span class="sd">    For single-source C/C++ programs, you can pass the path of the source file:</span>
-
-<span class="sd">    &gt;&gt;&gt; benchmark = make_benchmark(&#39;my_app.c&#39;)</span>
-<span class="sd">    &gt;&gt;&gt; env = gym.make(&quot;llvm-v0&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; env.reset(benchmark=benchmark)</span>
-
-<span class="sd">    The clang invocation used is roughly equivalent to:</span>
-
-<span class="sd">    .. code-block::</span>
-
-<span class="sd">        $ clang my_app.c -O0 -c -emit-llvm -o benchmark.bc</span>
-
-<span class="sd">    Additional compile-time arguments to clang can be provided using the</span>
-<span class="sd">    :code:`copt` argument:</span>
-
-<span class="sd">    &gt;&gt;&gt; benchmark = make_benchmark(&#39;/path/to/my_app.cpp&#39;, copt=[&#39;-O2&#39;])</span>
-
-<span class="sd">    If you need more fine-grained control over the options, you can directly</span>
-<span class="sd">    construct a :class:`ClangInvocation &lt;compiler_gym.envs.llvm.ClangInvocation&gt;`</span>
-<span class="sd">    to pass a list of arguments to clang:</span>
-
-<span class="sd">    &gt;&gt;&gt; benchmark = make_benchmark(</span>
-<span class="sd">        ClangInvocation([&#39;/path/to/my_app.c&#39;], timeout=10)</span>
-<span class="sd">    )</span>
-
-<span class="sd">    For multi-file programs, pass a list of inputs that will be compiled</span>
-<span class="sd">    separately and then linked to a single module:</span>
-
-<span class="sd">    &gt;&gt;&gt; benchmark = make_benchmark([</span>
-<span class="sd">        &#39;main.c&#39;,</span>
-<span class="sd">        &#39;lib.cpp&#39;,</span>
-<span class="sd">        &#39;lib2.bc&#39;,</span>
-<span class="sd">    ])</span>
-
-<span class="sd">    If you already have prepared bitcode files, those can be linked and used</span>
-<span class="sd">    directly:</span>
-
-<span class="sd">    &gt;&gt;&gt; benchmark = make_benchmark([</span>
-<span class="sd">        &#39;bitcode1.bc&#39;,</span>
-<span class="sd">        &#39;bitcode2.bc&#39;,</span>
-<span class="sd">    ])</span>
-
-<span class="sd">    .. note::</span>
-<span class="sd">        LLVM bitcode compatibility is</span>
-<span class="sd">        `not guaranteed &lt;https://llvm.org/docs/DeveloperPolicy.html#ir-backwards-compatibility&gt;`_,</span>
-<span class="sd">        so you must ensure that any precompiled bitcodes are compatible with the</span>
-<span class="sd">        LLVM version used by CompilerGym, which can be queried using</span>
-<span class="sd">        :func:`LlvmEnv.compiler_version &lt;compiler_gym.envs.CompilerEnv.compiler_version&gt;`.</span>
-
-<span class="sd">    :param inputs: An input, or list of inputs.</span>
-<span class="sd">    :param copt: A list of command line options to pass to clang when compiling</span>
-<span class="sd">        source files.</span>
-<span class="sd">    :param system_includes: Whether to include the system standard libraries</span>
-<span class="sd">        during compilation jobs. This requires a system toolchain. See</span>
-<span class="sd">        :func:`get_system_includes`.</span>
-<span class="sd">    :param timeout: The maximum number of seconds to allow clang to run before</span>
-<span class="sd">        terminating.</span>
-<span class="sd">    :return: A :code:`Benchmark` message.</span>
-<span class="sd">    :raises FileNotFoundError: If any input sources are not found.</span>
-<span class="sd">    :raises TypeError: If the inputs are of unsupported types.</span>
-<span class="sd">    :raises OSError: If a compilation job fails.</span>
-<span class="sd">    :raises TimeoutExpired: If a compilation job exceeds :code:`timeout` seconds.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="n">copt</span> <span class="o">=</span> <span class="n">copt</span> <span class="ow">or</span> <span class="p">[]</span>
-
-    <span class="n">bitcodes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">clang_jobs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ClangInvocation</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-
-    <span class="k">def</span> <span class="nf">_add_path</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_c_file</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span>
+        <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+        <span class="n">copt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">system_includes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;ClangInvocation&quot;</span><span class="p">:</span>
+        <span class="n">copt</span> <span class="o">=</span> <span class="n">copt</span> <span class="ow">or</span> <span class="p">[]</span>
         <span class="c1"># NOTE(cummins): There is some discussion about the best way to create a</span>
         <span class="c1"># bitcode that is unoptimized yet does not hinder downstream</span>
         <span class="c1"># optimization opportunities. Here we are using a configuration based on</span>
@@ -432,6 +340,129 @@
             <span class="s2">&quot;-disable-llvm-optzns&quot;</span><span class="p">,</span>
         <span class="p">]</span>
 
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">DEFAULT_COPT</span> <span class="o">+</span> <span class="n">copt</span> <span class="o">+</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)],</span>
+            <span class="n">system_includes</span><span class="o">=</span><span class="n">system_includes</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">_run_command</span><span class="p">(</span><span class="n">cmd</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+    <span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+        <span class="n">cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">DEVNULL</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span>
+    <span class="p">)</span>
+    <span class="n">_</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">_communicate</span><span class="p">(</span><span class="n">process</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">process</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
+        <span class="n">returncode</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">returncode</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Try and decode the name of a signal. Signal returncodes</span>
+            <span class="c1"># are negative.</span>
+            <span class="n">returncode</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">returncode</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">Signals</span><span class="p">(</span><span class="nb">abs</span><span class="p">(</span><span class="n">returncode</span><span class="p">))</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">pass</span>
+        <span class="k">raise</span> <span class="n">BenchmarkInitError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Compilation job failed with returncode </span><span class="si">{</span><span class="n">returncode</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Command: </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">cmd</span><span class="p">)</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="sa">f</span><span class="s2">&quot;Stderr: </span><span class="si">{</span><span class="n">stderr</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span>
+
+
+<div class="viewcode-block" id="make_benchmark"><a class="viewcode-back" href="../../../../llvm/api.html#compiler_gym.envs.llvm.make_benchmark">[docs]</a><span class="k">def</span> <span class="nf">make_benchmark</span><span class="p">(</span>
+    <span class="n">inputs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">ClangInvocation</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">ClangInvocation</span><span class="p">]]],</span>
+    <span class="n">copt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">system_includes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+    <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Create a benchmark for use by LLVM environments.</span>
+
+<span class="sd">    This function takes one or more inputs and uses them to create a benchmark</span>
+<span class="sd">    that can be passed to :meth:`compiler_gym.envs.LlvmEnv.reset`.</span>
+
+<span class="sd">    For single-source C/C++ programs, you can pass the path of the source file:</span>
+
+<span class="sd">        &gt;&gt;&gt; benchmark = make_benchmark(&#39;my_app.c&#39;)</span>
+<span class="sd">        &gt;&gt;&gt; env = gym.make(&quot;llvm-v0&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; env.reset(benchmark=benchmark)</span>
+
+<span class="sd">    The clang invocation used is roughly equivalent to:</span>
+
+<span class="sd">    .. code-block::</span>
+
+<span class="sd">        $ clang my_app.c -O0 -c -emit-llvm -o benchmark.bc</span>
+
+<span class="sd">    Additional compile-time arguments to clang can be provided using the</span>
+<span class="sd">    :code:`copt` argument:</span>
+
+<span class="sd">        &gt;&gt;&gt; benchmark = make_benchmark(&#39;/path/to/my_app.cpp&#39;, copt=[&#39;-O2&#39;])</span>
+
+<span class="sd">    If you need more fine-grained control over the options, you can directly</span>
+<span class="sd">    construct a :class:`ClangInvocation</span>
+<span class="sd">    &lt;compiler_gym.envs.llvm.ClangInvocation&gt;` to pass a list of arguments to</span>
+<span class="sd">    clang:</span>
+
+<span class="sd">        &gt;&gt;&gt; benchmark = make_benchmark(</span>
+<span class="sd">            ClangInvocation([&#39;/path/to/my_app.c&#39;], timeout=10)</span>
+<span class="sd">        )</span>
+
+<span class="sd">    For multi-file programs, pass a list of inputs that will be compiled</span>
+<span class="sd">    separately and then linked to a single module:</span>
+
+<span class="sd">        &gt;&gt;&gt; benchmark = make_benchmark([</span>
+<span class="sd">            &#39;main.c&#39;,</span>
+<span class="sd">            &#39;lib.cpp&#39;,</span>
+<span class="sd">            &#39;lib2.bc&#39;,</span>
+<span class="sd">        ])</span>
+
+<span class="sd">    If you already have prepared bitcode files, those can be linked and used</span>
+<span class="sd">    directly:</span>
+
+<span class="sd">        &gt;&gt;&gt; benchmark = make_benchmark([</span>
+<span class="sd">            &#39;bitcode1.bc&#39;,</span>
+<span class="sd">            &#39;bitcode2.bc&#39;,</span>
+<span class="sd">        ])</span>
+
+<span class="sd">    Text-format LLVM assembly can also be used:</span>
+
+<span class="sd">        &gt;&gt;&gt; benchmark = make_benchmark(&#39;module.ll&#39;)</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        LLVM bitcode compatibility is</span>
+<span class="sd">        `not guaranteed &lt;https://llvm.org/docs/DeveloperPolicy.html#ir-backwards-compatibility&gt;`_,</span>
+<span class="sd">        so you must ensure that any precompiled bitcodes are compatible with the</span>
+<span class="sd">        LLVM version used by CompilerGym, which can be queried using</span>
+<span class="sd">        :func:`env.compiler_version &lt;compiler_gym.envs.CompilerEnv.compiler_version&gt;`.</span>
+
+<span class="sd">    :param inputs: An input, or list of inputs.</span>
+
+<span class="sd">    :param copt: A list of command line options to pass to clang when compiling</span>
+<span class="sd">        source files.</span>
+
+<span class="sd">    :param system_includes: Whether to include the system standard libraries</span>
+<span class="sd">        during compilation jobs. This requires a system toolchain. See</span>
+<span class="sd">        :func:`get_system_includes`.</span>
+
+<span class="sd">    :param timeout: The maximum number of seconds to allow clang to run before</span>
+<span class="sd">        terminating.</span>
+
+<span class="sd">    :return: A :code:`Benchmark` instance.</span>
+
+<span class="sd">    :raises FileNotFoundError: If any input sources are not found.</span>
+
+<span class="sd">    :raises TypeError: If the inputs are of unsupported types.</span>
+
+<span class="sd">    :raises OSError: If a compilation job fails.</span>
+
+<span class="sd">    :raises TimeoutExpired: If a compilation job exceeds :code:`timeout`</span>
+<span class="sd">        seconds.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">copt</span> <span class="o">=</span> <span class="n">copt</span> <span class="ow">or</span> <span class="p">[]</span>
+
+    <span class="n">bitcodes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">clang_jobs</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ClangInvocation</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="n">ll_paths</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="nf">_add_path</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
@@ -439,12 +470,12 @@
             <span class="n">bitcodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">path</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;.c&quot;</span><span class="p">,</span> <span class="s2">&quot;.cxx&quot;</span><span class="p">,</span> <span class="s2">&quot;.cpp&quot;</span><span class="p">,</span> <span class="s2">&quot;.cc&quot;</span><span class="p">}:</span>
             <span class="n">clang_jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
-                <span class="n">ClangInvocation</span><span class="p">(</span>
-                    <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)]</span> <span class="o">+</span> <span class="n">DEFAULT_COPT</span> <span class="o">+</span> <span class="n">copt</span><span class="p">,</span>
-                    <span class="n">system_includes</span><span class="o">=</span><span class="n">system_includes</span><span class="p">,</span>
-                    <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+                <span class="n">ClangInvocation</span><span class="o">.</span><span class="n">from_c_file</span><span class="p">(</span>
+                    <span class="n">path</span><span class="p">,</span> <span class="n">copt</span><span class="o">=</span><span class="n">copt</span><span class="p">,</span> <span class="n">system_includes</span><span class="o">=</span><span class="n">system_includes</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span>
                 <span class="p">)</span>
             <span class="p">)</span>
+        <span class="k">elif</span> <span class="n">path</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;.ll&quot;</span><span class="p">:</span>
+            <span class="n">ll_paths</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unrecognized file type: </span><span class="si">{</span><span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
@@ -463,40 +494,66 @@
             <span class="k">else</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid input type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">bitcodes</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">clang_jobs</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No inputs&quot;</span><span class="p">)</span>
-
     <span class="c1"># Shortcut if we only have a single pre-compiled bitcode.</span>
     <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bitcodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">clang_jobs</span><span class="p">:</span>
         <span class="n">bitcode</span> <span class="o">=</span> <span class="n">bitcodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">Benchmark</span><span class="p">(</span>
-            <span class="n">uri</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;file:///</span><span class="si">{</span><span class="n">bitcode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">program</span><span class="o">=</span><span class="n">File</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;file:///</span><span class="si">{</span><span class="n">bitcode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-        <span class="p">)</span>
+        <span class="k">return</span> <span class="n">Benchmark</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;file:///</span><span class="si">{</span><span class="n">bitcode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">bitcode</span><span class="p">)</span>
 
-    <span class="n">tmpdir_root</span> <span class="o">=</span> <span class="n">cache_path</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+    <span class="n">tmpdir_root</span> <span class="o">=</span> <span class="n">transient_cache_path</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
     <span class="n">tmpdir_root</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="n">tmpdir_root</span><span class="p">)</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">(</span>
+        <span class="nb">dir</span><span class="o">=</span><span class="n">tmpdir_root</span><span class="p">,</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;llvm-make_benchmark-&quot;</span>
+    <span class="p">)</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
         <span class="n">working_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
 
-        <span class="c1"># Run the clang invocations in parallel.</span>
         <span class="n">clang_outs</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">working_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;out-</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.bc&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">clang_jobs</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+            <span class="n">working_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;clang-out-</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.bc&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">clang_jobs</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
         <span class="p">]</span>
-        <span class="k">with</span> <span class="n">ThreadPoolExecutor</span><span class="p">(</span><span class="n">max_workers</span><span class="o">=</span><span class="n">cpu_count</span><span class="p">())</span> <span class="k">as</span> <span class="n">executor</span><span class="p">:</span>
-            <span class="n">futures</span> <span class="o">=</span> <span class="p">(</span>
+        <span class="n">llvm_as_outs</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">working_dir</span> <span class="o">/</span> <span class="sa">f</span><span class="s2">&quot;llvm-as-out-</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">.bc&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">ll_paths</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)</span>
+        <span class="p">]</span>
+
+        <span class="c1"># Run the clang and llvm-as invocations in parallel. Avoid running this</span>
+        <span class="c1"># code path if possible as get_thread_pool_executor() requires locking.</span>
+        <span class="k">if</span> <span class="n">clang_jobs</span> <span class="ow">or</span> <span class="n">ll_paths</span><span class="p">:</span>
+            <span class="n">llvm_as_path</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">llvm</span><span class="o">.</span><span class="n">llvm_as_path</span><span class="p">())</span>
+            <span class="n">executor</span> <span class="o">=</span> <span class="n">get_thread_pool_executor</span><span class="p">()</span>
+
+            <span class="n">llvm_as_commands</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="p">[</span><span class="n">llvm_as_path</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">ll_path</span><span class="p">),</span> <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="n">bc_path</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">ll_path</span><span class="p">,</span> <span class="n">bc_path</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">ll_paths</span><span class="p">,</span> <span class="n">llvm_as_outs</span><span class="p">)</span>
+            <span class="p">]</span>
+
+            <span class="c1"># Fire off the clang and llvm-as jobs.</span>
+            <span class="n">futures</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">_run_command</span><span class="p">,</span> <span class="n">job</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">out</span><span class="p">),</span> <span class="n">job</span><span class="o">.</span><span class="n">timeout</span><span class="p">)</span>
                 <span class="k">for</span> <span class="n">job</span><span class="p">,</span> <span class="n">out</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">clang_jobs</span><span class="p">,</span> <span class="n">clang_outs</span><span class="p">)</span>
-            <span class="p">)</span>
+            <span class="p">]</span> <span class="o">+</span> <span class="p">[</span>
+                <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">_run_command</span><span class="p">,</span> <span class="n">command</span><span class="p">,</span> <span class="n">timeout</span><span class="p">)</span>
+                <span class="k">for</span> <span class="n">command</span> <span class="ow">in</span> <span class="n">llvm_as_commands</span>
+            <span class="p">]</span>
+
+            <span class="c1"># Block until finished.</span>
             <span class="nb">list</span><span class="p">(</span><span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span> <span class="k">for</span> <span class="n">future</span> <span class="ow">in</span> <span class="n">as_completed</span><span class="p">(</span><span class="n">futures</span><span class="p">))</span>
 
-        <span class="c1"># Check that the expected files were generated.</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">clang_outs</span><span class="p">):</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="n">b</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-                <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Clang invocation failed to produce a file: </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">clang_jobs</span><span class="p">[</span><span class="n">i</span><span class="p">]</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">clang_outs</span><span class="p">[</span><span class="n">i</span><span class="p">]))</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span>
+            <span class="c1"># Check that the expected files were generated.</span>
+            <span class="k">for</span> <span class="n">clang_job</span><span class="p">,</span> <span class="n">bc_path</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">clang_jobs</span><span class="p">,</span> <span class="n">clang_outs</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">bc_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="n">BenchmarkInitError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;clang failed: </span><span class="si">{</span><span class="s1">&#39; &#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">clang_job</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">bc_path</span><span class="p">))</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+            <span class="k">for</span> <span class="n">command</span><span class="p">,</span> <span class="n">bc_path</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">llvm_as_commands</span><span class="p">,</span> <span class="n">llvm_as_outs</span><span class="p">):</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">bc_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                    <span class="k">raise</span> <span class="n">BenchmarkInitError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;llvm-as failed: </span><span class="si">{</span><span class="n">command</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bitcodes</span> <span class="o">+</span> <span class="n">clang_outs</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+        <span class="n">all_outs</span> <span class="o">=</span> <span class="n">bitcodes</span> <span class="o">+</span> <span class="n">clang_outs</span> <span class="o">+</span> <span class="n">llvm_as_outs</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">all_outs</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No inputs&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_outs</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># We only have a single bitcode so read it.</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">all_outs</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">bitcode</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
             <span class="c1"># Link all of the bitcodes into a single module.</span>
             <span class="n">llvm_link_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">llvm</span><span class="o">.</span><span class="n">llvm_link_path</span><span class="p">()),</span> <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span>
                 <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">bitcodes</span> <span class="o">+</span> <span class="n">clang_outs</span>
@@ -506,18 +563,13 @@
             <span class="p">)</span>
             <span class="n">bitcode</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">_communicate</span><span class="p">(</span><span class="n">llvm_link</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">llvm_link</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
+                <span class="k">raise</span> <span class="n">BenchmarkInitError</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;Failed to link LLVM bitcodes with error: </span><span class="si">{</span><span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="c1"># We only have a single bitcode so read it.</span>
-            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">bitcodes</span> <span class="o">+</span> <span class="n">clang_outs</span><span class="p">)[</span><span class="mi">0</span><span class="p">]),</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-                <span class="n">bitcode</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
 
-    <span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;%Y%m%HT%H%M%S-</span><span class="si">{</span><span class="n">random</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">16</span><span class="o">**</span><span class="mi">4</span><span class="p">)</span><span class="si">:</span><span class="s2">04x</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">Benchmark</span><span class="p">(</span>
-        <span class="n">uri</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;benchmark://user/</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">program</span><span class="o">=</span><span class="n">File</span><span class="p">(</span><span class="n">contents</span><span class="o">=</span><span class="n">bitcode</span><span class="p">)</span>
-    <span class="p">)</span></div>
+    <span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m%HT%H%M%S&quot;</span><span class="p">)</span>
+    <span class="n">uri</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;benchmark://user/</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">random</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">16</span><span class="o">**</span><span class="mi">4</span><span class="p">)</span><span class="si">:</span><span class="s2">04x</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="k">return</span> <span class="n">Benchmark</span><span class="o">.</span><span class="n">from_file_contents</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">bitcode</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

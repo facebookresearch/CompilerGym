@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.util.debug_util &mdash; CompilerGym 0.1.7 documentation</title>
+  <title>compiler_gym.util.debug_util &mdash; CompilerGym 0.1.8 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.7
+                0.1.8
               </div>
             
           
@@ -228,11 +228,15 @@
 <div class="viewcode-block" id="set_debug_level"><a class="viewcode-back" href="../../../compiler_gym/compiler_gym.html#compiler_gym.set_debug_level">[docs]</a><span class="k">def</span> <span class="nf">set_debug_level</span><span class="p">(</span><span class="n">level</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Set a new debugging level.</span>
 
+<span class="sd">    See :func:`get_debug_level` for a description of the debug levels.</span>
+
 <span class="sd">    The debugging level should be set first when interacting with CompilerGym as</span>
 <span class="sd">    many CompilerGym objects will check the debug level only at initialization</span>
 <span class="sd">    time and not throughout their lifetime.</span>
 
-<span class="sd">    See :func:`get_debug_level` for a description of the debug levels.</span>
+<span class="sd">    Setting the debug level affects the entire process and is not thread safe.</span>
+<span class="sd">    For granular control of logging information, consider instead setting a</span>
+<span class="sd">    :code:`logging.Logger` instance on :code:`CompilerEnv.logger`.</span>
 
 <span class="sd">    :param level: The debugging level to use.</span>
 <span class="sd">    &quot;&quot;&quot;</span>

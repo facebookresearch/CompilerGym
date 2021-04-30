@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.validate &mdash; CompilerGym 0.1.7 documentation</title>
+  <title>compiler_gym.validate &mdash; CompilerGym 0.1.8 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.7
+                0.1.8
               </div>
             
           
@@ -178,7 +178,7 @@
 <span class="sd">&quot;&quot;&quot;Validate environment states.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">as_completed</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">from</span> <span class="nn">compiler_gym.compiler_env_state</span> <span class="kn">import</span> <span class="n">CompilerEnvState</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.envs.compiler_env</span> <span class="kn">import</span> <span class="n">CompilerEnv</span>
@@ -200,7 +200,6 @@
 <div class="viewcode-block" id="validate_states"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.validate_states">[docs]</a><span class="k">def</span> <span class="nf">validate_states</span><span class="p">(</span>
     <span class="n">make_env</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">CompilerEnv</span><span class="p">],</span>
     <span class="n">states</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">CompilerEnvState</span><span class="p">],</span>
-    <span class="n">datasets</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">nproc</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">inorder</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ValidationResult</span><span class="p">]:</span>
@@ -210,21 +209,12 @@
 
 <span class="sd">    :param make_env: A callback which instantiates a compiler environment.</span>
 <span class="sd">    :param states: A sequence of compiler environment states to validate.</span>
-<span class="sd">    :param datasets: An optional list of datasets that are required.</span>
 <span class="sd">    :param nproc: The number of parallel worker processes to run.</span>
 <span class="sd">    :param inorder: Whether to return results in the order they were provided,</span>
 <span class="sd">        or in the order that they are available.</span>
 <span class="sd">    :return: An iterator over validation results. The order of results may</span>
 <span class="sd">        differ from the input states.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Ensure that the required datasets are available.</span>
-    <span class="k">if</span> <span class="n">datasets</span><span class="p">:</span>
-        <span class="n">env</span> <span class="o">=</span> <span class="n">make_env</span><span class="p">()</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">env</span><span class="o">.</span><span class="n">require_datasets</span><span class="p">(</span><span class="n">datasets</span><span class="p">)</span>
-        <span class="k">finally</span><span class="p">:</span>
-            <span class="n">env</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
     <span class="n">executor</span> <span class="o">=</span> <span class="n">thread_pool</span><span class="o">.</span><span class="n">get_thread_pool_executor</span><span class="p">()</span>
 
     <span class="k">if</span> <span class="n">nproc</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>

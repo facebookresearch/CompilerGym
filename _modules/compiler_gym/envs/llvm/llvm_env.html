@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.envs.llvm.llvm_env &mdash; CompilerGym 0.1.7 documentation</title>
+  <title>compiler_gym.envs.llvm.llvm_env &mdash; CompilerGym 0.1.8 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.7
+                0.1.8
               </div>
             
           
@@ -180,18 +180,16 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">gym.spaces</span> <span class="kn">import</span> <span class="n">Box</span>
 <span class="kn">from</span> <span class="nn">gym.spaces</span> <span class="kn">import</span> <span class="n">Dict</span> <span class="k">as</span> <span class="n">DictSpace</span>
 
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">BenchmarkInitError</span><span class="p">,</span> <span class="n">Dataset</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.envs.compiler_env</span> <span class="kn">import</span> <span class="n">CompilerEnv</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.benchmarks</span> <span class="kn">import</span> <span class="n">make_benchmark</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.legacy_datasets</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">LLVM_DATASETS</span><span class="p">,</span>
-    <span class="n">get_llvm_benchmark_validation_callback</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.datasets</span> <span class="kn">import</span> <span class="n">get_llvm_datasets</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.llvm_benchmark</span> <span class="kn">import</span> <span class="n">ClangInvocation</span><span class="p">,</span> <span class="n">make_benchmark</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.llvm_rewards</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">BaselineImprovementNormalizedReward</span><span class="p">,</span>
     <span class="n">CostFunctionReward</span><span class="p">,</span>
@@ -202,8 +200,7 @@
 <span class="kn">from</span> <span class="nn">compiler_gym.third_party.inst2vec</span> <span class="kn">import</span> <span class="n">Inst2vecEncoder</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.third_party.llvm</span> <span class="kn">import</span> <span class="n">download_llvm_files</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.third_party.llvm.instcount</span> <span class="kn">import</span> <span class="n">INST_COUNT_FEATURE_NAMES</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">runfiles_path</span><span class="p">,</span> <span class="n">site_data_path</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.validation_result</span> <span class="kn">import</span> <span class="n">ValidationError</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">runfiles_path</span>
 
 <span class="n">_ACTIONS_LIST</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span>
     <span class="n">runfiles_path</span><span class="p">(</span><span class="s2">&quot;compiler_gym/envs/llvm/service/passes/actions_list.txt&quot;</span><span class="p">)</span>
@@ -231,35 +228,58 @@
 <span class="n">_FLAGS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">_ACTIONS</span><span class="p">,</span> <span class="n">_read_list_file</span><span class="p">(</span><span class="n">_FLAGS_LIST</span><span class="p">)))</span>
 <span class="n">_DESCRIPTIONS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">_ACTIONS</span><span class="p">,</span> <span class="n">_read_list_file</span><span class="p">(</span><span class="n">_DESCRIPTIONS_LIST</span><span class="p">)))</span>
 
-<span class="c1"># TODO(github.com/facebookresearch/CompilerGym/issues/122): Lazily instantiate</span>
-<span class="c1"># inst2vec encoder.</span>
 <span class="n">_INST2VEC_ENCODER</span> <span class="o">=</span> <span class="n">Inst2vecEncoder</span><span class="p">()</span>
+
+
+<span class="n">_LLVM_DATASETS</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+
+
+<span class="k">def</span> <span class="nf">_get_llvm_datasets</span><span class="p">(</span><span class="n">site_data_base</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Get the LLVM datasets. Use a singleton value when site_data_base is the</span>
+<span class="sd">    default value.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">global</span> <span class="n">_LLVM_DATASETS</span>
+    <span class="k">if</span> <span class="n">site_data_base</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">_LLVM_DATASETS</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">_LLVM_DATASETS</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">get_llvm_datasets</span><span class="p">(</span><span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">))</span>
+        <span class="k">return</span> <span class="n">_LLVM_DATASETS</span>
+    <span class="k">return</span> <span class="n">get_llvm_datasets</span><span class="p">(</span><span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="LlvmEnv"><a class="viewcode-back" href="../../../../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv">[docs]</a><span class="k">class</span> <span class="nc">LlvmEnv</span><span class="p">(</span><span class="n">CompilerEnv</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A specialized CompilerEnv for LLVM.</span>
 
-<span class="sd">    This extends the default :class:`CompilerEnv` environment, adding extra LLVM</span>
-<span class="sd">    functionality. Specifically, the actions use the</span>
-<span class="sd">    :class:`CommandlineFlag &lt;compiler_gym.spaces.CommandlineFlag&gt;` space, which</span>
-<span class="sd">    is a type of :code:`Discrete` space that provides additional documentation</span>
-<span class="sd">    about each action, and the</span>
-<span class="sd">    :meth:`LlvmEnv.commandline() &lt;compiler_gym.envs.LlvmEnv.commandline&gt;` method</span>
-<span class="sd">    can be used to produce an equivalent LLVM opt invocation for the current</span>
-<span class="sd">    environment state.</span>
+<span class="sd">    This extends the default :class:`CompilerEnv</span>
+<span class="sd">    &lt;compiler_gym.envs.CompilerEnv&gt;` environment, adding extra LLVM</span>
+<span class="sd">    functionality. Specifically, the actions use the :class:`CommandlineFlag</span>
+<span class="sd">    &lt;compiler_gym.spaces.CommandlineFlag&gt;` space, which is a type of</span>
+<span class="sd">    :code:`Discrete` space that provides additional documentation about each</span>
+<span class="sd">    action, and the :meth:`LlvmEnv.commandline()</span>
+<span class="sd">    &lt;compiler_gym.envs.LlvmEnv.commandline&gt;` method can be used to produce an</span>
+<span class="sd">    equivalent LLVM opt invocation for the current environment state.</span>
 
 <span class="sd">    :ivar actions: The list of actions that have been performed since the</span>
 <span class="sd">        previous call to :func:`reset`.</span>
+
 <span class="sd">    :vartype actions: List[int]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">,</span>
+        <span class="n">benchmark</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Benchmark</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">datasets_site_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+    <span class="p">):</span>
         <span class="c1"># First perform a one-time download of LLVM binaries that are needed by</span>
         <span class="c1"># the LLVM service and are not included by the pip-installed package.</span>
         <span class="n">download_llvm_files</span><span class="p">()</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="o">*</span><span class="n">args</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+            <span class="c1"># Set a default benchmark for use.</span>
+            <span class="n">benchmark</span><span class="o">=</span><span class="n">benchmark</span> <span class="ow">or</span> <span class="s2">&quot;cbench-v1/qsort&quot;</span><span class="p">,</span>
+            <span class="n">datasets</span><span class="o">=</span><span class="n">_get_llvm_datasets</span><span class="p">(</span><span class="n">site_data_base</span><span class="o">=</span><span class="n">datasets_site_path</span><span class="p">),</span>
             <span class="n">rewards</span><span class="o">=</span><span class="p">[</span>
                 <span class="n">CostFunctionReward</span><span class="p">(</span>
                     <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;IrInstructionCount&quot;</span><span class="p">,</span>
@@ -337,13 +357,6 @@
                 <span class="p">),</span>
             <span class="p">],</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">datasets_site_path</span> <span class="o">=</span> <span class="n">site_data_path</span><span class="p">(</span><span class="s2">&quot;llvm/10.0.0/bitcode_benchmarks&quot;</span><span class="p">)</span>
-
-        <span class="c1"># Register the LLVM datasets.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">datasets_site_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">inactive_datasets_site_path</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">dataset</span> <span class="ow">in</span> <span class="n">LLVM_DATASETS</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">register_dataset</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span> <span class="o">=</span> <span class="n">_INST2VEC_ENCODER</span>
 
@@ -452,27 +465,112 @@
         <span class="p">)</span>
 
 <div class="viewcode-block" id="LlvmEnv.reset"><a class="viewcode-back" href="../../../../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="c1"># The BenchmarkFactory::getBenchmark() method raises an error if there</span>
-        <span class="c1"># are no benchmarks to select from. Install the cBench dataset as a</span>
-        <span class="c1"># fallback.</span>
-        <span class="c1">#</span>
-        <span class="c1"># TODO(github.com/facebookresearch/CompilerGym/issues/45): Remove this</span>
-        <span class="c1"># once the dataset API has been refactored so that service-side datasets</span>
-        <span class="c1"># are no longer an issue.</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;reset() called on servie with no benchmarks available. &quot;</span>
-                <span class="s2">&quot;Installing cBench-v1&quot;</span>
-            <span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">require_dataset</span><span class="p">(</span><span class="s2">&quot;cBench-v1&quot;</span><span class="p">)</span>
-            <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Catch and re-raise a compilation error with a more informative</span>
+            <span class="c1"># error type.</span>
+            <span class="k">if</span> <span class="s2">&quot;Failed to compute .text size cost&quot;</span> <span class="ow">in</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="n">BenchmarkInitError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Failed to initialize benchmark </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span><span class="o">.</span><span class="n">uri</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+            <span class="k">raise</span></div>
 
-<div class="viewcode-block" id="LlvmEnv.make_benchmark"><a class="viewcode-back" href="../../../../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.make_benchmark">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">make_benchmark</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Alias to :func:`llvm.make_benchmark() &lt;compiler_gym.envs.llvm.make_benchmark&gt;`.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">make_benchmark</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span></div>
+<div class="viewcode-block" id="LlvmEnv.make_benchmark"><a class="viewcode-back" href="../../../../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.make_benchmark">[docs]</a>    <span class="k">def</span> <span class="nf">make_benchmark</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">inputs</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
+            <span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">ClangInvocation</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">ClangInvocation</span><span class="p">]]</span>
+        <span class="p">],</span>
+        <span class="n">copt</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">system_includes</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">600</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Create a benchmark for use with this environment.</span>
+
+<span class="sd">        This function takes one or more inputs and uses them to create a</span>
+<span class="sd">        benchmark that can be passed to :meth:`compiler_gym.envs.LlvmEnv.reset`.</span>
+
+<span class="sd">        For single-source C/C++ programs, you can pass the path of the source</span>
+<span class="sd">        file:</span>
+
+<span class="sd">            &gt;&gt;&gt; benchmark = make_benchmark(&#39;my_app.c&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; env = gym.make(&quot;llvm-v0&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; env.reset(benchmark=benchmark)</span>
+
+<span class="sd">        The clang invocation used is roughly equivalent to:</span>
+
+<span class="sd">        .. code-block::</span>
+
+<span class="sd">            $ clang my_app.c -O0 -c -emit-llvm -o benchmark.bc</span>
+
+<span class="sd">        Additional compile-time arguments to clang can be provided using the</span>
+<span class="sd">        :code:`copt` argument:</span>
+
+<span class="sd">            &gt;&gt;&gt; benchmark = make_benchmark(&#39;/path/to/my_app.cpp&#39;, copt=[&#39;-O2&#39;])</span>
+
+<span class="sd">        If you need more fine-grained control over the options, you can directly</span>
+<span class="sd">        construct a :class:`ClangInvocation</span>
+<span class="sd">        &lt;compiler_gym.envs.llvm.ClangInvocation&gt;` to pass a list of arguments to</span>
+<span class="sd">        clang:</span>
+
+<span class="sd">            &gt;&gt;&gt; benchmark = make_benchmark(</span>
+<span class="sd">                ClangInvocation([&#39;/path/to/my_app.c&#39;], timeout=10)</span>
+<span class="sd">            )</span>
+
+<span class="sd">        For multi-file programs, pass a list of inputs that will be compiled</span>
+<span class="sd">        separately and then linked to a single module:</span>
+
+<span class="sd">            &gt;&gt;&gt; benchmark = make_benchmark([</span>
+<span class="sd">                &#39;main.c&#39;,</span>
+<span class="sd">                &#39;lib.cpp&#39;,</span>
+<span class="sd">                &#39;lib2.bc&#39;,</span>
+<span class="sd">            ])</span>
+
+<span class="sd">        If you already have prepared bitcode files, those can be linked and used</span>
+<span class="sd">        directly:</span>
+
+<span class="sd">            &gt;&gt;&gt; benchmark = make_benchmark([</span>
+<span class="sd">                &#39;bitcode1.bc&#39;,</span>
+<span class="sd">                &#39;bitcode2.bc&#39;,</span>
+<span class="sd">            ])</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            LLVM bitcode compatibility is</span>
+<span class="sd">            `not guaranteed &lt;https://llvm.org/docs/DeveloperPolicy.html#ir-backwards-compatibility&gt;`_,</span>
+<span class="sd">            so you must ensure that any precompiled bitcodes are compatible with the</span>
+<span class="sd">            LLVM version used by CompilerGym, which can be queried using</span>
+<span class="sd">            :func:`LlvmEnv.compiler_version &lt;compiler_gym.envs.CompilerEnv.compiler_version&gt;`.</span>
+
+<span class="sd">        :param inputs: An input, or list of inputs.</span>
+
+<span class="sd">        :param copt: A list of command line options to pass to clang when</span>
+<span class="sd">            compiling source files.</span>
+
+<span class="sd">        :param system_includes: Whether to include the system standard libraries</span>
+<span class="sd">            during compilation jobs. This requires a system toolchain. See</span>
+<span class="sd">            :func:`get_system_includes`.</span>
+
+<span class="sd">        :param timeout: The maximum number of seconds to allow clang to run</span>
+<span class="sd">            before terminating.</span>
+
+<span class="sd">        :return: A :code:`Benchmark` instance.</span>
+
+<span class="sd">        :raises FileNotFoundError: If any input sources are not found.</span>
+
+<span class="sd">        :raises TypeError: If the inputs are of unsupported types.</span>
+
+<span class="sd">        :raises OSError: If a compilation job fails.</span>
+
+<span class="sd">        :raises TimeoutExpired: If a compilation job exceeds :code:`timeout`</span>
+<span class="sd">            seconds.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="n">make_benchmark</span><span class="p">(</span>
+            <span class="n">inputs</span><span class="o">=</span><span class="n">inputs</span><span class="p">,</span>
+            <span class="n">copt</span><span class="o">=</span><span class="n">copt</span><span class="p">,</span>
+            <span class="n">system_includes</span><span class="o">=</span><span class="n">system_includes</span><span class="p">,</span>
+            <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_make_action_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">entries</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Commandline</span><span class="p">:</span>
         <span class="n">flags</span> <span class="o">=</span> <span class="p">[</span>
@@ -534,7 +632,7 @@
 
 <span class="sd">        Equivalent to: :code:`hashlib.sha1(env.ir.encode(&quot;utf-8&quot;)).hexdigest()`.</span>
 
-<span class="sd">        :return: A 40-character hexademical sha1 string.</span>
+<span class="sd">        :return: A 40-character hexadecimal sha1 string.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># TODO(cummins): Compute this on the service-side and add it as an</span>
         <span class="c1"># observation space.</span>
@@ -572,21 +670,7 @@
         <span class="k">if</span> <span class="n">mode</span> <span class="o">==</span> <span class="s2">&quot;human&quot;</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ir</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="LlvmEnv.get_benchmark_validation_callback"><a class="viewcode-back" href="../../../../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.get_benchmark_validation_callback">[docs]</a>    <span class="k">def</span> <span class="nf">get_benchmark_validation_callback</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">CompilerEnv</span><span class="p">],</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ValidationError</span><span class="p">]]]:</span>
-        <span class="sd">&quot;&quot;&quot;Return a callback for validating a given environment state.</span>
-
-<span class="sd">        If there is no valid callback, returns :code:`None`.</span>
-
-<span class="sd">        :param env: An :class:`LlvmEnv` instance.</span>
-<span class="sd">        :return: An optional callback that takes an :class:`LlvmEnv` instance as</span>
-<span class="sd">            argument and returns an optional string containing a validation error</span>
-<span class="sd">            message.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">get_llvm_benchmark_validation_callback</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span></div></div>
+            <span class="k">return</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">render</span><span class="p">(</span><span class="n">mode</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>

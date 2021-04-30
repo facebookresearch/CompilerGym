@@ -1,0 +1,496 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>compiler_gym.envs.llvm.datasets &mdash; CompilerGym 0.1.8 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+        <script src="../../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="author" title="About these documents" href="../../../../about.html" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home" alt="Documentation Home"> CompilerGym
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.8
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../llvm/index.html">LLVM Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command Line Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/views.html">compiler_gym.views</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">CompilerGym</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>compiler_gym.envs.llvm.datasets</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for compiler_gym.envs.llvm.datasets</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) Facebook, Inc. and its affiliates.</span>
+<span class="c1">#</span>
+<span class="c1"># This source code is licensed under the MIT license found in the</span>
+<span class="c1"># LICENSE file in the root directory of this source tree.</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span>
+
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">TarDatasetWithManifest</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.datasets.anghabench</span> <span class="kn">import</span> <span class="n">AnghaBenchDataset</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.datasets.cbench</span> <span class="kn">import</span> <span class="n">CBenchDataset</span><span class="p">,</span> <span class="n">CBenchLegacyDataset</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.datasets.clgen</span> <span class="kn">import</span> <span class="n">CLgenDataset</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.datasets.csmith</span> <span class="kn">import</span> <span class="n">CsmithBenchmark</span><span class="p">,</span> <span class="n">CsmithDataset</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.datasets.llvm_stress</span> <span class="kn">import</span> <span class="n">LlvmStressDataset</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.datasets.poj104</span> <span class="kn">import</span> <span class="n">POJ104Dataset</span><span class="p">,</span> <span class="n">POJ104LegacyDataset</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">site_data_path</span>
+
+
+<div class="viewcode-block" id="BlasDataset"><a class="viewcode-back" href="../../../../llvm/api.html#compiler_gym.envs.llvm.datasets.BlasDataset">[docs]</a><span class="k">class</span> <span class="nc">BlasDataset</span><span class="p">(</span><span class="n">TarDatasetWithManifest</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_data_base</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">sort_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;benchmark://blas-v0&quot;</span><span class="p">,</span>
+            <span class="n">tar_urls</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-blas-v0.tar.bz2&quot;</span>
+            <span class="p">],</span>
+            <span class="n">tar_sha256</span><span class="o">=</span><span class="s2">&quot;e724a8114709f8480adeb9873d48e426e8d9444b00cddce48e342b9f0f2b096d&quot;</span><span class="p">,</span>
+            <span class="n">manifest_urls</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-blas-v0-manifest.bz2&quot;</span>
+            <span class="p">],</span>
+            <span class="n">manifest_sha256</span><span class="o">=</span><span class="s2">&quot;6946437dcb0da5fad3ed8a7fd83eb4294964198391d5537b1310e22d7ceebff4&quot;</span><span class="p">,</span>
+            <span class="n">references</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;Paper&quot;</span><span class="p">:</span> <span class="s2">&quot;https://strum355.netsoc.co/books/PDF/Basic</span><span class="si">%20Li</span><span class="s2">near%20Algebra%20Subprograms</span><span class="si">%20f</span><span class="s2">or</span><span class="si">%20F</span><span class="s2">ortran%20Usage%20-%20BLAS%20(1979).pdf&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Homepage&quot;</span><span class="p">:</span> <span class="s2">&quot;http://www.netlib.org/blas/&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">license</span><span class="o">=</span><span class="s2">&quot;BSD 3-Clause&quot;</span><span class="p">,</span>
+            <span class="n">strip_prefix</span><span class="o">=</span><span class="s2">&quot;blas-v0&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Basic linear algebra kernels&quot;</span><span class="p">,</span>
+            <span class="n">benchmark_file_suffix</span><span class="o">=</span><span class="s2">&quot;.bc&quot;</span><span class="p">,</span>
+            <span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span>
+            <span class="n">sort_order</span><span class="o">=</span><span class="n">sort_order</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GitHubDataset"><a class="viewcode-back" href="../../../../llvm/api.html#compiler_gym.envs.llvm.datasets.GitHubDataset">[docs]</a><span class="k">class</span> <span class="nc">GitHubDataset</span><span class="p">(</span><span class="n">TarDatasetWithManifest</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_data_base</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">sort_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">manifest_url</span><span class="p">,</span> <span class="n">manifest_sha256</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;darwin&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-github-v0-macos-manifest.bz2&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;10d933a7d608248be286d756b27813794789f7b87d8561c241d0897fb3238503&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;linux&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-github-v0-linux-manifest.bz2&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;aede9ca78657b4694ada9a4592d93f0bbeb3b3bd0fff3b537209850228480d3b&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">}[</span><span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;benchmark://github-v0&quot;</span><span class="p">,</span>
+            <span class="n">tar_urls</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-github-v0.tar.bz2&quot;</span>
+            <span class="p">],</span>
+            <span class="n">tar_sha256</span><span class="o">=</span><span class="s2">&quot;880269dd7a5c2508ea222a2e54c318c38c8090eb105c0a87c595e9dd31720764&quot;</span><span class="p">,</span>
+            <span class="n">manifest_urls</span><span class="o">=</span><span class="p">[</span><span class="n">manifest_url</span><span class="p">],</span>
+            <span class="n">manifest_sha256</span><span class="o">=</span><span class="n">manifest_sha256</span><span class="p">,</span>
+            <span class="n">license</span><span class="o">=</span><span class="s2">&quot;CC BY 4.0&quot;</span><span class="p">,</span>
+            <span class="n">references</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;Paper&quot;</span><span class="p">:</span> <span class="s2">&quot;https://arxiv.org/pdf/2012.01470.pdf&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">strip_prefix</span><span class="o">=</span><span class="s2">&quot;github-v0&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Compile-only C/C++ objects from GitHub&quot;</span><span class="p">,</span>
+            <span class="n">benchmark_file_suffix</span><span class="o">=</span><span class="s2">&quot;.bc&quot;</span><span class="p">,</span>
+            <span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span>
+            <span class="n">sort_order</span><span class="o">=</span><span class="n">sort_order</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="LinuxDataset"><a class="viewcode-back" href="../../../../llvm/api.html#compiler_gym.envs.llvm.datasets.LinuxDataset">[docs]</a><span class="k">class</span> <span class="nc">LinuxDataset</span><span class="p">(</span><span class="n">TarDatasetWithManifest</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_data_base</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">sort_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="n">manifest_url</span><span class="p">,</span> <span class="n">manifest_sha256</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;darwin&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-linux-v0-macos-manifest.bz2&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;dfc87b94c7a43e899e76507398a5af22178aebaebcb5d7e24e82088aeecb0690&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+            <span class="s2">&quot;linux&quot;</span><span class="p">:</span> <span class="p">(</span>
+                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-linux-v0-linux-manifest.bz2&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;32ceb8576f683798010816ac605ee496f386ddbbe64be9e0796015d247a73f92&quot;</span><span class="p">,</span>
+            <span class="p">),</span>
+        <span class="p">}[</span><span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;benchmark://linux-v0&quot;</span><span class="p">,</span>
+            <span class="n">tar_urls</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-linux-v0.tar.bz2&quot;</span>
+            <span class="p">],</span>
+            <span class="n">tar_sha256</span><span class="o">=</span><span class="s2">&quot;a1ae5c376af30ab042c9e54dc432f89ce75f9ebaee953bc19c08aff070f12566&quot;</span><span class="p">,</span>
+            <span class="n">manifest_urls</span><span class="o">=</span><span class="p">[</span><span class="n">manifest_url</span><span class="p">],</span>
+            <span class="n">manifest_sha256</span><span class="o">=</span><span class="n">manifest_sha256</span><span class="p">,</span>
+            <span class="n">references</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;Homepage&quot;</span><span class="p">:</span> <span class="s2">&quot;https://www.linux.org/&quot;</span><span class="p">},</span>
+            <span class="n">license</span><span class="o">=</span><span class="s2">&quot;GPL-2.0&quot;</span><span class="p">,</span>
+            <span class="n">strip_prefix</span><span class="o">=</span><span class="s2">&quot;linux-v0&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Compile-only object files from C Linux kernel&quot;</span><span class="p">,</span>
+            <span class="n">benchmark_file_suffix</span><span class="o">=</span><span class="s2">&quot;.bc&quot;</span><span class="p">,</span>
+            <span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span>
+            <span class="n">sort_order</span><span class="o">=</span><span class="n">sort_order</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="MibenchDataset"><a class="viewcode-back" href="../../../../llvm/api.html#compiler_gym.envs.llvm.datasets.MibenchDataset">[docs]</a><span class="k">class</span> <span class="nc">MibenchDataset</span><span class="p">(</span><span class="n">TarDatasetWithManifest</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_data_base</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">sort_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;benchmark://mibench-v0&quot;</span><span class="p">,</span>
+            <span class="n">tar_urls</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-mibench-v0.tar.bz2&quot;</span>
+            <span class="p">],</span>
+            <span class="n">tar_sha256</span><span class="o">=</span><span class="s2">&quot;128c090c40b955b99fdf766da167a5f642018fb35c16a1d082f63be2e977eb13&quot;</span><span class="p">,</span>
+            <span class="n">manifest_urls</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-mibench-v0-manifest.bz2&quot;</span>
+            <span class="p">],</span>
+            <span class="n">manifest_sha256</span><span class="o">=</span><span class="s2">&quot;8ed985d685b48f444a3312cd84ccc5debda4a839850e442a3cdc93910ba0dc5f&quot;</span><span class="p">,</span>
+            <span class="n">references</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;Paper&quot;</span><span class="p">:</span> <span class="s2">&quot;http://vhosts.eecs.umich.edu/mibench/Publications/MiBench.pdf&quot;</span>
+            <span class="p">},</span>
+            <span class="n">license</span><span class="o">=</span><span class="s2">&quot;BSD 3-Clause&quot;</span><span class="p">,</span>
+            <span class="n">strip_prefix</span><span class="o">=</span><span class="s2">&quot;mibench-v0&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;C benchmarks&quot;</span><span class="p">,</span>
+            <span class="n">benchmark_file_suffix</span><span class="o">=</span><span class="s2">&quot;.bc&quot;</span><span class="p">,</span>
+            <span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span>
+            <span class="n">sort_order</span><span class="o">=</span><span class="n">sort_order</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="NPBDataset"><a class="viewcode-back" href="../../../../llvm/api.html#compiler_gym.envs.llvm.datasets.NPBDataset">[docs]</a><span class="k">class</span> <span class="nc">NPBDataset</span><span class="p">(</span><span class="n">TarDatasetWithManifest</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_data_base</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">sort_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;benchmark://npb-v0&quot;</span><span class="p">,</span>
+            <span class="n">tar_urls</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-npb-v0.tar.bz2&quot;</span>
+            <span class="p">],</span>
+            <span class="n">tar_sha256</span><span class="o">=</span><span class="s2">&quot;793ac2e7a4f4ed83709e8a270371e65b724da09eaa0095c52e7f4209f63bb1f2&quot;</span><span class="p">,</span>
+            <span class="n">manifest_urls</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-npb-v0-manifest.bz2&quot;</span>
+            <span class="p">],</span>
+            <span class="n">manifest_sha256</span><span class="o">=</span><span class="s2">&quot;89eccb7f1b0b9e1f82b9b900b9f686ff5b189a2a67a4f8969a15901cd315dba2&quot;</span><span class="p">,</span>
+            <span class="n">references</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;Paper&quot;</span><span class="p">:</span> <span class="s2">&quot;http://optout.csc.ncsu.edu/~mueller/codeopt/codeopt05/projects/www4.ncsu.edu/~pgauria/csc791a/papers/NAS-95-020.pdf&quot;</span>
+            <span class="p">},</span>
+            <span class="n">license</span><span class="o">=</span><span class="s2">&quot;NASA Open Source Agreement v1.3&quot;</span><span class="p">,</span>
+            <span class="n">strip_prefix</span><span class="o">=</span><span class="s2">&quot;npb-v0&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;NASA Parallel Benchmarks&quot;</span><span class="p">,</span>
+            <span class="n">benchmark_file_suffix</span><span class="o">=</span><span class="s2">&quot;.bc&quot;</span><span class="p">,</span>
+            <span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span>
+            <span class="n">sort_order</span><span class="o">=</span><span class="n">sort_order</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="OpenCVDataset"><a class="viewcode-back" href="../../../../llvm/api.html#compiler_gym.envs.llvm.datasets.OpenCVDataset">[docs]</a><span class="k">class</span> <span class="nc">OpenCVDataset</span><span class="p">(</span><span class="n">TarDatasetWithManifest</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_data_base</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">sort_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;benchmark://opencv-v0&quot;</span><span class="p">,</span>
+            <span class="n">tar_urls</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-opencv-v0.tar.bz2&quot;</span>
+            <span class="p">],</span>
+            <span class="n">tar_sha256</span><span class="o">=</span><span class="s2">&quot;003df853bd58df93572862ca2f934c7b129db2a3573bcae69a2e59431037205c&quot;</span><span class="p">,</span>
+            <span class="n">manifest_urls</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-opencv-v0-manifest.bz2&quot;</span>
+            <span class="p">],</span>
+            <span class="n">manifest_sha256</span><span class="o">=</span><span class="s2">&quot;8de96f722fab18f3a2a74db74b4038c7947fe8b3da867c9260206fdf5338cd81&quot;</span><span class="p">,</span>
+            <span class="n">references</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;Paper&quot;</span><span class="p">:</span> <span class="s2">&quot;https://mipro-proceedings.com/sites/mipro-proceedings.com/files/upload/sp/sp_008.pdf&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Homepage&quot;</span><span class="p">:</span> <span class="s2">&quot;https://opencv.org/&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">license</span><span class="o">=</span><span class="s2">&quot;Apache 2.0&quot;</span><span class="p">,</span>
+            <span class="n">strip_prefix</span><span class="o">=</span><span class="s2">&quot;opencv-v0&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Compile-only object files from C++ OpenCV library&quot;</span><span class="p">,</span>
+            <span class="n">benchmark_file_suffix</span><span class="o">=</span><span class="s2">&quot;.bc&quot;</span><span class="p">,</span>
+            <span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span>
+            <span class="n">sort_order</span><span class="o">=</span><span class="n">sort_order</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="TensorFlowDataset"><a class="viewcode-back" href="../../../../llvm/api.html#compiler_gym.envs.llvm.datasets.TensorFlowDataset">[docs]</a><span class="k">class</span> <span class="nc">TensorFlowDataset</span><span class="p">(</span><span class="n">TarDatasetWithManifest</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_data_base</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">sort_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;benchmark://tensorflow-v0&quot;</span><span class="p">,</span>
+            <span class="n">tar_urls</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-tensorflow-v0.tar.bz2&quot;</span>
+            <span class="p">],</span>
+            <span class="n">tar_sha256</span><span class="o">=</span><span class="s2">&quot;f77dd1988c772e8359e1303cc9aba0d73d5eb27e0c98415ac3348076ab94efd1&quot;</span><span class="p">,</span>
+            <span class="n">manifest_urls</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-tensorflow-v0-manifest.bz2&quot;</span>
+            <span class="p">],</span>
+            <span class="n">manifest_sha256</span><span class="o">=</span><span class="s2">&quot;cffc45cd10250d483cb093dec913c8a7da64026686284cccf404623bd1da6da8&quot;</span><span class="p">,</span>
+            <span class="n">references</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;Paper&quot;</span><span class="p">:</span> <span class="s2">&quot;https://www.usenix.org/system/files/conference/osdi16/osdi16-abadi.pdf&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Homepage&quot;</span><span class="p">:</span> <span class="s2">&quot;https://www.tensorflow.org/&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">license</span><span class="o">=</span><span class="s2">&quot;Apache 2.0&quot;</span><span class="p">,</span>
+            <span class="n">strip_prefix</span><span class="o">=</span><span class="s2">&quot;tensorflow-v0&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Compile-only object files from C++ TensorFlow library&quot;</span><span class="p">,</span>
+            <span class="n">benchmark_file_suffix</span><span class="o">=</span><span class="s2">&quot;.bc&quot;</span><span class="p">,</span>
+            <span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span>
+            <span class="n">sort_order</span><span class="o">=</span><span class="n">sort_order</span><span class="p">,</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="get_llvm_datasets"><a class="viewcode-back" href="../../../../llvm/api.html#compiler_gym.envs.llvm.datasets.get_llvm_datasets">[docs]</a><span class="k">def</span> <span class="nf">get_llvm_datasets</span><span class="p">(</span><span class="n">site_data_base</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Dataset</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Instantiate the builtin LLVM datasets.</span>
+
+<span class="sd">    :param site_data_base: The root of the site data path.</span>
+
+<span class="sd">    :return: An iterable sequence of :class:`Dataset</span>
+<span class="sd">        &lt;compiler_gym.datasets.Dataset&gt;` instances.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">site_data_base</span> <span class="o">=</span> <span class="n">site_data_base</span> <span class="ow">or</span> <span class="n">site_data_path</span><span class="p">(</span><span class="s2">&quot;llvm-v0&quot;</span><span class="p">)</span>
+
+    <span class="k">yield</span> <span class="n">AnghaBenchDataset</span><span class="p">(</span><span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span> <span class="n">sort_order</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">yield</span> <span class="n">BlasDataset</span><span class="p">(</span><span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span> <span class="n">sort_order</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">yield</span> <span class="n">CLgenDataset</span><span class="p">(</span><span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span> <span class="n">sort_order</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">yield</span> <span class="n">CBenchDataset</span><span class="p">(</span><span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span> <span class="n">sort_order</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+    <span class="c1"># Add legacy version of cbench-v1 in which the &#39;b&#39; was capitalized. This</span>
+    <span class="c1"># is deprecated and will be removed no earlier than v0.1.10.</span>
+    <span class="k">yield</span> <span class="n">CBenchDataset</span><span class="p">(</span>
+        <span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span>
+        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;benchmark://cBench-v1&quot;</span><span class="p">,</span>
+        <span class="n">deprecated</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;Please use &#39;benchmark://cbench-v1&#39; (note the lowercase name). &quot;</span>
+            <span class="s2">&quot;The dataset is the same, only the name has changed&quot;</span>
+        <span class="p">),</span>
+        <span class="n">manifest_url</span><span class="o">=</span><span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v1-manifest.bz2&quot;</span><span class="p">,</span>
+        <span class="n">manifest_sha256</span><span class="o">=</span><span class="s2">&quot;635b94eeb2784dfedb3b53fd8f84517c3b4b95d851ddb662d4c1058c72dc81e0&quot;</span><span class="p">,</span>
+        <span class="n">sort_order</span><span class="o">=</span><span class="mi">100</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="k">yield</span> <span class="n">CBenchLegacyDataset</span><span class="p">(</span><span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">)</span>
+    <span class="k">yield</span> <span class="n">CsmithDataset</span><span class="p">(</span><span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span> <span class="n">sort_order</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">yield</span> <span class="n">GitHubDataset</span><span class="p">(</span><span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span> <span class="n">sort_order</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">yield</span> <span class="n">LinuxDataset</span><span class="p">(</span><span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span> <span class="n">sort_order</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">yield</span> <span class="n">LlvmStressDataset</span><span class="p">(</span><span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span> <span class="n">sort_order</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">yield</span> <span class="n">MibenchDataset</span><span class="p">(</span><span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span> <span class="n">sort_order</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">yield</span> <span class="n">NPBDataset</span><span class="p">(</span><span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span> <span class="n">sort_order</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">yield</span> <span class="n">OpenCVDataset</span><span class="p">(</span><span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span> <span class="n">sort_order</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">yield</span> <span class="n">POJ104Dataset</span><span class="p">(</span><span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span> <span class="n">sort_order</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+    <span class="k">yield</span> <span class="n">POJ104LegacyDataset</span><span class="p">(</span><span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span> <span class="n">sort_order</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+    <span class="k">yield</span> <span class="n">TensorFlowDataset</span><span class="p">(</span><span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span> <span class="n">sort_order</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span></div>
+
+
+<span class="n">__all__</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;AnghaBenchDataset&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;BlasDataset&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CBenchDataset&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CBenchLegacyDataset&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CLgenDataset&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CsmithBenchmark&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;CsmithDataset&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;get_llvm_datasets&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;GitHubDataset&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LinuxDataset&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;LlvmStressDataset&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;MibenchDataset&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;NPBDataset&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;OpenCVDataset&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;POJ104Dataset&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;POJ104LegacyDataset&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;TensorFlowDataset&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright Facebook AI Research
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    <!-- Theme Analytics -->
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'G-T95G5EVYXM', 'auto');
+    ga('send', 'pageview');
+    </script>
+
+    
+   
+
+</body>
+</html>

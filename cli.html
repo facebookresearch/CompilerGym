@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Command Line Reference &mdash; CompilerGym 0.1.7 documentation</title>
+  <title>Command Line Reference &mdash; CompilerGym 0.1.8 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.7
+                0.1.8
               </div>
             
           
@@ -99,16 +99,8 @@
 <li class="toctree-l3"><a class="reference internal" href="#querying-the-capabilities-of-a-service">Querying the capabilities of a service</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#module-compiler_gym.bin.datasets">compiler_gym.bin.datasets</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#listing-installed-datasets">Listing installed datasets</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#downloading-datasets">Downloading datasets</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#activating-and-deactivating-datasets">Activating and deactivating datasets</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#deleting-datasets">Deleting datasets</a></li>
-</ul>
-</li>
 <li class="toctree-l2"><a class="reference internal" href="#module-compiler_gym.bin.manual_env">compiler_gym.bin.manual_env</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#compilergym-shell-tutorial">CompilerGym Shell Tutorial</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#downloading-a-dataset">Downloading a Dataset</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#setting-a-benchmark-reward-and-observation">Setting a Benchmark, Reward and Observation</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#actions-and-the-action-stack">Actions and the Action Stack</a></li>
 <li class="toctree-l4"><a class="reference internal" href="#current-status">Current Status</a></li>
@@ -225,39 +217,30 @@ commands with <code class="code docutils literal notranslate"><span class="pre">
 <li><p><a class="reference internal" href="#querying-the-capabilities-of-a-service" id="id3">Querying the capabilities of a service</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#module-compiler_gym.bin.datasets" id="id4">compiler_gym.bin.datasets</a></p>
+<li><p><a class="reference internal" href="#module-compiler_gym.bin.manual_env" id="id4">compiler_gym.bin.manual_env</a></p>
 <ul>
-<li><p><a class="reference internal" href="#listing-installed-datasets" id="id5">Listing installed datasets</a></p></li>
-<li><p><a class="reference internal" href="#downloading-datasets" id="id6">Downloading datasets</a></p></li>
-<li><p><a class="reference internal" href="#activating-and-deactivating-datasets" id="id7">Activating and deactivating datasets</a></p></li>
-<li><p><a class="reference internal" href="#deleting-datasets" id="id8">Deleting datasets</a></p></li>
-</ul>
-</li>
-<li><p><a class="reference internal" href="#module-compiler_gym.bin.manual_env" id="id9">compiler_gym.bin.manual_env</a></p>
+<li><p><a class="reference internal" href="#compilergym-shell-tutorial" id="id5">CompilerGym Shell Tutorial</a></p>
 <ul>
-<li><p><a class="reference internal" href="#compilergym-shell-tutorial" id="id10">CompilerGym Shell Tutorial</a></p>
-<ul>
-<li><p><a class="reference internal" href="#downloading-a-dataset" id="id11">Downloading a Dataset</a></p></li>
-<li><p><a class="reference internal" href="#setting-a-benchmark-reward-and-observation" id="id12">Setting a Benchmark, Reward and Observation</a></p></li>
-<li><p><a class="reference internal" href="#actions-and-the-action-stack" id="id13">Actions and the Action Stack</a></p></li>
-<li><p><a class="reference internal" href="#current-status" id="id14">Current Status</a></p></li>
-<li><p><a class="reference internal" href="#searching" id="id15">Searching</a></p></li>
-<li><p><a class="reference internal" href="#miscellaneous" id="id16">Miscellaneous</a></p></li>
+<li><p><a class="reference internal" href="#setting-a-benchmark-reward-and-observation" id="id6">Setting a Benchmark, Reward and Observation</a></p></li>
+<li><p><a class="reference internal" href="#actions-and-the-action-stack" id="id7">Actions and the Action Stack</a></p></li>
+<li><p><a class="reference internal" href="#current-status" id="id8">Current Status</a></p></li>
+<li><p><a class="reference internal" href="#searching" id="id9">Searching</a></p></li>
+<li><p><a class="reference internal" href="#miscellaneous" id="id10">Miscellaneous</a></p></li>
 </ul>
 </li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#module-compiler_gym.bin.random_search" id="id17">compiler_gym.bin.random_search</a></p>
+<li><p><a class="reference internal" href="#module-compiler_gym.bin.random_search" id="id11">compiler_gym.bin.random_search</a></p>
 <ul>
-<li><p><a class="reference internal" href="#search-strategy" id="id18">Search strategy</a></p></li>
-<li><p><a class="reference internal" href="#execution-strategy" id="id19">Execution strategy</a></p></li>
+<li><p><a class="reference internal" href="#search-strategy" id="id12">Search strategy</a></p></li>
+<li><p><a class="reference internal" href="#execution-strategy" id="id13">Execution strategy</a></p></li>
 </ul>
 </li>
-<li><p><a class="reference internal" href="#module-compiler_gym.bin.random_replay" id="id20">compiler_gym.bin.random_replay</a></p></li>
-<li><p><a class="reference internal" href="#module-compiler_gym.bin.validate" id="id21">compiler_gym.bin.validate</a></p>
+<li><p><a class="reference internal" href="#module-compiler_gym.bin.random_replay" id="id14">compiler_gym.bin.random_replay</a></p></li>
+<li><p><a class="reference internal" href="#module-compiler_gym.bin.validate" id="id15">compiler_gym.bin.validate</a></p>
 <ul>
-<li><p><a class="reference internal" href="#input-format" id="id22">Input Format</a></p></li>
-<li><p><a class="reference internal" href="#output-format" id="id23">Output Format</a></p></li>
+<li><p><a class="reference internal" href="#input-format" id="id16">Input Format</a></p></li>
+<li><p><a class="reference internal" href="#output-format" id="id17">Output Format</a></p></li>
 </ul>
 </li>
 </ul>
@@ -275,211 +258,97 @@ commands with <code class="code docutils literal notranslate"><span class="pre">
 <div class="section" id="querying-the-capabilities-of-a-service">
 <h3><a class="toc-backref" href="#id3">Querying the capabilities of a service</a><a class="headerlink" href="#querying-the-capabilities-of-a-service" title="Permalink to this headline">¶</a></h3>
 <p>Query the capabilities of a service using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.service --env=&lt;env&gt; [--heading_level=&lt;num&gt;]
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.service --env=&lt;env&gt;
 </pre></div>
 </div>
 <p>For example:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.service --env=llvm-v0
-# CompilerGym Service `/path/to/compiler_gym/envs/llvm/service/compiler_gym-llvm-service`
 
-## Programs
+Datasets
+--------
 
-+------------------------+
-| Benchmark              |
-+========================+
-| benchmark://npb-v0/1   |
-+------------------------+
-
++----------------------------+--------------------------+------------------------------+
+| Dataset                    | Num. Benchmarks [#f1]_   | Description                  |
++============================+==========================+==============================+
+| benchmark://anghabench-v0  | 1,042,976                | Compile-only C/C++ functions |
++----------------------------+--------------------------+------------------------------+
+| benchmark://blas-v0        | 300                      | Basic linear algebra kernels |
++----------------------------+--------------------------+------------------------------+
 ...
 
-## Action Spaces
+Observation Spaces
+------------------
 
-
-### `PassesAll` (Commandline)
-
-+---------------------------------------+-----------------------------------+-------------------------------+
-| Action                                | Flag                              | Description                   |
-+=======================================+===================================+===============================+
-| AddDiscriminatorsPass                 | `-add-discriminators`             | Add DWARF path discriminators |
-+---------------------------------------+-----------------------------------+-------------------------------+
++--------------------------+----------------------------------------------+
+| Observation space        | Shape                                        |
++==========================+==============================================+
+| Autophase                | `Box(0, 9223372036854775807, (56,), int64)`  |
++--------------------------+----------------------------------------------+
+| AutophaseDict            | `Dict(ArgsPhi:int&lt;0,inf&gt;, BB03Phi:int&lt;0,...` |
++--------------------------+----------------------------------------------+
+| BitcodeFile              | `str_list&lt;&gt;[0,4096.0])`                      |
++--------------------------+----------------------------------------------+
 ...
 </pre></div>
 </div>
-<p>The capabilities of an unmanaged service can be queried using the
-<code class="code docutils literal notranslate"><span class="pre">--service</span></code> flag. For example, query a service running at
-<code class="code docutils literal notranslate"><span class="pre">localhost:8080</span></code>:</p>
+<p>The output is tabular summaries of the environment’s datasets, observation
+spaces, reward spaces, and action spaces, using reStructuredText syntax
+(<a class="reference external" href="https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html#tables">https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html#tables</a>).</p>
+<p>To query the capabilities of an unmanaged service, use <code class="code docutils literal notranslate"><span class="pre">--service</span></code>. For
+example, query a service running at <code class="code docutils literal notranslate"><span class="pre">localhost:8080</span></code> using:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.service --service=localhost:8080
 </pre></div>
 </div>
-<p>Or query the capabilities of a binary that implements the RPC service interface
-using:</p>
+<p>To query the capability of a binary that implements the RPC service interface,
+use the <code class="code docutils literal notranslate"><span class="pre">--local_service_binary</span></code> flag:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.service --local_service_binary=/path/to/service/binary
 </pre></div>
 </div>
 </div>
 </div>
-<div class="section" id="module-compiler_gym.bin.datasets">
-<span id="compiler-gym-bin-datasets"></span><h2><a class="toc-backref" href="#id4">compiler_gym.bin.datasets</a><a class="headerlink" href="#module-compiler_gym.bin.datasets" title="Permalink to this headline">¶</a></h2>
-<p>Manage datasets of benchmarks.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.datasets --env=&lt;env&gt; [command...]
-</pre></div>
-</div>
-<p>Where <code class="code docutils literal notranslate"><span class="pre">command</span></code> is one of <code class="code docutils literal notranslate"><span class="pre">--download=&lt;dataset...&gt;</span></code>,
-<code class="code docutils literal notranslate"><span class="pre">--activate=&lt;dataset...&gt;</span></code>, <code class="code docutils literal notranslate"><span class="pre">--deactivate=&lt;dataset...&gt;</span></code>,
-and <code class="code docutils literal notranslate"><span class="pre">--delete=&lt;dataset...&gt;</span></code>.</p>
-<div class="section" id="listing-installed-datasets">
-<h3><a class="toc-backref" href="#id5">Listing installed datasets</a><a class="headerlink" href="#listing-installed-datasets" title="Permalink to this headline">¶</a></h3>
-<p>If run with no arguments, this command shows an overview of the datasets that
-are activate, inactive, and available to download. For example:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m comiler_gym.bin.benchmarks --env=llvm-v0
-llvm-v0 benchmarks site dir: /home/user/.local/share/compiler_gym/llvm/10.0.0/bitcode_benchmarks
-
-+-------------------+--------------+-----------------+----------------+
-| Active Datasets   | License      |   #. Benchmarks | Size on disk   |
-+===================+==============+=================+================+
-| cBench-v1         | BSD 3-Clause |              23 | 10.1 MB        |
-+-------------------+--------------+-----------------+----------------+
-| Total             |              |              23 | 10.1 MB        |
-+-------------------+--------------+-----------------+----------------+
-These benchmarks are ready for use. Deactivate them using `--deactivate=&lt;name&gt;`.
-
-+---------------------+-----------+-----------------+----------------+
-| Inactive Datasets   | License   |   #. Benchmarks | Size on disk   |
-+=====================+===========+=================+================+
-| Total               |           |               0 | 0 Bytes        |
-+---------------------+-----------+-----------------+----------------+
-These benchmarks may be activated using `--activate=&lt;name&gt;`.
-
-+------------------------+---------------------------------+-----------------+----------------+
-| Downloadable Dataset   | License                         | #. Benchmarks   | Size on disk   |
-+========================+=================================+=================+================+
-| blas-v0                | BSD 3-Clause                    | 300             | 4.0 MB         |
-+------------------------+---------------------------------+-----------------+----------------+
-| polybench-v0           | BSD 3-Clause                    | 27              | 162.6 kB       |
-+------------------------+---------------------------------+-----------------+----------------+
-These benchmarks may be installed using `--download=&lt;name&gt; --activate=&lt;name&gt;`.
-</pre></div>
-</div>
-</div>
-<div class="section" id="downloading-datasets">
-<h3><a class="toc-backref" href="#id6">Downloading datasets</a><a class="headerlink" href="#downloading-datasets" title="Permalink to this headline">¶</a></h3>
-<p>Use <code class="code docutils literal notranslate"><span class="pre">--download</span></code> to download a dataset from the list of available datasets:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --download=npb-v0
-</pre></div>
-</div>
-<p>After downloading, the dataset will be activated and the benchmarks will be
-available to use by the environment.</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">compiler_gym</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">gym</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-v0&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">=</span> <span class="s2">&quot;npb-v0&quot;</span>
-</pre></div>
-</div>
-<p>The flag <code class="code docutils literal notranslate"><span class="pre">--download_all</span></code> can be used to download every available dataset:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --download_all
-</pre></div>
-</div>
-<p><code class="code docutils literal notranslate"><span class="pre">--download</span></code> accepts the URL of any <code class="code docutils literal notranslate"><span class="pre">.tar.bz2</span></code> file to support custom datasets:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --download=https://example.com/dataset.tar.bz2
-</pre></div>
-</div>
-<p>Or use the <code class="code docutils literal notranslate"><span class="pre">file:///</span></code> URI to install a local archive file:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.benchmarks --env=llvm-v0 --download=file:////tmp/dataset.tar.bz2
-</pre></div>
-</div>
-<p>The list of datasets that are available to download may be extended by calling
-<a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.register_dataset" title="compiler_gym.envs.CompilerEnv.register_dataset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">CompilerEnv.register_dataset()</span></code></a>
-on a <code class="code docutils literal notranslate"><span class="pre">CompilerEnv</span></code> instance.</p>
-<p>To programmatically download datasets, see
-<a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.require_dataset" title="compiler_gym.envs.CompilerEnv.require_dataset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">CompilerEnv.require_dataset()</span></code></a>.</p>
-</div>
-<div class="section" id="activating-and-deactivating-datasets">
-<h3><a class="toc-backref" href="#id7">Activating and deactivating datasets</a><a class="headerlink" href="#activating-and-deactivating-datasets" title="Permalink to this headline">¶</a></h3>
-<p>Datasets have two states: active and inactive. An inactive dataset still exists
-locally on the filesystem, but is excluded from use by CompilerGym environments.
-This be useful if you have many datasets downloaded and you would to limit the
-benchmarks that can be selected randomly by an environment.</p>
-<p>Activate or deactivate datasets using the <code class="code docutils literal notranslate"><span class="pre">--activate</span></code> and <code class="code docutils literal notranslate"><span class="pre">--deactivate</span></code>
-flags, respectively:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --activate=npb-v0,github-v0 --deactivate=cBench-v1
-</pre></div>
-</div>
-<p>The <code class="code docutils literal notranslate"><span class="pre">--activate_all</span></code> and <code class="code docutils literal notranslate"><span class="pre">--deactivate_all</span></code> flags can be used as a
-shortcut to activate or deactivate every downloaded:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span># Activate all inactivate datasets:
-$ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --activate_all
-# Make all activate datasets inactive:
-$ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --deactivate_all
-</pre></div>
-</div>
-</div>
-<div class="section" id="deleting-datasets">
-<h3><a class="toc-backref" href="#id8">Deleting datasets</a><a class="headerlink" href="#deleting-datasets" title="Permalink to this headline">¶</a></h3>
-<p>To remove a dataset from the filesystem, use <code class="code docutils literal notranslate"><span class="pre">--delete</span></code>:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m comiler_gym.bin.benchmarks --env=llvm-v0 --delete=npb-v0
-</pre></div>
-</div>
-<p>Once deleted, a dataset must be downloaded before it can be used again.</p>
-<p>A <code class="code docutils literal notranslate"><span class="pre">--delete_all</span></code> flag can be used to delete all of the locally installed
-datasets.</p>
-</div>
-</div>
 <div class="section" id="module-compiler_gym.bin.manual_env">
-<span id="compiler-gym-bin-manual-env"></span><h2><a class="toc-backref" href="#id9">compiler_gym.bin.manual_env</a><a class="headerlink" href="#module-compiler_gym.bin.manual_env" title="Permalink to this headline">¶</a></h2>
+<span id="compiler-gym-bin-manual-env"></span><h2><a class="toc-backref" href="#id4">compiler_gym.bin.manual_env</a><a class="headerlink" href="#module-compiler_gym.bin.manual_env" title="Permalink to this headline">¶</a></h2>
 <p>Run a CompilerGym environment with text interface controls.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.manual_env --env=&lt;env&gt; [--benchmark=&lt;name&gt;] [--observation=&lt;space&gt;] [--reward=&lt;space&gt;]
 </pre></div>
 </div>
 <p>The benchmark to use can be specified using <code class="code docutils literal notranslate"><span class="pre">--benchmark=&lt;name&gt;</span></code>.</p>
 <div class="section" id="compilergym-shell-tutorial">
-<h3><a class="toc-backref" href="#id10">CompilerGym Shell Tutorial</a><a class="headerlink" href="#compilergym-shell-tutorial" title="Permalink to this headline">¶</a></h3>
-<p>This program gives a basic shell through which many of commands from
-CompilerGym can be executed. CompilerGym provides a simple Python interface to
-various compiler functions, enabling programs to be compiled in different ways
-and to make queries about those programs. The goal is to have a simple system
-for machine learning in compilers.</p>
-<div class="section" id="downloading-a-dataset">
-<h4><a class="toc-backref" href="#id11">Downloading a Dataset</a><a class="headerlink" href="#downloading-a-dataset" title="Permalink to this headline">¶</a></h4>
-<p>When entering the Shell, the environment (compiler choice) will have already
-been made on the command line. The benchmark or program to be compiled may not
-yet be set. Before setting a benchmark, however, the corresponding dataset must
-be downloaded. You may have already downloaded a dataset through the
-compiler_gym.bin.datasets command, but if not, you can do that from this shell.</p>
-<p>To download a dataset, call:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compilergym</span><span class="p">:</span><span class="n">NO</span><span class="o">-</span><span class="n">BENCHMARK</span><span class="o">&gt;</span> <span class="n">require_dataset</span> <span class="o">&lt;</span><span class="n">dataset</span><span class="o">-</span><span class="n">name</span><span class="o">&gt;</span>
-</pre></div>
-</div>
-<p>The command and the dataset name should tab-complete for you (most things will
-tab-complete in the shell). You can also see what datasets are available with
-this command:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compilergym</span><span class="p">:</span><span class="n">NO</span><span class="o">-</span><span class="n">BENCHMARK</span><span class="o">&gt;</span> <span class="n">list_datasets</span>
-</pre></div>
-</div>
-</div>
+<h3><a class="toc-backref" href="#id5">CompilerGym Shell Tutorial</a><a class="headerlink" href="#compilergym-shell-tutorial" title="Permalink to this headline">¶</a></h3>
+<p>This program gives a basic shell through which many of commands from CompilerGym
+can be executed. CompilerGym provides a simple Python interface to various
+compiler functions, enabling programs to be compiled in different ways and to
+make queries about those programs. The goal is to have a simple system for
+machine learning in compilers.</p>
 <div class="section" id="setting-a-benchmark-reward-and-observation">
-<h4><a class="toc-backref" href="#id12">Setting a Benchmark, Reward and Observation</a><a class="headerlink" href="#setting-a-benchmark-reward-and-observation" title="Permalink to this headline">¶</a></h4>
+<h4><a class="toc-backref" href="#id6">Setting a Benchmark, Reward and Observation</a><a class="headerlink" href="#setting-a-benchmark-reward-and-observation" title="Permalink to this headline">¶</a></h4>
 <p>The CompilerGym operates on a program or benchmark. If not set on the command
 line, the benchmark can be specified in the shell with:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compilergym</span><span class="p">:</span><span class="n">NO</span><span class="o">-</span><span class="n">BENCHMARK</span><span class="o">&gt;</span> <span class="n">set_benchmark</span> <span class="o">&lt;</span><span class="n">benchmark</span><span class="o">-</span><span class="n">name</span><span class="o">&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compiler_gym</span><span class="p">:</span><span class="n">cbench</span><span class="o">-</span><span class="n">v1</span><span class="o">/</span><span class="n">qsort</span><span class="o">&gt;</span> <span class="n">set_benchmark</span> <span class="o">&lt;</span><span class="n">benchmark</span><span class="o">-</span><span class="n">name</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 <p>When a benchmark is set, the prompt will update with the name of the benchmark.
 Supposing that is “bench”, then the prompt would be:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compilergym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compiler_gym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span>
 </pre></div>
 </div>
-<p>The list of available benchmarks can be shown with:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compilergym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">list_benchmarks</span>
+<p>The list of available benchmarks can be shown with, though this is limited to
+the first 200 benchmarks:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compiler_gym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">list_benchmarks</span>
+</pre></div>
+</div>
+<p>You can also see what datasets are available with this command:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compiler_gym</span><span class="p">:</span><span class="n">cbench</span><span class="o">-</span><span class="n">v1</span><span class="o">/</span><span class="n">qsort</span><span class="o">&gt;</span> <span class="n">list_datasets</span>
 </pre></div>
 </div>
 <p>The default reward and observation can be similarly set with:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compilergym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">set_default_reward</span> <span class="o">&lt;</span><span class="n">reward</span><span class="o">-</span><span class="n">name</span><span class="o">&gt;</span>
-<span class="n">compilergym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">set_default_observation</span> <span class="o">&lt;</span><span class="n">observation</span><span class="o">-</span><span class="n">name</span><span class="o">&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compiler_gym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">set_default_reward</span> <span class="o">&lt;</span><span class="n">reward</span><span class="o">-</span><span class="n">name</span><span class="o">&gt;</span>
+<span class="n">compiler_gym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">set_default_observation</span> <span class="o">&lt;</span><span class="n">observation</span><span class="o">-</span><span class="n">name</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 <p>And lists of the choices are available with:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compilergym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">list_rewards</span>
-<span class="n">compilergym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">list_observations</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compiler_gym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">list_rewards</span>
+<span class="n">compiler_gym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">list_observations</span>
 </pre></div>
 </div>
 <p>The default rewards and observations will be reported every time an action is
@@ -491,110 +360,109 @@ be reported.</p>
 set, since they will try to optimise that reward.</p>
 </div>
 <div class="section" id="actions-and-the-action-stack">
-<h4><a class="toc-backref" href="#id13">Actions and the Action Stack</a><a class="headerlink" href="#actions-and-the-action-stack" title="Permalink to this headline">¶</a></h4>
+<h4><a class="toc-backref" href="#id7">Actions and the Action Stack</a><a class="headerlink" href="#actions-and-the-action-stack" title="Permalink to this headline">¶</a></h4>
 <p>In CompilerGym an action corresponds to invoking an compiler operation
 (currently an LLVM opt pass) on the intermediate representation of the program.
 Each action acts on the result of the previous action and so on.</p>
-<p>So, for example, to apply first the ‘tail call elimination’ pass, then the
-‘loop unrolling’ pass we call two actions:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compilergym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">action</span> <span class="o">-</span><span class="n">tailcallelim</span>
-<span class="n">compilergym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">action</span> <span class="o">-</span><span class="n">loop</span><span class="o">-</span><span class="n">unroll</span>
+<p>So, for example, to apply first the ‘tail call elimination’ pass, then the ‘loop
+unrolling’ pass we call two actions:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compiler_gym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">action</span> <span class="o">-</span><span class="n">tailcallelim</span>
+<span class="n">compiler_gym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">action</span> <span class="o">-</span><span class="n">loop</span><span class="o">-</span><span class="n">unroll</span>
 </pre></div>
 </div>
-<p>Each action will report its default reward.
-Note that multiple actions can be placed on a single line, so that the above is
-equivalent to:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compilergym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">action</span> <span class="o">-</span><span class="n">tailcallelim</span> <span class="o">-</span><span class="n">loop</span><span class="o">-</span><span class="n">unroll</span>
+<p>Each action will report its default reward. Note that multiple actions can be
+placed on a single line, so that the above is equivalent to:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compiler_gym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">action</span> <span class="o">-</span><span class="n">tailcallelim</span> <span class="o">-</span><span class="n">loop</span><span class="o">-</span><span class="n">unroll</span>
 </pre></div>
 </div>
 <p>You can choose a random action, by using just a ‘-‘ as the action name:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compilergym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">action</span> <span class="o">-</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compiler_gym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">action</span> <span class="o">-</span>
 </pre></div>
 </div>
 <p>Since an empty line on the shell repeats the last action, you can execute many
 random actions by typing that line first then holding down return.</p>
 <p>The actions are recorded in a stack, with the latest action on the top of the
 stack. You can view the action stack with stack command:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compilergym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">stack</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compiler_gym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">stack</span>
 </pre></div>
 </div>
 <p>This will show for each action if it had an effect (as computed by the
 underlying compiler), whether this terminated compiler, and what the per action
 and cumulative rewards are.</p>
 <p>The last action can be undone by:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compilergym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">undo</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compiler_gym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">undo</span>
 </pre></div>
 </div>
 <p>All actions in the stack can be undone at once by:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compilergym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">reset</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compiler_gym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">reset</span>
 </pre></div>
 </div>
 <p>You can find out what the effect of each action would be by calling this
 command:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compilergym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">try_all_actions</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compiler_gym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">try_all_actions</span>
 </pre></div>
 </div>
 <p>This will show a table with the reward for each action, sorted by best first.</p>
 <p>If you have a large stack of actions, many of which are not profitable, you can
 simplify the stack with this command:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compilergym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">simplify_stack</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compiler_gym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">simplify_stack</span>
 </pre></div>
 </div>
 <p>This will redo the entire stack, keeping only those actions which previously
 gave good rewards. (Note this doesn’t mean that the simplified stack will only
-have positive rewards, some negative actions may be necessary set up for a
-later positive reward.)</p>
+have positive rewards, some negative actions may be necessary set up for a later
+positive reward.)</p>
 </div>
 <div class="section" id="current-status">
-<h4><a class="toc-backref" href="#id14">Current Status</a><a class="headerlink" href="#current-status" title="Permalink to this headline">¶</a></h4>
+<h4><a class="toc-backref" href="#id8">Current Status</a><a class="headerlink" href="#current-status" title="Permalink to this headline">¶</a></h4>
 <p>For the current state of the program - after whatever actions have been called
 on it - you can make several queries.</p>
 <p>The first is to get a reward. This might not be the same as the current default
 reward:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compilergym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">reward</span> <span class="o">&lt;</span><span class="n">reward</span><span class="o">-</span><span class="n">name</span><span class="o">&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compiler_gym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">reward</span> <span class="o">&lt;</span><span class="n">reward</span><span class="o">-</span><span class="n">name</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 <p>You can see various observations with:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compilergym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">observation</span> <span class="o">&lt;</span><span class="n">observation</span><span class="o">-</span><span class="n">name</span><span class="o">&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compiler_gym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">observation</span> <span class="o">&lt;</span><span class="n">observation</span><span class="o">-</span><span class="n">name</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 <p>Finally, you can print the equivalent command line for achieving the same
 behaviour as the actions through the standard system shell:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compilergym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">commandline</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compiler_gym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">commandline</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="searching">
-<h4><a class="toc-backref" href="#id15">Searching</a><a class="headerlink" href="#searching" title="Permalink to this headline">¶</a></h4>
+<h4><a class="toc-backref" href="#id9">Searching</a><a class="headerlink" href="#searching" title="Permalink to this headline">¶</a></h4>
 <p>Some very basic search capabilities are supported, directly in the shell. Each
 of them just looks for another action to add.</p>
 <p>First, is the random search through this command:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compilergym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">action</span> <span class="o">-</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compiler_gym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">action</span> <span class="o">-</span>
 </pre></div>
 </div>
 <p>Multiple steps can be taken by holding down the return key.</p>
 <p>A hill-climbing search tries an action, but will only accept it if it yields a
 positive reward:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compilergym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">hill_climb</span> <span class="o">&lt;</span><span class="n">num</span><span class="o">-</span><span class="n">steps</span><span class="o">&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compiler_gym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">hill_climb</span> <span class="o">&lt;</span><span class="n">num</span><span class="o">-</span><span class="n">steps</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 <p>A simple greedy search tries all possible actions and takes the one with the
 highest reward, stopping when no action has a positive reward:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compilergym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">greedy</span> <span class="o">&lt;</span><span class="n">num</span><span class="o">-</span><span class="n">steps</span><span class="o">&gt;</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compiler_gym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">greedy</span> <span class="o">&lt;</span><span class="n">num</span><span class="o">-</span><span class="n">steps</span><span class="o">&gt;</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="miscellaneous">
-<h4><a class="toc-backref" href="#id16">Miscellaneous</a><a class="headerlink" href="#miscellaneous" title="Permalink to this headline">¶</a></h4>
+<h4><a class="toc-backref" href="#id10">Miscellaneous</a><a class="headerlink" href="#miscellaneous" title="Permalink to this headline">¶</a></h4>
 <p>One useful command is:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compilergym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">breakpoint</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compiler_gym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">breakpoint</span>
 </pre></div>
 </div>
 <p>Which drops into the python debugger. This is very useful if you want to see
 what is going on internally. There is a ‘self.env’ object that represents the
 environment that is definitely worth exploring.</p>
 <p>And finally:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compilergym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">exit</span>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">compiler_gym</span><span class="p">:</span><span class="n">bench</span><span class="o">&gt;</span> <span class="n">exit</span>
 </pre></div>
 </div>
 <p>Drops out of the shell. <code class="code docutils literal notranslate"><span class="pre">Ctrl-D</span></code> should have the same effect.</p>
@@ -602,7 +470,7 @@ environment that is definitely worth exploring.</p>
 </div>
 </div>
 <div class="section" id="module-compiler_gym.bin.random_search">
-<span id="compiler-gym-bin-random-search"></span><h2><a class="toc-backref" href="#id17">compiler_gym.bin.random_search</a><a class="headerlink" href="#module-compiler_gym.bin.random_search" title="Permalink to this headline">¶</a></h2>
+<span id="compiler-gym-bin-random-search"></span><h2><a class="toc-backref" href="#id11">compiler_gym.bin.random_search</a><a class="headerlink" href="#module-compiler_gym.bin.random_search" title="Permalink to this headline">¶</a></h2>
 <p>Run a parallelized random search of an environment’s action space.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.random_search --env=&lt;env&gt; --benchmark=&lt;name&gt; [--runtime=&lt;sec&gt;]
 </pre></div>
@@ -612,8 +480,8 @@ benchmark. The best reward, and sequence of actions that produced this, are
 logged to file.</p>
 <p>For example, run a random search of the LLVM instruction count optimization
 space on a Dijkstra benchmark for 60 seconds using:</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.random_search --env=llvm-ic-v0 --benchmark=cBench-v1/dijkstra --runtime=60
-Started 16 worker threads for benchmark benchmark://cBench-v1/dijkstra (410 instructions) using reward IrInstructionCountOz.
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.random_search --env=llvm-ic-v0 --benchmark=cbench-v1/dijkstra --runtime=60
+Started 16 worker threads for benchmark benchmark://cbench-v1/dijkstra (410 instructions) using reward IrInstructionCountOz.
 === Running for a minute ===
 Runtime: a minute. Num steps: 470,407 (7,780 / sec). Num episodes: 4,616 (76 / sec). Num restarts: 0.
 Best reward: 101.59% (96 passes, found after 35 seconds)
@@ -627,7 +495,7 @@ Step [096 / 096]: reward=1.015936, change=0.008031, action=NewGvnpass
 </pre></div>
 </div>
 <div class="section" id="search-strategy">
-<h3><a class="toc-backref" href="#id18">Search strategy</a><a class="headerlink" href="#search-strategy" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id12">Search strategy</a><a class="headerlink" href="#search-strategy" title="Permalink to this headline">¶</a></h3>
 <p>At each step, the agent selects an action randomly and records the
 reward. After a number of steps without improving reward (the “patience” of the
 agent), the agent terminates, and the environment resets. The number of steps
@@ -638,7 +506,7 @@ the search will run indefinitely. Use <code class="code docutils literal notrans
 search.</p>
 </div>
 <div class="section" id="execution-strategy">
-<h3><a class="toc-backref" href="#id19">Execution strategy</a><a class="headerlink" href="#execution-strategy" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id13">Execution strategy</a><a class="headerlink" href="#execution-strategy" title="Permalink to this headline">¶</a></h3>
 <p>The results of the search are logged to files. Control the location of these
 logs using the <code class="code docutils literal notranslate"><span class="pre">--output_dir=/path</span></code> flag.</p>
 <p>Multiple agents are run in parallel. By default, the number of agents is equal
@@ -647,7 +515,7 @@ to the number of processors on the host machine. Set a different value using
 </div>
 </div>
 <div class="section" id="module-compiler_gym.bin.random_replay">
-<span id="compiler-gym-bin-random-replay"></span><h2><a class="toc-backref" href="#id20">compiler_gym.bin.random_replay</a><a class="headerlink" href="#module-compiler_gym.bin.random_replay" title="Permalink to this headline">¶</a></h2>
+<span id="compiler-gym-bin-random-replay"></span><h2><a class="toc-backref" href="#id14">compiler_gym.bin.random_replay</a><a class="headerlink" href="#module-compiler_gym.bin.random_replay" title="Permalink to this headline">¶</a></h2>
 <p>Replay the best solution found from a random search.</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python -m compiler_gym.bin.random_replay --env=llvm-ic-v0 --output_dir=/path/to/logs
 </pre></div>
@@ -657,12 +525,12 @@ prior search, replay the best sequence of actions found and record the
 incremental reward of each action.</p>
 </div>
 <div class="section" id="module-compiler_gym.bin.validate">
-<span id="compiler-gym-bin-validate"></span><h2><a class="toc-backref" href="#id21">compiler_gym.bin.validate</a><a class="headerlink" href="#module-compiler_gym.bin.validate" title="Permalink to this headline">¶</a></h2>
+<span id="compiler-gym-bin-validate"></span><h2><a class="toc-backref" href="#id15">compiler_gym.bin.validate</a><a class="headerlink" href="#module-compiler_gym.bin.validate" title="Permalink to this headline">¶</a></h2>
 <p>Validate environment states.</p>
 <p>Example usage:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ cat &lt;&lt; EOF |
 benchmark,reward,walltime,commandline
-cBench-v1/crc32,0,1.2,opt  input.bc -o output.bc
+cbench-v1/crc32,0,1.2,opt  input.bc -o output.bc
 EOF
 python -m compiler_gym.bin.validate --env=llvm-ic-v0 -
 </pre></div>
@@ -674,26 +542,20 @@ validating that the reward matches the expected value. Further, some benchmarks
 allow for validation of program semantics. When available, those additional
 checks will be automatically run.</p>
 <div class="section" id="input-format">
-<h3><a class="toc-backref" href="#id22">Input Format</a><a class="headerlink" href="#input-format" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id16">Input Format</a><a class="headerlink" href="#input-format" title="Permalink to this headline">¶</a></h3>
 <p>The correct format for generating input states can be generated using
-<code class="xref py py-func docutils literal notranslate"><span class="pre">env.state.to_csv()</span></code>. The
-input CSV must start with a header row. A valid header row can be generated
-using
-<code class="xref py py-func docutils literal notranslate"><span class="pre">env.state.csv_header()</span></code>.</p>
-<p>Full example:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-v0&quot;</span><span class="p">)</span>
+<a class="reference internal" href="compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvStateWriter" title="compiler_gym.CompilerEnvStateWriter"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompilerEnvStateWriter</span></code></a>. For
+.. rubric:: Example</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-autophase-ic-v0&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">csv_header</span><span class="p">())</span>
-<span class="go">benchmark,reward,walltime,commandline</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">state</span><span class="o">.</span><span class="n">to_csv</span><span class="p">())</span>
-<span class="go">benchmark://cBench-v1/rijndael,,20.53565216064453,opt -add-discriminators input.bc -o output.bc</span>
-<span class="go">%</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">sample</span><span class="p">())</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">with</span> <span class="n">CompilerEnvStateWriter</span><span class="p">(</span><span class="nb">open</span><span class="p">(</span><span class="s2">&quot;results.csv&quot;</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">))</span> <span class="k">as</span> <span class="n">writer</span><span class="p">:</span>
+<span class="gp">... </span>    <span class="n">writer</span><span class="o">.</span><span class="n">write_state</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
 </pre></div>
 </div>
 </div>
 <div class="section" id="output-format">
-<h3><a class="toc-backref" href="#id23">Output Format</a><a class="headerlink" href="#output-format" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id17">Output Format</a><a class="headerlink" href="#output-format" title="Permalink to this headline">¶</a></h3>
 <p>This script prints one line per input state. The order of input states is not
 preserved. A successfully validated state has the format:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>✅  &lt;benchmark_name&gt;  &lt;reproduced_reward&gt;

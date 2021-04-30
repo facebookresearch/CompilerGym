@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>LLVM Environment Reference &mdash; CompilerGym 0.1.7 documentation</title>
+  <title>LLVM Environment Reference &mdash; CompilerGym 0.1.8 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                0.1.7
+                0.1.8
               </div>
             
           
@@ -227,82 +227,100 @@ languages.</p>
 </div>
 <div class="section" id="datasets">
 <h2><a class="toc-backref" href="#id4">Datasets</a><a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h2>
-<p>We provide several datasets of open-source LLVM-IR benchmarks for download:</p>
+<p>We provide several datasets of open-source LLVM-IR benchmarks for use:</p>
 <table class="docutils align-default">
 <colgroup>
-<col style="width: 25%" />
-<col style="width: 15%" />
-<col style="width: 18%" />
-<col style="width: 22%" />
-<col style="width: 20%" />
+<col style="width: 10%" />
+<col style="width: 9%" />
+<col style="width: 74%" />
+<col style="width: 8%" />
 </colgroup>
 <thead>
 <tr class="row-odd"><th class="head"><p>Dataset</p></th>
-<th class="head"><p>License</p></th>
-<th class="head"><p>Num. Benchmarks</p></th>
-<th class="head"><p>Validatable? <a class="footnote-reference brackets" href="#f1" id="id1">1</a></p></th>
-<th class="head"><p>Difficulty <a class="footnote-reference brackets" href="#f2" id="id2">2</a></p></th>
+<th class="head"><p>Num. Benchmarks <a class="footnote-reference brackets" href="#f1" id="id1">1</a></p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Validatable <a class="footnote-reference brackets" href="#f2" id="id2">2</a></p></th>
 </tr>
 </thead>
 <tbody>
-<tr class="row-even"><td><p>blas-v0</p></td>
-<td><p>BSD 3-Clause</p></td>
+<tr class="row-even"><td><p>benchmark://anghabench-v0</p></td>
+<td><p>1,042,976</p></td>
+<td><p>Compile-only C/C++ functions extracted from GitHub [<a class="reference external" href="http://cuda.dcc.ufmg.br/angha/">Homepage</a>, <a class="reference external" href="https://homepages.dcc.ufmg.br/~fernando/publications/papers/FaustinoCGO21.pdf">Paper</a>]</p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p>benchmark://blas-v0</p></td>
 <td><p>300</p></td>
+<td><p>Basic linear algebra kernels [<a class="reference external" href="http://www.netlib.org/blas/">Homepage</a>, <a class="reference external" href="https://strum355.netsoc.co/books/PDF/Basic%20Linear%20Algebra%20Subprograms%20for%20Fortran%20Usage%20-%20BLAS%20(1979).pdf">Paper</a>]</p></td>
 <td><p>No</p></td>
-<td><p>0.3</p></td>
 </tr>
-<tr class="row-odd"><td><p>cBench-v1</p></td>
-<td><p>BSD 3-Clause</p></td>
+<tr class="row-even"><td><p>benchmark://cbench-v1</p></td>
 <td><p>23</p></td>
-<td><p>Partial</p></td>
-<td><p>0.8</p></td>
+<td><p>Runnable C benchmarks [<a class="reference external" href="https://ctuning.org/wiki/index.php/CTools:CBench">Homepage</a>, <a class="reference external" href="https://arxiv.org/pdf/1407.3487.pdf">Paper</a>]</p></td>
+<td><p>Partially</p></td>
 </tr>
-<tr class="row-even"><td><p>github-v0</p></td>
-<td><p>CC BY 4.0</p></td>
-<td><p>50,708</p></td>
+<tr class="row-odd"><td><p>benchmark://clgen-v0</p></td>
+<td><p>996</p></td>
+<td><p>Synthetically generated OpenCL kernels [<a class="reference external" href="https://github.com/ChrisCummins/clgen">Homepage</a>, <a class="reference external" href="https://chriscummins.cc/pub/2017-cgo.pdf">Paper</a>]</p></td>
 <td><p>No</p></td>
-<td><p>0.7</p></td>
 </tr>
-<tr class="row-odd"><td><p>linux-v0</p></td>
-<td><p>GPL-2.0</p></td>
-<td><p>13,920</p></td>
+<tr class="row-even"><td><p>benchmark://github-v0</p></td>
+<td><p>49,738</p></td>
+<td><p>Compile-only C/C++ objects from GitHub [<a class="reference external" href="https://arxiv.org/pdf/2012.01470.pdf">Paper</a>]</p></td>
 <td><p>No</p></td>
-<td><p>0.4</p></td>
 </tr>
-<tr class="row-even"><td><p>mibench-v0</p></td>
-<td><p>BSD 3-Clause</p></td>
+<tr class="row-odd"><td><p>benchmark://linux-v0</p></td>
+<td><p>13,894</p></td>
+<td><p>Compile-only object files from C Linux kernel [<a class="reference external" href="https://www.linux.org/">Homepage</a>]</p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p>benchmark://mibench-v0</p></td>
 <td><p>40</p></td>
+<td><p>C benchmarks [<a class="reference external" href="http://vhosts.eecs.umich.edu/mibench/Publications/MiBench.pdf">Paper</a>]</p></td>
 <td><p>No</p></td>
-<td><p>0.8</p></td>
 </tr>
-<tr class="row-odd"><td><p>npb-v0</p></td>
-<td><p>NASA v1.3</p></td>
+<tr class="row-odd"><td><p>benchmark://npb-v0</p></td>
 <td><p>122</p></td>
+<td><p>NASA Parallel Benchmarks [<a class="reference external" href="http://optout.csc.ncsu.edu/~mueller/codeopt/codeopt05/projects/www4.ncsu.edu/~pgauria/csc791a/papers/NAS-95-020.pdf">Paper</a>]</p></td>
 <td><p>No</p></td>
-<td><p>0.4</p></td>
 </tr>
-<tr class="row-even"><td><p>opencv-v0</p></td>
-<td><p>Apache 2.0</p></td>
+<tr class="row-even"><td><p>benchmark://opencv-v0</p></td>
 <td><p>442</p></td>
+<td><p>Compile-only object files from C++ OpenCV library [<a class="reference external" href="https://opencv.org/">Homepage</a>, <a class="reference external" href="https://mipro-proceedings.com/sites/mipro-proceedings.com/files/upload/sp/sp_008.pdf">Paper</a>]</p></td>
 <td><p>No</p></td>
-<td><p>0.3</p></td>
 </tr>
-<tr class="row-odd"><td><p>poj104-v0</p></td>
-<td><p>BSD 3-Clause</p></td>
-<td><p>49,628</p></td>
+<tr class="row-odd"><td><p>benchmark://poj104-v1</p></td>
+<td><p>49,816</p></td>
+<td><p>Solutions to programming programs [<a class="reference external" href="https://sites.google.com/site/treebasedcnn/">Homepage</a>, <a class="reference external" href="https://ojs.aaai.org/index.php/AAAI/article/download/10139/9998">Paper</a>]</p></td>
 <td><p>No</p></td>
-<td><p>0.7</p></td>
 </tr>
-<tr class="row-even"><td><p>tensorflow-v0</p></td>
-<td><p>Apache 2.0</p></td>
+<tr class="row-even"><td><p>benchmark://tensorflow-v0</p></td>
 <td><p>1,985</p></td>
+<td><p>Compile-only object files from C++ TensorFlow library [<a class="reference external" href="https://www.tensorflow.org/">Homepage</a>, <a class="reference external" href="https://www.usenix.org/system/files/conference/osdi16/osdi16-abadi.pdf">Paper</a>]</p></td>
 <td><p>No</p></td>
-<td><p>0.3</p></td>
+</tr>
+<tr class="row-odd"><td><p>generator://csmith-v0</p></td>
+<td><p>∞</p></td>
+<td><p>Random conformant C99 programs [<a class="reference external" href="https://embed.cs.utah.edu/csmith/">Homepage</a>, <a class="reference external" href="http://web.cse.ohio-state.edu/~rountev.1/5343/pdf/pldi11.pdf">Paper</a>]</p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p>generator://llvm-stress-v0</p></td>
+<td><p>∞</p></td>
+<td><p>Randomly generated LLVM-IR [<a class="reference external" href="https://llvm.org/docs/CommandGuide/llvm-stress.html">Documentation</a>]</p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p>Total</p></td>
+<td><p>1,160,330</p></td>
+<td></td>
+<td></td>
 </tr>
 </tbody>
 </table>
 <dl class="footnote brackets">
 <dt class="label" id="f1"><span class="brackets"><a class="fn-backref" href="#id1">1</a></span></dt>
+<dd><p>Values are for the Linux datasets. Some of the datasets contain fewer
+benchmarks on macOS.</p>
+</dd>
+<dt class="label" id="f2"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
 <dd><p>A <strong>validatable</strong> dataset is one where the behavior of the benchmarks
 can be checked by compiling the programs to binaries and executing
 them. If the benchmarks crash, or are found to have different behavior,
@@ -310,31 +328,16 @@ then validation fails. This type of validation is used to check that
 the compiler has not broken the semantics of the program.
 See <a class="reference internal" href="../cli.html#module-compiler_gym.bin.validate" title="compiler_gym.bin.validate"><code class="xref py py-mod docutils literal notranslate"><span class="pre">compiler_gym.bin.validate</span></code></a>.</p>
 </dd>
-<dt class="label" id="f2"><span class="brackets"><a class="fn-backref" href="#id2">2</a></span></dt>
-<dd><p>The <strong>difficulty</strong> of a dataset is an indicator of how likely a random
-policy is to outperform the default compiler policy in a fixed amount
-of time. A lower difficulty shows that a random policy is more likely
-to succeed. It is a crude characterization metric that does not take
-into account factors such as the diversity of programs, the complexity
-of the optimization space, etc. The difficulty values in this table
-were estimated using 2000 random trials and a fixed time budget of 30
-seconds.</p>
-</dd>
 </dl>
-<p>Install these datasets using the <a class="reference internal" href="../cli.html#module-compiler_gym.bin.datasets" title="compiler_gym.bin.datasets"><code class="xref py py-mod docutils literal notranslate"><span class="pre">compiler_gym.bin.datasets</span></code></a> command line
-tool, or programatically using
-<a class="reference internal" href="../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.require_datasets" title="compiler_gym.envs.CompilerEnv.require_datasets"><code class="xref py py-meth docutils literal notranslate"><span class="pre">CompilerEnv.require_datasets()</span></code></a>:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-v0&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">require_datasets</span><span class="p">([</span><span class="s2">&quot;tensorflow-v0&quot;</span><span class="p">,</span> <span class="s2">&quot;npb-v0&quot;</span><span class="p">])</span>
-</pre></div>
-</div>
+<p>All of the above datasets are available for use with the LLVM environment. See
+<a class="reference internal" href="api.html#datasets"><span class="std std-ref">compiler_gym.envs.llvm.datasets</span></a> for API details.</p>
 <p>We characterize the datasets below in radial plots which show, clockwise from
 the top: the average number of instructions per benchmark, the density of
 branching instructions, the density of arithmetic instructions, and the density
-of memory operations. For example, comparing blas-v0 and cBench-v1 shows that
+of memory operations. For example, comparing blas-v0 and cbench-v1 shows that
 blas-v0 consists of smaller programs with a similar density of branches, a
 higher density of arithmetic operations and relatively few memory operations.
-cBench-v1, in contrast to the small linear algebra kernels of blas-v0, contains
+cbench-v1, in contrast to the small linear algebra kernels of blas-v0, contains
 larger programs with a higher density of memory operations and fewer arithmetic
 operations.</p>
 <img alt="../_images/datasets.png" src="../_images/datasets.png" />

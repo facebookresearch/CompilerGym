@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.compiler_env_state &mdash; CompilerGym 0.1.7 documentation</title>
+  <title>compiler_gym.compiler_env_state &mdash; CompilerGym 0.1.8 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.7
+                0.1.8
               </div>
             
           
@@ -177,18 +177,16 @@
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
 <span class="sd">&quot;&quot;&quot;This module defines a class to represent a compiler environment state.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">csv</span>
-<span class="kn">from</span> <span class="nn">io</span> <span class="kn">import</span> <span class="n">StringIO</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">import</span> <span class="nn">sys</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TextIO</span>
+
+<span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span><span class="p">,</span> <span class="n">validator</span>
+
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets.uri</span> <span class="kn">import</span> <span class="n">BENCHMARK_URI_PATTERN</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.truncate</span> <span class="kn">import</span> <span class="n">truncate</span>
 
 
-<span class="k">def</span> <span class="nf">_to_csv</span><span class="p">(</span><span class="o">*</span><span class="n">columns</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-    <span class="n">buf</span> <span class="o">=</span> <span class="n">StringIO</span><span class="p">()</span>
-    <span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="n">buf</span><span class="p">)</span>
-    <span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">buf</span><span class="o">.</span><span class="n">getvalue</span><span class="p">()</span><span class="o">.</span><span class="n">rstrip</span><span class="p">()</span>
-
-
-<div class="viewcode-block" id="CompilerEnvState"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvState">[docs]</a><span class="k">class</span> <span class="nc">CompilerEnvState</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+<div class="viewcode-block" id="CompilerEnvState"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvState">[docs]</a><span class="k">class</span> <span class="nc">CompilerEnvState</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;The representation of a compiler environment state.</span>
 
 <span class="sd">    The state of an environment is defined as a benchmark and a sequence of</span>
@@ -196,87 +194,39 @@
 <span class="sd">    contains the information required to reproduce the result.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">benchmark</span><span class="p">:</span> <span class="nb">str</span>
-    <span class="sd">&quot;&quot;&quot;The name of the benchmark used for this episode.&quot;&quot;&quot;</span>
+    <span class="n">benchmark</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">allow_mutation</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">regex</span><span class="o">=</span><span class="n">BENCHMARK_URI_PATTERN</span><span class="p">,</span>
+        <span class="n">examples</span><span class="o">=</span><span class="p">[</span>
+            <span class="s2">&quot;benchmark://cbench-v1/crc32&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;generator://csmith-v0/0&quot;</span><span class="p">,</span>
+        <span class="p">],</span>
+    <span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;The URI of the benchmark used for this episode.&quot;&quot;&quot;</span>
 
     <span class="n">commandline</span><span class="p">:</span> <span class="nb">str</span>
     <span class="sd">&quot;&quot;&quot;The list of actions that produced this state, as a commandline.&quot;&quot;&quot;</span>
 
     <span class="n">walltime</span><span class="p">:</span> <span class="nb">float</span>
-    <span class="sd">&quot;&quot;&quot;The walltime of the episode.&quot;&quot;&quot;</span>
+    <span class="sd">&quot;&quot;&quot;The walltime of the episode in seconds. Must be non-negative.&quot;&quot;&quot;</span>
 
-    <span class="n">reward</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="sd">&quot;&quot;&quot;The cumulative reward for this episode.&quot;&quot;&quot;</span>
+    <span class="n">reward</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">required</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
+        <span class="n">allow_mutation</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="sd">&quot;&quot;&quot;The cumulative reward for this episode. Optional.&quot;&quot;&quot;</span>
+
+    <span class="nd">@validator</span><span class="p">(</span><span class="s2">&quot;walltime&quot;</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">walltime_nonnegative</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">v</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">v</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">assert</span> <span class="n">v</span> <span class="o">&gt;=</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Walltime cannot be negative&quot;</span>
+        <span class="k">return</span> <span class="n">v</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">has_reward</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return whether the state has a reward value.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
-
-<div class="viewcode-block" id="CompilerEnvState.csv_header"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvState.csv_header">[docs]</a>    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">csv_header</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Return the header string for the CSV-format.</span>
-
-<span class="sd">        :return: A comma-separated string.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_to_csv</span><span class="p">(</span><span class="s2">&quot;benchmark&quot;</span><span class="p">,</span> <span class="s2">&quot;reward&quot;</span><span class="p">,</span> <span class="s2">&quot;walltime&quot;</span><span class="p">,</span> <span class="s2">&quot;commandline&quot;</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="CompilerEnvState.json"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvState.json">[docs]</a>    <span class="k">def</span> <span class="nf">json</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Return the state as JSON.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_asdict</span><span class="p">()</span>  <span class="c1"># pylint: disable=no-member</span></div>
-
-<div class="viewcode-block" id="CompilerEnvState.to_csv"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvState.to_csv">[docs]</a>    <span class="k">def</span> <span class="nf">to_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Serialize a state to a comma separated list of values.</span>
-
-<span class="sd">        :return: A comma-separated string.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">_to_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">walltime</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">commandline</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="CompilerEnvState.from_json"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvState.from_json">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_json</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="s2">&quot;CompilerEnvState&quot;</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Construct a state from a JSON dictionary.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span></div>
-
-<div class="viewcode-block" id="CompilerEnvState.from_csv"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvState.from_csv">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_csv</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">csv_string</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CompilerEnvState&quot;</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Construct a state from a comma separated list of values.&quot;&quot;&quot;</span>
-        <span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="n">StringIO</span><span class="p">(</span><span class="n">csv_string</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">benchmark</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">walltime</span><span class="p">,</span> <span class="n">commandline</span> <span class="o">=</span> <span class="n">line</span>
-                <span class="k">break</span>
-            <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to parse input: `</span><span class="si">{</span><span class="n">csv_string</span><span class="si">}</span><span class="s2">`: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to parse input: `</span><span class="si">{</span><span class="n">csv_string</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
-            <span class="n">benchmark</span><span class="o">=</span><span class="n">benchmark</span><span class="p">,</span>
-            <span class="n">reward</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">reward</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">reward</span><span class="p">),</span>
-            <span class="n">walltime</span><span class="o">=</span><span class="mi">0</span> <span class="k">if</span> <span class="n">walltime</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">walltime</span><span class="p">),</span>
-            <span class="n">commandline</span><span class="o">=</span><span class="n">commandline</span><span class="p">,</span>
-        <span class="p">)</span></div>
-
-<div class="viewcode-block" id="CompilerEnvState.read_csv_file"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvState.read_csv_file">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">read_csv_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">in_file</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="s2">&quot;CompilerEnvState&quot;</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Read states from a CSV file.</span>
-
-<span class="sd">        :param in_file: A file object.</span>
-<span class="sd">        :returns: A generator of :class:`CompilerEnvState` instances.</span>
-<span class="sd">        :raises ValueError: If input parsing fails.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># TODO(cummins): Check schema of DictReader and, on failure, fallback</span>
-        <span class="c1"># to from_csv() per-line.</span>
-        <span class="c1"># TODO(cummins): Accept a URL for in_file and read from web.</span>
-        <span class="n">data</span> <span class="o">=</span> <span class="n">in_file</span><span class="o">.</span><span class="n">readlines</span><span class="p">()</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">csv</span><span class="o">.</span><span class="n">DictReader</span><span class="p">(</span><span class="n">data</span><span class="p">):</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">line</span><span class="p">[</span><span class="s2">&quot;reward&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s2">&quot;reward&quot;</span><span class="p">])</span> <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;reward&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
-                <span class="n">line</span><span class="p">[</span><span class="s2">&quot;walltime&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="nb">float</span><span class="p">(</span><span class="n">line</span><span class="p">[</span><span class="s2">&quot;walltime&quot;</span><span class="p">])</span> <span class="k">if</span> <span class="n">line</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;walltime&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
-                <span class="p">)</span>
-                <span class="k">yield</span> <span class="n">CompilerEnvState</span><span class="p">(</span><span class="o">**</span><span class="n">line</span><span class="p">)</span>
-            <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">KeyError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to parse input: `</span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">`&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span></div>
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rhs</span><span class="p">,</span> <span class="n">CompilerEnvState</span><span class="p">):</span>
@@ -297,7 +247,159 @@
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">rhs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">rhs</span></div>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">rhs</span>
+
+    <span class="k">class</span> <span class="nc">Config</span><span class="p">:</span>
+        <span class="n">validate_assignment</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+<div class="viewcode-block" id="CompilerEnvStateWriter"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvStateWriter">[docs]</a><span class="k">class</span> <span class="nc">CompilerEnvStateWriter</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Serialize compiler environment states to CSV.</span>
+
+<span class="sd">    Example use:</span>
+
+<span class="sd">        &gt;&gt;&gt; with CompilerEnvStateWriter(open(&quot;results.csv&quot;, &quot;wb&quot;)) as writer:</span>
+<span class="sd">        ...     writer.write_state(env.state)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CompilerEnvStateWriter.__init__"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvStateWriter.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">TextIO</span><span class="p">,</span> <span class="n">header</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor.</span>
+
+<span class="sd">        :param f: The file to write to.</span>
+<span class="sd">        :param header: Whether to include a header row.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">f</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">writer</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">writer</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">,</span> <span class="n">lineterminator</span><span class="o">=</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="n">header</span></div>
+
+<div class="viewcode-block" id="CompilerEnvStateWriter.write_state"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvStateWriter.write_state">[docs]</a>    <span class="k">def</span> <span class="nf">write_state</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">CompilerEnvState</span><span class="p">,</span> <span class="n">flush</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Write the state to file.</span>
+
+<span class="sd">        :param state: A compiler environment state.</span>
+
+<span class="sd">        :param flush: Write to file immediately.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">header</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">((</span><span class="s2">&quot;benchmark&quot;</span><span class="p">,</span> <span class="s2">&quot;reward&quot;</span><span class="p">,</span> <span class="s2">&quot;walltime&quot;</span><span class="p">,</span> <span class="s2">&quot;commandline&quot;</span><span class="p">))</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">header</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">writer</span><span class="o">.</span><span class="n">writerow</span><span class="p">(</span>
+            <span class="p">(</span><span class="n">state</span><span class="o">.</span><span class="n">benchmark</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">reward</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">walltime</span><span class="p">,</span> <span class="n">state</span><span class="o">.</span><span class="n">commandline</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">flush</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">flush</span><span class="p">()</span></div>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Support with-statement for the writer.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Support with-statement for the writer.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="CompilerEnvStateReader"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvStateReader">[docs]</a><span class="k">class</span> <span class="nc">CompilerEnvStateReader</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Read states from a CSV file.</span>
+
+<span class="sd">    Example usage:</span>
+
+<span class="sd">        &gt;&gt;&gt; with CompilerEnvStateReader(open(&quot;results.csv&quot;, &quot;rb&quot;)) as reader:</span>
+<span class="sd">        ...     for state in reader:</span>
+<span class="sd">        ...         print(state)</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CompilerEnvStateReader.__init__"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvStateReader.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">f</span><span class="p">:</span> <span class="n">TextIO</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor.</span>
+
+<span class="sd">        :param f: The file to read.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span> <span class="o">=</span> <span class="n">f</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reader</span> <span class="o">=</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="CompilerEnvStateReader.__iter__"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvStateReader.__iter__">[docs]</a>    <span class="k">def</span> <span class="fm">__iter__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">CompilerEnvState</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Read the states from the file.&quot;&quot;&quot;</span>
+        <span class="n">columns_in_order</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;benchmark&quot;</span><span class="p">,</span> <span class="s2">&quot;reward&quot;</span><span class="p">,</span> <span class="s2">&quot;walltime&quot;</span><span class="p">,</span> <span class="s2">&quot;commandline&quot;</span><span class="p">]</span>
+        <span class="c1"># Read the CSV and coerce the columns into the expected order.</span>
+        <span class="k">for</span> <span class="p">(</span>
+            <span class="n">benchmark</span><span class="p">,</span>
+            <span class="n">reward</span><span class="p">,</span>
+            <span class="n">walltime</span><span class="p">,</span>
+            <span class="n">commandline</span><span class="p">,</span>
+        <span class="p">)</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_iterate_columns_in_order</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">reader</span><span class="p">,</span> <span class="n">columns_in_order</span><span class="p">):</span>
+            <span class="k">yield</span> <span class="n">CompilerEnvState</span><span class="p">(</span>
+                <span class="n">benchmark</span><span class="o">=</span><span class="n">benchmark</span><span class="p">,</span>
+                <span class="n">reward</span><span class="o">=</span><span class="kc">None</span> <span class="k">if</span> <span class="n">reward</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">reward</span><span class="p">),</span>
+                <span class="n">walltime</span><span class="o">=</span><span class="mi">0</span> <span class="k">if</span> <span class="n">walltime</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="n">walltime</span><span class="p">),</span>
+                <span class="n">commandline</span><span class="o">=</span><span class="n">commandline</span><span class="p">,</span>
+            <span class="p">)</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_iterate_columns_in_order</span><span class="p">(</span>
+        <span class="n">reader</span><span class="p">:</span> <span class="n">csv</span><span class="o">.</span><span class="n">reader</span><span class="p">,</span> <span class="n">columns</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]:</span>
+        <span class="sd">&quot;&quot;&quot;Read the input CSV and return each row in the given column order.</span>
+
+<span class="sd">        Supports CSVs both with and without a header. If no header, columns are</span>
+<span class="sd">        expected to be in the correct order. Else the header row is used to</span>
+<span class="sd">        determine column order.</span>
+
+<span class="sd">        Header row detection is case insensitive.</span>
+
+<span class="sd">        :param reader: The CSV file to read.</span>
+
+<span class="sd">        :param columns: A list of column names in the order that they are</span>
+<span class="sd">            expected.</span>
+
+<span class="sd">        :return: An iterator over rows.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">row</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="n">reader</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+            <span class="c1"># Empty file.</span>
+            <span class="k">return</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">row</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Expected </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">columns</span><span class="p">)</span><span class="si">}</span><span class="s2"> columns in the first row of CSV: </span><span class="si">{</span><span class="n">truncate</span><span class="p">(</span><span class="n">row</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
+        <span class="c1"># Convert the maybe-header columns to lowercase for case-insensitive</span>
+        <span class="c1"># comparison.</span>
+        <span class="n">maybe_header</span> <span class="o">=</span> <span class="p">[</span><span class="n">v</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">row</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">set</span><span class="p">(</span><span class="n">maybe_header</span><span class="p">)</span> <span class="o">==</span> <span class="nb">set</span><span class="p">(</span><span class="n">columns</span><span class="p">):</span>
+            <span class="c1"># The first row matches the expected columns names, so use it to</span>
+            <span class="c1"># determine the column order.</span>
+            <span class="n">column_order</span> <span class="o">=</span> <span class="p">[</span><span class="n">maybe_header</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">]</span>
+            <span class="k">yield from</span> <span class="p">([</span><span class="n">row</span><span class="p">[</span><span class="n">v</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">column_order</span><span class="p">]</span> <span class="k">for</span> <span class="n">row</span> <span class="ow">in</span> <span class="n">reader</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># The first row isn&#39;t a header, so assume that all rows are in</span>
+            <span class="c1"># expected column order.</span>
+            <span class="k">yield</span> <span class="n">row</span>
+            <span class="k">yield from</span> <span class="n">reader</span>
+
+    <span class="k">def</span> <span class="fm">__enter__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Support with-statement for the reader.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span>
+
+    <span class="k">def</span> <span class="fm">__exit__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Support with-statement for the reader.&quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">f</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+<div class="viewcode-block" id="CompilerEnvStateReader.read_paths"><a class="viewcode-back" href="../../compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvStateReader.read_paths">[docs]</a>    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">read_paths</span><span class="p">(</span><span class="n">paths</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">CompilerEnvState</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Read a states from a list of file paths.</span>
+
+<span class="sd">        Read states from stdin using a special path :code:`&quot;-&quot;`.</span>
+
+<span class="sd">        :param: A list of paths.</span>
+
+<span class="sd">        :return: A generator of compiler env states.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">paths</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">path</span> <span class="o">==</span> <span class="s2">&quot;-&quot;</span><span class="p">:</span>
+                <span class="k">yield from</span> <span class="nb">iter</span><span class="p">(</span><span class="n">CompilerEnvStateReader</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">stdin</span><span class="p">))</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                    <span class="k">yield from</span> <span class="nb">iter</span><span class="p">(</span><span class="n">CompilerEnvStateReader</span><span class="p">(</span><span class="n">f</span><span class="p">))</span></div></div>
 </pre></div>
 
            </div>

@@ -1,0 +1,573 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>compiler_gym.datasets.benchmark &mdash; CompilerGym 0.1.8 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script src="../../../_static/jquery.js"></script>
+        <script src="../../../_static/underscore.js"></script>
+        <script src="../../../_static/doctools.js"></script>
+        <script src="../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../_static/js/theme.js"></script>
+
+    
+    <link rel="author" title="About these documents" href="../../../about.html" />
+    <link rel="index" title="Index" href="../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> CompilerGym
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.8
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command Line Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/views.html">compiler_gym.views</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../index.html">CompilerGym</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../index.html">Module code</a> &raquo;</li>
+        
+      <li>compiler_gym.datasets.benchmark</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for compiler_gym.datasets.benchmark</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) Facebook, Inc. and its affiliates.</span>
+<span class="c1">#</span>
+<span class="c1"># This source code is licensed under the MIT license found in the</span>
+<span class="c1"># LICENSE file in the root directory of this source tree.</span>
+<span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">as_completed</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">Benchmark</span> <span class="k">as</span> <span class="n">BenchmarkProto</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">File</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util</span> <span class="kn">import</span> <span class="n">thread_pool</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.decorators</span> <span class="kn">import</span> <span class="n">memoized_property</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.validation_error</span> <span class="kn">import</span> <span class="n">ValidationError</span>
+
+<span class="c1"># A validation callback is a function that takes a single CompilerEnv instance</span>
+<span class="c1"># as its argument and returns an iterable sequence of zero or more</span>
+<span class="c1"># ValidationError tuples.</span>
+<span class="n">ValidationCallback</span> <span class="o">=</span> <span class="n">Callable</span><span class="p">[[</span><span class="s2">&quot;CompilerEnv&quot;</span><span class="p">],</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ValidationError</span><span class="p">]]</span>  <span class="c1"># noqa: F821</span>
+
+
+<div class="viewcode-block" id="BenchmarkSource"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.BenchmarkSource">[docs]</a><span class="k">class</span> <span class="nc">BenchmarkSource</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A source file that is used to generate a benchmark. A benchmark may</span>
+<span class="sd">    comprise many source files.</span>
+
+<span class="sd">    .. warning::</span>
+
+<span class="sd">        The :class:`BenchmarkSource &lt;compiler_gym.datasets.BenchmarkSource&gt;`</span>
+<span class="sd">        class is new and is likely to change in the future.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">filename</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="sd">&quot;&quot;&quot;The name of the file.&quot;&quot;&quot;</span>
+
+    <span class="n">contents</span><span class="p">:</span> <span class="nb">bytes</span>
+    <span class="sd">&quot;&quot;&quot;The contents of the file as a byte array.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">filename</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="Benchmark"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Benchmark">[docs]</a><span class="k">class</span> <span class="nc">Benchmark</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A benchmark represents a particular program that is being compiled.</span>
+
+<span class="sd">    A benchmark is a program that can be used by a :class:`CompilerEnv</span>
+<span class="sd">    &lt;compiler_gym.envs.CompilerEnv&gt;` as a program to optimize. A benchmark</span>
+<span class="sd">    comprises the data that is fed into the compiler, identified by a URI.</span>
+
+<span class="sd">    Benchmarks are not normally instantiated directly. Instead, benchmarks are</span>
+<span class="sd">    instantiated using :meth:`env.datasets.benchmark(uri)</span>
+<span class="sd">    &lt;compiler_gym.datasets.Datasets.benchmark&gt;`:</span>
+
+<span class="sd">        &gt;&gt;&gt; env.datasets.benchmark(&quot;benchmark://npb-v0/20&quot;)</span>
+<span class="sd">        benchmark://npb-v0/20</span>
+
+<span class="sd">    The available benchmark URIs can be queried using</span>
+<span class="sd">    :meth:`env.datasets.benchmark_uris()</span>
+<span class="sd">    &lt;compiler_gym.datasets.Datasets.benchmark_uris&gt;`.</span>
+
+<span class="sd">        &gt;&gt;&gt; next(env.datasets.benchmark_uris())</span>
+<span class="sd">        &#39;benchmark://cbench-v1/adpcm&#39;</span>
+
+<span class="sd">    Compiler environments may provide additional helper functions for generating</span>
+<span class="sd">    benchmarks, such as :meth:`env.make_benchmark()</span>
+<span class="sd">    &lt;compiler_gym.envs.LlvmEnv.make_benchmark&gt;` for LLVM.</span>
+
+<span class="sd">    A Benchmark instance wraps an instance of the :code:`Benchmark` protocol</span>
+<span class="sd">    buffer from the `RPC interface</span>
+<span class="sd">    &lt;https://github.com/facebookresearch/CompilerGym/blob/development/compiler_gym/service/proto/compiler_gym_service.proto&gt;`_</span>
+<span class="sd">    with additional functionality. The data underlying benchmarks should be</span>
+<span class="sd">    considered immutable. New attributes cannot be assigned to Benchmark</span>
+<span class="sd">    instances.</span>
+
+<span class="sd">    The benchmark for an environment can be set during :meth:`env.reset()</span>
+<span class="sd">    &lt;compiler_gym.envs.CompilerEnv.reset&gt;`. The currently active benchmark can</span>
+<span class="sd">    be queried using :attr:`env.benchmark</span>
+<span class="sd">    &lt;compiler_gym.envs.CompilerEnv.benchmark&gt;`:</span>
+
+<span class="sd">        &gt;&gt;&gt; env = gym.make(&quot;llvm-v0&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; env.reset(benchmark=&quot;benchmark://cbench-v1/crc32&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; env.benchmark</span>
+<span class="sd">        benchmark://cbench-v1/crc32</span>
+
+
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="vm">__slots__</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;_proto&quot;</span><span class="p">,</span> <span class="s2">&quot;_validation_callbacks&quot;</span><span class="p">,</span> <span class="s2">&quot;_sources&quot;</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">proto</span><span class="p">:</span> <span class="n">BenchmarkProto</span><span class="p">,</span>
+        <span class="n">validation_callbacks</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">ValidationCallback</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">sources</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">BenchmarkSource</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_proto</span> <span class="o">=</span> <span class="n">proto</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validation_callbacks</span> <span class="o">=</span> <span class="n">validation_callbacks</span> <span class="ow">or</span> <span class="p">[]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sources</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">sources</span> <span class="ow">or</span> <span class="p">[])</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">uri</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;The URI of the benchmark.</span>
+
+<span class="sd">        Benchmark URIs should be unique, that is, that two URIs with the same</span>
+<span class="sd">        value should resolve to the same benchmark. However, URIs do not have</span>
+<span class="sd">        uniquely describe a benchmark. That is, multiple identical benchmarks</span>
+<span class="sd">        could have different URIs.</span>
+
+<span class="sd">        :return: A URI string. :type: string</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_proto</span><span class="o">.</span><span class="n">uri</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">proto</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BenchmarkProto</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;The protocol buffer representing the benchmark.</span>
+
+<span class="sd">        :return: A Benchmark message.</span>
+<span class="sd">        :type: :code:`Benchmark`</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_proto</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">sources</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">BenchmarkSource</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;The original source code used to produce this benchmark, as a list of</span>
+<span class="sd">        :class:`BenchmarkSource &lt;compiler_gym.datasets.BenchmarkSource&gt;`</span>
+<span class="sd">        instances.</span>
+
+<span class="sd">        :return: A sequence of source files.</span>
+
+<span class="sd">        :type: :code:`Iterable[BenchmarkSource]`</span>
+
+<span class="sd">        .. warning::</span>
+
+<span class="sd">            The :meth:`Benchmark.sources</span>
+<span class="sd">            &lt;compiler_gym.datasets.Benchmark.sources&gt;` property is new and is</span>
+<span class="sd">            likely to change in the future.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">(</span><span class="n">BenchmarkSource</span><span class="p">(</span><span class="o">*</span><span class="n">x</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_sources</span><span class="p">)</span>
+
+<div class="viewcode-block" id="Benchmark.is_validatable"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Benchmark.is_validatable">[docs]</a>    <span class="k">def</span> <span class="nf">is_validatable</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Whether the benchmark has any validation callbacks registered.</span>
+
+<span class="sd">        :return: :code:`True` if the benchmark has at least one validation</span>
+<span class="sd">            callback.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validation_callbacks</span> <span class="o">!=</span> <span class="p">[]</span></div>
+
+<div class="viewcode-block" id="Benchmark.validate"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Benchmark.validate">[docs]</a>    <span class="k">def</span> <span class="nf">validate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">:</span> <span class="s2">&quot;CompilerEnv&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ValidationError</span><span class="p">]:</span>  <span class="c1"># noqa: F821</span>
+        <span class="sd">&quot;&quot;&quot;Run the validation callbacks and return any errors.</span>
+
+<span class="sd">        If no errors are returned, validation has succeeded:</span>
+
+<span class="sd">            &gt;&gt;&gt; benchmark.validate(env)</span>
+<span class="sd">            []</span>
+
+<span class="sd">        If an error occurs, a :class:`ValidationError</span>
+<span class="sd">        &lt;compiler_gym.ValidationError&gt;` tuple will describe the type of the</span>
+<span class="sd">        error, and optionally contain other data:</span>
+
+<span class="sd">            &gt;&gt;&gt; benchmark.validate(env)</span>
+<span class="sd">            [ValidationError(type=&quot;RuntimeError&quot;)]</span>
+
+<span class="sd">        Multiple :class:`ValidationError &lt;compiler_gym.ValidationError&gt;` errors</span>
+<span class="sd">        may be returned to indicate multiple errors.</span>
+
+<span class="sd">        This is a synchronous version of :meth:`ivalidate()</span>
+<span class="sd">        &lt;compiler_gym.datasets.Benchmark.ivalidate&gt;` that blocks until all</span>
+<span class="sd">        results are ready:</span>
+
+<span class="sd">            &gt;&gt;&gt; benchmark.validate(env) == list(benchmark.ivalidate(env))</span>
+<span class="sd">            True</span>
+
+<span class="sd">        :param env: The :class:`CompilerEnv &lt;compiler_gym.envs.CompilerEnv&gt;`</span>
+<span class="sd">            instance that is being validated.</span>
+
+<span class="sd">        :return: A list of zero or more :class:`ValidationError</span>
+<span class="sd">            &lt;compiler_gym.ValidationError&gt;` tuples that occurred during</span>
+<span class="sd">            validation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">ivalidate</span><span class="p">(</span><span class="n">env</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="Benchmark.ivalidate"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Benchmark.ivalidate">[docs]</a>    <span class="k">def</span> <span class="nf">ivalidate</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">:</span> <span class="s2">&quot;CompilerEnv&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ValidationError</span><span class="p">]:</span>  <span class="c1"># noqa: F821</span>
+        <span class="sd">&quot;&quot;&quot;Run the validation callbacks and return a generator of errors.</span>
+
+<span class="sd">        This is an asynchronous version of :meth:`validate()</span>
+<span class="sd">        &lt;compiler_gym.datasets.Benchmark.validate&gt;` that returns immediately.</span>
+
+<span class="sd">        :parameter env: A :class:`CompilerEnv &lt;compiler_gym.envs.CompilerEnv&gt;`</span>
+<span class="sd">            instance to validate.</span>
+
+<span class="sd">        :return: A generator of :class:`ValidationError</span>
+<span class="sd">            &lt;compiler_gym.ValidationError&gt;` tuples that occur during validation.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">executor</span> <span class="o">=</span> <span class="n">thread_pool</span><span class="o">.</span><span class="n">get_thread_pool_executor</span><span class="p">()</span>
+        <span class="n">futures</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="n">executor</span><span class="o">.</span><span class="n">submit</span><span class="p">(</span><span class="n">validator</span><span class="p">,</span> <span class="n">env</span><span class="p">)</span> <span class="k">for</span> <span class="n">validator</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">validation_callbacks</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="k">for</span> <span class="n">future</span> <span class="ow">in</span> <span class="n">as_completed</span><span class="p">(</span><span class="n">futures</span><span class="p">):</span>
+            <span class="n">result</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ValidationError</span><span class="p">]</span> <span class="o">=</span> <span class="n">future</span><span class="o">.</span><span class="n">result</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">result</span><span class="p">:</span>
+                <span class="k">yield from</span> <span class="n">result</span></div>
+
+<div class="viewcode-block" id="Benchmark.validation_callbacks"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Benchmark.validation_callbacks">[docs]</a>    <span class="k">def</span> <span class="nf">validation_callbacks</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">ValidationCallback</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Return the list of registered validation callbacks.</span>
+
+<span class="sd">        :return: A list of callables. See :meth:`add_validation_callback()</span>
+<span class="sd">            &lt;compiler_gym.datasets.Benchmark.add_validation_callback&gt;`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validation_callbacks</span></div>
+
+<div class="viewcode-block" id="Benchmark.add_source"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Benchmark.add_source">[docs]</a>    <span class="k">def</span> <span class="nf">add_source</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">source</span><span class="p">:</span> <span class="n">BenchmarkSource</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Register a new source file for this benchmark.</span>
+
+<span class="sd">        :param source: The :class:`BenchmarkSource</span>
+<span class="sd">            &lt;compiler_gym.datasets.BenchmarkSource&gt;` to register.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_sources</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">source</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Benchmark.add_validation_callback"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Benchmark.add_validation_callback">[docs]</a>    <span class="k">def</span> <span class="nf">add_validation_callback</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">validation_callback</span><span class="p">:</span> <span class="n">ValidationCallback</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Register a new validation callback that will be executed on</span>
+<span class="sd">        :meth:`validate() &lt;compiler_gym.datasets.Benchmark.validate&gt;`.</span>
+
+<span class="sd">        :param validation_callback: A callback that accepts a single</span>
+<span class="sd">            :class:`CompilerEnv &lt;compiler_gym.envs.CompilerEnv&gt;` argument and</span>
+<span class="sd">            returns an iterable sequence of zero or more :class:`ValidationError</span>
+<span class="sd">            &lt;compiler_gym.ValidationError&gt;` tuples. Validation callbacks must be</span>
+<span class="sd">            thread safe and must not modify the environment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_validation_callbacks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">validation_callback</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Benchmark.write_sources_to_directory"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Benchmark.write_sources_to_directory">[docs]</a>    <span class="k">def</span> <span class="nf">write_sources_to_directory</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">directory</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Write the source files for this benchmark to the given directory.</span>
+
+<span class="sd">        This writes each of the :attr:`benchmark.sources</span>
+<span class="sd">        &lt;compiler_gym.datasets.Benchmark.sources&gt;` files to disk.</span>
+
+<span class="sd">        If the benchmark has no sources, no files are written.</span>
+
+<span class="sd">        :param directory: The directory to write results to. If it does not</span>
+<span class="sd">            exist, it is created.</span>
+
+<span class="sd">        :return: The number of files written.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">directory</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">directory</span><span class="p">)</span>
+        <span class="n">directory</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="n">uniq_paths</span> <span class="o">=</span> <span class="nb">set</span><span class="p">()</span>
+        <span class="k">for</span> <span class="n">filename</span><span class="p">,</span> <span class="n">contents</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">directory</span> <span class="o">/</span> <span class="n">filename</span>
+            <span class="n">uniq_paths</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+            <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">contents</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">uniq_paths</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Benchmark.from_file"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Benchmark.from_file">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct a benchmark from a file.</span>
+
+<span class="sd">        :param uri: The URI of the benchmark.</span>
+
+<span class="sd">        :param path: A filesystem path.</span>
+
+<span class="sd">        :raise FileNotFoundError: If the path does not exist.</span>
+
+<span class="sd">        :return: A :class:`Benchmark &lt;compiler_gym.datasets.Benchmark&gt;`</span>
+<span class="sd">            instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
+            <span class="n">proto</span><span class="o">=</span><span class="n">BenchmarkProto</span><span class="p">(</span>
+                <span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">,</span> <span class="n">program</span><span class="o">=</span><span class="n">File</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;file:///</span><span class="si">{</span><span class="n">path</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="p">),</span>
+        <span class="p">)</span></div>
+
+<div class="viewcode-block" id="Benchmark.from_file_contents"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Benchmark.from_file_contents">[docs]</a>    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">from_file_contents</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Construct a benchmark from raw data.</span>
+
+<span class="sd">        :param uri: The URI of the benchmark.</span>
+
+<span class="sd">        :param data: An array of bytes that will be passed to the compiler</span>
+<span class="sd">            service.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">proto</span><span class="o">=</span><span class="n">BenchmarkProto</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">,</span> <span class="n">program</span><span class="o">=</span><span class="n">File</span><span class="p">(</span><span class="n">contents</span><span class="o">=</span><span class="n">data</span><span class="p">)))</span></div>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Benchmark&quot;</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Benchmark</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">uri</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">uri</span> <span class="o">==</span> <span class="n">other</span>
+
+    <span class="k">def</span> <span class="fm">__ne__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Benchmark&quot;</span><span class="p">]):</span>
+        <span class="k">return</span> <span class="ow">not</span> <span class="bp">self</span> <span class="o">==</span> <span class="n">other</span></div>
+
+
+<div class="viewcode-block" id="BenchmarkInitError"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.BenchmarkInitError">[docs]</a><span class="k">class</span> <span class="nc">BenchmarkInitError</span><span class="p">(</span><span class="ne">OSError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Base class for errors raised if a benchmark fails to initialize.&quot;&quot;&quot;</span></div>
+
+
+<span class="k">class</span> <span class="nc">BenchmarkWithSource</span><span class="p">(</span><span class="n">Benchmark</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A benchmark which has a single source file.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_src_name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_src_path</span> <span class="o">=</span> <span class="kc">None</span>
+
+    <span class="nd">@classmethod</span>
+    <span class="k">def</span> <span class="nf">create</span><span class="p">(</span>
+        <span class="bp">cls</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">input_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">src_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">src_path</span><span class="p">:</span> <span class="n">Path</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Create a benchmark from paths.&quot;&quot;&quot;</span>
+        <span class="n">benchmark</span> <span class="o">=</span> <span class="bp">cls</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">input_path</span><span class="p">)</span>
+        <span class="n">benchmark</span><span class="o">.</span><span class="n">_src_name</span> <span class="o">=</span> <span class="n">src_name</span>  <span class="c1"># pylint: disable=protected-access</span>
+        <span class="n">benchmark</span><span class="o">.</span><span class="n">_src_path</span> <span class="o">=</span> <span class="n">src_path</span>  <span class="c1"># pylint: disable=protected-access</span>
+        <span class="k">return</span> <span class="n">benchmark</span>
+
+    <span class="nd">@memoized_property</span>
+    <span class="k">def</span> <span class="nf">sources</span><span class="p">(</span>  <span class="c1"># pylint: disable=invalid-overridden-method</span>
+        <span class="bp">self</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">BenchmarkSource</span><span class="p">]:</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_src_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[</span>
+                <span class="n">BenchmarkSource</span><span class="p">(</span><span class="n">filename</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_src_name</span><span class="p">,</span> <span class="n">contents</span><span class="o">=</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()),</span>
+            <span class="p">]</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">source</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return the single source file contents as a string.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">sources</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">contents</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright Facebook AI Research
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    <!-- Theme Analytics -->
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'G-T95G5EVYXM', 'auto');
+    ga('send', 'pageview');
+    </script>
+
+    
+   
+
+</body>
+</html>

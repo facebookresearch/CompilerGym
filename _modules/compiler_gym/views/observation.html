@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.views.observation &mdash; CompilerGym 0.1.7 documentation</title>
+  <title>compiler_gym.views.observation &mdash; CompilerGym 0.1.8 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.7
+                0.1.8
               </div>
             
           
@@ -187,16 +187,16 @@
 
 <span class="sd">    Example usage:</span>
 
-<span class="sd">    &gt;&gt;&gt; env = gym.make(&quot;llvm-v0&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; env.reset()</span>
-<span class="sd">    &gt;&gt;&gt; env.observation.spaces.keys()</span>
-<span class="sd">    [&quot;Autophase&quot;, &quot;Ir&quot;]</span>
-<span class="sd">    &gt;&gt;&gt; env.observation.spaces[&quot;Autophase&quot;].space</span>
-<span class="sd">    Box(56,)</span>
-<span class="sd">    &gt;&gt;&gt; env.observation[&quot;Autophase&quot;]</span>
-<span class="sd">    [0, 1, ..., 2]</span>
-<span class="sd">    &gt;&gt;&gt; observation[&quot;Ir&quot;]</span>
-<span class="sd">    int main() {...}</span>
+<span class="sd">        &gt;&gt;&gt; env = gym.make(&quot;llvm-v0&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; env.reset()</span>
+<span class="sd">        &gt;&gt;&gt; env.observation.spaces.keys()</span>
+<span class="sd">        [&quot;Autophase&quot;, &quot;Ir&quot;]</span>
+<span class="sd">        &gt;&gt;&gt; env.observation.spaces[&quot;Autophase&quot;].space</span>
+<span class="sd">        Box(56,)</span>
+<span class="sd">        &gt;&gt;&gt; env.observation[&quot;Autophase&quot;]</span>
+<span class="sd">        [0, 1, ..., 2]</span>
+<span class="sd">        &gt;&gt;&gt; observation[&quot;Ir&quot;]</span>
+<span class="sd">        int main() {...}</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -218,8 +218,13 @@
         <span class="sd">&quot;&quot;&quot;Request an observation from the given space.</span>
 
 <span class="sd">        :param observation_space: The observation space to query.</span>
+
 <span class="sd">        :return: An observation.</span>
+
 <span class="sd">        :raises KeyError: If the requested observation space does not exist.</span>
+
+<span class="sd">        :raises SessionNotFound: If :meth:`env.reset()</span>
+<span class="sd">            &lt;compiler_gym.envs.CompilerEnv.reset&gt;` has not been called.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">observation_space</span><span class="p">]</span>
         <span class="n">request</span> <span class="o">=</span> <span class="n">StepRequest</span><span class="p">(</span>
@@ -248,26 +253,29 @@
         <span class="n">base_id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Alias to</span>
-<span class="sd">        :func:`ObservationSpaceSpec.make_derived_space() &lt;compiler_gym.views.ObservationSpaceSpec.make_derived_space&gt;`</span>
-<span class="sd">        that adds the derived space to the observation view.</span>
+        <span class="sd">&quot;&quot;&quot;Alias to :func:`ObservationSpaceSpec.make_derived_space()</span>
+<span class="sd">        &lt;compiler_gym.views.ObservationSpaceSpec.make_derived_space&gt;` that adds</span>
+<span class="sd">        the derived space to the observation view.</span>
 
 <span class="sd">        Example usage:</span>
 
-<span class="sd">        &gt;&gt;&gt; env.observation.add_derived_space(</span>
-<span class="sd">            id=&quot;src_len&quot;,</span>
-<span class="sd">            base_id=&quot;src&quot;,</span>
-<span class="sd">            translate=lambda src: np.array([len(src)], dtype=np.int32),</span>
-<span class="sd">            shape=Box(shape=(1,), dtype=np.int32),</span>
-<span class="sd">        )</span>
-<span class="sd">        &gt;&gt;&gt; env.observation[&quot;src_len&quot;]</span>
-<span class="sd">        1029</span>
+<span class="sd">            &gt;&gt;&gt; env.observation.add_derived_space(</span>
+<span class="sd">                id=&quot;src_len&quot;,</span>
+<span class="sd">                base_id=&quot;src&quot;,</span>
+<span class="sd">                translate=lambda src: np.array([len(src)], dtype=np.int32),</span>
+<span class="sd">                shape=Box(shape=(1,), dtype=np.int32),</span>
+<span class="sd">            )</span>
+<span class="sd">            &gt;&gt;&gt; env.observation[&quot;src_len&quot;]</span>
+<span class="sd">            1029</span>
 
 <span class="sd">        :param id: The name of the new observation space.</span>
+
 <span class="sd">        :param base_id: The name of the observation space that this is derived</span>
 <span class="sd">            from.</span>
+
 <span class="sd">        :param \\**kwargs: Arguments passed to</span>
-<span class="sd">            :func:`ObservationSpaceSpec.make_derived_space &lt;compiler_gym.views.ObservationSpaceSpec.make_derived_space&gt;`.</span>
+<span class="sd">            :func:`ObservationSpaceSpec.make_derived_space</span>
+<span class="sd">            &lt;compiler_gym.views.ObservationSpaceSpec.make_derived_space&gt;`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">base_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">base_id</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_add_space</span><span class="p">(</span><span class="n">base_space</span><span class="o">.</span><span class="n">make_derived_space</span><span class="p">(</span><span class="nb">id</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">))</span></div>

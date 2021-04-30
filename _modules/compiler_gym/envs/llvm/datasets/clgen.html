@@ -1,0 +1,404 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>compiler_gym.envs.llvm.datasets.clgen &mdash; CompilerGym 0.1.8 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/css/custom.css" type="text/css" />
+
+  
+  
+  
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script src="../../../../../_static/jquery.js"></script>
+        <script src="../../../../../_static/underscore.js"></script>
+        <script src="../../../../../_static/doctools.js"></script>
+        <script src="../../../../../_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    
+    <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="author" title="About these documents" href="../../../../../about.html" />
+    <link rel="index" title="Index" href="../../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../../index.html" class="icon icon-home" alt="Documentation Home"> CompilerGym
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.8
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../llvm/index.html">LLVM Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../cli.html">Command Line Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/views.html">compiler_gym.views</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../../index.html">CompilerGym</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../../index.html">Module code</a> &raquo;</li>
+        
+          <li><a href="../datasets.html">compiler_gym.envs.llvm.datasets</a> &raquo;</li>
+        
+      <li>compiler_gym.envs.llvm.datasets.clgen</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for compiler_gym.envs.llvm.datasets.clgen</h1><div class="highlight"><pre>
+<span></span><span class="c1"># Copyright (c) Facebook, Inc. and its affiliates.</span>
+<span class="c1">#</span>
+<span class="c1"># This source code is licensed under the MIT license found in the</span>
+<span class="c1"># LICENSE file in the root directory of this source tree.</span>
+<span class="kn">import</span> <span class="nn">io</span>
+<span class="kn">import</span> <span class="nn">shutil</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">tarfile</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
+
+<span class="kn">from</span> <span class="nn">fasteners</span> <span class="kn">import</span> <span class="n">InterProcessLock</span>
+
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">BenchmarkInitError</span><span class="p">,</span> <span class="n">TarDatasetWithManifest</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets.benchmark</span> <span class="kn">import</span> <span class="n">BenchmarkWithSource</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.llvm_benchmark</span> <span class="kn">import</span> <span class="n">ClangInvocation</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.download</span> <span class="kn">import</span> <span class="n">download</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.filesystem</span> <span class="kn">import</span> <span class="n">atomic_file_write</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.truncate</span> <span class="kn">import</span> <span class="n">truncate</span>
+
+
+<div class="viewcode-block" id="CLgenDataset"><a class="viewcode-back" href="../../../../../llvm/api.html#compiler_gym.envs.llvm.datasets.CLgenDataset">[docs]</a><span class="k">class</span> <span class="nc">CLgenDataset</span><span class="p">(</span><span class="n">TarDatasetWithManifest</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;The CLgen dataset contains 1000 synthetically generated OpenCL kernels.</span>
+
+<span class="sd">    The dataset is from:</span>
+
+<span class="sd">        Cummins, Chris, Pavlos Petoumenos, Zheng Wang, and Hugh Leather.</span>
+<span class="sd">        &quot;Synthesizing benchmarks for predictive modeling.&quot; In 2017 IEEE/ACM</span>
+<span class="sd">        International Symposium on Code Generation and Optimization (CGO),</span>
+<span class="sd">        pp. 86-99. IEEE, 2017.</span>
+
+<span class="sd">    And is available at:</span>
+
+<span class="sd">        https://github.com/ChrisCummins/paper-synthesizing-benchmarks</span>
+
+<span class="sd">    Installation</span>
+<span class="sd">    ------------</span>
+
+<span class="sd">    The CLgen dataset consists of OpenCL kernels that are compiled to LLVM-IR</span>
+<span class="sd">    on-demand and cached. The first time each benchmark is used there is an</span>
+<span class="sd">    overhead of compiling it from OpenCL to bitcode. This is a one-off cost.</span>
+<span class="sd">    Compiling OpenCL to bitcode requires third party headers that are downloaded</span>
+<span class="sd">    on the first call to :code:`install()`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_data_base</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">sort_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;benchmark://clgen-v0&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Synthetically generated OpenCL kernels&quot;</span><span class="p">,</span>
+            <span class="n">references</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;Paper&quot;</span><span class="p">:</span> <span class="s2">&quot;https://chriscummins.cc/pub/2017-cgo.pdf&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Homepage&quot;</span><span class="p">:</span> <span class="s2">&quot;https://github.com/ChrisCummins/clgen&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">license</span><span class="o">=</span><span class="s2">&quot;GNU General Public License v3.0&quot;</span><span class="p">,</span>
+            <span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span>
+            <span class="n">manifest_urls</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-clgen-v0-manifest.bz2&quot;</span>
+            <span class="p">],</span>
+            <span class="n">manifest_sha256</span><span class="o">=</span><span class="s2">&quot;d2bbc1da5a24a8cb03b604d1d8e59227b33bdfcd964ebe741ca8339f1c8d65cc&quot;</span><span class="p">,</span>
+            <span class="n">tar_urls</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;https://github.com/ChrisCummins/paper-synthesizing-benchmarks/raw/e45b6dffe9998f612624f05a6c4878ab4bcc84ec/data/clgen-1000.tar.bz2&quot;</span>
+            <span class="p">],</span>
+            <span class="n">tar_sha256</span><span class="o">=</span><span class="s2">&quot;0bbd1b737f2537305e4db09b2971a5fa848b7c3a978bff6b570f45d1a488a72c&quot;</span><span class="p">,</span>
+            <span class="n">strip_prefix</span><span class="o">=</span><span class="s2">&quot;clgen-1000/kernels&quot;</span><span class="p">,</span>
+            <span class="n">tar_compression</span><span class="o">=</span><span class="s2">&quot;bz2&quot;</span><span class="p">,</span>
+            <span class="n">benchmark_file_suffix</span><span class="o">=</span><span class="s2">&quot;.bc&quot;</span><span class="p">,</span>
+            <span class="n">sort_order</span><span class="o">=</span><span class="n">sort_order</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_opencl_installed</span> <span class="o">=</span> <span class="kc">False</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_opencl_headers_installed_marker</span> <span class="o">=</span> <span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_site_data_path</span> <span class="o">/</span> <span class="s2">&quot;.opencl-installed&quot;</span>
+        <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">libclc_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_data_path</span> <span class="o">/</span> <span class="s2">&quot;libclc&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">opencl_h_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_data_path</span> <span class="o">/</span> <span class="s2">&quot;opencl.h&quot;</span>
+
+    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">install</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opencl_installed</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_opencl_installed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opencl_headers_installed_marker</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opencl_installed</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_tar_lock</span><span class="p">,</span> <span class="n">InterProcessLock</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_tar_lockfile</span><span class="p">):</span>
+            <span class="c1"># Repeat install check now that we are in the locked region.</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_opencl_headers_installed_marker</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                <span class="k">return</span>
+
+            <span class="c1"># Download the libclc headers.</span>
+            <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">libclc_dir</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Downloading OpenCL headers&quot;</span><span class="p">)</span>
+            <span class="n">tar_data</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span>
+                <span class="n">download</span><span class="p">(</span>
+                    <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/libclc-v0.tar.bz2&quot;</span><span class="p">,</span>
+                    <span class="n">sha256</span><span class="o">=</span><span class="s2">&quot;f1c511f2ac12adf98dcc0fbfc4e09d0f755fa403c18f1fb1ffa5547e1fa1a499&quot;</span><span class="p">,</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
+            <span class="k">with</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fileobj</span><span class="o">=</span><span class="n">tar_data</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r:bz2&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">arc</span><span class="p">:</span>
+                <span class="n">arc</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">site_data_path</span> <span class="o">/</span> <span class="s2">&quot;libclc&quot;</span><span class="p">))</span>
+
+            <span class="c1"># Download the OpenCL header.</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opencl_h_path</span><span class="p">,</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span>
+                    <span class="n">download</span><span class="p">(</span>
+                        <span class="s2">&quot;https://github.com/ChrisCummins/clgen/raw/463c0adcd8abcf2432b24df0aca594b77a69e9d3/deeplearning/clgen/data/include/opencl.h&quot;</span><span class="p">,</span>
+                        <span class="n">sha256</span><span class="o">=</span><span class="s2">&quot;f95b9f4c8b1d09114e491846d0d41425d24930ac167e024f45dab8071d19f3f7&quot;</span><span class="p">,</span>
+                    <span class="p">)</span>
+                <span class="p">)</span>
+
+            <span class="bp">self</span><span class="o">.</span><span class="n">_opencl_headers_installed_marker</span><span class="o">.</span><span class="n">touch</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">benchmark</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">install</span><span class="p">()</span>
+
+        <span class="n">benchmark_name</span> <span class="o">=</span> <span class="n">uri</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">benchmark_name</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No benchmark specified: </span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># The absolute path of the file, without an extension.</span>
+        <span class="n">path_stem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_root</span> <span class="o">/</span> <span class="n">uri</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span>
+
+        <span class="n">bc_path</span><span class="p">,</span> <span class="n">cl_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path_stem</span><span class="si">}</span><span class="s2">.bc&quot;</span><span class="p">),</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path_stem</span><span class="si">}</span><span class="s2">.cl&quot;</span><span class="p">)</span>
+
+        <span class="c1"># If the file does not exist, compile it on-demand.</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">bc_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">cl_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Benchmark not found: </span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s2"> (file not found: </span><span class="si">{</span><span class="n">cl_path</span><span class="si">}</span><span class="s2">, path_stem </span><span class="si">{</span><span class="n">path_stem</span><span class="si">}</span><span class="s2">)&quot;</span>
+                <span class="p">)</span>
+
+            <span class="c1"># Compile the OpenCL kernel into a bitcode file.</span>
+            <span class="k">with</span> <span class="n">atomic_file_write</span><span class="p">(</span><span class="n">bc_path</span><span class="p">)</span> <span class="k">as</span> <span class="n">tmp_bc_path</span><span class="p">:</span>
+                <span class="n">compile_command</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">ClangInvocation</span><span class="o">.</span><span class="n">from_c_file</span><span class="p">(</span>
+                    <span class="n">cl_path</span><span class="p">,</span>
+                    <span class="n">copt</span><span class="o">=</span><span class="p">[</span>
+                        <span class="s2">&quot;-isystem&quot;</span><span class="p">,</span>
+                        <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">libclc_dir</span><span class="p">),</span>
+                        <span class="s2">&quot;-include&quot;</span><span class="p">,</span>
+                        <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">opencl_h_path</span><span class="p">),</span>
+                        <span class="s2">&quot;-target&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;nvptx64-nvidia-nvcl&quot;</span><span class="p">,</span>
+                        <span class="s2">&quot;-ferror-limit=1&quot;</span><span class="p">,</span>  <span class="c1"># Stop on first error.</span>
+                        <span class="s2">&quot;-w&quot;</span><span class="p">,</span>  <span class="c1"># No warnings.</span>
+                    <span class="p">],</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">outpath</span><span class="o">=</span><span class="n">tmp_bc_path</span><span class="p">)</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Exec </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">compile_command</span><span class="p">)</span>
+                <span class="n">clang</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+                    <span class="n">compile_command</span><span class="p">,</span>
+                    <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                    <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                    <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">clang</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+
+            <span class="k">if</span> <span class="n">clang</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
+                <span class="n">compile_command</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">compile_command</span><span class="p">)</span>
+                <span class="n">error</span> <span class="o">=</span> <span class="n">truncate</span><span class="p">(</span>
+                    <span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">),</span> <span class="n">max_lines</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">max_line_len</span><span class="o">=</span><span class="mi">20000</span>
+                <span class="p">)</span>
+                <span class="k">raise</span> <span class="n">BenchmarkInitError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Compilation job failed!</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Command: </span><span class="si">{</span><span class="n">compile_command</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">BenchmarkWithSource</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">bc_path</span><span class="p">,</span> <span class="s2">&quot;kernel.cl&quot;</span><span class="p">,</span> <span class="n">cl_path</span><span class="p">)</span></div>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        
+        &copy; Copyright Facebook AI Research
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    <!-- Theme Analytics -->
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'G-T95G5EVYXM', 'auto');
+    ga('send', 'pageview');
+    </script>
+
+    
+   
+
+</body>
+</html>

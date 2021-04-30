@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.spaces.commandline &mdash; CompilerGym 0.1.7 documentation</title>
+  <title>compiler_gym.spaces.commandline &mdash; CompilerGym 0.1.8 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.7
+                0.1.8
               </div>
             
           
@@ -194,31 +194,32 @@
 
 
 <div class="viewcode-block" id="Commandline"><a class="viewcode-back" href="../../../compiler_gym/spaces.html#compiler_gym.spaces.Commandline">[docs]</a><span class="k">class</span> <span class="nc">Commandline</span><span class="p">(</span><span class="n">NamedDiscrete</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A :class:`NamedDiscrete` space where each element represents a</span>
-<span class="sd">    commandline flag.</span>
+    <span class="sd">&quot;&quot;&quot;A :class:`NamedDiscrete &lt;compiler_gym.spaces.NamedDiscrete&gt;` space where</span>
+<span class="sd">    each element represents a commandline flag.</span>
 
 <span class="sd">    Example usage:</span>
 
-<span class="sd">    &gt;&gt;&gt; space = Commandline([</span>
-<span class="sd">        CommandlineFlag(&quot;a&quot;, &quot;-a&quot;, &quot;A flag&quot;),</span>
-<span class="sd">        CommandlineFlag(&quot;b&quot;, &quot;-b&quot;, &quot;Another flag&quot;),</span>
-<span class="sd">    ])</span>
-<span class="sd">    &gt;&gt;&gt; space.n</span>
-<span class="sd">    2</span>
-<span class="sd">    &gt;&gt;&gt; space[&quot;a&quot;]</span>
-<span class="sd">    0</span>
-<span class="sd">    &gt;&gt;&gt; space.names[0]</span>
-<span class="sd">    a</span>
-<span class="sd">    &gt;&gt;&gt; space.flags[0]</span>
-<span class="sd">    -a</span>
-<span class="sd">    &gt;&gt;&gt; space.descriptions[0]</span>
-<span class="sd">    A flag</span>
-<span class="sd">    &gt;&gt;&gt; space.sample()</span>
-<span class="sd">    1</span>
-<span class="sd">    &gt;&gt;&gt; space.commandline([0, 1])</span>
-<span class="sd">    -a -b</span>
+<span class="sd">        &gt;&gt;&gt; space = Commandline([</span>
+<span class="sd">            CommandlineFlag(&quot;a&quot;, &quot;-a&quot;, &quot;A flag&quot;),</span>
+<span class="sd">            CommandlineFlag(&quot;b&quot;, &quot;-b&quot;, &quot;Another flag&quot;),</span>
+<span class="sd">        ])</span>
+<span class="sd">        &gt;&gt;&gt; space.n</span>
+<span class="sd">        2</span>
+<span class="sd">        &gt;&gt;&gt; space[&quot;a&quot;]</span>
+<span class="sd">        0</span>
+<span class="sd">        &gt;&gt;&gt; space.names[0]</span>
+<span class="sd">        a</span>
+<span class="sd">        &gt;&gt;&gt; space.flags[0]</span>
+<span class="sd">        -a</span>
+<span class="sd">        &gt;&gt;&gt; space.descriptions[0]</span>
+<span class="sd">        A flag</span>
+<span class="sd">        &gt;&gt;&gt; space.sample()</span>
+<span class="sd">        1</span>
+<span class="sd">        &gt;&gt;&gt; space.commandline([0, 1])</span>
+<span class="sd">        -a -b</span>
 
 <span class="sd">    :ivar flags: A list of flag strings.</span>
+
 <span class="sd">    :ivar descriptions: A list of flag descriptions.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.util.download &mdash; CompilerGym 0.1.7 documentation</title>
+  <title>compiler_gym.util.download &mdash; CompilerGym 0.1.8 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.7
+                0.1.8
               </div>
             
           
@@ -177,58 +177,40 @@
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
 <span class="kn">import</span> <span class="nn">hashlib</span>
 <span class="kn">import</span> <span class="nn">logging</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">fasteners</span>
 <span class="kn">import</span> <span class="nn">requests</span>
 
+<span class="kn">from</span> <span class="nn">compiler_gym.util.filesystem</span> <span class="kn">import</span> <span class="n">atomic_file_write</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">cache_path</span>
 
 
-<span class="k">def</span> <span class="nf">_download</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">DownloadFailed</span><span class="p">(</span><span class="ne">OSError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Error thrown if a download fails.&quot;&quot;&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">_get_url_data</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
     <span class="n">req</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">req</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GET returned status code </span><span class="si">{</span><span class="n">req</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="n">DownloadFailed</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GET returned status code </span><span class="si">{</span><span class="n">req</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">req</span><span class="o">.</span><span class="n">content</span>
     <span class="k">finally</span><span class="p">:</span>
         <span class="n">req</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
 
-<span class="c1"># Only a single process may download at a time. The idea here is to prevent</span>
-<span class="c1"># overloading the NIC when, for example, you launch a bunch of simultaneous</span>
-<span class="c1"># learning processes which all require the same dataset.</span>
-<div class="viewcode-block" id="download"><a class="viewcode-back" href="../../../compiler_gym/compiler_gym.html#compiler_gym.download">[docs]</a><span class="nd">@fasteners</span><span class="o">.</span><span class="n">interprocess_locked</span><span class="p">(</span><span class="n">cache_path</span><span class="p">(</span><span class="s2">&quot;downloads/LOCK&quot;</span><span class="p">))</span>
-<span class="k">def</span> <span class="nf">download</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">sha256</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-    <span class="sd">&quot;&quot;&quot;Download a file and return its contents.</span>
-
-<span class="sd">    If :code:`sha256` is provided and the download succeeds, the file contents are cached locally</span>
-<span class="sd">    in :code:`$cache_path/downloads/$sha256`. See :func:`compiler_gym.cache_path`.</span>
-
-<span class="sd">    An inter-process lock ensures that only a single call to this function may</span>
-<span class="sd">    execute at a time.</span>
-
-<span class="sd">    :param url: The URL of the file to download.</span>
-<span class="sd">    :param sha256: The expected sha256 checksum of the file.</span>
-<span class="sd">    :return: The contents of the downloaded file.</span>
-<span class="sd">    :raises OSError: If the download fails, or if the downloaded content does match the expected</span>
-<span class="sd">        :code:`sha256` checksum.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Cache hit.</span>
-    <span class="k">if</span> <span class="n">sha256</span> <span class="ow">and</span> <span class="n">cache_path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;downloads/</span><span class="si">{</span><span class="n">sha256</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cache_path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;downloads/</span><span class="si">{</span><span class="n">sha256</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)),</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-            <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-
-    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloading </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2"> ...&quot;</span><span class="p">)</span>
-    <span class="n">content</span> <span class="o">=</span> <span class="n">_download</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_do_download_attempt</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">sha256</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Downloading </span><span class="si">%s</span><span class="s2"> ...&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+    <span class="n">content</span> <span class="o">=</span> <span class="n">_get_url_data</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">sha256</span><span class="p">:</span>
         <span class="c1"># Validate the checksum.</span>
         <span class="n">checksum</span> <span class="o">=</span> <span class="n">hashlib</span><span class="o">.</span><span class="n">sha256</span><span class="p">()</span>
         <span class="n">checksum</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
         <span class="n">actual_sha256</span> <span class="o">=</span> <span class="n">checksum</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">sha256</span> <span class="o">!=</span> <span class="n">actual_sha256</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
+            <span class="k">raise</span> <span class="n">DownloadFailed</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Checksum of downloaded dataset does not match:</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;Url: </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;Expected: </span><span class="si">{</span><span class="n">sha256</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
@@ -236,12 +218,68 @@
             <span class="p">)</span>
 
         <span class="c1"># Cache the downloaded file.</span>
-        <span class="n">cache_path</span><span class="p">(</span><span class="s2">&quot;downloads&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cache_path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;downloads/</span><span class="si">{</span><span class="n">sha256</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)),</span> <span class="s2">&quot;wb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">cache_path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;downloads/</span><span class="si">{</span><span class="n">sha256</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="n">path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">atomic_file_write</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fileobj</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
 
-    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloaded </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">content</span></div>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloaded </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">content</span>
+
+
+<span class="k">def</span> <span class="nf">_download</span><span class="p">(</span><span class="n">urls</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">sha256</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">max_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+    <span class="c1"># Cache hit.</span>
+    <span class="k">if</span> <span class="n">sha256</span> <span class="ow">and</span> <span class="n">cache_path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;downloads/</span><span class="si">{</span><span class="n">sha256</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+        <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cache_path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;downloads/</span><span class="si">{</span><span class="n">sha256</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)),</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+
+    <span class="c1"># A retry loop, and loop over all urls provided.</span>
+    <span class="n">last_exception</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_retries</span><span class="p">):</span>
+        <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">urls</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">_do_download_attempt</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">sha256</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">DownloadFailed</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Download failed&quot;</span><span class="p">)</span>
+                <span class="n">last_exception</span> <span class="o">=</span> <span class="n">e</span>
+    <span class="k">raise</span> <span class="n">last_exception</span>
+
+
+<div class="viewcode-block" id="download"><a class="viewcode-back" href="../../../compiler_gym/compiler_gym.html#compiler_gym.download">[docs]</a><span class="k">def</span> <span class="nf">download</span><span class="p">(</span>
+    <span class="n">urls</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">sha256</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Download a file and return its contents.</span>
+
+<span class="sd">    If :code:`sha256` is provided and the download succeeds, the file contents</span>
+<span class="sd">    are cached locally in :code:`$cache_path/downloads/$sha256`. See</span>
+<span class="sd">    :func:`compiler_gym.cache_path`.</span>
+
+<span class="sd">    An inter-process lock ensures that only a single call to this function may</span>
+<span class="sd">    execute at a time.</span>
+
+<span class="sd">    :param urls: Either a single URL of the file to download, or a list of URLs</span>
+<span class="sd">        to download.</span>
+
+<span class="sd">    :param sha256: The expected sha256 checksum of the file.</span>
+
+<span class="sd">    :return: The contents of the downloaded file.</span>
+
+<span class="sd">    :raises OSError: If the download fails, or if the downloaded content does</span>
+<span class="sd">        match the expected :code:`sha256` checksum.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Convert a singular string into a list of strings.</span>
+    <span class="n">urls</span> <span class="o">=</span> <span class="p">[</span><span class="n">urls</span><span class="p">]</span> <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span> <span class="nb">list</span><span class="p">)</span> <span class="k">else</span> <span class="n">urls</span>
+
+    <span class="c1"># Only a single process may download a file at a time. The idea here is to</span>
+    <span class="c1"># prevent redundant downloads when multiple simultaneous processes all try</span>
+    <span class="c1"># and download the same resource. If we don&#39;t have an ID for the resource</span>
+    <span class="c1"># then we just lock globally to reduce NIC thrashing.</span>
+    <span class="k">if</span> <span class="n">sha256</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">fasteners</span><span class="o">.</span><span class="n">InterProcessLock</span><span class="p">(</span><span class="n">cache_path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;downloads/.</span><span class="si">{</span><span class="n">sha256</span><span class="si">}</span><span class="s2">.lock&quot;</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">_download</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span> <span class="n">sha256</span><span class="p">,</span> <span class="n">max_retries</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="k">with</span> <span class="n">fasteners</span><span class="o">.</span><span class="n">InterProcessLock</span><span class="p">(</span><span class="n">cache_path</span><span class="p">(</span><span class="s2">&quot;downloads/.lock&quot;</span><span class="p">)):</span>
+            <span class="k">return</span> <span class="n">_download</span><span class="p">(</span><span class="n">urls</span><span class="p">,</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_retries</span><span class="p">)</span></div>
 </pre></div>
 
            </div>

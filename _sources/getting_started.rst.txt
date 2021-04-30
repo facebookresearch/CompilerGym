@@ -15,7 +15,7 @@ started!
 
 
 Key Concepts
---------------------
+------------
 
 CompilerGym exposes compiler optimization problems as environments for
 reinforcement learning. It uses the `OpenAI Gym <https://gym.openai.com/>`_
@@ -49,6 +49,10 @@ cumulative reward from these environments so as to produce the best programs.
 
 
 .. include:: installation.rst
+
+See `the Readme file
+<https://github.com/facebookresearch/CompilerGym#building-from-source>`_ for
+alternative installation methods.
 
 
 Using CompilerGym
@@ -87,10 +91,10 @@ Where :code:`<compiler>` identifiers the compiler optimization task,
 and :code:`<reward>` is the reward signal.
 
 .. note::
-    A key concept is that
-    CompilerGym environments enables **lazy evaluation** of observations and
-    reward signals. This makes the environment much more computationally
-    efficient for scenarios in which you do not need to compute a reward or
+
+    A key concept is that CompilerGym environments enables **lazy evaluation**
+    of observations and reward signals. This increases computational efficiency
+    sampling for scenarios in which you do not need to compute a reward or
     observation for every step. If an environment omits a :code:`<observation>`
     or :code:`<reward>` tag, this means that no observation or reward is
     provided by default. See :doc:`compiler_gym.views <compiler_gym/views>` for
@@ -106,37 +110,16 @@ Create an instance of this environment using:
 
     >>> env = gym.make("llvm-autophase-ic-v0")
 
+.. note::
 
-Installing benchmarks
-~~~~~~~~~~~~~~~~~~~~~
+    The first time you run :code:`gym.make()` you may see a logging message
+    "Downloading <url> ..." followed by a delay of 1-2 minutes. This is
+    CompilerGym downloading large environment-specific dependencies that are not
+    shipped by default to keep the size of the package down. This is a one-off
+    download that occurs only the first time the environment is used. Other
+    operations that require one-off downloads include installing datasets
+    (described below).
 
-A compiler requires a program as input. For the purposes of CompilerGym we call
-these input programs *benchmarks*, and collections of benchmarks are assembled
-into *datasets*. You may provide your own programs to use as benchmarks, or
-download one of our pre-assembled datasets.
-
-The benchmarks that are available to an environment can be queried using
-:attr:`env.benchmarks <compiler_gym.envs.CompilerEnv.benchmarks>`:
-
-    >>> env.benchmarks
-    []
-
-As you can see, there are no benchmarks installed by default. We have provided
-a collection of pre-assembled
-:ref:`LLVM benchmark datasets <llvm/index:Datasets>` that can be
-installed using
-:meth:`env.require_dataset() <compiler_gym.envs.CompilerEnv.require_dataset>`.
-For this tutorial we will use the
-`NAS Parallel Benchmarks <https://www.nas.nasa.gov/publications/npb.html>`_
-dataset:
-
-    >>> env.require_dataset("npb-v0")
-
-Now, :attr:`env.benchmarks <compiler_gym.envs.CompilerEnv.benchmarks>` lists
-the 123 benchmarks that comprise the dataset we just installed:
-
-    >>> env.benchmarks
-    ['benchmark://npb-v0/46', 'benchmark://npb-v0/17', ...]
 
 The compiler environment
 ~~~~~~~~~~~~~~~~~~~~~~~~
@@ -145,7 +128,7 @@ If you have experience using `OpenAI Gym <https://gym.openai.com/>`_, the
 CompilerGym environments will be familiar. If not, you can call :code:`help()`
 on any function, object, or method to query the documentation:
 
-    >>> help(env)
+    >>> help(env.step)
 
 The action space is described by
 :meth:`env.action_space <compiler_gym.envs.CompilerEnv.action_space>`.
@@ -161,9 +144,9 @@ The observation space is described by
 The :ref:`Autophase <llvm/index:Autophase>` observation space is a 56-dimension
 vector of integers:
 
-    >>> env.observation_space.space.shape
+    >>> env.observation_space.shape
     (56,)
-    >>> env.observation_space.space.dtype
+    >>> env.observation_space.dtype
     dtype('int64')
 
 The upper and lower bounds of the reward signal are described by
@@ -172,31 +155,30 @@ The upper and lower bounds of the reward signal are described by
     >>> env.reward_range
     (0.0, inf)
 
-As with other Gym environments,
-:meth:`reset() <compiler_gym.envs.CompilerEnv.reset>`
-must be called before a CompilerGym environment may be used:
+As with other Gym environments, :meth:`reset()
+<compiler_gym.envs.CompilerEnv.reset>` must be called before a CompilerGym
+environment may be used.
 
     >>> env.reset()
-    array([   0,    0,  399,  381,   10,  399,  147,    8,  137,  147,    0,
-              0,    0,  556,    0,  546,    0,   15,  693,  574, 1214, 1180,
-            384,  399,  214,    0,  120,  116,    0,   88,  468,    8,  546,
-             16, 1073,  147,    0, 1551,    0,    0,    0,   10,  766,    0,
-              0,  505,   46,    0,    0,    0,  556, 5075, 3261,   13,    0,
-           2441])
+    array([  0,   4,  54,  39,  12,  46,  23,   6,  12,  31,   2,   4,   0,
+            81,   4,  77,  13,  15, 108, 106,  75,  51,  71,  46,  15,   0,
+             9,  46,   0,  13,  72,  51,  77,  81,  39,  31,   0, 163,   2,
+             0,   4,   6,  13,   1,   0,  73,   8,   1,   0,  15,  85, 638,
+           402,  16,  10, 298])
 
-The numpy array that is returned here is the initial
-:ref:`Autophase <llvm/index:Autophase>` observation. Calling
-:meth:`env.reset() <compiler_gym.envs.CompilerEnv.reset>` starts an
-instance of the compiler and selects a random benchmark to use. You can see
-which benchmark is currently being used by an environment using
-:attr:`env.benchmark <compiler_gym.envs.CompilerEnv.benchmark>`:
+The numpy array that is returned by :meth:`reset()
+<compiler_gym.envs.CompilerEnv.reset>` is the initial observation of the program
+state. This value, along with the entire dynamics of the environment, depends on
+the particular program that is being compiled. In CompilerGym these programs are
+called **benchmarks**. You can see which benchmark is currently being used by an
+environment using :attr:`env.benchmark
+<compiler_gym.envs.CompilerEnv.benchmark>`:
 
     >>> env.benchmark
-    'benchmark://npb-v0/90'
+    benchmark://cbench-v1/qsort
 
-If we want to force the environment to use a specific benchmark, we can pass the
-name of the benchmark as an argument to
-:meth:`env.reset() <compiler_gym.envs.CompilerEnv.reset>`:
+If we want to compile a different program, we can pass the name of a benchmark
+to :meth:`env.reset() <compiler_gym.envs.CompilerEnv.reset>`:
 
     >>> env.reset(benchmark="benchmark://npb-v0/50")
     array([   0,    0,   26,   25,    1,   26,   10,    1,    8,   10,    0,
@@ -205,6 +187,14 @@ name of the benchmark as an argument to
              10, 1058,   10,    0,  840,    0,    0,    0,    1,  416,    0,
               0,  148,   60,    0,    0,    0,   37, 3008, 2062,    9,    0,
            1262])
+
+We provide over :ref:`a million benchmarks for the LLVM environments
+<llvm/index:Datasets>` that can be used for training agents and evaluating the
+generalization of strategies across unseen programs. Benchmarks are grouped into
+*datasets* , which are managed using :class:`env.datasets
+<compiler_gym.datasets.Datasets>`. You may also provide your own programs to use
+as benchmarks, see :meth:`env.make_benchmark()
+<compiler_gym.envs.LlvmEnv.make_benchmark>` for details.
 
 
 Interacting with the environment
@@ -294,18 +284,37 @@ the sequence of actions we just run:
     >>> env.commandline()
     'opt -consthoist -sancov -inferattrs ... -place-safepoints input.bc -o output.bc'
 
-We can also save the program for future reference:
+We can also save the program in its current state for future reference:
 
     >>> env.write_bitcode("~/program.bc")
 
 Once we are finished, we must close the environment to end the compiler
-instance:
+session:
 
     >>> env.close()
 
 And finally we are done with our python session:
 
     >>> exit()
+
+
+.. note::
+
+    Internally, CompilerGym environments may launch subprocesses and use
+    temporary files to communicate between the environment and the underlying
+    compiler (see :doc:`compiler_gym.service <compiler_gym/service>` for
+    details). This means it is important to call :meth:`env.close()
+    <compiler_gym.envs.CompilerEnv.close>` after use to free up resources and
+    prevent orphan subprocesses or files. We recommend using the :code:`with`
+    statement pattern for creating environments:
+
+        >>> with gym.make("llvm-autophase-ic-v0") as env:
+        ...    env.reset()
+        ...    # use env how you like
+
+    This removes the need to call :meth:`env.close()
+    <compiler_gym.envs.CompilerEnv.close>` yourself.
+
 
 Using the command line tools
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
@@ -327,65 +336,97 @@ And to describe the capabilities of each environment:
 .. code-block::
 
     $ python -m compiler_gym.bin.service --env=llvm-v0
-    # CompilerGym Service `/path/to/compiler_gym/envs/llvm/service/compiler_gym-llvm-service`
 
-    ## Programs
+    Datasets
+    --------
 
-    +------------------------+
-    | Benchmark              |
-    +========================+
-    | benchmark://npb-v0/1   |
-    +------------------------+
-
+    +----------------------------+--------------------------+------------------------------+
+    | Dataset                    | Num. Benchmarks [#f1]_   | Description                  |
+    +============================+==========================+==============================+
+    | benchmark://anghabench-v0  | 1,042,976                | Compile-only C/C++ functions |
+    +----------------------------+--------------------------+------------------------------+
+    | benchmark://blas-v0        | 300                      | Basic linear algebra kernels |
+    +----------------------------+--------------------------+------------------------------+
     ...
 
-    ## Action Spaces
+    Observation Spaces
+    ------------------
 
-
-    ### `PassesAll` (Commandline)
-
-    +---------------------------------------+-----------------------------------+-------------------------------+
-    | Action                                | Flag                              | Description                   |
-    +=======================================+===================================+===============================+
-    | AddDiscriminatorsPass                 | `-add-discriminators`             | Add DWARF path discriminators |
-    +---------------------------------------+-----------------------------------+-------------------------------+
+    +--------------------------+----------------------------------------------+
+    | Observation space        | Shape                                        |
+    +==========================+==============================================+
+    | Autophase                | `Box(0, 9223372036854775807, (56,), int64)`  |
+    +--------------------------+----------------------------------------------+
+    | AutophaseDict            | `Dict(ArgsPhi:int<0,inf>, BB03Phi:int<0,...` |
+    +--------------------------+----------------------------------------------+
+    | BitcodeFile              | `str_list<>[0,4096.0])`                      |
+    +--------------------------+----------------------------------------------+
     ...
 
-The :mod:`compiler_gym.bin.manual_env` module provides a thin text user
-interface around the environment for interactive sessions:
+The :mod:`compiler_gym.bin.manual_env` module provides an interactive text user
+interface for CompilerGym environments:
 
 .. code-block::
 
-    $ python -m compiler_gym.bin.manual_env --env=llvm-autophase-ic-v0 --benchmark=npb-v0/50
-    Initialized environment in 264.9ms
-    Reset benchmark://npb-v0/50 environment in 27.6ms
-    Observation: [  0   0  11  10   1  11   5   1   3   5   0   0   0  17   0  16   0   2
-      21  20  50  44  18  11   6   0   3  10   0   1  16   0  16   2  40   5
-       0  59   0   0   0   1  30   0   0  18   0   0   0   0  17 193 129   4
-       0  99]
+    $ python -m compiler_gym.bin.manual_env --env=llvm-v0
+    Initialized environment in 144.3ms
+    Welcome to the CompilerGym Shell!
+    ---------------------------------
+    Type help or ? for more information.
+    The 'tutorial' command will give a step by step guide.
 
-Finally, the :mod:`compiler_gym.bin.random_search` module provides a simple
-but powerful strategy for randomly searching the optimization space:
+    compiler_gym:cbench-v1/qsort> help
+
+    Documented commands (type help <topic>):
+    ========================================
+    action       help               list_rewards     set_default_observation
+    back         hill_climb         observation      set_default_reward
+    breakpoint   list_actions       require_dataset  simplify_stack
+    commandline  list_benchmarks    reset            stack
+    exit         list_datasets      reward           try_all_actions
+    greedy       list_observations  set_benchmark    tutorial
+
+Finally, the :mod:`compiler_gym.bin.random_search` module provides a simple but
+efficient implementation for randomly searching the optimization space:
 
 .. code-block::
 
     $ python -m compiler_gym.bin.random_search --env=llvm-autophase-ic-v0 --benchmark=npb-v0/50 --runtime=10
-
-    Started 16 worker threads for benchmark://npb-v0/50 (3,008 instructions) using reward IrInstructionCountOz.
-    Writing logs to /home/user/logs/compiler_gym/random/npb-v0/50/2020-12-03T17:24:17.304887
+    Started 24 worker threads for using reward IrInstructionCountOz.
+    Writing logs to /home/user/logs/compiler_gym/random/npb-v0/50/2021-04-21T16:42:41.038447
     === Running for 10 seconds ===
-    Runtime: 10 seconds. Num steps: 32,287 (3,206 / sec). Num episodes: 285 (28 / sec). Num restarts: 0.
-    Best reward: 107.85% (69 passes, found after 9 seconds)
+    Runtime: 10 seconds. Num steps: 21,563 (2,105 / sec). Num episodes: 141 (13 / sec). Num restarts: 0.
+    Best reward: 1.0228 (141 passes, found after 4 seconds)
 
     Ending worker threads ... done
     Replaying actions from best solution found:
-    Step [000 / 069]: reward=31.52%
-    Step [001 / 069]: reward=31.52%, change=0.00%, action=SlpvectorizerPass
-    Step [002 / 069]: reward=37.09%, change=5.57%, action=Sroapass
+    Step [001 / 141]: reward=0.0000         episode=0.0000          action=-hotcoldsplit
+    Step [002 / 141]: reward=0.0000         episode=0.0000          action=-scalarizer
+    Step [003 / 141]: reward=0.0000         episode=0.0000          action=-redundant-dbg-inst-elim
     ...
-    Step [067 / 069]: reward=107.60%, change=0.00%, action=InductiveRangeCheckEliminationPass
-    Step [068 / 069]: reward=107.60%, change=0.00%, action=LoopDeletionPass
-    Step [069 / 069]: reward=107.85%, change=0.24%, action=Gvnpass
+    Step [139 / 141]: reward=0.0000         episode=1.0218          action=-barrier
+    Step [140 / 141]: reward=0.0000         episode=1.0218          action=-sink
+    Step [141 / 141]: reward=0.0010         episode=1.0228          action=-loop-simplifycfg
+    +---------------------------+-------+-------+---------+
+    |                           |   -O0 |   -Oz |   final |
+    +===========================+=======+=======+=========+
+    | IR instruction count      |  3008 |   948 |     901 |
+    +---------------------------+-------+-------+---------+
+    | Object .text size (bytes) | 13047 | 10991 |   10399 |
+    +---------------------------+-------+-------+---------+
 
-To beat the compiler by 7.85% after 10 seconds of random trials is not bad
+To beat the compiler by 2.28% after 10 seconds of random trials is not bad
 going!
+
+Next Steps
+----------
+
+Now that you have got to grips with the compiler environment, take a browse
+through the `examples directory
+<https://github.com/facebookresearch/CompilerGym/tree/stable/examples>`_ for
+pytorch integration, agent implementations, etc. Then check out `the
+leaderboards <https://github.com/facebookresearch/CompilerGym#leaderboards>`_ to
+see what the best performing algorithms are, and `the documentation
+<https://facebookresearch.github.io/CompilerGym/>`_ for details of the APIs and
+environments. We love feedback, bug reports, and feature requests - please `file
+an issue <https://github.com/facebookresearch/CompilerGym/issues/new/choose>`_!
