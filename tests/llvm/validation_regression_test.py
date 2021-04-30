@@ -50,6 +50,8 @@ KNOWN_BAD_STATE_NAMES = [f"{s.benchmark},{s.commandline}" for s in KNOWN_BAD_STA
 # benchmark://cbench-v1/tiff2rgba,,,opt -structurizecfg input.bc -o output.bc
 # benchmark://cbench-v1/tiffdither,,,opt -structurizecfg input.bc -o output.bc
 # benchmark://cbench-v1/tiffmedian,,,opt -structurizecfg input.bc -o output.bc
+# benchmark://cBench-v0/susan,-0.5352209944751382,1.849454402923584,opt -structurizecfg -loop-extract -mergereturn -structurizecfg -loop-extract -mergereturn input.bc -o output.bc
+# benchmark://cBench-v0/susan,0.9802486187845304,1.7552905082702637,opt -mem2reg -simplifycfg -lcssa -break-crit-edges -newgvn -mem2reg -simplifycfg -lcssa -break-crit-edges -newgvn input.bc -o output.bc
 
 
 @skip_on_ci
