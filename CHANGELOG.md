@@ -1,3 +1,90 @@
+## Release 0.1.8 (2021-04-30)
+
+This release introduces some significant changes to the way that benchmarks are
+managed, introducing a new dataset API. This enabled us to add support for
+millions of new benchmarks and a more efficient implementation for the LLVM
+environment, but this will require some migrating of old code to the new
+interfaces (see "Migration Checklist" below). Some of the key changes of this
+release are:
+
+- **[Core API change]** We have added a Python
+  [Benchmark](https://facebookresearch.github.io/CompilerGym/compiler_gym/datasets.html#compiler_gym.datasets.Benchmark)
+  class ([#190](https://github.com/facebookresearch/CompilerGym/pull/190)). The
+  `env.benchmark` attribute is now an instance of this class rather than a
+  string ([#222](https://github.com/facebookresearch/CompilerGym/pull/222)).
+- **[Core behavior change]** Environments will no longer select benchmarks
+  randomly. Now `env.reset()` will now always select the last-used benchmark,
+  unless the `benchmark` argument is provided or `env.benchmark` has been set.
+  If no benchmark is specified, a default is used.
+- **[API deprecations]** We have added a new
+  [Dataset](https://facebookresearch.github.io/CompilerGym/compiler_gym/datasets.html#compiler_gym.datasets.Dataset)
+  class hierarchy
+  ([#191](https://github.com/facebookresearch/CompilerGym/pull/191),
+  [#192](https://github.com/facebookresearch/CompilerGym/pull/192)). All
+  datasets are now available without needing to be downloaded first, and a new
+  [Datasets](https://facebookresearch.github.io/CompilerGym/compiler_gym/datasets.html#compiler_gym.datasets.Datasets)
+  class can be used to iterate over them
+  ([#200](https://github.com/facebookresearch/CompilerGym/pull/200)). We have
+  deprecated the old dataset management operations, the
+  `compiler_gym.bin.datasets` script, and removed the `--dataset` and
+  `--ls_benchmark` flags from the command line tools.
+- **[RPC interface change]** The `StartSession` RPC endpoint now accepts a list
+  of initial observations to compute. This removes the need for an immediate
+  call to `Step`, reducing environment reset time by 15-21%
+  ([#189](https://github.com/facebookresearch/CompilerGym/pull/189)).
+- [LLVM] We have added several new datasets of benchmarks, including the Csmith
+  and llvm-stress program generators
+  ([#207](https://github.com/facebookresearch/CompilerGym/pull/207)), a dataset
+  of OpenCL kernels
+  ([#208](https://github.com/facebookresearch/CompilerGym/pull/208)), and a
+  dataset of compilable C functions
+  ([#210](https://github.com/facebookresearch/CompilerGym/pull/210)). See [the
+  docs](https://facebookresearch.github.io/CompilerGym/llvm/index.html#datasets)
+  for an overview.
+- `CompilerEnv` now takes an optional `Logger` instance at construction time for
+  fine-grained control over logging output
+  ([#187](https://github.com/facebookresearch/CompilerGym/pull/187)).
+- [LLVM] The ModuleID and source_filename of LLVM-IR modules are now anonymized
+  to prevent unintentional overfitting to benchmarks by name
+  ([#171](https://github.com/facebookresearch/CompilerGym/pull/171)).
+- [docs] We have added a [Feature
+  Stability](https://facebookresearch.github.io/CompilerGym/about.html#feature-stability)
+  section to the documentation
+  ([#196](https://github.com/facebookresearch/CompilerGym/pull/196)).
+- Numerous bug fixes and improvements.
+
+Please use this checklist when updating code for the previous CompilerGym release:
+
+* Review code that accesses the `env.benchmark` property and update to
+  `env.benchmark.uri` if a string name is required. Setting this attribute by
+  string (`env.benchmark = "benchmark://a-v0/b"`) and comparison to string types
+  (`env.benchmark == "benchmark://a-v0/b"`) still work.
+* Review code that calls `env.reset()` without first setting a benchmark.
+  Previously, calling `env.reset()` would select a random benchmark. Now,
+  `env.reset()` always selects the last used benchmark, or a predetermined
+  default if none is specified.
+* Review code that relies on `env.benchmark` being `None` to select benchmarks
+  randomly. Now, `env.benchmark` is always set to the previously used benchmark,
+  or a predetermined default benchmark if none has been specified. Setting
+  `env.benchmark = None` will raise an error. Select a benchmark randomly by
+  sampling from the `env.datasets.benchmark_uris()` iterator.
+* Remove calls to `env.require_dataset()` and related operations. These are no
+  longer required.
+* Remove accesses to `env.benchmarks`. An iterator over available benchmark URIs
+  is now available at `env.datasets.benchmark_uris()`, but the list of URIs
+  cannot be relied on to be fully enumerable (the LLVM environments have over
+  2^32 URIs).
+* Review code that accesses `env.observation_space` and update to
+  `env.observation_space_spec` where necessary
+  ([#228](https://github.com/facebookresearch/CompilerGym/pull/228)).
+* Update compiler service implementations to support the updated RPC interface
+  by removing the deprecated `GetBenchmarks` RPC endpoint and replacing it with
+  `Dataset` classes. See the [example
+  service](https://github.com/facebookresearch/CompilerGym/tree/development/examples/example_compiler_gym_service)
+  for details.
+* [LLVM] Update references to the `poj104-v0` dataset to `poj104-v1`.
+* [LLVM] Update references to the `cBench-v1` dataset to `cbench-v1`.
+
 ## Release 0.1.7 (2021-04-01)
 
 This release introduces [public
