@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Tests for the AnghaBench dataset."""
+import sys
 from itertools import islice
 
 import gym
@@ -45,7 +46,7 @@ def test_llvm_stress_random_select(
     # As of the current version (LLVM 10.0.0), programs generated with the
     # following seeds emit an error when compiled: "Cannot emit physreg copy
     # instruction".
-    FAILING_SEEDS = {173, 239}
+    FAILING_SEEDS = {"linux": {173, 239}, "darwin": {173}}[sys.platform]
 
     if index in FAILING_SEEDS:
         with pytest.raises(
