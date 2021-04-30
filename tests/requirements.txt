@@ -1,5 +1,6 @@
 pytest==6.1.0
 pytest-benchmark==3.2.3
+pytest-cov==2.11.1
 pytest-mock==3.6.0
 pytest-shard==0.1.1
 pytest-stress==1.0.1
