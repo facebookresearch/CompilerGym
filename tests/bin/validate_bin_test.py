@@ -88,7 +88,7 @@ def test_invalid_csv_format(monkeypatch):
         with pytest.raises(SystemExit):
             main(["argv0", "-"])
 
-    assert "Failed to parse input:" in out.stderr
+    assert "Expected 4 columns in the first row of CSV" in out.stderr
 
 
 @skip_on_ci

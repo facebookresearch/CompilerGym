@@ -26,6 +26,7 @@ py_library(
     visibility = ["//compiler_gym:__subpackages__"],
     deps = [
         "//compiler_gym/datasets:uri",
+        "//compiler_gym/util",
     ],
 )
 

@@ -1108,7 +1108,7 @@ class CompilerEnv(gym.Env):
         finally:
             fkd.close()
 
-        return ValidationResult(
+        return ValidationResult.construct(
             walltime=walltime.time,
             errors=errors,
             **validation,
