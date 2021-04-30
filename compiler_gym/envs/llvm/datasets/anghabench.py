@@ -6,6 +6,7 @@ import subprocess
 import sys
 from concurrent.futures import as_completed
 from pathlib import Path
+from typing import Optional
 
 from compiler_gym.datasets import Benchmark, TarDatasetWithManifest
 from compiler_gym.datasets.benchmark import BenchmarkWithSource
@@ -38,19 +39,27 @@ class AnghaBenchDataset(TarDatasetWithManifest):
     overhead of compiling it from C to bitcode. This is a one-off cost.
     """
 
-    def __init__(self, site_data_base: Path, sort_order: int = 0):
-        manifest_url, manifest_sha256 = {
+    def __init__(
+        self,
+        site_data_base: Path,
+        sort_order: int = 0,
+        manifest_url: Optional[str] = None,
+        manifest_sha256: Optional[str] = None,
+        deprecated: Optional[str] = None,
+        name: Optional[str] = None,
+    ):
+        manifest_url_, manifest_sha256_ = {
             "darwin": (
-                "https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-anghabench-v0-macos-manifest.bz2",
-                "39464256405aacefdb7550a7f990c9c578264c132804eec3daac091fa3c21bd1",
+                "https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-anghabench-v1-macos-manifest.bz2",
+                "96ead63da5f8efa07fd0370f0c6e452b59bed840828b8b19402102b1ce3ee109",
             ),
             "linux": (
-                "https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-anghabench-v0-linux-manifest.bz2",
-                "a038d25d39ee9472662a9704dfff19c9e3512ff6a70f1067af85c5cb3784b477",
+                "https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-anghabench-v1-linux-manifest.bz2",
+                "14df85f650199498cf769715e9f0d7841d09f9fa62a95b8ecc242bdaf227f33a",
             ),
         }[sys.platform]
         super().__init__(
-            name="benchmark://anghabench-v0",
+            name=name or "benchmark://anghabench-v1",
             description="Compile-only C/C++ functions extracted from GitHub",
             references={
                 "Paper": "https://homepages.dcc.ufmg.br/~fernando/publications/papers/FaustinoCGO21.pdf",
@@ -58,8 +67,8 @@ class AnghaBenchDataset(TarDatasetWithManifest):
             },
             license="Unknown. See: https://github.com/brenocfg/AnghaBench/issues/1",
             site_data_base=site_data_base,
-            manifest_urls=[manifest_url],
-            manifest_sha256=manifest_sha256,
+            manifest_urls=[manifest_url or manifest_url_],
+            manifest_sha256=manifest_sha256 or manifest_sha256_,
             tar_urls=[
                 "https://github.com/brenocfg/AnghaBench/archive/d8034ac8562b8c978376008f4b33df01b8887b19.tar.gz"
             ],
@@ -68,6 +77,7 @@ class AnghaBenchDataset(TarDatasetWithManifest):
             tar_compression="gz",
             benchmark_file_suffix=".bc",
             sort_order=sort_order,
+            deprecated=deprecated,
         )
 
     def benchmark(self, uri: str) -> Benchmark:
