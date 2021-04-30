@@ -643,10 +643,11 @@ def get_llvm_benchmark_validation_callback(
 
     If there is no valid callback, returns :code:`None`.
 
-    :param env: An :class:`LlvmEnv` instance.
-    :return: An optional callback that takes an :class:`LlvmEnv` instance as
-        argument and returns an optional string containing a validation error
-        message.
+    :param env: An :class:`LlvmEnv <compiler_gym.envs.LlvmEnv>` instance.
+
+    :return: An optional callback that takes an :class:`LlvmEnv
+        <compiler_gym.envs.LlvmEnv>` instance as argument and returns an
+        optional string containing a validation error message.
     """
     validators = VALIDATORS.get(env.benchmark)
 

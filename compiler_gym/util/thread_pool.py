@@ -11,7 +11,7 @@ _executor = None
 
 
 def get_thread_pool_executor() -> ThreadPoolExecutor:
-    """Return a singleton :class:`ThreadPoolExecutor`.
+    """Return a singleton :code:`ThreadPoolExecutor`.
 
     This executor is intended to be used for multithreaded parallelism. The
     maximum number of threads in the pool is equal to the number of cores on the

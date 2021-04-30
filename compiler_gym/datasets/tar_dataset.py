@@ -21,9 +21,9 @@ from compiler_gym.util.filesystem import atomic_file_write
 class TarDataset(FilesDataset):
     """A dataset comprising a files tree stored in a tar archive.
 
-    This extends the :class:`FilesDataset` class by adding support for
-    compressed archives of files. The archive is downloaded and unpacked
-    on-demand.
+    This extends the :class:`FilesDataset <compiler_gym.datasets.FilesDataset>`
+    class by adding support for compressed archives of files. The archive is
+    downloaded and unpacked on-demand.
     """
 
     def __init__(
@@ -63,7 +63,7 @@ class TarDataset(FilesDataset):
         self._installed = False
         self._tar_extracted_marker = self.site_data_path / ".extracted"
         self._tar_lock = Lock()
-        self._tar_lockfile = self.site_data_path / "LOCK"
+        self._tar_lockfile = self.site_data_path / ".install_lock"
 
     @property
     def installed(self) -> bool:
@@ -108,13 +108,14 @@ class TarDataset(FilesDataset):
 
 
 class TarDatasetWithManifest(TarDataset):
-    """A tarball-based dataset that uses a separate file to list benchmark URIs.
+    """A tarball-based dataset that reads the benchmark URIs from a separate
+    manifest file.
 
-    The idea is to allow the list of benchmark URIs to be enumerated in a more
-    lightweight manner than downloading and unpacking the entire dataset. It
-    does this by downloading a "manifest", which is a plain text file containing
-    a list of benchmark names, one per line, and only downloads the actual
-    tarball containing the benchmarks when it is needed.
+    A manifest file is a plain text file containing a list of benchmark names,
+    one per line, and is shipped separately from the tar file. The idea is to
+    allow the list of benchmark URIs to be enumerated in a more lightweight
+    manner than downloading and unpacking the entire dataset. It does this by
+    downloading and unpacking only the manifest to iterate over the URIs.
 
     The manifest file is assumed to be correct and is not validated.
     """
@@ -148,7 +149,7 @@ class TarDatasetWithManifest(TarDataset):
         self._manifest_path = self.site_data_path / f"manifest-{manifest_sha256}.txt"
 
         self._manifest_lock = Lock()
-        self._manifest_lockfile = self.site_data_path / "manifest.LOCK"
+        self._manifest_lockfile = self.site_data_path / ".manifest_lock"
 
     def _read_manifest(self, manifest_data: str) -> List[str]:
         """Read the manifest data into a list of URIs. Does not validate the

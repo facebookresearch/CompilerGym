@@ -36,6 +36,7 @@ developers to expose new optimization problems for AI.
 
 **Table of Contents**
 
+- [Features](#features)
 - [Getting Started](#getting-started)
   - [Installation](#installation)
     - [Building from Source](#building-from-source)
@@ -45,6 +46,40 @@ developers to expose new optimization problems for AI.
 - [Contributing](#contributing)
 - [Citation](#citation)
 
+
+# Features
+
+With CompilerGym, building ML models for compiler research problems is as easy
+as building ML models to play video games. Here are some highlights of key
+features:
+
+* **API:** uses the popular [Gym](https://gym.openai.com/) interface from OpenAI
+  — use Python to write your agent.
+
+* **Datasets:** wraps real world programs (C++ programs, TensorFlow programs,
+  programs from Github, etc.) and a mainstream compiler
+  ([LLVM](https://llvm.org/)), providing millions of programs for training.
+
+* **Tasks and Actions:** interfaces the [LLVM](https://llvm.org/) compiler for
+  one compiler research problem:  phase ordering (more to come). It has a large
+  discrete action space.
+
+* **Representations:** provides raw representations of programs, as well as
+  multiple kinds of pre-computed features: you can focus on end-to-end deep
+  learning or features + boosted trees, all the way up to graph models.
+
+* **Rewards:** provides appropriate reward functions and loss functions out of
+  the box.
+
+* **Testing:** provides a validation process for correctness of results.
+
+* **Baselines:** provides some baselines and reports their performance.
+
+* **Competition:** provides [leaderboards](#leaderboards) for you to submit your
+  results.
+
+For a glimpse of what's to come, check out [our
+roadmap](https://github.com/facebookresearch/CompilerGym/projects/1).
 
 # Getting Started
 

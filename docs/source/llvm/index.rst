@@ -59,9 +59,8 @@ We provide several datasets of open-source LLVM-IR benchmarks for use:
          the compiler has not broken the semantics of the program.
          See :mod:`compiler_gym.bin.validate`.
 
-All of the above datasets are available for use with the LLVM environment. Use
-:class:`env.datasets <compiler_gym.datasets.Datasets>` if you wish to manage
-which are available.
+All of the above datasets are available for use with the LLVM environment. See
+:ref:`compiler_gym.envs.llvm.datasets <llvm/api:Datasets>` for API details.
 
 We characterize the datasets below in radial plots which show, clockwise from
 the top: the average number of instructions per benchmark, the density of

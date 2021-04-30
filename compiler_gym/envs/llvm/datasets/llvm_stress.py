@@ -29,7 +29,7 @@ class LlvmStressDataset(Dataset):
     such, there is a higher likelihood that the benchmark cannot be used for an
     environment and that :meth:`env.reset()
     <compiler_gym.envs.CompilerEnv.reset>` will raise
-    :class:`compiler_gym.datasets.BenchmarkInitError`.
+    :class:`BenchmarkInitError <compiler_gym.datasets.BenchmarkInitError>`.
     """
 
     def __init__(self, site_data_base: Path, sort_order: int = 0):

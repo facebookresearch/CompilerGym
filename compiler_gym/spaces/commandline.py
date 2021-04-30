@@ -21,31 +21,32 @@ class CommandlineFlag(NamedTuple):
 
 
 class Commandline(NamedDiscrete):
-    """A :class:`NamedDiscrete` space where each element represents a
-    commandline flag.
+    """A :class:`NamedDiscrete <compiler_gym.spaces.NamedDiscrete>` space where
+    each element represents a commandline flag.
 
     Example usage:
 
-    >>> space = Commandline([
-        CommandlineFlag("a", "-a", "A flag"),
-        CommandlineFlag("b", "-b", "Another flag"),
-    ])
-    >>> space.n
-    2
-    >>> space["a"]
-    0
-    >>> space.names[0]
-    a
-    >>> space.flags[0]
-    -a
-    >>> space.descriptions[0]
-    A flag
-    >>> space.sample()
-    1
-    >>> space.commandline([0, 1])
-    -a -b
+        >>> space = Commandline([
+            CommandlineFlag("a", "-a", "A flag"),
+            CommandlineFlag("b", "-b", "Another flag"),
+        ])
+        >>> space.n
+        2
+        >>> space["a"]
+        0
+        >>> space.names[0]
+        a
+        >>> space.flags[0]
+        -a
+        >>> space.descriptions[0]
+        A flag
+        >>> space.sample()
+        1
+        >>> space.commandline([0, 1])
+        -a -b
 
     :ivar flags: A list of flag strings.
+
     :ivar descriptions: A list of flag descriptions.
     """
 

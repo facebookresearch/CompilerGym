@@ -14,12 +14,12 @@ class FilesDataset(Dataset):
     """A dataset comprising a directory tree of files.
 
     A FilesDataset is a root directory that contains (a possibly nested tree of)
-    files, where each file represents a benchmark. Files can be filtered on
-    their expected filename suffix.
+    files, where each file represents a benchmark. The directory contents can be
+    filtered by specifying a filename suffix that files must match.
 
-    Every file that matches a filename suffix is a benchmark. The URI of a
-    benchmark is the relative path of the file, stripped of the filename suffix.
-    For example, given the following file tree:
+    The URI of benchmarks is the relative path of each file, stripped of a
+    required filename suffix, if specified. For example, given the following
+    file tree:
 
     .. code-block::
 
@@ -54,9 +54,10 @@ class FilesDataset(Dataset):
             a file to be used as a benchmark.
 
         :param memoize_uris: Whether to memoize the list of URIs contained in
-            the dataset. Memoizing the URIs is a tradeoff between *O(n)*
-            computation complexity of random access vs *O(n)* space complexity
-            of memoizing the URI list.
+            the dataset. Memoizing the URIs enables faster repeated iteration
+            over :meth:`dataset.benchmark_uris()
+            <compiler_gym.datasets.Dataset.benchmark_uris>` at the expense of
+            increased memory overhead as the file list must be kept in memory.
 
         :param dataset_args: See :meth:`Dataset.__init__()
             <compiler_gym.datasets.Dataset.__init__>`.
