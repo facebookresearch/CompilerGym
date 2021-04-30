@@ -5,6 +5,7 @@
 import io
 import logging
 import subprocess
+import sys
 import tarfile
 import tempfile
 from pathlib import Path
@@ -50,6 +51,31 @@ class CsmithBenchmark(BenchmarkWithSource):
     def source(self) -> str:
         """Return the single source file contents as a string."""
         return self._src.decode("utf-8")
+
+
+class CsmithBuildError(DatasetInitError):
+    """Error raised if :meth:`CsmithDataset.install()
+    <compiler_gym.datasets.CsmithDataset.install>` fails."""
+
+    def __init__(self, failing_stage: str, stdout: str, stderr: str):
+        install_instructions = {
+            "linux": "sudo apt install g++ m4",
+            "darwin": "brew install m4",
+        }[sys.platform]
+
+        super().__init__(
+            "\n".join(
+                [
+                    f"Failed to build Csmith from source, `{failing_stage}` failed.",
+                    "You may be missing installation dependencies. Install them using:",
+                    f"    {install_instructions}",
+                    "See https://github.com/csmith-project/csmith#install-csmith for more details",
+                    f"--- Start `{failing_stage}` logs: ---\n",
+                    stdout,
+                    stderr,
+                ]
+            )
+        )
 
 
 class CsmithDataset(Dataset):
@@ -175,20 +201,7 @@ class CsmithDataset(Dataset):
             )
             stdout, stderr = configure.communicate(timeout=600)
             if configure.returncode:
-                raise DatasetInitError(
-                    "\n".join(
-                        [
-                            "Failed to build Csmith from source, `./configure` failed.",
-                            "You may be missing installation dependencies. Install them using:",
-                            "     linux: `sudo apt install g++ m4`",
-                            "     macOS: `brew install m4`",
-                            "See https://github.com/csmith-project/csmith#install-csmith for more details",
-                            "--- Start `./configure` logs: ---\n",
-                            stdout,
-                            stderr,
-                        ]
-                    )
-                )
+                raise CsmithBuildError("./configure", stdout, stderr)
 
             logger.debug("Installing Csmith to %s", install_root)
             make = subprocess.Popen(
@@ -200,20 +213,7 @@ class CsmithDataset(Dataset):
             )
             stdout, stderr = make.communicate(timeout=600)
             if make.returncode:
-                raise DatasetInitError(
-                    "\n".join(
-                        [
-                            "Failed to build Csmith from source, `make install` failed.",
-                            "You may be missing installation dependencies. Install them using:",
-                            "     linux: `sudo apt install g++ m4`",
-                            "     macOS: `brew install m4`",
-                            "See https://github.com/csmith-project/csmith#install-csmith for more details",
-                            "--- Start `make install` logs: ---\n",
-                            stdout,
-                            stderr,
-                        ]
-                    )
-                )
+                raise CsmithBuildError("make install", stdout, stderr)
 
     @property
     def size(self) -> int:
