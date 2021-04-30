@@ -10,7 +10,7 @@ Example usage:
 
     $ cat << EOF |
     benchmark,reward,walltime,commandline
-    cBench-v1/crc32,0,1.2,opt  input.bc -o output.bc
+    cbench-v1/crc32,0,1.2,opt  input.bc -o output.bc
     EOF
     python -m compiler_gym.bin.validate --env=llvm-ic-v0 -
 
@@ -25,21 +25,15 @@ Input Format
 ------------
 
 The correct format for generating input states can be generated using
-:func:`env.state.to_csv() <compiler_gym.envs.CompilerEnvState.to_csv>`. The
-input CSV must start with a header row. A valid header row can be generated
-using
-:func:`env.state.csv_header() <compiler_gym.envs.CompilerEnvState.csv_header>`.
+:class:`CompilerEnvStateWriter <compiler_gym.CompilerEnvStateWriter>`. For
+example:
 
-Full example:
+    >>> env = gym.make("llvm-autophase-ic-v0")
+    >>> env.reset()
+    >>> env.step(env.action_space.sample())
+    >>> with CompilerEnvStateWriter(open("results.csv", "wb")) as writer:
+    ...     writer.write_state(env.state)
 
->>> env = gym.make("llvm-v0")
->>> env.reset()
->>> env.step(0)
->>> print(env.state.csv_header())
-benchmark,reward,walltime,commandline
->>> print(env.state.to_csv())
-benchmark://cBench-v1/rijndael,,20.53565216064453,opt -add-discriminators input.bc -o output.bc
-%
 
 Output Format
 -------------
@@ -60,17 +54,15 @@ Else if validation fails, the output is:
 import json
 import re
 import sys
-from typing import Iterable
 
 import numpy as np
 from absl import app, flags
 
-import compiler_gym.util.flags.dataset  # noqa Flag definition.
 import compiler_gym.util.flags.nproc  # noqa Flag definition.
-from compiler_gym.envs.compiler_env import CompilerEnvState
+from compiler_gym.compiler_env_state import CompilerEnvState, CompilerEnvStateReader
 from compiler_gym.util.flags.env_from_flags import env_from_flags
 from compiler_gym.util.shell_format import emph, plural
-from compiler_gym.util.statistics import geometric_mean
+from compiler_gym.util.statistics import arithmetic_mean, geometric_mean, stdev
 from compiler_gym.validate import ValidationResult, validate_states
 
 flags.DEFINE_boolean(
@@ -122,31 +114,10 @@ def to_string(result: ValidationResult, name_col_width: int) -> str:
         return f"✅  {name:<{name_col_width}}  {result.state.reward:9.4f}"
 
 
-def arithmetic_mean(values):
-    """Zero-length-safe arithmetic mean."""
-    if not values:
-        return 0
-    return sum(values) / len(values)
-
-
-def stdev(values):
-    """Zero-length-safe standard deviation."""
-    return np.std(values or [0])
-
-
-def read_states_from_paths(paths: Iterable[str]) -> Iterable[CompilerEnvState]:
-    for path in paths:
-        if path == "-":
-            yield from CompilerEnvState.read_csv_file(sys.stdin)
-        else:
-            with open(path) as f:
-                yield from CompilerEnvState.read_csv_file(f)
-
-
 def main(argv):
     """Main entry point."""
     try:
-        states = list(read_states_from_paths(argv[1:]))
+        states = list(CompilerEnvStateReader.read_paths(argv[1:]))
     except ValueError as e:
         print(e, file=sys.stderr)
         sys.exit(1)
@@ -177,7 +148,6 @@ def main(argv):
         validation_results = validate_states(
             env_from_flags,
             states,
-            datasets=FLAGS.dataset,
             nproc=FLAGS.nproc,
             inorder=FLAGS.inorder,
         )
@@ -238,16 +208,16 @@ def main(argv):
         )
 
     progress_message(len(states))
-    json_log = []
+    result_dicts = []
 
-    def dump_json_log():
+    def dump_result_dicst_to_json():
         with open(FLAGS.validation_logfile, "w") as f:
-            json.dump(json_log, f)
+            json.dump(result_dicts, f)
 
     for i, result in enumerate(validation_results, start=1):
         intermediate_print("\r\033[K", to_string(result, name_col_width), sep="")
         progress_message(len(states) - i)
-        json_log.append(result.json())
+        result_dicts.append(result.dict())
 
         if not result.okay():
             error_count += 1
@@ -256,9 +226,9 @@ def main(argv):
             walltimes.append(result.state.walltime)
 
         if not i % 10:
-            dump_json_log()
+            dump_result_dicst_to_json()
 
-    dump_json_log()
+    dump_result_dicst_to_json()
 
     # Print a summary footer.
     intermediate_print("\r\033[K----", "-" * name_col_width, "-----------", sep="")

@@ -42,9 +42,6 @@ class ExampleService final : public CompilerGymService::Service {
   grpc::Status Step(grpc::ServerContext* context, const StepRequest* request,
                     StepReply* reply) final override;
 
-  grpc::Status GetBenchmarks(grpc::ServerContext* context, const GetBenchmarksRequest* request,
-                             GetBenchmarksReply* reply) final override;
-
  private:
   [[nodiscard]] grpc::Status session(uint64_t id, ExampleCompilationSession** environment);
 
@@ -67,15 +64,11 @@ class ExampleCompilationSession {
 
   [[nodiscard]] grpc::Status Step(const StepRequest* request, StepReply* reply);
 
- private:
   grpc::Status getObservation(int32_t observationSpace, Observation* reply);
 
+ private:
   const std::string benchmark_;
   ActionSpace actionSpace_;
 };
-
-// Helper functions to describe the available action/observation/reward spaces.
-std::vector<ActionSpace> getActionSpaces();
-std::vector<ObservationSpace> getObservationSpaces();
 
 }  // namespace compiler_gym::example_service

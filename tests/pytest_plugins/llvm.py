@@ -10,8 +10,8 @@ from typing import Iterable, List
 import gym
 import pytest
 
-from compiler_gym.envs import CompilerEnv
-from compiler_gym.envs.llvm.legacy_datasets import VALIDATORS
+from compiler_gym.envs.llvm import LlvmEnv
+from compiler_gym.envs.llvm.datasets.cbench import VALIDATORS
 from compiler_gym.third_party import llvm
 from compiler_gym.util.runfiles_path import runfiles_path
 
@@ -19,7 +19,7 @@ ACTIONS_LIST = Path(
     runfiles_path("compiler_gym/envs/llvm/service/passes/actions_flags.txt")
 )
 
-BENCHMARKS_LIST = Path(runfiles_path("compiler_gym/third_party/cBench/benchmarks.txt"))
+BENCHMARKS_LIST = Path(runfiles_path("compiler_gym/third_party/cbench/benchmarks.txt"))
 
 
 def _read_list_file(path: Path) -> Iterable[str]:
@@ -35,13 +35,12 @@ BENCHMARK_NAMES = list(_read_list_file(BENCHMARKS_LIST))
 # Skip ghostscript on CI as it is just too heavy.
 if bool(os.environ.get("CI")):
     BENCHMARK_NAMES = [
-        b for b in BENCHMARK_NAMES if b != "benchmark://cBench-v1/ghostscript"
+        b for b in BENCHMARK_NAMES if b != "benchmark://cbench-v1/ghostscript"
     ]
 
-_env = gym.make("llvm-v0")
-OBSERVATION_SPACE_NAMES = sorted(_env.observation.spaces.keys())
-REWARD_SPACE_NAMES = sorted(_env.reward.spaces.keys())
-_env.close()
+with gym.make("llvm-v0") as env:
+    OBSERVATION_SPACE_NAMES = sorted(env.observation.spaces.keys())
+    REWARD_SPACE_NAMES = sorted(env.reward.spaces.keys())
 
 
 @pytest.fixture(scope="module")
@@ -78,39 +77,28 @@ def benchmark_name(request) -> str:
     yield request.param
 
 
-VALIDATABLE_BENCHMARKS = [b for b in BENCHMARK_NAMES if b in VALIDATORS]
-NON_VALIDATABLE_BENCHMARKS = [b for b in BENCHMARK_NAMES if b not in VALIDATORS]
+VALIDATABLE_CBENCH_URIS = [b for b in BENCHMARK_NAMES if b in VALIDATORS]
+NON_VALIDATABLE_CBENCH_URIS = [b for b in BENCHMARK_NAMES if b not in VALIDATORS]
 
 
-@pytest.fixture(scope="module", params=VALIDATABLE_BENCHMARKS)
-def validatable_benchmark_name(request) -> str:
+@pytest.fixture(scope="module", params=VALIDATABLE_CBENCH_URIS)
+def validatable_cbench_uri(request) -> str:
     """Enumerate the names of benchmarks whose semantics can be validated."""
     yield request.param
 
 
-@pytest.fixture(scope="module", params=NON_VALIDATABLE_BENCHMARKS)
-def non_validatable_benchmark_name(request) -> str:
+@pytest.fixture(scope="module", params=NON_VALIDATABLE_CBENCH_URIS)
+def non_validatable_cbench_uri(request) -> str:
     """Enumerate the names of benchmarks whose semantics cannot be validated."""
     yield request.param
 
 
 @pytest.fixture(scope="function")
-def env() -> CompilerEnv:
+def env() -> LlvmEnv:
     """Create an LLVM environment."""
     env = gym.make("llvm-v0")
-    env.require_dataset("cBench-v1")
     try:
         yield env
-    finally:
-        env.close()
-
-
-@pytest.fixture(scope="module")
-def cBench_dataset():
-    """Test fixture that ensures that cBench is available."""
-    env = gym.make("llvm-v0")
-    try:
-        env.require_dataset("cBench-v1")
     finally:
         env.close()
 

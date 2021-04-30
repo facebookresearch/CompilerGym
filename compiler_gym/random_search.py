@@ -121,10 +121,10 @@ def random_search(
                 f"random_search() requires CompilerEnv. Called with: {type(env).__name__}"
             )
 
-        benchmark_name = env.benchmark
+        benchmark_uri = env.benchmark.uri
         if not outdir:
-            sanitized_benchmark_name = "/".join(benchmark_name.split("/")[-2:])
-            outdir = create_logging_dir(f"random/{sanitized_benchmark_name}")
+            sanitized_benchmark_uri = "/".join(benchmark_uri.split("/")[-2:])
+            outdir = create_logging_dir(f"random/{sanitized_benchmark_uri}")
         outdir = Path(outdir)
 
         if not env.reward_space:
@@ -145,7 +145,7 @@ def random_search(
         # Write a metadata file.
         metadata = {
             "env": env.spec.id if env.spec else "",
-            "benchmark": benchmark_name,
+            "benchmark": benchmark_uri,
             "reward": reward_space_name,
             "patience": patience,
         }

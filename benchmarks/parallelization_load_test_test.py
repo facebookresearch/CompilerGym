@@ -2,14 +2,14 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""Smoke test for //tests/benchmarks:parallelization_load_test."""
+"""Smoke test for //benchmarks:parallelization_load_test."""
 from pathlib import Path
 
 from absl import flags
 
+from benchmarks.parallelization_load_test import main as load_test
 from compiler_gym.util.capture_output import capture_output
-from tests.benchmarks.parallelization_load_test import main as load_test
-from tests.pytest_plugins.common import skip_on_ci
+from tests.pytest_plugins.common import set_command_line_flags, skip_on_ci
 from tests.test_main import main
 
 FLAGS = flags.FLAGS
@@ -21,12 +21,11 @@ pytest_plugins = ["tests.pytest_plugins.llvm", "tests.pytest_plugins.common"]
 def test_load_test(env, tmpwd):
     del env  # Unused.
     del tmpwd  # Unused.
-    FLAGS.unparse_flags()
-    FLAGS(
+    set_command_line_flags(
         [
             "arv0",
             "--env=llvm-v0",
-            "--benchmark=cBench-v1/crc32",
+            "--benchmark=cbench-v1/crc32",
             "--max_nproc=3",
             "--nproc_increment=1",
             "--num_steps=2",

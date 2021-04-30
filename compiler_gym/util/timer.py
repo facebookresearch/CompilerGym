@@ -24,6 +24,11 @@ def humanize_duration(seconds: float) -> str:
         return f"{sign}{value:.1f}s"
 
 
+def humanize_duration_hms(seconds: float) -> str:
+    seconds = int(seconds)
+    return f"{seconds // 3600}:{(seconds % 3600) // 60:02d}:{seconds % 60:02d}"
+
+
 class Timer(object):
     """A very simple scoped timer.
 
@@ -55,16 +60,21 @@ class Timer(object):
         self.label = label
         self.print_fn = print_fn
 
-    def __enter__(self):
+    def reset(self) -> "Timer":
         self._start_time = time()
         return self
+
+    def __enter__(self) -> "Timer":
+        return self.reset()
 
     @property
     def time(self) -> float:
         if self._elapsed:
             return self._elapsed
-        else:
+        elif self._start_time:
             return time() - self._start_time
+        else:
+            return 0
 
     @skip_log_prefix
     def __exit__(self, *args):

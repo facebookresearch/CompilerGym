@@ -34,7 +34,7 @@ FLAGS = flags.FLAGS
 logging.basicConfig(level=logging.DEBUG)
 
 # The names of the benchmarks that are supported
-BENCHMARKS = ["foo", "bar"]
+BENCHMARKS = ["benchmark://example-v0/foo", "benchmark://example-v0/bar"]
 
 # The list of actions that are supported by this service. This example uses a
 # static (unchanging) action space, but this could be extended to support a
@@ -93,6 +93,16 @@ class CompilationSession(object):
         # Do any of the set up required to start a compilation "session".
         self.benchmark = benchmark
 
+    def set_observation(self, observation_space, observation):
+        logging.debug("Compute observation %d", observation_space)
+        if observation_space == 0:  # ir
+            observation.string_value = "Hello, world!"
+        elif observation_space == 1:  # features
+            observation.int64_list.value[:] = [0, 0, 0]
+        elif observation_space == 1:  # runtime
+            observation.scalar_double = 0
+        return observation
+
     def step(self, request: proto.StepRequest, context) -> proto.StepReply:
         reply = proto.StepReply()
 
@@ -108,14 +118,7 @@ class CompilationSession(object):
         # Compute a list of observations from the user. Each value is an index
         # into the OBSERVATION_SPACES list.
         for observation_space in request.observation_space:
-            logging.debug("Compute observation %d", observation_space)
-            observation = reply.observation.add()
-            if observation_space == 0:  # ir
-                observation.string_value = "Hello, world!"
-            elif observation_space == 1:  # features
-                observation.int64_list.value[:] = [0, 0, 0]
-            elif observation_space == 1:  # runtime
-                observation.scalar_double = 0
+            self.set_observation(observation_space, reply.observation.add())
 
         return reply
 
@@ -150,19 +153,12 @@ class ExampleCompilerGymService(proto.CompilerGymServiceServicer):
             observation_space_list=OBSERVATION_SPACES,
         )
 
-    def GetBenchmarks(
-        self, request: proto.GetBenchmarksRequest, context
-    ) -> proto.GetBenchmarksReply:
-        del context  # Unused
-        # Report the available benchmarks to the user.
-        logging.debug("GetBenchmarks()")
-        return proto.GetBenchmarksReply(benchmark=BENCHMARKS)
-
     def StartSession(
         self, request: proto.StartSessionRequest, context
     ) -> proto.StartSessionReply:
         """Create a new compilation session."""
         logging.debug("StartSession(benchmark=%s)", request.benchmark)
+        reply = proto.StartSessionReply()
 
         if not request.benchmark:
             benchmark = "foo"  # Pick a default benchmark is none was requested.
@@ -175,11 +171,16 @@ class ExampleCompilerGymService(proto.CompilerGymServiceServicer):
             return
 
         session = CompilationSession(benchmark=benchmark)
-        session_id = len(self.sessions)
-        self.sessions[session_id] = session
-        return proto.StartSessionReply(
-            session_id=session_id, benchmark=session.benchmark
-        )
+
+        # Generate the initial observations.
+        for observation_space in request.observation_space:
+            session.set_observation(observation_space, reply.observation.add())
+
+        reply.session_id = len(self.sessions)
+        reply.benchmark = session.benchmark
+        self.sessions[reply.session_id] = session
+
+        return reply
 
     def EndSession(
         self, request: proto.EndSessionRequest, context
@@ -194,8 +195,8 @@ class ExampleCompilerGymService(proto.CompilerGymServiceServicer):
     def Step(self, request: proto.StepRequest, context) -> proto.StepReply:
         logging.debug("Step()")
         if request.session_id not in self.sessions:
-            context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
-            context.set_details("Session ID not found")
+            context.set_code(grpc.StatusCode.NOT_FOUND)
+            context.set_details(f"Session not found: {request.session_id}")
             return
 
         return self.sessions[request.session_id].step(request, context)

@@ -34,6 +34,12 @@ Post-installation Tests
         usually not needed for interactive development since `make test` runs
         the same tests without having to install anything.
 
+    make install-test-cov
+        The same as `make install-test`, but with python test coverage
+        reporting. A summary of test coverage is printed at the end of execution
+        and the full details are recorded in a coverage.xml file in the project
+        root directory.
+
     make install-fuzz
         Run the fuzz testing suite against an installed CompilerGym package.
         Fuzz tests are tests that generate their own inputs and run in a loop
@@ -185,7 +191,7 @@ docs/source/contributing.rst: CONTRIBUTING.md
 
 docs/source/installation.rst: README.md
 	echo "..\n  Generated from $<. Do not edit!\n" > $@
-	sed -n '/^## Installation/,$$p' $< | sed -n '/^## Trying/q;p' | $(PANDOC) --from=markdown --to=rst >> $@
+	sed -n '/^## Installation/,$$p' $< | sed -n '/^### Building/q;p' | $(PANDOC) --from=markdown --to=rst >> $@
 
 GENERATED_DOCS := \
 	docs/source/changelog.rst \
@@ -215,20 +221,30 @@ test:
 itest:
 	$(IBAZEL) $(BAZEL_OPTS) test $(BAZEL_TEST_OPTS) //...
 
-install-test-datasets:
-	cd .. && $(PYTHON) -m compiler_gym.bin.datasets --env=llvm-v0 --download=cBench-v1 >/dev/null
 
-install-test: install-test-datasets
+# Since we can't run compiler_gym from the project root we need to jump through
+# some hoops to run pytest "out of tree" by creating an empty directory and
+# symlinking the test directory into it so that pytest can be invoked.
+define run_pytest_suite
 	mkdir -p /tmp/compiler_gym/wheel_tests
-	rm -f /tmp/compiler_gym/wheel_tests/tests
+	rm -f /tmp/compiler_gym/wheel_tests/tests /tmp/compiler_gym/wheel_tests/tox.ini
 	ln -s $(ROOT)/tests /tmp/compiler_gym/wheel_tests
-	cd /tmp/compiler_gym/wheel_tests && pytest tests -n auto -k "not fuzz"
+	ln -s $(ROOT)/tox.ini /tmp/compiler_gym/wheel_tests
+	cd /tmp/compiler_gym/wheel_tests && pytest tests $(1) --benchmark-disable -n auto -k "not fuzz"
+endef
+
+install-test:
+	$(call run_pytest_suite,)
+
+install-test-cov:
+	$(call run_pytest_suite,--cov=compiler_gym --cov-report=xml)
+	@mv /tmp/compiler_gym/wheel_tests/coverage.xml .
 
 # The minimum number of seconds to run the fuzz tests in a loop for. Override
 # this at the commandline, e.g. `FUZZ_SECONDS=1800 make fuzz`.
 FUZZ_SECONDS ?= 300
 
-install-fuzz: install-test-datasets
+install-fuzz:
 	mkdir -p /tmp/compiler_gym/wheel_fuzz_tests
 	rm -f /tmp/compiler_gym/wheel_fuzz_tests/tests
 	ln -s $(ROOT)/tests /tmp/compiler_gym/wheel_fuzz_tests

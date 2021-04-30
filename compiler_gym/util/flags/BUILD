@@ -14,12 +14,6 @@ py_library(
 )
 
 py_library(
-    name = "dataset",
-    srcs = ["dataset.py"],
-    visibility = ["//visibility:public"],
-)
-
-py_library(
     name = "env_from_flags",
     srcs = ["env_from_flags.py"],
     visibility = ["//visibility:public"],
@@ -28,12 +22,6 @@ py_library(
         "//compiler_gym/service",
         "//compiler_gym/service/proto",
     ],
-)
-
-py_library(
-    name = "ls_benchmark",
-    srcs = ["ls_benchmark.py"],
-    visibility = ["//visibility:public"],
 )
 
 py_library(

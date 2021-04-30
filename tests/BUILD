@@ -22,6 +22,7 @@ py_test(
     deps = [
         "//compiler_gym",
         "//tests:test_main",
+        "//tests/pytest_plugins:common",
     ],
 )
 
@@ -34,6 +35,7 @@ py_test(
         "//compiler_gym:random_replay",
         "//compiler_gym:random_search",
         "//tests:test_main",
+        "//tests/pytest_plugins:common",
     ],
 )
 
@@ -42,12 +44,12 @@ py_library(
     testonly = 1,
     srcs = ["test_main.py"],
     visibility = [
+        "//benchmarks:__subpackages__",
         "//examples:__subpackages__",
         "//leaderboard:__subpackages__",
         "//tests:__subpackages__",
     ],
     deps = [
-        "//compiler_gym",
         "//compiler_gym/util",
     ],
 )

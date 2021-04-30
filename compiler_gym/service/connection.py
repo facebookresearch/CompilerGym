@@ -13,9 +13,10 @@ from datetime import datetime
 from pathlib import Path
 from signal import Signals
 from time import sleep, time
-from typing import Iterable, List, NamedTuple, Optional, TypeVar, Union
+from typing import Iterable, List, Optional, TypeVar, Union
 
 import grpc
+from pydantic import BaseModel
 
 from compiler_gym.service.proto import (
     ActionSpace,
@@ -42,7 +43,7 @@ GRPC_CHANNEL_OPTIONS = [
 ]
 
 
-class ConnectionOpts(NamedTuple):
+class ConnectionOpts(BaseModel):
     """The options used to configure a connection to a service."""
 
     rpc_call_max_seconds: float = 300
@@ -84,6 +85,10 @@ class ConnectionOpts(NamedTuple):
 
 class ServiceError(Exception):
     """Error raised from the service."""
+
+
+class SessionNotFound(ServiceError):
+    """Requested session ID not found in service."""
 
 
 class ServiceOSError(ServiceError, OSError):
@@ -243,13 +248,12 @@ class Connection(object):
         yield from ()
 
 
-def make_working_dir():
-    """Make a working directory for a service. The calling code is responsible for
-    removing this directory when done.
+def make_working_dir() -> Path:
+    """Make a working directory for a service. The calling code is responsible
+    for removing this directory when done.
     """
-    timestamp = datetime.now().isoformat()
     random_hash = random.getrandbits(16)
-    service_name = f"service-{timestamp}-{random_hash:04x}"
+    service_name = datetime.now().strftime(f"s/%m%dT%H%M%S-%f-{random_hash:04x}")
     working_dir = transient_cache_path(service_name)
     (working_dir / "logs").mkdir(parents=True, exist_ok=False)
     return working_dir
@@ -306,6 +310,12 @@ class ManagedConnection(Connection):
             # value to disable buffering of logging messages. This makes it
             # easier to `LOG(INFO) << "..."` debug things.
             cmd.append("--logbuflevel=-1")
+        else:
+            # Silence the gRPC logs as we will do our own error reporting, but
+            # don't override any existing value so that the user may debug the
+            # gRPC backend by setting GRPC_VERBOSITY to ERROR, INFO, or DEBUG.
+            if not os.environ.get("GRPC_VERBOSITY"):
+                os.environ["GRPC_VERBOSITY"] = "NONE"
 
         logger.debug("Exec %s", cmd)
         self.process = subprocess.Popen(
@@ -390,7 +400,7 @@ class ManagedConnection(Connection):
             shutil.rmtree(self.working_dir)
             raise TimeoutError(
                 "Failed to connect to RPC service after "
-                f"{process_exit_max_seconds:.1f} seconds.{logs_message}"
+                f"{rpc_init_max_seconds:.1f} seconds.{logs_message}"
             )
 
         super().__init__(channel, url, logger)

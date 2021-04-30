@@ -52,5 +52,5 @@ terminates when the maximum reward attainable by any action is <= 0.
 ### Experimental Methodology
 
 ```sh
-$ python e_greedy.py --n=1 --epsilon=0 --results_logfile=results_e0.csv
+$ python e_greedy.py --n=1 --epsilon=0 --leaderboard_results=results_e0.csv
 ```

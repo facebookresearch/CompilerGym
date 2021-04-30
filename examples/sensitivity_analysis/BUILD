@@ -24,6 +24,7 @@ py_test(
         ":action_sensitivity_analysis",
         ":sensitivity_analysis_eval",
         "//tests:test_main",
+        "//tests/pytest_plugins:common",
     ],
 )
 
@@ -48,6 +49,7 @@ py_test(
         ":benchmark_sensitivity_analysis",
         ":sensitivity_analysis_eval",
         "//tests:test_main",
+        "//tests/pytest_plugins:common",
     ],
 )
 

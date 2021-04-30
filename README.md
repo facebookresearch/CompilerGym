@@ -22,6 +22,10 @@
 <a href="https://tldrlegal.com/license/mit-license">
     <img src="https://img.shields.io/pypi/l/compiler-gym" alt="License" height="20">
 </a>
+<!-- Getting started colab -->
+<a href="https://colab.research.google.com/github/facebookresearch/CompilerGym/blob/stable/examples/getting-started.ipynb">
+    <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Colab" height="20">
+</a>
 
 CompilerGym is a toolkit for exposing compiler optimization problems
 for reinforcement learning. It allows machine learning researchers to
@@ -32,6 +36,7 @@ developers to expose new optimization problems for AI.
 
 **Table of Contents**
 
+- [Features](#features)
 - [Getting Started](#getting-started)
   - [Installation](#installation)
     - [Building from Source](#building-from-source)
@@ -41,6 +46,40 @@ developers to expose new optimization problems for AI.
 - [Contributing](#contributing)
 - [Citation](#citation)
 
+
+# Features
+
+With CompilerGym, building ML models for compiler research problems is as easy
+as building ML models to play video games. Here are some highlights of key
+features:
+
+* **API:** uses the popular [Gym](https://gym.openai.com/) interface from OpenAI
+  — use Python to write your agent.
+
+* **Datasets:** wraps real world programs (C++ programs, TensorFlow programs,
+  programs from Github, etc.) and a mainstream compiler
+  ([LLVM](https://llvm.org/)), providing millions of programs for training.
+
+* **Tasks and Actions:** interfaces the [LLVM](https://llvm.org/) compiler for
+  one compiler research problem:  phase ordering (more to come). It has a large
+  discrete action space.
+
+* **Representations:** provides raw representations of programs, as well as
+  multiple kinds of pre-computed features: you can focus on end-to-end deep
+  learning or features + boosted trees, all the way up to graph models.
+
+* **Rewards:** provides appropriate reward functions and loss functions out of
+  the box.
+
+* **Testing:** provides a validation process for correctness of results.
+
+* **Baselines:** provides some baselines and reports their performance.
+
+* **Competition:** provides [leaderboards](#leaderboards) for you to submit your
+  results.
+
+For a glimpse of what's to come, check out [our
+roadmap](https://github.com/facebookresearch/CompilerGym/projects/1).
 
 # Getting Started
 
@@ -83,7 +122,7 @@ Now proceed to [All platforms](#all-platforms) below.
 On debian-based linux systems, install the required toolchain using:
 
 ```sh
-sudo apt install clang libtinfo5 libjpeg-dev patchelf
+sudo apt install clang-9 libtinfo5 libjpeg-dev patchelf
 wget https://github.com/bazelbuild/bazelisk/releases/download/v1.7.5/bazelisk-linux-amd64 -O bazel
 chmod +x bazel && mkdir -p ~/.local/bin && mv -v bazel ~/.local/bin
 export PATH="$HOME/.local/bin:$PATH"
@@ -106,12 +145,15 @@ Then clone the CompilerGym source code using:
     git clone https://github.com/facebookresearch/CompilerGym.git
     cd CompilerGym
 
-Install the python development dependencies using:
+There are two primary git branches: `stable` tracks the latest release;
+`development` is for bleeding edge features that may not yet be mature. Checkout
+your preferred branch and install the python development dependencies using:
 
+    git checkout stable
     make init
 
 The `make init` target only needs to be run once on initial setup, or when
-upgrading to a different CompilerGym release.
+pulling remote changes to the CompilerGym repository.
 
 Run the test suite to confirm that everything is working:
 
@@ -140,15 +182,18 @@ In Python, import `compiler_gym` to use the environments:
 >>> import gym
 >>> import compiler_gym                     # imports the CompilerGym environments
 >>> env = gym.make("llvm-autophase-ic-v0")  # starts a new environment
->>> env.require_dataset("npb-v0")           # downloads a set of programs
->>> env.reset()                             # starts a new compilation session with a random program
+>>> env.benchmark = "benchmark://cbench-v1/qsort"  # select a program to compile
+>>> env.reset()                             # starts a new compilation session
 >>> env.render()                            # prints the IR of the program
 >>> env.step(env.action_space.sample())     # applies a random optimization, updates state/reward/actions
 ```
 
-See the
-[documentation website](http://facebookresearch.github.io/CompilerGym/) for
-tutorials, further details, and API reference.
+See the [documentation website](http://facebookresearch.github.io/CompilerGym/)
+for tutorials, further details, and API reference. Our
+[roadmap](https://facebookresearch.github.io/CompilerGym/about.html#roadmap) of
+planned features is public, and the
+[changelog](https://github.com/facebookresearch/CompilerGym/blob/development/CHANGELOG.md)
+summarizes shipped features.
 
 
 # Leaderboards
@@ -169,7 +214,7 @@ count achieved scaled to the reduction achieved by LLVM's builtin `-Oz`
 pipeline.
 
 This leaderboard tracks the results achieved by algorithms on the `llvm-ic-v0`
-environment on the 23 benchmarks in the `cBench-v1` dataset.
+environment on the 23 benchmarks in the `cbench-v1` dataset.
 
 | Author | Algorithm | Links | Date | Walltime (mean) | Codesize Reduction (geomean) |
 | --- | --- | --- | --- | --- | --- |
@@ -178,7 +223,9 @@ environment on the 23 benchmarks in the `cBench-v1` dataset.
 | Facebook | Greedy search | [write-up](leaderboard/llvm_instcount/e_greedy/README.md), [results](leaderboard/llvm_instcount/e_greedy/results_e0.csv) | 2021-03 | 169.237s | 1.055× |
 | Facebook | Random search (t=60) | [write-up](leaderboard/llvm_instcount/random_search/README.md), [results](leaderboard/llvm_instcount/random_search/results_p125_t60.csv) | 2021-03 | 91.215s | 1.045× |
 | Facebook | e-Greedy search (e=0.1) | [write-up](leaderboard/llvm_instcount/e_greedy/README.md), [results](leaderboard/llvm_instcount/e_greedy/results_e10.csv) | 2021-03 | 152.579s | 1.041× |
+| Jiadong Guo | Tabular Q (N=5000, H=10) | [write-up](leaderboard/llvm_instcount/tabular_q/README.md), [results](leaderboard/llvm_instcount/tabular_q/results-H10-N5000.csv) | 2021-04 | 2534.305 | 1.036× |
 | Facebook | Random search (t=10) | [write-up](leaderboard/llvm_instcount/random_search/README.md), [results](leaderboard/llvm_instcount/random_search/results_p125_t10.csv) | 2021-03 | **42.939s** | 1.031× |
+| Jiadong Guo | Tabular Q (N=2000, H=5) | [write-up](leaderboard/llvm_instcount/tabular_q/README.md), [results](leaderboard/llvm_instcount/tabular_q/results-H5-N2000.csv) | 2021-04 | 694.105 | 0.988× |
 
 
 # Contributing

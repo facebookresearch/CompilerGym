@@ -16,33 +16,11 @@ The benchmark to use can be specified using :code:`--benchmark=<name>`.
 CompilerGym Shell Tutorial
 **************************
 
-This program gives a basic shell through which many of commands from
-CompilerGym can be executed. CompilerGym provides a simple Python interface to
-various compiler functions, enabling programs to be compiled in different ways
-and to make queries about those programs. The goal is to have a simple system
-for machine learning in compilers.
-
-Downloading a Dataset
----------------------
-When entering the Shell, the environment (compiler choice) will have already
-been made on the command line. The benchmark or program to be compiled may not
-yet be set. Before setting a benchmark, however, the corresponding dataset must
-be downloaded. You may have already downloaded a dataset through the
-compiler_gym.bin.datasets command, but if not, you can do that from this shell.
-
-To download a dataset, call:
-
-.. code-block::
-
-    compilergym:NO-BENCHMARK> require_dataset <dataset-name>
-
-The command and the dataset name should tab-complete for you (most things will
-tab-complete in the shell). You can also see what datasets are available with
-this command:
-
-.. code-block::
-
-    compilergym:NO-BENCHMARK> list_datasets
+This program gives a basic shell through which many of commands from CompilerGym
+can be executed. CompilerGym provides a simple Python interface to various
+compiler functions, enabling programs to be compiled in different ways and to
+make queries about those programs. The goal is to have a simple system for
+machine learning in compilers.
 
 Setting a Benchmark, Reward and Observation
 -------------------------------------------
@@ -51,34 +29,41 @@ line, the benchmark can be specified in the shell with:
 
 .. code-block::
 
-    compilergym:NO-BENCHMARK> set_benchmark <benchmark-name>
+    compiler_gym:cbench-v1/qsort> set_benchmark <benchmark-name>
 
 When a benchmark is set, the prompt will update with the name of the benchmark.
 Supposing that is "bench", then the prompt would be:
 
 .. code-block::
 
-    compilergym:bench>
+    compiler_gym:bench>
 
-The list of available benchmarks can be shown with:
+The list of available benchmarks can be shown with, though this is limited to
+the first 200 benchmarks:
 
 .. code-block::
 
-    compilergym:bench> list_benchmarks
+    compiler_gym:bench> list_benchmarks
+
+You can also see what datasets are available with this command:
+
+.. code-block::
+
+    compiler_gym:cbench-v1/qsort> list_datasets
 
 The default reward and observation can be similarly set with:
 
 .. code-block::
 
-    compilergym:bench> set_default_reward <reward-name>
-    compilergym:bench> set_default_observation <observation-name>
+    compiler_gym:bench> set_default_reward <reward-name>
+    compiler_gym:bench> set_default_observation <observation-name>
 
 And lists of the choices are available with:
 
 .. code-block::
 
-    compilergym:bench> list_rewards
-    compilergym:bench> list_observations
+    compiler_gym:bench> list_rewards
+    compiler_gym:bench> list_observations
 
 The default rewards and observations will be reported every time an action is
 taken. So, if, for example, you want to see how the instruction count of the
@@ -95,27 +80,26 @@ In CompilerGym an action corresponds to invoking an compiler operation
 (currently an LLVM opt pass) on the intermediate representation of the program.
 Each action acts on the result of the previous action and so on.
 
-So, for example, to apply first the 'tail call elimination' pass, then the
-'loop unrolling' pass we call two actions:
+So, for example, to apply first the 'tail call elimination' pass, then the 'loop
+unrolling' pass we call two actions:
 
 .. code-block::
 
-    compilergym:bench> action -tailcallelim
-    compilergym:bench> action -loop-unroll
+    compiler_gym:bench> action -tailcallelim
+    compiler_gym:bench> action -loop-unroll
 
-Each action will report its default reward.
-Note that multiple actions can be placed on a single line, so that the above is
-equivalent to:
+Each action will report its default reward. Note that multiple actions can be
+placed on a single line, so that the above is equivalent to:
 
 .. code-block::
 
-    compilergym:bench> action -tailcallelim -loop-unroll
+    compiler_gym:bench> action -tailcallelim -loop-unroll
 
 You can choose a random action, by using just a '-' as the action name:
 
 .. code-block::
 
-    compilergym:bench> action -
+    compiler_gym:bench> action -
 
 Since an empty line on the shell repeats the last action, you can execute many
 random actions by typing that line first then holding down return.
@@ -125,7 +109,7 @@ stack. You can view the action stack with stack command:
 
 .. code-block::
 
-    compilergym:bench> stack
+    compiler_gym:bench> stack
 
 This will show for each action if it had an effect (as computed by the
 underlying compiler), whether this terminated compiler, and what the per action
@@ -135,20 +119,20 @@ The last action can be undone by:
 
 .. code-block::
 
-    compilergym:bench> undo
+    compiler_gym:bench> undo
 
 All actions in the stack can be undone at once by:
 
 .. code-block::
 
-    compilergym:bench> reset
+    compiler_gym:bench> reset
 
 You can find out what the effect of each action would be by calling this
 command:
 
 .. code-block::
 
-    compilergym:bench> try_all_actions
+    compiler_gym:bench> try_all_actions
 
 This will show a table with the reward for each action, sorted by best first.
 
@@ -157,12 +141,12 @@ simplify the stack with this command:
 
 .. code-block::
 
-    compilergym:bench> simplify_stack
+    compiler_gym:bench> simplify_stack
 
 This will redo the entire stack, keeping only those actions which previously
 gave good rewards. (Note this doesn't mean that the simplified stack will only
-have positive rewards, some negative actions may be necessary set up for a
-later positive reward.)
+have positive rewards, some negative actions may be necessary set up for a later
+positive reward.)
 
 Current Status
 --------------
@@ -174,20 +158,20 @@ reward:
 
 .. code-block::
 
-    compilergym:bench> reward <reward-name>
+    compiler_gym:bench> reward <reward-name>
 
 You can see various observations with:
 
 .. code-block::
 
-    compilergym:bench> observation <observation-name>
+    compiler_gym:bench> observation <observation-name>
 
 Finally, you can print the equivalent command line for achieving the same
 behaviour as the actions through the standard system shell:
 
 .. code-block::
 
-    compilergym:bench> commandline
+    compiler_gym:bench> commandline
 
 Searching
 ---------
@@ -198,7 +182,7 @@ First, is the random search through this command:
 
 .. code-block::
 
-    compilergym:bench> action -
+    compiler_gym:bench> action -
 
 Multiple steps can be taken by holding down the return key.
 
@@ -207,14 +191,14 @@ positive reward:
 
 .. code-block::
 
-    compilergym:bench> hill_climb <num-steps>
+    compiler_gym:bench> hill_climb <num-steps>
 
 A simple greedy search tries all possible actions and takes the one with the
 highest reward, stopping when no action has a positive reward:
 
 .. code-block::
 
-    compilergym:bench> greedy <num-steps>
+    compiler_gym:bench> greedy <num-steps>
 
 Miscellaneous
 -------------
@@ -222,7 +206,7 @@ One useful command is:
 
 .. code-block::
 
-    compilergym:bench> breakpoint
+    compiler_gym:bench> breakpoint
 
 Which drops into the python debugger. This is very useful if you want to see
 what is going on internally. There is a 'self.env' object that represents the
@@ -232,7 +216,7 @@ And finally:
 
 .. code-block::
 
-    compilergym:bench> exit
+    compiler_gym:bench> exit
 
 Drops out of the shell. :code:`Ctrl-D` should have the same effect.
 """
@@ -240,10 +224,10 @@ import cmd
 import random
 import readline
 import sys
+from itertools import islice
 
 from absl import app, flags
 
-import compiler_gym.util.flags.ls_benchmark  # noqa Flag definition.
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.flags.env_from_flags import env_from_flags
@@ -301,10 +285,12 @@ The 'tutorial' command will give a step by step guide."""
 
         self.env = env
 
-        self.init_benchmarks()
-
         # Get the benchmarks
-        self.benchmarks = sorted(self.env.benchmarks)
+        self.benchmarks = []
+        for dataset in self.env.datasets:
+            self.benchmarks += islice(dataset.benchmark_uris(), 50)
+        self.benchmarks.sort()
+
         # Strip default benchmark:// protocol.
         for i, benchmark in enumerate(self.benchmarks):
             if benchmark.startswith("benchmark://"):
@@ -319,6 +305,12 @@ The 'tutorial' command will give a step by step guide."""
         self.stack = []
 
         self.set_prompt()
+
+    def __del__(self):
+        """Tidy up in case postloop() is not called."""
+        if self.env:
+            self.env.close()
+            self.env = None
 
     def do_tutorial(self, arg):
         """Print the turorial"""
@@ -335,24 +327,12 @@ The 'tutorial' command will give a step by step guide."""
         self.env.close()
         self.env = None
 
-    def init_benchmarks(self):
-        """Initialise the set of benchmarks"""
-        # Get the benchmarks
-        self.benchmarks = sorted(self.env.benchmarks)
-        # Strip default benchmark:// protocol.
-        for i, benchmark in enumerate(self.benchmarks):
-            if benchmark.startswith("benchmark://"):
-                self.benchmarks[i] = benchmark[len("benchmark://") :]
-
     def set_prompt(self):
         """Set the prompt - shows the benchmark name"""
-        if self.env.benchmark:
-            bname = self.env.benchmark
-            if bname.startswith("benchmark://"):
-                bname = bname[len("benchmark://") :]
-        else:
-            bname = "NO-BENCHMARK"
-        prompt = f"compilergym:{bname}>"
+        benchmark_name = self.env.benchmark.uri
+        if benchmark_name.startswith("benchmark://"):
+            benchmark_name = benchmark_name[len("benchmark://") :]
+        prompt = f"compiler_gym:{benchmark_name}>"
         self.prompt = f"\n{emph(prompt)} "
 
     def simple_complete(self, text, options):
@@ -363,38 +343,16 @@ The 'tutorial' command will give a step by step guide."""
             return options
 
     def get_datasets(self):
-        """Get the list of available datasets"""
-        return sorted([k for k in self.env.available_datasets])
+        """Get the list of datasets"""
+        return sorted([k.name for k in self.env.datasets.datasets()])
 
     def do_list_datasets(self, arg):
-        """List all of the available datasets"""
+        """List all of the datasets"""
         print(", ".join(self.get_datasets()))
 
-    def complete_require_dataset(self, text, line, begidx, endidx):
-        """Complete the require_benchmark argument"""
-        return self.simple_complete(text, self.get_datasets())
-
-    def do_require_dataset(self, arg):
-        """Require dataset
-        The argument is the name of the dataset to require.
-        """
-        if self.get_datasets().count(arg):
-            with Timer(f"Downloaded dataset {arg}"):
-                self.env.require_dataset(arg)
-            self.init_benchmarks()
-        else:
-            print("Unknown dataset, '" + arg + "'")
-            print("Available datasets are listed with command, list_available_datasets")
-
     def do_list_benchmarks(self, arg):
-        """List all of the available benchmarks"""
-        if not self.benchmarks:
-            doc_root_url = "https://facebookresearch.github.io/CompilerGym/"
-            install_url = doc_root_url + "getting_started.html#installing-benchmarks"
-            print("No benchmarks available. See " + install_url)
-            print("Datasets can be installed with command, require_dataset")
-        else:
-            print(", ".join(self.benchmarks))
+        """List the benchmarks"""
+        print(", ".join(self.benchmarks))
 
     def complete_set_benchmark(self, text, line, begidx, endidx):
         """Complete the set_benchmark argument"""
@@ -409,27 +367,27 @@ The 'tutorial' command will give a step by step guide."""
         Use '-' for a random benchmark.
         """
         if arg == "-":
-            arg = random.choice(self.benchmarks)
+            arg = self.env.datasets.benchmark().uri
             print(f"set_benchmark {arg}")
 
-        if self.benchmarks.count(arg):
+        try:
+            benchmark = self.env.datasets.benchmark(arg)
             self.stack.clear()
 
             # Set the current benchmark
             with Timer() as timer:
-                observation = self.env.reset(benchmark=arg)
+                observation = self.env.reset(benchmark=benchmark)
             print(f"Reset {self.env.benchmark} environment in {timer}")
 
             if self.env.observation_space and observation is not None:
                 print(
-                    f"Observation: {self.env.observation_space.to_string(observation)}"
+                    f"Observation: {self.env.observation_space_spec.to_string(observation)}"
                 )
 
             self.set_prompt()
-
-        else:
+        except LookupError:
             print("Unknown benchmark, '" + arg + "'")
-            print("Bencmarks are listed with command, list_benchmarks")
+            print("Benchmarks are listed with command, list_benchmarks")
 
     def get_actions(self):
         """Get the list of actions"""
@@ -451,10 +409,6 @@ The 'tutorial' command will give a step by step guide."""
         Tab completion will be used if available.
         Use '-' for a random action.
         """
-        if not self.env.benchmark:
-            print("No benchmark set, please call the set_benchmark command")
-            return
-
         if self.stack and self.stack[-1].done:
             print(
                 "No action possible, last action ended by the environment with error:",
@@ -497,7 +451,7 @@ The 'tutorial' command will give a step by step guide."""
                 # Print the observation, if available.
                 if self.env.observation_space and observation is not None:
                     print(
-                        f"Observation: {self.env.observation_space.to_string(observation)}"
+                        f"Observation: {self.env.observation_space_spec.to_string(observation)}"
                     )
 
                 # Print the reward, if available.
@@ -557,10 +511,6 @@ The 'tutorial' command will give a step by step guide."""
         An argument, if given, should be the number of steps to take.
         The search will try to improve the default reward. Please call set_default_reward if needed.
         """
-        if not self.env.benchmark:
-            print("No benchmark set, please call the set_benchmark command")
-            return
-
         if not self.env.reward_space:
             print("No default reward set. Call set_default_reward")
             return
@@ -617,10 +567,6 @@ The 'tutorial' command will give a step by step guide."""
 
     def do_try_all_actions(self, args):
         """Tries all actions from this position and reports the results in sorted order by reward"""
-        if not self.env.benchmark:
-            print("No benchmark set, please call the set_benchmark command")
-            return
-
         if not self.env.reward_space:
             print("No default reward set. Call set_default_reward")
             return
@@ -646,10 +592,6 @@ The 'tutorial' command will give a step by step guide."""
         An argument, if given, should be the number of steps to take.
         The search will try to improve the default reward. Please call set_default_reward if needed.
         """
-        if not self.env.benchmark:
-            print("No benchmark set, please call the set_benchmark command")
-            return
-
         if not self.env.reward_space:
             print("No default reward set. Call set_default_reward")
             return
@@ -690,12 +632,8 @@ The 'tutorial' command will give a step by step guide."""
         The name should come from the list of observations printed by the command list_observations.
         Tab completion will be used if available.
         """
-        if not self.env.benchmark:
-            print("No benchmark set, please call the set_benchmark command")
-            return
-
         if arg == "" and self.env.observation_space:
-            arg = self.env.observation_space.id
+            arg = self.env.observation_space_spec.id
 
         if self.observations.count(arg):
             with Timer() as timer:
@@ -718,10 +656,6 @@ The 'tutorial' command will give a step by step guide."""
         With no argument it will set to None.
         This command will rerun the actions on the stack.
         """
-        if not self.env.benchmark:
-            print("No benchmark set, please call the set_benchmark command")
-            return
-
         arg = arg.strip()
         if not arg or self.observations.count(arg):
             with Timer() as timer:
@@ -746,10 +680,6 @@ The 'tutorial' command will give a step by step guide."""
         The name should come from the list of rewards printed by the command list_rewards.
         Tab completion will be used if available.
         """
-        if not self.env.benchmark:
-            print("No benchmark set, please call the set_benchmark command")
-            return
-
         if arg == "" and self.env.reward_space:
             arg = self.env.reward_space.id
 
@@ -772,10 +702,6 @@ The 'tutorial' command will give a step by step guide."""
         With no argument it will set to None.
         This command will rerun the actions on the stack.
         """
-        if not self.env.benchmark:
-            print("No benchmark set, please call the set_benchmark command")
-            return
-
         arg = arg.strip()
         if not arg or self.rewards.count(arg):
             with Timer(f"Reward {arg}"):
@@ -791,10 +717,6 @@ The 'tutorial' command will give a step by step guide."""
 
     def do_stack(self, arg):
         """Show the environments on the stack. The current environment is the first shown."""
-        if not self.env.benchmark:
-            print("No benchmark set, please call the set_benchmark command")
-            return
-
         rows = []
         total = 0
         for i, hist in enumerate(self.stack):
@@ -821,10 +743,6 @@ The 'tutorial' command will give a step by step guide."""
         being removed that previously had a negative reward being necessary for a later action to
         have a positive reward. This means you might see non-positive rewards on the stack afterwards.
         """
-        if not self.env.benchmark:
-            print("No benchmark set, please call the set_benchmark command")
-            return
-
         self.env.reset()
         old_stack = self.stack
         self.stack = []
@@ -889,15 +807,7 @@ def main(argv):
     if len(argv) != 1:
         raise app.UsageError(f"Unknown command line arguments: {argv[1:]}")
 
-    if FLAGS.ls_benchmark:
-        benchmark = benchmark_from_flags()
-        env = env_from_flags(benchmark)
-        print("\n".join(sorted(env.benchmarks)))
-        env.close()
-        return
-
     with Timer("Initialized environment"):
-        # FIXME Chris, I don't seem to actually get a benchmark
         benchmark = benchmark_from_flags()
         env = env_from_flags(benchmark)
 

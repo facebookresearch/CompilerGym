@@ -50,9 +50,12 @@ setuptools.setup(
     packages=[
         "compiler_gym.bin",
         "compiler_gym.datasets",
+        "compiler_gym.envs.llvm.datasets",
         "compiler_gym.envs.llvm.service.passes",
         "compiler_gym.envs.llvm.service",
         "compiler_gym.envs.llvm",
+        "compiler_gym.envs.llvm",
+        "compiler_gym.envs",
         "compiler_gym.envs",
         "compiler_gym.leaderboard",
         "compiler_gym.service.proto",
@@ -72,13 +75,12 @@ setuptools.setup(
     },
     package_data={
         "compiler_gym": [
-            "envs/llvm/service/passes/*.txt",
             "envs/llvm/service/compiler_gym-llvm-service",
             "envs/llvm/service/libLLVMPolly.so",
+            "envs/llvm/service/passes/*.txt",
+            "third_party/cbench/benchmarks.txt",
+            "third_party/cbench/cbench-v*/*",
             "third_party/inst2vec/*.pickle",
-            "third_party/cBench/benchmarks.txt",
-            "third_party/cBench/cBench-v*/*",
-            "third_party/cBench/runtime_data/**/*",
         ]
     },
     install_requires=requirements,

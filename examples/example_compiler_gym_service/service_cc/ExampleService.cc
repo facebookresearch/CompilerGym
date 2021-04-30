@@ -5,6 +5,8 @@
 
 #include "examples/example_compiler_gym_service/service_cc/ExampleService.h"
 
+#include <fmt/format.h>
+
 #include "compiler_gym/service/proto/compiler_gym_service.pb.h"
 #include "compiler_gym/util/GrpcStatusMacros.h"
 #include "compiler_gym/util/Version.h"
@@ -27,9 +29,9 @@ template <typename T>
   return Status::OK;
 }
 
-}  // namespace
-
-std::vector<std::string> getBenchmarks() { return {"foo", "bar"}; }
+std::vector<std::string> getBenchmarkUris() {
+  return {"benchmark://example-v0/foo", "benchmark://example-v0/bar"};
+}
 
 std::vector<ActionSpace> getActionSpaces() {
   ActionSpace space;
@@ -69,6 +71,8 @@ std::vector<ObservationSpace> getObservationSpaces() {
   return {ir, features, runtime};
 }
 
+}  // namespace
+
 ExampleService::ExampleService(const fs::path& workingDirectory)
     : workingDirectory_(workingDirectory), nextSessionId_(0) {}
 
@@ -95,7 +99,7 @@ Status ExampleService::StartSession(ServerContext* /* unused*/, const StartSessi
 
   // Determine the benchmark to use.
   std::string benchmark = request->benchmark();
-  const auto benchmarks = getBenchmarks();
+  const auto benchmarks = getBenchmarkUris();
   if (!benchmark.empty() &&
       std::find(benchmarks.begin(), benchmarks.end(), benchmark) == benchmarks.end()) {
     return Status(StatusCode::INVALID_ARGUMENT, "Unknown program name");
@@ -112,8 +116,18 @@ Status ExampleService::StartSession(ServerContext* /* unused*/, const StartSessi
   const auto actionSpace = actionSpaces[request->action_space()];
 
   // Create the new compilation session given.
+  auto session = std::make_unique<ExampleCompilationSession>(benchmark, actionSpace);
+
+  // Generate initial observations.
+  for (int i = 0; i < request->observation_space_size(); ++i) {
+    RETURN_IF_ERROR(rangeCheck(request->observation_space(i), 0,
+                               static_cast<int32_t>(getObservationSpaces().size()) - 1));
+    RETURN_IF_ERROR(
+        session->getObservation(request->observation_space(i), reply->add_observation()));
+  }
+
   reply->set_session_id(nextSessionId_);
-  sessions_[nextSessionId_] = std::make_unique<ExampleCompilationSession>(benchmark, actionSpace);
+  sessions_[nextSessionId_] = std::move(session);
   ++nextSessionId_;
 
   return Status::OK;
@@ -138,18 +152,10 @@ Status ExampleService::Step(ServerContext* /* unused*/, const StepRequest* reque
   return sess->Step(request, reply);
 }
 
-Status ExampleService::GetBenchmarks(grpc::ServerContext* /*unused*/,
-                                     const GetBenchmarksRequest* /*unused*/,
-                                     GetBenchmarksReply* reply) {
-  const auto benchmarks = getBenchmarks();
-  *reply->mutable_benchmark() = {benchmarks.begin(), benchmarks.end()};
-  return Status::OK;
-}
-
 Status ExampleService::session(uint64_t id, ExampleCompilationSession** sess) {
   auto it = sessions_.find(id);
   if (it == sessions_.end()) {
-    return Status(StatusCode::INVALID_ARGUMENT, "Session ID not found");
+    return Status(StatusCode::NOT_FOUND, fmt::format("Session not found: {}", id));
   }
   *sess = it->second.get();
   return Status::OK;
@@ -170,8 +176,7 @@ Status ExampleCompilationSession::Step(const StepRequest* request, StepReply* re
   for (int i = 0; i < request->observation_space_size(); ++i) {
     RETURN_IF_ERROR(rangeCheck(request->observation_space(i), 0,
                                static_cast<int32_t>(getObservationSpaces().size()) - 1));
-    auto observation = reply->add_observation();
-    RETURN_IF_ERROR(getObservation(request->observation_space(i), observation));
+    RETURN_IF_ERROR(getObservation(request->observation_space(i), reply->add_observation()));
   }
 
   return Status::OK;

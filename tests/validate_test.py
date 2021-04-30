@@ -14,7 +14,7 @@ from tests.test_main import main
 @pytest.mark.parametrize("nproc", (1, 2))
 def test_validate_states_lambda_callback(inorder, nproc):
     state = CompilerEnvState(
-        benchmark="benchmark://cBench-v1/crc32",
+        benchmark="benchmark://cbench-v1/crc32",
         walltime=1,
         commandline="opt  input.bc -o output.bc",
     )
@@ -22,7 +22,6 @@ def test_validate_states_lambda_callback(inorder, nproc):
         validate_states(
             make_env=lambda: gym.make("llvm-v0"),
             states=[state],
-            datasets=["cBench-v1"],
             inorder=inorder,
             nproc=nproc,
         )

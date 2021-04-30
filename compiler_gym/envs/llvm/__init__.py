@@ -5,7 +5,7 @@
 """Register the LLVM environments."""
 from itertools import product
 
-from compiler_gym.envs.llvm.benchmarks import (
+from compiler_gym.envs.llvm.llvm_benchmark import (
     ClangInvocation,
     get_system_includes,
     make_benchmark,

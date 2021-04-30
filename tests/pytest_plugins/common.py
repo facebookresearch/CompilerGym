@@ -7,8 +7,14 @@ import os
 import sys
 import tempfile
 from pathlib import Path
+from typing import List
 
 import pytest
+from absl import flags as absl_flags
+
+from compiler_gym.util.runfiles_path import transient_cache_path
+
+FLAGS = absl_flags.FLAGS
 
 # Decorator to skip a test in the CI environment.
 skip_on_ci = pytest.mark.skipif(os.environ.get("CI", "") != "", reason="Skip on CI")
@@ -31,8 +37,10 @@ bazel_only = pytest.mark.skipif(
 
 @pytest.fixture(scope="function")
 def tmpwd() -> Path:
-    """A fixture that creates a tempory directory, changes to it, and yields the path."""
-    with tempfile.TemporaryDirectory(prefix="compiler_gym-test-") as d:
+    """A fixture that creates a temporary directory, changes to it, and yields the path."""
+    tmpdir_root = transient_cache_path("tests")
+    tmpdir_root.mkdir(exist_ok=True, parents=True)
+    with tempfile.TemporaryDirectory(dir=tmpdir_root, prefix="tmpwd-") as d:
         pwd = os.getcwd()
         try:
             os.chdir(d)
@@ -46,7 +54,14 @@ def temporary_environ():
     """A fixture that allows you to modify os.environ without affecting other tests."""
     old_env = os.environ.copy()
     try:
-        yield
+        yield os.environ
     finally:
         os.environ.clear()
         os.environ.update(old_env)
+
+
+def set_command_line_flags(flags: List[str]):
+    """Set the command line flags."""
+    sys.argv = flags
+    FLAGS.unparse_flags()
+    FLAGS(flags)

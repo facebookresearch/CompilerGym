@@ -7,14 +7,13 @@
 import tempfile
 from pathlib import Path
 
-from absl import flags
-
 from examples.sensitivity_analysis.action_sensitivity_analysis import (
     run_action_sensitivity_analysis,
 )
 from examples.sensitivity_analysis.sensitivity_analysis_eval import (
     run_sensitivity_analysis_eval,
 )
+from tests.pytest_plugins.common import set_command_line_flags
 from tests.test_main import main
 
 
@@ -22,10 +21,9 @@ def test_run_action_sensitivity_analysis():
     actions = [0, 1]
     env = "llvm-v0"
     reward = "IrInstructionCountO3"
-    benchmark = "cBench-v1/crc32"
+    benchmark = "cbench-v1/crc32"
 
-    flags.FLAGS.unparse_flags()
-    flags.FLAGS(["argv0", f"--env={env}", f"--benchmark={benchmark}"])
+    set_command_line_flags(["argv0", f"--env={env}", f"--benchmark={benchmark}"])
 
     with tempfile.TemporaryDirectory() as tmp:
         tmp = Path(tmp)

@@ -27,7 +27,7 @@ from compiler_gym.util import thread_pool
 from compiler_gym.util.download import download
 from compiler_gym.util.runfiles_path import cache_path, site_data_path
 from compiler_gym.util.timer import Timer
-from compiler_gym.validation_result import ValidationError
+from compiler_gym.validation_error import ValidationError
 
 _CBENCH_DATA_URL = (
     "https://dl.fbaipublicfiles.com/compiler_gym/cBench-v0-runtime-data.tar.bz2"
@@ -419,7 +419,7 @@ def _make_cBench_validator(
     def validator_cb(env: "LlvmEnv") -> Optional[ValidationError]:  # noqa: F821
         """The validation callback."""
         with _CBENCH_DOWNLOAD_THREAD_LOCK:
-            with fasteners.InterProcessLock(cache_path("cBench-v1-runtime-data.LOCK")):
+            with fasteners.InterProcessLock(cache_path(".cBench-v1-runtime-data.lock")):
                 download_cBench_runtime_data()
 
         cbench_data = site_data_path("llvm/cBench-v1-runtime-data/runtime_data")
@@ -643,10 +643,11 @@ def get_llvm_benchmark_validation_callback(
 
     If there is no valid callback, returns :code:`None`.
 
-    :param env: An :class:`LlvmEnv` instance.
-    :return: An optional callback that takes an :class:`LlvmEnv` instance as
-        argument and returns an optional string containing a validation error
-        message.
+    :param env: An :class:`LlvmEnv <compiler_gym.envs.LlvmEnv>` instance.
+
+    :return: An optional callback that takes an :class:`LlvmEnv
+        <compiler_gym.envs.LlvmEnv>` instance as argument and returns an
+        optional string containing a validation error message.
     """
     validators = VALIDATORS.get(env.benchmark)
 

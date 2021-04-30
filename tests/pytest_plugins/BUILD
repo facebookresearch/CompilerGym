@@ -14,11 +14,12 @@ py_library(
     srcs = ["llvm.py"],
     data = [
         "//compiler_gym/envs/llvm/service/passes:actions_genfiles",
-        "//compiler_gym/third_party/cBench:benchmarks_list",
+        "//compiler_gym/third_party/cbench:benchmarks_list",
     ],
     deps = [
-        "//compiler_gym",
+        "//compiler_gym/envs/llvm",
         "//compiler_gym/third_party/llvm",
+        "//compiler_gym/util",
     ],
 )
 
@@ -26,6 +27,9 @@ py_library(
     name = "common",
     testonly = 1,
     srcs = ["common.py"],
+    deps = [
+        "//compiler_gym/util",
+    ],
 )
 
 py_library(

@@ -27,6 +27,7 @@ Evaluate the LLVM codesize reward delta on all benchmarks:
 """
 import random
 from concurrent.futures import ThreadPoolExecutor
+from itertools import islice
 from multiprocessing import cpu_count
 from pathlib import Path
 from typing import List, Optional, Union
@@ -173,7 +174,7 @@ def main(argv):
         benchmarks = [benchmark]
     else:
         with env_session_from_flags() as env:
-            benchmarks = env.benchmarks
+            benchmarks = islice(env.benchmarks, 100)
 
     logs_dir = Path(
         FLAGS.output_dir or create_logging_dir("benchmark_sensitivity_analysis")

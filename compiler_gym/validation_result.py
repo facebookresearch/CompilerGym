@@ -6,49 +6,17 @@
 import itertools
 import re
 from collections import Counter
-from typing import Any, Dict, Iterable, List, NamedTuple
+from typing import Iterable, List
+
+from pydantic import BaseModel, validator
 
 from compiler_gym.compiler_env_state import CompilerEnvState
 from compiler_gym.util.shell_format import plural
 from compiler_gym.util.truncate import truncate
+from compiler_gym.validation_error import ValidationError
 
 
-class ValidationError(NamedTuple):
-    """A ValidationError describes an error encountered in a call to
-    :meth:`env.validate() <compiler_gym.envs.CompilerEnv.validate>`.
-    """
-
-    type: str
-    """A short name describing the type of error that occured. E.g.
-    :code:`"Runtime crash"`.
-    """
-
-    data: Dict[str, Any] = {}
-    """A JSON-serialized dictionary of data that further describes the error.
-    This data dictionary can contain any information that may be relevant for
-    diagnosing the underlying issue, such as a stack trace or an error line
-    number. There is no specified schema for this data, validators are free to
-    return whatever data they like. Setting this field is optional.
-    """
-
-    def json(self):
-        """Get the error as a JSON-serializable dictionary.
-
-        :return: A JSON dict.
-        """
-        return self._asdict()  # pylint: disable=no-member
-
-    @classmethod
-    def from_json(cls, data) -> "ValidationResult":
-        """Create a validation error from JSON data.
-
-        :param data: A JSON dict.
-        :return: A validation error.
-        """
-        return cls(**data)
-
-
-class ValidationResult(NamedTuple):
+class ValidationResult(BaseModel):
     """A tuple that represents the result of validating a compiler environment state."""
 
     state: CompilerEnvState
@@ -73,7 +41,12 @@ class ValidationResult(NamedTuple):
     """Whether the semantics of the benchmark were found to have changed."""
 
     errors: List[ValidationError] = []
-    """A list of :class:`ValidationError` """
+    """A list of :class:`ValidationError <compiler_gym.ValidationError>` """
+
+    @validator("walltime")
+    def walltime_nonnegative(cls, v):
+        assert v >= 0, "Walltime cannot be negative"
+        return v
 
     def __eq__(self, rhs):
         """Equality comparison.
@@ -151,26 +124,8 @@ class ValidationResult(NamedTuple):
         else:
             return f"✅  {benchmark}  {self.state.reward:.4f}"
 
-    def json(self):
-        """Get the state as a JSON-serializable dictionary.
-
-        :return: A JSON dict.
-        """
-        data = self._asdict()  # pylint: disable=no-member
-        data["errors"] = [e.json() for e in self.errors]
-        data["state"] = self.state.json()
-        return data
-
-    @classmethod
-    def from_json(cls, data) -> "ValidationResult":
-        """Create a validation result from JSON data.
-
-        :param data: A JSON dict.
-        :return: A validation result instance.
-        """
-        data["state"] = CompilerEnvState.from_json(data["state"])
-        data["errors"] = [ValidationError.from_json(e) for e in data["errors"]]
-        return cls(**data)
+    def __str__(self):
+        return repr(self)
 
     @classmethod
     def join(cls, results: Iterable["ValidationResult"]):

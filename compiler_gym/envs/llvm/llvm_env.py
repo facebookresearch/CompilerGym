@@ -7,18 +7,16 @@ import hashlib
 import os
 import shutil
 from pathlib import Path
-from typing import Callable, Iterable, List, Optional, Union, cast
+from typing import Iterable, List, Optional, Union, cast
 
 import numpy as np
 from gym.spaces import Box
 from gym.spaces import Dict as DictSpace
 
+from compiler_gym.datasets import Benchmark, BenchmarkInitError, Dataset
 from compiler_gym.envs.compiler_env import CompilerEnv
-from compiler_gym.envs.llvm.benchmarks import make_benchmark
-from compiler_gym.envs.llvm.legacy_datasets import (
-    LLVM_DATASETS,
-    get_llvm_benchmark_validation_callback,
-)
+from compiler_gym.envs.llvm.datasets import get_llvm_datasets
+from compiler_gym.envs.llvm.llvm_benchmark import ClangInvocation, make_benchmark
 from compiler_gym.envs.llvm.llvm_rewards import (
     BaselineImprovementNormalizedReward,
     CostFunctionReward,
@@ -29,8 +27,7 @@ from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_NAMES
 from compiler_gym.third_party.inst2vec import Inst2vecEncoder
 from compiler_gym.third_party.llvm import download_llvm_files
 from compiler_gym.third_party.llvm.instcount import INST_COUNT_FEATURE_NAMES
-from compiler_gym.util.runfiles_path import runfiles_path, site_data_path
-from compiler_gym.validation_result import ValidationError
+from compiler_gym.util.runfiles_path import runfiles_path
 
 _ACTIONS_LIST = Path(
     runfiles_path("compiler_gym/envs/llvm/service/passes/actions_list.txt")
@@ -58,35 +55,58 @@ _ACTIONS = list(_read_list_file(_ACTIONS_LIST))
 _FLAGS = dict(zip(_ACTIONS, _read_list_file(_FLAGS_LIST)))
 _DESCRIPTIONS = dict(zip(_ACTIONS, _read_list_file(_DESCRIPTIONS_LIST)))
 
-# TODO(github.com/facebookresearch/CompilerGym/issues/122): Lazily instantiate
-# inst2vec encoder.
 _INST2VEC_ENCODER = Inst2vecEncoder()
+
+
+_LLVM_DATASETS: Optional[List[Dataset]] = None
+
+
+def _get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset]:
+    """Get the LLVM datasets. Use a singleton value when site_data_base is the
+    default value.
+    """
+    global _LLVM_DATASETS
+    if site_data_base is None:
+        if _LLVM_DATASETS is None:
+            _LLVM_DATASETS = list(get_llvm_datasets(site_data_base=site_data_base))
+        return _LLVM_DATASETS
+    return get_llvm_datasets(site_data_base=site_data_base)
 
 
 class LlvmEnv(CompilerEnv):
     """A specialized CompilerEnv for LLVM.
 
-    This extends the default :class:`CompilerEnv` environment, adding extra LLVM
-    functionality. Specifically, the actions use the
-    :class:`CommandlineFlag <compiler_gym.spaces.CommandlineFlag>` space, which
-    is a type of :code:`Discrete` space that provides additional documentation
-    about each action, and the
-    :meth:`LlvmEnv.commandline() <compiler_gym.envs.LlvmEnv.commandline>` method
-    can be used to produce an equivalent LLVM opt invocation for the current
-    environment state.
+    This extends the default :class:`CompilerEnv
+    <compiler_gym.envs.CompilerEnv>` environment, adding extra LLVM
+    functionality. Specifically, the actions use the :class:`CommandlineFlag
+    <compiler_gym.spaces.CommandlineFlag>` space, which is a type of
+    :code:`Discrete` space that provides additional documentation about each
+    action, and the :meth:`LlvmEnv.commandline()
+    <compiler_gym.envs.LlvmEnv.commandline>` method can be used to produce an
+    equivalent LLVM opt invocation for the current environment state.
 
     :ivar actions: The list of actions that have been performed since the
         previous call to :func:`reset`.
+
     :vartype actions: List[int]
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(
+        self,
+        *args,
+        benchmark: Optional[Union[str, Benchmark]] = None,
+        datasets_site_path: Optional[Path] = None,
+        **kwargs,
+    ):
         # First perform a one-time download of LLVM binaries that are needed by
         # the LLVM service and are not included by the pip-installed package.
         download_llvm_files()
         super().__init__(
             *args,
             **kwargs,
+            # Set a default benchmark for use.
+            benchmark=benchmark or "cbench-v1/qsort",
+            datasets=_get_llvm_datasets(site_data_base=datasets_site_path),
             rewards=[
                 CostFunctionReward(
                     id="IrInstructionCount",
@@ -164,13 +184,6 @@ class LlvmEnv(CompilerEnv):
                 ),
             ],
         )
-        self.datasets_site_path = site_data_path("llvm/10.0.0/bitcode_benchmarks")
-
-        # Register the LLVM datasets.
-        self.datasets_site_path.mkdir(parents=True, exist_ok=True)
-        self.inactive_datasets_site_path.mkdir(parents=True, exist_ok=True)
-        for dataset in LLVM_DATASETS:
-            self.register_dataset(dataset)
 
         self.inst2vec = _INST2VEC_ENCODER
 
@@ -279,27 +292,112 @@ class LlvmEnv(CompilerEnv):
         )
 
     def reset(self, *args, **kwargs):
-        # The BenchmarkFactory::getBenchmark() method raises an error if there
-        # are no benchmarks to select from. Install the cBench dataset as a
-        # fallback.
-        #
-        # TODO(github.com/facebookresearch/CompilerGym/issues/45): Remove this
-        # once the dataset API has been refactored so that service-side datasets
-        # are no longer an issue.
         try:
             return super().reset(*args, **kwargs)
-        except FileNotFoundError:
-            self.logger.warning(
-                "reset() called on servie with no benchmarks available. "
-                "Installing cBench-v1"
-            )
-            self.require_dataset("cBench-v1")
-            super().reset(*args, **kwargs)
+        except ValueError as e:
+            # Catch and re-raise a compilation error with a more informative
+            # error type.
+            if "Failed to compute .text size cost" in str(e):
+                raise BenchmarkInitError(
+                    f"Failed to initialize benchmark {self._benchmark_in_use.uri}: {e}"
+                ) from e
+            raise
 
-    @staticmethod
-    def make_benchmark(*args, **kwargs):
-        """Alias to :func:`llvm.make_benchmark() <compiler_gym.envs.llvm.make_benchmark>`."""
-        return make_benchmark(*args, **kwargs)
+    def make_benchmark(
+        self,
+        inputs: Union[
+            str, Path, ClangInvocation, List[Union[str, Path, ClangInvocation]]
+        ],
+        copt: Optional[List[str]] = None,
+        system_includes: bool = True,
+        timeout: int = 600,
+    ) -> Benchmark:
+        """Create a benchmark for use with this environment.
+
+        This function takes one or more inputs and uses them to create a
+        benchmark that can be passed to :meth:`compiler_gym.envs.LlvmEnv.reset`.
+
+        For single-source C/C++ programs, you can pass the path of the source
+        file:
+
+            >>> benchmark = make_benchmark('my_app.c')
+            >>> env = gym.make("llvm-v0")
+            >>> env.reset(benchmark=benchmark)
+
+        The clang invocation used is roughly equivalent to:
+
+        .. code-block::
+
+            $ clang my_app.c -O0 -c -emit-llvm -o benchmark.bc
+
+        Additional compile-time arguments to clang can be provided using the
+        :code:`copt` argument:
+
+            >>> benchmark = make_benchmark('/path/to/my_app.cpp', copt=['-O2'])
+
+        If you need more fine-grained control over the options, you can directly
+        construct a :class:`ClangInvocation
+        <compiler_gym.envs.llvm.ClangInvocation>` to pass a list of arguments to
+        clang:
+
+            >>> benchmark = make_benchmark(
+                ClangInvocation(['/path/to/my_app.c'], timeout=10)
+            )
+
+        For multi-file programs, pass a list of inputs that will be compiled
+        separately and then linked to a single module:
+
+            >>> benchmark = make_benchmark([
+                'main.c',
+                'lib.cpp',
+                'lib2.bc',
+            ])
+
+        If you already have prepared bitcode files, those can be linked and used
+        directly:
+
+            >>> benchmark = make_benchmark([
+                'bitcode1.bc',
+                'bitcode2.bc',
+            ])
+
+        .. note::
+
+            LLVM bitcode compatibility is
+            `not guaranteed <https://llvm.org/docs/DeveloperPolicy.html#ir-backwards-compatibility>`_,
+            so you must ensure that any precompiled bitcodes are compatible with the
+            LLVM version used by CompilerGym, which can be queried using
+            :func:`LlvmEnv.compiler_version <compiler_gym.envs.CompilerEnv.compiler_version>`.
+
+        :param inputs: An input, or list of inputs.
+
+        :param copt: A list of command line options to pass to clang when
+            compiling source files.
+
+        :param system_includes: Whether to include the system standard libraries
+            during compilation jobs. This requires a system toolchain. See
+            :func:`get_system_includes`.
+
+        :param timeout: The maximum number of seconds to allow clang to run
+            before terminating.
+
+        :return: A :code:`Benchmark` instance.
+
+        :raises FileNotFoundError: If any input sources are not found.
+
+        :raises TypeError: If the inputs are of unsupported types.
+
+        :raises OSError: If a compilation job fails.
+
+        :raises TimeoutExpired: If a compilation job exceeds :code:`timeout`
+            seconds.
+        """
+        return make_benchmark(
+            inputs=inputs,
+            copt=copt,
+            system_includes=system_includes,
+            timeout=timeout,
+        )
 
     def _make_action_space(self, name: str, entries: List[str]) -> Commandline:
         flags = [
@@ -361,7 +459,7 @@ class LlvmEnv(CompilerEnv):
 
         Equivalent to: :code:`hashlib.sha1(env.ir.encode("utf-8")).hexdigest()`.
 
-        :return: A 40-character hexademical sha1 string.
+        :return: A 40-character hexadecimal sha1 string.
         """
         # TODO(cummins): Compute this on the service-side and add it as an
         # observation space.
@@ -400,17 +498,3 @@ class LlvmEnv(CompilerEnv):
             print(self.ir)
         else:
             return super().render(mode)
-
-    def get_benchmark_validation_callback(
-        self,
-    ) -> Optional[Callable[[CompilerEnv], Iterable[ValidationError]]]:
-        """Return a callback for validating a given environment state.
-
-        If there is no valid callback, returns :code:`None`.
-
-        :param env: An :class:`LlvmEnv` instance.
-        :return: An optional callback that takes an :class:`LlvmEnv` instance as
-            argument and returns an optional string containing a validation error
-            message.
-        """
-        return get_llvm_benchmark_validation_callback(self)

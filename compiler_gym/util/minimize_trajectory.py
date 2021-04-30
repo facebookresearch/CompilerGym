@@ -15,7 +15,6 @@ import random
 from math import ceil, log
 from typing import Callable, Iterable
 
-from compiler_gym.envs import CompilerEnv
 from compiler_gym.util.truncate import truncate
 
 
@@ -25,10 +24,10 @@ class MinimizationError(OSError):
 
 # A hypothesis is a callback that accepts as input an enivornment in a given
 # state returns true if a particular hypothesis holds, else false.
-Hypothesis = Callable[[CompilerEnv], bool]
+Hypothesis = Callable[["CompilerEnv"], bool]  # noqa: F821
 
 
-def environment_validation_fails(env: CompilerEnv) -> bool:
+def environment_validation_fails(env: "CompilerEnv") -> bool:  # noqa: F821
     """A hypothesis that holds true if environment validation fails."""
     validation_result = env.validate()
     logging.debug(truncate(str(validation_result), max_lines=1, max_line_len=120))
@@ -52,11 +51,11 @@ def _apply_and_test(env, actions, hypothesis, flakiness) -> bool:
 
 
 def bisect_trajectory(
-    env: CompilerEnv,
+    env: "CompilerEnv",  # noqa: F821
     hypothesis: Hypothesis = environment_validation_fails,
     reverse: bool = False,
     flakiness: int = 1,
-) -> Iterable[CompilerEnv]:
+) -> Iterable["CompilerEnv"]:  # noqa: F821
     """Run a binary search to remove the suffix or prefix of a trjectory.
 
     Requires worst-case O(log n) evaluation rounds, where n is the length of the
@@ -152,14 +151,14 @@ def bisect_trajectory(
 
 
 def random_minimization(
-    env: CompilerEnv,
+    env: "CompilerEnv",  # noqa: F821
     hypothesis: Hypothesis = environment_validation_fails,
     num_steps_ratio_multiplier: float = 5,
     init_discard_ratio: float = 0.75,
     discard_ratio_decay: float = 0.75,
     min_trajectory_len: int = 5,
     flakiness: int = 1,
-) -> Iterable[CompilerEnv]:
+) -> Iterable["CompilerEnv"]:  # noqa: F821
     """Run an iterative process of randomly removing actions to minimize a
     trajectory.
 
@@ -245,10 +244,10 @@ def random_minimization(
 
 
 def minimize_trajectory_iteratively(
-    env: CompilerEnv,
+    env: "CompilerEnv",  # noqa: F821
     hypothesis: Hypothesis = environment_validation_fails,
     flakiness: int = 1,
-) -> Iterable[CompilerEnv]:
+) -> Iterable["CompilerEnv"]:  # noqa: F821
     """Minimize a trajectory by remove actions, one at a time, until a minimal
     trajectory is reached.
 

@@ -29,7 +29,11 @@ except ModuleNotFoundError as e:
         "compiler_gym` will work."
     ) from e
 
-from compiler_gym.compiler_env_state import CompilerEnvState
+from compiler_gym.compiler_env_state import (
+    CompilerEnvState,
+    CompilerEnvStateReader,
+    CompilerEnvStateWriter,
+)
 from compiler_gym.envs import COMPILER_GYM_ENVS, CompilerEnv, observation_t, step_t
 from compiler_gym.random_search import random_search
 from compiler_gym.util.debug_util import (
@@ -44,7 +48,8 @@ from compiler_gym.util.runfiles_path import (
     transient_cache_path,
 )
 from compiler_gym.validate import validate_states
-from compiler_gym.validation_result import ValidationError, ValidationResult
+from compiler_gym.validation_error import ValidationError
+from compiler_gym.validation_result import ValidationResult
 
 # The top-level compiler_gym API.
 __all__ = [
@@ -53,6 +58,8 @@ __all__ = [
     "COMPILER_GYM_ENVS",
     "CompilerEnv",
     "CompilerEnvState",
+    "CompilerEnvStateWriter",
+    "CompilerEnvStateReader",
     "download",
     "get_debug_level",
     "get_logging_level",

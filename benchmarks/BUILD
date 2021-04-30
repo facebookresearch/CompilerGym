@@ -10,6 +10,7 @@ py_test(
     shard_count = 8,
     deps = [
         "//compiler_gym",
+        "//examples/example_compiler_gym_service",
         "//tests:test_main",
         "//tests/pytest_plugins:llvm",
     ],
@@ -27,7 +28,9 @@ py_binary(
 
 py_test(
     name = "parallelization_load_test_test",
+    timeout = "moderate",
     srcs = ["parallelization_load_test_test.py"],
+    flaky = 1,
     deps = [
         ":parallelization_load_test",
         "//tests:test_main",

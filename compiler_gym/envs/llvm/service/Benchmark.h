@@ -28,7 +28,8 @@ using Bitcode = llvm::SmallString<0>;
 
 grpc::Status readBitcodeFile(const boost::filesystem::path& path, Bitcode* bitcode);
 
-// Returns nullptr on error and sets status.
+// Parses the given bitcode into a module and strips the identifying ModuleID
+// and source_filename attributes. Returns nullptr on error and sets status.
 std::unique_ptr<llvm::Module> makeModule(llvm::LLVMContext& context, const Bitcode& bitcode,
                                          const std::string& name, grpc::Status* status);
 
@@ -37,22 +38,16 @@ std::unique_ptr<llvm::Module> makeModule(llvm::LLVMContext& context, const Bitco
 class Benchmark {
  public:
   Benchmark(const std::string& name, const Bitcode& bitcode,
-            const boost::filesystem::path& workingDirectory,
-            std::optional<boost::filesystem::path> bitcodePath = std::nullopt,
-            const BaselineCosts* baselineCosts = nullptr);
+            const boost::filesystem::path& workingDirectory, const BaselineCosts& baselineCosts);
 
   Benchmark(const std::string& name, std::unique_ptr<llvm::LLVMContext> context,
             std::unique_ptr<llvm::Module> module, size_t bitcodeSize,
-            const boost::filesystem::path& workingDirectory,
-            std::optional<boost::filesystem::path> bitcodePath = std::nullopt,
-            const BaselineCosts* baselineCosts = nullptr);
+            const boost::filesystem::path& workingDirectory, const BaselineCosts& baselineCosts);
 
   // Make a copy of the benchmark.
   std::unique_ptr<Benchmark> clone(const boost::filesystem::path& workingDirectory) const;
 
   inline const std::string& name() const { return name_; }
-
-  inline const std::optional<boost::filesystem::path> bitcodePath() const { return bitcodePath_; }
 
   inline const size_t bitcodeSize() const { return bitcodeSize_; }
 
@@ -90,9 +85,6 @@ class Benchmark {
   const std::string name_;
   // The length of the bitcode string for this benchmark.
   const size_t bitcodeSize_;
-  // The path of the bitcode file for this benchmark. This is optional -
-  // benchmarks do not have to be backed by a file.
-  const std::optional<boost::filesystem::path> bitcodePath_;
 };
 
 }  // namespace compiler_gym::llvm_service

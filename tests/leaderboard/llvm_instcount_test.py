@@ -9,6 +9,7 @@ import pytest
 from absl import flags
 
 from compiler_gym.leaderboard.llvm_instcount import eval_llvm_instcount_policy
+from tests.pytest_plugins.common import set_command_line_flags
 from tests.test_main import main
 
 FLAGS = flags.FLAGS
@@ -22,24 +23,21 @@ def null_policy(env) -> None:
 
 
 def test_eval_llvm_instcount_policy():
-    FLAGS.unparse_flags()
-    FLAGS(["argv0", "--n=1", "--max_benchmarks=1", "--novalidate"])
+    set_command_line_flags(["argv0", "--n=1", "--max_benchmarks=1", "--novalidate"])
     with pytest.raises(SystemExit):
         eval_llvm_instcount_policy(null_policy)
 
 
 def test_eval_llvm_instcount_policy_resume(tmpwd):
-    FLAGS.unparse_flags()
-
     # Run eval on a single benchmark.
-    FLAGS(
+    set_command_line_flags(
         [
             "argv0",
             "--n=1",
             "--max_benchmarks=1",
             "--novalidate",
             "--resume",
-            "--results_logfile=test.csv",
+            "--leaderboard_results=test.csv",
         ]
     )
     with pytest.raises(SystemExit):
@@ -53,14 +51,14 @@ def test_eval_llvm_instcount_policy_resume(tmpwd):
     init_logfile = log
 
     # Repeat, but for two benchmarks.
-    FLAGS(
+    set_command_line_flags(
         [
             "argv0",
             "--n=1",
             "--max_benchmarks=2",
             "--novalidate",
             "--resume",
-            "--results_logfile=test.csv",
+            "--leaderboard_results=test.csv",
         ]
     )
     with pytest.raises(SystemExit):
@@ -75,14 +73,14 @@ def test_eval_llvm_instcount_policy_resume(tmpwd):
     init_logfile = log
 
     # Repeat, but for two runs of each benchmark.
-    FLAGS(
+    set_command_line_flags(
         [
             "argv0",
             "--n=2",
             "--max_benchmarks=2",
             "--novalidate",
             "--resume",
-            "--results_logfile=test.csv",
+            "--leaderboard_results=test.csv",
         ]
     )
     with pytest.raises(SystemExit):
@@ -97,8 +95,7 @@ def test_eval_llvm_instcount_policy_resume(tmpwd):
 
 
 def test_eval_llvm_instcount_policy_invalid_flag():
-    FLAGS.unparse_flags()
-    FLAGS(["argv0", "--n=-1"])
+    set_command_line_flags(["argv0", "--n=-1"])
     with pytest.raises(AssertionError):
         eval_llvm_instcount_policy(null_policy)
 

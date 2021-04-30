@@ -14,7 +14,7 @@ import sys
 from pathlib import Path
 from typing import List
 
-from compiler_gym.envs.llvm.benchmarks import make_benchmark
+from compiler_gym.envs.llvm.llvm_benchmark import make_benchmark
 
 
 def make_cbench_llvm_module(
@@ -32,7 +32,7 @@ def make_cbench_llvm_module(
     benchmark = make_benchmark(inputs=src_files, copt=cflags or [])
     # Write just the bitcode to file.
     with open(output_path, "wb") as f:
-        f.write(benchmark.program.contents)
+        f.write(benchmark.proto.program.contents)
 
 
 def main():

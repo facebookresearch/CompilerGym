@@ -7,20 +7,20 @@ from absl import flags
 
 from compiler_gym.util.capture_output import capture_output
 from examples.tabular_q import main
+from tests.pytest_plugins.common import set_command_line_flags
 from tests.test_main import main as _test_main
 
 FLAGS = flags.FLAGS
 
 
 def test_run_tabular_q_smoke_test():
-    FLAGS.unparse_flags()
-    FLAGS(
+    set_command_line_flags(
         [
             "argv0",
             "--episode_length=5",
             "--episodes=10",
             "--log_every=2",
-            "--benchmark=cBench-v1/crc32",
+            "--benchmark=cbench-v1/crc32",
         ]
     )
     with capture_output() as out:

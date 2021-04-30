@@ -2,6 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+load("@rules_python//python:defs.bzl", "py_library")
 
 py_library(
     name = "llvm",
@@ -47,21 +48,27 @@ cc_binary(
 # genrule(
 #     name = "llvm_data_tar",
 #     srcs = [":llvm_data"],
-#     outs = ["llvm.tar.bz2"],
+#     outs = ["llvm-v0.tar.bz2"],
 #     cmd = "mkdir -p $(@D)/lib && tar cjfh $@ -C $(@D) LICENSE bin lib",
 # )
 #
 # filegroup(
 #     name = "llvm_data",
 #     srcs = [
-#         "LICENSE",
 #         "bin/clang",
+#         "bin/llc",
 #         "bin/lli",
+#         "bin/llvm-as",
+#         "bin/llvm-bcanalyzer",
+#         "bin/llvm-config",
 #         "bin/llvm-diff",
+#         "bin/llvm-dis",
 #         "bin/llvm-link",
+#         "bin/llvm-mca",
 #         "bin/llvm-size",
 #         "bin/llvm-stress",
 #         "bin/opt",
+#         "LICENSE",
 #     ] + select({
 #         "@llvm//:darwin": [],
 #         "//conditions:default": [
@@ -105,6 +112,90 @@ cc_binary(
 #         ],
 #     }),
 #     outs = ["bin/lli"],
+#     cmd = "mkdir -p $$(dirname $@) && cp $< $@",
+# )
+
+# genrule(
+#     name = "make_llc",
+#     srcs = select({
+#         "@llvm//:darwin": [
+#             "@clang-llvm-10.0.0-x86_64-apple-darwin//:llc",
+#         ],
+#         "//conditions:default": [
+#             "@clang-llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04//:llc",
+#         ],
+#     }),
+#     outs = ["bin/llc"],
+#     cmd = "mkdir -p $$(dirname $@) && cp $< $@",
+# )
+#
+# genrule(
+#     name = "make_llvm-as",
+#     srcs = select({
+#         "@llvm//:darwin": [
+#             "@clang-llvm-10.0.0-x86_64-apple-darwin//:llvm-as",
+#         ],
+#         "//conditions:default": [
+#             "@clang-llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04//:llvm-as",
+#         ],
+#     }),
+#     outs = ["bin/llvm-as"],
+#     cmd = "mkdir -p $$(dirname $@) && cp $< $@",
+# )
+#
+# genrule(
+#     name = "make_llvm-mca",
+#     srcs = select({
+#         "@llvm//:darwin": [
+#             "@clang-llvm-10.0.0-x86_64-apple-darwin//:llvm-mca",
+#         ],
+#         "//conditions:default": [
+#             "@clang-llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04//:llvm-mca",
+#         ],
+#     }),
+#     outs = ["bin/llvm-mca"],
+#     cmd = "mkdir -p $$(dirname $@) && cp $< $@",
+# )
+#
+# genrule(
+#     name = "make_llvm-bcanalyzer",
+#     srcs = select({
+#         "@llvm//:darwin": [
+#             "@clang-llvm-10.0.0-x86_64-apple-darwin//:llvm-bcanalyzer",
+#         ],
+#         "//conditions:default": [
+#             "@clang-llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04//:llvm-bcanalyzer",
+#         ],
+#     }),
+#     outs = ["bin/llvm-bcanalyzer"],
+#     cmd = "mkdir -p $$(dirname $@) && cp $< $@",
+# )
+
+# genrule(
+#     name = "make_llvm-config",
+#     srcs = select({
+#         "@llvm//:darwin": [
+#             "@clang-llvm-10.0.0-x86_64-apple-darwin//:llvm-config",
+#         ],
+#         "//conditions:default": [
+#             "@clang-llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04//:llvm-config",
+#         ],
+#     }),
+#     outs = ["bin/llvm-config"],
+#     cmd = "mkdir -p $$(dirname $@) && cp $< $@",
+# )
+#
+# genrule(
+#     name = "make_llvm-dis",
+#     srcs = select({
+#         "@llvm//:darwin": [
+#             "@clang-llvm-10.0.0-x86_64-apple-darwin//:llvm-dis",
+#         ],
+#         "//conditions:default": [
+#             "@clang-llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04//:llvm-dis",
+#         ],
+#     }),
+#     outs = ["bin/llvm-dis"],
 #     cmd = "mkdir -p $$(dirname $@) && cp $< $@",
 # )
 #

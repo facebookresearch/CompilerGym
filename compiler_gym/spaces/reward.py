@@ -98,7 +98,10 @@ class Reward(Scalar):
         pass
 
     def update(
-        self, action: int, observations: List[observation_t], observation_view
+        self,
+        action: int,
+        observations: List[observation_t],
+        observation_view: "compiler_gym.views.ObservationView",  # noqa: F821
     ) -> float:
         """Calculate a reward for the given action.
 
@@ -133,3 +136,32 @@ class Reward(Scalar):
 
     def __repr__(self):
         return self.id
+
+
+class DefaultRewardFromObservation(Reward):
+    def __init__(self, observation_name: str, **kwargs):
+        super().__init__(
+            observation_spaces=[observation_name], id=observation_name, **kwargs
+        )
+        self.previous_value: Optional[observation_t] = None
+
+    def reset(self, benchmark: str) -> None:
+        """Called on env.reset(). Reset incremental progress."""
+        del benchmark  # unused
+        self.previous_value = None
+
+    def update(
+        self,
+        action: int,
+        observations: List[observation_t],
+        observation_view: "compiler_gym.views.ObservationView",  # noqa: F821
+    ) -> float:
+        """Called on env.step(). Compute and return new reward."""
+        del action  # unused
+        del observation_view  # unused
+        value: float = observations[0]
+        if self.previous_value is None:
+            self.previous_value = 0
+        reward = float(value - self.previous_value)
+        self.previous_value = value
+        return reward

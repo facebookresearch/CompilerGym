@@ -11,31 +11,21 @@ py_library(
         ":specs.py",
     ],
     data = ["//compiler_gym/envs/llvm/service"],
-    visibility = ["//compiler_gym:__subpackages__"],
+    visibility = ["//visibility:public"],
     deps = [
-        ":benchmarks",
+        ":llvm_benchmark",
         ":llvm_env",
         "//compiler_gym/util",
     ],
 )
 
 py_library(
-    name = "benchmarks",
-    srcs = ["benchmarks.py"],
+    name = "llvm_benchmark",
+    srcs = ["llvm_benchmark.py"],
     visibility = ["//compiler_gym:__subpackages__"],
     deps = [
+        "//compiler_gym/datasets",
         "//compiler_gym/service/proto",
-        "//compiler_gym/third_party/llvm",
-        "//compiler_gym/util",
-    ],
-)
-
-py_library(
-    name = "legacy_datasets",
-    srcs = ["legacy_datasets.py"],
-    visibility = ["//tests:__subpackages__"],
-    deps = [
-        "//compiler_gym/datasets:dataset",
         "//compiler_gym/third_party/llvm",
         "//compiler_gym/util",
     ],
@@ -48,10 +38,11 @@ py_library(
         "//compiler_gym/envs/llvm/service/passes:actions_genfiles",
     ],
     deps = [
-        ":benchmarks",
-        ":legacy_datasets",
+        ":llvm_benchmark",
         ":llvm_rewards",
+        "//compiler_gym/datasets",
         "//compiler_gym/envs:compiler_env",
+        "//compiler_gym/envs/llvm/datasets",
         "//compiler_gym/spaces",
         "//compiler_gym/third_party/autophase",
         "//compiler_gym/third_party/inst2vec",

@@ -17,7 +17,7 @@ def test_step(env: CompilerEnv, action_name: str):
     """Run each action on a single benchmark."""
     env.reward_space = "IrInstructionCount"
     env.observation_space = "Autophase"
-    env.reset(benchmark="cBench-v1/crc32")
+    env.reset(benchmark="cbench-v1/crc32")
     observation, reward, done, _ = env.step(env.action_space.from_string(action_name))
 
     assert isinstance(observation, np.ndarray)

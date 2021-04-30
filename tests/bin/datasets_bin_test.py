@@ -4,36 +4,30 @@
 # LICENSE file in the root directory of this source tree.
 """End-to-end tests for //compiler_gym/bin:benchmarks."""
 import pytest
-from absl import flags
 
 from compiler_gym.bin.datasets import main
+from compiler_gym.util.capture_output import capture_output
+from tests.pytest_plugins.common import set_command_line_flags
 from tests.test_main import main as _test_main
-
-FLAGS = flags.FLAGS
 
 
 def run_main(*args):
-    FLAGS.unparse_flags()
-    FLAGS(["argv"] + list(args))
+    set_command_line_flags(["argv"] + list(args))
     return main(["argv0"])
 
 
-def test_llvm_download_url_404():
-    invalid_url = "https://facebook.com/not/a/valid/url"
-    with pytest.raises(OSError) as ctx:
-        run_main("--env=llvm-v0", "--download", invalid_url)
-    assert str(
-        ctx.value
-    ) == f"GET returned status code 404: {invalid_url}" or "Max retries exceeded with url" in str(
-        ctx.value
-    )
+def test_llvm_summary():
+    with capture_output() as out:
+        run_main("--env=llvm-v0")
+
+    assert "cbench-v1" in out.stdout
 
 
-def test_llvm_download_invalid_protocol():
-    invalid_url = "invalid://facebook.com"
-    with pytest.raises(OSError) as ctx:
-        run_main("--env=llvm-v0", "--download", invalid_url)
-    assert invalid_url in str(ctx.value)
+def test_datasets_is_deprecated():
+    with pytest.deprecated_call(
+        match="Command-line management of datasets is deprecated"
+    ):
+        run_main("--env=llvm-v0")
 
 
 if __name__ == "__main__":
