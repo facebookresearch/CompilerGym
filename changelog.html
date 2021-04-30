@@ -97,6 +97,7 @@
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#release-0-1-8-2021-04-30">Release 0.1.8 (2021-04-30)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#release-0-1-7-2021-04-01">Release 0.1.7 (2021-04-01)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#release-0-1-6-2021-03-22">Release 0.1.6 (2021-03-22)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#release-0-1-3-2021-02-25">Release 0.1.3 (2021-02-25)</a></li>
@@ -184,6 +185,105 @@
             
   <div class="section" id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="release-0-1-8-2021-04-30">
+<h2>Release 0.1.8 (2021-04-30)<a class="headerlink" href="#release-0-1-8-2021-04-30" title="Permalink to this headline">¶</a></h2>
+<p>This release introduces some significant changes to the way that
+benchmarks are managed, introducing a new dataset API. This enabled us
+to add support for millions of new benchmarks and a more efficient
+implementation for the LLVM environment, but this will require some
+migrating of old code to the new interfaces (see “Migration Checklist”
+below). Some of the key changes of this release are:</p>
+<ul class="simple">
+<li><p><strong>[Core API change]</strong> We have added a Python
+<a class="reference external" href="https://facebookresearch.github.io/CompilerGym/compiler_gym/datasets.html#compiler_gym.datasets.Benchmark">Benchmark</a>
+class
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/190">#190</a>).
+The <code class="docutils literal notranslate"><span class="pre">env.benchmark</span></code> attribute is now an instance of this class
+rather than a string
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/222">#222</a>).</p></li>
+<li><p><strong>[Core behavior change]</strong> Environments will no longer select
+benchmarks randomly. Now <code class="docutils literal notranslate"><span class="pre">env.reset()</span></code> will now always select the
+last-used benchmark, unless the <code class="docutils literal notranslate"><span class="pre">benchmark</span></code> argument is provided or
+<code class="docutils literal notranslate"><span class="pre">env.benchmark</span></code> has been set. If no benchmark is specified, a
+default is used.</p></li>
+<li><p><strong>[API deprecations]</strong> We have added a new
+<a class="reference external" href="https://facebookresearch.github.io/CompilerGym/compiler_gym/datasets.html#compiler_gym.datasets.Dataset">Dataset</a>
+class hierarchy
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/191">#191</a>,
+<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/192">#192</a>).
+All datasets are now available without needing to be downloaded
+first, and a new
+<a class="reference external" href="https://facebookresearch.github.io/CompilerGym/compiler_gym/datasets.html#compiler_gym.datasets.Datasets">Datasets</a>
+class can be used to iterate over them
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/200">#200</a>).
+We have deprecated the old dataset management operations, the
+<code class="docutils literal notranslate"><span class="pre">compiler_gym.bin.datasets</span></code> script, and removed the <code class="docutils literal notranslate"><span class="pre">--dataset</span></code>
+and <code class="docutils literal notranslate"><span class="pre">--ls_benchmark</span></code> flags from the command line tools.</p></li>
+<li><p><strong>[RPC interface change]</strong> The <code class="docutils literal notranslate"><span class="pre">StartSession</span></code> RPC endpoint now
+accepts a list of initial observations to compute. This removes the
+need for an immediate call to <code class="docutils literal notranslate"><span class="pre">Step</span></code>, reducing environment reset
+time by 15-21%
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/189">#189</a>).</p></li>
+<li><p>[LLVM] We have added several new datasets of benchmarks, including
+the Csmith and llvm-stress program generators
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/207">#207</a>),
+a dataset of OpenCL kernels
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/208">#208</a>),
+and a dataset of compilable C functions
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/210">#210</a>).
+See <a class="reference external" href="https://facebookresearch.github.io/CompilerGym/llvm/index.html#datasets">the
+docs</a>
+for an overview.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">CompilerEnv</span></code> now takes an optional <code class="docutils literal notranslate"><span class="pre">Logger</span></code> instance at
+construction time for fine-grained control over logging output
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/187">#187</a>).</p></li>
+<li><p>[LLVM] The ModuleID and source_filename of LLVM-IR modules are now
+anonymized to prevent unintentional overfitting to benchmarks by name
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/171">#171</a>).</p></li>
+<li><p>[docs] We have added a <a class="reference external" href="https://facebookresearch.github.io/CompilerGym/about.html#feature-stability">Feature
+Stability</a>
+section to the documentation
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/196">#196</a>).</p></li>
+<li><p>Numerous bug fixes and improvements.</p></li>
+</ul>
+<p>Please use this checklist when updating code for the previous
+CompilerGym release:</p>
+<ul class="simple">
+<li><p>Review code that accesses the <code class="docutils literal notranslate"><span class="pre">env.benchmark</span></code> property and update
+to <code class="docutils literal notranslate"><span class="pre">env.benchmark.uri</span></code> if a string name is required. Setting this
+attribute by string (<code class="docutils literal notranslate"><span class="pre">env.benchmark</span> <span class="pre">=</span> <span class="pre">&quot;benchmark://a-v0/b&quot;</span></code>) and
+comparison to string types
+(<code class="docutils literal notranslate"><span class="pre">env.benchmark</span> <span class="pre">==</span> <span class="pre">&quot;benchmark://a-v0/b&quot;</span></code>) still work.</p></li>
+<li><p>Review code that calls <code class="docutils literal notranslate"><span class="pre">env.reset()</span></code> without first setting a
+benchmark. Previously, calling <code class="docutils literal notranslate"><span class="pre">env.reset()</span></code> would select a random
+benchmark. Now, <code class="docutils literal notranslate"><span class="pre">env.reset()</span></code> always selects the last used
+benchmark, or a predetermined default if none is specified.</p></li>
+<li><p>Review code that relies on <code class="docutils literal notranslate"><span class="pre">env.benchmark</span></code> being <code class="docutils literal notranslate"><span class="pre">None</span></code> to select
+benchmarks randomly. Now, <code class="docutils literal notranslate"><span class="pre">env.benchmark</span></code> is always set to the
+previously used benchmark, or a predetermined default benchmark if
+none has been specified. Setting <code class="docutils literal notranslate"><span class="pre">env.benchmark</span> <span class="pre">=</span> <span class="pre">None</span></code> will raise
+an error. Select a benchmark randomly by sampling from the
+<code class="docutils literal notranslate"><span class="pre">env.datasets.benchmark_uris()</span></code> iterator.</p></li>
+<li><p>Remove calls to <code class="docutils literal notranslate"><span class="pre">env.require_dataset()</span></code> and related operations.
+These are no longer required.</p></li>
+<li><p>Remove accesses to <code class="docutils literal notranslate"><span class="pre">env.benchmarks</span></code>. An iterator over available
+benchmark URIs is now available at <code class="docutils literal notranslate"><span class="pre">env.datasets.benchmark_uris()</span></code>,
+but the list of URIs cannot be relied on to be fully enumerable (the
+LLVM environments have over 2^32 URIs).</p></li>
+<li><p>Review code that accesses <code class="docutils literal notranslate"><span class="pre">env.observation_space</span></code> and update to
+<code class="docutils literal notranslate"><span class="pre">env.observation_space_spec</span></code> where necessary
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/228">#228</a>).</p></li>
+<li><p>Update compiler service implementations to support the updated RPC
+interface by removing the deprecated <code class="docutils literal notranslate"><span class="pre">GetBenchmarks</span></code> RPC endpoint
+and replacing it with <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> classes. See the <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/tree/development/examples/example_compiler_gym_service">example
+service</a>
+for details.</p></li>
+<li><p>[LLVM] Update references to the <code class="docutils literal notranslate"><span class="pre">poj104-v0</span></code> dataset to
+<code class="docutils literal notranslate"><span class="pre">poj104-v1</span></code>.</p></li>
+<li><p>[LLVM] Update references to the <code class="docutils literal notranslate"><span class="pre">cBench-v1</span></code> dataset to
+<code class="docutils literal notranslate"><span class="pre">cbench-v1</span></code>.</p></li>
+</ul>
+</div>
 <div class="section" id="release-0-1-7-2021-04-01">
 <h2>Release 0.1.7 (2021-04-01)<a class="headerlink" href="#release-0-1-7-2021-04-01" title="Permalink to this headline">¶</a></h2>
 <p>This release introduces <a class="reference external" href="https://github.com/facebookresearch/CompilerGym#leaderboards">public
