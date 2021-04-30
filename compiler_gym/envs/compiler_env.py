@@ -585,12 +585,12 @@ class CompilerEnv(gym.Env):
 
             Internally, CompilerGym environments may launch subprocesses and use
             temporary files to communicate between the environment and the
-            underlying compiler (see :doc:`compiler_gym.service
-            <compiler_gym/service>` for details). This means it is important to
-            call :meth:`env.close() <compiler_gym.envs.CompilerEnv.close>` after
-            use to free up resources and prevent orphan subprocesses or files.
-            We recommend using the :code:`with` statement pattern for creating
-            environments:
+            underlying compiler (see :ref:`compiler_gym.service
+            <compiler_gym/service:compiler_gym.service>` for details). This
+            means it is important to call :meth:`env.close()
+            <compiler_gym.envs.CompilerEnv.close>` after use to free up
+            resources and prevent orphan subprocesses or files. We recommend
+            using the :code:`with`-statement pattern for creating environments:
 
                 >>> with gym.make("llvm-autophase-ic-v0") as env:
                 ...    env.reset()
