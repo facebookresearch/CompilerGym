@@ -37,10 +37,9 @@ developers to expose new optimization problems for AI.
 **Table of Contents**
 
 - [Features](#features)
-- [Getting Started](#getting-started)
-  - [Installation](#installation)
-    - [Building from Source](#building-from-source)
-  - [Trying it out](#trying-it-out)
+- [Installation](#installation)
+  - [Building from Source](#building-from-source)
+- [Usage](#usage)
 - [Leaderboards](#leaderboards)
   - [LLVM Instruction Count](#llvm-instruction-count)
 - [Contributing](#contributing)
@@ -81,15 +80,7 @@ features:
 For a glimpse of what's to come, check out [our
 roadmap](https://github.com/facebookresearch/CompilerGym/projects/1).
 
-# Getting Started
-
-Starting with CompilerGym is simple. If you not already familiar with the gym
-interface, refer to the
-[getting started guide](http://facebookresearch.github.io/CompilerGym/getting_started.html)
-for an overview of the key concepts.
-
-
-## Installation
+# Installation
 
 Install the latest CompilerGym release using:
 
@@ -98,12 +89,12 @@ Install the latest CompilerGym release using:
 The binary works on macOS and Linux (on Ubuntu 18.04, Fedora 28, Debian 10 or
 newer equivalents).
 
-### Building from Source
+## Building from Source
 
 If you prefer, you may build from source. This requires a modern C++ toolchain
 and bazel.
 
-#### macOS  <!-- omit in toc -->
+### macOS  <!-- omit in toc -->
 
 On macOS the required dependencies can be installed using
 [homebrew](https://docs.brew.sh/Installation):
@@ -117,7 +108,7 @@ export PKG_CONFIG_PATH="/usr/local/opt/zlib/lib/pkgconfig"
 
 Now proceed to [All platforms](#all-platforms) below.
 
-#### Linux  <!-- omit in toc -->
+### Linux  <!-- omit in toc -->
 
 On debian-based linux systems, install the required toolchain using:
 
@@ -130,7 +121,7 @@ export CC=clang
 export CXX=clang++
 ```
 
-#### All platforms  <!-- omit in toc -->
+### All platforms  <!-- omit in toc -->
 
 We recommend using
 [conda](https://docs.conda.io/projects/conda/en/latest/user-guide/install/)
@@ -173,8 +164,12 @@ environment using:
     conda deactivate
     conda env remove -n compiler_gym
 
+# Usage
 
-## Trying it out
+Starting with CompilerGym is simple. If you not already familiar with the gym
+interface, refer to the [getting started
+guide](http://facebookresearch.github.io/CompilerGym/getting_started.html) for
+an overview of the key concepts.
 
 In Python, import `compiler_gym` to use the environments:
 
