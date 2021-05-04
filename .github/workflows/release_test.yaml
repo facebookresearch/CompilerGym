@@ -26,8 +26,16 @@ jobs:
               with:
                   python-version: ${{ matrix.python }}
 
+            - name: Install dependencies (macos)
+              run: brew install zlib
+              if: matrix.os == 'macos-latest'
+
             - name: Install python wheel
               run: python -m pip install compiler_gym
+              env:
+                  LDFLAGS: -L/usr/local/opt/zlib/lib
+                  CPPFLAGS: -I/usr/local/opt/zlib/include
+                  PKG_CONFIG_PATH: /usr/local/opt/zlib/lib/pkgconfig
 
             - name: Install python test dependencies
               run: python -m pip install -r tests/requirements.txt
