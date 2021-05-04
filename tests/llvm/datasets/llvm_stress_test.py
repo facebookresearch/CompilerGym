@@ -7,6 +7,7 @@ import sys
 from itertools import islice
 
 import gym
+import numpy as np
 import pytest
 
 import compiler_gym.envs.llvm  # noqa register environments
@@ -57,6 +58,19 @@ def test_llvm_stress_random_select(
         instcount = env.reset(benchmark=benchmark)
         print(env.ir)  # For debugging in case of error.
         assert instcount["TotalInstsCount"] > 0
+
+
+@skip_on_ci
+def test_random_benchmark(llvm_stress_dataset: LlvmStressDataset):
+    num_benchmarks = 5
+    rng = np.random.default_rng(0)
+    random_benchmarks = {
+        b.uri
+        for b in (
+            llvm_stress_dataset.random_benchmark(rng) for _ in range(num_benchmarks)
+        )
+    }
+    assert len(random_benchmarks) == num_benchmarks
 
 
 if __name__ == "__main__":

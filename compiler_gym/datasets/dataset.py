@@ -9,6 +9,7 @@ import warnings
 from pathlib import Path
 from typing import Dict, Iterable, Optional, Union
 
+import numpy as np
 from deprecated.sphinx import deprecated as mark_deprecated
 
 from compiler_gym.datasets.benchmark import Benchmark
@@ -355,6 +356,29 @@ class Dataset(object):
             instance.
 
         :raise LookupError: If :code:`uri` is not found.
+        """
+        raise NotImplementedError("abstract class")
+
+    def random_benchmark(
+        self, random_state: Optional[np.random.Generator] = None
+    ) -> Benchmark:
+        """Select a benchmark randomly.
+
+        :param random_state: A random number generator. If not provided, a
+            default :code:`np.random.default_rng()` is used.
+
+        :return: A :class:`Benchmark <compiler_gym.datasets.Benchmark>`
+            instance.
+        """
+        random_state = random_state or np.random.default_rng()
+        return self._random_benchmark(random_state)
+
+    def _random_benchmark(self, random_state: np.random.Generator) -> Benchmark:
+        """Private implementation of the random benchmark getter.
+
+        Subclasses must implement this method so that it selects a benchmark
+        from the available benchmarks with uniform probability, using only
+        :code:`random_state` as a source of randomness.
         """
         raise NotImplementedError("abstract class")
 

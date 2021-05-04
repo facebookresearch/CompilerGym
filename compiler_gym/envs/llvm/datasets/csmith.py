@@ -12,6 +12,7 @@ from pathlib import Path
 from threading import Lock
 from typing import Iterable, List
 
+import numpy as np
 from fasteners import InterProcessLock
 
 from compiler_gym.datasets import Benchmark, BenchmarkSource, Dataset
@@ -226,6 +227,10 @@ class CsmithDataset(Dataset):
 
     def benchmark(self, uri: str) -> CsmithBenchmark:
         return self.benchmark_from_seed(int(uri.split("/")[-1]))
+
+    def _random_benchmark(self, random_state: np.random.Generator) -> Benchmark:
+        seed = random_state.integers(UINT_MAX)
+        return self.benchmark_from_seed(seed)
 
     def benchmark_from_seed(self, seed: int) -> CsmithBenchmark:
         """Get a benchmark from a uint32 seed.

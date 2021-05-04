@@ -6,6 +6,7 @@
 import tempfile
 from pathlib import Path
 
+import numpy as np
 import pytest
 
 from compiler_gym.datasets import FilesDataset
@@ -109,6 +110,18 @@ def test_populated_dataset_with_file_extension_filter(populated_dataset: FilesDa
         "benchmark://test-v0/b/d",
     ]
     assert populated_dataset.size == 2
+
+
+def test_populated_dataset_random_benchmark(populated_dataset: FilesDataset):
+    num_benchmarks = 3
+    rng = np.random.default_rng(0)
+    random_benchmarks = {
+        b.uri
+        for b in (
+            populated_dataset.random_benchmark(rng) for _ in range(num_benchmarks)
+        )
+    }
+    assert len(random_benchmarks) == num_benchmarks
 
 
 if __name__ == "__main__":
