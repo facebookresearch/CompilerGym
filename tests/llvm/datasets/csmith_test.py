@@ -33,7 +33,7 @@ def test_csmith_size(csmith_dataset: CsmithDataset):
     assert csmith_dataset.size == float("inf")
 
 
-@pytest.mark.parametrize(range(3) if is_ci() else range(250))
+@pytest.mark.parametrize("index", range(3) if is_ci() else range(250))
 def test_csmith_random_select(
     env: LlvmEnv, csmith_dataset: CsmithDataset, index: int, tmpwd: Path
 ):
@@ -47,7 +47,6 @@ def test_csmith_random_select(
     assert (tmpwd / "source.c").is_file()
 
 
-@skip_on_ci
 def test_random_benchmark(csmith_dataset: CsmithDataset):
     num_benchmarks = 5
     rng = np.random.default_rng(0)
