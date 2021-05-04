@@ -33,14 +33,8 @@ py_library(
     name = "inst2vec_preprocess",
     srcs = ["inst2vec_preprocess.py"],
     deps = [
-        ":inst2vec_utils",
         ":rgx_utils",
     ],
-)
-
-py_library(
-    name = "inst2vec_utils",
-    srcs = ["inst2vec_utils.py"],
 )
 
 py_library(
