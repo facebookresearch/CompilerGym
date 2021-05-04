@@ -52,4 +52,18 @@ def main(extra_pytest_args: Optional[List[str]] = None, debug_level: int = 1):
 
     pytest_args += extra_pytest_args or []
 
-    sys.exit(pytest.main(pytest_args))
+    returncode = pytest.main(pytest_args)
+
+    # By default pytest will fail with an error if no tests are collected.
+    # Disable that behavior here (with a warning) since there legitimate cases
+    # where we may want to run a test file with no tests in it. For example,
+    # when running on a continuous integration service where all the tests are
+    # marked with the @skip_on_ci decorator.
+    if returncode == pytest.ExitCode.NO_TESTS_COLLECTED.value:
+        print(
+            "WARNING: The test suite was empty. Is that intended?",
+            file=sys.stderr,
+        )
+        returncode = 0
+
+    sys.exit(returncode)
