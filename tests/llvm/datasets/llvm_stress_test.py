@@ -34,7 +34,7 @@ def test_llvm_stress_size(llvm_stress_dataset: LlvmStressDataset):
     assert llvm_stress_dataset.size == float("inf")
 
 
-@pytest.mark.parametrize(range(3) if is_ci() else range(250))
+@pytest.mark.parametrize("index", range(3) if is_ci() else range(250))
 def test_llvm_stress_random_select(
     env: LlvmEnv, llvm_stress_dataset: LlvmStressDataset, index: int
 ):

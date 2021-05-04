@@ -12,7 +12,7 @@ import pytest
 import compiler_gym.envs.llvm  # noqa register environments
 from compiler_gym.envs.llvm import LlvmEnv
 from compiler_gym.envs.llvm.datasets import CLgenDataset
-from tests.pytest_plugins.common import skip_on_ci
+from tests.pytest_plugins.common import is_ci
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.llvm"]
@@ -49,8 +49,7 @@ def test_missing_benchmark_name(clgen_dataset: CLgenDataset, mocker):
     assert clgen_dataset.install.call_count == 2
 
 
-@skip_on_ci
-@pytest.mark.parametrize("index", range(250))
+@pytest.mark.parametrize("index", range(3) if is_ci() else range(250))
 def test_clgen_random_select(
     env: LlvmEnv, clgen_dataset: CLgenDataset, index: int, tmpwd: Path
 ):
