@@ -59,14 +59,15 @@ message GetVersionReply {
 // StartSession().
 
 message StartSessionRequest {
-  // The name of the benchmark to use for this session. If not provided, a
-  // benchmark is chosen randomly by the service.
+  // The uri of the benchmark to use for this session. Corresponds to the
+  // Benchmark.uri field. Returns StatusCode::NOT_FOUND if unknown.
   string benchmark = 1;
   // An index into the GetSpacesReply.action_space_list selecting the action
   // space that is to be used for this session. Once set, the action space
   // cannot be changed for the duration of the session.
   int32 action_space = 2;
-  // A list of indices into the GetSpacesReply.observation_space_list
+  // A list of indices into the GetSpacesReply.observation_space_list of initial
+  // observations to compute.
   repeated int32 observation_space = 3;
 }
 
@@ -80,7 +81,7 @@ message StartSessionReply {
   // space and replace it with this one. Else, the action space remains
   // unchanged.
   ActionSpace new_action_space = 3;
-  // Observed states after completing the action.
+  // Initial observations.
   repeated Observation observation = 4;
   // DEPRECATED: The `benchmark` field is no longer used and will be removed in
   // CompilerGym v0.1.10.
@@ -96,7 +97,8 @@ message StepRequest {
   // A list of indices into the ActionSpace.action list. Actions are executed
   // in the order they appear in this list.
   repeated int32 action = 2;
-  // A list of indices into the GetSpacesReply.observation_space_list
+  // A list of indices into the GetSpacesReply.observation_space_list of
+  // observations to compute.
   repeated int32 observation_space = 3;
 }
 
