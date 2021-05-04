@@ -175,14 +175,16 @@ In Python, import `compiler_gym` to use the environments:
 
 ```py
 >>> import gym
->>> import compiler_gym                     # import the CompilerGym environments
->>> env = gym.make(                         # create a new environment
-...     "llvm-autophase-ic-v0"              # select the compiler optimization task
-...     benchmark="cbench-v1/qsort"         # select the program to compile
+>>> import compiler_gym                      # imports the CompilerGym environments
+>>> env = gym.make(                          # creates a new environment
+...     "llvm-v0",                           # selects the compiler to use
+...     benchmark="cbench-v1/qsort",         # selects the program to compile
+...     reward_space="IrInstructionCountOz", # selects the optimization target
+...     observation_space="Autophase",       # selects the observation space
 ... )
->>> env.reset()                             # start a new compilation session
->>> env.render()                            # print the IR of the program
->>> env.step(env.action_space.sample())     # apply a random optimization, update state/reward/actions
+>>> env.reset()                              # starts a new compilation session
+>>> env.render()                             # prints the IR of the program
+>>> env.step(env.action_space.sample())      # applies a random optimization, updates state/reward/actions
 ```
 
 See the [documentation website](http://facebookresearch.github.io/CompilerGym/)
