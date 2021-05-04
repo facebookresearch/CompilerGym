@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Unit tests for //compiler_gym/datasets."""
+import numpy as np
 import pytest
 
 from compiler_gym.datasets.datasets import Datasets, round_robin_iterables
@@ -33,13 +34,14 @@ class MockDataset:
     def benchmarks(self):
         yield from self.benchmark_values
 
-    def benchmark(self, uri=None):
-        if uri:
-            for b in self.benchmark_values:
-                if b.uri == uri:
-                    return b
-            raise KeyError(uri)
-        return self.benchmark_values[0]
+    def benchmark(self, uri):
+        for b in self.benchmark_values:
+            if b.uri == uri:
+                return b
+        raise KeyError(uri)
+
+    def random_benchmark(self, random_state=None):
+        return random_state.choice(self.benchmark_values)
 
     def __repr__(self):
         return str(self.name)
@@ -241,6 +243,25 @@ def test_benchmarks_iter_deprecated():
         "benchmark://bar-v0/123",
         "benchmark://foo-v0/123",
     ]
+
+
+def test_random_benchmark(mocker):
+    da = MockDataset("benchmark://foo-v0")
+    ba = MockBenchmark(uri="benchmark://foo-v0/abc")
+    da.benchmark_values.append(ba)
+    datasets = Datasets([da])
+
+    mocker.spy(da, "random_benchmark")
+
+    num_benchmarks = 5
+    rng = np.random.default_rng(0)
+    random_benchmarks = {
+        b.uri for b in (datasets.random_benchmark(rng) for _ in range(num_benchmarks))
+    }
+
+    assert da.random_benchmark.call_count == num_benchmarks
+    assert len(random_benchmarks) == 1
+    assert next(iter(random_benchmarks)) == "benchmark://foo-v0/abc"
 
 
 if __name__ == "__main__":

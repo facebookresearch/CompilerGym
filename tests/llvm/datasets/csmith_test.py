@@ -7,6 +7,7 @@ from itertools import islice
 from pathlib import Path
 
 import gym
+import numpy as np
 import pytest
 
 import compiler_gym.envs.llvm  # noqa register environments
@@ -45,6 +46,17 @@ def test_csmith_random_select(
     assert benchmark.source
     benchmark.write_sources_to_directory(tmpwd)
     assert (tmpwd / "source.c").is_file()
+
+
+@skip_on_ci
+def test_random_benchmark(csmith_dataset: CsmithDataset):
+    num_benchmarks = 5
+    rng = np.random.default_rng(0)
+    random_benchmarks = {
+        b.uri
+        for b in (csmith_dataset.random_benchmark(rng) for _ in range(num_benchmarks))
+    }
+    assert len(random_benchmarks) == num_benchmarks
 
 
 if __name__ == "__main__":

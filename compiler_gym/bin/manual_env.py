@@ -367,7 +367,7 @@ The 'tutorial' command will give a step by step guide."""
         Use '-' for a random benchmark.
         """
         if arg == "-":
-            arg = self.env.datasets.benchmark().uri
+            arg = self.env.datasets.random_benchmark().uri
             print(f"set_benchmark {arg}")
 
         try:

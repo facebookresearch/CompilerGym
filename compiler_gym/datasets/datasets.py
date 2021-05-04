@@ -3,7 +3,9 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 from collections import deque
-from typing import Dict, Iterable, Set, TypeVar
+from typing import Dict, Iterable, Optional, Set, TypeVar
+
+import numpy as np
 
 from compiler_gym.datasets.benchmark import Benchmark
 from compiler_gym.datasets.dataset import Dataset
@@ -250,6 +252,42 @@ class Datasets(object):
         dataset = self._datasets[dataset_name]
 
         return dataset.benchmark(uri)
+
+    def random_benchmark(
+        self, random_state: Optional[np.random.Generator] = None
+    ) -> Benchmark:
+        """Select a benchmark randomly.
+
+        First, a dataset is selected uniformly randomly using
+        :code:`random_state.choice(list(datasets))`. The
+        :meth:`random_benchmark()
+        <compiler_gym.datasets.Dataset.random_benchmark>` method of that dataset
+        is then called to select a benchmark.
+
+        Note that the distribution of benchmarks selected by this method is not
+        biased by the size of each dataset, since datasets are selected
+        uniformly. This means that datasets with a small number of benchmarks
+        will be overrepresented compared to datasets with many benchmarks. To
+        correct for this bias, use the number of benchmarks in each dataset as
+        a weight for the random selection:
+
+            >>> rng = np.random.default_rng()
+            >>> finite_datasets = [d for d in env.datasets if len(d) != math.inf]
+            >>> dataset = rng.choice(
+                finite_datasets,
+                p=[len(d) for d in finite_datasets]
+            )
+            >>> dataset.random_benchmark(random_state=rng)
+
+        :param random_state: A random number generator. If not provided, a
+            default :code:`np.random.default_rng()` is used.
+
+        :return: A :class:`Benchmark <compiler_gym.datasets.Benchmark>`
+            instance.
+        """
+        random_state = random_state or np.random.default_rng()
+        dataset = random_state.choice(list(self._visible_datasets))
+        return self[dataset].random_benchmark(random_state=random_state)
 
     @property
     def size(self) -> int:
