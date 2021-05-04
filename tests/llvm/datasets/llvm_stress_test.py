@@ -14,7 +14,7 @@ import compiler_gym.envs.llvm  # noqa register environments
 from compiler_gym.datasets import BenchmarkInitError
 from compiler_gym.envs.llvm import LlvmEnv
 from compiler_gym.envs.llvm.datasets import LlvmStressDataset
-from tests.pytest_plugins.common import skip_on_ci
+from tests.pytest_plugins.common import is_ci
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.llvm"]
@@ -34,8 +34,7 @@ def test_llvm_stress_size(llvm_stress_dataset: LlvmStressDataset):
     assert llvm_stress_dataset.size == float("inf")
 
 
-@skip_on_ci
-@pytest.mark.parametrize("index", range(250))
+@pytest.mark.parametrize(range(3) if is_ci() else range(250))
 def test_llvm_stress_random_select(
     env: LlvmEnv, llvm_stress_dataset: LlvmStressDataset, index: int
 ):
