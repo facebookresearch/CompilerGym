@@ -107,7 +107,7 @@ def get_system_includes() -> List[Path]:
     return _SYSTEM_INCLUDES
 
 
-class ClangInvocation(object):
+class ClangInvocation:
     """Class to represent a single invocation of the clang compiler."""
 
     def __init__(

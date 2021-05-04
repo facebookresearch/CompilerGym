@@ -18,14 +18,14 @@ pytest_plugins = ["tests.pytest_plugins.llvm"]
 logging.basicConfig(level=logging.DEBUG)
 
 
-class MockActionSpace(object):
+class MockActionSpace:
     """A mock action space for use by MockEnv."""
 
     def __init__(self, actions):
         self.flags = {a: str(a) for a in set(actions)}
 
 
-class MockValidationResult(object):
+class MockValidationResult:
     """A mock validation result for use by MockEnv."""
 
     def __init__(self, okay):
@@ -35,7 +35,7 @@ class MockValidationResult(object):
         return self._okay
 
 
-class MockEnv(object):
+class MockEnv:
     """A mock environment for testing trajectory minimization."""
 
     def __init__(self, actions: List[int], validate=lambda env: True):

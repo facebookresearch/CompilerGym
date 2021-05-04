@@ -15,7 +15,7 @@ _PICKLED_EMBEDDINGS = runfiles_path(
 )
 
 
-class Inst2vecEncoder(object):
+class Inst2vecEncoder:
     """An LLVM encoder for inst2vec."""
 
     def __init__(self):

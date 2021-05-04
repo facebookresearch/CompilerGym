@@ -9,7 +9,7 @@ from compiler_gym.service.proto import ObservationSpace, StepReply, StepRequest
 from compiler_gym.views.observation_space_spec import ObservationSpaceSpec
 
 
-class ObservationView(object):
+class ObservationView:
     """A view into the available observation spaces of a service.
 
     Example usage:

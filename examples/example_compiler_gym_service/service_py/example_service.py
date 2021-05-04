@@ -86,7 +86,7 @@ OBSERVATION_SPACES = [
 ]
 
 
-class CompilationSession(object):
+class CompilationSession:
     """Represents an instance of an interactive compilation session."""
 
     def __init__(self, benchmark: str):
