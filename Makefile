@@ -237,7 +237,7 @@ install-test:
 	$(call run_pytest_suite,)
 
 install-test-cov:
-	$(call run_pytest_suite,--cov=compiler_gym --cov-report=xml)
+	$(call run_pytest_suite,--cov=compiler_gym --cov-report=xml --cov-report=term)
 	@mv /tmp/compiler_gym/wheel_tests/coverage.xml .
 
 # The minimum number of seconds to run the fuzz tests in a loop for. Override
