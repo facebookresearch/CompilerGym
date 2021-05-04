@@ -177,7 +177,6 @@ class ExampleCompilerGymService(proto.CompilerGymServiceServicer):
             session.set_observation(observation_space, reply.observation.add())
 
         reply.session_id = len(self.sessions)
-        reply.benchmark = session.benchmark
         self.sessions[reply.session_id] = session
 
         return reply

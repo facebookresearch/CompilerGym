@@ -74,8 +74,6 @@ message StartSessionReply {
   // The ID that has been assigned to the session. The client must use this ID
   // in all subsequent interactions with the service for this session.
   int64 session_id = 1;
-  // The name of the benchmark.
-  string benchmark = 2;
   // A new action space. This is set only if, after initializing the session,
   // the action space has changed from the default action space returned by
   // GetSpaces(). If set, the environment should discard the previous action
@@ -84,6 +82,9 @@ message StartSessionReply {
   ActionSpace new_action_space = 3;
   // Observed states after completing the action.
   repeated Observation observation = 4;
+  // DEPRECATED: The `benchmark` field is no longer used and will be removed in
+  // CompilerGym v0.1.10.
+  string benchmark = 2;
 }
 
 // ===========================================================================

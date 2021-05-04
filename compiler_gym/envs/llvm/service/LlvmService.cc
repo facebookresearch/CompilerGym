@@ -61,7 +61,6 @@ Status LlvmService::StartSession(ServerContext* /* unused */, const StartSession
   std::unique_ptr<Benchmark> benchmark;
   RETURN_IF_ERROR(benchmarkFactory_.getBenchmark(request->benchmark(), &benchmark));
 
-  reply->set_benchmark(benchmark->name());
   VLOG(1) << "StartSession(" << benchmark->name() << "), [" << nextSessionId_ << "]";
 
   LlvmActionSpace actionSpace;

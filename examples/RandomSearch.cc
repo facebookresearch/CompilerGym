@@ -57,7 +57,6 @@ class Environment {
 
     StartSessionRequest startRequest;
     StartSessionReply startReply;
-    startRequest.set_benchmark(benchmark_);
     RETURN_IF_ERROR(service_.StartSession(nullptr, &startRequest, &startReply));
     sessionId_ = startReply.session_id();
 

@@ -107,7 +107,6 @@ Status ExampleService::StartSession(ServerContext* /* unused*/, const StartSessi
     // If no benchmark was requested, choose one.
     benchmark = "foo";
   }
-  reply->set_benchmark(benchmark);
 
   // Determine the action space.
   const auto actionSpaces = getActionSpaces();
