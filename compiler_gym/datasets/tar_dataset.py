@@ -60,17 +60,13 @@ class TarDataset(FilesDataset):
         self.tar_compression = tar_compression
         self.strip_prefix = strip_prefix
 
-        self._installed = False
         self._tar_extracted_marker = self.site_data_path / ".extracted"
         self._tar_lock = Lock()
         self._tar_lockfile = self.site_data_path / ".install_lock"
 
     @property
     def installed(self) -> bool:
-        # Fast path for repeated checks to 'installed' without a disk op.
-        if not self._installed:
-            self._installed = self._tar_extracted_marker.is_file()
-        return self._installed
+        return self._tar_extracted_marker.is_file()
 
     def install(self) -> None:
         super().install()
