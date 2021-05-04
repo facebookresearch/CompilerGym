@@ -50,6 +50,7 @@ jobs:
               env:
                   CC: clang
                   CXX: clang++
+                  BAZEL_OPTS: --batch
                   BAZEL_TEST_OPTS: --config=ci
 
             - name: Test
