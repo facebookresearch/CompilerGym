@@ -57,6 +57,20 @@ class ExampleService final : public CompilerGymService::Service {
   uint64_t nextSessionId_;
 };
 
+class BaseCompilationSession {
+ public:
+  static std::vector<ActionSpace> getActionSpaces();            // what your compiler can do
+  static std::vector<ObservationSpace> getObservationSpaces();  // features you provide
+
+  BaseCompilationSession(const ActionSpace& actionSpace, const Benchmark& benchmark);
+
+  [[nodiscard]] Status applyAction(int action);  // apply an action
+
+  // compute an observation
+  [[nodiscard]] Status setObservation(const ObservationSpace& observationSpace,
+                                      Observation* observation);
+};
+
 // The representation of a compilation session.
 class ExampleCompilationSession {
  public:
