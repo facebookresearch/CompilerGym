@@ -25,7 +25,8 @@ class BenchmarkProtoCache {
 
   // The pointer set by benchmark is valid only until the next call to
   // addBenchmark().
-  [[nodiscard]] grpc::Status getBenchmark(const std::string& uri, const Benchmark* benchmark) const;
+  [[nodiscard]] grpc::Status getBenchmark(const std::string& uri,
+                                          const Benchmark** benchmark) const;
 
   [[nodiscard]] grpc::Status addBenchmark(const Benchmark&& benchmark);
 
@@ -33,7 +34,7 @@ class BenchmarkProtoCache {
   inline size_t maxCacheSize() const { return maxCacheSize_; };
 
  private:
-  size_t& cacheSize();
+  size_t& cacheSize() { return cacheSize_; };
 
   // Evict benchmarks randomly until we have reduced capacity below 50%.
   void pruneBenchmarksCache();

@@ -4,6 +4,7 @@
 // LICENSE file in the root directory of this source tree.
 #include "compiler_gym/envs/llvm/service/LlvmSession.h"
 #include "compiler_gym/service/core/Core.h"
+#include "compiler_gym/service/core/Run.h"
 
 const char* usage = R"(LLVM CompilerGym service)";
 

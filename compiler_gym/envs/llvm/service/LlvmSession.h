@@ -4,6 +4,7 @@
 // LICENSE file in the root directory of this source tree.
 #pragma once
 
+#include <glog/logging.h>
 #include <grpcpp/grpcpp.h>
 
 #include <magic_enum.hpp>
@@ -46,30 +47,38 @@ class LlvmSession final : public CompilationSession {
   [[nodiscard]] grpc::Status init(size_t actionSpaceIndex,
                                   const compiler_gym::Benchmark& benchmark) override;
 
-  [[nodiscard]] grpc::Status init(CompilationSession& other) override;
+  [[nodiscard]] grpc::Status init(CompilationSession* other) override;
 
   [[nodiscard]] grpc::Status applyAction(size_t actionIndex, bool* endOfEpisode,
                                          bool* actionSpaceChanged,
                                          bool* actionHadNoEffect) override;
+
+  [[nodiscard]] grpc::Status endOfActions(bool* endOfEpisode, bool* actionSpaceChanged) override;
 
   [[nodiscard]] grpc::Status setObservation(size_t observationSpaceIndex,
                                             Observation* observation) override;
 
   inline const LlvmActionSpace actionSpace() const { return actionSpace_; }
 
-  // Compute the requested observation.
-  [[nodiscard]] grpc::Status getObservation(LlvmObservationSpace space, Observation* reply);
-
  private:
+  [[nodiscard]] grpc::Status setObservation(LlvmObservationSpace space, Observation* reply);
+
   [[nodiscard]] grpc::Status init(size_t actionSpaceIndex, std::unique_ptr<Benchmark> benchmark);
 
-  inline const Benchmark& benchmark() const { return *benchmark_; }
-  inline Benchmark& benchmark() { return *benchmark_; }
+  inline const Benchmark& benchmark() const {
+    DCHECK(benchmark_) << "Calling benchmark() before init()";
+    return *benchmark_;
+  }
+  inline Benchmark& benchmark() {
+    DCHECK(benchmark_) << "Calling benchmark() before init()";
+    return *benchmark_;
+  }
 
   // Run the requested action.
   [[nodiscard]] grpc::Status applyPassAction(LlvmAction action, bool* actionHadNoEffect);
 
-  // Run the given pass, possibly modifying the underlying LLVM module.
+  // Run the given pass, possibly modifying the underlying LLVM module. Return
+  // whether the module was modified.
   bool runPass(llvm::Pass* pass);
   bool runPass(llvm::FunctionPass* pass);
 

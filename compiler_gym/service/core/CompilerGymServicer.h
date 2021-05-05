@@ -12,6 +12,7 @@
 
 #include "boost/filesystem.hpp"
 #include "compiler_gym/service/core/BenchmarkProtoCache.h"
+#include "compiler_gym/service/core/Core.h"
 #include "compiler_gym/service/proto/compiler_gym_service.grpc.pb.h"
 #include "compiler_gym/service/proto/compiler_gym_service.pb.h"
 #include "compiler_gym/util/GrpcStatusMacros.h"
@@ -19,29 +20,29 @@
 
 namespace compiler_gym {
 
-template <typename CompilationSession>
+template <typename ConcreteCompilationSession>
 class CompilerGymServicer final : public CompilerGymService::Service {
  public:
   explicit CompilerGymServicer(const boost::filesystem::path& workingDirectory)
-      : workingDirectory_(workingDirectory) {}
+      : workingDirectory_(workingDirectory), nextSessionId_(0) {}
 
   // RPC endpoints.
   grpc::Status GetVersion(grpc::ServerContext* context, const GetVersionRequest* request,
                           GetVersionReply* reply) final override {
     VLOG(2) << "GetSpaces()";
     reply->set_service_version(COMPILER_GYM_VERSION);
-    CompilationSession session(workingDirectory());
-    reply->set_compiler_version(session.getCompilerVersion());
+    ConcreteCompilationSession environment(workingDirectory());
+    reply->set_compiler_version(environment.getCompilerVersion());
     return grpc::Status::OK;
   }
 
   grpc::Status GetSpaces(grpc::ServerContext* context, const GetSpacesRequest* request,
                          GetSpacesReply* reply) final override {
     VLOG(2) << "GetSpaces()";
-    CompilationSession session(workingDirectory());
-    const auto actionSpaces = session.getActionSpaces();
+    ConcreteCompilationSession environment(workingDirectory());
+    const auto actionSpaces = environment.getActionSpaces();
     *reply->mutable_action_space_list() = {actionSpaces.begin(), actionSpaces.end()};
-    const auto observationSpaces = session.getObservationSpaces();
+    const auto observationSpaces = environment.getObservationSpaces();
     *reply->mutable_observation_space_list() = {observationSpaces.begin(), observationSpaces.end()};
     return grpc::Status::OK;
   }
@@ -56,11 +57,13 @@ class CompilerGymServicer final : public CompilerGymService::Service {
     VLOG(1) << "StartSession(" << request->benchmark() << "), [" << nextSessionId_ << "]";
     const std::lock_guard<std::mutex> lock(sessionsMutex_);
 
-    Benchmark benchmark;
+    const Benchmark* benchmark;
     RETURN_IF_ERROR(benchmarkCache_.getBenchmark(request->benchmark(), &benchmark));
+    DCHECK(benchmark) << "getBenchmark() did not set benchmark";
 
     // Construct the new session.
-    auto session = std::make_unique<CompilationSession>(workingDirectory());
+    auto session = std::make_unique<ConcreteCompilationSession>(workingDirectory());
+    RETURN_IF_ERROR(session->init(request->action_space(), *benchmark));
 
     // Compute the initial observations.
     for (int i = 0; i < request->observation_space_size(); ++i) {
@@ -68,9 +71,7 @@ class CompilerGymServicer final : public CompilerGymService::Service {
           session->setObservation(request->observation_space(i), reply->add_observation()));
     }
 
-    reply->set_session_id(nextSessionId_);
-    sessions_[nextSessionId_] = std::move(session);
-    ++nextSessionId_;
+    reply->set_session_id(addSession(std::move(session)));
 
     return grpc::Status::OK;
   }
@@ -84,20 +85,21 @@ class CompilerGymServicer final : public CompilerGymService::Service {
     VLOG(1) << "ForkSession(" << request->session_id() << "), [" << nextSessionId_ << "]";
 
     // Construct the new session.
-    auto forked = std::make_unique<CompilationSession>(workingDirectory());
+    auto forked = std::make_unique<ConcreteCompilationSession>(workingDirectory());
 
     // Initialize from the base environment.
-    RETURN_IF_ERROR(forked->init(*baseSession));
+    RETURN_IF_ERROR(forked->init(static_cast<CompilationSession*>(baseSession)));
 
-    reply->set_session_id(nextSessionId_);
-    sessions_[nextSessionId_] = std::move(forked);
-    ++nextSessionId_;
+    reply->set_session_id(addSession(std::move(forked)));
 
     return grpc::Status::OK;
   }
 
   grpc::Status EndSession(grpc::ServerContext* context, const EndSessionRequest* request,
                           EndSessionReply* reply) final override {
+    VLOG(1) << "EndSession(" << request->session_id() << "), " << sessions_.size() - 1
+            << " sessions remaining";
+
     const std::lock_guard<std::mutex> lock(sessionsMutex_);
 
     // Note that unlike the other methods, no error is thrown if the requested
@@ -106,8 +108,6 @@ class CompilerGymServicer final : public CompilerGymService::Service {
       const CompilationSession* environment;
       RETURN_IF_ERROR(session(request->session_id(), &environment));
       sessions_.erase(request->session_id());
-      VLOG(1) << "EndSession(" << request->session_id() << "), " << sessions_.size()
-              << " remaining";
     }
 
     reply->set_remaining_sessions(sessions_.size());
@@ -115,8 +115,8 @@ class CompilerGymServicer final : public CompilerGymService::Service {
   }
 
   // NOTE: Step() is not thread safe. The underlying assumption is that each
-  // CompilationSession is managed by a single thread, so race conditions
-  // between operations that affect the same CompilationSession are not
+  // ConcreteCompilationSession is managed by a single thread, so race conditions
+  // between operations that affect the same ConcreteCompilationSession are not
   // protected against.
   grpc::Status Step(grpc::ServerContext* context, const StepRequest* request,
                     StepReply* reply) final override {
@@ -125,10 +125,11 @@ class CompilerGymServicer final : public CompilerGymService::Service {
 
     VLOG(2) << "Session " << request->session_id() << " Step()";
 
-    // Apply the actions.
     bool endOfEpisode = false;
     bool newActionSpace = false;
-    bool actionsHadNoEffect = false;
+    bool actionsHadNoEffect = true;
+
+    // Apply the actions.
     for (int i = 0; i < request->action_size(); ++i) {
       bool actionHadNoEffect = false;
       RETURN_IF_ERROR(environment->applyAction(request->action(i), &endOfEpisode, &newActionSpace,
@@ -190,6 +191,14 @@ class CompilerGymServicer final : public CompilerGymService::Service {
   }
 
   inline const boost::filesystem::path& workingDirectory() const { return workingDirectory_; }
+
+  // Add the given session and return its ID.
+  uint64_t addSession(std::unique_ptr<CompilationSession> session) {
+    uint64_t id = nextSessionId_;
+    sessions_[id] = std::move(session);
+    ++nextSessionId_;
+    return id;
+  }
 
  private:
   const boost::filesystem::path workingDirectory_;

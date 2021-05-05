@@ -2,9 +2,11 @@ py_library(
     name = "py_core",
     srcs = [
         "__init__.py",
+        "compiler_gym_servicer.py",
         "core.py",
+        "run.py",
     ],
-    visibility = ["//visiblity:public"],
+    visibility = ["//visibility:public"],
     deps = [
         "//compiler_gym/service/proto",
     ],
@@ -12,25 +14,19 @@ py_library(
 
 cc_library(
     name = "cc_core",
-    srcs = ["Core.cc"],
-    hdrs = ["Core.h"],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":cc_core_impl",
-    ],
-)
-
-cc_library(
-    name = "cc_core_impl",
     srcs = [
         "BenchmarkProtoCache.cc",
+        "Core.cc",
         "CreateAndRunCompilerGymService.cc",
     ],
     hdrs = [
         "BenchmarkProtoCache.h",
         "CompilerGymServicer.h",
+        "Core.h",
         "CreateAndRunCompilerGymService.h",
+        "Run.h",
     ],
+    visibility = ["//visibility:public"],
     deps = [
         "//compiler_gym/service/proto:compiler_gym_service_cc",
         "//compiler_gym/service/proto:compiler_gym_service_cc_grpc",

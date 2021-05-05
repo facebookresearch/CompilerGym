@@ -157,8 +157,8 @@ Status LlvmSession::init(size_t actionSpaceIndex, const BenchmarkProto& benchmar
   return init(actionSpaceIndex, std::move(llvmBenchmark));
 }
 
-Status LlvmSession::init(CompilationSession& other) {
-  return init(0, static_cast<LlvmSession&>(other).benchmark().clone(workingDirectory()));
+Status LlvmSession::init(CompilationSession* other) {
+  return init(0, static_cast<LlvmSession*>(other)->benchmark().clone(workingDirectory()));
 }
 
 Status LlvmSession::init(size_t actionSpaceIndex, std::unique_ptr<Benchmark> benchmark) {
@@ -178,13 +178,13 @@ Status LlvmSession::init(size_t actionSpaceIndex, std::unique_ptr<Benchmark> ben
   }
 
   // Verify the module now to catch any problems early.
-  RETURN_IF_ERROR(verifyModuleStatus(benchmark_->module()));
-
-  return Status::OK;
+  return verifyModuleStatus(benchmark_->module());
 }
 
 Status LlvmSession::applyAction(size_t actionIndex, bool* endOfEpisode, bool* actionSpaceChanged,
                                 bool* actionHadNoEffect) {
+  DCHECK(benchmark_) << "Calling applyAction() before init()";
+
   // Apply the requested action.
   switch (actionSpace()) {
     case LlvmActionSpace::PASSES_ALL:
@@ -193,17 +193,19 @@ Status LlvmSession::applyAction(size_t actionIndex, bool* endOfEpisode, bool* ac
       RETURN_IF_ERROR(applyPassAction(action, actionHadNoEffect));
   }
 
-  // Fail now if we have broken something.
-  // TODO: Move this into endOfActions() callback.
-  RETURN_IF_ERROR(verifyModuleStatus(benchmark().module()));
-
   return Status::OK;
 }
 
+Status LlvmSession::endOfActions(bool* endOfEpisode, bool* actionSpaceChanged) {
+  return verifyModuleStatus(benchmark().module());
+}
+
 Status LlvmSession::setObservation(size_t observationSpaceIndex, Observation* observation) {
+  DCHECK(benchmark_) << "Calling setObservation() before init()";
+
   LlvmObservationSpace observationSpace;
   RETURN_IF_ERROR(util::intToEnum(observationSpaceIndex, &observationSpace));
-  RETURN_IF_ERROR(getObservation(observationSpace, observation));
+  RETURN_IF_ERROR(setObservation(observationSpace, observation));
   return Status::OK;
 }
 
@@ -221,7 +223,7 @@ Status LlvmSession::applyPassAction(LlvmAction action, bool* actionHadNoEffect) 
 #endif
 
 // Use the generated HANDLE_PASS() switch statement to dispatch to runPass().
-#define HANDLE_PASS(pass) *actionHadNoEffect = runPass(pass);
+#define HANDLE_PASS(pass) *actionHadNoEffect = !runPass(pass);
   HANDLE_ACTION(action, HANDLE_PASS)
 #undef HANDLE_PASS
 
@@ -296,7 +298,7 @@ Status LlvmSession::runOptWithArgs(const std::vector<std::string>& optArgs) {
   return Status::OK;
 }
 
-Status LlvmSession::getObservation(LlvmObservationSpace space, Observation* reply) {
+Status LlvmSession::setObservation(LlvmObservationSpace space, Observation* reply) {
   switch (space) {
     case LlvmObservationSpace::IR: {
       // Serialize the LLVM module to an IR string.

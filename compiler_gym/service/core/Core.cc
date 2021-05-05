@@ -9,9 +9,13 @@ using grpc::StatusCode;
 
 namespace compiler_gym {
 
-grpc::Status CompilationSession::init(CompilationSession& other) {
+grpc::Status CompilationSession::init(CompilationSession* other) {
   return grpc::Status(grpc::StatusCode::UNIMPLEMENTED,
                       "copy initializer not supported for this compiler");
+}
+
+grpc::Status CompilationSession::endOfActions(bool* endOfEpisode, bool* actionSpaceChanged) {
+  return Status::OK;
 }
 
 }  // namespace compiler_gym

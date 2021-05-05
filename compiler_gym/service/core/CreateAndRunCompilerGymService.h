@@ -22,6 +22,10 @@ DECLARE_string(working_dir);
 
 namespace compiler_gym {
 
+// Increase maximum message size beyond the 4MB default as inbound message
+// may be larger (e.g., in the case of IR strings).
+constexpr size_t kMaxMessageSizeInBytes = 512 * 1024 * 1024;
+
 // Create a service, configured using --port and --working_dir flags, and run
 // it. This function never returns.
 //
@@ -62,9 +66,7 @@ template <typename CompilationSession>
   grpc::ServerBuilder builder;
   builder.RegisterService(&service);
 
-  // Increase maximum message size beyond the 4MB default as inbound message
-  // may be larger (e.g., in the case of IR strings).
-  builder.SetMaxMessageSize(512 * 1024 * 1024);
+  builder.SetMaxMessageSize(kMaxMessageSizeInBytes);
 
   // Start a channel on the port.
   int port;

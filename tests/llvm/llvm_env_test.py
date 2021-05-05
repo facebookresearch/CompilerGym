@@ -201,7 +201,20 @@ def test_write_ir(env: LlvmEnv, tmpwd: Path):
     assert Path("file.ll").is_file()
 
 
-def test_ir_sha1(env: LlvmEnv, tmpwd: Path):
+def test_action_had_no_effect(env: LlvmEnv):
+    env.reset(benchmark="cbench-v1/crc32")
+
+    _, _, done, info = env.step(env.action_space.flags.index("-mem2reg"))
+    assert not done, info
+    assert not info["action_had_no_effect"], info
+
+    # Running the action again has no effect.
+    _, _, done, info = env.step(env.action_space.flags.index("-mem2reg"))
+    assert not done, info
+    assert info["action_had_no_effect"], info
+
+
+def test_ir_sha1(env: LlvmEnv):
     env.reset(benchmark="cbench-v1/crc32")
     before = env.ir_sha1
 

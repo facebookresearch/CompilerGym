@@ -23,10 +23,10 @@ BenchmarkProtoCache::BenchmarkProtoCache(std::optional<std::mt19937_64> rand, si
       cacheSize_(0){};
 
 grpc::Status BenchmarkProtoCache::getBenchmark(const std::string& uri,
-                                               const Benchmark* benchmark) const {
+                                               const Benchmark** benchmark) const {
   auto it = benchmarks_.find(uri);
   if (it != benchmarks_.end()) {
-    benchmark = &it->second;
+    *benchmark = &it->second;
     return Status::OK;
   }
 

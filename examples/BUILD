@@ -121,7 +121,8 @@ cc_binary(
     name = "RandomSearch",
     srcs = ["RandomSearch.cc"],
     deps = [
-        "//compiler_gym/envs/llvm/service:LlvmService",
+        "//compiler_gym/envs/llvm/service:LlvmSession",
+        "//compiler_gym/service/core:cc_core",
         "@boost//:filesystem",
         "@gflags",
         "@glog",

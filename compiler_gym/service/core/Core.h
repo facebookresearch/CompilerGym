@@ -9,7 +9,6 @@
 #include <vector>
 
 #include "boost/filesystem.hpp"
-#include "compiler_gym/service/core/CreateAndRunCompilerGymService.h"
 #include "compiler_gym/service/proto/compiler_gym_service.pb.h"
 
 namespace compiler_gym {
@@ -19,6 +18,8 @@ class CompilationSession {
   CompilationSession(const boost::filesystem::path& workingDirectory)
       : workingDirectory_(workingDirectory){};
 
+  virtual ~CompilationSession() = default;
+
   virtual std::string getCompilerVersion() const { return ""; }
   virtual std::vector<ActionSpace> getActionSpaces() const = 0;  // what your compiler can do
   virtual std::vector<ObservationSpace> getObservationSpaces() const = 0;  // features you provide
@@ -27,14 +28,14 @@ class CompilationSession {
 
   [[nodiscard]] virtual grpc::Status init(size_t actionSpaceIndex, const Benchmark& benchmark) = 0;
 
-  [[nodiscard]] virtual grpc::Status init(CompilationSession& other);
+  [[nodiscard]] virtual grpc::Status init(CompilationSession* other);
 
   [[nodiscard]] virtual grpc::Status applyAction(size_t actionIndex, bool* endOfEpisode,
                                                  bool* actionSpaceChanged,
                                                  bool* actionHadNoEffect) = 0;  // apply an action
 
-  // TODO: virtual grpc::Status endOfActions(bool* endOfEpisode, bool* actionSpaceChanged,
-  // *actionHadNoEffect) { return Status::OK; }
+  // Optional.
+  [[nodiscard]] virtual grpc::Status endOfActions(bool* endOfEpisode, bool* actionSpaceChanged);
 
   // compute an observation
   [[nodiscard]] virtual grpc::Status setObservation(size_t observationSpaceIndex,
@@ -46,10 +47,5 @@ class CompilationSession {
  private:
   const boost::filesystem::path workingDirectory_;
 };
-
-template <typename CompilationSession>
-[[noreturn]] void createAndRunCompilerGymService(int* argc, char*** argv, const char* usage) {
-  createAndRunCompilerGymServiceImpl<CompilationSession>(argc, argv, usage);
-}
 
 }  // namespace compiler_gym

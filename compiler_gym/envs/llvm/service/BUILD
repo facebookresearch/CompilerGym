@@ -136,25 +136,6 @@ cc_library(
 )
 
 cc_library(
-    name = "LlvmService",
-    srcs = ["LlvmService.cc"],
-    hdrs = ["LlvmService.h"],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":Benchmark",
-        ":BenchmarkFactory",
-        ":Cost",
-        ":LlvmSession",
-        ":ObservationSpaces",
-        "//compiler_gym/service/proto:compiler_gym_service_cc",
-        "//compiler_gym/util:GrpcStatusMacros",
-        "//compiler_gym/util:Version",
-        "@boost//:filesystem",
-        "@llvm//10.0.0",
-    ],
-)
-
-cc_library(
     name = "LlvmSession",
     srcs = [
         "LlvmSession.cc",
@@ -168,7 +149,7 @@ cc_library(
         "-DGOOGLE_PROTOBUF_NO_RTTI",
         "-fno-rtti",
     ],
-    visibility = ["//tests:__subpackages__"],
+    visibility = ["//visibility:public"],
     deps = [
         ":ActionSpace",
         ":Benchmark",

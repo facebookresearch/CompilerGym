@@ -49,11 +49,13 @@ Status BenchmarkFactory::getBenchmark(const BenchmarkProto& benchmarkMessage,
   // Benchmark not cached, cache it and try again.
   const auto& programFile = benchmarkMessage.program();
   switch (programFile.data_case()) {
-    case ::compiler_gym::File::DataCase::kContents:
+    case compiler_gym::File::DataCase::kContents: {
       RETURN_IF_ERROR(addBitcode(
           benchmarkMessage.uri(),
           llvm::SmallString<0>(programFile.contents().begin(), programFile.contents().end())));
-    case ::compiler_gym::File::DataCase::kUri: {
+      break;
+    }
+    case compiler_gym::File::DataCase::kUri: {
       // Check that protocol of the benmchmark URI.
       if (programFile.uri().find("file:///") != 0) {
         return Status(StatusCode::INVALID_ARGUMENT,
@@ -64,9 +66,11 @@ Status BenchmarkFactory::getBenchmark(const BenchmarkProto& benchmarkMessage,
 
       const fs::path path(programFile.uri().substr(util::strLen("file:///"), std::string::npos));
       RETURN_IF_ERROR(addBitcode(benchmarkMessage.uri(), path));
+      break;
     }
-    case ::compiler_gym::File::DataCase::DATA_NOT_SET:
-      return Status(StatusCode::INVALID_ARGUMENT, "No program set");
+    case compiler_gym::File::DataCase::DATA_NOT_SET:
+      return Status(StatusCode::INVALID_ARGUMENT, fmt::format("No program set in Benchmark:\n{}",
+                                                              benchmarkMessage.DebugString()));
   }
 
   return getBenchmark(benchmarkMessage, benchmark);

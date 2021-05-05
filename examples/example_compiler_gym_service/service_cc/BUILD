@@ -10,7 +10,7 @@ cc_binary(
     visibility = ["//visibility:public"],
     deps = [
         ":ExampleService",
-        "//compiler_gym/util:RunService",
+        "//compiler_gym/service/core:cc_core",
     ],
 )
 
@@ -19,12 +19,11 @@ cc_library(
     srcs = ["ExampleService.cc"],
     hdrs = ["ExampleService.h"],
     deps = [
+        "//compiler_gym/service/core:cc_core",
         "//compiler_gym/service/proto:compiler_gym_service_cc",
-        "//compiler_gym/service/proto:compiler_gym_service_cc_grpc",
         "//compiler_gym/util:GrpcStatusMacros",
-        "//compiler_gym/util:Version",
         "@boost//:filesystem",
-        "@com_github_grpc_grpc//:grpc++",
         "@fmt",
+        "@glog",
     ],
 )

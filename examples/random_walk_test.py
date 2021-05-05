@@ -6,11 +6,13 @@
 import gym
 from absl import flags
 
+from compiler_gym.util.debug_util import set_debug_level
 from examples.random_walk import run_random_walk
 from tests.test_main import main
 
 
 def test_run_random_walk_smoke_test():
+    set_debug_level(3)
     flags.FLAGS(["argv0"])
     env = gym.make("llvm-autophase-ic-v0")
     env.benchmark = "cbench-v1/crc32"
