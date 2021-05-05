@@ -192,7 +192,7 @@ py_test(
     deps = [
         "//compiler_gym",
         "//tests:test_main",
-        "//tests/pytest_plugins:llvm",
+        "//tests/pytest_plugins:common",
     ],
 )
 
