@@ -128,12 +128,35 @@ message StepReply {
 message ActionSpace {
   // The name of the action space.
   string name = 1;
-  // A list of discrete action names.
-  // NOTE(cummins): This currently only supports flat action spaces of
-  // categorical values. In the future we will want to replace this with a more
-  // extensible representation that supports parameterized actions, and actions
-  // of different types (e.g. optimization passes vs optimization contexts).
-  repeated string action = 2;
+  repeated ActionSpaceComponent component = 2;
+}
+
+message ActionSpaceComponent {
+  // Whether the observation space is deterministic.
+  bool deterministic = 2;
+  // A safe
+  bool all_choices_safe = 3;
+  oneof component {
+    CategoricalActionSpace categorical = 5;
+    ScalarRange discrete_int64 = 6;
+    ScalarRange continuous_double = 7;
+  }
+}
+
+message CategoricalActionSpace {
+  repeated string entry = 1;
+}
+
+message Action {
+  repeated ActionValue value = 1;
+}
+
+message ActionValue {
+  oneof value {
+    int64 categorical_value = 1;
+    int64 int64_value = 2;
+    double double_value = 3;
+  }
 }
 
 // ===========================================================================
