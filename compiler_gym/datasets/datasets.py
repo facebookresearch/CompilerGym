@@ -33,7 +33,7 @@ def round_robin_iterables(iters: Iterable[Iterable[T]]) -> Iterable[T]:
         yield from iters.popleft()
 
 
-class Datasets(object):
+class Datasets:
     """A collection of datasets.
 
     This class provides a dictionary-like interface for indexing and iterating

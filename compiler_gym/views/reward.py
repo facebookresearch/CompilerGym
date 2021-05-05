@@ -10,7 +10,7 @@ from compiler_gym.spaces.reward import Reward
 from compiler_gym.views.observation import ObservationView
 
 
-class RewardView(object):
+class RewardView:
     """A view into a set of reward spaces.
 
     Example usage:

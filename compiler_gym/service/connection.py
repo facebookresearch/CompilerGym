@@ -134,7 +134,7 @@ else:
     StubMethod = Callable[[Request], Reply]
 
 
-class Connection(object):
+class Connection:
     """Base class for service connections."""
 
     def __init__(self, channel, url: str, logger: logging.Logger):
@@ -477,7 +477,7 @@ class UnmanagedConnection(Connection):
         return self.url
 
 
-class CompilerGymServiceConnection(object):
+class CompilerGymServiceConnection:
     """A connection to a compiler gym service.
 
     There are two types of service connections: managed and unmanaged. The type

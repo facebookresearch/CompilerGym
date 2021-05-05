@@ -38,7 +38,7 @@ class BenchmarkSource(NamedTuple):
         return str(self.filename)
 
 
-class Benchmark(object):
+class Benchmark:
     """A benchmark represents a particular program that is being compiled.
 
     A benchmark is a program that can be used by a :class:`CompilerEnv

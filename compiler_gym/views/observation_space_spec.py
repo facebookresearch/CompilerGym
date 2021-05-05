@@ -22,7 +22,7 @@ def _json2nx(observation):
     )
 
 
-class ObservationSpaceSpec(object):
+class ObservationSpaceSpec:
     """Specification of an observation space.
 
     :ivar id: The name of the observation space.

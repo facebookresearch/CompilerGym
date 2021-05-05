@@ -17,7 +17,7 @@ from compiler_gym.datasets.uri import DATASET_NAME_RE
 from compiler_gym.util.debug_util import get_logging_level
 
 
-class Dataset(object):
+class Dataset:
     """A dataset is a collection of benchmarks.
 
     The Dataset class has methods for installing and managing groups of

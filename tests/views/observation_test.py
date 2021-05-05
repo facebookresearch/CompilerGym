@@ -21,12 +21,12 @@ from compiler_gym.views import ObservationView
 from tests.test_main import main
 
 
-class MockGetObservationReply(object):
+class MockGetObservationReply:
     def __init__(self, value):
         self.observation = [value]
 
 
-class MockGetObservation(object):
+class MockGetObservation:
     """Mock for the get_observation callack of ObservationView."""
 
     def __init__(self, ret=None):
