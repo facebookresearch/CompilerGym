@@ -11,6 +11,7 @@ import gym
 import pytest
 
 from compiler_gym.envs import LlvmEnv
+from tests.pytest_plugins.common import macos_only
 from tests.test_main import main
 
 
@@ -63,7 +64,8 @@ def test_running_environment_in_background_process():
         process.join()
 
 
-@pytest.mark.skipif(sys.platform != "darwin", reason="macOS only")
+@macos_only
+@pytest.mark.skipif(sys.version_info < (3, 8, 0), reason="Py >= 3.8 only")
 def test_moving_environment_to_background_process_macos():
     """Test moving an LLVM environment to a background process."""
     queue = mp.Queue(maxsize=3)
