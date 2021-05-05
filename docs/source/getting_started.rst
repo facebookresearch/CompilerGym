@@ -50,9 +50,9 @@ cumulative reward from these environments so as to produce the best programs.
 
 .. include:: installation.rst
 
-See `the Readme file
-<https://github.com/facebookresearch/CompilerGym#building-from-source>`_ for
-alternative installation methods.
+See `INSTALL.md
+<https://github.com/facebookresearch/CompilerGym/blob/development/INSTALL.md>`_
+for alternative installation methods.
 
 
 Using CompilerGym
