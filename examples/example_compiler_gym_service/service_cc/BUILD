@@ -9,16 +9,6 @@ cc_binary(
     srcs = ["RunService.cc"],
     visibility = ["//visibility:public"],
     deps = [
-        ":ExampleService",
-        "//compiler_gym/service/core:cc_core",
-    ],
-)
-
-cc_library(
-    name = "ExampleService",
-    srcs = ["ExampleService.cc"],
-    hdrs = ["ExampleService.h"],
-    deps = [
         "//compiler_gym/service/core:cc_core",
         "//compiler_gym/service/proto:compiler_gym_service_cc",
         "//compiler_gym/util:GrpcStatusMacros",
