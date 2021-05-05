@@ -41,7 +41,7 @@ We actively welcome your pull requests.
 1. Fork [the repo](https://github.com/facebookresearch/CompilerGym) and create
    your branch from `development`.
 2. Follow the instructions for
-   [building from source](https://github.com/facebookresearch/CompilerGym#building-from-source)
+   [building from source](https://github.com/facebookresearch/CompilerGym/blob/development/INSTALL.md)
    to set up your environment.
 3. If you've added code that should be tested, add tests.
 4. If you've changed APIs, update the [documentation](/docs/source).
