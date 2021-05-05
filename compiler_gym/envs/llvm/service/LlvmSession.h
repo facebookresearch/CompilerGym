@@ -14,6 +14,7 @@
 #include "compiler_gym/envs/llvm/service/Benchmark.h"
 #include "compiler_gym/envs/llvm/service/Cost.h"
 #include "compiler_gym/envs/llvm/service/ObservationSpaces.h"
+#include "compiler_gym/service/core/Core.h"
 #include "compiler_gym/service/proto/compiler_gym_service.grpc.pb.h"
 #include "llvm/Analysis/ProfileSummaryInfo.h"
 #include "llvm/Analysis/TargetLibraryInfo.h"
@@ -30,37 +31,47 @@ namespace compiler_gym::llvm_service {
 //
 // It can be used directly as a C++ API, or it can be accessed through an RPC
 // interface using the compiler_gym::service::LlvmService class.
-class LlvmSession {
+class LlvmSession final : public CompilationSession {
  public:
-  // Construct an environment by taking ownership of a benchmark. Throws
-  // std::invalid_argument if the benchmark's LLVM module fails verification.
-  LlvmSession(std::unique_ptr<Benchmark> benchmark, LlvmActionSpace actionSpace,
-              const boost::filesystem::path& workingDirectory);
+  LlvmSession(const boost::filesystem::path& workingDirectory);
 
-  inline const Benchmark& benchmark() const { return *benchmark_; }
-  inline Benchmark& benchmark() { return *benchmark_; }
+  std::string getCompilerVersion() const override;
+
+  std::vector<ActionSpace> getActionSpaces() const override;
+
+  ActionSpace getActionSpace() const override;
+
+  std::vector<ObservationSpace> getObservationSpaces() const override;
+
+  [[nodiscard]] grpc::Status init(size_t actionSpaceIndex,
+                                  const compiler_gym::Benchmark& benchmark) override;
+
+  [[nodiscard]] grpc::Status init(CompilationSession& other) override;
+
+  [[nodiscard]] grpc::Status applyAction(size_t actionIndex, bool* endOfEpisode,
+                                         bool* actionSpaceChanged,
+                                         bool* actionHadNoEffect) override;
+
+  [[nodiscard]] grpc::Status setObservation(size_t observationSpaceIndex,
+                                            Observation* observation) override;
 
   inline const LlvmActionSpace actionSpace() const { return actionSpace_; }
-
-  inline const boost::filesystem::path& workingDirectory() const { return workingDirectory_; }
-
-  // Run the requested action(s) then compute the requested observation(s).
-  [[nodiscard]] grpc::Status step(const StepRequest& request, StepReply* reply);
-
-  // Returns the number of actions that have been applied in calls to step()
-  // since the start of the session. This is just for logging and has no effect.
-  inline int actionCount() const { return actionCount_; }
-
-  // Run the requested action.
-  [[nodiscard]] grpc::Status runAction(LlvmAction action, StepReply* reply);
 
   // Compute the requested observation.
   [[nodiscard]] grpc::Status getObservation(LlvmObservationSpace space, Observation* reply);
 
- protected:
+ private:
+  [[nodiscard]] grpc::Status init(size_t actionSpaceIndex, std::unique_ptr<Benchmark> benchmark);
+
+  inline const Benchmark& benchmark() const { return *benchmark_; }
+  inline Benchmark& benchmark() { return *benchmark_; }
+
+  // Run the requested action.
+  [[nodiscard]] grpc::Status applyPassAction(LlvmAction action, bool* actionHadNoEffect);
+
   // Run the given pass, possibly modifying the underlying LLVM module.
-  void runPass(llvm::Pass* pass, StepReply* reply);
-  void runPass(llvm::FunctionPass* pass, StepReply* reply);
+  bool runPass(llvm::Pass* pass);
+  bool runPass(llvm::FunctionPass* pass);
 
   // Run the commandline `opt` tool on the current LLVM module with the given
   // arguments, replacing the environment state with the generated output.
@@ -68,7 +79,6 @@ class LlvmSession {
 
   inline const llvm::TargetLibraryInfoImpl& tlii() const { return tlii_; }
 
- private:
   // Setup pass manager with depdendent passes and the specified pass.
   template <typename PassManager, typename Pass>
   inline void setupPassManager(PassManager* passManager, Pass* pass) {
@@ -78,13 +88,12 @@ class LlvmSession {
     passManager->add(pass);
   }
 
-  const boost::filesystem::path workingDirectory_;
-  const std::unique_ptr<Benchmark> benchmark_;
-  const LlvmActionSpace actionSpace_;
-  const llvm::TargetLibraryInfoImpl tlii_;
+  // Immutable state.
   const programl::ProgramGraphOptions programlOptions_;
-
-  int actionCount_;
+  // Mutable state.
+  std::unique_ptr<Benchmark> benchmark_;
+  LlvmActionSpace actionSpace_;
+  llvm::TargetLibraryInfoImpl tlii_;
 };
 
 }  // namespace compiler_gym::llvm_service

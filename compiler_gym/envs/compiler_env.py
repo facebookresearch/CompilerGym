@@ -532,6 +532,7 @@ class CompilerEnv(gym.Env):
 
         request = ForkSessionRequest(session_id=self._session_id)
         reply: ForkSessionReply = self.service(self.service.stub.ForkSession, request)
+        # TODO: Handle NotImplementedError and fallback to replaying actions.
 
         # Create a new environment that shares the connection.
         new_env = type(self)(

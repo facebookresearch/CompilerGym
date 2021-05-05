@@ -54,8 +54,8 @@ cc_binary(
     name = "compiler_gym-llvm-service-prelinked",
     srcs = ["RunService.cc"],
     deps = [
-        ":LlvmService",
-        "//compiler_gym/util:RunService",
+        ":LlvmSession",
+        "//compiler_gym/service/core:cc_core",
     ],
 )
 
@@ -105,6 +105,7 @@ cc_library(
     deps = [
         ":Benchmark",
         ":Cost",
+        "//compiler_gym/service/proto:compiler_gym_service_cc",
         "//compiler_gym/util:GrpcStatusMacros",
         "//compiler_gym/util:RunfilesPath",
         "//compiler_gym/util:StrLenConstexpr",
@@ -171,8 +172,10 @@ cc_library(
     deps = [
         ":ActionSpace",
         ":Benchmark",
+        ":BenchmarkFactory",
         ":Cost",
         ":ObservationSpaces",
+        "//compiler_gym/service/core:cc_core",
         "//compiler_gym/service/proto:compiler_gym_service_cc_grpc",
         "//compiler_gym/third_party/autophase:InstCount",
         "//compiler_gym/third_party/cpuinfo",

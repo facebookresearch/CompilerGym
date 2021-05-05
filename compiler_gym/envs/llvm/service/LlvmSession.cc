@@ -13,7 +13,10 @@
 
 #include "boost/filesystem.hpp"
 #include "compiler_gym/envs/llvm/service/ActionSpace.h"
+#include "compiler_gym/envs/llvm/service/Benchmark.h"
+#include "compiler_gym/envs/llvm/service/BenchmarkFactory.h"
 #include "compiler_gym/envs/llvm/service/Cost.h"
+#include "compiler_gym/envs/llvm/service/ObservationSpaces.h"
 #include "compiler_gym/envs/llvm/service/passes/ActionHeaders.h"
 #include "compiler_gym/envs/llvm/service/passes/ActionSwitch.h"
 #include "compiler_gym/third_party/autophase/InstCount.h"
@@ -43,6 +46,9 @@ namespace compiler_gym::llvm_service {
 using grpc::Status;
 using grpc::StatusCode;
 using nlohmann::json;
+
+using BenchmarkProto = compiler_gym::Benchmark;
+using ActionSpaceProto = compiler_gym::ActionSpace;
 
 namespace {
 
@@ -118,18 +124,49 @@ Status writeBitcodeToFile(const llvm::Module& module, const fs::path& path) {
 
 }  // anonymous namespace
 
-LlvmSession::LlvmSession(std::unique_ptr<Benchmark> benchmark, LlvmActionSpace actionSpace,
-                         const boost::filesystem::path& workingDirectory)
-    : workingDirectory_(workingDirectory),
-      benchmark_(std::move(benchmark)),
-      actionSpace_(actionSpace),
-      tlii_(getTargetLibraryInfo(benchmark_->module())),
-      actionCount_(0) {
-  // Initialize LLVM.
-  initLlvm();
+std::string LlvmSession::getCompilerVersion() const {
+  std::stringstream ss;
+  ss << LLVM_VERSION_STRING << " " << llvm::Triple::normalize(LLVM_DEFAULT_TARGET_TRIPLE);
+  return ss.str();
+}
 
-  // Initialize cpuinfo
+std::vector<ActionSpace> LlvmSession::getActionSpaces() const { return getLlvmActionSpaceList(); }
+
+ActionSpace LlvmSession::getActionSpace() const {
+  const auto spaces = getActionSpaces();
+  return spaces[static_cast<int>(actionSpace_)];
+}
+
+std::vector<ObservationSpace> LlvmSession::getObservationSpaces() const {
+  return getLlvmObservationSpaceList();
+}
+
+LlvmSession::LlvmSession(const boost::filesystem::path& workingDirectory)
+    : CompilationSession(workingDirectory) {
+  initLlvm();
   cpuinfo_initialize();
+}
+
+Status LlvmSession::init(size_t actionSpaceIndex, const BenchmarkProto& benchmark) {
+  BenchmarkFactory& benchmarkFactory = BenchmarkFactory::getSingleton(workingDirectory());
+
+  // Get the benchmark or return an error.
+  std::unique_ptr<Benchmark> llvmBenchmark;
+  RETURN_IF_ERROR(benchmarkFactory.getBenchmark(benchmark, &llvmBenchmark));
+
+  return init(actionSpaceIndex, std::move(llvmBenchmark));
+}
+
+Status LlvmSession::init(CompilationSession& other) {
+  return init(0, static_cast<LlvmSession&>(other).benchmark().clone(workingDirectory()));
+}
+
+Status LlvmSession::init(size_t actionSpaceIndex, std::unique_ptr<Benchmark> benchmark) {
+  benchmark_ = std::move(benchmark);
+
+  RETURN_IF_ERROR(util::intToEnum(actionSpaceIndex, &actionSpace_));
+
+  tlii_ = getTargetLibraryInfo(benchmark_->module());
 
   // Strip module debug info.
   llvm::StripDebugInfo(benchmark_->module());
@@ -141,36 +178,36 @@ LlvmSession::LlvmSession(std::unique_ptr<Benchmark> benchmark, LlvmActionSpace a
   }
 
   // Verify the module now to catch any problems early.
-  CHECK(verifyModuleStatus(benchmark_->module()).ok());
-}
-
-Status LlvmSession::step(const StepRequest& request, StepReply* reply) {
-  // Apply the requested actions.
-  actionCount_ += request.action_size();
-  switch (actionSpace()) {
-    case LlvmActionSpace::PASSES_ALL:
-      for (int i = 0; i < request.action_size(); ++i) {
-        LlvmAction action;
-        RETURN_IF_ERROR(util::intToEnum(request.action(i), &action));
-        RETURN_IF_ERROR(runAction(action, reply));
-      }
-  }
-
-  // Fail now if we have broken something.
-  RETURN_IF_ERROR(verifyModuleStatus(benchmark().module()));
-
-  // Compute the requested observations.
-  for (int i = 0; i < request.observation_space_size(); ++i) {
-    LlvmObservationSpace observationSpace;
-    RETURN_IF_ERROR(util::intToEnum(request.observation_space(i), &observationSpace));
-    auto observation = reply->add_observation();
-    RETURN_IF_ERROR(getObservation(observationSpace, observation));
-  }
+  RETURN_IF_ERROR(verifyModuleStatus(benchmark_->module()));
 
   return Status::OK;
 }
 
-Status LlvmSession::runAction(LlvmAction action, StepReply* reply) {
+Status LlvmSession::applyAction(size_t actionIndex, bool* endOfEpisode, bool* actionSpaceChanged,
+                                bool* actionHadNoEffect) {
+  // Apply the requested action.
+  switch (actionSpace()) {
+    case LlvmActionSpace::PASSES_ALL:
+      LlvmAction action;
+      RETURN_IF_ERROR(util::intToEnum(actionIndex, &action));
+      RETURN_IF_ERROR(applyPassAction(action, actionHadNoEffect));
+  }
+
+  // Fail now if we have broken something.
+  // TODO: Move this into endOfActions() callback.
+  RETURN_IF_ERROR(verifyModuleStatus(benchmark().module()));
+
+  return Status::OK;
+}
+
+Status LlvmSession::setObservation(size_t observationSpaceIndex, Observation* observation) {
+  LlvmObservationSpace observationSpace;
+  RETURN_IF_ERROR(util::intToEnum(observationSpaceIndex, &observationSpace));
+  RETURN_IF_ERROR(getObservation(observationSpace, observation));
+  return Status::OK;
+}
+
+Status LlvmSession::applyPassAction(LlvmAction action, bool* actionHadNoEffect) {
 #ifdef EXPERIMENTAL_UNSTABLE_GVN_SINK_PASS
   // NOTE(https://github.com/facebookresearch/CompilerGym/issues/46): The
   // -gvn-sink pass has been found to have nondeterministic behavior so has
@@ -178,28 +215,27 @@ Status LlvmSession::runAction(LlvmAction action, StepReply* reply) {
   // the command line was found to produce more stable results.
   if (action == LlvmAction::GVNSINK_PASS) {
     RETURN_IF_ERROR(runOptWithArgs({"-gvn-sink"}));
-    reply->set_action_had_no_effect(true);
+    *actionHadNoEffect = true;
     return Status::OK;
   }
 #endif
 
 // Use the generated HANDLE_PASS() switch statement to dispatch to runPass().
-#define HANDLE_PASS(pass) runPass(pass, reply);
+#define HANDLE_PASS(pass) *actionHadNoEffect = runPass(pass);
   HANDLE_ACTION(action, HANDLE_PASS)
 #undef HANDLE_PASS
 
   return Status::OK;
 }
 
-void LlvmSession::runPass(llvm::Pass* pass, StepReply* reply) {
+bool LlvmSession::runPass(llvm::Pass* pass) {
   llvm::legacy::PassManager passManager;
   setupPassManager(&passManager, pass);
 
-  const bool changed = passManager.run(benchmark().module());
-  reply->set_action_had_no_effect(!changed);
+  return passManager.run(benchmark().module());
 }
 
-void LlvmSession::runPass(llvm::FunctionPass* pass, StepReply* reply) {
+bool LlvmSession::runPass(llvm::FunctionPass* pass) {
   llvm::legacy::FunctionPassManager passManager(&benchmark().module());
   setupPassManager(&passManager, pass);
 
@@ -208,13 +244,13 @@ void LlvmSession::runPass(llvm::FunctionPass* pass, StepReply* reply) {
     changed |= (passManager.run(function) ? 1 : 0);
   }
   changed |= (passManager.doFinalization() ? 1 : 0);
-  reply->set_action_had_no_effect(!changed);
+  return changed;
 }
 
 Status LlvmSession::runOptWithArgs(const std::vector<std::string>& optArgs) {
   // Create temporary files for `opt` to read from and write to.
-  const auto before_path = fs::unique_path(workingDirectory_ / "module-%%%%%%%%.bc");
-  const auto after_path = fs::unique_path(workingDirectory_ / "module-%%%%%%%%.bc");
+  const auto before_path = fs::unique_path(workingDirectory() / "module-%%%%%%%%.bc");
+  const auto after_path = fs::unique_path(workingDirectory() / "module-%%%%%%%%.bc");
   RETURN_IF_ERROR(writeBitcodeToFile(benchmark().module(), before_path));
 
   // Build a command line invocation: `opt input.bc -o output.bc <optArgs...>`.
@@ -272,7 +308,7 @@ Status LlvmSession::getObservation(LlvmObservationSpace space, Observation* repl
     }
     case LlvmObservationSpace::BITCODE_FILE: {
       // Generate an output path with 16 bits of randomness.
-      const auto outpath = fs::unique_path(workingDirectory_ / "module-%%%%%%%%.bc");
+      const auto outpath = fs::unique_path(workingDirectory() / "module-%%%%%%%%.bc");
       RETURN_IF_ERROR(writeBitcodeToFile(benchmark().module(), outpath));
       reply->set_string_value(outpath.string());
       break;
@@ -333,7 +369,7 @@ Status LlvmSession::getObservation(LlvmObservationSpace space, Observation* repl
     case LlvmObservationSpace::IR_INSTRUCTION_COUNT: {
       double cost;
       RETURN_IF_ERROR(setCost(LlvmCostFunction::IR_INSTRUCTION_COUNT, benchmark().module(),
-                              workingDirectory_, &cost));
+                              workingDirectory(), &cost));
       reply->set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
@@ -358,7 +394,7 @@ Status LlvmSession::getObservation(LlvmObservationSpace space, Observation* repl
     case LlvmObservationSpace::OBJECT_TEXT_SIZE_BYTES: {
       double cost;
       RETURN_IF_ERROR(setCost(LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES, benchmark().module(),
-                              workingDirectory_, &cost));
+                              workingDirectory(), &cost));
       reply->set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
@@ -384,7 +420,7 @@ Status LlvmSession::getObservation(LlvmObservationSpace space, Observation* repl
     case LlvmObservationSpace::TEXT_SIZE_BYTES: {
       double cost;
       RETURN_IF_ERROR(setCost(LlvmCostFunction::TEXT_SIZE_BYTES, benchmark().module(),
-                              workingDirectory_, &cost));
+                              workingDirectory(), &cost));
       reply->set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }

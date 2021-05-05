@@ -128,7 +128,9 @@ message StepReply {
 message ActionSpace {
   // The name of the action space.
   string name = 1;
-  repeated ActionSpaceComponent component = 2;
+  repeated string action = 2;
+  // TODO: repeated ActionSpaceComponent component = 2;
+
 }
 
 message ActionSpaceComponent {
