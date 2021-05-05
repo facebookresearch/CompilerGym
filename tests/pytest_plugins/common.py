@@ -16,8 +16,22 @@ from compiler_gym.util.runfiles_path import transient_cache_path
 
 FLAGS = absl_flags.FLAGS
 
+
+def is_ci() -> bool:
+    """Return whether running in CI environment."""
+    return os.environ.get("CI", "") != ""
+
+
+def in_bazel() -> bool:
+    """Return whether running under bazel."""
+    return os.environ.get("TEST_WORKSPACE", "") != ""
+
+
 # Decorator to skip a test in the CI environment.
-skip_on_ci = pytest.mark.skipif(os.environ.get("CI", "") != "", reason="Skip on CI")
+skip_on_ci = pytest.mark.skipif(is_ci(), reason="Skip on CI")
+
+# Decorator to run a test only in the CI environment.
+ci_only = pytest.mark.skipif(not is_ci(), reason="Runs only on CI")
 
 # Decorator to mark a test as skipped if not on Linux.
 linux_only = pytest.mark.skipif(
@@ -30,9 +44,11 @@ macos_only = pytest.mark.skipif(
 )
 
 # Decorator to mark a test as skipped if not running under bazel.
-bazel_only = pytest.mark.skipif(
-    os.environ.get("TEST_WORKSPACE", "") == "", reason="bazel only"
-)
+bazel_only = pytest.mark.skipif(not in_bazel(), reason="bazel only")
+
+# Decorator to make a test as skipped if not running in the `install-test`
+# environment.
+install_test_only = pytest.mark.skipif(in_bazel(), reason="install-test only")
 
 
 @pytest.fixture(scope="function")
