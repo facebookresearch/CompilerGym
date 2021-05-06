@@ -498,3 +498,9 @@ class LlvmEnv(CompilerEnv):
             print(self.ir)
         else:
             return super().render(mode)
+
+    def set_benchmark(self, benchmark: Union[str, Benchmark]):
+        if isinstance(benchmark, str) and benchmark.startswith("file:///"):
+            path = benchmark[len("file:///") :]
+            benchmark = self.make_benchmark(path)
+        super().set_benchmark(benchmark)

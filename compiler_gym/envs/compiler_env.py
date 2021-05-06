@@ -410,6 +410,9 @@ class CompilerEnv(gym.Env):
 
     @benchmark.setter
     def benchmark(self, benchmark: Union[str, Benchmark]):
+        return self.set_benchmark(benchmark)
+
+    def set_benchmark(self, benchmark: Union[str, Benchmark]) -> None:
         if self.in_episode:
             warnings.warn(
                 "Changing the benchmark has no effect until reset() is called"

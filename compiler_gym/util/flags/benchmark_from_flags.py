@@ -7,7 +7,7 @@ from typing import Optional, Union
 
 from absl import flags
 
-from compiler_gym.service.proto import Benchmark, File
+from compiler_gym.service.proto import Benchmark
 
 flags.DEFINE_string(
     "benchmark",
@@ -22,11 +22,4 @@ FLAGS = flags.FLAGS
 
 def benchmark_from_flags() -> Optional[Union[Benchmark, str]]:
     """Returns either the name of the benchmark, or a Benchmark message."""
-    if FLAGS.benchmark:
-        if FLAGS.benchmark.startswith("file:///"):
-            return Benchmark(uri=FLAGS.benchmark, program=File(uri=FLAGS.benchmark))
-        else:
-            return FLAGS.benchmark
-    else:
-        # No benchmark was specified.
-        return None
+    return FLAGS.benchmark if FLAGS.benchmark else None
