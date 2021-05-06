@@ -198,7 +198,10 @@ def random_search(
                     worker.total_environment_count for worker in workers
                 )
 
-                best_worker = max(workers, key=lambda worker: worker.best_returns)
+                best_worker = max(
+                    workers,
+                    key=lambda worker: (worker.best_returns, -len(worker.best_actions)),
+                )
                 best_returns = best_worker.best_returns
                 best_actions = best_worker.best_actions
                 best_commandline = best_worker.best_commandline
