@@ -196,7 +196,7 @@ Status LlvmSession::applyAction(size_t actionIndex, bool* endOfEpisode, bool* ac
   return Status::OK;
 }
 
-Status LlvmSession::endOfActions(bool* endOfEpisode, bool* actionSpaceChanged) {
+Status LlvmSession::endOfStep(bool* endOfEpisode) {
   return verifyModuleStatus(benchmark().module());
 }
 

@@ -136,14 +136,8 @@ class CompilerGymServicer final : public CompilerGymService::Service {
                                                &actionHadNoEffect));
       actionsHadNoEffect &= actionHadNoEffect;
       if (endOfEpisode) {
-        reply->set_end_of_session(true);
         break;
       }
-    }
-
-    reply->set_action_had_no_effect(actionsHadNoEffect);
-    if (newActionSpace) {
-      *reply->mutable_new_action_space() = environment->getActionSpace();
     }
 
     // Compute the requested observations.
@@ -152,7 +146,14 @@ class CompilerGymServicer final : public CompilerGymService::Service {
           environment->setObservation(request->observation_space(i), reply->add_observation()));
     }
 
-    return grpc::Status::OK;
+    RETURN_IF_ERROR(environment->endOfStep(&endOfEpisode));
+
+    reply->set_action_had_no_effect(actionsHadNoEffect);
+    if (newActionSpace) {
+      *reply->mutable_new_action_space() = environment->getActionSpace();
+    }
+    reply->set_end_of_session(endOfEpisode);
+    return Status::OK;
   }
 
   grpc::Status AddBenchmark(grpc::ServerContext* context, const AddBenchmarkRequest* request,

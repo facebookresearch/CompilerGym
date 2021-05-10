@@ -35,7 +35,7 @@ class CompilationSession {
                                                  bool* actionHadNoEffect) = 0;  // apply an action
 
   // Optional.
-  [[nodiscard]] virtual grpc::Status endOfActions(bool* endOfEpisode, bool* actionSpaceChanged);
+  [[nodiscard]] virtual grpc::Status endOfStep(bool* endOfEpisode);
 
   // compute an observation
   [[nodiscard]] virtual grpc::Status setObservation(size_t observationSpaceIndex,

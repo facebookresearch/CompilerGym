@@ -53,7 +53,7 @@ class LlvmSession final : public CompilationSession {
                                          bool* actionSpaceChanged,
                                          bool* actionHadNoEffect) override;
 
-  [[nodiscard]] grpc::Status endOfActions(bool* endOfEpisode, bool* actionSpaceChanged) override;
+  [[nodiscard]] grpc::Status endOfStep(bool* endOfEpisode) override;
 
   [[nodiscard]] grpc::Status setObservation(size_t observationSpaceIndex,
                                             Observation* observation) override;

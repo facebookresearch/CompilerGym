@@ -14,8 +14,6 @@ grpc::Status CompilationSession::init(CompilationSession* other) {
                       "copy initializer not supported for this compiler");
 }
 
-grpc::Status CompilationSession::endOfActions(bool* endOfEpisode, bool* actionSpaceChanged) {
-  return Status::OK;
-}
+grpc::Status CompilationSession::endOfStep(bool* endOfEpisode) { return Status::OK; }
 
 }  // namespace compiler_gym
