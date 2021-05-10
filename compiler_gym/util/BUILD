@@ -14,6 +14,7 @@ py_library(
         "decorators.py",
         "download.py",
         "filesystem.py",
+        "gym_type_hints.py",
         "logs.py",
         "minimize_trajectory.py",
         "registration.py",

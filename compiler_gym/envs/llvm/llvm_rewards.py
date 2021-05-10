@@ -8,6 +8,7 @@ from typing import List, Optional
 from compiler_gym.datasets import Benchmark
 from compiler_gym.service import observation_t
 from compiler_gym.spaces.reward import Reward
+from compiler_gym.util.gym_type_hints import RewardType
 from compiler_gym.views.observation import ObservationView
 
 
@@ -46,12 +47,12 @@ class CostFunctionReward(Reward):
         action: int,
         observations: List[observation_t],
         observation_view: ObservationView,
-    ) -> float:
+    ) -> RewardType:
         """Called on env.step(). Compute and return new reward."""
-        cost: float = observations[0]
+        cost: RewardType = observations[0]
         if self.previous_cost is None:
             self.previous_cost = observation_view[self.init_cost_function]
-        reward = float(self.previous_cost - cost)
+        reward = RewardType(self.previous_cost - cost)
         self.previous_cost = cost
         return reward
 
@@ -82,13 +83,13 @@ class NormalizedReward(CostFunctionReward):
         action: int,
         observations: List[observation_t],
         observation_view: ObservationView,
-    ) -> float:
+    ) -> RewardType:
         """Called on env.step(). Compute and return new reward."""
         if self.cost_norm is None:
             self.cost_norm = self.get_cost_norm(observation_view)
         return super().update(action, observations, observation_view) / self.cost_norm
 
-    def get_cost_norm(self, observation_view: ObservationView) -> float:
+    def get_cost_norm(self, observation_view: ObservationView) -> RewardType:
         """Return the value used to normalize costs."""
         return observation_view[self.init_cost_function]
 
@@ -104,7 +105,7 @@ class BaselineImprovementNormalizedReward(NormalizedReward):
         super().__init__(**kwargs)
         self.baseline_cost_function: str = baseline_cost_function
 
-    def get_cost_norm(self, observation_view: ObservationView) -> float:
+    def get_cost_norm(self, observation_view: ObservationView) -> RewardType:
         """Return the value used to normalize costs."""
         init_cost = observation_view[self.init_cost_function]
         baseline_cost = observation_view[self.baseline_cost_function]

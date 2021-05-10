@@ -34,7 +34,7 @@ from compiler_gym.compiler_env_state import (
     CompilerEnvStateReader,
     CompilerEnvStateWriter,
 )
-from compiler_gym.envs import COMPILER_GYM_ENVS, CompilerEnv, observation_t, step_t
+from compiler_gym.envs import COMPILER_GYM_ENVS, CompilerEnv
 from compiler_gym.random_search import random_search
 from compiler_gym.util.debug_util import (
     get_debug_level,
@@ -63,11 +63,9 @@ __all__ = [
     "download",
     "get_debug_level",
     "get_logging_level",
-    "observation_t",
     "random_search",
     "set_debug_level",
     "site_data_path",
-    "step_t",
     "transient_cache_path",
     "validate_states",
     "ValidationError",

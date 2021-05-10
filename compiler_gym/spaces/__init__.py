@@ -9,11 +9,11 @@ from compiler_gym.spaces.scalar import Scalar
 from compiler_gym.spaces.sequence import Sequence
 
 __all__ = [
-    "DefaultRewardFromObservation",
-    "Scalar",
-    "Sequence",
-    "NamedDiscrete",
     "Commandline",
     "CommandlineFlag",
+    "DefaultRewardFromObservation",
+    "NamedDiscrete",
     "Reward",
+    "Scalar",
+    "Sequence",
 ]
