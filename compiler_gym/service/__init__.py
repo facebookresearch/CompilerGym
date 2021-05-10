@@ -12,13 +12,10 @@ from compiler_gym.service.connection import (
     ServiceTransportError,
     SessionNotFound,
 )
-from compiler_gym.service.proto2py import observation_t, scalar_range2tuple
 
 __all__ = [
     "CompilerGymServiceConnection",
     "ConnectionOpts",
-    "observation_t",
-    "scalar_range2tuple",
     "ServiceError",
     "ServiceInitError",
     "ServiceIsClosed",

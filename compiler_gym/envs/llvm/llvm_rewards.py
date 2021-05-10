@@ -6,7 +6,7 @@
 from typing import List, Optional
 
 from compiler_gym.datasets import Benchmark
-from compiler_gym.service import observation_t
+from compiler_gym.service.core import observation_t
 from compiler_gym.spaces.reward import Reward
 from compiler_gym.views.observation import ObservationView
 

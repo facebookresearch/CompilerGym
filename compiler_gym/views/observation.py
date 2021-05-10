@@ -4,7 +4,8 @@
 # LICENSE file in the root directory of this source tree.
 from typing import Callable, Dict, List
 
-from compiler_gym.service import ServiceError, observation_t
+from compiler_gym.service import ServiceError
+from compiler_gym.service.core import observation_t
 from compiler_gym.service.proto import ObservationSpace, StepReply, StepRequest
 from compiler_gym.views.observation_space_spec import ObservationSpaceSpec
 

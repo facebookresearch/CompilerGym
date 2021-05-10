@@ -27,8 +27,8 @@ from compiler_gym.service import (
     ServiceOSError,
     ServiceTransportError,
     SessionNotFound,
-    observation_t,
 )
+from compiler_gym.service.core import observation_t
 from compiler_gym.service.proto import (
     AddBenchmarkRequest,
     EndSessionReply,

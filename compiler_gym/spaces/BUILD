@@ -37,7 +37,7 @@ py_library(
     srcs = ["reward.py"],
     deps = [
         ":scalar",
-        "//compiler_gym/service",
+        "//compiler_gym/service/core:py_core",
     ],
 )
 

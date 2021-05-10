@@ -9,7 +9,7 @@ import networkx as nx
 import numpy as np
 from gym.spaces import Box, Space
 
-from compiler_gym.service import observation_t, scalar_range2tuple
+from compiler_gym.service.core import observation_t, scalar_range2tuple
 from compiler_gym.service.proto import Observation, ObservationSpace
 from compiler_gym.spaces.scalar import Scalar
 from compiler_gym.spaces.sequence import Sequence

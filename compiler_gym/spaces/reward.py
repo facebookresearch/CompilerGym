@@ -6,7 +6,7 @@ from typing import List, Optional, Tuple
 
 import numpy as np
 
-from compiler_gym.service import observation_t
+from compiler_gym.service.core import observation_t
 from compiler_gym.spaces.scalar import Scalar
 
 

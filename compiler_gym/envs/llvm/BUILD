@@ -55,7 +55,7 @@ py_library(
     name = "llvm_rewards",
     srcs = ["llvm_rewards.py"],
     deps = [
-        "//compiler_gym/service",
+        "//compiler_gym/service/core:py_core",
         "//compiler_gym/spaces",
         "//compiler_gym/views",
     ],

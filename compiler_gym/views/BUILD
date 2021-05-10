@@ -20,6 +20,7 @@ py_library(
     deps = [
         ":observation_space_spec",
         "//compiler_gym/service",
+        "//compiler_gym/service/core:py_core",
         "//compiler_gym/service/proto",
     ],
 )
@@ -28,7 +29,7 @@ py_library(
     name = "observation_space_spec",
     srcs = ["observation_space_spec.py"],
     deps = [
-        "//compiler_gym/service",
+        "//compiler_gym/service/core:py_core",
         "//compiler_gym/service/proto",
         "//compiler_gym/spaces",
     ],

@@ -4,6 +4,7 @@ py_library(
         "__init__.py",
         "compiler_gym_servicer.py",
         "core.py",
+        "proto2py.py",
         "run.py",
     ],
     visibility = ["//visibility:public"],
@@ -38,5 +39,14 @@ cc_library(
         "@fmt",
         "@gflags",
         "@glog",
+    ],
+)
+
+py_library(
+    name = "proto2py",
+    srcs = ["proto2py.py"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//compiler_gym/service/proto",
     ],
 )
