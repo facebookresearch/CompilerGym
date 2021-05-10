@@ -41,12 +41,13 @@ constexpr size_t kMaxMessageSizeInBytes = 512 * 1024 * 1024;
 // Usage:
 //
 //     int main(int argc, char** argv) {
-//       createAndRunCompilerGymServiceImpl(&argc, &argv, "usage string");
+//       createAndRunCompilerGymServiceImpl(argc, argv, "usage string");
 //     }
 template <typename CompilationSession>
-[[noreturn]] void createAndRunCompilerGymServiceImpl(int* argc, char*** argv, const char* usage) {
+[[noreturn]] void createAndRunCompilerGymServiceImpl(int argc, char** argv, const char* usage) {
   gflags::SetUsageMessage(std::string(usage));
-  gflags::ParseCommandLineFlags(argc, argv, /*remove_flags=*/false);
+  // TODO: Fatal error if unparsed flags remain.
+  gflags::ParseCommandLineFlags(&argc, &argv, /*remove_flags=*/false);
 
   // TODO: Create a temporary working directory if --working_dir is not set.
   CHECK(!FLAGS_working_dir.empty()) << "--working_dir flag not set";
@@ -59,7 +60,7 @@ template <typename CompilationSession>
 
   CHECK(boost::filesystem::is_directory(FLAGS_log_dir)) << "Directory not found: " << FLAGS_log_dir;
 
-  google::InitGoogleLogging((*argv)[0]);
+  google::InitGoogleLogging(argv[0]);
 
   CompilerGymServicer<CompilationSession> service{workingDirectory};
 

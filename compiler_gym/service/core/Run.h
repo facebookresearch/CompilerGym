@@ -9,7 +9,7 @@
 namespace compiler_gym {
 
 template <typename CompilationSession>
-[[noreturn]] void createAndRunCompilerGymService(int* argc, char*** argv, const char* usage) {
+[[noreturn]] void createAndRunCompilerGymService(int argc, char** argv, const char* usage) {
   createAndRunCompilerGymServiceImpl<CompilationSession>(argc, argv, usage);
 }
 

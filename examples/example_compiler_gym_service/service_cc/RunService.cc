@@ -123,5 +123,5 @@ class ExampleCompilationSession final : public CompilationSession {
 }  // namespace
 
 int main(int argc, char** argv) {
-  createAndRunCompilerGymService<ExampleCompilationSession>(&argc, &argv, usage);
+  createAndRunCompilerGymService<ExampleCompilationSession>(argc, argv, usage);
 }

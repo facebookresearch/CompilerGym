@@ -11,6 +11,4 @@ const char* usage = R"(LLVM CompilerGym service)";
 using compiler_gym::createAndRunCompilerGymService;
 using compiler_gym::llvm_service::LlvmSession;
 
-int main(int argc, char** argv) {
-  createAndRunCompilerGymService<LlvmSession>(&argc, &argv, usage);
-}
+int main(int argc, char** argv) { createAndRunCompilerGymService<LlvmSession>(argc, argv, usage); }
