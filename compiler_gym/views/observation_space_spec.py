@@ -9,10 +9,11 @@ import networkx as nx
 import numpy as np
 from gym.spaces import Box, Space
 
-from compiler_gym.service import observation_t, scalar_range2tuple
+from compiler_gym.service import scalar_range2tuple
 from compiler_gym.service.proto import Observation, ObservationSpace
 from compiler_gym.spaces.scalar import Scalar
 from compiler_gym.spaces.sequence import Sequence
+from compiler_gym.util.gym_type_hints import ObservationType
 
 
 def _json2nx(observation):
@@ -53,11 +54,11 @@ class ObservationSpaceSpec:
         id: str,
         index: int,
         space: Space,
-        translate: Callable[[Union[observation_t, Observation]], observation_t],
-        to_string: Callable[[observation_t], str],
+        translate: Callable[[Union[ObservationType, Observation]], ObservationType],
+        to_string: Callable[[ObservationType], str],
         deterministic: bool,
         platform_dependent: bool,
-        default_value: observation_t,
+        default_value: ObservationType,
     ):
         """Constructor. Don't call directly, use make_derived_space()."""
         self.id: str = id
@@ -213,12 +214,12 @@ class ObservationSpaceSpec:
     def make_derived_space(
         self,
         id: str,
-        translate: Callable[[observation_t], observation_t],
+        translate: Callable[[ObservationType], ObservationType],
         space: Optional[Space] = None,
         deterministic: Optional[bool] = None,
-        default_value: Optional[observation_t] = None,
+        default_value: Optional[ObservationType] = None,
         platform_dependent: Optional[bool] = None,
-        to_string: Callable[[observation_t], str] = None,
+        to_string: Callable[[ObservationType], str] = None,
     ) -> "ObservationSpaceSpec":
         """Create a derived observation space.
 

@@ -27,7 +27,6 @@ from compiler_gym.service import (
     ServiceOSError,
     ServiceTransportError,
     SessionNotFound,
-    observation_t,
 )
 from compiler_gym.service.proto import (
     AddBenchmarkRequest,
@@ -43,7 +42,7 @@ from compiler_gym.service.proto import (
 )
 from compiler_gym.spaces import DefaultRewardFromObservation, NamedDiscrete, Reward
 from compiler_gym.util.debug_util import get_logging_level
-from compiler_gym.util.gym_type_hints import StepType
+from compiler_gym.util.gym_type_hints import ObservationType, StepType
 from compiler_gym.util.timer import Timer
 from compiler_gym.validation_error import ValidationError
 from compiler_gym.validation_result import ValidationResult
@@ -629,7 +628,7 @@ class CompilerEnv(gym.Env):
         benchmark: Optional[Union[str, Benchmark]] = None,
         action_space: Optional[str] = None,
         retry_count: int = 0,
-    ) -> Optional[observation_t]:
+    ) -> Optional[ObservationType]:
         """Reset the environment state.
 
         This method must be called before :func:`step()`.

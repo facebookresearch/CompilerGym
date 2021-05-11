@@ -6,9 +6,8 @@
 from typing import List, Optional
 
 from compiler_gym.datasets import Benchmark
-from compiler_gym.service import observation_t
 from compiler_gym.spaces.reward import Reward
-from compiler_gym.util.gym_type_hints import RewardType
+from compiler_gym.util.gym_type_hints import ObservationType, RewardType
 from compiler_gym.views.observation import ObservationView
 
 
@@ -35,7 +34,7 @@ class CostFunctionReward(Reward):
         super().__init__(observation_spaces=[cost_function], **kwargs)
         self.cost_function: str = cost_function
         self.init_cost_function: str = init_cost_function
-        self.previous_cost: Optional[observation_t] = None
+        self.previous_cost: Optional[ObservationType] = None
 
     def reset(self, benchmark: Benchmark) -> None:
         """Called on env.reset(). Reset incremental progress."""
@@ -45,7 +44,7 @@ class CostFunctionReward(Reward):
     def update(
         self,
         action: int,
-        observations: List[observation_t],
+        observations: List[ObservationType],
         observation_view: ObservationView,
     ) -> RewardType:
         """Called on env.step(). Compute and return new reward."""
@@ -65,7 +64,7 @@ class NormalizedReward(CostFunctionReward):
     def __init__(self, **kwargs):
         """Constructor."""
         super().__init__(**kwargs)
-        self.cost_norm: Optional[observation_t] = None
+        self.cost_norm: Optional[ObservationType] = None
         self.benchmark: Benchmark = None
 
     def reset(self, benchmark: str) -> None:
@@ -81,7 +80,7 @@ class NormalizedReward(CostFunctionReward):
     def update(
         self,
         action: int,
-        observations: List[observation_t],
+        observations: List[ObservationType],
         observation_view: ObservationView,
     ) -> RewardType:
         """Called on env.step(). Compute and return new reward."""

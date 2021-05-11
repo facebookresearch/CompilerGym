@@ -8,14 +8,14 @@ from time import time
 from typing import List, Tuple
 
 from compiler_gym.envs import CompilerEnv
-from compiler_gym.service import observation_t
+from compiler_gym.util.gym_type_hints import ObservationType
 
 
 def apply_random_trajectory(
     env: CompilerEnv,
     random_trajectory_length_range=(1, 50),
     timeout: int = 0,
-) -> List[Tuple[int, observation_t, float, bool]]:
+) -> List[Tuple[int, ObservationType, float, bool]]:
     """Evaluate and return a random trajectory."""
     end_time = time() + timeout
     num_actions = random.randint(*random_trajectory_length_range)
