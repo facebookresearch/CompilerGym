@@ -43,7 +43,6 @@ py_library(
     deps = [
         ":observation",
         "//compiler_gym/datasets",
-        "//compiler_gym/service",
         "//compiler_gym/service/proto",
         "//compiler_gym/spaces",
     ],

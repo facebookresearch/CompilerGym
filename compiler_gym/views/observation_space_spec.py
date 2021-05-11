@@ -9,8 +9,7 @@ import networkx as nx
 import numpy as np
 from gym.spaces import Box, Space
 
-from compiler_gym.service import scalar_range2tuple
-from compiler_gym.service.proto import Observation, ObservationSpace
+from compiler_gym.service.proto import Observation, ObservationSpace, ScalarRange
 from compiler_gym.spaces.scalar import Scalar
 from compiler_gym.spaces.sequence import Sequence
 from compiler_gym.util.gym_type_hints import ObservationType
@@ -20,6 +19,14 @@ def _json2nx(observation):
     json_data = json.loads(observation.string_value)
     return nx.readwrite.json_graph.node_link_graph(
         json_data, multigraph=True, directed=True
+    )
+
+
+def _scalar_range2tuple(sr: ScalarRange, defaults=(-np.inf, np.inf)):
+    """Convert a ScalarRange to a tuple of (min, max) bounds."""
+    return (
+        sr.min.value if sr.HasField("min") else defaults[0],
+        sr.max.value if sr.HasField("max") else defaults[1],
     )
 
 
@@ -91,7 +98,7 @@ class ObservationSpaceSpec:
         shape_type = proto.WhichOneof("shape")
 
         def make_box(scalar_range_list, dtype, defaults):
-            bounds = [scalar_range2tuple(r, defaults) for r in scalar_range_list]
+            bounds = [_scalar_range2tuple(r, defaults) for r in scalar_range_list]
             return Box(
                 low=np.array([b[0] for b in bounds], dtype=dtype),
                 high=np.array([b[1] for b in bounds], dtype=dtype),
@@ -99,14 +106,14 @@ class ObservationSpaceSpec:
             )
 
         def make_scalar(scalar_range, dtype, defaults):
-            scalar_range_tuple = scalar_range2tuple(scalar_range, defaults)
+            scalar_range_tuple = _scalar_range2tuple(scalar_range, defaults)
             return Scalar(
                 min=scalar_range_tuple[0], max=scalar_range_tuple[1], dtype=dtype
             )
 
         def make_seq(scalar_range, dtype, defaults):
             return Sequence(
-                size_range=scalar_range2tuple(scalar_range, defaults),
+                size_range=_scalar_range2tuple(scalar_range, defaults),
                 dtype=dtype,
                 opaque_data_format=proto.opaque_data_format,
             )

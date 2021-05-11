@@ -10,7 +10,6 @@ py_library(
     visibility = ["//visibility:public"],
     deps = [
         ":connection",
-        ":proto2py",
         "//compiler_gym/service/proto",
     ],
 )
@@ -22,14 +21,5 @@ py_library(
     deps = [
         "//compiler_gym/service/proto",
         "//compiler_gym/util",
-    ],
-)
-
-py_library(
-    name = "proto2py",
-    srcs = ["proto2py.py"],
-    visibility = ["//visibility:public"],
-    deps = [
-        "//compiler_gym/service/proto",
     ],
 )
