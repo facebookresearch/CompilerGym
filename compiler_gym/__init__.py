@@ -42,6 +42,7 @@ from compiler_gym.util.debug_util import (
     set_debug_level,
 )
 from compiler_gym.util.download import download
+from compiler_gym.util.registration import make
 from compiler_gym.util.runfiles_path import (
     cache_path,
     site_data_path,
@@ -56,6 +57,7 @@ __all__ = [
     "__version__",
     "cache_path",
     "COMPILER_GYM_ENVS",
+    "make",
     "CompilerEnv",
     "CompilerEnvState",
     "CompilerEnvStateWriter",
