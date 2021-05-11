@@ -31,7 +31,10 @@ import logging
 import os
 from itertools import islice
 from pathlib import Path
+import queue
 from threading import Thread
+import multiprocessing as mp
+from copy import deepcopy
 from time import sleep
 from typing import Callable, List
 
@@ -84,61 +87,58 @@ FLAGS = flags.FLAGS
 # interacts with that environment with the goal of maximising cumulative reward.
 Policy = Callable[[LlvmEnv], None]
 
+def eval_policy(d):
+    benchmark, policy = d
+    env = gym.make("llvm-ic-v0")
+    env.logger.setLevel(logging.DEBUG)
 
-class _EvalPolicyWorker(Thread):
+    # print(f"Start one job {benchmark}!", flush=True)
+    env.reset(benchmark=benchmark)
+    with Timer() as timer:
+        policy(env)
+
+    # Sanity check that the policy didn't change the expected
+    # experimental setup.
+    assert env.in_episode, "Environment is no longer in an episode"
+    assert env.benchmark and (
+        env.benchmark == benchmark
+    ), "Policy changed environment benchmark"
+    assert env.reward_space, "Policy unset environment reward space"
+    assert (
+        env.reward_space.id == "IrInstructionCountOz"
+    ), "Policy changed environment reward space"
+
+    # print("Finish one job!", flush=True)
+    # Override walltime in the generated state.
+    state = env.state.copy()
+    state.walltime = timer.time
+    env.close()
+    return state
+
+class _EvalPolicyWorker(mp.Process):
     """Worker thread to evaluate a policy."""
 
     def __init__(
         self,
-        env: LlvmEnv,
+        num_process: int,
         benchmarks: List[str],
         policy: Policy,
-        init_states: List[CompilerEnvState],
+        q: mp.Queue
     ):
         super().__init__()
-        self.env = env
+        self.num_process = num_process
         self.benchmarks = benchmarks
         self.policy = policy
-        self.states: List[CompilerEnvState] = init_states
-        self.alive = True
+        self.q = q
 
     def run(self):
-        # Determine if we need to print a header.
-        header = (
-            not Path(FLAGS.leaderboard_results).is_file()
-            or os.stat(FLAGS.leaderboard_results).st_size == 0
-        )
-        with CompilerEnvStateWriter(
-            open(FLAGS.leaderboard_results, "a"), header=header
-        ) as writer:
-            for benchmark in self.benchmarks:
-                self.env.reset(benchmark=benchmark)
-                with Timer() as timer:
-                    self.policy(self.env)
-
-                # Sanity check that the policy didn't change the expected
-                # experimental setup.
-                assert self.env.in_episode, "Environment is no longer in an episode"
-                assert self.env.benchmark and (
-                    self.env.benchmark == benchmark
-                ), "Policy changed environment benchmark"
-                assert self.env.reward_space, "Policy unset environment reward space"
-                assert (
-                    self.env.reward_space.id == "IrInstructionCountOz"
-                ), "Policy changed environment reward space"
-
-                # Override walltime in the generated state.
-                state = self.env.state.copy()
-                state.walltime = timer.time
-
-                writer.write_state(state, flush=True)
-                self.states.append(state)
-
-                if not self.alive:
-                    return
+        args = [ (bm, self.policy) for bm in self.benchmarks ]
+        with mp.Pool(self.num_process) as pool:
+            for state in pool.imap_unordered(eval_policy, args):
+                self.q.put(state)
 
 
-def eval_llvm_instcount_policy(policy: Policy) -> None:
+def eval_llvm_instcount_policy(policy: Policy, num_process: int = 1) -> None:
     """Evaluate an LLVM codesize policy and generate results for a leaderboard
     submission.
 
@@ -225,18 +225,18 @@ def eval_llvm_instcount_policy(policy: Policy) -> None:
         assert len(argv) == 1, f"Unknown args: {argv[:1]}"
         assert FLAGS.n > 0, "n must be > 0"
 
-        env = gym.make("llvm-ic-v0")
-
         # Stream verbose CompilerGym logs to file.
         logger = logging.getLogger("compiler_gym")
         logger.setLevel(logging.DEBUG)
-        env.logger.setLevel(logging.DEBUG)
         log_handler = logging.FileHandler(FLAGS.leaderboard_logfile)
         logger.addHandler(log_handler)
         logger.propagate = False
 
         print(f"Writing results to {FLAGS.leaderboard_results}")
         print(f"Writing logs to {FLAGS.leaderboard_logfile}")
+
+        env = gym.make("llvm-ic-v0")
+        env.logger.setLevel(logging.DEBUG)
 
         try:
             # Build the list of benchmarks to evaluate.
@@ -253,33 +253,50 @@ def eval_llvm_instcount_policy(policy: Policy) -> None:
             # If we are resuming from a previous job, read the states that have
             # already been proccessed and remove those benchmarks from the list
             # of benchmarks to evaluate.
-            init_states = []
+            states = []
             if FLAGS.resume and Path(FLAGS.leaderboard_results).is_file():
                 with CompilerEnvStateReader(open(FLAGS.leaderboard_results)) as reader:
                     for state in reader:
-                        init_states.append(state)
+                        states.append(state)
                         if state.benchmark in benchmarks:
                             benchmarks.remove(state.benchmark)
 
             # Run the benchmark loop in background so that we can asynchronously
             # log progress.
-            worker = _EvalPolicyWorker(env, benchmarks, policy, init_states)
+            # split the tasks into multiple processes.
+            q = mp.Queue()
+            worker = _EvalPolicyWorker(num_process, benchmarks, policy, q)
             worker.start()
+
             timer = Timer().reset()
             try:
+                # Determine if we need to print a header.
+                header = (
+                    not Path(FLAGS.leaderboard_results).is_file()
+                    or os.stat(FLAGS.leaderboard_results).st_size == 0
+                )
+                writer = CompilerEnvStateWriter(open(FLAGS.leaderboard_results, "a"), header=header)
                 print(
                     f"=== Evaluating policy on "
                     f"{humanize.intcomma(total_count)} "
                     f"{FLAGS.test_dataset} benchmarks ==="
                     "\n\n"  # Blank lines will be filled below
                 )
-                while worker.is_alive():
-                    done_count = len(worker.states)
+
+                while len(states) < len(benchmarks):
+                    try:
+                        state = q.get_nowait()
+                        states.append(state)
+                        writer.write_state(state)
+                    except queue.Empty:
+                        pass
+
+                    done_count = len(states)
                     remaining_count = total_count - done_count
                     time = timer.time
-                    gmean_reward = geometric_mean([s.reward for s in worker.states])
+                    gmean_reward = geometric_mean([s.reward for s in states])
                     mean_walltime = (
-                        arithmetic_mean([s.walltime for s in worker.states]) or time
+                        arithmetic_mean([s.walltime for s in states]) or time
                     )
                     print(
                         "\r\033[2A"
@@ -296,9 +313,9 @@ def eval_llvm_instcount_policy(policy: Policy) -> None:
                         end="",
                     )
                     sleep(1)
+
             except KeyboardInterrupt:
                 print("\nkeyboard interrupt", flush=True)
-                worker.alive = False
                 # User interrupt, don't validate.
                 FLAGS.validate = False
         finally:
