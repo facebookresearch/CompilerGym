@@ -252,10 +252,18 @@ def make_working_dir() -> Path:
     """Make a working directory for a service. The calling code is responsible
     for removing this directory when done.
     """
-    random_hash = random.getrandbits(16)
-    service_name = datetime.now().strftime(f"s/%m%dT%H%M%S-%f-{random_hash:04x}")
-    working_dir = transient_cache_path(service_name)
-    (working_dir / "logs").mkdir(parents=True, exist_ok=False)
+    while True:
+        random_hash = random.getrandbits(16)
+        service_name = datetime.now().strftime(f"s/%m%dT%H%M%S-%f-{random_hash:04x}")
+        working_dir = transient_cache_path(service_name)
+        # Guard against the unlike scenario that there is a collision between
+        # the randomly generated working directories of multiple
+        # make_working_dir() calls.
+        try:
+            (working_dir / "logs").mkdir(parents=True, exist_ok=False)
+            break
+        except FileExistsError:
+            pass
     return working_dir
 
 
