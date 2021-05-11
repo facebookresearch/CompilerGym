@@ -4,8 +4,9 @@
 # LICENSE file in the root directory of this source tree.
 from typing import Callable, Dict, List
 
-from compiler_gym.service import ServiceError, observation_t
+from compiler_gym.service import ServiceError
 from compiler_gym.service.proto import ObservationSpace, StepReply, StepRequest
+from compiler_gym.util.gym_type_hints import ObservationType
 from compiler_gym.views.observation_space_spec import ObservationSpaceSpec
 
 
@@ -41,7 +42,7 @@ class ObservationView:
         for i, s in enumerate(spaces):
             self._add_space(ObservationSpaceSpec.from_proto(i, s))
 
-    def __getitem__(self, observation_space: str) -> observation_t:
+    def __getitem__(self, observation_space: str) -> ObservationType:
         """Request an observation from the given space.
 
         :param observation_space: The observation space to query.

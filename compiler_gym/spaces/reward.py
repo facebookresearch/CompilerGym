@@ -6,9 +6,8 @@ from typing import List, Optional, Tuple
 
 import numpy as np
 
-from compiler_gym.service import observation_t
 from compiler_gym.spaces.scalar import Scalar
-from compiler_gym.util.gym_type_hints import RewardType
+from compiler_gym.util.gym_type_hints import ObservationType, RewardType
 
 
 class Reward(Scalar):
@@ -101,7 +100,7 @@ class Reward(Scalar):
     def update(
         self,
         action: int,
-        observations: List[observation_t],
+        observations: List[ObservationType],
         observation_view: "compiler_gym.views.ObservationView",  # noqa: F821
     ) -> RewardType:
         """Calculate a reward for the given action.
@@ -144,7 +143,7 @@ class DefaultRewardFromObservation(Reward):
         super().__init__(
             observation_spaces=[observation_name], id=observation_name, **kwargs
         )
-        self.previous_value: Optional[observation_t] = None
+        self.previous_value: Optional[ObservationType] = None
 
     def reset(self, benchmark: str) -> None:
         """Called on env.reset(). Reset incremental progress."""
@@ -154,7 +153,7 @@ class DefaultRewardFromObservation(Reward):
     def update(
         self,
         action: int,
-        observations: List[observation_t],
+        observations: List[ObservationType],
         observation_view: "compiler_gym.views.ObservationView",  # noqa: F821
     ) -> RewardType:
         """Called on env.step(). Compute and return new reward."""
