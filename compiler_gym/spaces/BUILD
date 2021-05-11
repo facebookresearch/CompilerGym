@@ -38,6 +38,7 @@ py_library(
     deps = [
         ":scalar",
         "//compiler_gym/service",
+        "//compiler_gym/util",
     ],
 )
 

@@ -11,7 +11,7 @@ from copy import deepcopy
 from math import isclose
 from pathlib import Path
 from time import time
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Callable, Dict, Iterable, List, Optional, Tuple, Union
 
 import gym
 import numpy as np
@@ -43,14 +43,11 @@ from compiler_gym.service.proto import (
 )
 from compiler_gym.spaces import DefaultRewardFromObservation, NamedDiscrete, Reward
 from compiler_gym.util.debug_util import get_logging_level
+from compiler_gym.util.gym_type_hints import StepType
 from compiler_gym.util.timer import Timer
 from compiler_gym.validation_error import ValidationError
 from compiler_gym.validation_result import ValidationResult
 from compiler_gym.views import ObservationSpaceSpec, ObservationView, RewardView
-
-# Type hints.
-info_t = Dict[str, Any]
-step_t = Tuple[Optional[observation_t], Optional[float], bool, info_t]
 
 
 def _wrapped_step(
@@ -751,7 +748,7 @@ class CompilerEnv(gym.Env):
                 reply.observation[0]
             )
 
-    def step(self, action: Union[int, Iterable[int]]) -> step_t:
+    def step(self, action: Union[int, Iterable[int]]) -> StepType:
         """Take a step.
 
         :param action: An action, or a sequence of actions. When multiple
