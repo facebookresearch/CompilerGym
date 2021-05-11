@@ -47,8 +47,11 @@ A single instance of this "agent-environment loop" represents the compilation of
 a particular program. The goal is to develop an agent that maximises the
 cumulative reward from these environments so as to produce the best programs.
 
+Install the latest CompilerGym release using:
 
-.. include:: installation.rst
+.. code-block::
+
+   pip install -U compiler_gym
 
 See `INSTALL.md
 <https://github.com/facebookresearch/CompilerGym/blob/development/INSTALL.md>`_
