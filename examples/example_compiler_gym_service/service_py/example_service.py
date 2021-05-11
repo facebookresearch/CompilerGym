@@ -109,8 +109,8 @@ class CompilationSession:
         # Apply a list of actions from the user. Each value is an index into the
         # ACTIONS_SPACE.action list.
         for action in request.action:
-            logging.debug("Apply action %d", action)
-            if action < 0 or action >= len(ACTION_SPACE.action):
+            logging.debug("Apply action %d", action.action)
+            if action.action < 0 or action.action >= len(ACTION_SPACE.action):
                 context.set_code(grpc.StatusCode.INVALID_ARGUMENT)
                 context.set_details("Out-of-range")
                 return

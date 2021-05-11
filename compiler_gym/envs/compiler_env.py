@@ -29,6 +29,7 @@ from compiler_gym.service import (
     SessionNotFound,
 )
 from compiler_gym.service.proto import (
+    Action,
     AddBenchmarkRequest,
     EndSessionReply,
     EndSessionRequest,
@@ -789,7 +790,7 @@ class CompilerEnv(gym.Env):
         # Send the request to the backend service.
         request = StepRequest(
             session_id=self._session_id,
-            action=actions,
+            action=[Action(action=a) for a in actions],
             observation_space=observation_indices,
         )
         try:

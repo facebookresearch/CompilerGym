@@ -151,7 +151,7 @@ Status LlvmSession::step(const StepRequest& request, StepReply* reply) {
     case LlvmActionSpace::PASSES_ALL:
       for (int i = 0; i < request.action_size(); ++i) {
         LlvmAction action;
-        RETURN_IF_ERROR(util::intToEnum(request.action(i), &action));
+        RETURN_IF_ERROR(util::intToEnum(request.action(i).action(), &action));
         RETURN_IF_ERROR(runAction(action, reply));
       }
   }
