@@ -13,7 +13,7 @@ import pytest
 import compiler_gym.envs.llvm  # noqa register environments
 from compiler_gym.envs.llvm import LlvmEnv
 from compiler_gym.envs.llvm.datasets import CsmithBenchmark, CsmithDataset
-from tests.pytest_plugins.common import skip_on_ci
+from tests.pytest_plugins.common import is_ci
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.llvm"]
@@ -33,8 +33,7 @@ def test_csmith_size(csmith_dataset: CsmithDataset):
     assert csmith_dataset.size == float("inf")
 
 
-@skip_on_ci
-@pytest.mark.parametrize("index", range(250))
+@pytest.mark.parametrize("index", range(3) if is_ci() else range(250))
 def test_csmith_random_select(
     env: LlvmEnv, csmith_dataset: CsmithDataset, index: int, tmpwd: Path
 ):
@@ -48,7 +47,6 @@ def test_csmith_random_select(
     assert (tmpwd / "source.c").is_file()
 
 
-@skip_on_ci
 def test_random_benchmark(csmith_dataset: CsmithDataset):
     num_benchmarks = 5
     rng = np.random.default_rng(0)

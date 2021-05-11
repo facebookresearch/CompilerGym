@@ -225,14 +225,14 @@ define run_pytest_suite
 	rm -f /tmp/compiler_gym/wheel_tests/tests /tmp/compiler_gym/wheel_tests/tox.ini
 	ln -s $(ROOT)/tests /tmp/compiler_gym/wheel_tests
 	ln -s $(ROOT)/tox.ini /tmp/compiler_gym/wheel_tests
-	cd /tmp/compiler_gym/wheel_tests && pytest tests $(1) --benchmark-disable -n auto -k "not fuzz"
+	cd /tmp/compiler_gym/wheel_tests && pytest tests $(1) --durations=5 --benchmark-disable -n auto -k "not fuzz"
 endef
 
 install-test:
 	$(call run_pytest_suite,)
 
 install-test-cov:
-	$(call run_pytest_suite,--cov=compiler_gym --cov-report=xml)
+	$(call run_pytest_suite,--cov=compiler_gym --cov-report=xml --cov-report=term)
 	@mv /tmp/compiler_gym/wheel_tests/coverage.xml .
 
 # The minimum number of seconds to run the fuzz tests in a loop for. Override

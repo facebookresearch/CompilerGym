@@ -18,13 +18,7 @@ jobs:
             fail-fast: false
             matrix:
                 os: [ubuntu-latest, macos-latest]
-                python: [3.6, 3.7, 3.8, 3.9]
-                exclude:
-                    # Only test recent python versions on macOS.
-                    - os: macos-latest
-                      python: 3.6
-                    - os: macos-latest
-                      python: 3.7
+                python: [3.9]
 
         steps:
             - uses: actions/checkout@v2
@@ -58,6 +52,7 @@ jobs:
               env:
                   CC: clang
                   CXX: clang++
+                  BAZEL_OPTS: --batch
                   BAZEL_TEST_OPTS: --config=ci --test_timeout=300,900,1800,7200
 
 
@@ -68,7 +63,7 @@ jobs:
             fail-fast: false
             matrix:
                 os: [ubuntu-latest, macos-latest]
-                python: [3.8]
+                python: [3.6, 3.7, 3.8, 3.9]
 
         steps:
             - uses: actions/checkout@v2
@@ -102,6 +97,7 @@ jobs:
               env:
                   CC: clang
                   CXX: clang++
+                  BAZEL_OPTS: --batch
                   BAZEL_BUILD_OPTS: --config=ci
 
             - name: Test
@@ -110,7 +106,7 @@ jobs:
                   CC: clang
                   CXX: clang++
                   BAZEL_BUILD_OPTS: --config=ci
-              if: matrix.os == 'macos-latest'
+              if: ${{ ! (matrix.os == 'ubuntu-latest' && matrix.python == 3.9) }}
 
             - name: Test with coverage
               run: make install-test-cov
@@ -118,7 +114,7 @@ jobs:
                   CC: clang
                   CXX: clang++
                   BAZEL_BUILD_OPTS: --config=ci
-              if: matrix.os == 'ubuntu-latest'
+              if: ${{ matrix.os == 'ubuntu-latest' && matrix.python == 3.9 }}
 
             - name: Upload coverage to Codecov
               uses: codecov/codecov-action@v1
