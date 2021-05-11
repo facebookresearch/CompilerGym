@@ -89,7 +89,7 @@ class Environment {
     StepReply reply;
 
     request.set_session_id(sessionId_);
-    request.add_action(static_cast<int>(action));
+    request.add_action()->set_action(static_cast<int>(action));
     request.add_observation_space(static_cast<int>(observationSpace));
     RETURN_IF_ERROR(service_.Step(nullptr, &request, &reply));
     CHECK(reply.observation_size() == 1);

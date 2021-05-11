@@ -92,9 +92,8 @@ message StartSessionReply {
 message StepRequest {
   // The ID of the session.
   int64 session_id = 1;
-  // A list of indices into the ActionSpace.action list. Actions are executed
-  // in the order they appear in this list.
-  repeated int32 action = 2;
+  // A list of actions to execute, in order.
+  repeated Action action = 2;
   // A list of indices into the GetSpacesReply.observation_space_list
   repeated int32 observation_space = 3;
 }
@@ -131,6 +130,11 @@ message ActionSpace {
   // extensible representation that supports parameterized actions, and actions
   // of different types (e.g. optimization passes vs optimization contexts).
   repeated string action = 2;
+}
+
+message Action {
+  // An index into the ActionSpace.action list.
+  int32 action = 1;
 }
 
 // ===========================================================================

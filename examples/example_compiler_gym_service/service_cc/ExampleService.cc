@@ -167,7 +167,7 @@ ExampleCompilationSession::ExampleCompilationSession(const std::string& benchmar
 
 Status ExampleCompilationSession::Step(const StepRequest* request, StepReply* reply) {
   for (int i = 0; i < request->action_size(); ++i) {
-    const auto action = request->action(i);
+    const auto action = request->action(i).action();
     // Run the actual action. Here we just range check.
     RETURN_IF_ERROR(rangeCheck(action, 0, static_cast<int32_t>(actionSpace_.action_size() - 1)));
   }

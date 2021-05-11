@@ -47,7 +47,8 @@ TEST_F(GvnSinkTest, runGvnSinkOnBlowfish) {
                   std::nullopt, workingDirectory_);
 
   StepRequest request;
-  request.add_action(static_cast<int>(LlvmAction::GVNSINK_PASS));
+  Action* action = request.add_action();
+  action->set_action(static_cast<int>(LlvmAction::GVNSINK_PASS)));
   StepReply reply;
   ASSERT_OK(env.Step(request, &reply));
 }

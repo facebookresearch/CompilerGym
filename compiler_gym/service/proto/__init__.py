@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 from compiler_gym.service.proto.compiler_gym_service_pb2 import (
+    Action,
     ActionSpace,
     AddBenchmarkReply,
     AddBenchmarkRequest,
@@ -34,6 +35,7 @@ from compiler_gym.service.proto.compiler_gym_service_pb2_grpc import (
 )
 
 __all__ = [
+    "Action",
     "ActionSpace",
     "AddBenchmarkReply",
     "AddBenchmarkRequest",
