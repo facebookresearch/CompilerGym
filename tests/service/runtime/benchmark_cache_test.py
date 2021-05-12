@@ -40,6 +40,18 @@ def test_oversized_benchmark_triggers_prune(mocker):
     cache.prune.assert_called_once()
 
 
+def test_replace_existing_item():
+    cache = BenchmarkCache()
+
+    cache["a"] = make_benchmark_of_size(30)
+    assert cache.size == 1
+    assert cache.size_in_bytes == 30
+
+    cache["a"] = make_benchmark_of_size(50)
+    assert cache.size == 1
+    assert cache.size_in_bytes == 50
+
+
 def test_prune_on_max_size_reached(mocker):
     """Test that cache is pruned when the maximum size is exceeded."""
     cache = BenchmarkCache(max_size_in_bytes=100)
