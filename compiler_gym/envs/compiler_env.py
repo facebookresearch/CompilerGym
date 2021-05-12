@@ -773,16 +773,17 @@ class CompilerEnv(gym.Env):
         # TODO(cummins): We could de-duplicate this list to improve efficiency
         # when multiple redundant copies of the same observation space are
         # requested.
-        observation_indices, observation_spaces = [], []
-        if self.observation_space:
-            observation_indices.append(self.observation_space_spec.index)
-            observation_spaces.append(self.observation_space_spec.id)
         if self.reward_space:
-            observation_indices += [
+            observation_indices = [
                 self.observation.spaces[obs].index
                 for obs in self.reward_space.observation_spaces
             ]
-            observation_spaces += self.reward_space.observation_spaces
+            observation_spaces = self.reward_space.observation_spaces
+        else:
+            observation_indices, observation_spaces = [], []
+        if self.observation_space:
+            observation_indices.append(self.observation_space_spec.index)
+            observation_spaces.append(self.observation_space_spec.id)
 
         # Record the actions.
         self.actions += actions
@@ -835,7 +836,7 @@ class CompilerEnv(gym.Env):
 
         # Pop the requested observation.
         if self.observation_space:
-            observation, observations = observations[0], observations[1:]
+            observation, observations = observations[-1], observations[:-1]
 
         # Compute reward.
         self.reward.previous_action = action
