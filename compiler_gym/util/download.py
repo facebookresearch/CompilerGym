@@ -46,7 +46,7 @@ def _do_download_attempt(url: str, sha256: Optional[str]) -> bytes:
         actual_sha256 = checksum.hexdigest()
         if sha256 != actual_sha256:
             raise DownloadFailed(
-                f"Checksum of downloaded dataset does not match:\n"
+                f"Checksum of download does not match:\n"
                 f"Url: {url}\n"
                 f"Expected: {sha256}\n"
                 f"Actual:   {actual_sha256}"
@@ -62,7 +62,7 @@ def _do_download_attempt(url: str, sha256: Optional[str]) -> bytes:
     return content
 
 
-def _download(urls: List[str], sha256: Optional[str], max_retries: int = 5) -> bytes:
+def _download(urls: List[str], sha256: Optional[str], max_retries: int) -> bytes:
     # Cache hit.
     if sha256 and cache_path(f"downloads/{sha256}").is_file():
         with open(str(cache_path(f"downloads/{sha256}")), "rb") as f:
