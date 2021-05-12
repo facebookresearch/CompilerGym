@@ -43,6 +43,9 @@ class Benchmark {
   // Make a copy of the benchmark.
   std::unique_ptr<Benchmark> clone(const boost::filesystem::path& workingDirectory) const;
 
+  // Compute and return a SHA1 hash of the module.
+  BenchmarkHash module_hash() const;
+
   inline const std::string& name() const { return name_; }
 
   inline const size_t bitcodeSize() const { return bitcodeSize_; }

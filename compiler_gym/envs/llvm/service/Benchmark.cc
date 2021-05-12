@@ -120,4 +120,6 @@ std::unique_ptr<Benchmark> Benchmark::clone(const fs::path& workingDirectory) co
   return std::make_unique<Benchmark>(name(), bitcode, workingDirectory, baselineCosts());
 }
 
+BenchmarkHash Benchmark::module_hash() const { return getModuleHash(*module_); }
+
 }  // namespace compiler_gym::llvm_service
