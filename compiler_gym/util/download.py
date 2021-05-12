@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 import hashlib
 import logging
+from time import sleep
 from typing import List, Optional, Union
 
 import fasteners
@@ -11,16 +12,23 @@ import requests
 
 from compiler_gym.util.filesystem import atomic_file_write
 from compiler_gym.util.runfiles_path import cache_path
+from compiler_gym.util.truncate import truncate
 
 
 class DownloadFailed(OSError):
     """Error thrown if a download fails."""
 
 
+class TooManyRequests(DownloadFailed):
+    """Error thrown by HTTP 429 response."""
+
+
 def _get_url_data(url: str) -> bytes:
     req = requests.get(url)
     try:
-        if req.status_code != 200:
+        if req.status_code == 429:
+            raise TooManyRequests("429 Too Many Requests")
+        elif req.status_code != 200:
             raise DownloadFailed(f"GET returned status code {req.status_code}: {url}")
 
         return req.content
@@ -38,7 +46,7 @@ def _do_download_attempt(url: str, sha256: Optional[str]) -> bytes:
         actual_sha256 = checksum.hexdigest()
         if sha256 != actual_sha256:
             raise DownloadFailed(
-                f"Checksum of downloaded dataset does not match:\n"
+                f"Checksum of download does not match:\n"
                 f"Url: {url}\n"
                 f"Expected: {sha256}\n"
                 f"Actual:   {actual_sha256}"
@@ -54,7 +62,7 @@ def _do_download_attempt(url: str, sha256: Optional[str]) -> bytes:
     return content
 
 
-def _download(urls: List[str], sha256: Optional[str], max_retries: int = 3) -> bytes:
+def _download(urls: List[str], sha256: Optional[str], max_retries: int) -> bytes:
     # Cache hit.
     if sha256 and cache_path(f"downloads/{sha256}").is_file():
         with open(str(cache_path(f"downloads/{sha256}")), "rb") as f:
@@ -62,12 +70,22 @@ def _download(urls: List[str], sha256: Optional[str], max_retries: int = 3) -> b
 
     # A retry loop, and loop over all urls provided.
     last_exception = None
+    wait_time = 5
     for _ in range(max_retries):
         for url in urls:
             try:
                 return _do_download_attempt(url, sha256)
+            except TooManyRequests as e:
+                last_exception = e
+                logging.info(
+                    "Download attempt failed with Too Many Requests error. "
+                    "Watiting %.1f seconds",
+                    wait_time,
+                )
+                sleep(wait_time)
+                wait_time *= 1.5
             except DownloadFailed as e:
-                logging.info("Download failed")
+                logging.info("Download attempt failed: %s", truncate(e))
                 last_exception = e
     raise last_exception
 

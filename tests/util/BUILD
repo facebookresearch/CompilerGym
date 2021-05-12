@@ -24,6 +24,15 @@ py_test(
     ],
 )
 
+py_test(
+    name = "download_test",
+    srcs = ["download_test.py"],
+    deps = [
+        "//compiler_gym/util",
+        "//tests:test_main",
+    ],
+)
+
 cc_test(
     name = "EnumUtilTest",
     srcs = ["EnumUtilTest.cc"],
