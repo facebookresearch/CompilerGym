@@ -89,31 +89,35 @@ Policy = Callable[[LlvmEnv], None]
 
 def eval_policy(d):
     benchmark, policy = d
-    env = gym.make("llvm-ic-v0")
-    env.logger.setLevel(logging.DEBUG)
+    try:
+        env = gym.make("llvm-ic-v0")
+        env.logger.setLevel(logging.DEBUG)
 
-    # print(f"Start one job {benchmark}!", flush=True)
-    env.reset(benchmark=benchmark)
-    with Timer() as timer:
-        policy(env)
+        # print(f"Start one job {benchmark}!", flush=True)
+        env.reset(benchmark=benchmark)
+        with Timer() as timer:
+            policy(env)
 
-    # Sanity check that the policy didn't change the expected
-    # experimental setup.
-    assert env.in_episode, "Environment is no longer in an episode"
-    assert env.benchmark and (
-        env.benchmark == benchmark
-    ), "Policy changed environment benchmark"
-    assert env.reward_space, "Policy unset environment reward space"
-    assert (
-        env.reward_space.id == "IrInstructionCountOz"
-    ), "Policy changed environment reward space"
+        # Sanity check that the policy didn't change the expected
+        # experimental setup.
+        assert env.in_episode, "Environment is no longer in an episode"
+        assert env.benchmark and (
+            env.benchmark == benchmark
+        ), "Policy changed environment benchmark"
+        assert env.reward_space, "Policy unset environment reward space"
+        assert (
+            env.reward_space.id == "IrInstructionCountOz"
+        ), "Policy changed environment reward space"
 
-    # print("Finish one job!", flush=True)
-    # Override walltime in the generated state.
-    state = env.state.copy()
-    state.walltime = timer.time
-    env.close()
-    return state
+        # print("Finish one job!", flush=True)
+        # Override walltime in the generated state.
+        state = env.state.copy()
+        state.walltime = timer.time
+        env.close()
+        return benchmark, state
+    except:
+        # If the code fails, then return None and we restart the same job again.
+        return benchmark, None
 
 class _EvalPolicyWorker(mp.Process):
     """Worker thread to evaluate a policy."""
@@ -132,11 +136,18 @@ class _EvalPolicyWorker(mp.Process):
         self.q = q
 
     def run(self):
-        args = [ (bm, self.policy) for bm in self.benchmarks ]
+        curr_benchmarks = self.benchmarks
         with mp.Pool(self.num_process) as pool:
-            for state in pool.imap_unordered(eval_policy, args):
-                self.q.put(state)
-
+            while len(curr_benchmarks) > 0:
+                args = [ (bm, self.policy) for bm in curr_benchmarks ]
+                unsolved_benchmarks = []
+                for benchmark, state in pool.imap_unordered(eval_policy, args):
+                    if state is not None:
+                        self.q.put(state)
+                    else:
+                        # The job failed, put it to the next batch. 
+                        unsolved_benchmarks.append(benchmark)
+                curr_benchmarks = unsolved_benchmarks
 
 def eval_llvm_instcount_policy(policy: Policy, num_process: int = 1) -> None:
     """Evaluate an LLVM codesize policy and generate results for a leaderboard
