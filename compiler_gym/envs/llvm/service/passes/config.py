@@ -47,7 +47,8 @@ CREATE_PASS_NAME_MAP = {
     "DeadInstElimination": "DeadInstEliminationPass",
     "DivRemPairsLegacyPass": "DivRemPairsPass",
     "DSELegacyPass": "DeadStoreEliminationPass",
-    "EarlyCSEMemSSALegacyPass": "EarlyCSEPass",
+    "EarlyCSELegacyPass": "EarlyCSEPass",
+    "EarlyCSEMemSSALegacyPass": "EarlyCSEMemSSAPass",
     "EliminateAvailableExternallyLegacyPass": "EliminateAvailableExternallyPass",
     "EntryExitInstrumenter": "EntryExitInstrumenterPass",
     "Float2IntLegacyPass": "Float2IntPass",
@@ -174,7 +175,6 @@ _EXCLUDED_PASSES = {
     "WholeProgramDevirt",
     "MakeGuardsExplicitLegacyPass",
     "LowerTypeTests",
-    "EarlyCSELegacyPass",
     # Unneeded debugging passes.
     "WriteThinLTOBitcode",
     "PredicateInfoPrinterLegacyPass",
