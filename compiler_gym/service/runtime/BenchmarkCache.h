@@ -25,8 +25,8 @@ constexpr size_t kEvictionSizeInBytes = 512 * 1024 * 1024;
 // reduced to 50%.
 class BenchmarkCache {
  public:
-  BenchmarkCache(std::optional<std::mt19937_64> rand = std::nullopt,
-                 size_t maxSizeInBytes = kEvictionSizeInBytes);
+  BenchmarkCache(size_t maxSizeInBytes = kEvictionSizeInBytes,
+                 std::optional<std::mt19937_64> rand = std::nullopt);
 
   // The pointer set by benchmark is valid only until the next call to add().
   const Benchmark* get(const std::string& uri) const;
@@ -40,8 +40,10 @@ class BenchmarkCache {
 
   void setMaxSizeInBytes(size_t maxSizeInBytes);
 
-  // Evict benchmarks randomly to reduce the capacity below 50%.
-  void prune(std::optional<size_t> targetSize = std::nullopt);
+  // Evict benchmarks randomly to reduce the capacity to the given size. If
+  // targetSizeInBytes is not provided, benchmarks are evicted to 50% of
+  // maxSizeInBytes.
+  void evictToCapacity(std::optional<size_t> targetSizeInBytes = std::nullopt);
 
  private:
   std::unordered_map<std::string, const Benchmark> benchmarks_;

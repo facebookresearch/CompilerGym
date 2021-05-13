@@ -27,17 +27,17 @@ def test_make_benchmark_of_size(size: int):
     assert make_benchmark_of_size(size).ByteSize() == size
 
 
-def test_oversized_benchmark_triggers_prune(mocker):
+def test_oversized_benchmark_triggers_evict_to_capacity(mocker):
     cache = BenchmarkCache(max_size_in_bytes=10)
 
-    mocker.spy(cache, "prune")
+    mocker.spy(cache, "evict_to_capacity")
 
     cache["test"] = make_benchmark_of_size(50)
 
     assert cache.size == 1
     assert cache.size_in_bytes == 50
 
-    cache.prune.assert_called_once()
+    cache.evict_to_capacity.assert_called_once()
 
 
 def test_replace_existing_item():
@@ -52,20 +52,20 @@ def test_replace_existing_item():
     assert cache.size_in_bytes == 50
 
 
-def test_prune_on_max_size_reached(mocker):
-    """Test that cache is pruned when the maximum size is exceeded."""
+def test_evict_to_capacity_on_max_size_reached(mocker):
+    """Test that cache is evict_to_capacityd when the maximum size is exceeded."""
     cache = BenchmarkCache(max_size_in_bytes=100)
 
-    mocker.spy(cache, "prune")
+    mocker.spy(cache, "evict_to_capacity")
     mocker.spy(cache.logger, "info")
 
     cache["a"] = make_benchmark_of_size(30)
     cache["b"] = make_benchmark_of_size(30)
     cache["c"] = make_benchmark_of_size(30)
-    assert cache.prune.call_count == 0
+    assert cache.evict_to_capacity.call_count == 0
 
     cache["d"] = make_benchmark_of_size(30)
-    assert cache.prune.call_count == 1
+    assert cache.evict_to_capacity.call_count == 1
 
     assert cache.size == 2
     assert cache.size_in_bytes == 60
@@ -123,20 +123,20 @@ def test_getter():
         cache["c"]
 
 
-def test_prune_on_maximum_size_update(mocker):
-    """Test that cache is pruned when the maximum size is exceeded."""
+def test_evict_to_capacity_on_maximum_size_update(mocker):
+    """Test that cache is evict_to_capacityd when the maximum size is exceeded."""
     cache = BenchmarkCache(max_size_in_bytes=100)
 
-    mocker.spy(cache, "prune")
+    mocker.spy(cache, "evict_to_capacity")
     mocker.spy(cache.logger, "info")
 
     cache["a"] = make_benchmark_of_size(30)
     cache["b"] = make_benchmark_of_size(30)
     cache["c"] = make_benchmark_of_size(30)
-    assert cache.prune.call_count == 0
+    assert cache.evict_to_capacity.call_count == 0
 
     cache.max_size_in_bytes = 50
-    assert cache.prune.call_count == 1
+    assert cache.evict_to_capacity.call_count == 1
     assert cache.size_in_bytes == 30
 
 

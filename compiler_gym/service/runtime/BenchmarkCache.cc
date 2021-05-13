@@ -11,7 +11,7 @@ using grpc::StatusCode;
 
 namespace compiler_gym::runtime {
 
-BenchmarkCache::BenchmarkCache(std::optional<std::mt19937_64> rand, size_t maxSizeInBytes)
+BenchmarkCache::BenchmarkCache(size_t maxSizeInBytes, std::optional<std::mt19937_64> rand)
     : rand_(rand.has_value() ? *rand : std::mt19937_64(std::random_device()())),
       maxSizeInBytes_(maxSizeInBytes),
       sizeInBytes_(0){};
@@ -46,14 +46,14 @@ void BenchmarkCache::add(const Benchmark&& benchmark) {
       VLOG(3) << "Adding new benchmark with size " << size << " bytes exceeds maximum size "
               << maxSizeInBytes() << " bytes, " << this->size() << " items";
     }
-    prune();
+    evictToCapacity();
   }
 
   benchmarks_.insert({benchmark.uri(), std::move(benchmark)});
   sizeInBytes_ += size;
 }
 
-void BenchmarkCache::prune(std::optional<size_t> targetSize) {
+void BenchmarkCache::evictToCapacity(std::optional<size_t> targetSize) {
   int evicted = 0;
   targetSize = targetSize.has_value() ? targetSize : maxSizeInBytes() / 2;
 
@@ -77,7 +77,7 @@ void BenchmarkCache::prune(std::optional<size_t> targetSize) {
 
 void BenchmarkCache::setMaxSizeInBytes(size_t maxSizeInBytes) {
   maxSizeInBytes_ = maxSizeInBytes;
-  prune(maxSizeInBytes);
+  evictToCapacity(maxSizeInBytes);
 }
 
 }  // namespace compiler_gym::runtime

@@ -23,11 +23,11 @@ class BenchmarkCache:
     def __init__(
         self,
         max_size_in_bytes: int = MAX_SIZE_IN_BYTES,
-        logger: Optional[logging.Logger] = None,
         rng: Optional[np.random.Generator] = None,
+        logger: Optional[logging.Logger] = None,
     ):
-        self.rng = rng or np.random.default_rng()
         self._max_size_in_bytes = max_size_in_bytes
+        self.rng = rng or np.random.default_rng()
         self.logger = logger or logging.getLogger("compiler_gym")
 
         self._benchmarks: Dict[str, Benchmark] = {}
@@ -75,12 +75,12 @@ class BenchmarkCache:
                     self.max_size_in_bytes,
                     self.size,
                 )
-            self.prune()
+            self.evict_to_capacity()
 
         self._benchmarks[uri] = benchmark
         self._size_in_bytes += size
 
-    def prune(self, target_size_in_bytes: Optional[int] = None) -> None:
+    def evict_to_capacity(self, target_size_in_bytes: Optional[int] = None) -> None:
         """Evict benchmarks randomly to reduce the capacity below 50%."""
         evicted = 0
         target_size_in_bytes = (
@@ -125,4 +125,4 @@ class BenchmarkCache:
     def max_size_in_bytes(self, value: int) -> None:
         """Set a new maximum cache size."""
         self._max_size_in_bytes = value
-        self.prune(target_size_in_bytes=value)
+        self.evict_to_capacity(target_size_in_bytes=value)

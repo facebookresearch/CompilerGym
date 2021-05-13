@@ -53,7 +53,7 @@ TEST(BenchmarkCache, replaceExistingItem) {
   ASSERT_EQ(cache.sizeInBytes(), 50);
 }
 
-TEST(BenchmarkCache, pruneOnMaxSizeReached) {
+TEST(BenchmarkCache, evictToCapacityOnMaxSizeReached) {
   BenchmarkCache cache;
   cache.setMaxSizeInBytes(100);
 
@@ -82,7 +82,7 @@ TEST(BenchmarkCache, getter) {
   ASSERT_EQ(cache.get("b")->DebugString(), b.DebugString());
 }
 
-TEST(BenchmarkCache, pruneOnMaximumSizeUpdate) {
+TEST(BenchmarkCache, evictToCapacityOnMaximumSizeUpdate) {
   BenchmarkCache cache;
 
   cache.add(makeBenchmarkOfSize("a", 30));
