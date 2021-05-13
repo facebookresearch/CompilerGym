@@ -3,13 +3,16 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Tests for the example CompilerGym service."""
+import subprocess
+from pathlib import Path
+
 import gym
 import numpy as np
 import pytest
 from gym.spaces import Box
 
 import compiler_gym
-import examples.example_compiler_gym_service  # noqa Register environments.
+import examples.example_compiler_gym_service as example
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.service import SessionNotFound
 from compiler_gym.spaces import NamedDiscrete, Scalar, Sequence
@@ -25,6 +28,37 @@ def env(request) -> CompilerEnv:
         yield env
     finally:
         env.close()
+
+
+@pytest.fixture(
+    scope="module",
+    params=[example.EXAMPLE_CC_SERVICE_BINARY, example.EXAMPLE_PY_SERVICE_BINARY],
+)
+def bin(request) -> Path:
+    yield request.param
+
+
+def test_invalid_arguments(bin: Path):
+    """Test that running the binary with unrecognized arguments is an error."""
+
+    def run(cmd):
+        p = subprocess.Popen(
+            cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE, universal_newlines=True
+        )
+        stdout, stderr = p.communicate(timeout=10)
+        return p.returncode, stdout, stderr
+
+    returncode, _, stderr = run([str(bin), "foobar"])
+    assert stderr.startswith("ERROR:")
+    assert "'foobar'" in stderr
+    assert returncode == 1
+
+    returncode, _, stderr = run([str(bin), "--foobar"])
+    # C++ and python flag parsing library emit slightly different error
+    # messages.
+    assert stderr.startswith("ERROR:") or "FATAL" in stderr
+    assert "'foobar'" in stderr
+    assert returncode == 1
 
 
 def test_versions(env: CompilerEnv):

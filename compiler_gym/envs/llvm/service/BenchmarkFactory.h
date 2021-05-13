@@ -15,6 +15,7 @@
 
 #include "boost/filesystem.hpp"
 #include "compiler_gym/envs/llvm/service/Benchmark.h"
+#include "compiler_gym/service/proto/compiler_gym_service.pb.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
 
@@ -35,6 +36,23 @@ constexpr size_t kMaxLoadedBenchmarkSize = 512 * 1024 * 1024;
 //     // ... do fun stuff
 class BenchmarkFactory {
  public:
+  static BenchmarkFactory& getSingleton(const boost::filesystem::path& workingDirectory,
+                                        std::optional<std::mt19937_64> rand = std::nullopt,
+                                        size_t maxLoadedBenchmarkSize = kMaxLoadedBenchmarkSize) {
+    static BenchmarkFactory instance(workingDirectory, rand, maxLoadedBenchmarkSize);
+    return instance;
+  }
+
+  // Get the requested named benchmark.
+  [[nodiscard]] grpc::Status getBenchmark(const compiler_gym::Benchmark& benchmarkMessage,
+                                          std::unique_ptr<Benchmark>* benchmark);
+
+ private:
+  [[nodiscard]] grpc::Status addBitcode(const std::string& uri, const Bitcode& bitcode);
+
+  [[nodiscard]] grpc::Status addBitcode(const std::string& uri,
+                                        const boost::filesystem::path& path);
+
   // Construct a benchmark factory. rand is a random seed used to control the
   // selection of random benchmarks. maxLoadedBenchmarkSize is the maximum
   // combined size of the bitcodes that may be cached in memory. Once this
@@ -44,16 +62,9 @@ class BenchmarkFactory {
                    std::optional<std::mt19937_64> rand = std::nullopt,
                    size_t maxLoadedBenchmarkSize = kMaxLoadedBenchmarkSize);
 
-  // Get the requested named benchmark.
-  [[nodiscard]] grpc::Status getBenchmark(const std::string& uri,
-                                          std::unique_ptr<Benchmark>* benchmark);
+  BenchmarkFactory(const BenchmarkFactory&) = delete;
+  BenchmarkFactory& operator=(const BenchmarkFactory&) = delete;
 
-  [[nodiscard]] grpc::Status addBitcode(const std::string& uri, const Bitcode& bitcode);
-
-  [[nodiscard]] grpc::Status addBitcode(const std::string& uri,
-                                        const boost::filesystem::path& path);
-
- private:
   // A mapping from URI to benchmarks which have been loaded into memory.
   std::unordered_map<std::string, Benchmark> benchmarks_;
 

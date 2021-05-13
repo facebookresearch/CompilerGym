@@ -21,8 +21,9 @@
 #include <thread>
 #include <vector>
 
-#include "compiler_gym/envs/llvm/service/LlvmService.h"
+#include "compiler_gym/envs/llvm/service/LlvmSession.h"
 #include "compiler_gym/envs/llvm/service/ObservationSpaces.h"
+#include "compiler_gym/service/runtime/CompilerGymService.h"
 #include "compiler_gym/util/GrpcStatusMacros.h"
 
 DEFINE_string(benchmark, "benchmark://cbench-v1/crc32", "The benchmark to use.");
@@ -37,7 +38,7 @@ namespace compiler_gym {
 using grpc::Status;
 using llvm_service::LlvmAction;
 using llvm_service::LlvmObservationSpace;
-using llvm_service::LlvmService;
+using LlvmService = runtime::CompilerGymService<llvm_service::LlvmSession>;
 
 // A wrapper around an LLVM service. Here, we call the RPC enpoints directly
 // on the service, we do not use RPC. This means that we do not get the
@@ -57,7 +58,6 @@ class Environment {
 
     StartSessionRequest startRequest;
     StartSessionReply startReply;
-    startRequest.set_benchmark(benchmark_);
     RETURN_IF_ERROR(service_.StartSession(nullptr, &startRequest, &startReply));
     sessionId_ = startReply.session_id();
 

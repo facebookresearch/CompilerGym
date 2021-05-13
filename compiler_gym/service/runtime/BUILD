@@ -65,7 +65,7 @@ cc_library(
         "CompilerGymService.h",
         "CompilerGymServiceImpl.h",
     ],
-    visibility = ["//tests/service/runtime:__subpackages__"],
+    visibility = ["//visibility:public"],
     deps = [
         ":BenchmarkCache",
         ":CompilerGymServiceImpl",

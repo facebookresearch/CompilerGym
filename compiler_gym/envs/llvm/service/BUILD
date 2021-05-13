@@ -54,8 +54,8 @@ cc_binary(
     name = "compiler_gym-llvm-service-prelinked",
     srcs = ["RunService.cc"],
     deps = [
-        ":LlvmService",
-        "//compiler_gym/util:RunService",
+        ":LlvmSession",
+        "//compiler_gym/service/runtime:cc_runtime",
     ],
 )
 
@@ -105,6 +105,7 @@ cc_library(
     deps = [
         ":Benchmark",
         ":Cost",
+        "//compiler_gym/service/proto:compiler_gym_service_cc",
         "//compiler_gym/util:GrpcStatusMacros",
         "//compiler_gym/util:RunfilesPath",
         "//compiler_gym/util:StrLenConstexpr",
@@ -135,29 +136,8 @@ cc_library(
 )
 
 cc_library(
-    name = "LlvmService",
-    srcs = ["LlvmService.cc"],
-    hdrs = ["LlvmService.h"],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":Benchmark",
-        ":BenchmarkFactory",
-        ":Cost",
-        ":LlvmSession",
-        ":ObservationSpaces",
-        "//compiler_gym/service/proto:compiler_gym_service_cc",
-        "//compiler_gym/util:GrpcStatusMacros",
-        "//compiler_gym/util:Version",
-        "@boost//:filesystem",
-        "@llvm//10.0.0",
-    ],
-)
-
-cc_library(
     name = "LlvmSession",
-    srcs = [
-        "LlvmSession.cc",
-    ],
+    srcs = ["LlvmSession.cc"],
     hdrs = [
         "LlvmSession.h",
         "//compiler_gym/envs/llvm/service/passes:ActionHeaders.h",
@@ -167,12 +147,14 @@ cc_library(
         "-DGOOGLE_PROTOBUF_NO_RTTI",
         "-fno-rtti",
     ],
-    visibility = ["//tests:__subpackages__"],
+    visibility = ["//visibility:public"],
     deps = [
         ":ActionSpace",
         ":Benchmark",
+        ":BenchmarkFactory",
         ":Cost",
         ":ObservationSpaces",
+        "//compiler_gym/service:CompilationSession",
         "//compiler_gym/service/proto:compiler_gym_service_cc_grpc",
         "//compiler_gym/third_party/autophase:InstCount",
         "//compiler_gym/third_party/cpuinfo",
