@@ -13,6 +13,12 @@ client and service is managed by the :class:`CompilerGymServiceConnection
 .. contents:: Document contents:
     :local:
 
+.. autoclass:: CompilationSession
+   :members:
+
+   .. automethod:: __init__
+
+
 The connection object
 ---------------------
 
