@@ -23,6 +23,7 @@ py_library(
         "//compiler_gym/datasets",
         "//compiler_gym/envs",
         "//compiler_gym/service",
+        "//compiler_gym/service/runtime",
         "//compiler_gym/spaces",
         "//compiler_gym/views",
         "//examples/sensitivity_analysis:action_sensitivity_analysis",
