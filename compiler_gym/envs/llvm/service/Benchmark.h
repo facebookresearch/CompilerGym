@@ -17,11 +17,7 @@
 
 namespace compiler_gym::llvm_service {
 
-// We identify benchmarks using a hash of the LLVM module, which is a
-// 160 bits SHA1.
-//
-// NOTE(cummins): In the future when we extend this to support optimizing for
-// performance, we would need this
+// A 160 bits SHA1 that identifies an LLVM module.
 using BenchmarkHash = llvm::ModuleHash;
 
 using Bitcode = llvm::SmallString<0>;
@@ -47,6 +43,9 @@ class Benchmark {
   // Make a copy of the benchmark.
   std::unique_ptr<Benchmark> clone(const boost::filesystem::path& workingDirectory) const;
 
+  // Compute and return a SHA1 hash of the module.
+  BenchmarkHash module_hash() const;
+
   inline const std::string& name() const { return name_; }
 
   inline const size_t bitcodeSize() const { return bitcodeSize_; }
@@ -66,8 +65,6 @@ class Benchmark {
 
   inline const llvm::Module* module_ptr() const { return module_.get(); }
 
-  inline const BenchmarkHash hash() const { return hash_; }
-
   // Replace the benchmark module with a new one. This is to enable
   // out-of-process modification of the IR by serializing the benchmark to a
   // file, modifying the file, then loading the modified file and updating the
@@ -81,7 +78,6 @@ class Benchmark {
   std::unique_ptr<llvm::LLVMContext> context_;
   std::unique_ptr<llvm::Module> module_;
   const BaselineCosts baselineCosts_;
-  const BenchmarkHash hash_;
   const std::string name_;
   // The length of the bitcode string for this benchmark.
   const size_t bitcodeSize_;

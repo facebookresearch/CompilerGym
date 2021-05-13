@@ -100,7 +100,6 @@ Benchmark::Benchmark(const std::string& name, const Bitcode& bitcode,
     : context_(std::make_unique<llvm::LLVMContext>()),
       module_(makeModuleOrDie(*context_, bitcode, name)),
       baselineCosts_(baselineCosts),
-      hash_(getModuleHash(*module_)),
       name_(name),
       bitcodeSize_(bitcode.size()) {}
 
@@ -110,7 +109,6 @@ Benchmark::Benchmark(const std::string& name, std::unique_ptr<llvm::LLVMContext>
     : context_(std::move(context)),
       module_(std::move(module)),
       baselineCosts_(baselineCosts),
-      hash_(getModuleHash(*module_)),
       name_(name),
       bitcodeSize_(bitcodeSize) {}
 
@@ -121,5 +119,7 @@ std::unique_ptr<Benchmark> Benchmark::clone(const fs::path& workingDirectory) co
 
   return std::make_unique<Benchmark>(name(), bitcode, workingDirectory, baselineCosts());
 }
+
+BenchmarkHash Benchmark::module_hash() const { return getModuleHash(*module_); }
 
 }  // namespace compiler_gym::llvm_service

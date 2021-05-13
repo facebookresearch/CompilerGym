@@ -39,6 +39,7 @@ def test_observation_spaces(env: LlvmEnv):
 
     assert set(env.observation.spaces.keys()) == {
         "Ir",
+        "IrSha1",
         "BitcodeFile",
         "InstCount",
         "InstCountDict",
@@ -73,6 +74,24 @@ def test_ir_observation_space(env: LlvmEnv):
     value: str = env.observation[key]
     print(value)  # For debugging in case of error.
     assert isinstance(value, str)
+    assert space.space.contains(value)
+
+    assert space.deterministic
+    assert not space.platform_dependent
+
+
+def test_ir_sha1_observation_space(env: LlvmEnv):
+    env.reset("cbench-v1/crc32")
+    key = "IrSha1"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Sequence)
+    assert space.space.dtype == str
+    assert space.space.size_range == (40, 40)
+
+    value: str = env.observation[key]
+    print(value)  # For debugging in case of error.
+    assert isinstance(value, str)
+    assert len(value) == 40
     assert space.space.contains(value)
 
     assert space.deterministic

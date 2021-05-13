@@ -23,6 +23,8 @@ enum class LlvmObservationSpace {
   // The entire LLVM module as an IR string. This allows the user to do its own
   // feature extraction.
   IR,
+  // The 40-digit hex SHA1 checksum of the LLVM module.
+  IR_SHA1,
   // Write the bitcode to a file. Returns a string, which is the path of the
   // written file.
   BITCODE_FILE,

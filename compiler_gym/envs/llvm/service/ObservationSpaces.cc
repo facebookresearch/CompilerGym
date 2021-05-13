@@ -37,6 +37,14 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
         space.set_platform_dependent(false);
         break;
       }
+      case LlvmObservationSpace::IR_SHA1: {
+        ScalarRange sha1Size;
+        space.mutable_string_size_range()->mutable_min()->set_value(40);
+        space.mutable_string_size_range()->mutable_max()->set_value(40);
+        space.set_deterministic(true);
+        space.set_platform_dependent(false);
+        break;
+      }
       case LlvmObservationSpace::BITCODE_FILE: {
         ScalarRange pathLength;
         space.mutable_string_size_range()->mutable_min()->set_value(0);

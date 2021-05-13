@@ -8,6 +8,7 @@
 #include <fmt/format.h>
 #include <glog/logging.h>
 
+#include <iomanip>
 #include <optional>
 #include <subprocess/subprocess.hpp>
 
@@ -268,6 +269,18 @@ Status LlvmSession::getObservation(LlvmObservationSpace space, Observation* repl
       llvm::raw_string_ostream rso(ir);
       benchmark().module().print(rso, /*AAW=*/nullptr);
       reply->set_string_value(ir);
+      break;
+    }
+    case LlvmObservationSpace::IR_SHA1: {
+      std::stringstream ss;
+      const BenchmarkHash hash = benchmark().module_hash();
+      // Hex encode, zero pad, and concatenate the unsigned integers that
+      // contain the hash.
+      for (uint32_t val : hash) {
+        ss << std::setfill('0') << std::setw(sizeof(BenchmarkHash::value_type) * 2) << std::hex
+           << val;
+      }
+      reply->set_string_value(ss.str());
       break;
     }
     case LlvmObservationSpace::BITCODE_FILE: {
