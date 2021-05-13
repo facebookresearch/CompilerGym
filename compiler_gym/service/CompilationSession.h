@@ -18,7 +18,7 @@ namespace compiler_gym {
 //
 // To add support for a new compiler, subclass from this base and provide
 // implementations of the abstract methods, then call
-// createAndRunCompilationService() and parametrize it with your class type:
+// createAndRunCompilerGymService() and parametrize it with your class type:
 //
 //     #include "compiler_gym/service/CompilationSession.h"
 //     #include "compiler_gym/service/runtime/Runtime.h"
@@ -28,7 +28,7 @@ namespace compiler_gym {
 //     class MyCompilationSession final : public CompilationSession { ... }
 //
 //     int main(int argc, char** argv) {
-//         runtime::createAndRunCompilationService<MyCompilationSession>();
+//         runtime::createAndRunCompilerGymService<MyCompilationSession>();
 //     }
 //
 class CompilationSession {
