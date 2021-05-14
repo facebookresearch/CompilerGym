@@ -77,6 +77,12 @@ class ObservationSpaceSpec:
         self.translate = translate
         self.to_string = to_string
 
+    def __hash__(self) -> int:
+        # Quickly hash observation spaces by comparing the index into the list
+        # of spaces returned by the environment. This means that hashing across
+        # different environments is _not_ safe.
+        return self.index
+
     def __repr__(self) -> str:
         return f"ObservationSpaceSpec({self.id})"
 
