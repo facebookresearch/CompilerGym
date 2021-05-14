@@ -10,6 +10,7 @@
 #include <optional>
 #include <stdexcept>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "magic_enum.hpp"
@@ -65,6 +66,33 @@ std::string demangle() {
   } else {
     return name.substr(pos + 2);
   }
+}
+
+// Convert a PascalCase enum name to enum value.
+// E.g. pascalCaseToEnum("MyEnumVal", &myEnum) -> MyEnum::MY_ENUM_VAL
+template <typename Enum>
+[[nodiscard]] grpc::Status pascalCaseToEnum(const std::string& name, Enum* value) {
+  for (const auto candidateValue : magic_enum::enum_values<Enum>()) {
+    const std::string pascalCaseName = enumNameToPascalCase(candidateValue);
+    if (pascalCaseName == name) {
+      *value = candidateValue;
+      return grpc::Status::OK;
+    }
+  }
+  return grpc::Status(
+      grpc::StatusCode::INVALID_ARGUMENT,
+      fmt::format("Could not convert '{}' to {} enum entry", name, demangle<Enum>()));
+}
+
+// Create a map from PascalCase enum value names to enum values.
+template <typename Enum>
+std::unordered_map<std::string, Enum> createPascalCaseToEnumLookupTable() {
+  std::unordered_map<std::string, Enum> table;
+  for (const auto value : magic_enum::enum_values<Enum>()) {
+    const std::string pascalCaseName = enumNameToPascalCase(value);
+    table[pascalCaseName] = value;
+  }
+  return table;
 }
 
 // Convert an integer to an enum with bounds checking.

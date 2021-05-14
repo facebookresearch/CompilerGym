@@ -55,10 +55,8 @@ def test_invalid_benchmark_missing_file(env: LlvmEnv):
         )
     )
 
-    with pytest.raises(ValueError) as ctx:
+    with pytest.raises(ValueError, match="No program set"):
         env.reset(benchmark=benchmark)
-
-    assert str(ctx.value) == "No program set"
 
 
 def test_benchmark_path_empty_file(env: LlvmEnv):
