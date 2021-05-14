@@ -43,7 +43,7 @@ from compiler_gym.service.proto import (
 )
 from compiler_gym.spaces import DefaultRewardFromObservation, NamedDiscrete, Reward
 from compiler_gym.util.debug_util import get_logging_level
-from compiler_gym.util.gym_type_hints import ObservationType, StepType
+from compiler_gym.util.gym_type_hints import ObservationType, RewardType, StepType
 from compiler_gym.util.timer import Timer
 from compiler_gym.validation_error import ValidationError
 from compiler_gym.validation_result import ValidationResult
@@ -737,7 +737,7 @@ class CompilerEnv(gym.Env):
 
         self.reward.reset(benchmark=self.benchmark)
         if self.reward_space:
-            self.episode_reward = 0
+            self.episode_reward = 0.0
 
         if self.observation_space:
             if len(reply.observation) != 1:
@@ -748,41 +748,32 @@ class CompilerEnv(gym.Env):
                 reply.observation[0]
             )
 
-    def step(self, action: Union[int, Iterable[int]]) -> StepType:
-        """Take a step.
-
-        :param action: An action, or a sequence of actions. When multiple
-            actions are provided the observation and reward are returned after
-            running all of the actions.
-
-        :return: A tuple of observation, reward, done, and info. Observation and
-            reward are None if default observation/reward is not set. If done is
-            True, observation and reward may also be None (e.g. because the
-            service failed).
-
-        :raises SessionNotFound: If :meth:`reset()
-            <compiler_gym.envs.CompilerEnv.reset>` has not been called.
-        """
+    def raw_step(
+        self,
+        actions: Iterable[int],
+        observations: Iterable[ObservationSpaceSpec],
+        rewards: Iterable[Reward],
+    ) -> StepType:
         if not self.in_episode:
             raise SessionNotFound("Must call reset() before step()")
-        actions = action if isinstance(action, IterableType) else [action]
-        observation, reward = None, None
 
         # Build the list of observations that must be computed by the backend
-        # service to generate the user-requested observation and reward.
-        # TODO(cummins): We could de-duplicate this list to improve efficiency
-        # when multiple redundant copies of the same observation space are
-        # requested.
-        observation_indices, observation_spaces = [], []
-        if self.observation_space:
-            observation_indices.append(self.observation_space_spec.index)
-            observation_spaces.append(self.observation_space_spec.id)
-        if self.reward_space:
-            observation_indices += [
-                self.observation.spaces[obs].index
-                for obs in self.reward_space.observation_spaces
+        user_observation_spaces: List[ObservationSpaceSpec] = list(observations)
+        reward_spaces: List[Reward] = list(rewards)
+
+        reward_observation_spaces: List[ObservationSpaceSpec] = []
+        for reward_space in reward_spaces:
+            reward_observation_spaces += [
+                self.observation.spaces[obs] for obs in reward_space.observation_spaces
             ]
-            observation_spaces += self.reward_space.observation_spaces
+
+        observations_to_compute: List[ObservationSpaceSpec] = list(
+            set(user_observation_spaces).union(set(reward_observation_spaces))
+        )
+        observation_space_index_map: Dict[ObservationSpaceSpec, int] = {
+            observation_space: i
+            for i, observation_space in enumerate(observations_to_compute)
+        }
 
         # Record the actions.
         self.actions += actions
@@ -791,7 +782,9 @@ class CompilerEnv(gym.Env):
         request = StepRequest(
             session_id=self._session_id,
             action=[Action(action=a) for a in actions],
-            observation_space=observation_indices,
+            observation_space=[
+                observation_space.index for observation_space in observations_to_compute
+            ],
         )
         try:
             reply = _wrapped_step(self.service, request)
@@ -810,11 +803,15 @@ class CompilerEnv(gym.Env):
                 "error_type": type(e).__name__,
                 "error_details": str(e),
             }
-            if self.reward_space:
-                reward = self.reward_space.reward_on_error(self.episode_reward)
-            if self.observation_space:
-                observation = self.observation_space_spec.default_value
-            return observation, reward, True, info
+            default_observations = [
+                observation_space.default_value
+                for observation_space in user_observation_spaces
+            ]
+            default_rewards = [
+                float(reward_space.reward_on_error(self.episode_reward))
+                for reward_space in reward_spaces
+            ]
+            return default_observations, default_rewards, True, info
 
         # If the action space has changed, update it.
         if reply.HasField("new_action_space"):
@@ -823,32 +820,126 @@ class CompilerEnv(gym.Env):
             )
 
         # Translate observations to python representations.
-        if len(reply.observation) != len(observation_indices):
+        if len(reply.observation) != len(observations_to_compute):
             raise ServiceError(
-                f"Requested {observation_indices} observations "
+                f"Requested {len(observations_to_compute)} observations "
                 f"but received {len(reply.observation)}"
             )
-        observations = [
-            self.observation.spaces[obs].translate(val)
-            for obs, val in zip(observation_spaces, reply.observation)
+        computed_observations = [
+            observation_space.translate(value)
+            for observation_space, value in zip(
+                observations_to_compute, reply.observation
+            )
         ]
 
-        # Pop the requested observation.
-        if self.observation_space:
-            observation, observations = observations[0], observations[1:]
+        # Get the user-requested observation.
+        observations: List[ObservationType] = [
+            computed_observations[observation_space_index_map[observation_space]]
+            for observation_space in user_observation_spaces
+        ]
 
-        # Compute reward.
-        self.reward.previous_action = action
-        if self.reward_space:
-            reward = self.reward_space.update(action, observations, self.observation)
-            self.episode_reward += reward
+        # Update and compue the rewards.
+        rewards: List[RewardType] = []
+        for reward_space in reward_spaces:
+            reward_observations = [
+                computed_observations[
+                    observation_space_index_map[
+                        self.observation.spaces[observation_space]
+                    ]
+                ]
+                for observation_space in reward_space.observation_spaces
+            ]
+            rewards.append(
+                float(
+                    reward_space.update(actions, reward_observations, self.observation)
+                )
+            )
 
         info = {
             "action_had_no_effect": reply.action_had_no_effect,
             "new_action_space": reply.HasField("new_action_space"),
         }
 
-        return observation, reward, reply.end_of_session, info
+        return observations, rewards, reply.end_of_session, info
+
+    def step(
+        self,
+        action: Union[int, Iterable[int]],
+        observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        rewards: Optional[Iterable[Union[str, Reward]]] = None,
+    ) -> StepType:
+        """Take a step.
+
+        :param action: An action, or a sequence of actions. When multiple
+            actions are provided the observation and reward are returned after
+            running all of the actions.
+
+        :param observations: A list of observation spaces to compute
+            observations from. If provided, this changes the :code:`observation`
+            element of the return tuple to be a list of observations from the
+            requested spaces. The default :code:`env.observation_space` is not
+            returned.
+
+        :param rewards: A list of reward spaces to compute rewards from. If
+            provided, this changes the :code:`reward` element of the return
+            tuple to be a list of rewards from the requested spaces. The default
+            :code:`env.reward_space` is not returned.
+
+        :return: A tuple of observation, reward, done, and info. Observation and
+            reward are None if default observation/reward is not set. If done is
+            True, observation and reward may also be None (e.g. because the
+            service failed).
+
+        :raises SessionNotFound: If :meth:`reset()
+            <compiler_gym.envs.CompilerEnv.reset>` has not been called.
+        """
+        # Coerce actions into a list.
+        actions = action if isinstance(action, IterableType) else [action]
+
+        # Coerce observation spaces into a list of ObservationSpaceSpec instances.
+        if observations:
+            observation_spaces: List[ObservationSpaceSpec] = [
+                obs
+                if isinstance(obs, ObservationSpaceSpec)
+                else self.observation.spaces[obs]
+                for obs in observations
+            ]
+        elif self.observation_space_spec:
+            observation_spaces: List[ObservationSpaceSpec] = [
+                self.observation_space_spec
+            ]
+        else:
+            observation_spaces: List[ObservationSpaceSpec] = []
+
+        # Coerce reward spaces into a list of Reward instances.
+        if rewards:
+            reward_spaces: List[Reward] = [
+                rew if isinstance(rew, Reward) else self.reward.spaces[rew]
+                for rew in rewards
+            ]
+        elif self.reward_space:
+            reward_spaces: List[Reward] = [self.reward_space]
+        else:
+            reward_spaces: List[Reward] = []
+
+        # Perform the underlying environment step.
+        observations, rewards, done, info = self.raw_step(
+            actions, observation_spaces, reward_spaces
+        )
+
+        # Translate observations lists back to the appropriate types.
+        if self.observation_space_spec and len(observations) == 1:
+            observations = observations[0]
+        elif not observation_spaces:
+            observations = None
+
+        # Translate reward lists back to the appropriate types.
+        if self.reward_space_spec and len(rewards) == 1:
+            rewards = rewards[0]
+        elif not reward_spaces:
+            rewards = None
+
+        return observations, rewards, done, info
 
     def render(
         self,
