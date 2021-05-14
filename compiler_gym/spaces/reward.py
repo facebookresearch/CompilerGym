@@ -99,7 +99,7 @@ class Reward(Scalar):
 
     def update(
         self,
-        action: int,
+        actions: List[int],
         observations: List[ObservationType],
         observation_view: "compiler_gym.views.ObservationView",  # noqa: F821
     ) -> RewardType:
