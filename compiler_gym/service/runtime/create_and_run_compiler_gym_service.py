@@ -21,7 +21,9 @@ from compiler_gym.util.filesystem import atomic_file_write
 
 flags.DEFINE_string("working_dir", "", "Path to use as service working directory")
 flags.DEFINE_integer("port", 0, "The service listening port")
-flags.DEFINE_integer("nproc", cpu_count(), "The number of server worker threads")
+flags.DEFINE_integer(
+    "rpc_service_threads", cpu_count(), "The number of server worker threads"
+)
 flags.DEFINE_integer("logbuflevel", 0, "Flag for compatability with C++ service.")
 FLAGS = flags.FLAGS
 
@@ -46,7 +48,7 @@ def create_and_run_compiler_gym_service(compilation_session_type):
 
         # Create the service.
         server = grpc.server(
-            futures.ThreadPoolExecutor(max_workers=FLAGS.nproc),
+            futures.ThreadPoolExecutor(max_workers=FLAGS.rpc_service_threads),
             options=[
                 ("grpc.max_send_message_length", MAX_MESSAGE_SIZE_IN_BYTES),
                 ("grpc.max_receive_message_length", MAX_MESSAGE_SIZE_IN_BYTES),
