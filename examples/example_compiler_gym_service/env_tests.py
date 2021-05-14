@@ -205,5 +205,17 @@ def test_benchmarks(env: CompilerEnv):
     ]
 
 
+def test_fork(env: CompilerEnv):
+    env.reset()
+    env.step(0)
+    env.step(1)
+    other_env = env.fork()
+    try:
+        assert env.benchmark == other_env.benchmark
+        assert other_env.actions == [0, 1]
+    finally:
+        other_env.close()
+
+
 if __name__ == "__main__":
     main()
