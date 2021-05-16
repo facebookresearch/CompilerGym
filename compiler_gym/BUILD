@@ -17,6 +17,7 @@ py_library(
         "//compiler_gym/envs",
         "//compiler_gym/leaderboard",
         "//compiler_gym/util",
+        "//compiler_gym/wrappers",
     ],
 )
 

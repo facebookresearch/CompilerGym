@@ -35,6 +35,7 @@ for applying reinforcement learning to compiler optimizations.
    compiler_gym/service
    compiler_gym/spaces
    compiler_gym/views
+   compiler_gym/wrappers
 
 ..
    TODO(github.com/facebookresearch/CompilerGym/issues/4): Add LLVM Service docs.

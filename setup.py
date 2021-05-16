@@ -69,6 +69,7 @@ setuptools.setup(
         "compiler_gym.util.flags",
         "compiler_gym.util",
         "compiler_gym.views",
+        "compiler_gym.wrappers",
         "compiler_gym",
     ],
     package_dir={

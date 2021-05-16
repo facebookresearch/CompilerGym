@@ -98,6 +98,9 @@ class Benchmark:
     def __repr__(self) -> str:
         return str(self.uri)
 
+    def __hash__(self) -> int:
+        return hash(self.uri)
+
     @property
     def uri(self) -> str:
         """The URI of the benchmark.
