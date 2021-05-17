@@ -15,7 +15,7 @@ from compiler_gym.util.runfiles_path import cache_path
 from compiler_gym.util.truncate import truncate
 
 
-class DownloadFailed(OSError):
+class DownloadFailed(IOError):
     """Error thrown if a download fails."""
 
 
@@ -24,7 +24,12 @@ class TooManyRequests(DownloadFailed):
 
 
 def _get_url_data(url: str) -> bytes:
-    req = requests.get(url)
+    try:
+        req = requests.get(url)
+    except IOError as e:
+        # Re-cast an error raised by requests library to DownloadFailed type.
+        raise DownloadFailed(str(e)) from e
+
     try:
         if req.status_code == 429:
             raise TooManyRequests("429 Too Many Requests")
@@ -109,7 +114,7 @@ def download(
 
     :return: The contents of the downloaded file.
 
-    :raises OSError: If the download fails, or if the downloaded content does
+    :raises IOError: If the download fails, or if the downloaded content does
         match the expected :code:`sha256` checksum.
     """
     # Convert a singular string into a list of strings.
