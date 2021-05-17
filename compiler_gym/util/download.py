@@ -24,7 +24,12 @@ class TooManyRequests(DownloadFailed):
 
 
 def _get_url_data(url: str) -> bytes:
-    req = requests.get(url)
+    try:
+        req = requests.get(url)
+    except IOError as e:
+        # Re-cast an error raised by requests library to DownloadFailed type.
+        raise DownloadFailed(str(e)) from e
+
     try:
         if req.status_code == 429:
             raise TooManyRequests("429 Too Many Requests")
