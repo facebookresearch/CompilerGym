@@ -15,7 +15,7 @@ from compiler_gym.util.runfiles_path import cache_path
 from compiler_gym.util.truncate import truncate
 
 
-class DownloadFailed(OSError):
+class DownloadFailed(IOError):
     """Error thrown if a download fails."""
 
 
@@ -109,7 +109,7 @@ def download(
 
     :return: The contents of the downloaded file.
 
-    :raises OSError: If the download fails, or if the downloaded content does
+    :raises IOError: If the download fails, or if the downloaded content does
         match the expected :code:`sha256` checksum.
     """
     # Convert a singular string into a list of strings.
