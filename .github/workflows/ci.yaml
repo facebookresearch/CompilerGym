@@ -120,7 +120,7 @@ jobs:
               uses: codecov/codecov-action@v1
               with:
                   files: ./coverage.xml
-              if: matrix.os == 'ubuntu-latest'
+              if: ${{ always() && matrix.os == 'ubuntu-latest' }}
 
             - name: Uninstall
               run: make purge
