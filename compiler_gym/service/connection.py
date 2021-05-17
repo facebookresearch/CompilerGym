@@ -289,17 +289,12 @@ class ManagedConnection(Connection):
             raise FileNotFoundError(f"File not found: {local_service_binary}")
         self.working_dir = make_working_dir()
 
-        # Set environment variable COMPILER_GYM_SERVICE_ARGS to pass
-        # additional arguments to the service.
-        args = os.environ.get("COMPILER_GYM_SERVICE_ARGS", "")
-
         # The command that will be executed. The working directory of this
         # command will be set to the local_service_binary's parent, so we can
         # use the relpath for a neater `ps aux` view.
         cmd = [
             f"./{local_service_binary.name}",
             f"--working_dir={self.working_dir}",
-            args,
         ]
 
         # Set the root of the runfiles directory.
@@ -324,6 +319,12 @@ class ManagedConnection(Connection):
             # gRPC backend by setting GRPC_VERBOSITY to ERROR, INFO, or DEBUG.
             if not os.environ.get("GRPC_VERBOSITY"):
                 os.environ["GRPC_VERBOSITY"] = "NONE"
+
+        # Set environment variable COMPILER_GYM_SERVICE_ARGS to pass
+        # additional arguments to the service.
+        args = os.environ.get("COMPILER_GYM_SERVICE_ARGS", "")
+        if args:
+            cmd.append(args)
 
         logger.debug("Exec %s", cmd)
         self.process = subprocess.Popen(
