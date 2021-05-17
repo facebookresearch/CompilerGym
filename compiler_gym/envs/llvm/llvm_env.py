@@ -3,7 +3,6 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Extensions to the CompilerEnv environment for LLVM."""
-import hashlib
 import os
 import shutil
 from pathlib import Path
@@ -461,9 +460,7 @@ class LlvmEnv(CompilerEnv):
 
         :return: A 40-character hexadecimal sha1 string.
         """
-        # TODO(cummins): Compute this on the service-side and add it as an
-        # observation space.
-        return hashlib.sha1(self.ir.encode("utf-8")).hexdigest()
+        return self.observation["IrSha1"]
 
     def write_ir(self, path: Union[Path, str]) -> Path:
         """Write the current program state to a file.
