@@ -224,40 +224,47 @@ livedocs: gendocs doxygen
 COMPILER_GYM_SITE_DATA ?= "/tmp/compiler_gym/tests/site_data"
 COMPILER_GYM_CACHE ?= "/tmp/compiler_gym/tests/cache"
 
+# The target to use. If not provided, all tests will be run. For `make test` and
+# related, this is a bazel target pattern, with default value '//...'. For `make
+# install-test` and related, this is a relative file path of the directory or
+# file to test, with default value 'tests'.
+TEST_TARGET ?=
+
+# Extra command line arguments for pytest.
+PYTEST_ARGS ?=
+
 test:
-	$(BAZEL) $(BAZEL_OPTS) test $(BAZEL_TEST_OPTS) //...
+	$(BAZEL) $(BAZEL_OPTS) test $(BAZEL_TEST_OPTS) $(if $(TEST_TARGET),$(TEST_TARGET),//...)
 
 itest:
-	$(IBAZEL) $(BAZEL_OPTS) test $(BAZEL_TEST_OPTS) //...
-
+	$(IBAZEL) $(BAZEL_OPTS) test $(BAZEL_TEST_OPTS) $(if $(TEST_TARGET),$(TEST_TARGET),//...)
 
 # Since we can't run compiler_gym from the project root we need to jump through
 # some hoops to run pytest "out of tree" by creating an empty directory and
 # symlinking the test directory into it so that pytest can be invoked.
-define run_pytest_suite
-	mkdir -p /tmp/compiler_gym/wheel_tests
-	rm -f /tmp/compiler_gym/wheel_tests/tests /tmp/compiler_gym/wheel_tests/tox.ini
-	ln -s $(ROOT)/tests /tmp/compiler_gym/wheel_tests
-	ln -s $(ROOT)/tox.ini /tmp/compiler_gym/wheel_tests
-	cd /tmp/compiler_gym/wheel_tests && pytest tests $(1) --durations=5 --benchmark-disable -n auto -k "not fuzz"
+install-test-setup:
+	mkdir -p /tmp/compiler_gym/install_tests
+	rm -f /tmp/compiler_gym/install_tests/tests /tmp/compiler_gym/install_tests/tox.ini
+	ln -s $(ROOT)/tests /tmp/compiler_gym/install_tests
+	ln -s $(ROOT)/tox.ini /tmp/compiler_gym/install_tests
+
+define pytest
+	cd /tmp/compiler_gym/install_tests && pytest $(if $(TEST_TARGET),$(TEST_TARGET),tests) $(1) $(PYTEST_ARGS)
 endef
 
-install-test:
-	$(call run_pytest_suite,)
+install-test: install-test-setup
+	$(call pytest,--benchmark-disable -n auto -k "not fuzz" --durations=5)
 
-install-test-cov:
-	$(call run_pytest_suite,--cov=compiler_gym --cov-report=xml --cov-report=term)
+install-test-cov: install-test-setup
+	$(call pytest,--benchmark-disable -n auto -k "not fuzz" --durations=5 --cov=compiler_gym --cov-report=xml --cov-report=term)
 	@mv /tmp/compiler_gym/wheel_tests/coverage.xml .
 
 # The minimum number of seconds to run the fuzz tests in a loop for. Override
 # this at the commandline, e.g. `FUZZ_SECONDS=1800 make fuzz`.
 FUZZ_SECONDS ?= 300
 
-install-fuzz:
-	mkdir -p /tmp/compiler_gym/wheel_fuzz_tests
-	rm -f /tmp/compiler_gym/wheel_fuzz_tests/tests
-	ln -s $(ROOT)/tests /tmp/compiler_gym/wheel_fuzz_tests
-	cd /tmp/compiler_gym/wheel_fuzz_tests && pytest tests -p no:sugar -x -vv -k fuzz --seconds=$(FUZZ_SECONDS)
+install-fuzz: install-test-setup
+	$(call pytest,-p no:sugar -x -vv -k fuzz --seconds=$(FUZZ_SECONDS))
 
 post-install-test:
 	$(MAKE) -C examples/makefile_integration clean
@@ -270,10 +277,12 @@ post-install-test:
 # Installation #
 ################
 
-install: bazel-build
+pip-install:
 	$(PYTHON) setup.py install
 
-.PHONY: install
+install: | bazel-build pip-install
+
+.PHONY: pip-install install
 
 
 ##############
