@@ -86,3 +86,43 @@ jobs:
 
             - name: Uninstall
               run: make purge
+
+    llvm-asan:
+        runs-on: ${{ matrix.os }}
+
+        strategy:
+            matrix:
+                os: [ubuntu-latest]
+                python: [3.9]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python ${{ matrix.python }}
+              uses: actions/setup-python@v2
+              with:
+                  python-version: ${{ matrix.python }}
+
+            - name: Install dependencies
+              run: |
+                  curl -L "https://github.com/bazelbuild/bazelisk/releases/download/v1.6.1/bazelisk-linux-amd64" > bazel
+                  chmod +x bazel
+                  sudo mv bazel /usr/local/bin/bazel
+                  sudo apt install clang-9 patchelf
+                  python -m pip install -r compiler_gym/requirements.txt -r tests/requirements.txt
+
+            - name: Install address sanitized package
+              run: |
+                  make bazel-build
+                  make bazel-build BAZEL_BUILD_OPTS=--config=asan BUILD_TARGET=//compiler_gym/envs/llvm/service:compiler_gym-llvm-service
+                  make pip-install
+              env:
+                  CC: clang
+                  CXX: clang++
+                  BAZEL_OPTS: --batch
+                  BAZEL_BUILD_OPTS: --config=ci
+
+            - name: Test
+              run: make install-test
+              env:
+                  ASAN_OPTIONS: detect_leaks=1
