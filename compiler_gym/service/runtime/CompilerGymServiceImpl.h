@@ -52,8 +52,9 @@ grpc::Status CompilerGymService<CompilationSessionType>::StartSession(
                         "No benchmark URI set for StartSession()");
   }
 
-  VLOG(1) << "StartSession(" << request->benchmark() << "), [" << nextSessionId_ << "]";
   const std::lock_guard<std::mutex> lock(sessionsMutex_);
+  VLOG(1) << "StartSession(" << request->benchmark() << "), " << sessionCount()
+          << " active sessions";
 
   const Benchmark* benchmark = benchmarks().get(request->benchmark());
   if (!benchmark) {
@@ -106,7 +107,7 @@ grpc::Status CompilerGymService<CompilationSessionType>::ForkSession(
 template <typename CompilationSessionType>
 grpc::Status CompilerGymService<CompilationSessionType>::EndSession(
     grpc::ServerContext* context, const EndSessionRequest* request, EndSessionReply* reply) {
-  VLOG(1) << "EndSession(" << request->session_id() << "), " << sessions_.size() - 1
+  VLOG(1) << "EndSession(" << request->session_id() << "), " << sessionCount() - 1
           << " sessions remaining";
 
   const std::lock_guard<std::mutex> lock(sessionsMutex_);
@@ -119,7 +120,7 @@ grpc::Status CompilerGymService<CompilationSessionType>::EndSession(
     sessions_.erase(request->session_id());
   }
 
-  reply->set_remaining_sessions(sessions_.size());
+  reply->set_remaining_sessions(sessionCount());
   return Status::OK;
 }
 

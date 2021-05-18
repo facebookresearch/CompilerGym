@@ -105,7 +105,6 @@ cc_library(
     deps = [
         ":CompilerGymService",
         "//compiler_gym/util:GrpcStatusMacros",
-        "//compiler_gym/util:Unreachable",
         "@boost//:filesystem",
         "@com_github_grpc_grpc//:grpc++",
         "@gflags",

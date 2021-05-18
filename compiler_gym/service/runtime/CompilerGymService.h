@@ -54,6 +54,9 @@ class CompilerGymService final : public compiler_gym::CompilerGymService::Servic
 
   inline BenchmarkCache& benchmarks() { return *benchmarks_; }
 
+  // Get the number of active sessions.
+  inline int sessionCount() const { return static_cast<int>(sessions_.size()); }
+
  protected:
   [[nodiscard]] grpc::Status session(uint64_t id, CompilationSession** environment);
 

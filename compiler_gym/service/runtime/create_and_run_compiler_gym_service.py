@@ -10,7 +10,9 @@ import sys
 from concurrent import futures
 from multiprocessing import cpu_count
 from pathlib import Path
+from signal import SIGTERM, signal
 from tempfile import mkdtemp
+from threading import Event, Thread
 
 import grpc
 from absl import app, flags, logging
@@ -28,6 +30,14 @@ flags.DEFINE_integer("logbuflevel", 0, "Flag for compatability with C++ service.
 FLAGS = flags.FLAGS
 
 MAX_MESSAGE_SIZE_IN_BYTES = 512 * 1024 * 1024
+
+
+shutdown_signal = Event()
+
+
+def _shutdown_handler(signum):
+    logging.info("Service received signal: %d", signum)
+    shutdown_signal.set()
 
 
 def create_and_run_compiler_gym_service(compilation_session_type):
@@ -54,12 +64,12 @@ def create_and_run_compiler_gym_service(compilation_session_type):
                 ("grpc.max_receive_message_length", MAX_MESSAGE_SIZE_IN_BYTES),
             ],
         )
-        servicer = CompilerGymService(
+        service = CompilerGymService(
             working_directory=working_dir,
             compilation_session_type=compilation_session_type,
         )
         compiler_gym_service_pb2_grpc.add_CompilerGymServiceServicer_to_server(
-            servicer, server
+            service, server
         )
         port = server.add_insecure_port("0.0.0.0:0")
 
@@ -74,9 +84,25 @@ def create_and_run_compiler_gym_service(compilation_session_type):
         )
 
         server.start()
-        server.wait_for_termination()
-        logging.fatal(
-            "Unreachable! grpc.server.wait_for_termination() should not return"
-        )
+
+        # Block on the RPC service in a separate thread. This enables the
+        # current thread to handle the shutdown routine.
+        server_thread = Thread(target=server.wait_for_termination)
+        server_thread.start()
+
+        # Register the signal handlers for a shutdown request that will each set
+        # the shutdownSignal future value.
+        signal(SIGTERM, _shutdown_handler)
+
+        # Block until the shutdown signal is received.
+        shutdown_signal.wait()
+        logging.info("Shutting down the RPC service")
+        server.stop(60).wait()
+        server_thread.join()
+
+        if len(service.sessions):
+            logging.fatal(
+                "Killing a service with %d active sessions!", len(service.sessions)
+            )
 
     app.run(main)
