@@ -112,6 +112,7 @@ export HELP
 CC ?= clang
 CXX ?= clang++
 BAZEL ?= bazel
+DOXYGEN ?= doxygen
 IBAZEL ?= ibazel
 PANDOC ?= pandoc
 PYTHON ?= python3
@@ -196,11 +197,20 @@ GENERATED_DOCS := \
 
 gendocs: $(GENERATED_DOCS)
 
-docs: gendocs bazel-build
+doxygen:
+	cd docs && $(DOXYGEN) Doxyfile
+
+doxygen-rst:
+	cd docs && $(PYTHON) generate_cc_rst.py
+
+docs: gendocs bazel-build doxygen
 	PYTHONPATH=$(ROOT)/bazel-bin/package.runfiles/CompilerGym $(MAKE) -C docs html
 
-livedocs: gendocs
+livedocs: gendocs doxygen
 	PYTHONPATH=$(ROOT)/bazel-bin/package.runfiles/CompilerGym $(MAKE) -C docs livehtml
+
+
+.PHONY: doxygen doxygen-rst
 
 
 ###########
