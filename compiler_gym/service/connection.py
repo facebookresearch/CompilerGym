@@ -302,16 +302,17 @@ class ManagedConnection(Connection):
         env["COMPILER_GYM_RUNFILES"] = str(runfiles_path("."))
         env["COMPILER_GYM_SITE_DATA"] = str(site_data_path("."))
 
-        # Set the verbosity of the service. The logging level of the service
-        # is the debug level - 1, so that COMPILER_GYM_DEUG=3 will cause VLOG(2)
+        # Set the verbosity of the service. The logging level of the service is
+        # the debug level - 1, so that COMPILER_GYM_DEBUG=3 will cause VLOG(2)
         # and lower to be logged to stdout.
         debug_level = get_debug_level()
         if debug_level > 0:
             cmd.append("--alsologtostderr")
             cmd.append(f"-v={debug_level - 1}")
             # If we are debugging the backend, set the logbuflevel to a low
-            # value to disable buffering of logging messages. This makes it
-            # easier to `LOG(INFO) << "..."` debug things.
+            # value to disable buffering of logging messages. This removes any
+            # buffering between `LOG(INFO) << "..."` and the message being
+            # emited to stderr.
             cmd.append("--logbuflevel=-1")
         else:
             # Silence the gRPC logs as we will do our own error reporting, but
@@ -432,13 +433,24 @@ class ManagedConnection(Connection):
     def close(self):
         """Terminate a local subprocess and close the connection."""
         try:
-            self.process.kill()
+            self.process.terminate()
             self.process.communicate(timeout=self.process_exit_max_seconds)
+            if self.process.returncode:
+                self.logger.fatal(
+                    f"Service exited with returncode {self.process.returncode}"
+                )
+                sys.exit(1)
         except ProcessLookupError:
             self.logger.warning("Service process not found at %s", self.working_dir)
         except subprocess.TimeoutExpired:
+            # Try and kill it and then walk away.
+            try:
+                self.process.kill()
+            except:  # noqa
+                pass
             self.logger.warning("Abandoning orphan service at %s", self.working_dir)
-        shutil.rmtree(self.working_dir, ignore_errors=True)
+        finally:
+            shutil.rmtree(self.working_dir, ignore_errors=True)
         super().close()
 
     def __repr__(self):
