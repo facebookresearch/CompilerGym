@@ -18,6 +18,7 @@ from compiler_gym.compiler_env_state import (
 )
 from compiler_gym.envs import CompilerEnv, llvm
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
+from compiler_gym.service import ServiceError
 from compiler_gym.service.connection import CompilerGymServiceConnection
 from compiler_gym.util import debug_util as dbg
 from tests.pytest_plugins import llvm as llvm_plugin
@@ -102,7 +103,9 @@ def test_connection_dies_default_reward(env: LlvmEnv):
     env.reward_space.default_value = 2.5
     env.episode_reward = 10
 
-    env.service.close()
+    with pytest.raises(ServiceError, match="Service exited with returncode 1"):
+        env.service.close()
+
     observation, reward, done, _ = env.step(0)
     assert done
 

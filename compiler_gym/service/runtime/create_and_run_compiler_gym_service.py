@@ -20,6 +20,7 @@ from absl import app, flags, logging
 from compiler_gym.service.proto import compiler_gym_service_pb2_grpc
 from compiler_gym.service.runtime.compiler_gym_service import CompilerGymService
 from compiler_gym.util.filesystem import atomic_file_write
+from compiler_gym.util.shell_format import plural
 
 flags.DEFINE_string("working_dir", "", "Path to use as service working directory")
 flags.DEFINE_integer("port", 0, "The service listening port")
@@ -101,8 +102,11 @@ def create_and_run_compiler_gym_service(compilation_session_type):
         server_thread.join()
 
         if len(service.sessions):
-            logging.fatal(
-                "Killing a service with %d active sessions!", len(service.sessions)
+            print(
+                "ERROR: Killing a service with",
+                plural(len(service.session), "active session", "active sessions"),
+                file=sys.stderr,
             )
+            sys.exit(6)
 
     app.run(main)

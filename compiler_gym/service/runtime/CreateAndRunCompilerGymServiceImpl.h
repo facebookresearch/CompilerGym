@@ -137,8 +137,12 @@ template <typename CompilationSessionType>
   server->Shutdown();
   serverThread.join();
 
-  CHECK(service.sessionCount() == 0)
-      << "Killing a service with " << service.sessionCount() << " active sessions!";
+  if (service.sessionCount()) {
+    std::cerr << "ERROR: Killing a service with " << service.sessionCount()
+              << (service.sessionCount() > 1 ? " active sessions!" : " active session!")
+              << std::endl;
+    exit(6);
+  }
 
   exit(0);
 }
