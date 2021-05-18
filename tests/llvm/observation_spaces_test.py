@@ -1151,5 +1151,24 @@ def test_object_text_size_observation_spaces(env: LlvmEnv):
     assert value == crc32_code_sizes[sys.platform][2]
 
 
+def test_add_derived_space(env: LlvmEnv):
+    env.reset()
+    env.observation.add_derived_space(
+        id="IrLen",
+        base_id="Ir",
+        space=Box(low=0, high=float("inf"), shape=(1,), dtype=int),
+        translate=lambda base: [15],
+    )
+
+    value = env.observation["IrLen"]
+    assert isinstance(value, list)
+    assert value == [15]
+
+    # Repeat the above test using the generated bound method.
+    value = env.observation.IrLen()
+    assert isinstance(value, list)
+    assert value == [15]
+
+
 if __name__ == "__main__":
     main()

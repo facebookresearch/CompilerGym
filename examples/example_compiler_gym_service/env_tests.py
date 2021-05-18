@@ -66,22 +66,20 @@ def test_reward_spaces(env: CompilerEnv):
 
 def test_step_before_reset(env: CompilerEnv):
     """Taking a step() before reset() is illegal."""
-    with pytest.raises(Exception):
+    with pytest.raises(SessionNotFound, match=r"Must call reset\(\) before step\(\)"):
         env.step(0)
 
 
 def test_observation_before_reset(env: CompilerEnv):
     """Taking an observation before reset() is illegal."""
-    with pytest.raises(SessionNotFound) as ctx:
+    with pytest.raises(SessionNotFound, match=r"Must call reset\(\) before step\(\)"):
         _ = env.observation["ir"]
-    assert str(ctx.value).startswith("Session not found")
 
 
 def test_reward_before_reset(env: CompilerEnv):
     """Taking a reward before reset() is illegal."""
-    with pytest.raises(SessionNotFound) as ctx:
+    with pytest.raises(SessionNotFound, match=r"Must call reset\(\) before step\(\)"):
         _ = env.reward["runtime"]
-    assert str(ctx.value).startswith("Session not found")
 
 
 def test_reset_invalid_benchmark(env: CompilerEnv):

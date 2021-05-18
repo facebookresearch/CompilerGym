@@ -262,7 +262,7 @@ class CompilerEnv(gym.Env):
             for space in self.service.action_spaces
         ]
         self.observation = self._observation_view_type(
-            get_observation=lambda req: _wrapped_step(self.service, req),
+            raw_step=self.raw_step,
             spaces=self.service.observation_spaces,
         )
         self.reward = self._reward_view_type(rewards, self.observation)
