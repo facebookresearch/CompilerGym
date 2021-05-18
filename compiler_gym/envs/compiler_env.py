@@ -43,7 +43,12 @@ from compiler_gym.service.proto import (
 )
 from compiler_gym.spaces import DefaultRewardFromObservation, NamedDiscrete, Reward
 from compiler_gym.util.debug_util import get_logging_level
-from compiler_gym.util.gym_type_hints import ObservationType, RewardType, StepType
+from compiler_gym.util.gym_type_hints import (
+    ActionType,
+    ObservationType,
+    RewardType,
+    StepType,
+)
 from compiler_gym.util.timer import Timer
 from compiler_gym.validation_error import ValidationError
 from compiler_gym.validation_result import ValidationResult
@@ -864,7 +869,7 @@ class CompilerEnv(gym.Env):
 
     def step(
         self,
-        action: Union[int, Iterable[int]],
+        action: Union[ActionType, Iterable[ActionType]],
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
     ) -> StepType:
