@@ -37,8 +37,9 @@ MAX_MESSAGE_SIZE_IN_BYTES = 512 * 1024 * 1024
 shutdown_signal = Event()
 
 
-def _shutdown_handler(signum):
-    logging.info("Service received signal: %d", signum)
+def _shutdown_handler(signal_number, stack_frame):
+    del stack_frame  # Unused
+    logging.info("Service received signal: %d", signal_number)
     shutdown_signal.set()
 
 
