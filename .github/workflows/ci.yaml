@@ -69,9 +69,6 @@ jobs:
 
             - name: Test
               run: make install-test
-              env:
-                  CC: clang
-                  CXX: clang++
               if: ${{ ! (matrix.os == 'ubuntu-latest' && matrix.python == 3.9) }}
 
             - name: Test with coverage
@@ -88,12 +85,7 @@ jobs:
               run: make purge
 
     llvm-asan:
-        runs-on: ${{ matrix.os }}
-
-        strategy:
-            matrix:
-                os: [ubuntu-latest]
-                python: [3.9]
+        runs-on: ubuntu-latest
 
         steps:
             - uses: actions/checkout@v2
@@ -101,7 +93,7 @@ jobs:
             - name: Set up Python ${{ matrix.python }}
               uses: actions/setup-python@v2
               with:
-                  python-version: ${{ matrix.python }}
+                  python-version: 3.9
 
             - name: Install dependencies
               run: |
