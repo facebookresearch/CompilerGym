@@ -103,10 +103,16 @@ def test_connection_dies_default_reward(env: LlvmEnv):
     env.reward_space.default_value = 2.5
     env.episode_reward = 10
 
-    with pytest.raises(ServiceError, match="Service exited with returncode 1"):
+    # Kill the service. Note killing the service for a ManagedConnection will
+    # result in a ServiceError because we have not ended the session we started
+    # with env.reset() above. For UnmanagedConnection, this error will not be
+    # raised.
+    try:
         env.service.close()
+    except ServiceError as e:
+        assert "Service exited with returncode " in str(e)
 
-    observation, reward, done, _ = env.step(0)
+    _, reward, done, _ = env.step(0)
     assert done
 
     assert reward == 2.5
@@ -120,7 +126,15 @@ def test_connection_dies_default_reward_negated(env: LlvmEnv):
     env.reward_space.default_value = 2.5
     env.episode_reward = 10
 
-    env.service.close()
+    # Kill the service. Note killing the service for a ManagedConnection will
+    # result in a ServiceError because we have not ended the session we started
+    # with env.reset() above. For UnmanagedConnection, this error will not be
+    # raised.
+    try:
+        env.service.close()
+    except ServiceError as e:
+        assert "Service exited with returncode " in str(e)
+
     observation, reward, done, _ = env.step(0)
     assert done
 

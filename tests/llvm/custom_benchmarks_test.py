@@ -245,8 +245,8 @@ def test_make_benchmark_invalid_clang_job():
 
 
 def test_custom_benchmark_is_added_on_service_restart(env: LlvmEnv):
-    # When the service is restarted, the environment must send a custom
-    # benchmark to it again.
+    # When the service is restarted, the environment still uses the same custom
+    # benchmark.
     with tempfile.TemporaryDirectory() as d:
         source = Path(d) / "a.c"
         with open(str(source), "w") as f:
@@ -258,8 +258,8 @@ def test_custom_benchmark_is_added_on_service_restart(env: LlvmEnv):
     assert env.benchmark == benchmark.uri
 
     # Kill the service so that the next call to reset() starts a new one.
-    env.service.close()
-    env.service = None
+    env.close()
+    assert env.service is None
 
     env.reset()
     assert env.benchmark == benchmark.uri
