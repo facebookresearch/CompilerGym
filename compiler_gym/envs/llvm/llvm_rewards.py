@@ -43,11 +43,12 @@ class CostFunctionReward(Reward):
 
     def update(
         self,
-        action: int,
+        actions: List[int],
         observations: List[ObservationType],
         observation_view: ObservationView,
     ) -> RewardType:
         """Called on env.step(). Compute and return new reward."""
+        del actions  # unused
         cost: RewardType = observations[0]
         if self.previous_cost is None:
             self.previous_cost = observation_view[self.init_cost_function]
@@ -79,14 +80,14 @@ class NormalizedReward(CostFunctionReward):
 
     def update(
         self,
-        action: int,
+        actions: List[int],
         observations: List[ObservationType],
         observation_view: ObservationView,
     ) -> RewardType:
         """Called on env.step(). Compute and return new reward."""
         if self.cost_norm is None:
             self.cost_norm = self.get_cost_norm(observation_view)
-        return super().update(action, observations, observation_view) / self.cost_norm
+        return super().update(actions, observations, observation_view) / self.cost_norm
 
     def get_cost_norm(self, observation_view: ObservationView) -> RewardType:
         """Return the value used to normalize costs."""

@@ -18,8 +18,7 @@ def main(argv):
     assert len(argv) == 3, "Usage: make_specs.py <service_binary> <output_path>"
     service_path, output_path = argv[1:]
 
-    env = LlvmEnv(Path(service_path))
-    try:
+    with LlvmEnv(Path(service_path)) as env:
         with open(output_path, "w") as f:
             print("from enum import Enum", file=f)
             print(file=f)
@@ -30,8 +29,6 @@ def main(argv):
             print("class reward_spaces(Enum):", file=f)
             for name in env.reward.spaces:
                 print(f'    {name} = "{name}"', file=f)
-    finally:
-        env.close()
 
 
 if __name__ == "__main__":

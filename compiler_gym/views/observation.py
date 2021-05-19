@@ -4,9 +4,13 @@
 # LICENSE file in the root directory of this source tree.
 from typing import Callable, Dict, List
 
-from compiler_gym.service import ServiceError
-from compiler_gym.service.proto import ObservationSpace, StepReply, StepRequest
-from compiler_gym.util.gym_type_hints import ObservationType
+from compiler_gym.service.proto import ObservationSpace
+from compiler_gym.util.gym_type_hints import (
+    ActionType,
+    ObservationType,
+    RewardType,
+    StepType,
+)
 from compiler_gym.views.observation_space_spec import ObservationSpaceSpec
 
 
@@ -29,15 +33,16 @@ class ObservationView:
 
     def __init__(
         self,
-        get_observation: Callable[[StepRequest], StepReply],
+        raw_step: Callable[
+            [List[ActionType], List[ObservationType], List[RewardType]], StepType
+        ],
         spaces: List[ObservationSpace],
     ):
         if not spaces:
             raise ValueError("No observation spaces")
         self.spaces: Dict[str, ObservationSpaceSpec] = {}
 
-        self._get_observation = get_observation
-        self.session_id = -1
+        self._raw_step = raw_step
 
         for i, s in enumerate(spaces):
             self._add_space(ObservationSpaceSpec.from_proto(i, s))
@@ -54,17 +59,14 @@ class ObservationView:
         :raises SessionNotFound: If :meth:`env.reset()
             <compiler_gym.envs.CompilerEnv.reset>` has not been called.
         """
-        space = self.spaces[observation_space]
-        request = StepRequest(
-            session_id=self.session_id,
-            observation_space=[space.index],
+        observation_space: ObservationSpaceSpec = self.spaces[observation_space]
+        observations, _, _, _ = self._raw_step(
+            actions=[], observations=[observation_space], rewards=[]
         )
-        reply: StepReply = self._get_observation(request)
-        if len(reply.observation) != 1:
-            raise ServiceError(
-                f"Requested 1 observation but received {len(reply.observation)}"
-            )
-        return space.translate(reply.observation[0])
+        assert (
+            len(observations) == 1
+        ), f"Expected 1 observation. Received: {len(observations)}"
+        return observations[0]
 
     def _add_space(self, space: ObservationSpaceSpec):
         """Register a new space."""
