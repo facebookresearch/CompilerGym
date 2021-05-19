@@ -48,7 +48,7 @@ class CostFunctionReward(Reward):
         observation_view: ObservationView,
     ) -> RewardType:
         """Called on env.step(). Compute and return new reward."""
-        del actions
+        del actions  # unused
         cost: RewardType = observations[0]
         if self.previous_cost is None:
             self.previous_cost = observation_view[self.init_cost_function]

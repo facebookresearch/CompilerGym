@@ -80,11 +80,11 @@ class CompilerEnv(gym.Env):
     :doc:`/compiler_gym/service` for more details on connecting to services):
 
     >>> env = CompilerEnv(
-        service="localhost:8080",
-        observation_space="features",
-        reward_space="runtime",
-        rewards=[env_reward_spaces],
-    )
+    ...     service="localhost:8080",
+    ...     observation_space="features",
+    ...     reward_space="runtime",
+    ...     rewards=[env_reward_spaces],
+    ... )
 
     Once constructed, an environment can be used in exactly the same way as a
     regular :code:`gym.Env`, e.g.
@@ -759,6 +759,30 @@ class CompilerEnv(gym.Env):
         observations: Iterable[ObservationSpaceSpec],
         rewards: Iterable[Reward],
     ) -> StepType:
+        """Take a step.
+
+        :param actions: A list of actions to be applied.
+
+        :param observations: A list of observations spaces to compute
+            observations from. These are evaluated after the actions are
+            applied.
+
+        :param rewards: A list of reward spaces to compute rewards from. These
+            are evaluated after the actions are applied.
+
+        :return: A tuple of observations, rewards, done, and info. Observations
+            and rewards are lists.
+
+        :raises SessionNotFound: If :meth:`reset()
+            <compiler_gym.envs.CompilerEnv.reset>` has not been called.
+
+        .. warning::
+
+            Prefer :meth:`step() <compiler_gym.envs.CompilerEnv.step>` to
+            :meth:`raw_step() <compiler_gym.envs.CompilerEnv.step>`.
+            :meth:`step() <compiler_gym.envs.CompilerEnv.step>` has equivalent
+            functionality, and is less likely to change in the future.
+        """
         if not self.in_episode:
             raise SessionNotFound("Must call reset() before step()")
 
@@ -843,7 +867,7 @@ class CompilerEnv(gym.Env):
             for observation_space in user_observation_spaces
         ]
 
-        # Update and compue the rewards.
+        # Update and compute the rewards.
         rewards: List[RewardType] = []
         for reward_space in reward_spaces:
             reward_observations = [
@@ -891,9 +915,7 @@ class CompilerEnv(gym.Env):
             :code:`env.reward_space` is not returned.
 
         :return: A tuple of observation, reward, done, and info. Observation and
-            reward are None if default observation/reward is not set. If done is
-            True, observation and reward may also be None (e.g. because the
-            service failed).
+            reward are None if default observation/reward is not set.
 
         :raises SessionNotFound: If :meth:`reset()
             <compiler_gym.envs.CompilerEnv.reset>` has not been called.
