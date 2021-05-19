@@ -79,8 +79,17 @@ class ObservationSpaceSpec:
 
     def __hash__(self) -> int:
         # Quickly hash observation spaces by comparing the index into the list
-        # of spaces returned by the environment. This means that hashing across
-        # different environments is _not_ safe.
+        # of spaces returned by the environment. This means that you should not
+        # hash between observation spaces from different environments as this
+        # will cause collisions, e.g.
+        #
+        #     # not okay:
+        #     >>> obs = set(env.observation.spaces).union(
+        #         other_env.observation.spaces
+        #     )
+        #
+        # If you want to hash between environments, consider using the string id
+        # to identify the observation spaces.
         return self.index
 
     def __repr__(self) -> str:
