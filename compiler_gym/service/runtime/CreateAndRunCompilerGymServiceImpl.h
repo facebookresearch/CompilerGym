@@ -54,6 +54,10 @@ void shutdown_handler(int signum);
 //     }
 template <typename CompilationSessionType>
 [[noreturn]] void createAndRunCompilerGymServiceImpl(int argc, char** argv, const char* usage) {
+  // Register a signal handler for SIGTERM that will set the shutdown_signal
+  // future value.
+  std::signal(SIGTERM, shutdown_handler);
+
   gflags::SetUsageMessage(std::string(usage));
 
   // Parse the command line arguments and die if any are unrecognized.
@@ -126,10 +130,6 @@ template <typename CompilationSessionType>
   // Block on the RPC service in a separate thread. This enables the current
   // thread to handle the shutdown routine.
   std::thread serverThread([&]() { server->Wait(); });
-
-  // Register the signal handlers for a shutdown request that will each set the
-  // shutdownSignal future value.
-  std::signal(SIGTERM, shutdown_handler);
 
   // Block until this shutdown signal is received.
   shutdownSignal.get_future().wait();

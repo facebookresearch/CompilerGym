@@ -45,6 +45,10 @@ def _shutdown_handler(signal_number, stack_frame):
 
 def create_and_run_compiler_gym_service(compilation_session_type):
     def main(argv):
+        # Register a signal handler for SIGTERM that will set the shutdownSignal
+        # future value.
+        signal(SIGTERM, _shutdown_handler)
+
         argv = [x for x in argv if x.strip()]
         if len(argv) > 1:
             print(
@@ -93,10 +97,6 @@ def create_and_run_compiler_gym_service(compilation_session_type):
         # current thread to handle the shutdown routine.
         server_thread = Thread(target=server.wait_for_termination)
         server_thread.start()
-
-        # Register the signal handlers for a shutdown request that will each set
-        # the shutdownSignal future value.
-        signal(SIGTERM, _shutdown_handler)
 
         # Block until the shutdown signal is received.
         shutdown_signal.wait()
