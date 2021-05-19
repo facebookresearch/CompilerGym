@@ -11,13 +11,14 @@ RUN apt-get update \
         'clang=1:6.0-41~exp5~ubuntu1' \
         'cmake=3.10.2-1ubuntu2.18.04.1' \
         'curl=7.58.0-2ubuntu3.12' \
+        'libtinfo5=6.1-1ubuntu1.18.04' \
         'make=4.1-9.1ubuntu1' \
         'patchelf=0.9-1' \
         'python3-dev=3.6.7-1~18.04' \
         'python3-distutils=3.6.9-1~18.04' \
         'python3-pip=9.0.1-2.3~ubuntu1.18.04.4' \
         'python3=3.6.7-1~18.04' \
-        'libtinfo5=6.1-1ubuntu1.18.04' \
+        'rsync=3.1.2-2.1ubuntu1.1' \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
