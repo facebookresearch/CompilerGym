@@ -121,10 +121,10 @@ rules_proto_toolchains()
 # Version should be kept in step with compiler_gym/requirements.txt.
 http_archive(
     name = "com_github_grpc_grpc",
-    sha256 = "acf247ec3a52edaee5dee28644a4e485c5e5badf46bdb24a80ca1d76cb8f1174",
-    strip_prefix = "grpc-1.37.1",
+    sha256 = "1a5127c81487f4e3e57973bb332f04b9159f94d860c207e096d8a587d371edbd",
+    strip_prefix = "grpc-1.36.0",
     urls = [
-        "https://github.com/grpc/grpc/archive/v1.37.1.tar.gz",
+        "https://github.com/grpc/grpc/archive/v1.36.0.tar.gz",
     ],
 )
 
