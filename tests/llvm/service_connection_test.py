@@ -43,8 +43,10 @@ def test_service_env_dies_reset(env: CompilerEnv):
     env.reward_space = "IrInstructionCount"
     env.reset("cbench-v1/crc32")
 
-    # Kill the service.
-    with pytest.raises(ServiceError, match="Service exited with returncode 1"):
+    # Kill the service. Note killing the service directly will result in an
+    # error because we have not ended the session we started with env.reset()
+    # above.
+    with pytest.raises(ServiceError, match="Service exited with returncode "):
         env.service.close()
 
     # Check that the environment doesn't fall over.
