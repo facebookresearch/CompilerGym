@@ -222,7 +222,7 @@ genrule(
     ],
     outs = ["cbench-v1/gsm.bc"],
     cmd = (
-        "mkdir -p $(@D) &&rsync -rL $$(dirname $(location @cBench//:readme))/telecom_gsm/ $(@D)/telecom_gsm_src/ &&" +
+        "mkdir -p $(@D) && rsync -rL $$(dirname $(location @cBench//:readme))/telecom_gsm/ $(@D)/telecom_gsm_src/ &&" +
         "patch --quiet --forward $(@D)/telecom_gsm_src/src/add.c < $(location cBench-gsm-add.c.patch);" +
         "$(location :make_llvm_module) $(@D)/telecom_gsm_src $@ -DSASR -DSTUPID_COMPILER -DNeedFunctionPrototypes=1"
     ),
@@ -238,7 +238,7 @@ genrule(
     ],
     outs = ["cbench-v1/ispell.bc"],
     cmd = (
-        "mkdir -p $(@D) &&rsync -rL $$(dirname $(location @cBench//:readme))/office_ispell/ $(@D)/office_ispell_src/ &&" +
+        "mkdir -p $(@D) && rsync -rL $$(dirname $(location @cBench//:readme))/office_ispell/ $(@D)/office_ispell_src/ &&" +
         "patch --quiet --forward $(@D)/office_ispell_src/src/correct.c < $(location cBench-ispell-correct.c.patch);" +
         "$(location :make_llvm_module) $(@D)/office_ispell_src $@"
     ),
