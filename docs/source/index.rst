@@ -24,6 +24,13 @@ for applying reinforcement learning to compiler optimizations.
 
 .. toctree::
    :maxdepth: 3
+   :caption: Developer Manual
+
+   contributing
+   rpc.rst
+
+.. toctree::
+   :maxdepth: 3
    :caption: Python API Reference
 
    compiler_gym/compiler_gym
@@ -44,13 +51,6 @@ for applying reinforcement learning to compiler optimizations.
    cc/compiler_gym/service.rst
    cc/compiler_gym/service/runtime.rst
    cc/compiler_gym/util.rst
-
-.. toctree::
-   :maxdepth: 3
-   :caption: Developer Manual
-
-   contributing
-   rpc.rst
 
 
 Indices and tables
