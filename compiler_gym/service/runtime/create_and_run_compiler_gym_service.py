@@ -19,6 +19,7 @@ from absl import app, flags, logging
 
 from compiler_gym.service.proto import compiler_gym_service_pb2_grpc
 from compiler_gym.service.runtime.compiler_gym_service import CompilerGymService
+from compiler_gym.util import debug_util as dbg
 from compiler_gym.util.filesystem import atomic_file_write
 from compiler_gym.util.shell_format import plural
 
@@ -56,6 +57,7 @@ def create_and_run_compiler_gym_service(compilation_session_type):
 
         FLAGS.log_dir = str(working_dir / "logs")
         logging.get_absl_handler().use_absl_log_file()
+        logging.set_verbosity(dbg.get_logging_level())
 
         # Create the service.
         server = grpc.server(
