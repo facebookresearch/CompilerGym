@@ -168,7 +168,7 @@ cc_library(
         "@magic_enum",
         "@nlohmann_json//:json",
         "@programl//programl/graph/format:node_link_graph",
-        "@programl//programl/ir/llvm",
+        "@programl//programl/ir/llvm:llvm-10",
         "@programl//programl/proto:programl_cc",
         "@subprocess",
     ],
