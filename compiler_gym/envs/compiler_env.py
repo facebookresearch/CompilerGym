@@ -631,8 +631,12 @@ class CompilerEnv(gym.Env):
                 # not kill it.
                 if reply.remaining_sessions:
                     close_service = False
-            except:  # noqa pylint: disable=bare-except
-                pass  # Don't feel bad, computer, you tried ;-)
+            except Exception as e:
+                self.logger.warning(
+                    "Failed to end active compiler session on close(): %s (%s)",
+                    e,
+                    type(e).__name__,
+                )
             self._session_id = None
 
         if self.service and close_service:
@@ -846,6 +850,7 @@ class CompilerEnv(gym.Env):
             # end the current episode and provide some diagnostic information to
             # the user through the `info` dict.
             self.close()
+
             info = {
                 "error_type": type(e).__name__,
                 "error_details": str(e),
