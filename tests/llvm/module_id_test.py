@@ -11,7 +11,7 @@ pytest_plugins = ["tests.pytest_plugins.llvm", "tests.pytest_plugins.common"]
 
 def test_no_module_id_builtin_benchmark(env: LlvmEnv):
     """Test that the module and source IDs are stripped in shipped benchmark."""
-    env.reset("cBench-v1/crc32")
+    env.reset("cbench-v1/crc32")
     ir = env.ir
 
     print(ir)  # For debugging in case of error.
