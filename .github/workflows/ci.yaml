@@ -69,10 +69,16 @@ jobs:
 
             - name: Test
               run: make install-test
+              env:
+                  CC: clang
+                  CXX: clang++
               if: ${{ ! (matrix.os == 'ubuntu-latest' && matrix.python == 3.9) }}
 
             - name: Test with coverage
               run: make install-test-cov
+              env:
+                  CC: clang
+                  CXX: clang++
               if: ${{ matrix.os == 'ubuntu-latest' && matrix.python == 3.9 }}
 
             - name: Upload coverage to Codecov
