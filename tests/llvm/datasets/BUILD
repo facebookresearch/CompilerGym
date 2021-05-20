@@ -46,6 +46,19 @@ py_test(
 )
 
 py_test(
+    name = "chstone_test",
+    timeout = "moderate",
+    srcs = ["chstone_test.py"],
+    deps = [
+        "//compiler_gym/envs/llvm",
+        "//compiler_gym/envs/llvm/datasets",
+        "//tests:test_main",
+        "//tests/pytest_plugins:common",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "clgen_test",
     timeout = "moderate",
     srcs = ["clgen_test.py"],
