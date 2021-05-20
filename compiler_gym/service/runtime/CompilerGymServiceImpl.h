@@ -39,8 +39,12 @@ grpc::Status CompilerGymService<CompilationSessionType>::GetSpaces(grpc::ServerC
                                                                    const GetSpacesRequest* request,
                                                                    GetSpacesReply* reply) {
   VLOG(2) << "GetSpaces()";
-  *reply->mutable_action_space_list() = {actionSpaces_.begin(), actionSpaces_.end()};
-  *reply->mutable_observation_space_list() = {observationSpaces_.begin(), observationSpaces_.end()};
+  for (const auto& actionSpace : actionSpaces_) {
+    *reply->add_action_space_list() = actionSpace;
+  }
+  for (const auto& observationSpace : observationSpaces_) {
+    *reply->add_observation_space_list() = observationSpace;
+  }
   return grpc::Status::OK;
 }
 
