@@ -35,6 +35,7 @@ from absl import app, flags
 from torch.distributions import Categorical
 
 import compiler_gym  # noqa Register environments.
+from compiler_gym.wrappers import ConstrainedCommandline, TimeLimit
 
 flags.DEFINE_list(
     "flags",
@@ -58,7 +59,7 @@ flags.DEFINE_list(
     "List of optimizatins to explore.",
 )
 flags.DEFINE_string("reward", "IrInstructionCount", "The reward function to optimize.")
-flags.DEFINE_string("benchmark", "cbench-v1/dijkstra", "Benchmark to optimize.")
+flags.DEFINE_string("benchmark", "cbench-v1/qsort", "Benchmark to optimize.")
 flags.DEFINE_integer("episode_len", 5, "Number of transitions per episode.")
 flags.DEFINE_integer("hidden_size", 64, "Latent vector size.")
 flags.DEFINE_integer("episodes", 1000, "Number of episodes to run and train on.")
@@ -95,19 +96,8 @@ class MovingExponentialAverage:
         return self.value
 
 
-class CustomEnv:
-    """A custom environment class for applying compiler passes.
-
-    Initialization: load a program (benchmark)
-    Step: apply a compiler pass to the program
-    Reward: reduction in the size of the program measured in instructions
-
-    The sum of all rewards will be the total reduction in the size of
-    the program, due to the combination of all optimization passes
-    that were applied, measured in instructions. This number will be
-    negative if the program became larger.
-
-    For the input representation (state), if there are N possible
+class HistoryObservation(gym.ObservationWrapper):
+    """For the input representation (state), if there are N possible
     actions, then an action x is represented by a one-hot vector V(x)
     with N entries. A sequence of M actions (x, y, ...) is represented
     by an MxN matrix of 1-hot vectors (V(x), V(y), ...). Actions that
@@ -116,25 +106,22 @@ class CustomEnv:
     a fixed number of actions.
     """
 
-    def __init__(self):
-        self._env = gym.make("llvm-v0", reward_space=FLAGS.reward)
-        try:
-            self._env.reset(benchmark=FLAGS.benchmark)
+    def __init__(self, env):
+        super().__init__(env=env)
+        self.observation_space = gym.spaces.Box(
+            low=np.full(len(FLAGS.flags), 0, dtype=np.float32),
+            high=np.full(len(FLAGS.flags), float("inf"), dtype=np.float32),
+            dtype=np.float32,
+        )
 
-            # Project onto the subset of transformations that have
-            # been specified to be used.
-            self._actions = [self._env.action_space.flags.index(f) for f in FLAGS.flags]
-            self.action_space = [self._env.action_space.flags[a] for a in self._actions]
+    def reset(self, *args, **kwargs):
+        self._steps_taken = 0
+        self._state = np.zeros(
+            (FLAGS.episode_len - 1, self.action_space.n), dtype=np.int32
+        )
+        return super().reset(*args, **kwargs)
 
-        finally:
-            # The program will not terminate until the environment is
-            # closed, not even if there is an exception.
-            self._env.close()
-
-    def step(self, action):
-        assert 0 <= action and action < len(self._actions)
-
-        # Update state
+    def step(self, action: int):
         assert self._steps_taken < FLAGS.episode_len
         if self._steps_taken < FLAGS.episode_len - 1:
             # Don't need to record the last action since there are no
@@ -143,22 +130,10 @@ class CustomEnv:
             self._state[self._steps_taken][action] = 1
         self._steps_taken += 1
 
-        # Update environment
-        _, reward, done, info = self._env.step(self._actions[action])
-        done = done or self._steps_taken == FLAGS.episode_len
+        return super().step(action)
 
-        return self._state, reward, done, info
-
-    def reset(self):
-        self._env.reset()
-        self._steps_taken = 0
-        self._state = np.zeros(
-            (FLAGS.episode_len - 1, len(self.action_space)), dtype=np.int32
-        )
+    def observation(self, observation):
         return self._state
-
-    def close(self):
-        self._env.close()
 
 
 class Policy(nn.Module):
@@ -367,13 +342,20 @@ def TrainActorCritic(env):
     return avg_reward.value
 
 
+def make_env():
+    env = gym.make("llvm-v0", benchmark=FLAGS.benchmark, reward_space=FLAGS.reward)
+    env = ConstrainedCommandline(env, flags=FLAGS.flags)
+    env = TimeLimit(env, max_episode_steps=FLAGS.episode_len)
+    env = HistoryObservation(env)
+    return env
+
+
 def main(argv):
     """Main entry point."""
     torch.manual_seed(FLAGS.seed)
     random.seed(FLAGS.seed)
 
-    env = CustomEnv()
-    try:
+    with make_env() as env:
         print(f"Seed: {FLAGS.seed}")
         print(f"Episode length: {FLAGS.episode_len}")
         print(f"Exploration: {FLAGS.exploration:.2%}")
@@ -400,11 +382,6 @@ def main(argv):
         print(f"Median performance: {statistics.median(performances):.2f}")
         print(f"   Avg performance: {statistics.mean(performances):.2f}")
         print(f" Worst performance: {min(performances):.2f}")
-
-    finally:
-        # The program will not terminate until the environment is
-        # closed.
-        env.close()
 
 
 if __name__ == "__main__":

@@ -28,11 +28,6 @@ class CompilerEnvWrapper(gym.Wrapper):
             <compiler_gym.envs.CompilerEnv>`.
         """
         super().__init__(env)
-        if not isinstance(env, CompilerEnv):
-            raise TypeError(
-                "Only a CompilerEnv instance can be wrapped, not "
-                f"an instance of type: '{type(env).__name__}'"
-            )
 
     def reset(self, *args, **kwargs) -> ObservationType:
         return self.env.reset(*args, **kwargs)
