@@ -76,7 +76,7 @@ def _download(urls: List[str], sha256: Optional[str], max_retries: int) -> bytes
     # A retry loop, and loop over all urls provided.
     last_exception = None
     wait_time = 5
-    for _ in range(max_retries):
+    for _ in range(max(max_retries, 1)):
         for url in urls:
             try:
                 return _do_download_attempt(url, sha256)
