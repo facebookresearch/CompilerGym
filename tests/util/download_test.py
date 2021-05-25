@@ -98,5 +98,10 @@ def test_download_mismatched_checksum(mocker):
         download.download("example", sha256="123")
 
 
+def test_download_no_urls():
+    with pytest.raises(ValueError, match="No URLs to download"):
+        download.download(urls=[])
+
+
 if __name__ == "__main__":
     main()

@@ -68,6 +68,9 @@ def _do_download_attempt(url: str, sha256: Optional[str]) -> bytes:
 
 
 def _download(urls: List[str], sha256: Optional[str], max_retries: int) -> bytes:
+    if not urls:
+        raise ValueError("No URLs to download")
+
     # Cache hit.
     if sha256 and cache_path(f"downloads/{sha256}").is_file():
         with open(str(cache_path(f"downloads/{sha256}")), "rb") as f:
