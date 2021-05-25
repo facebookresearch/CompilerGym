@@ -115,7 +115,7 @@ def random_search(
 ) -> Tuple[float, List[int]]:
     with make_env() as env:
         env.reset()
-        if not isinstance(env, CompilerEnv):
+        if not isinstance(env.unwrapped, CompilerEnv):
             raise TypeError(
                 f"random_search() requires CompilerEnv. Called with: {type(env).__name__}"
             )
