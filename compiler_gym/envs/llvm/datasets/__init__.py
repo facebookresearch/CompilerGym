@@ -9,6 +9,7 @@ from typing import Iterable, Optional
 from compiler_gym.datasets import Dataset, TarDatasetWithManifest
 from compiler_gym.envs.llvm.datasets.anghabench import AnghaBenchDataset
 from compiler_gym.envs.llvm.datasets.cbench import CBenchDataset, CBenchLegacyDataset
+from compiler_gym.envs.llvm.datasets.chstone import CHStoneDataset
 from compiler_gym.envs.llvm.datasets.clgen import CLgenDataset
 from compiler_gym.envs.llvm.datasets.csmith import CsmithBenchmark, CsmithDataset
 from compiler_gym.envs.llvm.datasets.llvm_stress import LlvmStressDataset
@@ -248,6 +249,7 @@ def get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset
         sort_order=100,
     )
     yield CBenchLegacyDataset(site_data_base=site_data_base)
+    yield CHStoneDataset(site_data_base=site_data_base)
     yield CsmithDataset(site_data_base=site_data_base, sort_order=0)
     yield GitHubDataset(site_data_base=site_data_base, sort_order=0)
     yield LinuxDataset(site_data_base=site_data_base, sort_order=0)
