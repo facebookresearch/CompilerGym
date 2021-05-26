@@ -48,6 +48,7 @@ with the required dependencies:
 
     conda create -n compiler_gym python=3.9 cmake pandoc patchelf
     conda activate compiler_gym
+    conda install -c conda-forge doxygen
 
 Then clone the CompilerGym source code using:
 

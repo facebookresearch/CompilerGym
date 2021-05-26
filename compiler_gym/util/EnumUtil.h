@@ -17,8 +17,14 @@
 
 namespace compiler_gym::util {
 
-// Convert an UPPER_SNAKE_CASE enum name to PascalCase.
-// E.g. MyEnum::MY_ENUM_VALUE -> "MyEnumValue".
+/**
+ * Convert an UPPER_SNAKE_CASE enum name to PascalCase.
+ *
+ * E.g. `MyEnum::MY_ENUM_VALUE -> "MyEnumValue"`.
+ *
+ * @param value An enum.
+ * @return A string.
+ */
 template <typename Enum>
 std::string enumNameToPascalCase(Enum value) {
   const std::string name(magic_enum::enum_name<Enum>(value));
@@ -35,8 +41,14 @@ std::string enumNameToPascalCase(Enum value) {
   return out;
 }
 
-// Convert an optional UPPER_SNAKE_CASE enum name to PascalCase.
-// E.g. MyEnum::MY_ENUM_VALUE -> "MyEnumValue".
+/**
+ * Convert an UPPER_SNAKE_CASE enum name to PascalCase.
+ *
+ * E.g. `MyEnum::MY_ENUM_VALUE -> "MyEnumValue"`.
+ *
+ * @param value An enum.
+ * @return A string.
+ */
 template <typename Enum>
 std::string enumNameToPascalCase(std::optional<Enum> value) {
   if (!value.has_value()) {
@@ -45,7 +57,11 @@ std::string enumNameToPascalCase(std::optional<Enum> value) {
   return enumNameToPascalCase(value.value());
 }
 
-// Enumerate all values of an optional enum, including nullopt.
+/**
+ * Enumearate all values of an optional Enum, including `std::nullopt`.
+ *
+ * @return A vector of optional enum values.
+ */
 template <typename Enum>
 std::vector<std::optional<Enum>> optionalEnumValues() {
   std::vector<std::optional<Enum>> values;
@@ -56,7 +72,11 @@ std::vector<std::optional<Enum>> optionalEnumValues() {
   return values;
 }
 
-// Return the name of an enum, e.g. demangle<foo::MyEnum>() -> "MyEnum".
+/**
+ * Return the name of an enum, e.g. `demangle<foo::MyEnum>() -> "MyEnum"`.
+ *
+ * @return A string.
+ */
 template <typename Enum>
 std::string demangle() {
   const std::string name(magic_enum::enum_type_name<Enum>());
@@ -68,8 +88,17 @@ std::string demangle() {
   }
 }
 
-// Convert a PascalCase enum name to enum value.
-// E.g. pascalCaseToEnum("MyEnumVal", &myEnum) -> MyEnum::MY_ENUM_VAL
+/**
+ * Convert a PascalCase enum name to enum value.
+ *
+ * E.g. `pascalCaseToEnum("MyEnumVal", &myEnum) -> MyEnum::MY_ENUM_VAL`.
+ *
+ * @tparam Enum Enum type.
+ * @param name A string.
+ * @param value The value to write to.
+ * @return `Status::OK` on success. `Status::INVALID_ARGUMENT` if the string
+ *          name is not recognized.
+ */
 template <typename Enum>
 [[nodiscard]] grpc::Status pascalCaseToEnum(const std::string& name, Enum* value) {
   for (const auto candidateValue : magic_enum::enum_values<Enum>()) {
@@ -84,7 +113,12 @@ template <typename Enum>
       fmt::format("Could not convert '{}' to {} enum entry", name, demangle<Enum>()));
 }
 
-// Create a map from PascalCase enum value names to enum values.
+/**
+ * @brief Create a map from PascalCase enum value names to enum values.
+ *
+ * @tparam Enum Enum type.
+ * @return A `name -> value` lookup table.
+ */
 template <typename Enum>
 std::unordered_map<std::string, Enum> createPascalCaseToEnumLookupTable() {
   std::unordered_map<std::string, Enum> table;
@@ -95,8 +129,16 @@ std::unordered_map<std::string, Enum> createPascalCaseToEnumLookupTable() {
   return table;
 }
 
-// Convert an integer to an enum with bounds checking.
-// E.g. intToEnum(3, &myEnum);
+/**
+ * Convert an integer to an enum with bounds checking.
+ *
+ * E.g. `intToEnum(3, &myEnum);`
+ *
+ * @tparam Enum Enum type.
+ * @param numericValue An integer.
+ * @param enumValue An enum to write.
+ * @return `Status::OK` on success. `Status::INVALID_ARGUMENT` if out of bounds.
+ */
 template <typename Enum>
 [[nodiscard]] inline grpc::Status intToEnum(int numericValue, Enum* enumValue) {
   const auto max = magic_enum::enum_count<Enum>();
