@@ -224,6 +224,10 @@ livedocs: gendocs doxygen
 COMPILER_GYM_SITE_DATA ?= "/tmp/compiler_gym/tests/site_data"
 COMPILER_GYM_CACHE ?= "/tmp/compiler_gym/tests/cache"
 
+# A directory that is used as the working directory for running pytest tests
+# by symlinking the tests directory into it.
+INSTALL_TEST_ROOT ?= "/tmp/compiler_gym/install_tests"
+
 # The target to use. If not provided, all tests will be run. For `make test` and
 # related, this is a bazel target pattern, with default value '//...'. For `make
 # install-test` and related, this is a relative file path of the directory or
@@ -243,13 +247,13 @@ itest:
 # some hoops to run pytest "out of tree" by creating an empty directory and
 # symlinking the test directory into it so that pytest can be invoked.
 install-test-setup:
-	mkdir -p /tmp/compiler_gym/install_tests
-	rm -f /tmp/compiler_gym/install_tests/tests /tmp/compiler_gym/install_tests/tox.ini
-	ln -s $(ROOT)/tests /tmp/compiler_gym/install_tests
-	ln -s $(ROOT)/tox.ini /tmp/compiler_gym/install_tests
+	mkdir -p "$(INSTALL_TEST_ROOT)"
+	rm -f "$(INSTALL_TEST_ROOT)/tests" "$(INSTALL_TEST_ROOT)/tox.ini"
+	ln -s "$(ROOT)/tests" "$(INSTALL_TEST_ROOT)"
+	ln -s "$(ROOT)/tox.ini" "$(INSTALL_TEST_ROOT)"
 
 define pytest
-	cd /tmp/compiler_gym/install_tests && pytest $(if $(TEST_TARGET),$(TEST_TARGET),tests) $(1) $(PYTEST_ARGS)
+	cd "$(INSTALL_TEST_ROOT)" && pytest $(if $(TEST_TARGET),$(TEST_TARGET),tests) $(1) $(PYTEST_ARGS)
 endef
 
 install-test: install-test-setup
@@ -257,7 +261,7 @@ install-test: install-test-setup
 
 install-test-cov: install-test-setup
 	$(call pytest,--benchmark-disable -n auto -k "not fuzz" --durations=5 --cov=compiler_gym --cov-report=xml --cov-report=term)
-	@mv /tmp/compiler_gym/wheel_tests/coverage.xml .
+	@mv "$(INSTALL_TEST_ROOT)/coverage.xml" .
 
 # The minimum number of seconds to run the fuzz tests in a loop for. Override
 # this at the commandline, e.g. `FUZZ_SECONDS=1800 make fuzz`.
