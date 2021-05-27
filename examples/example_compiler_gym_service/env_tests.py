@@ -49,14 +49,14 @@ def test_invalid_arguments(bin: Path):
         return p.returncode, stdout, stderr
 
     returncode, _, stderr = run([str(bin), "foobar"])
-    assert stderr.startswith("ERROR:")
+    assert "ERROR:" in stderr
     assert "'foobar'" in stderr
     assert returncode == 1
 
     returncode, _, stderr = run([str(bin), "--foobar"])
     # C++ and python flag parsing library emit slightly different error
     # messages.
-    assert stderr.startswith("ERROR:") or "FATAL" in stderr
+    assert "ERROR:" in stderr or "FATAL" in stderr
     assert "'foobar'" in stderr
     assert returncode == 1
 
