@@ -25,9 +25,9 @@
 #
 #     $ pre-commit run --all-files
 #
-# Install the pre-commit hook using:
+# The pre-commit git hook is installed using:
 #
-#     $ pre-commit install
+#     $ make init
 #
 repos:
     - repo: https://github.com/pre-commit/pre-commit-hooks

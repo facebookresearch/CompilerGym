@@ -10,6 +10,8 @@ py_binary(
     main = "example_service.py",
     visibility = ["//visibility:public"],
     deps = [
+        "//compiler_gym/service",
         "//compiler_gym/service/proto",
+        "//compiler_gym/service/runtime",
     ],
 )

@@ -46,6 +46,10 @@ class Benchmark {
   // Compute and return a SHA1 hash of the module.
   BenchmarkHash module_hash() const;
 
+  // Wrapper around llvm::verifyModule() which returns an error status on
+  // failure.
+  grpc::Status verify_module();
+
   inline const std::string& name() const { return name_; }
 
   inline const size_t bitcodeSize() const { return bitcodeSize_; }

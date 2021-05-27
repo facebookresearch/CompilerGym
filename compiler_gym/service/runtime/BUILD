@@ -65,7 +65,7 @@ cc_library(
         "CompilerGymService.h",
         "CompilerGymServiceImpl.h",
     ],
-    visibility = ["//tests/service/runtime:__subpackages__"],
+    visibility = ["//visibility:public"],
     deps = [
         ":BenchmarkCache",
         ":CompilerGymServiceImpl",
@@ -105,7 +105,6 @@ cc_library(
     deps = [
         ":CompilerGymService",
         "//compiler_gym/util:GrpcStatusMacros",
-        "//compiler_gym/util:Unreachable",
         "@boost//:filesystem",
         "@com_github_grpc_grpc//:grpc++",
         "@gflags",

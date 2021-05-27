@@ -12,6 +12,8 @@
 #include <grpcpp/grpcpp.h>
 #include <unistd.h>
 
+#include <csignal>
+#include <future>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -19,16 +21,19 @@
 #include "boost/filesystem.hpp"
 #include "compiler_gym/service/proto/compiler_gym_service.pb.h"
 #include "compiler_gym/service/runtime/CompilerGymService.h"
-#include "compiler_gym/util/Unreachable.h"
 
 DECLARE_string(port);
 DECLARE_string(working_dir);
 
 namespace compiler_gym::runtime {
 
+extern std::promise<void> shutdownSignal;
+
 // Increase maximum message size beyond the 4MB default as inbound message
 // may be larger (e.g., in the case of IR strings).
 constexpr size_t kMaxMessageSizeInBytes = 512 * 1024 * 1024;
+
+void shutdown_handler(int signum);
 
 // Create a service, configured using --port and --working_dir flags, and run
 // it. This function never returns.
@@ -49,6 +54,10 @@ constexpr size_t kMaxMessageSizeInBytes = 512 * 1024 * 1024;
 //     }
 template <typename CompilationSessionType>
 [[noreturn]] void createAndRunCompilerGymServiceImpl(int argc, char** argv, const char* usage) {
+  // Register a signal handler for SIGTERM that will set the shutdown_signal
+  // future value.
+  std::signal(SIGTERM, shutdown_handler);
+
   gflags::SetUsageMessage(std::string(usage));
 
   // Parse the command line arguments and die if any are unrecognized.
@@ -59,7 +68,7 @@ template <typename CompilationSessionType>
   }
 
   // Set up the working and logging directories.
-  boost::filesystem::path workingDirectory = FLAGS_working_dir;
+  boost::filesystem::path workingDirectory{FLAGS_working_dir};
   bool createdWorkingDir = false;
   if (FLAGS_working_dir.empty()) {
     // If no working directory was set, create one.
@@ -118,8 +127,24 @@ template <typename CompilationSessionType>
 
   LOG(INFO) << "Service " << workingDirectory << " listening on " << port << ", PID = " << getpid();
 
-  server->Wait();
-  UNREACHABLE("grpc::Server::Wait() should not return");
+  // Block on the RPC service in a separate thread. This enables the current
+  // thread to handle the shutdown routine.
+  std::thread serverThread([&]() { server->Wait(); });
+
+  // Block until this shutdown signal is received.
+  shutdownSignal.get_future().wait();
+  VLOG(2) << "Shutting down the RPC service";
+  server->Shutdown();
+  serverThread.join();
+
+  if (service.sessionCount()) {
+    std::cerr << "ERROR: Killing a service with " << service.sessionCount()
+              << (service.sessionCount() > 1 ? " active sessions!" : " active session!")
+              << std::endl;
+    exit(6);
+  }
+
+  exit(0);
 }
 
 }  // namespace compiler_gym::runtime

@@ -6,24 +6,12 @@ load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
 cc_binary(
     name = "compiler_gym-example-service-cc",
-    srcs = ["RunService.cc"],
+    srcs = ["ExampleService.cc"],
     visibility = ["//visibility:public"],
     deps = [
-        ":ExampleService",
-        "//compiler_gym/util:RunService",
-    ],
-)
-
-cc_library(
-    name = "ExampleService",
-    srcs = ["ExampleService.cc"],
-    hdrs = ["ExampleService.h"],
-    deps = [
-        "//compiler_gym/service/proto:compiler_gym_service_cc",
-        "//compiler_gym/service/proto:compiler_gym_service_cc_grpc",
-        "//compiler_gym/util:GrpcStatusMacros",
-        "//compiler_gym/util:Version",
-        "@boost//:filesystem",
+        "//compiler_gym/service:CompilationSession",
+        "//compiler_gym/service/runtime:cc_runtime",
+        "//compiler_gym/util:Unreachable",
         "@com_github_grpc_grpc//:grpc++",
         "@fmt",
     ],

@@ -72,22 +72,6 @@ jobs:
               env:
                   CC: clang
                   CXX: clang++
-                  BAZEL_BUILD_OPTS: --config=ci
-              if: ${{ ! (matrix.os == 'ubuntu-latest' && matrix.python == 3.9) }}
-
-            - name: Test with coverage
-              run: make install-test-cov
-              env:
-                  CC: clang
-                  CXX: clang++
-                  BAZEL_BUILD_OPTS: --config=ci
-              if: ${{ matrix.os == 'ubuntu-latest' && matrix.python == 3.9 }}
-
-            - name: Upload coverage to Codecov
-              uses: codecov/codecov-action@v1
-              with:
-                  files: ./coverage.xml
-              if: ${{ always() && matrix.os == 'ubuntu-latest' }}
 
             - name: Uninstall
               run: make purge

@@ -524,39 +524,57 @@ class CompilerEnv(gym.Env):
         :return: A new environment instance.
         """
         if not self.in_episode:
-            if self.actions and not self.in_episode:
+            actions = self.actions.copy()
+            self.reset()
+            if actions:
                 self.logger.warning(
                     "Parent service of fork() has died, replaying state"
                 )
-                self.apply(self.state)
-            else:
-                self.reset()
+                _, _, done, _ = self.step(actions)
+                assert not done, "Failed to replay action sequence"
 
         request = ForkSessionRequest(session_id=self._session_id)
-        reply: ForkSessionReply = self.service(self.service.stub.ForkSession, request)
+        try:
+            reply: ForkSessionReply = self.service(
+                self.service.stub.ForkSession, request
+            )
 
-        # Create a new environment that shares the connection.
-        new_env = type(self)(
-            service=self._service_endpoint,
-            action_space=self.action_space,
-            connection_settings=self._connection_settings,
-            service_connection=self.service,
-        )
+            # Create a new environment that shares the connection.
+            new_env = type(self)(
+                service=self._service_endpoint,
+                action_space=self.action_space,
+                connection_settings=self._connection_settings,
+                service_connection=self.service,
+            )
 
-        # Set the session ID.
-        new_env._session_id = reply.session_id  # pylint: disable=protected-access
-        new_env.observation.session_id = reply.session_id
+            # Set the session ID.
+            new_env._session_id = reply.session_id  # pylint: disable=protected-access
+            new_env.observation.session_id = reply.session_id
 
-        # Now that we have initialized the environment with the current state,
-        # set the benchmark so that calls to new_env.reset() will correctly
-        # revert the environment to the initial benchmark state.
-        #
-        # pylint: disable=protected-access
-        new_env._next_benchmark = self._benchmark_in_use
+            # Now that we have initialized the environment with the current state,
+            # set the benchmark so that calls to new_env.reset() will correctly
+            # revert the environment to the initial benchmark state.
+            #
+            # pylint: disable=protected-access
+            new_env._next_benchmark = self._benchmark_in_use
 
-        # Set the "visible" name of the current benchmark to hide the fact that
-        # we loaded from a custom bitcode file.
-        new_env._benchmark_in_use = self._benchmark_in_use
+            # Set the "visible" name of the current benchmark to hide the fact that
+            # we loaded from a custom bitcode file.
+            new_env._benchmark_in_use = self._benchmark_in_use
+        except NotImplementedError:
+            # Fallback implementation. If the compiler service does not support
+            # the Fork() operator then we create a new independent environment
+            # and apply the sequence of actions in the current environment to
+            # replay the state.
+            new_env = type(self)(
+                service=self._service_endpoint,
+                action_space=self.action_space,
+                benchmark=self.benchmark,
+                connection_settings=self._connection_settings,
+            )
+            new_env.reset()
+            _, _, done, _ = new_env.step(self.actions)
+            assert not done, "Failed to replay action sequence in forked environment"
 
         # Create copies of the mutable reward and observation spaces. This
         # is required to correctly calculate incremental updates.
@@ -613,8 +631,12 @@ class CompilerEnv(gym.Env):
                 # not kill it.
                 if reply.remaining_sessions:
                     close_service = False
-            except:  # noqa pylint: disable=bare-except
-                pass  # Don't feel bad, computer, you tried ;-)
+            except Exception as e:
+                self.logger.warning(
+                    "Failed to end active compiler session on close(): %s (%s)",
+                    e,
+                    type(e).__name__,
+                )
             self._session_id = None
 
         if self.service and close_service:
@@ -828,6 +850,7 @@ class CompilerEnv(gym.Env):
             # end the current episode and provide some diagnostic information to
             # the user through the `info` dict.
             self.close()
+
             info = {
                 "error_type": type(e).__name__,
                 "error_details": str(e),

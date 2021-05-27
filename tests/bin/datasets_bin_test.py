@@ -17,17 +17,13 @@ def run_main(*args):
 
 
 def test_llvm_summary():
-    with capture_output() as out:
-        run_main("--env=llvm-v0")
+    with pytest.warns(
+        DeprecationWarning, match="Command-line management of datasets is deprecated"
+    ):
+        with capture_output() as out:
+            run_main("--env=llvm-v0")
 
     assert "cbench-v1" in out.stdout
-
-
-def test_datasets_is_deprecated():
-    with pytest.deprecated_call(
-        match="Command-line management of datasets is deprecated"
-    ):
-        run_main("--env=llvm-v0")
 
 
 if __name__ == "__main__":

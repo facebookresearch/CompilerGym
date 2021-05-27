@@ -10,3 +10,14 @@ DEFINE_string(
 DEFINE_string(port, "0",
               "The port to listen on. If 0, an unused port will be selected. The selected port is "
               "written to <working_dir>/port.txt.");
+
+namespace compiler_gym::runtime {
+
+std::promise<void> shutdownSignal;
+
+void shutdown_handler(int signum) {
+  VLOG(1) << "Service received signal: " << signum;
+  shutdownSignal.set_value();
+}
+
+}  // namespace compiler_gym::runtime

@@ -14,7 +14,10 @@
 
 #include "boost/filesystem.hpp"
 #include "compiler_gym/envs/llvm/service/ActionSpace.h"
+#include "compiler_gym/envs/llvm/service/Benchmark.h"
+#include "compiler_gym/envs/llvm/service/BenchmarkFactory.h"
 #include "compiler_gym/envs/llvm/service/Cost.h"
+#include "compiler_gym/envs/llvm/service/ObservationSpaces.h"
 #include "compiler_gym/envs/llvm/service/passes/ActionHeaders.h"
 #include "compiler_gym/envs/llvm/service/passes/ActionSwitch.h"
 #include "compiler_gym/third_party/autophase/InstCount.h"
@@ -24,11 +27,9 @@
 #include "compiler_gym/util/RunfilesPath.h"
 #include "llvm/Bitcode/BitcodeWriter.h"
 #include "llvm/CodeGen/Passes.h"
-#include "llvm/IR/DebugInfo.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/Metadata.h"
 #include "llvm/IR/Module.h"
-#include "llvm/IR/Verifier.h"
 #include "llvm/InitializePasses.h"
 #include "llvm/Pass.h"
 #include "llvm/Support/TargetSelect.h"
@@ -45,24 +46,15 @@ using grpc::Status;
 using grpc::StatusCode;
 using nlohmann::json;
 
+using BenchmarkProto = compiler_gym::Benchmark;
+using ActionSpaceProto = compiler_gym::ActionSpace;
+
 namespace {
 
 // Return the target library information for a module.
 llvm::TargetLibraryInfoImpl getTargetLibraryInfo(llvm::Module& module) {
   llvm::Triple triple(module.getTargetTriple());
   return llvm::TargetLibraryInfoImpl(triple);
-}
-
-// Wrapper around llvm::verifyModule() which raises the given exception type
-// on failure.
-Status verifyModuleStatus(const llvm::Module& module) {
-  std::string errorMessage;
-  llvm::raw_string_ostream rso(errorMessage);
-  if (llvm::verifyModule(module, &rso)) {
-    rso.flush();
-    return Status(StatusCode::DATA_LOSS, "Failed to verify module: " + errorMessage);
-  }
-  return Status::OK;
 }
 
 void initLlvm() {
@@ -119,59 +111,98 @@ Status writeBitcodeToFile(const llvm::Module& module, const fs::path& path) {
 
 }  // anonymous namespace
 
-LlvmSession::LlvmSession(std::unique_ptr<Benchmark> benchmark, LlvmActionSpace actionSpace,
-                         const boost::filesystem::path& workingDirectory)
-    : workingDirectory_(workingDirectory),
-      benchmark_(std::move(benchmark)),
-      actionSpace_(actionSpace),
-      tlii_(getTargetLibraryInfo(benchmark_->module())),
-      actionCount_(0) {
-  // Initialize LLVM.
-  initLlvm();
-
-  // Initialize cpuinfo
-  cpuinfo_initialize();
-
-  // Strip module debug info.
-  llvm::StripDebugInfo(benchmark_->module());
-
-  // Erase module-level named metadata.
-  while (!benchmark_->module().named_metadata_empty()) {
-    llvm::NamedMDNode* nmd = &*benchmark_->module().named_metadata_begin();
-    benchmark_->module().eraseNamedMetadata(nmd);
-  }
-
-  // Verify the module now to catch any problems early.
-  CHECK(verifyModuleStatus(benchmark_->module()).ok());
+std::string LlvmSession::getCompilerVersion() const {
+  std::stringstream ss;
+  ss << LLVM_VERSION_STRING << " " << llvm::Triple::normalize(LLVM_DEFAULT_TARGET_TRIPLE);
+  return ss.str();
 }
 
-Status LlvmSession::step(const StepRequest& request, StepReply* reply) {
-  // Apply the requested actions.
-  actionCount_ += request.action_size();
+std::vector<ActionSpace> LlvmSession::getActionSpaces() const { return getLlvmActionSpaceList(); }
+
+std::vector<ObservationSpace> LlvmSession::getObservationSpaces() const {
+  return getLlvmObservationSpaceList();
+}
+
+LlvmSession::LlvmSession(const boost::filesystem::path& workingDirectory)
+    : CompilationSession(workingDirectory),
+      observationSpaceNames_(util::createPascalCaseToEnumLookupTable<LlvmObservationSpace>()) {
+  initLlvm();
+  cpuinfo_initialize();
+}
+
+Status LlvmSession::init(const ActionSpace& actionSpace, const BenchmarkProto& benchmark) {
+  BenchmarkFactory& benchmarkFactory = BenchmarkFactory::getSingleton(workingDirectory());
+
+  // Get the benchmark or return an error.
+  std::unique_ptr<Benchmark> llvmBenchmark;
+  RETURN_IF_ERROR(benchmarkFactory.getBenchmark(benchmark, &llvmBenchmark));
+
+  // Verify the benchmark now to catch errors early.
+  RETURN_IF_ERROR(llvmBenchmark->verify_module());
+
+  LlvmActionSpace actionSpaceEnum;
+  RETURN_IF_ERROR(util::pascalCaseToEnum(actionSpace.name(), &actionSpaceEnum));
+
+  return init(actionSpaceEnum, std::move(llvmBenchmark));
+}
+
+Status LlvmSession::init(CompilationSession* other) {
+  // TODO: Static cast?
+  auto llvmOther = static_cast<LlvmSession*>(other);
+  return init(llvmOther->actionSpace(), llvmOther->benchmark().clone(workingDirectory()));
+}
+
+Status LlvmSession::init(const LlvmActionSpace& actionSpace, std::unique_ptr<Benchmark> benchmark) {
+  benchmark_ = std::move(benchmark);
+  actionSpace_ = actionSpace;
+
+  tlii_ = getTargetLibraryInfo(benchmark_->module());
+
+  // Verify the module now to catch any problems early.
+  return Status::OK;
+}
+
+Status LlvmSession::applyAction(const Action& action, bool& endOfEpisode,
+                                std::optional<ActionSpace>& newActionSpace,
+                                bool& actionHadNoEffect) {
+  DCHECK(benchmark_) << "Calling applyAction() before init()";
+
+  // Apply the requested action.
   switch (actionSpace()) {
     case LlvmActionSpace::PASSES_ALL:
-      for (int i = 0; i < request.action_size(); ++i) {
-        LlvmAction action;
-        RETURN_IF_ERROR(util::intToEnum(request.action(i).action(), &action));
-        RETURN_IF_ERROR(runAction(action, reply));
-      }
-  }
-
-  // Fail now if we have broken something.
-  RETURN_IF_ERROR(verifyModuleStatus(benchmark().module()));
-
-  // Compute the requested observations.
-  for (int i = 0; i < request.observation_space_size(); ++i) {
-    LlvmObservationSpace observationSpace;
-    RETURN_IF_ERROR(util::intToEnum(request.observation_space(i), &observationSpace));
-    auto observation = reply->add_observation();
-    RETURN_IF_ERROR(getObservation(observationSpace, observation));
+      LlvmAction actionEnum;
+      RETURN_IF_ERROR(util::intToEnum(action.action(), &actionEnum));
+      RETURN_IF_ERROR(applyPassAction(actionEnum, actionHadNoEffect));
   }
 
   return Status::OK;
 }
 
-Status LlvmSession::runAction(LlvmAction action, StepReply* reply) {
+Status LlvmSession::endOfStep(bool actionHadNoEffect, bool& endOfEpisode,
+                              std::optional<ActionSpace>& newActionSpace) {
+  if (actionHadNoEffect) {
+    return Status::OK;
+  } else {
+    return benchmark().verify_module();
+  }
+}
+
+Status LlvmSession::computeObservation(const ObservationSpace& observationSpace,
+                                       Observation& observation) {
+  DCHECK(benchmark_) << "Calling computeObservation() before init()";
+
+  const auto& it = observationSpaceNames_.find(observationSpace.name());
+  if (it == observationSpaceNames_.end()) {
+    return Status(
+        StatusCode::INVALID_ARGUMENT,
+        fmt::format("Could not interpret observation space name: {}", observationSpace.name()));
+  }
+  const LlvmObservationSpace observationSpaceEnum = it->second;
+  RETURN_IF_ERROR(computeObservation(observationSpaceEnum, observation));
+  return Status::OK;
+}
+
+Status LlvmSession::applyPassAction(LlvmAction action, bool& actionHadNoEffect) {
 #ifdef EXPERIMENTAL_UNSTABLE_GVN_SINK_PASS
   // NOTE(https://github.com/facebookresearch/CompilerGym/issues/46): The
   // -gvn-sink pass has been found to have nondeterministic behavior so has
@@ -179,28 +210,27 @@ Status LlvmSession::runAction(LlvmAction action, StepReply* reply) {
   // the command line was found to produce more stable results.
   if (action == LlvmAction::GVNSINK_PASS) {
     RETURN_IF_ERROR(runOptWithArgs({"-gvn-sink"}));
-    reply->set_action_had_no_effect(true);
+    actionHadNoEffect = true;
     return Status::OK;
   }
 #endif
 
 // Use the generated HANDLE_PASS() switch statement to dispatch to runPass().
-#define HANDLE_PASS(pass) runPass(pass, reply);
+#define HANDLE_PASS(pass) actionHadNoEffect = !runPass(pass);
   HANDLE_ACTION(action, HANDLE_PASS)
 #undef HANDLE_PASS
 
   return Status::OK;
 }
 
-void LlvmSession::runPass(llvm::Pass* pass, StepReply* reply) {
+bool LlvmSession::runPass(llvm::Pass* pass) {
   llvm::legacy::PassManager passManager;
   setupPassManager(&passManager, pass);
 
-  const bool changed = passManager.run(benchmark().module());
-  reply->set_action_had_no_effect(!changed);
+  return passManager.run(benchmark().module());
 }
 
-void LlvmSession::runPass(llvm::FunctionPass* pass, StepReply* reply) {
+bool LlvmSession::runPass(llvm::FunctionPass* pass) {
   llvm::legacy::FunctionPassManager passManager(&benchmark().module());
   setupPassManager(&passManager, pass);
 
@@ -209,13 +239,13 @@ void LlvmSession::runPass(llvm::FunctionPass* pass, StepReply* reply) {
     changed |= (passManager.run(function) ? 1 : 0);
   }
   changed |= (passManager.doFinalization() ? 1 : 0);
-  reply->set_action_had_no_effect(!changed);
+  return changed;
 }
 
 Status LlvmSession::runOptWithArgs(const std::vector<std::string>& optArgs) {
   // Create temporary files for `opt` to read from and write to.
-  const auto before_path = fs::unique_path(workingDirectory_ / "module-%%%%%%%%.bc");
-  const auto after_path = fs::unique_path(workingDirectory_ / "module-%%%%%%%%.bc");
+  const auto before_path = fs::unique_path(workingDirectory() / "module-%%%%%%%%.bc");
+  const auto after_path = fs::unique_path(workingDirectory() / "module-%%%%%%%%.bc");
   RETURN_IF_ERROR(writeBitcodeToFile(benchmark().module(), before_path));
 
   // Build a command line invocation: `opt input.bc -o output.bc <optArgs...>`.
@@ -261,14 +291,14 @@ Status LlvmSession::runOptWithArgs(const std::vector<std::string>& optArgs) {
   return Status::OK;
 }
 
-Status LlvmSession::getObservation(LlvmObservationSpace space, Observation* reply) {
+Status LlvmSession::computeObservation(LlvmObservationSpace space, Observation& reply) {
   switch (space) {
     case LlvmObservationSpace::IR: {
       // Serialize the LLVM module to an IR string.
       std::string ir;
       llvm::raw_string_ostream rso(ir);
       benchmark().module().print(rso, /*AAW=*/nullptr);
-      reply->set_string_value(ir);
+      reply.set_string_value(ir);
       break;
     }
     case LlvmObservationSpace::IR_SHA1: {
@@ -280,24 +310,24 @@ Status LlvmSession::getObservation(LlvmObservationSpace space, Observation* repl
         ss << std::setfill('0') << std::setw(sizeof(BenchmarkHash::value_type) * 2) << std::hex
            << val;
       }
-      reply->set_string_value(ss.str());
+      reply.set_string_value(ss.str());
       break;
     }
     case LlvmObservationSpace::BITCODE_FILE: {
       // Generate an output path with 16 bits of randomness.
-      const auto outpath = fs::unique_path(workingDirectory_ / "module-%%%%%%%%.bc");
+      const auto outpath = fs::unique_path(workingDirectory() / "module-%%%%%%%%.bc");
       RETURN_IF_ERROR(writeBitcodeToFile(benchmark().module(), outpath));
-      reply->set_string_value(outpath.string());
+      reply.set_string_value(outpath.string());
       break;
     }
     case LlvmObservationSpace::INST_COUNT: {
       const auto features = InstCount::getFeatureVector(benchmark().module());
-      *reply->mutable_int64_list()->mutable_value() = {features.begin(), features.end()};
+      *reply.mutable_int64_list()->mutable_value() = {features.begin(), features.end()};
       break;
     }
     case LlvmObservationSpace::AUTOPHASE: {
       const auto features = autophase::InstCount::getFeatureVector(benchmark().module());
-      *reply->mutable_int64_list()->mutable_value() = {features.begin(), features.end()};
+      *reply.mutable_int64_list()->mutable_value() = {features.begin(), features.end()};
       break;
     }
     case LlvmObservationSpace::PROGRAML: {
@@ -315,7 +345,7 @@ Status LlvmSession::getObservation(LlvmObservationSpace space, Observation* repl
       if (!status.ok()) {
         return Status(StatusCode::INTERNAL, status.error_message());
       }
-      *reply->mutable_string_value() = nodeLinkGraph.dump();
+      *reply.mutable_string_value() = nodeLinkGraph.dump();
       break;
     }
     case LlvmObservationSpace::CPU_INFO: {
@@ -340,83 +370,83 @@ Status LlvmSession::getObservation(LlvmObservationSpace space, Observation* repl
       hwinfo["cores_count"] = cpuinfo_get_cores_count();
       auto cpu = cpuinfo_get_packages();
       hwinfo["name"] = cpu->name;
-      *reply->mutable_string_value() = hwinfo.dump();
+      *reply.mutable_string_value() = hwinfo.dump();
       break;
     }
     case LlvmObservationSpace::IR_INSTRUCTION_COUNT: {
       double cost;
       RETURN_IF_ERROR(setCost(LlvmCostFunction::IR_INSTRUCTION_COUNT, benchmark().module(),
-                              workingDirectory_, &cost));
-      reply->set_scalar_int64(static_cast<int64_t>(cost));
+                              workingDirectory(), &cost));
+      reply.set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::IR_INSTRUCTION_COUNT_O0: {
       const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O0,
                                         LlvmCostFunction::IR_INSTRUCTION_COUNT);
-      reply->set_scalar_int64(static_cast<int64_t>(cost));
+      reply.set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::IR_INSTRUCTION_COUNT_O3: {
       const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O3,
                                         LlvmCostFunction::IR_INSTRUCTION_COUNT);
-      reply->set_scalar_int64(static_cast<int64_t>(cost));
+      reply.set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::IR_INSTRUCTION_COUNT_OZ: {
       const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::Oz,
                                         LlvmCostFunction::IR_INSTRUCTION_COUNT);
-      reply->set_scalar_int64(static_cast<int64_t>(cost));
+      reply.set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::OBJECT_TEXT_SIZE_BYTES: {
       double cost;
       RETURN_IF_ERROR(setCost(LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES, benchmark().module(),
-                              workingDirectory_, &cost));
-      reply->set_scalar_int64(static_cast<int64_t>(cost));
+                              workingDirectory(), &cost));
+      reply.set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::OBJECT_TEXT_SIZE_O0: {
       const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O0,
                                         LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES);
-      reply->set_scalar_int64(static_cast<int64_t>(cost));
+      reply.set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::OBJECT_TEXT_SIZE_O3: {
       const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O3,
                                         LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES);
-      reply->set_scalar_int64(static_cast<int64_t>(cost));
+      reply.set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::OBJECT_TEXT_SIZE_OZ: {
       const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::Oz,
                                         LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES);
-      reply->set_scalar_int64(static_cast<int64_t>(cost));
+      reply.set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
 #ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
     case LlvmObservationSpace::TEXT_SIZE_BYTES: {
       double cost;
       RETURN_IF_ERROR(setCost(LlvmCostFunction::TEXT_SIZE_BYTES, benchmark().module(),
-                              workingDirectory_, &cost));
-      reply->set_scalar_int64(static_cast<int64_t>(cost));
+                              workingDirectory(), &cost));
+      reply.set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::TEXT_SIZE_O0: {
       const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O0,
                                         LlvmCostFunction::TEXT_SIZE_BYTES);
-      reply->set_scalar_int64(static_cast<int64_t>(cost));
+      reply.set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::TEXT_SIZE_O3: {
       const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O3,
                                         LlvmCostFunction::TEXT_SIZE_BYTES);
-      reply->set_scalar_int64(static_cast<int64_t>(cost));
+      reply.set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::TEXT_SIZE_OZ: {
       const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::Oz,
                                         LlvmCostFunction::TEXT_SIZE_BYTES);
-      reply->set_scalar_int64(static_cast<int64_t>(cost));
+      reply.set_scalar_int64(static_cast<int64_t>(cost));
       break;
     }
 #endif
