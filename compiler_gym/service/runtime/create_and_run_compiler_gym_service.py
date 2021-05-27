@@ -37,13 +37,16 @@ MAX_MESSAGE_SIZE_IN_BYTES = 512 * 1024 * 1024
 shutdown_signal = Event()
 
 
-def _shutdown_handler(signal_number, stack_frame):
+# NOTE(cummins): This script is executed in a subprocess, so code coverage
+# tracking does not work. As such we use "# pragma: no cover" annotation for all
+# functions.
+def _shutdown_handler(signal_number, stack_frame):  # pragma: no cover
     del stack_frame  # Unused
     logging.info("Service received signal: %d", signal_number)
     shutdown_signal.set()
 
 
-def create_and_run_compiler_gym_service(compilation_session_type):
+def create_and_run_compiler_gym_service(compilation_session_type):  # pragma: no cover
     def main(argv):
         # Register a signal handler for SIGTERM that will set the shutdownSignal
         # future value.
