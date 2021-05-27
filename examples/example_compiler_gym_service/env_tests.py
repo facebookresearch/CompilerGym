@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Tests for the example CompilerGym service."""
+import logging
 import subprocess
 from pathlib import Path
 
@@ -16,26 +17,36 @@ import examples.example_compiler_gym_service as example
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.service import SessionNotFound
 from compiler_gym.spaces import NamedDiscrete, Scalar, Sequence
+from compiler_gym.util.debug_util import set_debug_level
 from tests.test_main import main
-
 
 # Given that the C++ and Python service implementations have identical
 # featuresets, we can parameterize the tests and run them against both backends.
-@pytest.fixture(scope="function", params=["example-cc-v0", "example-py-v0"])
+EXAMPLE_ENVIRONMENTS = ["example-cc-v0", "example-py-v0"]
+
+
+@pytest.fixture(scope="function", params=EXAMPLE_ENVIRONMENTS)
 def env(request) -> CompilerEnv:
-    env = gym.make(request.param)
-    try:
+    """Text fixture that yields an environment."""
+    with gym.make(request.param) as env:
         yield env
-    finally:
-        env.close()
 
 
 @pytest.fixture(
     scope="module",
     params=[example.EXAMPLE_CC_SERVICE_BINARY, example.EXAMPLE_PY_SERVICE_BINARY],
+    ids=["example-cc-v0", "example-py-v0"],
 )
 def bin(request) -> Path:
     yield request.param
+
+
+@pytest.mark.parametrize("env_id", EXAMPLE_ENVIRONMENTS)
+def test_debug_level(env_id: str):
+    """Test that debug level is set."""
+    set_debug_level(3)
+    with gym.make(env_id) as env:
+        assert env.logger.level == logging.DEBUG
 
 
 def test_invalid_arguments(bin: Path):
