@@ -32,7 +32,7 @@ def test_benchmark_random_actions(benchmark_name: str):
         # Take a random step until a predetermined amount of time has elapsed.
         end_time = time() + FUZZ_TIME_SECONDS
         while time() < end_time:
-            observation, reward, done, info = env.step(env.action_space.sample())
+            observation, reward, done, _ = env.step(env.action_space.sample())
             if done:
                 # Default-value for observation is an array of zeros.
                 np.testing.assert_array_equal(

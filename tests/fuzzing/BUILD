@@ -42,6 +42,21 @@ py_test(
 )
 
 py_test(
+    name = "benchmarks_random_actions_test",
+    timeout = "long",
+    srcs = ["benchmarks_random_actions_test.py"],
+    shard_count = 4,
+    tags = ["manual"],
+    deps = [
+        "//compiler_gym",
+        "//compiler_gym/envs",
+        "//compiler_gym/third_party/autophase",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "llvm_trajectory_replay_fuzz_test",
     srcs = ["llvm_trajectory_replay_fuzz_test.py"],
     tags = ["manual"],
