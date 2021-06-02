@@ -259,8 +259,11 @@ endef
 install-test: install-test-setup
 	$(call pytest,--benchmark-disable -n auto -k "not fuzz" --durations=5)
 
+# Note we export $CI=1 so that the tests always run as if within the CI
+# environement. This is to ensure that the reported coverage matches that of
+# the value on: https://codecov.io/gh/facebookresearch/CompilerGym
 install-test-cov: install-test-setup
-	$(call pytest,--benchmark-disable -n auto -k "not fuzz" --durations=5 --cov=compiler_gym --cov-report=xml --cov-report=term)
+	export CI=1; $(call pytest,--benchmark-disable -n auto -k "not fuzz" --durations=5 --cov=compiler_gym --cov-report=xml --cov-report=term)
 	@mv "$(INSTALL_TEST_ROOT)/coverage.xml" .
 
 # The minimum number of seconds to run the fuzz tests in a loop for. Override
