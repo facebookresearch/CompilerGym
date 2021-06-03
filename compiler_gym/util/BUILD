@@ -67,29 +67,6 @@ cc_library(
 )
 
 cc_library(
-    name = "RunService",
-    srcs = ["RunService.cc"],
-    hdrs = ["RunService.h"],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":RunServiceImpl",
-        "@boost//:filesystem",
-        "@gflags",
-        "@glog",
-    ],
-)
-
-cc_library(
-    name = "RunServiceImpl",
-    hdrs = ["RunServiceImpl.h"],
-    deps = [
-        "@boost//:filesystem",
-        "@com_github_grpc_grpc//:grpc++",
-        "@glog",
-    ],
-)
-
-cc_library(
     name = "StrLenConstexpr",
     hdrs = ["StrLenConstexpr.h"],
     visibility = ["//visibility:public"],
