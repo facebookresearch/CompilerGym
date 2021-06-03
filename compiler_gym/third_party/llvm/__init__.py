@@ -107,6 +107,11 @@ def llvm_stress_path() -> Path:
     return download_llvm_files() / "bin/llvm-stress"
 
 
+def llvm_diff_path() -> Path:
+    """Return the path of llvm-diff."""
+    return download_llvm_files() / "bin/llvm-diff"
+
+
 def opt_path() -> Path:
     """Return the path of opt."""
     return download_llvm_files() / "bin/opt"
