@@ -8,7 +8,12 @@ from compiler_gym.wrappers.commandline import (
     CommandlineWithTerminalAction,
     ConstrainedCommandline,
 )
-from compiler_gym.wrappers.core import ActionWrapper, CompilerEnvWrapper
+from compiler_gym.wrappers.core import (
+    ActionWrapper,
+    CompilerEnvWrapper,
+    ObservationWrapper,
+    RewardWrapper,
+)
 from compiler_gym.wrappers.datasets import (
     CycleOverBenchmarks,
     IterateOverBenchmarks,
@@ -23,6 +28,8 @@ __all__ = [
     "ConstrainedCommandline",
     "CycleOverBenchmarks",
     "IterateOverBenchmarks",
+    "ObservationWrapper",
     "RandomOrderBenchmarks",
+    "RewardWrapper",
     "TimeLimit",
 ]

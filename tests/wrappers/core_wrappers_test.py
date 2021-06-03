@@ -5,7 +5,12 @@
 """Unit tests for //compiler_gym/wrappers."""
 from compiler_gym.datasets import Datasets
 from compiler_gym.envs.llvm import LlvmEnv
-from compiler_gym.wrappers import ActionWrapper, CompilerEnvWrapper
+from compiler_gym.wrappers import (
+    ActionWrapper,
+    CompilerEnvWrapper,
+    ObservationWrapper,
+    RewardWrapper,
+)
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
@@ -93,6 +98,32 @@ def test_wrapped_action(env: LlvmEnv):
     env.step(2)
 
     assert env.actions == [0, 1]
+
+
+def test_wrapped_observation(env: LlvmEnv):
+    class MyWrapper(ObservationWrapper):
+        def observation(self, observation):
+            return isinstance(observation, str)
+            return len(str)
+
+    env.observation_space = "Ir"
+    env = MyWrapper(env)
+    assert env.reset() > 0
+    observation, _, _, _ = env.step(0)
+    assert observation > 0
+
+
+def test_wrapped_reward(env: LlvmEnv):
+    class MyWrapper(RewardWrapper):
+        def reward(self, reward):
+            return -5
+
+    env.reward_space = "IrInstructionCount"
+    env = MyWrapper(env)
+
+    env.reset()
+    _, reward, _, _ = env.step(0)
+    assert reward == -5
 
 
 if __name__ == "__main__":
