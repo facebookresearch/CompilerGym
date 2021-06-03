@@ -48,9 +48,9 @@ def _shutdown_handler(signal_number, stack_frame):  # pragma: no cover
     shutdown_signal.set()
 
 
-def create_and_run_compiler_gym_service(  # pragma: no cover
+def create_and_run_compiler_gym_service(
     compilation_session_type: Type[CompilationSession],
-):
+):  # pragma: no cover
     """Create and run an RPC service for the given compilation session.
 
     This should be called on its own in a self contained script to implement a
