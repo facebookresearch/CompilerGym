@@ -5,11 +5,15 @@ This page answers some of the commonly asked questions about CompilerGym. Have a
 question not answered here? File an issue on the `GitHub issue tracker
 <https://github.com/facebookresearch/CompilerGym/issues>`_.
 
-.. contents:: Questions:
+.. contents:: Topics:
     :local:
 
+General
+-------
+
+
 What can I do with this?
-------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~
 
 This projects lets you control the decisions that a compiler makes when
 optimizing a program. Currently, it lets you control the selection and ordering
@@ -27,16 +31,8 @@ Once you get the hang of things, try submitting your best algorithm to our
 `leaderboards <https://github.com/facebookresearch/CompilerGym#leaderboards>`_!
 
 
-I found a bug. How do I report it?
-----------------------------------
-
-Great! Please file an issue using the `GitHub issue tracker
-<https://github.com/facebookresearch/CompilerGym/issues>`_.  See
-:doc:`contributing` for more details.
-
-
 Do I have to use reinforcement learning?
-----------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 No. We think that the the gym provides a useful abstraction for sequential
 decision making. You may use any technique you wish to explore the optimization
@@ -44,13 +40,13 @@ space.
 
 
 What features are going to be added in the future?
---------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 See :ref:`roadmap <about:roadmap>`.
 
 
 Is compiler optimization really a sequential decision process?
---------------------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Compilers frequently package individual transformations as "optimization passes"
 which are then applied in a sequential order. Usually this order is fixed (e.g.
@@ -60,8 +56,12 @@ CompilerGym replaces that fixed order with a sequential decision process where
 any pass may be applied at any stage.
 
 
-When does a compiler enviornment consider an episode “done”?
-------------------------------------------------------------
+LLVM Environment
+----------------
+
+
+When does the environment consider an episode “done”?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The compiler itself doesn't have a signal for termination. Actions are like
 rewrite rules, it is up to the user to decide when no more improvement can be
@@ -73,10 +73,10 @@ unexpected state - we have to abort. This happens.
 
 
 How do I run this on my own program?
-------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-For LLVM, you compile your program to an unoptimized LLVM bitcode file. This can
-be done automatically for C/C++ programs using the :meth:`env.make_benchmark()
+By compiling your program to an unoptimized LLVM bitcode file. This can be done
+automatically for C/C++ programs using the :meth:`env.make_benchmark()
 <compiler_gym.envs.llvm.make_benchmark>` API, or you can do this yourself using
 clang:
 
@@ -89,31 +89,13 @@ tools using the `--benchmark` flag, e.g.
 
 ::
 
-    $ bazel run -c opt //compiler_gym/bin:random_search -- --env=llvm-ic-v0 \
+    $ bazel run -c opt //compiler_gym/bin:random_search -- \
+        --env=llvm-ic-v0 \
         --benchmark=file:///$PWD/myapp.bc
 
 
-I want to add a new program representation / reward signal. How do I do that?
------------------------------------------------------------------------------
-
-If your program representation can be computed from existing observations,
-consider using the :meth:`add_derived_space()
-<compiler_gym.views.ObservationSpace.add_derived_space>` API to add a derived
-observation or :meth:`add_space() <compiler_gym.views.RewardView.add_space>` to
-add a new reward space.
-
-If you require modifying the underlying compiler service implementation, fork
-this project and build it from source (see `installation
-<https://github.com/facebookresearch/CompilerGym/blob/development/INSTALL.md>`_).
-Then modify the C++ service implementation for the compiler that you are
-interested in. The service codebase is located at
-:code:`compiler_gym/envs/$COMPILER/service`, where :code:`$COMPILER` is the name
-of the compiler service you would wish to modify, e.g. llvm. Once done, send us
-a pull request!
-
-
 Should I always try different actions?
---------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Some optimization actions may be called multiple times after other actions. An
 example of this is `dead code elimination
@@ -122,11 +104,25 @@ example of this is `dead code elimination
 in different context can bring improvements.
 
 
+Development
+-----------
+
+
+I found a bug. How do I report it?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Great! Please file an issue using the `GitHub issue tracker
+<https://github.com/facebookresearch/CompilerGym/issues>`_.  See
+:doc:`contributing` for more details.
+
+
 I updated with "git pull" and now it doesn't work
--------------------------------------------------
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The first thing to is to re-run :code:`make init` to ensure that you have the
 correct development depencies installed, as those can change between releases.
+Then run :code:`make distclean` to tidy up any build artifacts from the old
+version.
 
 If that doesn't fix the problem, feel free to
 `file an issue <https://github.com/facebookresearch/CompilerGym/issues>`_, but
@@ -137,3 +133,25 @@ stability. If you would like to build from source but do not require the
 latest feature set, use the
 `stable <https://github.com/facebookresearch/CompilerGym/commits/stable>`_
 branch which lags to the latest release with hotfixes.
+
+
+I want to add a new program representation / reward signal. How do I do that?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If your reward or observation is a transformation of an existing space, consider
+using the :mod:`compiler_gym.wrappers` module to define a wrapper that performs
+the translation from the base space.
+
+If your reward or observation requires combining multiple existing spaces,
+consider using :meth:`add_derived_space()
+<compiler_gym.views.ObservationView.add_derived_space>` or :meth:`add_space()
+<compiler_gym.views.RewardView.add_space>`.
+
+If you require modifying the underlying compiler service implementation, fork
+this project and build it from source (see `installation
+<https://github.com/facebookresearch/CompilerGym/blob/development/INSTALL.md>`_).
+Then modify the service implementation for the compiler that you are interested
+in. The service codebase is located at
+:code:`compiler_gym/envs/$COMPILER/service`, where :code:`$COMPILER` is the name
+of the compiler service you would wish to modify, e.g. llvm. Once done, send us
+a pull request!
