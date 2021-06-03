@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.envs.compiler_env &mdash; CompilerGym 0.1.8 documentation</title>
+  <title>compiler_gym.envs.compiler_env &mdash; CompilerGym 0.1.9 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.8
+                0.1.9
               </div>
             
           
@@ -87,17 +87,18 @@
               
             
             
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../about.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rpc.html">RPC Service Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -107,6 +108,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/views.html">compiler_gym.views</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
+</ul>
+<p><span class="caption-text">C++ API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/service.html">compiler_gym/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/service/runtime.html">compiler_gym/service/runtime</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/util.html">compiler_gym/util</a></li>
 </ul>
 
             
@@ -184,7 +193,7 @@
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">isclose</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">gym</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -200,9 +209,9 @@
     <span class="n">ServiceOSError</span><span class="p">,</span>
     <span class="n">ServiceTransportError</span><span class="p">,</span>
     <span class="n">SessionNotFound</span><span class="p">,</span>
-    <span class="n">observation_t</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Action</span><span class="p">,</span>
     <span class="n">AddBenchmarkRequest</span><span class="p">,</span>
     <span class="n">EndSessionReply</span><span class="p">,</span>
     <span class="n">EndSessionRequest</span><span class="p">,</span>
@@ -216,14 +225,16 @@
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.spaces</span> <span class="kn">import</span> <span class="n">DefaultRewardFromObservation</span><span class="p">,</span> <span class="n">NamedDiscrete</span><span class="p">,</span> <span class="n">Reward</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.debug_util</span> <span class="kn">import</span> <span class="n">get_logging_level</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.gym_type_hints</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ActionType</span><span class="p">,</span>
+    <span class="n">ObservationType</span><span class="p">,</span>
+    <span class="n">RewardType</span><span class="p">,</span>
+    <span class="n">StepType</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.timer</span> <span class="kn">import</span> <span class="n">Timer</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.validation_error</span> <span class="kn">import</span> <span class="n">ValidationError</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.validation_result</span> <span class="kn">import</span> <span class="n">ValidationResult</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.views</span> <span class="kn">import</span> <span class="n">ObservationSpaceSpec</span><span class="p">,</span> <span class="n">ObservationView</span><span class="p">,</span> <span class="n">RewardView</span>
-
-<span class="c1"># Type hints.</span>
-<span class="n">info_t</span> <span class="o">=</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span>
-<span class="n">step_t</span> <span class="o">=</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="n">observation_t</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">],</span> <span class="nb">bool</span><span class="p">,</span> <span class="n">info_t</span><span class="p">]</span>
 
 
 <span class="k">def</span> <span class="nf">_wrapped_step</span><span class="p">(</span>
@@ -251,11 +262,11 @@
 <span class="sd">    :doc:`/compiler_gym/service` for more details on connecting to services):</span>
 
 <span class="sd">    &gt;&gt;&gt; env = CompilerEnv(</span>
-<span class="sd">        service=&quot;localhost:8080&quot;,</span>
-<span class="sd">        observation_space=&quot;features&quot;,</span>
-<span class="sd">        reward_space=&quot;runtime&quot;,</span>
-<span class="sd">        rewards=[env_reward_spaces],</span>
-<span class="sd">    )</span>
+<span class="sd">    ...     service=&quot;localhost:8080&quot;,</span>
+<span class="sd">    ...     observation_space=&quot;features&quot;,</span>
+<span class="sd">    ...     reward_space=&quot;runtime&quot;,</span>
+<span class="sd">    ...     rewards=[env_reward_spaces],</span>
+<span class="sd">    ... )</span>
 
 <span class="sd">    Once constructed, an environment can be used in exactly the same way as a</span>
 <span class="sd">    regular :code:`gym.Env`, e.g.</span>
@@ -438,7 +449,7 @@
             <span class="k">for</span> <span class="n">space</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">action_spaces</span>
         <span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">observation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_observation_view_type</span><span class="p">(</span>
-            <span class="n">get_observation</span><span class="o">=</span><span class="k">lambda</span> <span class="n">req</span><span class="p">:</span> <span class="n">_wrapped_step</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">,</span> <span class="n">req</span><span class="p">),</span>
+            <span class="n">raw_step</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_step</span><span class="p">,</span>
             <span class="n">spaces</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">observation_spaces</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reward</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reward_view_type</span><span class="p">(</span><span class="n">rewards</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="p">)</span>
@@ -695,39 +706,57 @@
 <span class="sd">        :return: A new environment instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">:</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">actions</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">:</span>
+            <span class="n">actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">actions</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">actions</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                     <span class="s2">&quot;Parent service of fork() has died, replaying state&quot;</span>
                 <span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">state</span><span class="p">)</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">actions</span><span class="p">)</span>
+                <span class="k">assert</span> <span class="ow">not</span> <span class="n">done</span><span class="p">,</span> <span class="s2">&quot;Failed to replay action sequence&quot;</span>
 
         <span class="n">request</span> <span class="o">=</span> <span class="n">ForkSessionRequest</span><span class="p">(</span><span class="n">session_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">)</span>
-        <span class="n">reply</span><span class="p">:</span> <span class="n">ForkSessionReply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">ForkSession</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">reply</span><span class="p">:</span> <span class="n">ForkSessionReply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">ForkSession</span><span class="p">,</span> <span class="n">request</span>
+            <span class="p">)</span>
 
-        <span class="c1"># Create a new environment that shares the connection.</span>
-        <span class="n">new_env</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span>
-            <span class="n">service</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_service_endpoint</span><span class="p">,</span>
-            <span class="n">action_space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">action_space</span><span class="p">,</span>
-            <span class="n">connection_settings</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_connection_settings</span><span class="p">,</span>
-            <span class="n">service_connection</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">,</span>
-        <span class="p">)</span>
+            <span class="c1"># Create a new environment that shares the connection.</span>
+            <span class="n">new_env</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span>
+                <span class="n">service</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_service_endpoint</span><span class="p">,</span>
+                <span class="n">action_space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">action_space</span><span class="p">,</span>
+                <span class="n">connection_settings</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_connection_settings</span><span class="p">,</span>
+                <span class="n">service_connection</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">,</span>
+            <span class="p">)</span>
 
-        <span class="c1"># Set the session ID.</span>
-        <span class="n">new_env</span><span class="o">.</span><span class="n">_session_id</span> <span class="o">=</span> <span class="n">reply</span><span class="o">.</span><span class="n">session_id</span>  <span class="c1"># pylint: disable=protected-access</span>
-        <span class="n">new_env</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">session_id</span> <span class="o">=</span> <span class="n">reply</span><span class="o">.</span><span class="n">session_id</span>
+            <span class="c1"># Set the session ID.</span>
+            <span class="n">new_env</span><span class="o">.</span><span class="n">_session_id</span> <span class="o">=</span> <span class="n">reply</span><span class="o">.</span><span class="n">session_id</span>  <span class="c1"># pylint: disable=protected-access</span>
+            <span class="n">new_env</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">session_id</span> <span class="o">=</span> <span class="n">reply</span><span class="o">.</span><span class="n">session_id</span>
 
-        <span class="c1"># Now that we have initialized the environment with the current state,</span>
-        <span class="c1"># set the benchmark so that calls to new_env.reset() will correctly</span>
-        <span class="c1"># revert the environment to the initial benchmark state.</span>
-        <span class="c1">#</span>
-        <span class="c1"># pylint: disable=protected-access</span>
-        <span class="n">new_env</span><span class="o">.</span><span class="n">_next_benchmark</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span>
+            <span class="c1"># Now that we have initialized the environment with the current state,</span>
+            <span class="c1"># set the benchmark so that calls to new_env.reset() will correctly</span>
+            <span class="c1"># revert the environment to the initial benchmark state.</span>
+            <span class="c1">#</span>
+            <span class="c1"># pylint: disable=protected-access</span>
+            <span class="n">new_env</span><span class="o">.</span><span class="n">_next_benchmark</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span>
 
-        <span class="c1"># Set the &quot;visible&quot; name of the current benchmark to hide the fact that</span>
-        <span class="c1"># we loaded from a custom bitcode file.</span>
-        <span class="n">new_env</span><span class="o">.</span><span class="n">_benchmark_in_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span>
+            <span class="c1"># Set the &quot;visible&quot; name of the current benchmark to hide the fact that</span>
+            <span class="c1"># we loaded from a custom bitcode file.</span>
+            <span class="n">new_env</span><span class="o">.</span><span class="n">_benchmark_in_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span>
+        <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
+            <span class="c1"># Fallback implementation. If the compiler service does not support</span>
+            <span class="c1"># the Fork() operator then we create a new independent environment</span>
+            <span class="c1"># and apply the sequence of actions in the current environment to</span>
+            <span class="c1"># replay the state.</span>
+            <span class="n">new_env</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span>
+                <span class="n">service</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_service_endpoint</span><span class="p">,</span>
+                <span class="n">action_space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">action_space</span><span class="p">,</span>
+                <span class="n">benchmark</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span><span class="p">,</span>
+                <span class="n">connection_settings</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_connection_settings</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">new_env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+            <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">new_env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">actions</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="n">done</span><span class="p">,</span> <span class="s2">&quot;Failed to replay action sequence in forked environment&quot;</span>
 
         <span class="c1"># Create copies of the mutable reward and observation spaces. This</span>
         <span class="c1"># is required to correctly calculate incremental updates.</span>
@@ -784,8 +813,12 @@
                 <span class="c1"># not kill it.</span>
                 <span class="k">if</span> <span class="n">reply</span><span class="o">.</span><span class="n">remaining_sessions</span><span class="p">:</span>
                     <span class="n">close_service</span> <span class="o">=</span> <span class="kc">False</span>
-            <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa pylint: disable=bare-except</span>
-                <span class="k">pass</span>  <span class="c1"># Don&#39;t feel bad, computer, you tried ;-)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;Failed to end active compiler session on close(): </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
+                    <span class="n">e</span><span class="p">,</span>
+                    <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="ow">and</span> <span class="n">close_service</span><span class="p">:</span>
@@ -805,7 +838,7 @@
         <span class="n">benchmark</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Benchmark</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">action_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">retry_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">observation_t</span><span class="p">]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ObservationType</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Reset the environment state.</span>
 
 <span class="sd">        This method must be called before :func:`step()`.</span>
@@ -913,7 +946,7 @@
 
         <span class="bp">self</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">episode_reward</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">episode_reward</span> <span class="o">=</span> <span class="mf">0.0</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="p">:</span>
             <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">reply</span><span class="o">.</span><span class="n">observation</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
@@ -924,41 +957,56 @@
                 <span class="n">reply</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
             <span class="p">)</span></div>
 
-<div class="viewcode-block" id="CompilerEnv.step"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.step">[docs]</a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">step_t</span><span class="p">:</span>
+<div class="viewcode-block" id="CompilerEnv.raw_step"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.raw_step">[docs]</a>    <span class="k">def</span> <span class="nf">raw_step</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">actions</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">observations</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ObservationSpaceSpec</span><span class="p">],</span>
+        <span class="n">rewards</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Reward</span><span class="p">],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StepType</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Take a step.</span>
 
-<span class="sd">        :param action: An action, or a sequence of actions. When multiple</span>
-<span class="sd">            actions are provided the observation and reward are returned after</span>
-<span class="sd">            running all of the actions.</span>
+<span class="sd">        :param actions: A list of actions to be applied.</span>
 
-<span class="sd">        :return: A tuple of observation, reward, done, and info. Observation and</span>
-<span class="sd">            reward are None if default observation/reward is not set. If done is</span>
-<span class="sd">            True, observation and reward may also be None (e.g. because the</span>
-<span class="sd">            service failed).</span>
+<span class="sd">        :param observations: A list of observations spaces to compute</span>
+<span class="sd">            observations from. These are evaluated after the actions are</span>
+<span class="sd">            applied.</span>
+
+<span class="sd">        :param rewards: A list of reward spaces to compute rewards from. These</span>
+<span class="sd">            are evaluated after the actions are applied.</span>
+
+<span class="sd">        :return: A tuple of observations, rewards, done, and info. Observations</span>
+<span class="sd">            and rewards are lists.</span>
 
 <span class="sd">        :raises SessionNotFound: If :meth:`reset()</span>
 <span class="sd">            &lt;compiler_gym.envs.CompilerEnv.reset&gt;` has not been called.</span>
+
+<span class="sd">        .. warning::</span>
+
+<span class="sd">            Prefer :meth:`step() &lt;compiler_gym.envs.CompilerEnv.step&gt;` to</span>
+<span class="sd">            :meth:`raw_step() &lt;compiler_gym.envs.CompilerEnv.step&gt;`.</span>
+<span class="sd">            :meth:`step() &lt;compiler_gym.envs.CompilerEnv.step&gt;` has equivalent</span>
+<span class="sd">            functionality, and is less likely to change in the future.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">SessionNotFound</span><span class="p">(</span><span class="s2">&quot;Must call reset() before step()&quot;</span><span class="p">)</span>
-        <span class="n">actions</span> <span class="o">=</span> <span class="n">action</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">IterableType</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">action</span><span class="p">]</span>
-        <span class="n">observation</span><span class="p">,</span> <span class="n">reward</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="kc">None</span>
 
         <span class="c1"># Build the list of observations that must be computed by the backend</span>
-        <span class="c1"># service to generate the user-requested observation and reward.</span>
-        <span class="c1"># TODO(cummins): We could de-duplicate this list to improve efficiency</span>
-        <span class="c1"># when multiple redundant copies of the same observation space are</span>
-        <span class="c1"># requested.</span>
-        <span class="n">observation_indices</span><span class="p">,</span> <span class="n">observation_spaces</span> <span class="o">=</span> <span class="p">[],</span> <span class="p">[]</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="p">:</span>
-            <span class="n">observation_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">observation_space_spec</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
-            <span class="n">observation_spaces</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">observation_space_spec</span><span class="o">.</span><span class="n">id</span><span class="p">)</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="p">:</span>
-            <span class="n">observation_indices</span> <span class="o">+=</span> <span class="p">[</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">obs</span><span class="p">]</span><span class="o">.</span><span class="n">index</span>
-                <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="o">.</span><span class="n">observation_spaces</span>
+        <span class="n">user_observation_spaces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationSpaceSpec</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">observations</span><span class="p">)</span>
+        <span class="n">reward_spaces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Reward</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">rewards</span><span class="p">)</span>
+
+        <span class="n">reward_observation_spaces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationSpaceSpec</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">reward_space</span> <span class="ow">in</span> <span class="n">reward_spaces</span><span class="p">:</span>
+            <span class="n">reward_observation_spaces</span> <span class="o">+=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">obs</span><span class="p">]</span> <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="n">reward_space</span><span class="o">.</span><span class="n">observation_spaces</span>
             <span class="p">]</span>
-            <span class="n">observation_spaces</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="o">.</span><span class="n">observation_spaces</span>
+
+        <span class="n">observations_to_compute</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationSpaceSpec</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
+            <span class="nb">set</span><span class="p">(</span><span class="n">user_observation_spaces</span><span class="p">)</span><span class="o">.</span><span class="n">union</span><span class="p">(</span><span class="nb">set</span><span class="p">(</span><span class="n">reward_observation_spaces</span><span class="p">))</span>
+        <span class="p">)</span>
+        <span class="n">observation_space_index_map</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="n">ObservationSpaceSpec</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="n">observation_space</span><span class="p">:</span> <span class="n">i</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">observation_space</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">observations_to_compute</span><span class="p">)</span>
+        <span class="p">}</span>
 
         <span class="c1"># Record the actions.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">actions</span> <span class="o">+=</span> <span class="n">actions</span>
@@ -966,8 +1014,10 @@
         <span class="c1"># Send the request to the backend service.</span>
         <span class="n">request</span> <span class="o">=</span> <span class="n">StepRequest</span><span class="p">(</span>
             <span class="n">session_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">,</span>
-            <span class="n">action</span><span class="o">=</span><span class="n">actions</span><span class="p">,</span>
-            <span class="n">observation_space</span><span class="o">=</span><span class="n">observation_indices</span><span class="p">,</span>
+            <span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="n">Action</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">],</span>
+            <span class="n">observation_space</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">observation_space</span><span class="o">.</span><span class="n">index</span> <span class="k">for</span> <span class="n">observation_space</span> <span class="ow">in</span> <span class="n">observations_to_compute</span>
+            <span class="p">],</span>
         <span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
             <span class="n">reply</span> <span class="o">=</span> <span class="n">_wrapped_step</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">,</span> <span class="n">request</span><span class="p">)</span>
@@ -982,15 +1032,20 @@
             <span class="c1"># end the current episode and provide some diagnostic information to</span>
             <span class="c1"># the user through the `info` dict.</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
             <span class="n">info</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s2">&quot;error_type&quot;</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
                 <span class="s2">&quot;error_details&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
             <span class="p">}</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="p">:</span>
-                <span class="n">reward</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="o">.</span><span class="n">reward_on_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">episode_reward</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="p">:</span>
-                <span class="n">observation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space_spec</span><span class="o">.</span><span class="n">default_value</span>
-            <span class="k">return</span> <span class="n">observation</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">info</span>
+            <span class="n">default_observations</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">observation_space</span><span class="o">.</span><span class="n">default_value</span>
+                <span class="k">for</span> <span class="n">observation_space</span> <span class="ow">in</span> <span class="n">user_observation_spaces</span>
+            <span class="p">]</span>
+            <span class="n">default_rewards</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="nb">float</span><span class="p">(</span><span class="n">reward_space</span><span class="o">.</span><span class="n">reward_on_error</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">episode_reward</span><span class="p">))</span>
+                <span class="k">for</span> <span class="n">reward_space</span> <span class="ow">in</span> <span class="n">reward_spaces</span>
+            <span class="p">]</span>
+            <span class="k">return</span> <span class="n">default_observations</span><span class="p">,</span> <span class="n">default_rewards</span><span class="p">,</span> <span class="kc">True</span><span class="p">,</span> <span class="n">info</span>
 
         <span class="c1"># If the action space has changed, update it.</span>
         <span class="k">if</span> <span class="n">reply</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;new_action_space&quot;</span><span class="p">):</span>
@@ -999,32 +1054,126 @@
             <span class="p">)</span>
 
         <span class="c1"># Translate observations to python representations.</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">reply</span><span class="o">.</span><span class="n">observation</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">observation_indices</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">reply</span><span class="o">.</span><span class="n">observation</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">observations_to_compute</span><span class="p">):</span>
             <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Requested </span><span class="si">{</span><span class="n">observation_indices</span><span class="si">}</span><span class="s2"> observations &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Requested </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">observations_to_compute</span><span class="p">)</span><span class="si">}</span><span class="s2"> observations &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;but received </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">reply</span><span class="o">.</span><span class="n">observation</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
-        <span class="n">observations</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">obs</span><span class="p">]</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">obs</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">observation_spaces</span><span class="p">,</span> <span class="n">reply</span><span class="o">.</span><span class="n">observation</span><span class="p">)</span>
+        <span class="n">computed_observations</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">observation_space</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">observation_space</span><span class="p">,</span> <span class="n">value</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                <span class="n">observations_to_compute</span><span class="p">,</span> <span class="n">reply</span><span class="o">.</span><span class="n">observation</span>
+            <span class="p">)</span>
         <span class="p">]</span>
 
-        <span class="c1"># Pop the requested observation.</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="p">:</span>
-            <span class="n">observation</span><span class="p">,</span> <span class="n">observations</span> <span class="o">=</span> <span class="n">observations</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">observations</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+        <span class="c1"># Get the user-requested observation.</span>
+        <span class="n">observations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationType</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">computed_observations</span><span class="p">[</span><span class="n">observation_space_index_map</span><span class="p">[</span><span class="n">observation_space</span><span class="p">]]</span>
+            <span class="k">for</span> <span class="n">observation_space</span> <span class="ow">in</span> <span class="n">user_observation_spaces</span>
+        <span class="p">]</span>
 
-        <span class="c1"># Compute reward.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">previous_action</span> <span class="o">=</span> <span class="n">action</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="p">:</span>
-            <span class="n">reward</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">observations</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">episode_reward</span> <span class="o">+=</span> <span class="n">reward</span>
+        <span class="c1"># Update and compute the rewards.</span>
+        <span class="n">rewards</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">RewardType</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">reward_space</span> <span class="ow">in</span> <span class="n">reward_spaces</span><span class="p">:</span>
+            <span class="n">reward_observations</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">computed_observations</span><span class="p">[</span>
+                    <span class="n">observation_space_index_map</span><span class="p">[</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">observation_space</span><span class="p">]</span>
+                    <span class="p">]</span>
+                <span class="p">]</span>
+                <span class="k">for</span> <span class="n">observation_space</span> <span class="ow">in</span> <span class="n">reward_space</span><span class="o">.</span><span class="n">observation_spaces</span>
+            <span class="p">]</span>
+            <span class="n">rewards</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                <span class="nb">float</span><span class="p">(</span>
+                    <span class="n">reward_space</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">actions</span><span class="p">,</span> <span class="n">reward_observations</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="p">)</span>
+                <span class="p">)</span>
+            <span class="p">)</span>
 
         <span class="n">info</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;action_had_no_effect&quot;</span><span class="p">:</span> <span class="n">reply</span><span class="o">.</span><span class="n">action_had_no_effect</span><span class="p">,</span>
             <span class="s2">&quot;new_action_space&quot;</span><span class="p">:</span> <span class="n">reply</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;new_action_space&quot;</span><span class="p">),</span>
         <span class="p">}</span>
 
-        <span class="k">return</span> <span class="n">observation</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">reply</span><span class="o">.</span><span class="n">end_of_session</span><span class="p">,</span> <span class="n">info</span></div>
+        <span class="k">return</span> <span class="n">observations</span><span class="p">,</span> <span class="n">rewards</span><span class="p">,</span> <span class="n">reply</span><span class="o">.</span><span class="n">end_of_session</span><span class="p">,</span> <span class="n">info</span></div>
+
+<div class="viewcode-block" id="CompilerEnv.step"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.step">[docs]</a>    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">action</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="n">ActionType</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ActionType</span><span class="p">]],</span>
+        <span class="n">observations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">rewards</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Reward</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StepType</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Take a step.</span>
+
+<span class="sd">        :param action: An action, or a sequence of actions. When multiple</span>
+<span class="sd">            actions are provided the observation and reward are returned after</span>
+<span class="sd">            running all of the actions.</span>
+
+<span class="sd">        :param observations: A list of observation spaces to compute</span>
+<span class="sd">            observations from. If provided, this changes the :code:`observation`</span>
+<span class="sd">            element of the return tuple to be a list of observations from the</span>
+<span class="sd">            requested spaces. The default :code:`env.observation_space` is not</span>
+<span class="sd">            returned.</span>
+
+<span class="sd">        :param rewards: A list of reward spaces to compute rewards from. If</span>
+<span class="sd">            provided, this changes the :code:`reward` element of the return</span>
+<span class="sd">            tuple to be a list of rewards from the requested spaces. The default</span>
+<span class="sd">            :code:`env.reward_space` is not returned.</span>
+
+<span class="sd">        :return: A tuple of observation, reward, done, and info. Observation and</span>
+<span class="sd">            reward are None if default observation/reward is not set.</span>
+
+<span class="sd">        :raises SessionNotFound: If :meth:`reset()</span>
+<span class="sd">            &lt;compiler_gym.envs.CompilerEnv.reset&gt;` has not been called.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Coerce actions into a list.</span>
+        <span class="n">actions</span> <span class="o">=</span> <span class="n">action</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">IterableType</span><span class="p">)</span> <span class="k">else</span> <span class="p">[</span><span class="n">action</span><span class="p">]</span>
+
+        <span class="c1"># Coerce observation spaces into a list of ObservationSpaceSpec instances.</span>
+        <span class="k">if</span> <span class="n">observations</span><span class="p">:</span>
+            <span class="n">observation_spaces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationSpaceSpec</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">obs</span>
+                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">obs</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span><span class="p">)</span>
+                <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">obs</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">obs</span> <span class="ow">in</span> <span class="n">observations</span>
+            <span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space_spec</span><span class="p">:</span>
+            <span class="n">observation_spaces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationSpaceSpec</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">observation_space_spec</span>
+            <span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">observation_spaces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationSpaceSpec</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Coerce reward spaces into a list of Reward instances.</span>
+        <span class="k">if</span> <span class="n">rewards</span><span class="p">:</span>
+            <span class="n">reward_spaces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Reward</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
+                <span class="n">rew</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">rew</span><span class="p">,</span> <span class="n">Reward</span><span class="p">)</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">rew</span><span class="p">]</span>
+                <span class="k">for</span> <span class="n">rew</span> <span class="ow">in</span> <span class="n">rewards</span>
+            <span class="p">]</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="p">:</span>
+            <span class="n">reward_spaces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Reward</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="p">]</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">reward_spaces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Reward</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="c1"># Perform the underlying environment step.</span>
+        <span class="n">observation_values</span><span class="p">,</span> <span class="n">reward_values</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">raw_step</span><span class="p">(</span>
+            <span class="n">actions</span><span class="p">,</span> <span class="n">observation_spaces</span><span class="p">,</span> <span class="n">reward_spaces</span>
+        <span class="p">)</span>
+
+        <span class="c1"># Translate observations lists back to the appropriate types.</span>
+        <span class="k">if</span> <span class="n">observations</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space_spec</span><span class="p">:</span>
+            <span class="n">observation_values</span> <span class="o">=</span> <span class="n">observation_values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">observation_spaces</span><span class="p">:</span>
+            <span class="n">observation_values</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># Translate reward lists back to the appropriate types.</span>
+        <span class="k">if</span> <span class="n">rewards</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="p">:</span>
+            <span class="n">reward_values</span> <span class="o">=</span> <span class="n">reward_values</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+            <span class="c1"># Update the cumulative episode reward</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">episode_reward</span> <span class="o">+=</span> <span class="n">reward_values</span>
+        <span class="k">elif</span> <span class="ow">not</span> <span class="n">reward_spaces</span><span class="p">:</span>
+            <span class="n">reward_values</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">return</span> <span class="n">observation_values</span><span class="p">,</span> <span class="n">reward_values</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span></div>
 
 <div class="viewcode-block" id="CompilerEnv.render"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.render">[docs]</a>    <span class="k">def</span> <span class="nf">render</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>

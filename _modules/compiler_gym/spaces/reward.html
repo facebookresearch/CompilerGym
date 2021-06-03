@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.spaces.reward &mdash; CompilerGym 0.1.8 documentation</title>
+  <title>compiler_gym.spaces.reward &mdash; CompilerGym 0.1.9 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.8
+                0.1.9
               </div>
             
           
@@ -87,17 +87,18 @@
               
             
             
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../about.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rpc.html">RPC Service Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -107,6 +108,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/views.html">compiler_gym.views</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
+</ul>
+<p><span class="caption-text">C++ API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/service.html">compiler_gym/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/service/runtime.html">compiler_gym/service/runtime</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/util.html">compiler_gym/util</a></li>
 </ul>
 
             
@@ -175,12 +184,12 @@
 <span class="c1">#</span>
 <span class="c1"># This source code is licensed under the MIT license found in the</span>
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
-<span class="kn">from</span> <span class="nn">compiler_gym.service</span> <span class="kn">import</span> <span class="n">observation_t</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.spaces.scalar</span> <span class="kn">import</span> <span class="n">Scalar</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.gym_type_hints</span> <span class="kn">import</span> <span class="n">ObservationType</span><span class="p">,</span> <span class="n">RewardType</span>
 
 
 <div class="viewcode-block" id="Reward"><a class="viewcode-back" href="../../../compiler_gym/spaces.html#compiler_gym.spaces.Reward">[docs]</a><span class="k">class</span> <span class="nc">Reward</span><span class="p">(</span><span class="n">Scalar</span><span class="p">):</span>
@@ -212,11 +221,11 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">observation_spaces</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">default_value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="nb">min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="nb">max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">default_value</span><span class="p">:</span> <span class="n">RewardType</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="nb">min</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RewardType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="nb">max</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RewardType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">default_negates_returns</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-        <span class="n">success_threshold</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">success_threshold</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RewardType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">deterministic</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">platform_dependent</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
     <span class="p">):</span>
@@ -255,7 +264,7 @@
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">=</span> <span class="nb">id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">observation_spaces</span> <span class="o">=</span> <span class="n">observation_spaces</span> <span class="ow">or</span> <span class="p">[]</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">default_value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span><span class="p">:</span> <span class="n">RewardType</span> <span class="o">=</span> <span class="n">default_value</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">default_negates_returns</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="n">default_negates_returns</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">success_threshold</span> <span class="o">=</span> <span class="n">success_threshold</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">deterministic</span> <span class="o">=</span> <span class="n">deterministic</span>
@@ -272,10 +281,10 @@
 
 <div class="viewcode-block" id="Reward.update"><a class="viewcode-back" href="../../../compiler_gym/spaces.html#compiler_gym.spaces.Reward.update">[docs]</a>    <span class="k">def</span> <span class="nf">update</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">action</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">observations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">observation_t</span><span class="p">],</span>
+        <span class="n">actions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">],</span>
+        <span class="n">observations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationType</span><span class="p">],</span>
         <span class="n">observation_view</span><span class="p">:</span> <span class="s2">&quot;compiler_gym.views.ObservationView&quot;</span><span class="p">,</span>  <span class="c1"># noqa: F821</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RewardType</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Calculate a reward for the given action.</span>
 
 <span class="sd">        :param action: The action performed.</span>
@@ -287,7 +296,7 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract class&quot;</span><span class="p">)</span></div>
 
-<div class="viewcode-block" id="Reward.reward_on_error"><a class="viewcode-back" href="../../../compiler_gym/spaces.html#compiler_gym.spaces.Reward.reward_on_error">[docs]</a>    <span class="k">def</span> <span class="nf">reward_on_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">episode_reward</span><span class="p">:</span> <span class="nb">float</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<div class="viewcode-block" id="Reward.reward_on_error"><a class="viewcode-back" href="../../../compiler_gym/spaces.html#compiler_gym.spaces.Reward.reward_on_error">[docs]</a>    <span class="k">def</span> <span class="nf">reward_on_error</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">episode_reward</span><span class="p">:</span> <span class="n">RewardType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RewardType</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return the reward value for an error condition.</span>
 
 <span class="sd">        This method should be used to produce the reward value that should be</span>
@@ -303,12 +312,20 @@
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">default_value</span></div>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">range</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">range</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">RewardType</span><span class="p">,</span> <span class="n">RewardType</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;The lower and upper bounds of the reward.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">min</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">max</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span>
+
+    <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="s2">&quot;Reward&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">other</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Reward</span><span class="p">):</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">id</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span></div>
 
 
 <span class="k">class</span> <span class="nc">DefaultRewardFromObservation</span><span class="p">(</span><span class="n">Reward</span><span class="p">):</span>
@@ -316,7 +333,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">observation_spaces</span><span class="o">=</span><span class="p">[</span><span class="n">observation_name</span><span class="p">],</span> <span class="nb">id</span><span class="o">=</span><span class="n">observation_name</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">previous_value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">observation_t</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">previous_value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ObservationType</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
     <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">benchmark</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Called on env.reset(). Reset incremental progress.&quot;&quot;&quot;</span>
@@ -326,16 +343,16 @@
     <span class="k">def</span> <span class="nf">update</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">action</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-        <span class="n">observations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">observation_t</span><span class="p">],</span>
+        <span class="n">observations</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationType</span><span class="p">],</span>
         <span class="n">observation_view</span><span class="p">:</span> <span class="s2">&quot;compiler_gym.views.ObservationView&quot;</span><span class="p">,</span>  <span class="c1"># noqa: F821</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RewardType</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Called on env.step(). Compute and return new reward.&quot;&quot;&quot;</span>
         <span class="k">del</span> <span class="n">action</span>  <span class="c1"># unused</span>
         <span class="k">del</span> <span class="n">observation_view</span>  <span class="c1"># unused</span>
-        <span class="n">value</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">observations</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">value</span><span class="p">:</span> <span class="n">RewardType</span> <span class="o">=</span> <span class="n">observations</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">previous_value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">previous_value</span> <span class="o">=</span> <span class="mi">0</span>
-        <span class="n">reward</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">value</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">previous_value</span><span class="p">)</span>
+        <span class="n">reward</span> <span class="o">=</span> <span class="n">RewardType</span><span class="p">(</span><span class="n">value</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">previous_value</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">previous_value</span> <span class="o">=</span> <span class="n">value</span>
         <span class="k">return</span> <span class="n">reward</span>
 </pre></div>

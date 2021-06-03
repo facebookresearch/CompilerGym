@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.envs.llvm.datasets.anghabench &mdash; CompilerGym 0.1.8 documentation</title>
+  <title>compiler_gym.envs.llvm.datasets.anghabench &mdash; CompilerGym 0.1.9 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.8
+                0.1.9
               </div>
             
           
@@ -87,17 +87,18 @@
               
             
             
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../about.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../rpc.html">RPC Service Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -107,6 +108,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/views.html">compiler_gym.views</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
+</ul>
+<p><span class="caption-text">C++ API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../cc/compiler_gym/service.html">compiler_gym/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../cc/compiler_gym/service/runtime.html">compiler_gym/service/runtime</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../cc/compiler_gym/util.html">compiler_gym/util</a></li>
 </ul>
 
             
@@ -181,6 +190,7 @@
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">as_completed</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">TarDatasetWithManifest</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets.benchmark</span> <span class="kn">import</span> <span class="n">BenchmarkWithSource</span>
@@ -213,19 +223,27 @@
 <span class="sd">    overhead of compiling it from C to bitcode. This is a one-off cost.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_data_base</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">sort_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
-        <span class="n">manifest_url</span><span class="p">,</span> <span class="n">manifest_sha256</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">site_data_base</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+        <span class="n">sort_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">manifest_url</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">manifest_sha256</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">deprecated</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">manifest_url_</span><span class="p">,</span> <span class="n">manifest_sha256_</span> <span class="o">=</span> <span class="p">{</span>
             <span class="s2">&quot;darwin&quot;</span><span class="p">:</span> <span class="p">(</span>
-                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-anghabench-v0-macos-manifest.bz2&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;39464256405aacefdb7550a7f990c9c578264c132804eec3daac091fa3c21bd1&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-anghabench-v1-macos-manifest.bz2&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;96ead63da5f8efa07fd0370f0c6e452b59bed840828b8b19402102b1ce3ee109&quot;</span><span class="p">,</span>
             <span class="p">),</span>
             <span class="s2">&quot;linux&quot;</span><span class="p">:</span> <span class="p">(</span>
-                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-anghabench-v0-linux-manifest.bz2&quot;</span><span class="p">,</span>
-                <span class="s2">&quot;a038d25d39ee9472662a9704dfff19c9e3512ff6a70f1067af85c5cb3784b477&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-anghabench-v1-linux-manifest.bz2&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;14df85f650199498cf769715e9f0d7841d09f9fa62a95b8ecc242bdaf227f33a&quot;</span><span class="p">,</span>
             <span class="p">),</span>
         <span class="p">}[</span><span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">]</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;benchmark://anghabench-v0&quot;</span><span class="p">,</span>
+            <span class="n">name</span><span class="o">=</span><span class="n">name</span> <span class="ow">or</span> <span class="s2">&quot;benchmark://anghabench-v1&quot;</span><span class="p">,</span>
             <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Compile-only C/C++ functions extracted from GitHub&quot;</span><span class="p">,</span>
             <span class="n">references</span><span class="o">=</span><span class="p">{</span>
                 <span class="s2">&quot;Paper&quot;</span><span class="p">:</span> <span class="s2">&quot;https://homepages.dcc.ufmg.br/~fernando/publications/papers/FaustinoCGO21.pdf&quot;</span><span class="p">,</span>
@@ -233,8 +251,8 @@
             <span class="p">},</span>
             <span class="n">license</span><span class="o">=</span><span class="s2">&quot;Unknown. See: https://github.com/brenocfg/AnghaBench/issues/1&quot;</span><span class="p">,</span>
             <span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span>
-            <span class="n">manifest_urls</span><span class="o">=</span><span class="p">[</span><span class="n">manifest_url</span><span class="p">],</span>
-            <span class="n">manifest_sha256</span><span class="o">=</span><span class="n">manifest_sha256</span><span class="p">,</span>
+            <span class="n">manifest_urls</span><span class="o">=</span><span class="p">[</span><span class="n">manifest_url</span> <span class="ow">or</span> <span class="n">manifest_url_</span><span class="p">],</span>
+            <span class="n">manifest_sha256</span><span class="o">=</span><span class="n">manifest_sha256</span> <span class="ow">or</span> <span class="n">manifest_sha256_</span><span class="p">,</span>
             <span class="n">tar_urls</span><span class="o">=</span><span class="p">[</span>
                 <span class="s2">&quot;https://github.com/brenocfg/AnghaBench/archive/d8034ac8562b8c978376008f4b33df01b8887b19.tar.gz&quot;</span>
             <span class="p">],</span>
@@ -243,6 +261,7 @@
             <span class="n">tar_compression</span><span class="o">=</span><span class="s2">&quot;gz&quot;</span><span class="p">,</span>
             <span class="n">benchmark_file_suffix</span><span class="o">=</span><span class="s2">&quot;.bc&quot;</span><span class="p">,</span>
             <span class="n">sort_order</span><span class="o">=</span><span class="n">sort_order</span><span class="p">,</span>
+            <span class="n">deprecated</span><span class="o">=</span><span class="n">deprecated</span><span class="p">,</span>
         <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">benchmark</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>

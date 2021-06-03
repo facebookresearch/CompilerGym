@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.datasets.datasets &mdash; CompilerGym 0.1.8 documentation</title>
+  <title>compiler_gym.datasets.datasets &mdash; CompilerGym 0.1.9 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.8
+                0.1.9
               </div>
             
           
@@ -87,17 +87,18 @@
               
             
             
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../about.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rpc.html">RPC Service Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -107,6 +108,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/views.html">compiler_gym.views</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
+</ul>
+<p><span class="caption-text">C++ API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/service.html">compiler_gym/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/service/runtime.html">compiler_gym/service/runtime</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/util.html">compiler_gym/util</a></li>
 </ul>
 
             
@@ -176,7 +185,9 @@
 <span class="c1"># This source code is licensed under the MIT license found in the</span>
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">TypeVar</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">TypeVar</span>
+
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets.benchmark</span> <span class="kn">import</span> <span class="n">Benchmark</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
@@ -204,7 +215,7 @@
         <span class="k">yield from</span> <span class="n">iters</span><span class="o">.</span><span class="n">popleft</span><span class="p">()</span>
 
 
-<div class="viewcode-block" id="Datasets"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Datasets">[docs]</a><span class="k">class</span> <span class="nc">Datasets</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="Datasets"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Datasets">[docs]</a><span class="k">class</span> <span class="nc">Datasets</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;A collection of datasets.</span>
 
 <span class="sd">    This class provides a dictionary-like interface for indexing and iterating</span>
@@ -423,6 +434,42 @@
         <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">[</span><span class="n">dataset_name</span><span class="p">]</span>
 
         <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">benchmark</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span></div>
+
+<div class="viewcode-block" id="Datasets.random_benchmark"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Datasets.random_benchmark">[docs]</a>    <span class="k">def</span> <span class="nf">random_benchmark</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">random_state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Select a benchmark randomly.</span>
+
+<span class="sd">        First, a dataset is selected uniformly randomly using</span>
+<span class="sd">        :code:`random_state.choice(list(datasets))`. The</span>
+<span class="sd">        :meth:`random_benchmark()</span>
+<span class="sd">        &lt;compiler_gym.datasets.Dataset.random_benchmark&gt;` method of that dataset</span>
+<span class="sd">        is then called to select a benchmark.</span>
+
+<span class="sd">        Note that the distribution of benchmarks selected by this method is not</span>
+<span class="sd">        biased by the size of each dataset, since datasets are selected</span>
+<span class="sd">        uniformly. This means that datasets with a small number of benchmarks</span>
+<span class="sd">        will be overrepresented compared to datasets with many benchmarks. To</span>
+<span class="sd">        correct for this bias, use the number of benchmarks in each dataset as</span>
+<span class="sd">        a weight for the random selection:</span>
+
+<span class="sd">            &gt;&gt;&gt; rng = np.random.default_rng()</span>
+<span class="sd">            &gt;&gt;&gt; finite_datasets = [d for d in env.datasets if len(d) != math.inf]</span>
+<span class="sd">            &gt;&gt;&gt; dataset = rng.choice(</span>
+<span class="sd">                finite_datasets,</span>
+<span class="sd">                p=[len(d) for d in finite_datasets]</span>
+<span class="sd">            )</span>
+<span class="sd">            &gt;&gt;&gt; dataset.random_benchmark(random_state=rng)</span>
+
+<span class="sd">        :param random_state: A random number generator. If not provided, a</span>
+<span class="sd">            default :code:`np.random.default_rng()` is used.</span>
+
+<span class="sd">        :return: A :class:`Benchmark &lt;compiler_gym.datasets.Benchmark&gt;`</span>
+<span class="sd">            instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
+        <span class="n">dataset</span> <span class="o">=</span> <span class="n">random_state</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_visible_datasets</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="p">[</span><span class="n">dataset</span><span class="p">]</span><span class="o">.</span><span class="n">random_benchmark</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="n">random_state</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>

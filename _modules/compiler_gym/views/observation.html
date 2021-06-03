@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.views.observation &mdash; CompilerGym 0.1.8 documentation</title>
+  <title>compiler_gym.views.observation &mdash; CompilerGym 0.1.9 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.8
+                0.1.9
               </div>
             
           
@@ -87,17 +87,18 @@
               
             
             
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../about.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rpc.html">RPC Service Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -107,6 +108,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/views.html">compiler_gym.views</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
+</ul>
+<p><span class="caption-text">C++ API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/service.html">compiler_gym/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/service/runtime.html">compiler_gym/service/runtime</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/util.html">compiler_gym/util</a></li>
 </ul>
 
             
@@ -177,12 +186,17 @@
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span>
 
-<span class="kn">from</span> <span class="nn">compiler_gym.service</span> <span class="kn">import</span> <span class="n">ServiceError</span><span class="p">,</span> <span class="n">observation_t</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">ObservationSpace</span><span class="p">,</span> <span class="n">StepReply</span><span class="p">,</span> <span class="n">StepRequest</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">ObservationSpace</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.gym_type_hints</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">ActionType</span><span class="p">,</span>
+    <span class="n">ObservationType</span><span class="p">,</span>
+    <span class="n">RewardType</span><span class="p">,</span>
+    <span class="n">StepType</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.views.observation_space_spec</span> <span class="kn">import</span> <span class="n">ObservationSpaceSpec</span>
 
 
-<div class="viewcode-block" id="ObservationView"><a class="viewcode-back" href="../../../compiler_gym/views.html#compiler_gym.views.ObservationView">[docs]</a><span class="k">class</span> <span class="nc">ObservationView</span><span class="p">(</span><span class="nb">object</span><span class="p">):</span>
+<div class="viewcode-block" id="ObservationView"><a class="viewcode-back" href="../../../compiler_gym/views.html#compiler_gym.views.ObservationView">[docs]</a><span class="k">class</span> <span class="nc">ObservationView</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;A view into the available observation spaces of a service.</span>
 
 <span class="sd">    Example usage:</span>
@@ -201,20 +215,21 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">get_observation</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">StepRequest</span><span class="p">],</span> <span class="n">StepReply</span><span class="p">],</span>
+        <span class="n">raw_step</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[</span>
+            <span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">ActionType</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationType</span><span class="p">],</span> <span class="n">List</span><span class="p">[</span><span class="n">RewardType</span><span class="p">]],</span> <span class="n">StepType</span>
+        <span class="p">],</span>
         <span class="n">spaces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ObservationSpace</span><span class="p">],</span>
     <span class="p">):</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">spaces</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No observation spaces&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_get_observation</span> <span class="o">=</span> <span class="n">get_observation</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">session_id</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_raw_step</span> <span class="o">=</span> <span class="n">raw_step</span>
 
         <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">s</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">spaces</span><span class="p">):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_add_space</span><span class="p">(</span><span class="n">ObservationSpaceSpec</span><span class="o">.</span><span class="n">from_proto</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">s</span><span class="p">))</span>
 
-<div class="viewcode-block" id="ObservationView.__getitem__"><a class="viewcode-back" href="../../../compiler_gym/views.html#compiler_gym.views.ObservationView.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observation_space</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">observation_t</span><span class="p">:</span>
+<div class="viewcode-block" id="ObservationView.__getitem__"><a class="viewcode-back" href="../../../compiler_gym/views.html#compiler_gym.views.ObservationView.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observation_space</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ObservationType</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Request an observation from the given space.</span>
 
 <span class="sd">        :param observation_space: The observation space to query.</span>
@@ -226,17 +241,14 @@
 <span class="sd">        :raises SessionNotFound: If :meth:`env.reset()</span>
 <span class="sd">            &lt;compiler_gym.envs.CompilerEnv.reset&gt;` has not been called.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">observation_space</span><span class="p">]</span>
-        <span class="n">request</span> <span class="o">=</span> <span class="n">StepRequest</span><span class="p">(</span>
-            <span class="n">session_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
-            <span class="n">observation_space</span><span class="o">=</span><span class="p">[</span><span class="n">space</span><span class="o">.</span><span class="n">index</span><span class="p">],</span>
+        <span class="n">observation_space</span><span class="p">:</span> <span class="n">ObservationSpaceSpec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">observation_space</span><span class="p">]</span>
+        <span class="n">observations</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_raw_step</span><span class="p">(</span>
+            <span class="n">actions</span><span class="o">=</span><span class="p">[],</span> <span class="n">observations</span><span class="o">=</span><span class="p">[</span><span class="n">observation_space</span><span class="p">],</span> <span class="n">rewards</span><span class="o">=</span><span class="p">[]</span>
         <span class="p">)</span>
-        <span class="n">reply</span><span class="p">:</span> <span class="n">StepReply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_observation</span><span class="p">(</span><span class="n">request</span><span class="p">)</span>
-        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">reply</span><span class="o">.</span><span class="n">observation</span><span class="p">)</span> <span class="o">!=</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Requested 1 observation but received </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">reply</span><span class="o">.</span><span class="n">observation</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
-        <span class="k">return</span> <span class="n">space</span><span class="o">.</span><span class="n">translate</span><span class="p">(</span><span class="n">reply</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span></div>
+        <span class="k">assert</span> <span class="p">(</span>
+            <span class="nb">len</span><span class="p">(</span><span class="n">observations</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span>
+        <span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;Expected 1 observation. Received: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">observations</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="k">return</span> <span class="n">observations</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span></div>
 
     <span class="k">def</span> <span class="nf">_add_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">space</span><span class="p">:</span> <span class="n">ObservationSpaceSpec</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Register a new space.&quot;&quot;&quot;</span>

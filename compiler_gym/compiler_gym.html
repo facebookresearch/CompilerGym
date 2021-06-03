@@ -4,10 +4,11 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym &mdash; CompilerGym 0.1.8 documentation</title>
+  <title>compiler_gym &mdash; CompilerGym 0.1.9 documentation</title>
   
 
   
@@ -64,7 +65,7 @@
             
             
               <div class="version">
-                0.1.8
+                0.1.9
               </div>
             
           
@@ -89,17 +90,18 @@
               
             
             
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../about.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rpc.html">RPC Service Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p><span class="caption-text">Python API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">compiler_gym</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#compilerenvstate">CompilerEnvState</a></li>
@@ -115,6 +117,14 @@
 <li class="toctree-l1"><a class="reference internal" href="service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="views.html">compiler_gym.views</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wrappers.html">compiler_gym.wrappers</a></li>
+</ul>
+<p><span class="caption-text">C++ API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/service.html">compiler_gym/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/service/runtime.html">compiler_gym/service/runtime</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/util.html">compiler_gym/util</a></li>
 </ul>
 
             
@@ -180,7 +190,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="compiler-gym">
+  <section id="compiler-gym">
 <h1>compiler_gym<a class="headerlink" href="#compiler-gym" title="Permalink to this headline">¶</a></h1>
 <div class="contents local topic" id="contents">
 <ul class="simple">
@@ -190,7 +200,7 @@
 <li><p><a class="reference internal" href="#debugging" id="id4">Debugging</a></p></li>
 </ul>
 </div>
-<div class="section" id="compilerenvstate">
+<section id="compilerenvstate">
 <h2><a class="toc-backref" href="#id1">CompilerEnvState</a><a class="headerlink" href="#compilerenvstate" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="compiler_gym.CompilerEnvState">
@@ -314,8 +324,8 @@ contains the information required to reproduce the result.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="validation">
+</section>
+<section id="validation">
 <h2><a class="toc-backref" href="#id2">Validation</a><a class="headerlink" href="#validation" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="compiler_gym.ValidationResult">
@@ -436,8 +446,8 @@ differ from the input states.</p>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="filesystem-paths">
+</section>
+<section id="filesystem-paths">
 <h2><a class="toc-backref" href="#id3">Filesystem Paths</a><a class="headerlink" href="#filesystem-paths" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="compiler_gym.cache_path">
@@ -521,14 +531,14 @@ to download.</p></li>
 <dd class="field-even"><p>The contents of the downloaded file.</p>
 </dd>
 <dt class="field-odd">Raises</dt>
-<dd class="field-odd"><p><strong>OSError</strong> – If the download fails, or if the downloaded content does
+<dd class="field-odd"><p><strong>IOError</strong> – If the download fails, or if the downloaded content does
 match the expected <code class="code docutils literal notranslate"><span class="pre">sha256</span></code> checksum.</p>
 </dd>
 </dl>
 </dd></dl>
 
-</div>
-<div class="section" id="debugging">
+</section>
+<section id="debugging">
 <h2><a class="toc-backref" href="#id4">Debugging</a><a class="headerlink" href="#debugging" title="Permalink to this headline">¶</a></h2>
 <dl class="py function">
 <dt id="compiler_gym.get_debug_level">
@@ -584,8 +594,8 @@ For granular control of logging information, consider instead setting a
 </dl>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

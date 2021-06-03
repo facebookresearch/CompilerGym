@@ -4,10 +4,11 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Indices and tables &mdash; CompilerGym 0.1.8 documentation</title>
+  <title>Indices and tables &mdash; CompilerGym 0.1.9 documentation</title>
   
 
   
@@ -63,7 +64,7 @@
             
             
               <div class="version">
-                0.1.8
+                0.1.9
               </div>
             
           
@@ -88,17 +89,18 @@
               
             
             
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rpc.html">RPC Service Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -108,6 +110,14 @@
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/views.html">compiler_gym.views</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
+</ul>
+<p><span class="caption-text">C++ API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/service.html">compiler_gym/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/service/runtime.html">compiler_gym/service/runtime</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/util.html">compiler_gym/util</a></li>
 </ul>
 
             
@@ -177,19 +187,20 @@
 <p><a class="reference external" href="https://github.com/facebookresearch/CompilerGym">CompilerGym</a> is a toolkit
 for applying reinforcement learning to compiler optimizations.</p>
 <div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">User Guide</span></p>
+<p><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rpc.html">RPC Service Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 </ul>
 </div>
 <div class="toctree-wrapper compound">
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/compiler_gym.html">compiler_gym</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="compiler_gym/compiler_gym.html#compilerenvstate">CompilerEnvState</a></li>
@@ -241,16 +252,52 @@ for applying reinforcement learning to compiler optimizations.</p>
 <li class="toctree-l2"><a class="reference internal" href="compiler_gym/views.html#rewardview">RewardView</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/wrappers.html">compiler_gym.wrappers</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/wrappers.html#base-wrappers">Base wrappers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/wrappers.html#action-space-wrappers">Action space wrappers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/wrappers.html#datasets-wrappers">Datasets wrappers</a></li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="section" id="indices-and-tables">
+<div class="toctree-wrapper compound">
+<p><span class="caption-text">C++ API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cc/compiler_gym/envs/llvm/service.html#actionspace-h">ActionSpace.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cc/compiler_gym/envs/llvm/service.html#benchmark-h">Benchmark.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cc/compiler_gym/envs/llvm/service.html#benchmarkfactory-h">BenchmarkFactory.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cc/compiler_gym/envs/llvm/service.html#cost-h">Cost.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cc/compiler_gym/envs/llvm/service.html#llvmsession-h">LlvmSession.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cc/compiler_gym/envs/llvm/service.html#observationspaces-h">ObservationSpaces.h</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/service.html">compiler_gym/service</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cc/compiler_gym/service.html#compilationsession-h">CompilationSession.h</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/service/runtime.html">compiler_gym/service/runtime</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cc/compiler_gym/service/runtime.html#runtime-h">Runtime.h</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/util.html">compiler_gym/util</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="cc/compiler_gym/util.html#enumutil-h">EnumUtil.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cc/compiler_gym/util.html#grpcstatusmacros-h">GrpcStatusMacros.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cc/compiler_gym/util.html#runfilespath-h">RunfilesPath.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cc/compiler_gym/util.html#strlenconstexpr-h">StrLenConstexpr.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cc/compiler_gym/util.html#unreachable-h">Unreachable.h</a></li>
+</ul>
+</li>
+</ul>
+</div>
+<section id="indices-and-tables">
 <h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Permalink to this headline">¶</a></h1>
 <ul class="simple">
 <li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Index</span></a></p></li>
 <li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Module Index</span></a></p></li>
 <li><p><a class="reference internal" href="search.html"><span class="std std-ref">Search Page</span></a></p></li>
 </ul>
-</div>
+</section>
 
 
            </div>

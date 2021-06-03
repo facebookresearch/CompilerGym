@@ -4,10 +4,11 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Frequently Asked Questions &mdash; CompilerGym 0.1.8 documentation</title>
+  <title>Frequently Asked Questions &mdash; CompilerGym 0.1.9 documentation</title>
   
 
   
@@ -40,7 +41,7 @@
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
     <link rel="next" title="compiler_gym" href="compiler_gym/compiler_gym.html" />
-    <link rel="prev" title="Changelog" href="changelog.html" /> 
+    <link rel="prev" title="Contributing" href="contributing.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -64,7 +65,7 @@
             
             
               <div class="version">
-                0.1.8
+                0.1.9
               </div>
             
           
@@ -89,29 +90,39 @@
               
             
             
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p><span class="caption-text">User Guide</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rpc.html">RPC Service Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Frequently Asked Questions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#what-can-i-do-with-this">What can I do with this?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#i-found-a-bug-how-do-i-report-it">I found a bug. How do I report it?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#do-i-have-to-use-reinforcement-learning">Do I have to use reinforcement learning?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#what-features-are-going-to-be-added-in-the-future">What features are going to be added in the future?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#is-compiler-optimization-really-a-sequential-decision-process">Is compiler optimization really a sequential decision process?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#when-does-a-compiler-enviornment-consider-an-episode-done">When does a compiler enviornment consider an episode “done”?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#how-do-i-run-this-on-my-own-program">How do I run this on my own program?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#i-want-to-add-a-new-program-representation-reward-signal-how-do-i-do-that">I want to add a new program representation / reward signal. How do I do that?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#should-i-always-try-different-actions">Should I always try different actions?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#i-updated-with-git-pull-and-now-it-doesn-t-work">I updated with “git pull” and now it doesn’t work</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#general">General</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#what-can-i-do-with-this">What can I do with this?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#do-i-have-to-use-reinforcement-learning">Do I have to use reinforcement learning?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#what-features-are-going-to-be-added-in-the-future">What features are going to be added in the future?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#is-compiler-optimization-really-a-sequential-decision-process">Is compiler optimization really a sequential decision process?</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#llvm-environment">LLVM Environment</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#when-does-the-environment-consider-an-episode-done">When does the environment consider an episode “done”?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#how-do-i-run-this-on-my-own-program">How do I run this on my own program?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#should-i-always-try-different-actions">Should I always try different actions?</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#development">Development</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#i-found-a-bug-how-do-i-report-it">I found a bug. How do I report it?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#i-updated-with-git-pull-and-now-it-doesn-t-work">I updated with “git pull” and now it doesn’t work</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#i-want-to-add-a-new-program-representation-reward-signal-how-do-i-do-that">I want to add a new program representation / reward signal. How do I do that?</a></li>
 </ul>
 </li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+</li>
+</ul>
+<p><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -121,6 +132,14 @@
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/views.html">compiler_gym.views</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
+</ul>
+<p><span class="caption-text">C++ API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/service.html">compiler_gym/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/service/runtime.html">compiler_gym/service/runtime</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/util.html">compiler_gym/util</a></li>
 </ul>
 
             
@@ -186,27 +205,41 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="frequently-asked-questions">
+  <section id="frequently-asked-questions">
 <h1>Frequently Asked Questions<a class="headerlink" href="#frequently-asked-questions" title="Permalink to this headline">¶</a></h1>
 <p>This page answers some of the commonly asked questions about CompilerGym. Have a
 question not answered here? File an issue on the <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/issues">GitHub issue tracker</a>.</p>
-<div class="contents local topic" id="questions">
-<p class="topic-title">Questions:</p>
+<div class="contents local topic" id="topics">
+<p class="topic-title">Topics:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#what-can-i-do-with-this" id="id2">What can I do with this?</a></p></li>
-<li><p><a class="reference internal" href="#i-found-a-bug-how-do-i-report-it" id="id3">I found a bug. How do I report it?</a></p></li>
-<li><p><a class="reference internal" href="#do-i-have-to-use-reinforcement-learning" id="id4">Do I have to use reinforcement learning?</a></p></li>
-<li><p><a class="reference internal" href="#what-features-are-going-to-be-added-in-the-future" id="id5">What features are going to be added in the future?</a></p></li>
-<li><p><a class="reference internal" href="#is-compiler-optimization-really-a-sequential-decision-process" id="id6">Is compiler optimization really a sequential decision process?</a></p></li>
-<li><p><a class="reference internal" href="#when-does-a-compiler-enviornment-consider-an-episode-done" id="id7">When does a compiler enviornment consider an episode “done”?</a></p></li>
-<li><p><a class="reference internal" href="#how-do-i-run-this-on-my-own-program" id="id8">How do I run this on my own program?</a></p></li>
-<li><p><a class="reference internal" href="#i-want-to-add-a-new-program-representation-reward-signal-how-do-i-do-that" id="id9">I want to add a new program representation / reward signal. How do I do that?</a></p></li>
-<li><p><a class="reference internal" href="#should-i-always-try-different-actions" id="id10">Should I always try different actions?</a></p></li>
-<li><p><a class="reference internal" href="#i-updated-with-git-pull-and-now-it-doesn-t-work" id="id11">I updated with “git pull” and now it doesn’t work</a></p></li>
+<li><p><a class="reference internal" href="#general" id="id3">General</a></p>
+<ul>
+<li><p><a class="reference internal" href="#what-can-i-do-with-this" id="id4">What can I do with this?</a></p></li>
+<li><p><a class="reference internal" href="#do-i-have-to-use-reinforcement-learning" id="id5">Do I have to use reinforcement learning?</a></p></li>
+<li><p><a class="reference internal" href="#what-features-are-going-to-be-added-in-the-future" id="id6">What features are going to be added in the future?</a></p></li>
+<li><p><a class="reference internal" href="#is-compiler-optimization-really-a-sequential-decision-process" id="id7">Is compiler optimization really a sequential decision process?</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#llvm-environment" id="id8">LLVM Environment</a></p>
+<ul>
+<li><p><a class="reference internal" href="#when-does-the-environment-consider-an-episode-done" id="id9">When does the environment consider an episode “done”?</a></p></li>
+<li><p><a class="reference internal" href="#how-do-i-run-this-on-my-own-program" id="id10">How do I run this on my own program?</a></p></li>
+<li><p><a class="reference internal" href="#should-i-always-try-different-actions" id="id11">Should I always try different actions?</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#development" id="id12">Development</a></p>
+<ul>
+<li><p><a class="reference internal" href="#i-found-a-bug-how-do-i-report-it" id="id13">I found a bug. How do I report it?</a></p></li>
+<li><p><a class="reference internal" href="#i-updated-with-git-pull-and-now-it-doesn-t-work" id="id14">I updated with “git pull” and now it doesn’t work</a></p></li>
+<li><p><a class="reference internal" href="#i-want-to-add-a-new-program-representation-reward-signal-how-do-i-do-that" id="id15">I want to add a new program representation / reward signal. How do I do that?</a></p></li>
+</ul>
+</li>
 </ul>
 </div>
-<div class="section" id="what-can-i-do-with-this">
-<h2><a class="toc-backref" href="#id2">What can I do with this?</a><a class="headerlink" href="#what-can-i-do-with-this" title="Permalink to this headline">¶</a></h2>
+<section id="general">
+<h2><a class="toc-backref" href="#id3">General</a><a class="headerlink" href="#general" title="Permalink to this headline">¶</a></h2>
+<section id="what-can-i-do-with-this">
+<h3><a class="toc-backref" href="#id4">What can I do with this?</a><a class="headerlink" href="#what-can-i-do-with-this" title="Permalink to this headline">¶</a></h3>
 <p>This projects lets you control the decisions that a compiler makes when
 optimizing a program. Currently, it lets you control the selection and ordering
 of optimization passes for LLVM in order to minimize the size of the code.</p>
@@ -218,78 +251,74 @@ around with it to better understand what is going on:</p>
 </div>
 <p>Once you get the hang of things, try submitting your best algorithm to our
 <a class="reference external" href="https://github.com/facebookresearch/CompilerGym#leaderboards">leaderboards</a>!</p>
-</div>
-<div class="section" id="i-found-a-bug-how-do-i-report-it">
-<h2><a class="toc-backref" href="#id3">I found a bug. How do I report it?</a><a class="headerlink" href="#i-found-a-bug-how-do-i-report-it" title="Permalink to this headline">¶</a></h2>
-<p>Great! Please file an issue using the <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/issues">GitHub issue tracker</a>.  See
-<a class="reference internal" href="contributing.html"><span class="doc">Contributing</span></a> for more details.</p>
-</div>
-<div class="section" id="do-i-have-to-use-reinforcement-learning">
-<h2><a class="toc-backref" href="#id4">Do I have to use reinforcement learning?</a><a class="headerlink" href="#do-i-have-to-use-reinforcement-learning" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="do-i-have-to-use-reinforcement-learning">
+<h3><a class="toc-backref" href="#id5">Do I have to use reinforcement learning?</a><a class="headerlink" href="#do-i-have-to-use-reinforcement-learning" title="Permalink to this headline">¶</a></h3>
 <p>No. We think that the the gym provides a useful abstraction for sequential
 decision making. You may use any technique you wish to explore the optimization
 space.</p>
-</div>
-<div class="section" id="what-features-are-going-to-be-added-in-the-future">
-<h2><a class="toc-backref" href="#id5">What features are going to be added in the future?</a><a class="headerlink" href="#what-features-are-going-to-be-added-in-the-future" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="what-features-are-going-to-be-added-in-the-future">
+<h3><a class="toc-backref" href="#id6">What features are going to be added in the future?</a><a class="headerlink" href="#what-features-are-going-to-be-added-in-the-future" title="Permalink to this headline">¶</a></h3>
 <p>See <a class="reference internal" href="about.html#roadmap"><span class="std std-ref">roadmap</span></a>.</p>
-</div>
-<div class="section" id="is-compiler-optimization-really-a-sequential-decision-process">
-<h2><a class="toc-backref" href="#id6">Is compiler optimization really a sequential decision process?</a><a class="headerlink" href="#is-compiler-optimization-really-a-sequential-decision-process" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="is-compiler-optimization-really-a-sequential-decision-process">
+<h3><a class="toc-backref" href="#id7">Is compiler optimization really a sequential decision process?</a><a class="headerlink" href="#is-compiler-optimization-really-a-sequential-decision-process" title="Permalink to this headline">¶</a></h3>
 <p>Compilers frequently package individual transformations as “optimization passes”
 which are then applied in a sequential order. Usually this order is fixed (e.g.
 <a class="reference external" href="https://github.com/llvm/llvm-project/blob/71a8e4e7d6b947c8b954ec0763ff7969b3879d7b/llvm/lib/Transforms/IPO/PassManagerBuilder.cpp#L517-L922">realworld example</a>).
 CompilerGym replaces that fixed order with a sequential decision process where
 any pass may be applied at any stage.</p>
-</div>
-<div class="section" id="when-does-a-compiler-enviornment-consider-an-episode-done">
-<h2><a class="toc-backref" href="#id7">When does a compiler enviornment consider an episode “done”?</a><a class="headerlink" href="#when-does-a-compiler-enviornment-consider-an-episode-done" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="llvm-environment">
+<h2><a class="toc-backref" href="#id8">LLVM Environment</a><a class="headerlink" href="#llvm-environment" title="Permalink to this headline">¶</a></h2>
+<section id="when-does-the-environment-consider-an-episode-done">
+<h3><a class="toc-backref" href="#id9">When does the environment consider an episode “done”?</a><a class="headerlink" href="#when-does-the-environment-consider-an-episode-done" title="Permalink to this headline">¶</a></h3>
 <p>The compiler itself doesn’t have a signal for termination. Actions are like
 rewrite rules, it is up to the user to decide when no more improvement can be
 achieved from further rewrites. E.g. for simple random search we can use
 <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/blob/8fa65c232d2bf6a7347af44565579c60775162ac/compiler_gym/bin/random_search.py#L33-L40">“patience”</a>.
 The only exception is if the compiler crashes, or the code ends up in an
 unexpected state - we have to abort. This happens.</p>
-</div>
-<div class="section" id="how-do-i-run-this-on-my-own-program">
-<h2><a class="toc-backref" href="#id8">How do I run this on my own program?</a><a class="headerlink" href="#how-do-i-run-this-on-my-own-program" title="Permalink to this headline">¶</a></h2>
-<p>For LLVM, you compile your program to an unoptimized LLVM bitcode file. This can
-be done automatically for C/C++ programs using the <a class="reference internal" href="llvm/api.html#compiler_gym.envs.llvm.make_benchmark" title="compiler_gym.envs.llvm.make_benchmark"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.make_benchmark()</span></code></a> API, or you can do this yourself using
+</section>
+<section id="how-do-i-run-this-on-my-own-program">
+<h3><a class="toc-backref" href="#id10">How do I run this on my own program?</a><a class="headerlink" href="#how-do-i-run-this-on-my-own-program" title="Permalink to this headline">¶</a></h3>
+<p>By compiling your program to an unoptimized LLVM bitcode file. This can be done
+automatically for C/C++ programs using the <a class="reference internal" href="llvm/api.html#compiler_gym.envs.llvm.make_benchmark" title="compiler_gym.envs.llvm.make_benchmark"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.make_benchmark()</span></code></a> API, or you can do this yourself using
 clang:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ clang -emit-llvm -c -O0 -Xclang -disable-O0-optnone -Xclang -disable-llvm-passes myapp.c
 </pre></div>
 </div>
 <p>Then pass the path of the generated <cite>.bc</cite> file to the CompilerGym commandline
 tools using the <cite>–benchmark</cite> flag, e.g.</p>
-<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ bazel run -c opt //compiler_gym/bin:random_search -- --env=llvm-ic-v0 \
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ bazel run -c opt //compiler_gym/bin:random_search -- \
+    --env=llvm-ic-v0 \
     --benchmark=file:///$PWD/myapp.bc
 </pre></div>
 </div>
-</div>
-<div class="section" id="i-want-to-add-a-new-program-representation-reward-signal-how-do-i-do-that">
-<h2><a class="toc-backref" href="#id9">I want to add a new program representation / reward signal. How do I do that?</a><a class="headerlink" href="#i-want-to-add-a-new-program-representation-reward-signal-how-do-i-do-that" title="Permalink to this headline">¶</a></h2>
-<p>If your program representation can be computed from existing observations,
-consider using the <code class="xref py py-meth docutils literal notranslate"><span class="pre">add_derived_space()</span></code> API to add a derived
-observation or <a class="reference internal" href="compiler_gym/views.html#compiler_gym.views.RewardView.add_space" title="compiler_gym.views.RewardView.add_space"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_space()</span></code></a> to
-add a new reward space.</p>
-<p>If you require modifying the underlying compiler service implementation, fork
-this project and build it from source (see <a class="reference internal" href="installation.html"><span class="doc">Installation</span></a>). Then modify the
-C++ service implementation for the compiler that you are interested in. The
-service codebase is located at <code class="code docutils literal notranslate"><span class="pre">compiler_gym/envs/$COMPILER/service</span></code>,
-where <code class="code docutils literal notranslate"><span class="pre">$COMPILER</span></code> is the name of the compiler service you would wish to
-modify, e.g. llvm. Once done, send us a pull request!</p>
-</div>
-<div class="section" id="should-i-always-try-different-actions">
-<h2><a class="toc-backref" href="#id10">Should I always try different actions?</a><a class="headerlink" href="#should-i-always-try-different-actions" title="Permalink to this headline">¶</a></h2>
+</section>
+<section id="should-i-always-try-different-actions">
+<h3><a class="toc-backref" href="#id11">Should I always try different actions?</a><a class="headerlink" href="#should-i-always-try-different-actions" title="Permalink to this headline">¶</a></h3>
 <p>Some optimization actions may be called multiple times after other actions. An
 example of this is <a class="reference external" href="https://en.wikipedia.org/wiki/Dead_code_elimination">dead code elimination</a>, which can be used to
 “clean up mess” generated from a previous action. So repeating the same action
 in different context can bring improvements.</p>
-</div>
-<div class="section" id="i-updated-with-git-pull-and-now-it-doesn-t-work">
-<h2><a class="toc-backref" href="#id11">I updated with “git pull” and now it doesn’t work</a><a class="headerlink" href="#i-updated-with-git-pull-and-now-it-doesn-t-work" title="Permalink to this headline">¶</a></h2>
+</section>
+</section>
+<section id="development">
+<h2><a class="toc-backref" href="#id12">Development</a><a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
+<section id="i-found-a-bug-how-do-i-report-it">
+<h3><a class="toc-backref" href="#id13">I found a bug. How do I report it?</a><a class="headerlink" href="#i-found-a-bug-how-do-i-report-it" title="Permalink to this headline">¶</a></h3>
+<p>Great! Please file an issue using the <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/issues">GitHub issue tracker</a>.  See
+<a class="reference internal" href="contributing.html"><span class="doc">Contributing</span></a> for more details.</p>
+</section>
+<section id="i-updated-with-git-pull-and-now-it-doesn-t-work">
+<h3><a class="toc-backref" href="#id14">I updated with “git pull” and now it doesn’t work</a><a class="headerlink" href="#i-updated-with-git-pull-and-now-it-doesn-t-work" title="Permalink to this headline">¶</a></h3>
 <p>The first thing to is to re-run <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">init</span></code> to ensure that you have the
-correct development depencies installed, as those can change between releases.</p>
+correct development depencies installed, as those can change between releases.
+Then run <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">distclean</span></code> to tidy up any build artifacts from the old
+version.</p>
 <p>If that doesn’t fix the problem, feel free to
 <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/issues">file an issue</a>, but
 note that the
@@ -299,8 +328,24 @@ stability. If you would like to build from source but do not require the
 latest feature set, use the
 <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/commits/stable">stable</a>
 branch which lags to the latest release with hotfixes.</p>
-</div>
-</div>
+</section>
+<section id="i-want-to-add-a-new-program-representation-reward-signal-how-do-i-do-that">
+<h3><a class="toc-backref" href="#id15">I want to add a new program representation / reward signal. How do I do that?</a><a class="headerlink" href="#i-want-to-add-a-new-program-representation-reward-signal-how-do-i-do-that" title="Permalink to this headline">¶</a></h3>
+<p>If your reward or observation is a transformation of an existing space, consider
+using the <a class="reference internal" href="compiler_gym/wrappers.html#module-compiler_gym.wrappers" title="compiler_gym.wrappers"><code class="xref py py-mod docutils literal notranslate"><span class="pre">compiler_gym.wrappers</span></code></a> module to define a wrapper that performs
+the translation from the base space.</p>
+<p>If your reward or observation requires combining multiple existing spaces,
+consider using <a class="reference internal" href="compiler_gym/views.html#compiler_gym.views.ObservationView.add_derived_space" title="compiler_gym.views.ObservationView.add_derived_space"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_derived_space()</span></code></a> or <a class="reference internal" href="compiler_gym/views.html#compiler_gym.views.RewardView.add_space" title="compiler_gym.views.RewardView.add_space"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_space()</span></code></a>.</p>
+<p>If you require modifying the underlying compiler service implementation, fork
+this project and build it from source (see <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/blob/development/INSTALL.md">installation</a>).
+Then modify the service implementation for the compiler that you are interested
+in. The service codebase is located at
+<code class="code docutils literal notranslate"><span class="pre">compiler_gym/envs/$COMPILER/service</span></code>, where <code class="code docutils literal notranslate"><span class="pre">$COMPILER</span></code> is the name
+of the compiler service you would wish to modify, e.g. llvm. Once done, send us
+a pull request!</p>
+</section>
+</section>
+</section>
 
 
            </div>
@@ -313,7 +358,7 @@ branch which lags to the latest release with hotfixes.</p>
         <a href="compiler_gym/compiler_gym.html" class="btn btn-neutral float-right" title="compiler_gym" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="changelog.html" class="btn btn-neutral float-left" title="Changelog" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="contributing.html" class="btn btn-neutral float-left" title="Contributing" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.util.download &mdash; CompilerGym 0.1.8 documentation</title>
+  <title>compiler_gym.util.download &mdash; CompilerGym 0.1.9 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.8
+                0.1.9
               </div>
             
           
@@ -87,17 +87,18 @@
               
             
             
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../about.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../rpc.html">RPC Service Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -107,6 +108,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/views.html">compiler_gym.views</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
+</ul>
+<p><span class="caption-text">C++ API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/service.html">compiler_gym/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/service/runtime.html">compiler_gym/service/runtime</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/util.html">compiler_gym/util</a></li>
 </ul>
 
             
@@ -177,6 +186,7 @@
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
 <span class="kn">import</span> <span class="nn">hashlib</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">fasteners</span>
@@ -184,16 +194,28 @@
 
 <span class="kn">from</span> <span class="nn">compiler_gym.util.filesystem</span> <span class="kn">import</span> <span class="n">atomic_file_write</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">cache_path</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.truncate</span> <span class="kn">import</span> <span class="n">truncate</span>
 
 
-<span class="k">class</span> <span class="nc">DownloadFailed</span><span class="p">(</span><span class="ne">OSError</span><span class="p">):</span>
+<span class="k">class</span> <span class="nc">DownloadFailed</span><span class="p">(</span><span class="ne">IOError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Error thrown if a download fails.&quot;&quot;&quot;</span>
 
 
+<span class="k">class</span> <span class="nc">TooManyRequests</span><span class="p">(</span><span class="n">DownloadFailed</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Error thrown by HTTP 429 response.&quot;&quot;&quot;</span>
+
+
 <span class="k">def</span> <span class="nf">_get_url_data</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-    <span class="n">req</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">req</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
+        <span class="n">req</span> <span class="o">=</span> <span class="n">requests</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">IOError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># Re-cast an error raised by requests library to DownloadFailed type.</span>
+        <span class="k">raise</span> <span class="n">DownloadFailed</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">))</span> <span class="kn">from</span> <span class="nn">e</span>
+
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">req</span><span class="o">.</span><span class="n">status_code</span> <span class="o">==</span> <span class="mi">429</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">TooManyRequests</span><span class="p">(</span><span class="s2">&quot;429 Too Many Requests&quot;</span><span class="p">)</span>
+        <span class="k">elif</span> <span class="n">req</span><span class="o">.</span><span class="n">status_code</span> <span class="o">!=</span> <span class="mi">200</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">DownloadFailed</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GET returned status code </span><span class="si">{</span><span class="n">req</span><span class="o">.</span><span class="n">status_code</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="k">return</span> <span class="n">req</span><span class="o">.</span><span class="n">content</span>
@@ -211,7 +233,7 @@
         <span class="n">actual_sha256</span> <span class="o">=</span> <span class="n">checksum</span><span class="o">.</span><span class="n">hexdigest</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">sha256</span> <span class="o">!=</span> <span class="n">actual_sha256</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">DownloadFailed</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Checksum of downloaded dataset does not match:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Checksum of download does not match:</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;Url: </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;Expected: </span><span class="si">{</span><span class="n">sha256</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;Actual:   </span><span class="si">{</span><span class="n">actual_sha256</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -227,7 +249,10 @@
     <span class="k">return</span> <span class="n">content</span>
 
 
-<span class="k">def</span> <span class="nf">_download</span><span class="p">(</span><span class="n">urls</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">sha256</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">max_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+<span class="k">def</span> <span class="nf">_download</span><span class="p">(</span><span class="n">urls</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">sha256</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span> <span class="n">max_retries</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
+    <span class="k">if</span> <span class="ow">not</span> <span class="n">urls</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No URLs to download&quot;</span><span class="p">)</span>
+
     <span class="c1"># Cache hit.</span>
     <span class="k">if</span> <span class="n">sha256</span> <span class="ow">and</span> <span class="n">cache_path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;downloads/</span><span class="si">{</span><span class="n">sha256</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">cache_path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;downloads/</span><span class="si">{</span><span class="n">sha256</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)),</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
@@ -235,12 +260,22 @@
 
     <span class="c1"># A retry loop, and loop over all urls provided.</span>
     <span class="n">last_exception</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_retries</span><span class="p">):</span>
+    <span class="n">wait_time</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">max_retries</span><span class="p">,</span> <span class="mi">1</span><span class="p">)):</span>
         <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">urls</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">_do_download_attempt</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">sha256</span><span class="p">)</span>
+            <span class="k">except</span> <span class="n">TooManyRequests</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="n">last_exception</span> <span class="o">=</span> <span class="n">e</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                    <span class="s2">&quot;Download attempt failed with Too Many Requests error. &quot;</span>
+                    <span class="s2">&quot;Watiting </span><span class="si">%.1f</span><span class="s2"> seconds&quot;</span><span class="p">,</span>
+                    <span class="n">wait_time</span><span class="p">,</span>
+                <span class="p">)</span>
+                <span class="n">sleep</span><span class="p">(</span><span class="n">wait_time</span><span class="p">)</span>
+                <span class="n">wait_time</span> <span class="o">*=</span> <span class="mf">1.5</span>
             <span class="k">except</span> <span class="n">DownloadFailed</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Download failed&quot;</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Download attempt failed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">truncate</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
                 <span class="n">last_exception</span> <span class="o">=</span> <span class="n">e</span>
     <span class="k">raise</span> <span class="n">last_exception</span>
 
@@ -264,7 +299,7 @@
 
 <span class="sd">    :return: The contents of the downloaded file.</span>
 
-<span class="sd">    :raises OSError: If the download fails, or if the downloaded content does</span>
+<span class="sd">    :raises IOError: If the download fails, or if the downloaded content does</span>
 <span class="sd">        match the expected :code:`sha256` checksum.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Convert a singular string into a list of strings.</span>

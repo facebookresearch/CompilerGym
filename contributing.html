@@ -4,10 +4,11 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Contributing &mdash; CompilerGym 0.1.8 documentation</title>
+  <title>Contributing &mdash; CompilerGym 0.1.9 documentation</title>
   
 
   
@@ -39,8 +40,8 @@
     <link rel="author" title="About these documents" href="about.html" />
     <link rel="index" title="Index" href="genindex.html" />
     <link rel="search" title="Search" href="search.html" />
-    <link rel="next" title="Changelog" href="changelog.html" />
-    <link rel="prev" title="About" href="about.html" /> 
+    <link rel="next" title="Frequently Asked Questions" href="faq.html" />
+    <link rel="prev" title="Changelog" href="changelog.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -64,7 +65,7 @@
             
             
               <div class="version">
-                0.1.8
+                0.1.9
               </div>
             
           
@@ -89,12 +90,14 @@
               
             
             
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p><span class="caption-text">User Guide</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rpc.html">RPC Service Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Contributing</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#how-to-contribute">How to Contribute</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#pull-requests">Pull Requests</a></li>
@@ -103,10 +106,9 @@
 <li class="toctree-l2"><a class="reference internal" href="#contributor-license-agreement-cla">Contributor License Agreement (“CLA”)</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -116,6 +118,14 @@
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/views.html">compiler_gym.views</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
+</ul>
+<p><span class="caption-text">C++ API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/service.html">compiler_gym/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/service/runtime.html">compiler_gym/service/runtime</a></li>
+<li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/util.html">compiler_gym/util</a></li>
 </ul>
 
             
@@ -181,7 +191,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="contributing">
+  <section id="contributing">
 <h1>Contributing<a class="headerlink" href="#contributing" title="Permalink to this headline">¶</a></h1>
 <p><strong>Table of Contents</strong></p>
 <ul class="simple">
@@ -193,7 +203,7 @@
 (“CLA”)</a></p></li>
 </ul>
 <hr class="docutils" />
-<div class="section" id="how-to-contribute">
+<section id="how-to-contribute">
 <h2>How to Contribute<a class="headerlink" href="#how-to-contribute" title="Permalink to this headline">¶</a></h2>
 <p>We want to make contributing to CompilerGym as easy and transparent as
 possible. The most helpful ways to contribute are:</p>
@@ -224,14 +234,14 @@ research results using CompilerGym, etc.</p></li>
 </ul>
 </li>
 </ol>
-</div>
-<div class="section" id="pull-requests">
+</section>
+<section id="pull-requests">
 <h2>Pull Requests<a class="headerlink" href="#pull-requests" title="Permalink to this headline">¶</a></h2>
 <p>We actively welcome your pull requests.</p>
 <ol class="arabic simple">
 <li><p>Fork <a class="reference external" href="https://github.com/facebookresearch/CompilerGym">the repo</a>
 and create your branch from <code class="docutils literal notranslate"><span class="pre">development</span></code>.</p></li>
-<li><p>Follow the instructions for <a class="reference external" href="https://github.com/facebookresearch/CompilerGym#building-from-source">building from
+<li><p>Follow the instructions for <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/blob/development/INSTALL.md">building from
 source</a>
 to set up your environment.</p></li>
 <li><p>If you’ve added code that should be tested, add tests.</p></li>
@@ -241,8 +251,8 @@ to set up your environment.</p></li>
 <li><p>If you haven’t already, complete the <a class="reference external" href="#contributor-license-agreement-cla">Contributor License Agreement
 (“CLA”)</a>.</p></li>
 </ol>
-</div>
-<div class="section" id="leaderboard-submissions">
+</section>
+<section id="leaderboard-submissions">
 <h2>Leaderboard Submissions<a class="headerlink" href="#leaderboard-submissions" title="Permalink to this headline">¶</a></h2>
 <p>To add a new result to the leaderboard, add a new entry to the
 leaderboard table and file a <a class="reference external" href="#pull-requests">Pull Request</a>. Please
@@ -263,8 +273,8 @@ may ask clarifying questions if we feel that those would be useful to
 improve reproducibility. <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/117">Take a look
 here</a> for
 an example of a well-formed pull request submission.</p>
-</div>
-<div class="section" id="code-style">
+</section>
+<section id="code-style">
 <h2>Code Style<a class="headerlink" href="#code-style" title="Permalink to this headline">¶</a></h2>
 <p>We want to ease the burden of code formatting using tools. Our code
 style is simple:</p>
@@ -289,15 +299,15 @@ installation and usage instructions.</p>
 <li><p>Prefer easy-to-use code over easy-to-read, and easy-to-read code over
 easy-to-write.</p></li>
 </ul>
-</div>
-<div class="section" id="contributor-license-agreement-cla">
+</section>
+<section id="contributor-license-agreement-cla">
 <h2>Contributor License Agreement (“CLA”)<a class="headerlink" href="#contributor-license-agreement-cla" title="Permalink to this headline">¶</a></h2>
 <p>In order to accept your pull request, we need you to submit a CLA. You
 only need to do this once to work on any of Facebook’s open source
 projects.</p>
 <p>Complete your CLA here: <a class="reference external" href="https://code.facebook.com/cla">https://code.facebook.com/cla</a></p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
@@ -307,10 +317,10 @@ projects.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="changelog.html" class="btn btn-neutral float-right" title="Changelog" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="faq.html" class="btn btn-neutral float-right" title="Frequently Asked Questions" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="about.html" class="btn btn-neutral float-left" title="About" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="changelog.html" class="btn btn-neutral float-left" title="Changelog" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

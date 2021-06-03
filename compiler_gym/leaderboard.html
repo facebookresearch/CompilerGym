@@ -4,10 +4,11 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.leaderboard &mdash; CompilerGym 0.1.8 documentation</title>
+  <title>compiler_gym.leaderboard &mdash; CompilerGym 0.1.9 documentation</title>
   
 
   
@@ -64,7 +65,7 @@
             
             
               <div class="version">
-                0.1.8
+                0.1.9
               </div>
             
           
@@ -89,17 +90,18 @@
               
             
             
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../about.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rpc.html">RPC Service Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p><span class="caption-text">Python API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">compiler_gym.datasets</a></li>
@@ -112,6 +114,14 @@
 <li class="toctree-l1"><a class="reference internal" href="service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="views.html">compiler_gym.views</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wrappers.html">compiler_gym.wrappers</a></li>
+</ul>
+<p><span class="caption-text">C++ API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/service.html">compiler_gym/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/service/runtime.html">compiler_gym/service/runtime</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/util.html">compiler_gym/util</a></li>
 </ul>
 
             
@@ -177,7 +187,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="module-compiler_gym.leaderboard">
+  <section id="module-compiler_gym.leaderboard">
 <span id="compiler-gym-leaderboard"></span><h1>compiler_gym.leaderboard<a class="headerlink" href="#module-compiler_gym.leaderboard" title="Permalink to this headline">¶</a></h1>
 <p>This package contains modules that can be used for preparing leaderboard
 submissions.</p>
@@ -188,7 +198,7 @@ work, and to provide a common framework for evaluating and comparing different
 approaches. We accept submissions to the leaderboards through pull requests, see
 <a class="reference external" href="https://facebookresearch.github.io/CompilerGym/contributing.html#leaderboard-submissions">here</a>
 for instructions.</p>
-<div class="section" id="module-compiler_gym.leaderboard.llvm_instcount">
+<section id="module-compiler_gym.leaderboard.llvm_instcount">
 <span id="llvm-instruction-count"></span><h2>LLVM Instruction Count<a class="headerlink" href="#module-compiler_gym.leaderboard.llvm_instcount" title="Permalink to this headline">¶</a></h2>
 <p>LLVM is a popular open source compiler used widely in industry and research.
 The <code class="code docutils literal notranslate"><span class="pre">llvm-ic-v0</span></code> environment exposes LLVM’s optimizing passes as a set of
@@ -298,8 +308,8 @@ defined:</p>
 for instructions on preparing a submission to the leaderboard.</p>
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

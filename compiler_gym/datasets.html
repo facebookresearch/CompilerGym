@@ -4,10 +4,11 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.datasets &mdash; CompilerGym 0.1.8 documentation</title>
+  <title>compiler_gym.datasets &mdash; CompilerGym 0.1.9 documentation</title>
   
 
   
@@ -64,7 +65,7 @@
             
             
               <div class="version">
-                0.1.8
+                0.1.9
               </div>
             
           
@@ -89,17 +90,18 @@
               
             
             
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../about.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rpc.html">RPC Service Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p><span class="caption-text">Python API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">compiler_gym.datasets</a><ul>
@@ -117,6 +119,14 @@
 <li class="toctree-l1"><a class="reference internal" href="service.html">compiler_gym.service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="views.html">compiler_gym.views</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wrappers.html">compiler_gym.wrappers</a></li>
+</ul>
+<p><span class="caption-text">C++ API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/service.html">compiler_gym/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/service/runtime.html">compiler_gym/service/runtime</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/util.html">compiler_gym/util</a></li>
 </ul>
 
             
@@ -182,7 +192,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="compiler-gym-datasets">
+  <section id="compiler-gym-datasets">
 <h1>compiler_gym.datasets<a class="headerlink" href="#compiler-gym-datasets" title="Permalink to this headline">¶</a></h1>
 <p>An instance of a CompilerGym environment uses a <a class="reference internal" href="#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.Benchmark"><code class="xref py py-class docutils literal notranslate"><span class="pre">Benchmark</span></code></a> as the program being optimized. A
 <a class="reference internal" href="#compiler_gym.datasets.Dataset" title="compiler_gym.datasets.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> is collection of benchmarks
@@ -197,7 +207,7 @@ that can be installed and made available for use.</p>
 <li><p><a class="reference internal" href="#datasets" id="id6">Datasets</a></p></li>
 </ul>
 </div>
-<div class="section" id="benchmark">
+<section id="benchmark">
 <h2><a class="toc-backref" href="#id1">Benchmark</a><a class="headerlink" href="#benchmark" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="compiler_gym.datasets.Benchmark">
@@ -467,8 +477,8 @@ class is new and is likely to change in the future.</p>
 <dd><p>Base class for errors raised if a benchmark fails to initialize.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="dataset">
+</section>
+<section id="dataset">
 <h2><a class="toc-backref" href="#id2">Dataset</a><a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="compiler_gym.datasets.Dataset">
@@ -720,6 +730,22 @@ automatically on first use, or by calling <a class="reference internal" href="#c
 </dd></dl>
 
 <dl class="py method">
+<dt id="compiler_gym.datasets.Dataset.random_benchmark">
+<code class="sig-name descname">random_benchmark</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">random_state</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>numpy.random._generator.Generator<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; compiler_gym.datasets.benchmark.Benchmark<a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.random_benchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.random_benchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select a benchmark randomly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>random_state</strong> – A random number generator. If not provided, a
+default <code class="code docutils literal notranslate"><span class="pre">np.random.default_rng()</span></code> is used.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.Benchmark"><code class="xref py py-class docutils literal notranslate"><span class="pre">Benchmark</span></code></a>
+instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
 <dt id="compiler_gym.datasets.Dataset.references">
 <em class="property">property </em><code class="sig-name descname">references</code><a class="headerlink" href="#compiler_gym.datasets.Dataset.references" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dictionary of useful named URLs for this dataset containing extra
@@ -819,8 +845,8 @@ only. Suggested values are “Yes”, “No”, or “Partial”.</p>
 <dd><p>Base class for errors raised if a dataset fails to initialize.</p>
 </dd></dl>
 
-</div>
-<div class="section" id="filesdataset">
+</section>
+<section id="filesdataset">
 <h2><a class="toc-backref" href="#id3">FilesDataset</a><a class="headerlink" href="#filesdataset" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="compiler_gym.datasets.FilesDataset">
@@ -920,8 +946,8 @@ generator that can produce an infinite number of programs, the value is
 
 </dd></dl>
 
-</div>
-<div class="section" id="tardataset">
+</section>
+<section id="tardataset">
 <h2><a class="toc-backref" href="#id4">TarDataset</a><a class="headerlink" href="#tardataset" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="compiler_gym.datasets.TarDataset">
@@ -974,8 +1000,8 @@ automatically on first use, or by calling <a class="reference internal" href="#c
 
 </dd></dl>
 
-</div>
-<div class="section" id="tardatasetwithmanifest">
+</section>
+<section id="tardatasetwithmanifest">
 <h2><a class="toc-backref" href="#id5">TarDatasetWithManifest</a><a class="headerlink" href="#tardatasetwithmanifest" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="compiler_gym.datasets.TarDatasetWithManifest">
@@ -1042,8 +1068,8 @@ generator that can produce an infinite number of programs, the value is
 
 </dd></dl>
 
-</div>
-<div class="section" id="datasets">
+</section>
+<section id="datasets">
 <h2><a class="toc-backref" href="#id6">Datasets</a><a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><dl class="py class">
@@ -1259,11 +1285,46 @@ marked as deprecated.</p>
 </dl>
 </dd></dl>
 
+<dl class="py method">
+<dt id="compiler_gym.datasets.Datasets.random_benchmark">
+<code class="sig-name descname">random_benchmark</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">random_state</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>numpy.random._generator.Generator<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; compiler_gym.datasets.benchmark.Benchmark<a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.random_benchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.random_benchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Select a benchmark randomly.</p>
+<p>First, a dataset is selected uniformly randomly using
+<code class="code docutils literal notranslate"><span class="pre">random_state.choice(list(datasets))</span></code>. The
+<a class="reference internal" href="#compiler_gym.datasets.Dataset.random_benchmark" title="compiler_gym.datasets.Dataset.random_benchmark"><code class="xref py py-meth docutils literal notranslate"><span class="pre">random_benchmark()</span></code></a> method of that dataset
+is then called to select a benchmark.</p>
+<p>Note that the distribution of benchmarks selected by this method is not
+biased by the size of each dataset, since datasets are selected
+uniformly. This means that datasets with a small number of benchmarks
+will be overrepresented compared to datasets with many benchmarks. To
+correct for this bias, use the number of benchmarks in each dataset as
+a weight for the random selection:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">finite_datasets</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">env</span><span class="o">.</span><span class="n">datasets</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">!=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
+<span class="go">    finite_datasets,</span>
+<span class="go">    p=[len(d) for d in finite_datasets]</span>
+<span class="go">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">random_benchmark</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>random_state</strong> – A random number generator. If not provided, a
+default <code class="code docutils literal notranslate"><span class="pre">np.random.default_rng()</span></code> is used.</p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A <a class="reference internal" href="#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.Benchmark"><code class="xref py py-class docutils literal notranslate"><span class="pre">Benchmark</span></code></a>
+instance.</p>
+</dd>
+</dl>
+</dd></dl>
+
 </dd></dl>
 
 </div></blockquote>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

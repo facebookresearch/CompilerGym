@@ -4,10 +4,11 @@
 <html class="writer-html5" lang="en" >
 <head>
   <meta charset="utf-8">
-  
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>compiler_gym.spaces &mdash; CompilerGym 0.1.8 documentation</title>
+  <title>compiler_gym.spaces &mdash; CompilerGym 0.1.9 documentation</title>
   
 
   
@@ -64,7 +65,7 @@
             
             
               <div class="version">
-                0.1.8
+                0.1.9
               </div>
             
           
@@ -89,17 +90,18 @@
               
             
             
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../about.html">About</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rpc.html">RPC Service Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p><span class="caption-text">Python API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">compiler_gym.datasets</a></li>
@@ -116,6 +118,14 @@
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="views.html">compiler_gym.views</a></li>
+<li class="toctree-l1"><a class="reference internal" href="wrappers.html">compiler_gym.wrappers</a></li>
+</ul>
+<p><span class="caption-text">C++ API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/service.html">compiler_gym/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/service/runtime.html">compiler_gym/service/runtime</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/util.html">compiler_gym/util</a></li>
 </ul>
 
             
@@ -181,7 +191,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="compiler-gym-spaces">
+  <section id="compiler-gym-spaces">
 <h1>compiler_gym.spaces<a class="headerlink" href="#compiler-gym-spaces" title="Permalink to this headline">¶</a></h1>
 <p>CompilerGym extends the builtin <a class="reference external" href="https://gym.openai.com/docs/#spaces">gym spaces</a> to better describe the
 observation spaces available to compilers.</p>
@@ -195,7 +205,7 @@ observation spaces available to compilers.</p>
 <li><p><a class="reference internal" href="#reward" id="id5">Reward</a></p></li>
 </ul>
 </div>
-<div class="section" id="scalar">
+<section id="scalar">
 <h2><a class="toc-backref" href="#id1">Scalar</a><a class="headerlink" href="#scalar" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="compiler_gym.spaces.Scalar">
@@ -234,8 +244,8 @@ uniform or non-uniform sampling based on boundedness of space.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="sequence">
+</section>
+<section id="sequence">
 <h2><a class="toc-backref" href="#id2">Sequence</a><a class="headerlink" href="#sequence" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="compiler_gym.spaces.Sequence">
@@ -314,8 +324,8 @@ member of this space</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="nameddiscrete">
+</section>
+<section id="nameddiscrete">
 <h2><a class="toc-backref" href="#id3">NamedDiscrete</a><a class="headerlink" href="#nameddiscrete" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="compiler_gym.spaces.NamedDiscrete">
@@ -403,8 +413,8 @@ space has a name. Additionally, the space itself may have a name.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="commandline">
+</section>
+<section id="commandline">
 <h2><a class="toc-backref" href="#id4">Commandline</a><a class="headerlink" href="#commandline" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="compiler_gym.spaces.Commandline">
@@ -513,8 +523,8 @@ recognized.</p>
 
 </dd></dl>
 
-</div>
-<div class="section" id="reward">
+</section>
+<section id="reward">
 <h2><a class="toc-backref" href="#id5">Reward</a><a class="headerlink" href="#reward" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt id="compiler_gym.spaces.Reward">
@@ -604,7 +614,7 @@ crashed or the connection has dropped.</p>
 
 <dl class="py method">
 <dt id="compiler_gym.spaces.Reward.update">
-<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">action</span><span class="p">:</span> <span class="n">int</span></em>, <em class="sig-param"><span class="n">observations</span><span class="p">:</span> <span class="n">List<span class="p">[</span>Union<span class="p">[</span>numpy.ndarray<span class="p">, </span>str<span class="p">, </span>bytes<span class="p">, </span>int<span class="p">, </span>float<span class="p">, </span>List<span class="p">[</span>Any<span class="p">]</span><span class="p">, </span>Dict<span class="p">[</span>str<span class="p">, </span>Any<span class="p">]</span><span class="p">, </span>networkx.classes.digraph.DiGraph<span class="p">]</span><span class="p">]</span></span></em>, <em class="sig-param"><span class="n">observation_view</span><span class="p">:</span> <span class="n"><a class="reference internal" href="views.html#compiler_gym.views.ObservationView" title="compiler_gym.views.ObservationView">compiler_gym.views.ObservationView</a></span></em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="../_modules/compiler_gym/spaces/reward.html#Reward.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.spaces.Reward.update" title="Permalink to this definition">¶</a></dt>
+<code class="sig-name descname">update</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">actions</span><span class="p">:</span> <span class="n">List<span class="p">[</span>int<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">observations</span><span class="p">:</span> <span class="n">List<span class="p">[</span>ObservationType<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">observation_view</span><span class="p">:</span> <span class="n"><a class="reference internal" href="views.html#compiler_gym.views.ObservationView" title="compiler_gym.views.ObservationView">compiler_gym.views.ObservationView</a></span></em><span class="sig-paren">)</span> &#x2192; float<a class="reference internal" href="../_modules/compiler_gym/spaces/reward.html#Reward.update"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.spaces.Reward.update" title="Permalink to this definition">¶</a></dt>
 <dd><p>Calculate a reward for the given action.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -622,8 +632,8 @@ instance.</p></li>
 
 </dd></dl>
 
-</div>
-</div>
+</section>
+</section>
 
 
            </div>

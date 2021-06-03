@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Installation &mdash; CompilerGym 0.1.8 documentation</title>
+  <title>Installation &mdash; CompilerGym 0.1.7 documentation</title>
   
 
   
@@ -62,7 +62,7 @@
             
             
               <div class="version">
-                0.1.8
+                0.1.7
               </div>
             
           
@@ -180,6 +180,75 @@
 </div>
 <p>The binary works on macOS and Linux (on Ubuntu 18.04, Fedora 28, Debian
 10 or newer equivalents).</p>
+<div class="section" id="building-from-source">
+<h2>Building from Source<a class="headerlink" href="#building-from-source" title="Permalink to this headline">¶</a></h2>
+<p>If you prefer, you may build from source. This requires a modern C++
+toolchain and bazel.</p>
+<div class="section" id="macos">
+<h3>macOS<a class="headerlink" href="#macos" title="Permalink to this headline">¶</a></h3>
+<p>On macOS the required dependencies can be installed using
+<a class="reference external" href="https://docs.brew.sh/Installation">homebrew</a>:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>brew install bazelisk zlib
+<span class="nb">export</span> <span class="nv">LDFLAGS</span><span class="o">=</span><span class="s2">&quot;-L/usr/local/opt/zlib/lib&quot;</span>
+<span class="nb">export</span> <span class="nv">CPPFLAGS</span><span class="o">=</span><span class="s2">&quot;-I/usr/local/opt/zlib/include&quot;</span>
+<span class="nb">export</span> <span class="nv">PKG_CONFIG_PATH</span><span class="o">=</span><span class="s2">&quot;/usr/local/opt/zlib/lib/pkgconfig&quot;</span>
+</pre></div>
+</div>
+<p>Now proceed to <a class="reference external" href="#all-platforms">All platforms</a> below.</p>
+</div>
+<div class="section" id="linux">
+<h3>Linux<a class="headerlink" href="#linux" title="Permalink to this headline">¶</a></h3>
+<p>On debian-based linux systems, install the required toolchain using:</p>
+<div class="highlight-sh notranslate"><div class="highlight"><pre><span></span>sudo apt install clang-9 libtinfo5 libjpeg-dev patchelf
+wget https://github.com/bazelbuild/bazelisk/releases/download/v1.7.5/bazelisk-linux-amd64 -O bazel
+chmod +x bazel <span class="o">&amp;&amp;</span> mkdir -p ~/.local/bin <span class="o">&amp;&amp;</span> mv -v bazel ~/.local/bin
+<span class="nb">export</span> <span class="nv">PATH</span><span class="o">=</span><span class="s2">&quot;</span><span class="nv">$HOME</span><span class="s2">/.local/bin:</span><span class="nv">$PATH</span><span class="s2">&quot;</span>
+<span class="nb">export</span> <span class="nv">CC</span><span class="o">=</span>clang
+<span class="nb">export</span> <span class="nv">CXX</span><span class="o">=</span>clang++
+</pre></div>
+</div>
+</div>
+<div class="section" id="all-platforms">
+<h3>All platforms<a class="headerlink" href="#all-platforms" title="Permalink to this headline">¶</a></h3>
+<p>We recommend using
+<a class="reference external" href="https://docs.conda.io/projects/conda/en/latest/user-guide/install/">conda</a>
+to manage the remaining build dependencies. First create a conda
+environment with the required dependencies:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">create</span> <span class="o">-</span><span class="n">n</span> <span class="n">compiler_gym</span> <span class="n">python</span><span class="o">=</span><span class="mf">3.9</span> <span class="n">cmake</span> <span class="n">pandoc</span>
+<span class="n">conda</span> <span class="n">activate</span> <span class="n">compiler_gym</span>
+</pre></div>
+</div>
+<p>Then clone the CompilerGym source code using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">git</span> <span class="n">clone</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">github</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">facebookresearch</span><span class="o">/</span><span class="n">CompilerGym</span><span class="o">.</span><span class="n">git</span>
+<span class="n">cd</span> <span class="n">CompilerGym</span>
+</pre></div>
+</div>
+<p>Install the python development dependencies using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">init</span>
+</pre></div>
+</div>
+<p>The <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">init</span></code> target only needs to be run once on initial setup, or
+when upgrading to a different CompilerGym release.</p>
+<p>Run the test suite to confirm that everything is working:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">test</span>
+</pre></div>
+</div>
+<p>To build and install the <code class="docutils literal notranslate"><span class="pre">compiler_gym</span></code> python package, run:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">make</span> <span class="n">install</span>
+</pre></div>
+</div>
+<p><strong>NOTE:</strong> To use the <code class="docutils literal notranslate"><span class="pre">compiler_gym</span></code> package that is installed by
+<code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">install</span></code> you must leave the root directory of this repository.
+Attempting to import <code class="docutils literal notranslate"><span class="pre">compiler_gym</span></code> while in the root of this
+repository will cause import errors.</p>
+<p>When you are finished, you can deactivate and delete the conda
+environment using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">conda</span> <span class="n">deactivate</span>
+<span class="n">conda</span> <span class="n">env</span> <span class="n">remove</span> <span class="o">-</span><span class="n">n</span> <span class="n">compiler_gym</span>
+</pre></div>
+</div>
+</div>
+</div>
 </div>
 
 

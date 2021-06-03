@@ -6,12 +6,18 @@ compiler_gym.service
 CompilerGym uses a client/server architecture. Services provide an interface for
 manipulating compiler behavior. Clients are Python frontend objects that provide
 a reinforcement learning abstraction on top of the service. Communication
-between the service and client is done using RPC. The connection between the
+between the service and client is done :doc:`using RPC </rpc>`. The connection between the
 client and service is managed by the :class:`CompilerGymServiceConnection
 <compiler_gym.service.CompilerGymServiceConnection>` object.
 
 .. contents:: Document contents:
     :local:
+
+.. autoclass:: CompilationSession
+   :members:
+
+   .. automethod:: __init__
+
 
 The connection object
 ---------------------
