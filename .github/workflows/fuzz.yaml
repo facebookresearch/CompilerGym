@@ -42,4 +42,4 @@ jobs:
                   BAZEL_TEST_OPTS: --config=ci
 
             - name: Test
-              run: FUZZ_TIME=600 make fuzz
+              run: FUZZ_TIME=600 make install-fuzz

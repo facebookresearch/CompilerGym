@@ -5,6 +5,8 @@
 """Fuzz test for LlvmEnv.validate()."""
 import random
 
+import pytest
+
 from compiler_gym.envs import LlvmEnv
 from tests.pytest_plugins.llvm import VALIDATABLE_CBENCH_URIS
 from tests.test_main import main
@@ -16,6 +18,7 @@ pytest_plugins = ["tests.pytest_plugins.llvm"]
 RANDOM_TRAJECTORY_LENGTH_RANGE = (1, 50)
 
 
+@pytest.mark.timeout(600)
 def test_fuzz(env: LlvmEnv):
     """This test generates a random trajectory and validates the semantics."""
     benchmark = random.choice(VALIDATABLE_CBENCH_URIS)
@@ -29,7 +32,8 @@ def test_fuzz(env: LlvmEnv):
                 break  # Broken trajectory, retry.
         else:
             print(f"Validating state {env.state}")
-            assert env.validate() == []
+            result = env.validate()
+            assert result.okay(), result
             # Stop the test.
             break
 

@@ -124,6 +124,11 @@ def test_wrapped_reward(env: LlvmEnv):
     env.reset()
     _, reward, _, _ = env.step(0)
     assert reward == -5
+    assert env.episode_reward == -5
+
+    _, reward, _, _ = env.step(0)
+    assert reward == -5
+    assert env.episode_reward == -10
 
 
 if __name__ == "__main__":
