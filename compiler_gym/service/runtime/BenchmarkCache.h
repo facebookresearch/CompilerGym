@@ -42,7 +42,7 @@ class BenchmarkCache {
    * Lookup a benchmark. The pointer set by this method is valid only until the
    * next call to add().
    *
-   * @param uri The URI of the benchmark
+   * @param uri The URI of the benchmark.
    * @return A Benchmark pointer.
    */
   const Benchmark* get(const std::string& uri) const;

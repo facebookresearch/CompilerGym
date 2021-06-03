@@ -56,7 +56,7 @@ Status BenchmarkFactory::getBenchmark(const BenchmarkProto& benchmarkMessage,
       break;
     }
     case compiler_gym::File::DataCase::kUri: {
-      // Check that protocol of the benmchmark URI.
+      // Check the protocol of the benchmark URI.
       if (programFile.uri().find("file:///") != 0) {
         return Status(StatusCode::INVALID_ARGUMENT,
                       fmt::format("Invalid benchmark data URI. "
