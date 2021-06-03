@@ -84,6 +84,7 @@ div.toctree-wrapper.compound p {
 }
 
 /* Flatten first nested namespace in C++ docs. */
-div.section > dl.cpp.type > dd {
+div.section > dl.cpp.type > dd,
+section > dl.cpp.type > dd {
 	margin: 0 0 12px 0;
 }
