@@ -69,6 +69,17 @@ py_test(
 )
 
 py_test(
+    name = "episode_reward_test",
+    timeout = "long",
+    srcs = ["episode_reward_test.py"],
+    deps = [
+        "//compiler_gym/envs",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "fork_env_test",
     timeout = "long",
     srcs = ["fork_env_test.py"],

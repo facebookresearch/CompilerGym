@@ -973,23 +973,25 @@ class CompilerEnv(gym.Env):
             reward_spaces: List[Reward] = []
 
         # Perform the underlying environment step.
-        observations, rewards, done, info = self.raw_step(
+        observation_values, reward_values, done, info = self.raw_step(
             actions, observation_spaces, reward_spaces
         )
 
         # Translate observations lists back to the appropriate types.
-        if self.observation_space_spec and len(observations) == 1:
-            observations = observations[0]
+        if observations is None and self.observation_space_spec:
+            observation_values = observation_values[0]
         elif not observation_spaces:
-            observations = None
+            observation_values = None
 
         # Translate reward lists back to the appropriate types.
-        if self.reward_space_spec and len(rewards) == 1:
-            rewards = rewards[0]
+        if rewards is None and self.reward_space:
+            reward_values = reward_values[0]
+            # Update the cumulative episode reward
+            self.episode_reward += reward_values
         elif not reward_spaces:
-            rewards = None
+            reward_values = None
 
-        return observations, rewards, done, info
+        return observation_values, reward_values, done, info
 
     def render(
         self,

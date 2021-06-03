@@ -2,7 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
 
 import numpy as np
 
@@ -136,6 +136,14 @@ class Reward(Scalar):
 
     def __repr__(self):
         return self.id
+
+    def __eq__(self, other: Union["Reward", str]) -> bool:
+        if isinstance(other, str):
+            return self.id == other
+        elif isinstance(other, Reward):
+            return self.id == other.id
+        else:
+            return False
 
 
 class DefaultRewardFromObservation(Reward):
