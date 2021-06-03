@@ -17,6 +17,7 @@ PRE_FORK_ACTIONS = 10
 POST_FORK_ACTIONS = 10
 
 
+@pytest.mark.timeout(600)
 def test_fuzz(env: LlvmEnv, reward_space: str):
     """This test generates a random trajectory and checks that fork() produces
     an equivalent state. It then runs a second trajectory on the two

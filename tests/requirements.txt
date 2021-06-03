@@ -5,4 +5,5 @@ pytest-mock==3.6.0
 pytest-shard==0.1.1
 pytest-stress==1.0.1
 pytest-sugar==0.9.4
+pytest-timeout==1.4.2
 pytest-xdist==2.2.1
