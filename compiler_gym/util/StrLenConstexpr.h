@@ -8,8 +8,15 @@
 
 namespace compiler_gym::util {
 
-// Calculate the length of a string literal at compile-time.
-// E.g., strLen("abc") -> 3.
+/**
+ * Calculate the length of a string literal at compile-time.
+ *
+ * E.g., `strLen("abc") -> 3`.
+ *
+ * @tparam T The character type.
+ * @param str A string.
+ * @return A nonnegative integer.
+ */
 template <typename T>
 size_t constexpr strLen(const T* str) {
   return *str ? 1 + strLen(str + 1) : 0;

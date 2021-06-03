@@ -39,9 +39,9 @@ constexpr size_t kMaxLoadedBenchmarkSize = 512 * 1024 * 1024;
  * Example usage:
  *
  * \code{.cpp}
- * BenchmarkFactory factory;
- * auto benchmark = factory.getBenchmark("file:////tmp/my_bitcode.bc");
- * // ... do fun stuff
+ *     BenchmarkFactory factory;
+ *     auto benchmark = factory.getBenchmark("file:////tmp/my_bitcode.bc");
+ *     // ... do fun stuff
  * \endcode
  */
 class BenchmarkFactory {

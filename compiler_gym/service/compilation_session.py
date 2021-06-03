@@ -82,9 +82,11 @@ class CompilationSession:
         raise NotImplementedError
 
     def fork(self) -> "CompilationSession":
-        """Optional. Create a copy of current session state.
+        """Create a copy of current session state.
 
-        :return: A new CopmilationSession with the same state.
+        Implementing this method is optional.
+
+        :return: A new CompilationSession with the same state.
         """
         # No need to override this if you are not adding support to fork().
         raise NotImplementedError("CompilationSession.fork() not supported")

@@ -13,10 +13,12 @@ from pathlib import Path
 from signal import SIGTERM, signal
 from tempfile import mkdtemp
 from threading import Event, Thread
+from typing import Type
 
 import grpc
 from absl import app, flags, logging
 
+from compiler_gym.service.compilation_session import CompilationSession
 from compiler_gym.service.proto import compiler_gym_service_pb2_grpc
 from compiler_gym.service.runtime.compiler_gym_service import CompilerGymService
 from compiler_gym.util import debug_util as dbg
@@ -46,7 +48,29 @@ def _shutdown_handler(signal_number, stack_frame):  # pragma: no cover
     shutdown_signal.set()
 
 
-def create_and_run_compiler_gym_service(compilation_session_type):  # pragma: no cover
+def create_and_run_compiler_gym_service(  # pragma: no cover
+    compilation_session_type: Type[CompilationSession],
+):
+    """Create and run an RPC service for the given compilation session.
+
+    This should be called on its own in a self contained script to implement a
+    compilation service. Example:
+
+    .. code-block:: python
+
+        from compiler_gym.service import runtime
+        from my_compiler_service import MyCompilationSession
+
+        if __name__ == "__main__":
+            runtime.create_and_run_compiler_gym_service(MyCompilationSession)
+
+    This function never returns.
+
+    :param compilation_session_type: A sublass of :class:`CompilationSession
+        <compiler_gym.service.CompilationSession>` that provides implementations
+        of the abstract methods.
+    """
+
     def main(argv):
         # Register a signal handler for SIGTERM that will set the shutdownSignal
         # future value.

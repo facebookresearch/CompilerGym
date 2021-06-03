@@ -6,16 +6,20 @@
 
 namespace compiler_gym::util {
 
-// Resolve the path to a runfiles data path.
-//
-// Use environment variable COMPILER_GYM_RUNFILES=/path/to/runfiles if running
-// outside of bazel.
+/**
+ * Resolve the path to a runfiles data path.
+ *
+ * Use environment variable `COMPILER_GYM_RUNFILES=/path/to/runfiles` if running
+ * outside of bazel.
+ */
 boost::filesystem::path getRunfilesPath(const std::string& relPath);
 
-// Resolve the path to the site data path.
-//
-// The site data path is used for storing persistent data files, such as
-// benchmark datasets.
+/**
+ * Resolve the path to the site data path.
+ *
+ * The site data path is used for storing persistent data files, such as
+ * benchmark datasets.
+ */
 boost::filesystem::path getSiteDataPath(const std::string& relPath);
 
 }  // namespace compiler_gym::util
