@@ -3,6 +3,9 @@ compiler_gym.leaderboard
 
 .. automodule:: compiler_gym.leaderboard
 
+.. contents:: Leaderboards:
+    :local:
+
 LLVM Instruction Count
 ----------------------
 
