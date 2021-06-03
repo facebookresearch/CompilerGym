@@ -3,9 +3,10 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8" />
-  
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="utf-8">
+  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
   <title>Changelog &mdash; CompilerGym 0.1.9 documentation</title>
   
@@ -13,16 +14,11 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
-  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
 
   
   
-
   
-  
-
   
 
   
@@ -32,10 +28,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
-        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
+        <script src="_static/language_data.js"></script>
+        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -58,7 +55,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> CompilerGym
+            <a href="index.html" class="icon icon-home" alt="Documentation Home"> CompilerGym
           
 
           
@@ -93,7 +90,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p><span class="caption-text">User Guide</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environment Reference</a></li>
@@ -114,7 +111,7 @@
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -126,7 +123,7 @@
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
 </ul>
-<p class="caption"><span class="caption-text">C++ API Reference</span></p>
+<p><span class="caption-text">C++ API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/service.html">compiler_gym/service</a></li>
@@ -172,8 +169,6 @@
 
 
 
-
-
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -185,7 +180,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-          
+            
             <a href="_sources/changelog.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -199,9 +194,9 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="changelog">
+  <section id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
-<div class="section" id="release-0-1-9-2021-06-03">
+<section id="release-0-1-9-2021-06-03">
 <h2>Release 0.1.9 (2021-06-03)<a class="headerlink" href="#release-0-1-9-2021-06-03" title="Permalink to this headline">¶</a></h2>
 <p>This release of CompilerGym focuses on <strong>backend extensibility</strong> and
 adds a bunch of new features to make it easier to add support for new
@@ -241,8 +236,8 @@ environment state
 (<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/242">#242</a>).</p></li>
 <li><p>Numerous bug fixes and improvements.</p></li>
 </ul>
-</div>
-<div class="section" id="release-0-1-8-2021-04-30">
+</section>
+<section id="release-0-1-8-2021-04-30">
 <h2>Release 0.1.8 (2021-04-30)<a class="headerlink" href="#release-0-1-8-2021-04-30" title="Permalink to this headline">¶</a></h2>
 <p>This release introduces some significant changes to the way that
 benchmarks are managed, introducing a new dataset API. This enabled us
@@ -340,8 +335,8 @@ for details.</p></li>
 <li><p>[LLVM] Update references to the <code class="docutils literal notranslate"><span class="pre">cBench-v1</span></code> dataset to
 <code class="docutils literal notranslate"><span class="pre">cbench-v1</span></code>.</p></li>
 </ul>
-</div>
-<div class="section" id="release-0-1-7-2021-04-01">
+</section>
+<section id="release-0-1-7-2021-04-01">
 <h2>Release 0.1.7 (2021-04-01)<a class="headerlink" href="#release-0-1-7-2021-04-01" title="Permalink to this headline">¶</a></h2>
 <p>This release introduces <a class="reference external" href="https://github.com/facebookresearch/CompilerGym#leaderboards">public
 leaderboards</a>
@@ -368,8 +363,8 @@ remove your existing conda environment using
 <code class="docutils literal notranslate"><span class="pre">conda</span> <span class="pre">remove</span> <span class="pre">--name</span> <span class="pre">compiler_gym</span> <span class="pre">--all</span></code> and to repeat the steps in
 <a class="reference external" href="https://github.com/facebookresearch/CompilerGym#building-from-source">building from
 source</a>.</p>
-</div>
-<div class="section" id="release-0-1-6-2021-03-22">
+</section>
+<section id="release-0-1-6-2021-03-22">
 <h2>Release 0.1.6 (2021-03-22)<a class="headerlink" href="#release-0-1-6-2021-03-22" title="Permalink to this headline">¶</a></h2>
 <p>This release focuses on hardening the LLVM environments, providing
 improved semantics validation, and improving the datasets. Many thanks
@@ -404,8 +399,8 @@ deprecated.</p></li>
 address, and undefined behavior sanitizers.</p></li>
 <li><p>Numerous bug fixes and improvements.</p></li>
 </ul>
-</div>
-<div class="section" id="release-0-1-3-2021-02-25">
+</section>
+<section id="release-0-1-3-2021-02-25">
 <h2>Release 0.1.3 (2021-02-25)<a class="headerlink" href="#release-0-1-3-2021-02-25" title="Permalink to this headline">¶</a></h2>
 <p>This release adds numerous enhancements aimed at improving ease-of-use.
 Thanks to &#64;broune, &#64;hughleat, and &#64;JD-ETH for contributions.</p>
@@ -425,8 +420,8 @@ to Python. Reward functions have been removed from backend service
 implementations and replaced with equivalent Python classes.</p></li>
 <li><p>Various bug fixes and improvements.</p></li>
 </ul>
-</div>
-<div class="section" id="release-0-1-2-2021-01-25">
+</section>
+<section id="release-0-1-2-2021-01-25">
 <h2>Release 0.1.2 (2021-01-25)<a class="headerlink" href="#release-0-1-2-2021-01-25" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Add a new
@@ -441,8 +436,8 @@ unoptimized cost.</p></li>
 <li><p>Extended documentation and example codes.</p></li>
 <li><p>Numerous bug fixes and improvements.</p></li>
 </ul>
-</div>
-<div class="section" id="release-0-1-1-2020-12-28">
+</section>
+<section id="release-0-1-1-2020-12-28">
 <h2>Release 0.1.1 (2020-12-28)<a class="headerlink" href="#release-0-1-1-2020-12-28" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
 <li><p>Expose the package version through <code class="docutils literal notranslate"><span class="pre">compiler_gym.__version__</span></code>, and
@@ -457,41 +452,49 @@ section of compiled object files.</p></li>
 custom benchmarks for use in environments.</p></li>
 <li><p>Numerous bug fixes and improvements.</p></li>
 </ul>
-</div>
-<div class="section" id="release-0-1-0-2020-12-21">
+</section>
+<section id="release-0-1-0-2020-12-21">
 <h2>Release 0.1.0 (2020-12-21)<a class="headerlink" href="#release-0-1-0-2020-12-21" title="Permalink to this headline">¶</a></h2>
 <p>Initial release.</p>
-</div>
-</div>
+</section>
+</section>
 
 
            </div>
            
           </div>
           <footer>
+  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="contributing.html" class="btn btn-neutral float-right" title="Contributing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
-        <a href="rpc.html" class="btn btn-neutral float-left" title="RPC Service Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+      
+        <a href="contributing.html" class="btn btn-neutral float-right" title="Contributing" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+      
+      
+        <a href="rpc.html" class="btn btn-neutral float-left" title="RPC Service Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
     </div>
+  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        &#169; Copyright Facebook AI Research.
+        
+        &copy; Copyright Facebook AI Research
 
     </p>
   </div>
     
     
     
-    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
+
         </div>
       </div>
 
@@ -517,7 +520,6 @@ custom benchmarks for use in environments.</p></li>
     })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
     ga('create', 'G-T95G5EVYXM', 'auto');
-    
     ga('send', 'pageview');
     </script>
 
