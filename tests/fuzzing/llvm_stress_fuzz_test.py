@@ -17,7 +17,7 @@ def test_fuzz(env: LlvmEnv, observation_space: str, reward_space: str):
     """This test produces a random trajectory using a program generated using
     llvm-stress.
     """
-    env.benchmark = env.datasets["llvm-stress-v0"].random_benchmark()
+    env.benchmark = env.datasets["generator://llvm-stress-v0"].random_benchmark()
 
     env.observation_space = observation_space
     env.reward_space = reward_space
