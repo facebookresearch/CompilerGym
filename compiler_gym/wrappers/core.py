@@ -51,3 +51,38 @@ class ActionWrapper(CompilerEnvWrapper):
     def reverse_action(self, action):
         """Translate an action from the new space to the wrapped space."""
         raise NotImplementedError
+
+
+class ObservationWrapper(CompilerEnvWrapper):
+    """Wraps a :class:`CompilerEnv <compiler_gym.envs.CompilerEnv>` environment
+    to allow an observation space transformation.
+    """
+
+    def reset(self, *args, **kwargs):
+        observation = self.env.reset(*args, **kwargs)
+        return self.observation(observation)
+
+    def step(self, *args, **kwargs):
+        observation, reward, done, info = self.env.step(*args, **kwargs)
+        return self.observation(observation), reward, done, info
+
+    def observation(self, observation):
+        """Translate an observation to the new space."""
+        raise NotImplementedError
+
+
+class RewardWrapper(CompilerEnvWrapper):
+    """Wraps a :class:`CompilerEnv <compiler_gym.envs.CompilerEnv>` environment
+    to allow an reward space transformation.
+    """
+
+    def reset(self, *args, **kwargs):
+        return self.env.reset(*args, **kwargs)
+
+    def step(self, *args, **kwargs):
+        observation, reward, done, info = self.env.step(*args, **kwargs)
+        return observation, self.reward(reward), done, info
+
+    def reward(self, reward):
+        """Translate a reward to the new space."""
+        raise NotImplementedError

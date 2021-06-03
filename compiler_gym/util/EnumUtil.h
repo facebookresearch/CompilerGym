@@ -58,7 +58,7 @@ std::string enumNameToPascalCase(std::optional<Enum> value) {
 }
 
 /**
- * Enumearate all values of an optional Enum, including `std::nullopt`.
+ * Enumerate all values of an optional Enum, including `std::nullopt`.
  *
  * @return A vector of optional enum values.
  */
@@ -114,7 +114,7 @@ template <typename Enum>
 }
 
 /**
- * @brief Create a map from PascalCase enum value names to enum values.
+ * Create a map from PascalCase enum value names to enum values.
  *
  * @tparam Enum Enum type.
  * @return A `name -> value` lookup table.

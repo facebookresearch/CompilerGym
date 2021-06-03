@@ -19,7 +19,7 @@ namespace compiler_gym::runtime {
 constexpr size_t kEvictionSizeInBytes = 512 * 1024 * 1024;
 
 /**
- * @brief  A cache of Benchmark protocol messages.
+ * A cache of Benchmark protocol messages.
  *
  * This object caches Benchmark messages by URI. Once the cache reaches a
  * predetermined size, benchmarks are evicted randomly until the capacity is
@@ -28,7 +28,7 @@ constexpr size_t kEvictionSizeInBytes = 512 * 1024 * 1024;
 class BenchmarkCache {
  public:
   /**
-   * @brief Constructor.
+   * Constructor.
    *
    * @param maxSizeInBytes The maximum size of the benchmark buffer before an
    *    automated eviction is run.
@@ -42,7 +42,7 @@ class BenchmarkCache {
    * Lookup a benchmark. The pointer set by this method is valid only until the
    * next call to add().
    *
-   * @param uri The URI of the benchmark
+   * @param uri The URI of the benchmark.
    * @return A Benchmark pointer.
    */
   const Benchmark* get(const std::string& uri) const;

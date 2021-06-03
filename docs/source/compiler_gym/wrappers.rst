@@ -24,6 +24,16 @@ Base wrappers
     .. automethod:: reverse_action
 
 
+.. autoclass:: ObservationWrapper
+
+    .. automethod:: observation
+
+
+.. autoclass:: RewardWrapper
+
+    .. automethod:: reward
+
+
 Action space wrappers
 ---------------------
 

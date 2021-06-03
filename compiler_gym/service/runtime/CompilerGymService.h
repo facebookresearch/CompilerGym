@@ -17,9 +17,14 @@
 
 namespace compiler_gym::runtime {
 
-// A default implementation of the CompilerGymService. When parametrized by a
-// CompilationSession subclass, this provides the RPC handling logic to run a
-// gym service.
+/**
+ * A default implementation of the CompilerGymService.
+ *
+ * When parametrized by a CompilationSession subclass, this provides the RPC
+ * handling logic to run a gym service. User should call
+ * createAndRunCompilerGymService() rather than interacting with this class
+ * directly.
+ */
 template <typename CompilationSessionType>
 class CompilerGymService final : public compiler_gym::CompilerGymService::Service {
  public:

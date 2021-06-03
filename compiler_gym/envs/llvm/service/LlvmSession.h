@@ -28,11 +28,13 @@
 
 namespace compiler_gym::llvm_service {
 
-// This class exposes the LLVM optimization pipeline for an LLVM module as an
-// interactive environment.
-//
-// It can be used directly as a C++ API, or it can be accessed through an RPC
-// interface using the compiler_gym::service::LlvmService class.
+/**
+ * An interactive LLVM compilation session.
+ *
+ * This class exposes the LLVM optimization pipeline for an LLVM module as an
+ * interactive environment. It can be used directly as a C++ API, or it can be
+ * accessed through an RPC interface using the CompilerGym RPC runtime.
+ */
 class LlvmSession final : public CompilationSession {
  public:
   LlvmSession(const boost::filesystem::path& workingDirectory);
@@ -76,21 +78,41 @@ class LlvmSession final : public CompilationSession {
     return *benchmark_;
   }
 
-  // Run the requested action.
+  /**
+   * Run the requested action.
+   *
+   * @param action An action to apply.
+   * @param actionHadNoEffect Set to true if LLVM reported that any passes that
+   *    were run made no modifications to the module.
+   * @return `OK` on success.
+   */
   [[nodiscard]] grpc::Status applyPassAction(LlvmAction action, bool& actionHadNoEffect);
 
-  // Run the given pass, possibly modifying the underlying LLVM module. Return
-  // whether the module was modified.
+  /**
+   * Run the given pass, possibly modifying the underlying LLVM module.
+   *
+   * @return Whether the module was modified.
+   */
   bool runPass(llvm::Pass* pass);
+
+  /**
+   * Run the given pass, possibly modifying the underlying LLVM module.
+   *
+   * @return Whether the module was modified.
+   */
   bool runPass(llvm::FunctionPass* pass);
 
-  // Run the commandline `opt` tool on the current LLVM module with the given
-  // arguments, replacing the environment state with the generated output.
+  /**
+   * Run the commandline `opt` tool on the current LLVM module with the given
+   * arguments, replacing the environment state with the generated output.
+   */
   [[nodiscard]] grpc::Status runOptWithArgs(const std::vector<std::string>& optArgs);
 
   inline const llvm::TargetLibraryInfoImpl& tlii() const { return tlii_; }
 
-  // Setup pass manager with depdendent passes and the specified pass.
+  /**
+   * Setup pass manager with depdendent passes and the specified pass.
+   */
   template <typename PassManager, typename Pass>
   inline void setupPassManager(PassManager* passManager, Pass* pass) {
     passManager->add(new llvm::ProfileSummaryInfoWrapperPass());

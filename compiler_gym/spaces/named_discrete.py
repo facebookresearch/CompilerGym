@@ -13,6 +13,7 @@ class NamedDiscrete(Discrete):
 
     :ivar name: The name of the space. :code:`None` if the space has no name.
     :vartype name: Optional[str]
+
     :ivar names: A list of names for each element in the space.
     :vartype names: List[str]
 

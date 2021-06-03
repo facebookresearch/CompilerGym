@@ -1,6 +1,8 @@
 compiler_gym/service
 ====================
 
+This directory contains the base class for implementing compilation sessions.
+
 .. contents::
    :local:
 

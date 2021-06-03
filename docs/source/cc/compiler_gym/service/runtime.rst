@@ -1,8 +1,12 @@
 compiler_gym/service/runtime
 ============================
 
+This directory contains the CompilerGym runtime that takes a
+:code:`compiler_gym::CompilationSession` subclass and provides an RPC service
+that can be used by the Python frontend.
+
 .. contents::
-   :local:
+:local:
 
 Runtime.h
 ---------
@@ -11,16 +15,17 @@ Runtime.h
 
 .. doxygenfile:: compiler_gym/service/runtime/Runtime.h
 
-CompilerGymService.h
---------------------
+..
+  CompilerGymService.h
+  --------------------
 
-:code:`#include "compiler_gym/service/runtime/CompilerGymService.h"`
+  :code:`#include "compiler_gym/service/runtime/CompilerGymService.h"`
 
-.. doxygenfile:: compiler_gym/service/runtime/CompilerGymService.h
+  .. doxygenfile:: compiler_gym/service/runtime/CompilerGymService.h
 
-BenchmarkCache.h
-----------------
+  BenchmarkCache.h
+  ----------------
 
-:code:`#include "compiler_gym/service/runtime/BenchmarkCache.h"`
+  :code:`#include "compiler_gym/service/runtime/BenchmarkCache.h"`
 
-.. doxygenfile:: compiler_gym/service/runtime/BenchmarkCache.h
+  .. doxygenfile:: compiler_gym/service/runtime/BenchmarkCache.h
