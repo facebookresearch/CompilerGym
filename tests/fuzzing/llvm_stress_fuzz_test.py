@@ -19,6 +19,7 @@ def test_fuzz(env: LlvmEnv, observation_space: str, reward_space: str):
     llvm-stress.
     """
     env.benchmark = env.datasets["generator://llvm-stress-v0"].random_benchmark()
+    print(env.benchmark.uri)  # For debugging in case of failure.
 
     env.observation_space = observation_space
     env.reward_space = reward_space
