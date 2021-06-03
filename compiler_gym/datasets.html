@@ -3,10 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>compiler_gym.datasets &mdash; CompilerGym 0.1.9 documentation</title>
   
@@ -14,11 +13,16 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -28,11 +32,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -55,7 +58,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> CompilerGym
+            <a href="../index.html" class="icon icon-home"> CompilerGym
           
 
           
@@ -90,7 +93,7 @@
               
             
             
-              <p><span class="caption-text">User Guide</span></p>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../llvm/index.html">LLVM Environment Reference</a></li>
@@ -101,7 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p><span class="caption-text">Python API Reference</span></p>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">compiler_gym.datasets</a><ul>
@@ -121,7 +124,7 @@
 <li class="toctree-l1"><a class="reference internal" href="views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="wrappers.html">compiler_gym.wrappers</a></li>
 </ul>
-<p><span class="caption-text">C++ API Reference</span></p>
+<p class="caption"><span class="caption-text">C++ API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/service.html">compiler_gym/service</a></li>
@@ -167,6 +170,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -178,7 +183,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/compiler_gym/datasets.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -192,12 +197,13 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="compiler-gym-datasets">
+  <div class="section" id="compiler-gym-datasets">
 <h1>compiler_gym.datasets<a class="headerlink" href="#compiler-gym-datasets" title="Permalink to this headline">¶</a></h1>
 <p>An instance of a CompilerGym environment uses a <a class="reference internal" href="#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.Benchmark"><code class="xref py py-class docutils literal notranslate"><span class="pre">Benchmark</span></code></a> as the program being optimized. A
 <a class="reference internal" href="#compiler_gym.datasets.Dataset" title="compiler_gym.datasets.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> is collection of benchmarks
 that can be installed and made available for use.</p>
-<div class="contents local topic" id="contents">
+<div class="contents local topic" id="dataset-classes">
+<p class="topic-title">Dataset Classes:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#benchmark" id="id1">Benchmark</a></p></li>
 <li><p><a class="reference internal" href="#dataset" id="id2">Dataset</a></p></li>
@@ -207,11 +213,11 @@ that can be installed and made available for use.</p>
 <li><p><a class="reference internal" href="#datasets" id="id6">Datasets</a></p></li>
 </ul>
 </div>
-<section id="benchmark">
+<div class="section" id="benchmark">
 <h2><a class="toc-backref" href="#id1">Benchmark</a><a class="headerlink" href="#benchmark" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="compiler_gym.datasets.Benchmark">
-<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.datasets.</code><code class="sig-name descname">Benchmark</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">proto</span><span class="p">:</span> <span class="n">compiler_gym.service.proto.compiler_gym_service_pb2.Benchmark</span></em>, <em class="sig-param"><span class="n">validation_callbacks</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>List<span class="p">[</span>Callable<span class="p">[</span><span class="p">[</span>CompilerEnv<span class="p">]</span><span class="p">, </span>Iterable<span class="p">[</span>compiler_gym.validation_error.ValidationError<span class="p">]</span><span class="p">]</span><span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">sources</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>List<span class="p">[</span>compiler_gym.datasets.benchmark.BenchmarkSource<span class="p">]</span><span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/benchmark.html#Benchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Benchmark" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Benchmark">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.datasets.</span></span><span class="sig-name descname"><span class="pre">Benchmark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">proto</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.Benchmark</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_callbacks</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">CompilerEnv</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="compiler_gym.html#compiler_gym.ValidationError" title="compiler_gym.validation_error.ValidationError"><span class="pre">compiler_gym.validation_error.ValidationError</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sources</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#compiler_gym.datasets.BenchmarkSource" title="compiler_gym.datasets.benchmark.BenchmarkSource"><span class="pre">compiler_gym.datasets.benchmark.BenchmarkSource</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/benchmark.html#Benchmark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Benchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>A benchmark represents a particular program that is being compiled.</p>
 <p>A benchmark is a program that can be used by a <a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv" title="compiler_gym.envs.CompilerEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompilerEnv</span></code></a> as a program to optimize. A benchmark
 comprises the data that is fed into the compiler, identified by a URI.</p>
@@ -243,8 +249,8 @@ be queried using <a class="reference internal" href="envs.html#compiler_gym.envs
 </pre></div>
 </div>
 <dl class="py method">
-<dt id="compiler_gym.datasets.Benchmark.add_source">
-<code class="sig-name descname">add_source</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">source</span><span class="p">:</span> <span class="n">compiler_gym.datasets.benchmark.BenchmarkSource</span></em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/compiler_gym/datasets/benchmark.html#Benchmark.add_source"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Benchmark.add_source" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Benchmark.add_source">
+<span class="sig-name descname"><span class="pre">add_source</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#compiler_gym.datasets.BenchmarkSource" title="compiler_gym.datasets.benchmark.BenchmarkSource"><span class="pre">compiler_gym.datasets.benchmark.BenchmarkSource</span></a></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="reference internal" href="../_modules/compiler_gym/datasets/benchmark.html#Benchmark.add_source"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Benchmark.add_source" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register a new source file for this benchmark.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -254,8 +260,8 @@ be queried using <a class="reference internal" href="envs.html#compiler_gym.envs
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Benchmark.add_validation_callback">
-<code class="sig-name descname">add_validation_callback</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">validation_callback</span><span class="p">:</span> <span class="n">Callable<span class="p">[</span><span class="p">[</span>CompilerEnv<span class="p">]</span><span class="p">, </span>Iterable<span class="p">[</span>compiler_gym.validation_error.ValidationError<span class="p">]</span><span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/compiler_gym/datasets/benchmark.html#Benchmark.add_validation_callback"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Benchmark.add_validation_callback" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Benchmark.add_validation_callback">
+<span class="sig-name descname"><span class="pre">add_validation_callback</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">validation_callback</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">CompilerEnv</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="compiler_gym.html#compiler_gym.ValidationError" title="compiler_gym.validation_error.ValidationError"><span class="pre">compiler_gym.validation_error.ValidationError</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="reference internal" href="../_modules/compiler_gym/datasets/benchmark.html#Benchmark.add_validation_callback"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Benchmark.add_validation_callback" title="Permalink to this definition">¶</a></dt>
 <dd><p>Register a new validation callback that will be executed on
 <a class="reference internal" href="#compiler_gym.datasets.Benchmark.validate" title="compiler_gym.datasets.Benchmark.validate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">validate()</span></code></a>.</p>
 <dl class="field-list simple">
@@ -269,8 +275,8 @@ thread safe and must not modify the environment.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Benchmark.from_file">
-<em class="property">classmethod </em><code class="sig-name descname">from_file</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uri</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">path</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/benchmark.html#Benchmark.from_file"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Benchmark.from_file" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Benchmark.from_file">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">from_file</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pathlib.Path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/benchmark.html#Benchmark.from_file"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Benchmark.from_file" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct a benchmark from a file.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -290,8 +296,8 @@ instance.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Benchmark.from_file_contents">
-<em class="property">classmethod </em><code class="sig-name descname">from_file_contents</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uri</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">data</span><span class="p">:</span> <span class="n">bytes</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/benchmark.html#Benchmark.from_file_contents"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Benchmark.from_file_contents" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Benchmark.from_file_contents">
+<em class="property"><span class="pre">classmethod</span> </em><span class="sig-name descname"><span class="pre">from_file_contents</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">data</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/benchmark.html#Benchmark.from_file_contents"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Benchmark.from_file_contents" title="Permalink to this definition">¶</a></dt>
 <dd><p>Construct a benchmark from raw data.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -305,8 +311,8 @@ service.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Benchmark.is_validatable">
-<code class="sig-name descname">is_validatable</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="../_modules/compiler_gym/datasets/benchmark.html#Benchmark.is_validatable"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Benchmark.is_validatable" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Benchmark.is_validatable">
+<span class="sig-name descname"><span class="pre">is_validatable</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="reference internal" href="../_modules/compiler_gym/datasets/benchmark.html#Benchmark.is_validatable"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Benchmark.is_validatable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Whether the benchmark has any validation callbacks registered.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -317,8 +323,8 @@ callback.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Benchmark.ivalidate">
-<code class="sig-name descname">ivalidate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span><span class="p">:</span> <span class="n">CompilerEnv</span></em><span class="sig-paren">)</span> &#x2192; Iterable<span class="p">[</span>compiler_gym.validation_error.ValidationError<span class="p">]</span><a class="reference internal" href="../_modules/compiler_gym/datasets/benchmark.html#Benchmark.ivalidate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Benchmark.ivalidate" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Benchmark.ivalidate">
+<span class="sig-name descname"><span class="pre">ivalidate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">CompilerEnv</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="compiler_gym.html#compiler_gym.ValidationError" title="compiler_gym.validation_error.ValidationError"><span class="pre">compiler_gym.validation_error.ValidationError</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/datasets/benchmark.html#Benchmark.ivalidate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Benchmark.ivalidate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the validation callbacks and return a generator of errors.</p>
 <p>This is an asynchronous version of <a class="reference internal" href="#compiler_gym.datasets.Benchmark.validate" title="compiler_gym.datasets.Benchmark.validate"><code class="xref py py-meth docutils literal notranslate"><span class="pre">validate()</span></code></a> that returns immediately.</p>
 <dl class="field-list simple">
@@ -332,9 +338,9 @@ instance to validate.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="compiler_gym.datasets.Benchmark.proto">
-<em class="property">property </em><code class="sig-name descname">proto</code><a class="headerlink" href="#compiler_gym.datasets.Benchmark.proto" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.datasets.Benchmark.proto">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">proto</span></span><em class="property"><span class="pre">:</span> <span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.Benchmark</span></em><a class="headerlink" href="#compiler_gym.datasets.Benchmark.proto" title="Permalink to this definition">¶</a></dt>
 <dd><p>The protocol buffer representing the benchmark.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -346,9 +352,9 @@ instance to validate.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="compiler_gym.datasets.Benchmark.sources">
-<em class="property">property </em><code class="sig-name descname">sources</code><a class="headerlink" href="#compiler_gym.datasets.Benchmark.sources" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.datasets.Benchmark.sources">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">sources</span></span><em class="property"><span class="pre">:</span> <span class="pre">Iterable[compiler_gym.datasets.benchmark.BenchmarkSource]</span></em><a class="headerlink" href="#compiler_gym.datasets.Benchmark.sources" title="Permalink to this definition">¶</a></dt>
 <dd><p>The original source code used to produce this benchmark, as a list of
 <a class="reference internal" href="#compiler_gym.datasets.BenchmarkSource" title="compiler_gym.datasets.BenchmarkSource"><code class="xref py py-class docutils literal notranslate"><span class="pre">BenchmarkSource</span></code></a>
 instances.</p>
@@ -367,9 +373,9 @@ likely to change in the future.</p>
 </div>
 </dd></dl>
 
-<dl class="py method">
-<dt id="compiler_gym.datasets.Benchmark.uri">
-<em class="property">property </em><code class="sig-name descname">uri</code><a class="headerlink" href="#compiler_gym.datasets.Benchmark.uri" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.datasets.Benchmark.uri">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">uri</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#compiler_gym.datasets.Benchmark.uri" title="Permalink to this definition">¶</a></dt>
 <dd><p>The URI of the benchmark.</p>
 <p>Benchmark URIs should be unique, that is, that two URIs with the same
 value should resolve to the same benchmark. However, URIs do not have
@@ -383,8 +389,8 @@ could have different URIs.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Benchmark.validate">
-<code class="sig-name descname">validate</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">env</span><span class="p">:</span> <span class="n">CompilerEnv</span></em><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>compiler_gym.validation_error.ValidationError<span class="p">]</span><a class="reference internal" href="../_modules/compiler_gym/datasets/benchmark.html#Benchmark.validate"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Benchmark.validate" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Benchmark.validate">
+<span class="sig-name descname"><span class="pre">validate</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">CompilerEnv</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="compiler_gym.html#compiler_gym.ValidationError" title="compiler_gym.validation_error.ValidationError"><span class="pre">compiler_gym.validation_error.ValidationError</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/datasets/benchmark.html#Benchmark.validate"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Benchmark.validate" title="Permalink to this definition">¶</a></dt>
 <dd><p>Run the validation callbacks and return any errors.</p>
 <p>If no errors are returned, validation has succeeded:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">benchmark</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
@@ -418,8 +424,8 @@ validation.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Benchmark.validation_callbacks">
-<code class="sig-name descname">validation_callbacks</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; List<span class="p">[</span>Callable<span class="p">[</span><span class="p">[</span>CompilerEnv<span class="p">]</span><span class="p">, </span>Iterable<span class="p">[</span>compiler_gym.validation_error.ValidationError<span class="p">]</span><span class="p">]</span><span class="p">]</span><a class="reference internal" href="../_modules/compiler_gym/datasets/benchmark.html#Benchmark.validation_callbacks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Benchmark.validation_callbacks" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Benchmark.validation_callbacks">
+<span class="sig-name descname"><span class="pre">validation_callbacks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><span class="pre">CompilerEnv</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="compiler_gym.html#compiler_gym.ValidationError" title="compiler_gym.validation_error.ValidationError"><span class="pre">compiler_gym.validation_error.ValidationError</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/datasets/benchmark.html#Benchmark.validation_callbacks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Benchmark.validation_callbacks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Return the list of registered validation callbacks.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -429,8 +435,8 @@ validation.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Benchmark.write_sources_to_directory">
-<code class="sig-name descname">write_sources_to_directory</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">directory</span><span class="p">:</span> <span class="n">pathlib.Path</span></em><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="../_modules/compiler_gym/datasets/benchmark.html#Benchmark.write_sources_to_directory"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Benchmark.write_sources_to_directory" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Benchmark.write_sources_to_directory">
+<span class="sig-name descname"><span class="pre">write_sources_to_directory</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">directory</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pathlib.Path</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">int</span><a class="reference internal" href="../_modules/compiler_gym/datasets/benchmark.html#Benchmark.write_sources_to_directory"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Benchmark.write_sources_to_directory" title="Permalink to this definition">¶</a></dt>
 <dd><p>Write the source files for this benchmark to the given directory.</p>
 <p>This writes each of the <a class="reference internal" href="#compiler_gym.datasets.Benchmark.sources" title="compiler_gym.datasets.Benchmark.sources"><code class="xref py py-attr docutils literal notranslate"><span class="pre">benchmark.sources</span></code></a> files to disk.</p>
 <p>If the benchmark has no sources, no files are written.</p>
@@ -448,8 +454,8 @@ exist, it is created.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="compiler_gym.datasets.BenchmarkSource">
-<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.datasets.</code><code class="sig-name descname">BenchmarkSource</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">filename</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">contents</span><span class="p">:</span> <span class="n">bytes</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/benchmark.html#BenchmarkSource"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.BenchmarkSource" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.BenchmarkSource">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.datasets.</span></span><span class="sig-name descname"><span class="pre">BenchmarkSource</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">filename</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">contents</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bytes</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/benchmark.html#BenchmarkSource"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.BenchmarkSource" title="Permalink to this definition">¶</a></dt>
 <dd><p>A source file that is used to generate a benchmark. A benchmark may
 comprise many source files.</p>
 <div class="admonition warning">
@@ -458,31 +464,31 @@ comprise many source files.</p>
 class is new and is likely to change in the future.</p>
 </div>
 <dl class="py attribute">
-<dt id="compiler_gym.datasets.BenchmarkSource.contents">
-<code class="sig-name descname">contents</code><em class="property">: bytes</em><a class="headerlink" href="#compiler_gym.datasets.BenchmarkSource.contents" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.BenchmarkSource.contents">
+<span class="sig-name descname"><span class="pre">contents</span></span><em class="property"><span class="pre">:</span> <span class="pre">bytes</span></em><a class="headerlink" href="#compiler_gym.datasets.BenchmarkSource.contents" title="Permalink to this definition">¶</a></dt>
 <dd><p>The contents of the file as a byte array.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt id="compiler_gym.datasets.BenchmarkSource.filename">
-<code class="sig-name descname">filename</code><em class="property">: str</em><a class="headerlink" href="#compiler_gym.datasets.BenchmarkSource.filename" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.BenchmarkSource.filename">
+<span class="sig-name descname"><span class="pre">filename</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#compiler_gym.datasets.BenchmarkSource.filename" title="Permalink to this definition">¶</a></dt>
 <dd><p>The name of the file.</p>
 </dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
-<dt id="compiler_gym.datasets.BenchmarkInitError">
-<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.datasets.</code><code class="sig-name descname">BenchmarkInitError</code><a class="reference internal" href="../_modules/compiler_gym/datasets/benchmark.html#BenchmarkInitError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.BenchmarkInitError" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.BenchmarkInitError">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.datasets.</span></span><span class="sig-name descname"><span class="pre">BenchmarkInitError</span></span><a class="reference internal" href="../_modules/compiler_gym/datasets/benchmark.html#BenchmarkInitError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.BenchmarkInitError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Base class for errors raised if a benchmark fails to initialize.</p>
 </dd></dl>
 
-</section>
-<section id="dataset">
+</div>
+<div class="section" id="dataset">
 <h2><a class="toc-backref" href="#id2">Dataset</a><a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="compiler_gym.datasets.Dataset">
-<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.datasets.</code><code class="sig-name descname">Dataset</code><span class="sig-paren">(</span><em class="sig-param">name: str</em>, <em class="sig-param">description: str</em>, <em class="sig-param">license: str</em>, <em class="sig-param">site_data_base: pathlib.Path</em>, <em class="sig-param">benchmark_class=&lt;class 'compiler_gym.datasets.benchmark.Benchmark'&gt;</em>, <em class="sig-param">references: Optional[Dict[str</em>, <em class="sig-param">str]] = None</em>, <em class="sig-param">deprecated: Optional[str] = None</em>, <em class="sig-param">sort_order: int = 0</em>, <em class="sig-param">logger: Optional[logging.Logger] = None</em>, <em class="sig-param">validatable: str = 'No'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Dataset">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.datasets.</span></span><span class="sig-name descname"><span class="pre">Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">name:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">description:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">license:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">site_data_base:</span> <span class="pre">pathlib.Path</span></em>, <em class="sig-param"><span class="pre">benchmark_class=&lt;class</span> <span class="pre">'compiler_gym.datasets.benchmark.Benchmark'&gt;</span></em>, <em class="sig-param"><span class="pre">references:</span> <span class="pre">Optional[Dict[str</span></em>, <em class="sig-param"><span class="pre">str]]</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">deprecated:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">sort_order:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0</span></em>, <em class="sig-param"><span class="pre">logger:</span> <span class="pre">Optional[logging.Logger]</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">validatable:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'No'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dataset is a collection of benchmarks.</p>
 <p>The Dataset class has methods for installing and managing groups of
 benchmarks, for listing the available benchmark URIs, and for instantiating
@@ -492,8 +498,8 @@ minimum, subclasses must implement the <a class="reference internal" href="#comp
 <a class="reference internal" href="#compiler_gym.datasets.Dataset.install" title="compiler_gym.datasets.Dataset.install"><code class="xref py py-meth docutils literal notranslate"><span class="pre">install()</span></code></a> may be used where
 helpful.</p>
 <dl class="py method">
-<dt id="compiler_gym.datasets.Dataset.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param">name: str</em>, <em class="sig-param">description: str</em>, <em class="sig-param">license: str</em>, <em class="sig-param">site_data_base: pathlib.Path</em>, <em class="sig-param">benchmark_class=&lt;class 'compiler_gym.datasets.benchmark.Benchmark'&gt;</em>, <em class="sig-param">references: Optional[Dict[str</em>, <em class="sig-param">str]] = None</em>, <em class="sig-param">deprecated: Optional[str] = None</em>, <em class="sig-param">sort_order: int = 0</em>, <em class="sig-param">logger: Optional[logging.Logger] = None</em>, <em class="sig-param">validatable: str = 'No'</em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">name:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">description:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">license:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">site_data_base:</span> <span class="pre">pathlib.Path</span></em>, <em class="sig-param"><span class="pre">benchmark_class=&lt;class</span> <span class="pre">'compiler_gym.datasets.benchmark.Benchmark'&gt;</span></em>, <em class="sig-param"><span class="pre">references:</span> <span class="pre">Optional[Dict[str</span></em>, <em class="sig-param"><span class="pre">str]]</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">deprecated:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">sort_order:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0</span></em>, <em class="sig-param"><span class="pre">logger:</span> <span class="pre">Optional[logging.Logger]</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">validatable:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'No'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -532,8 +538,8 @@ Suggested values are “Yes”, “No”, or “Partial”.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Dataset.__len__">
-<code class="sig-name descname">__len__</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Union<span class="p">[</span>int<span class="p">, </span>float<span class="p">]</span><a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.__len__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.__len__" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of benchmarks in the dataset.</p>
 <p>This is the same as <a class="reference internal" href="#compiler_gym.datasets.Dataset.size" title="compiler_gym.datasets.Dataset.size"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.size</span></code></a>:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span> <span class="o">==</span> <span class="n">dataset</span><span class="o">.</span><span class="n">size</span>
@@ -548,8 +554,8 @@ Suggested values are “Yes”, “No”, or “Partial”.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Dataset.__getitem__">
-<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uri</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; compiler_gym.datasets.benchmark.Benchmark<a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Select a benchmark by URI.</p>
 <p>This is the same as <a class="reference internal" href="#compiler_gym.datasets.Dataset.benchmark" title="compiler_gym.datasets.Dataset.benchmark"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.benchmark(uri)</span></code></a>:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="p">[</span><span class="s2">&quot;benchmark://cbench-v1/crc32&quot;</span><span class="p">]</span> <span class="o">==</span> <span class="n">dataset</span><span class="o">.</span><span class="n">benchmark</span><span class="p">(</span><span class="s2">&quot;benchmark://cbench-v1/crc32&quot;</span><span class="p">)</span>
@@ -568,8 +574,8 @@ instance.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Dataset.__iter__">
-<code class="sig-name descname">__iter__</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Iterable<span class="p">[</span>compiler_gym.datasets.benchmark.Benchmark<span class="p">]</span><a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.__iter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.__iter__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.__iter__">
+<span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.__iter__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.__iter__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enumerate the (possibly infinite) benchmarks lazily.</p>
 <p>This is the same as <a class="reference internal" href="#compiler_gym.datasets.Dataset.benchmarks" title="compiler_gym.datasets.Dataset.benchmarks"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset.benchmarks()</span></code></a>:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">islice</span>
@@ -585,8 +591,8 @@ instance.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Dataset.benchmark">
-<code class="sig-name descname">benchmark</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uri</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; compiler_gym.datasets.benchmark.Benchmark<a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.benchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.benchmark" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.benchmark">
+<span class="sig-name descname"><span class="pre">benchmark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.benchmark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.benchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>Select a benchmark.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -603,8 +609,8 @@ instance.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Dataset.benchmark_uris">
-<code class="sig-name descname">benchmark_uris</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Iterable<span class="p">[</span>str<span class="p">]</span><a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.benchmark_uris"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.benchmark_uris" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.benchmark_uris">
+<span class="sig-name descname"><span class="pre">benchmark_uris</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.benchmark_uris"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.benchmark_uris" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enumerate the (possibly infinite) benchmark URIs.</p>
 <p>Iteration order is consistent across runs. The order of
 <a class="reference internal" href="#compiler_gym.datasets.Dataset.benchmarks" title="compiler_gym.datasets.Dataset.benchmarks"><code class="xref py py-meth docutils literal notranslate"><span class="pre">benchmarks()</span></code></a> and
@@ -621,8 +627,8 @@ will continue indefinitely.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Dataset.benchmarks">
-<code class="sig-name descname">benchmarks</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Iterable<span class="p">[</span>compiler_gym.datasets.benchmark.Benchmark<span class="p">]</span><a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.benchmarks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.benchmarks" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.benchmarks">
+<span class="sig-name descname"><span class="pre">benchmarks</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.benchmarks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.benchmarks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enumerate the (possibly infinite) benchmarks lazily.</p>
 <p>Iteration order is consistent across runs. The order of
 <a class="reference internal" href="#compiler_gym.datasets.Dataset.benchmarks" title="compiler_gym.datasets.Dataset.benchmarks"><code class="xref py py-meth docutils literal notranslate"><span class="pre">benchmarks()</span></code></a> and
@@ -638,9 +644,9 @@ will continue indefinitely.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="compiler_gym.datasets.Dataset.deprecated">
-<em class="property">property </em><code class="sig-name descname">deprecated</code><a class="headerlink" href="#compiler_gym.datasets.Dataset.deprecated" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.deprecated">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">deprecated</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#compiler_gym.datasets.Dataset.deprecated" title="Permalink to this definition">¶</a></dt>
 <dd><p>Whether the dataset is included in the iterable sequence of datasets
 of a containing <a class="reference internal" href="#compiler_gym.datasets.Datasets" title="compiler_gym.datasets.Datasets"><code class="xref py py-class docutils literal notranslate"><span class="pre">Datasets</span></code></a>
 collection.</p>
@@ -651,9 +657,9 @@ collection.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="compiler_gym.datasets.Dataset.description">
-<em class="property">property </em><code class="sig-name descname">description</code><a class="headerlink" href="#compiler_gym.datasets.Dataset.description" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.description">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#compiler_gym.datasets.Dataset.description" title="Permalink to this definition">¶</a></dt>
 <dd><p>A short human-readable description of the dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -663,8 +669,8 @@ collection.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Dataset.install">
-<code class="sig-name descname">install</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.install" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.install">
+<span class="sig-name descname"><span class="pre">install</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.install"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.install" title="Permalink to this definition">¶</a></dt>
 <dd><p>Install this dataset locally.</p>
 <p>Implementing this method is optional. If implementing this method, you
 must call <code class="code docutils literal notranslate"><span class="pre">super().install()</span></code> first.</p>
@@ -673,9 +679,9 @@ detect whether any work needs to be done so that repeated calls to
 <code class="code docutils literal notranslate"><span class="pre">install()</span></code> will complete quickly.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="compiler_gym.datasets.Dataset.installed">
-<em class="property">property </em><code class="sig-name descname">installed</code><a class="headerlink" href="#compiler_gym.datasets.Dataset.installed" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.installed">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">installed</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#compiler_gym.datasets.Dataset.installed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Whether the dataset is installed locally. Installation occurs
 automatically on first use, or by calling <a class="reference internal" href="#compiler_gym.datasets.Dataset.install" title="compiler_gym.datasets.Dataset.install"><code class="xref py py-meth docutils literal notranslate"><span class="pre">install()</span></code></a>.</p>
 <dl class="field-list simple">
@@ -685,9 +691,9 @@ automatically on first use, or by calling <a class="reference internal" href="#c
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="compiler_gym.datasets.Dataset.license">
-<em class="property">property </em><code class="sig-name descname">license</code><a class="headerlink" href="#compiler_gym.datasets.Dataset.license" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.license">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">license</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#compiler_gym.datasets.Dataset.license" title="Permalink to this definition">¶</a></dt>
 <dd><p>The name of the license of the dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -696,9 +702,9 @@ automatically on first use, or by calling <a class="reference internal" href="#c
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="compiler_gym.datasets.Dataset.logger">
-<em class="property">property </em><code class="sig-name descname">logger</code><a class="headerlink" href="#compiler_gym.datasets.Dataset.logger" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.logger">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">logger</span></span><em class="property"><span class="pre">:</span> <span class="pre">logging.Logger</span></em><a class="headerlink" href="#compiler_gym.datasets.Dataset.logger" title="Permalink to this definition">¶</a></dt>
 <dd><p>The logger for this dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -707,9 +713,9 @@ automatically on first use, or by calling <a class="reference internal" href="#c
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="compiler_gym.datasets.Dataset.name">
-<em class="property">property </em><code class="sig-name descname">name</code><a class="headerlink" href="#compiler_gym.datasets.Dataset.name" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.name">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#compiler_gym.datasets.Dataset.name" title="Permalink to this definition">¶</a></dt>
 <dd><p>The name of the dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -718,9 +724,9 @@ automatically on first use, or by calling <a class="reference internal" href="#c
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="compiler_gym.datasets.Dataset.protocol">
-<em class="property">property </em><code class="sig-name descname">protocol</code><a class="headerlink" href="#compiler_gym.datasets.Dataset.protocol" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.protocol">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">protocol</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#compiler_gym.datasets.Dataset.protocol" title="Permalink to this definition">¶</a></dt>
 <dd><p>The URI protocol that is used to identify benchmarks in this dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -730,8 +736,8 @@ automatically on first use, or by calling <a class="reference internal" href="#c
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Dataset.random_benchmark">
-<code class="sig-name descname">random_benchmark</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">random_state</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>numpy.random._generator.Generator<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; compiler_gym.datasets.benchmark.Benchmark<a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.random_benchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.random_benchmark" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.random_benchmark">
+<span class="sig-name descname"><span class="pre">random_benchmark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.random._generator.Generator</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.random_benchmark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.random_benchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>Select a benchmark randomly.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -745,9 +751,9 @@ instance.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="compiler_gym.datasets.Dataset.references">
-<em class="property">property </em><code class="sig-name descname">references</code><a class="headerlink" href="#compiler_gym.datasets.Dataset.references" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.references">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">references</span></span><em class="property"><span class="pre">:</span> <span class="pre">Dict[str,</span> <span class="pre">str]</span></em><a class="headerlink" href="#compiler_gym.datasets.Dataset.references" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dictionary of useful named URLs for this dataset containing extra
 information, download links, papers, etc.</p>
 <p>For example:</p>
@@ -763,9 +769,9 @@ information, download links, papers, etc.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="compiler_gym.datasets.Dataset.site_data_path">
-<em class="property">property </em><code class="sig-name descname">site_data_path</code><a class="headerlink" href="#compiler_gym.datasets.Dataset.site_data_path" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.site_data_path">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">site_data_path</span></span><em class="property"><span class="pre">:</span> <span class="pre">pathlib.Path</span></em><a class="headerlink" href="#compiler_gym.datasets.Dataset.site_data_path" title="Permalink to this definition">¶</a></dt>
 <dd><p>The filesystem path used to store persistent dataset files.</p>
 <p>This directory may not exist.</p>
 <dl class="field-list simple">
@@ -775,9 +781,9 @@ information, download links, papers, etc.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="compiler_gym.datasets.Dataset.site_data_size_in_bytes">
-<em class="property">property </em><code class="sig-name descname">site_data_size_in_bytes</code><a class="headerlink" href="#compiler_gym.datasets.Dataset.site_data_size_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.site_data_size_in_bytes">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">site_data_size_in_bytes</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#compiler_gym.datasets.Dataset.site_data_size_in_bytes" title="Permalink to this definition">¶</a></dt>
 <dd><p>The total size of the on-disk data used by this dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -786,9 +792,9 @@ information, download links, papers, etc.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="compiler_gym.datasets.Dataset.size">
-<em class="property">property </em><code class="sig-name descname">size</code><a class="headerlink" href="#compiler_gym.datasets.Dataset.size" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.size">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">size</span></span><em class="property"><span class="pre">:</span> <span class="pre">Union[int,</span> <span class="pre">float]</span></em><a class="headerlink" href="#compiler_gym.datasets.Dataset.size" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of benchmarks in the dataset. If the number of benchmarks
 is unbounded, for example because the dataset represents a program
 generator that can produce an infinite number of programs, the value is
@@ -801,16 +807,16 @@ generator that can produce an infinite number of programs, the value is
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Dataset.uninstall">
-<code class="sig-name descname">uninstall</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.uninstall"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.uninstall" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.uninstall">
+<span class="sig-name descname"><span class="pre">uninstall</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.uninstall"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.uninstall" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove any local data for this benchmark.</p>
 <p>This method undoes the work of <a class="reference internal" href="#compiler_gym.datasets.Dataset.install" title="compiler_gym.datasets.Dataset.install"><code class="xref py py-meth docutils literal notranslate"><span class="pre">install()</span></code></a>. The dataset can still be used
 after calling this method.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="compiler_gym.datasets.Dataset.validatable">
-<em class="property">property </em><code class="sig-name descname">validatable</code><a class="headerlink" href="#compiler_gym.datasets.Dataset.validatable" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.validatable">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">validatable</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#compiler_gym.datasets.Dataset.validatable" title="Permalink to this definition">¶</a></dt>
 <dd><p>Whether the dataset is validatable. A validatable dataset is one
 where the behavior of the benchmarks can be checked by compiling the
 programs to binaries and executing them. If the benchmarks crash, or are
@@ -826,9 +832,9 @@ only. Suggested values are “Yes”, “No”, or “Partial”.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="compiler_gym.datasets.Dataset.version">
-<em class="property">property </em><code class="sig-name descname">version</code><a class="headerlink" href="#compiler_gym.datasets.Dataset.version" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.version">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">version</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#compiler_gym.datasets.Dataset.version" title="Permalink to this definition">¶</a></dt>
 <dd><p>The version tag for this dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
@@ -840,17 +846,17 @@ only. Suggested values are “Yes”, “No”, or “Partial”.</p>
 </dd></dl>
 
 <dl class="py class">
-<dt id="compiler_gym.datasets.DatasetInitError">
-<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.datasets.</code><code class="sig-name descname">DatasetInitError</code><a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#DatasetInitError"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.DatasetInitError" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.DatasetInitError">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.datasets.</span></span><span class="sig-name descname"><span class="pre">DatasetInitError</span></span><a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#DatasetInitError"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.DatasetInitError" title="Permalink to this definition">¶</a></dt>
 <dd><p>Base class for errors raised if a dataset fails to initialize.</p>
 </dd></dl>
 
-</section>
-<section id="filesdataset">
+</div>
+<div class="section" id="filesdataset">
 <h2><a class="toc-backref" href="#id3">FilesDataset</a><a class="headerlink" href="#filesdataset" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="compiler_gym.datasets.FilesDataset">
-<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.datasets.</code><code class="sig-name descname">FilesDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataset_root</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">benchmark_file_suffix</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">memoize_uris</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">dataset_args</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/files_dataset.html#FilesDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.FilesDataset" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.FilesDataset">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.datasets.</span></span><span class="sig-name descname"><span class="pre">FilesDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_root</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">benchmark_file_suffix</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memoize_uris</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">dataset_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/files_dataset.html#FilesDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.FilesDataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dataset comprising a directory tree of files.</p>
 <p>A FilesDataset is a root directory that contains (a possibly nested tree of)
 files, where each file represents a benchmark. The directory contents can be
@@ -875,8 +881,8 @@ filename suffix <code class="code docutils literal notranslate"><span class="pre
 </pre></div>
 </div>
 <dl class="py method">
-<dt id="compiler_gym.datasets.FilesDataset.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataset_root</span><span class="p">:</span> <span class="n">pathlib.Path</span></em>, <em class="sig-param"><span class="n">benchmark_file_suffix</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="n">memoize_uris</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">True</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">dataset_args</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/files_dataset.html#FilesDataset.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.FilesDataset.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.FilesDataset.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset_root</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">benchmark_file_suffix</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">memoize_uris</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">dataset_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/files_dataset.html#FilesDataset.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.FilesDataset.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -895,8 +901,8 @@ increased memory overhead as the file list must be kept in memory.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.FilesDataset.benchmark">
-<code class="sig-name descname">benchmark</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uri</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; compiler_gym.datasets.benchmark.Benchmark<a class="reference internal" href="../_modules/compiler_gym/datasets/files_dataset.html#FilesDataset.benchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.FilesDataset.benchmark" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.FilesDataset.benchmark">
+<span class="sig-name descname"><span class="pre">benchmark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><a class="reference internal" href="../_modules/compiler_gym/datasets/files_dataset.html#FilesDataset.benchmark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.FilesDataset.benchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>Select a benchmark.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -913,8 +919,8 @@ instance.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.FilesDataset.benchmark_uris">
-<code class="sig-name descname">benchmark_uris</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Iterable<span class="p">[</span>str<span class="p">]</span><a class="reference internal" href="../_modules/compiler_gym/datasets/files_dataset.html#FilesDataset.benchmark_uris"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.FilesDataset.benchmark_uris" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.FilesDataset.benchmark_uris">
+<span class="sig-name descname"><span class="pre">benchmark_uris</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/datasets/files_dataset.html#FilesDataset.benchmark_uris"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.FilesDataset.benchmark_uris" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enumerate the (possibly infinite) benchmark URIs.</p>
 <p>Iteration order is consistent across runs. The order of
 <a class="reference internal" href="#compiler_gym.datasets.Dataset.benchmarks" title="compiler_gym.datasets.Dataset.benchmarks"><code class="xref py py-meth docutils literal notranslate"><span class="pre">benchmarks()</span></code></a> and
@@ -930,9 +936,9 @@ will continue indefinitely.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="compiler_gym.datasets.FilesDataset.size">
-<em class="property">property </em><code class="sig-name descname">size</code><a class="headerlink" href="#compiler_gym.datasets.FilesDataset.size" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.datasets.FilesDataset.size">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">size</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#compiler_gym.datasets.FilesDataset.size" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of benchmarks in the dataset. If the number of benchmarks
 is unbounded, for example because the dataset represents a program
 generator that can produce an infinite number of programs, the value is
@@ -946,19 +952,19 @@ generator that can produce an infinite number of programs, the value is
 
 </dd></dl>
 
-</section>
-<section id="tardataset">
+</div>
+<div class="section" id="tardataset">
 <h2><a class="toc-backref" href="#id4">TarDataset</a><a class="headerlink" href="#tardataset" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="compiler_gym.datasets.TarDataset">
-<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.datasets.</code><code class="sig-name descname">TarDataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tar_urls</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">tar_sha256</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tar_compression</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'bz2'</span></em>, <em class="sig-param"><span class="n">strip_prefix</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">dataset_args</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/tar_dataset.html#TarDataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.TarDataset" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.TarDataset">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.datasets.</span></span><span class="sig-name descname"><span class="pre">TarDataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tar_urls</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tar_sha256</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tar_compression</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'bz2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strip_prefix</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">dataset_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/tar_dataset.html#TarDataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.TarDataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dataset comprising a files tree stored in a tar archive.</p>
 <p>This extends the <a class="reference internal" href="#compiler_gym.datasets.FilesDataset" title="compiler_gym.datasets.FilesDataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">FilesDataset</span></code></a>
 class by adding support for compressed archives of files. The archive is
 downloaded and unpacked on-demand.</p>
 <dl class="py method">
-<dt id="compiler_gym.datasets.TarDataset.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">tar_urls</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">tar_sha256</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>str<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em>, <em class="sig-param"><span class="n">tar_compression</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'bz2'</span></em>, <em class="sig-param"><span class="n">strip_prefix</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">''</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">dataset_args</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/tar_dataset.html#TarDataset.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.TarDataset.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.TarDataset.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tar_urls</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tar_sha256</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tar_compression</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'bz2'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">strip_prefix</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">''</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">dataset_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/tar_dataset.html#TarDataset.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.TarDataset.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -976,8 +982,8 @@ match this path prefix will be used as benchmarks.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.TarDataset.install">
-<code class="sig-name descname">install</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/compiler_gym/datasets/tar_dataset.html#TarDataset.install"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.TarDataset.install" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.TarDataset.install">
+<span class="sig-name descname"><span class="pre">install</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="reference internal" href="../_modules/compiler_gym/datasets/tar_dataset.html#TarDataset.install"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.TarDataset.install" title="Permalink to this definition">¶</a></dt>
 <dd><p>Install this dataset locally.</p>
 <p>Implementing this method is optional. If implementing this method, you
 must call <code class="code docutils literal notranslate"><span class="pre">super().install()</span></code> first.</p>
@@ -986,9 +992,9 @@ detect whether any work needs to be done so that repeated calls to
 <code class="code docutils literal notranslate"><span class="pre">install()</span></code> will complete quickly.</p>
 </dd></dl>
 
-<dl class="py method">
-<dt id="compiler_gym.datasets.TarDataset.installed">
-<em class="property">property </em><code class="sig-name descname">installed</code><a class="headerlink" href="#compiler_gym.datasets.TarDataset.installed" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.datasets.TarDataset.installed">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">installed</span></span><em class="property"><span class="pre">:</span> <span class="pre">bool</span></em><a class="headerlink" href="#compiler_gym.datasets.TarDataset.installed" title="Permalink to this definition">¶</a></dt>
 <dd><p>Whether the dataset is installed locally. Installation occurs
 automatically on first use, or by calling <a class="reference internal" href="#compiler_gym.datasets.Dataset.install" title="compiler_gym.datasets.Dataset.install"><code class="xref py py-meth docutils literal notranslate"><span class="pre">install()</span></code></a>.</p>
 <dl class="field-list simple">
@@ -1000,12 +1006,12 @@ automatically on first use, or by calling <a class="reference internal" href="#c
 
 </dd></dl>
 
-</section>
-<section id="tardatasetwithmanifest">
+</div>
+<div class="section" id="tardatasetwithmanifest">
 <h2><a class="toc-backref" href="#id5">TarDatasetWithManifest</a><a class="headerlink" href="#tardatasetwithmanifest" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
-<dt id="compiler_gym.datasets.TarDatasetWithManifest">
-<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.datasets.</code><code class="sig-name descname">TarDatasetWithManifest</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">manifest_urls</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">manifest_sha256</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">manifest_compression</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'bz2'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">dataset_args</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/tar_dataset.html#TarDatasetWithManifest"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.TarDatasetWithManifest" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.TarDatasetWithManifest">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.datasets.</span></span><span class="sig-name descname"><span class="pre">TarDatasetWithManifest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manifest_urls</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manifest_sha256</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manifest_compression</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'bz2'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">dataset_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/tar_dataset.html#TarDatasetWithManifest"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.TarDatasetWithManifest" title="Permalink to this definition">¶</a></dt>
 <dd><p>A tarball-based dataset that reads the benchmark URIs from a separate
 manifest file.</p>
 <p>A manifest file is a plain text file containing a list of benchmark names,
@@ -1015,8 +1021,8 @@ manner than downloading and unpacking the entire dataset. It does this by
 downloading and unpacking only the manifest to iterate over the URIs.</p>
 <p>The manifest file is assumed to be correct and is not validated.</p>
 <dl class="py method">
-<dt id="compiler_gym.datasets.TarDatasetWithManifest.__init__">
-<code class="sig-name descname">__init__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">manifest_urls</span><span class="p">:</span> <span class="n">List<span class="p">[</span>str<span class="p">]</span></span></em>, <em class="sig-param"><span class="n">manifest_sha256</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">manifest_compression</span><span class="p">:</span> <span class="n">str</span> <span class="o">=</span> <span class="default_value">'bz2'</span></em>, <em class="sig-param"><span class="o">**</span><span class="n">dataset_args</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/tar_dataset.html#TarDatasetWithManifest.__init__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.TarDatasetWithManifest.__init__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.TarDatasetWithManifest.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">manifest_urls</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manifest_sha256</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">manifest_compression</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'bz2'</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">dataset_args</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/tar_dataset.html#TarDatasetWithManifest.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.TarDatasetWithManifest.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1035,8 +1041,8 @@ file.</p></li>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.TarDatasetWithManifest.benchmark_uris">
-<code class="sig-name descname">benchmark_uris</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Iterable<span class="p">[</span>str<span class="p">]</span><a class="reference internal" href="../_modules/compiler_gym/datasets/tar_dataset.html#TarDatasetWithManifest.benchmark_uris"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.TarDatasetWithManifest.benchmark_uris" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.TarDatasetWithManifest.benchmark_uris">
+<span class="sig-name descname"><span class="pre">benchmark_uris</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/datasets/tar_dataset.html#TarDatasetWithManifest.benchmark_uris"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.TarDatasetWithManifest.benchmark_uris" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enumerate the (possibly infinite) benchmark URIs.</p>
 <p>Iteration order is consistent across runs. The order of
 <a class="reference internal" href="#compiler_gym.datasets.Dataset.benchmarks" title="compiler_gym.datasets.Dataset.benchmarks"><code class="xref py py-meth docutils literal notranslate"><span class="pre">benchmarks()</span></code></a> and
@@ -1052,9 +1058,9 @@ will continue indefinitely.</p>
 </dl>
 </dd></dl>
 
-<dl class="py method">
-<dt id="compiler_gym.datasets.TarDatasetWithManifest.size">
-<em class="property">property </em><code class="sig-name descname">size</code><a class="headerlink" href="#compiler_gym.datasets.TarDatasetWithManifest.size" title="Permalink to this definition">¶</a></dt>
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.datasets.TarDatasetWithManifest.size">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">size</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#compiler_gym.datasets.TarDatasetWithManifest.size" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of benchmarks in the dataset. If the number of benchmarks
 is unbounded, for example because the dataset represents a program
 generator that can produce an infinite number of programs, the value is
@@ -1068,13 +1074,13 @@ generator that can produce an infinite number of programs, the value is
 
 </dd></dl>
 
-</section>
-<section id="datasets">
+</div>
+<div class="section" id="datasets">
 <h2><a class="toc-backref" href="#id6">Datasets</a><a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h2>
 <blockquote>
 <div><dl class="py class">
-<dt id="compiler_gym.datasets.Datasets">
-<em class="property">class </em><code class="sig-prename descclassname">compiler_gym.datasets.</code><code class="sig-name descname">Datasets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">datasets</span><span class="p">:</span> <span class="n">Iterable<span class="p">[</span>compiler_gym.datasets.dataset.Dataset<span class="p">]</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Datasets">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.datasets.</span></span><span class="sig-name descname"><span class="pre">Datasets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">datasets</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#compiler_gym.datasets.Dataset" title="compiler_gym.datasets.dataset.Dataset"><span class="pre">compiler_gym.datasets.dataset.Dataset</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets" title="Permalink to this definition">¶</a></dt>
 <dd><p>A collection of datasets.</p>
 <p>This class provides a dictionary-like interface for indexing and iterating
 over multiple <a class="reference internal" href="#compiler_gym.datasets.Dataset" title="compiler_gym.datasets.Dataset"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dataset</span></code></a> objects.
@@ -1115,14 +1121,14 @@ datasets in a stable round robin order:</p>
 </pre></div>
 </div>
 <dl class="py method">
-<dt id="compiler_gym.datasets.Datasets.__len__">
-<code class="sig-name descname">__len__</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; int<a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.__len__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.__len__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Datasets.__len__">
+<span class="sig-name descname"><span class="pre">__len__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">int</span><a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.__len__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.__len__" title="Permalink to this definition">¶</a></dt>
 <dd><p>The number of datasets in the collection.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Datasets.__getitem__">
-<code class="sig-name descname">__getitem__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataset</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; compiler_gym.datasets.dataset.Dataset<a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.__getitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.__getitem__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Datasets.__getitem__">
+<span class="sig-name descname"><span class="pre">__getitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#compiler_gym.datasets.Dataset" title="compiler_gym.datasets.dataset.Dataset"><span class="pre">compiler_gym.datasets.dataset.Dataset</span></a><a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.__getitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.__getitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Lookup a dataset.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1138,8 +1144,8 @@ datasets in a stable round robin order:</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Datasets.__setitem__">
-<code class="sig-name descname">__setitem__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">key</span><span class="p">:</span> <span class="n">str</span></em>, <em class="sig-param"><span class="n">dataset</span><span class="p">:</span> <span class="n">compiler_gym.datasets.dataset.Dataset</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.__setitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.__setitem__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Datasets.__setitem__">
+<span class="sig-name descname"><span class="pre">__setitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">key</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="#compiler_gym.datasets.Dataset" title="compiler_gym.datasets.dataset.Dataset"><span class="pre">compiler_gym.datasets.dataset.Dataset</span></a></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.__setitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.__setitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Add a dataset to the collection.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -1152,8 +1158,8 @@ datasets in a stable round robin order:</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Datasets.__delitem__">
-<code class="sig-name descname">__delitem__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataset</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.__delitem__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.__delitem__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Datasets.__delitem__">
+<span class="sig-name descname"><span class="pre">__delitem__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.__delitem__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.__delitem__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Remove a dataset from the collection.</p>
 <p>This does not affect any underlying storage used by dataset. See
 <code class="xref py py-meth docutils literal notranslate"><span class="pre">uninstall()</span></code> to clean
@@ -1170,14 +1176,14 @@ was already removed.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Datasets.__contains__">
-<code class="sig-name descname">__contains__</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataset</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; bool<a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.__contains__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.__contains__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Datasets.__contains__">
+<span class="sig-name descname"><span class="pre">__contains__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">bool</span><a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.__contains__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.__contains__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Returns whether the dataset is contained.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Datasets.__iter__">
-<code class="sig-name descname">__iter__</code><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; Iterable<span class="p">[</span>compiler_gym.datasets.dataset.Dataset<span class="p">]</span><a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.__iter__"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.__iter__" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Datasets.__iter__">
+<span class="sig-name descname"><span class="pre">__iter__</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#compiler_gym.datasets.Dataset" title="compiler_gym.datasets.dataset.Dataset"><span class="pre">compiler_gym.datasets.dataset.Dataset</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.__iter__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.__iter__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Iterate over the datasets.</p>
 <p>Dataset order is consistent across runs.</p>
 <p>Equivalent to <code class="xref py py-meth docutils literal notranslate"><span class="pre">datasets.datasets()</span></code>, but without the ability to
@@ -1193,8 +1199,8 @@ will continue indefinitely.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Datasets.benchmark">
-<code class="sig-name descname">benchmark</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">uri</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; compiler_gym.datasets.benchmark.Benchmark<a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.benchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.benchmark" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Datasets.benchmark">
+<span class="sig-name descname"><span class="pre">benchmark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">uri</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.benchmark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.benchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>Select a benchmark.</p>
 <p>Returns the corresponding <a class="reference internal" href="#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.Benchmark"><code class="xref py py-class docutils literal notranslate"><span class="pre">Benchmark</span></code></a>, regardless of whether the containing
 dataset is installed or deprecated.</p>
@@ -1210,8 +1216,8 @@ instance.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Datasets.benchmark_uris">
-<code class="sig-name descname">benchmark_uris</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">with_deprecated</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; Iterable<span class="p">[</span>str<span class="p">]</span><a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.benchmark_uris"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.benchmark_uris" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Datasets.benchmark_uris">
+<span class="sig-name descname"><span class="pre">benchmark_uris</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">with_deprecated</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.benchmark_uris"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.benchmark_uris" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enumerate the (possibly infinite) benchmark URIs.</p>
 <p>Benchmark URI order is consistent across runs. URIs from datasets are
 returned in round robin order. The order of <a class="reference internal" href="#compiler_gym.datasets.Datasets.benchmarks" title="compiler_gym.datasets.Datasets.benchmarks"><code class="xref py py-meth docutils literal notranslate"><span class="pre">benchmarks()</span></code></a> and <a class="reference internal" href="#compiler_gym.datasets.Datasets.benchmark_uris" title="compiler_gym.datasets.Datasets.benchmark_uris"><code class="xref py py-meth docutils literal notranslate"><span class="pre">benchmark_uris()</span></code></a> is the same.</p>
@@ -1230,8 +1236,8 @@ datasets that have been marked deprecated.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Datasets.benchmarks">
-<code class="sig-name descname">benchmarks</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">with_deprecated</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; Iterable<span class="p">[</span>compiler_gym.datasets.benchmark.Benchmark<span class="p">]</span><a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.benchmarks"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.benchmarks" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Datasets.benchmarks">
+<span class="sig-name descname"><span class="pre">benchmarks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">with_deprecated</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.benchmarks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.benchmarks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enumerate the (possibly infinite) benchmarks lazily.</p>
 <p>Benchmarks order is consistent across runs. One benchmark from each
 dataset is returned in round robin order until all datasets have been
@@ -1251,8 +1257,8 @@ datasets that have been marked deprecated.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Datasets.dataset">
-<code class="sig-name descname">dataset</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">dataset</span><span class="p">:</span> <span class="n">str</span></em><span class="sig-paren">)</span> &#x2192; compiler_gym.datasets.dataset.Dataset<a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.dataset"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.dataset" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Datasets.dataset">
+<span class="sig-name descname"><span class="pre">dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">dataset</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">str</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#compiler_gym.datasets.Dataset" title="compiler_gym.datasets.dataset.Dataset"><span class="pre">compiler_gym.datasets.dataset.Dataset</span></a><a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>Get a dataset.</p>
 <p>Return the corresponding <a class="reference internal" href="#compiler_gym.datasets.Dataset" title="compiler_gym.datasets.Dataset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">Dataset</span></code></a>. Name lookup will succeed whether or
 not the dataset is deprecated.</p>
@@ -1270,8 +1276,8 @@ not the dataset is deprecated.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Datasets.datasets">
-<code class="sig-name descname">datasets</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">with_deprecated</span><span class="p">:</span> <span class="n">bool</span> <span class="o">=</span> <span class="default_value">False</span></em><span class="sig-paren">)</span> &#x2192; Iterable<span class="p">[</span>compiler_gym.datasets.dataset.Dataset<span class="p">]</span><a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.datasets"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.datasets" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Datasets.datasets">
+<span class="sig-name descname"><span class="pre">datasets</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">with_deprecated</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#compiler_gym.datasets.Dataset" title="compiler_gym.datasets.dataset.Dataset"><span class="pre">compiler_gym.datasets.dataset.Dataset</span></a><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.datasets"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.datasets" title="Permalink to this definition">¶</a></dt>
 <dd><p>Enumerate the datasets.</p>
 <p>Dataset order is consistent across runs.</p>
 <dl class="field-list simple">
@@ -1286,8 +1292,8 @@ marked as deprecated.</p>
 </dd></dl>
 
 <dl class="py method">
-<dt id="compiler_gym.datasets.Datasets.random_benchmark">
-<code class="sig-name descname">random_benchmark</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">random_state</span><span class="p">:</span> <span class="n">Optional<span class="p">[</span>numpy.random._generator.Generator<span class="p">]</span></span> <span class="o">=</span> <span class="default_value">None</span></em><span class="sig-paren">)</span> &#x2192; compiler_gym.datasets.benchmark.Benchmark<a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.random_benchmark"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.random_benchmark" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.datasets.Datasets.random_benchmark">
+<span class="sig-name descname"><span class="pre">random_benchmark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.random._generator.Generator</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.random_benchmark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.random_benchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>Select a benchmark randomly.</p>
 <p>First, a dataset is selected uniformly randomly using
 <code class="code docutils literal notranslate"><span class="pre">random_state.choice(list(datasets))</span></code>. The
@@ -1323,45 +1329,37 @@ instance.</p>
 </dd></dl>
 
 </div></blockquote>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="envs.html" class="btn btn-neutral float-right" title="compiler_gym.envs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="compiler_gym.html" class="btn btn-neutral float-left" title="compiler_gym" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="envs.html" class="btn btn-neutral float-right" title="compiler_gym.envs" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="compiler_gym.html" class="btn btn-neutral float-left" title="compiler_gym" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright Facebook AI Research
+        &#169; Copyright Facebook AI Research.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -1387,6 +1385,7 @@ instance.</p>
     })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
     ga('create', 'G-T95G5EVYXM', 'auto');
+    
     ga('send', 'pageview');
     </script>
 

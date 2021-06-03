@@ -3,10 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>Getting Started &mdash; CompilerGym 0.1.9 documentation</title>
   
@@ -14,11 +13,16 @@
   
   <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -28,11 +32,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script data-url_root="./" id="documentation_options" src="_static/documentation_options.js"></script>
         <script src="_static/jquery.js"></script>
         <script src="_static/underscore.js"></script>
         <script src="_static/doctools.js"></script>
-        <script src="_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="_static/js/theme.js"></script>
 
@@ -55,7 +58,7 @@
           
 
           
-            <a href="index.html" class="icon icon-home" alt="Documentation Home"> CompilerGym
+            <a href="index.html" class="icon icon-home"> CompilerGym
           
 
           
@@ -90,7 +93,7 @@
               
             
             
-              <p><span class="caption-text">User Guide</span></p>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul class="current">
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#key-concepts">Key Concepts</a></li>
@@ -112,7 +115,7 @@
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p><span class="caption-text">Python API Reference</span></p>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -124,7 +127,7 @@
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
 </ul>
-<p><span class="caption-text">C++ API Reference</span></p>
+<p class="caption"><span class="caption-text">C++ API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="cc/compiler_gym/service.html">compiler_gym/service</a></li>
@@ -170,6 +173,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -181,7 +186,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="_sources/getting_started.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -195,7 +200,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="getting-started">
+  <div class="section" id="getting-started">
 <h1>Getting Started<a class="headerlink" href="#getting-started" title="Permalink to this headline">¶</a></h1>
 <a class="reference external image-reference" href="https://colab.research.google.com/github/facebookresearch/CompilerGym/blob/stable/examples/getting-started.ipynb"><img alt="https://colab.research.google.com/assets/colab-badge.svg" src="https://colab.research.google.com/assets/colab-badge.svg" /></a>
 <p>CompilerGym is a toolkit for applying reinforcement learning to compiler
@@ -218,7 +223,7 @@ started!</p>
 <li><p><a class="reference internal" href="#next-steps" id="id9">Next Steps</a></p></li>
 </ul>
 </div>
-<section id="key-concepts">
+<div class="section" id="key-concepts">
 <h2><a class="toc-backref" href="#id3">Key Concepts</a><a class="headerlink" href="#key-concepts" title="Permalink to this headline">¶</a></h2>
 <p>CompilerGym exposes compiler optimization problems as environments for
 reinforcement learning. It uses the <a class="reference external" href="https://gym.openai.com/">OpenAI Gym</a>
@@ -250,8 +255,8 @@ cumulative reward from these environments so as to produce the best programs.</p
 </div>
 <p>See <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/blob/development/INSTALL.md">INSTALL.md</a>
 for alternative installation methods.</p>
-</section>
-<section id="using-compilergym">
+</div>
+<div class="section" id="using-compilergym">
 <h2><a class="toc-backref" href="#id4">Using CompilerGym</a><a class="headerlink" href="#using-compilergym" title="Permalink to this headline">¶</a></h2>
 <p>Begin by firing up a python interpreter:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">python</span>
@@ -268,7 +273,7 @@ for alternative installation methods.</p>
 <span class="go">[&#39;llvm-v0&#39;, &#39;llvm-ic-v0&#39;, &#39;llvm-autophase-ic-v0&#39;, &#39;llvm-ir-ic-v0&#39;]</span>
 </pre></div>
 </div>
-<section id="selecting-an-environment">
+<div class="section" id="selecting-an-environment">
 <h3><a class="toc-backref" href="#id5">Selecting an environment</a><a class="headerlink" href="#selecting-an-environment" title="Permalink to this headline">¶</a></h3>
 <p>CompilerGym environments are named using one of the following formats:</p>
 <ol class="arabic simple">
@@ -309,8 +314,8 @@ download that occurs only the first time the environment is used. Other
 operations that require one-off downloads include installing datasets
 (described below).</p>
 </div>
-</section>
-<section id="the-compiler-environment">
+</div>
+<div class="section" id="the-compiler-environment">
 <h3><a class="toc-backref" href="#id6">The compiler environment</a><a class="headerlink" href="#the-compiler-environment" title="Permalink to this headline">¶</a></h3>
 <p>If you have experience using <a class="reference external" href="https://gym.openai.com/">OpenAI Gym</a>, the
 CompilerGym environments will be familiar. If not, you can call <code class="code docutils literal notranslate"><span class="pre">help()</span></code>
@@ -377,8 +382,8 @@ to <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.
 generalization of strategies across unseen programs. Benchmarks are grouped into
 <em>datasets</em> , which are managed using <a class="reference internal" href="compiler_gym/datasets.html#compiler_gym.datasets.Datasets" title="compiler_gym.datasets.Datasets"><code class="xref py py-class docutils literal notranslate"><span class="pre">env.datasets</span></code></a>. You may also provide your own programs to use
 as benchmarks, see <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.make_benchmark" title="compiler_gym.envs.LlvmEnv.make_benchmark"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.make_benchmark()</span></code></a> for details.</p>
-</section>
-<section id="interacting-with-the-environment">
+</div>
+<div class="section" id="interacting-with-the-environment">
 <h3><a class="toc-backref" href="#id7">Interacting with the environment</a><a class="headerlink" href="#interacting-with-the-environment" title="Permalink to this headline">¶</a></h3>
 <p>Once an environment has been initialized, you interact with it in the same way
 that you would with any other <a class="reference external" href="https://gym.openai.com/">OpenAI Gym</a>
@@ -491,8 +496,8 @@ statement pattern for creating environments:</p>
 </div>
 <p>This removes the need to call <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.close" title="compiler_gym.envs.CompilerEnv.close"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.close()</span></code></a> yourself.</p>
 </div>
-</section>
-<section id="using-the-command-line-tools">
+</div>
+<div class="section" id="using-the-command-line-tools">
 <h3><a class="toc-backref" href="#id8">Using the command line tools</a><a class="headerlink" href="#using-the-command-line-tools" title="Permalink to this headline">¶</a></h3>
 <p>CompilerGym includes a set of useful <a class="reference internal" href="cli.html"><span class="doc">command line tools</span></a>. Each of
 the steps above could be replicated from the command line.</p>
@@ -583,9 +588,9 @@ Step [141 / 141]: reward=0.0010         episode=1.0228          action=-loop-sim
 </div>
 <p>To beat the compiler by 2.28% after 10 seconds of random trials is not bad
 going!</p>
-</section>
-</section>
-<section id="next-steps">
+</div>
+</div>
+<div class="section" id="next-steps">
 <h2><a class="toc-backref" href="#id9">Next Steps</a><a class="headerlink" href="#next-steps" title="Permalink to this headline">¶</a></h2>
 <p>Now that you have got to grips with the compiler environment, take a browse
 through the <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/tree/stable/examples">examples directory</a> for
@@ -594,45 +599,37 @@ leaderboards</a> to
 see what the best performing algorithms are, and <a class="reference external" href="https://facebookresearch.github.io/CompilerGym/">the documentation</a> for details of the APIs and
 environments. We love feedback, bug reports, and feature requests - please <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/issues/new/choose">file
 an issue</a>!</p>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="llvm/index.html" class="btn btn-neutral float-right" title="LLVM Environment Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="index.html" class="btn btn-neutral float-left" title="Indices and tables" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="llvm/index.html" class="btn btn-neutral float-right" title="LLVM Environment Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Indices and tables" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright Facebook AI Research
+        &#169; Copyright Facebook AI Research.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -658,6 +655,7 @@ an issue</a>!</p>
     })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
     ga('create', 'G-T95G5EVYXM', 'auto');
+    
     ga('send', 'pageview');
     </script>
 

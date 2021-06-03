@@ -49,3 +49,36 @@ div.wy-side-scroll a {
 	font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
 	font-weight: 300;
 }
+
+/* Tables of contents. */
+div.contents {
+	padding: 0 0 24px;
+}
+div.contents ul,
+section#indices-and-tables ul {
+	padding-left: 24px;
+}
+div.contents ul.simple li,
+section#indices-and-tables li,
+table.indextable li {
+	list-style: disc;
+}
+div.contents ul.simple li p,
+section#indices-and-tables li p {
+	margin: 0;
+}
+section#indices-and-tables h1 {
+	margin-bottom: .3em;
+}
+
+/* Sidebar headers */
+div.wy-menu.wy-menu-vertical p {
+	margin: 1.5em 0.3em 0 .5em;
+	color: #404040;
+}
+
+/* Table of contents index */
+div.toctree-wrapper.compound p {
+	margin: 1.5em 0 0.3em 0;
+	color: #404040;
+}

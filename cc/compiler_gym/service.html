@@ -3,10 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>compiler_gym/service &mdash; CompilerGym 0.1.9 documentation</title>
   
@@ -14,11 +13,16 @@
   
   <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -28,11 +32,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
         <script src="../../_static/jquery.js"></script>
         <script src="../../_static/underscore.js"></script>
         <script src="../../_static/doctools.js"></script>
-        <script src="../../_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../../_static/js/theme.js"></script>
 
@@ -55,7 +58,7 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home" alt="Documentation Home"> CompilerGym
+            <a href="../../index.html" class="icon icon-home"> CompilerGym
           
 
           
@@ -90,7 +93,7 @@
               
             
             
-              <p><span class="caption-text">User Guide</span></p>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../llvm/index.html">LLVM Environment Reference</a></li>
@@ -101,7 +104,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p><span class="caption-text">Python API Reference</span></p>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -113,7 +116,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
 </ul>
-<p><span class="caption-text">C++ API Reference</span></p>
+<p class="caption"><span class="caption-text">C++ API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">compiler_gym/service</a><ul>
@@ -162,6 +165,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -173,7 +178,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../../_sources/cc/compiler_gym/service.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -187,7 +192,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="compiler-gym-service">
+  <div class="section" id="compiler-gym-service">
 <h1>compiler_gym/service<a class="headerlink" href="#compiler-gym-service" title="Permalink to this headline">¶</a></h1>
 <p>This directory contains the base class for implementing compilation sessions.</p>
 <div class="contents local topic" id="contents">
@@ -195,15 +200,15 @@
 <li><p><a class="reference internal" href="#compilationsession-h" id="id1">CompilationSession.h</a></p></li>
 </ul>
 </div>
-<section id="compilationsession-h">
+<div class="section" id="compilationsession-h">
 <h2><a class="toc-backref" href="#id1">CompilationSession.h</a><a class="headerlink" href="#compilationsession-h" title="Permalink to this headline">¶</a></h2>
 <p><code class="code docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&quot;compiler_gym/service/CompilationSession.h&quot;</span></code></p>
 <dl class="cpp type">
-<dt id="_CPPv412compiler_gym">
-<span id="_CPPv312compiler_gym"></span><span id="_CPPv212compiler_gym"></span><span id="compiler_gym"></span><span class="target" id="namespacecompiler__gym"></span><em class="property">namespace </em><code class="sig-name descname">compiler_gym</code><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv412compiler_gym">
+<span id="_CPPv312compiler_gym"></span><span id="_CPPv212compiler_gym"></span><span id="compiler_gym"></span><span class="target" id="namespacecompiler__gym"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">compiler_gym</span></span></span><br /></dt>
 <dd><dl class="cpp class">
-<dt id="_CPPv4N12compiler_gym18CompilationSessionE">
-<span id="_CPPv3N12compiler_gym18CompilationSessionE"></span><span id="_CPPv2N12compiler_gym18CompilationSessionE"></span><span id="compiler_gym::CompilationSession"></span><span class="target" id="classcompiler__gym_1_1_compilation_session"></span><em class="property">class </em><code class="sig-name descname">CompilationSession</code><a class="headerlink" href="#_CPPv4N12compiler_gym18CompilationSessionE" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym18CompilationSessionE">
+<span id="_CPPv3N12compiler_gym18CompilationSessionE"></span><span id="_CPPv2N12compiler_gym18CompilationSessionE"></span><span id="compiler_gym::CompilationSession"></span><span class="target" id="classcompiler__gym_1_1_compilation_session"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">CompilationSession</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym18CompilationSessionE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><em>#include &lt;CompilationSession.h&gt;</em><p>Base class for encapsulating an incremental compilation session. </p>
 <p>To add support for a new compiler, subclass from this base and provide implementations of the abstract methods, then call <a class="reference internal" href="service/runtime.html#namespacecompiler__gym_1_1runtime_1aeb0467a26dc7c97958101747bb9c115e"><span class="std std-ref">createAndRunCompilerGymService()</span></a> and parametrize it with your class type:</p>
 <p><div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="c1">#include &quot;compiler_gym/service/CompilationSession.h&quot;</span>
@@ -223,8 +228,8 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
 <dl class="cpp function">
-<dt id="_CPPv4NK12compiler_gym18CompilationSession18getCompilerVersionEv">
-<span id="_CPPv3NK12compiler_gym18CompilationSession18getCompilerVersionEv"></span><span id="_CPPv2NK12compiler_gym18CompilationSession18getCompilerVersionEv"></span><span id="compiler_gym::CompilationSession::getCompilerVersionC"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1a9ce336d6ee0fae7cdfa9783944208255"></span><em class="property">virtual</em> std::string <code class="sig-name descname">getCompilerVersion</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em><a class="headerlink" href="#_CPPv4NK12compiler_gym18CompilationSession18getCompilerVersionEv" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym18CompilationSession18getCompilerVersionEv">
+<span id="_CPPv3NK12compiler_gym18CompilationSession18getCompilerVersionEv"></span><span id="_CPPv2NK12compiler_gym18CompilationSession18getCompilerVersionEv"></span><span id="compiler_gym::CompilationSession::getCompilerVersionC"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1a9ce336d6ee0fae7cdfa9783944208255"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getCompilerVersion</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym18CompilationSession18getCompilerVersionEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get the compiler version. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -234,8 +239,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4NK12compiler_gym18CompilationSession15getActionSpacesEv">
-<span id="_CPPv3NK12compiler_gym18CompilationSession15getActionSpacesEv"></span><span id="_CPPv2NK12compiler_gym18CompilationSession15getActionSpacesEv"></span><span id="compiler_gym::CompilationSession::getActionSpacesC"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1a8a75cd9e5e78f08b777d0a9b0c6f372b"></span><em class="property">virtual</em> std::vector&lt;ActionSpace&gt; <code class="sig-name descname">getActionSpaces</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em> = 0<a class="headerlink" href="#_CPPv4NK12compiler_gym18CompilationSession15getActionSpacesEv" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym18CompilationSession15getActionSpacesEv">
+<span id="_CPPv3NK12compiler_gym18CompilationSession15getActionSpacesEv"></span><span id="_CPPv2NK12compiler_gym18CompilationSession15getActionSpacesEv"></span><span id="compiler_gym::CompilationSession::getActionSpacesC"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1a8a75cd9e5e78f08b777d0a9b0c6f372b"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">ActionSpace</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getActionSpaces</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym18CompilationSession15getActionSpacesEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>A list of action spaces describing the capabilities of the compiler. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -245,8 +250,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4NK12compiler_gym18CompilationSession20getObservationSpacesEv">
-<span id="_CPPv3NK12compiler_gym18CompilationSession20getObservationSpacesEv"></span><span id="_CPPv2NK12compiler_gym18CompilationSession20getObservationSpacesEv"></span><span id="compiler_gym::CompilationSession::getObservationSpacesC"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1a165762ced29c1dc6d9b2c381fb2268c6"></span><em class="property">virtual</em> std::vector&lt;ObservationSpace&gt; <code class="sig-name descname">getObservationSpaces</code><span class="sig-paren">(</span><span class="sig-paren">)</span> <em class="property">const</em> = 0<a class="headerlink" href="#_CPPv4NK12compiler_gym18CompilationSession20getObservationSpacesEv" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym18CompilationSession20getObservationSpacesEv">
+<span id="_CPPv3NK12compiler_gym18CompilationSession20getObservationSpacesEv"></span><span id="_CPPv2NK12compiler_gym18CompilationSession20getObservationSpacesEv"></span><span id="compiler_gym::CompilationSession::getObservationSpacesC"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1a165762ced29c1dc6d9b2c381fb2268c6"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">ObservationSpace</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getObservationSpaces</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym18CompilationSession20getObservationSpacesEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>A list of feature vectors that this compiler provides. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -256,8 +261,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N12compiler_gym18CompilationSession4initERK11ActionSpaceRK9Benchmark">
-<span id="_CPPv3N12compiler_gym18CompilationSession4initERK11ActionSpaceRK9Benchmark"></span><span id="_CPPv2N12compiler_gym18CompilationSession4initERK11ActionSpaceRK9Benchmark"></span><span id="compiler_gym::CompilationSession::init__ActionSpaceCR.BenchmarkCR"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1a7fc016a3e8bcd4f37881fd6728a4f1bf"></span><em class="property">virtual</em> grpc::Status <code class="sig-name descname">init</code><span class="sig-paren">(</span><em class="property">const</em> ActionSpace &amp;<em>actionSpace</em>, <em class="property">const</em> Benchmark &amp;<em>benchmark</em><span class="sig-paren">)</span> = 0<a class="headerlink" href="#_CPPv4N12compiler_gym18CompilationSession4initERK11ActionSpaceRK9Benchmark" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym18CompilationSession4initERK11ActionSpaceRK9Benchmark">
+<span id="_CPPv3N12compiler_gym18CompilationSession4initERK11ActionSpaceRK9Benchmark"></span><span id="_CPPv2N12compiler_gym18CompilationSession4initERK11ActionSpaceRK9Benchmark"></span><span id="compiler_gym::CompilationSession::init__ActionSpaceCR.BenchmarkCR"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1a7fc016a3e8bcd4f37881fd6728a4f1bf"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">grpc</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Status</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">init</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">ActionSpace</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">actionSpace</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Benchmark</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">benchmark</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12compiler_gym18CompilationSession4initERK11ActionSpaceRK9Benchmark" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Start a <a class="reference internal" href="#classcompiler__gym_1_1_compilation_session"><span class="std std-ref">CompilationSession</span></a>. </p>
 <p>This will be called after construction and before <a class="reference internal" href="#classcompiler__gym_1_1_compilation_session_1abcda5557c8b520365a803d6b14c84c3d"><span class="std std-ref">applyAction()</span></a> or <a class="reference internal" href="#classcompiler__gym_1_1_compilation_session_1a5b834d08b66bc8ccc04ceadbe58bd348"><span class="std std-ref">computeObservation()</span></a>. This will only be called once.</p>
 <dl class="field-list simple">
@@ -274,8 +279,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N12compiler_gym18CompilationSession4initEP18CompilationSession">
-<span id="_CPPv3N12compiler_gym18CompilationSession4initEP18CompilationSession"></span><span id="_CPPv2N12compiler_gym18CompilationSession4initEP18CompilationSession"></span><span id="compiler_gym::CompilationSession::init__CompilationSessionP"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1af5f64a5ff65311b1ac72543774285319"></span><em class="property">virtual</em> grpc::Status <code class="sig-name descname">init</code><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N12compiler_gym18CompilationSessionE" title="compiler_gym::CompilationSession">CompilationSession</a> *<em>other</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym18CompilationSession4initEP18CompilationSession" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym18CompilationSession4initEP18CompilationSession">
+<span id="_CPPv3N12compiler_gym18CompilationSession4initEP18CompilationSession"></span><span id="_CPPv2N12compiler_gym18CompilationSession4initEP18CompilationSession"></span><span id="compiler_gym::CompilationSession::init__CompilationSessionP"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1af5f64a5ff65311b1ac72543774285319"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">grpc</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Status</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">init</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N12compiler_gym18CompilationSessionE" title="compiler_gym::CompilationSession"><span class="n"><span class="pre">CompilationSession</span></span></a><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">other</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym18CompilationSession4initEP18CompilationSession" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Initialize a <a class="reference internal" href="#classcompiler__gym_1_1_compilation_session"><span class="std std-ref">CompilationSession</span></a> from another CompilerSession. </p>
 <p>Think of this like a copy constructor, except that this method is allowed to fail.</p>
 <p>This will be called after construction and before <a class="reference internal" href="#classcompiler__gym_1_1_compilation_session_1abcda5557c8b520365a803d6b14c84c3d"><span class="std std-ref">applyAction()</span></a> or <a class="reference internal" href="#classcompiler__gym_1_1_compilation_session_1a5b834d08b66bc8ccc04ceadbe58bd348"><span class="std std-ref">computeObservation()</span></a>. This will only be called once.</p>
@@ -290,8 +295,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N12compiler_gym18CompilationSession11applyActionERK6ActionRbRNSt8optionalI11ActionSpaceEERb">
-<span id="_CPPv3N12compiler_gym18CompilationSession11applyActionERK6ActionRbRNSt8optionalI11ActionSpaceEERb"></span><span id="_CPPv2N12compiler_gym18CompilationSession11applyActionERK6ActionRbRNSt8optionalI11ActionSpaceEERb"></span><span id="compiler_gym::CompilationSession::applyAction__ActionCR.bR.std::optional:ActionSpace:R.bR"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1abcda5557c8b520365a803d6b14c84c3d"></span><em class="property">virtual</em> grpc::Status <code class="sig-name descname">applyAction</code><span class="sig-paren">(</span><em class="property">const</em> Action &amp;<em>action</em>, bool &amp;<em>endOfEpisode</em>, std::optional&lt;ActionSpace&gt; &amp;<em>newActionSpace</em>, bool &amp;<em>actionHadNoEffect</em><span class="sig-paren">)</span> = 0<a class="headerlink" href="#_CPPv4N12compiler_gym18CompilationSession11applyActionERK6ActionRbRNSt8optionalI11ActionSpaceEERb" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym18CompilationSession11applyActionERK6ActionRbRNSt8optionalI11ActionSpaceEERb">
+<span id="_CPPv3N12compiler_gym18CompilationSession11applyActionERK6ActionRbRNSt8optionalI11ActionSpaceEERb"></span><span id="_CPPv2N12compiler_gym18CompilationSession11applyActionERK6ActionRbRNSt8optionalI11ActionSpaceEERb"></span><span id="compiler_gym::CompilationSession::applyAction__ActionCR.bR.std::optional:ActionSpace:R.bR"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1abcda5557c8b520365a803d6b14c84c3d"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">grpc</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Status</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">applyAction</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">Action</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">action</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">endOfEpisode</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">ActionSpace</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">newActionSpace</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">actionHadNoEffect</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12compiler_gym18CompilationSession11applyActionERK6ActionRbRNSt8optionalI11ActionSpaceEERb" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Apply an action. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -308,8 +313,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N12compiler_gym18CompilationSession18computeObservationERK16ObservationSpaceR11Observation">
-<span id="_CPPv3N12compiler_gym18CompilationSession18computeObservationERK16ObservationSpaceR11Observation"></span><span id="_CPPv2N12compiler_gym18CompilationSession18computeObservationERK16ObservationSpaceR11Observation"></span><span id="compiler_gym::CompilationSession::computeObservation__ObservationSpaceCR.ObservationR"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1a5b834d08b66bc8ccc04ceadbe58bd348"></span><em class="property">virtual</em> grpc::Status <code class="sig-name descname">computeObservation</code><span class="sig-paren">(</span><em class="property">const</em> ObservationSpace &amp;<em>observationSpace</em>, Observation &amp;<em>observation</em><span class="sig-paren">)</span> = 0<a class="headerlink" href="#_CPPv4N12compiler_gym18CompilationSession18computeObservationERK16ObservationSpaceR11Observation" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym18CompilationSession18computeObservationERK16ObservationSpaceR11Observation">
+<span id="_CPPv3N12compiler_gym18CompilationSession18computeObservationERK16ObservationSpaceR11Observation"></span><span id="_CPPv2N12compiler_gym18CompilationSession18computeObservationERK16ObservationSpaceR11Observation"></span><span id="compiler_gym::CompilationSession::computeObservation__ObservationSpaceCR.ObservationR"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1a5b834d08b66bc8ccc04ceadbe58bd348"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">grpc</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Status</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">computeObservation</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">ObservationSpace</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">observationSpace</span></span>, <span class="n"><span class="pre">Observation</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">observation</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">0</span></span><a class="headerlink" href="#_CPPv4N12compiler_gym18CompilationSession18computeObservationERK16ObservationSpaceR11Observation" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Compute an observation. </p>
 <dl class="field-list simple">
 <dt class="field-odd">Returns</dt>
@@ -319,8 +324,8 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N12compiler_gym18CompilationSession9endOfStepEbRbRNSt8optionalI11ActionSpaceEE">
-<span id="_CPPv3N12compiler_gym18CompilationSession9endOfStepEbRbRNSt8optionalI11ActionSpaceEE"></span><span id="_CPPv2N12compiler_gym18CompilationSession9endOfStepEbRbRNSt8optionalI11ActionSpaceEE"></span><span id="compiler_gym::CompilationSession::endOfStep__b.bR.std::optional:ActionSpace:R"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1a6d139777451ce6d19bd8a37fed152b23"></span><em class="property">virtual</em> grpc::Status <code class="sig-name descname">endOfStep</code><span class="sig-paren">(</span>bool <em>actionHadNoEffect</em>, bool &amp;<em>endOfEpisode</em>, std::optional&lt;ActionSpace&gt; &amp;<em>newActionSpace</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym18CompilationSession9endOfStepEbRbRNSt8optionalI11ActionSpaceEE" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym18CompilationSession9endOfStepEbRbRNSt8optionalI11ActionSpaceEE">
+<span id="_CPPv3N12compiler_gym18CompilationSession9endOfStepEbRbRNSt8optionalI11ActionSpaceEE"></span><span id="_CPPv2N12compiler_gym18CompilationSession9endOfStepEbRbRNSt8optionalI11ActionSpaceEE"></span><span id="compiler_gym::CompilationSession::endOfStep__b.bR.std::optional:ActionSpace:R"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1a6d139777451ce6d19bd8a37fed152b23"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="n"><span class="pre">grpc</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Status</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">endOfStep</span></span></span><span class="sig-paren">(</span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">actionHadNoEffect</span></span>, <span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">endOfEpisode</span></span>, <span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">ActionSpace</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">newActionSpace</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym18CompilationSession9endOfStepEbRbRNSt8optionalI11ActionSpaceEE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Optional. </p>
 <p>This will be called after all <a class="reference internal" href="#classcompiler__gym_1_1_compilation_session_1abcda5557c8b520365a803d6b14c84c3d"><span class="std std-ref">applyAction()</span></a> and <a class="reference internal" href="#classcompiler__gym_1_1_compilation_session_1a5b834d08b66bc8ccc04ceadbe58bd348"><span class="std std-ref">computeObservation()</span></a> in a step. Use this method if you would like to perform post-transform validation of compiler state.</p>
 <dl class="field-list simple">
@@ -331,21 +336,21 @@
 </dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N12compiler_gym18CompilationSession18CompilationSessionERKN5boost10filesystem4pathE">
-<span id="_CPPv3N12compiler_gym18CompilationSession18CompilationSessionERKN5boost10filesystem4pathE"></span><span id="_CPPv2N12compiler_gym18CompilationSession18CompilationSessionERKN5boost10filesystem4pathE"></span><span id="compiler_gym::CompilationSession::CompilationSession__boost::filesystem::pathCR"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1a89db668bd4e4ce91029dad9d883d9bc9"></span><code class="sig-name descname">CompilationSession</code><span class="sig-paren">(</span><em class="property">const</em> boost::filesystem::path &amp;<em>workingDirectory</em><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym18CompilationSession18CompilationSessionERKN5boost10filesystem4pathE" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym18CompilationSession18CompilationSessionERKN5boost10filesystem4pathE">
+<span id="_CPPv3N12compiler_gym18CompilationSession18CompilationSessionERKN5boost10filesystem4pathE"></span><span id="_CPPv2N12compiler_gym18CompilationSession18CompilationSessionERKN5boost10filesystem4pathE"></span><span id="compiler_gym::CompilationSession::CompilationSession__boost::filesystem::pathCR"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1a89db668bd4e4ce91029dad9d883d9bc9"></span><span class="sig-name descname"><span class="n"><span class="pre">CompilationSession</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">boost</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">filesystem</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">path</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">workingDirectory</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym18CompilationSession18CompilationSessionERKN5boost10filesystem4pathE" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
-<dt id="_CPPv4N12compiler_gym18CompilationSessionD0Ev">
-<span id="_CPPv3N12compiler_gym18CompilationSessionD0Ev"></span><span id="_CPPv2N12compiler_gym18CompilationSessionD0Ev"></span><span id="compiler_gym::CompilationSession::~CompilationSession"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1a1458e958c883185215e0d9a0577f42fa"></span><em class="property">virtual</em> <code class="sig-name descname">~CompilationSession</code><span class="sig-paren">(</span><span class="sig-paren">)</span> = default<a class="headerlink" href="#_CPPv4N12compiler_gym18CompilationSessionD0Ev" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym18CompilationSessionD0Ev">
+<span id="_CPPv3N12compiler_gym18CompilationSessionD0Ev"></span><span id="_CPPv2N12compiler_gym18CompilationSessionD0Ev"></span><span id="compiler_gym::CompilationSession::~CompilationSession"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1a1458e958c883185215e0d9a0577f42fa"></span><span class="k"><span class="pre">virtual</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">~CompilationSession</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="k"><span class="pre">default</span></span><a class="headerlink" href="#_CPPv4N12compiler_gym18CompilationSessionD0Ev" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 </div>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-protected-functions">Protected Functions</p>
 <dl class="cpp function">
-<dt id="_CPPv4N12compiler_gym18CompilationSession16workingDirectoryEv">
-<span id="_CPPv3N12compiler_gym18CompilationSession16workingDirectoryEv"></span><span id="_CPPv2N12compiler_gym18CompilationSession16workingDirectoryEv"></span><span id="compiler_gym::CompilationSession::workingDirectory"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1ac758355c22837a6586f34fba77d72c70"></span><em class="property">inline</em> <em class="property">const</em> boost::filesystem::path &amp;<code class="sig-name descname">workingDirectory</code><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym18CompilationSession16workingDirectoryEv" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym18CompilationSession16workingDirectoryEv">
+<span id="_CPPv3N12compiler_gym18CompilationSession16workingDirectoryEv"></span><span id="_CPPv2N12compiler_gym18CompilationSession16workingDirectoryEv"></span><span id="compiler_gym::CompilationSession::workingDirectory"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1ac758355c22837a6586f34fba77d72c70"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">boost</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">filesystem</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">path</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">workingDirectory</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym18CompilationSession16workingDirectoryEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Get the working directory. </p>
 <p>The working directory is a local filesystem directory that this <a class="reference internal" href="#classcompiler__gym_1_1_compilation_session"><span class="std std-ref">CompilationSession</span></a> can use to store temporary files such as build artifacts. The directory exists.</p>
 <div class="admonition note">
@@ -367,8 +372,8 @@
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
 <dl class="cpp var">
-<dt id="_CPPv4N12compiler_gym18CompilationSession17workingDirectory_E">
-<span id="_CPPv3N12compiler_gym18CompilationSession17workingDirectory_E"></span><span id="_CPPv2N12compiler_gym18CompilationSession17workingDirectory_E"></span><span id="compiler_gym::CompilationSession::workingDirectory___boost::filesystem::pathC"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1a080986ff35b58bdc19be5e838eab1819"></span><em class="property">const</em> boost::filesystem::path <code class="sig-name descname">workingDirectory_</code><a class="headerlink" href="#_CPPv4N12compiler_gym18CompilationSession17workingDirectory_E" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym18CompilationSession17workingDirectory_E">
+<span id="_CPPv3N12compiler_gym18CompilationSession17workingDirectory_E"></span><span id="_CPPv2N12compiler_gym18CompilationSession17workingDirectory_E"></span><span id="compiler_gym::CompilationSession::workingDirectory___boost::filesystem::pathC"></span><span class="target" id="classcompiler__gym_1_1_compilation_session_1a080986ff35b58bdc19be5e838eab1819"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">boost</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">filesystem</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">path</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">workingDirectory_</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym18CompilationSession17workingDirectory_E" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 </div>
@@ -376,45 +381,37 @@
 
 </dd></dl>
 
-</section>
-</section>
+</div>
+</div>
 
 
            </div>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="service/runtime.html" class="btn btn-neutral float-right" title="compiler_gym/service/runtime" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="envs/llvm/service.html" class="btn btn-neutral float-left" title="compiler_gym/envs/llvm/service" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="service/runtime.html" class="btn btn-neutral float-right" title="compiler_gym/service/runtime" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="envs/llvm/service.html" class="btn btn-neutral float-left" title="compiler_gym/envs/llvm/service" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright Facebook AI Research
+        &#169; Copyright Facebook AI Research.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -440,6 +437,7 @@
     })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
     ga('create', 'G-T95G5EVYXM', 'auto');
+    
     ga('send', 'pageview');
     </script>
 

@@ -3,10 +3,9 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
   <title>LLVM Environment Reference &mdash; CompilerGym 0.1.9 documentation</title>
   
@@ -14,11 +13,16 @@
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -28,11 +32,11 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
+        <script async="async" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -55,7 +59,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> CompilerGym
+            <a href="../index.html" class="icon icon-home"> CompilerGym
           
 
           
@@ -90,7 +94,7 @@
               
             
             
-              <p><span class="caption-text">User Guide</span></p>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">LLVM Environment Reference</a><ul>
@@ -120,7 +124,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p><span class="caption-text">Python API Reference</span></p>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -132,7 +136,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
 </ul>
-<p><span class="caption-text">C++ API Reference</span></p>
+<p class="caption"><span class="caption-text">C++ API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/service.html">compiler_gym/service</a></li>
@@ -178,6 +182,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -189,7 +195,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/llvm/index.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -203,7 +209,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="llvm-environment-reference">
+  <div class="section" id="llvm-environment-reference">
 <h1>LLVM Environment Reference<a class="headerlink" href="#llvm-environment-reference" title="Permalink to this headline">¶</a></h1>
 <p><a class="reference external" href="https://llvm.org/">LLVM</a> is a production-grade compiler used throughout
 industry. It defines a machine independent intermediate representation (IR), and
@@ -235,7 +241,7 @@ languages.</p>
 <li><p><a class="reference internal" href="#action-space" id="id16">Action Space</a></p></li>
 </ul>
 </div>
-<section id="datasets">
+<div class="section" id="datasets">
 <h2><a class="toc-backref" href="#id4">Datasets</a><a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h2>
 <p>We provide several datasets of open-source LLVM-IR benchmarks for use:</p>
 <table class="docutils align-default">
@@ -351,12 +357,12 @@ cbench-v1, in contrast to the small linear algebra kernels of blas-v0, contains
 larger programs with a higher density of memory operations and fewer arithmetic
 operations.</p>
 <img alt="../_images/datasets.png" src="../_images/datasets.png" />
-</section>
-<section id="observation-spaces">
+</div>
+<div class="section" id="observation-spaces">
 <h2><a class="toc-backref" href="#id5">Observation Spaces</a><a class="headerlink" href="#observation-spaces" title="Permalink to this headline">¶</a></h2>
 <p>We provide several observation spaces for LLVM based on published compiler
 research.</p>
-<section id="llvm-ir">
+<div class="section" id="llvm-ir">
 <h3><a class="toc-backref" href="#id6">LLVM-IR</a><a class="headerlink" href="#llvm-ir" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
@@ -393,8 +399,8 @@ the <code class="code docutils literal notranslate"><span class="pre">Ir</span><
 <p>Files generated by the <code class="code docutils literal notranslate"><span class="pre">BitcodeFile</span></code> observation space are put in a
 temporary directory that is removed when <a class="reference internal" href="../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.close" title="compiler_gym.envs.CompilerEnv.close"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.close()</span></code></a> is called.</p>
 </div>
-</section>
-<section id="instcount">
+</div>
+<div class="section" id="instcount">
 <h3><a class="toc-backref" href="#id7">InstCount</a><a class="headerlink" href="#instcount" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
@@ -794,8 +800,8 @@ feature vector:</p>
 </div>
 <p>The InstCount observation space and its derivatives are cheap to compute,
 deterministic, and platform independent.</p>
-</section>
-<section id="autophase">
+</div>
+<div class="section" id="autophase">
 <h3><a class="toc-backref" href="#id8">Autophase</a><a class="headerlink" href="#autophase" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
@@ -1090,8 +1096,8 @@ they appear in the keys of the <code class="code docutils literal notranslate"><
 <span class="go"> &#39;BlockLow&#39;: 32, &#39;NumBitCastInst&#39;: 0, &#39;NumBrInst&#39;: 36, &#39;NumCallInst&#39;: 10, ... }</span>
 </pre></div>
 </div>
-</section>
-<section id="inst2vec">
+</div>
+<div class="section" id="inst2vec">
 <h3><a class="toc-backref" href="#id9">Inst2vec</a><a class="headerlink" href="#inst2vec" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
@@ -1167,8 +1173,8 @@ produce a program embedding.</p>
 <span class="go">         0.8492773 ,  0.8914213 ]], dtype=float32)</span>
 </pre></div>
 </div>
-</section>
-<section id="programl">
+</div>
+<div class="section" id="programl">
 <h3><a class="toc-backref" href="#id10">ProGraML</a><a class="headerlink" href="#programl" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
@@ -1219,8 +1225,8 @@ flow, and green edges are call flow.</p>
 <span class="go">{&#39;flow&#39;: 2, &#39;position&#39;: 0}</span>
 </pre></div>
 </div>
-</section>
-<section id="hardware-information">
+</div>
+<div class="section" id="hardware-information">
 <h3><a class="toc-backref" href="#id11">Hardware Information</a><a class="headerlink" href="#hardware-information" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
@@ -1248,8 +1254,8 @@ hardware. The values are independent of the compiler and program state.</p>
 <span class="go">{&#39;cores_count&#39;: 8, &#39;l1d_cache_count&#39;: 8, ...}</span>
 </pre></div>
 </div>
-</section>
-<section id="cost-models">
+</div>
+<div class="section" id="cost-models">
 <h3><a class="toc-backref" href="#id12">Cost Models</a><a class="headerlink" href="#cost-models" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
@@ -1289,9 +1295,9 @@ hardware. The values are independent of the compiler and program state.</p>
 </tbody>
 </table>
 <p>Raw values from the cost models used to compute <a class="reference internal" href="#reward"><span class="std std-ref">rewards</span></a>.</p>
-</section>
-</section>
-<section id="reward-spaces">
+</div>
+</div>
+<div class="section" id="reward-spaces">
 <span id="reward"></span><h2><a class="toc-backref" href="#id13">Reward Spaces</a><a class="headerlink" href="#reward-spaces" title="Permalink to this headline">¶</a></h2>
 <p>The goal of CompilerGym tasks is to minimize a cost function <span class="math notranslate nohighlight">\(C(s)\)</span> which
 takes as input the current program state <span class="math notranslate nohighlight">\(s\)</span> and produces a real-valued
@@ -1317,7 +1323,7 @@ achieved by applying the baseline policy to produce a baseline state
 <p>These reward spaces are indicated by the baseline policy name as a suffix, e.g.
 the reward space <code class="code docutils literal notranslate"><span class="pre">IrInstructionCountO3</span></code> is <code class="code docutils literal notranslate"><span class="pre">IrInstructionCount</span></code>
 reward normalized to the <code class="code docutils literal notranslate"><span class="pre">-O3</span></code> baseline policy.</p>
-<section id="ir-instruction-count">
+<div class="section" id="ir-instruction-count">
 <h3><a class="toc-backref" href="#id14">IR Instruction Count</a><a class="headerlink" href="#ir-instruction-count" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
@@ -1375,8 +1381,8 @@ to the improvement made by the baseline <code class="code docutils literal notra
 pipelines. LLVM-IR instruction count is fast to evaluate, deterministic, and
 platform-independent, but is not a measure of true codesize reduction as it does
 not take into account the effects of lowering.</p>
-</section>
-<section id="codesize">
+</div>
+<div class="section" id="codesize">
 <h3><a class="toc-backref" href="#id15">Codesize</a><a class="headerlink" href="#codesize" title="Permalink to this headline">¶</a></h3>
 <table class="docutils align-default">
 <colgroup>
@@ -1432,9 +1438,9 @@ not take into account the effects of lowering.</p>
 linking. This is more expensive to compute than <code class="code docutils literal notranslate"><span class="pre">IrInstructionCount</span></code>. The
 object file code size depends on the target platform, see
 <a class="reference internal" href="../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.compiler_version" title="compiler_gym.envs.CompilerEnv.compiler_version"><code class="xref py py-func docutils literal notranslate"><span class="pre">CompilerEnv.compiler_version</span></code></a>.</p>
-</section>
-</section>
-<section id="action-space">
+</div>
+</div>
+<div class="section" id="action-space">
 <h2><a class="toc-backref" href="#id16">Action Space</a><a class="headerlink" href="#action-space" title="Permalink to this headline">¶</a></h2>
 <p>The LLVM action space exposes the selection of semantics-preserving optimization
 transforms as a discrete space.</p>
@@ -1820,45 +1826,37 @@ transforms as a discrete space.</p>
 </tr>
 </tbody>
 </table>
-</section>
-</section>
+</div>
+</div>
 
 
            </div>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="../cli.html" class="btn btn-neutral float-right" title="Command Line Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="../getting_started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="../cli.html" class="btn btn-neutral float-right" title="Command Line Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../getting_started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright Facebook AI Research
+        &#169; Copyright Facebook AI Research.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -1884,6 +1882,7 @@ transforms as a discrete space.</p>
     })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
     ga('create', 'G-T95G5EVYXM', 'auto');
+    
     ga('send', 'pageview');
     </script>
 

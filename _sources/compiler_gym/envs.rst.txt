@@ -8,7 +8,7 @@ extend the functionality by subclassing from
 :class:`CompilerEnv <compiler_gym.envs.CompilerEnv>`. The following
 environment classes are available:
 
-.. contents::
+.. contents:: Environment Classes:
     :local:
 
 .. currentmodule:: compiler_gym.envs
