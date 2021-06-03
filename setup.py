@@ -58,8 +58,9 @@ setuptools.setup(
         "compiler_gym.envs",
         "compiler_gym.envs",
         "compiler_gym.leaderboard",
-        "compiler_gym.service.proto",
         "compiler_gym.service",
+        "compiler_gym.service.proto",
+        "compiler_gym.service.runtime",
         "compiler_gym.spaces",
         "compiler_gym.third_party.autophase",
         "compiler_gym.third_party.inst2vec",
@@ -68,6 +69,7 @@ setuptools.setup(
         "compiler_gym.util.flags",
         "compiler_gym.util",
         "compiler_gym.views",
+        "compiler_gym.wrappers",
         "compiler_gym",
     ],
     package_dir={

@@ -10,6 +10,7 @@ import pytest
 import compiler_gym  # noqa Register environments.
 from compiler_gym.envs import CompilerEnv, llvm
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
+from compiler_gym.service import ServiceError
 from compiler_gym.service.connection import CompilerGymServiceConnection
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_DIM
 from tests.test_main import main
@@ -42,8 +43,14 @@ def test_service_env_dies_reset(env: CompilerEnv):
     env.reward_space = "IrInstructionCount"
     env.reset("cbench-v1/crc32")
 
-    # Kill the service.
-    env.service.close()
+    # Kill the service. Note killing the service for a ManagedConnection will
+    # result in a ServiceError because we have not ended the session we started
+    # with env.reset() above. For UnmanagedConnection, this error will not be
+    # raised.
+    try:
+        env.service.close()
+    except ServiceError as e:
+        assert "Service exited with returncode " in str(e)
 
     # Check that the environment doesn't fall over.
     observation, reward, done, info = env.step(0)

@@ -29,7 +29,7 @@ def humanize_duration_hms(seconds: float) -> str:
     return f"{seconds // 3600}:{(seconds % 3600) // 60:02d}:{seconds % 60:02d}"
 
 
-class Timer(object):
+class Timer:
     """A very simple scoped timer.
 
     Example:

@@ -9,10 +9,10 @@ import networkx as nx
 import numpy as np
 from gym.spaces import Box, Space
 
-from compiler_gym.service import observation_t, scalar_range2tuple
-from compiler_gym.service.proto import Observation, ObservationSpace
+from compiler_gym.service.proto import Observation, ObservationSpace, ScalarRange
 from compiler_gym.spaces.scalar import Scalar
 from compiler_gym.spaces.sequence import Sequence
+from compiler_gym.util.gym_type_hints import ObservationType
 
 
 def _json2nx(observation):
@@ -22,7 +22,15 @@ def _json2nx(observation):
     )
 
 
-class ObservationSpaceSpec(object):
+def _scalar_range2tuple(sr: ScalarRange, defaults=(-np.inf, np.inf)):
+    """Convert a ScalarRange to a tuple of (min, max) bounds."""
+    return (
+        sr.min.value if sr.HasField("min") else defaults[0],
+        sr.max.value if sr.HasField("max") else defaults[1],
+    )
+
+
+class ObservationSpaceSpec:
     """Specification of an observation space.
 
     :ivar id: The name of the observation space.
@@ -53,11 +61,11 @@ class ObservationSpaceSpec(object):
         id: str,
         index: int,
         space: Space,
-        translate: Callable[[Union[observation_t, Observation]], observation_t],
-        to_string: Callable[[observation_t], str],
+        translate: Callable[[Union[ObservationType, Observation]], ObservationType],
+        to_string: Callable[[ObservationType], str],
         deterministic: bool,
         platform_dependent: bool,
-        default_value: observation_t,
+        default_value: ObservationType,
     ):
         """Constructor. Don't call directly, use make_derived_space()."""
         self.id: str = id
@@ -68,6 +76,21 @@ class ObservationSpaceSpec(object):
         self.default_value = default_value
         self.translate = translate
         self.to_string = to_string
+
+    def __hash__(self) -> int:
+        # Quickly hash observation spaces by comparing the index into the list
+        # of spaces returned by the environment. This means that you should not
+        # hash between observation spaces from different environments as this
+        # will cause collisions, e.g.
+        #
+        #     # not okay:
+        #     >>> obs = set(env.observation.spaces).union(
+        #         other_env.observation.spaces
+        #     )
+        #
+        # If you want to hash between environments, consider using the string id
+        # to identify the observation spaces.
+        return self.index
 
     def __repr__(self) -> str:
         return f"ObservationSpaceSpec({self.id})"
@@ -90,7 +113,7 @@ class ObservationSpaceSpec(object):
         shape_type = proto.WhichOneof("shape")
 
         def make_box(scalar_range_list, dtype, defaults):
-            bounds = [scalar_range2tuple(r, defaults) for r in scalar_range_list]
+            bounds = [_scalar_range2tuple(r, defaults) for r in scalar_range_list]
             return Box(
                 low=np.array([b[0] for b in bounds], dtype=dtype),
                 high=np.array([b[1] for b in bounds], dtype=dtype),
@@ -98,14 +121,14 @@ class ObservationSpaceSpec(object):
             )
 
         def make_scalar(scalar_range, dtype, defaults):
-            scalar_range_tuple = scalar_range2tuple(scalar_range, defaults)
+            scalar_range_tuple = _scalar_range2tuple(scalar_range, defaults)
             return Scalar(
                 min=scalar_range_tuple[0], max=scalar_range_tuple[1], dtype=dtype
             )
 
         def make_seq(scalar_range, dtype, defaults):
             return Sequence(
-                size_range=scalar_range2tuple(scalar_range, defaults),
+                size_range=_scalar_range2tuple(scalar_range, defaults),
                 dtype=dtype,
                 opaque_data_format=proto.opaque_data_format,
             )
@@ -213,12 +236,12 @@ class ObservationSpaceSpec(object):
     def make_derived_space(
         self,
         id: str,
-        translate: Callable[[observation_t], observation_t],
+        translate: Callable[[ObservationType], ObservationType],
         space: Optional[Space] = None,
         deterministic: Optional[bool] = None,
-        default_value: Optional[observation_t] = None,
+        default_value: Optional[ObservationType] = None,
         platform_dependent: Optional[bool] = None,
-        to_string: Callable[[observation_t], str] = None,
+        to_string: Callable[[ObservationType], str] = None,
     ) -> "ObservationSpaceSpec":
         """Create a derived observation space.
 

@@ -8,6 +8,7 @@ from time import time
 
 import gym
 import numpy as np
+import pytest
 
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_DIM
 from tests.test_main import main
@@ -18,7 +19,8 @@ pytest_plugins = ["tests.pytest_plugins.llvm"]
 FUZZ_TIME_SECONDS = 2
 
 
-def test_benchmark_random_actions(benchmark_name: str):
+@pytest.mark.timeout(600)
+def test_fuzz(benchmark_name: str):
     """Run randomly selected actions on a benchmark until a minimum amount of time has elapsed."""
     env = gym.make(
         "llvm-v0",
@@ -32,7 +34,7 @@ def test_benchmark_random_actions(benchmark_name: str):
         # Take a random step until a predetermined amount of time has elapsed.
         end_time = time() + FUZZ_TIME_SECONDS
         while time() < end_time:
-            observation, reward, done, info = env.step(env.action_space.sample())
+            observation, reward, done, _ = env.step(env.action_space.sample())
             if done:
                 # Default-value for observation is an array of zeros.
                 np.testing.assert_array_equal(

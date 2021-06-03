@@ -12,6 +12,8 @@
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Bitcode/BitcodeReader.h"
 #include "llvm/Bitcode/BitcodeWriter.h"
+#include "llvm/IR/DebugInfo.h"
+#include "llvm/IR/Verifier.h"
 #include "llvm/Support/SHA1.h"
 
 namespace fs = boost::filesystem;
@@ -86,6 +88,15 @@ std::unique_ptr<llvm::Module> makeModule(llvm::LLVMContext& context, const Bitco
     module->setModuleIdentifier("-");
     module->setSourceFileName("-");
 
+    // Strip module debug info.
+    llvm::StripDebugInfo(*module);
+
+    // Erase module-level named metadata.
+    while (!module->named_metadata_empty()) {
+      llvm::NamedMDNode* nmd = &*module->named_metadata_begin();
+      module->eraseNamedMetadata(nmd);
+    }
+
     return module;
   } else {
     *status = Status(StatusCode::INVALID_ARGUMENT,
@@ -100,7 +111,6 @@ Benchmark::Benchmark(const std::string& name, const Bitcode& bitcode,
     : context_(std::make_unique<llvm::LLVMContext>()),
       module_(makeModuleOrDie(*context_, bitcode, name)),
       baselineCosts_(baselineCosts),
-      hash_(getModuleHash(*module_)),
       name_(name),
       bitcodeSize_(bitcode.size()) {}
 
@@ -110,7 +120,6 @@ Benchmark::Benchmark(const std::string& name, std::unique_ptr<llvm::LLVMContext>
     : context_(std::move(context)),
       module_(std::move(module)),
       baselineCosts_(baselineCosts),
-      hash_(getModuleHash(*module_)),
       name_(name),
       bitcodeSize_(bitcodeSize) {}
 
@@ -120,6 +129,18 @@ std::unique_ptr<Benchmark> Benchmark::clone(const fs::path& workingDirectory) co
   llvm::WriteBitcodeToFile(module(), ostream);
 
   return std::make_unique<Benchmark>(name(), bitcode, workingDirectory, baselineCosts());
+}
+
+BenchmarkHash Benchmark::module_hash() const { return getModuleHash(*module_); }
+
+Status Benchmark::verify_module() {
+  std::string errorMessage;
+  llvm::raw_string_ostream rso(errorMessage);
+  if (llvm::verifyModule(module(), &rso)) {
+    rso.flush();
+    return Status(StatusCode::DATA_LOSS, "Failed to verify module: " + errorMessage);
+  }
+  return Status::OK;
 }
 
 }  // namespace compiler_gym::llvm_service

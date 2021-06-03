@@ -1,0 +1,50 @@
+---
+name: LLVM Sanitizers
+
+on:
+    push:
+        branches:
+            - development
+            - stable
+    pull_request:
+
+jobs:
+    llvm-service-asan:
+        runs-on: ubuntu-latest
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Setup python
+              uses: actions/setup-python@v2
+              with:
+                  python-version: 3.9
+
+            - name: Install build dependencies
+              uses: ./.github/actions/install-build-dependencies
+
+            - name: Build pip package
+              run: make bazel-build
+              env:
+                  CC: clang
+                  CXX: clang++
+                  BAZEL_OPTS: --batch
+                  BAZEL_BUILD_OPTS: --config=ci
+
+            - name: Build address sanitized LLVM compiler service
+              run: make bazel-build BAZEL_BUILD_OPTS=--config=asan BUILD_TARGET=//compiler_gym/envs/llvm/service:compiler_gym-llvm-service
+              env:
+                  CC: clang
+                  CXX: clang++
+                  BAZEL_OPTS: --batch
+                  BAZEL_BUILD_OPTS: --config=ci
+
+            - name: Install pip package
+              run: make pip-install
+
+            - name: Test
+              run: make install-test TEST_TARGET=tests/llvm
+              env:
+                  ASAN_OPTIONS: detect_leaks=1
+                  CC: clang
+                  CXX: clang++

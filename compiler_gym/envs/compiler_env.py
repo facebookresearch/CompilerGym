@@ -11,7 +11,7 @@ from copy import deepcopy
 from math import isclose
 from pathlib import Path
 from time import time
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Callable, Dict, Iterable, List, Optional, Tuple, Union
 
 import gym
 import numpy as np
@@ -27,9 +27,9 @@ from compiler_gym.service import (
     ServiceOSError,
     ServiceTransportError,
     SessionNotFound,
-    observation_t,
 )
 from compiler_gym.service.proto import (
+    Action,
     AddBenchmarkRequest,
     EndSessionReply,
     EndSessionRequest,
@@ -43,14 +43,16 @@ from compiler_gym.service.proto import (
 )
 from compiler_gym.spaces import DefaultRewardFromObservation, NamedDiscrete, Reward
 from compiler_gym.util.debug_util import get_logging_level
+from compiler_gym.util.gym_type_hints import (
+    ActionType,
+    ObservationType,
+    RewardType,
+    StepType,
+)
 from compiler_gym.util.timer import Timer
 from compiler_gym.validation_error import ValidationError
 from compiler_gym.validation_result import ValidationResult
 from compiler_gym.views import ObservationSpaceSpec, ObservationView, RewardView
-
-# Type hints.
-info_t = Dict[str, Any]
-step_t = Tuple[Optional[observation_t], Optional[float], bool, info_t]
 
 
 def _wrapped_step(
@@ -78,11 +80,11 @@ class CompilerEnv(gym.Env):
     :doc:`/compiler_gym/service` for more details on connecting to services):
 
     >>> env = CompilerEnv(
-        service="localhost:8080",
-        observation_space="features",
-        reward_space="runtime",
-        rewards=[env_reward_spaces],
-    )
+    ...     service="localhost:8080",
+    ...     observation_space="features",
+    ...     reward_space="runtime",
+    ...     rewards=[env_reward_spaces],
+    ... )
 
     Once constructed, an environment can be used in exactly the same way as a
     regular :code:`gym.Env`, e.g.
@@ -265,7 +267,7 @@ class CompilerEnv(gym.Env):
             for space in self.service.action_spaces
         ]
         self.observation = self._observation_view_type(
-            get_observation=lambda req: _wrapped_step(self.service, req),
+            raw_step=self.raw_step,
             spaces=self.service.observation_spaces,
         )
         self.reward = self._reward_view_type(rewards, self.observation)
@@ -522,39 +524,57 @@ class CompilerEnv(gym.Env):
         :return: A new environment instance.
         """
         if not self.in_episode:
-            if self.actions and not self.in_episode:
+            actions = self.actions.copy()
+            self.reset()
+            if actions:
                 self.logger.warning(
                     "Parent service of fork() has died, replaying state"
                 )
-                self.apply(self.state)
-            else:
-                self.reset()
+                _, _, done, _ = self.step(actions)
+                assert not done, "Failed to replay action sequence"
 
         request = ForkSessionRequest(session_id=self._session_id)
-        reply: ForkSessionReply = self.service(self.service.stub.ForkSession, request)
+        try:
+            reply: ForkSessionReply = self.service(
+                self.service.stub.ForkSession, request
+            )
 
-        # Create a new environment that shares the connection.
-        new_env = type(self)(
-            service=self._service_endpoint,
-            action_space=self.action_space,
-            connection_settings=self._connection_settings,
-            service_connection=self.service,
-        )
+            # Create a new environment that shares the connection.
+            new_env = type(self)(
+                service=self._service_endpoint,
+                action_space=self.action_space,
+                connection_settings=self._connection_settings,
+                service_connection=self.service,
+            )
 
-        # Set the session ID.
-        new_env._session_id = reply.session_id  # pylint: disable=protected-access
-        new_env.observation.session_id = reply.session_id
+            # Set the session ID.
+            new_env._session_id = reply.session_id  # pylint: disable=protected-access
+            new_env.observation.session_id = reply.session_id
 
-        # Now that we have initialized the environment with the current state,
-        # set the benchmark so that calls to new_env.reset() will correctly
-        # revert the environment to the initial benchmark state.
-        #
-        # pylint: disable=protected-access
-        new_env._next_benchmark = self._benchmark_in_use
+            # Now that we have initialized the environment with the current state,
+            # set the benchmark so that calls to new_env.reset() will correctly
+            # revert the environment to the initial benchmark state.
+            #
+            # pylint: disable=protected-access
+            new_env._next_benchmark = self._benchmark_in_use
 
-        # Set the "visible" name of the current benchmark to hide the fact that
-        # we loaded from a custom bitcode file.
-        new_env._benchmark_in_use = self._benchmark_in_use
+            # Set the "visible" name of the current benchmark to hide the fact that
+            # we loaded from a custom bitcode file.
+            new_env._benchmark_in_use = self._benchmark_in_use
+        except NotImplementedError:
+            # Fallback implementation. If the compiler service does not support
+            # the Fork() operator then we create a new independent environment
+            # and apply the sequence of actions in the current environment to
+            # replay the state.
+            new_env = type(self)(
+                service=self._service_endpoint,
+                action_space=self.action_space,
+                benchmark=self.benchmark,
+                connection_settings=self._connection_settings,
+            )
+            new_env.reset()
+            _, _, done, _ = new_env.step(self.actions)
+            assert not done, "Failed to replay action sequence in forked environment"
 
         # Create copies of the mutable reward and observation spaces. This
         # is required to correctly calculate incremental updates.
@@ -611,8 +631,12 @@ class CompilerEnv(gym.Env):
                 # not kill it.
                 if reply.remaining_sessions:
                     close_service = False
-            except:  # noqa pylint: disable=bare-except
-                pass  # Don't feel bad, computer, you tried ;-)
+            except Exception as e:
+                self.logger.warning(
+                    "Failed to end active compiler session on close(): %s (%s)",
+                    e,
+                    type(e).__name__,
+                )
             self._session_id = None
 
         if self.service and close_service:
@@ -632,7 +656,7 @@ class CompilerEnv(gym.Env):
         benchmark: Optional[Union[str, Benchmark]] = None,
         action_space: Optional[str] = None,
         retry_count: int = 0,
-    ) -> Optional[observation_t]:
+    ) -> Optional[ObservationType]:
         """Reset the environment state.
 
         This method must be called before :func:`step()`.
@@ -740,7 +764,7 @@ class CompilerEnv(gym.Env):
 
         self.reward.reset(benchmark=self.benchmark)
         if self.reward_space:
-            self.episode_reward = 0
+            self.episode_reward = 0.0
 
         if self.observation_space:
             if len(reply.observation) != 1:
@@ -751,41 +775,56 @@ class CompilerEnv(gym.Env):
                 reply.observation[0]
             )
 
-    def step(self, action: Union[int, Iterable[int]]) -> step_t:
+    def raw_step(
+        self,
+        actions: Iterable[int],
+        observations: Iterable[ObservationSpaceSpec],
+        rewards: Iterable[Reward],
+    ) -> StepType:
         """Take a step.
 
-        :param action: An action, or a sequence of actions. When multiple
-            actions are provided the observation and reward are returned after
-            running all of the actions.
+        :param actions: A list of actions to be applied.
 
-        :return: A tuple of observation, reward, done, and info. Observation and
-            reward are None if default observation/reward is not set. If done is
-            True, observation and reward may also be None (e.g. because the
-            service failed).
+        :param observations: A list of observations spaces to compute
+            observations from. These are evaluated after the actions are
+            applied.
+
+        :param rewards: A list of reward spaces to compute rewards from. These
+            are evaluated after the actions are applied.
+
+        :return: A tuple of observations, rewards, done, and info. Observations
+            and rewards are lists.
 
         :raises SessionNotFound: If :meth:`reset()
             <compiler_gym.envs.CompilerEnv.reset>` has not been called.
+
+        .. warning::
+
+            Prefer :meth:`step() <compiler_gym.envs.CompilerEnv.step>` to
+            :meth:`raw_step() <compiler_gym.envs.CompilerEnv.step>`.
+            :meth:`step() <compiler_gym.envs.CompilerEnv.step>` has equivalent
+            functionality, and is less likely to change in the future.
         """
         if not self.in_episode:
             raise SessionNotFound("Must call reset() before step()")
-        actions = action if isinstance(action, IterableType) else [action]
-        observation, reward = None, None
 
         # Build the list of observations that must be computed by the backend
-        # service to generate the user-requested observation and reward.
-        # TODO(cummins): We could de-duplicate this list to improve efficiency
-        # when multiple redundant copies of the same observation space are
-        # requested.
-        observation_indices, observation_spaces = [], []
-        if self.observation_space:
-            observation_indices.append(self.observation_space_spec.index)
-            observation_spaces.append(self.observation_space_spec.id)
-        if self.reward_space:
-            observation_indices += [
-                self.observation.spaces[obs].index
-                for obs in self.reward_space.observation_spaces
+        user_observation_spaces: List[ObservationSpaceSpec] = list(observations)
+        reward_spaces: List[Reward] = list(rewards)
+
+        reward_observation_spaces: List[ObservationSpaceSpec] = []
+        for reward_space in reward_spaces:
+            reward_observation_spaces += [
+                self.observation.spaces[obs] for obs in reward_space.observation_spaces
             ]
-            observation_spaces += self.reward_space.observation_spaces
+
+        observations_to_compute: List[ObservationSpaceSpec] = list(
+            set(user_observation_spaces).union(set(reward_observation_spaces))
+        )
+        observation_space_index_map: Dict[ObservationSpaceSpec, int] = {
+            observation_space: i
+            for i, observation_space in enumerate(observations_to_compute)
+        }
 
         # Record the actions.
         self.actions += actions
@@ -793,8 +832,10 @@ class CompilerEnv(gym.Env):
         # Send the request to the backend service.
         request = StepRequest(
             session_id=self._session_id,
-            action=actions,
-            observation_space=observation_indices,
+            action=[Action(action=a) for a in actions],
+            observation_space=[
+                observation_space.index for observation_space in observations_to_compute
+            ],
         )
         try:
             reply = _wrapped_step(self.service, request)
@@ -809,15 +850,20 @@ class CompilerEnv(gym.Env):
             # end the current episode and provide some diagnostic information to
             # the user through the `info` dict.
             self.close()
+
             info = {
                 "error_type": type(e).__name__,
                 "error_details": str(e),
             }
-            if self.reward_space:
-                reward = self.reward_space.reward_on_error(self.episode_reward)
-            if self.observation_space:
-                observation = self.observation_space_spec.default_value
-            return observation, reward, True, info
+            default_observations = [
+                observation_space.default_value
+                for observation_space in user_observation_spaces
+            ]
+            default_rewards = [
+                float(reward_space.reward_on_error(self.episode_reward))
+                for reward_space in reward_spaces
+            ]
+            return default_observations, default_rewards, True, info
 
         # If the action space has changed, update it.
         if reply.HasField("new_action_space"):
@@ -826,32 +872,126 @@ class CompilerEnv(gym.Env):
             )
 
         # Translate observations to python representations.
-        if len(reply.observation) != len(observation_indices):
+        if len(reply.observation) != len(observations_to_compute):
             raise ServiceError(
-                f"Requested {observation_indices} observations "
+                f"Requested {len(observations_to_compute)} observations "
                 f"but received {len(reply.observation)}"
             )
-        observations = [
-            self.observation.spaces[obs].translate(val)
-            for obs, val in zip(observation_spaces, reply.observation)
+        computed_observations = [
+            observation_space.translate(value)
+            for observation_space, value in zip(
+                observations_to_compute, reply.observation
+            )
         ]
 
-        # Pop the requested observation.
-        if self.observation_space:
-            observation, observations = observations[0], observations[1:]
+        # Get the user-requested observation.
+        observations: List[ObservationType] = [
+            computed_observations[observation_space_index_map[observation_space]]
+            for observation_space in user_observation_spaces
+        ]
 
-        # Compute reward.
-        self.reward.previous_action = action
-        if self.reward_space:
-            reward = self.reward_space.update(action, observations, self.observation)
-            self.episode_reward += reward
+        # Update and compute the rewards.
+        rewards: List[RewardType] = []
+        for reward_space in reward_spaces:
+            reward_observations = [
+                computed_observations[
+                    observation_space_index_map[
+                        self.observation.spaces[observation_space]
+                    ]
+                ]
+                for observation_space in reward_space.observation_spaces
+            ]
+            rewards.append(
+                float(
+                    reward_space.update(actions, reward_observations, self.observation)
+                )
+            )
 
         info = {
             "action_had_no_effect": reply.action_had_no_effect,
             "new_action_space": reply.HasField("new_action_space"),
         }
 
-        return observation, reward, reply.end_of_session, info
+        return observations, rewards, reply.end_of_session, info
+
+    def step(
+        self,
+        action: Union[ActionType, Iterable[ActionType]],
+        observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        rewards: Optional[Iterable[Union[str, Reward]]] = None,
+    ) -> StepType:
+        """Take a step.
+
+        :param action: An action, or a sequence of actions. When multiple
+            actions are provided the observation and reward are returned after
+            running all of the actions.
+
+        :param observations: A list of observation spaces to compute
+            observations from. If provided, this changes the :code:`observation`
+            element of the return tuple to be a list of observations from the
+            requested spaces. The default :code:`env.observation_space` is not
+            returned.
+
+        :param rewards: A list of reward spaces to compute rewards from. If
+            provided, this changes the :code:`reward` element of the return
+            tuple to be a list of rewards from the requested spaces. The default
+            :code:`env.reward_space` is not returned.
+
+        :return: A tuple of observation, reward, done, and info. Observation and
+            reward are None if default observation/reward is not set.
+
+        :raises SessionNotFound: If :meth:`reset()
+            <compiler_gym.envs.CompilerEnv.reset>` has not been called.
+        """
+        # Coerce actions into a list.
+        actions = action if isinstance(action, IterableType) else [action]
+
+        # Coerce observation spaces into a list of ObservationSpaceSpec instances.
+        if observations:
+            observation_spaces: List[ObservationSpaceSpec] = [
+                obs
+                if isinstance(obs, ObservationSpaceSpec)
+                else self.observation.spaces[obs]
+                for obs in observations
+            ]
+        elif self.observation_space_spec:
+            observation_spaces: List[ObservationSpaceSpec] = [
+                self.observation_space_spec
+            ]
+        else:
+            observation_spaces: List[ObservationSpaceSpec] = []
+
+        # Coerce reward spaces into a list of Reward instances.
+        if rewards:
+            reward_spaces: List[Reward] = [
+                rew if isinstance(rew, Reward) else self.reward.spaces[rew]
+                for rew in rewards
+            ]
+        elif self.reward_space:
+            reward_spaces: List[Reward] = [self.reward_space]
+        else:
+            reward_spaces: List[Reward] = []
+
+        # Perform the underlying environment step.
+        observation_values, reward_values, done, info = self.raw_step(
+            actions, observation_spaces, reward_spaces
+        )
+
+        # Translate observations lists back to the appropriate types.
+        if observations is None and self.observation_space_spec:
+            observation_values = observation_values[0]
+        elif not observation_spaces:
+            observation_values = None
+
+        # Translate reward lists back to the appropriate types.
+        if rewards is None and self.reward_space:
+            reward_values = reward_values[0]
+            # Update the cumulative episode reward
+            self.episode_reward += reward_values
+        elif not reward_spaces:
+            reward_values = None
+
+        return observation_values, reward_values, done, info
 
     def render(
         self,

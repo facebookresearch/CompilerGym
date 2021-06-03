@@ -131,7 +131,7 @@ class _EvalPolicyWorker(Thread):
                 state = self.env.state.copy()
                 state.walltime = timer.time
 
-                writer.write_state(state)
+                writer.write_state(state, flush=True)
                 self.states.append(state)
 
                 if not self.alive:

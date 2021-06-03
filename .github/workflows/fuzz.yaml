@@ -13,7 +13,7 @@ on:
         - cron: 0 9 * * 1-5  # every weekday at 9am
 
 jobs:
-    test:
+    fuzz:
         runs-on: ${{ matrix.os }}
 
         strategy:
@@ -30,27 +30,16 @@ jobs:
               with:
                   python-version: ${{ matrix.python }}
 
-            - name: Install build dependencies (linux)
-              run: |
-                  curl -L "https://github.com/bazelbuild/bazelisk/releases/download/v1.6.1/bazelisk-linux-amd64" > bazel.tmp
-                  sudo mv bazel.tmp /usr/local/bin/bazel
-                  chmod +x /usr/local/bin/bazel
-                  sudo apt install clang-9 patchelf
-                  python -m pip install -r compiler_gym/requirements.txt -r tests/requirements.txt
-              if: matrix.os == 'ubuntu-latest'
-
-            - name: Install build dependencies (macOS)
-              run: |
-                  brew install bazelisk
-                  python -m pip install -r compiler_gym/requirements.txt -r tests/requirements.txt
-              if: matrix.os == 'macos-latest'
+            - name: Install build dependencies
+              uses: ./.github/actions/install-build-dependencies
 
             - name: Install
               run: make install
               env:
                   CC: clang
                   CXX: clang++
+                  BAZEL_OPTS: --batch
                   BAZEL_TEST_OPTS: --config=ci
 
             - name: Test
-              run: FUZZ_TIME=600 make fuzz
+              run: FUZZ_TIME=600 make install-fuzz

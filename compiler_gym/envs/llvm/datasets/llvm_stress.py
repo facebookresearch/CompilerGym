@@ -6,6 +6,8 @@ import subprocess
 from pathlib import Path
 from typing import Iterable
 
+import numpy as np
+
 from compiler_gym.datasets import Benchmark, Dataset
 from compiler_gym.datasets.benchmark import BenchmarkInitError
 from compiler_gym.third_party import llvm
@@ -55,6 +57,10 @@ class LlvmStressDataset(Dataset):
 
     def benchmark(self, uri: str) -> Benchmark:
         return self.benchmark_from_seed(int(uri.split("/")[-1]))
+
+    def _random_benchmark(self, random_state: np.random.Generator) -> Benchmark:
+        seed = random_state.integers(UINT_MAX)
+        return self.benchmark_from_seed(seed)
 
     def benchmark_from_seed(self, seed: int) -> Benchmark:
         """Get a benchmark from a uint32 seed.

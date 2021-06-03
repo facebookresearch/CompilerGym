@@ -10,58 +10,81 @@
 
 namespace compiler_gym::llvm_service {
 
-// The available observation spaces for LLVM.
-//
-// NOTE(cummins): Housekeeping rules - to add a new observation space:
-//   1. Add a new entry to this LlvmObservationSpace enum.
-//   2. Add a new switch case to getLlvmObservationSpaceList() to return the
-//      ObserverationSpace.
-//   3. Add a new switch case to LlvmSession::getObservation() to compute
-//      the actual observation.
-//   4. Run `bazel test //compiler_gym/...` and update the newly failing tests.
+/**
+ * The available observation spaces for LLVM.
+ *
+ * \note Housekeeping rules - to add a new observation space:
+ *   1. Add a new entry to this LlvmObservationSpace enum.
+ *   2. Add a new switch case to getLlvmObservationSpaceList() to return the
+ *      ObserverationSpace.
+ *   3. Add a new switch case to LlvmSession::getObservation() to compute
+ *      the actual observation.
+ *   4. Run `bazel test //compiler_gym/...` and update the newly failing tests.
+ */
 enum class LlvmObservationSpace {
-  // The entire LLVM module as an IR string. This allows the user to do its own
-  // feature extraction.
+  /**
+   * The entire LLVM module as an IR string.
+   *
+   * This allows the user to do their own feature extraction.
+   */
   IR,
-  // Write the bitcode to a file. Returns a string, which is the path of the
-  // written file.
+  /** The 40-digit hex SHA1 checksum of the LLVM module. */
+  IR_SHA1,
+  /** Write the bitcode to a file and return its path as a string. */
   BITCODE_FILE,
-  // The counts of all instructions in a program.
+  /** The counts of all instructions in a program. */
   INST_COUNT,
-  // The Autophase feature vector from:
-  //
-  //   Huang, Q., Haj-Ali, A., Moses, W., Xiang, J., Stoica, I., Asanovic, K., &
-  //   Wawrzynek, J. (2019). Autophase: Compiler phase-ordering for HLS with
-  //   deep reinforcement learning. FCCM.
+  /**
+   * The Autophase feature vector.
+   *
+   * From:
+   *
+   *     Huang, Q., Haj-Ali, A., Moses, W., Xiang, J., Stoica, I., Asanovic, K.,
+   *     & Wawrzynek, J. (2019). Autophase: Compiler phase-ordering for HLS with
+   *     deep reinforcement learning. FCCM.
+   */
   AUTOPHASE,
-  // Returns the graph representation of a program from:
-  //
-  //     Cummins, C., Fisches, Z. V., Ben-Nun, T., Hoefler, T., & Leather, H.
-  //     (2020). ProGraML: Graph-based Deep Learning for Program Optimization
-  //     and Analysis. ArXiv:2003.10536. https://arxiv.org/abs/2003.10536
+  /**
+   * Returns the graph representation of a program.
+   *
+   * From:
+   *
+   *     Cummins, C., Fisches, Z. V., Ben-Nun, T., Hoefler, T., & Leather, H.
+   *     (2020). ProGraML: Graph-based Deep Learning for Program Optimization
+   *     and Analysis. ArXiv:2003.10536. https://arxiv.org/abs/2003.10536
+   */
   PROGRAML,
-  // A JSON dictionary of properties describing the CPU.
+  /** A JSON dictionary of properties describing the CPU. */
   CPU_INFO,
-  // The number of LLVM-IR instructions in the current module.
+  /** The number of LLVM-IR instructions in the current module. */
   IR_INSTRUCTION_COUNT,
+  /** The number of LLVM-IR instructions normalized to `-O0`. */
   IR_INSTRUCTION_COUNT_O0,
+  /** The number of LLVM-IR instructions normalized to `-O3`. */
   IR_INSTRUCTION_COUNT_O3,
+  /** The number of LLVM-IR instructions normalized to `-Oz`. */
   IR_INSTRUCTION_COUNT_OZ,
-  // The size of the .text section of the lowered module. Platform dependent.
+  /** The platform-dependent size of the .text section of the lowered module. */
   OBJECT_TEXT_SIZE_BYTES,
+  /** The platform-dependent size of the .text section of the lowered module. */
   OBJECT_TEXT_SIZE_O0,
+  /** The platform-dependent size of the .text section of the lowered module. */
   OBJECT_TEXT_SIZE_O3,
+  /** The platform-dependent size of the .text section of the lowered module. */
   OBJECT_TEXT_SIZE_OZ,
 #ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
-  // The size of the .text section of the compiled binary. Platform dependent.
+  /** The platform-dependent size of the .text section of the compiled binary. */
   TEXT_SIZE_BYTES,
+  /** The platform-dependent size of the .text section of the compiled binary. */
   TEXT_SIZE_O0,
+  /** The platform-dependent size of the .text section of the compiled binary. */
   TEXT_SIZE_O3,
+  /** The platform-dependent size of the .text section of the compiled binary. */
   TEXT_SIZE_OZ,
 #endif
 };
 
-// Return the list of available observation spaces.
+/** Return the list of available observation spaces. */
 std::vector<ObservationSpace> getLlvmObservationSpaceList();
 
 }  // namespace compiler_gym::llvm_service

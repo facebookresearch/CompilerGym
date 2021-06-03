@@ -22,27 +22,33 @@ jobs:
                   sudo rm -f /usr/bin/clang-format
                   sudo ln -s /usr/bin/clang-format-10 /usr/bin/clang-format
                   clang-format --version
+
             - name: Install go
               uses: actions/setup-go@v2
               with:
                   go-version: ^1.13.1
+
             - name: Install buildifier
               run: |
                   go get github.com/bazelbuild/buildtools/buildifier
                   buildifier --version
+
             - name: Install prototool
               run: |
                   GO111MODULE=on go get github.com/uber/prototool/cmd/prototool@dev
                   prototool version
+
             - name: Install hadolint
               run: |
                   wget -O hadolint https://github.com/hadolint/hadolint/releases/download/v1.19.0/hadolint-Linux-x86_64
                   chmod +x hadolint
                   sudo mv hadolint /usr/local/bin
-            - name: Install Python 3.9
+
+            - name: Set up Python
               uses: actions/setup-python@v2
               with:
                   python-version: 3.9
+
             - name: Install Python dependencies
               run: |
                   sudo apt-get install python3-setuptools
@@ -51,6 +57,7 @@ jobs:
                   python3 -m isort --version
                   python3 -m black --version
                   python3 -m pre_commit --version
+
             - name: Run pre-commit checks
               # TODO(github.com/facebookresearch/CompilerGym/issues/1): Disable
               # isort due to inconsistent results when run locally versus in

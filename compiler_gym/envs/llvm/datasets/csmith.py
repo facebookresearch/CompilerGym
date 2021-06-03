@@ -12,6 +12,7 @@ from pathlib import Path
 from threading import Lock
 from typing import Iterable, List
 
+import numpy as np
 from fasteners import InterProcessLock
 
 from compiler_gym.datasets import Benchmark, BenchmarkSource, Dataset
@@ -21,7 +22,6 @@ from compiler_gym.envs.llvm.llvm_benchmark import ClangInvocation
 from compiler_gym.util.decorators import memoized_property
 from compiler_gym.util.download import download
 from compiler_gym.util.runfiles_path import transient_cache_path
-from compiler_gym.util.truncate import truncate
 
 # The maximum value for the --seed argument to csmith.
 UINT_MAX = (2 ** 32) - 1
@@ -227,6 +227,10 @@ class CsmithDataset(Dataset):
     def benchmark(self, uri: str) -> CsmithBenchmark:
         return self.benchmark_from_seed(int(uri.split("/")[-1]))
 
+    def _random_benchmark(self, random_state: np.random.Generator) -> Benchmark:
+        seed = random_state.integers(UINT_MAX)
+        return self.benchmark_from_seed(seed)
+
     def benchmark_from_seed(self, seed: int) -> CsmithBenchmark:
         """Get a benchmark from a uint32 seed.
 
@@ -246,30 +250,25 @@ class CsmithDataset(Dataset):
         )
 
         # Generate the C source.
-        src, stderr = csmith.communicate(timeout=300)
+        src, _ = csmith.communicate(timeout=300)
         if csmith.returncode:
-            error = truncate(stderr.decode("utf-8"), max_lines=20, max_line_len=100)
-            raise OSError(f"Csmith failed with seed {seed}\nError: {error}")
+            raise OSError(f"Csmith failed with seed {seed}")
 
         # Compile to IR.
         clang = subprocess.Popen(
             self.clang_compile_command,
             stdin=subprocess.PIPE,
             stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
+            stderr=subprocess.DEVNULL,
         )
-        stdout, stderr = clang.communicate(src, timeout=300)
+        stdout, _ = clang.communicate(src, timeout=300)
 
-        if csmith.returncode:
-            raise OSError(f"Csmith failed with seed {seed}")
         if clang.returncode:
             compile_cmd = " ".join(self.clang_compile_command)
-            error = truncate(stderr.decode("utf-8"), max_lines=20, max_line_len=100)
             raise BenchmarkInitError(
                 f"Compilation job failed!\n"
                 f"Csmith seed: {seed}\n"
                 f"Command: {compile_cmd}\n"
-                f"Error: {error}"
             )
 
         return self.benchmark_class.create(f"{self.name}/{seed}", stdout, src)

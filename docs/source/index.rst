@@ -11,8 +11,9 @@ for applying reinforcement learning to compiler optimizations.
    llvm/index
    cli
    about
-   contributing
+   rpc
    changelog
+   contributing
    faq
 
 ..
@@ -35,9 +36,16 @@ for applying reinforcement learning to compiler optimizations.
    compiler_gym/service
    compiler_gym/spaces
    compiler_gym/views
+   compiler_gym/wrappers
 
-..
-   TODO(github.com/facebookresearch/CompilerGym/issues/4): Add LLVM Service docs.
+.. toctree::
+   :maxdepth: 3
+   :caption: C++ API Reference
+
+   cc/compiler_gym/envs/llvm/service
+   cc/compiler_gym/service
+   cc/compiler_gym/service/runtime
+   cc/compiler_gym/util
 
 
 Indices and tables
@@ -45,4 +53,3 @@ Indices and tables
 
 * :ref:`genindex`
 * :ref:`modindex`
-* :ref:`search`

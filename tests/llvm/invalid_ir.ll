@@ -2,6 +2,11 @@
 ; This IR file can be assembled: $ lvm-as tests/llvm/invalid_ir.ll
 ; But it cannot be compiled:     $ clang tests/llvm/invalid_ir.ll
 ; The error is: "error in backend: Cannot emit physreg copy instruction"
+;
+; Copyright (c) Facebook, Inc. and its affiliates.
+;
+; This source code is licensed under the MIT license found in the
+; LICENSE file in the root directory of this source tree.
 
 ; ModuleID = '<stdin>'
 source_filename = "/tmp/autogen.bc"

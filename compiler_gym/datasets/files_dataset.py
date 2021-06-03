@@ -6,6 +6,8 @@ import os
 from pathlib import Path
 from typing import Iterable, List
 
+import numpy as np
+
 from compiler_gym.datasets.dataset import Benchmark, Dataset
 from compiler_gym.util.decorators import memoized_property
 
@@ -117,3 +119,6 @@ class FilesDataset(Dataset):
         if not abspath.is_file():
             raise LookupError(f"Benchmark not found: {uri} (file not found: {abspath})")
         return self.benchmark_class.from_file(uri, abspath)
+
+    def _random_benchmark(self, random_state: np.random.Generator) -> Benchmark:
+        return self.benchmark(random_state.choice(list(self.benchmark_uris())))

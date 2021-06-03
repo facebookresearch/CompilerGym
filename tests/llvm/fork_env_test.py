@@ -43,7 +43,7 @@ def test_fork_child_process_is_not_orphaned(env: LlvmEnv):
         fkd.close()
 
         # Check that the service has been killed.
-        assert process.poll()
+        assert process.poll() is not None
     finally:
         fkd.close()
 

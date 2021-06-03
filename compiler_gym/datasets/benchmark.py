@@ -38,7 +38,7 @@ class BenchmarkSource(NamedTuple):
         return str(self.filename)
 
 
-class Benchmark(object):
+class Benchmark:
     """A benchmark represents a particular program that is being compiled.
 
     A benchmark is a program that can be used by a :class:`CompilerEnv
@@ -97,6 +97,9 @@ class Benchmark(object):
 
     def __repr__(self) -> str:
         return str(self.uri)
+
+    def __hash__(self) -> int:
+        return hash(self.uri)
 
     @property
     def uri(self) -> str:

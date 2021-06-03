@@ -113,10 +113,9 @@ def random_search(
     nproc: int = cpu_count(),
     skip_done: bool = False,
 ) -> Tuple[float, List[int]]:
-    env = make_env()
-    try:
+    with make_env() as env:
         env.reset()
-        if not isinstance(env, CompilerEnv):
+        if not isinstance(env.unwrapped, CompilerEnv):
             raise TypeError(
                 f"random_search() requires CompilerEnv. Called with: {type(env).__name__}"
             )
@@ -151,8 +150,6 @@ def random_search(
         }
         with open(str(metadata_path), "w") as f:
             json.dump(metadata, f, sort_keys=True, indent=2)
-    finally:
-        env.close()
 
     workers = [RandomAgentWorker(make_env, patience) for _ in range(nproc)]
     for worker in workers:
@@ -164,7 +161,7 @@ def random_search(
     last_best_returns = -float("inf")
 
     print(
-        f"Started {len(workers)} worker threads for "
+        f"Started {len(workers)} worker threads for {benchmark_uri} "
         f"using reward {reward_space_name}."
     )
     print(f"Writing logs to {outdir}")

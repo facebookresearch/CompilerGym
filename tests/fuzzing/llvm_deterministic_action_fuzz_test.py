@@ -24,6 +24,7 @@ def sha1(string: str):
     return sha1.hexdigest()
 
 
+@pytest.mark.timeout(600)
 def test_fuzz(env: LlvmEnv):
     """Run an action multiple times from the same starting state and check that
     the generated LLVM-IR is the same.

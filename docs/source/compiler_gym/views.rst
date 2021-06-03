@@ -10,6 +10,8 @@ available observation and reward spaces can be queried through the
 :py:attr:`~compiler_gym.envs.CompilerEnv.reward` attributes,
 respectively.
 
+.. contents:: Document contents:
+    :local:
 
 .. currentmodule:: compiler_gym.views
 

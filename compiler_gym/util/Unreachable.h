@@ -6,9 +6,14 @@
 
 #include <glog/logging.h>
 
-// Declare a program point as unreachable. For debug builds, this will trigger
-// a fatal error if reached. For optimized builds (i.e. ones built using
-// `bazel build -c opt`), this is totally undefined.
+/**
+ * Declare a program point as unreachable. For debug builds, this will trigger a
+ * fatal error if reached. For optimized builds (i.e. ones built using `bazel
+ * build -c opt`), this is undefined.
+ *
+ * @param msg A message that will be printed if this program point is reached
+ *    in a debug build.
+ */
 #define UNREACHABLE(msg)                   \
   DLOG(FATAL) << "Unreachable: " << (msg); \
   __builtin_unreachable();

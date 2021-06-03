@@ -5,7 +5,7 @@
 from typing import Any
 
 
-class ShellFormatCodes(object):
+class ShellFormatCodes:
     """Shell escape codes for pretty-printing."""
 
     PURPLE = "\033[95m"

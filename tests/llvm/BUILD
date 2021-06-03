@@ -41,20 +41,6 @@ py_test(
 )
 
 py_test(
-    name = "benchmarks_random_actions_test",
-    timeout = "long",
-    srcs = ["benchmarks_random_actions_test.py"],
-    shard_count = 4,
-    deps = [
-        "//compiler_gym",
-        "//compiler_gym/envs",
-        "//compiler_gym/third_party/autophase",
-        "//tests:test_main",
-        "//tests/pytest_plugins:llvm",
-    ],
-)
-
-py_test(
     name = "custom_benchmarks_test",
     srcs = ["custom_benchmarks_test.py"],
     data = [
@@ -79,6 +65,17 @@ py_test(
         "//compiler_gym/util",
         "//tests:test_main",
         "//tests/pytest_plugins:common",
+    ],
+)
+
+py_test(
+    name = "episode_reward_test",
+    timeout = "long",
+    srcs = ["episode_reward_test.py"],
+    deps = [
+        "//compiler_gym/envs",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
     ],
 )
 
@@ -192,7 +189,7 @@ py_test(
     deps = [
         "//compiler_gym",
         "//tests:test_main",
-        "//tests/pytest_plugins:llvm",
+        "//tests/pytest_plugins:common",
     ],
 )
 

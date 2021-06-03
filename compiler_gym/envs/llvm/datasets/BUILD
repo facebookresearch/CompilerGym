@@ -10,6 +10,7 @@ py_library(
         "__init__.py",
         "anghabench.py",
         "cbench.py",
+        "chstone.py",
         "clgen.py",
         "csmith.py",
         "llvm_stress.py",

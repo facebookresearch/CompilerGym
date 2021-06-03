@@ -1,3 +1,39 @@
+## Release 0.1.9 (2021-06-03)
+
+This release of CompilerGym focuses on **backend extensibility** and adds a
+bunch of new features to make it easier to add support for new compilers:
+
+- Adds a new `CompilationSession` class encapsulates a single incremental
+  compilation session
+  ([#261](https://github.com/facebookresearch/CompilerGym/pull/261)).
+- Adds a common runtime for CompilerGym services that takes a
+  `CompilationSession` subclass and handles all the RPC wrangling for you
+  ([#270](https://github.com/facebookresearch/CompilerGym/pull/270)).
+- Ports the LLVM service and example services to the new runtime
+  ([#277](https://github.com/facebookresearch/CompilerGym/pull/277)). This
+  provides a net performance win with fewer lines of code.
+
+Other highlights of this release include:
+
+- [Core API] Adds a new `compiler_gym.wrappers` module that makes it easy to
+  apply modular transformations to CompilerGym environments without modifying
+  the environment code
+  ([#272](https://github.com/facebookresearch/CompilerGym/pull/272)).
+- [Core API] Adds a new `Datasets.random_benchmark()` method for selecting a
+  uniform random benchmark from one or more datasets
+  ([#247](https://github.com/facebookresearch/CompilerGym/pull/247)).
+- [Core API] Adds a new `compiler_gym.make()` function, equivalent to
+  `gym.make()`
+  ([#257](https://github.com/facebookresearch/CompilerGym/pull/257)).
+- [LLVM] Adds a new `IrSha1` observation space that uses a fast, service-side
+  C++ implementation to compute a checksum of the environment state
+  ([#267](https://github.com/facebookresearch/CompilerGym/pull/267)).
+- [LLVM] Adds 12 new C programs from the CHStone benchmark suite
+  ([#284](https://github.com/facebookresearch/CompilerGym/pull/284)).
+- [LLVM] Adds the `anghabench-v1` dataset and deprecated `anghabench-v0`
+  ([#242](https://github.com/facebookresearch/CompilerGym/pull/242)).
+- Numerous bug fixes and improvements.
+
 ## Release 0.1.8 (2021-04-30)
 
 This release introduces some significant changes to the way that benchmarks are

@@ -23,7 +23,7 @@ pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.llvm"]
 def anghabench_dataset() -> AnghaBenchDataset:
     env = gym.make("llvm-v0")
     try:
-        ds = env.datasets["anghabench-v0"]
+        ds = env.datasets["anghabench-v1"]
     finally:
         env.close()
     yield ds
@@ -31,9 +31,9 @@ def anghabench_dataset() -> AnghaBenchDataset:
 
 def test_anghabench_size(anghabench_dataset: AnghaBenchDataset):
     if sys.platform == "darwin":
-        assert anghabench_dataset.size == 1042908
+        assert anghabench_dataset.size == 1041265
     else:
-        assert anghabench_dataset.size == 1042976
+        assert anghabench_dataset.size == 1041333
 
 
 def test_missing_benchmark_name(anghabench_dataset: AnghaBenchDataset, mocker):
@@ -41,15 +41,15 @@ def test_missing_benchmark_name(anghabench_dataset: AnghaBenchDataset, mocker):
     mocker.patch.object(anghabench_dataset, "install")
 
     with pytest.raises(
-        LookupError, match=r"^No benchmark specified: benchmark://anghabench-v0$"
+        LookupError, match=r"^No benchmark specified: benchmark://anghabench-v1$"
     ):
-        anghabench_dataset.benchmark("benchmark://anghabench-v0")
+        anghabench_dataset.benchmark("benchmark://anghabench-v1")
     anghabench_dataset.install.assert_called_once()
 
     with pytest.raises(
-        LookupError, match=r"^No benchmark specified: benchmark://anghabench-v0/$"
+        LookupError, match=r"^No benchmark specified: benchmark://anghabench-v1/$"
     ):
-        anghabench_dataset.benchmark("benchmark://anghabench-v0/")
+        anghabench_dataset.benchmark("benchmark://anghabench-v1/")
     assert anghabench_dataset.install.call_count == 2
 
 

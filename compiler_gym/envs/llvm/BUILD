@@ -57,6 +57,7 @@ py_library(
     deps = [
         "//compiler_gym/service",
         "//compiler_gym/spaces",
+        "//compiler_gym/util",
         "//compiler_gym/views",
     ],
 )

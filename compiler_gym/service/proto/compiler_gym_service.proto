@@ -9,11 +9,14 @@ syntax = "proto3";
 
 package compiler_gym;
 
+option cc_enable_arenas = true;
 option go_package = "compiler_gympb";
 option java_multiple_files = true;
 option java_outer_classname = "CompilerGymServiceProto";
 option java_package = "com.compiler_gym";
 
+// The CompilerGymService is the interface that exposes the incremental
+// optimization of a program as an interactive environment.
 service CompilerGymService {
   // Request version strings from the service.
   rpc GetVersion(GetVersionRequest) returns (GetVersionReply);
@@ -43,11 +46,10 @@ service CompilerGymService {
   rpc AddBenchmark(AddBenchmarkRequest) returns (AddBenchmarkReply);
 }
 
-// ===========================================================================
-// GetVersion().
-
+// A GetVersion() request.
 message GetVersionRequest {}
 
+// The GetVersion() response.
 message GetVersionReply {
   // The version string for this service.
   string service_version = 1;
@@ -55,9 +57,7 @@ message GetVersionReply {
   string compiler_version = 2;
 }
 
-// ===========================================================================
-// StartSession().
-
+// A StartSession() request.
 message StartSessionRequest {
   // The name of the benchmark to use for this session. If not provided, a
   // benchmark is chosen randomly by the service.
@@ -70,6 +70,7 @@ message StartSessionRequest {
   repeated int32 observation_space = 3;
 }
 
+// A StartSession() reply.
 message StartSessionReply {
   // The ID that has been assigned to the session. The client must use this ID
   // in all subsequent interactions with the service for this session.
@@ -86,19 +87,17 @@ message StartSessionReply {
   repeated Observation observation = 4;
 }
 
-// ===========================================================================
-// Step().
-
+// A Step() request.
 message StepRequest {
   // The ID of the session.
   int64 session_id = 1;
-  // A list of indices into the ActionSpace.action list. Actions are executed
-  // in the order they appear in this list.
-  repeated int32 action = 2;
+  // A list of actions to execute, in order.
+  repeated Action action = 2;
   // A list of indices into the GetSpacesReply.observation_space_list
   repeated int32 observation_space = 3;
 }
 
+// A Step() reply.
 message StepReply {
   // Indicates that the session has ended. This could be because there are no
   // further actions that can be made, or because the action has led to an
@@ -119,23 +118,27 @@ message StepReply {
   repeated Observation observation = 4;
 }
 
-// ===========================================================================
-// Actions.
-
+// A description of an action space.
+//
+// \warning This message format is likely to change. This currently only
+//     supports flat action spaces of categorical values. In the future we will
+//     want to replace this with a more extensible representation that supports
+//     parameterized actions, and actions of different types (e.g. optimization
+//     passes vs optimization contexts).
 message ActionSpace {
   // The name of the action space.
   string name = 1;
   // A list of discrete action names.
-  // NOTE(cummins): This currently only supports flat action spaces of
-  // categorical values. In the future we will want to replace this with a more
-  // extensible representation that supports parameterized actions, and actions
-  // of different types (e.g. optimization passes vs optimization contexts).
   repeated string action = 2;
 }
 
-// ===========================================================================
-// Observations.
+// An action.
+message Action {
+  // An index into the ActionSpace.action list.
+  int32 action = 1;
+}
 
+// An observations from a compiler.
 message Observation {
   // A point in an ObservationSpace is _either_ a scalar or vector of integers
   // or real values, a string, or an opaque byte array.
@@ -149,14 +152,17 @@ message Observation {
   }
 }
 
+// A list of 64 bit integers.
 message Int64List {
   repeated int64 value = 1;
 }
 
+// A list of doubles.
 message DoubleList {
   repeated double value = 1;
 }
 
+// The [min, max] range of a scalar.
 message ScalarRange {
   // The minimum value (inclusive). If not set, the value is -inf.
   ScalarLimit min = 1;
@@ -164,14 +170,17 @@ message ScalarRange {
   ScalarLimit max = 2;
 }
 
+// Representation of the upper or lower limit of a scalar.
 message ScalarLimit {
   double value = 1;
 }
 
+// A list of scalar ranges.
 message ScalarRangeList {
   repeated ScalarRange range = 1;
 }
 
+// The description of a space of observations.
 message ObservationSpace {
   // The name of the observation space.
   string name = 1;
@@ -207,37 +216,34 @@ message ObservationSpace {
   Observation default_value = 9;
 }
 
-// ===========================================================================
-// Fork().
-
+// A Fork() request.
 message ForkSessionRequest {
   // The ID of the session to fork.
   int64 session_id = 1;
 }
 
+// A Fork() reply.
 message ForkSessionReply {
   // The ID of the newly created session.
   int64 session_id = 1;
 }
 
-// ===========================================================================
-// EndSession().
-
+// An EndSession() request.
 message EndSessionRequest {
   // The ID of the session.
   int64 session_id = 1;
 }
 
+// An EndSession() reply.
 message EndSessionReply {
   // The number of sessions that the service currently has.
   int32 remaining_sessions = 1;
 }
 
-// ===========================================================================
-// GetSpaces().
-
+// A GetSpaces() request.
 message GetSpacesRequest {}
 
+// A GetSpaces() reply.
 message GetSpacesReply {
   // The initial space of actions. Subsequent calls to step() may produce
   // a new action space.
@@ -247,11 +253,7 @@ message GetSpacesReply {
   repeated ObservationSpace observation_space_list = 2;
 }
 
-// ===========================================================================
-// AddBenchmark().
-
-// A Benchmark message is used to register a new benchmark with a compiler
-// service.
+// Representation of the input to a compiler.
 message Benchmark {
   // The name of the benchmark to add. In case of conflict with an existing
   // benchmark, this new benchmark replaces the existing one.
@@ -274,8 +276,10 @@ message File {
   }
 }
 
+// An AddBenchmark() request.
 message AddBenchmarkRequest {
   repeated Benchmark benchmark = 1;
 }
 
+// An AddBenchmark() reply.
 message AddBenchmarkReply {}

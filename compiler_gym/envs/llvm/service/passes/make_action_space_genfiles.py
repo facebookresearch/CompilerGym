@@ -154,6 +154,19 @@ def make_action_sources(pass_iterator, outpath: Path):
         print("#pragma once", file=f)
         for header in sorted(headers):
             print(f'#include "{header}"', file=f)
+
+        # Inject an ad-hoc workaround for the non-standard constructor of the
+        # EarlyCSEMemSSAPass.
+        print(
+            """
+namespace llvm {
+FunctionPass* createEarlyCSEMemSSAPass() {
+  return createEarlyCSEPass(/*UseMemorySSA=*/true);
+}
+} // namespace llvm
+""",
+            file=f,
+        )
     logging.debug("Generated %s", include_path.name)
 
     with open(actions_path, "w") as f:

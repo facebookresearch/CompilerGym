@@ -9,7 +9,7 @@ from compiler_gym.views import RewardView
 from tests.test_main import main
 
 
-class MockReward(object):
+class MockReward:
     def __init__(self, id, ret=None):
         self.id = id
         self.ret = list(reversed(ret or []))
@@ -21,7 +21,7 @@ class MockReward(object):
         return ret
 
 
-class MockObservationView(object):
+class MockObservationView:
     pass
 
 

@@ -48,6 +48,7 @@ extensions = [
     "sphinx_rtd_theme",
     "sphinx.ext.autosectionlabel",
     "sphinxemoji.sphinxemoji",
+    "breathe",
 ]
 
 autosectionlabel_prefix_document = True
@@ -75,3 +76,9 @@ html_css_files = [
 ]
 
 html_static_path = ["_static"]
+
+# -- Breathe configuration -
+
+breathe_default_project = "CompilerGym"
+
+breathe_projects = {"CompilerGym": "../doxygen/xml"}

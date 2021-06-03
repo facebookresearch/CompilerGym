@@ -7,6 +7,17 @@
 load("@rules_python//python:defs.bzl", "py_test")
 
 py_test(
+    name = "llvm_cbench_validate_fuzz_test",
+    srcs = ["llvm_cbench_validate_fuzz_test.py"],
+    tags = ["manual"],
+    deps = [
+        "//compiler_gym",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "llvm_commandline_opt_equivalence_fuzz_test",
     srcs = ["llvm_commandline_opt_equivalence_fuzz_test.py"],
     tags = ["manual"],
@@ -42,6 +53,21 @@ py_test(
 )
 
 py_test(
+    name = "benchmarks_random_actions_test",
+    timeout = "long",
+    srcs = ["benchmarks_random_actions_test.py"],
+    shard_count = 4,
+    tags = ["manual"],
+    deps = [
+        "//compiler_gym",
+        "//compiler_gym/envs",
+        "//compiler_gym/third_party/autophase",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "llvm_trajectory_replay_fuzz_test",
     srcs = ["llvm_trajectory_replay_fuzz_test.py"],
     tags = ["manual"],
@@ -50,17 +76,6 @@ py_test(
         "//tests:test_main",
         "//tests/pytest_plugins:llvm",
         "//tests/pytest_plugins:random_util",
-    ],
-)
-
-py_test(
-    name = "llvm_validate_fuzz_test",
-    srcs = ["llvm_validate_fuzz_test.py"],
-    tags = ["manual"],
-    deps = [
-        "//compiler_gym",
-        "//tests:test_main",
-        "//tests/pytest_plugins:llvm",
     ],
 )
 

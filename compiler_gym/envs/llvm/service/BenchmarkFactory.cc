@@ -23,6 +23,8 @@ namespace fs = boost::filesystem;
 using grpc::Status;
 using grpc::StatusCode;
 
+using BenchmarkProto = compiler_gym::Benchmark;
+
 namespace compiler_gym::llvm_service {
 
 BenchmarkFactory::BenchmarkFactory(const boost::filesystem::path& workingDirectory,
@@ -35,16 +37,43 @@ BenchmarkFactory::BenchmarkFactory(const boost::filesystem::path& workingDirecto
   VLOG(2) << "BenchmarkFactory initialized";
 }
 
-Status BenchmarkFactory::getBenchmark(const std::string& uri,
+Status BenchmarkFactory::getBenchmark(const BenchmarkProto& benchmarkMessage,
                                       std::unique_ptr<Benchmark>* benchmark) {
   // Check if the benchmark has already been loaded into memory.
-  auto loaded = benchmarks_.find(uri);
+  auto loaded = benchmarks_.find(benchmarkMessage.uri());
   if (loaded != benchmarks_.end()) {
     *benchmark = loaded->second.clone(workingDirectory_);
     return Status::OK;
   }
 
-  return Status(StatusCode::NOT_FOUND, "Benchmark not found");
+  // Benchmark not cached, cache it and try again.
+  const auto& programFile = benchmarkMessage.program();
+  switch (programFile.data_case()) {
+    case compiler_gym::File::DataCase::kContents: {
+      RETURN_IF_ERROR(addBitcode(
+          benchmarkMessage.uri(),
+          llvm::SmallString<0>(programFile.contents().begin(), programFile.contents().end())));
+      break;
+    }
+    case compiler_gym::File::DataCase::kUri: {
+      // Check the protocol of the benchmark URI.
+      if (programFile.uri().find("file:///") != 0) {
+        return Status(StatusCode::INVALID_ARGUMENT,
+                      fmt::format("Invalid benchmark data URI. "
+                                  "Only the file:/// protocol is supported: \"{}\"",
+                                  programFile.uri()));
+      }
+
+      const fs::path path(programFile.uri().substr(util::strLen("file:///"), std::string::npos));
+      RETURN_IF_ERROR(addBitcode(benchmarkMessage.uri(), path));
+      break;
+    }
+    case compiler_gym::File::DataCase::DATA_NOT_SET:
+      return Status(StatusCode::INVALID_ARGUMENT, fmt::format("No program set in Benchmark:\n{}",
+                                                              benchmarkMessage.DebugString()));
+  }
+
+  return getBenchmark(benchmarkMessage, benchmark);
 }
 
 Status BenchmarkFactory::addBitcode(const std::string& uri, const Bitcode& bitcode) {

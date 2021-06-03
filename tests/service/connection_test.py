@@ -32,7 +32,7 @@ def dead_connection() -> CompilerGymServiceConnection:
     env = gym.make("llvm-v0")
     try:
         # Kill the service.
-        env.service.connection.process.kill()
+        env.service.connection.process.terminate()
         env.service.connection.process.communicate()
 
         yield env.service
@@ -41,9 +41,8 @@ def dead_connection() -> CompilerGymServiceConnection:
 
 
 def test_create_invalid_options():
-    with pytest.raises(TypeError) as ctx:
+    with pytest.raises(TypeError, match="No endpoint provided for service connection"):
         CompilerGymServiceConnection("")
-    assert str(ctx.value) == "No endpoint provided for service connection"
 
 
 def test_create_channel_failed_subprocess(
@@ -68,7 +67,13 @@ def test_create_channel_failed_subprocess_rpc_timeout(
     """Same as the above test, but RPC timeout is long enough that only a single
     attempt can be made.
     """
-    with pytest.raises(OSError) as ctx:
+    with pytest.raises(
+        OSError,
+        match=(
+            r"Failed to create connection to localhost:\d+ after "
+            r"[\d\.]+ seconds \(1 attempt made\)"
+        ),
+    ):
         CompilerGymServiceConnection(
             f"{dead_connection.connection.url}",
             ConnectionOpts(
@@ -78,20 +83,17 @@ def test_create_channel_failed_subprocess_rpc_timeout(
             ),
         )
 
-    assert str(ctx.value).startswith("Failed to create connection to localhost:")
-    assert " (1 attempt made)" in str(ctx.value)
-
 
 def test_call_stub_invalid_type(connection: CompilerGymServiceConnection):
-    with pytest.raises(TypeError) as ctx:
+    with pytest.raises(
+        TypeError, match="Exception serializing request! Request type: type"
+    ):
         connection(connection.stub.GetSpaces, int)
-    assert str(ctx.value) == "Exception serializing request! Request type: type"
 
 
 def test_call_stub_negative_timeout(connection: CompilerGymServiceConnection):
-    with pytest.raises(TimeoutError) as ctx:
+    with pytest.raises(TimeoutError, match=r"Deadline Exceeded \(-10.0 seconds\)"):
         connection(connection.stub.GetSpaces, GetSpacesRequest(), timeout=-10)
-    assert str(ctx.value) == "Deadline Exceeded (-10.0 seconds)"
 
 
 if __name__ == "__main__":

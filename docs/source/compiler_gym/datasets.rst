@@ -6,7 +6,7 @@ An instance of a CompilerGym environment uses a :class:`Benchmark
 :class:`Dataset <compiler_gym.datasets.Dataset>` is collection of benchmarks
 that can be installed and made available for use.
 
-.. contents::
+.. contents:: Dataset Classes:
   :local:
 
 .. currentmodule:: compiler_gym.datasets
