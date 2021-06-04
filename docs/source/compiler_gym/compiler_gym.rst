@@ -1,7 +1,7 @@
 compiler_gym
 ============
 
-.. contents::
+.. contents:: Document contents:
     :local:
 
 .. currentmodule:: compiler_gym

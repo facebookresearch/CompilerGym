@@ -5,7 +5,7 @@ The :code:`compiler_gym.envs.llvm` module contains datasets and API extensions
 for the :doc:`LLVM Environments <index>`. See :class:`LlvmEnv
 <compiler_gym.envs.LlvmEnv>` for the class definition.
 
-.. contents::
+.. contents:: Document contents:
    :local:
 
 Constructing Benchmarks
