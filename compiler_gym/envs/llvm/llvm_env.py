@@ -294,12 +294,18 @@ class LlvmEnv(CompilerEnv):
         try:
             return super().reset(*args, **kwargs)
         except ValueError as e:
-            # Catch and re-raise a compilation error with a more informative
-            # error type.
+            # Catch and re-raise some known benchmark initialization errors with
+            # a more informative error type.
             if "Failed to compute .text size cost" in str(e):
                 raise BenchmarkInitError(
                     f"Failed to initialize benchmark {self._benchmark_in_use.uri}: {e}"
                 ) from e
+            elif (
+                "File not found:" in str(e)
+                or "File is empty:" in str(e)
+                or "Error reading file:" in str(e)
+            ):
+                raise BenchmarkInitError(str(e)) from e
             raise
 
     def make_benchmark(
