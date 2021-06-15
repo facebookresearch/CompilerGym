@@ -26,3 +26,18 @@ cc_library(
         "@llvm//10.0.0",
     ],
 )
+
+cc_binary(
+    name = "compute_autophase",
+    srcs = ["compute_autophase.cc"],
+    copts = [
+        "-DGOOGLE_PROTOBUF_NO_RTTI",
+        "-fno-rtti",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":InstCount",
+        "@glog",
+        "@llvm//10.0.0",
+    ],
+)
