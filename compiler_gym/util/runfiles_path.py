@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Module for resolving a runfiles path."""
+import getpass
 import os
 from pathlib import Path
 
@@ -119,7 +120,7 @@ def transient_cache_path(relpath: str) -> Path:
     if forced:
         return Path(forced) / relpath
     elif Path("/dev/shm").is_dir():
-        return Path("/dev/shm/compiler_gym") / relpath
+        return Path(f"/dev/shm/compiler_gym_{getpass.getuser()}") / relpath
     else:
         # Fallback to using the regular cache.
         return cache_path(relpath)
