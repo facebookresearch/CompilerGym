@@ -15,7 +15,7 @@ Patrick Hesse
 0.1.9
 
 **Open source?**
-Yes.[Source Code](https://github.com/phesse001/compiler-gym-dqn/blob/leaderboard/eval.py).
+Yes. [Source Code](https://github.com/phesse001/compiler-gym-dqn/blob/5a7dc2eec2f144bdabf640266b1667b3da470c79/eval.py).
 
 **Did you modify the CompilerGym source code?**
 No.
