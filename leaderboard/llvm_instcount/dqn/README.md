@@ -38,6 +38,9 @@ No.
 * The number of nodes in a fully connected layer *n*
 
 **What range of values were considered for the above parameters?**
+Originally, I tried a much larger set of hyperparameters, something like:
+* H=40, λ=0.001, γ=0.99, entire action space, f=InstCountNorm, N=100000, ε=1.0, d=5e-6, E=0.05, s=100000, t=10000, p=5, l=32, b=32, n=512.
+But the model was much more unstable, oscillating between ok and bad policies. After some trial and error I eventually decided to scale down the problem by using a subset of the action space with actions that are known to help with code-size reduction and ended up using this set of hyperparameters:
 * H=10, λ=0.001, γ=0.9, 15 selected actions, f=InstCountNorm, N=4000, ε=1.0, d=5e-5, E=0.05, s=100000, t=500, p=5, l=32, b=32, n=128.
 
 **Is the policy deterministic?**
