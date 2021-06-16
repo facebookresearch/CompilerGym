@@ -7,7 +7,7 @@ A deep q-network that is trained to learn sequences of transformation passes on 
 Patrick Hesse
 
 **Results:**
-1. [Episode length 10, 4000 training episodes](results-H10-N4000.csv).
+1. [Episode length 10, 4000 training episodes](results-instcountnorm-H10-N4000.csv).
 
 **Publication:**
 
