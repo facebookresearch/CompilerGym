@@ -849,12 +849,20 @@ class CompilerEnv(gym.Env):
             # Gracefully handle "expected" error types. These non-fatal errors
             # end the current episode and provide some diagnostic information to
             # the user through the `info` dict.
-            self.close()
-
             info = {
                 "error_type": type(e).__name__,
                 "error_details": str(e),
             }
+
+            try:
+                self.close()
+            except ServiceError as e:
+                # close() can raise ServiceError if the service exists with a
+                # non-zero return code. If so,
+                info[
+                    "error_details"
+                ] += f". Additional error during environment closing: {e}"
+
             default_observations = [
                 observation_space.default_value
                 for observation_space in user_observation_spaces
