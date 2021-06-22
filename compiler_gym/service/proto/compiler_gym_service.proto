@@ -59,9 +59,9 @@ message GetVersionReply {
 
 // A StartSession() request.
 message StartSessionRequest {
-  // The name of the benchmark to use for this session. If not provided, a
-  // benchmark is chosen randomly by the service.
-  string benchmark = 1;
+  reserved 1;
+  // The benchmark to use.
+  Benchmark benchmark = 4;
   // An index into the GetSpacesReply.action_space_list selecting the action
   // space that is to be used for this session. Once set, the action space
   // cannot be changed for the duration of the session.
@@ -72,11 +72,10 @@ message StartSessionRequest {
 
 // A StartSession() reply.
 message StartSessionReply {
+  reserved 2;
   // The ID that has been assigned to the session. The client must use this ID
   // in all subsequent interactions with the service for this session.
   int64 session_id = 1;
-  // The name of the benchmark.
-  string benchmark = 2;
   // A new action space. This is set only if, after initializing the session,
   // the action space has changed from the default action space returned by
   // GetSpaces(). If set, the environment should discard the previous action

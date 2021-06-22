@@ -100,7 +100,12 @@ class CompilerGymService(CompilerGymServiceServicerStub):
             return reply
 
         with self.sessions_lock, exception_to_grpc_status(context):
-            if request.benchmark not in self.benchmarks:
+            # If a benchmark definition was provided, add it.
+            if request.benchmark.program:
+                self.benchmarks[request.benchmark.uri] = request.benchmark
+
+            # Lookup the requested benchmark.
+            if request.benchmark.uri not in self.benchmarks:
                 context.set_code(StatusCode.NOT_FOUND)
                 context.set_details("Benchmark not found")
                 return reply
@@ -108,7 +113,7 @@ class CompilerGymService(CompilerGymServiceServicerStub):
             session = self.compilation_session_type(
                 working_directory=self.working_directory,
                 action_space=self.action_spaces[request.action_space],
-                benchmark=self.benchmarks[request.benchmark],
+                benchmark=self.benchmarks[request.benchmark.uri],
             )
 
             # Generate the initial observations.

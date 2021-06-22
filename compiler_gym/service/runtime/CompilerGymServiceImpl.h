@@ -51,16 +51,22 @@ grpc::Status CompilerGymService<CompilationSessionType>::GetSpaces(grpc::ServerC
 template <typename CompilationSessionType>
 grpc::Status CompilerGymService<CompilationSessionType>::StartSession(
     grpc::ServerContext* context, const StartSessionRequest* request, StartSessionReply* reply) {
-  if (!request->benchmark().size()) {
+  if (!request->benchmark().uri().size()) {
     return grpc::Status(grpc::StatusCode::INVALID_ARGUMENT,
                         "No benchmark URI set for StartSession()");
   }
 
   const std::lock_guard<std::mutex> lock(sessionsMutex_);
-  VLOG(1) << "StartSession(id=" << nextSessionId_ << ", benchmark=" << request->benchmark() << "), "
-          << (sessionCount() + 1) << " active sessions";
+  VLOG(1) << "StartSession(id=" << nextSessionId_ << ", benchmark=" << request->benchmark().uri()
+          << "), " << (sessionCount() + 1) << " active sessions";
 
-  const Benchmark* benchmark = benchmarks().get(request->benchmark());
+  // If a benchmark definition was provided, add it.
+  if (request->benchmark().has_program()) {
+    benchmarks().add(std::move(request->benchmark()));
+  }
+
+  // Lookup the requested benchmark.
+  const Benchmark* benchmark = benchmarks().get(request->benchmark().uri());
   if (!benchmark) {
     return grpc::Status(grpc::StatusCode::NOT_FOUND, "Benchmark not found");
   }
