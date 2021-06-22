@@ -154,7 +154,23 @@ DISTTOOLS_OUTS := dist build compiler_gym.egg-info
 
 BUILD_TARGET ?= //:package
 
-bazel-build:
+BAZEL_FETCH_RETRIES ?= 5
+
+# Run `bazel fetch` in a retry loop due to intermitent failures when fetching
+# remote archives in the CI environment.
+bazel-fetch:
+	for i in $$(seq 1 $(BAZEL_FETCH_RETRIES)); do \
+		if $(BAZEL) fetch $(BUILD_TARGET) ; then \
+			break; \
+		else \
+			echo "bazel fetch attempt $$i of $(BAZEL_FETCH_RETRIES) failed" >&2; \
+		fi; \
+		if [ $i -eq 10 ]; then \
+			false; \
+		fi; \
+	done
+
+bazel-build: bazel-fetch
 	$(BAZEL) $(BAZEL_OPTS) build $(BAZEL_BUILD_OPTS) $(BUILD_TARGET)
 
 bdist_wheel: bazel-build
@@ -178,7 +194,7 @@ bdist_wheel-linux-test:
 
 all: docs bdist_wheel bdist_wheel-linux
 
-.PHONY: bazel-build bdist_wheel bdist_wheel-linux bdist_wheel-linux-shell bdist_wheel-linux-test
+.PHONY: bazel-fetch bazel-build bdist_wheel bdist_wheel-linux bdist_wheel-linux-shell bdist_wheel-linux-test
 
 
 #################

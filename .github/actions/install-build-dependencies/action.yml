@@ -1,5 +1,5 @@
 ---
-name: Install the Linux dependencies
+name: Install build dependencies
 description: Install build dependencies
 runs:
     using: composite
