@@ -90,8 +90,8 @@ class CompilerGymService(CompilerGymServiceServicerStub):
             "StartSession(id=%d, benchmark=%s), %d active sessions",
             self.next_session_id,
             request.benchmark,
-            len(self.sessions),
-        ) + 1
+            len(self.sessions) + 1,
+        )
         reply = StartSessionReply()
 
         if not request.benchmark:
