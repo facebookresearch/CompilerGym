@@ -253,10 +253,10 @@ TEST_TARGET ?=
 # Extra command line arguments for pytest.
 PYTEST_ARGS ?=
 
-test:
+test: bazel-fetch
 	$(BAZEL) $(BAZEL_OPTS) test $(BAZEL_TEST_OPTS) $(if $(TEST_TARGET),$(TEST_TARGET),//...)
 
-itest:
+itest: bazel-fetch
 	$(IBAZEL) $(BAZEL_OPTS) test $(BAZEL_TEST_OPTS) $(if $(TEST_TARGET),$(TEST_TARGET),//...)
 
 # Since we can't run compiler_gym from the project root we need to jump through
