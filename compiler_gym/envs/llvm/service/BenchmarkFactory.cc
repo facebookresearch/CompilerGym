@@ -43,7 +43,6 @@ Status BenchmarkFactory::getBenchmark(const BenchmarkProto& benchmarkMessage,
   auto loaded = benchmarks_.find(benchmarkMessage.uri());
   if (loaded != benchmarks_.end()) {
     VLOG(3) << "LLVM benchmark cache hit: " << benchmarkMessage.uri();
-    ;
     *benchmark = loaded->second.clone(workingDirectory_);
     return Status::OK;
   }
@@ -117,6 +116,10 @@ Status BenchmarkFactory::addBitcode(const std::string& uri, const Bitcode& bitco
   benchmarks_.insert({uri, Benchmark(uri, std::move(context), std::move(module), bitcodeSize,
                                      workingDirectory_, baselineCosts)});
   loadedBenchmarksSize_ += bitcodeSize;
+
+  VLOG(2) << "Cached LLVM benchmark " << uri << " (" << bitcodeSize
+          << " bytes). Cache size = " << loadedBenchmarksSize_ << " bytes, " << benchmarks_.size()
+          << " items";
 
   return Status::OK;
 }
