@@ -57,8 +57,8 @@ grpc::Status CompilerGymService<CompilationSessionType>::StartSession(
   }
 
   const std::lock_guard<std::mutex> lock(sessionsMutex_);
-  VLOG(1) << "StartSession(" << request->benchmark() << "), " << sessionCount()
-          << " active sessions";
+  VLOG(1) << "StartSession(id=" << nextSessionId_ << ", benchmark=" << request->benchmark() << "), "
+          << (sessionCount() + 1) << " active sessions";
 
   const Benchmark* benchmark = benchmarks().get(request->benchmark());
   if (!benchmark) {
@@ -111,7 +111,7 @@ grpc::Status CompilerGymService<CompilationSessionType>::ForkSession(
 template <typename CompilationSessionType>
 grpc::Status CompilerGymService<CompilationSessionType>::EndSession(
     grpc::ServerContext* context, const EndSessionRequest* request, EndSessionReply* reply) {
-  VLOG(1) << "EndSession(" << request->session_id() << "), " << sessionCount() - 1
+  VLOG(1) << "EndSession(id=" << request->session_id() << "), " << sessionCount() - 1
           << " sessions remaining";
 
   const std::lock_guard<std::mutex> lock(sessionsMutex_);

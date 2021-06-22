@@ -698,6 +698,7 @@ class CompilerEnv(gym.Env):
 
         # Stop an existing episode.
         if self.in_episode:
+            self.logger.debug("Ending session %d", self._session_id)
             self.service(
                 self.service.stub.EndSession,
                 EndSessionRequest(session_id=self._session_id),

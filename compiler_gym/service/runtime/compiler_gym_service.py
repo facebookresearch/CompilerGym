@@ -86,7 +86,12 @@ class CompilerGymService(CompilerGymServiceServicerStub):
 
     def StartSession(self, request: StartSessionRequest, context) -> StartSessionReply:
         """Create a new compilation session."""
-        logging.debug("StartSession(%s), [%d]", request.benchmark, self.next_session_id)
+        logging.debug(
+            "StartSession(id=%d, benchmark=%s), %d active sessions",
+            self.next_session_id,
+            request.benchmark,
+            len(self.sessions),
+        ) + 1
         reply = StartSessionReply()
 
         if not request.benchmark:
@@ -123,7 +128,7 @@ class CompilerGymService(CompilerGymServiceServicerStub):
     def EndSession(self, request: EndSessionRequest, context) -> EndSessionReply:
         del context  # Unused
         logging.debug(
-            "EndSession(%d), %d sessions remaining",
+            "EndSession(id=%d), %d sessions remaining",
             request.session_id,
             len(self.sessions) - 1,
         )

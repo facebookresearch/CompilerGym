@@ -42,6 +42,8 @@ Status BenchmarkFactory::getBenchmark(const BenchmarkProto& benchmarkMessage,
   // Check if the benchmark has already been loaded into memory.
   auto loaded = benchmarks_.find(benchmarkMessage.uri());
   if (loaded != benchmarks_.end()) {
+    VLOG(3) << "LLVM benchmark cache hit: " << benchmarkMessage.uri();
+    ;
     *benchmark = loaded->second.clone(workingDirectory_);
     return Status::OK;
   }
@@ -50,12 +52,14 @@ Status BenchmarkFactory::getBenchmark(const BenchmarkProto& benchmarkMessage,
   const auto& programFile = benchmarkMessage.program();
   switch (programFile.data_case()) {
     case compiler_gym::File::DataCase::kContents: {
+      VLOG(3) << "LLVM benchmark cache miss, add bitcode: " << benchmarkMessage.uri();
       RETURN_IF_ERROR(addBitcode(
           benchmarkMessage.uri(),
           llvm::SmallString<0>(programFile.contents().begin(), programFile.contents().end())));
       break;
     }
     case compiler_gym::File::DataCase::kUri: {
+      VLOG(3) << "LLVM benchmark cache miss, read from URI: " << benchmarkMessage.uri();
       // Check the protocol of the benchmark URI.
       if (programFile.uri().find("file:///") != 0) {
         return Status(StatusCode::INVALID_ARGUMENT,
