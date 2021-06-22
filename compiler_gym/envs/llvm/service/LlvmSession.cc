@@ -57,47 +57,6 @@ llvm::TargetLibraryInfoImpl getTargetLibraryInfo(llvm::Module& module) {
   return llvm::TargetLibraryInfoImpl(triple);
 }
 
-void initLlvm() {
-  llvm::InitializeAllTargets();
-  llvm::InitializeAllTargetMCs();
-  llvm::InitializeAllAsmPrinters();
-  llvm::InitializeAllAsmParsers();
-
-  // Initialize passes.
-  llvm::PassRegistry& Registry = *llvm::PassRegistry::getPassRegistry();
-  llvm::initializeCore(Registry);
-  llvm::initializeCoroutines(Registry);
-  llvm::initializeScalarOpts(Registry);
-  llvm::initializeObjCARCOpts(Registry);
-  llvm::initializeVectorization(Registry);
-  llvm::initializeIPO(Registry);
-  llvm::initializeAnalysis(Registry);
-  llvm::initializeTransformUtils(Registry);
-  llvm::initializeInstCombine(Registry);
-  llvm::initializeAggressiveInstCombine(Registry);
-  llvm::initializeInstrumentation(Registry);
-  llvm::initializeTarget(Registry);
-  llvm::initializeExpandMemCmpPassPass(Registry);
-  llvm::initializeScalarizeMaskedMemIntrinPass(Registry);
-  llvm::initializeCodeGenPreparePass(Registry);
-  llvm::initializeAtomicExpandPass(Registry);
-  llvm::initializeRewriteSymbolsLegacyPassPass(Registry);
-  llvm::initializeWinEHPreparePass(Registry);
-  llvm::initializeDwarfEHPreparePass(Registry);
-  llvm::initializeSafeStackLegacyPassPass(Registry);
-  llvm::initializeSjLjEHPreparePass(Registry);
-  llvm::initializePreISelIntrinsicLoweringLegacyPassPass(Registry);
-  llvm::initializeGlobalMergePass(Registry);
-  llvm::initializeIndirectBrExpandPassPass(Registry);
-  llvm::initializeInterleavedAccessPass(Registry);
-  llvm::initializeEntryExitInstrumenterPass(Registry);
-  llvm::initializePostInlineEntryExitInstrumenterPass(Registry);
-  llvm::initializeUnreachableBlockElimLegacyPassPass(Registry);
-  llvm::initializeExpandReductionsPass(Registry);
-  llvm::initializeWasmEHPreparePass(Registry);
-  llvm::initializeWriteBitcodePassPass(Registry);
-}
-
 Status writeBitcodeToFile(const llvm::Module& module, const fs::path& path) {
   std::error_code error;
   llvm::raw_fd_ostream outfile(path.string(), error);
@@ -126,7 +85,6 @@ std::vector<ObservationSpace> LlvmSession::getObservationSpaces() const {
 LlvmSession::LlvmSession(const boost::filesystem::path& workingDirectory)
     : CompilationSession(workingDirectory),
       observationSpaceNames_(util::createPascalCaseToEnumLookupTable<LlvmObservationSpace>()) {
-  initLlvm();
   cpuinfo_initialize();
 }
 
