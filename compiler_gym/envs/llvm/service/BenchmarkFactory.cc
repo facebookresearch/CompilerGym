@@ -106,8 +106,8 @@ Status BenchmarkFactory::addBitcode(const std::string& uri, const Bitcode& bitco
       benchmarks_.erase(iterator);
     }
 
-    VLOG(3) << "Evicted " << evicted << " benchmarks. Bitcode cache size now "
-            << loadedBenchmarksSize_ << ", " << benchmarks_.size() << " bitcodes";
+    VLOG(3) << "Evicted " << evicted << " benchmarks. LLVM cache size now " << loadedBenchmarksSize_
+            << ", " << benchmarks_.size() << " bitcodes";
   }
 
   BaselineCosts baselineCosts;
