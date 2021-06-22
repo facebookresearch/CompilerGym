@@ -30,7 +30,7 @@ namespace compiler_gym::llvm_service {
  * bytes. Once this size is reached, benchmarks are offloaded so that they must
  * be re-read from disk.
  */
-constexpr size_t kMaxLoadedBenchmarkSize = 512 * 1024 * 1024;
+constexpr size_t kMaxLoadedBenchmarkSize = 32 * 1024 * 1024;
 
 /**
  * A factory object for instantiating LLVM modules for use in optimization
