@@ -26,7 +26,6 @@ py_library(
         "thread_pool.py",
         "timer.py",
         "truncate.py",
-        "user_input.py",
         "version.py",
     ],
     visibility = ["//visibility:public"],
