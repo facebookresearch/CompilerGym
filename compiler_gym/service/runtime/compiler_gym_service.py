@@ -86,7 +86,12 @@ class CompilerGymService(CompilerGymServiceServicerStub):
 
     def StartSession(self, request: StartSessionRequest, context) -> StartSessionReply:
         """Create a new compilation session."""
-        logging.debug("StartSession(%s), [%d]", request.benchmark, self.next_session_id)
+        logging.debug(
+            "StartSession(id=%d, benchmark=%s), %d active sessions",
+            self.next_session_id,
+            request.benchmark,
+            len(self.sessions) + 1,
+        )
         reply = StartSessionReply()
 
         if not request.benchmark:
@@ -95,7 +100,12 @@ class CompilerGymService(CompilerGymServiceServicerStub):
             return reply
 
         with self.sessions_lock, exception_to_grpc_status(context):
-            if request.benchmark not in self.benchmarks:
+            # If a benchmark definition was provided, add it.
+            if request.benchmark.program:
+                self.benchmarks[request.benchmark.uri] = request.benchmark
+
+            # Lookup the requested benchmark.
+            if request.benchmark.uri not in self.benchmarks:
                 context.set_code(StatusCode.NOT_FOUND)
                 context.set_details("Benchmark not found")
                 return reply
@@ -103,7 +113,7 @@ class CompilerGymService(CompilerGymServiceServicerStub):
             session = self.compilation_session_type(
                 working_directory=self.working_directory,
                 action_space=self.action_spaces[request.action_space],
-                benchmark=self.benchmarks[request.benchmark],
+                benchmark=self.benchmarks[request.benchmark.uri],
             )
 
             # Generate the initial observations.
@@ -123,7 +133,7 @@ class CompilerGymService(CompilerGymServiceServicerStub):
     def EndSession(self, request: EndSessionRequest, context) -> EndSessionReply:
         del context  # Unused
         logging.debug(
-            "EndSession(%d), %d sessions remaining",
+            "EndSession(id=%d), %d sessions remaining",
             request.session_id,
             len(self.sessions) - 1,
         )

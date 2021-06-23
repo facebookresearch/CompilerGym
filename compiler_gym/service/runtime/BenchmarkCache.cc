@@ -26,8 +26,9 @@ const Benchmark* BenchmarkCache::get(const std::string& uri) const {
 }
 
 void BenchmarkCache::add(const Benchmark&& benchmark) {
-  VLOG(3) << "Caching benchmark " << benchmark.uri() << ". Cache size = " << sizeInBytes()
-          << " bytes, " << size() << " items";
+  const size_t benchmarkSize = benchmark.ByteSizeLong();
+  VLOG(3) << "Caching benchmark " << benchmark.uri() << " (" << benchmarkSize
+          << " bytes). Cache size = " << sizeInBytes() << " bytes, " << size() << " items";
 
   // Remove any existing value to keep the cache size consistent.
   const auto it = benchmarks_.find(benchmark.uri());
@@ -37,20 +38,20 @@ void BenchmarkCache::add(const Benchmark&& benchmark) {
     sizeInBytes_ -= replacedSize;
   }
 
-  const size_t size = benchmark.ByteSizeLong();
-  if (sizeInBytes() + size > maxSizeInBytes()) {
-    if (size > maxSizeInBytes()) {
-      LOG(WARNING) << "Adding new benchmark with size " << size
+  if (sizeInBytes() + benchmarkSize > maxSizeInBytes()) {
+    if (benchmarkSize > maxSizeInBytes()) {
+      LOG(WARNING) << "Adding new benchmark with size " << benchmarkSize
                    << " bytes exceeds total target cache size of " << maxSizeInBytes() << " bytes";
     } else {
-      VLOG(3) << "Adding new benchmark with size " << size << " bytes exceeds maximum size "
-              << maxSizeInBytes() << " bytes, " << this->size() << " items";
+      VLOG(3) << "Adding new benchmark with size " << benchmarkSize
+              << " bytes exceeds maximum size " << maxSizeInBytes() << " bytes, " << this->size()
+              << " items";
     }
     evictToCapacity();
   }
 
   benchmarks_.insert({benchmark.uri(), std::move(benchmark)});
-  sizeInBytes_ += size;
+  sizeInBytes_ += benchmarkSize;
 }
 
 void BenchmarkCache::evictToCapacity(std::optional<size_t> targetSize) {

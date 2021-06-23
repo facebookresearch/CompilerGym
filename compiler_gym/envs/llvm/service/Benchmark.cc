@@ -111,17 +111,15 @@ Benchmark::Benchmark(const std::string& name, const Bitcode& bitcode,
     : context_(std::make_unique<llvm::LLVMContext>()),
       module_(makeModuleOrDie(*context_, bitcode, name)),
       baselineCosts_(baselineCosts),
-      name_(name),
-      bitcodeSize_(bitcode.size()) {}
+      name_(name) {}
 
 Benchmark::Benchmark(const std::string& name, std::unique_ptr<llvm::LLVMContext> context,
-                     std::unique_ptr<llvm::Module> module, size_t bitcodeSize,
-                     const fs::path& workingDirectory, const BaselineCosts& baselineCosts)
+                     std::unique_ptr<llvm::Module> module, const fs::path& workingDirectory,
+                     const BaselineCosts& baselineCosts)
     : context_(std::move(context)),
       module_(std::move(module)),
       baselineCosts_(baselineCosts),
-      name_(name),
-      bitcodeSize_(bitcodeSize) {}
+      name_(name) {}
 
 std::unique_ptr<Benchmark> Benchmark::clone(const fs::path& workingDirectory) const {
   Bitcode bitcode;

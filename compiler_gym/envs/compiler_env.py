@@ -28,9 +28,9 @@ from compiler_gym.service import (
     ServiceTransportError,
     SessionNotFound,
 )
+from compiler_gym.service.proto import Action, AddBenchmarkRequest
+from compiler_gym.service.proto import Benchmark as BenchmarkProto
 from compiler_gym.service.proto import (
-    Action,
-    AddBenchmarkRequest,
     EndSessionReply,
     EndSessionRequest,
     ForkSessionReply,
@@ -236,6 +236,7 @@ class CompilerEnv(gym.Env):
         # the gap between the user setting the env.benchmark property while in
         # an episode and the next call to env.reset().
         self._benchmark_in_use: Optional[Benchmark] = None
+        self._benchmark_in_use_proto: BenchmarkProto = BenchmarkProto()
         self._next_benchmark: Optional[Benchmark] = None
         # Normally when the benchmark is changed the updated value is not
         # reflected until the next call to reset(). We make an exception for the
@@ -698,6 +699,7 @@ class CompilerEnv(gym.Env):
 
         # Stop an existing episode.
         if self.in_episode:
+            self.logger.debug("Ending session %d", self._session_id)
             self.service(
                 self.service.stub.EndSession,
                 EndSessionRequest(session_id=self._session_id),
@@ -709,8 +711,20 @@ class CompilerEnv(gym.Env):
             self.benchmark = benchmark
         self._benchmark_in_use = self._next_benchmark
 
+        # When always_send_benchmark_on_reset option is enabled, the entire
+        # benchmark program is sent with every StartEpisode request. Otherwise
+        # only the URI of the benchmark is sent. In cases where benchmarks are
+        # reused between calls to reset(), sending the URI is more efficient as
+        # the service can cache the benchmark. In cases where reset() is always
+        # called with a different benchmark, this causes unnecessary roundtrips
+        # as every StartEpisodeRequest receives a FileNotFound response.
+        if self.service.opts.always_send_benchmark_on_reset:
+            self._benchmark_in_use_proto = self._benchmark_in_use.proto
+        else:
+            self._benchmark_in_use_proto.uri = self._benchmark_in_use.uri
+
         start_session_request = StartSessionRequest(
-            benchmark=self._benchmark_in_use.uri,
+            benchmark=self._benchmark_in_use_proto,
             action_space=(
                 [a.name for a in self.action_spaces].index(self.action_space_name)
                 if self.action_space_name

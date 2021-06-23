@@ -82,6 +82,14 @@ class ConnectionOpts(BaseModel):
     rpc_init_max_seconds: float = 3
     """The maximum number of seconds to wait for an RPC connection to establish."""
 
+    always_send_benchmark_on_reset: bool = False
+    """Send the full benchmark program data to the compiler service on ever call
+    to :meth:`env.reset() <compiler_gym.envs.CompilerEnv.reset>`. This is more
+    efficient in cases where the majority of calls to
+    :meth:`env.reset() <compiler_gym.envs.CompilerEnv.reset>` uses a different
+    benchmark. In case of benchmark re-use, leave this :code:`False`.
+    """
+
 
 class ServiceError(Exception):
     """Error raised from the service."""
