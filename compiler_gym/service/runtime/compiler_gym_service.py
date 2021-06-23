@@ -30,9 +30,13 @@ from compiler_gym.service.proto import (
 from compiler_gym.service.runtime.benchmark_cache import BenchmarkCache
 from compiler_gym.util.version import __version__
 
+# NOTE(cummins): The CompilerGymService class is used in a subprocess by a
+# compiler service, so code coverage tracking does not work. As such we use "#
+# pragma: no cover" annotation for all definitions in this file.
+
 
 @contextmanager
-def exception_to_grpc_status(context):
+def exception_to_grpc_status(context):  # pragma: no cover
     def handle_exception_as(exception, code):
         context.set_code(code)
         context.set_details(str(exception))
@@ -53,7 +57,7 @@ def exception_to_grpc_status(context):
         handle_exception_as(e, StatusCode.DEADLINE_EXCEEDED)
 
 
-class CompilerGymService(CompilerGymServiceServicerStub):
+class CompilerGymService(CompilerGymServiceServicerStub):  # pragma: no cover
     def __init__(self, working_directory: Path, compilation_session_type):
         self.working_directory = working_directory
         self.benchmarks = BenchmarkCache()
