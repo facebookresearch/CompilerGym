@@ -72,7 +72,9 @@ def test_benchmark_names(env: LlvmEnv, benchmark_name: str):
     assert env.datasets.benchmark(benchmark_name)
 
 
-def test_double_reset(env: LlvmEnv):
+@pytest.mark.parametrize("always_send_benchmark_on_reset", [False, True])
+def test_double_reset(env: LlvmEnv, always_send_benchmark_on_reset: bool):
+    env.service.opts.always_send_benchmark_on_reset = always_send_benchmark_on_reset
     env.reset(benchmark="cbench-v1/crc32")
     env.reset(benchmark="cbench-v1/crc32")
     assert env.in_episode
