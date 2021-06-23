@@ -29,11 +29,12 @@ namespace compiler_gym::llvm_service {
 
 BenchmarkFactory::BenchmarkFactory(const boost::filesystem::path& workingDirectory,
                                    std::optional<std::mt19937_64> rand,
-                                   size_t maxLoadedBenchmarkSize)
+                                   size_t maxLoadedBenchmarksCount)
     : workingDirectory_(workingDirectory),
       rand_(rand.has_value() ? *rand : std::mt19937_64(std::random_device()())),
-      loadedBenchmarksSize_(0),
-      maxLoadedBenchmarkSize_(maxLoadedBenchmarkSize) {
+      maxLoadedBenchmarksCount_(maxLoadedBenchmarksCount) {
+  CHECK(maxLoadedBenchmarksCount) << "Assertion maxLoadedBenchmarksCount > 0 failed! "
+                                  << "maxLoadedBenchmarksCount = " << maxLoadedBenchmarksCount;
   VLOG(2) << "BenchmarkFactory initialized";
 }
 
@@ -86,39 +87,27 @@ Status BenchmarkFactory::addBitcode(const std::string& uri, const Bitcode& bitco
   RETURN_IF_ERROR(status);
   DCHECK(module);
 
-  const size_t bitcodeSize = bitcode.size();
-  if (loadedBenchmarksSize_ + bitcodeSize > maxLoadedBenchmarkSize_) {
-    VLOG(2) << "Adding new bitcode with size " << bitcodeSize
-            << " exceeds maximum in-memory cache capacity " << maxLoadedBenchmarkSize_ << ", "
-            << benchmarks_.size() << " bitcodes";
-    int evicted = 0;
-    // Evict benchmarks until we have reduced capacity below 50%.
-    const size_t targetCapacity = maxLoadedBenchmarkSize_ / 2;
-    while (benchmarks_.size() && loadedBenchmarksSize_ > targetCapacity) {
+  if (benchmarks_.size() == maxLoadedBenchmarksCount_) {
+    VLOG(2) << "LLVM benchmark cache reached maximum size " << maxLoadedBenchmarksCount_
+            << ". Evicting random 50%.";
+    for (int i = 0; i < static_cast<int>(maxLoadedBenchmarksCount_ / 2); ++i) {
       // Select a cached benchmark randomly.
       std::uniform_int_distribution<size_t> distribution(0, benchmarks_.size() - 1);
       size_t index = distribution(rand_);
       auto iterator = std::next(std::begin(benchmarks_), index);
 
       // Evict the benchmark from the pool of loaded benchmarks.
-      ++evicted;
-      loadedBenchmarksSize_ -= iterator->second.bitcodeSize();
       benchmarks_.erase(iterator);
     }
-
-    VLOG(3) << "Evicted " << evicted << " benchmarks. LLVM cache size now " << loadedBenchmarksSize_
-            << ", " << benchmarks_.size() << " bitcodes";
   }
 
   BaselineCosts baselineCosts;
   RETURN_IF_ERROR(setBaselineCosts(*module, &baselineCosts, workingDirectory_));
 
-  benchmarks_.insert({uri, Benchmark(uri, std::move(context), std::move(module), bitcodeSize,
-                                     workingDirectory_, baselineCosts)});
-  loadedBenchmarksSize_ += bitcodeSize;
+  benchmarks_.insert({uri, Benchmark(uri, std::move(context), std::move(module), workingDirectory_,
+                                     baselineCosts)});
 
-  VLOG(2) << "Cached LLVM benchmark " << uri << " (" << bitcodeSize
-          << " bytes). Cache size = " << loadedBenchmarksSize_ << " bytes, " << benchmarks_.size()
+  VLOG(2) << "Cached LLVM benchmark: " << uri << ". Cache size = " << benchmarks_.size()
           << " items";
 
   return Status::OK;

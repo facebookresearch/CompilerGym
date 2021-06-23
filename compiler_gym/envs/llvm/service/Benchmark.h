@@ -71,8 +71,8 @@ class Benchmark {
    * Construct a benchmark from an LLVM module.
    */
   Benchmark(const std::string& name, std::unique_ptr<llvm::LLVMContext> context,
-            std::unique_ptr<llvm::Module> module, size_t bitcodeSize,
-            const boost::filesystem::path& workingDirectory, const BaselineCosts& baselineCosts);
+            std::unique_ptr<llvm::Module> module, const boost::filesystem::path& workingDirectory,
+            const BaselineCosts& baselineCosts);
 
   /**
    * Make a copy of the benchmark.
@@ -101,11 +101,6 @@ class Benchmark {
    * The name of the benchmark.
    */
   inline const std::string& name() const { return name_; }
-
-  /**
-   * The size of the bitcode that was parsed to produce the initial benchmark.
-   */
-  inline const size_t bitcodeSize() const { return bitcodeSize_; }
 
   /**
    * The underlying LLVM module.
@@ -159,8 +154,6 @@ class Benchmark {
   std::unique_ptr<llvm::Module> module_;
   const BaselineCosts baselineCosts_;
   const std::string name_;
-  // The length of the bitcode string for this benchmark.
-  const size_t bitcodeSize_;
 };
 
 }  // namespace compiler_gym::llvm_service
