@@ -58,6 +58,16 @@ py_test(
 )
 
 py_test(
+    name = "datasets_pickle_test",
+    srcs = ["datasets_pickle_test.py"],
+    deps = [
+        "//compiler_gym/datasets",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "download_llvm_test",
     srcs = ["download_llvm_test.py"],
     deps = [

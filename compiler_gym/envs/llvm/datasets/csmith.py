@@ -26,6 +26,9 @@ from compiler_gym.util.runfiles_path import transient_cache_path
 # The maximum value for the --seed argument to csmith.
 UINT_MAX = (2 ** 32) - 1
 
+# A lock for exclusive access to the Csmith build logic.
+_CSMITH_BUILD_LOCK = Lock()
+
 
 class CsmithBenchmark(BenchmarkWithSource):
     """A CSmith benchmark."""
@@ -130,7 +133,6 @@ class CsmithDataset(Dataset):
         csmith_include_dir = self.site_data_path / "include" / "csmith-2.3.0"
 
         self._installed = False
-        self._build_lock = Lock()
         self._build_lockfile = self.site_data_path / ".build.LOCK"
         self._build_markerfile = self.site_data_path / ".built"
 
@@ -162,7 +164,7 @@ class CsmithDataset(Dataset):
         if self.installed:
             return
 
-        with self._build_lock, InterProcessLock(self._build_lockfile):
+        with _CSMITH_BUILD_LOCK, InterProcessLock(self._build_lockfile):
             # Repeat the check to see if we have already installed the dataset
             # now that we have acquired the lock.
             if not self.installed:
