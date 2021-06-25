@@ -69,7 +69,9 @@ Install the latest CompilerGym release using:
 
     pip install -U compiler_gym
 
-See [INSTALL.md](INSTALL.md) for further details.
+See
+[INSTALL.md](https://github.com/facebookresearch/CompilerGym/blob/development/INSTALL.md)
+for further details.
 
 
 ## Usage
