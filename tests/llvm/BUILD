@@ -59,6 +59,7 @@ py_test(
 
 py_test(
     name = "datasets_pickle_test",
+    timeout = "long",
     srcs = ["datasets_pickle_test.py"],
     deps = [
         "//compiler_gym/datasets",
