@@ -7,6 +7,7 @@ import shutil
 import subprocess
 import tarfile
 from pathlib import Path
+from threading import Lock
 from typing import List
 
 from fasteners import InterProcessLock
@@ -17,6 +18,8 @@ from compiler_gym.envs.llvm.llvm_benchmark import ClangInvocation
 from compiler_gym.util.download import download
 from compiler_gym.util.filesystem import atomic_file_write
 from compiler_gym.util.truncate import truncate
+
+_CLGEN_INSTALL_LOCK = Lock()
 
 
 class CLgenDataset(TarDatasetWithManifest):
@@ -83,7 +86,7 @@ class CLgenDataset(TarDatasetWithManifest):
         if self._opencl_installed:
             return
 
-        with self._tar_lock, InterProcessLock(self._tar_lockfile):
+        with _CLGEN_INSTALL_LOCK, InterProcessLock(self._tar_lockfile):
             # Repeat install check now that we are in the locked region.
             if self._opencl_headers_installed_marker.is_file():
                 return

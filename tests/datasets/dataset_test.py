@@ -148,6 +148,46 @@ def test_dataset_deprecation_message(tmpwd: Path):
         dataset.install()
 
 
+def test_dataset_equality_and_sorting():
+    """Test comparison operators between datasets."""
+    a = Dataset(
+        name="benchmark://a-v0",
+        description="A test dataset",
+        license="MIT",
+        site_data_base="test",
+    )
+    a2 = Dataset(
+        name="benchmark://a-v0",
+        description="A test dataset",
+        license="MIT",
+        site_data_base="test",
+    )
+    b = Dataset(
+        name="benchmark://b-v0",
+        description="A test dataset",
+        license="MIT",
+        site_data_base="test",
+    )
+    assert a == a2
+    assert a != b
+    assert a < b
+    assert a <= b
+    assert b > a
+    assert b >= a
+
+    # String comparisons
+    assert a == "benchmark://a-v0"
+    assert a != "benchmark://b-v0"
+    assert a < "benchmark://b-v0"
+
+    # Sorting
+    assert sorted([a2, b, a]) == [
+        "benchmark://a-v0",
+        "benchmark://a-v0",
+        "benchmark://b-v0",
+    ]
+
+
 class DatasetForTesting(Dataset):
     """A dataset to use for testing."""
 

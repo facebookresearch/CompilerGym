@@ -17,6 +17,12 @@ from compiler_gym.util.decorators import memoized_property
 from compiler_gym.util.download import download
 from compiler_gym.util.filesystem import atomic_file_write
 
+# Module-level locks that ensures exclusive access to install routines across
+# threads. Note that these lock are shared across all TarDataset instances. We
+# don't use per-dataset locks as locks cannot be pickled.
+_TAR_INSTALL_LOCK = Lock()
+_TAR_MANIFEST_INSTALL_LOCK = Lock()
+
 
 class TarDataset(FilesDataset):
     """A dataset comprising a files tree stored in a tar archive.
@@ -61,7 +67,6 @@ class TarDataset(FilesDataset):
         self.strip_prefix = strip_prefix
 
         self._tar_extracted_marker = self.site_data_path / ".extracted"
-        self._tar_lock = Lock()
         self._tar_lockfile = self.site_data_path / ".install_lock"
 
     @property
@@ -75,7 +80,7 @@ class TarDataset(FilesDataset):
             return
 
         # Thread-level and process-level locks to prevent races.
-        with self._tar_lock, InterProcessLock(self._tar_lockfile):
+        with _TAR_INSTALL_LOCK, InterProcessLock(self._tar_lockfile):
             # Repeat the check to see if we have already installed the
             # dataset now that we have acquired the lock.
             if self.installed:
@@ -144,7 +149,6 @@ class TarDatasetWithManifest(TarDataset):
         self.manifest_compression = manifest_compression
         self._manifest_path = self.site_data_path / f"manifest-{manifest_sha256}.txt"
 
-        self._manifest_lock = Lock()
         self._manifest_lockfile = self.site_data_path / ".manifest_lock"
 
     def _read_manifest(self, manifest_data: str) -> List[str]:
@@ -171,7 +175,7 @@ class TarDatasetWithManifest(TarDataset):
             return self._read_manifest_file()
 
         # Thread-level and process-level locks to prevent races.
-        with self._manifest_lock, InterProcessLock(self._manifest_lockfile):
+        with _TAR_MANIFEST_INSTALL_LOCK, InterProcessLock(self._manifest_lockfile):
             # Now that we have acquired the lock, repeat the check, since
             # another thread may have downloaded the manifest.
             if self._manifest_path.is_file():
