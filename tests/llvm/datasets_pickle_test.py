@@ -4,6 +4,9 @@
 # LICENSE file in the root directory of this source tree.
 """Tests for serializing LLVM datasets."""
 import pickle
+import sys
+
+import pytest
 
 from compiler_gym.datasets import Dataset
 from tests.test_main import main
@@ -11,6 +14,7 @@ from tests.test_main import main
 pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="Fails on py3.6")
 def test_pickle_dataset(dataset: Dataset):
     """Test that datasets can be pickled."""
     assert pickle.loads(pickle.dumps(dataset)) == dataset
