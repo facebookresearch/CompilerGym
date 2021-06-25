@@ -298,11 +298,15 @@ class Benchmark:
     def __eq__(self, other: Union[str, "Benchmark"]):
         if isinstance(other, Benchmark):
             return self.uri == other.uri
-        else:
-            return self.uri == other
+        return self.uri == other
 
-    def __ne__(self, other: Union[str, "Benchmark"]):
-        return not self == other
+    def __lt__(self, other: Union[str, "Benchmark"]):
+        if isinstance(other, Benchmark):
+            return self.uri < other.uri
+        return self.uri < other
+
+    def __le__(self, other: Union[str, "Benchmark"]):
+        return self < other or self == other
 
 
 class BenchmarkInitError(OSError):

@@ -303,5 +303,31 @@ def test_benchmark_from_file_not_found(tmpwd: Path):
     assert str(e_ctx.value).endswith(str(path))
 
 
+def test_dataset_equality_and_sorting():
+    """Test comparison operators between datasets."""
+    a = Benchmark(BenchmarkProto(uri="benchmark://example-v0/a"))
+    a2 = Benchmark(BenchmarkProto(uri="benchmark://example-v0/a"))
+    b = Benchmark(BenchmarkProto(uri="benchmark://example-v0/b"))
+
+    assert a == a2
+    assert a != b
+    assert a < b
+    assert a <= b
+    assert b > a
+    assert b >= a
+
+    # String comparisons
+    assert a == "benchmark://example-v0/a"
+    assert a != "benchmark://example-v0/b"
+    assert a < "benchmark://example-v0/b"
+
+    # Sorting
+    assert sorted([a2, b, a]) == [
+        "benchmark://example-v0/a",
+        "benchmark://example-v0/a",
+        "benchmark://example-v0/b",
+    ]
+
+
 if __name__ == "__main__":
     main()

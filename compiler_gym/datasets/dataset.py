@@ -260,6 +260,19 @@ class Dataset:
         """
         return self.size
 
+    def __eq__(self, other: Union["Dataset", str]) -> bool:
+        if isinstance(other, Dataset):
+            return self.name == other.name
+        return self.name == other
+
+    def __lt__(self, other: Union["Dataset", str]) -> bool:
+        if isinstance(other, Dataset):
+            return self.name < other.name
+        return self.name < other
+
+    def __le__(self, other: Union["Dataset", str]) -> bool:
+        return self < other or self == other
+
     @property
     def installed(self) -> bool:
         """Whether the dataset is installed locally. Installation occurs
