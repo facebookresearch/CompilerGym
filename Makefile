@@ -159,7 +159,8 @@ BAZEL_FETCH_RETRIES ?= 5
 # Run `bazel fetch` in a retry loop due to intermitent failures when fetching
 # remote archives in the CI environment.
 bazel-fetch:
-	for i in $$(seq 1 $(BAZEL_FETCH_RETRIES)); do \
+	@for i in $$(seq 1 $(BAZEL_FETCH_RETRIES)); do \
+		echo "$(BAZEL) fetch $(BUILD_TARGET)"; \
 		if $(BAZEL) fetch $(BUILD_TARGET) ; then \
 			break; \
 		else \
