@@ -218,7 +218,7 @@ class CsmithDataset(Dataset):
                 raise CsmithBuildError("make install", stdout, stderr)
 
     @property
-    def size(self) -> int:
+    def size(self) -> float:
         # Actually 2^32 - 1, but practically infinite for all intents and
         # purposes.
         return float("inf")
