@@ -25,7 +25,7 @@ around with it to better understand what is going on:
 
 ::
 
-    $ pythom -m compiler_gym.bin.manual_env --env=llvm-v0
+    $ python -m compiler_gym.bin.manual_env --env=llvm-v0
 
 Once you get the hang of things, try submitting your best algorithm to our
 `leaderboards <https://github.com/facebookresearch/CompilerGym#leaderboards>`_!
@@ -50,7 +50,7 @@ Is compiler optimization really a sequential decision process?
 
 Compilers frequently package individual transformations as "optimization passes"
 which are then applied in a sequential order. Usually this order is fixed (e.g.
-`realworld example
+`real world example
 <https://github.com/llvm/llvm-project/blob/71a8e4e7d6b947c8b954ec0763ff7969b3879d7b/llvm/lib/Transforms/IPO/PassManagerBuilder.cpp#L517-L922>`_).
 CompilerGym replaces that fixed order with a sequential decision process where
 any pass may be applied at any stage.
@@ -84,7 +84,7 @@ clang:
 
     $ clang -emit-llvm -c -O0 -Xclang -disable-O0-optnone -Xclang -disable-llvm-passes myapp.c
 
-Then pass the path of the generated `.bc` file to the CompilerGym commandline
+Then pass the path of the generated `.bc` file to the CompilerGym command-line
 tools using the `--benchmark` flag, e.g.
 
 ::
@@ -120,9 +120,9 @@ I updated with "git pull" and now it doesn't work
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The first thing to is to re-run :code:`make init` to ensure that you have the
-correct development depencies installed, as those can change between releases.
-Then run :code:`make distclean` to tidy up any build artifacts from the old
-version.
+correct development dependencies installed, as those can change between
+releases. Then run :code:`make distclean` to tidy up any build artifacts from
+the old version.
 
 If that doesn't fix the problem, feel free to
 `file an issue <https://github.com/facebookresearch/CompilerGym/issues>`_, but
