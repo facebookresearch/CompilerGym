@@ -268,6 +268,23 @@ message Benchmark {
   // For example, the service could expect that this file contains serialized
   // IR data, or an input source file.
   File program = 2;
+  // An optional configuration option that details how to build and run the
+  // benchmark program.
+  BenchmarkDynamicConfig dynamic_config = 3;
+}
+
+// Description of how to build and run a benchmark.
+message BenchmarkDynamicConfig {
+  string build_cmd = 1;
+  string build_genfile = 2;
+  string run_cmd = 3;
+  repeated string run_genfile = 4;
+  repeated string pre_run_cmd = 5;
+  repeated string post_run_cmd = 6;
+  int32 build_cmd_timeout_seconds = 7;
+  int32 run_cmd_timeout_seconds = 8;
+  int32 pre_run_cmd_timeout_seconds = 9;
+  int32 post_run_cmd_timeout_seconds = 10;
 }
 
 // A File message represents a file object.
