@@ -60,6 +60,10 @@ def test_observation_spaces(env: LlvmEnv):
         "ObjectTextSizeO0",
         "ObjectTextSizeO3",
         "ObjectTextSizeOz",
+        "Runtime",
+        "Buildtime",
+        "IsBuildable",
+        "IsRunnable",
     }
 
 

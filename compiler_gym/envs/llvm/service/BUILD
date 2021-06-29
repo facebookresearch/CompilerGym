@@ -86,6 +86,10 @@ cc_library(
     ],
     deps = [
         ":Cost",
+        "//compiler_gym/service/proto:compiler_gym_service_cc",
+        "//compiler_gym/util:GrpcStatusMacros",
+        "//compiler_gym/util:RunfilesPath",
+        "//compiler_gym/util:Subprocess",
         "@boost//:filesystem",
         "@com_github_grpc_grpc//:grpc++",
         "@fmt",
@@ -180,6 +184,7 @@ cc_library(
     hdrs = ["ObservationSpaces.h"],
     visibility = ["//tests:__subpackages__"],
     deps = [
+        ":Benchmark",
         "//compiler_gym/service/proto:compiler_gym_service_cc",
         "//compiler_gym/third_party/llvm:InstCount",
         "//compiler_gym/util:EnumUtil",

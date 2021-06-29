@@ -8,6 +8,7 @@
 
 #include <magic_enum.hpp>
 
+#include "compiler_gym/envs/llvm/service/Benchmark.h"
 #include "compiler_gym/third_party/llvm/InstCount.h"
 #include "compiler_gym/util/EnumUtil.h"
 #include "nlohmann/json.hpp"
@@ -147,6 +148,50 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
         break;
       }
 #endif
+      case LlvmObservationSpace::RUNTIME: {
+        ScalarRange featureSize;
+        featureSize.mutable_min()->set_value(0);
+        std::vector<ScalarRange> featureSizes;
+        featureSizes.reserve(kNumRuntimeObservations);
+        for (size_t i = 0; i < kNumRuntimeObservations; ++i) {
+          featureSizes.push_back(featureSize);
+        }
+        *space.mutable_double_range_list()->mutable_range() = {featureSizes.begin(),
+                                                               featureSizes.end()};
+        space.set_deterministic(false);
+        space.set_platform_dependent(true);
+        std::vector<double> defaultValue(kNumRuntimeObservations, 0);
+        *space.mutable_default_value()->mutable_double_list()->mutable_value() = {
+            defaultValue.begin(), defaultValue.end()};
+        break;
+      }
+      case LlvmObservationSpace::BUILDTIME: {
+        ScalarRange featureSize;
+        featureSize.mutable_min()->set_value(0);
+        std::vector<ScalarRange> featureSizes;
+        featureSizes.reserve(kNumBuildtimeObservations);
+        for (size_t i = 0; i < kNumBuildtimeObservations; ++i) {
+          featureSizes.push_back(featureSize);
+        }
+        *space.mutable_double_range_list()->mutable_range() = {featureSizes.begin(),
+                                                               featureSizes.end()};
+        space.set_deterministic(false);
+        space.set_platform_dependent(true);
+        std::vector<double> defaultValue(kNumBuildtimeObservations, 0);
+        *space.mutable_default_value()->mutable_double_list()->mutable_value() = {
+            defaultValue.begin(), defaultValue.end()};
+        break;
+      }
+      case LlvmObservationSpace::IS_BUILDABLE:
+      case LlvmObservationSpace::IS_RUNNABLE: {
+        auto featureSize = space.mutable_scalar_int64_range();
+        featureSize->mutable_min()->set_value(0);
+        featureSize->mutable_max()->set_value(1);
+        space.set_deterministic(true);
+        space.set_platform_dependent(true);
+        space.mutable_default_value()->set_scalar_int64(0);
+        break;
+      }
     }
     spaces.push_back(space);
   }

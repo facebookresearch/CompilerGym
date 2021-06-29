@@ -116,7 +116,6 @@ Status LlvmSession::init(const LlvmActionSpace& actionSpace, std::unique_ptr<Ben
 
   tlii_ = getTargetLibraryInfo(benchmark_->module());
 
-  // Verify the module now to catch any problems early.
   return Status::OK;
 }
 
@@ -177,6 +176,10 @@ Status LlvmSession::applyPassAction(LlvmAction action, bool& actionHadNoEffect) 
 #define HANDLE_PASS(pass) actionHadNoEffect = !runPass(pass);
   HANDLE_ACTION(action, HANDLE_PASS)
 #undef HANDLE_PASS
+
+  if (!actionHadNoEffect) {
+    benchmark().markModuleModified();
+  }
 
   return Status::OK;
 }
@@ -408,6 +411,23 @@ Status LlvmSession::computeObservation(LlvmObservationSpace space, Observation& 
       break;
     }
 #endif
+    case LlvmObservationSpace::RUNTIME: {
+      return benchmark().computeRuntime(reply);
+    }
+    case LlvmObservationSpace::IS_BUILDABLE: {
+      reply.set_scalar_int64(benchmark().isBuildable() ? 1 : 0);
+      break;
+    }
+    case LlvmObservationSpace::IS_RUNNABLE: {
+      reply.set_scalar_int64(benchmark().isRunnable() ? 1 : 0);
+      break;
+    }
+    case LlvmObservationSpace::BUILDTIME: {
+      if (benchmark().isBuildable()) {
+        reply.mutable_double_list()->add_value(
+            static_cast<double>(benchmark().lastBuildTimeMicroseconds()) / 1000000);
+      }
+    }
   }
 
   return Status::OK;

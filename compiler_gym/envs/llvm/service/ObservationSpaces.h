@@ -82,6 +82,24 @@ enum class LlvmObservationSpace {
   /** The platform-dependent size of the .text section of the compiled binary. */
   TEXT_SIZE_OZ,
 #endif
+  /** Return 1 if the benchmark is buildable, else 0.
+   */
+  IS_BUILDABLE,
+  /** Return 1 if the benchmark is runnable, else 0.
+   */
+  IS_RUNNABLE,
+  /** The runtime of the compiled program.
+   *
+   * Returns a list of runtime measurements in microseconds. This is not
+   * available to all benchmarks. When not available, a list of zeros are returned.
+   */
+  RUNTIME,
+  /** The time it took to compile the program.
+   *
+   * Returns a list of measurments in seconds. This is not available to all
+   * benchmarks. When not available, a list of zeros are returned.
+   */
+  BUILDTIME,
 };
 
 /** Return the list of available observation spaces. */

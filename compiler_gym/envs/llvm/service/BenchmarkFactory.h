@@ -74,10 +74,13 @@ class BenchmarkFactory {
                                           std::unique_ptr<Benchmark>* benchmark);
 
  private:
-  [[nodiscard]] grpc::Status addBitcode(const std::string& uri, const Bitcode& bitcode);
+  [[nodiscard]] grpc::Status addBitcode(
+      const std::string& uri, const Bitcode& bitcode,
+      std::optional<BenchmarkDynamicConfig> dynamicConfig = std::nullopt);
 
-  [[nodiscard]] grpc::Status addBitcode(const std::string& uri,
-                                        const boost::filesystem::path& path);
+  [[nodiscard]] grpc::Status addBitcode(
+      const std::string& uri, const boost::filesystem::path& path,
+      std::optional<BenchmarkDynamicConfig> dynamicConfig = std::nullopt);
 
   /**
    * Construct a benchmark factory.

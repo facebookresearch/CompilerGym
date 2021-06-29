@@ -8,7 +8,13 @@
 #include <glog/logging.h>
 
 #include <stdexcept>
+#include <subprocess/subprocess.hpp>
+#include <system_error>
+#include <thread>
 
+#include "compiler_gym/util/GrpcStatusMacros.h"
+#include "compiler_gym/util/RunfilesPath.h"
+#include "compiler_gym/util/Subprocess.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Bitcode/BitcodeReader.h"
 #include "llvm/Bitcode/BitcodeWriter.h"
@@ -17,6 +23,8 @@
 #include "llvm/Support/SHA1.h"
 
 namespace fs = boost::filesystem;
+namespace sys = boost::system;
+
 using grpc::Status;
 using grpc::StatusCode;
 
@@ -41,6 +49,28 @@ std::unique_ptr<llvm::Module> makeModuleOrDie(llvm::LLVMContext& context, const 
   auto module = makeModule(context, bitcode, name, &status);
   CHECK(status.ok()) << "Failed to make LLVM module: " << status.error_message();
   return module;
+}
+
+void substringReplace(const std::string& pattern, const std::string& replacement,
+                      std::string& str) {
+  size_t pos = 0;
+  while (true) {
+    pos = str.find(pattern, pos);
+    if (pos == std::string::npos) {
+      break;
+    }
+
+    str.replace(pos, pattern.size(), replacement);
+    pos += pattern.size();
+  }
+}
+
+std::string expandBuildCommand(const std::string& cmd, const fs::path& scratchDirectory) {
+  std::string out = cmd;
+  const auto clangPath = util::getSiteDataPath("llvm-v0/bin/clang");
+  substringReplace("$CC", clangPath.string(), out);
+  substringReplace("$<", (scratchDirectory / "out.bc").string(), out);
+  return out;
 }
 
 }  // anonymous namespace
@@ -107,26 +137,49 @@ std::unique_ptr<llvm::Module> makeModule(llvm::LLVMContext& context, const Bitco
 
 // A benchmark is an LLVM module and the LLVM context that owns it.
 Benchmark::Benchmark(const std::string& name, const Bitcode& bitcode,
-                     const fs::path& workingDirectory, const BaselineCosts& baselineCosts)
+                     const BenchmarkDynamicConfig& dynamicConfig, const fs::path& workingDirectory,
+                     const BaselineCosts& baselineCosts)
     : context_(std::make_unique<llvm::LLVMContext>()),
       module_(makeModuleOrDie(*context_, bitcode, name)),
+      dynamicConfig_(dynamicConfig),
+      scratchDirectory_(fs::unique_path(workingDirectory / "scratch-%%%%-%%%%")),
+      buildCmd_(expandBuildCommand(dynamicConfig.build_cmd(), scratchDirectory_)),
+      isBuildable_(dynamicConfig.build_cmd().size()),
+      isRunnable_(dynamicConfig.build_cmd().size() && dynamicConfig.run_cmd().size()),
       baselineCosts_(baselineCosts),
-      name_(name) {}
+      name_(name),
+      dirty_(true) {
+  sys::error_code ec;
+  fs::create_directory(scratchDirectory(), ec);
+  CHECK(!ec) << "Failed to create scratch directory: " << scratchDirectory();
+}
 
 Benchmark::Benchmark(const std::string& name, std::unique_ptr<llvm::LLVMContext> context,
-                     std::unique_ptr<llvm::Module> module, const fs::path& workingDirectory,
+                     std::unique_ptr<llvm::Module> module,
+                     const BenchmarkDynamicConfig& dynamicConfig, const fs::path& workingDirectory,
                      const BaselineCosts& baselineCosts)
     : context_(std::move(context)),
       module_(std::move(module)),
+      dynamicConfig_(dynamicConfig),
+      scratchDirectory_(fs::unique_path(workingDirectory / "scratch-%%%%-%%%%")),
+      buildCmd_(expandBuildCommand(dynamicConfig.build_cmd(), scratchDirectory_)),
+      isBuildable_(dynamicConfig.build_cmd().size()),
+      isRunnable_(dynamicConfig.build_cmd().size() && dynamicConfig.run_cmd().size()),
       baselineCosts_(baselineCosts),
-      name_(name) {}
+      name_(name),
+      dirty_(true) {
+  sys::error_code ec;
+  fs::create_directory(scratchDirectory(), ec);
+  CHECK(!ec) << "Failed to create scratch directory: " << scratchDirectory();
+}
 
 std::unique_ptr<Benchmark> Benchmark::clone(const fs::path& workingDirectory) const {
   Bitcode bitcode;
   llvm::raw_svector_ostream ostream(bitcode);
   llvm::WriteBitcodeToFile(module(), ostream);
 
-  return std::make_unique<Benchmark>(name(), bitcode, workingDirectory, baselineCosts());
+  return std::make_unique<Benchmark>(name(), bitcode, dynamicConfig(), workingDirectory,
+                                     baselineCosts());
 }
 
 BenchmarkHash Benchmark::module_hash() const { return getModuleHash(*module_); }
@@ -138,6 +191,94 @@ Status Benchmark::verify_module() {
     rso.flush();
     return Status(StatusCode::DATA_LOSS, "Failed to verify module: " + errorMessage);
   }
+  return Status::OK;
+}
+
+Status Benchmark::writeBitcodeToFile(const fs::path& path) {
+  std::error_code error;
+  llvm::raw_fd_ostream outfile(path.string(), error);
+  if (error.value()) {
+    return Status(StatusCode::INTERNAL,
+                  fmt::format("Failed to write bitcode file: {}", path.string()));
+  }
+  llvm::WriteBitcodeToFile(module(), outfile);
+  return Status::OK;
+}
+
+Status Benchmark::computeRuntime(Observation& observation) {
+  if (!isRunnable()) {
+    return Status::OK;
+  }
+
+  RETURN_IF_ERROR(compile());
+
+  // Run the pre-execution hooks.
+  for (int i = 0; i < dynamicConfig().pre_run_cmd_size(); ++i) {
+    RETURN_IF_ERROR(util::checkCall(dynamicConfig().pre_run_cmd(i),
+                                    dynamicConfig().pre_run_cmd_timeout_seconds(),
+                                    scratchDirectory()));
+  }
+
+  // Run the binary.
+  VLOG(3) << "Run: " << dynamicConfig().run_cmd();
+  for (int i = 0; i < kNumRuntimeObservations; ++i) {
+    const std::chrono::time_point<std::chrono::steady_clock> start =
+        std::chrono::steady_clock::now();
+    RETURN_IF_ERROR(util::checkCall(dynamicConfig().run_cmd(),
+                                    dynamicConfig().run_cmd_timeout_seconds(), scratchDirectory()));
+    const auto end = std::chrono::steady_clock::now();
+    observation.mutable_double_list()->add_value(
+        static_cast<double>(
+            std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()) /
+        1000000);
+  }
+
+  // Run the post-execution hooks.
+  for (int i = 0; i < dynamicConfig().post_run_cmd_size(); ++i) {
+    RETURN_IF_ERROR(util::checkCall(dynamicConfig().post_run_cmd(i),
+                                    dynamicConfig().post_run_cmd_timeout_seconds(),
+                                    scratchDirectory()));
+  }
+
+  return Status::OK;
+}
+
+Status Benchmark::compile() {
+  if (!isRunnable()) {
+    return Status::OK;
+  }
+
+  if (!dirty_) {
+    return Status::OK;
+  }
+
+  // Write the bitcode to a file.
+  RETURN_IF_ERROR(writeBitcodeToFile(scratchDirectory() / "out.bc"));
+  VLOG(3) << "Compile: " << buildCmd_;
+
+  // Build the bitcode.
+  const std::chrono::time_point<std::chrono::steady_clock> start = std::chrono::steady_clock::now();
+  RETURN_IF_ERROR(
+      util::checkCall(buildCmd_, dynamicConfig().build_cmd_timeout_seconds(), scratchDirectory()));
+  const auto end = std::chrono::steady_clock::now();
+  buildTimeMicroseconds_ =
+      std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
+
+  // If an output file path was specified, check that is generated.
+  if (dynamicConfig().build_genfile().size()) {
+    fs::path bin{dynamicConfig().build_genfile()};
+    if (!bin.is_absolute()) {
+      bin = scratchDirectory() / bin;
+    }
+    if (!fs::exists(bin)) {
+      return Status(StatusCode::INTERNAL,
+                    fmt::format("Compilation command '{}' did not produce expected file: {}",
+                                buildCmd_, bin.string()));
+    }
+  }
+
+  dirty_ = false;
+
   return Status::OK;
 }
 
