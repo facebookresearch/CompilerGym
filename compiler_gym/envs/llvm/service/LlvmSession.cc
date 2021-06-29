@@ -423,10 +423,7 @@ Status LlvmSession::computeObservation(LlvmObservationSpace space, Observation& 
       break;
     }
     case LlvmObservationSpace::BUILDTIME: {
-      if (benchmark().isBuildable()) {
-        reply.mutable_double_list()->add_value(
-            static_cast<double>(benchmark().lastBuildTimeMicroseconds()) / 1000000);
-      }
+      return benchmark().computeBuildtime(reply);
     }
   }
 

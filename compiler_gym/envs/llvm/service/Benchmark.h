@@ -111,11 +111,18 @@ class Benchmark {
   grpc::Status writeBitcodeToFile(const boost::filesystem::path& path);
 
   /**
-   * Compute fa list of runtimes.
+   * Compute a list of runtimes.
    *
    * If the benchmark is not runnable, the list is empty.
    */
   grpc::Status computeRuntime(Observation& observation);
+
+  /**
+   * Compute a list of buildtimes.
+   *
+   * If the benchmark is not buildable, the list is empty.
+   */
+  grpc::Status computeBuildtime(Observation& observation);
 
   grpc::Status compile();
 

@@ -1203,7 +1203,7 @@ def test_builtime_observation_space(env: LlvmEnv):
     print(value)  # For debugging in case of error.
     assert value.shape == (1,)
     assert space.space.contains(value)
-    assert value[0] > 0
+    assert value[0] >= 0
 
 
 def test_builtime_observation_space_not_runnable(env: LlvmEnv):

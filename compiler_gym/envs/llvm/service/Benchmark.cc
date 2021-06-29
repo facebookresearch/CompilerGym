@@ -243,6 +243,19 @@ Status Benchmark::computeRuntime(Observation& observation) {
   return Status::OK;
 }
 
+Status Benchmark::computeBuildtime(Observation& observation) {
+  if (!isBuildable()) {
+    return Status::OK;
+  }
+
+  RETURN_IF_ERROR(compile());
+
+  observation.mutable_double_list()->add_value(static_cast<double>(lastBuildTimeMicroseconds()) /
+                                               1000000);
+
+  return Status::OK;
+}
+
 Status Benchmark::compile() {
   if (!isRunnable()) {
     return Status::OK;
@@ -261,8 +274,6 @@ Status Benchmark::compile() {
   RETURN_IF_ERROR(
       util::checkCall(buildCmd_, dynamicConfig().build_cmd_timeout_seconds(), scratchDirectory()));
   const auto end = std::chrono::steady_clock::now();
-  buildTimeMicroseconds_ =
-      std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 
   // If an output file path was specified, check that is generated.
   if (dynamicConfig().build_genfile().size()) {
@@ -277,8 +288,10 @@ Status Benchmark::compile() {
     }
   }
 
-  needsRecompile_ = false;
+  buildTimeMicroseconds_ =
+      std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
 
+  needsRecompile_ = false;
   return Status::OK;
 }
 
