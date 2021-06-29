@@ -73,6 +73,19 @@ cc_library(
 )
 
 cc_library(
+    name = "Subprocess",
+    srcs = ["Subprocess.cc"],
+    hdrs = ["Subprocess.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@boost//:filesystem",
+        "@com_github_grpc_grpc//:grpc++",
+        "@fmt",
+        "@subprocess",
+    ],
+)
+
+cc_library(
     name = "Unreachable",
     hdrs = ["Unreachable.h"],
     visibility = ["//visibility:public"],
