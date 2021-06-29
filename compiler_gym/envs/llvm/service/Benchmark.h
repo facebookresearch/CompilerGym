@@ -130,7 +130,7 @@ class Benchmark {
   /**
    * Mark that the LLVM module has been modified.
    */
-  inline void markModuleModified() { dirty_ = true; }
+  inline void markModuleModified() { needsRecompile_ = true; }
 
   /**
    * The underlying LLVM module.
@@ -209,7 +209,7 @@ class Benchmark {
    * directory is unique.
    */
   const std::string name_;
-  bool dirty_;
+  bool needsRecompile_;
   int64_t buildTimeMicroseconds_;
 };
 

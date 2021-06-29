@@ -148,7 +148,7 @@ Benchmark::Benchmark(const std::string& name, const Bitcode& bitcode,
       isRunnable_(dynamicConfig.build_cmd().size() && dynamicConfig.run_cmd().size()),
       baselineCosts_(baselineCosts),
       name_(name),
-      dirty_(true) {
+      needsRecompile_(true) {
   sys::error_code ec;
   fs::create_directory(scratchDirectory(), ec);
   CHECK(!ec) << "Failed to create scratch directory: " << scratchDirectory();
@@ -167,7 +167,7 @@ Benchmark::Benchmark(const std::string& name, std::unique_ptr<llvm::LLVMContext>
       isRunnable_(dynamicConfig.build_cmd().size() && dynamicConfig.run_cmd().size()),
       baselineCosts_(baselineCosts),
       name_(name),
-      dirty_(true) {
+      needsRecompile_(true) {
   sys::error_code ec;
   fs::create_directory(scratchDirectory(), ec);
   CHECK(!ec) << "Failed to create scratch directory: " << scratchDirectory();
@@ -248,7 +248,7 @@ Status Benchmark::compile() {
     return Status::OK;
   }
 
-  if (!dirty_) {
+  if (!needsRecompile_) {
     return Status::OK;
   }
 
@@ -277,7 +277,7 @@ Status Benchmark::compile() {
     }
   }
 
-  dirty_ = false;
+  needsRecompile_ = false;
 
   return Status::OK;
 }
