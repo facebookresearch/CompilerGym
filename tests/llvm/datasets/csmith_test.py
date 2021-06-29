@@ -57,5 +57,21 @@ def test_random_benchmark(csmith_dataset: CsmithDataset):
     assert len(random_benchmarks) == num_benchmarks
 
 
+def test_csmith_positive_runtimes(env: LlvmEnv, csmith_dataset: CsmithDataset):
+    benchmark = next(csmith_dataset.benchmarks())
+    env.reset(benchmark=benchmark)
+    val = env.observation["Runtime"]
+    print(val.tolist())
+    assert np.greater(val, 0)
+
+
+def test_csmith_positive_buildtimes(env: LlvmEnv, csmith_dataset: CsmithDataset):
+    benchmark = next(csmith_dataset.benchmarks())
+    env.reset(benchmark=benchmark)
+    val = env.observation["Buildtime"]
+    print(val.tolist())
+    assert np.greater(val, 0)
+
+
 if __name__ == "__main__":
     main()
