@@ -5,6 +5,7 @@
 import random
 from typing import Optional
 
+import numpy as np
 from gym.spaces import Space
 
 
@@ -14,7 +15,7 @@ class Scalar(Space):
     __slots__ = ["min", "max", "dtype"]
 
     def __init__(
-        self, min: Optional[float] = None, max: Optional[float] = None, dtype=float
+        self, min: Optional[float] = None, max: Optional[float] = None, dtype=np.float64
     ):
         """Constructor.
 
