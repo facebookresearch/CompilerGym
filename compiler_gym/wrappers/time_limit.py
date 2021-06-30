@@ -20,3 +20,13 @@ class TimeLimit(gym.wrappers.TimeLimit, CompilerEnvWrapper):
         >>> done
         True
     """
+
+    def fork(self) -> "TimeLimit":
+        """Fork the wrapped environment.
+
+        The time limit state of the forked environment is the same as the source
+        state.
+        """
+        fkd = type(self)(env=self.env.fork(), max_episode_steps=self._max_episode_steps)
+        fkd._elapsed_steps = self._elapsed_steps  # pylint: disable=protected-access
+        return fkd

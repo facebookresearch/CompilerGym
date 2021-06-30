@@ -53,5 +53,28 @@ def test_time_limit_reached(env: LlvmEnv):
     assert info["TimeLimit.truncated"], info
 
 
+def test_time_limit_fork(env: LlvmEnv):
+    """Check that the time limit state is copied on fork()."""
+    env = TimeLimit(env, max_episode_steps=3)
+
+    env.reset()
+    _, _, done, info = env.step(0)  # 1st step
+    assert not done, info
+
+    fkd = env.fork()
+    try:
+        _, _, done, info = env.step(0)  # 2nd step
+        assert not done, info
+        _, _, done, info = fkd.step(0)  # 2nd step
+        assert not done, info
+
+        _, _, done, info = env.step(0)  # 3rd step
+        assert done, info
+        _, _, done, info = fkd.step(0)  # 3rd step
+        assert done, info
+    finally:
+        fkd.close()
+
+
 if __name__ == "__main__":
     main()
