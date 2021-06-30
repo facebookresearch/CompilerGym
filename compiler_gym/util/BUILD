@@ -17,6 +17,7 @@ py_library(
         "gym_type_hints.py",
         "logs.py",
         "minimize_trajectory.py",
+        "parallelization.py",
         "registration.py",
         "runfiles_path.py",
         "shell_format.py",
