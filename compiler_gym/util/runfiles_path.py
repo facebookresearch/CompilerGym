@@ -3,8 +3,8 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Module for resolving a runfiles path."""
-import getpass
 import os
+from getpass import getuser
 from pathlib import Path
 
 # NOTE(cummins): Moving this file may require updating this relative path.
@@ -72,7 +72,7 @@ def site_data_path(relpath: str) -> Path:
     elif os.environ.get("HOME"):
         return Path("~/.local/share/compiler_gym").expanduser() / relpath
     else:
-        return Path("/tmp/compiler_gym/site_data") / relpath
+        return Path(f"/tmp/compiler_gym_{getuser()}/site_data") / relpath
 
 
 def cache_path(relpath: str) -> Path:
@@ -96,7 +96,7 @@ def cache_path(relpath: str) -> Path:
     elif os.environ.get("HOME"):
         return Path("~/.cache/compiler_gym").expanduser() / relpath
     else:
-        return Path("/tmp/compiler_gym/cache") / relpath
+        return Path(f"/tmp/compiler_gym_{getuser()}/cache") / relpath
 
 
 def transient_cache_path(relpath: str) -> Path:
@@ -120,7 +120,7 @@ def transient_cache_path(relpath: str) -> Path:
     if forced:
         return Path(forced) / relpath
     elif Path("/dev/shm").is_dir():
-        return Path(f"/dev/shm/compiler_gym_{getpass.getuser()}") / relpath
+        return Path(f"/dev/shm/compiler_gym_{getuser()}") / relpath
     else:
         # Fallback to using the regular cache.
         return cache_path(relpath)
