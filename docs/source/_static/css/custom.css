@@ -50,21 +50,24 @@ div.wy-side-scroll a {
 	font-weight: 300;
 }
 
-/* Tables of contents. */
+/* Tables of contents and bullet list styles. */
 div.contents {
 	padding: 0 0 24px;
 }
 div.contents ul,
-section#indices-and-tables ul {
+section#indices-and-tables ul,
+div.document ul {
 	padding-left: 24px;
 }
 div.contents ul.simple li,
 section#indices-and-tables li,
-table.indextable li {
+table.indextable li,
+div.document ul.simple li {
 	list-style: disc;
 }
 div.contents ul.simple li p,
-section#indices-and-tables li p {
+section#indices-and-tables li p,
+div.document ul.simple li p {
 	margin: 0;
 }
 section#indices-and-tables h1 {
