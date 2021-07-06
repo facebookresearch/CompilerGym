@@ -2,16 +2,21 @@
 
 This exposes an API with three operations:
 
-   1. start() -> new_state   (/api/v1/start) Start a session. This would happen
-        when the user navigates to the page in their web browser. One tab = one
-        session. Returns a numeric session ID. This probably isn't the right way
-        of doing things,
+   1. start() -> session_id, state   (/api/v1/start)
 
-   2. step(session_id, action) -> new_state  (/api/v1/<session_id>/<action>) Run
-        an action and produce a
+        Start a session. This would happen when the user navigates to the page
+        in their web browser. One tab = one session. Returns a numeric session
+        ID (this probably isn't the right way of doing things but I don't know
+        any better :-) ). Also returns a state, which is the set of things we
+        want to visualize to represent the current environment state.
 
-   3. stop(session_id)  (/api/v1/stop/<session_id>) End a session. This would be
-        when the user closes the tab / disconnects.
+   2. step(session_id, action) -> state  (/api/v1/<session_id>/<action>)
+
+        Run an action and produce a new state, replacing the old one.
+
+   3. stop(session_id)  (/api/v1/stop/<session_id>)
+
+        End a session. This would be when the user closes the tab / disconnects.
 
 To run this script, install the python dependencies using:
 
@@ -78,8 +83,8 @@ GUI. Our session ID is 0, lets take a step in this session using action "10":
 
 Notice that the state dict has changed. Some of the numbers in the "autophase"
 and "instcount" vectors have changed, there is a codesize_reward value, and the
-commandline now includes the flag needed to run action "10" (which turned out
-to be the "-simplifycfg" flag).
+commandline now includes the flag needed to run action "10" (which turned out to
+be the "-simplifycfg" flag).
 
 We could carry on taking steps, or just end the session:
 
