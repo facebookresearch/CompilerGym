@@ -55,6 +55,8 @@ def exception_to_grpc_status(context):  # pragma: no cover
         handle_exception_as(e, StatusCode.FAILED_PRECONDITION)
     except TimeoutError as e:
         handle_exception_as(e, StatusCode.DEADLINE_EXCEEDED)
+    except Exception as e:  # pylint: disable=broad-except
+        handle_exception_as(e, StatusCode.INTERNAL)
 
 
 class CompilerGymService(CompilerGymServiceServicerStub):  # pragma: no cover
