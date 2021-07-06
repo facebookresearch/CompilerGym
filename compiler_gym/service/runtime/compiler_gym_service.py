@@ -105,7 +105,7 @@ class CompilerGymService(CompilerGymServiceServicerStub):  # pragma: no cover
 
         with self.sessions_lock, exception_to_grpc_status(context):
             # If a benchmark definition was provided, add it.
-            if request.benchmark.program:
+            if request.benchmark.HasField("program"):
                 self.benchmarks[request.benchmark.uri] = request.benchmark
 
             # Lookup the requested benchmark.
