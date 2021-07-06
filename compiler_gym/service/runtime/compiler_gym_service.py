@@ -55,6 +55,8 @@ def exception_to_grpc_status(context):  # pragma: no cover
         handle_exception_as(e, StatusCode.FAILED_PRECONDITION)
     except TimeoutError as e:
         handle_exception_as(e, StatusCode.DEADLINE_EXCEEDED)
+    except Exception as e:  # pylint: disable=broad-except
+        handle_exception_as(e, StatusCode.INTERNAL)
 
 
 class CompilerGymService(CompilerGymServiceServicerStub):  # pragma: no cover
@@ -93,7 +95,7 @@ class CompilerGymService(CompilerGymServiceServicerStub):  # pragma: no cover
         logging.debug(
             "StartSession(id=%d, benchmark=%s), %d active sessions",
             self.next_session_id,
-            request.benchmark,
+            request.benchmark.uri,
             len(self.sessions) + 1,
         )
         reply = StartSessionReply()
@@ -105,7 +107,7 @@ class CompilerGymService(CompilerGymServiceServicerStub):  # pragma: no cover
 
         with self.sessions_lock, exception_to_grpc_status(context):
             # If a benchmark definition was provided, add it.
-            if request.benchmark.program:
+            if request.benchmark.HasField("program"):
                 self.benchmarks[request.benchmark.uri] = request.benchmark
 
             # Lookup the requested benchmark.

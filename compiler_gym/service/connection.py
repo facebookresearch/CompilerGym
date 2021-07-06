@@ -309,6 +309,9 @@ class ManagedConnection(Connection):
         env = os.environ.copy()
         env["COMPILER_GYM_RUNFILES"] = str(runfiles_path("."))
         env["COMPILER_GYM_SITE_DATA"] = str(site_data_path("."))
+        # Set the pythonpath so that executable python scripts can use absolute
+        # import paths like `from compiler_gym.envs.foo import bar`.
+        env["PYTHONPATH"] = env["COMPILER_GYM_RUNFILES"]
 
         # Set the verbosity of the service. The logging level of the service is
         # the debug level - 1, so that COMPILER_GYM_DEBUG=3 will cause VLOG(2)
@@ -327,7 +330,7 @@ class ManagedConnection(Connection):
             # don't override any existing value so that the user may debug the
             # gRPC backend by setting GRPC_VERBOSITY to ERROR, INFO, or DEBUG.
             if not os.environ.get("GRPC_VERBOSITY"):
-                os.environ["GRPC_VERBOSITY"] = "NONE"
+                env["GRPC_VERBOSITY"] = "NONE"
 
         # Set environment variable COMPILER_GYM_SERVICE_ARGS to pass
         # additional arguments to the service.
