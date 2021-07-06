@@ -309,6 +309,9 @@ class ManagedConnection(Connection):
         env = os.environ.copy()
         env["COMPILER_GYM_RUNFILES"] = str(runfiles_path("."))
         env["COMPILER_GYM_SITE_DATA"] = str(site_data_path("."))
+        # Set the pythonpath so that executable python scripts can use absolute
+        # import paths like `from compiler_gym.envs.foo import bar`.
+        env["PYTHONPATH"] = env["COMPILER_GYM_RUNFILES"]
 
         # Set the verbosity of the service. The logging level of the service is
         # the debug level - 1, so that COMPILER_GYM_DEBUG=3 will cause VLOG(2)
