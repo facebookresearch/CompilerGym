@@ -95,7 +95,7 @@ class CompilerGymService(CompilerGymServiceServicerStub):  # pragma: no cover
         logging.debug(
             "StartSession(id=%d, benchmark=%s), %d active sessions",
             self.next_session_id,
-            request.benchmark,
+            request.benchmark.uri,
             len(self.sessions) + 1,
         )
         reply = StartSessionReply()
