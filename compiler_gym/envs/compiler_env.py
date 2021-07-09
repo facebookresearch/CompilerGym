@@ -37,6 +37,9 @@ from compiler_gym.service.proto import (
     ForkSessionRequest,
     GetVersionReply,
     GetVersionRequest,
+    SendSessionParameterReply,
+    SendSessionParameterRequest,
+    SessionParameter,
     StartSessionRequest,
     StepReply,
     StepRequest,
@@ -1310,3 +1313,42 @@ class CompilerEnv(gym.Env):
 
         if self.benchmark.validation_callbacks():
             return composed
+
+    def send_params(self, *params: List[Tuple[str, str]]) -> List[str]:
+        """Send a list of <key, value> parameters to the compiler service.
+
+        This provides a mechanism to send messages to the backend compilation
+        session in a way that doesn't conform to the normal communication
+        pattern. This can be useful for things like configuring runtime
+        debugging settings, or applying "meta actions" to the compiler that are
+        not exposed in the compiler's action space. Consult the documentation
+        for a specific compiler service to see what parameters, if any, are
+        supported.
+
+        Must have called :meth:`reset() <compiler_gym.envs.CompilerEnv.reset>`
+        first.
+
+        :param params: A list of parameters, where each parameter is a
+            :code:`(key, value)` tuple.
+
+        :return: A list of string responses, one per parameter.
+
+        :raises SessionNotFound: If called before :meth:`reset()
+            <compiler_gym.envs.CompilerEnv.reset>`.
+        """
+        if not self.in_episode:
+            raise SessionNotFound("Must call reset() before send_params()")
+
+        request = SendSessionParameterRequest(
+            session_id=self._session_id,
+            parameter=[SessionParameter(key=k, value=v) for (k, v) in params],
+        )
+        reply: SendSessionParameterReply = self.service(
+            self.service.stub.SendSessionParameter, request
+        )
+        if len(params) != len(reply.params):
+            raise OSError(
+                f"Send {len(params)} parameters but received {len(reply.params)} "
+                "responses from the service"
+            )
+        return list(reply.params)

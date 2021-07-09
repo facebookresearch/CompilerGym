@@ -119,6 +119,26 @@ class CompilationSession {
 
   virtual ~CompilationSession() = default;
 
+  /**
+   * Handle a session parameter send by the frontend.
+   *
+   * Session parameters provide a method to send ad-hoc key-value messages to a
+   * compilation session through the env.send_session_parameter() method. It us
+   * up to the client/service to agree on a common schema for encoding and
+   * decoding these parameters.
+   *
+   * Implementing this method is optional.
+   *
+   * @param key The parameter key.
+   * @param value The parameter value.
+   * @param reply A string response message for the parameter, or leave as
+   *    std::nullopt if the parameter is unknown.
+   * @return `OK` on success, else an errro code and message.
+   */
+  [[nodiscard]] virtual grpc::Status handleSessionParameter(const std::string& key,
+                                                            const std::string& value,
+                                                            std::optional<std::string>& reply);
+
  protected:
   /**
    * Get the working directory.

@@ -57,6 +57,10 @@ class CompilerGymService final : public compiler_gym::CompilerGymService::Servic
   grpc::Status AddBenchmark(grpc::ServerContext* context, const AddBenchmarkRequest* request,
                             AddBenchmarkReply* reply) final override;
 
+  grpc::Status SendSessionParameter(grpc::ServerContext* context,
+                                    const SendSessionParameterRequest* request,
+                                    SendSessionParameterReply* reply) final override;
+
   inline BenchmarkCache& benchmarks() { return *benchmarks_; }
 
   // Get the number of active sessions.

@@ -198,6 +198,33 @@ grpc::Status CompilerGymService<CompilationSessionType>::AddBenchmark(
 }
 
 template <typename CompilationSessionType>
+grpc::Status CompilerGymService<CompilationSessionType>::SendSessionParameter(
+    grpc::ServerContext* context, const SendSessionParameterRequest* request,
+    SendSessionParameterReply* reply) {
+  CompilationSession* environment;
+  RETURN_IF_ERROR(session(request->session_id(), &environment));
+
+  VLOG(2) << "Session " << request->session_id() << " SendSessionParameter()";
+
+  // Handle each parameter in the session and generate a response.
+  for (int i = 0; i < request->parameter_size(); ++i) {
+    const auto& param = request->parameter(i);
+    std::optional<std::string> message{std::nullopt};
+
+    RETURN_IF_ERROR(environment->handleSessionParameter(param.key(), param.value(), message));
+
+    if (message.has_value()) {
+      *reply->add_reply() = *message;
+    } else {
+      return Status(grpc::StatusCode::INVALID_ARGUMENT,
+                    fmt::format("Unknown parameter: {}", param.key()));
+    }
+  }
+
+  return grpc::Status::OK;
+}
+
+template <typename CompilationSessionType>
 grpc::Status CompilerGymService<CompilationSessionType>::session(uint64_t id,
                                                                  CompilationSession** environment) {
   auto it = sessions_.find(id);

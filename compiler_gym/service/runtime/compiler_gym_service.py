@@ -22,6 +22,8 @@ from compiler_gym.service.proto import (
     GetSpacesRequest,
     GetVersionReply,
     GetVersionRequest,
+    SendSessionParameterReply,
+    SendSessionParameterRequest,
     StartSessionReply,
     StartSessionRequest,
     StepReply,
@@ -184,4 +186,28 @@ class CompilerGymService(CompilerGymServiceServicerStub):  # pragma: no cover
         with self.sessions_lock:
             for benchmark in request.benchmark:
                 self.benchmarks[benchmark.uri] = benchmark
+        return reply
+
+    def SendSessionParameter(
+        self, request: SendSessionParameterRequest, context
+    ) -> SendSessionParameterReply:
+        reply = SendSessionParameterReply()
+
+        if request.session_id not in self.sessions:
+            context.set_code(StatusCode.NOT_FOUND)
+            context.set_details(f"Session not found: {request.session_id}")
+            return reply
+
+        session = self.sessions[request.session_id]
+
+        with exception_to_grpc_status(context):
+            # Handle each parameter in the session and generate a response.
+            for param in request.parameter:
+                message = session.handle_session_parameter(param.key, param.value)
+                if message is None:
+                    context.set_code(StatusCode.INVALID_ARGUMENT)
+                    context.set_details(f"Unknown parameter: {param.key}")
+                    return reply
+                reply.reply.append(message)
+
         return reply

@@ -90,3 +90,23 @@ class CompilationSession:
         """
         # No need to override this if you are not adding support to fork().
         raise NotImplementedError("CompilationSession.fork() not supported")
+
+    def handle_session_parameter(self, key: str, value: str) -> Optional[str]:
+        """Handle a session parameter send by the frontend.
+
+        Session parameters provide a method to send ad-hoc key-value messages to
+        a compilation session through the :meth:`env.send_session_parameter()
+        <compiler_gym.envs.CompilerEnv.send_session_parameter>` method. It us up
+        to the client/service to agree on a common schema for encoding and
+        decoding these parameters.
+
+        Implementing this method is optional.
+
+        :param key: The parameter key.
+
+        :param value: The parameter value.
+
+        :return: A string response message if the parameter was understood. Else
+            :code:`None` to indicate that the message could not be interpretted.
+        """
+        pass
