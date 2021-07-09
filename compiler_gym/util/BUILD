@@ -51,7 +51,9 @@ cc_library(
     hdrs = ["GrpcStatusMacros.h"],
     visibility = ["//visibility:public"],
     deps = [
+        "@boost//:current_function",
         "@com_github_grpc_grpc//:grpc++",
+        "@fmt",
         "@glog",
     ],
 )
