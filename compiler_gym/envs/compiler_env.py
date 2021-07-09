@@ -1314,7 +1314,7 @@ class CompilerEnv(gym.Env):
         if self.benchmark.validation_callbacks():
             return composed
 
-    def send_params(self, *params: List[Tuple[str, str]]) -> List[str]:
+    def send_params(self, *params: Iterable[Tuple[str, str]]) -> Union[str, List[str]]:
         """Send a list of <key, value> parameters to the compiler service.
 
         This provides a mechanism to send messages to the backend compilation
@@ -1331,7 +1331,8 @@ class CompilerEnv(gym.Env):
         :param params: A list of parameters, where each parameter is a
             :code:`(key, value)` tuple.
 
-        :return: A list of string responses, one per parameter.
+        :return: Either a string response if a single parameter was provided,
+            else a list if string responses, one per parameter.
 
         :raises SessionNotFound: If called before :meth:`reset()
             <compiler_gym.envs.CompilerEnv.reset>`.
@@ -1346,9 +1347,10 @@ class CompilerEnv(gym.Env):
         reply: SendSessionParameterReply = self.service(
             self.service.stub.SendSessionParameter, request
         )
-        if len(params) != len(reply.params):
+        if len(params) != len(reply.reply):
             raise OSError(
-                f"Send {len(params)} parameters but received {len(reply.params)} "
+                f"Send {len(params)} parameters but received {len(reply.reply)} "
                 "responses from the service"
             )
-        return list(reply.params)
+
+        return reply.reply[0] if len(params) == 1 else list(reply.reply)
