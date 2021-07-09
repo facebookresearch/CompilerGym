@@ -82,6 +82,11 @@ class CompilerGymService final : public compiler_gym::CompilerGymService::Servic
   // Add the given session and return its ID.
   uint64_t addSession(std::unique_ptr<CompilationSession> session);
 
+  // Handle a built-in session parameter.
+  [[nodiscard]] grpc::Status handleBuiltinSessionParameter(const std::string& key,
+                                                           const std::string& value,
+                                                           std::optional<std::string>& reply);
+
  private:
   const boost::filesystem::path workingDirectory_;
   const std::vector<ActionSpace> actionSpaces_;

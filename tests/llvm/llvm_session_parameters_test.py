@@ -27,5 +27,24 @@ def test_send_param_unknown_key(env: LlvmEnv):
         env.send_params(("unknown.key", ""))
 
 
+def test_benchmarks_cache_parameters(env: LlvmEnv):
+    env.reset()
+    assert int(env.send_params(("service.benchmark_cache.get_size_in_bytes", ""))) > 0
+
+    # Get the default max size.
+    assert env.send_params(
+        ("service.benchmark_cache.get_max_size_in_bytes", "")
+    ) == str(256 * 1024 * 1024)
+
+    # Set a new max size.
+    assert (
+        env.send_params(("service.benchmark_cache.set_max_size_in_bytes", "256"))
+        == "256"
+    )
+    assert (
+        env.send_params(("service.benchmark_cache.get_max_size_in_bytes", "")) == "256"
+    )
+
+
 if __name__ == "__main__":
     main()

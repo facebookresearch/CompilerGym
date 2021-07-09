@@ -6,7 +6,7 @@ import logging
 from contextlib import contextmanager
 from pathlib import Path
 from threading import Lock
-from typing import Dict
+from typing import Dict, Optional
 
 from grpc import StatusCode
 
@@ -201,9 +201,16 @@ class CompilerGymService(CompilerGymServiceServicerStub):  # pragma: no cover
         session = self.sessions[request.session_id]
 
         with exception_to_grpc_status(context):
-            # Handle each parameter in the session and generate a response.
             for param in request.parameter:
+                # Handle each parameter in the session and generate a response.
                 message = session.handle_session_parameter(param.key, param.value)
+
+                # Use the builtin parameter handlers if not handled by a session.
+                if message is None:
+                    message = self._handle_builtin_session_parameter(
+                        param.key, param.value
+                    )
+
                 if message is None:
                     context.set_code(StatusCode.INVALID_ARGUMENT)
                     context.set_details(f"Unknown parameter: {param.key}")
@@ -211,3 +218,23 @@ class CompilerGymService(CompilerGymServiceServicerStub):  # pragma: no cover
                 reply.reply.append(message)
 
         return reply
+
+    def _handle_builtin_session_parameter(self, key: str, value: str) -> Optional[str]:
+        """Handle a built-in session parameter.
+
+        :param key: The parameter key.
+
+        :param value: The parameter value.
+
+        :return: The response message, or :code:`None` if the key is not
+            understood.
+        """
+        if key == "service.benchmark_cache.set_max_size_in_bytes":
+            self.benchmarks.set_max_size_in_bytes = int(value)
+            return value
+        elif key == "service.benchmark_cache.get_max_size_in_bytes":
+            return str(self.benchmarks.max_size_in_bytes)
+        elif key == "service.benchmark_cache.get_size_in_bytes":
+            return str(self.benchmarks.size_in_bytes)
+
+        return None
