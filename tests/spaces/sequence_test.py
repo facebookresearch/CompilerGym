@@ -5,7 +5,7 @@
 """Unit tests for //compiler_gym/spaces:sequence."""
 import pytest
 
-from compiler_gym.spaces import Sequence
+from compiler_gym.spaces import Scalar, Sequence
 from tests.test_main import main
 
 
@@ -41,6 +41,17 @@ def test_int_contains():
     assert not space.contains(list(range(4)))
     assert space.contains(list(range(5)))
     assert not space.contains(list(range(6)))
+
+
+def test_contains_with_float_scalar_range():
+    space = Sequence(
+        size_range=(3, 3), dtype=float, scalar_range=Scalar(min=0, max=1, dtype=float)
+    )
+    assert space.contains([0.0, 0.0, 0.0])
+    assert space.contains([0.1, 1.0, 0.5])
+    assert not space.contains([0.0, 0.0, -1.0])  # out of bounds
+    assert not space.contains([0.0, 0, 0.1])  # wrong dtype
+    assert not space.contains([0.0, 0])  # wrong shape
 
 
 if __name__ == "__main__":
