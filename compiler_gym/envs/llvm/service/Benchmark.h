@@ -28,11 +28,15 @@ using BenchmarkHash = llvm::ModuleHash;
  */
 using Bitcode = llvm::SmallString<0>;
 
-/** The number of times a benchmark is executed. */
-constexpr int kNumRuntimeObservations = 30;
+/** The number of times a benchmark is executed. This can be overriden using
+ * the "llvm.set_runtimes_per_observation_count" session parameter.
+ */
+constexpr int kDefaultRuntimesPerObservationCount = 30;
 
-/** The number of times a benchmark is built. */
-constexpr int kNumBuildtimeObservations = 1;
+/** The number of times a benchmark is built. This can be overriden using
+ * the "llvm.set_buildtimes_per_observation_count" session parameter.
+ */
+constexpr int kDefaultBuildtimesPerObservationCount = 1;
 
 /**
  * Read a bitcode file from disk.
@@ -193,6 +197,18 @@ class Benchmark {
 
   inline int64_t lastBuildTimeMicroseconds() { return buildTimeMicroseconds_; }
 
+  inline int getRuntimesPerObservationCount() const { return runtimesPerObservationCount_; }
+
+  inline void setRuntimesPerObservationCount(const int value) {
+    runtimesPerObservationCount_ = value;
+  }
+
+  inline int getBuildtimesPerObservationCount() const { return buildtimesPerObservationCount_; }
+
+  inline void setBuildtimesPerObservationCount(const int value) {
+    buildtimesPerObservationCount_ = value;
+  }
+
  private:
   inline const boost::filesystem::path& scratchDirectory() const { return scratchDirectory_; }
   inline const boost::filesystem::path workingDirectory() const {
@@ -218,6 +234,8 @@ class Benchmark {
   const std::string name_;
   bool needsRecompile_;
   int64_t buildTimeMicroseconds_;
+  int runtimesPerObservationCount_;
+  int buildtimesPerObservationCount_;
 };
 
 }  // namespace compiler_gym::llvm_service

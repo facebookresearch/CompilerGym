@@ -10,6 +10,7 @@
 
 #include <iomanip>
 #include <optional>
+#include <string>
 #include <subprocess/subprocess.hpp>
 
 #include "boost/filesystem.hpp"
@@ -156,6 +157,22 @@ Status LlvmSession::computeObservation(const ObservationSpace& observationSpace,
   }
   const LlvmObservationSpace observationSpaceEnum = it->second;
   RETURN_IF_ERROR(computeObservation(observationSpaceEnum, observation));
+  return Status::OK;
+}
+
+Status LlvmSession::handleSessionParameter(const std::string& key, const std::string& value,
+                                           std::optional<std::string>& reply) {
+  if (key == "llvm.set_runtimes_per_observation_count") {
+    benchmark().setRuntimesPerObservationCount(std::stoi(value));
+    reply = value;
+  } else if (key == "llvm.get_runtimes_per_observation_count") {
+    reply = fmt::format("{}", benchmark().getRuntimesPerObservationCount());
+  } else if (key == "llvm.set_buildtimes_per_observation_count") {
+    benchmark().setBuildtimesPerObservationCount(std::stoi(value));
+    reply = value;
+  } else if (key == "llvm.get_buildtimes_per_observation_count") {
+    reply = fmt::format("{}", benchmark().getBuildtimesPerObservationCount());
+  }
   return Status::OK;
 }
 

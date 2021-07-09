@@ -148,7 +148,9 @@ Benchmark::Benchmark(const std::string& name, const Bitcode& bitcode,
       isRunnable_(dynamicConfig.build_cmd().size() && dynamicConfig.run_cmd().size()),
       baselineCosts_(baselineCosts),
       name_(name),
-      needsRecompile_(true) {
+      needsRecompile_(true),
+      runtimesPerObservationCount_(kDefaultRuntimesPerObservationCount),
+      buildtimesPerObservationCount_(kDefaultBuildtimesPerObservationCount) {
   sys::error_code ec;
   fs::create_directory(scratchDirectory(), ec);
   CHECK(!ec) << "Failed to create scratch directory: " << scratchDirectory();
@@ -221,7 +223,7 @@ Status Benchmark::computeRuntime(Observation& observation) {
 
   // Run the binary.
   VLOG(3) << "Run: " << dynamicConfig().run_cmd();
-  for (int i = 0; i < kNumRuntimeObservations; ++i) {
+  for (int i = 0; i < getRuntimesPerObservationCount(); ++i) {
     const std::chrono::time_point<std::chrono::steady_clock> start =
         std::chrono::steady_clock::now();
     RETURN_IF_ERROR(util::checkCall(dynamicConfig().run_cmd(),
