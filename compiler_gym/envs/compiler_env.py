@@ -73,58 +73,68 @@ class CompilerEnv(gym.Env):
     The easiest way to create a CompilerGym environment is to call
     :code:`gym.make()` on one of the registered environments:
 
-    >>> env = gym.make("llvm-v0")
+        >>> env = gym.make("llvm-v0")
+
+    See :code:`compiler_gym.COMPILER_GYM_ENVS` for a list of registered
+    environment names.
 
     Alternatively, an environment can be constructed directly, such as by
     connecting to a running compiler service at :code:`localhost:8080` (see
-    :doc:`/compiler_gym/service` for more details on connecting to services):
+    :doc:`this document </compiler_gym/service>` for more details):
 
-    >>> env = CompilerEnv(
-    ...     service="localhost:8080",
-    ...     observation_space="features",
-    ...     reward_space="runtime",
-    ...     rewards=[env_reward_spaces],
-    ... )
+        >>> env = CompilerEnv(
+        ...     service="localhost:8080",
+        ...     observation_space="features",
+        ...     reward_space="runtime",
+        ...     rewards=[env_reward_spaces],
+        ... )
 
     Once constructed, an environment can be used in exactly the same way as a
     regular :code:`gym.Env`, e.g.
 
-    >>> observation = env.reset()
-    >>> cumulative_reward = 0
-    >>> for i in range(100):
-    >>>     action = env.action_space.sample()
-    >>>     observation, reward, done, info = env.step(action)
-    >>>     cumulative_reward += reward
-    >>>     if done:
-    >>>         break
-    >>> print(f"Reward after {i} steps: {cumulative_reward}")
-    Reward after 100 steps: -0.32123
+        >>> observation = env.reset()
+        >>> cumulative_reward = 0
+        >>> for i in range(100):
+        >>>     action = env.action_space.sample()
+        >>>     observation, reward, done, info = env.step(action)
+        >>>     cumulative_reward += reward
+        >>>     if done:
+        >>>         break
+        >>> print(f"Reward after {i} steps: {cumulative_reward}")
+        Reward after 100 steps: -0.32123
 
     :ivar service: A connection to the underlying compiler service.
+
     :vartype service: compiler_gym.service.CompilerGymServiceConnection
 
     :ivar logger: A Logger instance used by the environment for communicating
         info and warnings.
+
     :vartype logger: logging.Logger
 
     :ivar action_spaces: A list of supported action space names.
+
     :vartype action_spaces: List[str]
 
-    :ivar reward_range: A tuple indicating the range of reward values.
-        Default range is (-inf, +inf).
+    :ivar reward_range: A tuple indicating the range of reward values. Default
+        range is (-inf, +inf).
+
     :vartype reward_range: Tuple[float, float]
 
     :ivar observation: A view of the available observation spaces that permits
         on-demand computation of observations.
+
     :vartype observation: compiler_gym.views.ObservationView
 
     :ivar reward: A view of the available reward spaces that permits on-demand
         computation of rewards.
+
     :vartype reward: compiler_gym.views.RewardView
 
-    :ivar episode_reward: If
-        :func:`CompilerEnv.reward_space <compiler_gym.envs.CompilerGym.reward_space>`
-        is set, this value is the sum of all rewards for the current episode.
+    :ivar episode_reward: If :func:`CompilerEnv.reward_space
+        <compiler_gym.envs.CompilerGym.reward_space>` is set, this value is the
+        sum of all rewards for the current episode.
+
     :vartype episode_reward: float
     """
 
@@ -142,6 +152,9 @@ class CompilerEnv(gym.Env):
         logger: Optional[logging.Logger] = None,
     ):
         """Construct and initialize a CompilerGym service environment.
+
+        In normal use you should use :code:`gym.make(...)` rather than calling
+        the constructor directly.
 
         :param service: The hostname and port of a service that implements the
             CompilerGym service interface, or the path of a binary file which
