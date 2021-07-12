@@ -160,8 +160,8 @@ BAZEL_FETCH_RETRIES ?= 5
 # remote archives in the CI environment.
 bazel-fetch:
 	@for i in $$(seq 1 $(BAZEL_FETCH_RETRIES)); do \
-		echo "$(BAZEL) fetch $(BUILD_TARGET)"; \
-		if $(BAZEL) fetch $(BUILD_TARGET) ; then \
+		echo "$(BAZEL) $(BAZEL_OPTS) fetch $(BUILD_TARGET)"; \
+		if $(BAZEL) $(BAZEL_OPTS) fetch $(BUILD_TARGET) ; then \
 			break; \
 		else \
 			echo "bazel fetch attempt $$i of $(BAZEL_FETCH_RETRIES) failed" >&2; \
