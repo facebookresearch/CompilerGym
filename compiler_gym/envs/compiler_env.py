@@ -1314,7 +1314,24 @@ class CompilerEnv(gym.Env):
         if self.benchmark.validation_callbacks():
             return composed
 
-    def send_params(self, *params: Iterable[Tuple[str, str]]) -> Union[str, List[str]]:
+    def send_param(self, key: str, value: str) -> str:
+        """Send a single <key, value> parameter to the compiler service.
+
+        See :meth:`send_params() <compiler_gym.envs.CompilerEnv.send_params>`
+        for more information.
+
+        :param key: The parameter key.
+
+        :param value: The parameter value.
+
+        :return: The response from the compiler service.
+
+        :raises SessionNotFound: If called before :meth:`reset()
+            <compiler_gym.envs.CompilerEnv.reset>`.
+        """
+        return self.send_params((key, value))[0]
+
+    def send_params(self, *params: Iterable[Tuple[str, str]]) -> List[str]:
         """Send a list of <key, value> parameters to the compiler service.
 
         This provides a mechanism to send messages to the backend compilation
@@ -1331,8 +1348,7 @@ class CompilerEnv(gym.Env):
         :param params: A list of parameters, where each parameter is a
             :code:`(key, value)` tuple.
 
-        :return: Either a string response if a single parameter was provided,
-            else a list if string responses, one per parameter.
+        :return: A list of string responses, one per parameter.
 
         :raises SessionNotFound: If called before :meth:`reset()
             <compiler_gym.envs.CompilerEnv.reset>`.
@@ -1353,4 +1369,4 @@ class CompilerEnv(gym.Env):
                 "responses from the service"
             )
 
-        return reply.reply[0] if len(params) == 1 else list(reply.reply)
+        return list(reply.reply)
