@@ -52,6 +52,7 @@ from compiler_gym.util.gym_type_hints import (
     RewardType,
     StepType,
 )
+from compiler_gym.util.shell_format import plural
 from compiler_gym.util.timer import Timer
 from compiler_gym.validation_error import ValidationError
 from compiler_gym.validation_result import ValidationResult
@@ -1365,8 +1366,9 @@ class CompilerEnv(gym.Env):
         )
         if len(params) != len(reply.reply):
             raise OSError(
-                f"Send {len(params)} parameters but received {len(reply.reply)} "
-                "responses from the service"
+                f"Sent {len(params)} {plural(len(params), 'parameter', 'parameters')} but received "
+                f"{len(reply.reply)} {plural(len(reply.reply), 'response', 'responses')} from the "
+                "service"
             )
 
         return list(reply.reply)

@@ -48,5 +48,16 @@ def test_benchmarks_cache_parameters(env: LlvmEnv):
     ]
 
 
+def test_send_param_invalid_reply_count(env: LlvmEnv, mocker):
+    """Test that an error is raised when # replies != # params."""
+    env.reset()
+
+    mocker.patch.object(env, "service")
+    with pytest.raises(
+        OSError, match="Sent 1 parameter but received 0 responses from the service"
+    ):
+        env.send_param("param", "")
+
+
 if __name__ == "__main__":
     main()
