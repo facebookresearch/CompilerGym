@@ -71,10 +71,8 @@ def test_runtime_observation_parameters(env: LlvmEnv, n: int):
     env.observation_space = "Runtime"
     env.reset(benchmark="cbench-v1/qsort")
 
-    assert env.send_params(("llvm.set_runtimes_per_observation_count", str(n))) == str(
-        n
-    )
-    assert env.send_params(("llvm.get_runtimes_per_observation_count", "")) == str(n)
+    assert env.send_param("llvm.set_runtimes_per_observation_count", str(n)) == str(n)
+    assert env.send_param("llvm.get_runtimes_per_observation_count", "") == str(n)
     runtimes = env.observation["Runtime"]
     assert len(runtimes) == n
 

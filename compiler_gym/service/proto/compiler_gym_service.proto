@@ -184,6 +184,11 @@ message ScalarRangeList {
   repeated ScalarRange range = 1;
 }
 
+message SequenceSpace {
+  ScalarRange length_range = 1;
+  ScalarRange scalar_range = 2;
+}
+
 // The description of a space of observations.
 message ObservationSpace {
   // The name of the observation space.
@@ -202,6 +207,8 @@ message ObservationSpace {
     // value.
     ScalarRange scalar_int64_range = 10;
     ScalarRange scalar_double_range = 11;
+    // A variable-length sequence of elements.
+    SequenceSpace double_sequence = 12;
   }
   // An optional string describing an opaque data format, e.g. a data structure
   // that is serialized to a string/binary array for transmission back to the

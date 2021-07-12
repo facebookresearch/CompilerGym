@@ -149,37 +149,17 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
       }
 #endif
       case LlvmObservationSpace::RUNTIME: {
-        ScalarRange featureSize;
-        featureSize.mutable_min()->set_value(0);
-        std::vector<ScalarRange> featureSizes;
-        featureSizes.reserve(kDefaultRuntimesPerObservationCount);
-        for (size_t i = 0; i < kDefaultRuntimesPerObservationCount; ++i) {
-          featureSizes.push_back(featureSize);
-        }
-        *space.mutable_double_range_list()->mutable_range() = {featureSizes.begin(),
-                                                               featureSizes.end()};
+        space.mutable_double_sequence()->mutable_length_range()->mutable_min()->set_value(0);
+        space.mutable_double_sequence()->mutable_scalar_range()->mutable_min()->set_value(0);
         space.set_deterministic(false);
         space.set_platform_dependent(true);
-        std::vector<double> defaultValue(kDefaultRuntimesPerObservationCount, 0);
-        *space.mutable_default_value()->mutable_double_list()->mutable_value() = {
-            defaultValue.begin(), defaultValue.end()};
         break;
       }
       case LlvmObservationSpace::BUILDTIME: {
-        ScalarRange featureSize;
-        featureSize.mutable_min()->set_value(0);
-        std::vector<ScalarRange> featureSizes;
-        featureSizes.reserve(kDefaultBuildtimesPerObservationCount);
-        for (size_t i = 0; i < kDefaultBuildtimesPerObservationCount; ++i) {
-          featureSizes.push_back(featureSize);
-        }
-        *space.mutable_double_range_list()->mutable_range() = {featureSizes.begin(),
-                                                               featureSizes.end()};
+        space.mutable_double_sequence()->mutable_length_range()->mutable_min()->set_value(0);
+        space.mutable_double_sequence()->mutable_scalar_range()->mutable_min()->set_value(0);
         space.set_deterministic(false);
         space.set_platform_dependent(true);
-        std::vector<double> defaultValue(kDefaultBuildtimesPerObservationCount, 0);
-        *space.mutable_default_value()->mutable_double_list()->mutable_value() = {
-            defaultValue.begin(), defaultValue.end()};
         break;
       }
       case LlvmObservationSpace::IS_BUILDABLE:
