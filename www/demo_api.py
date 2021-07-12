@@ -1,6 +1,6 @@
 """Demonstration of wrapping CompilerGym in a simple Flask app.
 
-This exposes an API with four operations:
+This exposes an API with five operations:
 
    1. describe() -> dict  (/api/v2/describe)
 
@@ -22,7 +22,11 @@ This exposes an API with four operations:
 
         Run an action and produce a new state, replacing the old one.
 
-   4. stop(session_id)  (/api/v2/stop/<session_id>)
+   4. undo(session_id) -> state  (/api/v2/<session_id>/undo)
+
+        Undo the previous action, returning the previous state.
+
+   5. stop(session_id)  (/api/v2/stop/<session_id>)
 
         End a session. This would be when the user closes the tab / disconnects.
 
@@ -127,7 +131,7 @@ We could carry on taking steps, or just end the session:
     $ curl -s localhost:5000/api/v2/stop/0
 """
 from itertools import islice
-from typing import Dict, List
+from typing import Dict, List, Tuple
 
 from flask import Flask, jsonify
 from pydantic import BaseModel
@@ -136,10 +140,6 @@ import compiler_gym
 from compiler_gym import CompilerEnv
 
 app = Flask("compiler_gym")
-
-# A set of sessions that are in use, keyed by a numeric session ID. This is
-# almost certainly not the right way of doing things ;-)
-sessions: Dict[int, CompilerEnv] = {}
 
 
 class StateToVisualize(BaseModel):
@@ -165,6 +165,16 @@ class StateToVisualize(BaseModel):
     # the sequence of actions that produces the highest cumulative reward is the
     # best:
     reward: float
+
+
+# A set of sessions that are in use, keyed by a numeric session ID. Each session
+# is represented by a list of (environment, state) tuples, whether the
+# environment is a CompilerGym environment and the state is a StateToVisualize.
+# Initially, a session consists of a single (environment, state) tuple. When an
+# action is taken, this generates a new (environment, state) tuple that is
+# appended the session list. In this way, undoing an operation is as simple as
+# popping the most recent (environment, state) tuple from the list.
+sessions: Dict[int, List[Tuple[CompilerEnv, StateToVisualize]]] = {}
 
 
 def compute_state(env: CompilerEnv, actions: List[int]) -> StateToVisualize:
@@ -226,7 +236,7 @@ def start(reward: str, benchmark: str):
     env.reset()
     state = compute_state(env, [])
     session_id = len(sessions)
-    sessions[session_id] = env
+    sessions[session_id] = [(env, state)]
     return jsonify({"session_id": session_id, "state": state.dict()})
 
 
@@ -234,7 +244,8 @@ def start(reward: str, benchmark: str):
 def stop(session_id: int):
     session_id = int(session_id)
 
-    sessions[session_id].close()
+    for env, _ in sessions[session_id]:
+        env.close()
     del sessions[session_id]
 
     return jsonify({"session_id": session_id})
@@ -245,6 +256,21 @@ def step(session_id: int, action: int):
     session_id = int(session_id)
     action = int(action)
 
-    new_state = compute_state(sessions[session_id], [action])
+    session = sessions[session_id]
+    new_env = session[-1][0].fork()
+    new_state = compute_state(new_env, [action])
+    session.append((new_env, new_state))
 
     return jsonify({"state": new_state.dict()})
+
+
+@app.route("/api/v2/undo/<session_id>")
+def undo(session_id: int):
+    session_id = int(session_id)
+
+    session = sessions[session_id]
+    env, _ = session.pop()
+    env.close()
+    _, old_state = session[-1]
+
+    return jsonify({"state": old_state.dict()})
