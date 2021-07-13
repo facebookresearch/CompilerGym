@@ -20,6 +20,7 @@ from compiler_gym.service.proto import (
     Int64List,
     Observation,
     ObservationSpace,
+    ScalarLimit,
     ScalarRange,
     ScalarRangeList,
 )
@@ -56,11 +57,22 @@ class LoopToolCompilationSession(CompilationSession):
         ),
         ObservationSpace(
             name="action_state",
-            int64_range_list=ScalarRangeList(),
+            int64_range_list=ScalarRangeList(
+                # FIXME(bwasti): Dummy values.
+                range=[
+                    ScalarRange(
+                        min=ScalarLimit(value=0),
+                        max=ScalarLimit(value=10),
+                    ),
+                ]
+            ),
             deterministic=True,
             platform_dependent=False,
             default_value=Observation(
-                int64_list=Int64List(),
+                int64_list=Int64List(
+                    # FIXME(bwasti): Dummy values.
+                    value=[0]
+                ),
             ),
         ),
     ]
