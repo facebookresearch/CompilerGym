@@ -121,8 +121,8 @@ class StateToVisualize(BaseModel):
     # Observations that we would like to visualize. This list will grow over
     # time to include graphs and 2-D matrices:
     ir: str
-    instcount: List[int]
-    autophase: List[int]
+    instcount: Dict[str, int]
+    autophase: Dict[str, int]
 
     # The reward signal measures how "good" the previous action was. Over time
     # the sequence of actions that produces the highest cumulative reward is the
@@ -137,18 +137,17 @@ def compute_state(env: CompilerEnv, actions: List[int]) -> StateToVisualize:
         actions=actions,
         observations=[
             env.observation.spaces["Ir"],
-            env.observation.spaces["InstCount"],
-            env.observation.spaces["Autophase"],
+            env.observation.spaces["InstCountDict"],
+            env.observation.spaces["AutophaseDict"],
         ],
         rewards=[env.reward.spaces["IrInstructionCountOz"]],
     )
     return StateToVisualize(
         commandline=env.commandline(),
         done=done,
-        # For the
-        ir=ir[:80],
-        instcount=instcount.tolist()[:5],
-        autophase=autophase.tolist()[:5],
+        ir=ir,
+        instcount=instcount,
+        autophase=autophase,
         codesize_reward=codesize_reward,
     )
 
