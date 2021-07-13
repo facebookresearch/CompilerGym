@@ -46,4 +46,4 @@ def test_rand():
 
 
 if __name__ == "__main__":
-    main()
+    main(debug_level=4)
