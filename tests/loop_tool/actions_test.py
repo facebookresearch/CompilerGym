@@ -4,13 +4,12 @@
 # LICENSE file in the root directory of this source tree.
 """Integrations tests for the loop_tool CompilerGym environment."""
 
-import gym
-
+import compiler_gym
 from tests.test_main import main
 
 
 def test_basic():
-    env = gym.make("looptool-v0")
+    env = compiler_gym.make("looptool-v0")
     env.observation_space = "flops"
     env.reset(
         benchmark=env.datasets.benchmark(uri="benchmark://loop_tool-v0/1024"),
@@ -29,7 +28,7 @@ def test_basic():
 
 
 def test_rand():
-    env = gym.make("looptool-v0")
+    env = compiler_gym.make("looptool-v0")
     env.observation_space = "flops"
     env.reset(
         benchmark=env.datasets.benchmark(uri="benchmark://loop_tool-v0/1024"),

@@ -5,13 +5,12 @@
 load("@rules_python//python:defs.bzl", "py_test")
 
 py_test(
-    name = "actions",
+    name = "actions_test",
     timeout = "long",
-    srcs = ["actions.py"],
-    shard_count = 8,
+    srcs = ["actions_test.py"],
+    shard_count = 1,
     deps = [
-        "//compiler_gym/envs",
+        "//compiler_gym",
         "//tests:test_main",
     ],
 )
-

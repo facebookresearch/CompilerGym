@@ -61,6 +61,7 @@ setuptools.setup(
         "compiler_gym.envs.llvm.service",
         "compiler_gym.envs.llvm",
         "compiler_gym.envs.loop_tool",
+        "compiler_gym.envs.loop_tool.service",
         "compiler_gym.envs",
         "compiler_gym.envs",
         "compiler_gym.leaderboard",
@@ -85,7 +86,7 @@ setuptools.setup(
         "compiler_gym": [
             "envs/gcc/service/compiler_gym-gcc-service",
             "envs/llvm/service/compiler_gym-llvm-service",
-            "envs/loop_tool/loop_tool-service-py",
+            "envs/loop_tool/service/compiler_gym-loop_tool-service",
             "envs/llvm/service/libLLVMPolly.so",
             "envs/llvm/service/compute_observation",
             "envs/llvm/service/passes/*.txt",

@@ -12,7 +12,7 @@ from compiler_gym.util.registration import register
 from compiler_gym.util.runfiles_path import runfiles_path, site_data_path
 
 LOOP_TOOL_SERVICE_BINARY: Path = runfiles_path(
-    "compiler_gym/envs/loop_tool/loop_tool-service-py"
+    "compiler_gym/envs/loop_tool/service/compiler_gym-loop_tool-service"
 )
 
 
@@ -67,7 +67,7 @@ class LoopToolDataset(Dataset):
 
 register(
     id="looptool-v0",
-    entry_point="compiler_gym.envs:CompilerEnv",
+    entry_point="compiler_gym.envs.loop_tool.loop_tool_env:LoopToolEnv",
     kwargs={
         "service": LOOP_TOOL_SERVICE_BINARY,
         "rewards": [FLOPSReward()],
