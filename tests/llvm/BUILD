@@ -181,6 +181,16 @@ py_test(
 )
 
 py_test(
+    name = "llvm_session_parameters_test",
+    srcs = ["llvm_session_parameters_test.py"],
+    deps = [
+        "//compiler_gym/envs",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "module_id_test",
     timeout = "short",
     srcs = ["module_id_test.py"],
