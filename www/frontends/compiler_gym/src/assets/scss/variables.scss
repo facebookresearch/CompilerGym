@@ -45,7 +45,7 @@ $indigo:  #2D303D !default;
 $purple:  #8965e0 !default;
 $pink:    #f3a4b5 !default;
 $red:     #f5365c !default;
-$orange:  #ea9b82 !default;
+$orange:  #ee4c2c !default;
 $yellow:  #efcb87 !default;
 $green:   #2dce89 !default;
 $teal:    #80cbd7 !default;
@@ -144,3 +144,5 @@ $dropdown-border-color:          rgba($black, .15) !default;
 $dropdown-font-size:             .75rem !default;
 
 $dropdown-link-color:            $white !default;
+$dropdown-link-active-color:     $dark !default;
+$dropdown-link-active-bg:        $gray-300 !default;

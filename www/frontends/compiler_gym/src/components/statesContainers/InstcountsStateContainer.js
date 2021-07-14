@@ -7,10 +7,16 @@ import ThemeContext from "../../context/ThemeContext";
 const InstcountsStateContainer = ({ instcount }) => {
   const { darkTheme } = useContext(ThemeContext);
 
+  const chartData = Object.entries(instcount).map(([category, result]) => ({
+    category,
+    result,
+  }));
+
   const options = {
     colors: ["#64E572", "#DDDF00", "#FF9655", "#FFF263", "#6AF9C4"],
     chart: {
       type: "bar",
+      height: 150 + "%", //3:2 ratio
     },
     title: {
       text: "InstCounts",
@@ -19,13 +25,7 @@ const InstcountsStateContainer = ({ instcount }) => {
       },
     },
     xAxis: {
-      categories: [
-        "TotalInstCount",
-        "TotalBlocksCount",
-        "TotalFuncsCount",
-        "RectCount",
-        "BrCount",
-      ],
+      categories: chartData.map((i) => i.category),
       labels: {
         style: {
           color: darkTheme && "white",
@@ -66,11 +66,10 @@ const InstcountsStateContainer = ({ instcount }) => {
     credits: {
       enabled: false,
     },
-
     series: [
       {
         name: "InstCounts",
-        data: instcount,
+        data: chartData.map((i) => i.result),
       },
     ],
   };

@@ -8,7 +8,7 @@ const StateContainer = () => {
 
     const context = useContext(ApiContext);
     const themeContext = useContext(ThemeContext)
-    const envState = context.compilerGym.state
+    const envState = context.session.state
     const [stateSelector, setStateSelector] = useState("ir")
 
     const renderState = () => {

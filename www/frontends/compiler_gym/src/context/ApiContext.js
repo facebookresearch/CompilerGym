@@ -7,7 +7,9 @@
 import React from "react";
 
 const ApiContext = React.createContext({
-    compilerGym: {session_id: null, state: { commandline: '' }},
+    compilerGym: {},
+    session: {session_id: null, state: { commandline: '' }},
+    setSession: () => {},
     submitStep: () => {}
 });
 

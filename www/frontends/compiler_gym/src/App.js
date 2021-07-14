@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 import React, { useEffect, useState } from "react";
 import "./assets/scss/custom.scss";
 import ApiService from "./api/ApiService";
@@ -10,24 +16,40 @@ import ControlsContainer from "./components/ControlsContainer";
 import StateContainer from "./components/StateContainer";
 
 const api = new ApiService("http://127.0.0.1:5000");
+const initialSettings = {
+  reward: "IrInstructionCountOz",
+  benchmark: "benchmark://cbench-v1/qsort",
+};
 
 function App() {
   const [compilerGym, setCompilerGym] = useState({});
+  const [session, setSession] = useState({});
   const [darkTheme, setDarkTheme] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
 
+  /*
+   * Start a new session when component mounts on the browser.
+   * It collects CompilerGym variables
+   */
   useEffect(() => {
-    setIsLoading(true);
-    api.startSession().then(
-      (result) => {
-        console.log(result);
-        setCompilerGym({ ...result });
+    const fetchData = async () => {
+      try {
+        const options = await api.getEnvOptions();
+        const initSession = await api.startSession(
+          initialSettings.reward,
+          initialSettings.benchmark
+        );
+        console.log(initSession);
+        setCompilerGym(options);
+        setSession(initSession);
         setIsLoading(false);
-      },
-      (error) => {
-        console.log(error);
+      } catch (err) {
+        console.log(err);
       }
-    );
+    };
+
+    setIsLoading(true);
+    fetchData();
     return () => {};
   }, []);
 
@@ -41,7 +63,7 @@ function App() {
   });
 
   const handleTabClosing = () => {
-    api.closeSession(compilerGym.session_id).then(
+    api.closeSession(session.session_id).then(
       (result) => {
         console.log(result);
       },
@@ -52,10 +74,9 @@ function App() {
   };
 
   const submitStep = (stepID) => {
-    api.getStep(compilerGym.session_id, stepID).then(
+    api.getStep(session.session_id, stepID).then(
       (result) => {
-        console.log(result);
-        setCompilerGym({ ...compilerGym, ...result });
+        setSession({ ...session, ...result });
       },
       (error) => {
         console.log(error);
@@ -77,7 +98,13 @@ function App() {
   return (
     <>
       <ApiContext.Provider
-        value={{ compilerGym: compilerGym, submitStep: submitStep }}
+        value={{
+          compilerGym: compilerGym,
+          session: session,
+          setSession,
+          submitStep: submitStep,
+          api: api,
+        }}
       >
         <ThemeContext.Provider
           value={{ darkTheme: darkTheme, toggleTheme: toggleTheme }}

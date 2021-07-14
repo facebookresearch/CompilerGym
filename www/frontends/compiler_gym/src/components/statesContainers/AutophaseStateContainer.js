@@ -7,9 +7,15 @@ import ThemeContext from "../../context/ThemeContext";
 const AutophaseStateContainer = ({ autophase }) => {
   const { darkTheme } = useContext(ThemeContext);
 
+  const chartData = Object.entries(autophase).map(([category, result]) => ({
+    category,
+    result,
+  }));
+
   const options = {
     chart: {
       type: "bar",
+      height: 150 + "%", //3:2 ratio
     },
     title: {
       text: "AutoPhase",
@@ -18,13 +24,7 @@ const AutophaseStateContainer = ({ autophase }) => {
       },
     },
     xAxis: {
-      categories: [
-        "BBNumArgsHi",
-        "BBNumArgsLo",
-        "onePred",
-        "OnePredOneSuc",
-        "OnePredTwoSuc",
-      ],
+      categories: chartData.map((i) => i.category),
       labels: {
         style: {
           color: darkTheme && "white",
@@ -61,15 +61,11 @@ const AutophaseStateContainer = ({ autophase }) => {
     credits: {
       enabled: false,
     },
-    //tooltip: {
-    //headerFormat: '<span style="font-size:11px">{series.name}</span><br>',
-    //pointFormat: '<span style="color:{point.color}">{point.x}</span>: <b>{point.y}</b> <br/>'
-    //},
 
     series: [
       {
         name: "Autophase",
-        data: autophase,
+        data: chartData.map((i) => i.result),
       },
     ],
   };
