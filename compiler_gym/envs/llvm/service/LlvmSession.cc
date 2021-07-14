@@ -172,6 +172,17 @@ Status LlvmSession::handleSessionParameter(const std::string& key, const std::st
     reply = value;
   } else if (key == "llvm.get_buildtimes_per_observation_count") {
     reply = fmt::format("{}", benchmark().getBuildtimesPerObservationCount());
+  } else if (key == "llvm.apply_baseline_optimizations") {
+    if (value == "-Oz") {
+      bool changed = benchmark().applyBaselineOptimizations(/*optLevel=*/2, /*sizeLevel=*/2);
+      reply = changed ? "1" : "0";
+    } else if (value == "-O3") {
+      bool changed = benchmark().applyBaselineOptimizations(/*optLevel=*/3, /*sizeLevel=*/0);
+      reply = changed ? "1" : "0";
+    } else {
+      return Status(StatusCode::INVALID_ARGUMENT,
+                    fmt::format("Invalid value for llvm.apply_baseline_optimizations: {}", value));
+    }
   }
   return Status::OK;
 }

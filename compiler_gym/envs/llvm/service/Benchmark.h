@@ -130,6 +130,15 @@ class Benchmark {
 
   grpc::Status compile();
 
+  /**
+   * Apply the given baseline optimizations.
+   *
+   * @param optLevel The runtime optimization level.
+   * @param sizeLevel The size optimization level
+   * @return Whether the baseline optimizations modified the module.
+   */
+  bool applyBaselineOptimizations(unsigned optLevel, unsigned sizeLevel);
+
   inline bool isBuildable() const { return isBuildable_; }
   inline bool isRunnable() const { return isRunnable_; }
 

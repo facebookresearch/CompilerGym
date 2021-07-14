@@ -297,4 +297,8 @@ Status Benchmark::compile() {
   return Status::OK;
 }
 
+bool Benchmark::applyBaselineOptimizations(unsigned optLevel, unsigned sizeLevel) {
+  return applyBaselineOptimizationsToModule(&module(), optLevel, sizeLevel);
+}
+
 }  // namespace compiler_gym::llvm_service
