@@ -1,0 +1,32 @@
+.chart-container {
+  margin: 1rem 0;
+  width: 100%;
+}
+
+.chart-dark-mode {
+  .highcharts-container {
+    position: relative;
+    overflow: hidden;
+    width: 100%;
+    height: 100%;
+    text-align: left;
+    line-height: normal;
+    z-index: 0; /* #1072 */
+    -webkit-tap-highlight-color: rgba(0,0,0,0);
+    font-size: 12px;
+  }
+
+  .highcharts-background {
+    fill: #282c34;
+  }
+
+  .highcharts-title, .highcharts-subtitle, .highcharts-axis-title {
+    fill: white;
+    font-weight: normal;
+  }
+
+  .highcharts-yaxis-grid .highcharts-grid-line {
+    stroke-width: 1px;
+    stroke: $gray-600;
+  }
+}

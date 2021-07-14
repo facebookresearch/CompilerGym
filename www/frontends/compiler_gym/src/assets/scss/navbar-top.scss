@@ -1,0 +1,55 @@
+// Navbar top (Topbar)
+
+.navbar-top {
+    border: 0;
+    padding-left: 1rem;
+    padding-right: 1rem;
+
+    .container,
+    .container-fluid {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    @media (min-width: 576px)  {
+        .navbar-brand {
+            display: block;
+        }
+    }
+
+    @media (max-width: 576px)  {
+        .navbar-collapse {
+            width: 100%;
+        }
+
+        .nav-item {
+            position: static;
+
+            .dropdown-menu {
+                position: absolute;
+                width: 94%;
+                min-width: auto;
+                left: 3%;
+                right: auto;
+            }
+        }
+    }
+
+    &.border-bottom {
+        &.navbar-dark {
+            border-color: rgba(255, 255, 255, .08) !important;
+        }
+
+        &.navbar-light {
+            border-color: rgba(0, 0, 0, .04) !important;
+        }
+    }
+}
+
+// *** Actions navbar ***
+
+.action-navbar-wrapper {
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}

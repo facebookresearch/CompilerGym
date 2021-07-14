@@ -93,12 +93,14 @@ We could carry on taking steps, or just end the session:
 from typing import Dict, List
 
 from flask import Flask, jsonify
+from flask_cors import CORS
 from pydantic import BaseModel
 
 import compiler_gym
 from compiler_gym import CompilerEnv
 
 app = Flask("compiler_gym")
+CORS(app)
 
 # A set of sessions that are in use, keyed by a numeric session ID. This is
 # almost certainly not the right way of doing things ;-)
