@@ -29,6 +29,7 @@ jobs:
                   CC: clang
                   CXX: clang++
                   BAZEL_OPTS: --batch
+                  BAZEL_FETCH_OPTS: --config=ci
                   BAZEL_BUILD_OPTS: --config=ci
 
             - name: Test
