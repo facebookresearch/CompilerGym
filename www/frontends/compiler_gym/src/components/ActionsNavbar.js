@@ -41,9 +41,10 @@ const CustomMenu = forwardRef(
   }
 );
 
+//name.toLowerCase().indexOf(this.props.filter.toLowerCase()) !== -1
+
 const ActionsNavbar = () => {
-  const { session, compilerGym, api, setSession } = useContext(ApiContext);
-  const [actionSpace, setActionSpace] = useState(15);
+  const { api, compilerGym, session, setSession } = useContext(ApiContext);
   const [actionsLine, setActionsLine] = useState("");
   const [benchmark, setBenchmark] = useState("benchmark://cbench-v1");
   const [uriOptions, setUriOptions] = useState([]);
@@ -187,37 +188,8 @@ const ActionsNavbar = () => {
           </Col>
         </Form.Row>
         <Form.Row className="align-items-center">
-          <Col md={4} className="mt-1">
+          <Col sm={11} md={11} className="mt-1">
             <InputGroup className="mb-1">
-              <InputGroup.Prepend>
-                <InputGroup.Text
-                  className="bg-dark"
-                  id="inputGroup-sizing-sm"
-                  style={{ color: "white" }}
-                >
-                  Action Space
-                </InputGroup.Text>
-              </InputGroup.Prepend>
-              <FormControl
-                aria-describedby="inputGroup-sizing-sm"
-                type="number"
-                placeholder="Select # action"
-                min={1}
-                name="actionSpace"
-                value={actionSpace || 0}
-                onChange={(e) => setActionSpace(e.target.value)}
-              />
-            </InputGroup>
-          </Col>
-          <Col md={1} className="mt-0 ml-auto">
-            <Button size="sm" variant="success" onClick={startNewSession}>
-              <i className="bi bi-play-fill"></i>
-            </Button>
-          </Col>
-        </Form.Row>
-        <Form.Row className="align-items-center">
-          <Col sm={12} md={12} className="mt-1">
-            <InputGroup className="mb-2">
               <InputGroup.Prepend>
                 <InputGroup.Text
                   className="bg-dark"
@@ -235,6 +207,11 @@ const ActionsNavbar = () => {
                 defaultValue={actionsLine}
               />
             </InputGroup>
+          </Col>
+          <Col md={1} className="mt-1 mb-1">
+            <Button variant="success" onClick={startNewSession}>
+              <i className="bi bi-play-fill"></i>
+            </Button>
           </Col>
         </Form.Row>
       </Form>

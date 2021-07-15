@@ -99,11 +99,11 @@ function App() {
     <>
       <ApiContext.Provider
         value={{
+          api: api,
           compilerGym: compilerGym,
           session: session,
           setSession,
-          submitStep: submitStep,
-          api: api,
+          submitStep,
         }}
       >
         <ThemeContext.Provider
