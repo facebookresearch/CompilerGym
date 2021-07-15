@@ -119,6 +119,7 @@ PYTHON ?= python3
 
 # Bazel build options.
 BAZEL_OPTS ?=
+BAZEL_FETCH_OPTS ?=
 BAZEL_BUILD_OPTS ?= -c opt
 BAZEL_TEST_OPTS ?=
 
@@ -160,8 +161,8 @@ BAZEL_FETCH_RETRIES ?= 5
 # remote archives in the CI environment.
 bazel-fetch:
 	@for i in $$(seq 1 $(BAZEL_FETCH_RETRIES)); do \
-		echo "$(BAZEL) $(BAZEL_OPTS) fetch $(BUILD_TARGET)"; \
-		if $(BAZEL) $(BAZEL_OPTS) fetch $(BUILD_TARGET) ; then \
+		echo "$(BAZEL) $(BAZEL_OPTS) fetch $(BAZEL_FETCH_OPTS) $(BUILD_TARGET)"; \
+		if $(BAZEL) $(BAZEL_OPTS) fetch $(BAZEL_FETCH_OPTS) $(BUILD_TARGET) ; then \
 			break; \
 		else \
 			echo "bazel fetch attempt $$i of $(BAZEL_FETCH_RETRIES) failed" >&2; \

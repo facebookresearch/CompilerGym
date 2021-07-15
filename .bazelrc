@@ -77,6 +77,10 @@ build:ubsan --linkopt -lubsan
 # --config ci: Continuous Integration tool
 query:ci --noshow_progress
 query:ci --noshow_loading_progress
+fetch:ci --noshow_progress
+fetch:ci --noshow_loading_progress
+fetch:ci --show_task_finish
+fetch:ci --keep_going
 build:ci --noshow_progress
 build:ci --noshow_loading_progress
 build:ci --show_task_finish
