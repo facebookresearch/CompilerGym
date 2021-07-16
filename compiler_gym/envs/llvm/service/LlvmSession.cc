@@ -163,12 +163,24 @@ Status LlvmSession::computeObservation(const ObservationSpace& observationSpace,
 Status LlvmSession::handleSessionParameter(const std::string& key, const std::string& value,
                                            std::optional<std::string>& reply) {
   if (key == "llvm.set_runtimes_per_observation_count") {
-    benchmark().setRuntimesPerObservationCount(std::stoi(value));
+    const int ivalue = std::stoi(value);
+    if (ivalue < 1) {
+      return Status(
+          StatusCode::INVALID_ARGUMENT,
+          fmt::format("runtimes_per_observation_count must be >= 1. Received: {}", ivalue));
+    }
+    benchmark().setRuntimesPerObservationCount(ivalue);
     reply = value;
   } else if (key == "llvm.get_runtimes_per_observation_count") {
     reply = fmt::format("{}", benchmark().getRuntimesPerObservationCount());
   } else if (key == "llvm.set_buildtimes_per_observation_count") {
-    benchmark().setBuildtimesPerObservationCount(std::stoi(value));
+    const int ivalue = std::stoi(value);
+    if (ivalue < 1) {
+      return Status(
+          StatusCode::INVALID_ARGUMENT,
+          fmt::format("buildtimes_per_observation_count must be >= 1. Received: {}", ivalue));
+    }
+    benchmark().setBuildtimesPerObservationCount(ivalue);
     reply = value;
   } else if (key == "llvm.get_buildtimes_per_observation_count") {
     reply = fmt::format("{}", benchmark().getBuildtimesPerObservationCount());

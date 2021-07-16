@@ -1164,6 +1164,7 @@ def test_runtime_observation_space(env: LlvmEnv):
     value: np.ndarray = env.observation[key]
     print(value.tolist())  # For debugging in case of error.
     assert isinstance(value, np.ndarray)
+    assert env.runtime_observation_count == 30
     assert value.shape == (30,)
 
     assert not space.deterministic
@@ -1171,10 +1172,42 @@ def test_runtime_observation_space(env: LlvmEnv):
 
     assert space.space.contains(value)
 
-    for builtime in value:
-        assert builtime > 0
+    for buildtime in value:
+        assert buildtime > 0
 
     assert len(set(value)) > 1
+
+
+def test_runtime_observation_space_different_observation_count(env: LlvmEnv):
+    """Test setting a custom observation count for LLVM runtimes."""
+    env.reset("cbench-v1/crc32")
+
+    env.runtime_observation_count = 3
+    value: np.ndarray = env.observation["Runtime"]
+    print(value.tolist())  # For debugging in case of error.
+    assert value.shape == (3,)
+
+    env.reset()
+    value: np.ndarray = env.observation["Runtime"]
+    print(value.tolist())  # For debugging in case of error.
+    assert value.shape == (3,)
+
+    env.runtime_observation_count = 5
+    value: np.ndarray = env.observation["Runtime"]
+    print(value.tolist())  # For debugging in case of error.
+    assert value.shape == (5,)
+
+
+def test_runtime_observation_space_invalid_observation_count(env: LlvmEnv):
+    """Test setting an invalid custom observation count for LLVM runtimes."""
+    env.reset("cbench-v1/crc32")
+
+    val = env.runtime_observation_count
+    with pytest.raises(
+        ValueError, match="runtimes_per_observation_count must be >= 1. Received: -5"
+    ):
+        env.runtime_observation_count = -5
+    assert env.runtime_observation_count == val  # unchanged
 
 
 def test_runtime_observation_space_not_runnable(env: LlvmEnv):
@@ -1190,7 +1223,7 @@ def test_runtime_observation_space_not_runnable(env: LlvmEnv):
     assert space.space.contains(value)
 
 
-def test_builtime_observation_space(env: LlvmEnv):
+def test_buildtime_observation_space(env: LlvmEnv):
     env.reset("cbench-v1/crc32")
     key = "Buildtime"
 
@@ -1206,7 +1239,7 @@ def test_builtime_observation_space(env: LlvmEnv):
     assert value[0] >= 0
 
 
-def test_builtime_observation_space_not_runnable(env: LlvmEnv):
+def test_buildtime_observation_space_not_runnable(env: LlvmEnv):
     env.reset("chstone-v0/gsm")
     key = "Buildtime"
 
