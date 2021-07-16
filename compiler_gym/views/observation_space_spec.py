@@ -123,7 +123,9 @@ class ObservationSpaceSpec:
         def make_scalar(scalar_range, dtype, defaults):
             scalar_range_tuple = _scalar_range2tuple(scalar_range, defaults)
             return Scalar(
-                min=scalar_range_tuple[0], max=scalar_range_tuple[1], dtype=dtype
+                min=dtype(scalar_range_tuple[0]),
+                max=dtype(scalar_range_tuple[1]),
+                dtype=dtype,
             )
 
         def make_seq(scalar_range, dtype, defaults):
@@ -200,7 +202,7 @@ class ObservationSpaceSpec:
         elif shape_type == "scalar_int64_range":
             space = make_scalar(
                 proto.scalar_int64_range,
-                np.int64,
+                int,
                 (np.iinfo(np.int64).min, np.iinfo(np.int64).max),
             )
 
@@ -209,9 +211,7 @@ class ObservationSpaceSpec:
 
             to_string = str
         elif shape_type == "scalar_double_range":
-            space = make_scalar(
-                proto.scalar_double_range, np.float64, (-np.inf, np.inf)
-            )
+            space = make_scalar(proto.scalar_double_range, float, (-np.inf, np.inf))
 
             def translate(observation):
                 return float(observation.scalar_double)
