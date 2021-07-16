@@ -3,13 +3,15 @@
 This is the frontend to run compiler gym on the browser.
 
 ## Install dependencies
+If Node.js and npm are not installed in your machine yet, we strongly recommend using [nvm](https://github.com/nvm-sh/nvm) to manage and install node versions.
+
 Go to the Folder frontends/compiler_gym and run the below command to install dependencies for the GUI.
 ```sh
 $ npm install
 ```
 
 ## Setup
-TO DO: Create a file named `.env` in the folder `frontends/compiler_gym` with a copy the .env.example file.
+[TO DO]: Create a file named `.env` in the folder `frontends/compiler_gym` with a copy the .env.example file.
 
 
 ## Development
