@@ -9,9 +9,9 @@ from functools import reduce
 from pathlib import Path
 from typing import Optional, Tuple
 
-import loop_tool_py as lt
 import numpy as np
 
+import loop_tool_py as lt
 from compiler_gym.service import CompilationSession
 from compiler_gym.service.proto import (
     Action,
@@ -56,13 +56,22 @@ class LoopToolCompilationSession(CompilationSession):
             ),
         ),
         ObservationSpace(
+            name="loop_tree",
+            string_size_range=ScalarRange(),
+            deterministic=True,
+            platform_dependent=False,
+            default_value=Observation(
+                string_value="",
+            ),
+        ),
+        ObservationSpace(
             name="action_state",
             int64_range_list=ScalarRangeList(
                 # FIXME(bwasti): Dummy values.
                 range=[
                     ScalarRange(
                         min=ScalarLimit(value=0),
-                        max=ScalarLimit(value=10),
+                        max=ScalarLimit(value=2 ** 36),
                     ),
                 ]
             ),
@@ -155,27 +164,33 @@ class LoopToolCompilationSession(CompilationSession):
         def lam(v, x):
             return v * x[0] + x[1]
 
-        k = reduce(lam, self.order[self.cursor + 1 :], 1)
+        k = reduce(lam, self.order[self.cursor + 1 :][::-1], 1)
         if increment == -1 and y:
             increment = 0
-        if x + increment < 1:
+        if (x + increment) < 1:
+            return
+        if (x + increment) > self.size:
             return
         n = a * x * k + b
         d = (x + increment) * k
         a_ = n // d
         b_ = n % d
+        if a_ < 1:
+            return
+        if a_ > self.size:
+            return
         self.order[self.cursor - 1] = (a_, b_)
         self.order[self.cursor] = (x + increment, 0)
-        end_size = reduce(lam, self.order, 1)
-        assert end_size == self.size
+        end_size = reduce(lam, self.order[::-1], 1)
+        assert (
+            end_size == self.size
+        ), f"{end_size} != {self.size} ({a}, {b}), ({x}, {y}) -> ({a_}, {b_}), ({x + increment}, 0)"
 
     def apply_action(self, action: Action) -> Tuple[bool, Optional[ActionSpace], bool]:
         logging.info("Applied action %d", action.action)
         if action.action < 0 or action.action > len(self.action_spaces[0].action):
             raise ValueError("Out-of-range")
-
         act = self.action_spaces[0].action[action.action]
-        # print("doing", act)
         if self.mode not in ["size", "select"]:
             raise RuntimeError("Invalid mode set: {}".format(self.mode))
         if act == "toggle_mode":
@@ -200,28 +215,24 @@ class LoopToolCompilationSession(CompilationSession):
                 next_cursor = (self.cursor + 1) % len(self.order)
                 self.cursor = next_cursor
 
-        # print(self.mode, self.cursor, self.order, self.thread)
         return False, None, False
 
-    def flops(self):
-        print(self.ir)
+    def lower(self):
         for n in self.ir.nodes:
-            print(n)
             o = [(self.var, k) for k in self.order]
-            print(o)
             self.ir.set_order(n, o)
         loop_tree = lt.LoopTree(self.ir)
-        print(loop_tree)
         parallel = set()
         t = loop_tree.roots[0]
         for b in self.thread:
             if b:
                 parallel.add(t)
             t = loop_tree.children(t)[0]
-        try:
-            c = lt.CompiledCuda(loop_tree, parallel)
-        except Exception as e:
-            print(str(e))
+        return loop_tree, parallel
+
+    def flops(self):
+        loop_tree, parallel = self.lower()
+        c = lt.CompiledCuda(loop_tree, parallel)
         A = lt.Tensor(self.size)
         B = lt.Tensor(self.size)
         C = lt.Tensor(self.size)
@@ -245,12 +256,17 @@ class LoopToolCompilationSession(CompilationSession):
         if observation_space.name == "action_state":
             observation = Observation()
             # split cursor, size cursor
-            observation.int64_list.value[:] = [self.cursor, self.order[self.cursor]]
+            o = self.order[self.cursor]
+            observation.int64_list.value[:] = [self.cursor, o[0], o[1]]
             return observation
         elif observation_space.name == "flops":
-            try:
-                return Observation(scalar_double=self.flops())
-            except Exception as e:
-                print(str(e))
+            return Observation(scalar_double=self.flops())
+        elif observation_space.name == "loop_tree":
+            loop_tree, parallel = self.lower()
+            return Observation(
+                string_value=loop_tree.dump(
+                    lambda x: "[thread]" if x in parallel else ""
+                )
+            )
         else:
             raise KeyError(observation_space.name)
