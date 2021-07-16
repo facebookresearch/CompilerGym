@@ -13,7 +13,7 @@ const ControlsContainer = () => {
     return (
         <div>
           <ActionsNavbar/>
-          <ActionsSearchTree/>  
+          <ActionsSearchTree/>
         </div>
     )
 }

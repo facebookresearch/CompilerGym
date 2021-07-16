@@ -28,7 +28,7 @@ function App() {
   const [isLoading, setIsLoading] = useState(false);
 
   /*
-   * Start a new session when component mounts on the browser.
+   * Start a new session when component mounts in the browser.
    * It collects CompilerGym variables
    */
   useEffect(() => {
@@ -54,11 +54,9 @@ function App() {
   }, []);
 
   useEffect(() => {
-    window.addEventListener("beforeunload", alertUser);
-    window.addEventListener("unload", handleTabClosing);
+    window.addEventListener("beforeunload", handleTabClosing);
     return () => {
-      window.removeEventListener("beforeunload", alertUser);
-      window.removeEventListener("unload", handleTabClosing);
+      window.removeEventListener("beforeunload", handleTabClosing);
     };
   });
 
@@ -82,11 +80,6 @@ function App() {
         console.log(error);
       }
     );
-  };
-
-  const alertUser = (event) => {
-    event.preventDefault();
-    event.returnValue = "";
   };
 
   const toggleTheme = () => {

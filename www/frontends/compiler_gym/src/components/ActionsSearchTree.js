@@ -81,10 +81,10 @@ const ActionsSearchTree = () => {
   }, [actionSpace, compilerGym.actions]);
 
   /**
-   * Function to generate new nodes/layer when user clicks on a node 
-   * 
+   * Function to generate new nodes/layer when user clicks on a node
+   *
    * @param {Object} layerData Receives a nested object data structure.
-   * @returns 
+   * @returns
    */
   const getRoot = (layerData) => {
     if (layerData.action_id.split(".")[0] === activeNode) {
