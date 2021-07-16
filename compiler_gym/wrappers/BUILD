@@ -18,5 +18,6 @@ py_library(
         "//compiler_gym/datasets",
         "//compiler_gym/envs",
         "//compiler_gym/util",
+        "//compiler_gym/views",
     ],
 )
