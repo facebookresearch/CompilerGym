@@ -37,6 +37,9 @@ from compiler_gym.service.proto import (
     ForkSessionRequest,
     GetVersionReply,
     GetVersionRequest,
+    SendSessionParameterReply,
+    SendSessionParameterRequest,
+    SessionParameter,
     StartSessionRequest,
     StepReply,
     StepRequest,
@@ -49,6 +52,7 @@ from compiler_gym.util.gym_type_hints import (
     RewardType,
     StepType,
 )
+from compiler_gym.util.shell_format import plural
 from compiler_gym.util.timer import Timer
 from compiler_gym.validation_error import ValidationError
 from compiler_gym.validation_result import ValidationResult
@@ -73,58 +77,68 @@ class CompilerEnv(gym.Env):
     The easiest way to create a CompilerGym environment is to call
     :code:`gym.make()` on one of the registered environments:
 
-    >>> env = gym.make("llvm-v0")
+        >>> env = gym.make("llvm-v0")
+
+    See :code:`compiler_gym.COMPILER_GYM_ENVS` for a list of registered
+    environment names.
 
     Alternatively, an environment can be constructed directly, such as by
     connecting to a running compiler service at :code:`localhost:8080` (see
-    :doc:`/compiler_gym/service` for more details on connecting to services):
+    :doc:`this document </compiler_gym/service>` for more details):
 
-    >>> env = CompilerEnv(
-    ...     service="localhost:8080",
-    ...     observation_space="features",
-    ...     reward_space="runtime",
-    ...     rewards=[env_reward_spaces],
-    ... )
+        >>> env = CompilerEnv(
+        ...     service="localhost:8080",
+        ...     observation_space="features",
+        ...     reward_space="runtime",
+        ...     rewards=[env_reward_spaces],
+        ... )
 
     Once constructed, an environment can be used in exactly the same way as a
     regular :code:`gym.Env`, e.g.
 
-    >>> observation = env.reset()
-    >>> cumulative_reward = 0
-    >>> for i in range(100):
-    >>>     action = env.action_space.sample()
-    >>>     observation, reward, done, info = env.step(action)
-    >>>     cumulative_reward += reward
-    >>>     if done:
-    >>>         break
-    >>> print(f"Reward after {i} steps: {cumulative_reward}")
-    Reward after 100 steps: -0.32123
+        >>> observation = env.reset()
+        >>> cumulative_reward = 0
+        >>> for i in range(100):
+        >>>     action = env.action_space.sample()
+        >>>     observation, reward, done, info = env.step(action)
+        >>>     cumulative_reward += reward
+        >>>     if done:
+        >>>         break
+        >>> print(f"Reward after {i} steps: {cumulative_reward}")
+        Reward after 100 steps: -0.32123
 
     :ivar service: A connection to the underlying compiler service.
+
     :vartype service: compiler_gym.service.CompilerGymServiceConnection
 
     :ivar logger: A Logger instance used by the environment for communicating
         info and warnings.
+
     :vartype logger: logging.Logger
 
     :ivar action_spaces: A list of supported action space names.
+
     :vartype action_spaces: List[str]
 
-    :ivar reward_range: A tuple indicating the range of reward values.
-        Default range is (-inf, +inf).
+    :ivar reward_range: A tuple indicating the range of reward values. Default
+        range is (-inf, +inf).
+
     :vartype reward_range: Tuple[float, float]
 
     :ivar observation: A view of the available observation spaces that permits
         on-demand computation of observations.
+
     :vartype observation: compiler_gym.views.ObservationView
 
     :ivar reward: A view of the available reward spaces that permits on-demand
         computation of rewards.
+
     :vartype reward: compiler_gym.views.RewardView
 
-    :ivar episode_reward: If
-        :func:`CompilerEnv.reward_space <compiler_gym.envs.CompilerGym.reward_space>`
-        is set, this value is the sum of all rewards for the current episode.
+    :ivar episode_reward: If :func:`CompilerEnv.reward_space
+        <compiler_gym.envs.CompilerGym.reward_space>` is set, this value is the
+        sum of all rewards for the current episode.
+
     :vartype episode_reward: float
     """
 
@@ -142,6 +156,9 @@ class CompilerEnv(gym.Env):
         logger: Optional[logging.Logger] = None,
     ):
         """Construct and initialize a CompilerGym service environment.
+
+        In normal use you should use :code:`gym.make(...)` rather than calling
+        the constructor directly.
 
         :param service: The hostname and port of a service that implements the
             CompilerGym service interface, or the path of a binary file which
@@ -1297,3 +1314,61 @@ class CompilerEnv(gym.Env):
 
         if self.benchmark.validation_callbacks():
             return composed
+
+    def send_param(self, key: str, value: str) -> str:
+        """Send a single <key, value> parameter to the compiler service.
+
+        See :meth:`send_params() <compiler_gym.envs.CompilerEnv.send_params>`
+        for more information.
+
+        :param key: The parameter key.
+
+        :param value: The parameter value.
+
+        :return: The response from the compiler service.
+
+        :raises SessionNotFound: If called before :meth:`reset()
+            <compiler_gym.envs.CompilerEnv.reset>`.
+        """
+        return self.send_params((key, value))[0]
+
+    def send_params(self, *params: Iterable[Tuple[str, str]]) -> List[str]:
+        """Send a list of <key, value> parameters to the compiler service.
+
+        This provides a mechanism to send messages to the backend compilation
+        session in a way that doesn't conform to the normal communication
+        pattern. This can be useful for things like configuring runtime
+        debugging settings, or applying "meta actions" to the compiler that are
+        not exposed in the compiler's action space. Consult the documentation
+        for a specific compiler service to see what parameters, if any, are
+        supported.
+
+        Must have called :meth:`reset() <compiler_gym.envs.CompilerEnv.reset>`
+        first.
+
+        :param params: A list of parameters, where each parameter is a
+            :code:`(key, value)` tuple.
+
+        :return: A list of string responses, one per parameter.
+
+        :raises SessionNotFound: If called before :meth:`reset()
+            <compiler_gym.envs.CompilerEnv.reset>`.
+        """
+        if not self.in_episode:
+            raise SessionNotFound("Must call reset() before send_params()")
+
+        request = SendSessionParameterRequest(
+            session_id=self._session_id,
+            parameter=[SessionParameter(key=k, value=v) for (k, v) in params],
+        )
+        reply: SendSessionParameterReply = self.service(
+            self.service.stub.SendSessionParameter, request
+        )
+        if len(params) != len(reply.reply):
+            raise OSError(
+                f"Sent {len(params)} {plural(len(params), 'parameter', 'parameters')} but received "
+                f"{len(reply.reply)} {plural(len(reply.reply), 'response', 'responses')} from the "
+                "service"
+            )
+
+        return list(reply.reply)
