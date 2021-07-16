@@ -44,6 +44,11 @@ service CompilerGymService {
   rpc Step(StepRequest) returns (StepReply);
   // Register a new benchmark.
   rpc AddBenchmark(AddBenchmarkRequest) returns (AddBenchmarkReply);
+  // Transmit <key, value> parameters to a session. Each parameter generates a
+  // string response. It us up to the client/service to agree on a common schema
+  // for encoding and decoding these parameters. An unknown key/value returns
+  // grpc::StatusCode::INVALID_ARGUMENT.
+  rpc SendSessionParameter(SendSessionParameterRequest) returns (SendSessionParameterReply);
 }
 
 // A GetVersion() request.
@@ -282,3 +287,23 @@ message AddBenchmarkRequest {
 
 // An AddBenchmark() reply.
 message AddBenchmarkReply {}
+
+// An arbitrary string parameter value for a session.
+message SessionParameter {
+  string key = 1;
+  string value = 2;
+}
+
+// A SendSessionParameter() request.
+message SendSessionParameterRequest {
+  // The ID of the session.
+  int64 session_id = 1;
+  // A list of <key, value> parameters to pass to the session.
+  repeated SessionParameter parameter = 2;
+}
+
+// A SendSessionParameter() reply.
+message SendSessionParameterReply {
+  // A list of response messages, one per parameter request.
+  repeated string reply = 1;
+}

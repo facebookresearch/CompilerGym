@@ -207,9 +207,9 @@ filegroup(
 http_archive(
     name = "ctuning-ai",
     build_file = "//:compiler_gym/third_party/ctuning-ai.BUILD",
-    sha256 = "2e12233a3d898a96a2ce279123ee256bee357f649e3c579f974628b6c35ea53d",
-    strip_prefix = "ai-afaba3e2900523a0813693fd614a114b4a6f6729",
-    urls = ["https://github.com/ctuning/ai/archive/afaba3e2900523a0813693fd614a114b4a6f6729.tar.gz"],
+    sha256 = "a82c13733696c46b5201c614fcf7229c3a74a83ce485cab2fbf17309b7564f9c",
+    strip_prefix = "ck-mlops-406738ad6d1fb2c1da9daa2c09d26fccab4e0938",
+    urls = ["https://github.com/ChrisCummins/ck-mlops/archive/406738ad6d1fb2c1da9daa2c09d26fccab4e0938.tar.gz"],
 )
 
 # Datasets.
