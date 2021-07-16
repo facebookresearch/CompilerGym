@@ -9,9 +9,10 @@ from functools import reduce
 from pathlib import Path
 from typing import Optional, Tuple
 
-import numpy as np
-
 import loop_tool_py as lt
+import numpy as np
+import pkg_resources
+
 from compiler_gym.service import CompilationSession
 from compiler_gym.service.proto import (
     Action,
@@ -29,7 +30,7 @@ from compiler_gym.service.proto import (
 class LoopToolCompilationSession(CompilationSession):
     """Represents an instance of an interactive loop_tool session."""
 
-    compiler_version: str = "0.0.1"
+    compiler_version: str = pkg_resources.get_distribution("loop-tool-py").version
 
     # keep it simple for now: 1 variable, 1 nest
     action_spaces = [
@@ -67,7 +68,6 @@ class LoopToolCompilationSession(CompilationSession):
         ObservationSpace(
             name="action_state",
             int64_range_list=ScalarRangeList(
-                # FIXME(bwasti): Dummy values.
                 range=[
                     ScalarRange(
                         min=ScalarLimit(value=0),
@@ -78,10 +78,7 @@ class LoopToolCompilationSession(CompilationSession):
             deterministic=True,
             platform_dependent=False,
             default_value=Observation(
-                int64_list=Int64List(
-                    # FIXME(bwasti): Dummy values.
-                    value=[0]
-                ),
+                int64_list=Int64List(value=[0]),
             ),
         ),
     ]
@@ -90,6 +87,7 @@ class LoopToolCompilationSession(CompilationSession):
         self, working_directory: Path, action_space: ActionSpace, benchmark: Benchmark
     ):
         super().__init__(working_directory, action_space, benchmark)
+        lt.set_default_hardware("cuda")
         self.ir = lt.IR()
         self.var = self.ir.create_var("a")
         r0 = self.ir.create_node("read", [], [self.var])
@@ -221,6 +219,8 @@ class LoopToolCompilationSession(CompilationSession):
         for n in self.ir.nodes:
             o = [(self.var, k) for k in self.order]
             self.ir.set_order(n, o)
+            # always disable innermost
+            self.ir.disable_reuse(n, len(o) - 1)
         loop_tree = lt.LoopTree(self.ir)
         parallel = set()
         t = loop_tree.roots[0]
@@ -232,17 +232,16 @@ class LoopToolCompilationSession(CompilationSession):
 
     def flops(self):
         loop_tree, parallel = self.lower()
-        c = lt.CompiledCuda(loop_tree, parallel)
+        c = lt.cuda(loop_tree, parallel)
         A = lt.Tensor(self.size)
         B = lt.Tensor(self.size)
         C = lt.Tensor(self.size)
         A.set(self.Ap)
         B.set(self.Bp)
-        iters = 10000
-        # warmup
-        for i in range(50):
+        iters = 1000
+        warmup = 50
+        for i in range(warmup):
             c([A, B, C])
-        # return 100
         t = time.time()
         for i in range(iters - 1):
             c([A, B, C], False)
@@ -252,10 +251,9 @@ class LoopToolCompilationSession(CompilationSession):
         return flops
 
     def get_observation(self, observation_space: ObservationSpace) -> Observation:
-        # TODO populate
         if observation_space.name == "action_state":
             observation = Observation()
-            # split cursor, size cursor
+            # cursor, (size, tail)
             o = self.order[self.cursor]
             observation.int64_list.value[:] = [self.cursor, o[0], o[1]]
             return observation

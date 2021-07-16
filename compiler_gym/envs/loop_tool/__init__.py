@@ -33,9 +33,9 @@ class FLOPSReward(Reward):
         )
         self.previous_flops = None
 
-    def reset(self, benchmark: str):
+    def reset(self, benchmark: str, observation_view):
         del benchmark  # unused
-        self.previous_flops = None
+        self.previous_flops = observation_view["flops"]
 
     def update(self, action, observations, observation_view):
         del action
@@ -43,8 +43,9 @@ class FLOPSReward(Reward):
 
         if self.previous_flops is None:
             self.previous_flops = observations[0]
+            return self.previous_flops
 
-        reward = float(self.previous_flops - observations[0])
+        reward = float(observations[0] - self.previous_flops)
         self.previous_flops = observations[0]
         return reward
 

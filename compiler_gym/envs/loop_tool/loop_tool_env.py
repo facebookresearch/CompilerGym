@@ -6,4 +6,5 @@ from compiler_gym.envs.compiler_env import CompilerEnv
 
 
 class LoopToolEnv(CompilerEnv):
-    pass
+    def commandline(self):
+        return ",".join(str(x) for x in self.actions)
