@@ -2,10 +2,10 @@ absl-py>=0.10.0
 deprecated>=1.2.12
 docker>=4.0.0
 fasteners>=0.15
-git+https://github.com/facebookresearch/loop_tool.git@dev
 grpcio>=1.32.0
 gym>=0.18.0
 humanize>=2.6.0
+loop_tool_py=0.0.4
 networkx>=2.5
 numpy>=1.19.3
 protobuf>=3.13.0
