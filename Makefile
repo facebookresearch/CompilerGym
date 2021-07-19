@@ -167,7 +167,7 @@ bazel-fetch:
 		else \
 			echo "bazel fetch attempt $$i of $(BAZEL_FETCH_RETRIES) failed" >&2; \
 		fi; \
-		if [ $i -eq 10 ]; then \
+		if [ $$i -eq 10 ]; then \
 			false; \
 		fi; \
 	done
