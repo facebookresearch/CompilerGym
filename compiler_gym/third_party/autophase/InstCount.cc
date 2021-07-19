@@ -35,7 +35,7 @@ void InstCount::visitFunction(Function& F) { ++TotalFuncs; }
 void InstCount::visitBasicBlock(BasicBlock& BB) {
   ++TotalBlocks;
   Instruction* term = BB.getTerminator();
-  unsigned numSuccessors = term->getNumSuccessors();
+  int numSuccessors = static_cast<int>(term->getNumSuccessors());
   for (int i = 0; i < numSuccessors; i++) {
     NumEdges++;
     if (isCriticalEdge(term, i)) {

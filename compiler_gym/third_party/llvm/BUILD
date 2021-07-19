@@ -13,6 +13,20 @@ py_library(
     ],
 )
 
+cc_binary(
+    name = "compute_ir_instruction_count",
+    srcs = ["compute_ir_instruction_count.cc"],
+    copts = [
+        "-DGOOGLE_PROTOBUF_NO_RTTI",
+        "-fno-rtti",
+    ],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@glog",
+        "@llvm//10.0.0",
+    ],
+)
+
 py_library(
     name = "instcount",
     srcs = ["instcount.py"],
