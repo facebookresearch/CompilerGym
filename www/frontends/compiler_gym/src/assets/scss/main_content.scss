@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 .main-content {
     position: relative;
     height: 100%;
@@ -68,14 +74,6 @@
   overflow: auto;
 }
 
-// **** Search tree container ****
-
-.search-tree-container {
-  margin:1rem;
-  width: 100vw;
-  min-height: 300vh;
-  background-color: $white;
-}
 
 // **** Custom dropdown ****
 

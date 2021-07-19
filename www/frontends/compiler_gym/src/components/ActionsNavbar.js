@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 import React, { useState, useEffect, useContext, forwardRef } from "react";
 import {
   Form,
@@ -6,6 +12,8 @@ import {
   InputGroup,
   Dropdown,
   Button,
+  Tooltip,
+  OverlayTrigger,
 } from "react-bootstrap";
 import ApiContext from "../context/ApiContext";
 
@@ -33,7 +41,10 @@ const CustomMenu = forwardRef(
         <ul>
           {React.Children.toArray(children).filter(
             (child) =>
-              !value || child.props.children.toLowerCase().startsWith(value)
+              !value ||
+              child.props.children
+                .toLowerCase()
+                .indexOf(value.toLowerCase()) !== -1
           )}
         </ul>
       </div>
@@ -42,10 +53,9 @@ const CustomMenu = forwardRef(
 );
 
 const ActionsNavbar = () => {
-  const { session, compilerGym, api, setSession } = useContext(ApiContext);
-  const [actionSpace, setActionSpace] = useState(15);
+  const { api, compilerGym, session, setSession } = useContext(ApiContext);
   const [actionsLine, setActionsLine] = useState("");
-  const [benchmark, setBenchmark] = useState("benchmark://cbench-v1");
+  const [dataset, setDataset] = useState("benchmark://cbench-v1");
   const [uriOptions, setUriOptions] = useState([]);
   const [datasetUri, setDatasetUri] = useState("qsort");
   const [reward, setReward] = useState("IrInstructionCountOz");
@@ -70,19 +80,15 @@ const ActionsNavbar = () => {
           dataset,
           uri,
         }))
-        .find((o) => o.dataset === benchmark);
+        .find((o) => o.dataset === dataset);
 
     setUriOptions(selected && selected.uri);
+    setDatasetUri(selected && selected.uri[0]);
     return () => {};
-  }, [benchmark, compilerGym.benchmarks]);
-
-  const handleBenchmarkSelect = (e) => {
-    setBenchmark(e);
-    setDatasetUri("");
-  };
+  }, [dataset, compilerGym.benchmarks]);
 
   const startNewSession = () => {
-    let newBenchmark = `${benchmark}/${datasetUri}`;
+    let newBenchmark = `${dataset}/${datasetUri}`;
     api.startSession(reward, newBenchmark).then(
       (result) => {
         setSession(result);
@@ -99,12 +105,9 @@ const ActionsNavbar = () => {
         <Form.Row className="align-items-center">
           <Col sm={5} className="mt-1">
             <InputGroup className="mb-1">
-              <Dropdown
-                as={InputGroup.Prepend}
-                onSelect={handleBenchmarkSelect}
-              >
+              <Dropdown as={InputGroup.Prepend} onSelect={(e) => setDataset(e)}>
                 <Dropdown.Toggle variant="dark" id="dropdown-benchmark">
-                  Benchmark
+                  Dataset
                 </Dropdown.Toggle>
                 <Dropdown.Menu as={CustomMenu}>
                   {benchmarkOptions &&
@@ -112,7 +115,7 @@ const ActionsNavbar = () => {
                       <Dropdown.Item
                         key={index}
                         eventKey={i.dataset}
-                        active={benchmark === i ? true : false}
+                        active={dataset === i ? true : false}
                       >
                         {i.dataset}
                       </Dropdown.Item>
@@ -123,7 +126,7 @@ const ActionsNavbar = () => {
                 aria-describedby="basic-addon1"
                 type="text"
                 readOnly
-                value={benchmark}
+                value={dataset}
               />
             </InputGroup>
           </Col>
@@ -134,7 +137,7 @@ const ActionsNavbar = () => {
                 onSelect={(e) => setDatasetUri(e)}
               >
                 <Dropdown.Toggle variant="dark" id="dropdown-benchmark-uri">
-                  Uri
+                  Benchmark
                 </Dropdown.Toggle>
                 <Dropdown.Menu as={CustomMenu}>
                   {uriOptions &&
@@ -187,37 +190,8 @@ const ActionsNavbar = () => {
           </Col>
         </Form.Row>
         <Form.Row className="align-items-center">
-          <Col md={4} className="mt-1">
+          <Col sm={11} md={11} className="mt-1">
             <InputGroup className="mb-1">
-              <InputGroup.Prepend>
-                <InputGroup.Text
-                  className="bg-dark"
-                  id="inputGroup-sizing-sm"
-                  style={{ color: "white" }}
-                >
-                  Action Space
-                </InputGroup.Text>
-              </InputGroup.Prepend>
-              <FormControl
-                aria-describedby="inputGroup-sizing-sm"
-                type="number"
-                placeholder="Select # action"
-                min={1}
-                name="actionSpace"
-                value={actionSpace || 0}
-                onChange={(e) => setActionSpace(e.target.value)}
-              />
-            </InputGroup>
-          </Col>
-          <Col md={1} className="mt-0 ml-auto">
-            <Button size="sm" variant="success" onClick={startNewSession}>
-              <i className="bi bi-play-fill"></i>
-            </Button>
-          </Col>
-        </Form.Row>
-        <Form.Row className="align-items-center">
-          <Col sm={12} md={12} className="mt-1">
-            <InputGroup className="mb-2">
               <InputGroup.Prepend>
                 <InputGroup.Text
                   className="bg-dark"
@@ -235,6 +209,26 @@ const ActionsNavbar = () => {
                 defaultValue={actionsLine}
               />
             </InputGroup>
+          </Col>
+          <Col md={1} className="mt-1 mb-1">
+            <OverlayTrigger
+              placement="right"
+              transition={false}
+              overlay={
+                <Tooltip id="button-tooltip-2">Start New Session</Tooltip>
+              }
+            >
+              {({ ref2, ...triggerHandler }) => (
+                <Button
+                  ref={ref2}
+                  {...triggerHandler}
+                  variant="success"
+                  onClick={startNewSession}
+                >
+                  <i className="bi bi-play-fill"></i>
+                </Button>
+              )}
+            </OverlayTrigger>
           </Col>
         </Form.Row>
       </Form>
