@@ -488,12 +488,12 @@ class CompilerEnv(gym.Env):
         return self._session_id is not None
 
     @property
-    def observation_space(self) -> Optional[ObservationSpaceSpec]:
+    def observation_space(self) -> Optional[Space]:
         """The observation space that is used to return an observation value in
         :func:`~step()`.
 
-        :getter: Returns the specification of the default observation space, or
-            :code:`None` if not set.
+        :getter: Returns the underlying observation space, or :code:`None` if
+            not set.
         :setter: Set the default observation space.
         """
         if self.observation_space_spec:
