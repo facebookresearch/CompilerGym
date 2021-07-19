@@ -19,6 +19,7 @@ from compiler_gym.datasets import Benchmark, BenchmarkSource, Dataset
 from compiler_gym.datasets.benchmark import BenchmarkInitError, BenchmarkWithSource
 from compiler_gym.datasets.dataset import DatasetInitError
 from compiler_gym.envs.llvm.llvm_benchmark import ClangInvocation
+from compiler_gym.service.proto import BenchmarkDynamicConfig
 from compiler_gym.util.decorators import memoized_property
 from compiler_gym.util.download import download
 from compiler_gym.util.runfiles_path import transient_cache_path
@@ -36,6 +37,15 @@ class CsmithBenchmark(BenchmarkWithSource):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._src = None
+        self.proto.dynamic_config.MergeFrom(
+            BenchmarkDynamicConfig(
+                build_cmd="$CC $<",
+                build_genfile="a.out",
+                run_cmd="./a.out",
+                build_cmd_timeout_seconds=60,
+                run_cmd_timeout_seconds=300,
+            )
+        )
 
     @classmethod
     def create(cls, uri: str, bitcode: bytes, src: bytes) -> Benchmark:

@@ -60,6 +60,10 @@ def test_observation_spaces(env: LlvmEnv):
         "ObjectTextSizeO0",
         "ObjectTextSizeO3",
         "ObjectTextSizeOz",
+        "Runtime",
+        "Buildtime",
+        "IsBuildable",
+        "IsRunnable",
     }
 
 
@@ -1149,6 +1153,157 @@ def test_object_text_size_observation_spaces(env: LlvmEnv):
     print(value)  # For debugging in case of error.
     assert isinstance(value, int)
     assert value == crc32_code_sizes[sys.platform][2]
+
+
+def test_runtime_observation_space(env: LlvmEnv):
+    env.reset("cbench-v1/crc32")
+    key = "Runtime"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Sequence)
+
+    value: np.ndarray = env.observation[key]
+    print(value.tolist())  # For debugging in case of error.
+    assert isinstance(value, np.ndarray)
+    assert env.runtime_observation_count == 30
+    assert value.shape == (30,)
+
+    assert not space.deterministic
+    assert space.platform_dependent
+
+    assert space.space.contains(value)
+
+    for buildtime in value:
+        assert buildtime > 0
+
+    assert len(set(value)) > 1
+
+
+def test_runtime_observation_space_different_observation_count(env: LlvmEnv):
+    """Test setting a custom observation count for LLVM runtimes."""
+    env.reset("cbench-v1/crc32")
+
+    env.runtime_observation_count = 3
+    value: np.ndarray = env.observation["Runtime"]
+    print(value.tolist())  # For debugging in case of error.
+    assert value.shape == (3,)
+
+    env.reset()
+    value: np.ndarray = env.observation["Runtime"]
+    print(value.tolist())  # For debugging in case of error.
+    assert value.shape == (3,)
+
+    env.runtime_observation_count = 5
+    value: np.ndarray = env.observation["Runtime"]
+    print(value.tolist())  # For debugging in case of error.
+    assert value.shape == (5,)
+
+
+def test_runtime_observation_space_invalid_observation_count(env: LlvmEnv):
+    """Test setting an invalid custom observation count for LLVM runtimes."""
+    env.reset("cbench-v1/crc32")
+
+    val = env.runtime_observation_count
+    with pytest.raises(
+        ValueError, match="runtimes_per_observation_count must be >= 1. Received: -5"
+    ):
+        env.runtime_observation_count = -5
+    assert env.runtime_observation_count == val  # unchanged
+
+
+def test_runtime_observation_space_not_runnable(env: LlvmEnv):
+    env.reset("chstone-v0/gsm")
+    key = "Runtime"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Sequence)
+
+    value: np.ndarray = env.observation[key]
+    print(value.tolist())  # For debugging in case of error.
+    assert isinstance(value, np.ndarray)
+    assert value.shape == (0,)
+    assert space.space.contains(value)
+
+
+def test_buildtime_observation_space(env: LlvmEnv):
+    env.reset("cbench-v1/crc32")
+    key = "Buildtime"
+
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Sequence)
+    assert not space.deterministic
+    assert space.platform_dependent
+
+    value: np.ndarray = env.observation[key]
+    print(value)  # For debugging in case of error.
+    assert value.shape == (1,)
+    assert space.space.contains(value)
+    assert value[0] >= 0
+
+
+def test_buildtime_observation_space_not_runnable(env: LlvmEnv):
+    env.reset("chstone-v0/gsm")
+    key = "Buildtime"
+
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Sequence)
+    assert not space.deterministic
+    assert space.platform_dependent
+
+    value: np.ndarray = env.observation[key]
+    print(value)  # For debugging in case of error.
+    assert value.shape == (0,)
+    assert space.space.contains(value)
+
+
+def test_is_runnable_observation_space(env: LlvmEnv):
+    env.reset("cbench-v1/crc32")
+    key = "IsRunnable"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Scalar)
+    assert space.deterministic
+    assert space.platform_dependent
+    value: int = env.observation[key]
+    print(value)  # For debugging in case of error.
+    assert isinstance(value, int)
+    assert value == 1
+
+
+def test_is_runnable_observation_space_not_runnable(env: LlvmEnv):
+    env.reset("chstone-v0/gsm")
+    key = "IsRunnable"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Scalar)
+    assert space.deterministic
+    assert space.platform_dependent
+    value: int = env.observation[key]
+    print(value)  # For debugging in case of error.
+    assert isinstance(value, int)
+    assert value == 0
+
+
+def test_is_buildable_observation_space(env: LlvmEnv):
+    env.reset("cbench-v1/crc32")
+    key = "IsBuildable"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Scalar)
+    assert space.deterministic
+    assert space.platform_dependent
+    value: int = env.observation[key]
+    print(value)  # For debugging in case of error.
+    assert isinstance(value, int)
+    assert value == 1
+
+
+def test_is_buildable_observation_space_not_buildable(env: LlvmEnv):
+    env.reset("chstone-v0/gsm")
+    key = "IsBuildable"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Scalar)
+    assert space.deterministic
+    assert space.platform_dependent
+    value: int = env.observation[key]
+    print(value)  # For debugging in case of error.
+    assert isinstance(value, int)
+    assert value == 0
 
 
 def test_add_derived_space(env: LlvmEnv):

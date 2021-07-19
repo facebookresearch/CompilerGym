@@ -92,7 +92,7 @@ class ExampleCompilationSession(CompilationSession):
         return False, None, False
 
     def get_observation(self, observation_space: ObservationSpace) -> Observation:
-        logging.info("Computing observation from space %d", observation_space)
+        logging.info("Computing observation from space %s", observation_space)
         if observation_space.name == "ir":
             return Observation(string_value="Hello, world!")
         elif observation_space.name == "features":

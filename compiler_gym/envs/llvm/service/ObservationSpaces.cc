@@ -8,6 +8,7 @@
 
 #include <magic_enum.hpp>
 
+#include "compiler_gym/envs/llvm/service/Benchmark.h"
 #include "compiler_gym/third_party/llvm/InstCount.h"
 #include "compiler_gym/util/EnumUtil.h"
 #include "nlohmann/json.hpp"
@@ -147,6 +148,30 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
         break;
       }
 #endif
+      case LlvmObservationSpace::RUNTIME: {
+        space.mutable_double_sequence()->mutable_length_range()->mutable_min()->set_value(0);
+        space.mutable_double_sequence()->mutable_scalar_range()->mutable_min()->set_value(0);
+        space.set_deterministic(false);
+        space.set_platform_dependent(true);
+        break;
+      }
+      case LlvmObservationSpace::BUILDTIME: {
+        space.mutable_double_sequence()->mutable_length_range()->mutable_min()->set_value(0);
+        space.mutable_double_sequence()->mutable_scalar_range()->mutable_min()->set_value(0);
+        space.set_deterministic(false);
+        space.set_platform_dependent(true);
+        break;
+      }
+      case LlvmObservationSpace::IS_BUILDABLE:
+      case LlvmObservationSpace::IS_RUNNABLE: {
+        auto featureSize = space.mutable_scalar_int64_range();
+        featureSize->mutable_min()->set_value(0);
+        featureSize->mutable_max()->set_value(1);
+        space.set_deterministic(true);
+        space.set_platform_dependent(true);
+        space.mutable_default_value()->set_scalar_int64(0);
+        break;
+      }
     }
     spaces.push_back(space);
   }

@@ -94,6 +94,15 @@ cc_test(
     ],
 )
 
+cc_test(
+    name = "SubprocessTest",
+    srcs = ["SubprocessTest.cc"],
+    deps = [
+        "//compiler_gym/util:Subprocess",
+        "//tests:TestMain",
+    ],
+)
+
 py_test(
     name = "temporary_working_directory_test",
     timeout = "short",

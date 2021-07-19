@@ -40,7 +40,7 @@ http_archive(
     urls = ["https://github.com/google/glog/archive/v0.4.0.tar.gz"],
 )
 
-# C++ subprocess management. https://github.com/arun11299/cpp-subprocess.git
+# C++ subprocess management. https://github.com/arun11299/cpp-subprocess
 
 http_archive(
     name = "subprocess",

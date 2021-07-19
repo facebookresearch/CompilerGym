@@ -8,7 +8,11 @@ from typing import Iterable, Optional
 
 from compiler_gym.datasets import Dataset, TarDatasetWithManifest
 from compiler_gym.envs.llvm.datasets.anghabench import AnghaBenchDataset
-from compiler_gym.envs.llvm.datasets.cbench import CBenchDataset, CBenchLegacyDataset
+from compiler_gym.envs.llvm.datasets.cbench import (
+    CBenchDataset,
+    CBenchLegacyDataset,
+    CBenchLegacyDataset2,
+)
 from compiler_gym.envs.llvm.datasets.chstone import CHStoneDataset
 from compiler_gym.envs.llvm.datasets.clgen import CLgenDataset
 from compiler_gym.envs.llvm.datasets.csmith import CsmithBenchmark, CsmithDataset
@@ -234,10 +238,10 @@ def get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset
     )
     yield BlasDataset(site_data_base=site_data_base, sort_order=0)
     yield CLgenDataset(site_data_base=site_data_base, sort_order=0)
-    yield CBenchDataset(site_data_base=site_data_base, sort_order=-1)
+    yield CBenchDataset(site_data_base=site_data_base)
     # Add legacy version of cbench-v1 in which the 'b' was capitalized. This
     # is deprecated and will be removed no earlier than v0.1.10.
-    yield CBenchDataset(
+    yield CBenchLegacyDataset2(
         site_data_base=site_data_base,
         name="benchmark://cBench-v1",
         deprecated=(

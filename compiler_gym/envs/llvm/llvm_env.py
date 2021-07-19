@@ -184,6 +184,10 @@ class LlvmEnv(CompilerEnv):
             ],
         )
 
+        # If the user sets a runtimes_per_observation value, this must be
+        # configured on every call to reset().
+        self._runtimes_per_observation_count: Optional[int] = None
+
         self.inst2vec = _INST2VEC_ENCODER
 
         self.observation.spaces["CpuInfo"].space = DictSpace(
@@ -292,7 +296,7 @@ class LlvmEnv(CompilerEnv):
 
     def reset(self, *args, **kwargs):
         try:
-            return super().reset(*args, **kwargs)
+            observation = super().reset(*args, **kwargs)
         except ValueError as e:
             # Catch and re-raise some known benchmark initialization errors with
             # a more informative error type.
@@ -307,6 +311,13 @@ class LlvmEnv(CompilerEnv):
             ):
                 raise BenchmarkInitError(str(e)) from e
             raise
+
+        # Resend the runtimes-per-observation session parameter, if it is a
+        # non-default value.
+        if self._runtimes_per_observation_count is not None:
+            self.runtime_observation_count = self._runtimes_per_observation_count
+
+        return observation
 
     def make_benchmark(
         self,
@@ -501,3 +512,29 @@ class LlvmEnv(CompilerEnv):
             print(self.ir)
         else:
             return super().render(mode)
+
+    @property
+    def runtime_observation_count(self) -> int:
+        """The number of runtimes to return for the :code:`Runtime` observation
+        space.
+
+        Example usage:
+
+            >>> env = compiler_gym.make("llvm-v0")
+            >>> env.reset()
+            >>> env.runtime_observation_count = 10
+            >>> len(env.observation.Runtime())
+            10
+
+        :getter: Returns the number of runtimes that will be returned when a
+            :code:`Runtime` observation is requested.
+
+        :setter: Set the number of runtimes to compute when a :code:`Runtime`
+            observation is requested.
+        """
+        return int(self.send_param("llvm.get_runtimes_per_observation_count", ""))
+
+    @runtime_observation_count.setter
+    def runtime_observation_count(self, n: int) -> None:
+        self._runtimes_per_observation_count = n
+        self.send_param("llvm.set_runtimes_per_observation_count", str(n))

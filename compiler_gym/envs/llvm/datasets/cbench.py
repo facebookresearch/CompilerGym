@@ -20,6 +20,7 @@ from typing import Callable, Dict, List, NamedTuple, Optional
 import fasteners
 
 from compiler_gym.datasets import Benchmark, TarDatasetWithManifest
+from compiler_gym.service.proto import BenchmarkDynamicConfig
 from compiler_gym.third_party import llvm
 from compiler_gym.util.download import download
 from compiler_gym.util.runfiles_path import cache_path, site_data_path
@@ -484,6 +485,19 @@ def validator(
                 )
             )
 
+    # Create the BenchmarkDynamicConfig object.
+    cbench_data = site_data_path("llvm-v0/cbench-v1-runtime-data/runtime_data")
+    DYNAMIC_CONFIGS[benchmark] = BenchmarkDynamicConfig(
+        build_cmd=" ".join(["$CC $<"] + linkopts),
+        build_genfile="a.out",
+        run_cmd=cmd.replace("$BIN", "./a.out").replace("$D", str(cbench_data)),
+        pre_run_cmd=["echo 1 > _finfo_dataset"],
+        run_genfile=[str(s) for s in outfiles],
+        build_cmd_timeout_seconds=60,
+        run_cmd_timeout_seconds=300,
+        pre_run_cmd_timeout_seconds=60,
+    )
+
     return True
 
 
@@ -492,12 +506,47 @@ class CBenchBenchmark(Benchmark):
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-
         for val in VALIDATORS.get(self.uri, []):
             self.add_validation_callback(val)
+        self.proto.dynamic_config.MergeFrom(
+            DYNAMIC_CONFIGS.get(self.uri, BenchmarkDynamicConfig())
+        )
 
 
 class CBenchDataset(TarDatasetWithManifest):
+    def __init__(self, site_data_base: Path):
+        platform = {"darwin": "macos"}.get(sys.platform, sys.platform)
+        url, sha256 = _CBENCH_TARS[platform]
+        super().__init__(
+            name="benchmark://cbench-v1",
+            description="Runnable C benchmarks",
+            license="BSD 3-Clause",
+            references={
+                "Paper": "https://arxiv.org/pdf/1407.3487.pdf",
+                "Homepage": "https://ctuning.org/wiki/index.php/CTools:CBench",
+            },
+            tar_urls=[url],
+            tar_sha256=sha256,
+            manifest_urls=[
+                "https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cbench-v1-manifest.bz2"
+            ],
+            manifest_sha256="eeffd7593aeb696a160fd22e6b0c382198a65d0918b8440253ea458cfe927741",
+            strip_prefix="cBench-v1",
+            benchmark_file_suffix=".bc",
+            benchmark_class=CBenchBenchmark,
+            site_data_base=site_data_base,
+            sort_order=-1,
+            validatable="Partially",
+        )
+
+    def install(self):
+        super().install()
+        with _CBENCH_DOWNLOAD_THREAD_LOCK:
+            with fasteners.InterProcessLock(cache_path("cbench-v1-runtime-data.LOCK")):
+                download_cBench_runtime_data()
+
+
+class CBenchLegacyDataset2(TarDatasetWithManifest):
     def __init__(
         self,
         site_data_base: Path,
@@ -587,6 +636,10 @@ class CBenchLegacyDataset(TarDatasetWithManifest):
 VALIDATORS: Dict[
     str, List[Callable[["LlvmEnv"], Optional[str]]]  # noqa: F821
 ] = defaultdict(list)
+
+
+# A map from benchmark name to BenchmarkDynamicConfig messages.
+DYNAMIC_CONFIGS: Dict[str, Optional[BenchmarkDynamicConfig]] = {}
 
 
 def validate_sha_output(result: BenchmarkExecutionResult) -> Optional[str]:

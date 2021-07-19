@@ -7,6 +7,7 @@ import pytest
 
 from compiler_gym.envs.llvm import LlvmEnv
 from compiler_gym.service import SessionNotFound
+from compiler_gym.service.connection import ServiceError
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
@@ -57,6 +58,25 @@ def test_send_param_invalid_reply_count(env: LlvmEnv, mocker):
         OSError, match="Sent 1 parameter but received 0 responses from the service"
     ):
         env.send_param("param", "")
+
+
+def test_benchmarks_cache_parameter_invalid_int_type(env: LlvmEnv):
+    env.reset()
+    with pytest.raises(ServiceError, match="stoi"):
+        env.send_params(("service.benchmark_cache.set_max_size_in_bytes", "not an int"))
+
+
+@pytest.mark.parametrize("n", [1, 3, 10])
+def test_runtime_observation_parameters(env: LlvmEnv, n: int):
+    env.observation_space = "Runtime"
+    env.reset(benchmark="cbench-v1/qsort")
+
+    assert env.send_param("llvm.set_runtimes_per_observation_count", str(n)) == str(n)
+    assert env.send_param("llvm.get_runtimes_per_observation_count", "") == str(n)
+    runtimes = env.observation["Runtime"]
+    assert len(runtimes) == n
+
+    assert env.observation_space.contains(runtimes)
 
 
 if __name__ == "__main__":
