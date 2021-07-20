@@ -280,7 +280,7 @@ message Benchmark {
   BenchmarkDynamicConfig dynamic_config = 3;
 }
 
-// Description of how to build and run a benchmark.
+// Description of how to build and run a benchmark binary.
 message BenchmarkDynamicConfig {
   string build_cmd = 1;
   string build_genfile = 2;
