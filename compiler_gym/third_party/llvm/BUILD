@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 load("@rules_python//python:defs.bzl", "py_library")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
 py_library(
     name = "llvm",
@@ -13,8 +14,21 @@ py_library(
     ],
 )
 
+filegroup(
+    name = "compute_ir_instruction_count-files",
+    srcs = [
+        ":compute_ir_instruction_count",
+    ] + select({
+        "@llvm//:darwin": [],
+        "//conditions:default": [
+            ":libLLVMPolly",
+        ],
+    }),
+    visibility = ["//visibility:public"],
+)
+
 cc_binary(
-    name = "compute_ir_instruction_count",
+    name = "compute_ir_instruction_count-prelinked",
     srcs = ["compute_ir_instruction_count.cc"],
     copts = [
         "-DGOOGLE_PROTOBUF_NO_RTTI",
@@ -25,6 +39,34 @@ cc_binary(
         "@glog",
         "@llvm//10.0.0",
     ],
+)
+
+genrule(
+    name = "compute_ir_instruction_count-bin",
+    srcs = [":compute_ir_instruction_count-prelinked"],
+    outs = ["compute_ir_instruction_count"],
+    cmd = select({
+        "@llvm//:darwin": (
+            "cp $(location :compute_ir_instruction_count-prelinked) $@"
+        ),
+        "//conditions:default": (
+            "cp $(location :compute_ir_instruction_count-prelinked) $@ && " +
+            "chmod 666 $@ && " +
+            "patchelf --set-rpath '$$ORIGIN' $@ && " +
+            "chmod 555 $@"
+        ),
+    }),
+)
+
+genrule(
+    name = "libLLVMPolly",
+    srcs = [
+        "@clang-llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04//:all_files",
+        "@clang-llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04//:clang",
+    ],
+    outs = ["libLLVMPolly.so"],
+    cmd = "cp $$(dirname $(location @clang-llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04//:clang))/../lib/LLVMPolly.so $@",
+    visibility = ["//visibility:public"],
 )
 
 py_library(
