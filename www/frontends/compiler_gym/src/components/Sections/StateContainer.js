@@ -6,9 +6,9 @@
 
 import React, { useContext, useState } from 'react';
 import { Tabs, Tab } from 'react-bootstrap';
-import ApiContext from '../context/ApiContext';
-import ThemeContext from '../context/ThemeContext';
-import { IrStateContainer, InstcountsStateContainer, AutophaseStateContainer } from './statesContainers';
+import ApiContext from '../../context/ApiContext';
+import ThemeContext from '../../context/ThemeContext';
+import { IrStateContainer, InstcountsStateContainer, AutophaseStateContainer } from '../StateVisualization';
 
 const StateContainer = () => {
 

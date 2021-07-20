@@ -13,8 +13,8 @@ import React, {
 } from "react";
 import classnames from "classnames";
 import { Col, Form, InputGroup, FormControl, Dropdown } from "react-bootstrap";
-import ApiContext from "../context/ApiContext";
-import ThemeContext from "../context/ThemeContext";
+import ApiContext from "../../context/ApiContext";
+import ThemeContext from "../../context/ThemeContext";
 import Tree from "react-d3-tree";
 
 const DropdownMenu = forwardRef(
@@ -77,7 +77,7 @@ const renderSvgNode = ({ nodeDatum, handleNodeClick }) => {
   );
 };
 
-const ActionsSearchTree = () => {
+const SearchTree = () => {
   const { compilerGym, session, api, submitStep, setSession } = useContext(ApiContext);
   const { darkTheme } = useContext(ThemeContext);
 
@@ -114,7 +114,7 @@ const ActionsSearchTree = () => {
   /**
    * Recursive function to create new node + layer when user clicks on a node.
    *
-   * @param {Array} arr Children's node.
+   * @param {Array} arr Receives the children array in the root node.
    * @param {String} actionID Receives the tree action_id of the node.
    * @returns
    */
@@ -141,7 +141,7 @@ const ActionsSearchTree = () => {
   /**
    * Recursive function to delete a node in nested child object.
    *
-   * @param {Array} arr Chiuldren array
+   * @param {Array} arr Receives the children array in the root node.
    * @param {String} actionID Receives the tree action_id of the node.
    * @returns
    */
@@ -235,6 +235,9 @@ const ActionsSearchTree = () => {
               />
             </InputGroup>
           </Col>
+          <Col md={8}>
+            <h4><span>Reward: </span>{session.state?.reward}</h4>
+          </Col>
         </Form.Row>
       </div>
       <div
@@ -258,4 +261,4 @@ const ActionsSearchTree = () => {
   );
 };
 
-export default ActionsSearchTree;
+export default SearchTree;
