@@ -102,6 +102,21 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
         *space.mutable_default_value()->mutable_string_value() = nodeLinkGraph.dump();
         break;
       }
+      case LlvmObservationSpace::PROGRAML_JSON: {
+        // ProGraML serializes the graph to JSON.
+        ScalarRange encodedSize;
+        encodedSize.mutable_min()->set_value(0);
+        space.set_opaque_data_format("json://");
+        *space.mutable_string_size_range() = encodedSize;
+        space.set_deterministic(true);
+        space.set_platform_dependent(false);
+        programl::ProgramGraph graph;
+        json nodeLinkGraph;
+        CHECK(programl::graph::format::ProgramGraphToNodeLinkGraph(graph, &nodeLinkGraph).ok())
+            << "Failed to serialize default ProGraML graph";
+        *space.mutable_default_value()->mutable_string_value() = nodeLinkGraph.dump();
+        break;
+      }
       case LlvmObservationSpace::CPU_INFO: {
         // Hardware info is returned as a JSON
         ScalarRange encodedSize;
