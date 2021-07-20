@@ -57,7 +57,7 @@ const ActionsNavbar = () => {
   const [actionsLine, setActionsLine] = useState("");
   const [dataset, setDataset] = useState("benchmark://cbench-v1");
   const [uriOptions, setUriOptions] = useState([]);
-  const [datasetUri, setDatasetUri] = useState("qsort");
+  const [datasetUri, setDatasetUri] = useState("");
   const [reward, setReward] = useState("IrInstructionCountOz");
 
   const benchmarkOptions =
