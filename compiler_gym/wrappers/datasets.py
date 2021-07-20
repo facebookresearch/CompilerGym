@@ -92,7 +92,7 @@ class CycleOverBenchmarks(IterateOverBenchmarks):
         :param benchmarks: An iterable sequence of benchmarks.
 
         :param fork_shares_iterator: If :code:`True`, the :code:`benchmarks`
-            iterator will bet shared by a forked environment created by
+            iterator will be shared by a forked environment created by
             :meth:`env.fork() <compiler_gym.envs.CompilerEnv.fork>`. This means
             that calling :meth:`env.reset()
             <compiler_gym.envs.CompilerEnv.reset>` with one environment will
