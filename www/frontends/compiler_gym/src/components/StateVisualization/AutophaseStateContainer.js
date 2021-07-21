@@ -8,7 +8,12 @@ import React, { useContext } from "react";
 import classnames from "classnames";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
+import HC_exporting from "highcharts/modules/exporting";
+import HC_exportData from "highcharts/modules/export-data";
 import ThemeContext from "../../context/ThemeContext";
+
+HC_exporting(Highcharts);
+HC_exportData(Highcharts);
 
 const AutophaseStateContainer = ({ autophase }) => {
   const { darkTheme } = useContext(ThemeContext);
@@ -74,6 +79,13 @@ const AutophaseStateContainer = ({ autophase }) => {
         data: chartData.map((i) => i.result),
       },
     ],
+    exporting: {
+      buttons: {
+        contextButton: {
+          menuItems: ["viewFullscreen", "printChart", "downloadCSV"],
+        },
+      },
+    },
   };
 
   return (
