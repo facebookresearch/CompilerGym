@@ -38,6 +38,7 @@ const StateContainer = () => {
           <Tabs
             id="uncontrolled-tab"
             activeKey={stateSelector}
+            transition={false}
             onSelect={(e) => setStateSelector(e)}
           >
             <Tab eventKey="ir" title="IR"></Tab>

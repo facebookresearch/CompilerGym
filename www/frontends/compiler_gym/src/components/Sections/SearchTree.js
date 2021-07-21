@@ -12,9 +12,10 @@ import React, {
   useRef,
 } from "react";
 import classnames from "classnames";
-import { Col, Form, InputGroup, FormControl, Dropdown } from "react-bootstrap";
+import { Row, Col, InputGroup, FormControl, Dropdown } from "react-bootstrap";
 import ApiContext from "../../context/ApiContext";
 import ThemeContext from "../../context/ThemeContext";
+import RewardHistory from "./RewardHistory";
 import Tree from "react-d3-tree";
 
 const DropdownMenu = forwardRef(
@@ -203,7 +204,7 @@ const SearchTree = () => {
   return (
     <>
       <div className="mx-2 searchtree-nav-wrapper">
-        <Form.Row className="align-items-center">
+        <Row className="align-items-center">
           <Col md={4}>
             <InputGroup className="mb-1">
               <Dropdown
@@ -213,7 +214,7 @@ const SearchTree = () => {
                 <Dropdown.Toggle variant="dark" id="dropdown-action-space">
                   Action Space
                 </Dropdown.Toggle>
-                <Dropdown.Menu as={DropdownMenu}>
+                <Dropdown.Menu as={DropdownMenu} style={{ margin: 0, borderRadius: "3%" }}>
                   {actionSpaceOptions &&
                     actionSpaceOptions.map((i, index) => (
                       <Dropdown.Item
@@ -235,10 +236,13 @@ const SearchTree = () => {
               />
             </InputGroup>
           </Col>
-          <Col md={8}>
+          <Col md={4}>
             <h4><span>Reward: </span>{session.state?.reward}</h4>
           </Col>
-        </Form.Row>
+          <Col md={4}>
+            <RewardHistory/>
+          </Col>
+        </Row>
       </div>
       <div
         ref={treeWindow}

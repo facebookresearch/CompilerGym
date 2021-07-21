@@ -147,3 +147,12 @@ $dropdown-font-size:             .75rem !default;
 $dropdown-link-color:            $white !default;
 $dropdown-link-active-color:     $dark !default;
 $dropdown-link-active-bg:        $gray-300 !default;
+
+// Offcanvas
+
+$offcanvas-padding-y:               1rem;
+$offcanvas-padding-x:               1rem;
+$offcanvas-horizontal-width:        100vw;
+$offcanvas-vertical-height:         60vh;
+$offcanvas-transition-duration:     .3s;
+$offcanvas-bg-color:                $secondary;

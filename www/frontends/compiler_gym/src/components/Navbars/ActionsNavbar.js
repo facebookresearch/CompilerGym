@@ -9,6 +9,7 @@ import {
   Form,
   FormControl,
   Col,
+  Row,
   InputGroup,
   Dropdown,
   Button,
@@ -102,14 +103,14 @@ const ActionsNavbar = () => {
   return (
     <div className="mx-2 action-navbar-wrapper">
       <Form>
-        <Form.Row className="align-items-center">
+        <Row className="align-items-center">
           <Col sm={5} className="mt-1">
             <InputGroup className="mb-1">
               <Dropdown as={InputGroup.Prepend} onSelect={(e) => setDataset(e)}>
                 <Dropdown.Toggle variant="dark" id="dropdown-benchmark">
                   Dataset
                 </Dropdown.Toggle>
-                <Dropdown.Menu as={CustomMenu}>
+                <Dropdown.Menu as={CustomMenu} style={{ margin: 0, borderRadius: "3%" }}>
                   {benchmarkOptions &&
                     benchmarkOptions.map((i, index) => (
                       <Dropdown.Item
@@ -139,7 +140,7 @@ const ActionsNavbar = () => {
                 <Dropdown.Toggle variant="dark" id="dropdown-benchmark-uri">
                   Benchmark
                 </Dropdown.Toggle>
-                <Dropdown.Menu as={CustomMenu}>
+                <Dropdown.Menu as={CustomMenu} style={{ margin: 0, borderRadius: "3%" }}>
                   {uriOptions &&
                     uriOptions.map((i, index) => (
                       <Dropdown.Item
@@ -166,7 +167,7 @@ const ActionsNavbar = () => {
                 <Dropdown.Toggle variant="dark" id="dropdown-reward">
                   Reward
                 </Dropdown.Toggle>
-                <Dropdown.Menu as={CustomMenu}>
+                <Dropdown.Menu as={CustomMenu} style={{ margin: 0, borderRadius: "3%" }}>
                   {compilerGym.rewards &&
                     compilerGym.rewards.map((i, index) => (
                       <Dropdown.Item
@@ -188,19 +189,17 @@ const ActionsNavbar = () => {
               />
             </InputGroup>
           </Col>
-        </Form.Row>
-        <Form.Row className="align-items-center">
+        </Row>
+        <Row className="align-items-center">
           <Col sm={11} md={11} className="mt-1">
-            <InputGroup className="mb-1">
-              <InputGroup.Prepend>
+            <InputGroup className="mb-1">     
                 <InputGroup.Text
                   className="bg-dark"
                   id="inputGroup-sizing-sm"
                   style={{ color: "white" }}
                 >
                   Actions
-                </InputGroup.Text>
-              </InputGroup.Prepend>
+                </InputGroup.Text>      
               <FormControl
                 id="actions-input"
                 type="text"
@@ -230,7 +229,7 @@ const ActionsNavbar = () => {
               )}
             </OverlayTrigger>
           </Col>
-        </Form.Row>
+        </Row>
       </Form>
     </div>
   );
