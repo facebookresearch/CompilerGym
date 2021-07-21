@@ -79,23 +79,25 @@ new session using reward IrInstructionCountOz and benchmark
     $ curl -s localhost:5000/api/v3/start/IrInstructionCountOz/benchmark%3A%2F%2Fcbench-v1%2Fqsort | jq
     {
         "session_id": 0,
-        "state": {
-            "autophase": {
-                "ArgsPhi": 10,
-                ...
-                "twoSuccessor": 31
-            },
-            "commandline": "opt  input.bc -o output.bc",
-            "done": false,
-            "instcount": {
-                "AShrCount": 0,
-                "AddCount": 9,
-                ...
-                "ZExtCount": 15
-            },
-            "ir": "; ModuleID = '-'\nsource_filename = \"-\"\ntarget ...",
-            "reward": 0
-        }
+        "states": [
+            {
+                "autophase": {
+                    "ArgsPhi": 10,
+                    ...
+                    "twoSuccessor": 31
+                },
+                "commandline": "opt  input.bc -o output.bc",
+                "done": false,
+                "instcount": {
+                    "AShrCount": 0,
+                    "AddCount": 9,
+                    ...
+                    "ZExtCount": 15
+                },
+                "ir": "; ModuleID = '-'\nsource_filename = \"-\"\ntarget ...",
+                "reward": 0
+            }
+        ]
     }
 
 That "state" dict contains the things that we would want to visualize in the
@@ -231,15 +233,24 @@ def describe():
     )
 
 
-@app.route("/api/v3/start/<reward>/<path:benchmark>")
-def start(reward: str, benchmark: str):
+@app.route("/api/v3/start/<reward>/<path:benchmark>", defaults={"actions": ""})
+@app.route("/api/v3/start/<reward>/<path:benchmark>/<actions>")
+def start(reward: str, benchmark: str, actions: str):
     env = compiler_gym.make("llvm-v0", benchmark=benchmark)
     env.reward_space = reward
     env.reset()
     state = compute_state(env, [])
     session_id = len(sessions)
-    sessions[session_id] = [(env, state)]
-    return jsonify({"session_id": session_id, "state": state.dict()})
+    session = [(env, state)]
+    sessions[session_id] = session
+
+    # Accept an optional comma-separated list of actions to compute and return.
+    for action in [int(a) for a in actions.split(",")]:
+        step(session_id, action)
+
+    return jsonify(
+        {"session_id": session_id, "states": [state.dict() for _, state in session]}
+    )
 
 
 @app.route("/api/v3/stop/<session_id>")
