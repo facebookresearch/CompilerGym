@@ -78,6 +78,13 @@ const InstcountsStateContainer = ({ instcount }) => {
         data: chartData.map((i) => i.result),
       },
     ],
+    exporting: {
+      buttons: {
+        contextButton: {
+          menuItems: ["viewFullscreen", "printChart", "downloadCSV"],
+        },
+      },
+    },
   };
 
   return (
