@@ -20,9 +20,10 @@ This exposes an API with five operations:
         visualize to represent the current environment state. There is an
         initial state, and then one state for each action.
 
-   3. step(session_id, action) -> state  (/api/v3/<session_id>/<action>)
+   3. step(session_id, actions) -> state[]  (/api/v3/<session_id>/<actions>)
 
-        Run an action and produce a new state, replacing the old one.
+        Run a list of actions and produce a list of states, replacing the old
+        ones.
 
    4. undo(session_id) -> state  (/api/v3/<session_id>/undo)
 
@@ -107,22 +108,24 @@ GUI. Our session ID is 0, lets take a step in this session using action "10":
 
     $ curl -s localhost:5000/api/v3/step/0/10 | jq
     {
-        "state": {
-            "autophase": {
-                "ArgsPhi": 2,
-                ..,
-                "twoSuccessor": 29
-            },
-            "commandline": "opt -simplifycfg input.bc -o output.bc",
-            "done": false,
-            "instcount": {
-                "AShrCount": 0,
-                ...
-                "ZExtCount": 15
-            },
-            "ir": "; ModuleID = '-'\nsource_filename = \"-\"\ntarget ...",
-            "reward": 0.06501547987616099
-        }
+        "states": [
+            {
+                "autophase": {
+                    "ArgsPhi": 2,
+                    ..,
+                    "twoSuccessor": 29
+                },
+                "commandline": "opt -simplifycfg input.bc -o output.bc",
+                "done": false,
+                "instcount": {
+                    "AShrCount": 0,
+                    ...
+                    "ZExtCount": 15
+                },
+                "ir": "; ModuleID = '-'\nsource_filename = \"-\"\ntarget ...",
+                "reward": 0.06501547987616099
+            }
+        ]
     }
 
 Notice that the state dict has changed. Some of the numbers in the "autophase"
@@ -247,8 +250,7 @@ def start(reward: str, actions: str, benchmark: str):
 
     # Accept an optional comma-separated list of actions to compute and return.
     if actions != "-":
-        for action in [int(a) for a in actions.split(",")]:
-            step(session_id, action)
+        step(session_id, actions)
 
     return jsonify(
         {"session_id": session_id, "states": [state.dict() for _, state in session]}
@@ -266,17 +268,19 @@ def stop(session_id: int):
     return jsonify({"session_id": session_id})
 
 
-@app.route("/api/v3/step/<session_id>/<action>")
-def step(session_id: int, action: int):
+@app.route("/api/v3/step/<session_id>/<actions>")
+def step(session_id: int, actions: str):
     session_id = int(session_id)
-    action = int(action)
 
-    session = sessions[session_id]
-    new_env = session[-1][0].fork()
-    new_state = compute_state(new_env, [action])
-    session.append((new_env, new_state))
+    state_dicts = []
+    for action in [int(a) for a in actions.split(",")]:
+        session = sessions[session_id]
+        new_env = session[-1][0].fork()
+        new_state = compute_state(new_env, [action])
+        session.append((new_env, new_state))
+        state_dicts.append(new_state.dict())
 
-    return jsonify({"state": new_state.dict()})
+    return jsonify({"states": state_dicts})
 
 
 @app.route("/api/v3/undo/<session_id>")
