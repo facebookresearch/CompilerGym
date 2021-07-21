@@ -190,7 +190,7 @@ def compute_state(env: CompilerEnv, actions: List[int]) -> StateToVisualize:
             env.observation.spaces["InstCountDict"],
             env.observation.spaces["AutophaseDict"],
         ],
-        rewards=[env.reward.spaces["IrInstructionCountOz"]],
+        rewards=[env.reward_space],
     )
     return StateToVisualize(
         commandline=env.commandline(),
