@@ -2,14 +2,14 @@
 
 This exposes an API with five operations:
 
-   1. describe() -> dict  (/api/v2/describe)
+   1. describe() -> dict  (/api/v3/describe)
 
         Describe the CompilerGym interface. This generates a list of action
         names and their numeric values, a list of benchmark datasets and the
         benchmarks within them, and a list of reward spaces.
 
    2. start(reward, benchmark) -> session_id, state
-        (/api/v2/start/<reward>/<benchmark>)
+        (/api/v3/start/<reward>/<benchmark>)
 
         Start a session. This would happen when the user navigates to the page
         in their web browser. One tab = one session. Takes a reward space name
@@ -18,15 +18,15 @@ This exposes an API with five operations:
         :-) ). Also returns a state, which is the set of things we want to
         visualize to represent the current environment state.
 
-   3. step(session_id, action) -> state  (/api/v2/<session_id>/<action>)
+   3. step(session_id, action) -> state  (/api/v3/<session_id>/<action>)
 
         Run an action and produce a new state, replacing the old one.
 
-   4. undo(session_id) -> state  (/api/v2/<session_id>/undo)
+   4. undo(session_id) -> state  (/api/v3/<session_id>/undo)
 
         Undo the previous action, returning the previous state.
 
-   5. stop(session_id)  (/api/v2/stop/<session_id>)
+   5. stop(session_id)  (/api/v3/stop/<session_id>)
 
         End a session. This would be when the user closes the tab / disconnects.
 
@@ -41,7 +41,7 @@ Then launch it by running, in this directory:
 Interact with the API through GET requests, such as using curl. A "describe"
 endpoint provides details on teh available actions, benchmarks, and rewards.:
 
-    $ curl -s localhost:5000/api/v2/describe | jq
+    $ curl -s localhost:5000/api/v3/describe | jq
     {
         "actions": {
             "-adce": 1,
@@ -76,7 +76,7 @@ requires URL-encoding the benchmark name as it contains slashes. e.g. to start a
 new session using reward IrInstructionCountOz and benchmark
 "benchmark://cbench-v1/qsort":
 
-    $ curl -s localhost:5000/api/v2/start/IrInstructionCountOz/benchmark%3A%2F%2Fcbench-v1%2Fqsort | jq
+    $ curl -s localhost:5000/api/v3/start/IrInstructionCountOz/benchmark%3A%2F%2Fcbench-v1%2Fqsort | jq
     {
         "session_id": 0,
         "state": {
@@ -101,7 +101,7 @@ new session using reward IrInstructionCountOz and benchmark
 That "state" dict contains the things that we would want to visualize in the
 GUI. Our session ID is 0, lets take a step in this session using action "10":
 
-    $ curl -s localhost:5000/api/v2/step/0/10 | jq
+    $ curl -s localhost:5000/api/v3/step/0/10 | jq
     {
         "state": {
             "autophase": {
@@ -128,7 +128,7 @@ out to be the "-simplifycfg" flag).
 
 We could carry on taking steps, or just end the session:
 
-    $ curl -s localhost:5000/api/v2/stop/0
+    $ curl -s localhost:5000/api/v3/stop/0
 """
 from itertools import islice
 from typing import Dict, List, Tuple
@@ -202,7 +202,7 @@ def compute_state(env: CompilerEnv, actions: List[int]) -> StateToVisualize:
     )
 
 
-@app.route("/api/v2/describe")
+@app.route("/api/v3/describe")
 def describe():
     env = compiler_gym.make("llvm-v0")
     env.reset()
@@ -231,7 +231,7 @@ def describe():
     )
 
 
-@app.route("/api/v2/start/<reward>/<path:benchmark>")
+@app.route("/api/v3/start/<reward>/<path:benchmark>")
 def start(reward: str, benchmark: str):
     env = compiler_gym.make("llvm-v0", benchmark=benchmark)
     env.reward_space = reward
@@ -242,7 +242,7 @@ def start(reward: str, benchmark: str):
     return jsonify({"session_id": session_id, "state": state.dict()})
 
 
-@app.route("/api/v2/stop/<session_id>")
+@app.route("/api/v3/stop/<session_id>")
 def stop(session_id: int):
     session_id = int(session_id)
 
@@ -253,7 +253,7 @@ def stop(session_id: int):
     return jsonify({"session_id": session_id})
 
 
-@app.route("/api/v2/step/<session_id>/<action>")
+@app.route("/api/v3/step/<session_id>/<action>")
 def step(session_id: int, action: int):
     session_id = int(session_id)
     action = int(action)
@@ -266,7 +266,7 @@ def step(session_id: int, action: int):
     return jsonify({"state": new_state.dict()})
 
 
-@app.route("/api/v2/undo/<session_id>")
+@app.route("/api/v3/undo/<session_id>")
 def undo(session_id: int):
     session_id = int(session_id)
 
