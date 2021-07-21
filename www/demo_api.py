@@ -146,6 +146,7 @@ from pydantic import BaseModel
 
 import compiler_gym
 from compiler_gym import CompilerEnv
+from compiler_gym.util.truncate import truncate
 
 app = Flask("compiler_gym")
 CORS(app)
@@ -202,7 +203,7 @@ def compute_state(env: CompilerEnv, actions: List[int]) -> StateToVisualize:
     return StateToVisualize(
         commandline=env.commandline(),
         done=done,
-        ir=ir,
+        ir=truncate(ir, max_line_len=250, max_lines=1024),
         instcount=instcount,
         autophase=autophase,
         reward=reward,
