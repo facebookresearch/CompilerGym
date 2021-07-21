@@ -1,0 +1,149 @@
+/*
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+// Global settings
+
+$enable-caret:              true !default;
+$enable-rounded:            true !default;
+$enable-gradients:          false !default;
+$enable-transitions:        true !default;
+$enable-grid-classes:       true !default;
+$enable-print-styles:       true !default;
+
+// Color system
+
+$white:    #fff !default;
+$gray-100: #f6f9fc !default;
+$gray-200: #e9ecef !default;
+$gray-300: #dee2e6 !default;
+$gray-400: #ced4da !default;
+$gray-500: #adb5bd !default;
+$gray-600: #8898aa !default;
+$gray-700: #525f7f !default;
+$gray-800: #32325d !default;
+$gray-900: #212529 !default;
+$black:    #000 !default;
+
+$grays: () !default;
+$grays: map-merge((
+  "100": $gray-100,
+  "200": $gray-200,
+  "300": $gray-300,
+  "400": $gray-400,
+  "500": $gray-500,
+  "600": $gray-600,
+  "700": $gray-700,
+  "800": $gray-800,
+  "900": $gray-900
+), $grays);
+
+$blue:    #3a6a88 !default;
+$indigo:  #2D303D !default;
+$purple:  #8965e0 !default;
+$pink:    #f3a4b5 !default;
+$red:     #f5365c !default;
+$orange:  #ee4c2c !default;
+$yellow:  #efcb87 !default;
+$green:   #2dce89 !default;
+$teal:    #80cbd7 !default;
+$cyan:    #87bfa1 !default;
+$blue2:   #5CA5B2 !default;
+
+$default:       #172b4d !default;
+$primary:       #2D303D !default;
+$secondary:     $gray-200 !default;
+$success:       $green !default;
+$info:          $teal !default;
+$warning:       $yellow !default;
+$danger:        $red !default;
+$light:         $gray-400 !default;
+$dark:          #282c34 !default;
+$darker:        darken($gray-900, 15%) !default;
+
+$theme-colors: () !default;
+$theme-colors: map-merge((
+  "default":      $default,
+  "primary":      $primary,
+  "secondary":    $secondary,
+  "success":      $success,
+  "info":         $info,
+  "warning":      $warning,
+  "danger":       $danger,
+  "white":        $white,
+  "neutral":      $white,
+  "dark":         $dark,
+  "darker":       $darker,
+  "blue":         $blue
+), $theme-colors);
+
+// Content
+
+$main-content-padding-y: 80px !default;
+$main-content-padding-x: 15px !default;
+
+// Fonts
+
+$font-family-sans-serif: source-code-pro, 'Menlo','proxima-nova' , 'Segoe UI', 'Roboto', 'Oxygen',
+'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+sans-serif;
+$font-family-base: $font-family-sans-serif !default;
+
+$font-size-base:              0.9rem !default; // Assumes the browser default, typically `16px`
+$font-size-xl:                ($font-size-base * 1.5);
+$font-size-lg:                ($font-size-base * 1.25);
+$font-size-sm:                ($font-size-base * .875);
+$font-size-xs:                ($font-size-base * .75);
+
+$font-weight-light:           300 !default;
+$font-weight-normal:          400 !default;
+$font-weight-bold:            500 !default;
+$font-weight-extra-bold:      800 !default;
+
+$h1-font-size:                $font-size-base * 1.625 !default;
+$h2-font-size:                $font-size-base * 1.25 !default;
+$h3-font-size:                $font-size-base * 1.0625 !default;
+$h4-font-size:                $font-size-base * .9375 !default;
+$h5-font-size:                $font-size-base * .8125 !default;
+$h6-font-size:                $font-size-base * .625 !default;
+
+// Navbar
+
+$navbar-nav-link-font-size:                .5rem !default;
+$navbar-nav-link-font-weight:              500 !default;
+$navbar-nav-link-text-transform:           normal !default;
+$navbar-nav-link-letter-spacing:           0 !default;
+
+// Border
+
+$border-width:                1px !default;
+$border-color:                $gray-200 !default;
+
+$border-radius:               .375rem !default;
+$border-radius-xl:            .5rem !default;
+$border-radius-lg:            .4375rem !default;
+$border-radius-sm:            .25rem !default;
+
+$box-shadow-sm:               0 0 .5rem rgba($gray-600, .075) !default;
+$box-shadow:                  0 0 2rem 0 rgba($gray-600, .15) !default;
+$box-shadow-lg:               0 0 3rem rgba($gray-600, .175) !default;
+
+// Buttons + Forms
+
+$input-btn-font-size-sm:      .75rem !default;
+$input-btn-font-size:         .8rem !default;
+$input-btn-font-size-lg:      .85rem !default;
+$input-border-color:          rgba($dark, .15) !default;
+
+// Dropdown
+
+$dropdown-bg:                    $dark !default;
+$dropdown-border-width:          0 !default;
+$dropdown-border-color:          rgba($black, .15) !default;
+$dropdown-font-size:             .75rem !default;
+
+$dropdown-link-color:            $white !default;
+$dropdown-link-active-color:     $dark !default;
+$dropdown-link-active-bg:        $gray-300 !default;

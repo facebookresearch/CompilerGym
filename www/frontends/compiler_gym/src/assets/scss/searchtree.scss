@@ -1,0 +1,48 @@
+/*
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+.searchtree-nav-wrapper {
+    position: sticky;
+    top: 10%;
+    z-index: 0;
+}
+
+.search-tree-container {
+  margin-top: 1rem;
+  margin-left: 0rem;
+  width: 98%;
+  height: 120vh;
+  min-height: 100vh;
+  overflow: auto;
+}
+
+.dark-mode-tree {
+  background-color: $dark;
+  text {
+    stroke-width: 0;
+    font-size: 0.8rem;
+    fill: $white;
+  }
+  path {
+    fill: none;
+    stroke: #2593B8;
+    stroke-width: 1.5px;
+  }
+}
+
+.light-mode-tree {
+  background-color: $white;
+  text {
+    stroke-width: 0;
+    font-size: 0.8rem;
+    fill: black;
+  }
+  path {
+    fill: none;
+    stroke: $gray-600;
+    stroke-width: 1.5px;
+  }
+}

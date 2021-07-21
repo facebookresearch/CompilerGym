@@ -1,0 +1,99 @@
+/*
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+.main-content {
+    position: relative;
+    height: 100%;
+    min-height: 100vh;
+    background-color: $gray-100;
+    -webkit-text-size-adjust: 100%;
+
+    // Navbar
+    .navbar-top {
+        padding-left: 0 !important;
+        padding-right: 0 !important;
+    }
+
+    // Container
+    .container-fluid {
+        padding-left : $main-content-padding-x;
+        padding-right: $main-content-padding-x;
+
+    }
+}
+
+// **** Splash Page ****
+
+.splash {
+  position: relative;
+  display: flex;
+  height: 100%;
+  min-height: 100vh;
+  img {
+    width: 50vw;
+    height: auto;
+    display: block;
+    margin: auto;
+  }
+}
+
+// **** Panels ****
+
+.splitView {
+  height: 94vh;
+  display: flex;
+  flex-direction: row;
+  align-items: flex-start;
+}
+
+.divider-hitbox {
+  cursor: col-resize;
+  align-self: stretch;
+  display: flex;
+  align-items: center;
+  padding-left: 0;
+  padding-right: 1rem;
+}
+
+.divider {
+  height: 100%;
+  border: 1px solid $gray-700;
+}
+
+.leftPane {
+  height: 94vh;
+  overflow: auto;
+}
+
+.rightPane {
+  flex: 1;
+  height: 94vh;
+  overflow: auto;
+}
+
+
+// **** Custom dropdown ****
+
+.cg-dropdown {
+  background-color: $dark;
+  height: 18vh;
+  overflow: auto;
+  border-radius: 5%;
+  padding: 0 0.4rem;
+  z-index: 4;
+  font-size: 0.75rem;
+  text-align: start;
+  ul {
+    padding-left: 0rem;
+  }
+}
+
+.search-bar {
+  position: sticky;
+  top: 0%;
+  min-width: 10px;
+  z-index: 4;
+}
