@@ -8,15 +8,17 @@ This exposes an API with five operations:
         names and their numeric values, a list of benchmark datasets and the
         benchmarks within them, and a list of reward spaces.
 
-   2. start(reward, benchmark) -> session_id, state
-        (/api/v3/start/<reward>/<benchmark>)
+   2. start(reward, actions, benchmark) -> session_id, state[]
+        (/api/v3/start/<reward>/<actions>/<benchmark>)
 
         Start a session. This would happen when the user navigates to the page
-        in their web browser. One tab = one session. Takes a reward space name
-        and a benchmark URI as inputs. Returns a numeric session ID (this
-        probably isn't the right way of doing things but I don't know any better
-        :-) ). Also returns a state, which is the set of things we want to
-        visualize to represent the current environment state.
+        in their web browser. One tab = one session. Takes a reward space name,
+        a list of actions, and a benchmark URI as inputs. If no actions are to
+        be performed, use "-". Returns a numeric session ID (this probably isn't
+        the right way of doing things but I don't know any better :-) ). Also
+        returns a list of states, which is the set of things we want to
+        visualize to represent the current environment state. There is an
+        initial state, and then one state for each action.
 
    3. step(session_id, action) -> state  (/api/v3/<session_id>/<action>)
 
@@ -233,9 +235,8 @@ def describe():
     )
 
 
-@app.route("/api/v3/start/<reward>/<path:benchmark>", defaults={"actions": ""})
-@app.route("/api/v3/start/<reward>/<path:benchmark>/<actions>")
-def start(reward: str, benchmark: str, actions: str):
+@app.route("/api/v3/start/<reward>/<actions>/<path:benchmark>")
+def start(reward: str, actions: str, benchmark: str):
     env = compiler_gym.make("llvm-v0", benchmark=benchmark)
     env.reward_space = reward
     env.reset()
@@ -245,8 +246,9 @@ def start(reward: str, benchmark: str, actions: str):
     sessions[session_id] = session
 
     # Accept an optional comma-separated list of actions to compute and return.
-    for action in [int(a) for a in actions.split(",")]:
-        step(session_id, action)
+    if actions != "-":
+        for action in [int(a) for a in actions.split(",")]:
+            step(session_id, action)
 
     return jsonify(
         {"session_id": session_id, "states": [state.dict() for _, state in session]}
