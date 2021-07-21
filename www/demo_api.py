@@ -2,31 +2,34 @@
 
 This exposes an API with five operations:
 
-   1. describe() -> dict  (/api/v2/describe)
+   1. describe() -> dict  (/api/v3/describe)
 
         Describe the CompilerGym interface. This generates a list of action
         names and their numeric values, a list of benchmark datasets and the
         benchmarks within them, and a list of reward spaces.
 
-   2. start(reward, benchmark) -> session_id, state
-        (/api/v2/start/<reward>/<benchmark>)
+   2. start(reward, actions, benchmark) -> session_id, state[]
+        (/api/v3/start/<reward>/<actions>/<benchmark>)
 
         Start a session. This would happen when the user navigates to the page
-        in their web browser. One tab = one session. Takes a reward space name
-        and a benchmark URI as inputs. Returns a numeric session ID (this
-        probably isn't the right way of doing things but I don't know any better
-        :-) ). Also returns a state, which is the set of things we want to
-        visualize to represent the current environment state.
+        in their web browser. One tab = one session. Takes a reward space name,
+        a list of actions, and a benchmark URI as inputs. If no actions are to
+        be performed, use "-". Returns a numeric session ID (this probably isn't
+        the right way of doing things but I don't know any better :-) ). Also
+        returns a list of states, which is the set of things we want to
+        visualize to represent the current environment state. There is an
+        initial state, and then one state for each action.
 
-   3. step(session_id, action) -> state  (/api/v2/<session_id>/<action>)
+   3. step(session_id, actions) -> state[]  (/api/v3/<session_id>/<actions>)
 
-        Run an action and produce a new state, replacing the old one.
+        Run a list of actions and produce a list of states, replacing the old
+        ones.
 
-   4. undo(session_id) -> state  (/api/v2/<session_id>/undo)
+   4. undo(session_id, n) -> state  (/api/v3/<session_id>/undo/<n>)
 
-        Undo the previous action, returning the previous state.
+        Undo `n` previous actions, returning the previous state.
 
-   5. stop(session_id)  (/api/v2/stop/<session_id>)
+   5. stop(session_id)  (/api/v3/stop/<session_id>)
 
         End a session. This would be when the user closes the tab / disconnects.
 
@@ -41,7 +44,7 @@ Then launch it by running, in this directory:
 Interact with the API through GET requests, such as using curl. A "describe"
 endpoint provides details on teh available actions, benchmarks, and rewards.:
 
-    $ curl -s localhost:5000/api/v2/describe | jq
+    $ curl -s localhost:5000/api/v3/describe | jq
     {
         "actions": {
             "-adce": 1,
@@ -76,49 +79,53 @@ requires URL-encoding the benchmark name as it contains slashes. e.g. to start a
 new session using reward IrInstructionCountOz and benchmark
 "benchmark://cbench-v1/qsort":
 
-    $ curl -s localhost:5000/api/v2/start/IrInstructionCountOz/benchmark%3A%2F%2Fcbench-v1%2Fqsort | jq
+    $ curl -s localhost:5000/api/v3/start/IrInstructionCountOz/benchmark%3A%2F%2Fcbench-v1%2Fqsort | jq
     {
         "session_id": 0,
-        "state": {
-            "autophase": {
-                "ArgsPhi": 10,
-                ...
-                "twoSuccessor": 31
-            },
-            "commandline": "opt  input.bc -o output.bc",
-            "done": false,
-            "instcount": {
-                "AShrCount": 0,
-                "AddCount": 9,
-                ...
-                "ZExtCount": 15
-            },
-            "ir": "; ModuleID = '-'\nsource_filename = \"-\"\ntarget ...",
-            "reward": 0
-        }
+        "states": [
+            {
+                "autophase": {
+                    "ArgsPhi": 10,
+                    ...
+                    "twoSuccessor": 31
+                },
+                "commandline": "opt  input.bc -o output.bc",
+                "done": false,
+                "instcount": {
+                    "AShrCount": 0,
+                    "AddCount": 9,
+                    ...
+                    "ZExtCount": 15
+                },
+                "ir": "; ModuleID = '-'\nsource_filename = \"-\"\ntarget ...",
+                "reward": 0
+            }
+        ]
     }
 
 That "state" dict contains the things that we would want to visualize in the
 GUI. Our session ID is 0, lets take a step in this session using action "10":
 
-    $ curl -s localhost:5000/api/v2/step/0/10 | jq
+    $ curl -s localhost:5000/api/v3/step/0/10 | jq
     {
-        "state": {
-            "autophase": {
-                "ArgsPhi": 2,
-                ..,
-                "twoSuccessor": 29
-            },
-            "commandline": "opt -simplifycfg input.bc -o output.bc",
-            "done": false,
-            "instcount": {
-                "AShrCount": 0,
-                ...
-                "ZExtCount": 15
-            },
-            "ir": "; ModuleID = '-'\nsource_filename = \"-\"\ntarget ...",
-            "reward": 0.06501547987616099
-        }
+        "states": [
+            {
+                "autophase": {
+                    "ArgsPhi": 2,
+                    ..,
+                    "twoSuccessor": 29
+                },
+                "commandline": "opt -simplifycfg input.bc -o output.bc",
+                "done": false,
+                "instcount": {
+                    "AShrCount": 0,
+                    ...
+                    "ZExtCount": 15
+                },
+                "ir": "; ModuleID = '-'\nsource_filename = \"-\"\ntarget ...",
+                "reward": 0.06501547987616099
+            }
+        ]
     }
 
 Notice that the state dict has changed. Some of the numbers in the "autophase"
@@ -128,7 +135,7 @@ out to be the "-simplifycfg" flag).
 
 We could carry on taking steps, or just end the session:
 
-    $ curl -s localhost:5000/api/v2/stop/0
+    $ curl -s localhost:5000/api/v3/stop/0
 """
 from itertools import islice
 from typing import Dict, List, Tuple
@@ -202,7 +209,7 @@ def compute_state(env: CompilerEnv, actions: List[int]) -> StateToVisualize:
     )
 
 
-@app.route("/api/v2/describe")
+@app.route("/api/v3/describe")
 def describe():
     env = compiler_gym.make("llvm-v0")
     env.reset()
@@ -231,18 +238,26 @@ def describe():
     )
 
 
-@app.route("/api/v2/start/<reward>/<path:benchmark>")
-def start(reward: str, benchmark: str):
+@app.route("/api/v3/start/<reward>/<actions>/<path:benchmark>")
+def start(reward: str, actions: str, benchmark: str):
     env = compiler_gym.make("llvm-v0", benchmark=benchmark)
     env.reward_space = reward
     env.reset()
     state = compute_state(env, [])
     session_id = len(sessions)
-    sessions[session_id] = [(env, state)]
-    return jsonify({"session_id": session_id, "state": state.dict()})
+    session = [(env, state)]
+    sessions[session_id] = session
+
+    # Accept an optional comma-separated list of actions to compute and return.
+    if actions != "-":
+        step(session_id, actions)
+
+    return jsonify(
+        {"session_id": session_id, "states": [state.dict() for _, state in session]}
+    )
 
 
-@app.route("/api/v2/stop/<session_id>")
+@app.route("/api/v3/stop/<session_id>")
 def stop(session_id: int):
     session_id = int(session_id)
 
@@ -253,26 +268,30 @@ def stop(session_id: int):
     return jsonify({"session_id": session_id})
 
 
-@app.route("/api/v2/step/<session_id>/<action>")
-def step(session_id: int, action: int):
-    session_id = int(session_id)
-    action = int(action)
-
-    session = sessions[session_id]
-    new_env = session[-1][0].fork()
-    new_state = compute_state(new_env, [action])
-    session.append((new_env, new_state))
-
-    return jsonify({"state": new_state.dict()})
-
-
-@app.route("/api/v2/undo/<session_id>")
-def undo(session_id: int):
+@app.route("/api/v3/step/<session_id>/<actions>")
+def step(session_id: int, actions: str):
     session_id = int(session_id)
 
+    state_dicts = []
+    for action in [int(a) for a in actions.split(",")]:
+        session = sessions[session_id]
+        new_env = session[-1][0].fork()
+        new_state = compute_state(new_env, [action])
+        session.append((new_env, new_state))
+        state_dicts.append(new_state.dict())
+
+    return jsonify({"states": state_dicts})
+
+
+@app.route("/api/v3/undo/<session_id>/<n>")
+def undo(session_id: int, n: int):
+    session_id = int(session_id)
+    n = int(n)
+
     session = sessions[session_id]
-    env, _ = session.pop()
-    env.close()
+    for _ in range(n):
+        env, _ = session.pop()
+        env.close()
     _, old_state = session[-1]
 
     return jsonify({"state": old_state.dict()})
