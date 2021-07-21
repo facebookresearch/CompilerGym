@@ -11,32 +11,38 @@
 }
 
 .search-tree-container {
-    margin-top: 1rem;
-    margin-left: 0rem;
-    //adding: 0 1rem;
-    width: 98%;
-    overflow: auto;
-    min-height: 100vh;
-    background-color: $white;
-    svg .node text {
-      font-size: 0.8rem;
-    }
-    svg .node {
-      cursor: pointer;
-    }
-  }
+  margin-top: 1rem;
+  margin-left: 0rem;
+  width: 98%;
+  height: 120vh;
+  min-height: 100vh;
+  overflow: auto;
+}
 
-  .dark-mode-tree {
-    background-color: $dark;
-    svg .node text {
-      font-size: 0.8rem;
-      background-color: #444;
-      fill: #F4F4F4;
-      text-shadow: 0 1px 4px black;
-    }
-    svg path.link {
-      fill: none;
-      stroke: #2593B8;
-      stroke-width: 1.5px;
-    }
+.dark-mode-tree {
+  background-color: $dark;
+  text {
+    stroke-width: 0;
+    font-size: 0.8rem;
+    fill: $white;
+  }
+  path {
+    fill: none;
+    stroke: #2593B8;
+    stroke-width: 1.5px;
+  }
+}
+
+.light-mode-tree {
+  background-color: $white;
+  text {
+    stroke-width: 0;
+    font-size: 0.8rem;
+    fill: black;
+  }
+  path {
+    fill: none;
+    stroke: $gray-600;
+    stroke-width: 1.5px;
+  }
 }

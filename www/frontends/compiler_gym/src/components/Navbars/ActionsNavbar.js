@@ -15,7 +15,7 @@ import {
   Tooltip,
   OverlayTrigger,
 } from "react-bootstrap";
-import ApiContext from "../context/ApiContext";
+import ApiContext from "../../context/ApiContext";
 
 const CustomMenu = forwardRef(
   ({ children, style, "aria-labelledby": labeledBy }, ref) => {
@@ -57,7 +57,7 @@ const ActionsNavbar = () => {
   const [actionsLine, setActionsLine] = useState("");
   const [dataset, setDataset] = useState("benchmark://cbench-v1");
   const [uriOptions, setUriOptions] = useState([]);
-  const [datasetUri, setDatasetUri] = useState("qsort");
+  const [datasetUri, setDatasetUri] = useState("");
   const [reward, setReward] = useState("IrInstructionCountOz");
 
   const benchmarkOptions =

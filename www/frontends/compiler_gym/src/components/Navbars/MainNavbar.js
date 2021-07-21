@@ -6,7 +6,7 @@
 
 import React, { useContext } from "react";
 import { Container, Navbar, NavDropdown, Nav } from "react-bootstrap";
-import ThemeContext from "../context/ThemeContext";
+import ThemeContext from "../../context/ThemeContext";
 
 const MainNavbar = () => {
   const themeContext = useContext(ThemeContext);

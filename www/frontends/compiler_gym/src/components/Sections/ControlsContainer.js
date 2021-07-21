@@ -5,15 +5,15 @@
  */
 
 import React from 'react';
-import ActionsNavbar from './ActionsNavbar';
-import ActionsSearchTree from './ActionsSearchTree';
+import ActionsNavbar from '../Navbars/ActionsNavbar';
+import SearchTree from './SearchTree';
 
 const ControlsContainer = () => {
 
     return (
         <div>
           <ActionsNavbar/>
-          <ActionsSearchTree/>
+          <SearchTree/>
         </div>
     )
 }

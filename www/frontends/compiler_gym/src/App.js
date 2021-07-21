@@ -9,11 +9,11 @@ import "./assets/scss/custom.scss";
 import ApiService from "./api/ApiService";
 import ApiContext from "./context/ApiContext";
 import ThemeContext from "./context/ThemeContext";
-import SplashPage from "./components/SplashPage";
-import MainNavbar from "./components/MainNavbar";
+import SplashPage from "./components/Pages/SplashPage";
+import MainNavbar from "./components/Navbars/MainNavbar";
 import PanelsContainer from "./components/PanelsContainer";
-import ControlsContainer from "./components/ControlsContainer";
-import StateContainer from "./components/StateContainer";
+import ControlsContainer from "./components/Sections/ControlsContainer";
+import StateContainer from "./components/Sections/StateContainer";
 
 const api = new ApiService("http://127.0.0.1:5000");
 const initialSettings = {
