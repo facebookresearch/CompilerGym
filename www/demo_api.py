@@ -25,9 +25,9 @@ This exposes an API with five operations:
         Run a list of actions and produce a list of states, replacing the old
         ones.
 
-   4. undo(session_id) -> state  (/api/v3/<session_id>/undo)
+   4. undo(session_id, n) -> state  (/api/v3/<session_id>/undo/<n>)
 
-        Undo the previous action, returning the previous state.
+        Undo `n` previous actions, returning the previous state.
 
    5. stop(session_id)  (/api/v3/stop/<session_id>)
 
@@ -283,13 +283,15 @@ def step(session_id: int, actions: str):
     return jsonify({"states": state_dicts})
 
 
-@app.route("/api/v3/undo/<session_id>")
-def undo(session_id: int):
+@app.route("/api/v3/undo/<session_id>/<n>")
+def undo(session_id: int, n: int):
     session_id = int(session_id)
+    n = int(n)
 
     session = sessions[session_id]
-    env, _ = session.pop()
-    env.close()
+    for _ in range(n):
+        env, _ = session.pop()
+        env.close()
     _, old_state = session[-1]
 
     return jsonify({"state": old_state.dict()})
