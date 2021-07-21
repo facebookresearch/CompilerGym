@@ -52,7 +52,7 @@ const DropdownMenu = forwardRef(
  * Renders a node component.
  *
  * @param {Object} nodeDatum Receieves an object with node data.
- * @param {Function} handleNodeClick Function to call when a node is clecked.
+ * @param {Function} handleNodeClick Function to be called when a node is clicked.
  * @returns
  */
 const renderSvgNode = ({ nodeDatum, handleNodeClick }) => {
