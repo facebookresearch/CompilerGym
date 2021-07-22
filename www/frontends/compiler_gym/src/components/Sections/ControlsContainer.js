@@ -4,18 +4,17 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React from 'react';
-import ActionsNavbar from '../Navbars/ActionsNavbar';
-import SearchTree from './SearchTree';
+import React from "react";
+import ActionsNavbar from "../Navbars/ActionsNavbar";
+import SearchTree from "./SearchTree";
 
 const ControlsContainer = () => {
-
-    return (
-        <div>
-          <ActionsNavbar/>
-          <SearchTree/>
-        </div>
-    )
-}
+  return (
+    <div>
+      <ActionsNavbar />
+      <SearchTree />
+    </div>
+  );
+};
 
 export default ControlsContainer;
