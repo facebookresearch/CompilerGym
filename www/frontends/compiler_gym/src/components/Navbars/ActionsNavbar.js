@@ -215,7 +215,7 @@ const ActionsNavbar = () => {
               placement="right"
               transition={false}
               overlay={
-                <Tooltip id="button-tooltip-2">Start New Session</Tooltip>
+                <Tooltip id="button-tooltip-2">Start Session</Tooltip>
               }
             >
               {({ ref2, ...triggerHandler }) => (
