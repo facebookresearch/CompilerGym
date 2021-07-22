@@ -4,14 +4,12 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React, { useContext } from "react";
+import React from "react";
 import classnames from "classnames";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
-import ThemeContext from "../../context/ThemeContext";
 
-const InstcountsStateContainer = ({ instcount }) => {
-  const { darkTheme } = useContext(ThemeContext);
+const InstcountsStateContainer = ({ instcount, darkTheme }) => {
 
   const chartData = Object.entries(instcount).map(([category, result]) => ({
     category,

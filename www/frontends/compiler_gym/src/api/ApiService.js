@@ -15,31 +15,31 @@ export default class ApiService {
   }
 
   getEnvOptions() {
-    return this.fetch(`${this.domain}/api/v2/describe`, {
+    return this.fetch(`${this.domain}/api/v3/describe`, {
       method: "GET",
     });
   }
 
   startSession(reward, benchmark) {
-    return this.fetch(`${this.domain}/api/v2/start/${reward}/${benchmark}`, {
+    return this.fetch(`${this.domain}/api/v3/start/${reward}/-/${benchmark}`, {
       method: "GET",
     });
   }
 
-  getStep(sessionID, stepID) {
-    return this.fetch(`${this.domain}/api/v2/step/${sessionID}/${stepID}`, {
+  getSteps(sessionID, stepIDs) {
+    return this.fetch(`${this.domain}/api/v3/step/${sessionID}/${stepIDs}`, {
       method: "GET",
     });
   }
 
-  undoStep(sessionID){
-    return this.fetch(`${this.domain}/api/v2/undo/${sessionID}`, {
+  undoStep(sessionID,n){
+    return this.fetch(`${this.domain}/api/v3/undo/${sessionID}/${n}`, {
       method: "GET",
     });
   }
 
   closeSession(sessionID) {
-    return this.fetch(`${this.domain}/api/v2/stop/${sessionID}`, {
+    return this.fetch(`${this.domain}/api/v3/stop/${sessionID}`, {
       method: "GET",
     });
   }

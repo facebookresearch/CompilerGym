@@ -15,7 +15,7 @@ import classnames from "classnames";
 import { Row, Col, InputGroup, FormControl, Dropdown } from "react-bootstrap";
 import ApiContext from "../../context/ApiContext";
 import ThemeContext from "../../context/ThemeContext";
-import RewardHistory from "./RewardHistory";
+import RewardsNavbar from "../Navbars/RewardsNavbar";
 import Tree from "react-d3-tree";
 
 const DropdownMenu = forwardRef(
@@ -160,10 +160,13 @@ const SearchTree = () => {
     return;
   };
 
-  const undoStep = () => {
-    api.undoStep(session.session_id).then(
+  const undoStep = (n) => {
+    let currentSteps = session.states;
+    api.undoStep(session.session_id, n).then(
       (result) => {
-        setSession({ ...session, ...result });
+        let actionToUndo = currentSteps.indexOf(result)
+        currentSteps.splice(actionToUndo, 1)
+        setSession({ ...session, states: currentSteps});
       },
       (error) => {
         console.log(error);
@@ -187,7 +190,7 @@ const SearchTree = () => {
         nodeDepth === layer - 1 &&
         actionsTaken.includes(nodeDatum.action_id)
       ) {
-        undoStep();
+        undoStep(1);
         setLayer(layer - 1);
         setTreeGlobalData(
           deleteNode(treeGlobalData.children, nodeDatum.action_id)
@@ -236,14 +239,9 @@ const SearchTree = () => {
               />
             </InputGroup>
           </Col>
-          <Col md={4}>
-            <h4><span>Reward: </span>{session.state?.reward}</h4>
-          </Col>
-          <Col md={4}>
-            <RewardHistory/>
-          </Col>
-        </Row>
+        </Row>  
       </div>
+      <RewardsNavbar session={session}/>
       <div
         ref={treeWindow}
         className={classnames(

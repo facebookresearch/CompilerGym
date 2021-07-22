@@ -69,7 +69,8 @@ const ActionsNavbar = () => {
     }));
 
   useEffect(() => {
-    setActionsLine(session.state && session.state.commandline);
+    let lastState = session.states?.[session.states?.length - 1]
+    setActionsLine(lastState?.commandline);
     return () => {};
   }, [session]);
 
@@ -104,7 +105,7 @@ const ActionsNavbar = () => {
     <div className="mx-2 action-navbar-wrapper">
       <Form>
         <Row className="align-items-center">
-          <Col sm={5} className="mt-1">
+          <Col sm={5} className="mt-1 pr-1">
             <InputGroup className="mb-1">
               <Dropdown as={InputGroup.Prepend} onSelect={(e) => setDataset(e)}>
                 <Dropdown.Toggle variant="dark" id="dropdown-benchmark">
@@ -131,7 +132,7 @@ const ActionsNavbar = () => {
               />
             </InputGroup>
           </Col>
-          <Col md={3} className="mt-1">
+          <Col md={3} className="mt-1 px-0">
             <InputGroup className="mb-1">
               <Dropdown
                 as={InputGroup.Prepend}
@@ -161,7 +162,7 @@ const ActionsNavbar = () => {
               />
             </InputGroup>
           </Col>
-          <Col sm={4} className="mt-1">
+          <Col sm={4} className="mt-1 pl-1">
             <InputGroup className="mb-1">
               <Dropdown as={InputGroup.Prepend} onSelect={(e) => setReward(e)}>
                 <Dropdown.Toggle variant="dark" id="dropdown-reward">
@@ -192,7 +193,7 @@ const ActionsNavbar = () => {
         </Row>
         <Row className="align-items-center">
           <Col sm={11} md={11} className="mt-1">
-            <InputGroup className="mb-1">     
+            <InputGroup className="mb-1 px-0">     
                 <InputGroup.Text
                   className="bg-dark"
                   id="inputGroup-sizing-sm"
@@ -222,6 +223,7 @@ const ActionsNavbar = () => {
                   ref={ref2}
                   {...triggerHandler}
                   variant="success"
+                  className="mr-0"
                   onClick={startNewSession}
                 >
                   <i className="bi bi-play-fill"></i>

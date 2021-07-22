@@ -1,20 +1,33 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import classnames from "classnames";
-import { Button, Offcanvas } from "react-bootstrap";
+import { Offcanvas } from "react-bootstrap";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import ThemeContext from "../../context/ThemeContext";
 
-const RewardHistory = () => {
-  const [show, setShow] = useState(false);
+const RewardHistoryChart = ({ session, show, onHide }) => {
   const { darkTheme } = useContext(ThemeContext);
+  const [rewards, setRewards] = useState([]);
+  const [cumulativeSum, setCumulativeSum] = useState([]);
+  const [steps, setSteps] = useState([]);
 
-  const handleClose = () => setShow(false);
-  const handleShow = () => setShow(true);
+  useEffect(() => {
+    let rewards = session.states?.map((i) => parseFloat(i.reward.toFixed(3)));
+    let lastState = session.states?.[session.states?.length - 1];
+    setRewards(rewards);
+    setCumulativeSum(
+      rewards?.reduce((a, x, i) => [...a, a.length > 0 ? x + a[i - 1] : x], [])
+    );
+    setSteps(
+      lastState?.commandline.split(" input.bc -o output.bc")[0].split(" ")
+    );
+    return () => {};
+  }, [session]);
 
   const options = {
+    colors: darkTheme ? ["#910000", "#2593B8"] : ["#2593B8", "#434348"],
     chart: {
-      type: "area",
+      type: "areaspline",
     },
     title: {
       text: "Reward History",
@@ -23,7 +36,7 @@ const RewardHistory = () => {
       },
     },
     xAxis: {
-      categories: ["Step1", "Step2", "Step3", "Step4", "Step5"],
+      categories: steps,
       labels: {
         style: {
           color: darkTheme && "white",
@@ -32,10 +45,10 @@ const RewardHistory = () => {
     },
     yAxis: {
       title: {
-          text: 'Reward Value',
-          style: {
-            color: darkTheme && "white",
-          },
+        text: "Reward Value",
+        style: {
+          color: darkTheme && "white",
+        },
       },
       labels: {
         style: {
@@ -47,16 +60,16 @@ const RewardHistory = () => {
       enabled: false,
     },
     legend: {
-      backgroundColor: 'white'
+      backgroundColor: "white",
     },
     series: [
       {
-        name: "Accumulated Reward",
-        data: [5, 3, 4, 7, 2],
+        name: "Cumulative Reward",
+        data: cumulativeSum,
       },
       {
         name: "Reward",
-        data: [2, -2, -3, 2, 1],
+        data: rewards,
       },
     ],
     exporting: {
@@ -70,10 +83,7 @@ const RewardHistory = () => {
 
   return (
     <>
-      <Button variant="primary" onClick={handleShow}>
-        Reward History
-      </Button>
-      <Offcanvas show={show} onHide={handleClose} placement={"bottom"}>
+      <Offcanvas show={show} onHide={onHide} placement={"bottom"}>
         <Offcanvas.Header
           closeButton
           className={classnames(
@@ -83,11 +93,12 @@ const RewardHistory = () => {
         >
           <Offcanvas.Title>Reward History</Offcanvas.Title>
         </Offcanvas.Header>
-        <Offcanvas.Body className={classnames(
+        <Offcanvas.Body
+          className={classnames(
             { "offcanvas-dark-mode chart-dark-mode": darkTheme },
             { "": darkTheme === false }
-          )
-        }>
+          )}
+        >
           <HighchartsReact highcharts={Highcharts} options={options} />
         </Offcanvas.Body>
       </Offcanvas>
@@ -95,4 +106,4 @@ const RewardHistory = () => {
   );
 };
 
-export default RewardHistory;
+export default RewardHistoryChart;

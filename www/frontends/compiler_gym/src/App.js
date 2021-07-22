@@ -71,10 +71,10 @@ function App() {
     );
   };
 
-  const submitStep = (stepID) => {
-    api.getStep(session.session_id, stepID).then(
+  const submitStep = (stepIDs) => {
+    api.getSteps(session.session_id, stepIDs).then(
       (result) => {
-        setSession({ ...session, ...result });
+        setSession({ ...session, states: [...session.states, ...result.states] });
       },
       (error) => {
         console.log(error);

@@ -153,6 +153,21 @@ $dropdown-link-active-bg:        $gray-300 !default;
 $offcanvas-padding-y:               1rem;
 $offcanvas-padding-x:               1rem;
 $offcanvas-horizontal-width:        100vw;
-$offcanvas-vertical-height:         60vh;
+$offcanvas-vertical-height:         50vh;
 $offcanvas-transition-duration:     .3s;
 $offcanvas-bg-color:                $secondary;
+
+// ListGroups
+
+$list-group-bg:                     $gray-200;
+$list-group-border-color:           $gray-400;
+$list-group-border-width:           $border-width;
+$list-group-border-radius:          $border-radius;
+
+$list-group-hover-bg:               $white;
+
+$list-group-action-color:           $gray-700;
+$list-group-action-hover-color:     $primary;
+
+$list-group-action-active-color:    $dark;
+$list-group-action-active-bg:       $gray-200;

@@ -6,8 +6,8 @@
 
 .searchtree-nav-wrapper {
     position: sticky;
-    top: 10%;
-    z-index: 0;
+    top: 5.4rem;
+    z-index: 1;
 }
 
 .search-tree-container {
@@ -17,6 +17,16 @@
   height: 120vh;
   min-height: 100vh;
   overflow: auto;
+}
+
+.reward-table-wrapper {
+  position: sticky;
+  top: 7.8rem;
+  z-index: 0;
+}
+
+.reward-table {
+  font-size: small;
 }
 
 .dark-mode-tree {
