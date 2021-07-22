@@ -193,14 +193,14 @@ const ActionsNavbar = () => {
         </Row>
         <Row className="align-items-center">
           <Col sm={11} md={11} className="mt-1">
-            <InputGroup className="mb-1 px-0">     
+            <InputGroup className="mb-1 px-0">
                 <InputGroup.Text
                   className="bg-dark"
                   id="inputGroup-sizing-sm"
                   style={{ color: "white" }}
                 >
                   Actions
-                </InputGroup.Text>      
+                </InputGroup.Text>
               <FormControl
                 id="actions-input"
                 type="text"

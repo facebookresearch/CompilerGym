@@ -239,7 +239,7 @@ const SearchTree = () => {
               />
             </InputGroup>
           </Col>
-        </Row>  
+        </Row>
       </div>
       <RewardsNavbar session={session}/>
       <div
