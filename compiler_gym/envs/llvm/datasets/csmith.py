@@ -23,6 +23,7 @@ from compiler_gym.service.proto import BenchmarkDynamicConfig
 from compiler_gym.util.decorators import memoized_property
 from compiler_gym.util.download import download
 from compiler_gym.util.runfiles_path import transient_cache_path
+from compiler_gym.util.truncate import truncate
 
 # The maximum value for the --seed argument to csmith.
 UINT_MAX = (2 ** 32) - 1
@@ -258,13 +259,21 @@ class CsmithDataset(Dataset):
         csmith = subprocess.Popen(
             [str(self.csmith_path), "--seed", str(seed)],
             stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
+            stderr=subprocess.PIPE,
         )
 
         # Generate the C source.
-        src, _ = csmith.communicate(timeout=300)
+        src, stderr = csmith.communicate(timeout=300)
         if csmith.returncode:
-            raise OSError(f"Csmith failed with seed {seed}")
+            try:
+                stderr = "\n".join(
+                    truncate(stderr.decode("utf-8"), max_line_len=200, max_lines=20)
+                )
+                raise OSError(f"Csmith failed with seed {seed}: {stderr}")
+            except UnicodeDecodeError as e:
+                # Failed to interpret the stderr output, generate a generic
+                # error message.
+                raise OSError(f"Csmith failed with seed {seed}") from e
 
         # Compile to IR.
         clang = subprocess.Popen(
