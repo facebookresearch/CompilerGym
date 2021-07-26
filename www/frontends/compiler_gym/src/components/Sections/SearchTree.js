@@ -79,15 +79,18 @@ const renderSvgNode = ({ nodeDatum, handleNodeClick }) => {
 };
 
 const SearchTree = () => {
-  const { compilerGym, session, api, submitStep, setSession } = useContext(ApiContext);
+  const { compilerGym, session, api, submitStep, setSession } =
+    useContext(ApiContext);
   const { darkTheme } = useContext(ThemeContext);
 
-  const [actionSpace, setActionSpace] = useState(15);
+  const [actionSpace, setActionSpace] = useState(30);
   const [treeData, setTreeData] = useState({});
-  const [treeGlobalData, setTreeGlobalData] = useState({});
   const [layer, setLayer] = useState(1);
   const [nodeSize, setNodeSize] = useState({ x: 300, y: 20 });
   const [actionsTaken, setActionsTaken] = useState([]);
+
+  const [actionsList, setActionsList] = useState([]);
+  const [activeNode, setActiveNode] = useState("x");
 
   const treeWindow = useRef();
 
@@ -96,21 +99,25 @@ const SearchTree = () => {
     Object.keys(compilerGym.actions).map((x, i) => i + 1);
 
   useEffect(() => {
-    const chartData =
+    const children =
       compilerGym.actions &&
-      Object.entries(compilerGym.actions)
-        .slice(0, actionSpace)
-        .map(([name, action_id]) => ({
-          name,
-          action_id: action_id.toString(),
-          children: [],
-        }));
-    setNodeSize({ x: actionSpace > 70 ? 700 : 300, y: 20 });
-    setTreeData({ name: "root", action_id: "x", children: chartData });
-    setTreeGlobalData({ name: "root", action_id: "x", children: chartData });
+      Object.entries(compilerGym.actions).map(([name, action_id]) => ({
+        name,
+        action_id: action_id.toString(),
+        children: [],
+      }));
+    setActionsList(children);
+    setTreeData({
+      name: "root",
+      action_id: "x",
+      children: children?.slice(0, 30),
+    });
+  }, [compilerGym.actions]);
 
+  useEffect(() => {
+    setNodeSize({ x: actionSpace > 70 ? 700 : 300, y: 20 });
     return () => {};
-  }, [actionSpace, compilerGym.actions]);
+  }, [actionSpace]);
 
   /**
    * Recursive function to create new node + layer when user clicks on a node.
@@ -122,8 +129,11 @@ const SearchTree = () => {
   const createNode = (arr, actionID) => {
     if (arr !== undefined) {
       arr.forEach((i) => {
+        let depth = actionID.split(".")[1];
         if (i.action_id === actionID) {
-          i.children = treeData.children.map((o) => {
+          i.active = true;
+          i.depth = depth ? depth : "1";
+          i.children = actionsList.slice(0, actionSpace).map((o) => {
             return {
               name: o.name,
               action_id: `${o.action_id}.${layer}`,
@@ -160,13 +170,47 @@ const SearchTree = () => {
     return;
   };
 
+  /**
+   * Recursive function to update number of links shown on active branch.
+   *
+   * @param {Object} tree receives the current state of the tree data as a hierarchical object.
+   * @param {String} activeNode receives a string that represents the id of actiove node.
+   * @param {Number} limit represents the number of children to display.
+   * @returns
+   */
+  const updateNode = (tree, activeNode, limit) => {
+    if (tree.action_id === activeNode) {
+      return { ...tree, children: actionsList.slice(0, limit) };
+    }
+    if (tree.children !== undefined) {
+      tree.children.forEach((i) => {
+        let depth = activeNode.split(".")[1];
+        if (i.action_id === activeNode) {
+          i.active = true;
+          i.depth = depth ? depth : "1";
+          i.children = actionsList.slice(0, limit).map((o) => {
+            return {
+              name: o.name,
+              action_id: `${o.action_id}.${layer}`,
+              children: [],
+            };
+          });
+        } else {
+          updateNode(i, activeNode, limit);
+        }
+      });
+      return { name: "root", action_id: "x", children: tree.children };
+    }
+    return;
+  };
+
   const undoStep = (n) => {
     let currentSteps = session.states;
     api.undoStep(session.session_id, n).then(
       (result) => {
-        let actionToUndo = currentSteps.indexOf(result)
-        currentSteps.splice(actionToUndo, 1)
-        setSession({ ...session, states: currentSteps});
+        let actionToUndo = currentSteps.indexOf(result);
+        currentSteps.splice(actionToUndo, 1);
+        setSession({ ...session, states: currentSteps });
       },
       (error) => {
         console.log(error);
@@ -182,26 +226,32 @@ const SearchTree = () => {
       if (nodeDepth === layer) {
         submitStep(nodeActionID);
         setLayer(layer + 1);
-        setTreeGlobalData(
-          createNode(treeGlobalData.children, nodeDatum.action_id)
-        );
+        setActiveNode(nodeDatum.action_id);
         setActionsTaken([...actionsTaken, nodeDatum.action_id]);
+
+        setTreeData(createNode(treeData.children, nodeDatum.action_id));
       } else if (
         nodeDepth === layer - 1 &&
         actionsTaken.includes(nodeDatum.action_id)
       ) {
         undoStep(1);
         setLayer(layer - 1);
-        setTreeGlobalData(
-          deleteNode(treeGlobalData.children, nodeDatum.action_id)
+        setActiveNode(
+          actionsTaken.length > 1 ? actionsTaken[actionsTaken.length - 2] : "x"
         );
         setActionsTaken((prev) =>
           prev.filter((i) => i !== nodeDatum.action_id)
         );
+        setTreeData(deleteNode(treeData.children, nodeDatum.action_id));
       }
       return;
     }
     return;
+  };
+
+  const handleActionSpace = (e) => {
+    setActionSpace(e);
+    setTreeData(updateNode(treeData, activeNode, e));
   };
 
   return (
@@ -210,14 +260,14 @@ const SearchTree = () => {
         <Row className="align-items-center">
           <Col md={4}>
             <InputGroup className="mb-1">
-              <Dropdown
-                as={InputGroup.Prepend}
-                onSelect={(e) => setActionSpace(e)}
-              >
+              <Dropdown as={InputGroup.Prepend} onSelect={handleActionSpace}>
                 <Dropdown.Toggle variant="dark" id="dropdown-action-space">
                   Action Space
                 </Dropdown.Toggle>
-                <Dropdown.Menu as={DropdownMenu} style={{ margin: 0, borderRadius: "3%" }}>
+                <Dropdown.Menu
+                  as={DropdownMenu}
+                  style={{ margin: 0, borderRadius: "3%" }}
+                >
                   {actionSpaceOptions &&
                     actionSpaceOptions.map((i, index) => (
                       <Dropdown.Item
@@ -241,7 +291,7 @@ const SearchTree = () => {
           </Col>
         </Row>
       </div>
-      <RewardsNavbar session={session}/>
+      <RewardsNavbar session={session} />
       <div
         ref={treeWindow}
         className={classnames(
@@ -251,7 +301,7 @@ const SearchTree = () => {
         )}
       >
         <Tree
-          data={treeGlobalData}
+          data={treeData}
           nodeSize={nodeSize}
           translate={{ x: 10, y: treeWindow.current?.clientHeight / 3 || 10 }}
           renderCustomNodeElement={(rd3tProps) =>
