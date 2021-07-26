@@ -52,7 +52,18 @@
   }
   path {
     fill: none;
-    stroke: $gray-600;
+    stroke: $gray-500;
     stroke-width: 1.5px;
   }
+}
+
+.link__to-leaf {
+  visibility: hidden;
+}
+
+.active-node-info {
+  border: 1px solid black;
+  border-radius: 5%;
+  background-color: $secondary;
+  padding: 0.3rem;
 }

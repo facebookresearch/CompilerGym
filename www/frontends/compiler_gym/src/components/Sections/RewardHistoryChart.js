@@ -62,13 +62,19 @@ const RewardHistoryChart = ({ session, show, onHide }) => {
     legend: {
       backgroundColor: "white",
     },
+    plotOptions: {
+      series: {
+          pointWidth: 20
+      }
+    },
     series: [
       {
         name: "Cumulative Reward",
         data: cumulativeSum,
       },
       {
-        name: "Reward",
+        type: 'column',
+        name: 'Reward',
         data: rewards,
       },
     ],

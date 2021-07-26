@@ -54,18 +54,39 @@ const DropdownMenu = forwardRef(
  *
  * @param {Object} nodeDatum Receieves an object with node data.
  * @param {Function} handleNodeClick Function to be called when a node is clicked.
- * @returns
+ * @param {Number} layer Takes the current active layer.
+ * @returns {JSX} JSX element representing a node.
  */
-const renderSvgNode = ({ nodeDatum, handleNodeClick }) => {
+
+const renderSvgNode = ({ nodeDatum, handleNodeClick, layer }) => {
+  const display =
+    nodeDatum.__rd3t.depth === 0 ||
+    nodeDatum.__rd3t.depth === layer ||
+    nodeDatum.active
+      ? true
+      : false;
+  const foreignObjectProps = { width: 115, height: 200, x: 20, y: 20 };
+
   return (
-    <g>
+    <g style={{ visibility: display ? "visible" : "hidden" }}>
       <circle
         r="5"
         x="0"
-        fill="white"
+        fill={nodeDatum.active ? "#2dce89" : "white"}
         strokeWidth="1"
         onClick={() => handleNodeClick(nodeDatum)}
       />
+      {nodeDatum.active && (
+        <foreignObject {...foreignObjectProps}>
+          <div className="active-node-info">
+            {nodeDatum.children && (
+              <h5>
+                <span className="text-weight">Reward:</span> {nodeDatum.reward}
+              </h5>
+            )}
+          </div>
+        </foreignObject>
+      )}
       <text
         strokeWidth="0"
         x="8"
@@ -79,8 +100,7 @@ const renderSvgNode = ({ nodeDatum, handleNodeClick }) => {
 };
 
 const SearchTree = () => {
-  const { compilerGym, session, api, submitStep, setSession } =
-    useContext(ApiContext);
+  const { compilerGym, session, api, setSession } = useContext(ApiContext);
   const { darkTheme } = useContext(ThemeContext);
 
   const [actionSpace, setActionSpace] = useState(30);
@@ -115,7 +135,7 @@ const SearchTree = () => {
   }, [compilerGym.actions]);
 
   useEffect(() => {
-    setNodeSize({ x: actionSpace > 70 ? 700 : 300, y: 20 });
+    setNodeSize({ x: actionSpace > 100 ? 700 : 300, y: 20 });
     return () => {};
   }, [actionSpace]);
 
@@ -124,24 +144,24 @@ const SearchTree = () => {
    *
    * @param {Array} arr Receives the children array in the root node.
    * @param {String} actionID Receives the tree action_id of the node.
+   * @param {String} reward takes the reward from api call.
    * @returns
    */
-  const createNode = (arr, actionID) => {
+  const createNode = (arr, actionID, reward) => {
     if (arr !== undefined) {
       arr.forEach((i) => {
-        let depth = actionID.split(".")[1];
         if (i.action_id === actionID) {
           i.active = true;
-          i.depth = depth ? depth : "1";
+          i.reward = reward;
           i.children = actionsList.slice(0, actionSpace).map((o) => {
             return {
               name: o.name,
-              action_id: `${o.action_id}.${layer}`,
+              action_id: `${o.action_id}.${layer + 1}`,
               children: [],
             };
           });
         } else {
-          createNode(i.children, actionID);
+          createNode(i.children, actionID, reward);
         }
       });
       return { name: "root", action_id: "x", children: arr };
@@ -160,6 +180,7 @@ const SearchTree = () => {
     if (arr !== undefined) {
       arr.forEach((i) => {
         if (i.action_id === actionID) {
+          i.active = false;
           i.children = [];
         } else {
           deleteNode(i.children, actionID);
@@ -171,7 +192,7 @@ const SearchTree = () => {
   };
 
   /**
-   * Recursive function to update number of links shown on active branch.
+   * Recursive function to update number of links shown on active node.
    *
    * @param {Object} tree receives the current state of the tree data as a hierarchical object.
    * @param {String} activeNode receives a string that represents the id of actiove node.
@@ -184,10 +205,8 @@ const SearchTree = () => {
     }
     if (tree.children !== undefined) {
       tree.children.forEach((i) => {
-        let depth = activeNode.split(".")[1];
         if (i.action_id === activeNode) {
           i.active = true;
-          i.depth = depth ? depth : "1";
           i.children = actionsList.slice(0, limit).map((o) => {
             return {
               name: o.name,
@@ -204,47 +223,73 @@ const SearchTree = () => {
     return;
   };
 
-  const undoStep = (n) => {
-    let currentSteps = session.states;
-    api.undoStep(session.session_id, n).then(
-      (result) => {
-        let actionToUndo = currentSteps.indexOf(result);
-        currentSteps.splice(actionToUndo, 1);
-        setSession({ ...session, states: currentSteps });
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
+  const submitStep = async (stepID) => {
+    try {
+      const response = await api.getSteps(session.session_id, stepID);
+      setSession({
+        ...session,
+        states: [...session.states, ...response.states],
+      });
+      const stepReward = response.states[0].reward.toFixed(3);
+      return stepReward
+    } catch (err) {
+      console.log(err);
+    }
   };
 
-  const handleNodeClick = (nodeDatum) => {
+  const undoStep = async (n) => {
+    let currentSteps = session.states;
+    try {
+      const result = await api.undoStep(session.session_id, n);
+      let actionToUndo = currentSteps.indexOf(result);
+      currentSteps.splice(actionToUndo, 1);
+      setSession({ ...session, states: currentSteps });
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  /**
+   * The handleNodeClick is an asynchronous function and has two scenarios:
+   * 1. when a node has no children, adds the node as activeNode it creates an array of children with unique id,
+   *    the action id + the depth e.g. 12.2, in which 12 represents the action ID and 2 represents the layer.
+   * 2. when a node has children, it removes its children and updates the activeNode to the previous node.
+   */
+
+  const handleNodeClick = async (nodeDatum) => {
     let nodeActionID = nodeDatum.action_id.split(".")[0];
     let nodeDepth = nodeDatum.__rd3t.depth;
 
     if (nodeDatum !== undefined && nodeDepth !== 0) {
-      if (nodeDepth === layer) {
-        submitStep(nodeActionID);
-        setLayer(layer + 1);
-        setActiveNode(nodeDatum.action_id);
-        setActionsTaken([...actionsTaken, nodeDatum.action_id]);
+      try {
+        if (nodeDepth === layer) {
+          let reward = await submitStep(nodeActionID);
+          setLayer(layer + 1);
+          setActiveNode(nodeDatum.action_id);
+          setActionsTaken([...actionsTaken, nodeDatum.action_id]);
 
-        setTreeData(createNode(treeData.children, nodeDatum.action_id));
-      } else if (
-        nodeDepth === layer - 1 &&
-        actionsTaken.includes(nodeDatum.action_id)
-      ) {
-        undoStep(1);
-        setLayer(layer - 1);
-        setActiveNode(
-          actionsTaken.length > 1 ? actionsTaken[actionsTaken.length - 2] : "x"
-        );
-        setActionsTaken((prev) =>
-          prev.filter((i) => i !== nodeDatum.action_id)
-        );
-        setTreeData(deleteNode(treeData.children, nodeDatum.action_id));
+          setTreeData(
+            createNode(treeData.children, nodeDatum.action_id, reward)
+          );
+        } else if (
+          nodeDepth === layer - 1 &&
+          actionsTaken.includes(nodeDatum.action_id)
+        ) {
+          undoStep(1);
+          setLayer(layer - 1);
+          setActiveNode(
+            actionsTaken.length > 1
+              ? actionsTaken[actionsTaken.length - 2]
+              : "x"
+          );
+          setActionsTaken((prev) =>
+            prev.filter((i) => i !== nodeDatum.action_id)
+          );
+          setTreeData(deleteNode(treeData.children, nodeDatum.action_id));
+        }
+      } catch (err) {
+        console.log(err);
       }
-      return;
     }
     return;
   };
@@ -252,6 +297,10 @@ const SearchTree = () => {
   const handleActionSpace = (e) => {
     setActionSpace(e);
     setTreeData(updateNode(treeData, activeNode, e));
+  };
+
+  const getDynamicPathClass = ({ source, target }) => {
+    if (!target.children && target.depth < layer) return "link__to-leaf";
   };
 
   return (
@@ -304,8 +353,9 @@ const SearchTree = () => {
           data={treeData}
           nodeSize={nodeSize}
           translate={{ x: 10, y: treeWindow.current?.clientHeight / 3 || 10 }}
+          pathClassFunc={getDynamicPathClass}
           renderCustomNodeElement={(rd3tProps) =>
-            renderSvgNode({ ...rd3tProps, handleNodeClick })
+            renderSvgNode({ ...rd3tProps, handleNodeClick, layer })
           }
         />
       </div>
