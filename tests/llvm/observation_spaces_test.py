@@ -48,6 +48,7 @@ def test_observation_spaces(env: LlvmEnv):
         "Autophase",
         "AutophaseDict",
         "Programl",
+        "ProgramlJson",
         "CpuInfo",
         "Inst2vecPreprocessedText",
         "Inst2vecEmbeddingIndices",
@@ -384,6 +385,15 @@ def test_programl_observation_space(env: LlvmEnv):
 
     assert space.deterministic
     assert not space.platform_dependent
+
+
+def test_programl_json_observation_space(env: LlvmEnv):
+    env.reset("cbench-v1/crc32")
+    key = "ProgramlJson"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Sequence)
+    graph: Dict[str, Any] = env.observation[key]
+    assert isinstance(graph, dict)
 
 
 def test_cpuinfo_observation_space(env: LlvmEnv):

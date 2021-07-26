@@ -331,7 +331,8 @@ Status LlvmSession::computeObservation(LlvmObservationSpace space, Observation& 
       *reply.mutable_int64_list()->mutable_value() = {features.begin(), features.end()};
       break;
     }
-    case LlvmObservationSpace::PROGRAML: {
+    case LlvmObservationSpace::PROGRAML:
+    case LlvmObservationSpace::PROGRAML_JSON: {
       // Build the ProGraML graph.
       programl::ProgramGraph graph;
       auto status =
