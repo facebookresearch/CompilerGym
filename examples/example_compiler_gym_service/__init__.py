@@ -36,7 +36,7 @@ class RuntimeReward(Reward):
         )
         self.previous_runtime = None
 
-    def reset(self, benchmark: str):
+    def reset(self, benchmark: str, observation_view):
         del benchmark  # unused
         self.previous_runtime = None
 
