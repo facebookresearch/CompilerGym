@@ -6,6 +6,7 @@ from typing import List, Optional, Tuple, Union
 
 import numpy as np
 
+import compiler_gym
 from compiler_gym.spaces.scalar import Scalar
 from compiler_gym.util.gym_type_hints import ObservationType, RewardType
 
@@ -88,12 +89,15 @@ class Reward(Scalar):
         self.deterministic = deterministic
         self.platform_dependent = platform_dependent
 
-    def reset(self, benchmark: str) -> None:
+    def reset(
+        self, benchmark: str, observation_view: "compiler_gym.views.ObservationView"
+    ) -> None:
         """Reset the rewards space. This is called on
         :meth:`env.reset() <compiler_gym.envs.CompilerEnv.reset>`.
 
         :param benchmark: The URI of the benchmark that is used for this
             episode.
+        :param observation: An observation view for reward initialization
         """
         pass
 
@@ -153,7 +157,7 @@ class DefaultRewardFromObservation(Reward):
         )
         self.previous_value: Optional[ObservationType] = None
 
-    def reset(self, benchmark: str) -> None:
+    def reset(self, benchmark: str, observation_view) -> None:
         """Called on env.reset(). Reset incremental progress."""
         del benchmark  # unused
         self.previous_value = None

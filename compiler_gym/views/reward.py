@@ -60,7 +60,7 @@ class RewardView:
         observations = [self._observation_view[obs] for obs in space.observation_spaces]
         return space.update(self.previous_action, observations, self._observation_view)
 
-    def reset(self, benchmark: Benchmark) -> None:
+    def reset(self, benchmark: Benchmark, observation_view: ObservationView) -> None:
         """Reset the rewards space view. This is called on
         :meth:`env.reset() <compiler_gym.envs.CompilerEnv.reset>`.
 
@@ -68,7 +68,7 @@ class RewardView:
         """
         self.previous_action = None
         for space in self.spaces.values():
-            space.reset(benchmark=benchmark)
+            space.reset(benchmark=benchmark, observation_view=observation_view)
 
     def add_space(self, space: Reward) -> None:
         """Register a new :class:`Reward <compiler_gym.spaces.Reward>` space.
