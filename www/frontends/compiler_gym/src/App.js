@@ -13,7 +13,7 @@ import SplashPage from "./components/Pages/SplashPage";
 import MainNavbar from "./components/Navbars/MainNavbar";
 import PanelsContainer from "./components/PanelsContainer";
 import ControlsContainer from "./components/Sections/ControlsContainer";
-import StateContainer from "./components/Sections/StateContainer";
+import ObservationsContainer from "./components/Sections/ObservationsContainer";
 
 const api = new ApiService("http://127.0.0.1:5000");
 const initialSettings = {
@@ -105,8 +105,8 @@ function App() {
           <div className="main-content">
             <MainNavbar />
             <PanelsContainer
-              left={<ControlsContainer />}
-              right={<StateContainer />}
+              left={<ControlsContainer/>}
+              right={<ObservationsContainer/>}
             />
           </div>
         </ThemeContext.Provider>

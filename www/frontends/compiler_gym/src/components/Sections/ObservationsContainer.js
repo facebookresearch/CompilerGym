@@ -12,7 +12,7 @@ import {
   IrStateContainer,
   InstcountsStateContainer,
   AutophaseStateContainer,
-} from "../StateVisualization";
+} from "../StateVisualizations";
 
 const StateContainer = () => {
   const context = useContext(ApiContext);

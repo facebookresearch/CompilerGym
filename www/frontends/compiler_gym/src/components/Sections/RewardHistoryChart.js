@@ -25,7 +25,7 @@ const RewardHistoryChart = ({ session, show, onHide }) => {
   }, [session]);
 
   const options = {
-    colors: darkTheme ? ["#910000", "#2593B8"] : ["#2593B8", "#434348"],
+    colors: darkTheme ? ["#b34949", "#2593B8"] : ["#2593B8", "#434348"],
     chart: {
       type: "areaspline",
     },
@@ -70,7 +70,7 @@ const RewardHistoryChart = ({ session, show, onHide }) => {
     series: [
       {
         name: "Cumulative Reward",
-        data: cumulativeSum,
+        data: cumulativeSum.map(i => parseFloat(i.toFixed(3))),
       },
       {
         type: 'column',

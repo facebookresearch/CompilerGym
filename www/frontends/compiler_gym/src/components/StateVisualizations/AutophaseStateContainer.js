@@ -8,22 +8,28 @@ import React from "react";
 import classnames from "classnames";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
+import HC_exporting from "highcharts/modules/exporting";
+import HC_exportData from "highcharts/modules/export-data";
 
-const InstcountsStateContainer = ({ instcount, darkTheme }) => {
+HC_exporting(Highcharts);
+HC_exportData(Highcharts);
 
-  const chartData = Object.entries(instcount).map(([category, result]) => ({
-    category,
-    result,
-  }));
+const AutophaseStateContainer = ({ autophase, darkTheme }) => {
+
+  const chartData = Object.entries(autophase)
+    .map(([category, result]) => ({
+      category,
+      result,
+    }))
+    .sort((a, b) => (a.result > b.result ? -1 : 1));
 
   const options = {
-    colors: ["#64E572", "#DDDF00", "#FF9655", "#FFF263", "#6AF9C4"],
     chart: {
       type: "bar",
       height: 150 + "%", //3:2 ratio
     },
     title: {
-      text: "InstCounts",
+      text: "AutoPhase",
       style: {
         color: darkTheme && "white",
       },
@@ -59,20 +65,17 @@ const InstcountsStateContainer = ({ instcount, darkTheme }) => {
         dataLabels: {
           enabled: true,
           format: "{point.y}",
-          borderWidth: 0,
           color: darkTheme && "white",
-          style: {
-            fontFamily: "menlo",
-          },
         },
       },
     },
     credits: {
       enabled: false,
     },
+
     series: [
       {
-        name: "InstCounts",
+        name: "Autophase",
         data: chartData.map((i) => i.result),
       },
     ],
@@ -98,4 +101,4 @@ const InstcountsStateContainer = ({ instcount, darkTheme }) => {
   );
 };
 
-export default InstcountsStateContainer;
+export default AutophaseStateContainer;
