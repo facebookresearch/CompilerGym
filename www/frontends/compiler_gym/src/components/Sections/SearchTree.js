@@ -6,9 +6,7 @@
 
 import React, { useState, useContext, useEffect, useRef } from "react";
 import classnames from "classnames";
-import ApiContext from "../../context/ApiContext";
 import ThemeContext from "../../context/ThemeContext";
-import RewardsNavbar from "../Navbars/RewardsNavbar";
 import Tree from "react-d3-tree";
 
 /**
@@ -62,7 +60,6 @@ const renderSvgNode = ({ nodeDatum, handleNodeClick, layer }) => {
 };
 
 const SearchTree = ({ actionSpace, treeData, layer, handleNodeClick }) => {
-  const { session } = useContext(ApiContext);
   const { darkTheme } = useContext(ThemeContext);
   const treeWindow = useRef();
 
@@ -79,7 +76,6 @@ const SearchTree = ({ actionSpace, treeData, layer, handleNodeClick }) => {
 
   return (
     <>
-      <RewardsNavbar session={session} />
       <div
         ref={treeWindow}
         className={classnames(

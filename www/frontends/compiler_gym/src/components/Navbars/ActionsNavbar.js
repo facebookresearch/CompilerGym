@@ -17,6 +17,7 @@ import {
   OverlayTrigger,
 } from "react-bootstrap";
 import ApiContext from "../../context/ApiContext";
+import RewardHistoryChart from "../Sections/RewardHistoryChart";
 
 const CustomMenu = forwardRef(
   ({ children, style, "aria-labelledby": labeledBy }, ref) => {
@@ -60,6 +61,11 @@ const ActionsNavbar = ({ startSession, actionSpace, handleActionSpace }) => {
   const [uriOptions, setUriOptions] = useState([]);
   const [datasetUri, setDatasetUri] = useState("");
   const [reward, setReward] = useState("IrInstructionCountOz");
+  const [showChart, setShow] = useState(false);
+  const [cumulativeSum, setCumulativeSum] = useState("");
+
+  const handleCloseChart = () => setShow(false);
+  const handleShowChart = () => setShow(true);
 
   const benchmarkOptions =
     compilerGym.benchmarks &&
@@ -73,8 +79,10 @@ const ActionsNavbar = ({ startSession, actionSpace, handleActionSpace }) => {
     Object.keys(compilerGym.actions).map((x, i) => i + 1);
 
   useEffect(() => {
-    let lastState = session.states?.[session.states?.length - 1]
+    let rewards = session.states?.map((i) => parseFloat(i.reward.toFixed(3)));
+    let lastState = session.states?.[session.states?.length - 1];
     setActionsLine(lastState?.commandline);
+    setCumulativeSum(rewards?.reduce((a, x) => a + x, 0));
     return () => {};
   }, [session]);
 
@@ -97,13 +105,16 @@ const ActionsNavbar = ({ startSession, actionSpace, handleActionSpace }) => {
     <div className="mx-2 action-navbar-wrapper">
       <Form>
         <Row className="align-items-center">
-          <Col lg={5} md={6} xs={12} className="mt-1 pr-lg-1">
+          <Col lg={5} md={4} xs={12} className="mt-1 pr-lg-1">
             <InputGroup className="mb-1">
               <Dropdown as={InputGroup.Prepend} onSelect={(e) => setDataset(e)}>
                 <Dropdown.Toggle variant="dark" id="dropdown-benchmark">
                   Dataset
                 </Dropdown.Toggle>
-                <Dropdown.Menu as={CustomMenu} style={{ margin: 0, borderRadius: "3%" }}>
+                <Dropdown.Menu
+                  as={CustomMenu}
+                  style={{ margin: 0, borderRadius: "3%" }}
+                >
                   {benchmarkOptions &&
                     benchmarkOptions.map((i, index) => (
                       <Dropdown.Item
@@ -124,7 +135,7 @@ const ActionsNavbar = ({ startSession, actionSpace, handleActionSpace }) => {
               />
             </InputGroup>
           </Col>
-          <Col lg={3} md={6} xs={12} className="mt-1 px-lg-0">
+          <Col lg={3} md={4} xs={12} className="mt-1 px-lg-0">
             <InputGroup className="mb-1">
               <Dropdown
                 as={InputGroup.Prepend}
@@ -133,7 +144,10 @@ const ActionsNavbar = ({ startSession, actionSpace, handleActionSpace }) => {
                 <Dropdown.Toggle variant="dark" id="dropdown-benchmark-uri">
                   Benchmark
                 </Dropdown.Toggle>
-                <Dropdown.Menu as={CustomMenu} style={{ margin: 0, borderRadius: "3%" }}>
+                <Dropdown.Menu
+                  as={CustomMenu}
+                  style={{ margin: 0, borderRadius: "3%" }}
+                >
                   {uriOptions &&
                     uriOptions.map((i, index) => (
                       <Dropdown.Item
@@ -154,13 +168,16 @@ const ActionsNavbar = ({ startSession, actionSpace, handleActionSpace }) => {
               />
             </InputGroup>
           </Col>
-          <Col lg={4} md={6} xs={12} className="mt-1 pl-lg-1">
+          <Col lg={4} md={4} xs={12} className="mt-1 pl-lg-1">
             <InputGroup className="mb-1">
               <Dropdown as={InputGroup.Prepend} onSelect={(e) => setReward(e)}>
                 <Dropdown.Toggle variant="dark" id="dropdown-reward">
                   Reward
                 </Dropdown.Toggle>
-                <Dropdown.Menu as={CustomMenu} style={{ margin: 0, borderRadius: "3%" }}>
+                <Dropdown.Menu
+                  as={CustomMenu}
+                  style={{ margin: 0, borderRadius: "3%" }}
+                >
                   {compilerGym.rewards &&
                     compilerGym.rewards.map((i, index) => (
                       <Dropdown.Item
@@ -186,13 +203,13 @@ const ActionsNavbar = ({ startSession, actionSpace, handleActionSpace }) => {
         <Row className="align-items-center">
           <Col sm={11} md={11} className="mt-1">
             <InputGroup className="mb-1 px-0">
-                <InputGroup.Text
-                  className="bg-dark"
-                  id="inputGroup-sizing-sm"
-                  style={{ color: "white" }}
-                >
-                  Actions
-                </InputGroup.Text>
+              <InputGroup.Text
+                className="bg-dark"
+                id="inputGroup-sizing-sm"
+                style={{ color: "white" }}
+              >
+                Actions
+              </InputGroup.Text>
               <FormControl
                 id="actions-input"
                 type="text"
@@ -206,9 +223,7 @@ const ActionsNavbar = ({ startSession, actionSpace, handleActionSpace }) => {
             <OverlayTrigger
               placement="right"
               transition={false}
-              overlay={
-                <Tooltip id="button-tooltip-2">Start Session</Tooltip>
-              }
+              overlay={<Tooltip id="button-tooltip-2">Start Session</Tooltip>}
             >
               {({ ref2, ...triggerHandler }) => (
                 <Button
@@ -216,7 +231,9 @@ const ActionsNavbar = ({ startSession, actionSpace, handleActionSpace }) => {
                   {...triggerHandler}
                   variant="success"
                   className="mr-0"
-                  onClick={() => startSession(reward,`${dataset}/${datasetUri}`)}
+                  onClick={() =>
+                    startSession(reward, `${dataset}/${datasetUri}`)
+                  }
                 >
                   <i className="bi bi-play-fill"></i>
                 </Button>
@@ -225,13 +242,16 @@ const ActionsNavbar = ({ startSession, actionSpace, handleActionSpace }) => {
           </Col>
         </Row>
         <Row className="align-items-center">
-          <Col lg={3} md={6} sm={12} className="mt-1">
-            <InputGroup className="mb-1">
+          <Col lg={4} md={4} sm={12} className="mt-1 pr-lg-1">
+            <InputGroup>
               <Dropdown as={InputGroup.Prepend} onSelect={handleActionSpace}>
                 <Dropdown.Toggle variant="dark" id="dropdown-action-space">
                   Action Space
                 </Dropdown.Toggle>
-                <Dropdown.Menu as={CustomMenu} style={{ margin: 0, borderRadius: "3%" }}>
+                <Dropdown.Menu
+                  as={CustomMenu}
+                  style={{ margin: 0, borderRadius: "3%" }}
+                >
                   {actionSpaceOptions &&
                     actionSpaceOptions.map((i, index) => (
                       <Dropdown.Item
@@ -253,6 +273,27 @@ const ActionsNavbar = ({ startSession, actionSpace, handleActionSpace }) => {
               />
             </InputGroup>
           </Col>
+          <Col lg={4} md={4} xs={12} className="mt-1 px-lg-1">
+            <FormControl
+              aria-describedby="basic-addon1"
+              type="text"
+              readOnly
+              value={`Cumulative Reward: ${
+                cumulativeSum && cumulativeSum.toFixed(3)
+              }`}
+            />
+          </Col>
+          <Col lg={4} md={4} xs={12} className="mt-1 pl-lg-1">
+            <Button variant="primary" onClick={handleShowChart}>
+              Reward History
+            </Button>
+          </Col>
+
+          <RewardHistoryChart
+            session={session}
+            show={showChart}
+            onHide={handleCloseChart}
+          />
         </Row>
       </Form>
     </div>

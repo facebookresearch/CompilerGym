@@ -59,3 +59,15 @@
     top: 0;
     z-index: 3;
 }
+
+@media (min-width: 576px)  {
+    .action-navbar-wrapper {
+        min-width: 600px;
+    }
+}
+
+@media (max-width: 576px)  {
+    .action-navbar-wrapper {
+        min-width: none;
+    }
+}

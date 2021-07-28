@@ -58,8 +58,10 @@ const ControlsContainer = () => {
             setTreeData({
               name: "root",
               action_id: "x",
-              children: children?.slice(0, actionSpace),
+              children: children?.slice(0, 30),
             });
+            setActionsList(children);
+            setActionSpace(30);
             setLayer(1);
             setActionsTaken([]);
             setActiveNode("x");

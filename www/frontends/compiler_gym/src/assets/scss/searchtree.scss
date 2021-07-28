@@ -19,10 +19,34 @@
   overflow: auto;
 }
 
+@media (min-width: 576px)  {
+  .search-tree-container{
+      min-width: 600px;
+  }
+}
+
+@media (max-width: 576px)  {
+  .search-tree-container {
+      min-width: none;
+  }
+}
+
 .reward-table-wrapper {
   position: sticky;
   top: 7.8rem;
   z-index: 0;
+}
+
+@media (min-width: 576px)  {
+  .reward-table-wrapper{
+      min-width: 600px;
+  }
+}
+
+@media (max-width: 576px)  {
+  .reward-table-wrapper {
+      min-width: none;
+  }
 }
 
 .reward-table {
