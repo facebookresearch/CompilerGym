@@ -16,7 +16,7 @@ BenchmarkLike = Union[str, Benchmark]
 
 
 class IterateOverBenchmarks(CompilerEnvWrapper):
-    """Iterate over a (possibly finite) sequence of benchmarks on each call to
+    """Iterate over a (possibly infinite) sequence of benchmarks on each call to
     reset(). Will raise :code:`StopIteration` on :meth:`reset()
     <compiler_gym.envs.CompilerEnv.reset>` once the iterator is exhausted. Use
     :class:`CycleOverBenchmarks` or :class:`RandomOrderBenchmarks` for wrappers
