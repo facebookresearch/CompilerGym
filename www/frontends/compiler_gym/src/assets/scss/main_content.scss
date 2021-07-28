@@ -54,8 +54,8 @@
   align-self: stretch;
   display: flex;
   align-items: center;
-  padding-left: 0;
-  padding-right: 1rem;
+  padding-left: 0rem;
+  padding-right: 0.5rem;
 }
 
 .divider {
@@ -107,4 +107,18 @@
 
 .text-weight {
   font-weight: 800;
+}
+
+// **** Observations Container ****
+
+.row-sort-button {
+  position: absolute;
+  top: 7rem;
+  z-index: 2;
+}
+
+@media (max-width: 576px) {
+.row-sort-button {
+    top: 8rem;
+  }
 }

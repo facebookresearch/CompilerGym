@@ -307,7 +307,7 @@ const SearchTree = () => {
     <>
       <div className="mx-2 searchtree-nav-wrapper">
         <Row className="align-items-center">
-          <Col md={4}>
+          <Col md={4} sm={12}>
             <InputGroup className="mb-1">
               <Dropdown as={InputGroup.Prepend} onSelect={handleActionSpace}>
                 <Dropdown.Toggle variant="dark" id="dropdown-action-space">

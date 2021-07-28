@@ -105,7 +105,7 @@ const ActionsNavbar = () => {
     <div className="mx-2 action-navbar-wrapper">
       <Form>
         <Row className="align-items-center">
-          <Col sm={5} className="mt-1 pr-1">
+          <Col sm={5} xs={12} className="mt-1 pr-1">
             <InputGroup className="mb-1">
               <Dropdown as={InputGroup.Prepend} onSelect={(e) => setDataset(e)}>
                 <Dropdown.Toggle variant="dark" id="dropdown-benchmark">
@@ -132,7 +132,7 @@ const ActionsNavbar = () => {
               />
             </InputGroup>
           </Col>
-          <Col md={3} className="mt-1 px-0">
+          <Col md={3} xs={12} className="mt-1 px-0">
             <InputGroup className="mb-1">
               <Dropdown
                 as={InputGroup.Prepend}
@@ -162,7 +162,7 @@ const ActionsNavbar = () => {
               />
             </InputGroup>
           </Col>
-          <Col sm={4} className="mt-1 pl-1">
+          <Col sm={4} xs={12} className="mt-1 pl-1">
             <InputGroup className="mb-1">
               <Dropdown as={InputGroup.Prepend} onSelect={(e) => setReward(e)}>
                 <Dropdown.Toggle variant="dark" id="dropdown-reward">

@@ -21,6 +21,7 @@ const StateContainer = () => {
   const [stateSelector, setStateSelector] = useState("ir");
 
   const last_observation = envState && envState[envState.length - 1];
+  const previous_observation = envState && envState[envState.length - 2];
 
   const renderState = () => {
     switch (stateSelector) {
@@ -35,6 +36,7 @@ const StateContainer = () => {
         return (
           <InstcountsStateContainer
             instcount={last_observation?.instcount}
+            prev_instcount ={previous_observation?.instcount || {}}
             darkTheme={themeContext.darkTheme}
           />
         );
@@ -42,6 +44,7 @@ const StateContainer = () => {
         return (
           <AutophaseStateContainer
             autophase={last_observation?.autophase}
+            prev_authophase ={previous_observation?.autophase || {}}
             darkTheme={themeContext.darkTheme}
           />
         );
@@ -64,7 +67,6 @@ const StateContainer = () => {
           <Tab eventKey="ir" title="IR"></Tab>
           <Tab eventKey="instcounts" title="InstCounts"></Tab>
           <Tab eventKey="autophase" title="Autophase"></Tab>
-          <Tab eventKey="programl" title="ProGraML"></Tab>
         </Tabs>
       </div>
       {renderState()}
