@@ -53,8 +53,8 @@ const CustomMenu = forwardRef(
   }
 );
 
-const ActionsNavbar = () => {
-  const { api, compilerGym, session, setSession } = useContext(ApiContext);
+const ActionsNavbar = ({ startSession, actionSpace, handleActionSpace }) => {
+  const { compilerGym, session } = useContext(ApiContext);
   const [actionsLine, setActionsLine] = useState("");
   const [dataset, setDataset] = useState("benchmark://cbench-v1");
   const [uriOptions, setUriOptions] = useState([]);
@@ -67,6 +67,10 @@ const ActionsNavbar = () => {
       dataset,
       uri,
     }));
+
+  const actionSpaceOptions =
+    compilerGym.actions &&
+    Object.keys(compilerGym.actions).map((x, i) => i + 1);
 
   useEffect(() => {
     let lastState = session.states?.[session.states?.length - 1]
@@ -89,23 +93,11 @@ const ActionsNavbar = () => {
     return () => {};
   }, [dataset, compilerGym.benchmarks]);
 
-  const startNewSession = () => {
-    let newBenchmark = `${dataset}/${datasetUri}`;
-    api.startSession(reward, newBenchmark).then(
-      (result) => {
-        setSession(result);
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
-  };
-
   return (
     <div className="mx-2 action-navbar-wrapper">
       <Form>
         <Row className="align-items-center">
-          <Col sm={5} xs={12} className="mt-1 pr-1">
+          <Col lg={5} md={6} xs={12} className="mt-1 pr-lg-1">
             <InputGroup className="mb-1">
               <Dropdown as={InputGroup.Prepend} onSelect={(e) => setDataset(e)}>
                 <Dropdown.Toggle variant="dark" id="dropdown-benchmark">
@@ -132,7 +124,7 @@ const ActionsNavbar = () => {
               />
             </InputGroup>
           </Col>
-          <Col md={3} xs={12} className="mt-1 px-0">
+          <Col lg={3} md={6} xs={12} className="mt-1 px-lg-0">
             <InputGroup className="mb-1">
               <Dropdown
                 as={InputGroup.Prepend}
@@ -162,7 +154,7 @@ const ActionsNavbar = () => {
               />
             </InputGroup>
           </Col>
-          <Col sm={4} xs={12} className="mt-1 pl-1">
+          <Col lg={4} md={6} xs={12} className="mt-1 pl-lg-1">
             <InputGroup className="mb-1">
               <Dropdown as={InputGroup.Prepend} onSelect={(e) => setReward(e)}>
                 <Dropdown.Toggle variant="dark" id="dropdown-reward">
@@ -224,12 +216,42 @@ const ActionsNavbar = () => {
                   {...triggerHandler}
                   variant="success"
                   className="mr-0"
-                  onClick={startNewSession}
+                  onClick={() => startSession(reward,`${dataset}/${datasetUri}`)}
                 >
                   <i className="bi bi-play-fill"></i>
                 </Button>
               )}
             </OverlayTrigger>
+          </Col>
+        </Row>
+        <Row className="align-items-center">
+          <Col lg={3} md={6} sm={12} className="mt-1">
+            <InputGroup className="mb-1">
+              <Dropdown as={InputGroup.Prepend} onSelect={handleActionSpace}>
+                <Dropdown.Toggle variant="dark" id="dropdown-action-space">
+                  Action Space
+                </Dropdown.Toggle>
+                <Dropdown.Menu as={CustomMenu} style={{ margin: 0, borderRadius: "3%" }}>
+                  {actionSpaceOptions &&
+                    actionSpaceOptions.map((i, index) => (
+                      <Dropdown.Item
+                        key={index}
+                        eventKey={i}
+                        active={actionSpace === i.toString() ? true : false}
+                      >
+                        {i.toString()}
+                      </Dropdown.Item>
+                    ))}
+                </Dropdown.Menu>
+              </Dropdown>
+              <FormControl
+                id="action-sepace-input"
+                aria-describedby="basic-addon3"
+                type="text"
+                readOnly
+                value={actionSpace}
+              />
+            </InputGroup>
           </Col>
         </Row>
       </Form>

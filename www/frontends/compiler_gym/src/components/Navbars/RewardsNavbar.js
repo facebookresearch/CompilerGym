@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useEffect } from "react";
-import { Row, Col, ListGroup, Button } from "react-bootstrap";
+import { Row, Col, Button, FormControl } from "react-bootstrap";
 import RewardHistoryChart from "../Sections/RewardHistoryChart";
 
 const RewardsNavbar = ({ session }) => {
@@ -24,14 +24,15 @@ const RewardsNavbar = ({ session }) => {
   return (
     <div className="mx-2 reward-table-wrapper">
       <Row className="align-items-center">
-        <Col md={4} xs={12} className="mt-1">
-          <ListGroup horizontal={"lg"} className="reward-table">
-            <ListGroup.Item action>
-              Cumulative Reward: {cumulativeSum && cumulativeSum.toFixed(3)}
-            </ListGroup.Item>
-          </ListGroup>
+        <Col lg={4} md={6} xs={12} className="mt-1">
+          <FormControl
+            aria-describedby="basic-addon1"
+            type="text"
+            readOnly
+            value={`Cumulative Reward: ${cumulativeSum && cumulativeSum.toFixed(3)}`}
+          />
         </Col>
-        <Col md={3} xs={12} className="mt-1">
+        <Col lg={3} md={6} xs={12} className="mt-1">
           <Button variant="primary" onClick={handleShowChart}>
             Reward History
           </Button>

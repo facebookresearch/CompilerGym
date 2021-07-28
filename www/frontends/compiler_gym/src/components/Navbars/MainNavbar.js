@@ -9,8 +9,7 @@ import { Container, Navbar, NavDropdown, Nav } from "react-bootstrap";
 import ThemeContext from "../../context/ThemeContext";
 
 const MainNavbar = () => {
-  const themeContext = useContext(ThemeContext);
-  const { darkTheme, toggleTheme } = themeContext;
+  const { darkTheme, toggleTheme } = useContext(ThemeContext);
 
   return (
     <Navbar bg="dark" variant="dark" expand="lg">
