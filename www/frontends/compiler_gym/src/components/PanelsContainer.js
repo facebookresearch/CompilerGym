@@ -6,7 +6,7 @@
 
 import React, { useEffect, useState, useRef} from 'react'
 
-const MIN_WIDTH = 170;
+const MIN_WIDTH = 140;
 
 const LeftPanel = ({ children, leftWidth, setLeftWidth }) => {
     const leftRef = useRef()

@@ -13,7 +13,7 @@ import SplashPage from "./components/Pages/SplashPage";
 import MainNavbar from "./components/Navbars/MainNavbar";
 import PanelsContainer from "./components/PanelsContainer";
 import ControlsContainer from "./components/Sections/ControlsContainer";
-import StateContainer from "./components/Sections/StateContainer";
+import ObservationsContainer from "./components/Sections/ObservationsContainer";
 
 const api = new ApiService("http://127.0.0.1:5000");
 const initialSettings = {
@@ -71,10 +71,10 @@ function App() {
     );
   };
 
-  const submitStep = (stepID) => {
-    api.getStep(session.session_id, stepID).then(
+  const submitStep = (stepIDs) => {
+    api.getSteps(session.session_id, stepIDs).then(
       (result) => {
-        setSession({ ...session, ...result });
+        setSession({ ...session, states: [...session.states, ...result.states] });
       },
       (error) => {
         console.log(error);
@@ -105,8 +105,8 @@ function App() {
           <div className="main-content">
             <MainNavbar />
             <PanelsContainer
-              left={<ControlsContainer />}
-              right={<StateContainer />}
+              left={<ControlsContainer/>}
+              right={<ObservationsContainer/>}
             />
           </div>
         </ThemeContext.Provider>

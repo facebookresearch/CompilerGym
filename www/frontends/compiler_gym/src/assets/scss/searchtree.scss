@@ -6,17 +6,51 @@
 
 .searchtree-nav-wrapper {
     position: sticky;
-    top: 10%;
-    z-index: 0;
+    top: 5.4rem;
+    z-index: 1;
 }
 
 .search-tree-container {
   margin-top: 1rem;
   margin-left: 0rem;
-  width: 98%;
+  width: 99%;
   height: 120vh;
   min-height: 100vh;
   overflow: auto;
+}
+
+@media (min-width: 576px)  {
+  .search-tree-container{
+      min-width: 600px;
+  }
+}
+
+@media (max-width: 576px)  {
+  .search-tree-container {
+      min-width: none;
+  }
+}
+
+.reward-table-wrapper {
+  position: sticky;
+  top: 7.8rem;
+  z-index: 0;
+}
+
+@media (min-width: 576px)  {
+  .reward-table-wrapper{
+      min-width: 600px;
+  }
+}
+
+@media (max-width: 576px)  {
+  .reward-table-wrapper {
+      min-width: none;
+  }
+}
+
+.reward-table {
+  font-size: small;
 }
 
 .dark-mode-tree {
@@ -42,7 +76,18 @@
   }
   path {
     fill: none;
-    stroke: $gray-600;
+    stroke: $gray-500;
     stroke-width: 1.5px;
   }
+}
+
+.link__to-leaf {
+  visibility: hidden;
+}
+
+.active-node-info {
+  border: 1px solid black;
+  border-radius: 5%;
+  background-color: $secondary;
+  padding: 0.3rem;
 }
