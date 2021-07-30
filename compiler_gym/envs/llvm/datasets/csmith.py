@@ -230,10 +230,10 @@ class CsmithDataset(Dataset):
                 raise CsmithBuildError("make install", stdout, stderr)
 
     @property
-    def size(self) -> float:
+    def size(self) -> int:
         # Actually 2^32 - 1, but practically infinite for all intents and
         # purposes.
-        return float("inf")
+        return 0
 
     def benchmark_uris(self) -> Iterable[str]:
         return (f"{self.name}/{i}" for i in range(UINT_MAX))
