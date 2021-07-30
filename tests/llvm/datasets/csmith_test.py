@@ -57,6 +57,11 @@ def test_random_benchmark(csmith_dataset: CsmithDataset):
     assert len(random_benchmarks) == num_benchmarks
 
 
+def test_csmith_from_seed_retry_count_exceeded(csmith_dataset: CsmithDataset):
+    with pytest.raises(OSError, match="Csmith failed after 5 attempts with seed 1"):
+        csmith_dataset.benchmark_from_seed(seed=1, max_retries=3, retry_count=5)
+
+
 def test_csmith_positive_runtimes(env: LlvmEnv, csmith_dataset: CsmithDataset):
     benchmark = next(csmith_dataset.benchmarks())
     env.reset(benchmark=benchmark)
