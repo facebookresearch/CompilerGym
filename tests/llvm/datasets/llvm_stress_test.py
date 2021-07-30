@@ -31,7 +31,8 @@ def llvm_stress_dataset() -> LlvmStressDataset:
 
 
 def test_llvm_stress_size(llvm_stress_dataset: LlvmStressDataset):
-    assert llvm_stress_dataset.size == float("inf")
+    assert llvm_stress_dataset.size == 0
+    assert len(llvm_stress_dataset) == 0
 
 
 @pytest.mark.parametrize("index", range(3) if is_ci() else range(250))

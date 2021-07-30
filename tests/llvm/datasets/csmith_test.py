@@ -30,7 +30,8 @@ def csmith_dataset() -> CsmithDataset:
 
 
 def test_csmith_size(csmith_dataset: CsmithDataset):
-    assert csmith_dataset.size == float("inf")
+    assert csmith_dataset.size == 0
+    assert len(csmith_dataset) == 0
 
 
 @pytest.mark.parametrize("index", range(3) if is_ci() else range(250))
