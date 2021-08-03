@@ -30,7 +30,8 @@ def csmith_dataset() -> CsmithDataset:
 
 
 def test_csmith_size(csmith_dataset: CsmithDataset):
-    assert csmith_dataset.size == float("inf")
+    assert csmith_dataset.size == 0
+    assert len(csmith_dataset) == 0
 
 
 @pytest.mark.parametrize("index", range(3) if is_ci() else range(250))
@@ -55,6 +56,11 @@ def test_random_benchmark(csmith_dataset: CsmithDataset):
         for b in (csmith_dataset.random_benchmark(rng) for _ in range(num_benchmarks))
     }
     assert len(random_benchmarks) == num_benchmarks
+
+
+def test_csmith_from_seed_retry_count_exceeded(csmith_dataset: CsmithDataset):
+    with pytest.raises(OSError, match="Csmith failed after 5 attempts with seed 1"):
+        csmith_dataset.benchmark_from_seed(seed=1, max_retries=3, retry_count=5)
 
 
 def test_csmith_positive_runtimes(env: LlvmEnv, csmith_dataset: CsmithDataset):

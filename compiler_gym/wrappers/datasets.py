@@ -54,7 +54,7 @@ class IterateOverBenchmarks(CompilerEnvWrapper):
 
     def reset(self, benchmark: Optional[BenchmarkLike] = None, **kwargs):
         if benchmark is not None:
-            raise TypeError("Benchmark passed toIterateOverBenchmarks.reset()")
+            raise TypeError("Benchmark passed to IterateOverBenchmarks.reset()")
         benchmark: BenchmarkLike = next(self.benchmarks)
         return self.env.reset(benchmark=benchmark)
 
