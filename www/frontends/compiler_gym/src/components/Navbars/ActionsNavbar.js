@@ -5,6 +5,7 @@
  */
 
 import React, { useState, useEffect, useContext, forwardRef } from "react";
+import classnames from "classnames";
 import {
   Form,
   FormControl,
@@ -15,9 +16,12 @@ import {
   Button,
   Tooltip,
   OverlayTrigger,
+  Alert,
 } from "react-bootstrap";
 import ApiContext from "../../context/ApiContext";
-import RewardHistoryChart from "../Sections/RewardHistoryChart";
+import ThemeContext from "../../context/ThemeContext";
+import BottomControlsNavbar from "./BottomControlsNavbar";
+import CommandLineModal from "../Modals/CommandLineModal";
 
 const CustomMenu = forwardRef(
   ({ children, style, "aria-labelledby": labeledBy }, ref) => {
@@ -54,18 +58,34 @@ const CustomMenu = forwardRef(
   }
 );
 
-const ActionsNavbar = ({ startSession, actionSpace, handleActionSpace }) => {
-  const { compilerGym, session } = useContext(ApiContext);
+/**
+ * Represenets the navbar component inside the controls container,
+ * this components takes care of the creation of a new CompilerGym environment.
+ *
+ * @param {function} startSession invoke API to start a new session with different specific datasets and benchmarks.
+ * @param {String} actionSpace a discrete space of actions to be exposed.
+ * @param {Array} actionsTaken an array of ids representing the actions selected from the tree.
+ * @param {function} handleActionSpace function to update the action space.
+ * @param {Object} urlParams
+ * @returns
+ */
+const ActionsNavbar = ({
+  startSession,
+  actionSpace,
+  actionsTaken,
+  handleActionSpace,
+  urlParams
+}) => {
+  const { darkTheme } = useContext(ThemeContext);
+  const { compilerGym, session, api, setSession } = useContext(ApiContext);
+
   const [actionsLine, setActionsLine] = useState("");
   const [dataset, setDataset] = useState("benchmark://cbench-v1");
   const [uriOptions, setUriOptions] = useState([]);
   const [datasetUri, setDatasetUri] = useState("");
   const [reward, setReward] = useState("IrInstructionCountOz");
-  const [showChart, setShow] = useState(false);
-  const [cumulativeSum, setCumulativeSum] = useState("");
-
-  const handleCloseChart = () => setShow(false);
-  const handleShowChart = () => setShow(true);
+  const [showWarning, setShowWarning] = useState(false);
+  const [showModal, setModal] = useState(false)
 
   const benchmarkOptions =
     compilerGym.benchmarks &&
@@ -74,20 +94,52 @@ const ActionsNavbar = ({ startSession, actionSpace, handleActionSpace }) => {
       uri,
     }));
 
-  const actionSpaceOptions =
-    compilerGym.actions &&
-    Object.keys(compilerGym.actions).map((x, i) => i + 1);
+  /*
+   * Start a new session when component mounts in the browser with URL params.
+   *
+   */
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        await api.closeSession(session.session_id);
+        const initSession = await api.startSession(
+          urlParams.reward,
+          urlParams.actions,
+          `${decodeURIComponent(urlParams.dataset)}/${decodeURIComponent(urlParams.benchmark)}`
+        );
+        console.log(initSession);
+        setSession(initSession);
+        setDataset(decodeURIComponent(urlParams.dataset));
+        setDatasetUri(decodeURIComponent(urlParams.benchmark));
+        setReward(urlParams.reward);
+      } catch (err) {
+        setShowWarning(true);
+      }
+    };
+    if (urlParams.reward && urlParams.dataset && session.session_id !== undefined) {
+      fetchData();
+    }
+
+    return () => {};
+  }, [
+    api,
+    session.session_id,
+    setSession,
+    urlParams.reward,
+    urlParams.actions,
+    urlParams.dataset,
+    urlParams.benchmark,
+  ]);
 
   useEffect(() => {
-    let rewards = session.states?.map((i) => parseFloat(i.reward.toFixed(3)));
     let lastState = session.states?.[session.states?.length - 1];
     setActionsLine(lastState?.commandline);
-    setCumulativeSum(rewards?.reduce((a, x) => a + x, 0));
+
     return () => {};
   }, [session]);
 
   useEffect(() => {
-    const selected =
+    let selected =
       compilerGym.benchmarks &&
       Object.entries(compilerGym.benchmarks)
         .map(([dataset, uri]) => ({
@@ -95,14 +147,33 @@ const ActionsNavbar = ({ startSession, actionSpace, handleActionSpace }) => {
           uri,
         }))
         .find((o) => o.dataset === dataset);
+    setUriOptions(selected?.uri);
+    setDatasetUri(selected?.uri[0]);
+    return () => {}
+  }, [compilerGym.benchmarks, dataset]);
 
-    setUriOptions(selected && selected.uri);
-    setDatasetUri(selected && selected.uri[0]);
-    return () => {};
-  }, [dataset, compilerGym.benchmarks]);
+  const startNewSession = () => {
+    startSession(reward, "-", `${dataset}/${datasetUri}`)
+  };
+
+  const getShareLink = () => {
+    const dataSetEncoded = encodeURIComponent(dataset);
+    const uriEncoded = encodeURIComponent(datasetUri);
+    let actions = actionsTaken.map((i) => i.split(".")[0]).join(",") || "-";  // Only keep the action ids, not the depth id.
+    let shareLink = `http://localhost:3000/${dataSetEncoded}/${uriEncoded}/${reward}/${actions}`;
+    return shareLink;
+  };
+
+  const handleModal = () => setModal(!showModal)
 
   return (
-    <div className="mx-2 action-navbar-wrapper">
+    <div
+      className={classnames(
+        "px-2 action-navbar-wrapper",
+        { "dark-mode-controls": darkTheme },
+        { "": darkTheme === false }
+      )}
+    >
       <Form>
         <Row className="align-items-center">
           <Col lg={5} md={4} xs={12} className="mt-1 pr-lg-1">
@@ -120,7 +191,7 @@ const ActionsNavbar = ({ startSession, actionSpace, handleActionSpace }) => {
                       <Dropdown.Item
                         key={index}
                         eventKey={i.dataset}
-                        active={dataset === i ? true : false}
+                        active={dataset === i.dataset ? true : false}
                       >
                         {i.dataset}
                       </Dropdown.Item>
@@ -201,8 +272,8 @@ const ActionsNavbar = ({ startSession, actionSpace, handleActionSpace }) => {
           </Col>
         </Row>
         <Row className="align-items-center">
-          <Col sm={11} md={11} className="mt-1">
-            <InputGroup className="mb-1 px-0">
+          <Col lg={10} sm={10} md={10} className="mt-1">
+            <InputGroup className="mb-1">
               <InputGroup.Text
                 className="bg-dark"
                 id="inputGroup-sizing-sm"
@@ -219,7 +290,24 @@ const ActionsNavbar = ({ startSession, actionSpace, handleActionSpace }) => {
               />
             </InputGroup>
           </Col>
-          <Col md={1} className="mt-1 mb-1">
+          <Col lg={2} md={2} className="mt-1 mb-1 text-right">
+            <OverlayTrigger
+              placement="right"
+              transition={false}
+              overlay={<Tooltip id="button-tooltip-3">Command Line</Tooltip>}
+            >
+              {({ ref1, ...triggerHandler }) => (
+                <Button
+                  ref={ref1}
+                  {...triggerHandler}
+                  variant="primary"
+                  className="mr-1"
+                  onClick={handleModal}
+                >
+                  <i className="bi bi-terminal-fill text-white"></i>
+                </Button>
+              )}
+            </OverlayTrigger>
             <OverlayTrigger
               placement="right"
               transition={false}
@@ -230,72 +318,43 @@ const ActionsNavbar = ({ startSession, actionSpace, handleActionSpace }) => {
                   ref={ref2}
                   {...triggerHandler}
                   variant="success"
-                  className="mr-0"
-                  onClick={() =>
-                    startSession(reward, `${dataset}/${datasetUri}`)
-                  }
+                  onClick={startNewSession}
                 >
-                  <i className="bi bi-play-fill"></i>
+                  <i className="bi bi-cpu"></i>
                 </Button>
               )}
             </OverlayTrigger>
           </Col>
         </Row>
         <Row className="align-items-center">
-          <Col lg={4} md={4} sm={12} className="mt-1 pr-lg-1">
-            <InputGroup>
-              <Dropdown as={InputGroup.Prepend} onSelect={handleActionSpace}>
-                <Dropdown.Toggle variant="dark" id="dropdown-action-space">
-                  Action Space
-                </Dropdown.Toggle>
-                <Dropdown.Menu
-                  as={CustomMenu}
-                  style={{ margin: 0, borderRadius: "3%" }}
-                >
-                  {actionSpaceOptions &&
-                    actionSpaceOptions.map((i, index) => (
-                      <Dropdown.Item
-                        key={index}
-                        eventKey={i}
-                        active={actionSpace === i.toString() ? true : false}
-                      >
-                        {i.toString()}
-                      </Dropdown.Item>
-                    ))}
-                </Dropdown.Menu>
-              </Dropdown>
-              <FormControl
-                id="action-sepace-input"
-                aria-describedby="basic-addon3"
-                type="text"
-                readOnly
-                value={actionSpace}
-              />
-            </InputGroup>
-          </Col>
-          <Col lg={4} md={4} xs={12} className="mt-1 px-lg-1">
-            <FormControl
-              aria-describedby="basic-addon1"
-              type="text"
-              readOnly
-              value={`Cumulative Reward: ${
-                cumulativeSum && cumulativeSum.toFixed(3)
-              }`}
-            />
-          </Col>
-          <Col lg={4} md={4} xs={12} className="mt-1 pl-lg-1">
-            <Button variant="primary" onClick={handleShowChart}>
-              Reward History
-            </Button>
-          </Col>
-
-          <RewardHistoryChart
-            session={session}
-            show={showChart}
-            onHide={handleCloseChart}
+          <BottomControlsNavbar
+            actionSpace={actionSpace}
+            handleActionSpace={handleActionSpace}
+            getShareLink={getShareLink}
           />
         </Row>
       </Form>
+      <CommandLineModal
+        showModal={showModal}
+        handleModal={handleModal}
+        title={"Command Line"}
+        startSession={startSession}
+        reward={reward}
+        benchmark={`${dataset}/${datasetUri}`}
+      />
+      {showWarning && (
+        <Alert
+          variant="danger"
+          className="mt-2"
+          onClose={() => setShowWarning(false)}
+          dismissible
+        >
+          <Alert.Heading>
+            <span className="text-weight">Oh snap!</span> You got an error, this
+            link is broken. You can still set up your own optimization steps.
+          </Alert.Heading>
+        </Alert>
+      )}
     </div>
   );
 };

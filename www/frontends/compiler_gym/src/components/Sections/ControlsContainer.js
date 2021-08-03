@@ -5,12 +5,17 @@
  */
 
 import React, { useState, useContext, useEffect } from "react";
+import { useParams, useHistory } from "react-router";
 import ApiContext from "../../context/ApiContext";
+import { makeTreeDataFromURL } from "../../utils/Helpers"
 import ActionsNavbar from "../Navbars/ActionsNavbar";
 import SearchTree from "./SearchTree";
+import ActionsHeatMap from "./ActionsHeatMap";
 
 const ControlsContainer = () => {
   const { compilerGym, session, api, setSession } = useContext(ApiContext);
+  const urlParams = useParams();
+  const history = useHistory();
 
   const [actionSpace, setActionSpace] = useState(30);
   const [actionsList, setActionsList] = useState([]);
@@ -19,30 +24,48 @@ const ControlsContainer = () => {
   const [activeNode, setActiveNode] = useState("x");
   const [actionsTaken, setActionsTaken] = useState([]);
 
+  /**
+   * Check whether a set of actions is passed as params in the URL, if yes, updates the DOM
+   * to render a search tree with a specific state. Otherwise, renders a clean tree with only
+   * one level depth and one set of children.
+   */
   useEffect(() => {
-    const children =
+    let children =
       compilerGym.actions &&
       Object.entries(compilerGym.actions).map(([name, action_id]) => ({
         name,
         action_id: action_id.toString(),
         children: [],
       }));
-    setActionsList(children);
-    setTreeData({
-      name: "root",
-      action_id: "x",
-      children: children?.slice(0, 30),
-    });
-  }, [compilerGym.actions]);
+    let urlIds = urlParams.actions?.split(",") || [];
+    let actionsTaken = urlIds.map((o,i) => `${o}.${i+1}`)
+    let rewards = session.states?.map((i) => parseFloat(i.reward.toFixed(3)));
+
+    if (urlIds.length > 0 && urlIds.length === rewards?.length - 1) {
+      setActionsList(children);
+      setTreeData(makeTreeDataFromURL(urlIds, children, rewards));
+      setLayer(urlIds.length+1)
+      setActionsTaken(actionsTaken)
+      setActiveNode(`${urlIds[urlIds.length - 1]}.${urlIds.length}`)
+    } else {
+      setActionsList(children);
+      setTreeData({
+        name: "root",
+        action_id: "x",
+        children: children?.slice(0, 30),
+      });
+    }
+    return () => {};
+  }, [compilerGym.actions, urlParams.actions, session.states]);
 
   /**
-   * This functions makes an API call to close current session and start a new session witgh new parameters
+   * This functions makes an API call to close current session and start a new session with new parameters
    *
    * @param {String} reward Takes the type of reward to initialize the new session with.
    * @param {String} newBenchmark Takes the benchamark to initialize a new session.
    */
 
-  const startNewSession = (reward, newBenchmark) => {
+  const startNewSession = (reward, actions, newBenchmark) => {
     const children =
       compilerGym.actions &&
       Object.entries(compilerGym.actions).map(([name, action_id]) => ({
@@ -50,9 +73,10 @@ const ControlsContainer = () => {
         action_id: action_id.toString(),
         children: [],
       }));
+    history.push("/");
     api.closeSession(session.session_id).then(
       (res) => {
-        api.startSession(reward, newBenchmark).then(
+        api.startSession(reward, actions, newBenchmark).then(
           (result) => {
             setSession(result);
             setTreeData({
@@ -241,16 +265,19 @@ const ControlsContainer = () => {
     <div>
       <ActionsNavbar
         actionSpace={actionSpace}
+        actionsTaken={actionsTaken}
         startSession={startNewSession}
         handleActionSpace={handleActionSpace}
+        urlParams={urlParams}
       />
       <SearchTree
         actionSpace={actionSpace}
         treeData={treeData}
         layer={layer}
-        handleActionSpace={handleActionSpace}
         handleNodeClick={handleNodeClick}
       />
+      <ActionsHeatMap/>
+
     </div>
   );
 };

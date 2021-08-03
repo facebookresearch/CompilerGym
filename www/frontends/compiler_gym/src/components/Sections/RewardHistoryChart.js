@@ -70,11 +70,12 @@ const RewardHistoryChart = ({ session, show, onHide }) => {
     },
     plotOptions: {
       series: {
-          pointWidth: 20
+          pointWidth: 5
       }
     },
     series: [
       {
+        type: 'line',
         name: "Cumulative Reward",
         data: cumulativeSum.map(i => parseFloat(i.toFixed(3))),
       },

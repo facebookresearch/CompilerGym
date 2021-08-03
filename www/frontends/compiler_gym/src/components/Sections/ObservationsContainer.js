@@ -59,6 +59,7 @@ const StateContainer = () => {
     <>
       <div className="m-0 action-navbar-wrapper">
         <Tabs
+          className="bg-white"
           id="uncontrolled-tab"
           activeKey={stateSelector}
           transition={false}

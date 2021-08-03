@@ -25,7 +25,7 @@ const renderSvgNode = ({ nodeDatum, handleNodeClick, layer }) => {
     nodeDatum.active
       ? true
       : false;
-  const foreignObjectProps = { width: 115, height: 200, x: 20, y: 20 };
+  const foreignObjectProps = { width: 115, height: 200, x: 20, y: 10 };
 
   return (
     <g style={{ visibility: display ? "visible" : "hidden" }}>
@@ -50,7 +50,7 @@ const renderSvgNode = ({ nodeDatum, handleNodeClick, layer }) => {
       <text
         strokeWidth="0"
         x="8"
-        dy="5"
+        dy={nodeDatum.active ? "-4" : "4"}
         onClick={() => handleNodeClick(nodeDatum)}
       >
         {nodeDatum.name}
@@ -59,6 +59,15 @@ const renderSvgNode = ({ nodeDatum, handleNodeClick, layer }) => {
   );
 };
 
+/**
+ * Renders the search tree component.
+ *
+ * @param {*} actionSpace Receives the number of nodes to show on an active node.
+ * @param {Object} treeData Takes a hierarchical object data structure representeing the data of the tree.
+ * @param {String} layer Receives the depth of the active node.
+ * @param {Function} handleNodeClick Function that manages the logic of clicking on a node.
+ * @returns
+ */
 const SearchTree = ({ actionSpace, treeData, layer, handleNodeClick }) => {
   const { darkTheme } = useContext(ThemeContext);
   const treeWindow = useRef();
@@ -66,7 +75,7 @@ const SearchTree = ({ actionSpace, treeData, layer, handleNodeClick }) => {
   const [nodeSize, setNodeSize] = useState({ x: 300, y: 20 });
 
   useEffect(() => {
-    setNodeSize({ x: actionSpace > 100 ? 700 : 300, y: 20 });
+    setNodeSize({ x: actionSpace > 100 ? 500 : 300, y: 20 });
     return () => {};
   }, [actionSpace]);
 
@@ -87,7 +96,7 @@ const SearchTree = ({ actionSpace, treeData, layer, handleNodeClick }) => {
         <Tree
           data={treeData}
           nodeSize={nodeSize}
-          translate={{ x: 10, y: treeWindow.current?.clientHeight / 3 || 10 }}
+          translate={{ x: 10, y: treeWindow.current?.clientHeight / 2 || 10 }}
           pathClassFunc={getDynamicPathClass}
           renderCustomNodeElement={(rd3tProps) =>
             renderSvgNode({ ...rd3tProps, handleNodeClick, layer })

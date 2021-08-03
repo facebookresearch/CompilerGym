@@ -58,6 +58,19 @@
     position: sticky;
     top: 0;
     z-index: 3;
+    margin-bottom: 0.5rem;
+    margin-left: 0;
+}
+
+.dark-mode-controls {
+    background-color: $dark;
+    margin-bottom: 0;
+    padding-bottom: 0.5rem;
+}
+
+.light-mode-controls {
+    background-color: $gray-100;
+    margin-bottom: 0.5rem;
 }
 
 @media (min-width: 576px)  {
@@ -70,4 +83,8 @@
     .action-navbar-wrapper {
         min-width: none;
     }
+}
+
+.cg-icon {
+    cursor: pointer;
 }

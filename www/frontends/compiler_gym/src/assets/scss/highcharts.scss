@@ -37,3 +37,17 @@
     stroke: $gray-700;
   }
 }
+
+.highcharts-figure, .highcharts-data-table table {
+  position: relative;
+  margin: 0rem 0;
+  overflow: auto;
+}
+
+.highcharts-data-table table {
+	font-family: Verdana, sans-serif;
+	border-collapse: collapse;
+	border: 1px solid #EBEBEB;
+	margin: 5px auto;
+	text-align: center;
+}

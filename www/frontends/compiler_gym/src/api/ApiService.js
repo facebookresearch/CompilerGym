@@ -20,14 +20,14 @@ export default class ApiService {
     });
   }
 
-  startSession(reward, benchmark) {
-    return this.fetch(`${this.domain}/api/v3/start/${reward}/-/${benchmark}`, {
+  startSession(reward, actionsIds, benchmark) {
+    return this.fetch(`${this.domain}/api/v3/start/${reward}/${actionsIds}/${benchmark}`, {
       method: "GET",
     });
   }
 
-  getSteps(sessionID, stepIDs) {
-    return this.fetch(`${this.domain}/api/v3/step/${sessionID}/${stepIDs}`, {
+  getSteps(sessionID, actionsIds) {
+    return this.fetch(`${this.domain}/api/v3/step/${sessionID}/${actionsIds}`, {
       method: "GET",
     });
   }
