@@ -82,6 +82,8 @@ setuptools.setup(
             "envs/llvm/service/passes/*.txt",
             "third_party/cbench/benchmarks.txt",
             "third_party/cbench/cbench-v*/*",
+            "third_party/csmith/csmith/bin/csmith",
+            "third_party/csmith/csmith/include/csmith-2.3.0/*.h",
             "third_party/inst2vec/*.pickle",
         ]
     },
