@@ -2,6 +2,35 @@ workspace(name = "CompilerGym")
 
 load("@bazel_tools//tools/build_defs/repo:http.bzl", "http_archive", "http_file")
 
+# === LLVM toolchain ===
+# https://github.com/grailbio/bazel-toolchain
+#
+# This registes an LLVM-based compiler toolchain to build C++ code, rather than
+# using the system toolchain. This is to provide better hemeticity of the
+# build. See github.com/facebookresearch/CompilerGym/issues/31 for example.
+
+http_archive(
+    name = "com_grail_bazel_toolchain",
+    sha256 = "b924b102adc0c3368d38a19bd971cb4fa75362a27bc363d0084b90ca6877d3f0",
+    strip_prefix = "bazel-toolchain-0.5.7",
+    urls = ["https://github.com/grailbio/bazel-toolchain/archive/refs/tags/0.5.7.tar.gz"],
+)
+
+load("@com_grail_bazel_toolchain//toolchain:deps.bzl", "bazel_toolchain_dependencies")
+
+bazel_toolchain_dependencies()
+
+load("@com_grail_bazel_toolchain//toolchain:rules.bzl", "llvm_toolchain")
+
+llvm_toolchain(
+    name = "llvm_toolchain",
+    llvm_version = "10.0.0",
+)
+
+load("@llvm_toolchain//:toolchains.bzl", "llvm_register_toolchains")
+
+llvm_register_toolchains()
+
 # === Google test ===
 
 http_archive(

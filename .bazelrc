@@ -1,5 +1,12 @@
 # See: https://bazel.build/versions/master/docs/bazel-user-manual.html#flag--compilation_mode
 
+build --crosstool_top=@llvm_toolchain//:toolchain
+test --crosstool_top=@llvm_toolchain//:toolchain
+
+# TODO(cummins): Enable for non-CI builds:
+# build --experimental_sandbox_base=/dev/shm
+# test --experimental_sandbox_base=/dev/shm
+
 # This project requires C++17.
 build --cxxopt='-std=c++17'
 test --cxxopt='-std=c++17'
