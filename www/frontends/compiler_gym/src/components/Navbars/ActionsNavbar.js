@@ -13,15 +13,13 @@ import {
   Row,
   InputGroup,
   Dropdown,
-  Button,
-  Tooltip,
-  OverlayTrigger,
   Alert,
+  Button
 } from "react-bootstrap";
 import ApiContext from "../../context/ApiContext";
 import ThemeContext from "../../context/ThemeContext";
-import BottomControlsNavbar from "./BottomControlsNavbar";
-import CommandLineModal from "../Modals/CommandLineModal";
+import LargeModal from "../Modals/LargeModal";
+import { getCommandLineArray } from "../../utils/Helpers";
 
 const CustomMenu = forwardRef(
   ({ children, style, "aria-labelledby": labeledBy }, ref) => {
@@ -74,7 +72,7 @@ const ActionsNavbar = ({
   actionSpace,
   actionsTaken,
   handleActionSpace,
-  urlParams
+  urlParams,
 }) => {
   const { darkTheme } = useContext(ThemeContext);
   const { compilerGym, session, api, setSession } = useContext(ApiContext);
@@ -94,6 +92,19 @@ const ActionsNavbar = ({
       uri,
     }));
 
+  const actionsList =
+    compilerGym.actions &&
+    Object.entries(compilerGym.actions).map(([name, action_id]) => ({
+      name,
+      action_id: action_id.toString(),
+    }));
+
+  const actionSpaceOptions =
+    compilerGym.actions &&
+    Object.keys(compilerGym.actions).map((x, i) => i + 1);  // Action space as a number to show in the dropdown menu.
+
+  const actionsIdsTaken = actionsTaken.map((i) => i.split(".")[0]); // Only keep the action ids, not the depth id
+
   /*
    * Start a new session when component mounts in the browser with URL params.
    *
@@ -105,7 +116,9 @@ const ActionsNavbar = ({
         const initSession = await api.startSession(
           urlParams.reward,
           urlParams.actions,
-          `${decodeURIComponent(urlParams.dataset)}/${decodeURIComponent(urlParams.benchmark)}`
+          `${decodeURIComponent(urlParams.dataset)}/${decodeURIComponent(
+            urlParams.benchmark
+          )}`
         );
         console.log(initSession);
         setSession(initSession);
@@ -116,7 +129,11 @@ const ActionsNavbar = ({
         setShowWarning(true);
       }
     };
-    if (urlParams.reward && urlParams.dataset && session.session_id !== undefined) {
+    if (
+      urlParams.reward &&
+      urlParams.dataset &&
+      session.session_id !== undefined
+    ) {
       fetchData();
     }
 
@@ -132,39 +149,72 @@ const ActionsNavbar = ({
   ]);
 
   useEffect(() => {
+    let selected =
+      benchmarkOptions && benchmarkOptions.find((o) => o.dataset === dataset);
+    setUriOptions(selected?.uri);
+    setDatasetUri(selected?.uri[0]);
+    return () => {};
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => {
     let lastState = session.states?.[session.states?.length - 1];
     setActionsLine(lastState?.commandline);
 
     return () => {};
   }, [session]);
 
-  useEffect(() => {
-    let selected =
-      compilerGym.benchmarks &&
-      Object.entries(compilerGym.benchmarks)
-        .map(([dataset, uri]) => ({
-          dataset,
-          uri,
-        }))
-        .find((o) => o.dataset === dataset);
+  const handleNewDataset = (e) => {
+    let selected = benchmarkOptions.find((o) => o.dataset === e);
+    setDataset(e);
     setUriOptions(selected?.uri);
     setDatasetUri(selected?.uri[0]);
-    return () => {}
-  }, [compilerGym.benchmarks, dataset]);
+    startSession(
+      reward,
+      actionsIdsTaken.length ? actionsIdsTaken : "-",
+      `${e}/${selected?.uri[0]}`
+    );
+  };
 
-  const startNewSession = () => {
-    startSession(reward, "-", `${dataset}/${datasetUri}`)
+  const handleDatasetUri = (e) => {
+    setDatasetUri(e);
+    startSession(
+      reward,
+      actionsIdsTaken.length ? actionsIdsTaken : "-",
+      `${dataset}/${e}`
+    );
+  };
+
+  const handleRewardSelect = (e) => {
+    setReward(e);
+    startSession(
+      e,
+      actionsIdsTaken.length ? actionsIdsTaken : "-",
+      `${dataset}/${datasetUri}`
+    );
   };
 
   const getShareLink = () => {
     const dataSetEncoded = encodeURIComponent(dataset);
     const uriEncoded = encodeURIComponent(datasetUri);
-    let actions = actionsTaken.map((i) => i.split(".")[0]).join(",") || "-";  // Only keep the action ids, not the depth id.
+    let actions = actionsTaken.map((i) => i.split(".")[0]).join(",") || "-"; // Only keep the action ids, not the depth id in the string.
     let shareLink = `http://localhost:3000/${dataSetEncoded}/${uriEncoded}/${reward}/${actions}`;
     return shareLink;
   };
 
-  const handleModal = () => setModal(!showModal)
+  const runCommandLine = async (e) => {
+    if (e.key === "Enter") {
+      try {
+        let actionsTaken = getCommandLineArray(actionsLine, actionsList);
+        await startSession(
+          reward,
+          actionsTaken.length ? actionsTaken : "-",
+          `${dataset}/${datasetUri}`
+        );
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  };
 
   return (
     <div
@@ -176,9 +226,9 @@ const ActionsNavbar = ({
     >
       <Form>
         <Row className="align-items-center">
-          <Col lg={5} md={4} xs={12} className="mt-1 pr-lg-1">
+          <Col lg={3} md={3} xs={12} className="mt-1 pr-lg-1">
             <InputGroup className="mb-1">
-              <Dropdown as={InputGroup.Prepend} onSelect={(e) => setDataset(e)}>
+              <Dropdown as={InputGroup.Prepend} onSelect={handleNewDataset}>
                 <Dropdown.Toggle variant="dark" id="dropdown-benchmark">
                   Dataset
                 </Dropdown.Toggle>
@@ -206,12 +256,9 @@ const ActionsNavbar = ({
               />
             </InputGroup>
           </Col>
-          <Col lg={3} md={4} xs={12} className="mt-1 px-lg-0">
+          <Col lg={3} md={3} xs={12} className="mt-1 pl-lg-0 pr-lg-1">
             <InputGroup className="mb-1">
-              <Dropdown
-                as={InputGroup.Prepend}
-                onSelect={(e) => setDatasetUri(e)}
-              >
+              <Dropdown as={InputGroup.Prepend} onSelect={handleDatasetUri}>
                 <Dropdown.Toggle variant="dark" id="dropdown-benchmark-uri">
                   Benchmark
                 </Dropdown.Toggle>
@@ -239,9 +286,9 @@ const ActionsNavbar = ({
               />
             </InputGroup>
           </Col>
-          <Col lg={4} md={4} xs={12} className="mt-1 pl-lg-1">
+          <Col lg={3} md={3} xs={12} className="mt-1 pl-lg-0 pr-lg-1">
             <InputGroup className="mb-1">
-              <Dropdown as={InputGroup.Prepend} onSelect={(e) => setReward(e)}>
+              <Dropdown as={InputGroup.Prepend} onSelect={handleRewardSelect}>
                 <Dropdown.Toggle variant="dark" id="dropdown-reward">
                   Reward
                 </Dropdown.Toggle>
@@ -270,78 +317,68 @@ const ActionsNavbar = ({
               />
             </InputGroup>
           </Col>
+          <Col lg={3} md={3} sm={12} className="mt-1 pl-lg-0">
+            <InputGroup className="mb-1">
+              <Dropdown as={InputGroup.Prepend} onSelect={handleActionSpace}>
+                <Dropdown.Toggle variant="dark" id="dropdown-action-space">
+                  Actions
+                </Dropdown.Toggle>
+                <Dropdown.Menu
+                  as={CustomMenu}
+                  style={{ margin: 0, borderRadius: "3%" }}
+                >
+                  {actionSpaceOptions &&
+                    actionSpaceOptions.map((i, index) => (
+                      <Dropdown.Item
+                        key={index}
+                        eventKey={i}
+                        active={actionSpace === i.toString() ? true : false}
+                      >
+                        {i.toString()}
+                      </Dropdown.Item>
+                    ))}
+                </Dropdown.Menu>
+              </Dropdown>
+              <FormControl
+                id="action-sepace-input"
+                aria-describedby="basic-addon3"
+                type="text"
+                readOnly
+                value={actionSpace}
+              />
+            </InputGroup>
+          </Col>
         </Row>
         <Row className="align-items-center">
-          <Col lg={10} sm={10} md={10} className="mt-1">
-            <InputGroup className="mb-1">
+          <Col lg={11} md={11} xs={11} className="my-1">
+            <InputGroup>
               <InputGroup.Text
                 className="bg-dark"
                 id="inputGroup-sizing-sm"
                 style={{ color: "white" }}
               >
-                Actions
+                Command
               </InputGroup.Text>
               <FormControl
                 id="actions-input"
                 type="text"
                 aria-describedby="basic-addon1"
-                readOnly
-                defaultValue={actionsLine}
+                className={classnames("", {
+                  "bg-darker text-white": darkTheme,
+                })}
+                value={actionsLine}
+                onChange={(e) => setActionsLine(e.target.value)}
+                onKeyPress={runCommandLine}
               />
             </InputGroup>
           </Col>
-          <Col lg={2} md={2} className="mt-1 mb-1 text-right">
-            <OverlayTrigger
-              placement="right"
-              transition={false}
-              overlay={<Tooltip id="button-tooltip-3">Command Line</Tooltip>}
-            >
-              {({ ref1, ...triggerHandler }) => (
-                <Button
-                  ref={ref1}
-                  {...triggerHandler}
-                  variant="primary"
-                  className="mr-1"
-                  onClick={handleModal}
-                >
-                  <i className="bi bi-terminal-fill text-white"></i>
-                </Button>
-              )}
-            </OverlayTrigger>
-            <OverlayTrigger
-              placement="right"
-              transition={false}
-              overlay={<Tooltip id="button-tooltip-2">Start Session</Tooltip>}
-            >
-              {({ ref2, ...triggerHandler }) => (
-                <Button
-                  ref={ref2}
-                  {...triggerHandler}
-                  variant="success"
-                  onClick={startNewSession}
-                >
-                  <i className="bi bi-cpu"></i>
-                </Button>
-              )}
-            </OverlayTrigger>
+          <Col lg={1} md={1} xs={1} className="my-1 pl-lg-1 text-right">
+            <Button variant="primary" onClick={() => setModal(!showModal)}>
+              <i className="bi bi-share-fill text-white cg-icon"></i>
+            </Button>
           </Col>
         </Row>
-        <Row className="align-items-center">
-          <BottomControlsNavbar
-            actionSpace={actionSpace}
-            handleActionSpace={handleActionSpace}
-            getShareLink={getShareLink}
-          />
-        </Row>
       </Form>
-      <CommandLineModal
-        showModal={showModal}
-        handleModal={handleModal}
-        title={"Command Line"}
-        startSession={startSession}
-        reward={reward}
-        benchmark={`${dataset}/${datasetUri}`}
-      />
       {showWarning && (
         <Alert
           variant="danger"
@@ -355,8 +392,18 @@ const ActionsNavbar = ({
           </Alert.Heading>
         </Alert>
       )}
+      <LargeModal
+        showModal={showModal}
+        handleModal={() => setModal(!showModal)}
+        title={"Share"}
+        getShareLink={getShareLink}
+      />
     </div>
   );
 };
 
 export default ActionsNavbar;
+
+//opt -early-cse -break-crit-edges -loop-simplifycfg -float2int -gvn -ipsccp -jump-threading -licm -instsimplify -lcssa -libcalls-shrinkwrap -mem2reg -called-value-propagation -loop-fusion -loop-idiom -guard-widening -loop-unroll -indvars input.bc -o output.bc
+//opt -licm -sroa -post-inline-ee-instrument -float2int -instsimplify -pgo-memop-opt -dce -early-cse-memssa -inferattrs -strip-nondebug -flattencfg -loop-interchange -float2int -add-discriminators -loop-vectorize -aggressive-instcombine -prune-eh -gvn-hoist -loop-predication -irce -instcombine -globalsplit -pgo-memop-opt -lcssa -loop-guard-widening -mldst-motion -loop-simplifycfg -hotcoldsplit -loop-vectorize -forceattrs -rewrite-statepoints-for-gc -coro-elide -forceattrs -deadargelim -infer-address-spaces -float2int -deadargelim -coro-early -libcalls-shrinkwrap -loop-fusion -prune-eh -aggressive-instcombine -coro-early -loop-load-elim -elim-avail-extern -flattencfg -ipconstprop -lower-matrix-intrinsics -aggressive-instcombine -strip -memcpyopt -lcssa -irce -scalarizer -lcssa -add-discriminators -coro-cleanup -coro-elide -sink -tailcallelim -barrier -lower-guard-intrinsic -bdce -deadargelim -load-store-vectorizer -die -reassociate -post-inline-ee-instrument -attributor -simple-loop-unswitch -loop-guard-widening -canonicalize-aliases -sink -pgo-memop-opt -bdce -ee-instrument -tailcallelim -loop-versioning -alignment-from-assumptions -instsimplify -simplifycfg -add-discriminators -pgo-memop-opt -dce -loop-simplifycfg -inject-tli-mappings -licm -strip-dead-prototypes -irce -globaldce -pgo-memop-opt -lower-widenable-condition -alignment-from-assumptions -globaldce -slp-vectorizer -globaldce -alignment-from-assumptions -loop-sink -barrier -instcombine -correlated-propagation -ipsccp -loop-instsimplify -sccp -alignment-from-assumptions -partial-inliner -forceattrs -loop-distribute -loop-interchange -separate-const-offset-from-gep -newgvn -loop-instsimplify -globaldce -indvars -deadargelim -instsimplify -redundant-dbg-inst-elim -loop-idiom -licm -loop-unroll-and-jam -hotcoldsplit -mergereturn -partially-inline-libcalls -div-rem-pairs -sink -strip-debug-declare -infer-address-spaces -instnamer -inline -gvn -functionattrs -nary-reassociate -loop-reroll -barrier -prune-eh -loop-unroll-and-jam -functionattrs -post-inline-ee-instrument -partial-inliner -simple-loop-unswitch -mergefunc -rewrite-statepoints-for-gc -loop-distribute -instnamer -memcpyopt -loop-load-elim -strip-debug-declare -ee-instrument -insert-gcov-profiling -ee-instrument -sink -simplifycfg -memcpyopt -die -deadargelim -newgvn -loop-idiom -lowerinvoke -scalarizer -loop-simplifycfg -early-cse-memssa -partial-inliner -globalsplit -lower-matrix-intrinsics -loop-data-prefetch -coro-cleanup -nary-reassociate -dce -forceattrs -always-inline -strip-nondebug -lower-expect -callsite-splitting -prune-eh -bdce -loop-versioning-licm -always-inline -post-inline-ee-instrument -insert-gcov-profiling -loop-data-prefetch -sancov -loop-guard-widening -alignment-from-assumptions -functionattrs -sroa -strip-nondebug -consthoist -jump-threading -guard-widening -consthoist -speculative-execution -die -reassociate -forceattrs -adce -loop-data-prefetch -float2int -forceattrs -loop-distribute -bdce -loop-load-elim -indvars -sancov -slp-vectorizer -tailcallelim -lower-guard-intrinsic -irce -float2int -consthoist -strip-debug-declare -sancov -loop-simplify -memcpyopt -loop-simplify -guard-widening -ipconstprop -coro-cleanup -hotcoldsplit -strip-debug-declare -instcombine -dse -strip-debug-declare -simplifycfg input.bc -o output.bc
+//http://localhost:3000/benchmark%3A%2F%2Fcbench-v1/blowfish/IrInstructionCountOz/30,9,72,34,39,46,55,57,52,56,58,103,12,63,65,43,77,47

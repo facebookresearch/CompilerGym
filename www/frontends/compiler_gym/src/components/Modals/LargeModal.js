@@ -4,12 +4,18 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React, { useState, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Modal, Button, FormControl, Row, Col } from "react-bootstrap";
 
-const LargeModal = ({ showModal, handleModal, title, content }) => {
+const LargeModal = ({ showModal, handleModal, title, getShareLink }) => {
   const [copySuccess, setCopySuccess] = useState("");
+  const [shareLink, setShareLink] = useState("")
   const textAreaRef = useRef();
+
+  useEffect(() => {
+    setShareLink(getShareLink)
+    return () => {}
+  }, [getShareLink])
 
   const copyToClipboard = (e) => {
     textAreaRef.current.select();
@@ -31,7 +37,7 @@ const LargeModal = ({ showModal, handleModal, title, content }) => {
               ref={textAreaRef}
               type="text"
               readOnly
-              value={content}
+              value={shareLink}
             />
           </Col>
           <Col lg={1} md={1} xs={1}>

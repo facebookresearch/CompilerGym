@@ -10,7 +10,7 @@ import ApiContext from "../../context/ApiContext";
 import { makeTreeDataFromURL } from "../../utils/Helpers"
 import ActionsNavbar from "../Navbars/ActionsNavbar";
 import SearchTree from "./SearchTree";
-import ActionsHeatMap from "./ActionsHeatMap";
+import RewardsSection from "./RewardsSection";
 
 const ControlsContainer = () => {
   const { compilerGym, session, api, setSession } = useContext(ApiContext);
@@ -23,6 +23,7 @@ const ControlsContainer = () => {
   const [layer, setLayer] = useState(1);
   const [activeNode, setActiveNode] = useState("x");
   const [actionsTaken, setActionsTaken] = useState([]);
+  const [highlightedPoint, setHighlightedPoint] = useState({})
 
   /**
    * Check whether a set of actions is passed as params in the URL, if yes, updates the DOM
@@ -62,6 +63,7 @@ const ControlsContainer = () => {
    * This functions makes an API call to close current session and start a new session with new parameters
    *
    * @param {String} reward Takes the type of reward to initialize the new session with.
+   * @param {Array} actions array with ids of actions.
    * @param {String} newBenchmark Takes the benchamark to initialize a new session.
    */
 
@@ -89,6 +91,11 @@ const ControlsContainer = () => {
             setLayer(1);
             setActionsTaken([]);
             setActiveNode("x");
+            if (actions !== "-" && actions.length) {
+              setActionsTaken(actions?.map((o,i) => `${o}.${i+1}`))
+            } else {
+              setActionsTaken([])
+            }
           },
           (error) => {
             console.log(error);
@@ -261,23 +268,39 @@ const ControlsContainer = () => {
     setTreeData(updateNode(treeData, activeNode, e));
   };
 
+  const handleMouseOverTree = (nodeData) => {
+    if (nodeData.active) {
+      setHighlightedPoint({point: nodeData.__rd3t.depth, selected: true})
+    }
+  }
+
+  const handleMouseOutTree = (nodeData) => {
+    if (nodeData.active) {
+      setHighlightedPoint({point: nodeData.__rd3t.depth, selected: false})
+    }
+  }
+
   return (
     <div>
       <ActionsNavbar
         actionSpace={actionSpace}
         actionsTaken={actionsTaken}
+        urlParams={urlParams}
         startSession={startNewSession}
         handleActionSpace={handleActionSpace}
-        urlParams={urlParams}
       />
       <SearchTree
         actionSpace={actionSpace}
         treeData={treeData}
         layer={layer}
         handleNodeClick={handleNodeClick}
+        handleMouseOverTree={handleMouseOverTree}
+        handleMouseOutTree={handleMouseOutTree}
       />
-      <ActionsHeatMap/>
-
+      <RewardsSection
+        session={session}
+        highlightedPoint={highlightedPoint}
+      />
     </div>
   );
 };

@@ -57,7 +57,7 @@ const AutophaseStateContainer = ({ autophase, prev_authophase, darkTheme }) => {
     colors: ["#7cb5ec", "#DDDF00"],
     chart: {
       type: "bar",
-      height: 180 + "%", //3:2 ratio
+      height: 180 + "%",
     },
     title: {
       text: "AutoPhase",
@@ -169,13 +169,19 @@ const AutophaseStateContainer = ({ autophase, prev_authophase, darkTheme }) => {
               eventKey={"result"}
               active={sortBy === "result" ? true : false}
             >
-              Observations
+              Value
             </Dropdown.Item>
             <Dropdown.Item
               eventKey={"diff"}
               active={sortBy === "diff" ? true : false}
             >
               Delta
+            </Dropdown.Item>
+            <Dropdown.Item
+              eventKey={"category"}
+              active={sortBy === "category" ? true : false}
+            >
+              Alphabetical
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>

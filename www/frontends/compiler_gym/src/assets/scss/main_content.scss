@@ -5,24 +5,23 @@
  */
 
 .main-content {
-    position: relative;
-    height: 100%;
-    min-height: 100vh;
-    background-color: $gray-100;
-    -webkit-text-size-adjust: 100%;
+  position: relative;
+  height: 100%;
+  min-height: 100vh;
+  background-color: $gray-100;
+  -webkit-text-size-adjust: 100%;
 
-    // Navbar
-    .navbar-top {
-        padding-left: 0 !important;
-        padding-right: 0 !important;
-    }
+  // Navbar
+  .navbar-top {
+    padding-left: 0 !important;
+    padding-right: 0 !important;
+  }
 
-    // Container
-    .container-fluid {
-        padding-left : $main-content-padding-x;
-        padding-right: $main-content-padding-x;
-
-    }
+  // Container
+  .container-fluid {
+    padding-left: $main-content-padding-x;
+    padding-right: $main-content-padding-x;
+  }
 }
 
 // **** Splash Page ****
@@ -74,7 +73,6 @@
   overflow: auto;
 }
 
-
 // **** Custom dropdown ****
 
 .cg-dropdown {
@@ -109,6 +107,24 @@
   font-weight: 800;
 }
 
+// **** RewardsSection ****
+
+.row-cumulative-reward {
+  position: absolute;
+  top: 9rem;
+  left: 1rem;
+  width: 16rem;
+  z-index: 2;
+}
+
+@media (max-width: 576px) {
+  .row-cumulative-reward {
+    display: none;
+    bottom: 2rem;
+    width: 12rem;
+  }
+}
+
 // **** Observations Container ****
 
 .row-sort-button {
@@ -118,7 +134,7 @@
 }
 
 @media (max-width: 576px) {
-.row-sort-button {
+  .row-sort-button {
     top: 8rem;
   }
 }

@@ -4,15 +4,15 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React, { useState, useContext, useEffect } from "react";
+import React, { useState, useContext, useEffect, useRef } from "react";
 import classnames from "classnames";
-import { Offcanvas } from "react-bootstrap";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import ThemeContext from "../../context/ThemeContext";
 
-const RewardHistoryChart = ({ session, show, onHide }) => {
+const RewardHistoryChart = ({ session }) => {
   const { darkTheme } = useContext(ThemeContext);
+  const panel = useRef();
   const [rewards, setRewards] = useState([]);
   const [cumulativeSum, setCumulativeSum] = useState([]);
   const [steps, setSteps] = useState([]);
@@ -34,29 +34,20 @@ const RewardHistoryChart = ({ session, show, onHide }) => {
     colors: darkTheme ? ["#b34949", "#2593B8"] : ["#2593B8", "#434348"],
     chart: {
       type: "areaspline",
+      height: 18 + "%",
+      width: panel.current?.clientWidth,
     },
-    title: {
-      text: "Reward History",
-      style: {
-        color: darkTheme && "white",
-      },
-    },
+    title: null,
     xAxis: {
       categories: steps,
       labels: {
-        style: {
-          color: darkTheme && "white",
-        },
+        enabled: false,
       },
     },
     yAxis: {
-      title: {
-        text: "Reward Value",
-        style: {
-          color: darkTheme && "white",
-        },
-      },
+      title: null,
       labels: {
+        enabled: true,
         style: {
           color: darkTheme && "white",
         },
@@ -70,18 +61,31 @@ const RewardHistoryChart = ({ session, show, onHide }) => {
     },
     plotOptions: {
       series: {
-          pointWidth: 5
-      }
+        pointWidth: 5,
+        allowPointSelect: true,
+        states: {
+          hover: {
+            enabled: false,
+          },
+          select: {
+            color: "yelow",
+          },
+          inactive: {
+            enabled: false,
+            opacity: 1,
+          },
+        },
+      },
     },
     series: [
       {
-        type: 'line',
+        type: "line",
         name: "Cumulative Reward",
-        data: cumulativeSum.map(i => parseFloat(i.toFixed(3))),
+        data: cumulativeSum.map((i) => parseFloat(i.toFixed(3))),
       },
       {
-        type: 'column',
-        name: 'Reward',
+        type: "column",
+        name: "Reward",
         data: rewards,
       },
     ],
@@ -95,27 +99,15 @@ const RewardHistoryChart = ({ session, show, onHide }) => {
   };
 
   return (
-    <>
-      <Offcanvas show={show} onHide={onHide} placement={"bottom"}>
-        <Offcanvas.Header
-          closeButton
-          className={classnames(
-            { "offcanvas-dark-mode": darkTheme },
-            { "": darkTheme === false }
-          )}
-        >
-          <Offcanvas.Title>Reward History</Offcanvas.Title>
-        </Offcanvas.Header>
-        <Offcanvas.Body
-          className={classnames(
-            { "offcanvas-dark-mode chart-dark-mode": darkTheme },
-            { "": darkTheme === false }
-          )}
-        >
-          <HighchartsReact highcharts={Highcharts} options={options} />
-        </Offcanvas.Body>
-      </Offcanvas>
-    </>
+    <div
+      ref={panel}
+      className={classnames(
+        { "offcanvas-dark-mode chart-dark-mode": darkTheme },
+        { "": !darkTheme }
+      )}
+    >
+      <HighchartsReact highcharts={Highcharts} options={options} />
+    </div>
   );
 };
 

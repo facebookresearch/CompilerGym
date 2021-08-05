@@ -167,13 +167,19 @@ const InstcountsStateContainer = ({ instcount, prev_instcount, darkTheme }) => {
               eventKey={"result"}
               active={sortBy === "result" ? true : false}
             >
-              Observations
+              Values
             </Dropdown.Item>
             <Dropdown.Item
               eventKey={"diff"}
               active={sortBy === "diff" ? true : false}
             >
               Delta
+            </Dropdown.Item>
+            <Dropdown.Item
+              eventKey={"category"}
+              active={sortBy === "category" ? true : false}
+            >
+              Alphabetical
             </Dropdown.Item>
           </Dropdown.Menu>
         </Dropdown>
