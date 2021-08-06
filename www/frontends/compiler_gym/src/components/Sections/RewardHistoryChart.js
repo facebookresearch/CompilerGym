@@ -37,7 +37,17 @@ const RewardHistoryChart = ({ session }) => {
       height: 18 + "%",
       width: panel.current?.clientWidth,
     },
-    title: null,
+    title: {
+      text: "Rewards",
+      floating: true,
+      align: "left",
+      x: panel.current?.clientWidth / 2,
+      y: 5,
+      style: {
+        fontSize: "12px",
+        color: darkTheme && "white",
+      },
+    },
     xAxis: {
       categories: steps,
       labels: {
@@ -57,11 +67,24 @@ const RewardHistoryChart = ({ session }) => {
       enabled: false,
     },
     legend: {
+      align: "right",
+      verticalAlign: "top",
+      layout: "vertical",
       backgroundColor: "white",
+      x: -10,
+      y: 50,
+      floating: true,
+      itemStyle: {
+        fontWeight: "normal",
+        fontSize: "12px",
+      },
     },
     plotOptions: {
       series: {
-        pointWidth: 5,
+        pointWidth: 6,
+        marker: {
+          radius: 4,
+        },
         allowPointSelect: true,
         states: {
           hover: {
@@ -80,12 +103,12 @@ const RewardHistoryChart = ({ session }) => {
     series: [
       {
         type: "line",
-        name: "Cumulative Reward",
+        name: "Cumulative",
         data: cumulativeSum.map((i) => parseFloat(i.toFixed(3))),
       },
       {
         type: "column",
-        name: "Reward",
+        name: "Step",
         data: rewards,
       },
     ],

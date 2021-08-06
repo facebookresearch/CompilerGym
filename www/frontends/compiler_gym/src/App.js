@@ -12,8 +12,7 @@ import ApiContext from "./context/ApiContext";
 import ThemeContext from "./context/ThemeContext";
 import SplashPage from "./components/Pages/SplashPage";
 import MainNavbar from "./components/Navbars/MainNavbar";
-import PanelsContainer from "./components/PanelsContainer";
-import ControlsContainer from "./components/Sections/ControlsContainer";
+import PanelsContainer from "./components/Sections/PanelsContainer";
 import ObservationsContainer from "./components/Sections/ObservationsContainer";
 
 const api = new ApiService("http://127.0.0.1:5000");
@@ -37,7 +36,8 @@ function App() {
       try {
         const options = await api.getEnvOptions();
         const initSession = await api.startSession(
-          INITIAL_SETTINGS.reward,"-",
+          INITIAL_SETTINGS.reward,
+          "-",
           INITIAL_SETTINGS.benchmark
         );
         console.log(initSession);
@@ -72,17 +72,6 @@ function App() {
     );
   };
 
-  const submitStep = (stepIDs) => {
-    api.getSteps(session.session_id, stepIDs).then(
-      (result) => {
-        setSession({ ...session, states: [...session.states, ...result.states] });
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
-  };
-
   const toggleTheme = () => {
     setDarkTheme(!darkTheme);
   };
@@ -96,19 +85,15 @@ function App() {
           api: api,
           compilerGym: compilerGym,
           session: session,
-          setSession,
-          submitStep,
+          setSession
         }}
       >
         <ThemeContext.Provider value={{ darkTheme: darkTheme, toggleTheme }}>
           <Switch>
             <Route path="/:dataset?/:benchmark?/:reward?/:actions?">
               <div className="main-content">
-                <MainNavbar/>
-                <PanelsContainer
-                  left={<ControlsContainer/>}
-                  right={<ObservationsContainer/>}
-                />
+                <MainNavbar />
+                <PanelsContainer right={<ObservationsContainer />} />
               </div>
             </Route>
           </Switch>

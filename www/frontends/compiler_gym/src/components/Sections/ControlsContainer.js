@@ -7,7 +7,7 @@
 import React, { useState, useContext, useEffect } from "react";
 import { useParams, useHistory } from "react-router";
 import ApiContext from "../../context/ApiContext";
-import { makeTreeDataFromURL } from "../../utils/Helpers"
+import { makeSessionTreeData } from "../../utils/Helpers";
 import ActionsNavbar from "../Navbars/ActionsNavbar";
 import SearchTree from "./SearchTree";
 import RewardsSection from "./RewardsSection";
@@ -18,12 +18,19 @@ const ControlsContainer = () => {
   const history = useHistory();
 
   const [actionSpace, setActionSpace] = useState(30);
-  const [actionsList, setActionsList] = useState([]);
   const [treeData, setTreeData] = useState({});
   const [layer, setLayer] = useState(1);
   const [activeNode, setActiveNode] = useState("x");
   const [actionsTaken, setActionsTaken] = useState([]);
-  const [highlightedPoint, setHighlightedPoint] = useState({})
+  const [highlightedPoint, setHighlightedPoint] = useState({});
+
+  const children =
+    compilerGym.actions &&
+    Object.entries(compilerGym.actions).map(([name, action_id]) => ({
+      name,
+      action_id: action_id.toString(),
+      children: [],
+    }));
 
   /**
    * Check whether a set of actions is passed as params in the URL, if yes, updates the DOM
@@ -39,22 +46,16 @@ const ControlsContainer = () => {
         children: [],
       }));
     let urlIds = urlParams.actions?.split(",") || [];
-    let actionsTaken = urlIds.map((o,i) => `${o}.${i+1}`)
+    let actionsTaken = urlIds.map((o, i) => `${o}.${i + 1}`);
     let rewards = session.states?.map((i) => parseFloat(i.reward.toFixed(3)));
 
     if (urlIds.length > 0 && urlIds.length === rewards?.length - 1) {
-      setActionsList(children);
-      setTreeData(makeTreeDataFromURL(urlIds, children, rewards));
-      setLayer(urlIds.length+1)
-      setActionsTaken(actionsTaken)
-      setActiveNode(`${urlIds[urlIds.length - 1]}.${urlIds.length}`)
-    } else {
-      setActionsList(children);
-      setTreeData({
-        name: "root",
-        action_id: "x",
-        children: children?.slice(0, 30),
-      });
+      setTreeData(makeSessionTreeData(session.states, children));
+      setLayer(urlIds.length + 1);
+      setActionsTaken(actionsTaken);
+      setActiveNode(`${urlIds[urlIds.length - 1]}.${urlIds.length}`);
+    } else if (session.states) {
+      setTreeData(makeSessionTreeData(session.states, children));
     }
     return () => {};
   }, [compilerGym.actions, urlParams.actions, session.states]);
@@ -66,35 +67,21 @@ const ControlsContainer = () => {
    * @param {Array} actions array with ids of actions.
    * @param {String} newBenchmark Takes the benchamark to initialize a new session.
    */
-
   const startNewSession = (reward, actions, newBenchmark) => {
-    const children =
-      compilerGym.actions &&
-      Object.entries(compilerGym.actions).map(([name, action_id]) => ({
-        name,
-        action_id: action_id.toString(),
-        children: [],
-      }));
     history.push("/");
     api.closeSession(session.session_id).then(
       (res) => {
         api.startSession(reward, actions, newBenchmark).then(
           (result) => {
             setSession(result);
-            setTreeData({
-              name: "root",
-              action_id: "x",
-              children: children?.slice(0, 30),
-            });
-            setActionsList(children);
             setActionSpace(30);
-            setLayer(1);
-            setActionsTaken([]);
-            setActiveNode("x");
             if (actions !== "-" && actions.length) {
-              setActionsTaken(actions?.map((o,i) => `${o}.${i+1}`))
+              let actionsTaken = actions.map((o, i) => `${o}.${i + 1}`);
+              setActionsTaken(actionsTaken);
+              setActiveNode(actionsTaken[actionsTaken.length - 1]);
             } else {
-              setActionsTaken([])
+              setActionsTaken([]);
+              setActiveNode("x");
             }
           },
           (error) => {
@@ -109,53 +96,103 @@ const ControlsContainer = () => {
   };
 
   /**
-   * Recursive function to create new node + layer when user clicks on a node.
+   * This function invokes the API to take a step in the current session and update the tree.
    *
-   * @param {Array} arr Receives the children array in the root node.
-   * @param {String} actionID Receives the tree action_id of the node.
-   * @param {String} reward takes the reward from api call.
-   * @returns
+   * @param {Array} stepsIDs receives an array of action ids.
    */
-  const createNode = (arr, actionID, reward) => {
-    if (arr !== undefined) {
-      arr.forEach((i) => {
-        if (i.action_id === actionID) {
-          i.active = true;
-          i.reward = reward;
-          i.children = actionsList.slice(0, actionSpace).map((o) => {
-            return {
-              name: o.name,
-              action_id: `${o.action_id}.${layer + 1}`,
-              children: [],
-            };
-          });
-        } else {
-          createNode(i.children, actionID, reward);
-        }
+  const submitStep = async (stepsIDs) => {
+    try {
+      const response = await api.getSteps(session.session_id, stepsIDs);
+      setSession({
+        ...session,
+        states: [...session.states, ...response.states],
       });
-      return { name: "root", action_id: "x", children: arr };
+      setTreeData(
+        makeSessionTreeData([...session.states, ...response.states], children)
+      );
+    } catch (err) {
+      console.log(err);
     }
-    return;
   };
 
   /**
-   * Recursive function to delete a node in nested child object.
+   * This function invokes the API to undo a number of steps on the current session and update the tree.
    *
-   * @param {Array} arr Receives the children array in the root node.
-   * @param {String} actionID Receives the tree action_id of the node.
+   * @param {Number} n the number of steps to remove.
+   */
+  const undoStep = async (n) => {
+    let currentSteps = session.states;
+    try {
+      await api.undoStep(session.session_id, n);
+      setSession({ ...session, states: currentSteps.slice(0, -n) });
+      setTreeData(makeSessionTreeData(currentSteps.slice(0, -n), children));
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
+  /**
+   * This function makes two API calls to undo a number of actions and replay episode.
+   * when a node between root and last children is clicked in the tree.
+   *
+   * @param {Number} n the number of steps to remove.
+   * @param {Array} stepsIDs an array of action ids.
+   */
+  const replicateSteps = async (n, stepsIDs) => {
+    try {
+      await api.undoStep(session.session_id, n);
+      const response = await api.getSteps(session.session_id, stepsIDs);
+      setSession({
+        ...session,
+        states: [session.states[0], ...response.states],
+      });
+      setTreeData(
+        makeSessionTreeData([session.states[0], ...response.states], children)
+      );
+      setActionsTaken(stepsIDs.map((o, i) => `${o}.${i + 1}`));
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  /**
+   * The handleNodeClick is an asynchronous function and has three scenarios:
+   * 1. when a node has no children, and is part of the last children, it creates an array new children with unique id,
+   * 2. when a node is a sibling of the last parent component. Undo the last action.
+   * 3. when a node is between the root and the last children, it gets activated and switched its siblings off.
+   *
+   * @param {Object} nodeDatum object containg data of the node.
    * @returns
    */
-  const deleteNode = (arr, actionID) => {
-    if (arr !== undefined) {
-      arr.forEach((i) => {
-        if (i.action_id === actionID) {
-          i.active = false;
-          i.children = [];
-        } else {
-          deleteNode(i.children, actionID);
+  const handleNodeClick = async (nodeDatum) => {
+    let nodeActionID = nodeDatum.action_id.split(".")[0];
+    let nodeDepth = nodeDatum.__rd3t.depth;
+
+    if (nodeDatum !== undefined && nodeDepth !== 0) {
+      try {
+        // Verifies it is one of the last children.
+        if (nodeDepth === session.states.length) {
+          await submitStep([nodeActionID]);
+          setLayer(layer + 1);
+          setActiveNode(nodeDatum.action_id);
+          setActionsTaken([...actionsTaken, nodeDatum.action_id]);
+        } else if (nodeDepth === session.states.length - 1 && nodeDepth > 1) {
+          await undoStep(1);
+          setLayer(layer - 1);
+          setActiveNode(
+            actionsTaken.length > 1
+              ? actionsTaken[actionsTaken.length - 2]
+              : "x"
+          );
+          setActionsTaken(actionsTaken.slice(0, -1));
+        } else if (nodeDepth < session.states.length && nodeDepth > 0) {
+          let actions = actionsTaken.map((i) => i.split(".")[0]).slice(); // Get a copy of actionsTaken
+          actions.splice(nodeDepth - 1, 1, nodeActionID); // modify the array of actions adding the node clicked and replacing old node.
+          await replicateSteps(actionsTaken.length, actions);
         }
-      });
-      return { name: "root", action_id: "x", children: arr };
+      } catch (err) {
+        console.log(err);
+      }
     }
     return;
   };
@@ -170,13 +207,13 @@ const ControlsContainer = () => {
    */
   const updateNode = (tree, activeNode, limit) => {
     if (tree.action_id === activeNode) {
-      return { ...tree, children: actionsList.slice(0, limit) };
+      return { ...tree, children: children.slice(0, limit) };
     }
     if (tree.children !== undefined) {
       tree.children.forEach((i) => {
         if (i.action_id === activeNode) {
           i.active = true;
-          i.children = actionsList.slice(0, limit).map((o) => {
+          i.children = children.slice(0, limit).map((o) => {
             return {
               name: o.name,
               action_id: `${o.action_id}.${layer}`,
@@ -192,77 +229,6 @@ const ControlsContainer = () => {
     return;
   };
 
-  const submitStep = async (stepID) => {
-    try {
-      const response = await api.getSteps(session.session_id, stepID);
-      setSession({
-        ...session,
-        states: [...session.states, ...response.states],
-      });
-      const stepReward = response.states[0].reward.toFixed(3);
-      return stepReward;
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  const undoStep = async (n) => {
-    let currentSteps = session.states;
-    try {
-      const result = await api.undoStep(session.session_id, n);
-      let actionToUndo = currentSteps.indexOf(result);
-      currentSteps.splice(actionToUndo, 1);
-      setSession({ ...session, states: currentSteps });
-    } catch (err) {
-      console.log(err);
-    }
-  };
-
-  /**
-   * The handleNodeClick is an asynchronous function and has two scenarios:
-   * 1. when a node has no children, adds the node as activeNode it creates an array of children with unique id,
-   *    the action id + the depth e.g. 12.2, in which 12 represents the action ID and 2 represents the layer.
-   * 2. when a node has children, it removes its children and updates the activeNode to the previous node.
-   */
-
-  const handleNodeClick = async (nodeDatum) => {
-    let nodeActionID = nodeDatum.action_id.split(".")[0];
-    let nodeDepth = nodeDatum.__rd3t.depth;
-
-    if (nodeDatum !== undefined && nodeDepth !== 0) {
-      try {
-        if (nodeDepth === layer) {
-          let reward = await submitStep(nodeActionID);
-          setLayer(layer + 1);
-          setActiveNode(nodeDatum.action_id);
-          setActionsTaken([...actionsTaken, nodeDatum.action_id]);
-
-          setTreeData(
-            createNode(treeData.children, nodeDatum.action_id, reward)
-          );
-        } else if (
-          nodeDepth === layer - 1 &&
-          actionsTaken.includes(nodeDatum.action_id)
-        ) {
-          undoStep(1);
-          setLayer(layer - 1);
-          setActiveNode(
-            actionsTaken.length > 1
-              ? actionsTaken[actionsTaken.length - 2]
-              : "x"
-          );
-          setActionsTaken((prev) =>
-            prev.filter((i) => i !== nodeDatum.action_id)
-          );
-          setTreeData(deleteNode(treeData.children, nodeDatum.action_id));
-        }
-      } catch (err) {
-        console.log(err);
-      }
-    }
-    return;
-  };
-
   const handleActionSpace = (e) => {
     setActionSpace(e);
     setTreeData(updateNode(treeData, activeNode, e));
@@ -270,15 +236,15 @@ const ControlsContainer = () => {
 
   const handleMouseOverTree = (nodeData) => {
     if (nodeData.active) {
-      setHighlightedPoint({point: nodeData.__rd3t.depth, selected: true})
+      setHighlightedPoint({ point: nodeData.__rd3t.depth, selected: true });
     }
-  }
+  };
 
   const handleMouseOutTree = (nodeData) => {
     if (nodeData.active) {
-      setHighlightedPoint({point: nodeData.__rd3t.depth, selected: false})
+      setHighlightedPoint({ point: nodeData.__rd3t.depth, selected: false });
     }
-  }
+  };
 
   return (
     <div>
@@ -297,10 +263,7 @@ const ControlsContainer = () => {
         handleMouseOverTree={handleMouseOverTree}
         handleMouseOutTree={handleMouseOutTree}
       />
-      <RewardsSection
-        session={session}
-        highlightedPoint={highlightedPoint}
-      />
+      <RewardsSection session={session} highlightedPoint={highlightedPoint} />
     </div>
   );
 };

@@ -6,12 +6,11 @@
 
 import React, { useState, useEffect } from "react";
 import { Row, FormControl, Col } from "react-bootstrap";
-import ActionsHeatMap from "./ActionsHeatMap";
 import RewardHistoryChart from "./RewardHistoryChart";
 
 const RewardsSection = ({ session, highlightedPoint }) => {
   const [cumulativeSum, setCumulativeSum] = useState("");
-  const [toggle, setToggle] = useState(false)
+  const [toggle, setToggle] = useState(false);
 
   useEffect(() => {
     let rewards = session.states?.map((i) => parseFloat(i.reward.toFixed(3)));
@@ -23,32 +22,32 @@ const RewardsSection = ({ session, highlightedPoint }) => {
     <>
       <div className="row-cumulative-reward">
         <Row className="align-items-center">
-          <Col lg={10} md={10} xs={10}>
-            <FormControl
-              aria-describedby="basic-addon1"
-              size="sm"
-              type="text"
-              readOnly
-              value={`Cumulative Reward: ${
-                cumulativeSum && cumulativeSum.toFixed(3)
-              }`}
-            />
-          </Col>
-          <Col lg={2} md={2} xs={2} className="ml-0">
+          <Col lg={2} md={2} xs={2} className="ml-0 mt-1">
             <div className="switch_box box_1">
               <input
                 type="checkbox"
                 className="switch_1"
                 checked={toggle}
-                onChange={()=> setToggle(!toggle)}
+                onChange={() => setToggle(!toggle)}
               />
             </div>
           </Col>
+          {toggle && (
+            <Col lg={10} md={10} xs={10}>
+              <FormControl
+                aria-describedby="basic-addon1"
+                size="sm"
+                type="text"
+                readOnly
+                value={`Cumulative Reward: ${
+                  cumulativeSum && cumulativeSum.toFixed(3)
+                }`}
+              />
+            </Col>
+          )}
         </Row>
       </div>
-      { toggle
-        ? <ActionsHeatMap session={session} highlightedPoint={highlightedPoint}/>
-        : <RewardHistoryChart session={session} /> }
+      <RewardHistoryChart session={session} />
     </>
   );
 };

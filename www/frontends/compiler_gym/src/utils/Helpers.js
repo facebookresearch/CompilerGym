@@ -4,28 +4,48 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-function isEmpty(obj) {
-  return Object.keys(obj).length === 0;
-}
 
 /**
- * A function to build a hierarchical data structure object based on a flat array of action ids.
+ * Function to filter an array of objects with same name.
+ * @param {Array} list an array of objects.
+ * @returns
+ */
+const getUniqueValues = (list) => {
+  return [...new Map(list.map((item) => [item.name, item])).values()];
+};
+
+const isEmpty = (obj) => {
+  return Object.keys(obj).length === 0;
+};
+
+/**
+ * A function to build a hierarchical data structure object based on a flat array session states.
  *
- * @param {Array} ids represents the ids of actions with an specific order.
+ * @param {Array} states represents array of states in current CompilerGym session.
  * @param {Array} children a constant children array of objects containing data for each action.
- * @param {Array} rewards takes an array with the reward value on each step.
  * @returns an object with hierarchical structure to be display in a seacrh tree.
  */
+export const makeSessionTreeData = (states, children) => {
+  if (states.length >= 2) {
+    const last_observation = states[states.length - 1];
+    const ids = getCommandLineArray(last_observation.commandline, children);
+    const rewards = states.map((a) => a.reward).slice(1, states.length); // All rewards except the initial 0.
 
-export const makeTreeDataFromURL = (ids, children, rewards) => {
-  if (ids.length && children !== undefined) {
-    let actionsData = ids.map((i) => children.find((e) => e.action_id === i));
+    let actionsData = ids
+      .map((i) => children.find((e) => e.action_id === i))
+      .map((i, index) => ({
+        ...i,
+        children: children
+          .slice(0, 30)
+          .map((o) => ({ ...o, action_id: `${o.action_id}.${index + 2}` })),
+      })); // Adds children to parents to display as options in the tree.
+
     let nestedChildren = actionsData?.reduceRight(
-      (value, key, i) => ({
-        name: key.name,
-        action_id: `${key.action_id}.${i + 1}`,
+      (value, current, i) => ({
+        name: current.name,
+        action_id: `${current.action_id}.${i + 1}`,
         active: true,
-        reward: rewards.slice(1, rewards.length)[i], // All rewards except the first value.
+        reward: rewards[i].toFixed(3),
         children: isEmpty({ ...value })
           ? children.slice(0, 30).map((o) => {
               return {
@@ -34,21 +54,22 @@ export const makeTreeDataFromURL = (ids, children, rewards) => {
                 children: [],
               };
             })
-          : [{ ...value }],
+          : getUniqueValues([...current.children, { ...value }]),
       }),
-      0
+      {}
     );
+
     const treeData = {
       name: "root",
       action_id: "x",
-      children: [nestedChildren],
+      children: getUniqueValues([...children.slice(0, 30), nestedChildren]),
     };
     return treeData;
   }
   return {
     name: "root",
     action_id: "x",
-    children: [{ name: "tempRoot", action_id: "x", children: [] }],
+    children: children.slice(0, 30),
   };
 };
 
@@ -60,15 +81,17 @@ export const makeTreeDataFromURL = (ids, children, rewards) => {
  * @returns
  */
 export const getCommandLineArray = (commandLine, actionsList) => {
-  const clArray = commandLine.split(" input.bc -o output.bc")[0].split(" ");
-  let actionNames = clArray.slice(1, clArray.length); // All actions except the 'opt' command.
-  let temp = [];
-  actionNames.forEach((i) => {
-    actionsList.forEach((o) => {
-      if (o.name === i) {
-        temp.push(o.action_id);
-      }
+  if (commandLine !== undefined) {
+    const clArray = commandLine.split(" input.bc -o output.bc")[0].split(" ");
+    let actionNames = clArray.slice(1, clArray.length); // All actions except the 'opt' command.
+    let temp = [];
+    actionNames.forEach((i) => {
+      actionsList.forEach((o) => {
+        if (o.name === i) {
+          temp.push(o.action_id);
+        }
+      });
     });
-  });
-  return temp;
+    return temp;
+  }
 };

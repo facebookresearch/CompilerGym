@@ -10,6 +10,18 @@
   height: auto;
 }
 
+@media (min-width: 576px)  {
+  .chart-container {
+      min-width: 650px;
+  }
+}
+
+@media (max-width: 576px)  {
+  .chart-container {
+      min-width: 650px;
+  }
+}
+
 .chart-dark-mode {
   .highcharts-container {
     position: relative;
@@ -50,4 +62,9 @@
 	border: 1px solid #EBEBEB;
 	margin: 5px auto;
 	text-align: center;
+}
+
+.highcharts-title {
+  fill: #434348;
+  font-family: Menlo, sans-serif;
 }
