@@ -65,6 +65,7 @@ const CustomMenu = forwardRef(
  * @param {String} actionSpace a discrete space of actions to be exposed.
  * @param {Array} actionsTaken an array of ids representing the actions selected from the tree.
  * @param {function} handleActionSpace function to update the action space.
+ * @param {function} handleResetActionsTracker updates the actions tracker state.
  * @returns
  */
 const ActionsNavbar = ({
@@ -72,6 +73,7 @@ const ActionsNavbar = ({
   actionSpace,
   actionsTaken,
   handleActionSpace,
+  handleResetActionsTracker,
 }) => {
   const { darkTheme } = useContext(ThemeContext);
   const { compilerGym, session, api, setSession } = useContext(ApiContext);
@@ -102,11 +104,12 @@ const ActionsNavbar = ({
       action_id: action_id.toString(),
     }));
 
+  // Action space as a number to show in the dropdown menu.
   const actionSpaceOptions =
     compilerGym.actions &&
-    Object.keys(compilerGym.actions).map((x, i) => i + 1); // Action space as a number to show in the dropdown menu.
+    Object.keys(compilerGym.actions).map((x, i) => i + 1);
 
-  const actionsIdsTaken = actionsTaken.map((i) => i.split(".")[0]); // Only keep the action ids, not the depth id
+  const actionsIdsTaken = actionsTaken?.map((i) => i.split(".")[0]); // Only keep the action ids, not the depth id
 
   /**
    * Must run once when the component is first rendered to populate the dataset uri dropdown.
@@ -121,7 +124,6 @@ const ActionsNavbar = ({
 
   /*
    * Start a new session when component mounts in the browser with URL params.
-   *
    */
   useEffect(() => {
     const fetchData = async () => {
@@ -157,6 +159,7 @@ const ActionsNavbar = ({
     return () => {};
   }, [api, session.session_id, setSession]); // eslint-disable-line react-hooks/exhaustive-deps
 
+  // Rerender the command line on every change in the current state of session.
   useEffect(() => {
     let lastState = session.states?.[session.states?.length - 1];
     setActionsLine(lastState?.commandline);
@@ -206,11 +209,16 @@ const ActionsNavbar = ({
     history.replace({ ...location, search: searchParams.toString() });
   };
 
+  // Append current url params into a string to generata a link.
   const getShareLink = () => {
     let shareLink = `http://localhost:3000/${location.search}`;
     return shareLink;
   };
 
+  /**
+   * Run a set of actions when clicking on the comand line text input.
+   * @param {*} e listens to an event on keyPress.
+   */
   const runCommandLine = async (e) => {
     if (e.key === "Enter") {
       try {
@@ -231,11 +239,13 @@ const ActionsNavbar = ({
     }
   };
 
+  // Close warning popup and start a new session.
   const handleWarningAlert = async () => {
     try {
       setShowWarning(false);
-      history.push("/");
+      history.replace("/");
       await api.startSession(reward, "-", `${dataset}/${datasetUri}`);
+      handleResetActionsTracker();
     } catch (error) {
       console.log(error);
     }

@@ -20,10 +20,12 @@ const ControlsContainer = () => {
 
   const [actionSpace, setActionSpace] = useState(30);
   const [treeData, setTreeData] = useState({});
-  const [layer, setLayer] = useState(1);
-  const [activeNode, setActiveNode] = useState("x");
-  const [actionsTaken, setActionsTaken] = useState([]);
   const [highlightedPoint, setHighlightedPoint] = useState({});
+  const [actionsTracker, setActionsTracker] = useState({
+    activeNode: "x",
+    actionsTaken: [],
+    layer: 1,
+  });
 
   const children =
     compilerGym.actions &&
@@ -44,9 +46,11 @@ const ControlsContainer = () => {
 
     if (urlIds.length && session.states) {
       setTreeData(makeSessionTreeData(session.states, children));
-      setLayer(urlIds.length + 1);
-      setActionsTaken(actionsTaken);
-      setActiveNode(`${urlIds[urlIds.length - 1]}.${urlIds.length}`);
+      setActionsTracker({
+        activeNode: `${urlIds[urlIds.length - 1]}.${urlIds.length}`,
+        actionsTaken: actionsTaken,
+        layer: urlIds.length + 1,
+      });
     } else if (session.states) {
       setTreeData(makeSessionTreeData(session.states, children));
     }
@@ -69,11 +73,17 @@ const ControlsContainer = () => {
             setActionSpace(30);
             if (actions !== "-" && actions.length) {
               let actionsTaken = actions.map((o, i) => `${o}.${i + 1}`);
-              setActionsTaken(actionsTaken);
-              setActiveNode(actionsTaken[actionsTaken.length - 1]);
+              setActionsTracker({
+                activeNode: actionsTaken[actionsTaken.length - 1],
+                actionsTaken: actionsTaken,
+                layer: actionsTaken.length + 1,
+              });
             } else {
-              setActionsTaken([]);
-              setActiveNode("x");
+              setActionsTracker({
+                activeNode: "x",
+                actionsTaken: [],
+                layer: 1,
+              });
             }
           },
           (error) => {
@@ -94,7 +104,9 @@ const ControlsContainer = () => {
    * @param {Array} stepsIDs receives an array of action ids.
    */
   const submitStep = async (stepID) => {
-    let urlActions = actionsTaken.map((i) => i.split(".")[0]).join(",");
+    let urlActions = actionsTracker.actionsTaken
+      .map((i) => i.split(".")[0])
+      .join(",");
     try {
       const response = await api.getSteps(session.session_id, stepID);
       setSession({
@@ -112,7 +124,7 @@ const ControlsContainer = () => {
   };
 
   /**
-   * This function invokes the API to undo a number of steps on the current session and update the tree.
+   * Invokes the API to undo a number of steps on the current session and update the tree.
    *
    * @param {Number} n the number of steps to remove.
    */
@@ -129,13 +141,14 @@ const ControlsContainer = () => {
 
   /**
    * A function that makes two API calls to undo a number of actions and replay episode.
-   * when a node between root and last children is clicked in the tree.
+   * when a node between the root and last children is clicked in the tree.
    * It also updates the url parameters to keep the state of current session.
    *
    * @param {Number} n the number of steps to remove.
    * @param {Array} stepsIDs an array of action ids.
    */
   const replicateSteps = async (n, stepsIDs) => {
+    let newActionsTaken = stepsIDs.map((o, i) => `${o}.${i + 1}`);
     try {
       await api.undoStep(session.session_id, n);
       const response = await api.getSteps(session.session_id, stepsIDs);
@@ -146,7 +159,12 @@ const ControlsContainer = () => {
       setTreeData(
         makeSessionTreeData([session.states[0], ...response.states], children)
       );
-      setActionsTaken(stepsIDs.map((o, i) => `${o}.${i + 1}`));
+      setActionsTracker({
+        ...actionsTracker,
+        activeNode: newActionsTaken[newActionsTaken.length - 1],
+        actionsTaken: newActionsTaken,
+        layer: newActionsTaken.length + 1,
+      });
       searchParams.set("actions", stepsIDs.join(","));
       history.replace({ ...location, search: searchParams.toString() });
     } catch (error) {
@@ -172,22 +190,33 @@ const ControlsContainer = () => {
         // Verifies it is one of the last children.
         if (nodeDepth === session.states.length) {
           await submitStep(nodeActionID);
-          setLayer(layer + 1);
-          setActiveNode(nodeDatum.action_id);
-          setActionsTaken([...actionsTaken, nodeDatum.action_id]);
+          setActionsTracker({
+            activeNode: nodeDatum.action_id,
+            actionsTaken: [...actionsTracker.actionsTaken, nodeDatum.action_id],
+            layer: actionsTracker.layer + 1,
+          });
         } else if (nodeDepth === session.states.length - 1 && nodeDepth > 1) {
           await undoStep(1);
-          setLayer(layer - 1);
-          setActiveNode(
-            actionsTaken.length > 1
-              ? actionsTaken[actionsTaken.length - 2]
-              : "x"
-          );
-          setActionsTaken(actionsTaken.slice(0, -1));
+          setActionsTracker({
+            activeNode:
+              actionsTracker.actionsTaken.length > 1
+                ? actionsTracker.actionsTaken[
+                    actionsTracker.actionsTaken.length - 2
+                  ]
+                : "x",
+            actionsTaken: actionsTracker.actionsTaken.slice(0, -1),
+            layer: actionsTracker.layer - 1,
+          });
         } else if (nodeDepth < session.states.length && nodeDepth > 0) {
-          let actions = actionsTaken.map((i) => i.split(".")[0]).slice(); // get a copy of actionsTaken
-          actions.splice(nodeDepth - 1, 1, nodeActionID); // modify the array of actions adding the node clicked and replacing old node.
-          await replicateSteps(actionsTaken.length, actions);
+          let actions = actionsTracker.actionsTaken
+            .map((i) => i.split(".")[0])
+            .slice(); // get a copy of actionsTaken
+          actions.splice(
+            nodeDepth - 1,
+            actions.length - nodeDepth + 1,
+            nodeActionID
+          ); // modify the array of actions adding the node clicked and removing ones on the right side.
+          await replicateSteps(actionsTracker.actionsTaken.length, actions);
         } else {
           return;
         }
@@ -217,7 +246,7 @@ const ControlsContainer = () => {
           i.children = children.slice(0, limit).map((o) => {
             return {
               name: o.name,
-              action_id: `${o.action_id}.${layer}`,
+              action_id: `${o.action_id}.${actionsTracker.layer}`,
               children: [],
             };
           });
@@ -232,7 +261,11 @@ const ControlsContainer = () => {
 
   const handleActionSpace = (e) => {
     setActionSpace(e);
-    setTreeData(updateNode(treeData, activeNode, e));
+    setTreeData(updateNode(treeData, actionsTracker.activeNode, e));
+  };
+
+  const handleResetActionsTracker = () => {
+    setActionsTracker({ activeNode: "x", actionsTaken: [], layer: 1 });
   };
 
   const handleMouseOverTree = (nodeData) => {
@@ -251,14 +284,15 @@ const ControlsContainer = () => {
     <div>
       <ActionsNavbar
         actionSpace={actionSpace}
-        actionsTaken={actionsTaken}
+        actionsTaken={actionsTracker.actionsTaken}
         startSession={startNewSession}
         handleActionSpace={handleActionSpace}
+        handleResetActionsTracker={handleResetActionsTracker}
       />
       <SearchTree
         actionSpace={actionSpace}
         treeData={treeData}
-        layer={layer}
+        layer={actionsTracker.layer}
         handleNodeClick={handleNodeClick}
         handleMouseOverTree={handleMouseOverTree}
         handleMouseOutTree={handleMouseOutTree}

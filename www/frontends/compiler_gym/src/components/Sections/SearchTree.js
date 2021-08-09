@@ -25,7 +25,7 @@ const renderSvgNode = ({
   handleMouseOutTree,
   layer,
 }) => {
-  const foreignObjectProps = { width: 125, height: 200, x: 20, y: 10 };
+  const foreignObjectProps = { width: 122, height: 200, x: 20, y: 10 };
 
   return (
     <g>
@@ -53,7 +53,8 @@ const renderSvgNode = ({
           <div className="active-node-info">
             {nodeDatum.children && (
               <h5>
-                <span className="text-weight">Reward:</span> {nodeDatum.reward}
+                <span className="text-weight">Reward:</span> {nodeDatum.reward}<br/>
+                {nodeDatum.__rd3t.depth}
               </h5>
             )}
           </div>
