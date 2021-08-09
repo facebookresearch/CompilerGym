@@ -4,6 +4,14 @@
  * LICENSE file in the root directory of this source tree.
  */
 
+/**
+ * An utility function to test for an empty object.
+ * @param {Object} obj
+ * @returns {Boolean}
+ */
+const isEmpty = (obj) => {
+  return Object.keys(obj).length === 0;
+};
 
 /**
  * Function to filter an array of objects with same name.
@@ -14,12 +22,9 @@ const getUniqueValues = (list) => {
   return [...new Map(list.map((item) => [item.name, item])).values()];
 };
 
-const isEmpty = (obj) => {
-  return Object.keys(obj).length === 0;
-};
-
 /**
  * A function to build a hierarchical data structure object based on a flat array session states.
+ * It builds an nested object.
  *
  * @param {Array} states represents array of states in current CompilerGym session.
  * @param {Array} children a constant children array of objects containing data for each action.
@@ -74,16 +79,16 @@ export const makeSessionTreeData = (states, children) => {
 };
 
 /**
- * Takes a string and convert it into an array of actions.
+ * Takes a string representing a command line and convert it into an array of actionsIds.
  *
  * @param {String} commandLine the input as command line.
- * @param {Array} actionsList array of objects containing the name and id of each action.
+ * @param {Array} actionsList an array of objects containing the name and id of each CompilerGym action.
  * @returns
  */
 export const getCommandLineArray = (commandLine, actionsList) => {
   if (commandLine !== undefined) {
     const clArray = commandLine.split(" input.bc -o output.bc")[0].split(" ");
-    let actionNames = clArray.slice(1, clArray.length); // All actions except the 'opt' command.
+    let actionNames = clArray.slice(1, clArray.length); // All actions except the 'opt' command string.
     let temp = [];
     actionNames.forEach((i) => {
       actionsList.forEach((o) => {
@@ -94,4 +99,5 @@ export const getCommandLineArray = (commandLine, actionsList) => {
     });
     return temp;
   }
+  return;
 };

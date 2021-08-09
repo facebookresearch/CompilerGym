@@ -42,7 +42,7 @@ const RewardHistoryChart = ({ session }) => {
       floating: true,
       align: "left",
       x: panel.current?.clientWidth / 2,
-      y: 5,
+      y: -1,
       style: {
         fontSize: "12px",
         color: darkTheme && "white",

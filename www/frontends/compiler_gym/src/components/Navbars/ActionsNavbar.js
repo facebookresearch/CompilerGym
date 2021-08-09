@@ -6,6 +6,7 @@
 
 import React, { useState, useEffect, useContext, forwardRef } from "react";
 import classnames from "classnames";
+import { useHistory, useLocation } from "react-router";
 import {
   Form,
   FormControl,
@@ -14,7 +15,7 @@ import {
   InputGroup,
   Dropdown,
   Alert,
-  Button
+  Button,
 } from "react-bootstrap";
 import ApiContext from "../../context/ApiContext";
 import ThemeContext from "../../context/ThemeContext";
@@ -64,7 +65,6 @@ const CustomMenu = forwardRef(
  * @param {String} actionSpace a discrete space of actions to be exposed.
  * @param {Array} actionsTaken an array of ids representing the actions selected from the tree.
  * @param {function} handleActionSpace function to update the action space.
- * @param {Object} urlParams
  * @returns
  */
 const ActionsNavbar = ({
@@ -72,10 +72,13 @@ const ActionsNavbar = ({
   actionSpace,
   actionsTaken,
   handleActionSpace,
-  urlParams,
 }) => {
   const { darkTheme } = useContext(ThemeContext);
   const { compilerGym, session, api, setSession } = useContext(ApiContext);
+
+  const history = useHistory();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
 
   const [actionsLine, setActionsLine] = useState("");
   const [dataset, setDataset] = useState("benchmark://cbench-v1");
@@ -83,7 +86,7 @@ const ActionsNavbar = ({
   const [datasetUri, setDatasetUri] = useState("");
   const [reward, setReward] = useState("IrInstructionCountOz");
   const [showWarning, setShowWarning] = useState(false);
-  const [showModal, setModal] = useState(false)
+  const [showModal, setModal] = useState(false);
 
   const benchmarkOptions =
     compilerGym.benchmarks &&
@@ -101,53 +104,13 @@ const ActionsNavbar = ({
 
   const actionSpaceOptions =
     compilerGym.actions &&
-    Object.keys(compilerGym.actions).map((x, i) => i + 1);  // Action space as a number to show in the dropdown menu.
+    Object.keys(compilerGym.actions).map((x, i) => i + 1); // Action space as a number to show in the dropdown menu.
 
   const actionsIdsTaken = actionsTaken.map((i) => i.split(".")[0]); // Only keep the action ids, not the depth id
 
-  /*
-   * Start a new session when component mounts in the browser with URL params.
-   *
+  /**
+   * Must run once when the component is first rendered to populate the dataset uri dropdown.
    */
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        await api.closeSession(session.session_id);
-        const initSession = await api.startSession(
-          urlParams.reward,
-          urlParams.actions,
-          `${decodeURIComponent(urlParams.dataset)}/${decodeURIComponent(
-            urlParams.benchmark
-          )}`
-        );
-        console.log(initSession);
-        setSession(initSession);
-        setDataset(decodeURIComponent(urlParams.dataset));
-        setDatasetUri(decodeURIComponent(urlParams.benchmark));
-        setReward(urlParams.reward);
-      } catch (err) {
-        setShowWarning(true);
-      }
-    };
-    if (
-      urlParams.reward &&
-      urlParams.dataset &&
-      session.session_id !== undefined
-    ) {
-      fetchData();
-    }
-
-    return () => {};
-  }, [
-    api,
-    session.session_id,
-    setSession,
-    urlParams.reward,
-    urlParams.actions,
-    urlParams.dataset,
-    urlParams.benchmark,
-  ]);
-
   useEffect(() => {
     let selected =
       benchmarkOptions && benchmarkOptions.find((o) => o.dataset === dataset);
@@ -155,6 +118,44 @@ const ActionsNavbar = ({
     setDatasetUri(selected?.uri[0]);
     return () => {};
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /*
+   * Start a new session when component mounts in the browser with URL params.
+   *
+   */
+  useEffect(() => {
+    const fetchData = async () => {
+      let selected = benchmarkOptions.find(
+        (o) => o.dataset === searchParams.get("dataset")
+      );
+      try {
+        await api.closeSession(session.session_id);
+        const initSession = await api.startSession(
+          searchParams.get("reward"),
+          searchParams.get("actions") ?? "-",
+          `${searchParams.get("dataset")}/${searchParams.get("dataset_uri")}`
+        );
+        console.log(initSession);
+        setSession(initSession);
+        setDataset(searchParams.get("dataset"));
+        setDatasetUri(searchParams.get("dataset_uri"));
+        setReward(searchParams.get("reward"));
+        setUriOptions(selected?.uri);
+      } catch (err) {
+        setShowWarning(true);
+      }
+    };
+    if (
+      searchParams.get("reward") &&
+      searchParams.get("dataset") &&
+      searchParams.get("dataset_uri") &&
+      session.session_id !== undefined
+    ) {
+      fetchData();
+    }
+
+    return () => {};
+  }, [api, session.session_id, setSession]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     let lastState = session.states?.[session.states?.length - 1];
@@ -173,6 +174,10 @@ const ActionsNavbar = ({
       actionsIdsTaken.length ? actionsIdsTaken : "-",
       `${e}/${selected?.uri[0]}`
     );
+    searchParams.set("dataset", e);
+    searchParams.set("dataset_uri", selected?.uri[0]);
+    searchParams.set("reward", reward);
+    history.replace({ ...location, search: searchParams.toString() });
   };
 
   const handleDatasetUri = (e) => {
@@ -182,6 +187,10 @@ const ActionsNavbar = ({
       actionsIdsTaken.length ? actionsIdsTaken : "-",
       `${dataset}/${e}`
     );
+    searchParams.set("dataset", dataset);
+    searchParams.set("dataset_uri", e);
+    searchParams.set("reward", reward);
+    history.replace({ ...location, search: searchParams.toString() });
   };
 
   const handleRewardSelect = (e) => {
@@ -191,13 +200,14 @@ const ActionsNavbar = ({
       actionsIdsTaken.length ? actionsIdsTaken : "-",
       `${dataset}/${datasetUri}`
     );
+    searchParams.set("dataset", dataset);
+    searchParams.set("dataset_uri", datasetUri);
+    searchParams.set("reward", e);
+    history.replace({ ...location, search: searchParams.toString() });
   };
 
   const getShareLink = () => {
-    const dataSetEncoded = encodeURIComponent(dataset);
-    const uriEncoded = encodeURIComponent(datasetUri);
-    let actions = actionsTaken.map((i) => i.split(".")[0]).join(",") || "-"; // Only keep the action ids, not the depth id in the string.
-    let shareLink = `http://localhost:3000/${dataSetEncoded}/${uriEncoded}/${reward}/${actions}`;
+    let shareLink = `http://localhost:3000/${location.search}`;
     return shareLink;
   };
 
@@ -210,9 +220,24 @@ const ActionsNavbar = ({
           actionsTaken.length ? actionsTaken : "-",
           `${dataset}/${datasetUri}`
         );
+        searchParams.set("dataset", dataset);
+        searchParams.set("dataset_uri", datasetUri);
+        searchParams.set("reward", reward);
+        searchParams.set("actions", actionsTaken.join(","));
+        history.replace({ ...location, search: searchParams.toString() });
       } catch (error) {
         console.log(error);
       }
+    }
+  };
+
+  const handleWarningAlert = async () => {
+    try {
+      setShowWarning(false);
+      history.push("/");
+      await api.startSession(reward, "-", `${dataset}/${datasetUri}`);
+    } catch (error) {
+      console.log(error);
     }
   };
 
@@ -383,8 +408,8 @@ const ActionsNavbar = ({
         <Alert
           variant="danger"
           className="mt-2"
-          onClose={() => setShowWarning(false)}
           dismissible
+          onClose={handleWarningAlert}
         >
           <Alert.Heading>
             <span className="text-weight">Oh snap!</span> You got an error, this

@@ -11,9 +11,7 @@ import ApiService from "./api/ApiService";
 import ApiContext from "./context/ApiContext";
 import ThemeContext from "./context/ThemeContext";
 import SplashPage from "./components/Pages/SplashPage";
-import MainNavbar from "./components/Navbars/MainNavbar";
-import PanelsContainer from "./components/Sections/PanelsContainer";
-import ObservationsContainer from "./components/Sections/ObservationsContainer";
+import MainPage from "./components/Pages/MainPage";
 
 const api = new ApiService("http://127.0.0.1:5000");
 const INITIAL_SETTINGS = {
@@ -90,11 +88,8 @@ function App() {
       >
         <ThemeContext.Provider value={{ darkTheme: darkTheme, toggleTheme }}>
           <Switch>
-            <Route path="/:dataset?/:benchmark?/:reward?/:actions?">
-              <div className="main-content">
-                <MainNavbar />
-                <PanelsContainer right={<ObservationsContainer />} />
-              </div>
+            <Route path="/:session?">
+              <MainPage/>
             </Route>
           </Switch>
         </ThemeContext.Provider>

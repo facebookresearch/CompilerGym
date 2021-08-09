@@ -5,7 +5,7 @@
  */
 
 import React, { useState, useContext, useEffect } from "react";
-import { useParams, useHistory } from "react-router";
+import { useHistory, useLocation } from "react-router";
 import ApiContext from "../../context/ApiContext";
 import { makeSessionTreeData } from "../../utils/Helpers";
 import ActionsNavbar from "../Navbars/ActionsNavbar";
@@ -14,8 +14,9 @@ import RewardsSection from "./RewardsSection";
 
 const ControlsContainer = () => {
   const { compilerGym, session, api, setSession } = useContext(ApiContext);
-  const urlParams = useParams();
   const history = useHistory();
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
 
   const [actionSpace, setActionSpace] = useState(30);
   const [treeData, setTreeData] = useState({});
@@ -35,21 +36,13 @@ const ControlsContainer = () => {
   /**
    * Check whether a set of actions is passed as params in the URL, if yes, updates the DOM
    * to render a search tree with a specific state. Otherwise, renders a clean tree with only
-   * one level depth and one set of children.
+   * one level depth and one set of children and root as active node.
    */
   useEffect(() => {
-    let children =
-      compilerGym.actions &&
-      Object.entries(compilerGym.actions).map(([name, action_id]) => ({
-        name,
-        action_id: action_id.toString(),
-        children: [],
-      }));
-    let urlIds = urlParams.actions?.split(",") || [];
+    let urlIds = searchParams.get("actions")?.split(",") ?? [];
     let actionsTaken = urlIds.map((o, i) => `${o}.${i + 1}`);
-    let rewards = session.states?.map((i) => parseFloat(i.reward.toFixed(3)));
 
-    if (urlIds.length > 0 && urlIds.length === rewards?.length - 1) {
+    if (urlIds.length && session.states) {
       setTreeData(makeSessionTreeData(session.states, children));
       setLayer(urlIds.length + 1);
       setActionsTaken(actionsTaken);
@@ -58,7 +51,7 @@ const ControlsContainer = () => {
       setTreeData(makeSessionTreeData(session.states, children));
     }
     return () => {};
-  }, [compilerGym.actions, urlParams.actions, session.states]);
+  }, [session.states]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /**
    * This functions makes an API call to close current session and start a new session with new parameters
@@ -68,7 +61,6 @@ const ControlsContainer = () => {
    * @param {String} newBenchmark Takes the benchamark to initialize a new session.
    */
   const startNewSession = (reward, actions, newBenchmark) => {
-    history.push("/");
     api.closeSession(session.session_id).then(
       (res) => {
         api.startSession(reward, actions, newBenchmark).then(
@@ -97,12 +89,14 @@ const ControlsContainer = () => {
 
   /**
    * This function invokes the API to take a step in the current session and update the tree.
+   * It also updates the url parameters to keep the state of current session.
    *
    * @param {Array} stepsIDs receives an array of action ids.
    */
-  const submitStep = async (stepsIDs) => {
+  const submitStep = async (stepID) => {
+    let urlActions = actionsTaken.map((i) => i.split(".")[0]).join(",");
     try {
-      const response = await api.getSteps(session.session_id, stepsIDs);
+      const response = await api.getSteps(session.session_id, stepID);
       setSession({
         ...session,
         states: [...session.states, ...response.states],
@@ -110,6 +104,8 @@ const ControlsContainer = () => {
       setTreeData(
         makeSessionTreeData([...session.states, ...response.states], children)
       );
+      searchParams.set("actions", `${urlActions},${stepID}`);
+      history.replace({ ...location, search: searchParams.toString() });
     } catch (err) {
       console.log(err);
     }
@@ -132,8 +128,9 @@ const ControlsContainer = () => {
   };
 
   /**
-   * This function makes two API calls to undo a number of actions and replay episode.
+   * A function that makes two API calls to undo a number of actions and replay episode.
    * when a node between root and last children is clicked in the tree.
+   * It also updates the url parameters to keep the state of current session.
    *
    * @param {Number} n the number of steps to remove.
    * @param {Array} stepsIDs an array of action ids.
@@ -150,6 +147,8 @@ const ControlsContainer = () => {
         makeSessionTreeData([session.states[0], ...response.states], children)
       );
       setActionsTaken(stepsIDs.map((o, i) => `${o}.${i + 1}`));
+      searchParams.set("actions", stepsIDs.join(","));
+      history.replace({ ...location, search: searchParams.toString() });
     } catch (error) {
       console.log(error);
     }
@@ -172,7 +171,7 @@ const ControlsContainer = () => {
       try {
         // Verifies it is one of the last children.
         if (nodeDepth === session.states.length) {
-          await submitStep([nodeActionID]);
+          await submitStep(nodeActionID);
           setLayer(layer + 1);
           setActiveNode(nodeDatum.action_id);
           setActionsTaken([...actionsTaken, nodeDatum.action_id]);
@@ -186,9 +185,11 @@ const ControlsContainer = () => {
           );
           setActionsTaken(actionsTaken.slice(0, -1));
         } else if (nodeDepth < session.states.length && nodeDepth > 0) {
-          let actions = actionsTaken.map((i) => i.split(".")[0]).slice(); // Get a copy of actionsTaken
+          let actions = actionsTaken.map((i) => i.split(".")[0]).slice(); // get a copy of actionsTaken
           actions.splice(nodeDepth - 1, 1, nodeActionID); // modify the array of actions adding the node clicked and replacing old node.
           await replicateSteps(actionsTaken.length, actions);
+        } else {
+          return;
         }
       } catch (err) {
         console.log(err);
@@ -251,7 +252,6 @@ const ControlsContainer = () => {
       <ActionsNavbar
         actionSpace={actionSpace}
         actionsTaken={actionsTaken}
-        urlParams={urlParams}
         startSession={startNewSession}
         handleActionSpace={handleActionSpace}
       />
