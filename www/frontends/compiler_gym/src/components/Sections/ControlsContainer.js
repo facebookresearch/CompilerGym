@@ -303,3 +303,5 @@ const ControlsContainer = () => {
 };
 
 export default ControlsContainer;
+
+//opt -early-cse -add-discriminators -early-cse-memssa -always-inline -barrier -loop-simplify -dse -mem2reg -callsite-splitting -coro-elide -break-crit-edges -early-cse input.bc -o output.bc

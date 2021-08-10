@@ -10,7 +10,7 @@ import RewardHistoryChart from "./RewardHistoryChart";
 
 const RewardsSection = ({ session, highlightedPoint }) => {
   const [cumulativeSum, setCumulativeSum] = useState("");
-  const [toggle, setToggle] = useState(false);
+  const [toggle, setToggle] = useState(true);
 
   useEffect(() => {
     let rewards = session.states?.map((i) => parseFloat(i.reward.toFixed(3)));

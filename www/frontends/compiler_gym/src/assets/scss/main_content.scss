@@ -111,17 +111,22 @@
 
 .row-cumulative-reward {
   position: absolute;
-  top: 9rem;
-  left: 1rem;
-  width: 16rem;
+  bottom: 10rem;
+  left: 1%;
+  width: 245px;
   z-index: 2;
+}
+
+@media (min-width: 576px) {
+  .row-cumulative-reward {
+    bottom: 16%;
+  }
 }
 
 @media (max-width: 576px) {
   .row-cumulative-reward {
     display: none;
     bottom: 2rem;
-    width: 12rem;
   }
 }
 

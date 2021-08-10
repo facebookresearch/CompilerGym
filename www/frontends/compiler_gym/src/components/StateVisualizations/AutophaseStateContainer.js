@@ -6,17 +6,24 @@
 
 import React, { useState } from "react";
 import classnames from "classnames";
-import { Dropdown } from "react-bootstrap";
+import { Dropdown, Row, Col } from "react-bootstrap";
 import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import HC_exporting from "highcharts/modules/exporting";
 import HC_exportData from "highcharts/modules/export-data";
+import AutophaseHistoricalChart from "./AutophaseHistoricalChart";
 
 HC_exporting(Highcharts);
 HC_exportData(Highcharts);
 
-const AutophaseStateContainer = ({ autophase, prev_authophase, darkTheme }) => {
+const AutophaseStateContainer = ({
+  sessionStates,
+  autophase,
+  prev_authophase,
+  darkTheme,
+}) => {
   const [sortBy, setSortBy] = useState("result");
+  const [toggle, setToggle] = useState(true);
 
   const newData = Object.entries(autophase).map(([category, result]) => ({
     category,
@@ -144,7 +151,7 @@ const AutophaseStateContainer = ({ autophase, prev_authophase, darkTheme }) => {
     exporting: {
       buttons: {
         contextButton: {
-          menuItems: ["viewFullscreen", "printChart", "downloadCSV"],
+          menuItems: ["viewFullscreen", "printChart"],
         },
       },
     },
@@ -159,34 +166,56 @@ const AutophaseStateContainer = ({ autophase, prev_authophase, darkTheme }) => {
       )}
     >
       <div className="row-sort-button ml-2">
-        <Dropdown onSelect={(e) => setSortBy(e)}>
-          <Dropdown.Toggle id="sort-options" size="sm">
-            Sort
-          </Dropdown.Toggle>
+        <Row className="align-items-center">
+          <Col>
+            <Dropdown onSelect={(e) => setSortBy(e)}>
+              <Dropdown.Toggle id="sort-options" size="sm">
+                Sort
+              </Dropdown.Toggle>
 
-          <Dropdown.Menu>
-            <Dropdown.Item
-              eventKey={"result"}
-              active={sortBy === "result" ? true : false}
-            >
-              Value
-            </Dropdown.Item>
-            <Dropdown.Item
-              eventKey={"diff"}
-              active={sortBy === "diff" ? true : false}
-            >
-              Delta
-            </Dropdown.Item>
-            <Dropdown.Item
-              eventKey={"category"}
-              active={sortBy === "category" ? true : false}
-            >
-              Alphabetical
-            </Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
+              <Dropdown.Menu>
+                <Dropdown.Item
+                  eventKey={"result"}
+                  active={sortBy === "result" ? true : false}
+                >
+                  Value
+                </Dropdown.Item>
+                <Dropdown.Item
+                  eventKey={"diff"}
+                  active={sortBy === "diff" ? true : false}
+                >
+                  Delta
+                </Dropdown.Item>
+                <Dropdown.Item
+                  eventKey={"category"}
+                  active={sortBy === "category" ? true : false}
+                >
+                  Alphabetical
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
+          </Col>
+          <Col className="px-0">
+            <div className="switch_box box_1">
+              <input
+                type="checkbox"
+                className="switch_1"
+                checked={toggle}
+                onChange={() => setToggle(!toggle)}
+              />
+            </div>
+          </Col>
+        </Row>
       </div>
-      <HighchartsReact highcharts={Highcharts} options={options} />
+      {toggle ? (
+        <AutophaseHistoricalChart
+          sessionStates={sessionStates}
+          darkTheme={darkTheme}
+          sortBy={sortBy}
+        />
+      ) : (
+        <HighchartsReact highcharts={Highcharts} options={options} />
+      )}
     </div>
   );
 };

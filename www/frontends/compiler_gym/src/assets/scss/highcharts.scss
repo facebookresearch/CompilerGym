@@ -22,10 +22,14 @@
   }
 }
 
+.highcharts-container {
+  overflow: visible !important;
+}
+
 .chart-dark-mode {
   .highcharts-container {
     position: relative;
-    overflow: hidden;
+    //overflow: hidden;
     width: 100%;
     height: 100%;
     text-align: left;
@@ -67,4 +71,13 @@
 .highcharts-title {
   fill: #434348;
   font-family: Menlo, sans-serif;
+}
+
+.sparkline-table {
+  td, th {
+    padding: 0.5rem;
+    border-bottom: 1px solid silver;
+    height: 2.5rem;
+    font-size: 12px;
+  }
 }

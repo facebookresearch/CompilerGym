@@ -101,3 +101,52 @@ export const getCommandLineArray = (commandLine, actionsList) => {
   }
   return;
 };
+
+/**
+ * Group objects by key
+ * @param {*} objectArray
+ * @param {*} property
+ * @returns
+ */
+export const groupBy = (objectArray, property) => {
+  return objectArray.reduce((acc, obj) => {
+    let key = property;
+    if (!acc[key]) {
+      acc[key] = [];
+    }
+    acc[key].push(obj[property]);
+    return acc;
+  }, {});
+};
+
+/**
+ * Returns the positive or negative greatest absoulute value with sign.
+ * @param {Array} array receives an array of positive and negative numbers.
+ * @returns
+ */
+export const getMaxDelta = (array) => {
+  let max = Math.max(...array);
+  let min = Math.min(...array);
+  if (Math.abs(max) > Math.abs(min)) return max;
+  return min;
+};
+
+/**
+ * Calculates the percentage increase between two numbers with edge case scenarios.
+ * @param {Number} a first number.
+ * @param {Number} b second number.
+ * @returns
+ */
+export const percIncrease = (a, b) => {
+  let percent;
+  if (b !== 0) {
+    if (a !== 0) {
+      percent = ((b - a) / a) * 100;
+    } else {
+      percent = b;
+    }
+  } else {
+    percent = -a * 100;
+  }
+  return Math.floor(percent);
+};

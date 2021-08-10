@@ -54,7 +54,7 @@ const renderSvgNode = ({
             {nodeDatum.children && (
               <h5>
                 <span className="text-weight">Reward:</span> {nodeDatum.reward}<br/>
-                {nodeDatum.__rd3t.depth}
+                Step: {nodeDatum.__rd3t.depth}
               </h5>
             )}
           </div>
@@ -104,7 +104,7 @@ const SearchTree = ({
         <Tree
           data={treeData}
           nodeSize={nodeSize}
-          translate={{ x: 10, y: treeWindow.current?.clientHeight / 2 || 10 }}
+          translate={{ x: 10, y: treeWindow.current?.clientHeight / 2.1 || 10 }}
           renderCustomNodeElement={(rd3tProps) =>
             renderSvgNode({
               ...rd3tProps,
