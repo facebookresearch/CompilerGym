@@ -1,6 +1,7 @@
 import React, { useState, useEffect, Fragment } from "react";
 import classnames from "classnames";
 import { groupBy, getMaxDelta, percIncrease } from "../../utils/Helpers";
+import AutophaseDict from "../../utils/AutophaseDict";
 import SparkLineTable from "./SparkLineTable";
 
 const AutophaseHistoricalChart = ({ sessionStates, darkTheme, sortBy }) => {
@@ -56,6 +57,7 @@ const AutophaseHistoricalChart = ({ sessionStates, darkTheme, sortBy }) => {
   const tableData = sortedList(generateHistoricalData(), sortBy);
 
   const rows = tableData.map((i, index) => {
+    let description = AutophaseDict.find((o) => o.Name === i.category).Description ?? "";
     let sparklineData = `${i.result.join(", ")}; ${steps.join(", ")}`;
     let sparklineDeltaData = `${i.percentageChange.join(", ")}; ${steps.join(
       ", "
@@ -63,7 +65,10 @@ const AutophaseHistoricalChart = ({ sessionStates, darkTheme, sortBy }) => {
     return (
       <Fragment key={index}>
         <tr>
-          <td>{i.category}</td>
+          <td className="cell-info">
+            {i.category}{" "}
+            <span className="description-tooltip">{description}</span>
+          </td>
           <td className="text-right">{i.maxValue}</td>
           <td data-sparkline={sparklineData} />
           <td className="text-right">{i.maxDelta} %</td>
