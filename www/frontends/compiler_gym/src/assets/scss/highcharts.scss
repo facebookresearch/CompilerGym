@@ -10,10 +10,25 @@
   height: auto;
 }
 
+@media (min-width: 576px)  {
+  .chart-container {
+      min-width: 650px;
+  }
+}
+
+@media (max-width: 576px)  {
+  .chart-container {
+      min-width: 650px;
+  }
+}
+
+.highcharts-container {
+  overflow: visible !important;
+}
+
 .chart-dark-mode {
   .highcharts-container {
     position: relative;
-    overflow: hidden;
     width: 100%;
     height: 100%;
     text-align: left;
@@ -35,5 +50,58 @@
   .highcharts-yaxis-grid .highcharts-grid-line {
     stroke-width: 1px;
     stroke: $gray-700;
+  }
+}
+
+.highcharts-figure, .highcharts-data-table table {
+  position: relative;
+  margin: 0rem 0;
+  overflow: auto;
+}
+
+.highcharts-data-table table {
+	font-family: Verdana, sans-serif;
+	border-collapse: collapse;
+	border: 1px solid #EBEBEB;
+	margin: 5px auto;
+	text-align: center;
+}
+
+.highcharts-title {
+  fill: #434348;
+  font-family: Menlo, sans-serif;
+}
+
+// **** Sparkline Table ****
+
+.sparkline-table {
+  td, th {
+    padding: 0.5rem;
+    border-bottom: 1px solid silver;
+    height: 2.5rem;
+    font-size: 12px;
+  }
+
+  .cell-info{
+    position:relative;
+  }
+
+  .description-tooltip{
+    display:none;
+    position:absolute;
+    z-index:100;
+    border: 1px;
+    background-color: $white;
+    border-style:solid;
+    border-width: 1px;
+    border-color: $primary;
+    padding: 5px;
+    color: $primary;
+    top:32px;
+    left:-40px;
+  }
+
+  .cell-info:hover span.description-tooltip{
+    display:block;
   }
 }

@@ -35,6 +35,7 @@ const StateContainer = () => {
       case "instcounts":
         return (
           <InstcountsStateContainer
+            sessionStates={context.session.states}
             instcount={last_observation?.instcount}
             prev_instcount ={previous_observation?.instcount || {}}
             darkTheme={themeContext.darkTheme}
@@ -43,6 +44,7 @@ const StateContainer = () => {
       case "autophase":
         return (
           <AutophaseStateContainer
+            sessionStates={context.session.states}
             autophase={last_observation?.autophase}
             prev_authophase ={previous_observation?.autophase || {}}
             darkTheme={themeContext.darkTheme}
@@ -59,6 +61,7 @@ const StateContainer = () => {
     <>
       <div className="m-0 action-navbar-wrapper">
         <Tabs
+          className="bg-white"
           id="uncontrolled-tab"
           activeKey={stateSelector}
           transition={false}

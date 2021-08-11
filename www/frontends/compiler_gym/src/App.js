@@ -5,20 +5,18 @@
  */
 
 import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Switch, Route } from "react-router-dom";
 import "./assets/scss/custom.scss";
 import ApiService from "./api/ApiService";
 import ApiContext from "./context/ApiContext";
 import ThemeContext from "./context/ThemeContext";
 import SplashPage from "./components/Pages/SplashPage";
-import MainNavbar from "./components/Navbars/MainNavbar";
-import PanelsContainer from "./components/PanelsContainer";
-import ControlsContainer from "./components/Sections/ControlsContainer";
-import ObservationsContainer from "./components/Sections/ObservationsContainer";
+import MainPage from "./components/Pages/MainPage";
 
 const api = new ApiService("http://127.0.0.1:5000");
-const initialSettings = {
+const INITIAL_SETTINGS = {
   reward: "IrInstructionCountOz",
-  benchmark: "benchmark://cbench-v1/qsort",
+  benchmark: "benchmark://cbench-v1/adpcm",
 };
 
 function App() {
@@ -36,8 +34,9 @@ function App() {
       try {
         const options = await api.getEnvOptions();
         const initSession = await api.startSession(
-          initialSettings.reward,
-          initialSettings.benchmark
+          INITIAL_SETTINGS.reward,
+          "-",
+          INITIAL_SETTINGS.benchmark
         );
         console.log(initSession);
         setCompilerGym(options);
@@ -71,17 +70,6 @@ function App() {
     );
   };
 
-  const submitStep = (stepIDs) => {
-    api.getSteps(session.session_id, stepIDs).then(
-      (result) => {
-        setSession({ ...session, states: [...session.states, ...result.states] });
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
-  };
-
   const toggleTheme = () => {
     setDarkTheme(!darkTheme);
   };
@@ -89,29 +77,24 @@ function App() {
   if (isLoading) return <SplashPage />;
 
   return (
-    <>
+    <Router>
       <ApiContext.Provider
         value={{
           api: api,
           compilerGym: compilerGym,
           session: session,
-          setSession,
-          submitStep,
+          setSession
         }}
       >
-        <ThemeContext.Provider
-          value={{ darkTheme: darkTheme, toggleTheme: toggleTheme }}
-        >
-          <div className="main-content">
-            <MainNavbar />
-            <PanelsContainer
-              left={<ControlsContainer/>}
-              right={<ObservationsContainer/>}
-            />
-          </div>
+        <ThemeContext.Provider value={{ darkTheme: darkTheme, toggleTheme }}>
+          <Switch>
+            <Route path="/:session?">
+              <MainPage/>
+            </Route>
+          </Switch>
         </ThemeContext.Provider>
       </ApiContext.Provider>
-    </>
+    </Router>
   );
 }
 

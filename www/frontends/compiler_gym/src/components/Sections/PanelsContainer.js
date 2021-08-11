@@ -4,7 +4,8 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React, { useEffect, useState, useRef} from 'react'
+import React, { useEffect, useState, useRef} from 'react';
+import ControlsContainer from './ControlsContainer';
 
 const MIN_WIDTH = 140;
 
@@ -23,7 +24,13 @@ const LeftPanel = ({ children, leftWidth, setLeftWidth }) => {
     return <div ref={leftRef} className="leftPane">{children}</div>;
 }
 
-const PanelsContainer = ({left, right, className}) => {
+/**
+ * Represents a react component that holds two panels to contain the main content.
+ *
+ * @param {JSX} right a component to display on the right side, will be dependant of left width.
+ * @returns
+ */
+const PanelsContainer = ({right, className}) => {
     const [leftWidth, setLeftWidth] = useState(window.innerWidth/2);
     const [separatorXPosition, setSeparatorXPosition] = useState(undefined)
     const [dragging, setDragging] = useState(false);
@@ -88,11 +95,10 @@ const PanelsContainer = ({left, right, className}) => {
       };
     });
 
-
     return (
         <div ref={splitPanelRef} className={`splitView ${className || ""}`}>
           <LeftPanel leftWidth={leftWidth} setLeftWidth={setLeftWidth}>
-            {left}
+            <ControlsContainer/>
           </LeftPanel>
 
           <div
@@ -103,7 +109,10 @@ const PanelsContainer = ({left, right, className}) => {
           >
             <div className="divider" />
           </div>
-          <div className="rightPane">{right}</div>
+
+          <div className="rightPane">
+            {right}
+          </div>
         </div>
     )
 }

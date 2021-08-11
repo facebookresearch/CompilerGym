@@ -18,61 +18,78 @@ import Tree from "react-d3-tree";
  * @returns {JSX} JSX element representing a node.
  */
 
-const renderSvgNode = ({ nodeDatum, handleNodeClick, layer }) => {
-  const display =
-    nodeDatum.__rd3t.depth === 0 ||
-    nodeDatum.__rd3t.depth === layer ||
-    nodeDatum.active
-      ? true
-      : false;
-  const foreignObjectProps = { width: 115, height: 200, x: 20, y: 20 };
+const renderSvgNode = ({
+  nodeDatum,
+  handleNodeClick,
+  handleMouseOverTree,
+  handleMouseOutTree,
+  layer,
+}) => {
+  const foreignObjectProps = { width: 122, height: 200, x: 20, y: 10 };
 
   return (
-    <g style={{ visibility: display ? "visible" : "hidden" }}>
+    <g>
       <circle
         r="5"
         x="0"
         fill={nodeDatum.active ? "#2dce89" : "white"}
         strokeWidth="1"
         onClick={() => handleNodeClick(nodeDatum)}
+        onMouseOver={() => handleMouseOverTree(nodeDatum)}
+        onMouseOut={() => handleMouseOutTree(nodeDatum)}
       />
+      <text
+        strokeWidth={nodeDatum.active ? "1" : "0"}
+        x="8"
+        dy="4"
+        onClick={() => handleNodeClick(nodeDatum)}
+        onMouseOver={() => handleMouseOverTree(nodeDatum)}
+        onMouseOut={() => handleMouseOutTree(nodeDatum)}
+      >
+        {nodeDatum.name}
+      </text>
       {nodeDatum.active && (
         <foreignObject {...foreignObjectProps}>
           <div className="active-node-info">
             {nodeDatum.children && (
               <h5>
-                <span className="text-weight">Reward:</span> {nodeDatum.reward}
+                <span className="text-weight">Reward:</span> {nodeDatum.reward}<br/>
+                Step: {nodeDatum.__rd3t.depth}
               </h5>
             )}
           </div>
         </foreignObject>
       )}
-      <text
-        strokeWidth="0"
-        x="8"
-        dy="5"
-        onClick={() => handleNodeClick(nodeDatum)}
-      >
-        {nodeDatum.name}
-      </text>
     </g>
   );
 };
 
-const SearchTree = ({ actionSpace, treeData, layer, handleNodeClick }) => {
+/**
+ * Renders the search tree component.
+ *
+ * @param {*} actionSpace Receives the number of nodes to show on an active node.
+ * @param {Object} treeData Takes a hierarchical object data structure representeing the data of the tree.
+ * @param {String} layer Receives the depth of the active node.
+ * @param {Function} handleNodeClick Function that manages the logic of clicking on a node.
+ * @returns
+ */
+const SearchTree = ({
+  actionSpace,
+  treeData,
+  layer,
+  handleNodeClick,
+  handleMouseOverTree,
+  handleMouseOutTree,
+}) => {
   const { darkTheme } = useContext(ThemeContext);
   const treeWindow = useRef();
 
   const [nodeSize, setNodeSize] = useState({ x: 300, y: 20 });
 
   useEffect(() => {
-    setNodeSize({ x: actionSpace > 100 ? 700 : 300, y: 20 });
+    setNodeSize({ x: actionSpace > 100 ? 500 : 300, y: 20 });
     return () => {};
   }, [actionSpace]);
-
-  const getDynamicPathClass = ({ source, target }) => {
-    if (!target.children && target.depth < layer) return "link__to-leaf";
-  };
 
   return (
     <>
@@ -87,10 +104,17 @@ const SearchTree = ({ actionSpace, treeData, layer, handleNodeClick }) => {
         <Tree
           data={treeData}
           nodeSize={nodeSize}
-          translate={{ x: 10, y: treeWindow.current?.clientHeight / 3 || 10 }}
-          pathClassFunc={getDynamicPathClass}
+          translate={{ x: 10, y: treeWindow.current?.clientHeight / 2.1 || 10 }}
+          scaleExtent={{ max: 0.9, min: 0.3 }}
+          zoomable={true}
           renderCustomNodeElement={(rd3tProps) =>
-            renderSvgNode({ ...rd3tProps, handleNodeClick, layer })
+            renderSvgNode({
+              ...rd3tProps,
+              handleNodeClick,
+              handleMouseOverTree,
+              handleMouseOutTree,
+              layer,
+            })
           }
         />
       </div>
