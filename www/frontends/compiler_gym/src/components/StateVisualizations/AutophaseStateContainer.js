@@ -161,10 +161,29 @@ const AutophaseStateContainer = ({
     <div
       className={classnames(
         "chart-container",
-        { "chart-dark-mode": darkTheme },
-        { "": darkTheme === false }
+        { "chart-dark-mode bg-dark text-white": darkTheme },
       )}
     >
+      <Row className="align-items-center mx-0 pt-2">
+        <Col md="6"></Col>
+        <Col md="6" className="text-right">
+          <div className="px-2">
+            <h5>
+              The Autophase observation space is a 56-dimension integer feature
+              vector summarizing the static LLVM-IR representation.
+              <br />
+              <a
+                className={classnames({ "text-white": darkTheme })}
+                href="https://facebookresearch.github.io/CompilerGym/llvm/index.html#autophase"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Docs <i className="bi bi-link-45deg" />
+              </a>
+            </h5>
+          </div>
+        </Col>
+      </Row>
       <div className="row-sort-button ml-2">
         <Row className="align-items-center">
           <Col>

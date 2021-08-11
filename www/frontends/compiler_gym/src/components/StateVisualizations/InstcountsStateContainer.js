@@ -159,10 +159,32 @@ const InstcountsStateContainer = ({
     <div
       className={classnames(
         "chart-container",
-        { "chart-dark-mode": darkTheme },
-        { "": darkTheme === false }
+        { "chart-dark-mode bg-dark text-white": darkTheme },
       )}
     >
+      <Row className="align-items-center mx-0 pt-2">
+        <Col md="3"></Col>
+        <Col md="9" className="text-right">
+          <div className="px-2">
+            <h5>
+              The InstCount observation space is a 70-dimension integer feature
+              vector in the range [0,∞]. It contains the total
+              number of instructions, the total number of basic blocks, and the
+              total number of functions. The remaining features are the number
+              of instructions of each of the 67 different types in the program.
+              <br />
+              <a
+                className={classnames({ "text-white": darkTheme })}
+                href="https://facebookresearch.github.io/CompilerGym/llvm/index.html#instcount"
+                target="_blank"
+                rel="noreferrer"
+              >
+                Docs <i className="bi bi-link-45deg" />
+              </a>
+            </h5>
+          </div>
+        </Col>
+      </Row>
       <div className="row-sort-button ml-2">
         <Row className="align-items-center">
           <Col>

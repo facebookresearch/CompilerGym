@@ -105,6 +105,8 @@ const SearchTree = ({
           data={treeData}
           nodeSize={nodeSize}
           translate={{ x: 10, y: treeWindow.current?.clientHeight / 2.1 || 10 }}
+          scaleExtent={{ max: 0.9, min: 0.3 }}
+          zoomable={true}
           renderCustomNodeElement={(rd3tProps) =>
             renderSvgNode({
               ...rd3tProps,
