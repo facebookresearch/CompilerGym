@@ -290,6 +290,17 @@ http_archive(
     urls = ["https://github.com/pytorch/cpuinfo/archive/63b254577ed77a8004a9be6ac707f3dccc4e1fd9.tar.gz"],
 )
 
+# === Csmith ===
+# https://embed.cs.utah.edu/csmith/
+
+http_archive(
+    name = "csmith",
+    build_file_content = all_content,
+    sha256 = "ba871c1e5a05a71ecd1af514fedba30561b16ee80b8dd5ba8f884eaded47009f",
+    strip_prefix = "csmith-csmith-2.3.0",
+    urls = ["https://github.com/csmith-project/csmith/archive/refs/tags/csmith-2.3.0.tar.gz"],
+)
+
 # === DeepDataFlow ===
 # https://zenodo.org/record/4122437
 

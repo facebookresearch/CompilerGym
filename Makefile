@@ -88,6 +88,9 @@ Deployment
         Run the `make install-test` suite against the build artifact generated
         by `make bdist_wheel-linux`.
 
+	make www
+		Run a local instance of the web visualization service. See www/README.md
+		for details.
 
 Tidying up
 -----------
@@ -198,6 +201,14 @@ all: docs bdist_wheel bdist_wheel-linux
 
 .PHONY: bazel-fetch bazel-build bdist_wheel bdist_wheel-linux bdist_wheel-linux-shell bdist_wheel-linux-test
 
+#################
+# Web interface #
+#################
+
+www:
+	cd www && $(PYTHON) run.py
+
+.PHONY: www
 
 #################
 # Documentation #

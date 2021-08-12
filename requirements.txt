@@ -3,3 +3,4 @@
 -r examples/requirements.txt
 -r requirements_pre_commit.txt
 -r tests/requirements.txt
+-r www/requirements.txt

@@ -16,6 +16,7 @@ py_library(
         "llvm_stress.py",
         "poj104.py",
     ],
+    data = ["//compiler_gym/third_party/csmith:all"],
     visibility = ["//visibility:public"],
     deps = [
         "//compiler_gym/datasets",
