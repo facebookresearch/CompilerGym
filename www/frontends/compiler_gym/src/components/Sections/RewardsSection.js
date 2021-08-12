@@ -10,6 +10,13 @@ import { Row, FormControl, Col } from "react-bootstrap";
 import ThemeContext from "../../context/ThemeContext";
 import RewardHistoryChart from "./RewardHistoryChart";
 
+/**
+ * Renders the rewards section in the UI.
+ *
+ * @param {Object} session current session as a prop, needed to calculate rewards and pass to the historical chart.
+ * @param {Object} highlightedPoint an object prop containing data about a node in the tree to display an action description.
+ * @returns
+ */
 const RewardsSection = ({ session, highlightedPoint }) => {
   const { darkTheme } = useContext(ThemeContext);
   const [cumulativeSum, setCumulativeSum] = useState("");

@@ -58,7 +58,6 @@ const InstcountsStateContainer = ({
   const options = {
     colors: ["#64E572", "#DDDF00"],
     chart: {
-      //type: "bar",
       height: 175 + "%", //3:2 ratio
     },
     title: {

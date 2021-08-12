@@ -99,7 +99,7 @@ const ControlsContainer = () => {
   };
 
   /**
-   * This function invokes the API to take a step in the current session and update the tree.
+   * Invokes the API to take a step in the current session and update the tree.
    * It also updates the url parameters to keep the state of current session.
    *
    * @param {Array} stepsIDs receives an array of action ids.

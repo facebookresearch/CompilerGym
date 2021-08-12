@@ -211,7 +211,7 @@ const ActionsNavbar = ({
 
   // Append current url params into a string to generata a link.
   const getShareLink = () => {
-    let shareLink = `http://localhost:3000/${location.search}`;
+    let shareLink = `${window.location.href}${location.search}`;
     return shareLink;
   };
 
