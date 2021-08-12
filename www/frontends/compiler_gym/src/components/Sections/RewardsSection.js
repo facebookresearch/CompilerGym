@@ -4,11 +4,14 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useContext } from "react";
+import classnames from "classnames";
 import { Row, FormControl, Col } from "react-bootstrap";
+import ThemeContext from "../../context/ThemeContext";
 import RewardHistoryChart from "./RewardHistoryChart";
 
 const RewardsSection = ({ session, highlightedPoint }) => {
+  const { darkTheme } = useContext(ThemeContext);
   const [cumulativeSum, setCumulativeSum] = useState("");
   const [toggle, setToggle] = useState(true);
 
@@ -20,33 +23,46 @@ const RewardsSection = ({ session, highlightedPoint }) => {
 
   return (
     <>
-      <div className="row-cumulative-reward">
-        <Row className="align-items-center">
-          <Col lg={2} md={2} xs={2} className="ml-0 mt-1">
-            <div className="switch_box box_1">
-              <input
-                type="checkbox"
-                className="switch_1"
-                checked={toggle}
-                onChange={() => setToggle(!toggle)}
-              />
-            </div>
+      <Row
+        className={classnames(
+          "row-cumulative-reward align-items-center mx-0 bg-white",
+          { "bg-dark text-white": darkTheme }
+        )}
+      >
+        <Col lg={1} md={1} xs={1} className="ml-0 mt-1">
+          <div className="switch_box box_1">
+            <input
+              type="checkbox"
+              className="switch_1"
+              checked={toggle}
+              onChange={() => setToggle(!toggle)}
+            />
+          </div>
+        </Col>
+        {toggle ? (
+          <Col lg={4} md={4} xs={4}>
+            <FormControl
+              aria-describedby="basic-addon1"
+              size="sm"
+              type="text"
+              readOnly
+              value={`Cumulative Reward: ${
+                cumulativeSum && cumulativeSum.toFixed(3)
+              }`}
+            />
           </Col>
-          {toggle && (
-            <Col lg={10} md={10} xs={10}>
-              <FormControl
-                aria-describedby="basic-addon1"
-                size="sm"
-                type="text"
-                readOnly
-                value={`Cumulative Reward: ${
-                  cumulativeSum && cumulativeSum.toFixed(3)
-                }`}
-              />
-            </Col>
+        ) : (
+          <Col lg={4} md={4} xs={4}></Col>
+        )}
+        <Col lg={7} md={7} xs={7} className="text-right">
+          {highlightedPoint.nodeDescription && (
+            <h5>
+              <span className="text-weight">Action Description: </span>
+              {highlightedPoint.nodeDescription}
+            </h5>
           )}
-        </Row>
-      </div>
+        </Col>
+      </Row>
       <RewardHistoryChart session={session} />
     </>
   );

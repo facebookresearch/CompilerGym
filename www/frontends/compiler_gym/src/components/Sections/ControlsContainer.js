@@ -11,6 +11,7 @@ import { makeSessionTreeData } from "../../utils/Helpers";
 import ActionsNavbar from "../Navbars/ActionsNavbar";
 import SearchTree from "./SearchTree";
 import RewardsSection from "./RewardsSection";
+import ActionsDict from "../../utils/ActionsDict";
 
 const ControlsContainer = () => {
   const { compilerGym, session, api, setSession } = useContext(ApiContext);
@@ -269,15 +270,29 @@ const ControlsContainer = () => {
   };
 
   const handleMouseOverTree = (nodeData) => {
+    let nodeDescription = ActionsDict.find((i) => i.Action === nodeData.name)?.Description || "";
     if (nodeData.active) {
-      setHighlightedPoint({ point: nodeData.__rd3t.depth, selected: true });
+      setHighlightedPoint({
+        point: nodeData.__rd3t.depth,
+        selected: true,
+        nodeDescription: nodeDescription,
+      });
     }
+    setHighlightedPoint({
+      ...highlightedPoint,
+      nodeDescription: nodeDescription,
+    });
   };
 
   const handleMouseOutTree = (nodeData) => {
     if (nodeData.active) {
-      setHighlightedPoint({ point: nodeData.__rd3t.depth, selected: false });
+      setHighlightedPoint({
+        point: nodeData.__rd3t.depth,
+        selected: false,
+        nodeDescription: "",
+      });
     }
+    setHighlightedPoint({ ...highlightedPoint, nodeDescription: "" });
   };
 
   return (
@@ -303,5 +318,3 @@ const ControlsContainer = () => {
 };
 
 export default ControlsContainer;
-
-//opt -early-cse -add-discriminators -early-cse-memssa -always-inline -barrier -loop-simplify -dse -mem2reg -callsite-splitting -coro-elide -break-crit-edges -early-cse input.bc -o output.bc
