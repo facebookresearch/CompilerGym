@@ -212,31 +212,34 @@ def compute_state(env: CompilerEnv, actions: List[int]) -> StateToVisualize:
 
 @app.route("/api/v3/describe")
 def describe():
-    env = compiler_gym.make("llvm-v0")
-    env.reset()
-    return jsonify(
-        {
-            # A mapping from dataset name to benchmark name. To generate a full
-            # benchmark URI, join the two values with a '/'. E.g. given a benchmark
-            # "qsort" in the dataset "benchmark://cbench-v1", the full URI is
-            # "benchmark://cbench-v1/qsort".
-            "benchmarks": {
-                dataset.name: list(
-                    islice(
-                        (x[len(dataset.name) + 1 :] for x in dataset.benchmark_uris()),
-                        10,
+    with compiler_gym.make("llvm-v0") as env:
+        env.reset()
+        return jsonify(
+            {
+                # A mapping from dataset name to benchmark name. To generate a full
+                # benchmark URI, join the two values with a '/'. E.g. given a benchmark
+                # "qsort" in the dataset "benchmark://cbench-v1", the full URI is
+                # "benchmark://cbench-v1/qsort".
+                "benchmarks": {
+                    dataset.name: list(
+                        islice(
+                            (
+                                x[len(dataset.name) + 1 :]
+                                for x in dataset.benchmark_uris()
+                            ),
+                            10,
+                        )
                     )
-                )
-                for dataset in env.datasets
-            },
-            # A mapping from the name of an action to the numeric value. This
-            # numeric value is what is passed as argument to the step() function.
-            "actions": {k: v for v, k in enumerate(env.action_space.flags)},
-            # A list of reward space names. You select the reward space to use
-            # during start().
-            "rewards": sorted(list(env.reward.spaces.keys())),
-        }
-    )
+                    for dataset in env.datasets
+                },
+                # A mapping from the name of an action to the numeric value. This
+                # numeric value is what is passed as argument to the step() function.
+                "actions": {k: v for v, k in enumerate(env.action_space.flags)},
+                # A list of reward space names. You select the reward space to use
+                # during start().
+                "rewards": sorted(list(env.reward.spaces.keys())),
+            }
+        )
 
 
 @app.route("/api/v3/start/<reward>/<actions>/<path:benchmark>")
