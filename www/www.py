@@ -1,4 +1,4 @@
-"""Demonstration of wrapping CompilerGym in a simple Flask app.
+"""A CompilerGym API and web frontend.
 
 This exposes an API with five operations:
 
@@ -138,13 +138,15 @@ We could carry on taking steps, or just end the session:
     $ curl -s localhost:5000/api/v3/stop/0
 """
 import logging
+import os
 import sys
 from itertools import islice
+from pathlib import Path
 from threading import Lock, Thread
 from time import sleep, time
 from typing import Dict, List, Tuple
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_file
 from flask_cors import CORS
 from pydantic import BaseModel
 
@@ -154,6 +156,9 @@ from compiler_gym.util.truncate import truncate
 
 app = Flask("compiler_gym")
 CORS(app)
+
+
+resource_dir: Path = (Path(__file__).parent / "frontends/compiler_gym/build").absolute()
 
 logger = logging.getLogger(__name__)
 
@@ -167,7 +172,7 @@ class StateToVisualize(BaseModel):
     commandline: str
 
     # If the compiler environment dies, crashes, or encounters some
-    # unrecoverable error, this "done" flag is set. At this point the user
+    # unrecoverable error, this "done" flag is set. At this point the user d
     # should start a new session.
     done: bool
 
@@ -344,6 +349,29 @@ def idle_session_watchdog(ttl_seconds: int = 1200):
         sleep(ttl_seconds)
 
 
+# Web endpoints.
+
+
+@app.route("/")
+def index_resource():
+    return send_file(resource_dir / "index.html")
+
+
+@app.route("/<path>")
+def root_resource(path: str):
+    return send_file(resource_dir / path)
+
+
+@app.route("/static/css/<path>")
+def css_resource(path: str):
+    return send_file(resource_dir / "static/css/" / path)
+
+
+@app.route("/static/js/<path>")
+def js_resource(path: str):
+    return send_file(resource_dir / "static/js/" / path)
+
+
 if __name__ == "__main__":
     logger.setLevel(logging.DEBUG)
     handler = logging.StreamHandler(sys.stderr)
@@ -354,5 +382,6 @@ if __name__ == "__main__":
     handler.setFormatter(formatter)
     logger.addHandler(handler)
 
+    logger.info("Serving from %s", resource_dir)
     Thread(target=idle_session_watchdog).start()
-    app.run()
+    app.run(port=int(os.environ.get("PORT", "5000")))
