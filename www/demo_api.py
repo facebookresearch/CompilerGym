@@ -137,7 +137,11 @@ We could carry on taking steps, or just end the session:
 
     $ curl -s localhost:5000/api/v3/stop/0
 """
+import logging
+import sys
 from itertools import islice
+from threading import Lock, Thread
+from time import sleep, time
 from typing import Dict, List, Tuple
 
 from flask import Flask, jsonify
@@ -150,6 +154,8 @@ from compiler_gym.util.truncate import truncate
 
 app = Flask("compiler_gym")
 CORS(app)
+
+logger = logging.getLogger(__name__)
 
 
 class StateToVisualize(BaseModel):
@@ -177,6 +183,18 @@ class StateToVisualize(BaseModel):
     reward: float
 
 
+class Session(BaseModel):
+    states: List[Tuple[CompilerEnv, StateToVisualize]]
+    last_use: float  # As returned by time().
+
+    def close(self):
+        for env, _ in self.states:
+            env.close()
+
+    class Config:
+        arbitrary_types_allowed = True
+
+
 # A set of sessions that are in use, keyed by a numeric session ID. Each session
 # is represented by a list of (environment, state) tuples, whether the
 # environment is a CompilerGym environment and the state is a StateToVisualize.
@@ -184,7 +202,8 @@ class StateToVisualize(BaseModel):
 # action is taken, this generates a new (environment, state) tuple that is
 # appended the session list. In this way, undoing an operation is as simple as
 # popping the most recent (environment, state) tuple from the list.
-sessions: Dict[int, List[Tuple[CompilerEnv, StateToVisualize]]] = {}
+sessions: Dict[int, Session] = {}
+sessions_lock = Lock()
 
 
 def compute_state(env: CompilerEnv, actions: List[int]) -> StateToVisualize:
@@ -248,16 +267,20 @@ def start(reward: str, actions: str, benchmark: str):
     env.reward_space = reward
     env.reset()
     state = compute_state(env, [])
-    session_id = len(sessions)
-    session = [(env, state)]
-    sessions[session_id] = session
+    with sessions_lock:
+        session_id = len(sessions)
+        session = Session(states=[(env, state)], last_use=time())
+        sessions[session_id] = session
 
     # Accept an optional comma-separated list of actions to compute and return.
     if actions != "-":
         step(session_id, actions)
 
     return jsonify(
-        {"session_id": session_id, "states": [state.dict() for _, state in session]}
+        {
+            "session_id": session_id,
+            "states": [state.dict() for _, state in session.states],
+        }
     )
 
 
@@ -265,9 +288,10 @@ def start(reward: str, actions: str, benchmark: str):
 def stop(session_id: int):
     session_id = int(session_id)
 
-    for env, _ in sessions[session_id]:
-        env.close()
-    del sessions[session_id]
+    session = sessions[session_id]
+    session.close()
+    with sessions_lock:
+        del sessions[session_id]
 
     return jsonify({"session_id": session_id})
 
@@ -277,13 +301,14 @@ def step(session_id: int, actions: str):
     session_id = int(session_id)
 
     state_dicts = []
+    session = sessions[session_id]
     for action in [int(a) for a in actions.split(",")]:
-        session = sessions[session_id]
-        new_env = session[-1][0].fork()
+        new_env = session.states[-1][0].fork()
         new_state = compute_state(new_env, [action])
-        session.append((new_env, new_state))
+        session.states.append((new_env, new_state))
         state_dicts.append(new_state.dict())
 
+    session.last_use = time()
     return jsonify({"states": state_dicts})
 
 
@@ -294,8 +319,40 @@ def undo(session_id: int, n: int):
 
     session = sessions[session_id]
     for _ in range(n):
-        env, _ = session.pop()
+        env, _ = session.states.pop()
         env.close()
     _, old_state = session[-1]
 
+    session.last_use = time()
     return jsonify({"state": old_state.dict()})
+
+
+def idle_session_watchdog(ttl_seconds: int = 1200):
+    """Background thread to perform periodic garbage collection of sessions
+    that haven't been used in `ttl_seconds` seconds.
+    """
+    while True:
+        session_ids_to_remove = []
+        for session_id, session in sessions.items():
+            if session.last_use + ttl_seconds < time():
+                session_ids_to_remove.append(session_id)
+        with sessions_lock:
+            for session_id in session_ids_to_remove:
+                sessions[session_id].close()
+                del sessions[session_id]
+        logger.info("Garbage collected %d sessions", len(session_ids_to_remove))
+        sleep(ttl_seconds)
+
+
+if __name__ == "__main__":
+    logger.setLevel(logging.DEBUG)
+    handler = logging.StreamHandler(sys.stderr)
+    handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+    Thread(target=idle_session_watchdog).start()
+    app.run()
