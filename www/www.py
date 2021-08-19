@@ -1,4 +1,4 @@
-"""Demonstration of wrapping CompilerGym in a simple Flask app.
+"""A CompilerGym API and web frontend.
 
 This exposes an API with five operations:
 
@@ -137,10 +137,16 @@ We could carry on taking steps, or just end the session:
 
     $ curl -s localhost:5000/api/v3/stop/0
 """
+import logging
+import os
+import sys
 from itertools import islice
+from pathlib import Path
+from threading import Lock, Thread
+from time import sleep, time
 from typing import Dict, List, Tuple
 
-from flask import Flask, jsonify
+from flask import Flask, jsonify, send_file
 from flask_cors import CORS
 from pydantic import BaseModel
 
@@ -152,6 +158,11 @@ app = Flask("compiler_gym")
 CORS(app)
 
 
+resource_dir: Path = (Path(__file__).parent / "frontends/compiler_gym/build").absolute()
+
+logger = logging.getLogger(__name__)
+
+
 class StateToVisualize(BaseModel):
     """Encapsulates everything we want to visualize in the frontend. This
     will change from step to step.
@@ -161,7 +172,7 @@ class StateToVisualize(BaseModel):
     commandline: str
 
     # If the compiler environment dies, crashes, or encounters some
-    # unrecoverable error, this "done" flag is set. At this point the user
+    # unrecoverable error, this "done" flag is set. At this point the user d
     # should start a new session.
     done: bool
 
@@ -177,6 +188,18 @@ class StateToVisualize(BaseModel):
     reward: float
 
 
+class Session(BaseModel):
+    states: List[Tuple[CompilerEnv, StateToVisualize]]
+    last_use: float  # As returned by time().
+
+    def close(self):
+        for env, _ in self.states:
+            env.close()
+
+    class Config:
+        arbitrary_types_allowed = True
+
+
 # A set of sessions that are in use, keyed by a numeric session ID. Each session
 # is represented by a list of (environment, state) tuples, whether the
 # environment is a CompilerGym environment and the state is a StateToVisualize.
@@ -184,7 +207,8 @@ class StateToVisualize(BaseModel):
 # action is taken, this generates a new (environment, state) tuple that is
 # appended the session list. In this way, undoing an operation is as simple as
 # popping the most recent (environment, state) tuple from the list.
-sessions: Dict[int, List[Tuple[CompilerEnv, StateToVisualize]]] = {}
+sessions: Dict[int, Session] = {}
+sessions_lock = Lock()
 
 
 def compute_state(env: CompilerEnv, actions: List[int]) -> StateToVisualize:
@@ -212,31 +236,34 @@ def compute_state(env: CompilerEnv, actions: List[int]) -> StateToVisualize:
 
 @app.route("/api/v3/describe")
 def describe():
-    env = compiler_gym.make("llvm-v0")
-    env.reset()
-    return jsonify(
-        {
-            # A mapping from dataset name to benchmark name. To generate a full
-            # benchmark URI, join the two values with a '/'. E.g. given a benchmark
-            # "qsort" in the dataset "benchmark://cbench-v1", the full URI is
-            # "benchmark://cbench-v1/qsort".
-            "benchmarks": {
-                dataset.name: list(
-                    islice(
-                        (x[len(dataset.name) + 1 :] for x in dataset.benchmark_uris()),
-                        10,
+    with compiler_gym.make("llvm-v0") as env:
+        env.reset()
+        return jsonify(
+            {
+                # A mapping from dataset name to benchmark name. To generate a full
+                # benchmark URI, join the two values with a '/'. E.g. given a benchmark
+                # "qsort" in the dataset "benchmark://cbench-v1", the full URI is
+                # "benchmark://cbench-v1/qsort".
+                "benchmarks": {
+                    dataset.name: list(
+                        islice(
+                            (
+                                x[len(dataset.name) + 1 :]
+                                for x in dataset.benchmark_uris()
+                            ),
+                            10,
+                        )
                     )
-                )
-                for dataset in env.datasets
-            },
-            # A mapping from the name of an action to the numeric value. This
-            # numeric value is what is passed as argument to the step() function.
-            "actions": {k: v for v, k in enumerate(env.action_space.flags)},
-            # A list of reward space names. You select the reward space to use
-            # during start().
-            "rewards": sorted(list(env.reward.spaces.keys())),
-        }
-    )
+                    for dataset in env.datasets
+                },
+                # A mapping from the name of an action to the numeric value. This
+                # numeric value is what is passed as argument to the step() function.
+                "actions": {k: v for v, k in enumerate(env.action_space.flags)},
+                # A list of reward space names. You select the reward space to use
+                # during start().
+                "rewards": sorted(list(env.reward.spaces.keys())),
+            }
+        )
 
 
 @app.route("/api/v3/start/<reward>/<actions>/<path:benchmark>")
@@ -245,16 +272,20 @@ def start(reward: str, actions: str, benchmark: str):
     env.reward_space = reward
     env.reset()
     state = compute_state(env, [])
-    session_id = len(sessions)
-    session = [(env, state)]
-    sessions[session_id] = session
+    with sessions_lock:
+        session_id = len(sessions)
+        session = Session(states=[(env, state)], last_use=time())
+        sessions[session_id] = session
 
     # Accept an optional comma-separated list of actions to compute and return.
     if actions != "-":
         step(session_id, actions)
 
     return jsonify(
-        {"session_id": session_id, "states": [state.dict() for _, state in session]}
+        {
+            "session_id": session_id,
+            "states": [state.dict() for _, state in session.states],
+        }
     )
 
 
@@ -262,9 +293,10 @@ def start(reward: str, actions: str, benchmark: str):
 def stop(session_id: int):
     session_id = int(session_id)
 
-    for env, _ in sessions[session_id]:
-        env.close()
-    del sessions[session_id]
+    session = sessions[session_id]
+    session.close()
+    with sessions_lock:
+        del sessions[session_id]
 
     return jsonify({"session_id": session_id})
 
@@ -274,13 +306,14 @@ def step(session_id: int, actions: str):
     session_id = int(session_id)
 
     state_dicts = []
+    session = sessions[session_id]
     for action in [int(a) for a in actions.split(",")]:
-        session = sessions[session_id]
-        new_env = session[-1][0].fork()
+        new_env = session.states[-1][0].fork()
         new_state = compute_state(new_env, [action])
-        session.append((new_env, new_state))
+        session.states.append((new_env, new_state))
         state_dicts.append(new_state.dict())
 
+    session.last_use = time()
     return jsonify({"states": state_dicts})
 
 
@@ -291,8 +324,64 @@ def undo(session_id: int, n: int):
 
     session = sessions[session_id]
     for _ in range(n):
-        env, _ = session.pop()
+        env, _ = session.states.pop()
         env.close()
     _, old_state = session[-1]
 
+    session.last_use = time()
     return jsonify({"state": old_state.dict()})
+
+
+def idle_session_watchdog(ttl_seconds: int = 1200):
+    """Background thread to perform periodic garbage collection of sessions
+    that haven't been used in `ttl_seconds` seconds.
+    """
+    while True:
+        session_ids_to_remove = []
+        for session_id, session in sessions.items():
+            if session.last_use + ttl_seconds < time():
+                session_ids_to_remove.append(session_id)
+        with sessions_lock:
+            for session_id in session_ids_to_remove:
+                sessions[session_id].close()
+                del sessions[session_id]
+        logger.info("Garbage collected %d sessions", len(session_ids_to_remove))
+        sleep(ttl_seconds)
+
+
+# Web endpoints.
+
+
+@app.route("/")
+def index_resource():
+    return send_file(resource_dir / "index.html")
+
+
+@app.route("/<path>")
+def root_resource(path: str):
+    return send_file(resource_dir / path)
+
+
+@app.route("/static/css/<path>")
+def css_resource(path: str):
+    return send_file(resource_dir / "static/css/" / path)
+
+
+@app.route("/static/js/<path>")
+def js_resource(path: str):
+    return send_file(resource_dir / "static/js/" / path)
+
+
+if __name__ == "__main__":
+    logger.setLevel(logging.DEBUG)
+    handler = logging.StreamHandler(sys.stderr)
+    handler.setLevel(logging.DEBUG)
+    formatter = logging.Formatter(
+        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+    )
+    handler.setFormatter(formatter)
+    logger.addHandler(handler)
+
+    logger.info("Serving from %s", resource_dir)
+    Thread(target=idle_session_watchdog).start()
+    app.run(port=int(os.environ.get("PORT", "5000")))

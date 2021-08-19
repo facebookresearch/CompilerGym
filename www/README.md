@@ -2,36 +2,25 @@
 
 This is the frontend to run compiler gym on the browser.
 
-## Install dependencies
-If Node.js and npm are not installed in your machine yet, we strongly recommend using [nvm](https://github.com/nvm-sh/nvm) to manage and install node versions, another way is to install via [`homebrew`](https://brew.sh/).
+## Dependencies
 
-Afer installing node.js and npm, go to the folder `frontends/compiler_gym` and run the below command to install dependencies for the GUI.
-```sh
-$ npm install
-```
-
-## Setup
-[TO DO]: Create a file named `.env` in the folder `frontends/compiler_gym` with a copy the .env.example file.
+In addition to the base requirements for [building from
+source](/INSTALL.md#building-from-source), this requires node. We recommend
+[nvm](https://github.com/nvm-sh/nvm) to manage and install node versions.
 
 
-## Development
-Run application in local [http://localhost:3000/](http://localhost:3000/)
-```sh
-$ npm start
-```
-## Enabling backend
+## Usage
 
-Make sure to follow CompilerGym installations instructions [here](https://github.com/facebookresearch/CompilerGym/blob/development/INSTALL.md) before running the flask server. Go to the folder www in the root directory and run
+Build and launch the service on [http://localhost:5000/](http://localhost:5000/)
+using:
 
 ```sh
-$ FLASK_APP=demo_api.py flask run
+make www
 ```
 
-## Deployment
-Make sure to you have updated the .env file and build the current application.
+The port can be changed using the `$PORT` environment variable. For example, to
+run the server on port 3000:
+
 ```sh
-$ npm run build
+make www PORT=3000
 ```
-## Contributing
-
-We welcome contributions to CompilerGym. If you are interested in contributing please see [this document](https://github.com/facebookresearch/CompilerGym/blob/development/CONTRIBUTING.md).

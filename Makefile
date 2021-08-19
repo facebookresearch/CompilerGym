@@ -205,10 +205,13 @@ all: docs bdist_wheel bdist_wheel-linux
 # Web interface #
 #################
 
-www:
-	cd www && $(PYTHON) run.py
+www: www-build
+	cd www && $(PYTHON) www.py
 
-.PHONY: www
+www-build:
+	cd www/frontends/compiler_gym && npm install && npm run build
+
+.PHONY: www www-build
 
 #################
 # Documentation #
