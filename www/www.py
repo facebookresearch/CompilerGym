@@ -326,7 +326,7 @@ def undo(session_id: int, n: int):
     for _ in range(n):
         env, _ = session.states.pop()
         env.close()
-    _, old_state = session[-1]
+    _, old_state = session.states[-1]
 
     session.last_use = time()
     return jsonify({"state": old_state.dict()})
