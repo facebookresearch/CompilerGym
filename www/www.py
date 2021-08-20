@@ -323,7 +323,7 @@ def undo(session_id: int, n: int):
     n = int(n)
 
     session = sessions[session_id]
-    for _ in range(n):
+    for _ in range(min(n, len(session.states))):
         env, _ = session.states.pop()
         env.close()
     _, old_state = session.states[-1]
