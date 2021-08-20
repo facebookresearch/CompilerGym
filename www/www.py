@@ -384,4 +384,4 @@ if __name__ == "__main__":
 
     logger.info("Serving from %s", resource_dir)
     Thread(target=idle_session_watchdog).start()
-    app.run(port=int(os.environ.get("PORT", "5000")))
+    app.run(port=int(os.environ.get("PORT", "5000")), host="0.0.0.0")
