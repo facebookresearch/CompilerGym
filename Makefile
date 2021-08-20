@@ -211,6 +211,10 @@ www: www-build
 www-build:
 	cd www/frontends/compiler_gym && npm install && npm run build
 
+www-image: www-build
+	cd www && docker build -t chriscummins/compiler_gym-www .
+	docker run -p 5000:5000 chriscummins/compiler_gym-www
+
 .PHONY: www www-build
 
 #################
