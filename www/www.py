@@ -139,6 +139,7 @@ We could carry on taking steps, or just end the session:
 """
 import logging
 import os
+import re
 import sys
 from itertools import islice
 from pathlib import Path
@@ -268,6 +269,9 @@ def describe():
 
 @app.route("/api/v3/start/<reward>/<actions>/<path:benchmark>")
 def start(reward: str, actions: str, benchmark: str):
+    # FIXME(cummins): Workaround unusual bug where the requested benchmark URI
+    # uses a :/ separateor instead of ://.
+    benchmark = re.sub(":/([^/])", r"://\1", benchmark)
     env = compiler_gym.make("llvm-v0", benchmark=benchmark)
     env.reward_space = reward
     env.reset()
