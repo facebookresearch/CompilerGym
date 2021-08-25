@@ -78,23 +78,6 @@ const RenderSvgNode = ({
 };
 
 /**
- *
- * {nodeDatum.active && (
-        <foreignObject {...foreignObjectProps}>
-          <div className="active-node-info">
-            {nodeDatum.children && (
-              <h5>
-                <span className="text-weight">Reward:</span> {nodeDatum.reward}
-                <br />
-                Step: {nodeDatum.__rd3t.depth}
-              </h5>
-            )}
-          </div>
-        </foreignObject>
-      )}
- */
-
-/**
  * Renders the search tree component.
  *
  * @param {*} actionSpace Receives the number of nodes to show on an active node.
@@ -132,7 +115,7 @@ const SearchTree = ({
             .hierarchyPointNode
         ).reverse()
       );
-    }, 1000);
+    }, 500);
     return () => clearTimeout(timer);
   }, [treeData]);
 
@@ -182,16 +165,3 @@ const SearchTree = ({
 };
 
 export default SearchTree;
-
-/**
- *
- * renderCustomNodeElement={(rd3tProps) =>
-            renderSvgNode({
-              ...rd3tProps,
-              handleNodeClick,
-              handleMouseOverTree,
-              handleMouseOutTree,
-              layer,
-            })
-          }
- */

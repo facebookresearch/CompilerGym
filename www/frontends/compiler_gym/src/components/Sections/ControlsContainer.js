@@ -267,7 +267,6 @@ const ControlsContainer = () => {
       tree.children.forEach((i) => {
         if (i.action_id === activeNode) {
           i.active = true;
-          //i.description = ActionsDict.find((i) => i.Action === i.name)?.Description || "";
           i.children = children.slice(0, limit).map((o) => {
             return {
               name: o.name,
