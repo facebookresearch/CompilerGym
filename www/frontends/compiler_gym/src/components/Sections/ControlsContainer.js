@@ -22,17 +22,20 @@ const ControlsContainer = () => {
   const [actionSpace, setActionSpace] = useState(30);
   const [treeData, setTreeData] = useState({});
   const [highlightedPoint, setHighlightedPoint] = useState({});
+  const [focusedNode, setFocusedNode] = useState(0);
   const [actionsTracker, setActionsTracker] = useState({
     activeNode: "x",
     actionsTaken: [],
     layer: 1,
   });
+  const [locationKeys, setLocationKeys] = useState([]);
 
   const children =
     compilerGym.actions &&
     Object.entries(compilerGym.actions).map(([name, action_id]) => ({
       name,
       action_id: action_id.toString(),
+      description : ActionsDict.find((i) => i.Action === name)?.Description || "",
       children: [],
     }));
 
@@ -57,6 +60,26 @@ const ControlsContainer = () => {
     }
     return () => {};
   }, [session.states]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /**
+   * Detects back and forward buttons in the browser, it allows to keep track
+   * of the session and observation states.
+   */
+  useEffect(() => {
+    return history.listen((location) => {
+      if (history.action === "PUSH") {
+        setLocationKeys([location.key]);
+      }
+      if (history.action === "POP") {
+        if (locationKeys[1] === location.key) {
+          setLocationKeys(([_, ...keys]) => keys);
+        } else {
+          setLocationKeys((keys) => [location.key, ...keys]);
+          window.location.reload();
+        }
+      }
+    });
+  }, [locationKeys]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /**
    * This functions makes an API call to close current session and start a new session with new parameters
@@ -118,7 +141,7 @@ const ControlsContainer = () => {
         makeSessionTreeData([...session.states, ...response.states], children)
       );
       searchParams.set("actions", `${urlActions},${stepID}`);
-      history.replace({ ...location, search: searchParams.toString() });
+      history.push({ ...location, search: searchParams.toString() });
     } catch (err) {
       console.log(err);
     }
@@ -167,7 +190,7 @@ const ControlsContainer = () => {
         layer: newActionsTaken.length + 1,
       });
       searchParams.set("actions", stepsIDs.join(","));
-      history.replace({ ...location, search: searchParams.toString() });
+      history.push({ ...location, search: searchParams.toString() });
     } catch (error) {
       console.log(error);
     }
@@ -244,9 +267,11 @@ const ControlsContainer = () => {
       tree.children.forEach((i) => {
         if (i.action_id === activeNode) {
           i.active = true;
+          //i.description = ActionsDict.find((i) => i.Action === i.name)?.Description || "";
           i.children = children.slice(0, limit).map((o) => {
             return {
               name: o.name,
+              description : ActionsDict.find((i) => i.Action === o.name)?.Description || "",
               action_id: `${o.action_id}.${actionsTracker.layer}`,
               children: [],
             };
@@ -277,11 +302,13 @@ const ControlsContainer = () => {
         selected: true,
         nodeDescription: nodeDescription,
       });
+    } else {
+      setHighlightedPoint({
+        ...highlightedPoint,
+        point: nodeData.__rd3t.depth,
+        nodeDescription: nodeDescription,
+      });
     }
-    setHighlightedPoint({
-      ...highlightedPoint,
-      nodeDescription: nodeDescription,
-    });
   };
 
   const handleMouseOutTree = (nodeData) => {
@@ -291,9 +318,14 @@ const ControlsContainer = () => {
         selected: false,
         nodeDescription: "",
       });
+    } else {
+      setHighlightedPoint({ ...highlightedPoint, nodeDescription: "", point: null });
     }
-    setHighlightedPoint({ ...highlightedPoint, nodeDescription: "" });
   };
+
+  const handleClickOnChart = (dataPoint) => {
+    setFocusedNode(dataPoint.index)
+  }
 
   return (
     <div>
@@ -308,11 +340,12 @@ const ControlsContainer = () => {
         actionSpace={actionSpace}
         treeData={treeData}
         layer={actionsTracker.layer}
+        focusedNode={focusedNode}
         handleNodeClick={handleNodeClick}
         handleMouseOverTree={handleMouseOverTree}
         handleMouseOutTree={handleMouseOutTree}
       />
-      <RewardsSection session={session} highlightedPoint={highlightedPoint} />
+      <RewardsSection session={session} highlightedPoint={highlightedPoint} handleClickOnChart={handleClickOnChart} />
     </div>
   );
 };

@@ -48,6 +48,7 @@ export const makeSessionTreeData = (states, children) => {
     let nestedChildren = actionsData?.reduceRight(
       (value, current, i) => ({
         name: current.name,
+        description: current.description,
         action_id: `${current.action_id}.${i + 1}`,
         active: true,
         reward: rewards[i].toFixed(3),
@@ -55,6 +56,7 @@ export const makeSessionTreeData = (states, children) => {
           ? children.slice(0, 30).map((o) => {
               return {
                 name: o.name,
+                description: o.description,
                 action_id: `${o.action_id}.${i + 2}`,
                 children: [],
               };
@@ -149,4 +151,25 @@ export const percIncrease = (a, b) => {
     percent = -a * 100;
   }
   return Math.floor(percent);
+};
+
+/**
+ * This recursive function takes a tree object of parents and returns the translate Y position in canvas as a flat array.
+ *
+ * @param {*} obj the three object of parents
+ * @param {*} y_deltas a memoized array with y deltas.
+ * @returns
+ */
+export const getYDeltas = (obj, y_deltas = []) => {
+  obj &&
+    Object.entries(obj).forEach(([key, value]) => {
+      if (key === "parent" && value) {
+        y_deltas.push(value.x);
+        return getYDeltas(value, y_deltas);
+      } else if (key === "parent" && !value) {
+        return y_deltas;
+      }
+    });
+
+  return y_deltas;
 };

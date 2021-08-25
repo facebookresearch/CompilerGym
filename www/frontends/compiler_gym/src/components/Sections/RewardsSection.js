@@ -17,7 +17,7 @@ import RewardHistoryChart from "./RewardHistoryChart";
  * @param {Object} highlightedPoint an object prop containing data about a node in the tree to display an action description.
  * @returns
  */
-const RewardsSection = ({ session, highlightedPoint }) => {
+const RewardsSection = ({ session, highlightedPoint, handleClickOnChart }) => {
   const { darkTheme } = useContext(ThemeContext);
   const [cumulativeSum, setCumulativeSum] = useState("");
   const [toggle, setToggle] = useState(true);
@@ -64,13 +64,13 @@ const RewardsSection = ({ session, highlightedPoint }) => {
         <Col lg={7} md={7} xs={7} className="text-right">
           {highlightedPoint.nodeDescription && (
             <h5>
-              <span className="text-weight">Action Description: </span>
-              {highlightedPoint.nodeDescription}
+              <span className="text-weight">Depth: </span>
+              {highlightedPoint.point}
             </h5>
           )}
         </Col>
       </Row>
-      <RewardHistoryChart session={session} />
+      <RewardHistoryChart session={session} highlightedPoint={highlightedPoint} handleClickOnChart={handleClickOnChart}/>
     </>
   );
 };

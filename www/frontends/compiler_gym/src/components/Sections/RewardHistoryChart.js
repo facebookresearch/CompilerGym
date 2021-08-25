@@ -10,9 +10,10 @@ import Highcharts from "highcharts";
 import HighchartsReact from "highcharts-react-official";
 import ThemeContext from "../../context/ThemeContext";
 
-const RewardHistoryChart = ({ session }) => {
+const RewardHistoryChart = ({ session, highlightedPoint, handleClickOnChart }) => {
   const { darkTheme } = useContext(ThemeContext);
   const panel = useRef();
+  const chart = useRef();
   const [rewards, setRewards] = useState([]);
   const [cumulativeSum, setCumulativeSum] = useState([]);
   const [steps, setSteps] = useState([]);
@@ -29,6 +30,19 @@ const RewardHistoryChart = ({ session }) => {
     );
     return () => {};
   }, [session]);
+
+  useEffect(() => {
+    if (highlightedPoint && highlightedPoint.selected) {
+      chart.current?.chart.tooltip.refresh(chart.current?.chart.series[1].points[highlightedPoint.point]);
+    } else {
+      chart.current?.chart.tooltip.hide();
+    }
+    return () => {};
+  }, [highlightedPoint]);
+
+  const setClickPoint = (e) => {
+    handleClickOnChart(e);
+  };
 
   const options = {
     colors: darkTheme ? ["#b34949", "#2593B8"] : ["#2593B8", "#434348"],
@@ -53,6 +67,7 @@ const RewardHistoryChart = ({ session }) => {
       labels: {
         enabled: false,
       },
+      crosshair: true
     },
     yAxis: {
       title: null,
@@ -76,16 +91,26 @@ const RewardHistoryChart = ({ session }) => {
       floating: true,
       itemStyle: {
         fontWeight: "normal",
-        fontSize: "12px",
+        fontSize: "11px",
       },
+    },
+    tooltip: {
+      shared: true,
     },
     plotOptions: {
       series: {
-        pointWidth: 6,
+        pointWidth: 4,
         marker: {
-          radius: 4,
+          radius: 2,
         },
         allowPointSelect: true,
+        point: {
+          events: {
+            select: function () {
+              setClickPoint(this);
+            },
+          },
+        },
         states: {
           hover: {
             enabled: false,
@@ -108,7 +133,7 @@ const RewardHistoryChart = ({ session }) => {
       },
       {
         type: "column",
-        name: "Step",
+        name: "Step Reward",
         data: rewards,
       },
     ],
@@ -129,7 +154,7 @@ const RewardHistoryChart = ({ session }) => {
         { "": !darkTheme }
       )}
     >
-      <HighchartsReact highcharts={Highcharts} options={options} />
+      <HighchartsReact ref={chart} highcharts={Highcharts} options={options} />
     </div>
   );
 };
