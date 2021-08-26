@@ -181,6 +181,14 @@ class LlvmEnv(CompilerEnv):
                     deterministic=True,
                     platform_dependent=True,
                 ),
+                CostFunctionReward(
+                    id="CircuitArea",
+                    cost_function="CircuitArea",
+                    init_cost_function=None,
+                    default_negates_returns=True,
+                    deterministic=True,
+                    platform_dependent=False,
+                ),
             ],
         )
 
