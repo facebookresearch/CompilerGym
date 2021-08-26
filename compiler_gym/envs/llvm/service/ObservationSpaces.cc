@@ -187,6 +187,14 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
         space.mutable_default_value()->set_scalar_int64(0);
         break;
       }
+      case LlvmObservationSpace::CIRCUIT_AREA: {
+        auto featureSize = space.mutable_scalar_int64_range();
+        featureSize->mutable_min()->set_value(0);
+        space.set_deterministic(true);
+        space.set_platform_dependent(false);
+        space.mutable_default_value()->set_scalar_int64(0);
+        break;
+      }
     }
     spaces.push_back(space);
   }

@@ -110,6 +110,10 @@ enum class LlvmObservationSpace {
    * benchmarks. When not available, a list of zeros are returned.
    */
   BUILDTIME,
+  /**
+   * TODO(ibrunar): document this observation space.
+   */
+  CIRCUIT_AREA,
 };
 
 /** Return the list of available observation spaces. */

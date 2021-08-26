@@ -7,6 +7,7 @@
 #include <cpuinfo.h>
 #include <fmt/format.h>
 #include <glog/logging.h>
+#include <stdlib.h>
 
 #include <iomanip>
 #include <optional>
@@ -26,6 +27,7 @@
 #include "compiler_gym/util/EnumUtil.h"
 #include "compiler_gym/util/GrpcStatusMacros.h"
 #include "compiler_gym/util/RunfilesPath.h"
+#include "compiler_gym/util/Subprocess.h"
 #include "llvm/Bitcode/BitcodeWriter.h"
 #include "llvm/CodeGen/Passes.h"
 #include "llvm/IR/LegacyPassManager.h"
@@ -465,6 +467,24 @@ Status LlvmSession::computeObservation(LlvmObservationSpace space, Observation& 
     }
     case LlvmObservationSpace::BUILDTIME: {
       return benchmark().computeBuildtime(reply);
+    }
+    case LlvmObservationSpace::CIRCUIT_AREA: {
+      // Write the bitcode to a file.
+      RETURN_IF_ERROR(writeBitcodeToFile(benchmark().module(), workingDirectory() / "bambu.bc"));
+
+      // Run bambu on the bitcode and record the stdout.
+      // TODO(ibrumar): Actually run bambu.
+      constexpr int kBambuTimeoutSeconds = 60;
+      std::string stdout;
+      util::checkOutput(fmt::format("du {}", (workingDirectory() / "bambu.bc").string()),
+                        kBambuTimeoutSeconds, workingDirectory(), stdout);
+
+      // Parse the output of bambu.
+      // TODO(ibrumar): Actually parse the output of bambu, including error
+      // handling.
+      int area = atoi(stdout.c_str());
+      reply.set_scalar_int64(area);
+      break;
     }
   }
 
