@@ -41,6 +41,7 @@ def test_observation_spaces(env: LlvmEnv):
         "Ir",
         "IrSha1",
         "BitcodeFile",
+        "CircuitArea",
         "InstCount",
         "InstCountDict",
         "InstCountNorm",

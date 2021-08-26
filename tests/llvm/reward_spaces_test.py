@@ -63,6 +63,7 @@ def test_reward_spaces(env: LlvmEnv):
     env.reset(benchmark="cbench-v1/crc32")
 
     assert set(env.reward.spaces.keys()) == {
+        "CircuitArea",
         "IrInstructionCount",
         "IrInstructionCountNorm",
         "IrInstructionCountO3",
