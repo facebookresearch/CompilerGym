@@ -22,7 +22,7 @@ class CostFunctionReward(Reward):
         "previous_cost",
     ]
 
-    def __init__(self, cost_function: str, init_cost_function: str, **kwargs):
+    def __init__(self, cost_function: str, init_cost_function: Optional[str], **kwargs):
         """Constructor.
 
         :param cost_function: The ID of the observation space used to produce
@@ -33,14 +33,29 @@ class CostFunctionReward(Reward):
         """
         super().__init__(observation_spaces=[cost_function], **kwargs)
         self.cost_function: str = cost_function
-        self.init_cost_function: str = init_cost_function
+        self.init_cost_function: Optional[str] = init_cost_function
         self.previous_cost: Optional[ObservationType] = None
+        self.cached_init_cost = None
+        self.cached_benchmark = None
 
     def reset(self, benchmark: Benchmark, observation_view: ObservationView) -> None:
         """Called on env.reset(). Reset incremental progress."""
-        del benchmark  # unused
-        del observation_view  # unused
-        self.previous_cost = None
+
+        if benchmark == self.cached_benchmark and self.cached_init_cost is not None:
+            # We have already computed the initial cost for this benchmark.
+            self.previous_cost = self.cached_init_cost
+        else:
+            # We need to compute the initial cost for this new benchmark, or
+            # compute it lazily.
+            if self.init_cost_function:
+                # We will compute the first cost lazily.
+                self.previous_cost = None
+            else:
+                # Without an initial cost function we must compute the first cost
+                # now.
+                self.previous_cost = observation_view[self.cost_function]
+
+            self.cached_benchmark = benchmark
 
     def update(
         self,
