@@ -14,12 +14,12 @@ const MainNavbar = () => {
   return (
     <Navbar bg="dark" variant="dark" expand="lg">
       <Container fluid>
-        <Navbar.Brand href="#home">CompilerGym</Navbar.Brand>
+        <Navbar.Brand>CompilerGym</Navbar.Brand>
         <Navbar.Toggle aria-controls="basic-navbar-nav" />
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="mr-auto">
             <Nav.Link
-              href="https://facebookresearch.github.io/CompilerGym/about.html"
+              href="https://facebookresearch.github.io/CompilerGym/index.html"
               target="_blank"
             >
               -

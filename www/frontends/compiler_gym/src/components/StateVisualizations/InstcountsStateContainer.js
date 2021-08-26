@@ -58,7 +58,6 @@ const InstcountsStateContainer = ({
   const options = {
     colors: ["#64E572", "#DDDF00"],
     chart: {
-      //type: "bar",
       height: 175 + "%", //3:2 ratio
     },
     title: {
@@ -163,8 +162,7 @@ const InstcountsStateContainer = ({
       )}
     >
       <Row className="align-items-center mx-0 pt-2">
-        <Col md="3"></Col>
-        <Col md="9" className="text-right">
+        <Col md="9">
           <div className="px-2">
             <h5>
               The InstCount observation space is a 70-dimension integer feature
@@ -184,8 +182,9 @@ const InstcountsStateContainer = ({
             </h5>
           </div>
         </Col>
+        <Col md="3"></Col>
       </Row>
-      <div className="row-sort-button ml-2">
+      <div className="row-sort-button mr-3">
         <Row className="align-items-center">
           <Col>
             <Dropdown onSelect={(e) => setSortBy(e)}>

@@ -165,8 +165,7 @@ const AutophaseStateContainer = ({
       )}
     >
       <Row className="align-items-center mx-0 pt-2">
-        <Col md="6"></Col>
-        <Col md="6" className="text-right">
+        <Col md="6">
           <div className="px-2">
             <h5>
               The Autophase observation space is a 56-dimension integer feature
@@ -183,8 +182,9 @@ const AutophaseStateContainer = ({
             </h5>
           </div>
         </Col>
+        <Col md="6"></Col>
       </Row>
-      <div className="row-sort-button ml-2">
+      <div className="row-sort-button mr-3">
         <Row className="align-items-center">
           <Col>
             <Dropdown onSelect={(e) => setSortBy(e)}>
