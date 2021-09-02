@@ -143,6 +143,7 @@ We could carry on taking steps, or just end the session:
 """
 import logging
 import os
+import re
 import sys
 from itertools import islice
 from pathlib import Path
@@ -272,6 +273,9 @@ def describe():
 
 @app.route("/api/v3/start/<reward>/<actions>/<path:benchmark>")
 def start(reward: str, actions: str, benchmark: str):
+    # FIXME(cummins): Workaround unusual bug where the requested benchmark URI
+    # uses a :/ separateor instead of ://.
+    benchmark = re.sub(":/([^/])", r"://\1", benchmark)
     env = compiler_gym.make("llvm-v0", benchmark=benchmark)
     env.reward_space = reward
     env.reset()
@@ -327,10 +331,10 @@ def undo(session_id: int, n: int):
     n = int(n)
 
     session = sessions[session_id]
-    for _ in range(n):
+    for _ in range(min(n, len(session.states))):
         env, _ = session.states.pop()
         env.close()
-    _, old_state = session[-1]
+    _, old_state = session.states[-1]
 
     session.last_use = time()
     return jsonify({"state": old_state.dict()})
@@ -388,4 +392,4 @@ if __name__ == "__main__":
 
     logger.info("Serving from %s", resource_dir)
     Thread(target=idle_session_watchdog).start()
-    app.run(port=int(os.environ.get("PORT", "5000")))
+    app.run(port=int(os.environ.get("PORT", "5000")), host="0.0.0.0")
