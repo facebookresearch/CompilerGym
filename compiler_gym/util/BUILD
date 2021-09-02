@@ -92,6 +92,9 @@ cc_library(
     name = "Unreachable",
     hdrs = ["Unreachable.h"],
     visibility = ["//visibility:public"],
+    deps = [
+        "@glog",
+    ],
 )
 
 genrule(
