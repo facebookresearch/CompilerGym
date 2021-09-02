@@ -32,7 +32,8 @@ The following files are generated:
         enum class LlvmAction {
           ADD_DISCRIMINATORS_PASS,
           AGGRESSIVE_DCEPASS,
-        ... }
+          ...
+        }
 
     This defines an enum that names all of the passes.
 
@@ -48,33 +49,24 @@ The following files are generated:
             case LlvmAction::AGGRESSIVE_DCEPASS: \
               handlePass(llvm::createAggressiveDCEPass()); \
               break; \
-        ...  }
+          ...
+        }
 
     To use the generated switch, call the HANDLE_ACTION() macro using an
     LlvmAction enum value and a handlePass function which accepts a pass
     instance as input.
 
-<outdir>/actions_list.txt
+<outdir>/flags.txt
 -------------------------
-    Example:
-
-        AddDiscriminatorsPass
-        AggressiveDcepass
-        ...
-
-    A list of names for each pass.
-
-<outdir>/actions_flags.txt
---------------------------
     Example:
 
         -add-discriminators
         -adce
         ...
 
-    A list of flags for each pass.
+    A list of names for each pass.
 
-<outdir>/actions_descriptions.txt
+<outdir>/flag_descriptions.txt
 ---------------------------------
     Example:
 
@@ -88,26 +80,9 @@ import csv
 import logging
 import sys
 from pathlib import Path
-from typing import List
 
 from compiler_gym.envs.llvm.service.passes.common import Pass
 from compiler_gym.envs.llvm.service.passes.config import EXTRA_LLVM_HEADERS
-
-
-def camel_case_split(string: str) -> List[str]:
-    """Split camelCase into a list of words.
-
-    E.g. "thisIsCamelCaps" -> ["this", "Is, "Camel", "Caps"].
-    """
-    words = [[string[0]]]
-
-    for c in string[1:]:
-        if words[-1][-1].islower() and c.isupper():
-            words.append(list(c))
-        else:
-            words[-1].append(c)
-
-    return ["".join(word) for word in words]
 
 
 def process_pass(pass_, headers, enum_f, switch_f):
@@ -116,7 +91,7 @@ def process_pass(pass_, headers, enum_f, switch_f):
         headers.add(pass_.header)
 
     # The name of the pass in UPPER_PASCAL_CASE.
-    enum_name = "_".join(camel_case_split(pass_.name)).upper()
+    enum_name = pass_.flag[1:].replace("-", "_").upper()
     print(f"  {enum_name},", file=enum_f)
     print(f"    case LlvmAction::{enum_name}: \\", file=switch_f)
     print(f"      handlePass(llvm::create{pass_.name}()); \\", file=switch_f)
@@ -133,9 +108,8 @@ def make_action_sources(pass_iterator, outpath: Path):
     switch_path = Path(outpath / "ActionSwitch.h")
     enum_path = Path(outpath / "ActionEnum.h")
     include_path = Path(outpath / "ActionHeaders.h")
-    actions_path = Path(outpath / "actions_list.txt")
-    flags_path = Path(outpath / "actions_flags.txt")
-    descriptions_path = Path(outpath / "actions_descriptions.txt")
+    flags_path = Path(outpath / "flags.txt")
+    descriptions_path = Path(outpath / "flag_descriptions.txt")
 
     with open(switch_path, "w") as switch_f, open(enum_path, "w") as enum_f:
         print("enum class LlvmAction {", file=enum_f)
@@ -168,16 +142,6 @@ FunctionPass* createEarlyCSEMemSSAPass() {
             file=f,
         )
     logging.debug("Generated %s", include_path.name)
-
-    with open(actions_path, "w") as f:
-        print(
-            "\n".join(
-                "".join(x.capitalize() for x in camel_case_split(p.name))
-                for p in passes
-            ),
-            file=f,
-        )
-    logging.debug("Generated %s", actions_path.name)
 
     with open(flags_path, "w") as f:
         print("\n".join(p.flag for p in passes), file=f)

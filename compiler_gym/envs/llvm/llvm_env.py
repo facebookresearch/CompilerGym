@@ -21,38 +21,11 @@ from compiler_gym.envs.llvm.llvm_rewards import (
     CostFunctionReward,
     NormalizedReward,
 )
-from compiler_gym.spaces import Commandline, CommandlineFlag, Scalar, Sequence
+from compiler_gym.spaces import Commandline, Scalar, Sequence
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_NAMES
 from compiler_gym.third_party.inst2vec import Inst2vecEncoder
 from compiler_gym.third_party.llvm import download_llvm_files
 from compiler_gym.third_party.llvm.instcount import INST_COUNT_FEATURE_NAMES
-from compiler_gym.util.runfiles_path import runfiles_path
-
-_ACTIONS_LIST = Path(
-    runfiles_path("compiler_gym/envs/llvm/service/passes/actions_list.txt")
-)
-
-_FLAGS_LIST = Path(
-    runfiles_path("compiler_gym/envs/llvm/service/passes/actions_flags.txt")
-)
-
-_DESCRIPTIONS_LIST = Path(
-    runfiles_path("compiler_gym/envs/llvm/service/passes/actions_descriptions.txt")
-)
-
-
-def _read_list_file(path: Path) -> Iterable[str]:
-    with open(str(path)) as f:
-        for action in f:
-            if action.strip():
-                yield action.strip()
-
-
-# TODO(github.com/facebookresearch/CompilerGym/issues/122): Replace text file
-# parsing with build-generated python modules and import them.
-_ACTIONS = list(_read_list_file(_ACTIONS_LIST))
-_FLAGS = dict(zip(_ACTIONS, _read_list_file(_FLAGS_LIST)))
-_DESCRIPTIONS = dict(zip(_ACTIONS, _read_list_file(_DESCRIPTIONS_LIST)))
 
 _INST2VEC_ENCODER = Inst2vecEncoder()
 
@@ -412,15 +385,6 @@ class LlvmEnv(CompilerEnv):
             system_includes=system_includes,
             timeout=timeout,
         )
-
-    def _make_action_space(self, name: str, entries: List[str]) -> Commandline:
-        flags = [
-            CommandlineFlag(
-                name=entry, flag=_FLAGS[entry], description=_DESCRIPTIONS[entry]
-            )
-            for entry in entries
-        ]
-        return Commandline(items=flags, name=name)
 
     def commandline(  # pylint: disable=arguments-differ
         self, textformat: bool = False

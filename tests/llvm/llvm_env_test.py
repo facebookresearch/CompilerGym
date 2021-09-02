@@ -76,23 +76,6 @@ def test_double_reset(env: LlvmEnv, always_send_benchmark_on_reset: bool):
     assert env.in_episode
 
 
-def test_commandline_no_actions(env: LlvmEnv):
-    env.reset(benchmark="cbench-v1/crc32")
-    assert env.commandline() == "opt  input.bc -o output.bc"
-    assert env.commandline_to_actions(env.commandline()) == []
-
-
-def test_commandline(env: LlvmEnv):
-    env.reset(benchmark="cbench-v1/crc32")
-    env.step(env.action_space.flags.index("-mem2reg"))
-    env.step(env.action_space.flags.index("-reg2mem"))
-    assert env.commandline() == "opt -mem2reg -reg2mem input.bc -o output.bc"
-    assert env.commandline_to_actions(env.commandline()) == [
-        env.action_space.flags.index("-mem2reg"),
-        env.action_space.flags.index("-reg2mem"),
-    ]
-
-
 def test_connection_dies_default_reward(env: LlvmEnv):
     env.reward_space = "IrInstructionCount"
     env.reset(benchmark="cbench-v1/crc32")
