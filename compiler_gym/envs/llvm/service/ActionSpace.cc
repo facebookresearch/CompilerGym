@@ -21,7 +21,11 @@ std::vector<ActionSpace> getLlvmActionSpaceList() {
         for (const auto& value : magic_enum::enum_values<LlvmAction>()) {
           space.add_action(util::enumNameToPascalCase<LlvmAction>(value));
         }
-        break;
+        flagChoice->mutable_named_discrete_space()->set_is_commandline(true);
+      } break;
+      default:
+        UNREACHABLE(fmt::format("Unknown LLVM action space {}",
+                                util::enumNameToPascalCase<LlvmActionSpace>(value)));
     }
 
     spaces.push_back(space);
