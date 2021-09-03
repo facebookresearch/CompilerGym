@@ -22,6 +22,7 @@ py_library(
 py_library(
     name = "commandline",
     srcs = ["commandline.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
     deps = [
         ":named_discrete",
     ],
@@ -30,6 +31,7 @@ py_library(
 py_library(
     name = "named_discrete",
     srcs = ["named_discrete.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
 )
 
 py_library(
@@ -45,6 +47,7 @@ py_library(
 py_library(
     name = "scalar",
     srcs = ["scalar.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
 )
 
 py_library(
