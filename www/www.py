@@ -55,9 +55,9 @@ This exposes an API with two operations:
 
             actions: An optional, command-separated list of actions to run.
 
-            all_rewards: An optional string that if "1" means that a list of
-                all rewards will be returned, one for each action. Else, only
-                the reward for the final action is returned.
+            all_states: An optional string that if "1" means that a list of
+                all states will be returned, one for each action. Else, only
+                the state for the final action is returned.
 
         Example usage:
 
@@ -67,13 +67,17 @@ This exposes an API with two operations:
                 "rewards": [0.003],
                 "done": false,
                 "ir": "...",
-                "instcount": {...},
-                "autophase": {...},
+                "states": [
+                    {
+                        "instcount": {...},
+                        "autophase": {...},
+                        "reward": 0.003
+                    },
+                ]
             }
 """
 import logging
 import os
-import re
 import sys
 from itertools import islice
 from pathlib import Path
@@ -104,24 +108,69 @@ env_lock = Lock()
 class StateToVisualize(BaseModel):
     """Encapsulates the state to visualize in the frontend."""
 
+    instcount: Dict[str, int]
+    autophase: Dict[str, int]
+    # The reward signal measures how "good" the previous action was. Over time
+    # the sequence of actions that produces the highest cumulative reward is the
+    # best:
+    reward: float
+
+
+class StepRequest(BaseModel):
+    """User arguments to /api/v4/step."""
+
+    # The name of the benchmark.
+    benchmark: str
+
+    # The reward space to use.
+    reward: str
+
+    # A comma-separated list of actions to perform.
+    actions: List[int]
+
+    # Whether to return a state for every action, or only the final action. See
+    # StepReply.states.
+    all_states: bool
+
+    @classmethod
+    def from_request(cls):
+        """Parse the arguments from Flask's request arguments."""
+
+        def required_arg(name: str) -> str:
+            value = request.args.get(name)
+            if not value:
+                raise ValueError(f"Missing requirement argument: {name}")
+            return value
+
+        actions_str: str = request.args.get("actions")
+        actions: List[int] = (
+            [int(x) for x in actions_str.split(",")] if actions_str else []
+        )
+
+        return cls(
+            benchmark=required_arg("benchmark"),
+            reward=required_arg("reward"),
+            actions=actions,
+            all_states=request.args.get("all_states", "0") == "1",
+        )
+
+
+class StepReply(BaseModel):
+    """The data returned by a call to /api/v4/step."""
+
     # This summarizes the sequence of actions that the user has selected so far:
     commandline: str
 
     # If the compiler environment dies, crashes, or encounters some
-    # unrecoverable error, this "done" flag is set. At this point the user d
+    # unrecoverable error, this "done" flag is set. At this point the user
     # should start a new session.
     done: bool
 
-    # Observations that we would like to visualize. This list will grow over
-    # time to include graphs and 2-D matrices:
+    # The current LLVM-IR:
     ir: str
-    instcount: Dict[str, int]
-    autophase: Dict[str, int]
 
-    # The reward signal measures how "good" the previous action was. Over time
-    # the sequence of actions that produces the highest cumulative reward is the
-    # best:
-    rewards: List[float]
+    # A list of states to visualize, ordered from first to last.
+    states: List[StateToVisualize]
 
 
 @app.route("/api/v4/describe")
@@ -156,38 +205,66 @@ def describe():
         )
 
 
-def _step(
-    benchmark: str, reward: str, actions: List[int], reward_history: bool
-) -> StateToVisualize:
-    rewards = []
+def _step(request: StepRequest) -> StepReply:
+    """Run the actual step with parsed arguments."""
+    states: List[StateToVisualize] = []
 
     with env_lock:
-        env.reward_space = reward
+        env.reward_space = request.reward
         env.reset()
 
         # Replay all actions except the last one.
-        if reward_history:
-            # Replay actions one at a time to receive incremental rewards. The first
-            # reward represents the state prior to any actions.
-            rewards.append(0)
-            for action in actions[:-1]:
-                _, reward, done, info = env.step(action)
-                rewards.append(reward)
+        if request.all_states:
+            # Replay actions one at a time to receive incremental rewards. The
+            # first item represents the state prior to any actions.
+            (instcount, autophase), _, done, info = env.step(
+                action=[],
+                observations=[
+                    env.observation.spaces["InstCountDict"],
+                    env.observation.spaces["AutophaseDict"],
+                ],
+            )
+            if done:
+                raise ValueError(
+                    f"Failed to compute initial state: {info['error_details']}"
+                )
+            states.append(
+                StateToVisualize(
+                    instcount=instcount,
+                    autophase=autophase,
+                    reward=0,
+                )
+            )
+            for action in request.actions[:-1]:
+                (instcount, autophase), reward, done, info = env.step(
+                    action,
+                    observations=[
+                        env.observation.spaces["InstCountDict"],
+                        env.observation.spaces["AutophaseDict"],
+                    ],
+                )
+                states.append(
+                    StateToVisualize(
+                        instcount=instcount,
+                        autophase=autophase,
+                        reward=reward,
+                    )
+                )
                 if done:
                     raise ValueError(
                         f"Failed to apply action {action}: {info['error_details']}"
                     )
         else:
             # Replay actions in a single batch.
-            _, _, done, info = env.step(actions[:-1])
+            _, _, done, info = env.step(request.actions[:-1])
             if done:
                 raise ValueError(
-                    f"Failed to apply actions {actions}: {info['error_details']}"
+                    f"Failed to apply actions {request.actions}: {info['error_details']}"
                 )
 
         # Perform the final action.
         (ir, instcount, autophase), (reward,), done, _ = env.raw_step(
-            actions=actions[-1:],
+            actions=request.actions[-1:],
             observations=[
                 env.observation.spaces["Ir"],
                 env.observation.spaces["InstCountDict"],
@@ -196,33 +273,30 @@ def _step(
             rewards=[env.reward_space],
         )
 
-    rewards.append(reward)
-    return StateToVisualize(
+    states.append(
+        StateToVisualize(
+            instcount=instcount,
+            autophase=autophase,
+            reward=reward,
+        )
+    )
+    return StepReply(
         commandline=env.commandline(),
         done=done,
         ir=truncate(ir, max_line_len=250, max_lines=1024),
-        instcount=instcount,
-        autophase=autophase,
-        rewards=rewards,
+        states=states,
     )
 
 
 @app.route("/api/v4/step")
 def step() -> Dict[str, Any]:
-    actions_str: str = request.args.get("actions")
-    benchmark: str = request.args.get("benchmark")
-    reward: str = request.args.get("reward")
-    reward_history: bool = request.args.get("reward_history", "0") == "1"
-
     try:
-        actions: List[int] = (
-            [int(x) for x in actions_str.split(",")] if actions_str else []
-        )
+        request = StepRequest.from_request()
     except ValueError as e:
         return jsonify({"error": f"Invalid actions: {e}"}), 400
 
     try:
-        return jsonify(_step(benchmark, reward, actions, reward_history).dict())
+        return jsonify(_step(request).dict())
     except Exception as e:
         return jsonify({"error": str(e)}), 400
 
