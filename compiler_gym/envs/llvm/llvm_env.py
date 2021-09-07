@@ -515,8 +515,10 @@ class LlvmEnv(CompilerEnv):
 
     @property
     def runtime_observation_count(self) -> int:
-        """The number of runtimes to return for the :code:`Runtime` observation
-        space.
+        """The number of runtimes to return for the Runtime observation space.
+
+        See the :ref:`Runtime observation space reference <llvm/index:Runtime>`
+        for further details.
 
         Example usage:
 
@@ -531,6 +533,8 @@ class LlvmEnv(CompilerEnv):
 
         :setter: Set the number of runtimes to compute when a :code:`Runtime`
             observation is requested.
+
+        :type: int
         """
         return int(self.send_param("llvm.get_runtimes_per_observation_count", ""))
 
