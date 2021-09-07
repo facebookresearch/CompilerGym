@@ -14,7 +14,7 @@ import RewardsSection from "./RewardsSection";
 import ActionsDict from "../../utils/ActionsDict";
 
 const ControlsContainer = () => {
-  const { compilerGym, session, api, setSession } = useContext(ApiContext);
+  const { compilerGym, session, params, api, setSession } = useContext(ApiContext);
   const history = useHistory();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -48,18 +48,18 @@ const ControlsContainer = () => {
     let urlIds = searchParams.get("actions")?.split(",") ?? [];
     let actionsTaken = urlIds.map((o, i) => `${o}.${i + 1}`);
 
-    if (urlIds.length && session.states) {
-      setTreeData(makeSessionTreeData(session.states, children));
+    if (urlIds.length && session) {
+      setTreeData(makeSessionTreeData(session, children));
       setActionsTracker({
         activeNode: `${urlIds[urlIds.length - 1]}.${urlIds.length}`,
         actionsTaken: actionsTaken,
         layer: urlIds.length + 1,
       });
-    } else if (session.states) {
-      setTreeData(makeSessionTreeData(session.states, children));
+    } else if (session.rewards) {
+      setTreeData(makeSessionTreeData(session, children));
     }
     return () => {};
-  }, [session.states]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [session]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /**
    * Detects back and forward buttons in the browser, it allows to keep track
@@ -88,7 +88,7 @@ const ControlsContainer = () => {
    * @param {Array} actions array with ids of actions.
    * @param {String} newBenchmark Takes the benchamark to initialize a new session.
    */
-  const startNewSession = (reward, actions, newBenchmark) => {
+  const startNewSession2 = (reward, actions, newBenchmark) => {
     api.closeSession(session.session_id).then(
       (res) => {
         api.startSession(reward, actions, newBenchmark).then(
@@ -121,6 +121,24 @@ const ControlsContainer = () => {
     );
   };
 
+  const startNewSession = async (dataset, datasetUri, reward) => {
+    const actionsIdsTaken = actionsTracker.actionsTaken?.map(
+      (i) => i.split(".")[0]
+    ); // Only keep the action ids, not the depth id
+    console.log(dataset, datasetUri, reward)
+    try {
+      const result = await api.getActions(
+        `${dataset}/${datasetUri}`,
+        reward,
+        actionsIdsTaken.length ? actionsIdsTaken : "",
+      );
+      console.log(result)
+      setSession(result);
+    } catch (err) {
+      console.log(err);
+    }
+  };
+
   /**
    * Invokes the API to take a step in the current session and update the tree.
    * It also updates the url parameters to keep the state of current session.
@@ -131,15 +149,23 @@ const ControlsContainer = () => {
     let urlActions = actionsTracker.actionsTaken
       .map((i) => i.split(".")[0])
       .join(",");
+    console.log(urlActions)
     try {
-      const response = await api.getSteps(session.session_id, stepID);
-      setSession({
+      //const response = await api.getSteps(session.session_id, stepID);
+      const response2 = await api.getActions(
+        `${params.dataset}/${params.datasetUri}`,
+        params.reward,
+        `${stepID}`,
+        "1"
+      );
+      console.log(response2)
+      /*setSession({
         ...session,
         states: [...session.states, ...response.states],
-      });
-      setTreeData(
-        makeSessionTreeData([...session.states, ...response.states], children)
-      );
+      });*/
+      /*setTreeData(
+        makeSessionTreeData([...session.states, ...response2.states], children)
+      );*/
       searchParams.set("actions", `${urlActions},${stepID}`);
       history.push({ ...location, search: searchParams.toString() });
     } catch (err) {
@@ -212,7 +238,7 @@ const ControlsContainer = () => {
     if (nodeDatum !== undefined && nodeDepth !== 0) {
       try {
         // Verifies it is one of the last children.
-        if (nodeDepth === session.states.length) {
+        if (nodeDepth === session.rewards.length) {
           await submitStep(nodeActionID);
           setActionsTracker({
             activeNode: nodeDatum.action_id,

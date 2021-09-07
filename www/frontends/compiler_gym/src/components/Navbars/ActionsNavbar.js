@@ -76,17 +76,14 @@ const ActionsNavbar = ({
   handleResetActionsTracker,
 }) => {
   const { darkTheme } = useContext(ThemeContext);
-  const { compilerGym, session, api, setSession } = useContext(ApiContext);
+  const { compilerGym, session, params, api, setParams, setSession } = useContext(ApiContext);
 
   const history = useHistory();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
 
   const [actionsLine, setActionsLine] = useState("");
-  const [dataset, setDataset] = useState("benchmark://cbench-v1");
   const [uriOptions, setUriOptions] = useState([]);
-  const [datasetUri, setDatasetUri] = useState("");
-  const [reward, setReward] = useState("IrInstructionCountOz");
   const [showWarning, setShowWarning] = useState(false);
   const [showModal, setModal] = useState(false);
 
@@ -116,9 +113,9 @@ const ActionsNavbar = ({
    */
   useEffect(() => {
     let selected =
-      benchmarkOptions && benchmarkOptions.find((o) => o.dataset === dataset);
+      benchmarkOptions && benchmarkOptions.find((o) => o.dataset === params.dataset);
     setUriOptions(selected?.uri);
-    setDatasetUri(selected?.uri[0]);
+
     return () => {};
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -139,9 +136,10 @@ const ActionsNavbar = ({
         );
         console.log(initSession);
         setSession(initSession);
-        setDataset(searchParams.get("dataset"));
-        setDatasetUri(searchParams.get("dataset_uri"));
-        setReward(searchParams.get("reward"));
+        setParams({ dataset: searchParams.get("dataset"), datasetUri: searchParams.get("dataset_uri"), reward: searchParams.get("reward")})
+        //setDataset(searchParams.get("dataset"));
+        //setDatasetUri(searchParams.get("dataset_uri"));
+        //setReward(searchParams.get("reward"));
         setUriOptions(selected?.uri);
       } catch (err) {
         setShowWarning(true);
@@ -161,50 +159,49 @@ const ActionsNavbar = ({
 
   // Rerender the command line on every change in the current state of session.
   useEffect(() => {
-    let lastState = session.states?.[session.states?.length - 1];
-    setActionsLine(lastState?.commandline);
+    //let lastState = session.states?.[session.states?.length - 1];
+    let currentState = session
+    setActionsLine(currentState.commandline);
 
     return () => {};
   }, [session]);
 
   const handleNewDataset = (e) => {
     let selected = benchmarkOptions.find((o) => o.dataset === e);
-    setDataset(e);
+    setParams({ ...params, dataset: e, datasetUri: selected?.uri[0] });
     setUriOptions(selected?.uri);
-    setDatasetUri(selected?.uri[0]);
-    startSession(
-      reward,
-      actionsIdsTaken.length ? actionsIdsTaken : "-",
-      `${e}/${selected?.uri[0]}`
-    );
+    //setDatasetUri(selected?.uri[0]);
+    startSession(e, selected?.uri[0], params.reward)
     searchParams.set("dataset", e);
     searchParams.set("dataset_uri", selected?.uri[0]);
-    searchParams.set("reward", reward);
+    searchParams.set("reward", params.reward);
     history.push({ ...location, search: searchParams.toString() });
   };
 
   const handleDatasetUri = (e) => {
-    setDatasetUri(e);
-    startSession(
+    //setDatasetUri(e);
+    setParams({...params, dataset: params.dataset, datasetUri: e })
+    /*startSession(
       reward,
       actionsIdsTaken.length ? actionsIdsTaken : "-",
       `${dataset}/${e}`
-    );
-    searchParams.set("dataset", dataset);
+    );*/
+    searchParams.set("dataset", params.dataset);
     searchParams.set("dataset_uri", e);
-    searchParams.set("reward", reward);
+    searchParams.set("reward", params.reward);
     history.push({ ...location, search: searchParams.toString() });
   };
 
   const handleRewardSelect = (e) => {
-    setReward(e);
-    startSession(
+    //setReward(e);
+    setParams({...params, reward: e })
+    /*startSession(
       e,
       actionsIdsTaken.length ? actionsIdsTaken : "-",
       `${dataset}/${datasetUri}`
-    );
-    searchParams.set("dataset", dataset);
-    searchParams.set("dataset_uri", datasetUri);
+    );*/
+    searchParams.set("dataset", params.dataset);
+    searchParams.set("dataset_uri", params.datasetUri);
     searchParams.set("reward", e);
     history.push({ ...location, search: searchParams.toString() });
   };
@@ -223,16 +220,16 @@ const ActionsNavbar = ({
     if (e.key === "Enter") {
       try {
         let actionsTaken = getCommandLineArray(actionsLine, actionsList);
-        await startSession(
+        /*await startSession(
           reward,
           actionsTaken.length ? actionsTaken : "-",
           `${dataset}/${datasetUri}`
-        );
-        searchParams.set("dataset", dataset);
-        searchParams.set("dataset_uri", datasetUri);
-        searchParams.set("reward", reward);
+        );*/
+        searchParams.set("dataset", params.dataset);
+        searchParams.set("dataset_uri", params.datasetUri);
+        searchParams.set("reward", params.reward);
         searchParams.set("actions", actionsTaken.join(","));
-        history.replace({ ...location, search: searchParams.toString() });
+        history.push({ ...location, search: searchParams.toString() });
       } catch (error) {
         console.log(error);
       }
@@ -244,7 +241,7 @@ const ActionsNavbar = ({
     try {
       setShowWarning(false);
       history.push("/");
-      await api.startSession(reward, "-", `${dataset}/${datasetUri}`);
+      //await api.startSession(reward, "-", `${dataset}/${datasetUri}`);
       handleResetActionsTracker();
     } catch (error) {
       console.log(error);
@@ -276,7 +273,7 @@ const ActionsNavbar = ({
                       <Dropdown.Item
                         key={index}
                         eventKey={i.dataset}
-                        active={dataset === i.dataset ? true : false}
+                        active={params.dataset === i.dataset ? true : false}
                       >
                         {i.dataset}
                       </Dropdown.Item>
@@ -287,7 +284,7 @@ const ActionsNavbar = ({
                 aria-describedby="basic-addon1"
                 type="text"
                 readOnly
-                value={dataset}
+                value={params.dataset}
               />
             </InputGroup>
           </Col>
@@ -306,7 +303,7 @@ const ActionsNavbar = ({
                       <Dropdown.Item
                         key={index}
                         eventKey={i}
-                        active={datasetUri === i ? true : false}
+                        active={params.datasetUri === i ? true : false}
                       >
                         {i}
                       </Dropdown.Item>
@@ -317,7 +314,7 @@ const ActionsNavbar = ({
                 aria-describedby="basic-addon1"
                 type="text"
                 readOnly
-                value={datasetUri}
+                value={params.datasetUri}
               />
             </InputGroup>
           </Col>
@@ -336,7 +333,7 @@ const ActionsNavbar = ({
                       <Dropdown.Item
                         key={index}
                         eventKey={i}
-                        active={reward === i ? true : false}
+                        active={params.reward === i ? true : false}
                       >
                         {i}
                       </Dropdown.Item>
@@ -348,7 +345,7 @@ const ActionsNavbar = ({
                 aria-describedby="basic-addon3"
                 type="text"
                 readOnly
-                value={reward}
+                value={params.reward}
               />
             </InputGroup>
           </Col>

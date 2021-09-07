@@ -19,14 +19,17 @@ const RewardHistoryChart = ({ session, highlightedPoint, handleClickOnChart }) =
   const [steps, setSteps] = useState([]);
 
   useEffect(() => {
-    let rewards = session.states?.map((i) => parseFloat(i.reward.toFixed(3)));
-    let lastState = session.states?.[session.states?.length - 1];
+    //let rewards = session.states?.map((i) => parseFloat(i.reward.toFixed(3)));
+    let rewards = session.rewards?.map((i) => parseFloat(i.toFixed(3)));
+    //let lastState = session.states?.[session.states?.length - 1];
+    let lastState = session?.commandline
     setRewards(rewards);
     setCumulativeSum(
       rewards?.reduce((a, x, i) => [...a, a.length > 0 ? x + a[i - 1] : x], [])
     );
     setSteps(
-      lastState?.commandline.split(" input.bc -o output.bc")[0].split(" ")
+      //lastState?.commandline.split(" input.bc -o output.bc")[0].split(" ")
+      lastState?.split(" input.bc -o output.bc")[0].split(" ")
     );
     return () => {};
   }, [session]);

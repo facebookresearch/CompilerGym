@@ -18,6 +18,7 @@ const StateContainer = () => {
   const context = useContext(ApiContext);
   const themeContext = useContext(ThemeContext);
   const envState = context.session.states;
+  const currentState = context.session;
   const [stateSelector, setStateSelector] = useState("ir");
 
   const last_observation = envState && envState[envState.length - 1];
@@ -28,7 +29,7 @@ const StateContainer = () => {
       case "ir":
         return (
           <IrStateContainer
-            irState={last_observation?.ir}
+            irState={currentState?.ir}
             darkTheme={themeContext.darkTheme}
           />
         );

@@ -31,10 +31,14 @@ const getUniqueValues = (list) => {
  * @returns an object with hierarchical structure to be display in a seacrh tree.
  */
 export const makeSessionTreeData = (states, children) => {
-  if (states.length >= 2) {
-    const last_observation = states[states.length - 1];
-    const ids = getCommandLineArray(last_observation.commandline, children);
-    const rewards = states.map((a) => a.reward).slice(1, states.length); // All rewards except the initial 0.
+  if (states.rewards.length >= 2 ) {
+    console.log(states)
+    //const last_observation = states[states.length - 1];
+    const last_observation = states.commandline
+    //const ids = getCommandLineArray(last_observation.commandline, children);
+    const ids = getCommandLineArray(last_observation, children)
+    //const rewards = states.map((a) => a.reward).slice(1, states.length); // All rewards except the initial 0.
+    const rewards = states.rewards.slice(1, states.rewards.length ) // All rewards except the initial 0.
 
     let actionsData = ids
       .map((i) => children.find((e) => e.action_id === i))

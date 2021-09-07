@@ -23,7 +23,7 @@ const RewardsSection = ({ session, highlightedPoint, handleClickOnChart }) => {
   const [toggle, setToggle] = useState(true);
 
   useEffect(() => {
-    let rewards = session.states?.map((i) => parseFloat(i.reward.toFixed(3)));
+    let rewards = session.rewards?.map((i) => parseFloat(i.toFixed(3)));
     setCumulativeSum(rewards?.reduce((a, x) => a + x, 0));
     return () => {};
   }, [session]);

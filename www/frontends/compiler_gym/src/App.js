@@ -16,6 +16,8 @@ import MainPage from "./components/Pages/MainPage";
 const api = new ApiService("http://127.0.0.1:5000");
 const INITIAL_SETTINGS = {
   reward: "IrInstructionCountOz",
+  dataset: "benchmark://cbench-v1",
+  datasetUri: "adpcm",
   benchmark: "benchmark://cbench-v1/adpcm",
 };
 
@@ -24,12 +26,18 @@ function App() {
   const [session, setSession] = useState({});
   const [darkTheme, setDarkTheme] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [params, setParams] = useState({
+    reward: INITIAL_SETTINGS.reward,
+    dataset: INITIAL_SETTINGS.dataset,
+    datasetUri: INITIAL_SETTINGS.datasetUri,
+    benchmark: INITIAL_SETTINGS.benchmark
+  })
 
   /*
    * Start a new session when component mounts in the browser.
    * It collects CompilerGym variables
    */
-  useEffect(() => {
+  /*useEffect(() => {
     const fetchData = async () => {
       try {
         const options = await api.getEnvOptions();
@@ -50,12 +58,35 @@ function App() {
     setIsLoading(true);
     fetchData();
     return () => {};
+  }, []);*/
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const options = await api.getEnvOptions();
+        const initSession = await api.getActions(
+          `${INITIAL_SETTINGS.dataset}/${INITIAL_SETTINGS.datasetUri}`,
+          INITIAL_SETTINGS.reward,
+          ""
+        );
+        console.log(initSession);
+        setCompilerGym(options);
+        setSession(initSession);
+        setIsLoading(false);
+      } catch (err) {
+        console.log(err);
+      }
+    };
+
+    setIsLoading(true);
+    fetchData();
+    return () => {};
   }, []);
 
   /**
    * Adds a listener to trigger a Close Session API call when user closes a tab or browser.
    */
-  useEffect(() => {
+  /*useEffect(() => {
     window.addEventListener("beforeunload", handleTabClosing);
     return () => {
       window.removeEventListener("beforeunload", handleTabClosing);
@@ -71,7 +102,7 @@ function App() {
         console.log(error);
       }
     );
-  };
+  };*/
 
   const toggleTheme = () => {
     setDarkTheme(!darkTheme);
@@ -86,6 +117,8 @@ function App() {
           api: api,
           compilerGym: compilerGym,
           session: session,
+          params: params,
+          setParams,
           setSession,
         }}
       >
