@@ -12,7 +12,6 @@ import numpy as np
 import pytest
 from gym.spaces import Box
 
-import compiler_gym
 import examples.example_compiler_gym_service as example
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.service import SessionNotFound
@@ -74,7 +73,6 @@ def test_invalid_arguments(bin: Path):
 
 def test_versions(env: CompilerEnv):
     """Tests the GetVersion() RPC endpoint."""
-    assert env.version == compiler_gym.__version__
     assert env.compiler_version == "1.0.0"
 
 
@@ -150,9 +148,19 @@ def test_double_reset(env: CompilerEnv):
     """Test that reset() can be called twice."""
     env.reset()
     assert env.in_episode
-    env.step(env.action_space.sample())
     env.reset()
-    env.step(env.action_space.sample())
+    assert env.in_episode
+
+
+def test_double_reset_with_step(env: CompilerEnv):
+    """Test that reset() can be called twice with a step."""
+    env.reset()
+    assert env.in_episode
+    _, _, done, info = env.step(env.action_space.sample())
+    assert not done, info
+    env.reset()
+    _, _, done, info = env.step(env.action_space.sample())
+    assert not done, info
     assert env.in_episode
 
 

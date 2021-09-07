@@ -33,11 +33,20 @@ class ExampleCompilationSession final : public CompilationSession {
   std::string getCompilerVersion() const final override { return "1.0.0"; }
 
   std::vector<ActionSpace> getActionSpaces() const final override {
+    // The acction spaces supported by this service. Here we will implement a
+    // single action space, called "default", that represents a command line
+    // with three options: "a", "b", and "c".
     ActionSpace space;
     space.set_name("default");
-    space.add_action("a");
-    space.add_action("b");
-    space.add_action("c");
+
+    ChoiceSpace* choice = space.add_choice();
+    choice->set_name("optimization_choice");
+
+    NamedDiscreteSpace* namedDiscreteChoice = choice->mutable_named_discrete_space();
+
+    namedDiscreteChoice->add_value("a");
+    namedDiscreteChoice->add_value("b");
+    namedDiscreteChoice->add_value("c");
 
     return {space};
   }
@@ -84,11 +93,23 @@ class ExampleCompilationSession final : public CompilationSession {
   [[nodiscard]] grpc::Status applyAction(const Action& action, bool& endOfEpisode,
                                          std::optional<ActionSpace>& newActionSpace,
                                          bool& actionHadNoEffect) final override {
-    LOG(INFO) << "Applying action " << action.action();
+    const int numChoices = getActionSpaces()[0].choice(0).named_discrete_space().value_size();
 
-    if (action.action() < 0 || action.action() > getActionSpaces()[0].action_size()) {
+    if (action.choice_size() != 1) {
+      return Status(StatusCode::INVALID_ARGUMENT, "Missing choice");
+    }
+
+    // This is the index into the action space's values ("a", "b", "c") that the
+    // user selected, e.g. 0 -> "a", 1 -> "b", 2 -> "c".
+    const int choiceIndex = action.choice(0).named_discrete_value_index();
+    LOG(INFO) << "Applying action " << choiceIndex;
+
+    if (choiceIndex < 0 || choiceIndex >= numChoices) {
       return Status(StatusCode::INVALID_ARGUMENT, "Out-of-range");
     }
+
+    // Here is where we would run the actual action to update the environment's
+    // state.
 
     return Status::OK;
   }
