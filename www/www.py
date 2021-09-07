@@ -55,9 +55,9 @@ This exposes an API with two operations:
 
             actions: An optional, command-separated list of actions to run.
 
-            all_rewards: An optional string that if "1" means that a list of
-                all rewards will be returned, one for each action. Else, only
-                the reward for the final action is returned.
+            all_states: An optional string that if "1" means that a list of
+                all states will be returned, one for each action. Else, only
+                the state for the final action is returned.
 
         Example usage:
 
@@ -67,8 +67,13 @@ This exposes an API with two operations:
                 "rewards": [0.003],
                 "done": false,
                 "ir": "...",
-                "instcount": {...},
-                "autophase": {...},
+                "states": [
+                    {
+                        "instcount": {...},
+                        "autophase": {...},
+                        "reward": 0.003
+                    },
+                ]
             }
 """
 import logging
