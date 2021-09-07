@@ -8,6 +8,7 @@ import React, { useState, useContext, useEffect, useRef } from "react";
 import classnames from "classnames";
 import ThemeContext from "../../context/ThemeContext";
 import Tree from "react-d3-tree";
+import { getYDeltas } from "../../utils/Helpers";
 
 /**
  * Renders a node component.
@@ -18,45 +19,57 @@ import Tree from "react-d3-tree";
  * @returns {JSX} JSX element representing a node.
  */
 
-const renderSvgNode = ({
+const RenderSvgNode = ({
   nodeDatum,
   handleNodeClick,
   handleMouseOverTree,
   handleMouseOutTree,
   layer,
 }) => {
-  const foreignObjectProps = { width: 122, height: 200, x: 20, y: 10 };
+  const foreignObjectProps = { width: 150, height: 200, x: 20, y: 10 };
+  const nodeRef = useRef();
+  const [seeDescription, setSeeDescription] = useState(false)
 
   return (
-    <g>
+    <g ref={nodeRef}>
       <circle
         r="5"
         x="0"
         fill={nodeDatum.active ? "#2dce89" : "white"}
         strokeWidth="1"
         onClick={() => handleNodeClick(nodeDatum)}
-        onMouseOver={() => handleMouseOverTree(nodeDatum)}
-        onMouseOut={() => handleMouseOutTree(nodeDatum)}
+        onMouseOver={() => {
+          handleMouseOverTree(nodeDatum);
+          setSeeDescription(true);
+        }}
+        onMouseOut={() => {
+          handleMouseOutTree(nodeDatum);
+          setSeeDescription(false);
+        }}
       />
       <text
         strokeWidth={nodeDatum.active ? "1" : "0"}
         x="8"
         dy="4"
         onClick={() => handleNodeClick(nodeDatum)}
-        onMouseOver={() => handleMouseOverTree(nodeDatum)}
-        onMouseOut={() => handleMouseOutTree(nodeDatum)}
+        onMouseOver={() => {
+          handleMouseOverTree(nodeDatum);
+          setSeeDescription(true);
+        }}
+        onMouseOut={() => {
+          handleMouseOutTree(nodeDatum);
+          setSeeDescription(false);
+        }}
       >
         {nodeDatum.name}
       </text>
-      {nodeDatum.active && (
+
+      {seeDescription && (
         <foreignObject {...foreignObjectProps}>
           <div className="active-node-info">
-            {nodeDatum.children && (
-              <h5>
-                <span className="text-weight">Reward:</span> {nodeDatum.reward}<br/>
-                Step: {nodeDatum.__rd3t.depth}
-              </h5>
-            )}
+            <span className="description-tooltip2">
+             {nodeDatum.description}
+            </span>
           </div>
         </foreignObject>
       )}
@@ -70,6 +83,7 @@ const renderSvgNode = ({
  * @param {*} actionSpace Receives the number of nodes to show on an active node.
  * @param {Object} treeData Takes a hierarchical object data structure representeing the data of the tree.
  * @param {String} layer Receives the depth of the active node.
+ * @param {Number} focusedNode a number representing the depth/level to position the tree when user clicks on a data point.
  * @param {Function} handleNodeClick Function that manages the logic of clicking on a node.
  * @returns
  */
@@ -77,19 +91,46 @@ const SearchTree = ({
   actionSpace,
   treeData,
   layer,
+  focusedNode,
   handleNodeClick,
   handleMouseOverTree,
   handleMouseOutTree,
 }) => {
   const { darkTheme } = useContext(ThemeContext);
   const treeWindow = useRef();
+  const treeBox = useRef();
 
   const [nodeSize, setNodeSize] = useState({ x: 300, y: 20 });
+  const [position, setPosition] = useState({
+    x: 10,
+    y: treeWindow.current?.clientHeight / 2.1 || 10,
+  });
+  const [deltas_y, setDeltas_y] = useState([]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setDeltas_y(
+        getYDeltas(
+          treeBox.current?._reactInternals.child.lastEffect.stateNode.props
+            .hierarchyPointNode
+        ).reverse()
+      );
+    }, 500);
+    return () => clearTimeout(timer);
+  }, [treeData]);
 
   useEffect(() => {
     setNodeSize({ x: actionSpace > 100 ? 500 : 300, y: 20 });
+    setPosition({
+      x: focusedNode === 0 ? 10 : (focusedNode - 1) * -300,
+      y:
+        focusedNode === 0
+          ? 300
+          : treeWindow.current?.clientHeight / 2 -
+            parseFloat(deltas_y[focusedNode]),
+    });
     return () => {};
-  }, [actionSpace]);
+  }, [actionSpace, focusedNode, deltas_y]);
 
   return (
     <>
@@ -102,20 +143,21 @@ const SearchTree = ({
         )}
       >
         <Tree
+          ref={treeBox}
           data={treeData}
           nodeSize={nodeSize}
-          translate={{ x: 10, y: treeWindow.current?.clientHeight / 2.1 || 10 }}
-          scaleExtent={{ max: 0.9, min: 0.3 }}
+          translate={position}
+          scaleExtent={{ max: 1, min: 0.25 }}
           zoomable={true}
-          renderCustomNodeElement={(rd3tProps) =>
-            renderSvgNode({
-              ...rd3tProps,
-              handleNodeClick,
-              handleMouseOverTree,
-              handleMouseOutTree,
-              layer,
-            })
-          }
+          renderCustomNodeElement={(rd3tProps) => (
+            <RenderSvgNode
+              {...rd3tProps}
+              handleNodeClick={handleNodeClick}
+              handleMouseOverTree={handleMouseOverTree}
+              handleMouseOutTree={handleMouseOutTree}
+              layer={layer}
+            />
+          )}
         />
       </div>
     </>

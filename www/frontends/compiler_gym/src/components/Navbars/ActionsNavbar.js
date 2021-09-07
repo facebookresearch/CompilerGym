@@ -180,7 +180,7 @@ const ActionsNavbar = ({
     searchParams.set("dataset", e);
     searchParams.set("dataset_uri", selected?.uri[0]);
     searchParams.set("reward", reward);
-    history.replace({ ...location, search: searchParams.toString() });
+    history.push({ ...location, search: searchParams.toString() });
   };
 
   const handleDatasetUri = (e) => {
@@ -193,7 +193,7 @@ const ActionsNavbar = ({
     searchParams.set("dataset", dataset);
     searchParams.set("dataset_uri", e);
     searchParams.set("reward", reward);
-    history.replace({ ...location, search: searchParams.toString() });
+    history.push({ ...location, search: searchParams.toString() });
   };
 
   const handleRewardSelect = (e) => {
@@ -206,12 +206,12 @@ const ActionsNavbar = ({
     searchParams.set("dataset", dataset);
     searchParams.set("dataset_uri", datasetUri);
     searchParams.set("reward", e);
-    history.replace({ ...location, search: searchParams.toString() });
+    history.push({ ...location, search: searchParams.toString() });
   };
 
   // Append current url params into a string to generata a link.
   const getShareLink = () => {
-    let shareLink = `http://localhost:3000/${location.search}`;
+    let shareLink = `${window.location.href}${location.search}`;
     return shareLink;
   };
 
@@ -243,7 +243,7 @@ const ActionsNavbar = ({
   const handleWarningAlert = async () => {
     try {
       setShowWarning(false);
-      history.replace("/");
+      history.push("/");
       await api.startSession(reward, "-", `${dataset}/${datasetUri}`);
       handleResetActionsTracker();
     } catch (error) {

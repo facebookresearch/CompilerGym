@@ -1,3 +1,9 @@
+/*
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
 import React, { useState, useEffect, Fragment } from "react";
 import classnames from "classnames";
 import { groupBy, getMaxDelta, percIncrease } from "../../utils/Helpers";
@@ -21,10 +27,8 @@ const InstCountsHistoricalChart = ({ sessionStates, darkTheme, sortBy }) => {
         return array.sort((a, b) => (a["maxValue"] > b["maxValue"] ? -1 : 1));
       case "diff":
         return array.sort((a, b) => (a["maxDelta"] > b["maxDelta"] ? -1 : 1));
-      case "category":
-        return array.sort((a, b) => (a["caregory"] > b["category"] ? -1 : 1));
       default:
-        return [];
+        return array;
     }
   };
 

@@ -110,24 +110,8 @@
 // **** RewardsSection ****
 
 .row-cumulative-reward {
-  position: absolute;
-  bottom: 10rem;
-  left: 1%;
-  width: 245px;
-  z-index: 2;
-}
-
-@media (min-width: 576px) {
-  .row-cumulative-reward {
-    bottom: 16%;
-  }
-}
-
-@media (max-width: 576px) {
-  .row-cumulative-reward {
-    display: none;
-    bottom: 2rem;
-  }
+  height: 3.6vh;
+  width: 100%;
 }
 
 // **** Observations Container ****
@@ -135,6 +119,7 @@
 .row-sort-button {
   position: absolute;
   top: 7rem;
+  right: 0;
   z-index: 2;
 }
 

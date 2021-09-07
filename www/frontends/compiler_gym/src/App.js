@@ -52,6 +52,9 @@ function App() {
     return () => {};
   }, []);
 
+  /**
+   * Adds a listener to trigger a Close Session API call when user closes a tab or browser.
+   */
   useEffect(() => {
     window.addEventListener("beforeunload", handleTabClosing);
     return () => {
@@ -83,13 +86,13 @@ function App() {
           api: api,
           compilerGym: compilerGym,
           session: session,
-          setSession
+          setSession,
         }}
       >
         <ThemeContext.Provider value={{ darkTheme: darkTheme, toggleTheme }}>
           <Switch>
             <Route path="/:session?">
-              <MainPage/>
+              <MainPage />
             </Route>
           </Switch>
         </ThemeContext.Provider>
