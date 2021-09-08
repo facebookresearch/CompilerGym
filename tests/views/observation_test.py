@@ -6,6 +6,7 @@
 import numpy as np
 import pytest
 
+from compiler_gym.service.connection import ServiceError
 from compiler_gym.service.proto import (
     ObservationSpace,
     ScalarLimit,
@@ -120,6 +121,70 @@ def test_observed_value_types():
 
     # Check that the correct observation_space_list indices were used.
     assert mock.called_observation_spaces == ["ir", "dfeat", "features", "binary"]
+
+
+def test_observation_when_raw_step_returns_incorrect_no_of_observations():
+    """Test that a ServiceError is propagated when raw_step() returns unexpected
+    number of observations."""
+
+    def make_failing_raw_step(n: int):
+        def failing_raw_step(*args, **kwargs):
+            """A callback that returns done=True."""
+            del args  # Unused
+            del kwargs  # Unused
+            return ["ir"] * n, None, False, {}
+
+        return failing_raw_step
+
+    spaces = [
+        ObservationSpace(
+            name="ir",
+            string_size_range=ScalarRange(min=ScalarLimit(value=0)),
+        )
+    ]
+
+    observation = ObservationView(make_failing_raw_step(0), spaces)
+    with pytest.raises(
+        ServiceError, match=r"^Expected 1 'ir' observation but the service returned 0$"
+    ):
+        observation["ir"]
+
+    observation = ObservationView(make_failing_raw_step(3), spaces)
+    with pytest.raises(
+        ServiceError, match=r"^Expected 1 'ir' observation but the service returned 3$"
+    ):
+        observation["ir"]
+
+
+def test_observation_when_raw_step_returns_done():
+    """Test that a SessionNotFoundError from the raw_step() callback propagates as a """
+
+    def make_failing_raw_step(error_msg=None):
+        def failing_raw_step(*args, **kwargs):
+            """A callback that returns done=True."""
+            info = {}
+            if error_msg:
+                info["error_details"] = error_msg
+            return [], None, True, info
+
+        return failing_raw_step
+
+    spaces = [
+        ObservationSpace(
+            name="ir",
+            string_size_range=ScalarRange(min=ScalarLimit(value=0)),
+        )
+    ]
+
+    observation = ObservationView(make_failing_raw_step(), spaces)
+    with pytest.raises(ServiceError, match=r"^Failed to compute observation 'ir'$"):
+        observation["ir"]  # pylint: disable=pointless-statement
+
+    observation = ObservationView(make_failing_raw_step("Oh no!"), spaces)
+    with pytest.raises(
+        ServiceError, match=r"^Failed to compute observation 'ir': Oh no!$"
+    ):
+        observation["ir"]  # pylint: disable=pointless-statement
 
 
 if __name__ == "__main__":
