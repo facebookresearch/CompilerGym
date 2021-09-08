@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 from typing import Callable, Dict, List
 
+from compiler_gym.service.connection import ServiceError
 from compiler_gym.service.proto import ObservationSpace
 from compiler_gym.util.gym_type_hints import (
     ActionType,
@@ -58,14 +59,29 @@ class ObservationView:
 
         :raises SessionNotFound: If :meth:`env.reset()
             <compiler_gym.envs.CompilerEnv.reset>` has not been called.
+
+        :raises ServiceError: If the backend service fails to compute the
+            observation, or reports that a terminal state has been reached.
         """
         observation_space: ObservationSpaceSpec = self.spaces[observation_space]
-        observations, _, _, _ = self._raw_step(
+        observations, _, done, info = self._raw_step(
             actions=[], observations=[observation_space], rewards=[]
         )
-        assert (
-            len(observations) == 1
-        ), f"Expected 1 observation. Received: {len(observations)}"
+
+        if done:
+            # Computing an observation should never cause a terminal state since
+            # no action has been applied.
+            msg = f"Failed to compute observation '{observation_space.id}'"
+            if info.get("error_details"):
+                msg += f": {info['error_details']}"
+            raise ServiceError(msg)
+
+        if len(observations) != 1:
+            raise ServiceError(
+                f"Expected 1 '{observation_space.id}' observation "
+                f"but the service returned {len(observations)}"
+            )
+
         return observations[0]
 
     def _add_space(self, space: ObservationSpaceSpec):
