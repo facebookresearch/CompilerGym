@@ -30,7 +30,7 @@ class ExampleCompilationSession(CompilationSession):
 
     compiler_version: str = "1.0.0"
 
-    # The acction spaces supported by this service. Here we will implement a
+    # The action spaces supported by this service. Here we will implement a
     # single action space, called "default", that represents a command line with
     # three options: "a", "b", and "c".
     action_spaces = [
