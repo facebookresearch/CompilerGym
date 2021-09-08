@@ -359,6 +359,7 @@ message File {
 
 // An AddBenchmark() request.
 message AddBenchmarkRequest {
+  // A list of benchmarks to add.
   repeated Benchmark benchmark = 1;
 }
 
@@ -367,7 +368,9 @@ message AddBenchmarkReply {}
 
 // An arbitrary string parameter value for a session.
 message SessionParameter {
+  // A string key.
   string key = 1;
+  // A string value.
   string value = 2;
 }
 

@@ -82,5 +82,66 @@ Request and Reply Messages
 .. doxygenstruct:: AddBenchmarkReply
    :members:
 
+.. doxygenstruct:: SendSessionParameterRequest
+   :members:
+
+.. doxygenstruct:: SendSessionParameterReply
+   :members:
+
+
+Core Message Types
+------------------
+
+.. doxygenstruct:: ActionSpace
+   :members:
+
+.. doxygenstruct:: Action
+   :members:
+
+.. doxygenstruct:: ChoiceSpace
+   :members:
+
+.. doxygenstruct:: Choice
+   :members:
+
+.. doxygenstruct:: ObservationSpace
+   :members:
+
+.. doxygenstruct:: Observation
+   :members:
+
+.. doxygenstruct:: NamedDiscreteSpace
+   :members:
+
+.. doxygenstruct:: Int64List
+   :members:
+
+.. doxygenstruct:: DoubleList
+   :members:
+
+.. doxygenstruct:: ScalarRange
+   :members:
+
+.. doxygenstruct:: ScalarLimit
+   :members:
+
+.. doxygenstruct:: ScalarRangeList
+   :members:
+
+.. doxygenstruct:: SequenceSpace
+   :members:
+
+.. doxygenstruct:: Benchmark
+   :members:
+
+.. doxygenstruct:: File
+   :members:
+
+.. doxygenstruct:: BenchmarkDynamicConfig
+   :members:
+
 .. doxygenstruct:: Command
    :members:
+
+.. doxygenstruct:: SessionParameter
+    :members:
