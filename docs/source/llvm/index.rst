@@ -683,6 +683,58 @@ Cost Models
 Raw values from the cost models used to compute :ref:`rewards <reward>`.
 
 
+Runtime
+~~~~~~~
+
+|:building_construction:| **Experimental API:** This runtime observation space
+is still in an experimental state and is not yet stable. There may be bugs and
+breaking changes in future releases.
+
++--------------------------+------------------------------------------------------------------------------------+
+| Observation space        | Shape                                                                              |
++==========================+====================================================================================+
+| IsRunnable               | `int<0,1>`                                                                         |
++--------------------------+------------------------------------------------------------------------------------+
+| Runtime                  | `float64_list<>[0,inf])`                                                           |
++--------------------------+------------------------------------------------------------------------------------+
+
+Compile and run the benchmark, returning a list of wall-clock execution times.
+Times are returned as floating point second values. The number of times that the
+benchmark is executed is determined by the
+:attr:`LlvmEnv.runtime_observation_count
+<compiler_gym.envs.LlvmEnv.runtime_observation_count>` property.
+
+Not all benchmarks are runnable. To check if the current benchmark is runnable,
+use the :code:`IsRunnable` observation space, that is :code:`1` if the benchmark
+is runnable, else :code:`0`. Requesting the :code:`Runtime` observation space
+for a benchmark that is not runnable will return an empty list.
+
+
+Build Time
+~~~~~~~~~~
+
+|:building_construction:| **Experimental API:** This compiler time observation
+space is still in an experimental state and is not yet stable. There may be bugs
+and breaking changes in future releases.
+
++--------------------------+------------------------------------------------------------------------------------+
+| Observation space        | Shape                                                                              |
++==========================+====================================================================================+
+| IsBuildable              | `int<0,1>`                                                                         |
++--------------------------+------------------------------------------------------------------------------------+
+| Buildtime                | `float64_list<>[0,inf])`                                                           |
++--------------------------+------------------------------------------------------------------------------------+
+
+Compile the benchmark to a binary and return a list of a single wall-clock build
+time as seconds.
+
+Not all benchmarks are build. To check if the current benchmark is buildable,
+use the :code:`IsBuildable` observation space, that is :code:`1` if the
+benchmark is buildable, else :code:`0`. Requesting the :code:`Buildtime`
+observation space for a benchmark that is not buildable will return an empty
+list.
+
+
 .. _reward:
 
 Reward Spaces
