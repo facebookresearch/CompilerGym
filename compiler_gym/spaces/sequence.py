@@ -6,6 +6,8 @@ from typing import Optional, Tuple
 
 from gym.spaces import Space
 
+from compiler_gym.spaces.scalar import Scalar
+
 
 class Sequence(Space):
     """A sequence of values. Each element of the sequence is of `dtype`. The
@@ -42,6 +44,7 @@ class Sequence(Space):
         size_range: Tuple[int, Optional[int]] = (0, None),
         dtype=bytes,
         opaque_data_format: Optional[str] = None,
+        scalar_range: Optional[Scalar] = None,
     ):
         """Constructor.
 
@@ -55,10 +58,14 @@ class Sequence(Space):
             service to agree on how to decode observations using this value. For
             example, an opaque_data_format of `string_json` could be used to
             indicate that the observation is a string-serialized JSON value.
+        :param scalar_range: If specified, this denotes the legal range of
+            each element in the sequence. This is enforced by
+            :meth:`contains() <compiler_gym.spaces.Sequence.contains>` checks.
         """
         self.size_range = size_range
         self.dtype = dtype
         self.opaque_data_format = opaque_data_format
+        self.scalar_range = scalar_range
 
     def __repr__(self) -> str:
         upper_bound = "inf" if self.size_range[1] is None else self.size_range[1]
@@ -75,6 +82,12 @@ class Sequence(Space):
         for element in x:
             if not isinstance(element, self.dtype):
                 return False
+
+        # Run the bounds check on every scalar element, if there is a scalar
+        # range specified.
+        if self.scalar_range:
+            return all(self.scalar_range.contains(s) for s in x)
+
         return True
 
     def sample(self):

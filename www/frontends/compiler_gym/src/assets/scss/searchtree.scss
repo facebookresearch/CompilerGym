@@ -1,0 +1,95 @@
+/*
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+.searchtree-nav-wrapper {
+    position: sticky;
+    top: 5.4rem;
+    z-index: 1;
+}
+
+.search-tree-container {
+  margin-top: 0rem;
+  margin-left: 0rem;
+  width: 100%;
+  height: 66vh;
+  min-height: 60vh;
+  overflow: auto;
+}
+
+@media (min-width: 576px)  {
+  .search-tree-container{
+      min-width: 600px;
+  }
+}
+
+@media (max-width: 576px)  {
+  .search-tree-container {
+      min-width: none;
+  }
+}
+
+.reward-table-wrapper {
+  position: sticky;
+  top: 7.8rem;
+  z-index: 0;
+}
+
+@media (min-width: 576px)  {
+  .reward-table-wrapper{
+      min-width: 600px;
+  }
+}
+
+@media (max-width: 576px)  {
+  .reward-table-wrapper {
+      min-width: none;
+  }
+}
+
+.reward-table {
+  font-size: small;
+}
+
+.dark-mode-tree {
+  background-color: $dark;
+  text {
+    stroke-width: 0;
+    font-size: 0.8rem;
+    fill: $white;
+  }
+  path {
+    fill: none;
+    stroke: #2593B8;
+    stroke-width: 1.5px;
+  }
+}
+
+.light-mode-tree {
+  background-color: $white;
+  text {
+    stroke-width: 0;
+    font-size: 0.8rem;
+    fill: black;
+  }
+  path {
+    fill: none;
+    stroke: $gray-500;
+    stroke-width: 1.5px;
+  }
+}
+
+.link__to-leaf {
+  visibility: hidden;
+}
+
+.active-node-info {
+  position: sticky;
+  border: 1px solid black;
+  border-radius: 5%;
+  background-color: $secondary;
+  padding: 0.45rem;
+  z-index: 100;
+}

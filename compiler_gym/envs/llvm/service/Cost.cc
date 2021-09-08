@@ -28,31 +28,6 @@ namespace compiler_gym::llvm_service {
 
 namespace {
 
-// Apply the optimizations from a given LLVM optimization level.
-bool applyBaselineOptimizations(llvm::Module* module, unsigned optLevel, unsigned sizeLevel) {
-  llvm::legacy::PassManager passManager;
-  llvm::legacy::FunctionPassManager functionPassManager(module);
-
-  llvm::PassManagerBuilder builder;
-  builder.OptLevel = optLevel;
-  builder.SizeLevel = sizeLevel;
-  if (optLevel > 1) {
-    builder.Inliner = llvm::createFunctionInliningPass(optLevel, sizeLevel, false);
-  }
-
-  builder.populateFunctionPassManager(functionPassManager);
-  builder.populateModulePassManager(passManager);
-
-  bool changed = passManager.run(*module);
-  changed |= (functionPassManager.doInitialization() ? 1 : 0);
-  for (auto& function : *module) {
-    changed |= (functionPassManager.run(function) ? 1 : 0);
-  }
-  changed |= (functionPassManager.doFinalization() ? 1 : 0);
-
-  return changed;
-}
-
 // Serialize the module to a string.
 std::string moduleToString(llvm::Module& module) {
   std::string str;
@@ -144,6 +119,39 @@ inline size_t getBaselineCostIndex(LlvmBaselinePolicy policy, LlvmCostFunction c
 
 }  // anonymous namespace
 
+/**
+ * Apply the given baseline optimizations.
+ *
+ * @param module The module to optimize.
+ * @param optLevel The runtime optimization level.
+ * @param sizeLevel The size optimization level
+ * @return Whether the baseline optimizations modified the module.
+ */
+bool applyBaselineOptimizationsToModule(llvm::Module* module, unsigned optLevel,
+                                        unsigned sizeLevel) {
+  llvm::legacy::PassManager passManager;
+  llvm::legacy::FunctionPassManager functionPassManager(module);
+
+  llvm::PassManagerBuilder builder;
+  builder.OptLevel = optLevel;
+  builder.SizeLevel = sizeLevel;
+  if (optLevel > 1) {
+    builder.Inliner = llvm::createFunctionInliningPass(optLevel, sizeLevel, false);
+  }
+
+  builder.populateFunctionPassManager(functionPassManager);
+  builder.populateModulePassManager(passManager);
+
+  bool changed = passManager.run(*module);
+  changed |= (functionPassManager.doInitialization() ? 1 : 0);
+  for (auto& function : *module) {
+    changed |= (functionPassManager.run(function) ? 1 : 0);
+  }
+  changed |= (functionPassManager.doFinalization() ? 1 : 0);
+
+  return changed;
+}
+
 Status setCost(const LlvmCostFunction& costFunction, llvm::Module& module,
                const fs::path& workingDirectory, double* cost) {
   switch (costFunction) {
@@ -195,10 +203,10 @@ Status setBaselineCosts(llvm::Module& unoptimizedModule, BaselineCosts* baseline
   // Create a copy of the unoptimized module and apply the default set of LLVM
   // optimizations.
   std::unique_ptr<llvm::Module> moduleOz = llvm::CloneModule(unoptimizedModule);
-  applyBaselineOptimizations(moduleOz.get(), /*optLevel=*/2, /*sizeLevel=*/2);
+  applyBaselineOptimizationsToModule(moduleOz.get(), /*optLevel=*/2, /*sizeLevel=*/2);
 
   std::unique_ptr<llvm::Module> moduleO3 = llvm::CloneModule(unoptimizedModule);
-  applyBaselineOptimizations(moduleO3.get(), /*optLevel=*/3, /*sizeLevel=*/0);
+  applyBaselineOptimizationsToModule(moduleO3.get(), /*optLevel=*/3, /*sizeLevel=*/0);
 
   for (const auto policy : magic_enum::enum_values<LlvmBaselinePolicy>()) {
     // Set the baseline module.

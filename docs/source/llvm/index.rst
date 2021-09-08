@@ -27,6 +27,8 @@ We provide several datasets of open-source LLVM-IR benchmarks for use:
 +----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
 | benchmark://cbench-v1      | 23                       | Runnable C benchmarks [`Homepage <https://ctuning.org/wiki/index.php/CTools:CBench>`__, `Paper <https://arxiv.org/pdf/1407.3487.pdf>`__]                                                                           | Partially            |
 +----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
+| benchmark://chstone-v0     | 12                       | Benchmarks for C-based High-Level Synthesis [`Homepage <http://www.ertl.jp/chstone/>`__, `Paper <http://www.yxi.com/applications/iscas2008-300_1027.pdf>`__]                                                       | No                   |
++----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
 | benchmark://clgen-v0       | 996                      | Synthetically generated OpenCL kernels [`Homepage <https://github.com/ChrisCummins/clgen>`__, `Paper <https://chriscummins.cc/pub/2017-cgo.pdf>`__]                                                                | No                   |
 +----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
 | benchmark://github-v0      | 49,738                   | Compile-only C/C++ objects from GitHub [`Paper <https://arxiv.org/pdf/2012.01470.pdf>`__]                                                                                                                          | No                   |
@@ -47,7 +49,7 @@ We provide several datasets of open-source LLVM-IR benchmarks for use:
 +----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
 | generator://llvm-stress-v0 | ∞                        | Randomly generated LLVM-IR [`Documentation <https://llvm.org/docs/CommandGuide/llvm-stress.html>`__]                                                                                                               | No                   |
 +----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
-| Total                      | 1,160,330                |                                                                                                                                                                                                                    |                      |
+| Total                      | 1,158,701                |                                                                                                                                                                                                                    |                      |
 +----------------------------+--------------------------+--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------+----------------------+
 
 .. [#f1] Values are for the Linux datasets. Some of the datasets contain fewer
@@ -679,6 +681,58 @@ Cost Models
 +--------------------------+------------------------------------------------------------------------------------+
 
 Raw values from the cost models used to compute :ref:`rewards <reward>`.
+
+
+Runtime
+~~~~~~~
+
+|:building_construction:| **Experimental API:** This runtime observation space
+is still in an experimental state and is not yet stable. There may be bugs and
+breaking changes in future releases.
+
++--------------------------+------------------------------------------------------------------------------------+
+| Observation space        | Shape                                                                              |
++==========================+====================================================================================+
+| IsRunnable               | `int<0,1>`                                                                         |
++--------------------------+------------------------------------------------------------------------------------+
+| Runtime                  | `float64_list<>[0,inf])`                                                           |
++--------------------------+------------------------------------------------------------------------------------+
+
+Compile and run the benchmark, returning a list of wall-clock execution times.
+Times are returned as floating point second values. The number of times that the
+benchmark is executed is determined by the
+:attr:`LlvmEnv.runtime_observation_count
+<compiler_gym.envs.LlvmEnv.runtime_observation_count>` property.
+
+Not all benchmarks are runnable. To check if the current benchmark is runnable,
+use the :code:`IsRunnable` observation space, that is :code:`1` if the benchmark
+is runnable, else :code:`0`. Requesting the :code:`Runtime` observation space
+for a benchmark that is not runnable will return an empty list.
+
+
+Build Time
+~~~~~~~~~~
+
+|:building_construction:| **Experimental API:** This compiler time observation
+space is still in an experimental state and is not yet stable. There may be bugs
+and breaking changes in future releases.
+
++--------------------------+------------------------------------------------------------------------------------+
+| Observation space        | Shape                                                                              |
++==========================+====================================================================================+
+| IsBuildable              | `int<0,1>`                                                                         |
++--------------------------+------------------------------------------------------------------------------------+
+| Buildtime                | `float64_list<>[0,inf])`                                                           |
++--------------------------+------------------------------------------------------------------------------------+
+
+Compile the benchmark to a binary and return a list of a single wall-clock build
+time as seconds.
+
+Not all benchmarks are build. To check if the current benchmark is buildable,
+use the :code:`IsBuildable` observation space, that is :code:`1` if the
+benchmark is buildable, else :code:`0`. Requesting the :code:`Buildtime`
+observation space for a benchmark that is not buildable will return an empty
+list.
 
 
 .. _reward:

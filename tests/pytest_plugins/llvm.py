@@ -10,6 +10,7 @@ from typing import Iterable, List
 import gym
 import pytest
 
+from compiler_gym.datasets import Dataset
 from compiler_gym.envs.llvm import LlvmEnv
 from compiler_gym.envs.llvm.datasets.cbench import VALIDATORS
 from compiler_gym.third_party import llvm
@@ -41,6 +42,7 @@ if bool(os.environ.get("CI")):
 with gym.make("llvm-v0") as env:
     OBSERVATION_SPACE_NAMES = sorted(env.observation.spaces.keys())
     REWARD_SPACE_NAMES = sorted(env.reward.spaces.keys())
+    DATASET_NAMES = sorted(d.name for d in env.datasets)
 
 
 @pytest.fixture(scope="module")
@@ -119,3 +121,14 @@ def llvm_diff() -> Path:
 def clang() -> Path:
     """Test fixture that yields the path of clang."""
     return llvm.clang_path()
+
+
+@pytest.fixture(scope="module", params=DATASET_NAMES)
+def dataset_name(request) -> str:
+    return request.param
+
+
+@pytest.fixture(scope="module", params=DATASET_NAMES)
+def dataset(request) -> Dataset:
+    with gym.make("llvm-v0") as env:
+        return env.datasets[request.param]

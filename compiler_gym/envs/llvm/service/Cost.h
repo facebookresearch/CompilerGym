@@ -52,6 +52,17 @@ using BaselineCosts = std::array<double, numBaselineCosts>;
 using PreviousCosts = std::array<std::optional<double>, numCosts>;
 
 /**
+ * Apply the given baseline optimizations.
+ *
+ * @param module The module to optimize.
+ * @param optLevel The runtime optimization level.
+ * @param sizeLevel The size optimization level
+ * @return Whether the baseline optimizations modified the module.
+ */
+bool applyBaselineOptimizationsToModule(llvm::Module* module, unsigned optLevel,
+                                        unsigned sizeLevel);
+
+/**
  * Compute the cost using a given cost function. A lower cost is better.
  *
  * @param costFunction The cost function to use.

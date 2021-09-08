@@ -58,6 +58,17 @@ py_test(
 )
 
 py_test(
+    name = "datasets_pickle_test",
+    timeout = "long",
+    srcs = ["datasets_pickle_test.py"],
+    deps = [
+        "//compiler_gym/datasets",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "download_llvm_test",
     srcs = ["download_llvm_test.py"],
     deps = [
@@ -165,6 +176,16 @@ py_test(
         "//compiler_gym",
         "//tests:test_main",
         "//tests/pytest_plugins:common",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
+    name = "llvm_session_parameters_test",
+    srcs = ["llvm_session_parameters_test.py"],
+    deps = [
+        "//compiler_gym/envs",
+        "//tests:test_main",
         "//tests/pytest_plugins:llvm",
     ],
 )

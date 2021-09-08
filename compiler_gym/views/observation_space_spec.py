@@ -123,14 +123,17 @@ class ObservationSpaceSpec:
         def make_scalar(scalar_range, dtype, defaults):
             scalar_range_tuple = _scalar_range2tuple(scalar_range, defaults)
             return Scalar(
-                min=scalar_range_tuple[0], max=scalar_range_tuple[1], dtype=dtype
+                min=dtype(scalar_range_tuple[0]),
+                max=dtype(scalar_range_tuple[1]),
+                dtype=dtype,
             )
 
-        def make_seq(scalar_range, dtype, defaults):
+        def make_seq(size_range, dtype, defaults, scalar_range=None):
             return Sequence(
-                size_range=_scalar_range2tuple(scalar_range, defaults),
+                size_range=_scalar_range2tuple(size_range, defaults),
                 dtype=dtype,
                 opaque_data_format=proto.opaque_data_format,
+                scalar_range=scalar_range,
             )
 
         # Translate from protocol buffer specification to python. There are
@@ -200,7 +203,7 @@ class ObservationSpaceSpec:
         elif shape_type == "scalar_int64_range":
             space = make_scalar(
                 proto.scalar_int64_range,
-                np.int64,
+                int,
                 (np.iinfo(np.int64).min, np.iinfo(np.int64).max),
             )
 
@@ -209,12 +212,24 @@ class ObservationSpaceSpec:
 
             to_string = str
         elif shape_type == "scalar_double_range":
-            space = make_scalar(
-                proto.scalar_double_range, np.float64, (-np.inf, np.inf)
-            )
+            space = make_scalar(proto.scalar_double_range, float, (-np.inf, np.inf))
 
             def translate(observation):
                 return float(observation.scalar_double)
+
+            to_string = str
+        elif shape_type == "double_sequence":
+            space = make_seq(
+                proto.double_sequence.length_range,
+                np.float64,
+                (-np.inf, np.inf),
+                make_scalar(
+                    proto.double_sequence.scalar_range, np.float64, (-np.inf, np.inf)
+                ),
+            )
+
+            def translate(observation):
+                return np.array(observation.double_list.value, dtype=np.float64)
 
             to_string = str
         else:

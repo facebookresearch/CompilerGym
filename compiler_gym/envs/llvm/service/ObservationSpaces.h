@@ -45,7 +45,7 @@ enum class LlvmObservationSpace {
    */
   AUTOPHASE,
   /**
-   * Returns the graph representation of a program.
+   * Returns the graph representation of a program as a networkx Graph.
    *
    * From:
    *
@@ -54,6 +54,16 @@ enum class LlvmObservationSpace {
    *     and Analysis. ArXiv:2003.10536. https://arxiv.org/abs/2003.10536
    */
   PROGRAML,
+  /**
+   * Returns the graph representation of a program as a JSON node-link graph.
+   *
+   * From:
+   *
+   *     Cummins, C., Fisches, Z. V., Ben-Nun, T., Hoefler, T., & Leather, H.
+   *     (2020). ProGraML: Graph-based Deep Learning for Program Optimization
+   *     and Analysis. ArXiv:2003.10536. https://arxiv.org/abs/2003.10536
+   */
+  PROGRAML_JSON,
   /** A JSON dictionary of properties describing the CPU. */
   CPU_INFO,
   /** The number of LLVM-IR instructions in the current module. */
@@ -82,6 +92,24 @@ enum class LlvmObservationSpace {
   /** The platform-dependent size of the .text section of the compiled binary. */
   TEXT_SIZE_OZ,
 #endif
+  /** Return 1 if the benchmark is buildable, else 0.
+   */
+  IS_BUILDABLE,
+  /** Return 1 if the benchmark is runnable, else 0.
+   */
+  IS_RUNNABLE,
+  /** The runtime of the compiled program.
+   *
+   * Returns a list of runtime measurements in microseconds. This is not
+   * available to all benchmarks. When not available, a list of zeros are returned.
+   */
+  RUNTIME,
+  /** The time it took to compile the program.
+   *
+   * Returns a list of measurments in seconds. This is not available to all
+   * benchmarks. When not available, a list of zeros are returned.
+   */
+  BUILDTIME,
 };
 
 /** Return the list of available observation spaces. */

@@ -6,7 +6,7 @@ import logging
 from contextlib import contextmanager
 from pathlib import Path
 from threading import Lock
-from typing import Dict
+from typing import Dict, Optional
 
 from grpc import StatusCode
 
@@ -22,6 +22,8 @@ from compiler_gym.service.proto import (
     GetSpacesRequest,
     GetVersionReply,
     GetVersionRequest,
+    SendSessionParameterReply,
+    SendSessionParameterRequest,
     StartSessionReply,
     StartSessionRequest,
     StepReply,
@@ -30,9 +32,13 @@ from compiler_gym.service.proto import (
 from compiler_gym.service.runtime.benchmark_cache import BenchmarkCache
 from compiler_gym.util.version import __version__
 
+# NOTE(cummins): The CompilerGymService class is used in a subprocess by a
+# compiler service, so code coverage tracking does not work. As such we use "#
+# pragma: no cover" annotation for all definitions in this file.
+
 
 @contextmanager
-def exception_to_grpc_status(context):
+def exception_to_grpc_status(context):  # pragma: no cover
     def handle_exception_as(exception, code):
         context.set_code(code)
         context.set_details(str(exception))
@@ -51,9 +57,11 @@ def exception_to_grpc_status(context):
         handle_exception_as(e, StatusCode.FAILED_PRECONDITION)
     except TimeoutError as e:
         handle_exception_as(e, StatusCode.DEADLINE_EXCEEDED)
+    except Exception as e:  # pylint: disable=broad-except
+        handle_exception_as(e, StatusCode.INTERNAL)
 
 
-class CompilerGymService(CompilerGymServiceServicerStub):
+class CompilerGymService(CompilerGymServiceServicerStub):  # pragma: no cover
     def __init__(self, working_directory: Path, compilation_session_type):
         self.working_directory = working_directory
         self.benchmarks = BenchmarkCache()
@@ -86,7 +94,12 @@ class CompilerGymService(CompilerGymServiceServicerStub):
 
     def StartSession(self, request: StartSessionRequest, context) -> StartSessionReply:
         """Create a new compilation session."""
-        logging.debug("StartSession(%s), [%d]", request.benchmark, self.next_session_id)
+        logging.debug(
+            "StartSession(id=%d, benchmark=%s), %d active sessions",
+            self.next_session_id,
+            request.benchmark.uri,
+            len(self.sessions) + 1,
+        )
         reply = StartSessionReply()
 
         if not request.benchmark:
@@ -95,7 +108,12 @@ class CompilerGymService(CompilerGymServiceServicerStub):
             return reply
 
         with self.sessions_lock, exception_to_grpc_status(context):
-            if request.benchmark not in self.benchmarks:
+            # If a benchmark definition was provided, add it.
+            if request.benchmark.HasField("program"):
+                self.benchmarks[request.benchmark.uri] = request.benchmark
+
+            # Lookup the requested benchmark.
+            if request.benchmark.uri not in self.benchmarks:
                 context.set_code(StatusCode.NOT_FOUND)
                 context.set_details("Benchmark not found")
                 return reply
@@ -103,7 +121,7 @@ class CompilerGymService(CompilerGymServiceServicerStub):
             session = self.compilation_session_type(
                 working_directory=self.working_directory,
                 action_space=self.action_spaces[request.action_space],
-                benchmark=self.benchmarks[request.benchmark],
+                benchmark=self.benchmarks[request.benchmark.uri],
             )
 
             # Generate the initial observations.
@@ -123,7 +141,7 @@ class CompilerGymService(CompilerGymServiceServicerStub):
     def EndSession(self, request: EndSessionRequest, context) -> EndSessionReply:
         del context  # Unused
         logging.debug(
-            "EndSession(%d), %d sessions remaining",
+            "EndSession(id=%d), %d sessions remaining",
             request.session_id,
             len(self.sessions) - 1,
         )
@@ -169,3 +187,54 @@ class CompilerGymService(CompilerGymServiceServicerStub):
             for benchmark in request.benchmark:
                 self.benchmarks[benchmark.uri] = benchmark
         return reply
+
+    def SendSessionParameter(
+        self, request: SendSessionParameterRequest, context
+    ) -> SendSessionParameterReply:
+        reply = SendSessionParameterReply()
+
+        if request.session_id not in self.sessions:
+            context.set_code(StatusCode.NOT_FOUND)
+            context.set_details(f"Session not found: {request.session_id}")
+            return reply
+
+        session = self.sessions[request.session_id]
+
+        with exception_to_grpc_status(context):
+            for param in request.parameter:
+                # Handle each parameter in the session and generate a response.
+                message = session.handle_session_parameter(param.key, param.value)
+
+                # Use the builtin parameter handlers if not handled by a session.
+                if message is None:
+                    message = self._handle_builtin_session_parameter(
+                        param.key, param.value
+                    )
+
+                if message is None:
+                    context.set_code(StatusCode.INVALID_ARGUMENT)
+                    context.set_details(f"Unknown parameter: {param.key}")
+                    return reply
+                reply.reply.append(message)
+
+        return reply
+
+    def _handle_builtin_session_parameter(self, key: str, value: str) -> Optional[str]:
+        """Handle a built-in session parameter.
+
+        :param key: The parameter key.
+
+        :param value: The parameter value.
+
+        :return: The response message, or :code:`None` if the key is not
+            understood.
+        """
+        if key == "service.benchmark_cache.set_max_size_in_bytes":
+            self.benchmarks.set_max_size_in_bytes = int(value)
+            return value
+        elif key == "service.benchmark_cache.get_max_size_in_bytes":
+            return str(self.benchmarks.max_size_in_bytes)
+        elif key == "service.benchmark_cache.get_size_in_bytes":
+            return str(self.benchmarks.size_in_bytes)
+
+        return None

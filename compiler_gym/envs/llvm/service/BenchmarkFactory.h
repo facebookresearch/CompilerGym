@@ -22,15 +22,14 @@
 namespace compiler_gym::llvm_service {
 
 /**
- * Maximum number of bytes before benchmark cache eviction.
+ * Maximum number of benchmark instances to cache before eviction.
  *
  * Benchmarks are loaded from disk and cached in-memory so that future uses do
  * not require a disk access. The number of benchmarks that may be
- * simultaneously loaded is limited by the combined size of the bitcodes, in
- * bytes. Once this size is reached, benchmarks are offloaded so that they must
- * be re-read from disk.
+ * simultaneously loaded is specified here. Once this number is reached, 50% of
+ * the cached benchmarks are selected randomly and evicted.
  */
-constexpr size_t kMaxLoadedBenchmarkSize = 512 * 1024 * 1024;
+constexpr size_t kMaxLoadedBenchmarksCount = 128;
 
 /**
  * A factory object for instantiating LLVM modules for use in optimization
@@ -52,14 +51,14 @@ class BenchmarkFactory {
    * @param workingDirectory The working directory.
    * @param rand An optional random number generator. This is used for cache
    *     evictions.
-   * @param maxLoadedBenchmarkSize The maximum size in bytes of the benchmark
-   *     cache before evictions.
+   * @param maxLoadedBenchmarksCount The maximum number of benchmarks to cache.
    * @return The benchmark factory singleton instance.
    */
-  static BenchmarkFactory& getSingleton(const boost::filesystem::path& workingDirectory,
-                                        std::optional<std::mt19937_64> rand = std::nullopt,
-                                        size_t maxLoadedBenchmarkSize = kMaxLoadedBenchmarkSize) {
-    static BenchmarkFactory instance(workingDirectory, rand, maxLoadedBenchmarkSize);
+  static BenchmarkFactory& getSingleton(
+      const boost::filesystem::path& workingDirectory,
+      std::optional<std::mt19937_64> rand = std::nullopt,
+      size_t maxLoadedBenchmarksCount = kMaxLoadedBenchmarksCount) {
+    static BenchmarkFactory instance(workingDirectory, rand, maxLoadedBenchmarksCount);
     return instance;
   }
 
@@ -75,10 +74,13 @@ class BenchmarkFactory {
                                           std::unique_ptr<Benchmark>* benchmark);
 
  private:
-  [[nodiscard]] grpc::Status addBitcode(const std::string& uri, const Bitcode& bitcode);
+  [[nodiscard]] grpc::Status addBitcode(
+      const std::string& uri, const Bitcode& bitcode,
+      std::optional<BenchmarkDynamicConfig> dynamicConfig = std::nullopt);
 
-  [[nodiscard]] grpc::Status addBitcode(const std::string& uri,
-                                        const boost::filesystem::path& path);
+  [[nodiscard]] grpc::Status addBitcode(
+      const std::string& uri, const boost::filesystem::path& path,
+      std::optional<BenchmarkDynamicConfig> dynamicConfig = std::nullopt);
 
   /**
    * Construct a benchmark factory.
@@ -87,13 +89,12 @@ class BenchmarkFactory {
    *    files.
    * @param rand is a random seed used to control the selection of random
    *    benchmarks.
-   * @param maxLoadedBenchmarkSize is the maximum combined size of the bitcodes
+   * @param maxLoadedBenchmarksCount is the maximum combined size of the bitcodes
    *    that may be cached in memory. Once this size is reached, benchmarks are
    *    offloaded so that they must be re-read from disk.
    */
   BenchmarkFactory(const boost::filesystem::path& workingDirectory,
-                   std::optional<std::mt19937_64> rand = std::nullopt,
-                   size_t maxLoadedBenchmarkSize = kMaxLoadedBenchmarkSize);
+                   std::optional<std::mt19937_64> rand, size_t maxLoadedBenchmarksCount);
 
   BenchmarkFactory(const BenchmarkFactory&) = delete;
   BenchmarkFactory& operator=(const BenchmarkFactory&) = delete;
@@ -106,10 +107,9 @@ class BenchmarkFactory {
   const boost::filesystem::path workingDirectory_;
   std::mt19937_64 rand_;
   /**
-   * The current and maximum allowed sizes of the loaded benchmarks.
+   * The maximum allowed size of the benchmark cache.
    */
-  size_t loadedBenchmarksSize_;
-  const size_t maxLoadedBenchmarkSize_;
+  const size_t maxLoadedBenchmarksCount_;
 };
 
 }  // namespace compiler_gym::llvm_service

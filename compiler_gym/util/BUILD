@@ -17,6 +17,7 @@ py_library(
         "gym_type_hints.py",
         "logs.py",
         "minimize_trajectory.py",
+        "parallelization.py",
         "registration.py",
         "runfiles_path.py",
         "shell_format.py",
@@ -26,7 +27,6 @@ py_library(
         "thread_pool.py",
         "timer.py",
         "truncate.py",
-        "user_input.py",
         "version.py",
     ],
     visibility = ["//visibility:public"],
@@ -51,7 +51,9 @@ cc_library(
     hdrs = ["GrpcStatusMacros.h"],
     visibility = ["//visibility:public"],
     deps = [
+        "@boost//:current_function",
         "@com_github_grpc_grpc//:grpc++",
+        "@fmt",
         "@glog",
     ],
 )
@@ -70,6 +72,19 @@ cc_library(
     name = "StrLenConstexpr",
     hdrs = ["StrLenConstexpr.h"],
     visibility = ["//visibility:public"],
+)
+
+cc_library(
+    name = "Subprocess",
+    srcs = ["Subprocess.cc"],
+    hdrs = ["Subprocess.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "@boost//:filesystem",
+        "@com_github_grpc_grpc//:grpc++",
+        "@fmt",
+        "@subprocess",
+    ],
 )
 
 cc_library(

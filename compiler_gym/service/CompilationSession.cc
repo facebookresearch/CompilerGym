@@ -20,6 +20,11 @@ Status CompilationSession::endOfStep(bool actionHadNoEffect, bool& endOfEpisode,
   return Status::OK;
 }
 
+Status CompilationSession::handleSessionParameter(const std::string& key, const std::string& value,
+                                                  std::optional<std::string>& reply) {
+  return Status::OK;
+}
+
 CompilationSession::CompilationSession(const boost::filesystem::path& workingDirectory)
     : workingDirectory_(workingDirectory) {}
 

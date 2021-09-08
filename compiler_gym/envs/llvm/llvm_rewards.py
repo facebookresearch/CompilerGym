@@ -36,9 +36,10 @@ class CostFunctionReward(Reward):
         self.init_cost_function: str = init_cost_function
         self.previous_cost: Optional[ObservationType] = None
 
-    def reset(self, benchmark: Benchmark) -> None:
+    def reset(self, benchmark: Benchmark, observation_view: ObservationView) -> None:
         """Called on env.reset(). Reset incremental progress."""
         del benchmark  # unused
+        del observation_view  # unused
         self.previous_cost = None
 
     def update(
@@ -68,9 +69,9 @@ class NormalizedReward(CostFunctionReward):
         self.cost_norm: Optional[ObservationType] = None
         self.benchmark: Benchmark = None
 
-    def reset(self, benchmark: str) -> None:
+    def reset(self, benchmark: str, observation_view: ObservationView) -> None:
         """Called on env.reset(). Reset incremental progress."""
-        super().reset(benchmark)
+        super().reset(benchmark, observation_view)
         # The benchmark has changed so we must compute a new cost normalization
         # value. If the benchmark has not changed then the previously computed
         # value is still valid.

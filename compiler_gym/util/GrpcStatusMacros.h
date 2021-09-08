@@ -4,6 +4,10 @@
 // LICENSE file in the root directory of this source tree.
 #pragma once
 
+#include <fmt/format.h>
+
+#include <boost/current_function.hpp>
+
 #include "glog/logging.h"
 #include "include/grpcpp/grpcpp.h"
 
@@ -23,22 +27,33 @@ using grpc::Status;
 
 #undef RETURN_IF_ERROR
 /**
- * Return from the current function if the expression returns an error status.
+ * Return from the current function if the expression returns an error status,
+ * or if a std::exception is thrown.
  *
  * This is equivalent to:
  *
- * \code{.cpp}
- *     Status status = expr;
- *     if (!status.ok()) {
+ *     \code{.cpp}
+ *     try {
+ *       Status status = expr;
+ *       if (!status.ok()) {
  *         return status;
+ *       }
+ *     } catch (std::exception& e) {
+ *       return E_STATUS;
  *     }
- * \endcode
+ *     \endcode
  *
  * @param expr An expression that return a `grpc::Status`.
  */
-#define RETURN_IF_ERROR(expr)      \
-  do {                             \
-    const Status _status = (expr); \
-    if (!_status.ok())             \
-      return _status;              \
+#define RETURN_IF_ERROR(expr)                                                                 \
+  do {                                                                                        \
+    try {                                                                                     \
+      const Status _status = (expr);                                                          \
+      if (!_status.ok())                                                                      \
+        return _status;                                                                       \
+    } catch (std::exception & e) {                                                            \
+      return grpc::Status(grpc::StatusCode::INTERNAL,                                         \
+                          fmt::format("Unhandled exception: {}\nSource: {}:{}\nFunction: {}", \
+                                      e.what(), __FILE__, __LINE__, BOOST_CURRENT_FUNCTION)); \
+    }                                                                                         \
   } while (0)

@@ -233,21 +233,19 @@ class Dataset:
             )
         return total_size
 
-    # We use Union[int, float] to represent the size because infinite size is
-    # represented by math.inf, which is a float. For all other sizes this should
-    # be an int.
     @property
-    def size(self) -> Union[int, float]:
-        """The number of benchmarks in the dataset. If the number of benchmarks
-        is unbounded, for example because the dataset represents a program
-        generator that can produce an infinite number of programs, the value is
-        :code:`math.inf`.
+    def size(self) -> int:
+        """The number of benchmarks in the dataset.
 
-        :type: Union[int, float]
+        If the number of benchmarks is unknown or unbounded, for example because
+        the dataset represents a program generator that can produce an infinite
+        number of programs, the value is 0.
+
+        :type: int
         """
         return 0
 
-    def __len__(self) -> Union[int, float]:
+    def __len__(self) -> int:
         """The number of benchmarks in the dataset.
 
         This is the same as :meth:`Dataset.size
@@ -256,9 +254,26 @@ class Dataset:
             >>> len(dataset) == dataset.size
             True
 
-        :return: An integer, or :code:`math.float`.
+        If the number of benchmarks is unknown or unbounded, for example because
+        the dataset represents a program generator that can produce an infinite
+        number of programs, the value is 0.
+
+        :return: An integer.
         """
         return self.size
+
+    def __eq__(self, other: Union["Dataset", str]) -> bool:
+        if isinstance(other, Dataset):
+            return self.name == other.name
+        return self.name == other
+
+    def __lt__(self, other: Union["Dataset", str]) -> bool:
+        if isinstance(other, Dataset):
+            return self.name < other.name
+        return self.name < other
+
+    def __le__(self, other: Union["Dataset", str]) -> bool:
+        return self < other or self == other
 
     @property
     def installed(self) -> bool:

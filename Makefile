@@ -88,6 +88,9 @@ Deployment
         Run the `make install-test` suite against the build artifact generated
         by `make bdist_wheel-linux`.
 
+	make www
+		Run a local instance of the web visualization service. See www/README.md
+		for details.
 
 Tidying up
 -----------
@@ -119,6 +122,7 @@ PYTHON ?= python3
 
 # Bazel build options.
 BAZEL_OPTS ?=
+BAZEL_FETCH_OPTS ?=
 BAZEL_BUILD_OPTS ?= -c opt
 BAZEL_TEST_OPTS ?=
 
@@ -154,7 +158,24 @@ DISTTOOLS_OUTS := dist build compiler_gym.egg-info
 
 BUILD_TARGET ?= //:package
 
-bazel-build:
+BAZEL_FETCH_RETRIES ?= 5
+
+# Run `bazel fetch` in a retry loop due to intermitent failures when fetching
+# remote archives in the CI environment.
+bazel-fetch:
+	@for i in $$(seq 1 $(BAZEL_FETCH_RETRIES)); do \
+		echo "$(BAZEL) $(BAZEL_OPTS) fetch $(BAZEL_FETCH_OPTS) $(BUILD_TARGET)"; \
+		if $(BAZEL) $(BAZEL_OPTS) fetch $(BAZEL_FETCH_OPTS) $(BUILD_TARGET) ; then \
+			break; \
+		else \
+			echo "bazel fetch attempt $$i of $(BAZEL_FETCH_RETRIES) failed" >&2; \
+		fi; \
+		if [ $$i -eq 10 ]; then \
+			false; \
+		fi; \
+	done
+
+bazel-build: bazel-fetch
 	$(BAZEL) $(BAZEL_OPTS) build $(BAZEL_BUILD_OPTS) $(BUILD_TARGET)
 
 bdist_wheel: bazel-build
@@ -178,8 +199,23 @@ bdist_wheel-linux-test:
 
 all: docs bdist_wheel bdist_wheel-linux
 
-.PHONY: bazel-build bdist_wheel bdist_wheel-linux bdist_wheel-linux-shell bdist_wheel-linux-test
+.PHONY: bazel-fetch bazel-build bdist_wheel bdist_wheel-linux bdist_wheel-linux-shell bdist_wheel-linux-test
 
+#################
+# Web interface #
+#################
+
+www: www-build
+	cd www && $(PYTHON) www.py
+
+www-build:
+	cd www/frontends/compiler_gym && npm install && npm run build
+
+www-image: www-build
+	cd www && docker build -t chriscummins/compiler_gym-www .
+	docker run -p 5000:5000 chriscummins/compiler_gym-www
+
+.PHONY: www www-build
 
 #################
 # Documentation #
@@ -237,10 +273,10 @@ TEST_TARGET ?=
 # Extra command line arguments for pytest.
 PYTEST_ARGS ?=
 
-test:
+test: bazel-fetch
 	$(BAZEL) $(BAZEL_OPTS) test $(BAZEL_TEST_OPTS) $(if $(TEST_TARGET),$(TEST_TARGET),//...)
 
-itest:
+itest: bazel-fetch
 	$(IBAZEL) $(BAZEL_OPTS) test $(BAZEL_TEST_OPTS) $(if $(TEST_TARGET),$(TEST_TARGET),//...)
 
 # Since we can't run compiler_gym from the project root we need to jump through

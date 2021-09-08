@@ -44,6 +44,11 @@ service CompilerGymService {
   rpc Step(StepRequest) returns (StepReply);
   // Register a new benchmark.
   rpc AddBenchmark(AddBenchmarkRequest) returns (AddBenchmarkReply);
+  // Transmit <key, value> parameters to a session. Each parameter generates a
+  // string response. It us up to the client/service to agree on a common schema
+  // for encoding and decoding these parameters. An unknown key/value returns
+  // grpc::StatusCode::INVALID_ARGUMENT.
+  rpc SendSessionParameter(SendSessionParameterRequest) returns (SendSessionParameterReply);
 }
 
 // A GetVersion() request.
@@ -59,9 +64,9 @@ message GetVersionReply {
 
 // A StartSession() request.
 message StartSessionRequest {
-  // The name of the benchmark to use for this session. If not provided, a
-  // benchmark is chosen randomly by the service.
-  string benchmark = 1;
+  reserved 1;
+  // The benchmark to use.
+  Benchmark benchmark = 4;
   // An index into the GetSpacesReply.action_space_list selecting the action
   // space that is to be used for this session. Once set, the action space
   // cannot be changed for the duration of the session.
@@ -72,11 +77,10 @@ message StartSessionRequest {
 
 // A StartSession() reply.
 message StartSessionReply {
+  reserved 2;
   // The ID that has been assigned to the session. The client must use this ID
   // in all subsequent interactions with the service for this session.
   int64 session_id = 1;
-  // The name of the benchmark.
-  string benchmark = 2;
   // A new action space. This is set only if, after initializing the session,
   // the action space has changed from the default action space returned by
   // GetSpaces(). If set, the environment should discard the previous action
@@ -180,6 +184,11 @@ message ScalarRangeList {
   repeated ScalarRange range = 1;
 }
 
+message SequenceSpace {
+  ScalarRange length_range = 1;
+  ScalarRange scalar_range = 2;
+}
+
 // The description of a space of observations.
 message ObservationSpace {
   // The name of the observation space.
@@ -198,6 +207,8 @@ message ObservationSpace {
     // value.
     ScalarRange scalar_int64_range = 10;
     ScalarRange scalar_double_range = 11;
+    // A variable-length sequence of elements.
+    SequenceSpace double_sequence = 12;
   }
   // An optional string describing an opaque data format, e.g. a data structure
   // that is serialized to a string/binary array for transmission back to the
@@ -264,6 +275,23 @@ message Benchmark {
   // For example, the service could expect that this file contains serialized
   // IR data, or an input source file.
   File program = 2;
+  // An optional configuration option that details how to build and run the
+  // benchmark program.
+  BenchmarkDynamicConfig dynamic_config = 3;
+}
+
+// Description of how to build and run a benchmark binary.
+message BenchmarkDynamicConfig {
+  string build_cmd = 1;
+  string build_genfile = 2;
+  string run_cmd = 3;
+  repeated string run_genfile = 4;
+  repeated string pre_run_cmd = 5;
+  repeated string post_run_cmd = 6;
+  int32 build_cmd_timeout_seconds = 7;
+  int32 run_cmd_timeout_seconds = 8;
+  int32 pre_run_cmd_timeout_seconds = 9;
+  int32 post_run_cmd_timeout_seconds = 10;
 }
 
 // A File message represents a file object.
@@ -283,3 +311,23 @@ message AddBenchmarkRequest {
 
 // An AddBenchmark() reply.
 message AddBenchmarkReply {}
+
+// An arbitrary string parameter value for a session.
+message SessionParameter {
+  string key = 1;
+  string value = 2;
+}
+
+// A SendSessionParameter() request.
+message SendSessionParameterRequest {
+  // The ID of the session.
+  int64 session_id = 1;
+  // A list of <key, value> parameters to pass to the session.
+  repeated SessionParameter parameter = 2;
+}
+
+// A SendSessionParameter() reply.
+message SendSessionParameterReply {
+  // A list of response messages, one per parameter request.
+  repeated string reply = 1;
+}

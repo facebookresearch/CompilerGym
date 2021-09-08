@@ -8,13 +8,18 @@ for applying reinforcement learning to compiler optimizations.
    :caption: User Guide
 
    getting_started
-   llvm/index
-   cli
    about
+   cli
    rpc
    changelog
    contributing
    faq
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Environments
+
+   llvm/index
 
 ..
     .. toctree::

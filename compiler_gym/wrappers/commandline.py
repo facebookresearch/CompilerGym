@@ -95,6 +95,7 @@ class ConstrainedCommandline(ActionWrapper):
         :param name: The name of the new action space.
         """
         super().__init__(env)
+        self._flags = flags
 
         if not flags:
             raise TypeError("No flags provided")
@@ -119,7 +120,7 @@ class ConstrainedCommandline(ActionWrapper):
                 )
                 for a in (env.action_space.flags.index(f) for f in flags)
             ],
-            name=f"{type(self).__name__}<{env.action_space.name}, {len(flags)}>",
+            name=f"{type(self).__name__}<{name or env.action_space.name}, {len(flags)}>",
         )
 
     def action(self, action: Union[int, List[int]]):
@@ -136,3 +137,8 @@ class ConstrainedCommandline(ActionWrapper):
     def actions(self) -> List[int]:
         """Reverse-translate actions back into the constrained space."""
         return self.reverse_action(self.env.actions)
+
+    def fork(self) -> "ConstrainedCommandline":
+        return ConstrainedCommandline(
+            env=self.env.fork(), flags=self._flags, name=self.action_space.name
+        )

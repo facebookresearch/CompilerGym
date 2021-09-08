@@ -51,16 +51,22 @@ grpc::Status CompilerGymService<CompilationSessionType>::GetSpaces(grpc::ServerC
 template <typename CompilationSessionType>
 grpc::Status CompilerGymService<CompilationSessionType>::StartSession(
     grpc::ServerContext* context, const StartSessionRequest* request, StartSessionReply* reply) {
-  if (!request->benchmark().size()) {
+  if (!request->benchmark().uri().size()) {
     return grpc::Status(grpc::StatusCode::INVALID_ARGUMENT,
                         "No benchmark URI set for StartSession()");
   }
 
   const std::lock_guard<std::mutex> lock(sessionsMutex_);
-  VLOG(1) << "StartSession(" << request->benchmark() << "), " << sessionCount()
-          << " active sessions";
+  VLOG(1) << "StartSession(id=" << nextSessionId_ << ", benchmark=" << request->benchmark().uri()
+          << "), " << (sessionCount() + 1) << " active sessions";
 
-  const Benchmark* benchmark = benchmarks().get(request->benchmark());
+  // If a benchmark definition was provided, add it.
+  if (request->benchmark().has_program()) {
+    benchmarks().add(std::move(request->benchmark()));
+  }
+
+  // Lookup the requested benchmark.
+  const Benchmark* benchmark = benchmarks().get(request->benchmark().uri());
   if (!benchmark) {
     return grpc::Status(grpc::StatusCode::NOT_FOUND, "Benchmark not found");
   }
@@ -111,7 +117,7 @@ grpc::Status CompilerGymService<CompilationSessionType>::ForkSession(
 template <typename CompilationSessionType>
 grpc::Status CompilerGymService<CompilationSessionType>::EndSession(
     grpc::ServerContext* context, const EndSessionRequest* request, EndSessionReply* reply) {
-  VLOG(1) << "EndSession(" << request->session_id() << "), " << sessionCount() - 1
+  VLOG(1) << "EndSession(id=" << request->session_id() << "), " << sessionCount() - 1
           << " sessions remaining";
 
   const std::lock_guard<std::mutex> lock(sessionsMutex_);
@@ -186,6 +192,53 @@ grpc::Status CompilerGymService<CompilationSessionType>::AddBenchmark(
   VLOG(2) << "AddBenchmark()";
   for (int i = 0; i < request->benchmark_size(); ++i) {
     benchmarks().add(std::move(request->benchmark(i)));
+  }
+
+  return grpc::Status::OK;
+}
+
+template <typename CompilationSessionType>
+grpc::Status CompilerGymService<CompilationSessionType>::SendSessionParameter(
+    grpc::ServerContext* context, const SendSessionParameterRequest* request,
+    SendSessionParameterReply* reply) {
+  CompilationSession* environment;
+  RETURN_IF_ERROR(session(request->session_id(), &environment));
+
+  VLOG(2) << "Session " << request->session_id() << " SendSessionParameter()";
+
+  for (int i = 0; i < request->parameter_size(); ++i) {
+    const auto& param = request->parameter(i);
+    std::optional<std::string> message{std::nullopt};
+
+    // Handle each parameter in the session and generate a response.
+    RETURN_IF_ERROR(environment->handleSessionParameter(param.key(), param.value(), message));
+
+    // Use the builtin parameter handlers if not handled by a session.
+    if (!message.has_value()) {
+      RETURN_IF_ERROR(handleBuiltinSessionParameter(param.key(), param.value(), message));
+    }
+
+    if (message.has_value()) {
+      *reply->add_reply() = *message;
+    } else {
+      return Status(grpc::StatusCode::INVALID_ARGUMENT,
+                    fmt::format("Unknown parameter: {}", param.key()));
+    }
+  }
+
+  return grpc::Status::OK;
+}
+
+template <typename CompilationSessionType>
+grpc::Status CompilerGymService<CompilationSessionType>::handleBuiltinSessionParameter(
+    const std::string& key, const std::string& value, std::optional<std::string>& reply) {
+  if (key == "service.benchmark_cache.set_max_size_in_bytes") {
+    benchmarks().setMaxSizeInBytes(std::stoi(value));
+    reply = value;
+  } else if (key == "service.benchmark_cache.get_max_size_in_bytes") {
+    reply = fmt::format("{}", benchmarks().maxSizeInBytes());
+  } else if (key == "service.benchmark_cache.get_size_in_bytes") {
+    reply = fmt::format("{}", benchmarks().sizeInBytes());
   }
 
   return grpc::Status::OK;

@@ -60,6 +60,10 @@ class LlvmSession final : public CompilationSession {
   [[nodiscard]] grpc::Status computeObservation(const ObservationSpace& observationSpace,
                                                 Observation& observation) final override;
 
+  [[nodiscard]] virtual grpc::Status handleSessionParameter(
+      const std::string& key, const std::string& value,
+      std::optional<std::string>& reply) final override;
+
   inline const LlvmActionSpace actionSpace() const { return actionSpace_; }
 
  private:

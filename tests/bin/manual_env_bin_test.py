@@ -100,7 +100,7 @@ def test_list_rewards():
 def test_list_observations():
     io_check(
         """list_observations""",
-        r"""compiler_gym:cbench-v1/qsort> Autophase, .*, Programl""",
+        r"""compiler_gym:cbench-v1/qsort> Autophase, .*, Runtime""",
     )
 
 

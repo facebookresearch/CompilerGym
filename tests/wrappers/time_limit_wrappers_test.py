@@ -36,6 +36,13 @@ def test_wrapped_step_multi_step(env: LlvmEnv):
     assert env.actions == [0, 0, 0]
 
 
+def test_wrapped_custom_step_args(env: LlvmEnv):
+    env = TimeLimit(env, max_episode_steps=5)
+    env.reset(benchmark="benchmark://cbench-v1/dijkstra")
+    (ic,), _, _, _ = env.step(0, observations=["IrInstructionCount"])
+    assert isinstance(ic, int)
+
+
 def test_time_limit_reached(env: LlvmEnv):
     env = TimeLimit(env, max_episode_steps=3)
 
@@ -51,6 +58,29 @@ def test_time_limit_reached(env: LlvmEnv):
     _, _, done, info = env.step(0)
     assert done, info
     assert info["TimeLimit.truncated"], info
+
+
+def test_time_limit_fork(env: LlvmEnv):
+    """Check that the time limit state is copied on fork()."""
+    env = TimeLimit(env, max_episode_steps=3)
+
+    env.reset()
+    _, _, done, info = env.step(0)  # 1st step
+    assert not done, info
+
+    fkd = env.fork()
+    try:
+        _, _, done, info = env.step(0)  # 2nd step
+        assert not done, info
+        _, _, done, info = fkd.step(0)  # 2nd step
+        assert not done, info
+
+        _, _, done, info = env.step(0)  # 3rd step
+        assert done, info
+        _, _, done, info = fkd.step(0)  # 3rd step
+        assert done, info
+    finally:
+        fkd.close()
 
 
 if __name__ == "__main__":

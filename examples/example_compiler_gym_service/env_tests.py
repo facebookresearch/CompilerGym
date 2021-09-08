@@ -96,10 +96,10 @@ def test_observation_spaces(env: CompilerEnv):
         size_range=(0, None), dtype=str, opaque_data_format=""
     )
     assert env.observation.spaces["features"].space == Box(
-        shape=(3,), low=-100, high=100, dtype=np.int64
+        shape=(3,), low=-100, high=100, dtype=int
     )
     assert env.observation.spaces["runtime"].space == Scalar(
-        min=0, max=np.inf, dtype=np.float64
+        min=0, max=np.inf, dtype=float
     )
 
 

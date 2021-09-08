@@ -17,7 +17,7 @@ py_test(
 
 py_test(
     name = "core_wrappers_test",
-    timeout = "short",
+    timeout = "moderate",
     srcs = ["core_wrappers_test.py"],
     deps = [
         "//compiler_gym/wrappers",

@@ -75,7 +75,6 @@ use the :code:`--local_service_binary` flag:
 import sys
 from typing import Iterable
 
-import humanize
 from absl import app, flags
 
 from compiler_gym.datasets import Dataset
@@ -132,7 +131,8 @@ def summarize_datasets(datasets: Iterable[Dataset]) -> str:
             [
                 (
                     n,
-                    humanize.intcomma(f) if f >= 0 else "∞",
+                    # A size of zero means infinite.
+                    f"{f:,d}" if f > 0 else "∞",
                     l,
                     v,
                 )

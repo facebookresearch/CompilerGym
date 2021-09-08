@@ -1,0 +1,90 @@
+/*
+ * Copyright (c) Facebook, Inc. and its affiliates.
+ * This source code is licensed under the MIT license found in the
+ * LICENSE file in the root directory of this source tree.
+ */
+
+// Navbar top (Topbar)
+
+.navbar-top {
+    border: 0;
+    padding-left: 1rem;
+    padding-right: 1rem;
+
+    .container,
+    .container-fluid {
+        padding-left: 15px;
+        padding-right: 15px;
+    }
+
+    @media (min-width: 576px)  {
+        .navbar-brand {
+            display: block;
+        }
+    }
+
+    @media (max-width: 576px)  {
+        .navbar-collapse {
+            width: 100%;
+        }
+
+        .nav-item {
+            position: static;
+
+            .dropdown-menu {
+                position: absolute;
+                width: 94%;
+                min-width: auto;
+                left: 3%;
+                right: auto;
+            }
+        }
+    }
+
+    &.border-bottom {
+        &.navbar-dark {
+            border-color: rgba(255, 255, 255, .08) !important;
+        }
+
+        &.navbar-light {
+            border-color: rgba(0, 0, 0, .04) !important;
+        }
+    }
+}
+
+// *** Actions navbar ***
+
+.action-navbar-wrapper {
+    position: sticky;
+    top: 0;
+    z-index: 3;
+    margin-bottom: 0.5rem;
+    margin-left: 0;
+}
+
+.dark-mode-controls {
+    background-color: $dark;
+    margin-bottom: 0;
+    padding-bottom: 0.5rem;
+}
+
+.light-mode-controls {
+    background-color: $gray-100;
+    margin-bottom: 0.5rem;
+}
+
+@media (min-width: 576px)  {
+    .action-navbar-wrapper {
+        min-width: 650px;
+    }
+}
+
+@media (max-width: 576px)  {
+    .action-navbar-wrapper {
+        min-width: none;
+    }
+}
+
+.cg-icon {
+    cursor: pointer;
+}

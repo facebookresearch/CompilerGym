@@ -66,6 +66,16 @@ py_test(
 )
 
 py_test(
+    name = "parallelization_test",
+    timeout = "short",
+    srcs = ["parallelization_test.py"],
+    deps = [
+        "//compiler_gym/util",
+        "//tests:test_main",
+    ],
+)
+
+py_test(
     name = "statistics_test",
     timeout = "short",
     srcs = ["statistics_test.py"],
@@ -80,6 +90,15 @@ cc_test(
     srcs = ["StrLenConstexprTest.cc"],
     deps = [
         "//compiler_gym/util:StrLenConstexpr",
+        "//tests:TestMain",
+    ],
+)
+
+cc_test(
+    name = "SubprocessTest",
+    srcs = ["SubprocessTest.cc"],
+    deps = [
+        "//compiler_gym/util:Subprocess",
         "//tests:TestMain",
     ],
 )

@@ -82,6 +82,14 @@ class ConnectionOpts(BaseModel):
     rpc_init_max_seconds: float = 3
     """The maximum number of seconds to wait for an RPC connection to establish."""
 
+    always_send_benchmark_on_reset: bool = False
+    """Send the full benchmark program data to the compiler service on ever call
+    to :meth:`env.reset() <compiler_gym.envs.CompilerEnv.reset>`. This is more
+    efficient in cases where the majority of calls to
+    :meth:`env.reset() <compiler_gym.envs.CompilerEnv.reset>` uses a different
+    benchmark. In case of benchmark re-use, leave this :code:`False`.
+    """
+
 
 class ServiceError(Exception):
     """Error raised from the service."""
@@ -301,6 +309,9 @@ class ManagedConnection(Connection):
         env = os.environ.copy()
         env["COMPILER_GYM_RUNFILES"] = str(runfiles_path("."))
         env["COMPILER_GYM_SITE_DATA"] = str(site_data_path("."))
+        # Set the pythonpath so that executable python scripts can use absolute
+        # import paths like `from compiler_gym.envs.foo import bar`.
+        env["PYTHONPATH"] = env["COMPILER_GYM_RUNFILES"]
 
         # Set the verbosity of the service. The logging level of the service is
         # the debug level - 1, so that COMPILER_GYM_DEBUG=3 will cause VLOG(2)
@@ -319,7 +330,7 @@ class ManagedConnection(Connection):
             # don't override any existing value so that the user may debug the
             # gRPC backend by setting GRPC_VERBOSITY to ERROR, INFO, or DEBUG.
             if not os.environ.get("GRPC_VERBOSITY"):
-                os.environ["GRPC_VERBOSITY"] = "NONE"
+                env["GRPC_VERBOSITY"] = "NONE"
 
         # Set environment variable COMPILER_GYM_SERVICE_ARGS to pass
         # additional arguments to the service.

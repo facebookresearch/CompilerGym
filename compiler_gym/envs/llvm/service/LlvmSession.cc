@@ -10,6 +10,7 @@
 
 #include <iomanip>
 #include <optional>
+#include <string>
 #include <subprocess/subprocess.hpp>
 
 #include "boost/filesystem.hpp"
@@ -57,47 +58,6 @@ llvm::TargetLibraryInfoImpl getTargetLibraryInfo(llvm::Module& module) {
   return llvm::TargetLibraryInfoImpl(triple);
 }
 
-void initLlvm() {
-  llvm::InitializeAllTargets();
-  llvm::InitializeAllTargetMCs();
-  llvm::InitializeAllAsmPrinters();
-  llvm::InitializeAllAsmParsers();
-
-  // Initialize passes.
-  llvm::PassRegistry& Registry = *llvm::PassRegistry::getPassRegistry();
-  llvm::initializeCore(Registry);
-  llvm::initializeCoroutines(Registry);
-  llvm::initializeScalarOpts(Registry);
-  llvm::initializeObjCARCOpts(Registry);
-  llvm::initializeVectorization(Registry);
-  llvm::initializeIPO(Registry);
-  llvm::initializeAnalysis(Registry);
-  llvm::initializeTransformUtils(Registry);
-  llvm::initializeInstCombine(Registry);
-  llvm::initializeAggressiveInstCombine(Registry);
-  llvm::initializeInstrumentation(Registry);
-  llvm::initializeTarget(Registry);
-  llvm::initializeExpandMemCmpPassPass(Registry);
-  llvm::initializeScalarizeMaskedMemIntrinPass(Registry);
-  llvm::initializeCodeGenPreparePass(Registry);
-  llvm::initializeAtomicExpandPass(Registry);
-  llvm::initializeRewriteSymbolsLegacyPassPass(Registry);
-  llvm::initializeWinEHPreparePass(Registry);
-  llvm::initializeDwarfEHPreparePass(Registry);
-  llvm::initializeSafeStackLegacyPassPass(Registry);
-  llvm::initializeSjLjEHPreparePass(Registry);
-  llvm::initializePreISelIntrinsicLoweringLegacyPassPass(Registry);
-  llvm::initializeGlobalMergePass(Registry);
-  llvm::initializeIndirectBrExpandPassPass(Registry);
-  llvm::initializeInterleavedAccessPass(Registry);
-  llvm::initializeEntryExitInstrumenterPass(Registry);
-  llvm::initializePostInlineEntryExitInstrumenterPass(Registry);
-  llvm::initializeUnreachableBlockElimLegacyPassPass(Registry);
-  llvm::initializeExpandReductionsPass(Registry);
-  llvm::initializeWasmEHPreparePass(Registry);
-  llvm::initializeWriteBitcodePassPass(Registry);
-}
-
 Status writeBitcodeToFile(const llvm::Module& module, const fs::path& path) {
   std::error_code error;
   llvm::raw_fd_ostream outfile(path.string(), error);
@@ -126,7 +86,6 @@ std::vector<ObservationSpace> LlvmSession::getObservationSpaces() const {
 LlvmSession::LlvmSession(const boost::filesystem::path& workingDirectory)
     : CompilationSession(workingDirectory),
       observationSpaceNames_(util::createPascalCaseToEnumLookupTable<LlvmObservationSpace>()) {
-  initLlvm();
   cpuinfo_initialize();
 }
 
@@ -158,7 +117,6 @@ Status LlvmSession::init(const LlvmActionSpace& actionSpace, std::unique_ptr<Ben
 
   tlii_ = getTargetLibraryInfo(benchmark_->module());
 
-  // Verify the module now to catch any problems early.
   return Status::OK;
 }
 
@@ -202,6 +160,45 @@ Status LlvmSession::computeObservation(const ObservationSpace& observationSpace,
   return Status::OK;
 }
 
+Status LlvmSession::handleSessionParameter(const std::string& key, const std::string& value,
+                                           std::optional<std::string>& reply) {
+  if (key == "llvm.set_runtimes_per_observation_count") {
+    const int ivalue = std::stoi(value);
+    if (ivalue < 1) {
+      return Status(
+          StatusCode::INVALID_ARGUMENT,
+          fmt::format("runtimes_per_observation_count must be >= 1. Received: {}", ivalue));
+    }
+    benchmark().setRuntimesPerObservationCount(ivalue);
+    reply = value;
+  } else if (key == "llvm.get_runtimes_per_observation_count") {
+    reply = fmt::format("{}", benchmark().getRuntimesPerObservationCount());
+  } else if (key == "llvm.set_buildtimes_per_observation_count") {
+    const int ivalue = std::stoi(value);
+    if (ivalue < 1) {
+      return Status(
+          StatusCode::INVALID_ARGUMENT,
+          fmt::format("buildtimes_per_observation_count must be >= 1. Received: {}", ivalue));
+    }
+    benchmark().setBuildtimesPerObservationCount(ivalue);
+    reply = value;
+  } else if (key == "llvm.get_buildtimes_per_observation_count") {
+    reply = fmt::format("{}", benchmark().getBuildtimesPerObservationCount());
+  } else if (key == "llvm.apply_baseline_optimizations") {
+    if (value == "-Oz") {
+      bool changed = benchmark().applyBaselineOptimizations(/*optLevel=*/2, /*sizeLevel=*/2);
+      reply = changed ? "1" : "0";
+    } else if (value == "-O3") {
+      bool changed = benchmark().applyBaselineOptimizations(/*optLevel=*/3, /*sizeLevel=*/0);
+      reply = changed ? "1" : "0";
+    } else {
+      return Status(StatusCode::INVALID_ARGUMENT,
+                    fmt::format("Invalid value for llvm.apply_baseline_optimizations: {}", value));
+    }
+  }
+  return Status::OK;
+}
+
 Status LlvmSession::applyPassAction(LlvmAction action, bool& actionHadNoEffect) {
 #ifdef EXPERIMENTAL_UNSTABLE_GVN_SINK_PASS
   // NOTE(https://github.com/facebookresearch/CompilerGym/issues/46): The
@@ -219,6 +216,10 @@ Status LlvmSession::applyPassAction(LlvmAction action, bool& actionHadNoEffect) 
 #define HANDLE_PASS(pass) actionHadNoEffect = !runPass(pass);
   HANDLE_ACTION(action, HANDLE_PASS)
 #undef HANDLE_PASS
+
+  if (!actionHadNoEffect) {
+    benchmark().markModuleModified();
+  }
 
   return Status::OK;
 }
@@ -330,7 +331,8 @@ Status LlvmSession::computeObservation(LlvmObservationSpace space, Observation& 
       *reply.mutable_int64_list()->mutable_value() = {features.begin(), features.end()};
       break;
     }
-    case LlvmObservationSpace::PROGRAML: {
+    case LlvmObservationSpace::PROGRAML:
+    case LlvmObservationSpace::PROGRAML_JSON: {
       // Build the ProGraML graph.
       programl::ProgramGraph graph;
       auto status =
@@ -450,6 +452,20 @@ Status LlvmSession::computeObservation(LlvmObservationSpace space, Observation& 
       break;
     }
 #endif
+    case LlvmObservationSpace::RUNTIME: {
+      return benchmark().computeRuntime(reply);
+    }
+    case LlvmObservationSpace::IS_BUILDABLE: {
+      reply.set_scalar_int64(benchmark().isBuildable() ? 1 : 0);
+      break;
+    }
+    case LlvmObservationSpace::IS_RUNNABLE: {
+      reply.set_scalar_int64(benchmark().isRunnable() ? 1 : 0);
+      break;
+    }
+    case LlvmObservationSpace::BUILDTIME: {
+      return benchmark().computeBuildtime(reply);
+    }
   }
 
   return Status::OK;

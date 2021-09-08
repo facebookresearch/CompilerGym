@@ -16,7 +16,7 @@
 
 namespace compiler_gym::runtime {
 
-constexpr size_t kEvictionSizeInBytes = 512 * 1024 * 1024;
+constexpr size_t kEvictionSizeInBytes = 256 * 1024 * 1024;
 
 /**
  * A cache of Benchmark protocol messages.

@@ -40,7 +40,7 @@ http_archive(
     urls = ["https://github.com/google/glog/archive/v0.4.0.tar.gz"],
 )
 
-# C++ subprocess management. https://github.com/arun11299/cpp-subprocess.git
+# C++ subprocess management. https://github.com/arun11299/cpp-subprocess
 
 http_archive(
     name = "subprocess",
@@ -207,9 +207,9 @@ filegroup(
 http_archive(
     name = "ctuning-ai",
     build_file = "//:compiler_gym/third_party/ctuning-ai.BUILD",
-    sha256 = "2e12233a3d898a96a2ce279123ee256bee357f649e3c579f974628b6c35ea53d",
-    strip_prefix = "ai-afaba3e2900523a0813693fd614a114b4a6f6729",
-    urls = ["https://github.com/ctuning/ai/archive/afaba3e2900523a0813693fd614a114b4a6f6729.tar.gz"],
+    sha256 = "a82c13733696c46b5201c614fcf7229c3a74a83ce485cab2fbf17309b7564f9c",
+    strip_prefix = "ck-mlops-406738ad6d1fb2c1da9daa2c09d26fccab4e0938",
+    urls = ["https://github.com/ChrisCummins/ck-mlops/archive/406738ad6d1fb2c1da9daa2c09d26fccab4e0938.tar.gz"],
 )
 
 # Datasets.
@@ -288,6 +288,17 @@ http_archive(
     sha256 = "18a99130ced1eaacab2ba8f75a1435f9955aab54fa0436b60468f020876ee902",
     strip_prefix = "cpuinfo-63b254577ed77a8004a9be6ac707f3dccc4e1fd9",
     urls = ["https://github.com/pytorch/cpuinfo/archive/63b254577ed77a8004a9be6ac707f3dccc4e1fd9.tar.gz"],
+)
+
+# === Csmith ===
+# https://embed.cs.utah.edu/csmith/
+
+http_archive(
+    name = "csmith",
+    build_file_content = all_content,
+    sha256 = "ba871c1e5a05a71ecd1af514fedba30561b16ee80b8dd5ba8f884eaded47009f",
+    strip_prefix = "csmith-csmith-2.3.0",
+    urls = ["https://github.com/csmith-project/csmith/archive/refs/tags/csmith-2.3.0.tar.gz"],
 )
 
 # === DeepDataFlow ===
