@@ -162,7 +162,7 @@ class CompilerEnv(gym.Env):
         service_connection: Optional[CompilerGymServiceConnection] = None,
         logger: Optional[logging.Logger] = None,
     ):
-        """Construct and initialize a CompilerGym service environment.
+        """Construct and initialize a CompilerGym environment.
 
         In normal use you should use :code:`gym.make(...)` rather than calling
         the constructor directly.
