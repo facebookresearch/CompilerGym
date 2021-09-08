@@ -3,21 +3,26 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.envs.compiler_env &mdash; CompilerGym 0.1.9 documentation</title>
+  <title>compiler_gym.envs.compiler_env &mdash; CompilerGym 0.1.10 documentation</title>
   
 
   
   <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -27,11 +32,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../" src="../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../" id="documentation_options" src="../../../_static/documentation_options.js"></script>
         <script src="../../../_static/jquery.js"></script>
         <script src="../../../_static/underscore.js"></script>
         <script src="../../../_static/doctools.js"></script>
-        <script src="../../../_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../../../_static/js/theme.js"></script>
 
@@ -52,7 +56,7 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home" alt="Documentation Home"> CompilerGym
+            <a href="../../../index.html" class="icon icon-home"> CompilerGym
           
 
           
@@ -62,7 +66,7 @@
             
             
               <div class="version">
-                0.1.9
+                0.1.10
               </div>
             
           
@@ -87,18 +91,21 @@
               
             
             
-              <p><span class="caption-text">User Guide</span></p>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../rpc.html">RPC Service Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p><span class="caption-text">Python API Reference</span></p>
+<p class="caption"><span class="caption-text">Environments</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -110,7 +117,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
 </ul>
-<p><span class="caption-text">C++ API Reference</span></p>
+<p class="caption"><span class="caption-text">C++ API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/service.html">compiler_gym/service</a></li>
@@ -141,6 +148,8 @@
         <div class="rst-content">
         
           
+
+
 
 
 
@@ -210,15 +219,18 @@
     <span class="n">ServiceTransportError</span><span class="p">,</span>
     <span class="n">SessionNotFound</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">Action</span><span class="p">,</span> <span class="n">AddBenchmarkRequest</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">Benchmark</span> <span class="k">as</span> <span class="n">BenchmarkProto</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">Action</span><span class="p">,</span>
-    <span class="n">AddBenchmarkRequest</span><span class="p">,</span>
     <span class="n">EndSessionReply</span><span class="p">,</span>
     <span class="n">EndSessionRequest</span><span class="p">,</span>
     <span class="n">ForkSessionReply</span><span class="p">,</span>
     <span class="n">ForkSessionRequest</span><span class="p">,</span>
     <span class="n">GetVersionReply</span><span class="p">,</span>
     <span class="n">GetVersionRequest</span><span class="p">,</span>
+    <span class="n">SendSessionParameterReply</span><span class="p">,</span>
+    <span class="n">SendSessionParameterRequest</span><span class="p">,</span>
+    <span class="n">SessionParameter</span><span class="p">,</span>
     <span class="n">StartSessionRequest</span><span class="p">,</span>
     <span class="n">StepReply</span><span class="p">,</span>
     <span class="n">StepRequest</span><span class="p">,</span>
@@ -231,6 +243,7 @@
     <span class="n">RewardType</span><span class="p">,</span>
     <span class="n">StepType</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.shell_format</span> <span class="kn">import</span> <span class="n">plural</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.timer</span> <span class="kn">import</span> <span class="n">Timer</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.validation_error</span> <span class="kn">import</span> <span class="n">ValidationError</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.validation_result</span> <span class="kn">import</span> <span class="n">ValidationResult</span>
@@ -255,58 +268,68 @@
 <span class="sd">    The easiest way to create a CompilerGym environment is to call</span>
 <span class="sd">    :code:`gym.make()` on one of the registered environments:</span>
 
-<span class="sd">    &gt;&gt;&gt; env = gym.make(&quot;llvm-v0&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; env = gym.make(&quot;llvm-v0&quot;)</span>
+
+<span class="sd">    See :code:`compiler_gym.COMPILER_GYM_ENVS` for a list of registered</span>
+<span class="sd">    environment names.</span>
 
 <span class="sd">    Alternatively, an environment can be constructed directly, such as by</span>
 <span class="sd">    connecting to a running compiler service at :code:`localhost:8080` (see</span>
-<span class="sd">    :doc:`/compiler_gym/service` for more details on connecting to services):</span>
+<span class="sd">    :doc:`this document &lt;/compiler_gym/service&gt;` for more details):</span>
 
-<span class="sd">    &gt;&gt;&gt; env = CompilerEnv(</span>
-<span class="sd">    ...     service=&quot;localhost:8080&quot;,</span>
-<span class="sd">    ...     observation_space=&quot;features&quot;,</span>
-<span class="sd">    ...     reward_space=&quot;runtime&quot;,</span>
-<span class="sd">    ...     rewards=[env_reward_spaces],</span>
-<span class="sd">    ... )</span>
+<span class="sd">        &gt;&gt;&gt; env = CompilerEnv(</span>
+<span class="sd">        ...     service=&quot;localhost:8080&quot;,</span>
+<span class="sd">        ...     observation_space=&quot;features&quot;,</span>
+<span class="sd">        ...     reward_space=&quot;runtime&quot;,</span>
+<span class="sd">        ...     rewards=[env_reward_spaces],</span>
+<span class="sd">        ... )</span>
 
 <span class="sd">    Once constructed, an environment can be used in exactly the same way as a</span>
 <span class="sd">    regular :code:`gym.Env`, e.g.</span>
 
-<span class="sd">    &gt;&gt;&gt; observation = env.reset()</span>
-<span class="sd">    &gt;&gt;&gt; cumulative_reward = 0</span>
-<span class="sd">    &gt;&gt;&gt; for i in range(100):</span>
-<span class="sd">    &gt;&gt;&gt;     action = env.action_space.sample()</span>
-<span class="sd">    &gt;&gt;&gt;     observation, reward, done, info = env.step(action)</span>
-<span class="sd">    &gt;&gt;&gt;     cumulative_reward += reward</span>
-<span class="sd">    &gt;&gt;&gt;     if done:</span>
-<span class="sd">    &gt;&gt;&gt;         break</span>
-<span class="sd">    &gt;&gt;&gt; print(f&quot;Reward after {i} steps: {cumulative_reward}&quot;)</span>
-<span class="sd">    Reward after 100 steps: -0.32123</span>
+<span class="sd">        &gt;&gt;&gt; observation = env.reset()</span>
+<span class="sd">        &gt;&gt;&gt; cumulative_reward = 0</span>
+<span class="sd">        &gt;&gt;&gt; for i in range(100):</span>
+<span class="sd">        &gt;&gt;&gt;     action = env.action_space.sample()</span>
+<span class="sd">        &gt;&gt;&gt;     observation, reward, done, info = env.step(action)</span>
+<span class="sd">        &gt;&gt;&gt;     cumulative_reward += reward</span>
+<span class="sd">        &gt;&gt;&gt;     if done:</span>
+<span class="sd">        &gt;&gt;&gt;         break</span>
+<span class="sd">        &gt;&gt;&gt; print(f&quot;Reward after {i} steps: {cumulative_reward}&quot;)</span>
+<span class="sd">        Reward after 100 steps: -0.32123</span>
 
 <span class="sd">    :ivar service: A connection to the underlying compiler service.</span>
+
 <span class="sd">    :vartype service: compiler_gym.service.CompilerGymServiceConnection</span>
 
 <span class="sd">    :ivar logger: A Logger instance used by the environment for communicating</span>
 <span class="sd">        info and warnings.</span>
+
 <span class="sd">    :vartype logger: logging.Logger</span>
 
 <span class="sd">    :ivar action_spaces: A list of supported action space names.</span>
+
 <span class="sd">    :vartype action_spaces: List[str]</span>
 
-<span class="sd">    :ivar reward_range: A tuple indicating the range of reward values.</span>
-<span class="sd">        Default range is (-inf, +inf).</span>
+<span class="sd">    :ivar reward_range: A tuple indicating the range of reward values. Default</span>
+<span class="sd">        range is (-inf, +inf).</span>
+
 <span class="sd">    :vartype reward_range: Tuple[float, float]</span>
 
 <span class="sd">    :ivar observation: A view of the available observation spaces that permits</span>
 <span class="sd">        on-demand computation of observations.</span>
+
 <span class="sd">    :vartype observation: compiler_gym.views.ObservationView</span>
 
 <span class="sd">    :ivar reward: A view of the available reward spaces that permits on-demand</span>
 <span class="sd">        computation of rewards.</span>
+
 <span class="sd">    :vartype reward: compiler_gym.views.RewardView</span>
 
-<span class="sd">    :ivar episode_reward: If</span>
-<span class="sd">        :func:`CompilerEnv.reward_space &lt;compiler_gym.envs.CompilerGym.reward_space&gt;`</span>
-<span class="sd">        is set, this value is the sum of all rewards for the current episode.</span>
+<span class="sd">    :ivar episode_reward: If :func:`CompilerEnv.reward_space</span>
+<span class="sd">        &lt;compiler_gym.envs.CompilerGym.reward_space&gt;` is set, this value is the</span>
+<span class="sd">        sum of all rewards for the current episode.</span>
+
 <span class="sd">    :vartype episode_reward: float</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
@@ -324,6 +347,9 @@
         <span class="n">logger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Construct and initialize a CompilerGym service environment.</span>
+
+<span class="sd">        In normal use you should use :code:`gym.make(...)` rather than calling</span>
+<span class="sd">        the constructor directly.</span>
 
 <span class="sd">        :param service: The hostname and port of a service that implements the</span>
 <span class="sd">            CompilerGym service interface, or the path of a binary file which</span>
@@ -418,6 +444,7 @@
         <span class="c1"># the gap between the user setting the env.benchmark property while in</span>
         <span class="c1"># an episode and the next call to env.reset().</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Benchmark</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use_proto</span><span class="p">:</span> <span class="n">BenchmarkProto</span> <span class="o">=</span> <span class="n">BenchmarkProto</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_next_benchmark</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Benchmark</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="c1"># Normally when the benchmark is changed the updated value is not</span>
         <span class="c1"># reflected until the next call to reset(). We make an exception for the</span>
@@ -652,12 +679,12 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">observation_space</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ObservationSpaceSpec</span><span class="p">]:</span>
+    <span class="k">def</span> <span class="nf">observation_space</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Space</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;The observation space that is used to return an observation value in</span>
 <span class="sd">        :func:`~step()`.</span>
 
-<span class="sd">        :getter: Returns the specification of the default observation space, or</span>
-<span class="sd">            :code:`None` if not set.</span>
+<span class="sd">        :getter: Returns the underlying observation space, or :code:`None` if</span>
+<span class="sd">            not set.</span>
 <span class="sd">        :setter: Set the default observation space.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation_space_spec</span><span class="p">:</span>
@@ -880,6 +907,7 @@
 
         <span class="c1"># Stop an existing episode.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Ending session </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">EndSession</span><span class="p">,</span>
                 <span class="n">EndSessionRequest</span><span class="p">(</span><span class="n">session_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">),</span>
@@ -891,8 +919,20 @@
             <span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span> <span class="o">=</span> <span class="n">benchmark</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_next_benchmark</span>
 
+        <span class="c1"># When always_send_benchmark_on_reset option is enabled, the entire</span>
+        <span class="c1"># benchmark program is sent with every StartEpisode request. Otherwise</span>
+        <span class="c1"># only the URI of the benchmark is sent. In cases where benchmarks are</span>
+        <span class="c1"># reused between calls to reset(), sending the URI is more efficient as</span>
+        <span class="c1"># the service can cache the benchmark. In cases where reset() is always</span>
+        <span class="c1"># called with a different benchmark, this causes unnecessary roundtrips</span>
+        <span class="c1"># as every StartEpisodeRequest receives a FileNotFound response.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">always_send_benchmark_on_reset</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use_proto</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span><span class="o">.</span><span class="n">proto</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use_proto</span><span class="o">.</span><span class="n">uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span><span class="o">.</span><span class="n">uri</span>
+
         <span class="n">start_session_request</span> <span class="o">=</span> <span class="n">StartSessionRequest</span><span class="p">(</span>
-            <span class="n">benchmark</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span><span class="o">.</span><span class="n">uri</span><span class="p">,</span>
+            <span class="n">benchmark</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use_proto</span><span class="p">,</span>
             <span class="n">action_space</span><span class="o">=</span><span class="p">(</span>
                 <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_spaces</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">action_space_name</span><span class="p">)</span>
                 <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_space_name</span>
@@ -944,7 +984,7 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">reply</span><span class="o">.</span><span class="n">new_action_space</span><span class="o">.</span><span class="n">action</span>
             <span class="p">)</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span><span class="p">,</span> <span class="n">observation_view</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="p">)</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">episode_reward</span> <span class="o">=</span> <span class="mf">0.0</span>
 
@@ -1031,12 +1071,20 @@
             <span class="c1"># Gracefully handle &quot;expected&quot; error types. These non-fatal errors</span>
             <span class="c1"># end the current episode and provide some diagnostic information to</span>
             <span class="c1"># the user through the `info` dict.</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-
             <span class="n">info</span> <span class="o">=</span> <span class="p">{</span>
                 <span class="s2">&quot;error_type&quot;</span><span class="p">:</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
                 <span class="s2">&quot;error_details&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">),</span>
             <span class="p">}</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="k">except</span> <span class="n">ServiceError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># close() can raise ServiceError if the service exists with a</span>
+                <span class="c1"># non-zero return code. If so,</span>
+                <span class="n">info</span><span class="p">[</span>
+                    <span class="s2">&quot;error_details&quot;</span>
+                <span class="p">]</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;. Additional error during environment closing: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+
             <span class="n">default_observations</span> <span class="o">=</span> <span class="p">[</span>
                 <span class="n">observation_space</span><span class="o">.</span><span class="n">default_value</span>
                 <span class="k">for</span> <span class="n">observation_space</span> <span class="ow">in</span> <span class="n">user_observation_spaces</span>
@@ -1456,35 +1504,90 @@
                     <span class="k">yield from</span> <span class="n">errors</span>
 
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span><span class="o">.</span><span class="n">validation_callbacks</span><span class="p">():</span>
-            <span class="k">return</span> <span class="n">composed</span></div></div>
+            <span class="k">return</span> <span class="n">composed</span></div>
+
+<div class="viewcode-block" id="CompilerEnv.send_param"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.send_param">[docs]</a>    <span class="k">def</span> <span class="nf">send_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Send a single &lt;key, value&gt; parameter to the compiler service.</span>
+
+<span class="sd">        See :meth:`send_params() &lt;compiler_gym.envs.CompilerEnv.send_params&gt;`</span>
+<span class="sd">        for more information.</span>
+
+<span class="sd">        :param key: The parameter key.</span>
+
+<span class="sd">        :param value: The parameter value.</span>
+
+<span class="sd">        :return: The response from the compiler service.</span>
+
+<span class="sd">        :raises SessionNotFound: If called before :meth:`reset()</span>
+<span class="sd">            &lt;compiler_gym.envs.CompilerEnv.reset&gt;`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">send_params</span><span class="p">((</span><span class="n">key</span><span class="p">,</span> <span class="n">value</span><span class="p">))[</span><span class="mi">0</span><span class="p">]</span></div>
+
+<div class="viewcode-block" id="CompilerEnv.send_params"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.send_params">[docs]</a>    <span class="k">def</span> <span class="nf">send_params</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">params</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Send a list of &lt;key, value&gt; parameters to the compiler service.</span>
+
+<span class="sd">        This provides a mechanism to send messages to the backend compilation</span>
+<span class="sd">        session in a way that doesn&#39;t conform to the normal communication</span>
+<span class="sd">        pattern. This can be useful for things like configuring runtime</span>
+<span class="sd">        debugging settings, or applying &quot;meta actions&quot; to the compiler that are</span>
+<span class="sd">        not exposed in the compiler&#39;s action space. Consult the documentation</span>
+<span class="sd">        for a specific compiler service to see what parameters, if any, are</span>
+<span class="sd">        supported.</span>
+
+<span class="sd">        Must have called :meth:`reset() &lt;compiler_gym.envs.CompilerEnv.reset&gt;`</span>
+<span class="sd">        first.</span>
+
+<span class="sd">        :param params: A list of parameters, where each parameter is a</span>
+<span class="sd">            :code:`(key, value)` tuple.</span>
+
+<span class="sd">        :return: A list of string responses, one per parameter.</span>
+
+<span class="sd">        :raises SessionNotFound: If called before :meth:`reset()</span>
+<span class="sd">            &lt;compiler_gym.envs.CompilerEnv.reset&gt;`.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">SessionNotFound</span><span class="p">(</span><span class="s2">&quot;Must call reset() before send_params()&quot;</span><span class="p">)</span>
+
+        <span class="n">request</span> <span class="o">=</span> <span class="n">SendSessionParameterRequest</span><span class="p">(</span>
+            <span class="n">session_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">,</span>
+            <span class="n">parameter</span><span class="o">=</span><span class="p">[</span><span class="n">SessionParameter</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="n">k</span><span class="p">,</span> <span class="n">value</span><span class="o">=</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="p">(</span><span class="n">k</span><span class="p">,</span> <span class="n">v</span><span class="p">)</span> <span class="ow">in</span> <span class="n">params</span><span class="p">],</span>
+        <span class="p">)</span>
+        <span class="n">reply</span><span class="p">:</span> <span class="n">SendSessionParameterReply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">SendSessionParameter</span><span class="p">,</span> <span class="n">request</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)</span> <span class="o">!=</span> <span class="nb">len</span><span class="p">(</span><span class="n">reply</span><span class="o">.</span><span class="n">reply</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Sent </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">plural</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">params</span><span class="p">),</span> <span class="s1">&#39;parameter&#39;</span><span class="p">,</span> <span class="s1">&#39;parameters&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> but received &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">reply</span><span class="o">.</span><span class="n">reply</span><span class="p">)</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">plural</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">reply</span><span class="o">.</span><span class="n">reply</span><span class="p">),</span> <span class="s1">&#39;response&#39;</span><span class="p">,</span> <span class="s1">&#39;responses&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> from the &quot;</span>
+                <span class="s2">&quot;service&quot;</span>
+            <span class="p">)</span>
+
+        <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">reply</span><span class="o">.</span><span class="n">reply</span><span class="p">)</span></div></div>
 </pre></div>
 
            </div>
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright Facebook AI Research
+        &#169; Copyright Facebook AI Research.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -1510,6 +1613,7 @@
     })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
     ga('create', 'G-T95G5EVYXM', 'auto');
+    
     ga('send', 'pageview');
     </script>
 

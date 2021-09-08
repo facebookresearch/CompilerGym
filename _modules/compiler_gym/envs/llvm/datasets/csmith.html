@@ -3,21 +3,26 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.envs.llvm.datasets.csmith &mdash; CompilerGym 0.1.9 documentation</title>
+  <title>compiler_gym.envs.llvm.datasets.csmith &mdash; CompilerGym 0.1.10 documentation</title>
   
 
   
   <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../../../_static/css/custom.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -27,11 +32,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
         <script src="../../../../../_static/jquery.js"></script>
         <script src="../../../../../_static/underscore.js"></script>
         <script src="../../../../../_static/doctools.js"></script>
-        <script src="../../../../../_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
 
@@ -52,7 +56,7 @@
           
 
           
-            <a href="../../../../../index.html" class="icon icon-home" alt="Documentation Home"> CompilerGym
+            <a href="../../../../../index.html" class="icon icon-home"> CompilerGym
           
 
           
@@ -62,7 +66,7 @@
             
             
               <div class="version">
-                0.1.9
+                0.1.10
               </div>
             
           
@@ -87,18 +91,21 @@
               
             
             
-              <p><span class="caption-text">User Guide</span></p>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../llvm/index.html">LLVM Environment Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../rpc.html">RPC Service Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p><span class="caption-text">Python API Reference</span></p>
+<p class="caption"><span class="caption-text">Environments</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../llvm/index.html">LLVM Environment Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -110,7 +117,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
 </ul>
-<p><span class="caption-text">C++ API Reference</span></p>
+<p class="caption"><span class="caption-text">C++ API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../cc/compiler_gym/service.html">compiler_gym/service</a></li>
@@ -156,6 +163,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -186,29 +195,29 @@
 <span class="c1">#</span>
 <span class="c1"># This source code is licensed under the MIT license found in the</span>
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
-<span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
-<span class="kn">import</span> <span class="nn">sys</span>
-<span class="kn">import</span> <span class="nn">tarfile</span>
-<span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Lock</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">fasteners</span> <span class="kn">import</span> <span class="n">InterProcessLock</span>
 
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">BenchmarkSource</span><span class="p">,</span> <span class="n">Dataset</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets.benchmark</span> <span class="kn">import</span> <span class="n">BenchmarkInitError</span><span class="p">,</span> <span class="n">BenchmarkWithSource</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.datasets.dataset</span> <span class="kn">import</span> <span class="n">DatasetInitError</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.llvm_benchmark</span> <span class="kn">import</span> <span class="n">ClangInvocation</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">BenchmarkDynamicConfig</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.decorators</span> <span class="kn">import</span> <span class="n">memoized_property</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.util.download</span> <span class="kn">import</span> <span class="n">download</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">transient_cache_path</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">runfiles_path</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.shell_format</span> <span class="kn">import</span> <span class="n">plural</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.truncate</span> <span class="kn">import</span> <span class="n">truncate</span>
 
 <span class="c1"># The maximum value for the --seed argument to csmith.</span>
 <span class="n">UINT_MAX</span> <span class="o">=</span> <span class="p">(</span><span class="mi">2</span> <span class="o">**</span> <span class="mi">32</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span>
+
+<span class="n">_CSMITH_BIN</span> <span class="o">=</span> <span class="n">runfiles_path</span><span class="p">(</span><span class="s2">&quot;compiler_gym/third_party/csmith/csmith/bin/csmith&quot;</span><span class="p">)</span>
+<span class="n">_CSMITH_INCLUDES</span> <span class="o">=</span> <span class="n">runfiles_path</span><span class="p">(</span>
+    <span class="s2">&quot;compiler_gym/third_party/csmith/csmith/include/csmith-2.3.0&quot;</span>
+<span class="p">)</span>
 
 
 <span class="k">class</span> <span class="nc">CsmithBenchmark</span><span class="p">(</span><span class="n">BenchmarkWithSource</span><span class="p">):</span>
@@ -217,6 +226,15 @@
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_src</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proto</span><span class="o">.</span><span class="n">dynamic_config</span><span class="o">.</span><span class="n">MergeFrom</span><span class="p">(</span>
+            <span class="n">BenchmarkDynamicConfig</span><span class="p">(</span>
+                <span class="n">build_cmd</span><span class="o">=</span><span class="s2">&quot;$CC $&lt;&quot;</span><span class="p">,</span>
+                <span class="n">build_genfile</span><span class="o">=</span><span class="s2">&quot;a.out&quot;</span><span class="p">,</span>
+                <span class="n">run_cmd</span><span class="o">=</span><span class="s2">&quot;./a.out&quot;</span><span class="p">,</span>
+                <span class="n">build_cmd_timeout_seconds</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+                <span class="n">run_cmd_timeout_seconds</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">create</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">bitcode</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">,</span> <span class="n">src</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
@@ -235,31 +253,6 @@
     <span class="k">def</span> <span class="nf">source</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Return the single source file contents as a string.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_src</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-
-
-<span class="k">class</span> <span class="nc">CsmithBuildError</span><span class="p">(</span><span class="n">DatasetInitError</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;Error raised if :meth:`CsmithDataset.install()</span>
-<span class="sd">    &lt;compiler_gym.datasets.CsmithDataset.install&gt;` fails.&quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">failing_stage</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">stdout</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">stderr</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">install_instructions</span> <span class="o">=</span> <span class="p">{</span>
-            <span class="s2">&quot;linux&quot;</span><span class="p">:</span> <span class="s2">&quot;sudo apt install g++ m4&quot;</span><span class="p">,</span>
-            <span class="s2">&quot;darwin&quot;</span><span class="p">:</span> <span class="s2">&quot;brew install m4&quot;</span><span class="p">,</span>
-        <span class="p">}[</span><span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">]</span>
-
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
-            <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                <span class="p">[</span>
-                    <span class="sa">f</span><span class="s2">&quot;Failed to build Csmith from source, `</span><span class="si">{</span><span class="n">failing_stage</span><span class="si">}</span><span class="s2">` failed.&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;You may be missing installation dependencies. Install them using:&quot;</span><span class="p">,</span>
-                    <span class="sa">f</span><span class="s2">&quot;    </span><span class="si">{</span><span class="n">install_instructions</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
-                    <span class="s2">&quot;See https://github.com/csmith-project/csmith#install-csmith for more details&quot;</span><span class="p">,</span>
-                    <span class="sa">f</span><span class="s2">&quot;--- Start `</span><span class="si">{</span><span class="n">failing_stage</span><span class="si">}</span><span class="s2">` logs: ---</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">,</span>
-                    <span class="n">stdout</span><span class="p">,</span>
-                    <span class="n">stderr</span><span class="p">,</span>
-                <span class="p">]</span>
-            <span class="p">)</span>
-        <span class="p">)</span>
 
 
 <div class="viewcode-block" id="CsmithDataset"><a class="viewcode-back" href="../../../../../llvm/api.html#compiler_gym.envs.llvm.datasets.CsmithDataset">[docs]</a><span class="k">class</span> <span class="nc">CsmithDataset</span><span class="p">(</span><span class="n">Dataset</span><span class="p">):</span>
@@ -297,7 +290,28 @@
 <span class="sd">    details.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_data_base</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">sort_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">site_data_base</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+        <span class="n">sort_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">csmith_bin</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">csmith_includes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor.</span>
+
+<span class="sd">        :param site_data_base: The base path of a directory that will be used to</span>
+<span class="sd">            store installed files.</span>
+
+<span class="sd">        :param sort_order: An optional numeric value that should be used to</span>
+<span class="sd">            order this dataset relative to others. Lowest value sorts first.</span>
+
+<span class="sd">        :param csmith_bin: The path of the Csmith binary to use. If not</span>
+<span class="sd">            provided, the version of Csmith shipped with CompilerGym is used.</span>
+
+<span class="sd">        :param csmith_includes: The path of the Csmith includes directory. If</span>
+<span class="sd">            not provided, the includes of the Csmith shipped with CompilerGym is</span>
+<span class="sd">            used.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">name</span><span class="o">=</span><span class="s2">&quot;generator://csmith-v0&quot;</span><span class="p">,</span>
             <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Random conformant C99 programs&quot;</span><span class="p">,</span>
@@ -310,100 +324,27 @@
             <span class="n">sort_order</span><span class="o">=</span><span class="n">sort_order</span><span class="p">,</span>
             <span class="n">benchmark_class</span><span class="o">=</span><span class="n">CsmithBenchmark</span><span class="p">,</span>
         <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">csmith_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_data_path</span> <span class="o">/</span> <span class="s2">&quot;bin&quot;</span> <span class="o">/</span> <span class="s2">&quot;csmith&quot;</span>
-        <span class="n">csmith_include_dir</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_data_path</span> <span class="o">/</span> <span class="s2">&quot;include&quot;</span> <span class="o">/</span> <span class="s2">&quot;csmith-2.3.0&quot;</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_installed</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_build_lock</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_build_lockfile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_data_path</span> <span class="o">/</span> <span class="s2">&quot;.build.LOCK&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_build_markerfile</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_data_path</span> <span class="o">/</span> <span class="s2">&quot;.built&quot;</span>
-
+        <span class="bp">self</span><span class="o">.</span><span class="n">csmith_bin_path</span> <span class="o">=</span> <span class="n">csmith_bin</span> <span class="ow">or</span> <span class="n">_CSMITH_BIN</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">csmith_includes_path</span> <span class="o">=</span> <span class="n">csmith_includes</span> <span class="ow">or</span> <span class="n">_CSMITH_INCLUDES</span>
         <span class="c1"># The command that is used to compile an LLVM-IR bitcode file from a</span>
         <span class="c1"># Csmith input. Reads from stdin, writes to stdout.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">clang_compile_command</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="n">ClangInvocation</span><span class="o">.</span><span class="n">from_c_file</span><span class="p">(</span>
             <span class="s2">&quot;-&quot;</span><span class="p">,</span>  <span class="c1"># Read from stdin.</span>
             <span class="n">copt</span><span class="o">=</span><span class="p">[</span>
-                <span class="s2">&quot;-xc&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;-xc&quot;</span><span class="p">,</span>  <span class="c1"># The C programming language.</span>
                 <span class="s2">&quot;-ferror-limit=1&quot;</span><span class="p">,</span>  <span class="c1"># Stop on first error.</span>
                 <span class="s2">&quot;-w&quot;</span><span class="p">,</span>  <span class="c1"># No warnings.</span>
-                <span class="sa">f</span><span class="s2">&quot;-I</span><span class="si">{</span><span class="n">csmith_include_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>  <span class="c1"># Include the Csmith headers.</span>
+                <span class="sa">f</span><span class="s2">&quot;-I</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">csmith_includes_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>  <span class="c1"># Include the Csmith headers.</span>
             <span class="p">],</span>
         <span class="p">)</span><span class="o">.</span><span class="n">command</span><span class="p">(</span>
-            <span class="n">outpath</span><span class="o">=</span><span class="s2">&quot;-&quot;</span>
-        <span class="p">)</span>  <span class="c1"># Write to stdout.</span>
-
-    <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">installed</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="c1"># Fast path for repeated checks to &#39;installed&#39; without a disk op.</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_installed</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_installed</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_markerfile</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_installed</span>
-
-    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Download and build the Csmith binary.&quot;&quot;&quot;</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">install</span><span class="p">()</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">installed</span><span class="p">:</span>
-            <span class="k">return</span>
-
-        <span class="k">with</span> <span class="bp">self</span><span class="o">.</span><span class="n">_build_lock</span><span class="p">,</span> <span class="n">InterProcessLock</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_build_lockfile</span><span class="p">):</span>
-            <span class="c1"># Repeat the check to see if we have already installed the dataset</span>
-            <span class="c1"># now that we have acquired the lock.</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">installed</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Downloading and building Csmith&quot;</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_build_csmith</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">site_data_path</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">_build_markerfile</span><span class="o">.</span><span class="n">touch</span><span class="p">()</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span> <span class="nf">_build_csmith</span><span class="p">(</span><span class="n">install_root</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Download, build, and install Csmith to the given directory.&quot;&quot;&quot;</span>
-        <span class="n">tar_data</span> <span class="o">=</span> <span class="n">io</span><span class="o">.</span><span class="n">BytesIO</span><span class="p">(</span>
-            <span class="n">download</span><span class="p">(</span>
-                <span class="n">urls</span><span class="o">=</span><span class="p">[</span>
-                    <span class="s2">&quot;https://github.com/csmith-project/csmith/archive/refs/tags/csmith-2.3.0.tar.gz&quot;</span><span class="p">,</span>
-                <span class="p">],</span>
-                <span class="n">sha256</span><span class="o">=</span><span class="s2">&quot;ba871c1e5a05a71ecd1af514fedba30561b16ee80b8dd5ba8f884eaded47009f&quot;</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="n">outpath</span><span class="o">=</span><span class="s2">&quot;-&quot;</span>  <span class="c1"># Write to stdout.</span>
         <span class="p">)</span>
-        <span class="c1"># Csmith uses a standard `configure` + `make install` build process.</span>
-        <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">(</span>
-            <span class="nb">dir</span><span class="o">=</span><span class="n">transient_cache_path</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">),</span> <span class="n">prefix</span><span class="o">=</span><span class="s2">&quot;csmith-&quot;</span>
-        <span class="p">)</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
-            <span class="k">with</span> <span class="n">tarfile</span><span class="o">.</span><span class="n">open</span><span class="p">(</span><span class="n">fileobj</span><span class="o">=</span><span class="n">tar_data</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;r:gz&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">arc</span><span class="p">:</span>
-                <span class="n">arc</span><span class="o">.</span><span class="n">extractall</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
-
-            <span class="c1"># The path of the extracted sources.</span>
-            <span class="n">src_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;csmith-csmith-2.3.0&quot;</span>
-
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Configuring Csmith at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">d</span><span class="p">)</span>
-            <span class="n">configure</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
-                <span class="p">[</span><span class="s2">&quot;./configure&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;--prefix=</span><span class="si">{</span><span class="n">install_root</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">],</span>
-                <span class="n">cwd</span><span class="o">=</span><span class="n">src_dir</span><span class="p">,</span>
-                <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-                <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-                <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">configure</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">configure</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">CsmithBuildError</span><span class="p">(</span><span class="s2">&quot;./configure&quot;</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span><span class="p">)</span>
-
-            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Installing Csmith to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">install_root</span><span class="p">)</span>
-            <span class="n">make</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
-                <span class="p">[</span><span class="s2">&quot;make&quot;</span><span class="p">,</span> <span class="s2">&quot;-j&quot;</span><span class="p">,</span> <span class="s2">&quot;install&quot;</span><span class="p">],</span>
-                <span class="n">cwd</span><span class="o">=</span><span class="n">src_dir</span><span class="p">,</span>
-                <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-                <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-                <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="p">)</span>
-            <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">make</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">make</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">CsmithBuildError</span><span class="p">(</span><span class="s2">&quot;make install&quot;</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
         <span class="c1"># Actually 2^32 - 1, but practically infinite for all intents and</span>
         <span class="c1"># purposes.</span>
-        <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="mi">0</span>
 
     <span class="k">def</span> <span class="nf">benchmark_uris</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">UINT_MAX</span><span class="p">))</span>
@@ -415,28 +356,52 @@
         <span class="n">seed</span> <span class="o">=</span> <span class="n">random_state</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="n">UINT_MAX</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark_from_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">benchmark_from_seed</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CsmithBenchmark</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">benchmark_from_seed</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">seed</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">max_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span> <span class="n">retry_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CsmithBenchmark</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Get a benchmark from a uint32 seed.</span>
 
 <span class="sd">        :param seed: A number in the range 0 &lt;= n &lt; 2^32.</span>
 
 <span class="sd">        :return: A benchmark instance.</span>
+
+<span class="sd">        :raises OSError: If Csmith fails.</span>
+
+<span class="sd">        :raises BenchmarkInitError: If the C program generated by Csmith cannot</span>
+<span class="sd">            be lowered to LLVM-IR.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">retry_count</span> <span class="o">&gt;=</span> <span class="n">max_retries</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Csmith failed after </span><span class="si">{</span><span class="n">retry_count</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">plural</span><span class="p">(</span><span class="n">retry_count</span><span class="p">,</span> <span class="s1">&#39;attempt&#39;</span><span class="p">,</span> <span class="s1">&#39;attempts&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;with seed </span><span class="si">{</span><span class="n">seed</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">install</span><span class="p">()</span>
 
         <span class="c1"># Run csmith with the given seed and pipe the output to clang to</span>
         <span class="c1"># assemble a bitcode.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Exec csmith --seed </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
         <span class="n">csmith</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
-            <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">csmith_path</span><span class="p">),</span> <span class="s2">&quot;--seed&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">seed</span><span class="p">)],</span>
+            <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">csmith_bin_path</span><span class="p">),</span> <span class="s2">&quot;--seed&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">seed</span><span class="p">)],</span>
             <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-            <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">DEVNULL</span><span class="p">,</span>
+            <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
         <span class="p">)</span>
 
         <span class="c1"># Generate the C source.</span>
-        <span class="n">src</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">csmith</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+        <span class="n">src</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">csmith</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">csmith</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Csmith failed with seed </span><span class="si">{</span><span class="n">seed</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">stderr</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                    <span class="n">truncate</span><span class="p">(</span><span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">),</span> <span class="n">max_line_len</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">max_lines</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
+                <span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Csmith failed with seed </span><span class="si">{</span><span class="n">seed</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">stderr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
+                <span class="c1"># Failed to interpret the stderr output, generate a generic</span>
+                <span class="c1"># error message.</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Csmith failed with seed </span><span class="si">{</span><span class="n">seed</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark_from_seed</span><span class="p">(</span>
+                <span class="n">seed</span><span class="p">,</span> <span class="n">max_retries</span><span class="o">=</span><span class="n">max_retries</span><span class="p">,</span> <span class="n">retry_count</span><span class="o">=</span><span class="n">retry_count</span> <span class="o">+</span> <span class="mi">1</span>
+            <span class="p">)</span>
 
         <span class="c1"># Compile to IR.</span>
         <span class="n">clang</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
@@ -462,28 +427,25 @@
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright Facebook AI Research
+        &#169; Copyright Facebook AI Research.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -509,6 +471,7 @@
     })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
     ga('create', 'G-T95G5EVYXM', 'auto');
+    
     ga('send', 'pageview');
     </script>
 

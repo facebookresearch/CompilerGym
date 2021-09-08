@@ -3,21 +3,26 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
+  <meta charset="utf-8" />
   
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.envs.llvm.datasets.cbench &mdash; CompilerGym 0.1.9 documentation</title>
+  <title>compiler_gym.envs.llvm.datasets.cbench &mdash; CompilerGym 0.1.10 documentation</title>
   
 
   
   <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../../../../../_static/css/custom.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -27,11 +32,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../../../../../" src="../../../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../../../" id="documentation_options" src="../../../../../_static/documentation_options.js"></script>
         <script src="../../../../../_static/jquery.js"></script>
         <script src="../../../../../_static/underscore.js"></script>
         <script src="../../../../../_static/doctools.js"></script>
-        <script src="../../../../../_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../../../../../_static/js/theme.js"></script>
 
@@ -52,7 +56,7 @@
           
 
           
-            <a href="../../../../../index.html" class="icon icon-home" alt="Documentation Home"> CompilerGym
+            <a href="../../../../../index.html" class="icon icon-home"> CompilerGym
           
 
           
@@ -62,7 +66,7 @@
             
             
               <div class="version">
-                0.1.9
+                0.1.10
               </div>
             
           
@@ -87,18 +91,21 @@
               
             
             
-              <p><span class="caption-text">User Guide</span></p>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../llvm/index.html">LLVM Environment Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../../../../../cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../rpc.html">RPC Service Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p><span class="caption-text">Python API Reference</span></p>
+<p class="caption"><span class="caption-text">Environments</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../llvm/index.html">LLVM Environment Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -110,7 +117,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
 </ul>
-<p><span class="caption-text">C++ API Reference</span></p>
+<p class="caption"><span class="caption-text">C++ API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../cc/compiler_gym/service.html">compiler_gym/service</a></li>
@@ -141,6 +148,8 @@
         <div class="rst-content">
         
           
+
+
 
 
 
@@ -204,6 +213,7 @@
 <span class="kn">import</span> <span class="nn">fasteners</span>
 
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">TarDatasetWithManifest</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">BenchmarkDynamicConfig</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.third_party</span> <span class="kn">import</span> <span class="n">llvm</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.download</span> <span class="kn">import</span> <span class="n">download</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">cache_path</span><span class="p">,</span> <span class="n">site_data_path</span>
@@ -668,6 +678,19 @@
                 <span class="p">)</span>
             <span class="p">)</span>
 
+    <span class="c1"># Create the BenchmarkDynamicConfig object.</span>
+    <span class="n">cbench_data</span> <span class="o">=</span> <span class="n">site_data_path</span><span class="p">(</span><span class="s2">&quot;llvm-v0/cbench-v1-runtime-data/runtime_data&quot;</span><span class="p">)</span>
+    <span class="n">DYNAMIC_CONFIGS</span><span class="p">[</span><span class="n">benchmark</span><span class="p">]</span> <span class="o">=</span> <span class="n">BenchmarkDynamicConfig</span><span class="p">(</span>
+        <span class="n">build_cmd</span><span class="o">=</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="s2">&quot;$CC $&lt;&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">linkopts</span><span class="p">),</span>
+        <span class="n">build_genfile</span><span class="o">=</span><span class="s2">&quot;a.out&quot;</span><span class="p">,</span>
+        <span class="n">run_cmd</span><span class="o">=</span><span class="n">cmd</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;$BIN&quot;</span><span class="p">,</span> <span class="s2">&quot;./a.out&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;$D&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">cbench_data</span><span class="p">)),</span>
+        <span class="n">pre_run_cmd</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;echo 1 &gt; _finfo_dataset&quot;</span><span class="p">],</span>
+        <span class="n">run_genfile</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">outfiles</span><span class="p">],</span>
+        <span class="n">build_cmd_timeout_seconds</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+        <span class="n">run_cmd_timeout_seconds</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+        <span class="n">pre_run_cmd_timeout_seconds</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+    <span class="p">)</span>
+
     <span class="k">return</span> <span class="kc">True</span>
 
 
@@ -676,12 +699,47 @@
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-
         <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">VALIDATORS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">,</span> <span class="p">[]):</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">add_validation_callback</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">proto</span><span class="o">.</span><span class="n">dynamic_config</span><span class="o">.</span><span class="n">MergeFrom</span><span class="p">(</span>
+            <span class="n">DYNAMIC_CONFIGS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">,</span> <span class="n">BenchmarkDynamicConfig</span><span class="p">())</span>
+        <span class="p">)</span>
 
 
 <div class="viewcode-block" id="CBenchDataset"><a class="viewcode-back" href="../../../../../llvm/api.html#compiler_gym.envs.llvm.datasets.CBenchDataset">[docs]</a><span class="k">class</span> <span class="nc">CBenchDataset</span><span class="p">(</span><span class="n">TarDatasetWithManifest</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">site_data_base</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+        <span class="n">platform</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;darwin&quot;</span><span class="p">:</span> <span class="s2">&quot;macos&quot;</span><span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">,</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span><span class="p">)</span>
+        <span class="n">url</span><span class="p">,</span> <span class="n">sha256</span> <span class="o">=</span> <span class="n">_CBENCH_TARS</span><span class="p">[</span><span class="n">platform</span><span class="p">]</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;benchmark://cbench-v1&quot;</span><span class="p">,</span>
+            <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Runnable C benchmarks&quot;</span><span class="p">,</span>
+            <span class="n">license</span><span class="o">=</span><span class="s2">&quot;BSD 3-Clause&quot;</span><span class="p">,</span>
+            <span class="n">references</span><span class="o">=</span><span class="p">{</span>
+                <span class="s2">&quot;Paper&quot;</span><span class="p">:</span> <span class="s2">&quot;https://arxiv.org/pdf/1407.3487.pdf&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;Homepage&quot;</span><span class="p">:</span> <span class="s2">&quot;https://ctuning.org/wiki/index.php/CTools:CBench&quot;</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">tar_urls</span><span class="o">=</span><span class="p">[</span><span class="n">url</span><span class="p">],</span>
+            <span class="n">tar_sha256</span><span class="o">=</span><span class="n">sha256</span><span class="p">,</span>
+            <span class="n">manifest_urls</span><span class="o">=</span><span class="p">[</span>
+                <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cbench-v1-manifest.bz2&quot;</span>
+            <span class="p">],</span>
+            <span class="n">manifest_sha256</span><span class="o">=</span><span class="s2">&quot;eeffd7593aeb696a160fd22e6b0c382198a65d0918b8440253ea458cfe927741&quot;</span><span class="p">,</span>
+            <span class="n">strip_prefix</span><span class="o">=</span><span class="s2">&quot;cBench-v1&quot;</span><span class="p">,</span>
+            <span class="n">benchmark_file_suffix</span><span class="o">=</span><span class="s2">&quot;.bc&quot;</span><span class="p">,</span>
+            <span class="n">benchmark_class</span><span class="o">=</span><span class="n">CBenchBenchmark</span><span class="p">,</span>
+            <span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span>
+            <span class="n">sort_order</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">validatable</span><span class="o">=</span><span class="s2">&quot;Partially&quot;</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">install</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">_CBENCH_DOWNLOAD_THREAD_LOCK</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">fasteners</span><span class="o">.</span><span class="n">InterProcessLock</span><span class="p">(</span><span class="n">cache_path</span><span class="p">(</span><span class="s2">&quot;cbench-v1-runtime-data.LOCK&quot;</span><span class="p">)):</span>
+                <span class="n">download_cBench_runtime_data</span><span class="p">()</span></div>
+
+
+<span class="k">class</span> <span class="nc">CBenchLegacyDataset2</span><span class="p">(</span><span class="n">TarDatasetWithManifest</span><span class="p">):</span>
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">site_data_base</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
@@ -712,7 +770,7 @@
             <span class="n">benchmark_class</span><span class="o">=</span><span class="n">CBenchBenchmark</span><span class="p">,</span>
             <span class="n">deprecated</span><span class="o">=</span><span class="n">deprecated</span><span class="p">,</span>
             <span class="n">validatable</span><span class="o">=</span><span class="s2">&quot;Partially&quot;</span><span class="p">,</span>
-        <span class="p">)</span></div>
+        <span class="p">)</span>
 
 
 <span class="c1"># URLs of the deprecated cBench datasets.</span>
@@ -771,6 +829,10 @@
 <span class="n">VALIDATORS</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span>
     <span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="s2">&quot;LlvmEnv&quot;</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span>  <span class="c1"># noqa: F821</span>
 <span class="p">]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+
+
+<span class="c1"># A map from benchmark name to BenchmarkDynamicConfig messages.</span>
+<span class="n">DYNAMIC_CONFIGS</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BenchmarkDynamicConfig</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
 
 
 <span class="k">def</span> <span class="nf">validate_sha_output</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">BenchmarkExecutionResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
@@ -1034,28 +1096,25 @@
            
           </div>
           <footer>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright Facebook AI Research
+        &#169; Copyright Facebook AI Research.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -1081,6 +1140,7 @@
     })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
     ga('create', 'G-T95G5EVYXM', 'auto');
+    
     ga('send', 'pageview');
     </script>
 

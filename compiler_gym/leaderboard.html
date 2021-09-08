@@ -3,22 +3,26 @@
 <!DOCTYPE html>
 <html class="writer-html5" lang="en" >
 <head>
-  <meta charset="utf-8">
-  <meta name="generator" content="Docutils 0.17.1: http://docutils.sourceforge.net/" />
-
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="utf-8" />
   
-  <title>compiler_gym.leaderboard &mdash; CompilerGym 0.1.9 documentation</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>compiler_gym.leaderboard &mdash; CompilerGym 0.1.10 documentation</title>
   
 
   
   <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
 
   
   
+
   
+  
+
   
 
   
@@ -28,11 +32,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
         <script src="../_static/jquery.js"></script>
         <script src="../_static/underscore.js"></script>
         <script src="../_static/doctools.js"></script>
-        <script src="../_static/language_data.js"></script>
-        <script async="async" src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.7/latest.js?config=TeX-AMS-MML_HTMLorMML"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -55,7 +58,7 @@
           
 
           
-            <a href="../index.html" class="icon icon-home" alt="Documentation Home"> CompilerGym
+            <a href="../index.html" class="icon icon-home"> CompilerGym
           
 
           
@@ -65,7 +68,7 @@
             
             
               <div class="version">
-                0.1.9
+                0.1.10
               </div>
             
           
@@ -90,18 +93,21 @@
               
             
             
-              <p><span class="caption-text">User Guide</span></p>
+              <p class="caption"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../llvm/index.html">LLVM Environment Reference</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../rpc.html">RPC Service Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p><span class="caption-text">Python API Reference</span></p>
+<p class="caption"><span class="caption-text">Environments</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../llvm/index.html">LLVM Environment Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="datasets.html">compiler_gym.datasets</a></li>
@@ -116,7 +122,7 @@
 <li class="toctree-l1"><a class="reference internal" href="views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="wrappers.html">compiler_gym.wrappers</a></li>
 </ul>
-<p><span class="caption-text">C++ API Reference</span></p>
+<p class="caption"><span class="caption-text">C++ API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/service.html">compiler_gym/service</a></li>
@@ -162,6 +168,8 @@
 
 
 
+
+
 <div role="navigation" aria-label="breadcrumbs navigation">
 
   <ul class="wy-breadcrumbs">
@@ -173,7 +181,7 @@
     
       <li class="wy-breadcrumbs-aside">
         
-            
+          
             <a href="../_sources/compiler_gym/leaderboard.rst.txt" rel="nofollow"> View page source</a>
           
         
@@ -187,7 +195,7 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <section id="module-compiler_gym.leaderboard">
+  <div class="section" id="module-compiler_gym.leaderboard">
 <span id="compiler-gym-leaderboard"></span><h1>compiler_gym.leaderboard<a class="headerlink" href="#module-compiler_gym.leaderboard" title="Permalink to this headline">¶</a></h1>
 <p>This package contains modules that can be used for preparing leaderboard
 submissions.</p>
@@ -204,7 +212,7 @@ for instructions.</p>
 <li><p><a class="reference internal" href="#module-compiler_gym.leaderboard.llvm_instcount" id="id2">LLVM Instruction Count</a></p></li>
 </ul>
 </div>
-<section id="module-compiler_gym.leaderboard.llvm_instcount">
+<div class="section" id="module-compiler_gym.leaderboard.llvm_instcount">
 <span id="llvm-instruction-count"></span><h2><a class="toc-backref" href="#id2">LLVM Instruction Count</a><a class="headerlink" href="#module-compiler_gym.leaderboard.llvm_instcount" title="Permalink to this headline">¶</a></h2>
 <p>LLVM is a popular open source compiler used widely in industry and research.
 The <code class="code docutils literal notranslate"><span class="pre">llvm-ic-v0</span></code> environment exposes LLVM’s optimizing passes as a set of
@@ -242,8 +250,8 @@ instruction count achieved scaled to the reduction achieved by LLVM’s builtin
 <a class="reference internal" href="#compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy" title="compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy"><code class="xref py py-func docutils literal notranslate"><span class="pre">eval_llvm_instcount_policy()</span></code></a> to
 automatically evaluate their agent on the test set.</p>
 <dl class="py function">
-<dt id="compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy">
-<code class="sig-prename descclassname">compiler_gym.leaderboard.llvm_instcount.</code><code class="sig-name descname">eval_llvm_instcount_policy</code><span class="sig-paren">(</span><em class="sig-param"><span class="n">policy</span><span class="p">:</span> <span class="n">Callable<span class="p">[</span><span class="p">[</span>compiler_gym.envs.llvm.llvm_env.LlvmEnv<span class="p">]</span><span class="p">, </span>None<span class="p">]</span></span></em><span class="sig-paren">)</span> &#x2192; None<a class="reference internal" href="../_modules/compiler_gym/leaderboard/llvm_instcount.html#eval_llvm_instcount_policy"><span class="viewcode-link">[source]</span></a><a class="headerlink" href="#compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy" title="Permalink to this definition">¶</a></dt>
+<dt class="sig sig-object py" id="compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy">
+<span class="sig-prename descclassname"><span class="pre">compiler_gym.leaderboard.llvm_instcount.</span></span><span class="sig-name descname"><span class="pre">eval_llvm_instcount_policy</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">policy</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="envs.html#compiler_gym.envs.LlvmEnv" title="compiler_gym.envs.llvm.llvm_env.LlvmEnv"><span class="pre">compiler_gym.envs.llvm.llvm_env.LlvmEnv</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">None</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="reference internal" href="../_modules/compiler_gym/leaderboard/llvm_instcount.html#eval_llvm_instcount_policy"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy" title="Permalink to this definition">¶</a></dt>
 <dd><p>Evaluate an LLVM codesize policy and generate results for a leaderboard
 submission.</p>
 <p>To use it, you define your policy as a function that takes an
@@ -314,45 +322,37 @@ defined:</p>
 for instructions on preparing a submission to the leaderboard.</p>
 </dd></dl>
 
-</section>
-</section>
+</div>
+</div>
 
 
            </div>
            
           </div>
           <footer>
-  
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-      
-        <a href="service.html" class="btn btn-neutral float-right" title="compiler_gym.service" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
-      
-      
-        <a href="../llvm/api.html" class="btn btn-neutral float-left" title="compiler_gym.envs.llvm" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
-      
+        <a href="service.html" class="btn btn-neutral float-right" title="compiler_gym.service" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../llvm/api.html" class="btn btn-neutral float-left" title="compiler_gym.envs.llvm" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
-  
 
   <hr/>
 
   <div role="contentinfo">
     <p>
-        
-        &copy; Copyright Facebook AI Research
+        &#169; Copyright Facebook AI Research.
 
     </p>
   </div>
     
     
     
-    Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
     
-    <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a>
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
     
     provided by <a href="https://readthedocs.org">Read the Docs</a>. 
 
 </footer>
-
         </div>
       </div>
 
@@ -378,6 +378,7 @@ for instructions on preparing a submission to the leaderboard.</p>
     })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
 
     ga('create', 'G-T95G5EVYXM', 'auto');
+    
     ga('send', 'pageview');
     </script>
 
