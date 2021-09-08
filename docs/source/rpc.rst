@@ -19,27 +19,22 @@ an interactive environment. The service is defined using `gRPC
 <https://grpc.io/>`_, and the individual requests and responses are defined
 using `protocol buffers <https://developers.google.com/protocol-buffers>`_. The
 protocol buffer schema is then used to generate bindings in a programming
-language of choice. Protocol buffers support a wide range of programming
-languages, allowing compiler developers to expose their optimization problems in
-whatever language makes sense for them.
+language of choice.
 
-To use the service from C++, include the generated protocol buffer header:
-
-.. code-block:: c++
-
-   #include "compiler_gym/service/proto/compiler_gym_service.pb.h"
-
-To use the service from Python, import the generated protocol buffer module:
-
-.. code-block:: python
-
-   import compiler_gym.service.proto
+Protocol buffers support a wide range of programming languages, allowing
+compiler developers to expose their optimization problems in whatever language
+makes sense for them. For Python and C++ we also provide a common runtime that
+offers a higher level of abstraction and takes care of much of the boilerplate
+required for RPC communication. For further details check out the :ref:`C++
+<cc/compiler_gym/service:CompilationSession.h>` or :class:`Python class
+<compiler_gym.service.CompilationSession>` documentation.
 
 
 CompilerGymService
 ------------------
 
 .. doxygennamespace:: CompilerGymService
+
 
 
 Request and Reply Messages
