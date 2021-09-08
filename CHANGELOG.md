@@ -16,9 +16,9 @@ CompilerGym:
   allows ad-hoc parameters that do not conform to the usual action space to be
   set for the duration of an episode. Add support for these parameters in the
   backend by implementing the optional
-  [`handle_session_parameter()`](https://github.com/facebookresearch/CompilerGym/blob/63ee95a34157856ca21c392c49d35234e065fa8d/compiler_gym/service/compilation_session.py#L94-L112)
+  [handle_session_parameter()](https://github.com/facebookresearch/CompilerGym/blob/63ee95a34157856ca21c392c49d35234e065fa8d/compiler_gym/service/compilation_session.py#L94-L112)
   method, and then send parameters using the
-  [`send_params()`](https://github.com/facebookresearch/CompilerGym/blob/63ee95a34157856ca21c392c49d35234e065fa8d/compiler_gym/envs/compiler_env.py#L1317-L1338)
+  [send_params()](https://github.com/facebookresearch/CompilerGym/blob/63ee95a34157856ca21c392c49d35234e065fa8d/compiler_gym/envs/compiler_env.py#L1317-L1338)
   method.
 
 Other highlights of this release include:
