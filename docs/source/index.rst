@@ -8,8 +8,8 @@ for applying reinforcement learning to compiler optimizations.
    :caption: User Guide
 
    getting_started
-   cli
    about
+   cli
    rpc
    changelog
    contributing
