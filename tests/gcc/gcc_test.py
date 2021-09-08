@@ -3,7 +3,6 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Tests for the example CompilerGym service."""
-import gym
 import numpy as np
 import pytest
 
@@ -12,11 +11,7 @@ from compiler_gym.service import SessionNotFound
 from compiler_gym.spaces import Scalar, Sequence
 from tests.test_main import main
 
-
-@pytest.fixture(scope="function")
-def env() -> GccEnv:
-    """Test fixture that yields an environment."""
-    return gym.make("gcc-v0")
+pytest_plugins = ["tests.pytest_plugins.gcc"]
 
 
 def test_versions(env: GccEnv):
@@ -41,17 +36,17 @@ def test_observation_spaces(env: GccEnv):
     """Test that the environment reports the service's observation spaces."""
     env.reset()
     assert env.observation.spaces.keys() == {
-        "source",
-        "rtl",
-        "asm",
-        "asm_size",
         "asm_hash",
-        "instruction_counts",
-        "obj",
-        "obj_size",
-        "obj_hash",
+        "asm_size",
+        "asm",
         "choices",
         "command_line",
+        "instruction_counts",
+        "obj_hash",
+        "obj_size",
+        "obj",
+        "rtl",
+        "source",
     }
     assert env.observation.spaces["obj_size"].space == Scalar(
         min=-1, max=np.iinfo(np.int64).max, dtype=np.int
@@ -179,56 +174,56 @@ def test_instruction_counts_observation(env: GccEnv):
     """Test observation spaces."""
     env.reset()
     assert env.instruction_counts == {
-        ".file": 1,
-        ".text": 4,
-        ".globl": 110,
-        ".bss": 8,
         ".align": 95,
-        ".type": 110,
-        ".size": 110,
-        ".zero": 83,
-        ".section": 10,
-        ".long": 502,
+        ".bss": 8,
         ".cfi": 91,
-        "pushq": 16,
-        "movq": 150,
-        "movl": 575,
-        "cmpl": 30,
-        "js": 7,
-        "jmp": 24,
-        "negl": 5,
-        "popq": 11,
-        "ret": 15,
-        "subq": 15,
-        "leaq": 40,
-        "movslq": 31,
-        "cltq": 67,
-        "imulq": 27,
-        "addq": 17,
-        "addl": 44,
-        "jle": 21,
-        "sarq": 20,
-        "call": 34,
-        "subl": 7,
-        "sarl": 9,
-        "testl": 1,
-        "cmovns": 2,
-        "jge": 3,
-        "sall": 2,
-        "orl": 1,
-        "leave": 4,
-        "andl": 2,
-        "nop": 7,
-        "cmpq": 1,
-        "salq": 7,
-        "jns": 2,
-        "jne": 1,
-        "testq": 4,
-        "negq": 1,
-        "shrl": 2,
-        ".string": 1,
-        "je": 2,
+        ".file": 1,
+        ".globl": 110,
         ".ident": 1,
+        ".long": 502,
+        ".section": 10,
+        ".size": 110,
+        ".string": 1,
+        ".text": 4,
+        ".type": 110,
+        ".zero": 83,
+        "addl": 44,
+        "addq": 17,
+        "andl": 2,
+        "call": 34,
+        "cltq": 67,
+        "cmovns": 2,
+        "cmpl": 30,
+        "cmpq": 1,
+        "imulq": 27,
+        "je": 2,
+        "jge": 3,
+        "jle": 21,
+        "jmp": 24,
+        "jne": 1,
+        "jns": 2,
+        "js": 7,
+        "leaq": 40,
+        "leave": 4,
+        "movl": 575,
+        "movq": 150,
+        "movslq": 31,
+        "negl": 5,
+        "negq": 1,
+        "nop": 7,
+        "orl": 1,
+        "popq": 11,
+        "pushq": 16,
+        "ret": 15,
+        "sall": 2,
+        "salq": 7,
+        "sarl": 9,
+        "sarq": 20,
+        "shrl": 2,
+        "subl": 7,
+        "subq": 15,
+        "testl": 1,
+        "testq": 4,
     }
 
 

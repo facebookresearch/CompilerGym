@@ -9,11 +9,10 @@ import pickle
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
-from compiler_gym.envs.gcc.gcc import DEFAULT_GCC
 from compiler_gym.datasets import Benchmark
 from compiler_gym.envs.compiler_env import CompilerEnv
 from compiler_gym.envs.gcc.datasets import get_gcc_datasets
-from compiler_gym.envs.gcc.gcc import GccSpec
+from compiler_gym.envs.gcc.gcc import DEFAULT_GCC, GccSpec
 from compiler_gym.service import ConnectionOpts
 from compiler_gym.spaces import Reward
 from compiler_gym.util.gym_type_hints import ObservationType
@@ -40,8 +39,8 @@ class AsmSizeReward(Reward):
         self.previous = None
 
     def update(self, action, observations, observation_view):
-        del action
-        del observation_view
+        del action  # unused
+        del observation_view  # unused
 
         if self.previous is None:
             self.previous = observations[0]

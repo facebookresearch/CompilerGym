@@ -4,11 +4,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""A CompilerGym service for GCC.
-This service reads a specification of the compiler from the binary using the
-code in 'gcc_spec.py'. To change the compiler from the default 'gcc', set the
-'GCC_BIN' environment variable.
-"""
+"""A CompilerGym service for GCC."""
 import codecs
 import hashlib
 import json
@@ -38,14 +34,11 @@ from compiler_gym.service.proto import (
 def make_gcc_compilation_session(gcc_bin: str):
     """Create a class to represent a GCC compilation service.
 
-    gcc_bin - path to the gcc executable.
-    This can a command name, like "gcc", or it can be path to the executable.
-    Finally, if prefixed with "docker:" it can be the name of a docker image,
-    e.g. "docker:gcc:11.2.0"
+    :param gcc_bin: Path to the gcc executable. This can a command name, like
+        "gcc", or it can be path to the executable. Finally, if prefixed with
+        "docker:" it can be the name of a docker image, e.g. "docker:gcc:11.2.0"
     """
-
     gcc = Gcc(gcc_bin)
-    spec = gcc.spec
 
     # The available actions
     actions = []
@@ -54,7 +47,7 @@ def make_gcc_compilation_session(gcc_bin: str):
     # explicit actions.
     # Actions that are not small will have the abbility to increment the choice
     # by different amounts.
-    for i, option in enumerate(spec.options):
+    for i, option in enumerate(gcc.spec.options):
         if len(option) < 10:
             for j in range(len(option)):
                 actions.append(SimpleAction(option, i, j))
@@ -166,7 +159,7 @@ def make_gcc_compilation_session(gcc_bin: str):
                     ScalarRange(
                         min=ScalarLimit(value=0), max=ScalarLimit(value=len(option) - 1)
                     )
-                    for option in spec.options
+                    for option in gcc.spec.options
                 ]
             ),
         ),
@@ -225,7 +218,7 @@ def make_gcc_compilation_session(gcc_bin: str):
         @property
         def choices(self) -> List[int]:
             if self._choices is None:
-                self._choices = [-1] * len(spec.options)
+                self._choices = [-1] * len(gcc.spec.options)
             return self._choices
 
         @choices.setter
@@ -326,7 +319,7 @@ def make_gcc_compilation_session(gcc_bin: str):
             # Gather the choices as strings
             opts = [
                 option[choice]
-                for option, choice in zip(spec.options, self.choices)
+                for option, choice in zip(gcc.spec.options, self.choices)
                 if choice >= 0
             ]
             cmd_line = opts + ["-w", "-c", src_path, "-o", obj_path]
@@ -343,7 +336,7 @@ def make_gcc_compilation_session(gcc_bin: str):
             asm_path = asm_path or self.asm_path
             opts = [
                 option[choice]
-                for option, choice in zip(spec.options, self.choices)
+                for option, choice in zip(gcc.spec.options, self.choices)
                 if choice >= 0
             ]
             cmd_line = opts + ["-w", "-S", src_path, "-o", asm_path]
@@ -362,7 +355,7 @@ def make_gcc_compilation_session(gcc_bin: str):
             asm_path = asm_path or self.asm_path
             opts = [
                 option[choice]
-                for option, choice in zip(spec.options, self.choices)
+                for option, choice in zip(gcc.spec.options, self.choices)
                 if choice >= 0
             ]
             cmd_line = opts + [
@@ -392,14 +385,13 @@ def make_gcc_compilation_session(gcc_bin: str):
             if not self._obj:
                 self.prepare_files()
                 logging.info(
-                    f"Compiling: {' '.join(map(str, self.obj_command_line()))}"
+                    "Compiling: %s", " ".join(map(str, self.obj_command_line()))
                 )
                 gcc(
                     *self.obj_command_line(),
                     cwd=self.working_dir,
                     timeout=self._timeout,
                 )
-                logging.info("Compiled")
                 with open(self.obj_path, "rb") as f:
                     # Set the internal variables
                     self._obj = f.read()
@@ -411,14 +403,13 @@ def make_gcc_compilation_session(gcc_bin: str):
             if not self._asm:
                 self.prepare_files()
                 logging.info(
-                    f"Assembling: {' '.join(map(str, self.asm_command_line()))}"
+                    "Assembling: %s", " ".join(map(str, self.asm_command_line()))
                 )
                 gcc(
                     *self.asm_command_line(),
                     cwd=self.working_dir,
                     timeout=self._timeout,
                 )
-                logging.info("Assembled")
                 with open(self.asm_path, "rb") as f:
                     # Set the internal variables
                     asm_bytes = f.read()
@@ -431,14 +422,13 @@ def make_gcc_compilation_session(gcc_bin: str):
             if not self._rtl:
                 self.prepare_files()
                 logging.info(
-                    f"Dumping RTL: {' '.join(map(str, self.rtl_command_line()))}"
+                    "Dumping RTL: %s", " ".join(map(str, self.rtl_command_line()))
                 )
                 gcc(
                     *self.rtl_command_line(),
                     cwd=self.working_dir,
                     timeout=self._timeout,
                 )
-                logging.info("RTL Dumped")
                 with open(self.asm_path, "rb") as f:
                     # Set the internal variables
                     asm_bytes = f.read()
@@ -474,7 +464,7 @@ def make_gcc_compilation_session(gcc_bin: str):
             # Apply the action to this session and check if we changed anything
             old_choices = self.choices.copy()
             action(self)
-            logging.info("Applied action " + str(action))
+            logging.info("Applied action %s", action)
 
             # Reset the internal variables if this action has caused a change in the
             # choices
@@ -520,12 +510,12 @@ def make_gcc_compilation_session(gcc_bin: str):
 
         def handle_session_parameter(self, key: str, value: str) -> Optional[str]:
             if key == "gcc_spec":
-                return codecs.encode(pickle.dumps(spec), "base64").decode()
+                return codecs.encode(pickle.dumps(gcc.spec), "base64").decode()
             elif key == "choices":
                 choices = list(map(int, value.split(",")))
-                assert len(choices) == len(spec.options)
+                assert len(choices) == len(gcc.spec.options)
                 assert all(
-                    -1 <= p <= len(spec.options[i]) for i, p in enumerate(choices)
+                    -1 <= p <= len(gcc.spec.options[i]) for i, p in enumerate(choices)
                 )
                 if choices != self.choices:
                     self.choices = choices
@@ -534,8 +524,7 @@ def make_gcc_compilation_session(gcc_bin: str):
             elif key == "timeout":
                 self._timeout = None if value == "" else int(value)
                 return ""
-            else:
-                return None
+            return None
 
     return GccCompilationSession
 

@@ -6,9 +6,12 @@ load("@rules_python//python:defs.bzl", "py_test")
 
 py_test(
     name = "gcc_test",
+    timeout = "long",
     srcs = ["gcc_test.py"],
+    shard_count = 4,
     deps = [
         "//compiler_gym/envs",
         "//tests:test_main",
+        "//tests/pytest_plugins:gcc",
     ],
 )
