@@ -44,7 +44,7 @@ from compiler_gym.service.proto import (
     StartSessionRequest,
     StepReply,
     StepRequest,
-    action_space_from_proto,
+    proto_to_action_space,
 )
 from compiler_gym.spaces import DefaultRewardFromObservation, NamedDiscrete, Reward
 from compiler_gym.util.debug_util import get_logging_level
@@ -288,7 +288,7 @@ class CompilerEnv(gym.Env):
 
         # Process the available action, observation, and reward spaces.
         action_spaces = [
-            action_space_from_proto(space) for space in self.service.action_spaces
+            proto_to_action_space(space) for space in self.service.action_spaces
         ]
         self.action_spaces = [a.space for a in action_spaces]
         self._make_actions = [a.make_action for a in action_spaces]
@@ -835,7 +835,7 @@ class CompilerEnv(gym.Env):
 
         # If the action space has changed, update it.
         if reply.HasField("new_action_space"):
-            self.action_space, self._make_action = action_space_from_proto(
+            self.action_space, self._make_action = proto_to_action_space(
                 reply.new_action_space
             )
 
@@ -955,7 +955,7 @@ class CompilerEnv(gym.Env):
 
         # If the action space has changed, update it.
         if reply.HasField("new_action_space"):
-            self.action_space, self._make_action = action_space_from_proto(
+            self.action_space, self._make_action = proto_to_action_space(
                 reply.action_space
             )
 

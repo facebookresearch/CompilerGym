@@ -19,8 +19,11 @@ py_library(
         ":compiler_gym_service_py",
         ":compiler_gym_service_py_grpc",
         "//compiler_gym/spaces:commandline",
+        "//compiler_gym/spaces:dict",
+        "//compiler_gym/spaces:discrete",
         "//compiler_gym/spaces:named_discrete",
         "//compiler_gym/spaces:scalar",
+        "//compiler_gym/spaces:tuple",
     ],
 )
 

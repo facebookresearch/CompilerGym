@@ -41,10 +41,10 @@ from compiler_gym.service.proto.compiler_gym_service_pb2_grpc import (
     CompilerGymServiceServicer,
     CompilerGymServiceStub,
 )
-from compiler_gym.service.proto.py_converters import action_space_from_proto
+from compiler_gym.service.proto.py_converters import proto_to_action_space
 
 __all__ = [
-    "action_space_from_proto",
+    "proto_to_action_space",
     "Action",
     "ActionSpace",
     "AddBenchmarkReply",
