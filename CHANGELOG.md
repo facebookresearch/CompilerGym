@@ -1,3 +1,50 @@
+## Release 0.1.10 (2021-09-08)
+
+This release lays the foundation for several new exciting additions to
+CompilerGym:
+
+- [LLVM] Added experimental support for **optimizing for runtime** and **compile
+  time** ([#307](https://github.com/facebookresearch/CompilerGym/pull/307)).
+  This is still proof of concept and is not yet stable. For now, only the
+  `benchmark://cbench-v1` and `generator://csmith-v0` datasets are supported.
+- [CompilerGym Explorer] Started development of a **web frontend** for the
+  LLVM environments. The work-in-progress Flask API and React website can be
+  found in the `www` directory.
+- [New Backend API] Added a mechanism for sending arbitrary data payloads to the
+  compiler service backends
+  ([#313](https://github.com/facebookresearch/CompilerGym/pull/313)). This
+  allows ad-hoc parameters that do not conform to the usual action space to be
+  set for the duration of an episode. Add support for these parameters in the
+  backend by implementing the optional
+  [`handle_session_parameter()`](https://github.com/facebookresearch/CompilerGym/blob/63ee95a34157856ca21c392c49d35234e065fa8d/compiler_gym/service/compilation_session.py#L94-L112)
+  method, and then send parameters using the
+  [`send_params()`](https://github.com/facebookresearch/CompilerGym/blob/63ee95a34157856ca21c392c49d35234e065fa8d/compiler_gym/envs/compiler_env.py#L1317-L1338)
+  method.
+
+Other highlights of this release include:
+
+- [LLVM] The Csmith program generator is now shipped as part of the CompilerGym
+  binary release, removing the need to compile it locally
+  ([#348](https://github.com/facebookresearch/CompilerGym/pull/348)).
+- [LLVM] A new `ProgramlJson` observation space provides the JSON node-link data
+  of a ProGraML graph without parsing to a `nx.MultiDiGraph`
+  ([#332](https://github.com/facebookresearch/CompilerGym/pull/332)).
+- [LLVM] Added a leaderboard submission for a DQN agent
+  ([#292](https://github.com/facebookresearch/CompilerGym/pull/292), thanks
+  @phesse001!).
+- [Backend API Update] The `Reward.reset()` method now receives an observation
+  view that can be used to compute initial states
+  ([#341](https://github.com/facebookresearch/CompilerGym/pull/341), thanks
+  @bwasti!).
+- [Datasets API] The size of infinite datasets has been changed from
+  `float("inf")` to `0`
+  ([#347](https://github.com/facebookresearch/CompilerGym/pull/347)). This is a
+  compatibility fix for `__len__()` which requires integers values.
+- Prevent excessive growth of in-memory caches
+  ([#299](https://github.com/facebookresearch/CompilerGym/pull/299)).
+- Multiple compatibility fixes for `compiler_gym.wrappers`.
+- Numerous other bug fixes and improvements.
+
 ## Release 0.1.9 (2021-06-03)
 
 This release of CompilerGym focuses on **backend extensibility** and adds a
