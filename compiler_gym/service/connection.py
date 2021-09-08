@@ -13,7 +13,7 @@ from datetime import datetime
 from pathlib import Path
 from signal import Signals
 from time import sleep, time
-from typing import Iterable, List, Optional, TypeVar, Union
+from typing import Dict, Iterable, List, Optional, TypeVar, Union
 
 import grpc
 from pydantic import BaseModel
@@ -89,6 +89,13 @@ class ConnectionOpts(BaseModel):
     :meth:`env.reset() <compiler_gym.envs.CompilerEnv.reset>` uses a different
     benchmark. In case of benchmark re-use, leave this :code:`False`.
     """
+
+    script_args: List[str] = []
+    """If the service is started from a local script, this set of args is used
+    on the command line. No effect when used for existing sockets."""
+    script_env: Dict[str, str] = {}
+    """If the service is started from a local script, this set of env vars is
+    used on the command line. No effect when used for existing sockets."""
 
 
 class ServiceError(Exception):
@@ -285,6 +292,8 @@ class ManagedConnection(Connection):
         rpc_init_max_seconds: float,
         process_exit_max_seconds: float,
         logger: logging.Logger,
+        script_args: List[str],
+        script_env: Dict[str, str],
     ):
         """Constructor.
 
@@ -304,6 +313,8 @@ class ManagedConnection(Connection):
             f"./{local_service_binary.name}",
             f"--working_dir={self.working_dir}",
         ]
+        # Add any custom arguments
+        cmd += script_args
 
         # Set the root of the runfiles directory.
         env = os.environ.copy()
@@ -337,6 +348,9 @@ class ManagedConnection(Connection):
         args = os.environ.get("COMPILER_GYM_SERVICE_ARGS", "")
         if args:
             cmd.append(args)
+
+        # Add any custom environment variables
+        env.update(script_env)
 
         logger.debug("Exec %s", cmd)
         self.process = subprocess.Popen(
@@ -637,6 +651,8 @@ class CompilerGymServiceConnection:
                         rpc_init_max_seconds=opts.rpc_init_max_seconds,
                         port_init_max_seconds=opts.local_service_port_init_max_seconds,
                         logger=logger,
+                        script_args=opts.script_args,
+                        script_env=opts.script_env,
                     )
                 else:
                     endpoint_name = endpoint
