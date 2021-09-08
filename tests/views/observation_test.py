@@ -16,8 +16,8 @@ from compiler_gym.views import ObservationView
 from tests.test_main import main
 
 
-class MockGetObservation:
-    """Mock for the get_observation callack of ObservationView."""
+class MockRawStep:
+    """Mock for the raw_step callack of ObservationView."""
 
     def __init__(self, ret=None):
         self.called_observation_spaces = []
@@ -35,7 +35,7 @@ class MockGetObservation:
 
 def test_empty_space():
     with pytest.raises(ValueError) as ctx:
-        ObservationView(MockGetObservation(), [])
+        ObservationView(MockRawStep(), [])
     assert str(ctx.value) == "No observation spaces"
 
 
@@ -73,7 +73,7 @@ def test_observed_value_types():
             ),
         ),
     ]
-    mock = MockGetObservation(
+    mock = MockRawStep(
         ret=[
             "Hello, IR",
             [1.0, 2.0],
