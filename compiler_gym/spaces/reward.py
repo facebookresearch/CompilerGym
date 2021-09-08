@@ -38,8 +38,8 @@ class Reward(Scalar):
 
     def __init__(
         self,
-        # TODO(cummins): Rename `id` to `name` for consistency with the other
-        # space classes.
+        # TODO(github.com/facebookresearch/CompilerGym/issues/381): Rename `id`
+        # to `name` for consistency with the other space classes.
         id: str,
         observation_spaces: Optional[List[str]] = None,
         default_value: RewardType = 0,
