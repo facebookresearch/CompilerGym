@@ -13,6 +13,7 @@ RUN apt-get update \
         cmake \
         curl \
         libtinfo5 \
+        m4 \
         make \
         patch \
         patchelf \

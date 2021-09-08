@@ -31,7 +31,7 @@ Now proceed to [All platforms](#all-platforms) below.
 On debian-based linux systems, install the required toolchain using:
 
 ```sh
-sudo apt install clang-9 libtinfo5 libjpeg-dev zlib1g-dev
+sudo apt install clang-9 libtinfo5 libjpeg-dev zlib1g-dev m4 make patch
 wget https://github.com/bazelbuild/bazelisk/releases/download/v1.7.5/bazelisk-linux-amd64 -O bazel
 chmod +x bazel && mkdir -p ~/.local/bin && mv -v bazel ~/.local/bin
 export PATH="$HOME/.local/bin:$PATH"
@@ -46,9 +46,9 @@ We recommend using
 to manage the remaining build dependencies. First create a conda environment
 with the required dependencies:
 
-    conda create -n compiler_gym python=3.9 cmake pandoc patchelf
+    conda create -n compiler_gym python=3.8
     conda activate compiler_gym
-    conda install -c conda-forge doxygen
+    conda install -c conda-forge cmake pandoc patchelf
 
 Then clone the CompilerGym source code using:
 
@@ -62,8 +62,8 @@ your preferred branch and install the python development dependencies using:
     git checkout stable
     make init
 
-The `make init` target only needs to be run once on initial setup, or when
-pulling remote changes to the CompilerGym repository.
+The `make init` target only needs to be run on initial setup and after pulling
+remote changes to the CompilerGym repository.
 
 Run the test suite to confirm that everything is working:
 
