@@ -257,7 +257,8 @@ class Gcc:
             return docker.from_env()
         except docker.errors.DockerException as e:
             raise ServiceError(
-                f"Failed to initialize docker client needed by GCC environment: {e}"
+                f"Failed to initialize docker client needed by GCC environment: {e}.\n"
+                "Is docker installed?"
             ) from e
 
     def __call__(
