@@ -10,12 +10,11 @@ from pathlib import Path
 import gym
 import numpy as np
 import pytest
-from gym.spaces import Box
 
 import examples.example_compiler_gym_service as example
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.service import SessionNotFound
-from compiler_gym.spaces import NamedDiscrete, Scalar, Sequence
+from compiler_gym.spaces import Box, NamedDiscrete, Scalar, Sequence
 from compiler_gym.util.debug_util import set_debug_level
 from tests.test_main import main
 
@@ -91,13 +90,13 @@ def test_observation_spaces(env: CompilerEnv):
     env.reset()
     assert env.observation.spaces.keys() == {"ir", "features", "runtime"}
     assert env.observation.spaces["ir"].space == Sequence(
-        size_range=(0, None), dtype=str, opaque_data_format=""
+        name="test", size_range=(0, None), dtype=str, opaque_data_format=""
     )
     assert env.observation.spaces["features"].space == Box(
-        shape=(3,), low=-100, high=100, dtype=int
+        name="test", shape=(3,), low=-100, high=100, dtype=int
     )
     assert env.observation.spaces["runtime"].space == Scalar(
-        min=0, max=np.inf, dtype=float
+        name="test", min=0, max=np.inf, dtype=float
     )
 
 

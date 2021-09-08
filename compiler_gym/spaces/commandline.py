@@ -2,7 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-from typing import Iterable, List, NamedTuple, Optional, Union
+from typing import Iterable, List, NamedTuple, Union
 
 from compiler_gym.spaces.named_discrete import NamedDiscrete
 
@@ -50,16 +50,17 @@ class Commandline(NamedDiscrete):
     :ivar descriptions: A list of flag descriptions.
     """
 
-    def __init__(self, items: Iterable[CommandlineFlag], name: Optional[str] = None):
+    def __init__(self, items: Iterable[CommandlineFlag], name: str):
         """Constructor.
 
         :param items: The commandline flags that comprise the space.
+
         :param name: The name of the space.
         """
         items = list(items)
         self.flags = [f.flag for f in items]
         self.descriptions = [f.description for f in items]
-        super().__init__([f.flag for f in items], name)
+        super().__init__([f.flag for f in items], name=name)
 
     def __repr__(self) -> str:
         return f"Commandline([{' '.join(self.flags)}])"

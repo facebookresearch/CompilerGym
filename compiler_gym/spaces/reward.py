@@ -38,6 +38,8 @@ class Reward(Scalar):
 
     def __init__(
         self,
+        # TODO(cummins): Rename `id` to `name` for consistency with the other
+        # space classes.
         id: str,
         observation_spaces: Optional[List[str]] = None,
         default_value: RewardType = 0,
@@ -77,6 +79,7 @@ class Reward(Scalar):
             execution environment of the service.
         """
         super().__init__(
+            name=id,
             min=-np.inf if min is None else min,
             max=np.inf if max is None else max,
             dtype=np.float64,
