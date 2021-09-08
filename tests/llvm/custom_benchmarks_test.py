@@ -290,30 +290,26 @@ def test_two_custom_benchmarks_reset(env: LlvmEnv):
     assert env.benchmark == benchmark2.uri
 
 
-def test_get_system_includes_nonzero_exit_status():
+def test_get_compiler_includes_not_found():
+    with pytest.raises(OSError) as ctx:
+        list(llvm.llvm_benchmark.get_compiler_includes("not-a-real-binary"))
+    assert "Failed to invoke not-a-real-binary" in str(ctx.value)
+
+
+def test_get_compiler_includes_nonzero_exit_status():
     """Test that setting the $CXX to an invalid binary raises an error."""
-    old_cxx = os.environ.get("CXX")
-    os.environ["CXX"] = "false"
-    try:
-        with pytest.raises(OSError) as ctx:
-            list(
-                llvm.llvm_benchmark._get_system_includes()  # pylint: disable=protected-access
-            )
-        assert "Failed to invoke false" in str(ctx.value)
-    finally:
-        if old_cxx:
-            os.environ["CXX"] = old_cxx
+    with pytest.raises(OSError) as ctx:
+        list(llvm.llvm_benchmark.get_compiler_includes("false"))
+    assert "Failed to invoke false" in str(ctx.value)
 
 
-def test_get_system_includes_output_parse_failure():
+def test_get_compiler_includes_output_parse_failure():
     """Test that setting the $CXX to an invalid binary raises an error."""
     old_cxx = os.environ.get("CXX")
     os.environ["CXX"] = "echo"
     try:
         with pytest.raises(OSError) as ctx:
-            list(
-                llvm.llvm_benchmark._get_system_includes()  # pylint: disable=protected-access
-            )
+            list(llvm.llvm_benchmark.get_compiler_includes("echo"))
         assert "Failed to parse '#include <...>' search paths from echo" in str(
             ctx.value
         )
