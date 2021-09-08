@@ -11,6 +11,7 @@ py_library(
         "commandline.py",
         "core.py",
         "datasets.py",
+        "locked_step.py",
         "time_limit.py",
     ],
     visibility = ["//visibility:public"],

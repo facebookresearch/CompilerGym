@@ -38,6 +38,17 @@ py_test(
 )
 
 py_test(
+    name = "locked_step_test",
+    timeout = "short",
+    srcs = ["locked_step_test.py"],
+    deps = [
+        "//compiler_gym/wrappers",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "time_limit_wrappers_test",
     timeout = "short",
     srcs = ["time_limit_wrappers_test.py"],

@@ -66,3 +66,11 @@ Datasets wrappers
 .. autoclass:: RandomOrderBenchmarks
 
     .. automethod:: __init__
+
+
+Miscellaneous
+-------------
+
+.. autoclass:: LockedStep
+
+    .. automethod:: __init__
