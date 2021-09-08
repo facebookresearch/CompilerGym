@@ -31,7 +31,7 @@ Now proceed to [All platforms](#all-platforms) below.
 On debian-based linux systems, install the required toolchain using:
 
 ```sh
-sudo apt install clang-9 libtinfo5 libjpeg-dev zlib1g-dev
+sudo apt install clang-9 libtinfo5 libjpeg-dev zlib1g-dev m4 make patch
 wget https://github.com/bazelbuild/bazelisk/releases/download/v1.7.5/bazelisk-linux-amd64 -O bazel
 chmod +x bazel && mkdir -p ~/.local/bin && mv -v bazel ~/.local/bin
 export PATH="$HOME/.local/bin:$PATH"
