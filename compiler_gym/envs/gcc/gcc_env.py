@@ -9,6 +9,7 @@ import pickle
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
+from compiler_gym.envs.gcc.gcc import DEFAULT_GCC
 from compiler_gym.datasets import Benchmark
 from compiler_gym.envs.compiler_env import CompilerEnv
 from compiler_gym.envs.gcc.datasets import get_gcc_datasets
@@ -103,7 +104,7 @@ class GccEnv(CompilerEnv):
         """
         connection_settings = connection_settings or ConnectionOpts()
         # Pass the executable path via an environment variable
-        connection_settings.script_env = {"CC": gcc_bin or "docker:gcc:11.2.0"}
+        connection_settings.script_env = {"CC": gcc_bin or DEFAULT_GCC}
         super().__init__(
             *args,
             **kwargs,
