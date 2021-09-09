@@ -54,22 +54,16 @@ class RandomAgentWorker(Thread):
         """Run episodes in an infinite loop."""
         while self.should_run_one_episode:
             self.total_environment_count += 1
-            env = self._make_env()
-            try:
+            with self._make_env() as env:
                 self._patience = self._patience or env.action_space.n
                 self.run_one_environment(env)
-            finally:
-                env.close()
 
     def run_one_environment(self, env: CompilerEnv) -> None:
         """Run random walks in an infinite loop. Returns if the environment ends."""
-        try:
-            while self.should_run_one_episode:
-                self.total_episode_count += 1
-                if not self.run_one_episode(env):
-                    return
-        finally:
-            env.close()
+        while self.should_run_one_episode:
+            self.total_episode_count += 1
+            if not self.run_one_episode(env):
+                return
 
     def run_one_episode(self, env: CompilerEnv) -> bool:
         """Run a single random episode.
@@ -253,9 +247,8 @@ def random_search(
     print("done")
 
     print("Replaying actions from best solution found:")
-    env = make_env()
-    env.reset()
-    replay_actions(env, best_action_names, outdir)
-    env.close()
+    with make_env() as env:
+        env.reset()
+        replay_actions(env, best_action_names, outdir)
 
     return best_returns, best_actions

@@ -21,11 +21,8 @@ pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.llvm"]
 
 @pytest.fixture(scope="module")
 def csmith_dataset() -> CsmithDataset:
-    env = gym.make("llvm-v0")
-    try:
+    with gym.make("llvm-v0") as env:
         ds = env.datasets["generator://csmith-v0"]
-    finally:
-        env.close()
     yield ds
 
 

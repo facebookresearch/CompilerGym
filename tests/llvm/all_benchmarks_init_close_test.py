@@ -14,7 +14,6 @@ def test_init_benchmark(env: CompilerEnv, benchmark_name: str):
     """Create an environment for each benchmark and close it."""
     env.reset(benchmark=benchmark_name)
     assert env.benchmark == benchmark_name
-    env.close()
 
 
 if __name__ == "__main__":

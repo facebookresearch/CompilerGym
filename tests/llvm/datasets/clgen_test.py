@@ -20,11 +20,8 @@ pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.llvm"]
 
 @pytest.fixture(scope="module")
 def clgen_dataset() -> CLgenDataset:
-    env = gym.make("llvm-v0")
-    try:
+    with gym.make("llvm-v0") as env:
         ds = env.datasets["benchmark://clgen-v0"]
-    finally:
-        env.close()
     yield ds
 
 

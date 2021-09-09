@@ -153,8 +153,7 @@ def main(argv):
         )
 
     # Determine the name of the reward space.
-    env = env_from_flags()
-    try:
+    with env_from_flags() as env:
         if FLAGS.reward_aggregation == "geomean":
 
             def reward_aggregation(a):
@@ -173,8 +172,6 @@ def main(argv):
             reward_name = f"{reward_aggregation_name} {env.reward_space.id}"
         else:
             reward_name = ""
-    finally:
-        env.close()
 
     # Determine the maximum column width required for printing tabular output.
     max_state_name_length = max(

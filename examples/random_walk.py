@@ -62,7 +62,6 @@ def run_random_walk(env: CompilerEnv, step_count: int) -> None:
             if done:
                 print("Episode ended by environment")
                 break
-        env.close()
 
     def reward_percentage(reward, rewards):
         if sum(rewards) == 0:
@@ -92,11 +91,10 @@ def main(argv):
     assert len(argv) == 1, f"Unrecognized flags: {argv[1:]}"
 
     benchmark = benchmark_from_flags()
-    env = env_from_flags(benchmark)
-
-    step_min = min(FLAGS.step_min, FLAGS.step_max)
-    step_max = max(FLAGS.step_min, FLAGS.step_max)
-    run_random_walk(env=env, step_count=random.randint(step_min, step_max))
+    with env_from_flags(benchmark) as env:
+        step_min = min(FLAGS.step_min, FLAGS.step_max)
+        step_max = max(FLAGS.step_min, FLAGS.step_max)
+        run_random_walk(env=env, step_count=random.randint(step_min, step_max))
 
 
 if __name__ == "__main__":

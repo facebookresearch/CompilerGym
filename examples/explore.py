@@ -447,8 +447,8 @@ def main(argv):
 
     print(f"Running with {FLAGS.nproc} threads.")
     assert FLAGS.nproc >= 1
+    envs = []
     try:
-        envs = []
         for _ in range(FLAGS.nproc):
             envs.append(make_env())
         compute_action_graph(envs, episode_length=FLAGS.episode_length)

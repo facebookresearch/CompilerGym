@@ -22,11 +22,8 @@ pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.llvm"]
 
 @pytest.fixture(scope="module")
 def llvm_stress_dataset() -> LlvmStressDataset:
-    env = gym.make("llvm-v0")
-    try:
+    with gym.make("llvm-v0") as env:
         ds = env.datasets["generator://llvm-stress-v0"]
-    finally:
-        env.close()
     yield ds
 
 

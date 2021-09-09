@@ -13,11 +13,7 @@ from tests.test_main import main
 
 @pytest.fixture(scope="function")
 def env() -> CompilerEnv:
-    env = gym.make("llvm-autophase-ic-v0")
-    try:
-        yield env
-    finally:
-        env.close()
+    return gym.make("llvm-autophase-ic-v0")
 
 
 def test_type_classes(env: CompilerEnv):

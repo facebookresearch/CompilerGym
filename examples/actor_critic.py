@@ -352,6 +352,8 @@ def make_env():
 
 def main(argv):
     """Main entry point."""
+    del argv  # unused
+
     torch.manual_seed(FLAGS.seed)
     random.seed(FLAGS.seed)
 

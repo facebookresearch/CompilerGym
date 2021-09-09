@@ -17,15 +17,14 @@ from tests.test_main import main
 
 def process_worker(env_name: str, benchmark: str, actions: List[int], queue: mp.Queue):
     assert actions
-    env = gym.make(env_name)
-    env.reset(benchmark=benchmark)
+    with gym.make(env_name) as env:
+        env.reset(benchmark=benchmark)
 
-    for action in actions:
-        observation, reward, done, info = env.step(action)
-        assert not done
+        for action in actions:
+            observation, reward, done, info = env.step(action)
+            assert not done
 
-    queue.put((observation, reward, done, info))
-    env.close()
+        queue.put((observation, reward, done, info))
 
 
 def process_worker_with_env(env: LlvmEnv, actions: List[int], queue: mp.Queue):
@@ -70,28 +69,27 @@ def test_moving_environment_to_background_process_macos():
     """Test moving an LLVM environment to a background process."""
     queue = mp.Queue(maxsize=3)
 
-    env = gym.make("llvm-autophase-ic-v0")
-    env.reset(benchmark="cbench-v1/crc32")
+    with gym.make("llvm-autophase-ic-v0") as env:
+        env.reset(benchmark="cbench-v1/crc32")
 
-    process = mp.Process(target=process_worker_with_env, args=(env, [0, 0, 0], queue))
+        process = mp.Process(
+            target=process_worker_with_env, args=(env, [0, 0, 0], queue)
+        )
 
-    # Moving an environment to a background process is not supported because
-    # we are using a subprocess.Popen() to manage the service binary, which
-    # doesn't support pickling.
-    with pytest.raises(TypeError):
-        process.start()
+        # Moving an environment to a background process is not supported because
+        # we are using a subprocess.Popen() to manage the service binary, which
+        # doesn't support pickling.
+        with pytest.raises(TypeError):
+            process.start()
 
 
 def test_port_collision_test():
     """Test that attempting to connect to a port that is already in use succeeds."""
-    env_a = gym.make("llvm-autophase-ic-v0")
-    env_a.reset(benchmark="cbench-v1/crc32")
+    with gym.make("llvm-autophase-ic-v0") as env_a:
+        env_a.reset(benchmark="cbench-v1/crc32")
 
-    env_b = LlvmEnv(service=env_a.service.connection.url)
-    env_b.reset(benchmark="cbench-v1/crc32")
-
-    env_b.close()
-    env_a.close()
+        with LlvmEnv(service=env_a.service.connection.url) as env_b:
+            env_b.reset(benchmark="cbench-v1/crc32")
 
 
 if __name__ == "__main__":
