@@ -24,7 +24,7 @@ def get_gcc_datasets(
     """
     site_data_base = site_data_base or site_data_path("gcc-v0")
 
-    yield CHStoneDataset(site_data_base=site_data_base)
+    yield CHStoneDataset(gcc_bin=gcc_bin, site_data_base=site_data_base)
     yield AnghaBenchDataset(site_data_base=site_data_base)
     yield CsmithDataset(gcc_bin=gcc_bin, site_data_base=site_data_base)
 

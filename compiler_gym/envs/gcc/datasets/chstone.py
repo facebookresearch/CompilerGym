@@ -7,6 +7,7 @@ from typing import Iterable
 
 from compiler_gym.datasets import Benchmark, TarDatasetWithManifest
 from compiler_gym.envs.gcc.gcc import Gcc
+from compiler_gym.util.decorators import memoized_property
 from compiler_gym.util.filesystem import atomic_file_write
 
 URIS = [
@@ -44,6 +45,7 @@ class CHStoneDataset(TarDatasetWithManifest):
 
     def __init__(
         self,
+        gcc_bin: Path,
         site_data_base: Path,
         sort_order: int = 0,
     ):
@@ -68,9 +70,17 @@ class CHStoneDataset(TarDatasetWithManifest):
             manifest_urls=[],
             manifest_sha256="",
         )
+        self.gcc_bin = gcc_bin
 
     def benchmark_uris(self) -> Iterable[str]:
         yield from URIS
+
+    @memoized_property
+    def gcc(self):
+        # Defer instantiation of Gcc from the constructor as it will fail if the
+        # given Gcc is not available. Memoize the result as initialization is
+        # expensive.
+        return Gcc(bin=self.gcc_bin)
 
     def benchmark(self, uri: str) -> Benchmark:
         self.install()
@@ -103,9 +113,7 @@ class CHStoneDataset(TarDatasetWithManifest):
                 # over the unprocessed code to the service, have the service
                 # preprocess. Until then, we do it client side with GCC having
                 # to fixed by an environment variable
-
-                gcc = Gcc()
-                gcc(
+                self.gcc(
                     "-E",
                     "-o",
                     tmp_path.name,
