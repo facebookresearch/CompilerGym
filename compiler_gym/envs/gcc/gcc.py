@@ -246,6 +246,7 @@ class Gcc:
     def __init__(self, bin: Union[str, Path] = DEFAULT_GCC):
         self.bin = str(bin)
         self.image = self.bin[len("docker:") :]
+
         self.call = (
             self._docker_run if self.bin.startswith("docker:") else self._subprocess_run
         )
@@ -272,9 +273,11 @@ class Gcc:
 
         :param args: The command line arguments to append.
 
+        :param timeout: A timeout in seconds.
+
         :param cwd: The working directory.
 
-        :timeout: A timeout in seconds.
+        :param volumes: A dictionary of volume bindings for docker.
         """
         return self.call(args, timeout, cwd=Path(cwd or "."), volumes=volumes)
 
@@ -322,9 +325,15 @@ class Gcc:
         del volumes  # Unused
 
         cmd_line = [self.bin] + list(map(str, args))
-        result = subprocess.check_output(
-            cmd_line, cwd=cwd, universal_newlines=True, timeout=timeout
-        )
+        try:
+            result = subprocess.check_output(
+                cmd_line, cwd=cwd, universal_newlines=True, timeout=timeout
+            )
+        except subprocess.CalledProcessError as e:
+            raise ServiceError(f"Failed to run {self.bin}: {e}") from e
+        except FileNotFoundError:
+            raise ServiceError(f"GCC binary not found: {self.bin}")
+
         return result
 
 

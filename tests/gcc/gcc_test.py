@@ -2,12 +2,12 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""Tests for the example CompilerGym service."""
+"""Tests for the GCC CompilerGym service."""
 import gym
 import numpy as np
 import pytest
 
-from compiler_gym.envs import GccEnv
+from compiler_gym.envs.gcc import GccEnv
 from compiler_gym.service import SessionNotFound
 from compiler_gym.service.connection import ServiceError
 from compiler_gym.spaces import Scalar, Sequence
