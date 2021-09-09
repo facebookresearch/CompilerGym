@@ -268,6 +268,10 @@ def join_docker_container(container, timeout_seconds: int) -> str:
 class Gcc:
     """This class represents an instance of the GCC compiler, either as a binary
     or a docker image.
+
+    It has two fields:
+    `self.bin` which is a string version of the constructor argument, and
+    `self.spec` is a `GccSpec` object.
     """
 
     def __init__(self, bin: Union[str, Path]):
@@ -354,7 +358,13 @@ class Gcc:
 class GccSpec:
     """This class combines all the information about the version and options.
 
-    It acts as a list of Options.
+    It provides a list of Options.
+
+    Fields are:
+
+    - `self.gcc` - the `Gcc` object from the constructor
+    - `self.version` - the `version` string from the constructor
+    - `self.options` - the `List[Option]` from the constructor
     """
 
     def __init__(self, gcc: Gcc, version: str, options: List[Option]):
@@ -374,8 +384,6 @@ class GccSpec:
     def size(self) -> int:
         """Calculate the size of the option space. This is the product of the
         cardinalities of all the options.
-
-        Note this size is likely too big to be returned by __len__.
         """
         sz = 1
         # Each option can be applied or not
