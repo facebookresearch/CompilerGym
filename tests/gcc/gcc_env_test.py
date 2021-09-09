@@ -49,7 +49,7 @@ def test_observation_spaces(env: GccEnv):
         "source",
     }
     assert env.observation.spaces["obj_size"].space == Scalar(
-        min=-1, max=np.iinfo(np.int64).max, dtype=np.int
+        min=-1, max=np.iinfo(np.int64).max, dtype=int
     )
     assert env.observation.spaces["asm"].space == Sequence(
         size_range=(0, None), dtype=str, opaque_data_format=""
