@@ -4,7 +4,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""Query a GCC binary for version,  optimisation and param spaces.
+"""Query a GCC binary for version,  optimization and param spaces.
 The goal of this file is to query the available settings in a GCC compiler so
 that they don't have to be hard coded.
 
@@ -22,7 +22,6 @@ import os
 import pickle
 import re
 import subprocess
-import sys
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
@@ -32,12 +31,12 @@ from compiler_gym.service import ServiceError
 from compiler_gym.util.filesystem import atomic_file_write
 from compiler_gym.util.runfiles_path import site_data_path
 
-# Default gcc_bin
+# The default gcc_bin argument.
 DEFAULT_GCC: str = "docker:gcc:11.2.0"
 
 
 class Option:
-    """An Option is either a command line optimisation setting or a parameter.
+    """An Option is either a command line optimization setting or a parameter.
     It is essentially a list of the possible values that can be taken.
 
     Each item is command line parameter. In GCC, all of these are single
@@ -46,7 +45,8 @@ class Option:
 
     def __len__(self):
         """Number of available settings. Note that the absence of a value is not
-        included in this, it is implicit."""
+        included in this, it is implicit.
+        """
         raise NotImplementedError()
 
     def __getitem__(self, key: int) -> str:
@@ -84,8 +84,8 @@ class GccOOption(Option):
 
 class GccFlagOption(Option):
     """An ordinary -f flag. These have two possible settings. For a given flag
-    name there are '-f<name>' and '-fno-<name>.
-    If no_fno is true, then there is only the -f<name> form
+    name there are '-f<name>' and '-fno-<name>. If no_fno is true, then there is
+    only the -f<name> form.
     """
 
     def __init__(self, name: str, no_fno: bool = False):
@@ -107,7 +107,9 @@ class GccFlagOption(Option):
 
 class GccFlagEnumOption(Option):
     """A flag of style '-f<name>=[val1, val2, ...]'.
-    'self.name' holds the name. 'self.values' holds the values."""
+
+    'self.name' holds the name. 'self.values' holds the values.
+    """
 
     def __init__(self, name: str, values: List[str]):
         self.name = name
@@ -128,7 +130,8 @@ class GccFlagEnumOption(Option):
 
 class GccFlagIntOption(Option):
     """A flag of style '-f<name>=<integer>' where the integer is between min and
-    max."""
+    max.
+    """
 
     def __init__(self, name: str, min: int, max: int):
         self.name = name
@@ -152,7 +155,7 @@ class GccFlagAlignOption(Option):
     """Alignment flags. These take several forms. See the GCC documentation."""
 
     def __init__(self, name: str):
-        logging.warning(f"Alignment options not properly handled {name}")
+        logging.warning("Alignment options not properly handled %s", name)
         self.name = name
 
     def __len__(self):
@@ -192,7 +195,8 @@ class GccParamEnumOption(Option):
 
 class GccParamIntOption(Option):
     """A parameter '--param=<name>=<integer>. where the integer is between min
-    and max."""
+    and max.
+    """
 
     def __init__(self, name: str, min: int, max: int):
         self.name = name
@@ -212,37 +216,10 @@ class GccParamIntOption(Option):
         return f"<GccParamIntOption name={self.name}, min={self.min}, max={self.max}>"
 
 
-class GccSpec:
-    """This class combines all the information about the version and options.
-    It acts as a list of Options"""
-
-    def __init__(self, gcc: "Gcc", version: str, options: List[Option]):
-        """Initialise the spec
-        bin - the name or path of the gcc executable. If this begins with
-        "docker:", then we will use a docker container with the name after.
-        E.g. docker:gcc:11.2.0 will use that container name and the gcc command
-        inside the container
-        version - the gcc version string
-        options - the list of options
-        """
-        self.gcc = gcc
-        self.version = version
-        self.options = options
-
-    @property
-    def size(self) -> int:
-        """Calculate the size of the option space. This is the product of the
-        cardinalities of all the options.
-        Note this size is likely to big to be returned by __len__.
-        """
-        sz = 1
-        # Each option can be applied or not
-        for option in self.options:
-            sz *= len(option) + 1
-        return sz
-
-
 class Gcc:
+    """This class represents an instance of the GCC compiler, either as a binary
+    or a docker image."""
+
     def __init__(self, bin: Union[str, Path] = DEFAULT_GCC):
         self.bin = str(bin)
         self.image = self.bin[len("docker:") :]
@@ -337,11 +314,43 @@ class Gcc:
         return result
 
 
-def _gcc_parse_optimize(gcc: Gcc) -> List[Option]:
-    """Parse the optimisation help string from the GCC binary to find
-    options."""
+class GccSpec:
+    """This class combines all the information about the version and options.
 
-    logging.info("Parsing GCC optimisation space")
+    It acts as a list of Options.
+    """
+
+    def __init__(self, gcc: Gcc, version: str, options: List[Option]):
+        """Initialise the spec.
+
+        :param gcc: A Gcc instance.
+
+        :param version: The gcc version string.
+
+        :param options: The list of options.
+        """
+        self.gcc = gcc
+        self.version = version
+        self.options = options
+
+    @property
+    def size(self) -> int:
+        """Calculate the size of the option space. This is the product of the
+        cardinalities of all the options.
+
+        Note this size is likely too big to be returned by __len__.
+        """
+        sz = 1
+        # Each option can be applied or not
+        for option in self.options:
+            sz *= len(option) + 1
+        return sz
+
+
+def _gcc_parse_optimize(gcc: Gcc) -> List[Option]:
+    """Parse the optimization help string from the GCC binary to find options."""
+
+    logging.debug("Parsing GCC optimization space")
 
     # Call 'gcc --help=optimize -Q'
     result = gcc("--help=optimize", "-Q", timeout=60)
@@ -470,7 +479,7 @@ def _gcc_parse_optimize(gcc: Gcc) -> List[Option]:
             add_gcc_flag_int(name, min, max)
             return
 
-        logging.warning(f"Unknown GCC optimisation flag spec, '{line}'")
+        logging.warning("Unknown GCC optimization flag spec, '%s'", line)
 
     # Parse all the lines
     for line in out:
@@ -485,7 +494,7 @@ def _gcc_parse_params(gcc: Gcc) -> List[Option]:
     options."""
 
     # Pretty much identical to _gcc_parse_optimize
-    logging.info("Parsing GCC param space")
+    logging.debug("Parsing GCC param space")
 
     result = gcc("--help=param", "-Q", timeout=60)
     out = result.split("\n")[1:]
@@ -574,7 +583,7 @@ def _gcc_parse_params(gcc: Gcc) -> List[Option]:
                 add_gcc_param_int(name, min, max)
                 return
 
-        logging.warning(f"Unknown GCC param flag spec, '{line}'")
+        logging.warning("Unknown GCC param flag spec, '%s'", line)
 
     # breakpoint()
     for line in out:
@@ -584,18 +593,19 @@ def _gcc_parse_params(gcc: Gcc) -> List[Option]:
 
 
 def _fix_options(options: List[Option]) -> List[Option]:
-    """Fixes for things that seem not to be true in the help"""
-    # Ignore -flive-patching
+    """Fixes for things that seem not to be true in the help."""
+
     def keep(option: Option) -> bool:
-        if type(option) == GccFlagEnumOption:
+        # Ignore -flive-patching
+        if isinstance(option, GccFlagEnumOption):
             if option.name == "live-patching":
                 return False
         return True
 
-    options = list(filter(keep, options))
+    options = [opt for opt in options if keep(opt)]
 
     for i, option in enumerate(options):
-        if type(option) == GccParamIntOption:
+        if isinstance(option, GccParamIntOption):
             # Some things say they can have -1, but can't
             if option.name in [
                 "logical-op-non-short-circuit",
@@ -605,7 +615,7 @@ def _fix_options(options: List[Option]) -> List[Option]:
             ]:
                 option.min = 0
 
-        elif type(option) == GccFlagOption:
+        elif isinstance(option, GccFlagOption):
             # -fhandle-exceptions renamed to -fexceptions
             if option.name == "handle-exceptions":
                 option.name = "exceptions"
@@ -622,7 +632,7 @@ def _fix_options(options: List[Option]) -> List[Option]:
             if option.name == "no-threadsafe-statics":
                 option.name = "threadsafe-statics"
 
-        elif type(option) == GccFlagIntOption:
+        elif isinstance(option, GccFlagIntOption):
             # -fpack-struct has to be a small positive power of two
             if option.name == "pack-struct":
                 values = [str(1 << j) for j in range(5)]
@@ -634,11 +644,13 @@ def _fix_options(options: List[Option]) -> List[Option]:
 def _gcc_get_version(gcc: Gcc) -> Optional[str]:
     """Get the version string"""
 
-    logging.info(f"Getting GCC version for {gcc.bin}")
+    logging.debug("Getting GCC version for %s", gcc.bin)
     try:
         result = gcc("--version", timeout=60)
         version = result.split("\n")[0]
-        logging.info(f"GCC version is {version}")
+        logging.debug("GCC version is %s", version)
+        if "gcc" not in version:
+            raise ServiceError(f"Invalid GCC version string: {version}")
         return version
     except subprocess.SubprocessError:
         logging.error("Unable to get GCC version")
@@ -694,24 +706,6 @@ def _get_spec(gcc: Gcc, cache_dir: Path) -> Optional[GccSpec]:
             pickle.dump(spec, f)
         logging.debug("GccSpec for %s written to %s", version, spec_path)
 
-    logging.info("GccSpec size is approximately 10^%s", math.log(spec.size))
+    logging.debug("GccSpec size is approximately 10^%.0f", round(math.log(spec.size)))
 
     return spec
-
-
-if __name__ == "__main__":
-    """Find the spec for GCC and print what is found.
-    Accepts zero, one or two arguments.
-    The first is the name or path of the GCC binary. If not given, then just
-    'gcc' is used.
-    The second is the optional cache directory. If not given, then no cache dir
-    will be used."
-    This program will print the GCC spec to standard output."""
-    gcc_bin = DEFAULT_GCC if len(sys.argv) < 2 else sys.argv[1]
-
-    gcc = Gcc(gcc_bin)
-
-    print(f"GCC Version: {gcc.spec.version}")
-    print("Options:")
-    for option in gcc.spec.options:
-        print(option.__repr__())
