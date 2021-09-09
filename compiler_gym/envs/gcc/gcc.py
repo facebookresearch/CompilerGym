@@ -229,15 +229,21 @@ def get_docker_client():
         ) from e
 
 
+# We only need to run this function once per image.
 @lru_cache
 def pull_docker_image(image: str) -> str:
     """Pull the requested docker image.
 
-    This function is cached.
+    :param image: The name of the docker image to pull.
+
+    :raises ServiceError: If pulling the docker image fails.
     """
-    client = get_docker_client()
-    client.images.pull(image)
-    return image
+    try:
+        client = get_docker_client()
+        client.images.pull(image)
+        return image
+    except docker.errors.DockerException as e:
+        raise ServiceError(f"Failed to fetch docker image '{image}': {e}")
 
 
 def join_docker_container(container, timeout_seconds: int) -> str:
