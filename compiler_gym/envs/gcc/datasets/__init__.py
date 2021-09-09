@@ -3,7 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 from pathlib import Path
-from typing import Iterable, Optional
+from typing import Iterable, Optional, Union
 
 from compiler_gym.datasets import Dataset
 from compiler_gym.envs.gcc.datasets.anghabench import AnghaBenchDataset
@@ -12,7 +12,9 @@ from compiler_gym.envs.gcc.datasets.csmith import CsmithBenchmark, CsmithDataset
 from compiler_gym.util.runfiles_path import site_data_path
 
 
-def get_gcc_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset]:
+def get_gcc_datasets(
+    gcc_bin: Union[str, Path], site_data_base: Optional[Path] = None
+) -> Iterable[Dataset]:
     """Instantiate the builtin GCC datasets.
 
     :param site_data_base: The root of the site data path.
@@ -24,7 +26,7 @@ def get_gcc_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset]
 
     yield CHStoneDataset(site_data_base=site_data_base)
     yield AnghaBenchDataset(site_data_base=site_data_base)
-    yield CsmithDataset(site_data_base=site_data_base)
+    yield CsmithDataset(gcc_bin=gcc_bin, site_data_base=site_data_base)
 
 
 __all__ = [

@@ -8,7 +8,7 @@ import subprocess
 import tempfile
 from pathlib import Path
 from threading import Lock
-from typing import Iterable, Optional
+from typing import Iterable, Optional, Union
 
 import numpy as np
 from fasteners import InterProcessLock
@@ -106,6 +106,7 @@ class CsmithDataset(Dataset):
 
     def __init__(
         self,
+        gcc_bin: Union[Path, str],
         site_data_base: Path,
         sort_order: int = 0,
         csmith_bin: Optional[Path] = None,
@@ -138,6 +139,7 @@ class CsmithDataset(Dataset):
             sort_order=sort_order,
             benchmark_class=CsmithBenchmark,
         )
+        self.gcc_bin = gcc_bin
         self.csmith_bin_path = csmith_bin or _CSMITH_BIN
         self.csmith_includes_path = csmith_includes or _CSMITH_INCLUDES
         self._install_lockfile = self.site_data_path / ".install.LOCK"
@@ -153,7 +155,7 @@ class CsmithDataset(Dataset):
         # Defer instantiation of Gcc from the constructor as it will fail if the
         # given Gcc is not available. Memoize the result as initialization is
         # expensive.
-        return Gcc()
+        return Gcc(bin=self.gcc_bin)
 
     def benchmark_uris(self) -> Iterable[str]:
         return (f"{self.name}/{i}" for i in range(UINT_MAX))

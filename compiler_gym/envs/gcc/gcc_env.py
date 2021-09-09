@@ -125,7 +125,9 @@ class GccEnv(CompilerEnv):
             **kwargs,
             # Set a default benchmark for use.
             benchmark=benchmark or "chstone-v0/adpcm",
-            datasets=list(get_gcc_datasets(site_data_base=datasets_site_path)),
+            datasets=list(
+                get_gcc_datasets(gcc_bin=gcc_bin, site_data_base=datasets_site_path)
+            ),
             rewards=[AsmSizeReward(), ObjSizeReward()],
             connection_settings=connection_settings,
         )
