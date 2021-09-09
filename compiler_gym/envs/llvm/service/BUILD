@@ -157,6 +157,7 @@ cc_library(
         ":Benchmark",
         ":BenchmarkFactory",
         ":Cost",
+        ":Observation",
         ":ObservationSpaces",
         "//compiler_gym/service:CompilationSession",
         "//compiler_gym/service/proto:compiler_gym_service_cc_grpc",
@@ -175,6 +176,29 @@ cc_library(
         "@programl//programl/ir/llvm:llvm-10",
         "@programl//programl/proto:programl_cc",
         "@subprocess",
+    ],
+)
+
+cc_library(
+    name = "Observation",
+    srcs = ["Observation.cc"],
+    hdrs = ["Observation.h"],
+    deps = [
+        ":Benchmark",
+        ":Cost",
+        ":ObservationSpaces",
+        "//compiler_gym/service/proto:compiler_gym_service_cc_grpc",
+        "//compiler_gym/third_party/autophase:InstCount",
+        "//compiler_gym/third_party/cpuinfo",
+        "//compiler_gym/util:GrpcStatusMacros",
+        "@boost//:filesystem",
+        "@glog",
+        "@llvm//10.0.0",
+        "@magic_enum",
+        "@nlohmann_json//:json",
+        "@programl//programl/graph/format:node_link_graph",
+        "@programl//programl/ir/llvm:llvm-10",
+        "@programl//programl/proto:programl_cc",
     ],
 )
 

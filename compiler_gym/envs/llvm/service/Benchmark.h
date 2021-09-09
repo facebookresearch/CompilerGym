@@ -49,6 +49,15 @@ constexpr int kDefaultBuildtimesPerObservationCount = 1;
 grpc::Status readBitcodeFile(const boost::filesystem::path& path, Bitcode* bitcode);
 
 /**
+ * Write the module bitcode to the given path.
+ *
+ * @param module The module to write to file.
+ * @param path The path of the bitcode file to write.
+ * @return `OK` on success.
+ */
+grpc::Status writeBitcodeFile(const llvm::Module& module, const boost::filesystem::path& path);
+
+/**
  * Construct an LLVM module from a bitcode.
  *
  * Parses the given bitcode into a module and strips the identifying `ModuleID`
