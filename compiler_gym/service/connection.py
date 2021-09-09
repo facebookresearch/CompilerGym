@@ -114,6 +114,11 @@ class ServiceInitError(ServiceError, OSError):
     """Error raised if the service fails to initialize."""
 
 
+class EnvironmentNotSupported(ServiceInitError):
+    """Error raised if the runtime requirements for an environment are not
+    met on the current system."""
+
+
 class ServiceTransportError(ServiceError, OSError):
     """Error that is raised if communication with the service fails."""
 

@@ -28,7 +28,7 @@ from typing import Dict, List, Optional, Union
 
 import docker
 
-from compiler_gym.service import ServiceError
+from compiler_gym.service import EnvironmentNotSupported, ServiceError, ServiceInitError
 from compiler_gym.util.filesystem import atomic_file_write
 from compiler_gym.util.runfiles_path import site_data_path
 
@@ -220,7 +220,7 @@ def get_docker_client():
     try:
         return docker.from_env()
     except docker.errors.DockerException as e:
-        raise ServiceError(
+        raise EnvironmentNotSupported(
             # TODO(github.com/facebookresearch/CompilerGym/issues/383): Add
             # a link to the GCC documentation with details on how to set up
             # the environment.
@@ -236,14 +236,14 @@ def pull_docker_image(image: str) -> str:
 
     :param image: The name of the docker image to pull.
 
-    :raises ServiceError: If pulling the docker image fails.
+    :raises ServiceInitError: If pulling the docker image fails.
     """
     try:
         client = get_docker_client()
         client.images.pull(image)
         return image
     except docker.errors.DockerException as e:
-        raise ServiceError(f"Failed to fetch docker image '{image}': {e}")
+        raise ServiceInitError(f"Failed to fetch docker image '{image}': {e}")
 
 
 def join_docker_container(container, timeout_seconds: int) -> str:
@@ -346,7 +346,7 @@ class Gcc:
         except subprocess.CalledProcessError as e:
             raise ServiceError(f"Failed to run {self.bin}: {e}") from e
         except FileNotFoundError:
-            raise ServiceError(f"GCC binary not found: {self.bin}")
+            raise ServiceInitError(f"GCC binary not found: {self.bin}")
 
         return result
 

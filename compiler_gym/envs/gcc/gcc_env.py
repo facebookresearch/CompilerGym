@@ -106,6 +106,11 @@ class GccEnv(CompilerEnv):
         :param connection_settings: The connection settings to use.
 
         :param timeout: The timeout to use when compiling.
+
+        :raises EnvironmentNotSupported: If the runtime requirements for the GCC
+            environment have not been met.
+
+        :raises ServiceInitError: If the requested GCC version cannot be used.
         """
         connection_settings = connection_settings or ConnectionOpts()
         # Pass the executable path via an environment variable
