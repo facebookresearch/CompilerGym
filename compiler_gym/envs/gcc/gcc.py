@@ -235,6 +235,9 @@ class Gcc:
             return docker.from_env()
         except docker.errors.DockerException as e:
             raise ServiceError(
+                # TODO(github.com/facebookresearch/CompilerGym/issues/383): Add
+                # a link to the GCC documentation with details on how to set up
+                # the environment.
                 f"Failed to initialize docker client needed by GCC environment: {e}.\n"
                 "Is docker installed?"
             ) from e
