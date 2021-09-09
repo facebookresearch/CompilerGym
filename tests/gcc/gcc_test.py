@@ -3,28 +3,40 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Tests for the example CompilerGym service."""
+import gym
 import numpy as np
 import pytest
 
 from compiler_gym.envs import GccEnv
 from compiler_gym.service import SessionNotFound
+from compiler_gym.service.connection import ServiceError
 from compiler_gym.spaces import Scalar, Sequence
+from tests.pytest_plugins.common import with_docker, without_docker
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.gcc"]
 
 
+@without_docker
+def test_gcc_env_fails_without_docker():
+    with pytest.raises(ServiceError, match="Is docker installed?"):
+        gym.make("gcc-v0")
+
+
+@with_docker
 def test_versions(env: GccEnv):
     """Tests the GetVersion() RPC endpoint."""
     assert env.compiler_version == "1.0.0"
 
 
+@with_docker
 def test_gcc_version(env: GccEnv):
     """Test that the gcc version is correct."""
     env.reset()
     assert env.gcc_spec.version == "gcc (GCC) 11.2.0"
 
 
+@with_docker
 def test_action_space(env: GccEnv):
     """Test that the environment reports the service's action spaces."""
     assert env.action_spaces[0].name == "default"
@@ -32,6 +44,7 @@ def test_action_space(env: GccEnv):
     assert env.action_spaces[0].names[0] == "-O0"
 
 
+@with_docker
 def test_observation_spaces(env: GccEnv):
     """Test that the environment reports the service's observation spaces."""
     env.reset()
@@ -56,30 +69,35 @@ def test_observation_spaces(env: GccEnv):
     )
 
 
+@with_docker
 def test_reward_spaces(env: GccEnv):
     """Test that the environment reports the service's reward spaces."""
     env.reset()
     assert env.reward.spaces.keys() == {"asm_size", "obj_size"}
 
 
+@with_docker
 def test_step_before_reset(env: GccEnv):
     """Taking a step() before reset() is illegal."""
     with pytest.raises(SessionNotFound, match=r"Must call reset\(\) before step\(\)"):
         env.step(0)
 
 
+@with_docker
 def test_observation_before_reset(env: GccEnv):
     """Taking an observation before reset() is illegal."""
     with pytest.raises(SessionNotFound, match=r"Must call reset\(\) before step\(\)"):
         _ = env.observation["asm"]
 
 
+@with_docker
 def test_reward_before_reset(env: GccEnv):
     """Taking a reward before reset() is illegal."""
     with pytest.raises(SessionNotFound, match=r"Must call reset\(\) before step\(\)"):
         _ = env.reward["obj_size"]
 
 
+@with_docker
 def test_reset_invalid_benchmark(env: GccEnv):
     """Test requesting a specific benchmark."""
     with pytest.raises(LookupError) as ctx:
@@ -87,18 +105,21 @@ def test_reset_invalid_benchmark(env: GccEnv):
     assert str(ctx.value) == "'benchmark://chstone-v1'"
 
 
+@with_docker
 def test_invalid_observation_space(env: GccEnv):
     """Test error handling with invalid observation space."""
     with pytest.raises(LookupError):
         env.observation_space = 100
 
 
+@with_docker
 def test_invalid_reward_space(env: GccEnv):
     """Test error handling with invalid reward space."""
     with pytest.raises(LookupError):
         env.reward_space = 100
 
 
+@with_docker
 def test_double_reset(env: GccEnv):
     """Test that reset() can be called twice."""
     env.reset()
@@ -109,6 +130,7 @@ def test_double_reset(env: GccEnv):
     assert env.in_episode
 
 
+@with_docker
 def test_Step_out_of_range(env: GccEnv):
     """Test error handling with an invalid action."""
     env.reset()
@@ -117,11 +139,13 @@ def test_Step_out_of_range(env: GccEnv):
     assert str(ctx.value) == "Out-of-range"
 
 
+@with_docker
 def test_default_benchmark(env: GccEnv):
     """Test that we are working with the expected default benchmark."""
     assert env.benchmark.proto.uri == "benchmark://chstone-v0/adpcm"
 
 
+@with_docker
 def test_default_reward(env: GccEnv):
     """Test default reward space."""
     env.reward_space = "obj_size"
@@ -132,6 +156,7 @@ def test_default_reward(env: GccEnv):
     assert not done
 
 
+@with_docker
 def test_source_observation(env: GccEnv):
     """Test observation spaces."""
     env.reset()
@@ -140,6 +165,7 @@ def test_source_observation(env: GccEnv):
     assert lines[0].endswith('adpcm.c"')
 
 
+@with_docker
 def test_rtl_observation(env: GccEnv):
     """Test observation spaces."""
     env.reset()
@@ -152,24 +178,28 @@ def test_rtl_observation(env: GccEnv):
     )
 
 
+@with_docker
 def test_asm_observation(env: GccEnv):
     """Test observation spaces."""
     env.reset()
     assert env.asm.startswith('\t.file\t"src.c"\n\t')
 
 
+@with_docker
 def test_asm_size_observation(env: GccEnv):
     """Test observation spaces."""
     env.reset()
     assert env.asm_size == 39876
 
 
+@with_docker
 def test_asm_hash_observation(env: GccEnv):
     """Test observation spaces."""
     env.reset()
     assert env.asm_hash == "f4921de395b026a55eab3844c8fe43dd"
 
 
+@with_docker
 def test_instruction_counts_observation(env: GccEnv):
     """Test observation spaces."""
     env.reset()
@@ -227,24 +257,28 @@ def test_instruction_counts_observation(env: GccEnv):
     }
 
 
+@with_docker
 def test_obj_observation(env: GccEnv):
     """Test observation spaces."""
     env.reset()
     assert env.obj[:5] == b"\x7fELF\x02"
 
 
+@with_docker
 def test_obj_size_observation(env: GccEnv):
     """Test observation spaces."""
     env.reset()
     assert env.obj_size == 21192
 
 
+@with_docker
 def test_obj_hash_observation(env: GccEnv):
     """Test observation spaces."""
     env.reset()
     assert env.obj_hash == "65937217c3758faf655df98741fe1d52"
 
 
+@with_docker
 def test_choices_observation(env: GccEnv):
     """Test observation spaces."""
     env.reset()
@@ -253,6 +287,7 @@ def test_choices_observation(env: GccEnv):
     assert all(map(lambda x: x == -1, choices))
 
 
+@with_docker
 def test_command_line_observation(env: GccEnv):
     """Test observation spaces."""
     env.reset()
@@ -260,6 +295,7 @@ def test_command_line_observation(env: GccEnv):
     assert command_line == "docker:gcc:11.2.0 -w -c src.c -o obj.o"
 
 
+@with_docker
 def test_gcc_spec(env: GccEnv):
     """Test gcc_spec param."""
     env.reset()
@@ -267,6 +303,7 @@ def test_gcc_spec(env: GccEnv):
     assert min(map(len, env.gcc_spec.options)) > 0
 
 
+@with_docker
 def test_set_choices(env: GccEnv):
     """Test that we can set the command line parameters"""
     env.reset()
@@ -278,6 +315,7 @@ def test_set_choices(env: GccEnv):
     )
 
 
+@with_docker
 def test_rewards(env: GccEnv):
     """Test reward spaces."""
     env.reset()
@@ -288,6 +326,7 @@ def test_rewards(env: GccEnv):
     assert env.reward["obj_size"] == -6520.0
 
 
+@with_docker
 def test_timeout(env: GccEnv):
     """Test that the timeout can be set. Can't really make it timeout, I think."""
     env.reset()
@@ -297,10 +336,12 @@ def test_timeout(env: GccEnv):
     assert env.timeout == 20
 
 
+@with_docker
 def test_benchmarks(env: GccEnv):
     assert list(env.datasets.benchmark_uris())[0] == "benchmark://chstone-v0/adpcm"
 
 
+@with_docker
 def test_compile(env: GccEnv):
     env.observation_space = "obj_size"
     observation = env.reset()
@@ -313,6 +354,7 @@ def test_compile(env: GccEnv):
     assert observation == 27712
 
 
+@with_docker
 def test_fork(env: GccEnv):
     env.reset()
     env.step(0)
