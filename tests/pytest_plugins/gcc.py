@@ -50,7 +50,7 @@ with_system_gcc = pytest.mark.skipif(
 
 # Decorator to skip a test if system GCC is availbale.
 without_system_gcc = pytest.mark.skipif(
-    not system_gcc_is_available(), reason="GCC is available"
+    system_gcc_is_available(), reason="GCC is available"
 )
 
 
@@ -59,8 +59,5 @@ def env() -> GccEnv:
     """Create a GCC environment."""
     assert gcc_environment_is_supported(), "Cannot use GCC env fixture"
 
-    env_ = gym.make("gcc-v0", gcc_bin=None if docker_is_available() else "gcc")
-    try:
+    with gym.make("gcc-v0", gcc_bin=None if docker_is_available() else "gcc") as env_:
         yield env_
-    finally:
-        env_.close()

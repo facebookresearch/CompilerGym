@@ -13,6 +13,7 @@ py_library(
     testonly = 1,
     srcs = ["gcc.py"],
     deps = [
+        ":common",
         "//compiler_gym/envs/gcc",
     ],
 )

@@ -22,11 +22,8 @@ pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.gcc"]
 
 @pytest.fixture(scope="module")
 def anghabench_dataset() -> AnghaBenchDataset:
-    env = gym.make("gcc-v0")
-    try:
+    with gym.make("gcc-v0") as env:
         ds = env.datasets["anghabench-v1"]
-    finally:
-        env.close()
     yield ds
 
 
