@@ -28,17 +28,13 @@ const getUniqueValues = (list) => {
  *
  * @param {Array} states represents array of states in current CompilerGym session.
  * @param {Array} children a constant children array of objects containing data for each action.
+ * @param {String} commandLine a string representing the commandline input.
  * @returns an object with hierarchical structure to be display in a seacrh tree.
  */
-export const makeSessionTreeData = (states, children) => {
-  if (states.rewards.length >= 2 ) {
-    console.log(states)
-    //const last_observation = states[states.length - 1];
-    const last_observation = states.commandline
-    //const ids = getCommandLineArray(last_observation.commandline, children);
-    const ids = getCommandLineArray(last_observation, children)
-    //const rewards = states.map((a) => a.reward).slice(1, states.length); // All rewards except the initial 0.
-    const rewards = states.rewards.slice(1, states.rewards.length ) // All rewards except the initial 0.
+export const makeSessionTreeData = (states, children, commandLine) => {
+  if (states.length >= 2 ) {
+    const ids = getCommandLineArray(commandLine, children)
+    const rewards = states.map((a) => a.reward).slice(1, states.length); // All rewards except the initial 0.
 
     let actionsData = ids
       .map((i) => children.find((e) => e.action_id === i))

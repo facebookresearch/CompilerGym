@@ -20,40 +20,13 @@ export default class ApiService {
     });
   }
 
-  getActions(benchmark, reward, actionsIds, reward_history) {
+  getActions(benchmark, reward, actionsIds, all_states) {
     return this.fetch(
-      `${this.domain}/api/v4/step?benchmark=${benchmark}&reward=${reward}&actions=${actionsIds}&reward_history=${reward_history}`,
+      `${this.domain}/api/v4/step?benchmark=${benchmark}&reward=${reward}&actions=${actionsIds}&all_states=${all_states}`,
       {
         method: "GET",
       }
     );
-  }
-
-  startSession(reward, actionsIds, benchmark) {
-    return this.fetch(
-      `${this.domain}/api/v3/start/${reward}/${actionsIds}/${benchmark}`,
-      {
-        method: "GET",
-      }
-    );
-  }
-
-  getSteps(sessionID, actionsIds) {
-    return this.fetch(`${this.domain}/api/v3/step/${sessionID}/${actionsIds}`, {
-      method: "GET",
-    });
-  }
-
-  undoStep(sessionID, n) {
-    return this.fetch(`${this.domain}/api/v3/undo/${sessionID}/${n}`, {
-      method: "GET",
-    });
-  }
-
-  closeSession(sessionID) {
-    return this.fetch(`${this.domain}/api/v3/stop/${sessionID}`, {
-      method: "GET",
-    });
   }
 
   doFetch(url, options, includeCredentials = false) {

@@ -18,7 +18,6 @@ const INITIAL_SETTINGS = {
   reward: "IrInstructionCountOz",
   dataset: "benchmark://cbench-v1",
   datasetUri: "adpcm",
-  benchmark: "benchmark://cbench-v1/adpcm",
 };
 
 function App() {
@@ -30,36 +29,12 @@ function App() {
     reward: INITIAL_SETTINGS.reward,
     dataset: INITIAL_SETTINGS.dataset,
     datasetUri: INITIAL_SETTINGS.datasetUri,
-    benchmark: INITIAL_SETTINGS.benchmark
   })
 
   /*
    * Start a new session when component mounts in the browser.
    * It collects CompilerGym variables
    */
-  /*useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const options = await api.getEnvOptions();
-        const initSession = await api.startSession(
-          INITIAL_SETTINGS.reward,
-          "-",
-          INITIAL_SETTINGS.benchmark
-        );
-        console.log(initSession);
-        setCompilerGym(options);
-        setSession(initSession);
-        setIsLoading(false);
-      } catch (err) {
-        console.log(err);
-      }
-    };
-
-    setIsLoading(true);
-    fetchData();
-    return () => {};
-  }, []);*/
-
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -67,7 +42,7 @@ function App() {
         const initSession = await api.getActions(
           `${INITIAL_SETTINGS.dataset}/${INITIAL_SETTINGS.datasetUri}`,
           INITIAL_SETTINGS.reward,
-          ""
+          "",
         );
         console.log(initSession);
         setCompilerGym(options);
@@ -82,27 +57,6 @@ function App() {
     fetchData();
     return () => {};
   }, []);
-
-  /**
-   * Adds a listener to trigger a Close Session API call when user closes a tab or browser.
-   */
-  /*useEffect(() => {
-    window.addEventListener("beforeunload", handleTabClosing);
-    return () => {
-      window.removeEventListener("beforeunload", handleTabClosing);
-    };
-  });
-
-  const handleTabClosing = () => {
-    api.closeSession(session.session_id).then(
-      (result) => {
-        console.log(result);
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
-  };*/
 
   const toggleTheme = () => {
     setDarkTheme(!darkTheme);

@@ -124,6 +124,10 @@ const actionsDict = [
     Description: "Hoist/decompose integer division and remainder",
   },
   {
+    Action: "-early-cse",
+    Description: "Early CSE (common subexpression elimination)",
+  },
+  {
     Action: "-early-cse-memssa",
     Description: "Early CSE w/ MemorySSA",
   },

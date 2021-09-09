@@ -61,9 +61,8 @@ const CustomMenu = forwardRef(
  * Represenets the navbar component inside the controls container,
  * this components takes care of the creation of a new CompilerGym environment.
  *
- * @param {function} startSession invoke API to start a new session with different specific datasets and benchmarks.
+ * @param {function} startSession invoke API to start a new session with different params.
  * @param {String} actionSpace a discrete space of actions to be exposed.
- * @param {Array} actionsTaken an array of ids representing the actions selected from the tree.
  * @param {function} handleActionSpace function to update the action space.
  * @param {function} handleResetActionsTracker updates the actions tracker state.
  * @returns
@@ -71,12 +70,12 @@ const CustomMenu = forwardRef(
 const ActionsNavbar = ({
   startSession,
   actionSpace,
-  actionsTaken,
   handleActionSpace,
   handleResetActionsTracker,
 }) => {
   const { darkTheme } = useContext(ThemeContext);
-  const { compilerGym, session, params, api, setParams, setSession } = useContext(ApiContext);
+  const { compilerGym, session, params, api, setParams, setSession } =
+    useContext(ApiContext);
 
   const history = useHistory();
   const location = useLocation();
@@ -106,14 +105,13 @@ const ActionsNavbar = ({
     compilerGym.actions &&
     Object.keys(compilerGym.actions).map((x, i) => i + 1);
 
-  const actionsIdsTaken = actionsTaken?.map((i) => i.split(".")[0]); // Only keep the action ids, not the depth id
-
   /**
    * Must run once when the component is first rendered to populate the dataset uri dropdown.
    */
   useEffect(() => {
     let selected =
-      benchmarkOptions && benchmarkOptions.find((o) => o.dataset === params.dataset);
+      benchmarkOptions &&
+      benchmarkOptions.find((o) => o.dataset === params.dataset);
     setUriOptions(selected?.uri);
 
     return () => {};
@@ -128,18 +126,19 @@ const ActionsNavbar = ({
         (o) => o.dataset === searchParams.get("dataset")
       );
       try {
-        await api.closeSession(session.session_id);
-        const initSession = await api.startSession(
+        const response = await api.getActions(
+          `${searchParams.get("dataset")}/${searchParams.get("dataset_uri")}`,
           searchParams.get("reward"),
-          searchParams.get("actions") ?? "-",
-          `${searchParams.get("dataset")}/${searchParams.get("dataset_uri")}`
+          searchParams.get("actions") ?? "",
+          "1"
         );
-        console.log(initSession);
-        setSession(initSession);
-        setParams({ dataset: searchParams.get("dataset"), datasetUri: searchParams.get("dataset_uri"), reward: searchParams.get("reward")})
-        //setDataset(searchParams.get("dataset"));
-        //setDatasetUri(searchParams.get("dataset_uri"));
-        //setReward(searchParams.get("reward"));
+        setSession(response);
+        console.log(response)
+        setParams({
+          dataset: searchParams.get("dataset"),
+          datasetUri: searchParams.get("dataset_uri"),
+          reward: searchParams.get("reward"),
+        });
         setUriOptions(selected?.uri);
       } catch (err) {
         setShowWarning(true);
@@ -149,19 +148,17 @@ const ActionsNavbar = ({
       searchParams.get("reward") &&
       searchParams.get("dataset") &&
       searchParams.get("dataset_uri") &&
-      session.session_id !== undefined
+      session.states
     ) {
       fetchData();
     }
 
     return () => {};
-  }, [api, session.session_id, setSession]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Rerender the command line on every change in the current state of session.
   useEffect(() => {
-    //let lastState = session.states?.[session.states?.length - 1];
-    let currentState = session
-    setActionsLine(currentState.commandline);
+    setActionsLine(session.commandline);
 
     return () => {};
   }, [session]);
@@ -170,8 +167,7 @@ const ActionsNavbar = ({
     let selected = benchmarkOptions.find((o) => o.dataset === e);
     setParams({ ...params, dataset: e, datasetUri: selected?.uri[0] });
     setUriOptions(selected?.uri);
-    //setDatasetUri(selected?.uri[0]);
-    startSession(e, selected?.uri[0], params.reward)
+    startSession(e, selected?.uri[0], params.reward);
     searchParams.set("dataset", e);
     searchParams.set("dataset_uri", selected?.uri[0]);
     searchParams.set("reward", params.reward);
@@ -179,13 +175,8 @@ const ActionsNavbar = ({
   };
 
   const handleDatasetUri = (e) => {
-    //setDatasetUri(e);
-    setParams({...params, dataset: params.dataset, datasetUri: e })
-    /*startSession(
-      reward,
-      actionsIdsTaken.length ? actionsIdsTaken : "-",
-      `${dataset}/${e}`
-    );*/
+    setParams({ ...params, datasetUri: e });
+    startSession(params.dataset, e, params.reward);
     searchParams.set("dataset", params.dataset);
     searchParams.set("dataset_uri", e);
     searchParams.set("reward", params.reward);
@@ -193,13 +184,8 @@ const ActionsNavbar = ({
   };
 
   const handleRewardSelect = (e) => {
-    //setReward(e);
-    setParams({...params, reward: e })
-    /*startSession(
-      e,
-      actionsIdsTaken.length ? actionsIdsTaken : "-",
-      `${dataset}/${datasetUri}`
-    );*/
+    setParams({ ...params, reward: e });
+    startSession(params.dataset, params.datasetUri, e);
     searchParams.set("dataset", params.dataset);
     searchParams.set("dataset_uri", params.datasetUri);
     searchParams.set("reward", e);
@@ -220,11 +206,9 @@ const ActionsNavbar = ({
     if (e.key === "Enter") {
       try {
         let actionsTaken = getCommandLineArray(actionsLine, actionsList);
-        /*await startSession(
-          reward,
-          actionsTaken.length ? actionsTaken : "-",
-          `${dataset}/${datasetUri}`
-        );*/
+        const response = await api.getActions(`${params.dataset}/${params.datasetUri}`,params.reward, actionsTaken.length ? actionsTaken : "", "1" )
+        setSession(response);
+
         searchParams.set("dataset", params.dataset);
         searchParams.set("dataset_uri", params.datasetUri);
         searchParams.set("reward", params.reward);
@@ -241,7 +225,7 @@ const ActionsNavbar = ({
     try {
       setShowWarning(false);
       history.push("/");
-      //await api.startSession(reward, "-", `${dataset}/${datasetUri}`);
+      await startSession(params.dataset, params.datasetUri, params.reward)
       handleResetActionsTracker();
     } catch (error) {
       console.log(error);
