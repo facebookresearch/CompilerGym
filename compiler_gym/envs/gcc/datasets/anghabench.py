@@ -9,6 +9,8 @@ from typing import Optional
 from compiler_gym.datasets import TarDatasetWithManifest
 
 
+# TODO(github.com/facebookresearch/CompilerGym/issues/325): This can be merged
+# with the LLVM implementation.
 class AnghaBenchDataset(TarDatasetWithManifest):
     """A dataset of C programs curated from GitHub source code.
 

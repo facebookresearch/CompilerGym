@@ -25,6 +25,8 @@ URIS = [
 ]
 
 
+# TODO(github.com/facebookresearch/CompilerGym/issues/325): This can be merged
+# with the LLVM implementation.
 class CHStoneDataset(TarDatasetWithManifest):
     """A dataset of C programs curated from GitHub source code.
 

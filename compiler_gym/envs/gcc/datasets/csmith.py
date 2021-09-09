@@ -32,6 +32,8 @@ _CSMITH_INCLUDES = runfiles_path(
 _CSMITH_INSTALL_LOCK = Lock()
 
 
+# TODO(github.com/facebookresearch/CompilerGym/issues/325): This can be merged
+# with the LLVM implementation.
 class CsmithBenchmark(BenchmarkWithSource):
     """A CSmith benchmark."""
 
