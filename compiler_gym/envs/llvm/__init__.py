@@ -5,6 +5,7 @@
 """Register the LLVM environments."""
 from itertools import product
 
+from compiler_gym.envs.llvm.compute_observation import compute_observation
 from compiler_gym.envs.llvm.llvm_benchmark import (
     ClangInvocation,
     get_system_includes,
@@ -16,11 +17,12 @@ from compiler_gym.util.registration import register
 from compiler_gym.util.runfiles_path import runfiles_path
 
 __all__ = [
-    "LlvmEnv",
-    "make_benchmark",
     "ClangInvocation",
+    "compute_observation",
     "get_system_includes",
     "LLVM_SERVICE_BINARY",
+    "LlvmEnv",
+    "make_benchmark",
     "observation_spaces",
     "reward_spaces",
 ]
