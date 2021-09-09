@@ -22,6 +22,7 @@ import os
 import pickle
 import re
 import subprocess
+from functools import lru_cache
 from pathlib import Path
 from typing import Dict, List, Optional, Union
 
@@ -216,31 +217,67 @@ class GccParamIntOption(Option):
         return f"<GccParamIntOption name={self.name}, min={self.min}, max={self.max}>"
 
 
+@lru_cache
+def get_docker_client():
+    """Fetch the docker client singleton."""
+    try:
+        return docker.from_env()
+    except docker.errors.DockerException as e:
+        raise ServiceError(
+            # TODO(github.com/facebookresearch/CompilerGym/issues/383): Add
+            # a link to the GCC documentation with details on how to set up
+            # the environment.
+            f"Failed to initialize docker client needed by GCC environment: {e}.\n"
+            "Is docker installed?"
+        ) from e
+
+
+@lru_cache
+def pull_docker_image(image: str) -> str:
+    """Pull the requested docker image.
+
+    This function is cached.
+    """
+    client = get_docker_client()
+    client.images.pull(image)
+    return image
+
+
+def join_docker_container(container, timeout_seconds: int) -> str:
+    """Block until the container terminates, returning its output."""
+    try:
+        status = container.wait(timeout=timeout_seconds)
+    except docker.exceptions.ReadTimeout as e:
+        # Catch and re-raise the timeout.
+        raise TimeoutError(f"GCC timed out after {timeout_seconds:,d} seconds") from e
+
+    if status["StatusCode"]:
+        logs = ""
+        try:
+            logs = container.logs(stdout=True, stderr=False).decode()
+        except (UnicodeDecodeError, docker.errors.NotFound):
+            pass
+        raise ServiceError(f"GCC failed with returncode {status['StatusCode']}: {logs}")
+
+    return container.logs(stdout=True, stderr=False).decode()
+
+
 class Gcc:
     """This class represents an instance of the GCC compiler, either as a binary
-    or a docker image."""
+    or a docker image.
+    """
 
     def __init__(self, bin: Union[str, Path] = DEFAULT_GCC):
         self.bin = str(bin)
         self.image = self.bin[len("docker:") :]
 
-        self.call = (
-            self._docker_run if self.bin.startswith("docker:") else self._subprocess_run
-        )
-        self.spec = _get_spec(self, cache_dir=site_data_path("gcc-v0"))
+        if self.bin.startswith("docker:"):
+            pull_docker_image(self.image)
+            self.call = self._docker_run
+        else:
+            self.call = self._subprocess_run
 
-    @property
-    def docker_client(self):
-        try:
-            return docker.from_env()
-        except docker.errors.DockerException as e:
-            raise ServiceError(
-                # TODO(github.com/facebookresearch/CompilerGym/issues/383): Add
-                # a link to the GCC documentation with details on how to set up
-                # the environment.
-                f"Failed to initialize docker client needed by GCC environment: {e}.\n"
-                "Is docker installed?"
-            ) from e
+        self.spec = _get_spec(self, cache_dir=site_data_path("gcc-v0"))
 
     def __call__(
         self,
@@ -258,6 +295,10 @@ class Gcc:
         :param cwd: The working directory.
 
         :param volumes: A dictionary of volume bindings for docker.
+
+        :raises TimeoutError: If GCC fails to complete within timeout.
+
+        :raises ServiceError: In case GCC fails.
         """
         return self.call(args, timeout, cwd=Path(cwd or "."), volumes=volumes)
 
@@ -278,7 +319,8 @@ class Gcc:
         volumes_ = {cwd: {"bind": cwd, "mode": "rw"}}
         volumes_.update(volumes or {})
 
-        container = self.docker_client.containers.create(
+        client = get_docker_client()
+        container = client.containers.create(
             self.image,
             cmd_line,
             working_dir=cwd,
@@ -286,18 +328,7 @@ class Gcc:
         )
         container.start()
         try:
-            status = container.wait(timeout=timeout)
-            if status["StatusCode"]:
-                logs = ""
-                try:
-                    logs = container.logs(stdout=True, stderr=False).decode()
-                except (UnicodeDecodeError, docker.errors.NotFound):
-                    pass
-                raise ServiceError(
-                    f"GCC failed with returncode {status['StatusCode']}: {logs}"
-                )
-
-            return container.logs(stdout=True, stderr=False).decode()
+            return join_docker_container(container, timeout_seconds=timeout)
         finally:
             container.remove()
 
@@ -670,8 +701,11 @@ def _version_hash(version: str) -> str:
 
 def _get_spec(gcc: Gcc, cache_dir: Path) -> Optional[GccSpec]:
     """Get the specification for a GCC executable.
-    gcc - the executable
-    cache_dir - optional directory to search for cached versions of the spec.
+
+    :param gcc: The executable.
+
+    :param cache_dir: An optional directory to search for cached versions of the
+        spec.
     """
     # Get the version
     version = _gcc_get_version(gcc)
