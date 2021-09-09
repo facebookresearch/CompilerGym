@@ -24,15 +24,14 @@ class ThreadedWorker(Thread):
         assert actions
 
     def run(self) -> None:
-        env = gym.make(self.env_name, benchmark=self.benchmark)
-        env.reset()
+        with gym.make(self.env_name, benchmark=self.benchmark) as env:
+            env.reset()
 
-        for action in self.actions:
-            self.observation, self.reward, done, self.info = env.step(action)
-            assert not done, self.info["error_details"]
+            for action in self.actions:
+                self.observation, self.reward, done, self.info = env.step(action)
+                assert not done, self.info["error_details"]
 
-        self.done = True
-        env.close()
+            self.done = True
 
 
 class ThreadedWorkerWithEnv(Thread):
@@ -73,20 +72,19 @@ def test_moving_environment_to_background_thread():
     """Test running an LLVM environment from a background thread. The environment
     is made in the main thread and used in the background thread.
     """
-    env = gym.make("llvm-autophase-ic-v0")
-    env.reset(benchmark="cbench-v1/crc32")
+    with gym.make("llvm-autophase-ic-v0") as env:
+        env.reset(benchmark="cbench-v1/crc32")
 
-    thread = ThreadedWorkerWithEnv(env=env, actions=[0, 0, 0])
-    thread.start()
-    thread.join(timeout=10)
+        thread = ThreadedWorkerWithEnv(env=env, actions=[0, 0, 0])
+        thread.start()
+        thread.join(timeout=10)
 
-    assert thread.done
-    assert thread.observation is not None
-    assert isinstance(thread.reward, float)
-    assert thread.info
+        assert thread.done
+        assert thread.observation is not None
+        assert isinstance(thread.reward, float)
+        assert thread.info
 
-    assert env.in_episode
-    env.close()
+        assert env.in_episode
 
 
 if __name__ == "__main__":

@@ -98,11 +98,8 @@ def non_validatable_cbench_uri(request) -> str:
 @pytest.fixture(scope="function")
 def env() -> LlvmEnv:
     """Create an LLVM environment."""
-    env = gym.make("llvm-v0")
-    try:
-        yield env
-    finally:
-        env.close()
+    with gym.make("llvm-v0") as env_:
+        yield env_
 
 
 @pytest.fixture(scope="module")

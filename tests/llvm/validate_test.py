@@ -22,11 +22,8 @@ def test_validate_state_no_reward():
         walltime=1,
         commandline="opt  input.bc -o output.bc",
     )
-    env = gym.make("llvm-v0")
-    try:
+    with gym.make("llvm-v0") as env:
         result = env.validate(state)
-    finally:
-        env.close()
 
     assert result.okay()
     assert not result.reward_validated
@@ -40,11 +37,8 @@ def test_validate_state_with_reward():
         reward=0,
         commandline="opt  input.bc -o output.bc",
     )
-    env = gym.make("llvm-v0", reward_space="IrInstructionCount")
-    try:
+    with gym.make("llvm-v0", reward_space="IrInstructionCount") as env:
         result = env.validate(state)
-    finally:
-        env.close()
 
     assert result.okay()
     assert result.reward_validated
@@ -59,11 +53,8 @@ def test_validate_state_invalid_reward():
         reward=1,
         commandline="opt  input.bc -o output.bc",
     )
-    env = gym.make("llvm-v0", reward_space="IrInstructionCount")
-    try:
+    with gym.make("llvm-v0", reward_space="IrInstructionCount") as env:
         result = env.validate(state)
-    finally:
-        env.close()
 
     assert not result.okay()
     assert result.reward_validated
@@ -80,11 +71,8 @@ def test_validate_state_without_state_reward():
         walltime=1,
         commandline="opt  input.bc -o output.bc",
     )
-    env = gym.make("llvm-v0", reward_space="IrInstructionCount")
-    try:
+    with gym.make("llvm-v0", reward_space="IrInstructionCount") as env:
         result = env.validate(state)
-    finally:
-        env.close()
 
     assert result.okay()
     assert not result.reward_validated
@@ -99,8 +87,7 @@ def test_validate_state_without_env_reward():
         reward=0,
         commandline="opt  input.bc -o output.bc",
     )
-    env = gym.make("llvm-v0")
-    try:
+    with gym.make("llvm-v0") as env:
         with pytest.warns(
             UserWarning,
             match=(
@@ -109,8 +96,6 @@ def test_validate_state_without_env_reward():
             ),
         ):
             result = env.validate(state)
-    finally:
-        env.close()
 
     assert result.okay()
     assert not result.reward_validated

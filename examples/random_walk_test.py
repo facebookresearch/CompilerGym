@@ -12,12 +12,9 @@ from tests.test_main import main
 
 def test_run_random_walk_smoke_test():
     flags.FLAGS(["argv0"])
-    env = gym.make("llvm-autophase-ic-v0")
-    env.benchmark = "cbench-v1/crc32"
-    try:
+    with gym.make("llvm-autophase-ic-v0") as env:
+        env.benchmark = "cbench-v1/crc32"
         run_random_walk(env=env, step_count=5)
-    finally:
-        env.close()
 
 
 if __name__ == "__main__":

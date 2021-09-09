@@ -23,18 +23,14 @@ def env(request) -> CompilerEnv:
     # Redefine fixture to test both gym.make(...) and unmanaged service
     # connections.
     if request.param == "local":
-        env = gym.make("llvm-v0")
-        try:
+        with gym.make("llvm-v0") as env:
             yield env
-        finally:
-            env.close()
     else:
         service = CompilerGymServiceConnection(llvm.LLVM_SERVICE_BINARY)
-        env = LlvmEnv(service=service.connection.url)
         try:
-            yield env
+            with LlvmEnv(service=service.connection.url) as env:
+                yield env
         finally:
-            env.close()
             service.close()
 
 

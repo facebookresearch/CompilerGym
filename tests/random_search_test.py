@@ -38,13 +38,10 @@ def test_random_search_smoke_test():
         assert (outdir / "random_search_best_actions.txt").is_file()
         assert (outdir / "optimized.bc").is_file()
 
-        env = make_env()
-        try:
+        with make_env() as env:
             replay_actions_from_logs(env, Path(outdir))
             assert (outdir / "random_search_best_actions_progress.csv").is_file()
             assert (outdir / "random_search_best_actions_commandline.txt").is_file()
-        finally:
-            env.close()
 
 
 if __name__ == "__main__":

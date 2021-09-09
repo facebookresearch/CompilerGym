@@ -172,33 +172,32 @@ def run_brute_force(
     meta_path = outdir / "meta.json"
     results_path = outdir / "results.csv"
 
-    env: CompilerEnv = make_env()
-    env.reset()
+    with make_env() as env:
+        env.reset()
 
-    action_names = action_names or env.action_space.names
+        action_names = action_names or env.action_space.names
 
-    if not env.reward_space:
-        raise ValueError("A reward space must be specified for random search")
-    reward_space_name = env.reward_space.id
+        if not env.reward_space:
+            raise ValueError("A reward space must be specified for random search")
+        reward_space_name = env.reward_space.id
 
-    actions = [env.action_space.names.index(a) for a in action_names]
-    benchmark_uri = env.benchmark.uri
+        actions = [env.action_space.names.index(a) for a in action_names]
+        benchmark_uri = env.benchmark.uri
 
-    meta = {
-        "env": env.spec.id,
-        "action_names": action_names,
-        "benchmark": benchmark_uri,
-        "reward": reward_space_name,
-        "init_reward": env.reward[reward_space_name],
-        "episode_length": episode_length,
-        "nproc": nproc,
-        "chunksize": chunksize,
-    }
-    with open(str(meta_path), "w") as f:
-        json.dump(meta, f)
-    print(f"Wrote {meta_path}")
-    print(f"Writing results to {results_path}")
-    env.close()
+        meta = {
+            "env": env.spec.id,
+            "action_names": action_names,
+            "benchmark": benchmark_uri,
+            "reward": reward_space_name,
+            "init_reward": env.reward[reward_space_name],
+            "episode_length": episode_length,
+            "nproc": nproc,
+            "chunksize": chunksize,
+        }
+        with open(str(meta_path), "w") as f:
+            json.dump(meta, f)
+        print(f"Wrote {meta_path}")
+        print(f"Writing results to {results_path}")
 
     # A queue for communicating action sequences to workers, and a queue for
     # workers to report <action_sequence, reward_sequence> results.
@@ -287,14 +286,13 @@ def run_brute_force(
         worker.join()
 
     num_trials = sum(worker.num_trials for worker in workers)
-    env: CompilerEnv = make_env()
-    print(
-        f"completed {humanize.intcomma(num_trials)} of "
-        f"{humanize.intcomma(expected_trial_count)} trials "
-        f"({num_trials / expected_trial_count:.3%}), best sequence",
-        " ".join([env.action_space.flags[i] for i in best_action_sequence]),
-    )
-    env.close()
+    with make_env() as env:
+        print(
+            f"completed {humanize.intcomma(num_trials)} of "
+            f"{humanize.intcomma(expected_trial_count)} trials "
+            f"({num_trials / expected_trial_count:.3%}), best sequence",
+            " ".join([env.action_space.flags[i] for i in best_action_sequence]),
+        )
 
 
 def main(argv):
@@ -309,11 +307,10 @@ def main(argv):
     if not benchmark:
         raise app.UsageError("No benchmark specified.")
 
-    env = env_from_flags(benchmark)
-    env.reset()
-    benchmark = env.benchmark
-    sanitized_benchmark_uri = "/".join(benchmark.split("/")[-2:])
-    env.close()
+    with env_from_flags(benchmark) as env:
+        env.reset()
+        benchmark = env.benchmark
+        sanitized_benchmark_uri = "/".join(benchmark.split("/")[-2:])
     logs_dir = Path(
         FLAGS.output_dir or create_logging_dir(f"brute_force/{sanitized_benchmark_uri}")
     )

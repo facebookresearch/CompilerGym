@@ -111,12 +111,9 @@ def test_custom_benchmark(env: LlvmEnv):
 
 def test_custom_benchmark_constructor():
     benchmark = Benchmark.from_file("benchmark://new", EXAMPLE_BITCODE_FILE)
-    env = gym.make("llvm-v0", benchmark=benchmark)
-    try:
+    with gym.make("llvm-v0", benchmark=benchmark) as env:
         env.reset()
         assert env.benchmark == "benchmark://new"
-    finally:
-        env.close()
 
 
 def test_make_benchmark_single_bitcode(env: LlvmEnv):

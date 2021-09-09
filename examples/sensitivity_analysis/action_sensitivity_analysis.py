@@ -36,7 +36,7 @@ from absl import app, flags
 
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
-from compiler_gym.util.flags.env_from_flags import env_session_from_flags
+from compiler_gym.util.flags.env_from_flags import env_from_flags
 from compiler_gym.util.logs import create_logging_dir
 from compiler_gym.util.timer import Timer
 from examples.sensitivity_analysis.sensitivity_analysis_eval import (
@@ -93,7 +93,7 @@ def get_rewards(
         and len(rewards) < num_trials
     ):
         num_attempts += 1
-        with env_session_from_flags(benchmark=benchmark) as env:
+        with env_from_flags(benchmark=benchmark) as env:
             env.observation_space = None
             env.reward_space = None
             env.reset(benchmark=benchmark)
@@ -143,7 +143,7 @@ def run_action_sensitivity_analysis(
     max_attempts_multiplier: int = 5,
 ):
     """Estimate the reward delta of a given list of actions."""
-    with env_session_from_flags() as env:
+    with env_from_flags() as env:
         action_names = env.action_space.names
 
     with ThreadPoolExecutor(max_workers=nproc) as executor:
@@ -172,7 +172,7 @@ def main(argv):
     if len(argv) != 1:
         raise app.UsageError(f"Unknown command line arguments: {argv[1:]}")
 
-    with env_session_from_flags() as env:
+    with env_from_flags() as env:
         action_names = env.action_space.names
 
     if FLAGS.action:

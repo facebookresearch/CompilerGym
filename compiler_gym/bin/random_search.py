@@ -93,9 +93,8 @@ def main(argv):
         raise app.UsageError(f"Unknown command line arguments: {argv[1:]}")
 
     if FLAGS.ls_reward:
-        env = env_from_flags()
-        print("\n".join(sorted(env.reward.indices.keys())))
-        env.close()
+        with env_from_flags() as env:
+            print("\n".join(sorted(env.reward.indices.keys())))
         return
 
     assert FLAGS.patience >= 0, "--patience must be >= 0"
@@ -103,11 +102,8 @@ def main(argv):
     def make_env():
         return env_from_flags(benchmark=benchmark_from_flags())
 
-    env = make_env()
-    try:
+    with make_env() as env:
         env.reset()
-    finally:
-        env.close()
 
     best_reward, _ = random_search(
         make_env=make_env,

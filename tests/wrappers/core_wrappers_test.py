@@ -35,10 +35,10 @@ def test_wrapped_close(env: LlvmEnv, wrapper_type):
 
 def test_wrapped_properties(env: LlvmEnv, wrapper_type):
     """Test accessing the non-standard properties."""
-    env = wrapper_type(env)
-    assert env.actions == []
-    assert env.benchmark
-    assert isinstance(env.datasets, Datasets)
+    with wrapper_type(env) as env:
+        assert env.actions == []
+        assert env.benchmark
+        assert isinstance(env.datasets, Datasets)
 
 
 def test_wrapped_fork_type(env: LlvmEnv, wrapper_type):

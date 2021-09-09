@@ -189,19 +189,16 @@ def main(argv):
     q_table: Dict[StateActionTuple, float] = {}
     benchmark = benchmark_from_flags()
     assert benchmark, "You must specify a benchmark using the --benchmark flag"
-    env = gym.make("llvm-ic-v0", benchmark=benchmark)
-    env.observation_space = "Autophase"
 
-    try:
+    with gym.make("llvm-ic-v0", benchmark=benchmark) as env:
+        env.observation_space = "Autophase"
+
         # Train a Q-table.
         with Timer("Constructing Q-table"):
             train(q_table, env)
 
         # Rollout resulting policy.
         rollout(q_table, env, printout=True)
-
-    finally:
-        env.close()
 
 
 if __name__ == "__main__":

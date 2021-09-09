@@ -18,11 +18,8 @@ pytest_plugins = ["tests.pytest_plugins.llvm"]
 def test_benchmark_constructor_arg(env: CompilerEnv):
     env.close()  # Fixture only required to pull in dataset.
 
-    env = gym.make("llvm-v0", benchmark="cbench-v1/dijkstra")
-    try:
+    with gym.make("llvm-v0", benchmark="cbench-v1/dijkstra") as env:
         assert env.benchmark == "benchmark://cbench-v1/dijkstra"
-    finally:
-        env.close()
 
 
 def test_benchmark_setter(env: CompilerEnv):
@@ -39,14 +36,10 @@ def test_benchmark_set_in_reset(env: CompilerEnv):
 
 def test_logger_forced():
     logger = logging.getLogger("test_logger")
-    env_a = gym.make("llvm-v0")
-    env_b = gym.make("llvm-v0", logger=logger)
-    try:
-        assert env_a.logger != logger
-        assert env_b.logger == logger
-    finally:
-        env_a.close()
-        env_b.close()
+    with gym.make("llvm-v0") as env_a:
+        with gym.make("llvm-v0", logger=logger) as env_b:
+            assert env_a.logger != logger
+            assert env_b.logger == logger
 
 
 def test_uri_substring_no_match(env: CompilerEnv):
@@ -120,14 +113,11 @@ def test_gym_make_kwargs():
     """Test that passing kwargs to gym.make() are forwarded to environment
     constructor.
     """
-    env = gym.make(
+    with gym.make(
         "llvm-v0", observation_space="Autophase", reward_space="IrInstructionCount"
-    )
-    try:
+    ) as env:
         assert env.observation_space_spec.id == "Autophase"
         assert env.reward_space.id == "IrInstructionCount"
-    finally:
-        env.close()
 
 
 def test_step_session_id_not_found(env: CompilerEnv):
@@ -146,11 +136,10 @@ def test_step_session_id_not_found(env: CompilerEnv):
 def remote_env() -> CompilerEnv:
     """A test fixture that yields a connection to a remote service."""
     service = CompilerGymServiceConnection(llvm.LLVM_SERVICE_BINARY)
-    env = CompilerEnv(service=service.connection.url)
     try:
-        yield env
+        with CompilerEnv(service=service.connection.url) as env:
+            yield env
     finally:
-        env.close()
         service.close()
 
 

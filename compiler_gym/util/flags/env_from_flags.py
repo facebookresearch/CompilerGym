@@ -141,8 +141,5 @@ def env_from_flags(benchmark: Optional[Union[str, Benchmark]] = None) -> Compile
 def env_session_from_flags(
     benchmark: Optional[Union[str, Benchmark]] = None
 ) -> CompilerEnv:
-    env = env_from_flags(benchmark=benchmark)
-    try:
+    with env_from_flags(benchmark=benchmark) as env:
         yield env
-    finally:
-        env.close()

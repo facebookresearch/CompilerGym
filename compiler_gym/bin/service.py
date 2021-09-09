@@ -229,11 +229,8 @@ def main(argv):
     """Main entry point."""
     assert len(argv) == 1, f"Unrecognized flags: {argv[1:]}"
 
-    env = env_from_flags()
-    try:
+    with env_from_flags() as env:
         print_service_capabilities(env)
-    finally:
-        env.close()
 
 
 if __name__ == "__main__":
