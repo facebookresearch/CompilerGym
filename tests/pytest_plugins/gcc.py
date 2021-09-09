@@ -12,7 +12,7 @@ import pytest
 from tests.pytest_plugins.common import docker_is_available
 
 
-@lru_cache
+@lru_cache(maxsize=2)
 def system_gcc_is_available() -> bool:
     """Return whether there is a system GCC available."""
     try:

@@ -214,7 +214,7 @@ class GccParamIntOption(Option):
         return f"<GccParamIntOption name={self.name}, min={self.min}, max={self.max}>"
 
 
-@lru_cache
+@lru_cache(maxsize=2)
 def get_docker_client():
     """Fetch the docker client singleton."""
     try:
@@ -230,7 +230,7 @@ def get_docker_client():
 
 
 # We only need to run this function once per image.
-@lru_cache
+@lru_cache(maxsize=64)
 def pull_docker_image(image: str) -> str:
     """Pull the requested docker image.
 
