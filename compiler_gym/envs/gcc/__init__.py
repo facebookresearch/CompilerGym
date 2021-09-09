@@ -5,8 +5,8 @@
 """This module demonstrates how to """
 from pathlib import Path
 
-from compiler_gym.envs.gcc.gcc import DEFAULT_GCC, Gcc, GccSpec, Option
-from compiler_gym.envs.gcc.gcc_env import GccEnv
+from compiler_gym.envs.gcc.gcc import Gcc, GccSpec, Option
+from compiler_gym.envs.gcc.gcc_env import DEFAULT_GCC, GccEnv
 from compiler_gym.util.registration import register
 from compiler_gym.util.runfiles_path import runfiles_path
 

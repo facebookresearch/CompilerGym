@@ -32,9 +32,6 @@ from compiler_gym.service import ServiceError
 from compiler_gym.util.filesystem import atomic_file_write
 from compiler_gym.util.runfiles_path import site_data_path
 
-# The default gcc_bin argument.
-DEFAULT_GCC: str = "docker:gcc:11.2.0"
-
 
 class Option:
     """An Option is either a command line optimization setting or a parameter.
@@ -267,7 +264,7 @@ class Gcc:
     or a docker image.
     """
 
-    def __init__(self, bin: Union[str, Path] = DEFAULT_GCC):
+    def __init__(self, bin: Union[str, Path]):
         self.bin = str(bin)
         self.image = self.bin[len("docker:") :]
 

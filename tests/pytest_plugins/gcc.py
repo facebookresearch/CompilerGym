@@ -11,6 +11,7 @@ import gym
 import pytest
 
 from compiler_gym.envs.gcc import GccEnv
+from compiler_gym.envs.gcc.gcc_env import DEFAULT_GCC
 from tests.pytest_plugins.common import docker_is_available
 
 
@@ -59,5 +60,7 @@ def env() -> GccEnv:
     """Create a GCC environment."""
     assert gcc_environment_is_supported(), "Cannot use GCC env fixture"
 
-    with gym.make("gcc-v0", gcc_bin=None if docker_is_available() else "gcc") as env_:
+    with gym.make(
+        "gcc-v0", gcc_bin=DEFAULT_GCC if docker_is_available() else "gcc"
+    ) as env_:
         yield env_

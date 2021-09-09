@@ -12,11 +12,14 @@ from typing import Dict, List, Optional, Union
 from compiler_gym.datasets import Benchmark
 from compiler_gym.envs.compiler_env import CompilerEnv
 from compiler_gym.envs.gcc.datasets import get_gcc_datasets
-from compiler_gym.envs.gcc.gcc import DEFAULT_GCC, GccSpec
+from compiler_gym.envs.gcc.gcc import Gcc, GccSpec
 from compiler_gym.service import ConnectionOpts
 from compiler_gym.spaces import Reward
 from compiler_gym.util.gym_type_hints import ObservationType
 from compiler_gym.views.observation import ObservationView
+
+# The default gcc_bin argument.
+DEFAULT_GCC: str = "docker:gcc:11.2.0"
 
 
 class AsmSizeReward(Reward):
@@ -89,21 +92,34 @@ class GccEnv(CompilerEnv):
         *args,
         benchmark: Optional[Union[str, Benchmark]] = None,
         datasets_site_path: Optional[Path] = None,
-        gcc_bin: Optional[str] = None,
+        gcc_bin: Union[str, Path] = DEFAULT_GCC,
         connection_settings: Optional[ConnectionOpts] = None,
         timeout: Optional[int] = None,
         **kwargs,
     ):
         """Create an environment.
-        gcc_bin - the path to the gcc executable. Only used if the environment
-        is attached to a local service. If attached remotely, the service will
-        have already been created.
-        connection_settings - the connection settings to use
-        timeout - the timeout to use when compiling
+
+        :param gcc_bin: The path to the GCC executable. Only used if the
+            environment is attached to a local service. If attached remotely,
+            the service will have already been created.
+
+        :param connection_settings: The connection settings to use.
+
+        :param timeout: The timeout to use when compiling.
         """
         connection_settings = connection_settings or ConnectionOpts()
         # Pass the executable path via an environment variable
-        connection_settings.script_env = {"CC": gcc_bin or DEFAULT_GCC}
+        connection_settings.script_env = {"CC": gcc_bin}
+
+        # Eagerly create a GCC compiler instance now because:
+        #
+        # 1. We want to catch an invalid gcc_bin argument early.
+        #
+        # 2. We want to perform the expensive one-off `docker pull` before we
+        #    start the backend service, as otherwise the backend service
+        #    initialization may time out.
+        Gcc(bin=gcc_bin)
+
         super().__init__(
             *args,
             **kwargs,
