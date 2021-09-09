@@ -70,6 +70,7 @@ const CustomMenu = forwardRef(
 const ActionsNavbar = ({
   startSession,
   actionSpace,
+  setIsLoading,
   handleActionSpace,
   handleResetActionsTracker,
 }) => {
@@ -140,6 +141,7 @@ const ActionsNavbar = ({
           reward: searchParams.get("reward"),
         });
         setUriOptions(selected?.uri);
+        setIsLoading(false)
       } catch (err) {
         setShowWarning(true);
       }
@@ -150,6 +152,7 @@ const ActionsNavbar = ({
       searchParams.get("dataset_uri") &&
       session.states
     ) {
+      setIsLoading(true)
       fetchData();
     }
 
@@ -206,8 +209,7 @@ const ActionsNavbar = ({
     if (e.key === "Enter") {
       try {
         let actionsTaken = getCommandLineArray(actionsLine, actionsList);
-        const response = await api.getActions(`${params.dataset}/${params.datasetUri}`,params.reward, actionsTaken.length ? actionsTaken : "", "1" )
-        setSession(response);
+        await startSession(params.dataset, params.datasetUri, params.reward, actionsTaken);
 
         searchParams.set("dataset", params.dataset);
         searchParams.set("dataset_uri", params.datasetUri);

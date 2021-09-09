@@ -6,6 +6,7 @@
 
 import React, { useState, useContext, useEffect } from "react";
 import { useHistory, useLocation } from "react-router";
+import { Spinner } from "react-bootstrap";
 import ApiContext from "../../context/ApiContext";
 import { makeSessionTreeData } from "../../utils/Helpers";
 import ActionsNavbar from "../Navbars/ActionsNavbar";
@@ -30,6 +31,7 @@ const ControlsContainer = () => {
     layer: 1,
   });
   const [locationKeys, setLocationKeys] = useState([]);
+  const [isLoading, setIsLoading] = useState(false)
 
   const children =
     compilerGym.actions &&
@@ -65,7 +67,7 @@ const ControlsContainer = () => {
       );
     }
     return () => {};
-  }, [session]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [session.states]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /**
    * Detects back and forward buttons in the browser, it allows to keep track
@@ -93,35 +95,46 @@ const ControlsContainer = () => {
    * @param {String} dataset a dataset string.
    * @param {String} datasetUri a string representing the uri of a dataset.
    * @param {String} reward the name of the reward signal to use.
+   * @param {Array} actions an optional array of action ids.
    */
-  const startNewSession = async (dataset, datasetUri, reward) => {
+  const startNewSession = async (dataset, datasetUri, reward, actions) => {
     const actionsIdsTaken = actionsTracker.actionsTaken?.map(
       (i) => i.split(".")[0]
     ); // Only keep the action ids, not the depth id
     try {
-      const result = await api.getActions(
-        `${dataset}/${datasetUri}`,
-        reward,
-        actionsIdsTaken.length ? actionsIdsTaken : "",
-        actionsIdsTaken.length ? "1" : null
-      );
-      console.log(result);
-      setSession(result);
-      setActionSpace(30);
-      if (actionsIdsTaken !== "" && actionsIdsTaken.length) {
-        let actionsTaken = actionsIdsTaken.map((o, i) => `${o}.${i + 1}`);
-        setActionsTracker({
-          activeNode: actionsTaken[actionsTaken.length - 1],
-          actionsTaken: actionsTaken,
-          layer: actionsTaken.length + 1,
-        });
+      setIsLoading(true)
+      if (actions !== undefined) {
+        const result = await api.getActions(`${dataset}/${datasetUri}`, reward, actions, "1");
+        console.log(result);
+        setSession(result);
+        setActionSpace(30);
+        let actionsTaken = actions.map((o, i) => `${o}.${i + 1}`);
+          setActionsTracker({
+            activeNode: actionsTaken[actionsTaken.length - 1],
+            actionsTaken: actionsTaken,
+            layer: actionsTaken.length + 1,
+          });
       } else {
-        setActionsTracker({
-          activeNode: "x",
-          actionsTaken: [],
-          layer: 1,
-        });
+        const result = await api.getActions(`${dataset}/${datasetUri}`, reward, actionsIdsTaken.length ? actionsIdsTaken : "", actionsIdsTaken.length ? "1" : null );
+        console.log(result);
+        setSession(result);
+        setActionSpace(30);
+        if (actionsIdsTaken.length) {
+          let actionsTaken = actionsIdsTaken.map((o, i) => `${o}.${i + 1}`);
+          setActionsTracker({
+            activeNode: actionsTaken[actionsTaken.length - 1],
+            actionsTaken: actionsTaken,
+            layer: actionsTaken.length + 1,
+          });
+        } else {
+          setActionsTracker({
+            activeNode: "x",
+            actionsTaken: [],
+            layer: 1,
+          });
+        }
       }
+      setIsLoading(false)
     } catch (err) {
       console.log(err);
     }
@@ -370,18 +383,29 @@ const ControlsContainer = () => {
       <ActionsNavbar
         actionSpace={actionSpace}
         startSession={startNewSession}
+        setIsLoading={setIsLoading}
         handleActionSpace={handleActionSpace}
         handleResetActionsTracker={handleResetActionsTracker}
       />
-      <SearchTree
-        actionSpace={actionSpace}
-        treeData={treeData}
-        layer={actionsTracker.layer}
-        focusedNode={focusedNode}
-        handleNodeClick={handleNodeClick}
-        handleMouseOverTree={handleMouseOverTree}
-        handleMouseOutTree={handleMouseOutTree}
-      />
+      {isLoading ? (
+        <div className="spinner-wrap">
+          <Spinner
+            animation="border"
+            role="status"
+            aria-hidden="true"
+          />
+        </div>
+      ) : (
+        <SearchTree
+          actionSpace={actionSpace}
+          treeData={treeData}
+          layer={actionsTracker.layer}
+          focusedNode={focusedNode}
+          handleNodeClick={handleNodeClick}
+          handleMouseOverTree={handleMouseOverTree}
+          handleMouseOutTree={handleMouseOutTree}
+        />
+      )}
       <RewardsSection
         session={session}
         highlightedPoint={highlightedPoint}
