@@ -12,7 +12,7 @@ import pytest
 
 from compiler_gym.envs.gcc import GccEnv
 from compiler_gym.envs.gcc.datasets import CsmithBenchmark, CsmithDataset
-from tests.pytest_plugins.common import is_ci
+from tests.pytest_plugins.common import is_ci, with_docker
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.gcc"]
@@ -28,11 +28,13 @@ def csmith_dataset() -> CsmithDataset:
     yield ds
 
 
+@with_docker
 def test_csmith_size(csmith_dataset: CsmithDataset):
     assert csmith_dataset.size == 0
     assert len(csmith_dataset) == 0
 
 
+@with_docker
 @pytest.mark.parametrize("index", range(3) if is_ci() else range(10))
 def test_csmith_random_select(
     env: GccEnv, csmith_dataset: CsmithDataset, index: int, tmpwd: Path
@@ -47,6 +49,7 @@ def test_csmith_random_select(
     assert (tmpwd / "source.c").is_file()
 
 
+@with_docker
 def test_random_benchmark(csmith_dataset: CsmithDataset):
     num_benchmarks = 5
     rng = np.random.default_rng(0)
@@ -57,6 +60,7 @@ def test_random_benchmark(csmith_dataset: CsmithDataset):
     assert len(random_benchmarks) == num_benchmarks
 
 
+@with_docker
 def test_csmith_from_seed_retry_count_exceeded(csmith_dataset: CsmithDataset):
     with pytest.raises(OSError, match="Csmith failed after 5 attempts with seed 1"):
         csmith_dataset.benchmark_from_seed(seed=1, max_retries=3, retry_count=5)
