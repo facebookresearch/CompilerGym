@@ -138,7 +138,6 @@ class CsmithDataset(Dataset):
         )
         self.csmith_bin_path = csmith_bin or _CSMITH_BIN
         self.csmith_includes_path = csmith_includes or _CSMITH_INCLUDES
-        self.gcc = Gcc()
         self._install_lockfile = self.site_data_path / ".install.LOCK"
 
     @property
@@ -146,6 +145,13 @@ class CsmithDataset(Dataset):
         # Actually 2^32 - 1, but practically infinite for all intents and
         # purposes.
         return 0
+
+    @memoized_property
+    def gcc(self):
+        # Defer instantiation of Gcc from the constructor as it will fail if the
+        # given Gcc is not available. Memoize the result as initialization is
+        # expensive.
+        return Gcc()
 
     def benchmark_uris(self) -> Iterable[str]:
         return (f"{self.name}/{i}" for i in range(UINT_MAX))
