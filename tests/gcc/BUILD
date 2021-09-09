@@ -12,15 +12,26 @@ py_test(
         "//compiler_gym/envs/gcc",
         "//compiler_gym/service",
         "//tests:test_main",
-        "//tests/pytest_plugins:common",
         "//tests/pytest_plugins:gcc",
     ],
 )
 
 py_test(
-    name = "gcc_test",
+    name = "gcc_docker_test",
     timeout = "long",
-    srcs = ["gcc_test.py"],
+    srcs = ["gcc_docker_test.py"],
+    deps = [
+        "//compiler_gym/envs/gcc",
+        "//compiler_gym/service",
+        "//tests:test_main",
+        "//tests/pytest_plugins:common",
+    ],
+)
+
+py_test(
+    name = "gcc_env_test",
+    timeout = "long",
+    srcs = ["gcc_env_test.py"],
     shard_count = 4,
     deps = [
         "//compiler_gym/envs/gcc",

@@ -178,7 +178,7 @@ def make_gcc_compilation_session(gcc_bin: str):
     class GccCompilationSession(CompilationSession):
         """A GCC interactive compilation session."""
 
-        compiler_version: str = "1.0.0"
+        compiler_version: str = gcc.spec.version
         action_spaces = action_spaces_
         observation_spaces = observation_spaces_
 

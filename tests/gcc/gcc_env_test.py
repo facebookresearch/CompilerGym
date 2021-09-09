@@ -24,19 +24,6 @@ def test_gcc_env_fails_without_gcc_support():
 
 
 @with_gcc_support
-def test_versions(env: GccEnv):
-    """Tests the GetVersion() RPC endpoint."""
-    assert env.compiler_version == "1.0.0"
-
-
-@with_gcc_support
-def test_gcc_version(env: GccEnv):
-    """Test that the gcc version is correct."""
-    env.reset()
-    assert env.gcc_spec.version == "gcc (GCC) 11.2.0"
-
-
-@with_gcc_support
 def test_action_space(env: GccEnv):
     """Test that the environment reports the service's action spaces."""
     assert env.action_spaces[0].name == "default"
