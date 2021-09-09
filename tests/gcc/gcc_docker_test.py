@@ -28,11 +28,29 @@ def test_version_11():
 def test_version_10():
     with gym.make("gcc-v0", gcc_bin="docker:gcc:10.3.0") as env:
         assert env.compiler_version == "gcc (GCC) 10.3.0"
+    with gym.make("gcc-v0", gcc_bin="docker:gcc:10.3") as env:
+        assert env.compiler_version == "gcc (GCC) 10.3.0"
+    with gym.make("gcc-v0", gcc_bin="docker:gcc:10") as env:
+        assert env.compiler_version == "gcc (GCC) 10.3.0"
+
+
+@with_docker
+def test_version_9():
+    with gym.make("gcc-v0", gcc_bin="docker:gcc:9.4.0") as env:
+        assert env.compiler_version == "gcc (GCC) 9.4.0"
+    with gym.make("gcc-v0", gcc_bin="docker:gcc:9.4") as env:
+        assert env.compiler_version == "gcc (GCC) 9.4.0"
+    with gym.make("gcc-v0", gcc_bin="docker:gcc:9") as env:
+        assert env.compiler_version == "gcc (GCC) 9.4.0"
 
 
 @with_docker
 def test_version_8():
     with gym.make("gcc-v0", gcc_bin="docker:gcc:8.5.0") as env:
+        assert env.compiler_version == "gcc (GCC) 8.5.0"
+    with gym.make("gcc-v0", gcc_bin="docker:gcc:8.5") as env:
+        assert env.compiler_version == "gcc (GCC) 8.5.0"
+    with gym.make("gcc-v0", gcc_bin="docker:gcc:8") as env:
         assert env.compiler_version == "gcc (GCC) 8.5.0"
 
 
