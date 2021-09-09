@@ -8,7 +8,7 @@ import pytest
 
 import compiler_gym.envs.gcc  # noqa register environments
 from compiler_gym.service import ServiceError
-from tests.pytest_plugins.common import with_docker
+from tests.pytest_plugins.common import skip_on_ci, with_docker
 from tests.test_main import main
 
 
@@ -24,6 +24,7 @@ def test_version_11():
         assert env.compiler_version == "gcc (GCC) 11.2.0"
 
 
+@skip_on_ci
 @with_docker
 def test_version_10():
     with gym.make("gcc-v0", gcc_bin="docker:gcc:10.3.0") as env:
@@ -34,6 +35,7 @@ def test_version_10():
         assert env.compiler_version == "gcc (GCC) 10.3.0"
 
 
+@skip_on_ci
 @with_docker
 def test_version_9():
     with gym.make("gcc-v0", gcc_bin="docker:gcc:9.4.0") as env:
@@ -44,6 +46,7 @@ def test_version_9():
         assert env.compiler_version == "gcc (GCC) 9.4.0"
 
 
+@skip_on_ci
 @with_docker
 def test_version_8():
     with gym.make("gcc-v0", gcc_bin="docker:gcc:8.5.0") as env:
