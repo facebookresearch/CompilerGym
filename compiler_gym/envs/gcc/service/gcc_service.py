@@ -384,7 +384,7 @@ def make_gcc_compilation_session(gcc_bin: str):
             """Compile the benchmark"""
             if not self._obj:
                 self.prepare_files()
-                logging.info(
+                logging.debug(
                     "Compiling: %s", " ".join(map(str, self.obj_command_line()))
                 )
                 gcc(
@@ -402,7 +402,7 @@ def make_gcc_compilation_session(gcc_bin: str):
             """Assemble the benchmark"""
             if not self._asm:
                 self.prepare_files()
-                logging.info(
+                logging.debug(
                     "Assembling: %s", " ".join(map(str, self.asm_command_line()))
                 )
                 gcc(
@@ -421,7 +421,7 @@ def make_gcc_compilation_session(gcc_bin: str):
             """Dump the RTL (and assemble the benchmark)"""
             if not self._rtl:
                 self.prepare_files()
-                logging.info(
+                logging.debug(
                     "Dumping RTL: %s", " ".join(map(str, self.rtl_command_line()))
                 )
                 gcc(
@@ -464,7 +464,7 @@ def make_gcc_compilation_session(gcc_bin: str):
             # Apply the action to this session and check if we changed anything
             old_choices = self.choices.copy()
             action(self)
-            logging.info("Applied action %s", action)
+            logging.debug("Applied action %s", action)
 
             # Reset the internal variables if this action has caused a change in the
             # choices

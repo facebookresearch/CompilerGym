@@ -201,11 +201,11 @@ class CsmithDataset(Dataset):
                 stderr = "\n".join(
                     truncate(stderr.decode("utf-8"), max_line_len=200, max_lines=20)
                 )
-                logging.info(f"Csmith failed with seed {seed}: {stderr}")
+                logging.warning("Csmith failed with seed %d: %s", seed, stderr)
             except UnicodeDecodeError:
                 # Failed to interpret the stderr output, generate a generic
                 # error message.
-                logging.info(f"Csmith failed with seed {seed}")
+                logging.warning("Csmith failed with seed %d", seed)
             return self.benchmark_from_seed(
                 seed, max_retries=max_retries, retry_count=retry_count + 1
             )
