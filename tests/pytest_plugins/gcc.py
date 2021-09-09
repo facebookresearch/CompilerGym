@@ -7,11 +7,8 @@
 import subprocess
 from functools import lru_cache
 
-import gym
 import pytest
 
-from compiler_gym.envs.gcc import GccEnv
-from compiler_gym.envs.gcc.gcc_env import DEFAULT_GCC
 from tests.pytest_plugins.common import docker_is_available
 
 
@@ -53,14 +50,3 @@ with_system_gcc = pytest.mark.skipif(
 without_system_gcc = pytest.mark.skipif(
     system_gcc_is_available(), reason="GCC is available"
 )
-
-
-@pytest.fixture(scope="function")
-def env() -> GccEnv:
-    """Create a GCC environment."""
-    assert gcc_environment_is_supported(), "Cannot use GCC env fixture"
-
-    with gym.make(
-        "gcc-v0", gcc_bin=DEFAULT_GCC if docker_is_available() else "gcc"
-    ) as env_:
-        yield env_

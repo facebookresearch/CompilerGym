@@ -10,7 +10,6 @@ import gym
 import numpy as np
 import pytest
 
-from compiler_gym.envs.gcc import GccEnv
 from compiler_gym.envs.gcc.datasets import CsmithBenchmark, CsmithDataset
 from tests.pytest_plugins.common import is_ci
 from tests.pytest_plugins.gcc import with_gcc_support
@@ -34,13 +33,12 @@ def test_csmith_size(csmith_dataset: CsmithDataset):
 
 @with_gcc_support
 @pytest.mark.parametrize("index", range(3) if is_ci() else range(10))
-def test_csmith_random_select(
-    env: GccEnv, csmith_dataset: CsmithDataset, index: int, tmpwd: Path
-):
+def test_csmith_random_select(csmith_dataset: CsmithDataset, index: int, tmpwd: Path):
     uri = next(islice(csmith_dataset.benchmark_uris(), index, None))
     benchmark = csmith_dataset.benchmark(uri)
     assert isinstance(benchmark, CsmithBenchmark)
-    env.reset(benchmark=benchmark)
+    with gym.make("gcc-v0") as env:
+        env.reset(benchmark=benchmark)
 
     assert benchmark.source
     benchmark.write_sources_to_directory(tmpwd)

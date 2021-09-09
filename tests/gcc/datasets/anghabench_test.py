@@ -5,13 +5,11 @@
 """Tests for the AnghaBench dataset."""
 import sys
 from itertools import islice
-from pathlib import Path
 
 import gym
 import pytest
 
 import compiler_gym.envs.gcc  # noqa register environments
-from compiler_gym.envs.gcc import GccEnv
 from compiler_gym.envs.gcc.datasets import AnghaBenchDataset
 from tests.pytest_plugins.common import skip_on_ci
 from tests.pytest_plugins.gcc import with_gcc_support
@@ -56,12 +54,11 @@ def test_missing_benchmark_name(anghabench_dataset: AnghaBenchDataset, mocker):
 @with_gcc_support
 @skip_on_ci
 @pytest.mark.parametrize("index", range(10))
-def test_anghabench_random_select(
-    env: GccEnv, anghabench_dataset: AnghaBenchDataset, index: int, tmpwd: Path
-):
+def test_anghabench_random_select(anghabench_dataset: AnghaBenchDataset, index: int):
     uri = next(islice(anghabench_dataset.benchmark_uris(), index, None))
     benchmark = anghabench_dataset.benchmark(uri)
-    env.reset(benchmark=benchmark)
+    with gym.make("gcc-v0") as env:
+        env.reset(benchmark=benchmark)
 
 
 if __name__ == "__main__":
