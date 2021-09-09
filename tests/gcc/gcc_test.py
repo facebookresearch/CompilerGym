@@ -19,7 +19,7 @@ pytest_plugins = ["tests.pytest_plugins.gcc"]
 
 @without_docker
 def test_gcc_env_fails_without_docker():
-    with pytest.raises(ServiceError, match="Is docker installed?"):
+    with pytest.raises(ServiceError):
         gym.make("gcc-v0")
 
 
@@ -100,9 +100,8 @@ def test_reward_before_reset(env: GccEnv):
 @with_docker
 def test_reset_invalid_benchmark(env: GccEnv):
     """Test requesting a specific benchmark."""
-    with pytest.raises(LookupError) as ctx:
+    with pytest.raises(LookupError, match=r"'benchmark://chstone-v1"):
         env.reset(benchmark="chstone-v1/flubbedydubfishface")
-    assert str(ctx.value) == "'benchmark://chstone-v1'"
 
 
 @with_docker
@@ -131,12 +130,11 @@ def test_double_reset(env: GccEnv):
 
 
 @with_docker
-def test_Step_out_of_range(env: GccEnv):
+def test_step_out_of_range(env: GccEnv):
     """Test error handling with an invalid action."""
     env.reset()
-    with pytest.raises(ValueError) as ctx:
+    with pytest.raises(ValueError, match="Out-of-range"):
         env.step(10000)
-    assert str(ctx.value) == "Out-of-range"
 
 
 @with_docker
@@ -328,17 +326,12 @@ def test_rewards(env: GccEnv):
 
 @with_docker
 def test_timeout(env: GccEnv):
-    """Test that the timeout can be set. Can't really make it timeout, I think."""
+    """Test that the timeout can be set."""
     env.reset()
     env.timeout = 20
     assert env.timeout == 20
     env.reset()
     assert env.timeout == 20
-
-
-@with_docker
-def test_benchmarks(env: GccEnv):
-    assert list(env.datasets.benchmark_uris())[0] == "benchmark://chstone-v0/adpcm"
 
 
 @with_docker
@@ -359,12 +352,15 @@ def test_fork(env: GccEnv):
     env.reset()
     env.step(0)
     env.step(1)
-    other_env = env.fork()
+    fkd = env.fork()
     try:
-        assert env.benchmark == other_env.benchmark
-        assert other_env.actions == [0, 1]
+        assert env.benchmark == fkd.benchmark
+        assert fkd.actions == [0, 1]
+        fkd.step(0)
+        assert fkd.actions == [0, 1, 0]
+        assert env.actions == [0, 1]
     finally:
-        other_env.close()
+        fkd.close()
 
 
 if __name__ == "__main__":
