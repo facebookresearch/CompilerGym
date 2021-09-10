@@ -143,6 +143,26 @@ def test_wrapped_benchmark(env: LlvmEnv, wrapper_type):
     assert ir_a != ir_b
 
 
+def test_wrapped_set_benchmark(env: LlvmEnv, wrapper_type):
+    """Test that the benchmark attribute can be set on wrapped classes."""
+
+    class MyWrapper(wrapper_type):
+        def observation(self, observation):
+            return observation  # pass thru
+
+    env = MyWrapper(env)
+
+    # Set the benchmark attribute and check that it propagates.
+    env.benchmark = "benchmark://cbench-v1/dijkstra"
+    env.reset()
+    assert env.benchmark == "benchmark://cbench-v1/dijkstra"
+
+    # Repeat again for a different benchmark.
+    env.benchmark = "benchmark://cbench-v1/crc32"
+    env.reset()
+    assert env.benchmark == "benchmark://cbench-v1/crc32"
+
+
 def test_wrapped_env_in_episode(env: LlvmEnv, wrapper_type):
     class MyWrapper(wrapper_type):
         def observation(self, observation):
