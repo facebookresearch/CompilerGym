@@ -11,6 +11,7 @@ runs:
                   chmod +x bazel
                   sudo mv bazel /usr/local/bin/bazel
                   sudo apt-get install clang-9 patchelf
+                  python -m pip install -U pip wheel
                   python -m pip install -r compiler_gym/requirements.txt -r examples/requirements.txt -r tests/requirements.txt
               fi
           shell: bash
@@ -19,6 +20,7 @@ runs:
           run: |
               if [ "$(uname)" = "Darwin" ]; then
                   brew install bazelisk zlib
+                  python -m pip install -U pip wheel
                   python -m pip install -r compiler_gym/requirements.txt -r examples/requirements.txt -r tests/requirements.txt
               fi
           shell: bash
