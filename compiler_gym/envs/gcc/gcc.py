@@ -24,7 +24,7 @@ import re
 import subprocess
 from functools import lru_cache
 from pathlib import Path
-from typing import Dict, List, Optional, Union, NamedTuple
+from typing import Dict, List, NamedTuple, Optional, Union
 
 import docker
 
@@ -723,7 +723,7 @@ def _get_spec(gcc: Gcc, cache_dir: Path) -> Optional[GccSpec]:
         try:
             with open(spec_path, "rb") as f:
                 spec = pickle.load(f)
-            spec.gcc = gcc
+            spec = GccSpec(gcc=gcc, version=spec.version, options=spec.options)
             logging.debug("GccSpec for version '%s' read from %s", version, spec_path)
         except (pickle.UnpicklingError, EOFError) as e:
             logging.warning("Unable to read spec from '%s': %s", spec_path, e)
