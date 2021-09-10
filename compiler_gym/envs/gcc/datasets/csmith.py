@@ -178,13 +178,15 @@ class CsmithDataset(Dataset):
             return
 
         with _CSMITH_INSTALL_LOCK, InterProcessLock(self._install_lockfile):
+            if (self.site_data_path / "includes").is_dir():
+                return
+
             # Copy the Csmith headers into the dataset's site directory path because
             # in bazel builds this includes directory is a symlink, and we need
             # actual files that we can use in a docker volume.
             shutil.copytree(
                 self.csmith_includes_path,
                 self.site_data_path / "includes.tmp",
-                dirs_exist_ok=True,
             )
             # Atomic directory rename to prevent race on install().
             (self.site_data_path / "includes.tmp").rename(
