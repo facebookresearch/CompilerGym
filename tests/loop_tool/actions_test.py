@@ -67,8 +67,11 @@ for a in 341 r 1 : L0 [thread]
  for a' in 3 : L1
   for a'' in 1 : L2
    %0[a] <- read()
+  for a'' in 1 : L4
    %1[a] <- read()
+  for a'' in 1 : L6
    %2[a] <- add(%0, %1)
+  for a'' in 1 : L8
    %3[a] <- write(%2)
 """
     lines = o[0].strip().split("\n")
@@ -91,8 +94,11 @@ for a in 1024 : L0
  for a' in 1 : L1
   for a'' in 1 : L2
    %0[a] <- read()
+  for a'' in 1 : L4
    %1[a] <- read()
+  for a'' in 1 : L6
    %2[a] <- add(%0, %1)
+  for a'' in 1 : L8
    %3[a] <- write(%2)
 """
     lines = o[0].strip().split("\n")
@@ -119,8 +125,11 @@ for a in 1024 : L0 [thread]
  for a' in 1 : L1 [thread]
   for a'' in 1 : L2
    %0[a] <- read()
+  for a'' in 1 : L4
    %1[a] <- read()
+  for a'' in 1 : L6
    %2[a] <- add(%0, %1)
+  for a'' in 1 : L8
    %3[a] <- write(%2)
 """
     lines = o[0].strip().split("\n")
