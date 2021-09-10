@@ -20,8 +20,9 @@ jobs:
               with:
                   python-version: 3.9
 
-            - name: Install build dependencies
-              uses: ./.github/actions/install-build-dependencies
+            - uses: ./.github/actions/install-build-dependencies
+
+            - uses: ./.github/actions/install-test-dependencies
 
             - name: Build pip package
               run: make bazel-build

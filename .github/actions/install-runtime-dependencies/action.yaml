@@ -1,0 +1,14 @@
+---
+name: Install runtime dependencies
+description: Install the runtime dependencies for CompilerGym.
+runs:
+    using: composite
+    steps:
+        - name: Install runtime dependencies
+          run: |
+              python -m pip install -U pip wheel
+              python -m pip install -r compiler_gym/requirements.txt
+              if [ "$(uname)" = "Darwin" ]; then
+                  brew install zlib
+              fi
+          shell: bash

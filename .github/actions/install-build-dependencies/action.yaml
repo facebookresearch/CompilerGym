@@ -4,25 +4,18 @@ description: Install build dependencies
 runs:
     using: composite
     steps:
-        - name: Install dependencies (linux)
+        - name: Install dependencies
           run: |
-              if [ "$(uname)" != "Darwin" ]; then
+              if [ "$(uname)" = "Darwin" ]; then
+                  brew install bazelisk zlib
+              else
                   curl -L "https://github.com/bazelbuild/bazelisk/releases/download/v1.6.1/bazelisk-linux-amd64" > bazel
                   chmod +x bazel
                   sudo mv bazel /usr/local/bin/bazel
                   sudo apt-get install clang-9 patchelf
-                  python -m pip install -U pip wheel
-                  python -m pip install -r compiler_gym/requirements.txt -r examples/requirements.txt -r tests/requirements.txt
               fi
-          shell: bash
-
-        - name: Install dependencies (macos)
-          run: |
-              if [ "$(uname)" = "Darwin" ]; then
-                  brew install bazelisk zlib
-                  python -m pip install -U pip wheel
-                  python -m pip install -r compiler_gym/requirements.txt -r examples/requirements.txt -r tests/requirements.txt
-              fi
+              python -m pip install -U pip wheel
+              python -m pip install -r compiler_gym/requirements.txt
           shell: bash
           env:
               LDFLAGS: -L/usr/local/opt/zlib/lib
