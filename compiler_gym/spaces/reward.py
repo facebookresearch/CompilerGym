@@ -81,7 +81,7 @@ class Reward(Scalar):
             max=np.inf if max is None else max,
             dtype=np.float64,
         )
-        self.id = name
+        self.name = name
         self.observation_spaces = observation_spaces or []
         self.default_value: RewardType = default_value
         self.default_negates_returns: bool = default_negates_returns
@@ -139,13 +139,13 @@ class Reward(Scalar):
         return (self.min, self.max)
 
     def __repr__(self):
-        return self.id
+        return self.name
 
     def __eq__(self, other: Union["Reward", str]) -> bool:
         if isinstance(other, str):
-            return self.id == other
+            return self.name == other
         elif isinstance(other, Reward):
-            return self.id == other.id
+            return self.name == other.id
         else:
             return False
 

@@ -111,7 +111,7 @@ class BruteForceWorker(Thread):
         env: CompilerEnv,
     ):
         super().__init__()
-        self.id = worker_id
+        self.name = worker_id
         self.in_q = in_q
         self.out_q = out_q
         self.env = env
@@ -123,7 +123,7 @@ class BruteForceWorker(Thread):
 
     def log(self, *args, **kwargs):
         logging.debug(
-            f"Worker {self.id} ({self.num_trials} trials):", *args, **kwargs, flush=True
+            f"Worker {self.name} ({self.num_trials} trials):", *args, **kwargs, flush=True
         )
 
     def run(self) -> None:

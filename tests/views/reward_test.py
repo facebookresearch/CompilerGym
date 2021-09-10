@@ -11,7 +11,7 @@ from tests.test_main import main
 
 class MockReward:
     def __init__(self, id, ret=None):
-        self.id = id
+        self.name = id
         self.ret = list(reversed(ret or []))
         self.observation_spaces = []
 

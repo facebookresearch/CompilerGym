@@ -68,7 +68,7 @@ class ObservationSpaceSpec:
         default_value: ObservationType,
     ):
         """Constructor. Don't call directly, use make_derived_space()."""
-        self.id: str = id
+        self.name: str = id
         self.index: int = index
         self.space = space
         self.deterministic = deterministic
@@ -93,14 +93,14 @@ class ObservationSpaceSpec:
         return self.index
 
     def __repr__(self) -> str:
-        return f"ObservationSpaceSpec({self.id})"
+        return f"ObservationSpaceSpec({self.name})"
 
     def __eq__(self, rhs) -> bool:
         """Equality check."""
         if not isinstance(rhs, ObservationSpaceSpec):
             return False
         return (
-            self.id == rhs.id
+            self.name == rhs.id
             and self.index == rhs.index
             and self.space == rhs.space
             and self.platform_dependent == rhs.platform_dependent
