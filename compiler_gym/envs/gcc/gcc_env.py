@@ -2,9 +2,8 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""This module demonstrates how to """
+"""A CompilerGym environment for GCC."""
 import codecs
-from compiler_gym.util.decorators import memoized_property
 import json
 import pickle
 from pathlib import Path
@@ -14,75 +13,13 @@ from compiler_gym.datasets import Benchmark
 from compiler_gym.envs.compiler_env import CompilerEnv
 from compiler_gym.envs.gcc.datasets import get_gcc_datasets
 from compiler_gym.envs.gcc.gcc import Gcc, GccSpec
+from compiler_gym.envs.gcc.gcc_rewards import AsmSizeReward, ObjSizeReward
 from compiler_gym.service import ConnectionOpts
-from compiler_gym.spaces import Reward
+from compiler_gym.util.decorators import memoized_property
 from compiler_gym.util.gym_type_hints import ObservationType
-from compiler_gym.views.observation import ObservationView
 
 # The default gcc_bin argument.
 DEFAULT_GCC: str = "docker:gcc:11.2.0"
-
-
-class AsmSizeReward(Reward):
-    """Reward for the size in bytes of the assembly code"""
-
-    def __init__(self):
-        super().__init__(
-            id="asm_size",
-            observation_spaces=["asm_size"],
-            default_value=0,
-            default_negates_returns=True,
-            deterministic=False,
-            platform_dependent=True,
-        )
-        self.previous = None
-
-    def reset(self, benchmark: str, observation_view: ObservationView):
-        super().reset(benchmark, observation_view)
-        del benchmark  # unused
-        self.previous = None
-
-    def update(self, action, observations, observation_view):
-        del action  # unused
-        del observation_view  # unused
-
-        if self.previous is None:
-            self.previous = observations[0]
-
-        reward = float(self.previous - observations[0])
-        self.previous = observations[0]
-        return reward
-
-
-class ObjSizeReward(Reward):
-    """Reward for the size in bytes of the object code"""
-
-    def __init__(self):
-        super().__init__(
-            id="obj_size",
-            observation_spaces=["obj_size"],
-            default_value=0,
-            default_negates_returns=True,
-            deterministic=False,
-            platform_dependent=True,
-        )
-        self.previous = None
-
-    def reset(self, benchmark: str, observation_view: ObservationView):
-        super().reset(benchmark, observation_view)
-        del benchmark  # unused
-        self.previous = None
-
-    def update(self, action, observations, observation_view):
-        del action
-        del observation_view
-
-        if self.previous is None:
-            self.previous = observations[0]
-
-        reward = float(self.previous - observations[0])
-        self.previous = observations[0]
-        return reward
 
 
 class GccEnv(CompilerEnv):
@@ -141,7 +78,9 @@ class GccEnv(CompilerEnv):
             *args,
             **kwargs,
             benchmark=benchmark,
-            datasets=get_gcc_datasets(gcc_bin=gcc_bin, site_data_base=datasets_site_path),
+            datasets=get_gcc_datasets(
+                gcc_bin=gcc_bin, site_data_base=datasets_site_path
+            ),
             rewards=[AsmSizeReward(), ObjSizeReward()],
             connection_settings=connection_settings,
         )
@@ -235,6 +174,7 @@ class GccEnv(CompilerEnv):
     def obj_hash(self) -> str:
         """Get a hash of the object code."""
         return self.observation["obj_hash"]
+
     @property
     def choices(self) -> List[int]:
         """Get the current choices"""
@@ -251,5 +191,7 @@ class GccEnv(CompilerEnv):
         # TODO(github.com/facebookresearch/CompilerGym/issues/52): This can be
         # exposed directly through the action space once #369 is merged.
         assert len(self.gcc_spec.options) == len(choices)
-        assert all(-1 <= c < len(self.gcc_spec.options[i]) for i, c in enumerate(choices))
+        assert all(
+            -1 <= c < len(self.gcc_spec.options[i]) for i, c in enumerate(choices)
+        )
         self.send_param("choices", ",".join(map(str, choices)))

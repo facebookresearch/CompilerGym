@@ -10,6 +10,7 @@ py_library(
         "__init__.py",
         "gcc.py",
         "gcc_env.py",
+        "gcc_rewards.py",
     ],
     data = [
         "//compiler_gym/envs/gcc/service",
