@@ -302,12 +302,11 @@ def test_choices_observation():
 
 
 @with_gcc_support
-def test_command_line_observation():
+def test_commandline():
     """Test observation spaces."""
     with gym.make("gcc-v0") as env:
         env.reset()
-        command_line = env.command_line
-        assert command_line == "docker:gcc:11.2.0 -w -c src.c -o obj.o"
+        assert env.commandline() == "docker:gcc:11.2.0 -w -c src.c -o obj.o"
 
 
 @with_gcc_support

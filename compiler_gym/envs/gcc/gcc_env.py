@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 """This module demonstrates how to """
 import codecs
+from compiler_gym.util.decorators import memoized_property
 import json
 import pickle
 from pathlib import Path
@@ -85,23 +86,34 @@ class ObjSizeReward(Reward):
 
 
 class GccEnv(CompilerEnv):
-    """A compiler environment for GCC"""
+    """A specialized CompilerEnv for GCC.
+
+    This class exposes the optimization space of GCC's command line flags
+    as an environment for reinforcement learning. For further details, see the
+    :ref:`GCC Environment Reference <envs/gcc:Installation>`.
+    """
 
     def __init__(
         self,
         *args,
-        benchmark: Optional[Union[str, Benchmark]] = None,
-        datasets_site_path: Optional[Path] = None,
         gcc_bin: Union[str, Path] = DEFAULT_GCC,
+        benchmark: Union[str, Benchmark] = "benchmark://chstone-v0/adpcm",
+        datasets_site_path: Optional[Path] = None,
         connection_settings: Optional[ConnectionOpts] = None,
         timeout: Optional[int] = None,
         **kwargs,
     ):
         """Create an environment.
 
-        :param gcc_bin: The path to the GCC executable. Only used if the
+        :param gcc_bin: The path to the GCC executable, or the name of a docker
+            image to use if prefixed with :code:`docker:`. Only used if the
             environment is attached to a local service. If attached remotely,
             the service will have already been created.
+
+        :param benchmark: The benchmark to use for this environment. Either a
+            URI string, or a :class:`Benchmark
+            <compiler_gym.datasets.Benchmark>` instance. If not provided, a
+            default benchmark is used.
 
         :param connection_settings: The connection settings to use.
 
@@ -128,15 +140,11 @@ class GccEnv(CompilerEnv):
         super().__init__(
             *args,
             **kwargs,
-            # Set a default benchmark for use.
-            benchmark=benchmark or "chstone-v0/adpcm",
-            datasets=list(
-                get_gcc_datasets(gcc_bin=gcc_bin, site_data_base=datasets_site_path)
-            ),
+            benchmark=benchmark,
+            datasets=get_gcc_datasets(gcc_bin=gcc_bin, site_data_base=datasets_site_path),
             rewards=[AsmSizeReward(), ObjSizeReward()],
             connection_settings=connection_settings,
         )
-        self._spec = None
         self._timeout = timeout
 
     def reset(
@@ -152,6 +160,13 @@ class GccEnv(CompilerEnv):
             self.send_param("timeout", str(self._timeout))
         return observation
 
+    def commandline(self) -> str:
+        """Return a string representing the command line options.
+
+        :return: A string.
+        """
+        return self.observation["command_line"]
+
     @property
     def timeout(self) -> Optional[int]:
         """Get the current compilation timeout"""
@@ -163,13 +178,13 @@ class GccEnv(CompilerEnv):
         self._timeout = value
         self.send_param("timeout", str(value) if value else "")
 
-    @property
+    @memoized_property
     def gcc_spec(self) -> GccSpec:
-        """Get a description of the GCC specification"""
-        if not self._spec:
-            pickled = self.send_param("gcc_spec", "")
-            self._spec = pickle.loads(codecs.decode(pickled.encode(), "base64"))
-        return self._spec
+        """A :class:`GccSpec <compiler_gym.envs.gcc.gcc.GccSpec>` description of
+        the compiler specification.
+        """
+        pickled = self.send_param("gcc_spec", "")
+        return pickle.loads(codecs.decode(pickled.encode(), "base64"))
 
     @property
     def source(self) -> str:
@@ -199,8 +214,11 @@ class GccEnv(CompilerEnv):
     @property
     def instruction_counts(self) -> Dict[str, int]:
         """Get a count of the instruction types in the assembly code.
-        Note, that it will also count fields beginning with a '.', like '.bss'
-        and '.align'. Make sure to remove those if not needed."""
+
+        Note, that it will also count fields beginning with a :code:`.`, like
+        :code:`.bss` and :code:`.align`. Make sure to remove those if not
+        needed.
+        """
         return json.loads(self.observation["instruction_counts"])
 
     @property
@@ -217,12 +235,6 @@ class GccEnv(CompilerEnv):
     def obj_hash(self) -> str:
         """Get a hash of the object code."""
         return self.observation["obj_hash"]
-
-    @property
-    def command_line(self) -> str:
-        """Get the command line to compile the source."""
-        return self.observation["command_line"]
-
     @property
     def choices(self) -> List[int]:
         """Get the current choices"""
@@ -231,11 +243,13 @@ class GccEnv(CompilerEnv):
     @choices.setter
     def choices(self, choices: List[int]):
         """Set the current choices.
+
         This must be a list of ints with one element for each option the
-        gcc_spec.
-        Each element must be in range for the corresponding option. I.e. it must
-        be between -1 and len(option) inclusive."""
-        spec = self.gcc_spec
-        assert len(spec.options) == len(choices)
-        assert all(-1 <= c < len(spec.options[i]) for i, c in enumerate(choices))
+        gcc_spec. Each element must be in range for the corresponding option.
+        I.e. it must be between -1 and len(option) inclusive.
+        """
+        # TODO(github.com/facebookresearch/CompilerGym/issues/52): This can be
+        # exposed directly through the action space once #369 is merged.
+        assert len(self.gcc_spec.options) == len(choices)
+        assert all(-1 <= c < len(self.gcc_spec.options[i]) for i, c in enumerate(choices))
         self.send_param("choices", ",".join(map(str, choices)))

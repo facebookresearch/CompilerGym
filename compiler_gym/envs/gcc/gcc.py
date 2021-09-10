@@ -24,7 +24,7 @@ import re
 import subprocess
 from functools import lru_cache
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, NamedTuple
 
 import docker
 
@@ -35,10 +35,10 @@ from compiler_gym.util.runfiles_path import site_data_path
 
 class Option:
     """An Option is either a command line optimization setting or a parameter.
-    It is essentially a list of the possible values that can be taken.
 
-    Each item is command line parameter. In GCC, all of these are single
-    settings, so only need one string to describe them, rather than a list.
+    It is essentially a list of the possible values that can be taken. Each item
+    is command line parameter. In GCC, all of these are single settings, so only
+    need one string to describe them, rather than a list.
     """
 
     def __len__(self):
@@ -57,11 +57,12 @@ class Option:
 
 
 class GccOOption(Option):
-    """This class represents the -O0, -O1, -O2, -O3, -Os, and -Ofast options.
-    This class starts with no values, we fill them in with
-    '__gcc_parse_optimize'.
+    """This class represents the :code:`-O0`, :code:`-O1`, :code:`-O2`,
+    :code:`-O3`, :code:`-Os`, and :code:`-Ofast` options.
 
-    The suffixes to append to '-O' are stored in self.values.
+    This class starts with no values, we fill them in with
+    :code:`_gcc_parse_optimize()`. The suffixes to append to :code:`-O` are
+    stored in self.values.
     """
 
     def __init__(self):
@@ -81,9 +82,11 @@ class GccOOption(Option):
 
 
 class GccFlagOption(Option):
-    """An ordinary -f flag. These have two possible settings. For a given flag
-    name there are '-f<name>' and '-fno-<name>. If no_fno is true, then there is
-    only the -f<name> form.
+    """An ordinary :code:`-f` flag.
+
+    These have two possible settings. For a given flag name there are
+    :code:`'-f<name>' and :code:`'-fno-<name>. If :code:`no_fno` is true, then
+    there is only the :code:`-f<name>` form.
     """
 
     def __init__(self, name: str, no_fno: bool = False):
@@ -104,9 +107,9 @@ class GccFlagOption(Option):
 
 
 class GccFlagEnumOption(Option):
-    """A flag of style '-f<name>=[val1, val2, ...]'.
+    """A flag of style :code:`-f<name>=[val1, val2, ...]`.
 
-    'self.name' holds the name. 'self.values' holds the values.
+    :code:`self.name` holds the name. :code:`self.values` holds the values.
     """
 
     def __init__(self, name: str, values: List[str]):
@@ -127,8 +130,8 @@ class GccFlagEnumOption(Option):
 
 
 class GccFlagIntOption(Option):
-    """A flag of style '-f<name>=<integer>' where the integer is between min and
-    max.
+    """A flag of style :code:`-f<name>=<integer>` where the integer is between
+    min and max.
     """
 
     def __init__(self, name: str, min: int, max: int):
@@ -170,7 +173,7 @@ class GccFlagAlignOption(Option):
 
 
 class GccParamEnumOption(Option):
-    """A parameter '--param=<name>=[val1, val2, val3]."""
+    """A parameter :code:`--param=<name>=[val1, val2, val3]`."""
 
     def __init__(self, name: str, values: List[str]):
         self.name = name
@@ -192,8 +195,8 @@ class GccParamEnumOption(Option):
 
 
 class GccParamIntOption(Option):
-    """A parameter '--param=<name>=<integer>. where the integer is between min
-    and max.
+    """A parameter :code:`--param=<name>=<integer>`, where the integer is
+    between min and max.
     """
 
     def __init__(self, name: str, min: int, max: int):
@@ -221,11 +224,10 @@ def get_docker_client():
         return docker.from_env()
     except docker.errors.DockerException as e:
         raise EnvironmentNotSupported(
-            # TODO(github.com/facebookresearch/CompilerGym/issues/383): Add
-            # a link to the GCC documentation with details on how to set up
-            # the environment.
             f"Failed to initialize docker client needed by GCC environment: {e}.\n"
-            "Is docker installed?"
+            "Have you installed the runtime dependencies?\n See "
+            "<https://facebookresearch.github.io/CompilerGym/envs/gcc.html#installation> "
+            "for details."
         ) from e
 
 
@@ -269,9 +271,13 @@ class Gcc:
     """This class represents an instance of the GCC compiler, either as a binary
     or a docker image.
 
-    It has two fields:
-    `self.bin` which is a string version of the constructor argument, and
-    `self.spec` is a `GccSpec` object.
+    :ivar bin: A string version of the constructor argument.
+
+    :vartype bin: str
+
+    :ivar spec: A :class:`GccSpec <compiler_gym.envs.gcc.gcc.GccSpec>` instance.
+
+    :vartype spec: GccSpec
     """
 
     def __init__(self, bin: Union[str, Path]):
@@ -355,30 +361,19 @@ class Gcc:
         return result
 
 
-class GccSpec:
-    """This class combines all the information about the version and options.
-
-    It provides a list of Options.
-
-    Fields are:
-
-    - `self.gcc` - the `Gcc` object from the constructor
-    - `self.version` - the `version` string from the constructor
-    - `self.options` - the `List[Option]` from the constructor
+class GccSpec(NamedTuple):
+    """This class combines all of the information about the version and options
+    for a GCC instance.
     """
 
-    def __init__(self, gcc: Gcc, version: str, options: List[Option]):
-        """Initialise the spec.
+    gcc: Gcc
+    """A compiler instance."""
 
-        :param gcc: A Gcc instance.
+    version: str
+    """The GCC version string."""
 
-        :param version: The gcc version string.
-
-        :param options: The list of options.
-        """
-        self.gcc = gcc
-        self.version = version
-        self.options = options
+    options: List[Option]
+    """A list of options exposed by the compiler."""
 
     @property
     def size(self) -> int:
@@ -386,8 +381,8 @@ class GccSpec:
         cardinalities of all the options.
         """
         sz = 1
-        # Each option can be applied or not
         for option in self.options:
+            # Each option can be applied or not.
             sz *= len(option) + 1
         return sz
 
@@ -535,8 +530,7 @@ def _gcc_parse_optimize(gcc: Gcc) -> List[Option]:
 
 
 def _gcc_parse_params(gcc: Gcc) -> List[Option]:
-    """Parse the param help string from the GCC binary to find
-    options."""
+    """Parse the param help string from the GCC binary to find options."""
 
     # Pretty much identical to _gcc_parse_optimize
     logging.debug("Parsing GCC param space")
@@ -686,20 +680,18 @@ def _fix_options(options: List[Option]) -> List[Option]:
     return options
 
 
-def _gcc_get_version(gcc: Gcc) -> Optional[str]:
+def _gcc_get_version(gcc: Gcc) -> str:
     """Get the version string"""
-
     logging.debug("Getting GCC version for %s", gcc.bin)
     try:
         result = gcc("--version", timeout=60)
-        version = result.split("\n")[0]
-        logging.debug("GCC version is %s", version)
-        if "gcc" not in version:
-            raise ServiceError(f"Invalid GCC version string: {version}")
-        return version
-    except subprocess.SubprocessError:
-        logging.error("Unable to get GCC version")
-        return None
+    except ServiceError as e:
+        raise EnvironmentNotSupported(f"Failed to run GCC binary: {gcc.bin}") from e
+    version = result.split("\n")[0]
+    logging.debug("GCC version is %s", version)
+    if "gcc" not in version:
+        raise ServiceInitError(f"Invalid GCC version string: {version}")
+    return version
 
 
 def _version_hash(version: str) -> str:
@@ -720,9 +712,6 @@ def _get_spec(gcc: Gcc, cache_dir: Path) -> Optional[GccSpec]:
     """
     # Get the version
     version = _gcc_get_version(gcc)
-    if not version:
-        # Already logged the problem
-        return None
 
     spec = None
     # See if there is a pickled spec in the cache_dir. First we use a hash to
