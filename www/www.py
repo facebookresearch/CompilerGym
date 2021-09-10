@@ -211,7 +211,7 @@ def _step(request: StepRequest) -> StepReply:
 
     with env_lock:
         env.reward_space = request.reward
-        env.reset()
+        env.reset(benchmark=request.benchmark)
 
         # Replay all actions except the last one.
         if request.all_states:
