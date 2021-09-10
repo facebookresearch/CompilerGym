@@ -81,7 +81,7 @@ class Reward(Scalar):
             max=np.inf if max is None else max,
             dtype=np.float64,
         )
-        self.id = id
+        self.id = name
         self.observation_spaces = observation_spaces or []
         self.default_value: RewardType = default_value
         self.default_negates_returns: bool = default_negates_returns
