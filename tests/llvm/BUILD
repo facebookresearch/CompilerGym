@@ -140,7 +140,7 @@ py_test(
     timeout = "short",
     srcs = ["gym_interface_compatability.py"],
     deps = [
-        "//compiler_gym",
+        "//compiler_gym/envs/llvm",
         "//tests:test_main",
     ],
 )
