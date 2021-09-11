@@ -35,7 +35,7 @@ jobs:
             - name: Upload Python wheel
               uses: actions/upload-artifact@v2
               with:
-                  name: manylinux-wheel-${{ env.GITHUB_RUN_NUMBER }}
+                  name: manylinux-wheel-${GITHUB_RUN_NUMBER}
                   path: dist/*.whl
                   if-no-files-found: error
                   retention-days: 7
@@ -62,7 +62,7 @@ jobs:
             - name: Upload Python wheel
               uses: actions/upload-artifact@v2
               with:
-                  name: macos-wheel-${{ env.GITHUB_RUN_NUMBER }}
+                  name: macos-wheel-${GITHUB_RUN_NUMBER}
                   path: dist/*.whl
                   if-no-files-found: error
                   retention-days: 7
@@ -74,8 +74,6 @@ jobs:
             fail-fast: false
             matrix:
                 python: [3.6, 3.7, 3.8, 3.9]
-        env:
-            COV_REPORT: ${{ env.GITHUB_WORKSPACE }}/coverage-${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_JOB }}-${{ env.RUNNER_OS }}-${{ matrix.python }}.xml
         steps:
             - uses: actions/checkout@v2
 
@@ -87,7 +85,7 @@ jobs:
             - name: Download Python wheel
               uses: actions/download-artifact@v2
               with:
-                  name: manylinux-wheel-${{ env.GITHUB_RUN_NUMBER }}
+                  name: manylinux-wheel-${GITHUB_RUN_NUMBER}
 
             - name: Install wheel
               run: python -m pip install *.whl
@@ -98,13 +96,17 @@ jobs:
             - name: Install test dependencies
               run: python -m pip install -r tests/requirements.txt
 
+            - name: Set coverage path
+              run: |
+                  echo "COV_REPORT=${GITHUB_WORKSPACE}/coverage-${GITHUB_RUN_NUMBER}-${GITHUB_JOB}-${RUNNER_OS}-${{ matrix.python }}.xml" >> $GITHUB_ENV
+
             - name: Run the test suite
               run: make install-test-cov TEST_TARGET="tests" PYTEST_ARGS="--ignore tests/llvm"
 
             - name: Upload code coverage report wheel
               uses: actions/upload-artifact@v2
               with:
-                  name: coverage-${{ env.GITHUB_RUN_NUMBER }}
+                  name: coverage-${GITHUB_RUN_NUMBER}
                   path: ${{ env.COV_REPORT }}
                   if-no-files-found: error
                   retention-days: 1
@@ -116,8 +118,6 @@ jobs:
             fail-fast: false
             matrix:
                 python: [3.8, 3.9]
-        env:
-            COV_REPORT: ${{ env.GITHUB_WORKSPACE }}/coverage-${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_JOB }}-${{ env.RUNNER_OS }}-${{ matrix.python }}.xml
         steps:
             - uses: actions/checkout@v2
 
@@ -129,7 +129,7 @@ jobs:
             - name: Download Python wheel
               uses: actions/download-artifact@v2
               with:
-                  name: macos-wheel-${{ env.GITHUB_RUN_NUMBER }}
+                  name: macos-wheel-${GITHUB_RUN_NUMBER}
 
             - name: Install wheel
               run: python -m pip install *.whl
@@ -140,13 +140,17 @@ jobs:
             - name: Install test dependencies
               run: python -m pip install -r tests/requirements.txt
 
+            - name: Set coverage path
+              run: |
+                  echo "COV_REPORT=${GITHUB_WORKSPACE}/coverage-${GITHUB_RUN_NUMBER}-${GITHUB_JOB}-${RUNNER_OS}-${{ matrix.python }}.xml" >> $GITHUB_ENV
+
             - name: Run the test suite
               run: make install-test-cov TEST_TARGET="tests" PYTEST_ARGS="--ignore tests/llvm"
 
             - name: Upload code coverage report wheel
               uses: actions/upload-artifact@v2
               with:
-                  name: coverage-${{ env.GITHUB_RUN_NUMBER }}
+                  name: coverage-${GITHUB_RUN_NUMBER}
                   path: ${{ env.COV_REPORT }}
                   if-no-files-found: error
                   retention-days: 1
@@ -158,8 +162,6 @@ jobs:
             fail-fast: false
             matrix:
                 python: [3.6, 3.7, 3.8, 3.9]
-        env:
-            COV_REPORT: ${{ env.GITHUB_WORKSPACE }}/coverage-${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_JOB }}-${{ env.RUNNER_OS }}-${{ matrix.python }}.xml
         steps:
             - uses: actions/checkout@v2
 
@@ -171,7 +173,7 @@ jobs:
             - name: Download Python wheel
               uses: actions/download-artifact@v2
               with:
-                  name: manylinux-wheel-${{ env.GITHUB_RUN_NUMBER }}
+                  name: manylinux-wheel-${GITHUB_RUN_NUMBER}
 
             - name: Install wheel
               run: python -m pip install *.whl
@@ -182,13 +184,17 @@ jobs:
             - name: Install test dependencies
               run: python -m pip install -r tests/requirements.txt
 
+            - name: Set coverage path
+              run: |
+                  echo "COV_REPORT=${GITHUB_WORKSPACE}/coverage-${GITHUB_RUN_NUMBER}-${GITHUB_JOB}-${RUNNER_OS}-${{ matrix.python }}.xml" >> $GITHUB_ENV
+
             - name: Run the test suite
               run: make install-test-cov TEST_TARGET="tests/llvm"
 
             - name: Upload code coverage report wheel
               uses: actions/upload-artifact@v2
               with:
-                  name: coverage-${{ env.GITHUB_RUN_NUMBER }}
+                  name: coverage-${GITHUB_RUN_NUMBER}
                   path: ${{ env.COV_REPORT }}
                   if-no-files-found: error
                   retention-days: 1
@@ -200,8 +206,6 @@ jobs:
             fail-fast: false
             matrix:
                 python: [3.8, 3.9]
-        env:
-            COV_REPORT: ${{ env.GITHUB_WORKSPACE }}/coverage-${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_JOB }}-${{ env.RUNNER_OS }}-${{ matrix.python }}.xml
         steps:
             - uses: actions/checkout@v2
 
@@ -213,7 +217,7 @@ jobs:
             - name: Download Python wheel
               uses: actions/download-artifact@v2
               with:
-                  name: macos-wheel-${{ env.GITHUB_RUN_NUMBER }}
+                  name: macos-wheel-${GITHUB_RUN_NUMBER}
 
             - name: Install wheel
               run: python -m pip install *.whl
@@ -224,13 +228,17 @@ jobs:
             - name: Install test dependencies
               run: python -m pip install -r tests/requirements.txt
 
+            - name: Set coverage path
+              run: |
+                  echo "COV_REPORT=${GITHUB_WORKSPACE}/coverage-${GITHUB_RUN_NUMBER}-${GITHUB_JOB}-${RUNNER_OS}-${{ matrix.python }}.xml" >> $GITHUB_ENV
+
             - name: Run the test suite
               run: make install-test-cov TEST_TARGET="tests/llvm"
 
             - name: Upload code coverage report wheel
               uses: actions/upload-artifact@v2
               with:
-                  name: coverage-${{ env.GITHUB_RUN_NUMBER }}
+                  name: coverage-${GITHUB_RUN_NUMBER}
                   path: ${{ env.COV_REPORT }}
                   if-no-files-found: error
                   retention-days: 1
@@ -242,8 +250,6 @@ jobs:
             fail-fast: false
             matrix:
                 python: [3.6, 3.7, 3.8, 3.9]
-        env:
-            COV_REPORT: ${{ env.GITHUB_WORKSPACE }}/coverage-${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_JOB }}-${{ env.RUNNER_OS }}-${{ matrix.python }}.xml
         steps:
             - uses: actions/checkout@v2
 
@@ -255,7 +261,7 @@ jobs:
             - name: Download Python wheel
               uses: actions/download-artifact@v2
               with:
-                  name: manylinux-wheel-${{ env.GITHUB_RUN_NUMBER }}
+                  name: manylinux-wheel-${GITHUB_RUN_NUMBER}
 
             - name: Install wheel
               run: python -m pip install *.whl
@@ -266,13 +272,17 @@ jobs:
             - name: Install test dependencies
               run: python -m pip install -r examples/requirements.txt -r tests/requirements.txt
 
+            - name: Set coverage path
+              run: |
+                  echo "COV_REPORT=${GITHUB_WORKSPACE}/coverage-${GITHUB_RUN_NUMBER}-${GITHUB_JOB}-${RUNNER_OS}-${{ matrix.python }}.xml" >> $GITHUB_ENV
+
             - name: Run the test suite
               run: make install-test-cov TEST_TARGET="examples"
 
             - name: Upload code coverage report wheel
               uses: actions/upload-artifact@v2
               with:
-                  name: coverage-${{ env.GITHUB_RUN_NUMBER }}
+                  name: coverage-${GITHUB_RUN_NUMBER}
                   path: ${{ env.COV_REPORT }}
                   if-no-files-found: error
                   retention-days: 1
@@ -284,8 +294,6 @@ jobs:
             fail-fast: false
             matrix:
                 python: [3.8, 3.9]
-        env:
-            COV_REPORT: ${{ env.GITHUB_WORKSPACE }}/coverage-${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_JOB }}-${{ env.RUNNER_OS }}-${{ matrix.python }}.xml
         steps:
             - uses: actions/checkout@v2
 
@@ -297,7 +305,7 @@ jobs:
             - name: Download Python wheel
               uses: actions/download-artifact@v2
               with:
-                  name: macos-wheel-${{ env.GITHUB_RUN_NUMBER }}
+                  name: macos-wheel-${GITHUB_RUN_NUMBER}
 
             - name: Install wheel
               run: python -m pip install *.whl
@@ -308,13 +316,17 @@ jobs:
             - name: Install test dependencies
               run: python -m pip install -r examples/requirements.txt -r tests/requirements.txt
 
+            - name: Set coverage path
+              run: |
+                  echo "COV_REPORT=${GITHUB_WORKSPACE}/coverage-${GITHUB_RUN_NUMBER}-${GITHUB_JOB}-${RUNNER_OS}-${{ matrix.python }}.xml" >> $GITHUB_ENV
+
             - name: Run the test suite
               run: make install-test-cov TEST_TARGET="examples"
 
             - name: Upload code coverage report wheel
               uses: actions/upload-artifact@v2
               with:
-                  name: coverage-${{ env.GITHUB_RUN_NUMBER }}
+                  name: coverage-${GITHUB_RUN_NUMBER}
                   path: ${{ env.COV_REPORT }}
                   if-no-files-found: error
                   retention-days: 1
@@ -333,7 +345,7 @@ jobs:
             - name: Download cover coverage reports
               uses: actions/download-artifact@v2
               with:
-                  name: coverage-${{ env.GITHUB_RUN_NUMBER }}
+                  name: coverage-${GITHUB_RUN_NUMBER}
 
             - name: List the coverage reports
               run: |
@@ -391,7 +403,7 @@ jobs:
             - name: Download Python wheel
               uses: actions/download-artifact@v2
               with:
-                  name: manylinux-wheel-${{ env.GITHUB_RUN_NUMBER }}
+                  name: manylinux-wheel-${GITHUB_RUN_NUMBER}
 
             - name: Download address sanitized LLVM compiler service
               uses: actions/download-artifact@v2
