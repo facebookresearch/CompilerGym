@@ -9,13 +9,16 @@ import sys
 import pytest
 
 from compiler_gym.datasets import Dataset
-from tests.pytest_plugins.common import skip_on_ci
+from compiler_gym.envs.llvm import LlvmEnv
+from tests.pytest_plugins.common import ci_only, skip_on_ci
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
 
+# Installing all datasets on CI is expensive. Skip these tests, we define
+# smaller versions of them below.
 
-# Installing all datasets on CI is expensive.
+
 @skip_on_ci
 @pytest.mark.skipif(sys.version_info < (3, 7), reason="Fails on py3.6")
 def test_pickle_dataset(dataset: Dataset):
@@ -23,10 +26,28 @@ def test_pickle_dataset(dataset: Dataset):
     assert pickle.loads(pickle.dumps(dataset)) == dataset
 
 
-# Installing all datasets on CI is expensive.
 @skip_on_ci
 def test_pickle_benchmark(dataset: Dataset):
     """Test that benchmarks can be pickled."""
+    benchmark = next(dataset.benchmarks())
+    assert pickle.loads(pickle.dumps(benchmark))
+
+
+# Smaller versions of the above tests for CI.
+
+
+@ci_only
+@pytest.mark.skipif(sys.version_info < (3, 7), reason="Fails on py3.6")
+def test_pickle_cbench_dataset(env: LlvmEnv):
+    """Test that datasets can be pickled."""
+    dataset = env.datasets["benchmark://cbench-v1"]
+    assert pickle.loads(pickle.dumps(dataset)) == dataset
+
+
+@ci_only
+def test_pickle_cbench_benchmark(env: LlvmEnv):
+    """Test that benchmarks can be pickled."""
+    dataset = env.datasets["benchmark://cbench-v1"]
     benchmark = next(dataset.benchmarks())
     assert pickle.loads(pickle.dumps(benchmark))
 
