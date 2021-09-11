@@ -72,12 +72,14 @@ compiler_gym:[a-zA-Z0-9/-]+> Exiting
 
 
 def test_list_datasets():
+    FLAGS.unparse_flags()
     io_check(
         """list_datasets""", r"""compiler_gym:cbench-v1/qsort> .*cbench-v[0-9]+.*"""
     )
 
 
 def test_list_benchmarks():
+    FLAGS.unparse_flags()
     io_check(
         """list_benchmarks""",
         r"""compiler_gym:cbench-v1/qsort> .*cbench-v[0-9]+/adpcm.*""",
@@ -85,12 +87,14 @@ def test_list_benchmarks():
 
 
 def test_list_actions():
+    FLAGS.unparse_flags()
     io_check(
         """list_actions""", r"""compiler_gym:cbench-v1/qsort> .*-adce.* -strip.*"""
     )
 
 
 def test_list_rewards():
+    FLAGS.unparse_flags()
     io_check(
         """list_rewards""",
         r"""compiler_gym:cbench-v1/qsort> .*IrInstructionCount.* ObjectTextSizeOz.*""",
@@ -98,6 +102,7 @@ def test_list_rewards():
 
 
 def test_list_observations():
+    FLAGS.unparse_flags()
     io_check(
         """list_observations""",
         r"""compiler_gym:cbench-v1/qsort> Autophase, .*, Runtime""",
@@ -105,6 +110,7 @@ def test_list_observations():
 
 
 def test_set_benchmark():
+    FLAGS.unparse_flags()
     io_check(
         """set_benchmark cbench-v1/adpcm""",
         r"""compiler_gym:cbench-v1/qsort> Reset benchmark://cbench-v[0-9]+/adpcm environment in [0-9.mu]*s""",
@@ -112,6 +118,7 @@ def test_set_benchmark():
 
 
 def test_actions_stack_back_stack():
+    FLAGS.unparse_flags()
     io_check(
         """set_benchmark cbench-v1/adpcm
         action -mem2reg -adce -adce
@@ -144,6 +151,7 @@ compiler_gym:cbench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   | Rew
 
 
 def test_reward():
+    FLAGS.unparse_flags()
     io_check(
         """set_benchmark cbench-v1/adpcm
         set_default_reward IrInstructionCount
@@ -174,6 +182,7 @@ compiler_gym:cbench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   |   R
 
 
 def test_observation():
+    FLAGS.unparse_flags()
     io_check(
         """set_benchmark cbench-v1/adpcm
         set_default_observation IrInstructionCount
@@ -201,6 +210,7 @@ Observation IrInstructionCountOz in [0-9.mu]*s""",
 
 
 def test_try_all_actions():
+    FLAGS.unparse_flags()
     io_check(
         """set_benchmark cbench-v1/adpcm
         set_default_reward IrInstructionCount
@@ -226,6 +236,7 @@ Got actions in [0-9.mu]*s
 
 
 def test_simplify_stack():
+    FLAGS.unparse_flags()
     io_check(
         """set_benchmark cbench-v1/adpcm
         set_default_reward IrInstructionCount
@@ -255,6 +266,7 @@ compiler_gym:cbench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   |   R
 
 
 def test_simplify_stack_no_reward():
+    FLAGS.unparse_flags()
     io_check(
         """set_benchmark cbench-v1/adpcm
         action -mem2reg -adce -adce
@@ -278,6 +290,7 @@ compiler_gym:cbench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   | Rew
 
 
 def test_hill_climb(monkeypatch):
+    FLAGS.unparse_flags()
     i = 0
 
     def incr():
@@ -308,6 +321,7 @@ compiler_gym:cbench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   |   R
 
 
 def test_greedy():
+    FLAGS.unparse_flags()
     io_check(
         """set_benchmark cbench-v1/adpcm
         set_default_reward IrInstructionCount
@@ -334,6 +348,7 @@ compiler_gym:cbench-v[0-9]+/adpcm>    Depth | Action   | Effect   | Done   |   R
 
 
 def test_commandline():
+    FLAGS.unparse_flags()
     io_check(
         """set_benchmark cbench-v1/adpcm
         action -mem2reg -adce
@@ -349,6 +364,7 @@ compiler_gym:cbench-v[0-9]+/adpcm> \$ opt -mem2reg -adce input.bc -o output.bc""
 
 
 def test_reset():
+    FLAGS.unparse_flags()
     io_check(
         """set_benchmark cbench-v1/adpcm
         action -mem2reg -adce
@@ -383,6 +399,7 @@ def test_missing_required_flag():
 
 
 def test_ls_env():
+    FLAGS.unparse_flags()
     with capture_output() as out:
         try:
             main(["argv0", "--ls_env"])
