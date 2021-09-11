@@ -24,7 +24,7 @@ def test_random_search_smoke_test():
     with tempfile.TemporaryDirectory() as tmp:
         outdir = Path(tmp)
         set_command_line_flags(["argv0"])
-        random_search(
+        env = random_search(
             make_env=make_env,
             outdir=outdir,
             patience=50,
@@ -32,6 +32,7 @@ def test_random_search_smoke_test():
             nproc=1,
             skip_done=False,
         )
+        env.close()
 
         assert (outdir / "random_search.json").is_file()
         assert (outdir / "random_search_progress.csv").is_file()

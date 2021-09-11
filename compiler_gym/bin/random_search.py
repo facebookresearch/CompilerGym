@@ -105,7 +105,7 @@ def main(argv):
     with make_env() as env:
         env.reset()
 
-    best_reward, _ = random_search(
+    env = random_search(
         make_env=make_env,
         outdir=Path(FLAGS.output_dir) if FLAGS.output_dir else None,
         patience=FLAGS.patience,
@@ -113,15 +113,20 @@ def main(argv):
         nproc=FLAGS.nproc,
         skip_done=FLAGS.skip_done,
     )
-
-    # Exit with error if --fail_threshold was set and the best reward does not
-    # meet this value.
-    if FLAGS.fail_threshold is not None and best_reward < FLAGS.fail_threshold:
-        print(
-            f"Best reward {best_reward:.3f} below threshold of {FLAGS.fail_threshold}",
-            file=sys.stderr,
-        )
-        sys.exit(1)
+    try:
+        # Exit with error if --fail_threshold was set and the best reward does not
+        # meet this value.
+        if (
+            FLAGS.fail_threshold is not None
+            and env.episode_reward < FLAGS.fail_threshold
+        ):
+            print(
+                f"Best reward {env.episode_reward:.3f} below threshold of {FLAGS.fail_threshold}",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+    finally:
+        env.close()
 
 
 if __name__ == "__main__":
