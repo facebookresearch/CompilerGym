@@ -284,12 +284,13 @@ itest: bazel-fetch
 # symlinking the test directory into it so that pytest can be invoked.
 install-test-setup:
 	mkdir -p "$(INSTALL_TEST_ROOT)"
-	rm -f "$(INSTALL_TEST_ROOT)/tests" "$(INSTALL_TEST_ROOT)/tox.ini"
+	rm -f "$(INSTALL_TEST_ROOT)/examples" "$(INSTALL_TEST_ROOT)/tests" "$(INSTALL_TEST_ROOT)/tox.ini"
+	ln -s "$(ROOT)/examples" "$(INSTALL_TEST_ROOT)"
 	ln -s "$(ROOT)/tests" "$(INSTALL_TEST_ROOT)"
 	ln -s "$(ROOT)/tox.ini" "$(INSTALL_TEST_ROOT)"
 
 define pytest
-	cd "$(INSTALL_TEST_ROOT)" && pytest $(if $(TEST_TARGET),$(TEST_TARGET),tests) $(1) $(PYTEST_ARGS)
+	cd "$(INSTALL_TEST_ROOT)" && pytest $(if $(TEST_TARGET),$(TEST_TARGET),examples tests) $(1) $(PYTEST_ARGS)
 endef
 
 install-test: install-test-setup
