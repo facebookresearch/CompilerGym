@@ -373,7 +373,9 @@ jobs:
               uses: ./.github/actions/install-build-dependencies
 
             - name: Build address sanitized LLVM compiler service
-              run: make bazel-build BAZEL_BUILD_OPTS=--config=asan BUILD_TARGET=//compiler_gym/envs/llvm/service:compiler_gym-llvm-service
+              run: |
+                  make bazel-build BAZEL_BUILD_OPTS=--config=asan BUILD_TARGET=//compiler_gym/envs/llvm/service:compiler_gym-llvm-service
+                  tar -C bazel-bin/compiler_gym/envs/llvm/service -cjvf compiler_gym-llvm-service.tar.bz2 compiler_gym-llvm-service
               env:
                   CC: clang
                   CXX: clang++
@@ -384,8 +386,8 @@ jobs:
             - name: Upload address sanitized LLVM compiler service
               uses: actions/upload-artifact@v2
               with:
-                  name: compiler_gym-llvm-service-linux-asan
-                  path: bazel-bin/compiler_gym/envs/llvm/service/compiler_gym-llvm-service
+                  name: compiler_gym-llvm-service-linux-asan-build
+                  path: compiler_gym-llvm-service.tar.bz2
                   if-no-files-found: error
                   retention-days: 7
 
@@ -403,15 +405,16 @@ jobs:
             - name: Download Python wheel
               uses: actions/download-artifact@v2
               with:
-                  name: manylinux-wheel-${GITHUB_RUN_NUMBER}
+                  name: linux-wheel-${{ env.GITHUB_RUN_NUMBER }}
 
             - name: Download address sanitized LLVM compiler service
               uses: actions/download-artifact@v2
               with:
-                  name: compiler_gym-llvm-service-linux-asan
+                  name: compiler_gym-llvm-service-linux-asan-build
 
             - name: Repack wheel
               run: |
+                  tar xjvf compiler_gym-llvm-service.tar.bz2
                   python -m pip install -U wheel
                   wheel unpack *.whl
                   rm *.whl
