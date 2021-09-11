@@ -98,7 +98,7 @@ jobs:
 
             - name: Set coverage path
               run: |
-                  echo "COV_REPORT=${GITHUB_WORKSPACE}/coverage-${GITHUB_RUN_NUMBER}-${GITHUB_JOB}-${RUNNER_OS}-${{ matrix.python }}.xml" >> $GITHUB_ENV
+                  echo "COV_REPORT=${GITHUB_WORKSPACE}/coverage-${GITHUB_RUN_NUMBER}-${GITHUB_JOB}-${{ matrix.python }}.xml" >> $GITHUB_ENV
 
             - name: Run the test suite
               run: make install-test-cov TEST_TARGET="tests" PYTEST_ARGS="--ignore tests/llvm"
@@ -142,7 +142,7 @@ jobs:
 
             - name: Set coverage path
               run: |
-                  echo "COV_REPORT=${GITHUB_WORKSPACE}/coverage-${GITHUB_RUN_NUMBER}-${GITHUB_JOB}-${RUNNER_OS}-${{ matrix.python }}.xml" >> $GITHUB_ENV
+                  echo "COV_REPORT=${GITHUB_WORKSPACE}/coverage-${GITHUB_RUN_NUMBER}-${GITHUB_JOB}-${{ matrix.python }}.xml" >> $GITHUB_ENV
 
             - name: Run the test suite
               run: make install-test-cov TEST_TARGET="tests" PYTEST_ARGS="--ignore tests/llvm"
@@ -186,7 +186,7 @@ jobs:
 
             - name: Set coverage path
               run: |
-                  echo "COV_REPORT=${GITHUB_WORKSPACE}/coverage-${GITHUB_RUN_NUMBER}-${GITHUB_JOB}-${RUNNER_OS}-${{ matrix.python }}.xml" >> $GITHUB_ENV
+                  echo "COV_REPORT=${GITHUB_WORKSPACE}/coverage-${GITHUB_RUN_NUMBER}-${GITHUB_JOB}-${{ matrix.python }}.xml" >> $GITHUB_ENV
 
             - name: Run the test suite
               run: make install-test-cov TEST_TARGET="tests/llvm"
@@ -230,7 +230,7 @@ jobs:
 
             - name: Set coverage path
               run: |
-                  echo "COV_REPORT=${GITHUB_WORKSPACE}/coverage-${GITHUB_RUN_NUMBER}-${GITHUB_JOB}-${RUNNER_OS}-${{ matrix.python }}.xml" >> $GITHUB_ENV
+                  echo "COV_REPORT=${GITHUB_WORKSPACE}/coverage-${GITHUB_RUN_NUMBER}-${GITHUB_JOB}-${{ matrix.python }}.xml" >> $GITHUB_ENV
 
             - name: Run the test suite
               run: make install-test-cov TEST_TARGET="tests/llvm"
@@ -274,7 +274,7 @@ jobs:
 
             - name: Set coverage path
               run: |
-                  echo "COV_REPORT=${GITHUB_WORKSPACE}/coverage-${GITHUB_RUN_NUMBER}-${GITHUB_JOB}-${RUNNER_OS}-${{ matrix.python }}.xml" >> $GITHUB_ENV
+                  echo "COV_REPORT=${GITHUB_WORKSPACE}/coverage-${GITHUB_RUN_NUMBER}-${GITHUB_JOB}-${{ matrix.python }}.xml" >> $GITHUB_ENV
 
             - name: Run the test suite
               run: make install-test-cov TEST_TARGET="examples"
@@ -318,7 +318,7 @@ jobs:
 
             - name: Set coverage path
               run: |
-                  echo "COV_REPORT=${GITHUB_WORKSPACE}/coverage-${GITHUB_RUN_NUMBER}-${GITHUB_JOB}-${RUNNER_OS}-${{ matrix.python }}.xml" >> $GITHUB_ENV
+                  echo "COV_REPORT=${GITHUB_WORKSPACE}/coverage-${GITHUB_RUN_NUMBER}-${GITHUB_JOB}-${{ matrix.python }}.xml" >> $GITHUB_ENV
 
             - name: Run the test suite
               run: make install-test-cov TEST_TARGET="examples"
