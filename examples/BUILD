@@ -10,6 +10,7 @@ py_binary(
     srcs = ["actor_critic.py"],
     deps = [
         "//compiler_gym",
+        "//compiler_gym/util/flags",
     ],
 )
 
@@ -33,9 +34,7 @@ py_binary(
         "//compiler_gym/envs",
         "//compiler_gym/service/proto",
         "//compiler_gym/util",
-        "//compiler_gym/util/flags:benchmark_from_flags",
-        "//compiler_gym/util/flags:env_from_flags",
-        "//compiler_gym/util/flags:output_dir",
+        "//compiler_gym/util/flags",
     ],
 )
 
@@ -57,8 +56,7 @@ py_binary(
         "//compiler_gym/envs",
         "//compiler_gym/service/proto",
         "//compiler_gym/util",
-        "//compiler_gym/util/flags:benchmark_from_flags",
-        "//compiler_gym/util/flags:env_from_flags",
+        "//compiler_gym/util/flags",
     ],
 )
 
@@ -68,6 +66,7 @@ py_test(
     deps = [
         ":explore",
         "//compiler_gym",
+        "//compiler_gym/util/flags",
         "//tests:test_main",
     ],
 )
@@ -79,7 +78,7 @@ py_binary(
     deps = [
         "//compiler_gym",
         "//compiler_gym/util",
-        "//compiler_gym/util/flags:benchmark_from_flags",
+        "//compiler_gym/util/flags",
     ],
 )
 
@@ -102,8 +101,7 @@ py_binary(
     deps = [
         "//compiler_gym/envs",
         "//compiler_gym/util",
-        "//compiler_gym/util/flags:benchmark_from_flags",
-        "//compiler_gym/util/flags:env_from_flags",
+        "//compiler_gym/util/flags",
     ],
 )
 

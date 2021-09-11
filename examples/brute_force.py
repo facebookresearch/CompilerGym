@@ -25,7 +25,6 @@ import json
 import logging
 import math
 import sys
-from multiprocessing import cpu_count
 from pathlib import Path
 from queue import Queue
 from threading import Thread
@@ -35,6 +34,8 @@ from typing import List
 import humanize
 from absl import app, flags
 
+import compiler_gym.util.flags.episode_length  # noqa Flag definition.
+import compiler_gym.util.flags.nproc  # noqa Flag definition.
 import compiler_gym.util.flags.output_dir  # noqa Flag definition.
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
@@ -42,14 +43,10 @@ from compiler_gym.util.flags.env_from_flags import env_from_flags
 from compiler_gym.util.logs import create_logging_dir
 
 flags.DEFINE_list(
-    "actions",
+    "brute_force_action_list",
     [],
     "A list of action names to enumerate. If not provided, all actions are used "
     "(warning: this might make a long time!)",
-)
-flags.DEFINE_integer("episode_length", 5, "The number of steps in each episode.")
-flags.DEFINE_integer(
-    "nproc", cpu_count(), "The number of parallel worker threads to run."
 )
 
 FLAGS = flags.FLAGS
@@ -317,7 +314,7 @@ def main(argv):
 
     run_brute_force(
         make_env=lambda: env_from_flags(benchmark_from_flags()),
-        action_names=FLAGS.actions,
+        action_names=FLAGS.brute_force_action_list,
         episode_length=FLAGS.episode_length,
         outdir=logs_dir,
         nproc=FLAGS.nproc,

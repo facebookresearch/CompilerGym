@@ -12,8 +12,7 @@ py_binary(
         ":sensitivity_analysis_eval",
         "//compiler_gym/envs",
         "//compiler_gym/util",
-        "//compiler_gym/util/flags:benchmark_from_flags",
-        "//compiler_gym/util/flags:env_from_flags",
+        "//compiler_gym/util/flags",
     ],
 )
 
@@ -37,8 +36,7 @@ py_binary(
         "//compiler_gym/envs",
         "//compiler_gym/service/proto",
         "//compiler_gym/util",
-        "//compiler_gym/util/flags:benchmark_from_flags",
-        "//compiler_gym/util/flags:env_from_flags",
+        "//compiler_gym/util/flags",
     ],
 )
 
@@ -59,6 +57,6 @@ py_binary(
     visibility = ["//visibility:public"],
     deps = [
         "//compiler_gym/util",
-        "//compiler_gym/util/flags:output_dir",
+        "//compiler_gym/util/flags",
     ],
 )

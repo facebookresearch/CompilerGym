@@ -21,8 +21,7 @@ py_binary(
     srcs = ["parallelization_load_test.py"],
     deps = [
         "//compiler_gym/util",
-        "//compiler_gym/util/flags:benchmark_from_flags",
-        "//compiler_gym/util/flags:env_from_flags",
+        "//compiler_gym/util/flags",
     ],
 )
 
