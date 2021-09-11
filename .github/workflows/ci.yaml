@@ -205,7 +205,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                python: [3.8, 3.9]
+                python: [3.9]
         steps:
             - uses: actions/checkout@v2
 
@@ -293,7 +293,7 @@ jobs:
         strategy:
             fail-fast: false
             matrix:
-                python: [3.8, 3.9]
+                python: [3.9]
         steps:
             - uses: actions/checkout@v2
 
@@ -331,7 +331,7 @@ jobs:
                   if-no-files-found: error
                   retention-days: 1
 
-    upload-coverage-report:
+    upload-coverage-reports:
         needs:
             - test-linux
             - test-macos
@@ -342,17 +342,17 @@ jobs:
         if: ${{ always() }}
         runs-on: ubuntu-latest
         steps:
-            - name: Download cover coverage reports
+            - name: Download coverage reports
               uses: actions/download-artifact@v2
               with:
                   name: coverage-${GITHUB_RUN_NUMBER}
 
-            - name: List the coverage reports
+            - name: Enumerate the coverage reports
               run: |
                   ls -lh coverage*.xml
                   echo "COV_FILES=$(ls coverage*.xml | tr '\n' ',')" >> $GITHUB_ENV
 
-            - name: Upload coverage to Codecov
+            - name: Upload coverage reports to Codecov
               uses: codecov/codecov-action@v2
               with:
                   files: ${{ env.COV_FILES }}
