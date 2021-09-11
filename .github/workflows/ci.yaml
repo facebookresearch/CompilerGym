@@ -101,7 +101,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test PYTEST_ARGS="--ignore tests/llvm"
+              run: make install-test TEST_TARGET="tests" PYTEST_ARGS="--ignore tests/llvm"
 
     test-llvm-env-linux:
         needs: build-linux-wheel
@@ -137,6 +137,40 @@ jobs:
             - name: Run the test suite
               run: make install-test TEST_TARGET="tests/llvm"
 
+    test-examples-linux:
+        needs: build-linux-wheel
+        runs-on: ubuntu-latest
+
+        strategy:
+            fail-fast: false
+            matrix:
+                python: [3.6, 3.7, 3.8, 3.9]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python ${{ matrix.python }}
+              uses: actions/setup-python@v2
+              with:
+                  python-version: ${{ matrix.python }}
+
+            - name: Download Python wheel
+              uses: actions/download-artifact@v2
+              with:
+                  name: manylinux-wheel
+
+            - name: Install wheel
+              run: python -m pip install *.whl
+
+            - name: Install runtime dependencies
+              uses: ./.github/actions/install-runtime-dependencies
+
+            - name: Install test dependencies
+              run: python -m pip install -r tests/requirements.txt
+
+            - name: Run the test suite
+              run: make install-test TEST_TARGET="examples"
+
     test-macos-wheel:
         needs: build-macos-wheel
         runs-on: macos-latest
@@ -169,7 +203,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test PYTEST_ARGS="--ignore tests/llvm"
+              run: make install-test TEST_TARGET="tests" PYTEST_ARGS="--ignore tests/llvm"
 
     test-llvm-env-macos:
         needs: build-macos-wheel
@@ -204,6 +238,40 @@ jobs:
 
             - name: Run the test suite
               run: make install-test TEST_TARGET="tests/llvm"
+
+    test-examples-macos:
+        needs: build-macos-wheel
+        runs-on: macos-latest
+
+        strategy:
+            fail-fast: false
+            matrix:
+                python: [3.8, 3.9]
+
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python ${{ matrix.python }}
+              uses: actions/setup-python@v2
+              with:
+                  python-version: ${{ matrix.python }}
+
+            - name: Download Python wheel
+              uses: actions/download-artifact@v2
+              with:
+                  name: macos-wheel
+
+            - name: Install wheel
+              run: python -m pip install *.whl
+
+            - name: Install runtime dependencies
+              uses: ./.github/actions/install-runtime-dependencies
+
+            - name: Install test dependencies
+              run: python -m pip install -r tests/requirements.txt
+
+            - name: Run the test suite
+              run: make install-test TEST_TARGET="examples"
 
     code-coverage:
         needs: build-linux-wheel
