@@ -1,9 +1,0 @@
----
-name: Install test dependencies
-description: Install the dependencies for running the test suite.
-runs:
-    using: composite
-    steps:
-        - name: Install test dependencies
-          run: python -m pip install -r examples/requirements.txt -r tests/requirements.txt
-          shell: bash
