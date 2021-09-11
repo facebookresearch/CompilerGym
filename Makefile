@@ -148,6 +148,8 @@ init:
 	$(PYTHON) -m pip install -r requirements.txt
 	pre-commit install
 
+init-runtime-requirements:
+	$(PYTHON) -m pip install -r compiler_gym/requirements.txt
 
 ############
 # Building #
@@ -324,7 +326,7 @@ post-install-test:
 pip-install:
 	$(PYTHON) setup.py install
 
-install: | bazel-build pip-install
+install: |  init-runtime-requirements bazel-build pip-install
 
 .PHONY: pip-install install
 
