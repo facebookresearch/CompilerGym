@@ -18,6 +18,7 @@ from absl import app, flags
 
 import compiler_gym.util.flags.episode_length  # noqa Flag definition.
 import compiler_gym.util.flags.episodes  # noqa Flag definition.
+import compiler_gym.util.flags.learning_rate  # noqa Flag definition.
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.timer import Timer
 
