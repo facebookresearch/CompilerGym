@@ -275,6 +275,10 @@ TEST_TARGET ?=
 # Extra command line arguments for pytest.
 PYTEST_ARGS ?=
 
+# The path of the XML pytest coverage report to generate when running the
+# install-test-cov target.
+COV_REPORT ?= $(ROOT)/coverage.xml
+
 test: bazel-fetch
 	$(BAZEL) $(BAZEL_OPTS) test $(BAZEL_TEST_OPTS) $(if $(TEST_TARGET),$(TEST_TARGET),//...)
 
@@ -302,8 +306,7 @@ install-test: install-test-setup
 # environement. This is to ensure that the reported coverage matches that of
 # the value on: https://codecov.io/gh/facebookresearch/CompilerGym
 install-test-cov: install-test-setup
-	export CI=1; $(call pytest,--benchmark-disable -n auto -k "not fuzz" --durations=5 --cov=compiler_gym --cov-report=xml --cov-report=term)
-	@mv "$(INSTALL_TEST_ROOT)/coverage.xml" .
+	export CI=1; $(call pytest,--benchmark-disable -n auto -k "not fuzz" --durations=5 --cov=compiler_gym --cov-report=xml:$(COV_REPORT) --cov-report=term)
 
 # The minimum number of seconds to run the fuzz tests in a loop for. Override
 # this at the commandline, e.g. `FUZZ_SECONDS=1800 make fuzz`.
