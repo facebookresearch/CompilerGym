@@ -74,6 +74,8 @@ jobs:
             fail-fast: false
             matrix:
                 python: [3.6, 3.7, 3.8, 3.9]
+        env:
+            COV_REPORT: ${{ env.GITHUB_WORKSPACE }}/coverage-${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_JOB }}-${{ env.RUNNER_OS }}-${{ matrix.python }}.xml
         steps:
             - uses: actions/checkout@v2
 
@@ -99,14 +101,11 @@ jobs:
             - name: Run the test suite
               run: make install-test-cov TEST_TARGET="tests" PYTEST_ARGS="--ignore tests/llvm"
 
-            - name: Prepare the code coverage report
-              run: mv -v coverage.xml coverage-${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_JOB }}-linux-${{ matrix.python }}.xml
-
             - name: Upload code coverage report wheel
               uses: actions/upload-artifact@v2
               with:
                   name: coverage-${{ env.GITHUB_RUN_NUMBER }}
-                  path: coverage-*.xml
+                  path: ${{ env.COV_REPORT }}
                   if-no-files-found: error
                   retention-days: 1
 
@@ -117,6 +116,8 @@ jobs:
             fail-fast: false
             matrix:
                 python: [3.8, 3.9]
+        env:
+            COV_REPORT: ${{ env.GITHUB_WORKSPACE }}/coverage-${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_JOB }}-${{ env.RUNNER_OS }}-${{ matrix.python }}.xml
         steps:
             - uses: actions/checkout@v2
 
@@ -142,14 +143,11 @@ jobs:
             - name: Run the test suite
               run: make install-test-cov TEST_TARGET="tests" PYTEST_ARGS="--ignore tests/llvm"
 
-            - name: Prepare the code coverage report
-              run: mv -v coverage.xml coverage-${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_JOB }}-macos-${{ matrix.python }}.xml
-
             - name: Upload code coverage report wheel
               uses: actions/upload-artifact@v2
               with:
                   name: coverage-${{ env.GITHUB_RUN_NUMBER }}
-                  path: coverage-*.xml
+                  path: ${{ env.COV_REPORT }}
                   if-no-files-found: error
                   retention-days: 1
 
@@ -160,6 +158,8 @@ jobs:
             fail-fast: false
             matrix:
                 python: [3.6, 3.7, 3.8, 3.9]
+        env:
+            COV_REPORT: ${{ env.GITHUB_WORKSPACE }}/coverage-${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_JOB }}-${{ env.RUNNER_OS }}-${{ matrix.python }}.xml
         steps:
             - uses: actions/checkout@v2
 
@@ -183,7 +183,15 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test TEST_TARGET="tests/llvm"
+              run: make install-test-cov TEST_TARGET="tests/llvm"
+
+            - name: Upload code coverage report wheel
+              uses: actions/upload-artifact@v2
+              with:
+                  name: coverage-${{ env.GITHUB_RUN_NUMBER }}
+                  path: ${{ env.COV_REPORT }}
+                  if-no-files-found: error
+                  retention-days: 1
 
     test-llvm-env-macos:
         needs: build-macos
@@ -192,6 +200,8 @@ jobs:
             fail-fast: false
             matrix:
                 python: [3.8, 3.9]
+        env:
+            COV_REPORT: ${{ env.GITHUB_WORKSPACE }}/coverage-${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_JOB }}-${{ env.RUNNER_OS }}-${{ matrix.python }}.xml
         steps:
             - uses: actions/checkout@v2
 
@@ -215,7 +225,15 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test TEST_TARGET="tests/llvm"
+              run: make install-test-cov TEST_TARGET="tests/llvm"
+
+            - name: Upload code coverage report wheel
+              uses: actions/upload-artifact@v2
+              with:
+                  name: coverage-${{ env.GITHUB_RUN_NUMBER }}
+                  path: ${{ env.COV_REPORT }}
+                  if-no-files-found: error
+                  retention-days: 1
 
     test-examples-linux:
         needs: build-linux
@@ -224,6 +242,8 @@ jobs:
             fail-fast: false
             matrix:
                 python: [3.6, 3.7, 3.8, 3.9]
+        env:
+            COV_REPORT: ${{ env.GITHUB_WORKSPACE }}/coverage-${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_JOB }}-${{ env.RUNNER_OS }}-${{ matrix.python }}.xml
         steps:
             - uses: actions/checkout@v2
 
@@ -247,7 +267,15 @@ jobs:
               run: python -m pip install -r examples/requirements.txt -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test TEST_TARGET="examples"
+              run: make install-test-cov TEST_TARGET="examples"
+
+            - name: Upload code coverage report wheel
+              uses: actions/upload-artifact@v2
+              with:
+                  name: coverage-${{ env.GITHUB_RUN_NUMBER }}
+                  path: ${{ env.COV_REPORT }}
+                  if-no-files-found: error
+                  retention-days: 1
 
     test-examples-macos:
         needs: build-macos
@@ -256,6 +284,8 @@ jobs:
             fail-fast: false
             matrix:
                 python: [3.8, 3.9]
+        env:
+            COV_REPORT: ${{ env.GITHUB_WORKSPACE }}/coverage-${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_JOB }}-${{ env.RUNNER_OS }}-${{ matrix.python }}.xml
         steps:
             - uses: actions/checkout@v2
 
@@ -279,11 +309,24 @@ jobs:
               run: python -m pip install -r examples/requirements.txt -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test TEST_TARGET="examples"
+              run: make install-test-cov TEST_TARGET="examples"
 
-    code-coverage:
-        # TODO: Add support for test-examples and test-llvm-env jobs.
-        needs: [test-linux, test-macos]
+            - name: Upload code coverage report wheel
+              uses: actions/upload-artifact@v2
+              with:
+                  name: coverage-${{ env.GITHUB_RUN_NUMBER }}
+                  path: ${{ env.COV_REPORT }}
+                  if-no-files-found: error
+                  retention-days: 1
+
+    upload-coverage-report:
+        needs:
+            - test-linux
+            - test-macos
+            - test-llvm-env-linux
+            - test-llvm-env-macos
+            - test-examples-linux
+            - test-examples-macos
         if: ${{ always() }}
         runs-on: ubuntu-latest
         steps:
@@ -293,12 +336,14 @@ jobs:
                   name: coverage-${{ env.GITHUB_RUN_NUMBER }}
 
             - name: List the coverage reports
-              run: ls -lh coverage*.xml
+              run: |
+                  ls -lh coverage*.xml
+                  echo "COV_FILES=$(ls coverage*.xml | tr '\n' ',')" >> $GITHUB_ENV
 
             - name: Upload coverage to Codecov
               uses: codecov/codecov-action@v2
               with:
-                  files: ./coverage-*.xml
+                  files: ${{ env.COV_FILES }}
                   fail_ci_if_error: true
                   verbose: true
 
