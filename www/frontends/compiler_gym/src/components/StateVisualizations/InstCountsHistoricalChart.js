@@ -10,16 +10,13 @@ import { groupBy, getMaxDelta, percIncrease } from "../../utils/Helpers";
 import InstCountDict from "../../utils/InstCountDict";
 import SparkLineTable from "./SparkLineTable";
 
-const InstCountsHistoricalChart = ({ sessionStates, darkTheme, sortBy }) => {
+const InstCountsHistoricalChart = ({ sessionStates, commandLine, darkTheme, sortBy }) => {
   const [steps, setSteps] = useState([]);
 
   useEffect(() => {
-    let lastState = sessionStates?.[sessionStates?.length - 1];
-    setSteps(
-      lastState?.commandline.split(" input.bc -o output.bc")[0].split(" ")
-    );
+    setSteps(commandLine.split(" input.bc -o output.bc")[0].split(" "));
     return () => {};
-  }, [sessionStates]);
+  }, [commandLine]);
 
   const sortedList = (array, name) => {
     switch (name) {

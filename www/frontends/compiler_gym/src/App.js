@@ -16,7 +16,8 @@ import MainPage from "./components/Pages/MainPage";
 const api = new ApiService("http://127.0.0.1:5000");
 const INITIAL_SETTINGS = {
   reward: "IrInstructionCountOz",
-  benchmark: "benchmark://cbench-v1/adpcm",
+  dataset: "benchmark://cbench-v1",
+  datasetUri: "adpcm",
 };
 
 function App() {
@@ -24,6 +25,11 @@ function App() {
   const [session, setSession] = useState({});
   const [darkTheme, setDarkTheme] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [params, setParams] = useState({
+    reward: INITIAL_SETTINGS.reward,
+    dataset: INITIAL_SETTINGS.dataset,
+    datasetUri: INITIAL_SETTINGS.datasetUri,
+  })
 
   /*
    * Start a new session when component mounts in the browser.
@@ -33,10 +39,10 @@ function App() {
     const fetchData = async () => {
       try {
         const options = await api.getEnvOptions();
-        const initSession = await api.startSession(
+        const initSession = await api.getActions(
+          `${INITIAL_SETTINGS.dataset}/${INITIAL_SETTINGS.datasetUri}`,
           INITIAL_SETTINGS.reward,
-          "-",
-          INITIAL_SETTINGS.benchmark
+          "",
         );
         console.log(initSession);
         setCompilerGym(options);
@@ -52,27 +58,6 @@ function App() {
     return () => {};
   }, []);
 
-  /**
-   * Adds a listener to trigger a Close Session API call when user closes a tab or browser.
-   */
-  useEffect(() => {
-    window.addEventListener("beforeunload", handleTabClosing);
-    return () => {
-      window.removeEventListener("beforeunload", handleTabClosing);
-    };
-  });
-
-  const handleTabClosing = () => {
-    api.closeSession(session.session_id).then(
-      (result) => {
-        console.log(result);
-      },
-      (error) => {
-        console.log(error);
-      }
-    );
-  };
-
   const toggleTheme = () => {
     setDarkTheme(!darkTheme);
   };
@@ -86,6 +71,8 @@ function App() {
           api: api,
           compilerGym: compilerGym,
           session: session,
+          params: params,
+          setParams,
           setSession,
         }}
       >

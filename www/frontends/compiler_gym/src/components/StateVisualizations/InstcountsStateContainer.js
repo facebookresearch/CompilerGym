@@ -13,6 +13,7 @@ import InstCountsHistoricalChart from "./InstCountsHistoricalChart";
 
 const InstcountsStateContainer = ({
   sessionStates,
+  commandLine,
   instcount,
   prev_instcount,
   darkTheme,
@@ -61,7 +62,7 @@ const InstcountsStateContainer = ({
       height: 175 + "%", //3:2 ratio
     },
     title: {
-      text: "InstCounts",
+      text: "InstCounts [Last Action]",
       style: {
         color: darkTheme && "white",
       },
@@ -229,6 +230,7 @@ const InstcountsStateContainer = ({
       {toggle ? (
         <InstCountsHistoricalChart
           sessionStates={sessionStates}
+          commandLine={commandLine}
           darkTheme={darkTheme}
           sortBy={sortBy}
         />

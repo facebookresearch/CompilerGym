@@ -18,6 +18,7 @@ HC_exportData(Highcharts);
 
 const AutophaseStateContainer = ({
   sessionStates,
+  commandLine,
   autophase,
   prev_authophase,
   darkTheme,
@@ -67,7 +68,7 @@ const AutophaseStateContainer = ({
       height: 180 + "%",
     },
     title: {
-      text: "AutoPhase",
+      text: "AutoPhase [Last Action]",
       style: {
         color: darkTheme && "white",
       },
@@ -229,6 +230,7 @@ const AutophaseStateContainer = ({
       {toggle ? (
         <AutophaseHistoricalChart
           sessionStates={sessionStates}
+          commandLine={commandLine}
           darkTheme={darkTheme}
           sortBy={sortBy}
         />
