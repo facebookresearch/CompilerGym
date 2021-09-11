@@ -97,7 +97,18 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test TEST_TARGET="tests" PYTEST_ARGS="--ignore tests/llvm"
+              run: make install-test-cov TEST_TARGET="tests" PYTEST_ARGS="--ignore tests/llvm"
+
+            - name: Prepare the code coverage report
+              run: mv -v coverage.xml coverage-${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_JOB }}-linux-${{ matrix.python }}.xml
+
+            - name: Upload code coverage report wheel
+              uses: actions/upload-artifact@v2
+              with:
+                  name: coverage-${{ env.GITHUB_RUN_NUMBER }}
+                  path: coverage-*.xml
+                  if-no-files-found: error
+                  retention-days: 1
 
     test-macos:
         needs: build-macos
@@ -129,7 +140,18 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test TEST_TARGET="tests" PYTEST_ARGS="--ignore tests/llvm"
+              run: make install-test-cov TEST_TARGET="tests" PYTEST_ARGS="--ignore tests/llvm"
+
+            - name: Prepare the code coverage report
+              run: mv -v coverage.xml coverage-${{ env.GITHUB_RUN_NUMBER }}-${{ env.GITHUB_JOB }}-macos-${{ matrix.python }}.xml
+
+            - name: Upload code coverage report wheel
+              uses: actions/upload-artifact@v2
+              with:
+                  name: coverage-${{ env.GITHUB_RUN_NUMBER }}
+                  path: coverage-*.xml
+                  if-no-files-found: error
+                  retention-days: 1
 
     test-llvm-env-linux:
         needs: build-linux
@@ -260,44 +282,25 @@ jobs:
               run: make install-test TEST_TARGET="examples"
 
     code-coverage:
-        needs: build-linux
+        # TODO: Add support for test-examples and test-llvm-env jobs.
+        needs: [test-linux, test-macos]
+        if: ${{ always() }}
         runs-on: ubuntu-latest
         steps:
-            - uses: actions/checkout@v2
-
-            - uses: actions/setup-python@v2
-              with:
-                  python-version: 3.9
-
-            - name: Download Python wheel
+            - name: Download cover coverage reports
               uses: actions/download-artifact@v2
               with:
-                  name: manylinux-wheel
+                  name: coverage-${{ env.GITHUB_RUN_NUMBER }}
 
-            - name: Install wheel
-              run: python -m pip install *.whl
-
-            - name: Install runtime dependencies
-              uses: ./.github/actions/install-runtime-dependencies
-
-            - name: Install test dependencies
-              run: python -m pip install -r tests/requirements.txt
-
-            - name: Run the test suite with coverage
-              # Note the `|| true` as we don't care about failing tests in this
-              # job.
-              run: make install-test-cov || true
-              env:
-                  CC: clang
-                  CXX: clang++
+            - name: List the coverage reports
+              run: ls -lh coverage*.xml
 
             - name: Upload coverage to Codecov
               uses: codecov/codecov-action@v2
               with:
-                  files: ./coverage.xml
+                  files: ./coverage-*.xml
                   fail_ci_if_error: true
                   verbose: true
-              if: ${{ always() }}
 
     build-asan-llvm-service:
         runs-on: ubuntu-latest
