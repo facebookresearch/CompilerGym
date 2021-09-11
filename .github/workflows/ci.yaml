@@ -415,10 +415,11 @@ jobs:
             - name: Repack wheel
               run: |
                   tar xjvf compiler_gym-llvm-service.tar.bz2
+                  rm compiler_gym-llvm-service.tar.bz2
+                  chmod +x compiler_gym-llvm-service
                   python -m pip install -U wheel
                   wheel unpack *.whl
                   rm *.whl
-                  chmod +x compiler_gym-llvm-service
                   chmod +x compiler_gym-*/compiler_gym-*.data/purelib/compiler_gym/third_party/csmith/csmith/bin/csmith
                   mv compiler_gym-llvm-service compiler_gym-*/compiler_gym-*.data/purelib/compiler_gym/envs/llvm/service/compiler_gym-llvm-service
                   wheel pack compiler_gym-*
