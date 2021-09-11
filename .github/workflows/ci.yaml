@@ -35,7 +35,7 @@ jobs:
             - name: Upload Python wheel
               uses: actions/upload-artifact@v2
               with:
-                  name: linux-wheel-${{ env.GITHUB_RUN_NUMBER }}
+                  name: linux-wheel
                   path: dist/*.whl
                   if-no-files-found: error
                   retention-days: 7
@@ -62,7 +62,7 @@ jobs:
             - name: Upload Python wheel
               uses: actions/upload-artifact@v2
               with:
-                  name: macos-wheel-${{ env.GITHUB_RUN_NUMBER }}
+                  name: macos-wheel
                   path: dist/*.whl
                   if-no-files-found: error
                   retention-days: 7
@@ -85,7 +85,7 @@ jobs:
             - name: Download Python wheel
               uses: actions/download-artifact@v2
               with:
-                  name: linux-wheel-${{ env.GITHUB_RUN_NUMBER }}
+                  name: linux-wheel
 
             - name: Install wheel
               run: python -m pip install *.whl
@@ -106,7 +106,7 @@ jobs:
             - name: Upload code coverage report wheel
               uses: actions/upload-artifact@v2
               with:
-                  name: coverage-reports-${{ env.GITHUB_RUN_NUMBER }}
+                  name: coverage-reports
                   path: ${{ env.COV_REPORT }}
                   if-no-files-found: error
                   retention-days: 1
@@ -129,7 +129,7 @@ jobs:
             - name: Download Python wheel
               uses: actions/download-artifact@v2
               with:
-                  name: macos-wheel-${{ env.GITHUB_RUN_NUMBER }}
+                  name: macos-wheel
 
             - name: Install wheel
               run: python -m pip install *.whl
@@ -150,7 +150,7 @@ jobs:
             - name: Upload code coverage report wheel
               uses: actions/upload-artifact@v2
               with:
-                  name: coverage-reports-${{ env.GITHUB_RUN_NUMBER }}
+                  name: coverage-reports
                   path: ${{ env.COV_REPORT }}
                   if-no-files-found: error
                   retention-days: 1
@@ -173,7 +173,7 @@ jobs:
             - name: Download Python wheel
               uses: actions/download-artifact@v2
               with:
-                  name: linux-wheel-${{ env.GITHUB_RUN_NUMBER }}
+                  name: linux-wheel
 
             - name: Install wheel
               run: python -m pip install *.whl
@@ -194,7 +194,7 @@ jobs:
             - name: Upload code coverage report wheel
               uses: actions/upload-artifact@v2
               with:
-                  name: coverage-reports-${{ env.GITHUB_RUN_NUMBER }}
+                  name: coverage-reports
                   path: ${{ env.COV_REPORT }}
                   if-no-files-found: error
                   retention-days: 1
@@ -217,7 +217,7 @@ jobs:
             - name: Download Python wheel
               uses: actions/download-artifact@v2
               with:
-                  name: macos-wheel-${{ env.GITHUB_RUN_NUMBER }}
+                  name: macos-wheel
 
             - name: Install wheel
               run: python -m pip install *.whl
@@ -238,7 +238,7 @@ jobs:
             - name: Upload code coverage report wheel
               uses: actions/upload-artifact@v2
               with:
-                  name: coverage-reports-${{ env.GITHUB_RUN_NUMBER }}
+                  name: coverage-reports
                   path: ${{ env.COV_REPORT }}
                   if-no-files-found: error
                   retention-days: 1
@@ -261,7 +261,7 @@ jobs:
             - name: Download Python wheel
               uses: actions/download-artifact@v2
               with:
-                  name: linux-wheel-${{ env.GITHUB_RUN_NUMBER }}
+                  name: linux-wheel
 
             - name: Install wheel
               run: python -m pip install *.whl
@@ -282,7 +282,7 @@ jobs:
             - name: Upload code coverage report wheel
               uses: actions/upload-artifact@v2
               with:
-                  name: coverage-reports-${{ env.GITHUB_RUN_NUMBER }}
+                  name: coverage-reports
                   path: ${{ env.COV_REPORT }}
                   if-no-files-found: error
                   retention-days: 1
@@ -305,7 +305,7 @@ jobs:
             - name: Download Python wheel
               uses: actions/download-artifact@v2
               with:
-                  name: macos-wheel-${{ env.GITHUB_RUN_NUMBER }}
+                  name: macos-wheel
 
             - name: Install wheel
               run: python -m pip install *.whl
@@ -326,7 +326,7 @@ jobs:
             - name: Upload code coverage report wheel
               uses: actions/upload-artifact@v2
               with:
-                  name: coverage-reports-${{ env.GITHUB_RUN_NUMBER }}
+                  name: coverage-reports
                   path: ${{ env.COV_REPORT }}
                   if-no-files-found: error
                   retention-days: 1
@@ -345,7 +345,7 @@ jobs:
             - name: Download coverage reports
               uses: actions/download-artifact@v2
               with:
-                  name: coverage-reports-${{ env.GITHUB_RUN_NUMBER }}
+                  name: coverage-reports
 
             - name: Enumerate the coverage reports
               run: |
@@ -405,7 +405,7 @@ jobs:
             - name: Download Python wheel
               uses: actions/download-artifact@v2
               with:
-                  name: linux-wheel-${{ env.GITHUB_RUN_NUMBER }}
+                  name: linux-wheel
 
             - name: Download address sanitized LLVM compiler service
               uses: actions/download-artifact@v2
