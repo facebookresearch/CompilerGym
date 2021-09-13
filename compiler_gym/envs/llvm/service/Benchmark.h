@@ -33,6 +33,12 @@ using Bitcode = llvm::SmallString<0>;
  */
 constexpr int kDefaultRuntimesPerObservationCount = 30;
 
+/** The default number of warmup runs that a benchmark is executed before measuring the runtimes.
+ * This can be overriden using the "llvm.set_warmup_runs_count_per_runtime_observation" session
+ * parameter.
+ */
+constexpr int kDefaultWarmupRunsPerRuntimeObservationCount = 5;
+
 /** The number of times a benchmark is built. This can be overriden using
  * the "llvm.set_buildtimes_per_observation_count" session parameter.
  */
@@ -212,6 +218,14 @@ class Benchmark {
     runtimesPerObservationCount_ = value;
   }
 
+  inline int getWarmupRunsPerRuntimeObservationCount() const {
+    return warmupRunsPerRuntimeObservationCount_;
+  }
+
+  inline void setWarmupRunsPerRuntimeObservationCount(const int value) {
+    warmupRunsPerRuntimeObservationCount_ = value;
+  }
+
   inline int getBuildtimesPerObservationCount() const { return buildtimesPerObservationCount_; }
 
   inline void setBuildtimesPerObservationCount(const int value) {
@@ -244,6 +258,7 @@ class Benchmark {
   bool needsRecompile_;
   int64_t buildTimeMicroseconds_;
   int runtimesPerObservationCount_;
+  int warmupRunsPerRuntimeObservationCount_;
   int buildtimesPerObservationCount_;
 };
 

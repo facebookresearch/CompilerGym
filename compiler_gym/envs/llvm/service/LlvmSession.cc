@@ -176,6 +176,18 @@ Status LlvmSession::handleSessionParameter(const std::string& key, const std::st
     reply = value;
   } else if (key == "llvm.get_runtimes_per_observation_count") {
     reply = fmt::format("{}", benchmark().getRuntimesPerObservationCount());
+  } else if (key == "llvm.set_warmup_runs_count_per_runtime_observation") {
+    const int ivalue = std::stoi(value);
+    if (ivalue < 0) {
+      return Status(
+          StatusCode::INVALID_ARGUMENT,
+          fmt::format("warmup_runs_count_per_runtime_observation must be >= 0. Received: {}",
+                      ivalue));
+    }
+    benchmark().setWarmupRunsPerRuntimeObservationCount(ivalue);
+    reply = value;
+  } else if (key == "llvm.get_warmup_runs_count_per_runtime_observation") {
+    reply = fmt::format("{}", benchmark().getWarmupRunsPerRuntimeObservationCount());
   } else if (key == "llvm.set_buildtimes_per_observation_count") {
     const int ivalue = std::stoi(value);
     if (ivalue < 1) {
