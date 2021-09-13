@@ -13,6 +13,13 @@ CompilerGym exposes the LLVM IR optimizer for reinforcement learning through an
     :local:
 
 
+Installation
+------------
+
+The LLVM environments are self-installing and work out of the box. A pack of
+required runtime data is downloaded and cached on first use of the environments.
+
+
 Datasets
 --------
 

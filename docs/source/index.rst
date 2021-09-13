@@ -20,6 +20,7 @@ for applying reinforcement learning to compiler optimizations.
    :caption: Environments
 
    llvm/index
+   envs/gcc
 
 ..
     .. toctree::
@@ -36,7 +37,8 @@ for applying reinforcement learning to compiler optimizations.
    compiler_gym/compiler_gym
    compiler_gym/datasets
    compiler_gym/envs
-   llvm/api
+   compiler_gym/envs/gcc
+   compiler_gym/envs/llvm
    compiler_gym/leaderboard
    compiler_gym/service
    compiler_gym/spaces

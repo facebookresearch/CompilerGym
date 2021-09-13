@@ -120,6 +120,11 @@ class CompilerEnv(gym.Env):
 
     :vartype action_spaces: List[str]
 
+    :ivar actions: The list of actions that have been performed since the
+        previous call to :func:`reset`.
+
+    :vartype actions: List[int]
+
     :ivar reward_range: A tuple indicating the range of reward values. Default
         range is (-inf, +inf).
 

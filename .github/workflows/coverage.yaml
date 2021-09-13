@@ -23,6 +23,9 @@ jobs:
             - name: Install build dependencies
               uses: ./.github/actions/install-build-dependencies
 
+            - name: Install docker
+              uses: ./.github/actions/install-docker
+
             - name: Install
               run: make install
               env:

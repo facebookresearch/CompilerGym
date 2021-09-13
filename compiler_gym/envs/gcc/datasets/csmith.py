@@ -3,15 +3,19 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 import logging
+import shutil
 import subprocess
+import tempfile
 from pathlib import Path
-from typing import Iterable, List, Optional
+from threading import Lock
+from typing import Iterable, Optional, Union
 
 import numpy as np
+from fasteners import InterProcessLock
 
 from compiler_gym.datasets import Benchmark, BenchmarkSource, Dataset
-from compiler_gym.datasets.benchmark import BenchmarkInitError, BenchmarkWithSource
-from compiler_gym.envs.llvm.llvm_benchmark import ClangInvocation
+from compiler_gym.datasets.benchmark import BenchmarkWithSource
+from compiler_gym.envs.gcc.gcc import Gcc
 from compiler_gym.service.proto import BenchmarkDynamicConfig
 from compiler_gym.util.decorators import memoized_property
 from compiler_gym.util.runfiles_path import runfiles_path
@@ -25,8 +29,11 @@ _CSMITH_BIN = runfiles_path("compiler_gym/third_party/csmith/csmith/bin/csmith")
 _CSMITH_INCLUDES = runfiles_path(
     "compiler_gym/third_party/csmith/csmith/include/csmith-2.3.0"
 )
+_CSMITH_INSTALL_LOCK = Lock()
 
 
+# TODO(github.com/facebookresearch/CompilerGym/issues/325): This can be merged
+# with the LLVM implementation.
 class CsmithBenchmark(BenchmarkWithSource):
     """A CSmith benchmark."""
 
@@ -86,6 +93,7 @@ class CsmithDataset(Dataset):
 
     def __init__(
         self,
+        gcc_bin: Union[Path, str],
         site_data_base: Path,
         sort_order: int = 0,
         csmith_bin: Optional[Path] = None,
@@ -118,27 +126,23 @@ class CsmithDataset(Dataset):
             sort_order=sort_order,
             benchmark_class=CsmithBenchmark,
         )
+        self.gcc_bin = gcc_bin
         self.csmith_bin_path = csmith_bin or _CSMITH_BIN
         self.csmith_includes_path = csmith_includes or _CSMITH_INCLUDES
-        # The command that is used to compile an LLVM-IR bitcode file from a
-        # Csmith input. Reads from stdin, writes to stdout.
-        self.clang_compile_command: List[str] = ClangInvocation.from_c_file(
-            "-",  # Read from stdin.
-            copt=[
-                "-xc",  # The C programming language.
-                "-ferror-limit=1",  # Stop on first error.
-                "-w",  # No warnings.
-                f"-I{self.csmith_includes_path}",  # Include the Csmith headers.
-            ],
-        ).command(
-            outpath="-"  # Write to stdout.
-        )
+        self._install_lockfile = self.site_data_path / ".install.LOCK"
 
     @property
     def size(self) -> int:
         # Actually 2^32 - 1, but practically infinite for all intents and
         # purposes.
         return 0
+
+    @memoized_property
+    def gcc(self):
+        # Defer instantiation of Gcc from the constructor as it will fail if the
+        # given Gcc is not available. Memoize the result as initialization is
+        # expensive.
+        return Gcc(bin=self.gcc_bin)
 
     def benchmark_uris(self) -> Iterable[str]:
         return (f"{self.name}/{i}" for i in range(UINT_MAX))
@@ -149,6 +153,32 @@ class CsmithDataset(Dataset):
     def _random_benchmark(self, random_state: np.random.Generator) -> Benchmark:
         seed = random_state.integers(UINT_MAX)
         return self.benchmark_from_seed(seed)
+
+    @property
+    def installed(self) -> bool:
+        return super().installed and (self.site_data_path / "includes").is_dir()
+
+    def install(self) -> None:
+        super().install()
+
+        if self.installed:
+            return
+
+        with _CSMITH_INSTALL_LOCK, InterProcessLock(self._install_lockfile):
+            if (self.site_data_path / "includes").is_dir():
+                return
+
+            # Copy the Csmith headers into the dataset's site directory path because
+            # in bazel builds this includes directory is a symlink, and we need
+            # actual files that we can use in a docker volume.
+            shutil.copytree(
+                self.csmith_includes_path,
+                self.site_data_path / "includes.tmp",
+            )
+            # Atomic directory rename to prevent race on install().
+            (self.site_data_path / "includes.tmp").rename(
+                self.site_data_path / "includes"
+            )
 
     def benchmark_from_seed(
         self, seed: int, max_retries: int = 3, retry_count: int = 0
@@ -197,21 +227,29 @@ class CsmithDataset(Dataset):
                 seed, max_retries=max_retries, retry_count=retry_count + 1
             )
 
-        # Compile to IR.
-        clang = subprocess.Popen(
-            self.clang_compile_command,
-            stdin=subprocess.PIPE,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.DEVNULL,
-        )
-        stdout, _ = clang.communicate(src, timeout=300)
+        # Pre-process the source.
+        with tempfile.TemporaryDirectory() as tmpdir:
+            src_file = f"{tmpdir}/src.c"
+            with open(src_file, "wb") as f:
+                f.write(src)
 
-        if clang.returncode:
-            compile_cmd = " ".join(self.clang_compile_command)
-            raise BenchmarkInitError(
-                f"Compilation job failed!\n"
-                f"Csmith seed: {seed}\n"
-                f"Command: {compile_cmd}\n"
+            preprocessed_src = self.gcc(
+                "-E",
+                "-I",
+                str(self.site_data_path / "includes"),
+                "-o",
+                "-",
+                src_file,
+                cwd=tmpdir,
+                timeout=60,
+                volumes={
+                    str(self.site_data_path / "includes"): {
+                        "bind": str(self.site_data_path / "includes"),
+                        "mode": "ro",
+                    }
+                },
             )
 
-        return self.benchmark_class.create(f"{self.name}/{seed}", stdout, src)
+        return self.benchmark_class.create(
+            f"{self.name}/{seed}", preprocessed_src.encode("utf-8"), src
+        )

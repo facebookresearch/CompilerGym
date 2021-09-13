@@ -10,6 +10,7 @@ py_library(
     visibility = ["//visibility:public"],
     deps = [
         ":compiler_env",
+        "//compiler_gym/envs/gcc",
         "//compiler_gym/envs/llvm",
     ],
 )

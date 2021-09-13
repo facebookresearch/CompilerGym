@@ -142,6 +142,7 @@ py_test(
     deps = [
         "//compiler_gym/envs/llvm",
         "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
     ],
 )
 

@@ -83,11 +83,6 @@ class LlvmEnv(CompilerEnv):
     action, and the :meth:`LlvmEnv.commandline()
     <compiler_gym.envs.LlvmEnv.commandline>` method can be used to produce an
     equivalent LLVM opt invocation for the current environment state.
-
-    :ivar actions: The list of actions that have been performed since the
-        previous call to :func:`reset`.
-
-    :vartype actions: List[int]
     """
 
     def __init__(
