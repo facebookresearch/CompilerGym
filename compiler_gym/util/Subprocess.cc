@@ -5,55 +5,43 @@
 #include "compiler_gym/util/Subprocess.h"
 
 #include <fmt/format.h>
+#include <unistd.h>
 
-#include <chrono>
-#include <condition_variable>
-#include <subprocess/subprocess.hpp>
-#include <thread>
+#include <boost/process.hpp>
+#include <future>
 
 namespace compiler_gym::util {
 
 using grpc::Status;
 using grpc::StatusCode;
 namespace fs = boost::filesystem;
+namespace bp = boost::process;
 
 Status checkCall(const std::string& cmd, int timeoutSeconds, const fs::path& workingDir) {
-  std::mutex m;
-  std::condition_variable cv;
-  Status returnStatus(StatusCode::INTERNAL, "Unknown error");
+  if (chdir(workingDir.string().c_str())) {
+    return Status(StatusCode::INTERNAL,
+                  fmt::format("Failed to set working directory: {}", workingDir.string()));
+  }
 
-  std::thread t([&cmd, &workingDir, &cv, &returnStatus]() {
-    try {
-      auto run = subprocess::Popen(cmd, subprocess::output{subprocess::PIPE},
-                                   subprocess::error{subprocess::PIPE}, subprocess::shell{true},
-                                   subprocess::cwd{workingDir.string()});
-      const auto runOutput = run.communicate();
-      if (run.retcode()) {
-        const std::string error(runOutput.second.buf.begin(), runOutput.second.buf.end());
-        returnStatus = Status(StatusCode::INTERNAL,
-                              fmt::format("Command '{}' failed with exit code: {}. Stderr:\n{}",
-                                          cmd, run.retcode(), error));
-      } else {
-        returnStatus = Status::OK;
-      }
-    } catch (subprocess::CalledProcessError& e) {
-      returnStatus = Status(StatusCode::INTERNAL,
-                            fmt::format("Command '{}' failed with error: {}", cmd, e.what()));
-    }
-    cv.notify_one();
-  });
-  t.detach();
+  try {
+    bp::child process(cmd, bp::std_out > bp::null, bp::std_err > bp::null);
 
-  {
-    std::unique_lock<std::mutex> lock(m);
-    if (cv.wait_for(lock, std::chrono::seconds(timeoutSeconds)) == std::cv_status::timeout) {
+    if (!process.wait_for(std::chrono::seconds(timeoutSeconds))) {
       return Status(
           StatusCode::DEADLINE_EXCEEDED,
           fmt::format("Command '{}' failed to complete within {} seconds", cmd, timeoutSeconds));
     }
+
+    if (process.exit_code()) {
+      return Status(StatusCode::INTERNAL, fmt::format("Command '{}' failed with exit code: {}", cmd,
+                                                      process.exit_code()));
+    }
+  } catch (bp::process_error& e) {
+    return Status(StatusCode::INTERNAL,
+                  fmt::format("Command '{}' failed with error: {}", cmd, e.what()));
   }
 
-  return returnStatus;
+  return Status::OK;
 }
 
 }  // namespace compiler_gym::util

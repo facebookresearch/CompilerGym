@@ -16,6 +16,7 @@ namespace compiler_gym::util {
  * @param cmd The command to execute as a string.
  * @param timeoutSeconds The number of seconds to wait for the command to
  *     terminate before failing with an error.
+ * @param workingDir The working directory.
  * @return `OK` on success, `DEADLINE_EXCEEDED` on timeout, or `INTERNAL` if the
  *    command returns with a non-zero returncode.
  */

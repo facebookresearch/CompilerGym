@@ -81,9 +81,9 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "@boost//:filesystem",
+        "@boost//:process",
         "@com_github_grpc_grpc//:grpc++",
         "@fmt",
-        "@subprocess",
     ],
 )
 
