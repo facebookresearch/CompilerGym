@@ -11,39 +11,42 @@ namespace {
 
 using grpc::StatusCode;
 
-TEST(Subprocess, true_) { EXPECT_TRUE(checkCall("true", 60, ".").ok()); }
+TEST(Subprocess, checkCallTrue) { EXPECT_TRUE(checkCall("true", 60, ".").ok()); }
 
-TEST(Subprocess, false_) {
+TEST(Subprocess, checkCallFalse) {
   const auto status = checkCall("false", 60, ".");
   EXPECT_EQ(status.error_code(), StatusCode::INTERNAL);
-  EXPECT_EQ(status.error_message(), "Command 'false' failed with exit code: 1. Stderr:\n");
+  EXPECT_EQ(status.error_message(), "Command 'false' failed with exit code: 1");
 }
 
-TEST(Subprocess, shellPipe) { EXPECT_TRUE(checkCall("echo Hello | cat", 60, ".").ok()); }
+TEST(Subprocess, checkCallShellPipe) { EXPECT_TRUE(checkCall("echo Hello | cat", 60, ".").ok()); }
 
-TEST(Subprocess, lastElementInPipeFails) {
-  const auto status = checkCall("echo Hello >&2 | false", 60, ".");
-  EXPECT_EQ(status.error_code(), StatusCode::INTERNAL);
-  EXPECT_EQ(status.error_message(),
-            "Command 'echo Hello >&2 | false' failed with exit code: 1. Stderr:\nHello\n");
-}
-
-TEST(Subprocess, firstElementInPipeFails) {
-  const auto status = checkCall("false | echo Hello >&2", 60, ".");
+TEST(Subprocess, checkCallConcatenatedCommands) {
+  const auto status = checkCall("echo Hello ; echo Foo", 60, ".");
   EXPECT_TRUE(status.ok());
 }
 
-TEST(Subprocess, timeout) {
+TEST(Subprocess, checkCallFirstElementInPipeFails) {
+  const auto status = checkCall("true | false", 60, ".");
+  EXPECT_TRUE(status.ok());
+}
+
+TEST(Subprocess, checkCallLastElementInPipeFails) {
+  const auto status = checkCall("false | true", 60, ".");
+  EXPECT_EQ(status.error_code(), StatusCode::INTERNAL);
+  EXPECT_EQ(status.error_message(), "Command 'false | true' failed with exit code: 1");
+}
+
+TEST(Subprocess, checkCallTimeout) {
   const auto status = checkCall("sleep 10", 1, ".");
   EXPECT_EQ(status.error_code(), StatusCode::DEADLINE_EXCEEDED);
   EXPECT_EQ(status.error_message(), "Command 'sleep 10' failed to complete within 1 seconds");
 }
 
-TEST(Subprocess, workingDirNotFound) {
+TEST(Subprocess, checkCallWorkingDirNotFound) {
   const auto status = checkCall("true", 60, "not/a/real/path");
   EXPECT_EQ(status.error_code(), StatusCode::INTERNAL);
-  EXPECT_EQ(status.error_message(),
-            "Command 'true' failed with error: chdir failed : No such file or directory");
+  EXPECT_EQ(status.error_message(), "Failed to set working directory: not/a/real/path");
 }
 
 }  // anonymous namespace

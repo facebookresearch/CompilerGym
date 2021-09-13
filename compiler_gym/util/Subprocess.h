@@ -23,4 +23,17 @@ namespace compiler_gym::util {
 grpc::Status checkCall(const std::string& cmd, int timeoutSeconds,
                        const boost::filesystem::path& workingDir);
 
+/**
+ * Run the given command in a subshell and return its stdout.
+ *
+ * @param cmd The command to execute as a string.
+ * @param timeoutSeconds The number of seconds to wait for the command to
+ *     terminate before failing with an error.
+ * @param workingDir The working directory.
+ * @return `OK` on success, `DEADLINE_EXCEEDED` on timeout, or `INTERNAL` if the
+ *    command returns with a non-zero returncode.
+ */
+grpc::Status checkOutput(const std::string& cmd, int timeoutSeconds,
+                         const boost::filesystem::path& workingDir, std::string& stdout);
+
 }  // namespace compiler_gym::util

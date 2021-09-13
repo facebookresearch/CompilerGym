@@ -44,4 +44,39 @@ Status checkCall(const std::string& cmd, int timeoutSeconds, const fs::path& wor
   return Status::OK;
 }
 
+Status checkOutput(const std::string& cmd, int timeoutSeconds, const fs::path& workingDir,
+                   std::string& stdout) {
+  if (chdir(workingDir.string().c_str())) {
+    return Status(StatusCode::INTERNAL,
+                  fmt::format("Failed to set working directory: {}", cmd, workingDir.string()));
+  }
+
+  try {
+    boost::asio::io_context stdoutStream;
+    std::future<std::string> stdoutFuture;
+
+    bp::child process(cmd, bp::std_in.close(), bp::std_out > stdoutFuture, bp::std_err > bp::null,
+                      stdoutStream);
+
+    if (!process.wait_for(std::chrono::seconds(timeoutSeconds))) {
+      return Status(
+          StatusCode::DEADLINE_EXCEEDED,
+          fmt::format("Command '{}' failed to complete within {} seconds", cmd, timeoutSeconds));
+    }
+    stdoutStream.run();
+
+    if (process.exit_code()) {
+      return Status(StatusCode::INTERNAL, fmt::format("Command '{}' failed with exit code: {}", cmd,
+                                                      process.exit_code()));
+    }
+
+    stdout = stdoutFuture.get();
+  } catch (bp::process_error& e) {
+    return Status(StatusCode::INTERNAL,
+                  fmt::format("Command '{}' failed with error: {}", cmd, e.what()));
+  }
+
+  return Status::OK;
+}
+
 }  // namespace compiler_gym::util
