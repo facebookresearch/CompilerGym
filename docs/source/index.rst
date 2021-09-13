@@ -21,6 +21,7 @@ for applying reinforcement learning to compiler optimizations.
 
    llvm/index
    envs/gcc
+   envs/loop_tool
 
 ..
     .. toctree::
