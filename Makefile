@@ -148,6 +148,8 @@ init:
 	$(PYTHON) -m pip install -r requirements.txt
 	pre-commit install
 
+init-runtime-requirements:
+	$(PYTHON) -m pip install -r compiler_gym/requirements.txt
 
 ############
 # Building #
@@ -273,6 +275,10 @@ TEST_TARGET ?=
 # Extra command line arguments for pytest.
 PYTEST_ARGS ?=
 
+# The path of the XML pytest coverage report to generate when running the
+# install-test-cov target.
+COV_REPORT ?= $(ROOT)/coverage.xml
+
 test: bazel-fetch
 	$(BAZEL) $(BAZEL_OPTS) test $(BAZEL_TEST_OPTS) $(if $(TEST_TARGET),$(TEST_TARGET),//...)
 
@@ -284,12 +290,13 @@ itest: bazel-fetch
 # symlinking the test directory into it so that pytest can be invoked.
 install-test-setup:
 	mkdir -p "$(INSTALL_TEST_ROOT)"
-	rm -f "$(INSTALL_TEST_ROOT)/tests" "$(INSTALL_TEST_ROOT)/tox.ini"
+	rm -f "$(INSTALL_TEST_ROOT)/examples" "$(INSTALL_TEST_ROOT)/tests" "$(INSTALL_TEST_ROOT)/tox.ini"
+	ln -s "$(ROOT)/examples" "$(INSTALL_TEST_ROOT)"
 	ln -s "$(ROOT)/tests" "$(INSTALL_TEST_ROOT)"
 	ln -s "$(ROOT)/tox.ini" "$(INSTALL_TEST_ROOT)"
 
 define pytest
-	cd "$(INSTALL_TEST_ROOT)" && pytest $(if $(TEST_TARGET),$(TEST_TARGET),tests) $(1) $(PYTEST_ARGS)
+	cd "$(INSTALL_TEST_ROOT)" && pytest $(if $(TEST_TARGET),$(TEST_TARGET),examples tests) $(1) $(PYTEST_ARGS)
 endef
 
 install-test: install-test-setup
@@ -299,8 +306,7 @@ install-test: install-test-setup
 # environement. This is to ensure that the reported coverage matches that of
 # the value on: https://codecov.io/gh/facebookresearch/CompilerGym
 install-test-cov: install-test-setup
-	export CI=1; $(call pytest,--benchmark-disable -n auto -k "not fuzz" --durations=5 --cov=compiler_gym --cov-report=xml --cov-report=term)
-	@mv "$(INSTALL_TEST_ROOT)/coverage.xml" .
+	export CI=1; $(call pytest,--benchmark-disable -n auto -k "not fuzz" --durations=5 --cov=compiler_gym --cov-report=xml:$(COV_REPORT) --cov-report=term)
 
 # The minimum number of seconds to run the fuzz tests in a loop for. Override
 # this at the commandline, e.g. `FUZZ_SECONDS=1800 make fuzz`.
@@ -323,7 +329,7 @@ post-install-test:
 pip-install:
 	$(PYTHON) setup.py install
 
-install: | bazel-build pip-install
+install: |  init-runtime-requirements bazel-build pip-install
 
 .PHONY: pip-install install
 

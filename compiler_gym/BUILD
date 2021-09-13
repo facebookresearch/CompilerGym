@@ -14,9 +14,14 @@ py_library(
     deps = [
         ":random_search",
         ":validate",
+        "//compiler_gym/bin",
+        "//compiler_gym/datasets",
         "//compiler_gym/envs",
         "//compiler_gym/leaderboard",
+        "//compiler_gym/service",
+        "//compiler_gym/spaces",
         "//compiler_gym/util",
+        "//compiler_gym/util/flags",
         "//compiler_gym/wrappers",
     ],
 )

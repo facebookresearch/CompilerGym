@@ -1,0 +1,12 @@
+---
+name: Install runtime dependencies
+description: Install the runtime dependencies for CompilerGym.
+runs:
+    using: composite
+    steps:
+        - name: Install runtime dependencies
+          run: |
+              if [ "$(uname)" = "Darwin" ]; then
+                  brew install zlib
+              fi
+          shell: bash

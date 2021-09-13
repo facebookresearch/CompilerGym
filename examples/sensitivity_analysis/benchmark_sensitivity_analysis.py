@@ -47,7 +47,7 @@ from examples.sensitivity_analysis.sensitivity_analysis_eval import (
 )
 
 flags.DEFINE_integer(
-    "num_trials",
+    "num_benchmark_sensitivity_trials",
     100,
     "The number of trials to perform when estimating the reward delta of each benchmark. "
     "A trial is a random episode of a benchmark. Increasing this number increases the "
@@ -65,14 +65,11 @@ flags.DEFINE_integer(
     "The maximum number of random steps to make in a single trial.",
 )
 flags.DEFINE_integer(
-    "nproc", cpu_count(), "The number of parallel evaluation threads to run."
-)
-flags.DEFINE_integer(
-    "max_attempts_multiplier",
+    "max_benchmark_attempts_multiplier",
     5,
     "A trial may fail because the environment crashes, or an action produces an invalid state. "
     "Limit the total number of trials performed for each action to "
-    "max_attempts_multiplier * num_trials.",
+    "max_benchmark_attempts_multiplier * num_trials.",
 )
 
 FLAGS = flags.FLAGS
@@ -187,11 +184,11 @@ def main(argv):
         runtimes_path=runtimes_path,
         benchmarks=benchmarks,
         reward=FLAGS.reward,
-        num_trials=FLAGS.num_trials,
+        num_trials=FLAGS.num_benchmark_sensitivity_trials,
         min_steps=FLAGS.min_steps,
         max_steps=FLAGS.max_steps,
         nproc=FLAGS.nproc,
-        max_attempts_multiplier=FLAGS.max_attempts_multiplier,
+        max_attempts_multiplier=FLAGS.max_benchmark_attempts_multiplier,
     )
 
 
