@@ -8,7 +8,10 @@
 #include <glog/logging.h>
 #include <grpcpp/grpcpp.h>
 
-#include <subprocess/subprocess.hpp>
+#include <boost/asio.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/process.hpp>
+#include <future>
 #include <system_error>
 
 #include "boost/filesystem.hpp"
@@ -21,6 +24,7 @@
 #include "llvm/Transforms/Utils/Cloning.h"
 
 namespace fs = boost::filesystem;
+namespace bp = boost::process;
 using grpc::Status;
 using grpc::StatusCode;
 
@@ -55,37 +59,70 @@ Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& 
   const std::string ir = moduleToString(module);
 
   const auto tmpFile = fs::unique_path(workingDirectory / "obj-%%%%");
+  std::string llvmSizeOutput;
 
+  try {
+// Use clang to compile the object file.
 #ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
-  std::vector<std::string> clangCmd{clangPath.string(), "-w", "-xir", "-", "-o", tmpFile.string()};
-  clangCmd.insert(clangCmd.end(), clangArgs.begin(), clangArgs.end());
-  auto clang =
-      subprocess::Popen(clangCmd, subprocess::input{subprocess::PIPE},
-                        subprocess::output{subprocess::PIPE}, subprocess::error{subprocess::PIPE});
+    std::string clangCmd = fmt::format("{} -w -xir - -o {}", clangPath.string(), tmpFile.string());
+    for (const auto& arg : clangArgs) {
+      clangCmd += " " + arg;
+    }
 #else
-  auto clang =
-      subprocess::Popen({clangPath.string(), "-w", "-xir", "-", "-o", tmpFile.string(), "-c"},
-                        subprocess::input{subprocess::PIPE}, subprocess::output{subprocess::PIPE},
-                        subprocess::error{subprocess::PIPE});
+    const std::string clangCmd =
+        fmt::format("{} -w -xir - -o {} -c", clangPath.string(), tmpFile.string());
 #endif
-  const auto clangOutput = clang.communicate(ir.c_str(), ir.size());
-  if (clang.retcode()) {
-    fs::remove(tmpFile);
-    const std::string error(clangOutput.second.buf.begin(), clangOutput.second.buf.end());
-    return Status(StatusCode::INVALID_ARGUMENT,
-                  fmt::format("Failed to compute .text size cost.\nError from clang:\n{}", error));
-  }
 
-  auto llvmSize =
-      subprocess::Popen({llvmSizePath.string(), tmpFile.string()},
-                        subprocess::output{subprocess::PIPE}, subprocess::error{subprocess::PIPE});
-  const auto sizeOutput = llvmSize.communicate();
-  fs::remove(tmpFile);
-  if (llvmSize.retcode()) {
-    const std::string error(sizeOutput.second.buf.begin(), sizeOutput.second.buf.end());
-    return Status(
-        StatusCode::INVALID_ARGUMENT,
-        fmt::format("Failed to compute .text size cost.\nError from llvm-size:\n{}", error));
+    boost::asio::io_service clangService;
+    auto stdinBuffer{boost::asio::buffer(ir)};
+    bp::async_pipe stdinPipe(clangService);
+
+    bp::child clang(clangCmd, bp::std_in<stdinPipe, bp::std_out> bp::null, bp::std_err > bp::null);
+
+    // Write the IR to stdin.
+    boost::asio::async_write(
+        stdinPipe, stdinBuffer,
+        [&](const boost::system::error_code& ec, std::size_t n) { stdinPipe.async_close(); });
+
+    clangService.run_for(std::chrono::seconds(60));
+    if (clangService.poll()) {
+      return Status(StatusCode::INVALID_ARGUMENT,
+                    fmt::format("Failed to compute .text size cost within 60 seconds"));
+    }
+    clang.wait();
+
+    if (clang.exit_code()) {
+      return Status(StatusCode::INVALID_ARGUMENT, fmt::format("Failed to compute .text size cost. "
+                                                              "Command returned exit code {}: {}",
+                                                              clang.exit_code(), clangCmd));
+    }
+
+    // Run llvm-size on the compiled file.
+    const std::string llvmSizeCmd = fmt::format("{} {}", llvmSizePath.string(), tmpFile.string());
+
+    boost::asio::io_context llvmSizeStdoutStream;
+    std::future<std::string> llvmSizeStdoutFuture;
+
+    bp::child llvmSize(llvmSizeCmd, bp::std_in.close(), bp::std_out > llvmSizeStdoutFuture,
+                       bp::std_err > bp::null, llvmSizeStdoutStream);
+
+    if (!llvmSize.wait_for(std::chrono::seconds(60))) {
+      return Status(StatusCode::DEADLINE_EXCEEDED,
+                    fmt::format("Failed to compute .text size cost within 60 seconds"));
+    }
+    llvmSizeStdoutStream.run();
+    fs::remove(tmpFile);
+    if (llvmSize.exit_code()) {
+      return Status(StatusCode::INVALID_ARGUMENT, fmt::format("Failed to compute .text size cost. "
+                                                              "Command returned exit code {}: {}",
+                                                              llvmSize.exit_code(), llvmSizeCmd));
+    }
+
+    llvmSizeOutput = llvmSizeStdoutFuture.get();
+  } catch (bp::process_error& e) {
+    fs::remove(tmpFile);
+    return Status(StatusCode::INVALID_ARGUMENT,
+                  fmt::format("Failed to compute .text size cost: {}", e.what()));
   }
 
   // The output of llvm-size is in berkley format, e.g.:
@@ -96,17 +133,18 @@ Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& 
   //
   // Skip the first line of output and read an integer from the start of the
   // second line:
-  const std::string stdout{sizeOutput.first.buf.begin(), sizeOutput.first.buf.end()};
-  const size_t eol = stdout.find('\n');
-  const size_t tab = stdout.find('\t', eol + 1);
+  const size_t eol = llvmSizeOutput.find('\n');
+  const size_t tab = llvmSizeOutput.find('\t', eol + 1);
   if (eol == std::string::npos || tab == std::string::npos) {
-    return Status(StatusCode::INTERNAL, fmt::format("Failed to parse .TEXT size: `{}`\n", stdout));
+    return Status(StatusCode::INTERNAL,
+                  fmt::format("Failed to parse .TEXT size: `{}`\n", llvmSizeOutput));
   }
-  const std::string extracted = stdout.substr(eol, tab - eol);
+  const std::string extracted = llvmSizeOutput.substr(eol, tab - eol);
   try {
     *value = std::stoi(extracted);
   } catch (std::exception const& e) {
-    return Status(StatusCode::INTERNAL, fmt::format("Failed to parse .TEXT size: `{}`\n", stdout));
+    return Status(StatusCode::INTERNAL,
+                  fmt::format("Failed to parse .TEXT size: `{}`\n", llvmSizeOutput));
   }
   return Status::OK;
 }

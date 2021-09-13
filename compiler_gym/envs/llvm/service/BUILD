@@ -130,12 +130,12 @@ cc_library(
         "//compiler_gym/util:RunfilesPath",
         "//compiler_gym/util:Unreachable",
         "@boost//:filesystem",
+        "@boost//:process",
         "@com_github_grpc_grpc//:grpc++",
         "@fmt",
         "@glog",
         "@llvm//10.0.0",
         "@magic_enum",
-        "@subprocess",
     ],
 )
 
@@ -166,6 +166,7 @@ cc_library(
         "//compiler_gym/util:GrpcStatusMacros",
         "//compiler_gym/util:RunfilesPath",
         "@boost//:filesystem",
+        "@boost//:process",
         "@fmt",
         "@glog",
         "@llvm//10.0.0",
@@ -174,7 +175,6 @@ cc_library(
         "@programl//programl/graph/format:node_link_graph",
         "@programl//programl/ir/llvm:llvm-10",
         "@programl//programl/proto:programl_cc",
-        "@subprocess",
     ],
 )
 
