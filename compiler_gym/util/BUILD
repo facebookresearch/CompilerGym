@@ -80,6 +80,7 @@ cc_library(
     hdrs = ["Subprocess.h"],
     visibility = ["//visibility:public"],
     deps = [
+        "//compiler_gym/service/proto:compiler_gym_service_cc",
         "@boost//:filesystem",
         "@boost//:process",
         "@com_github_grpc_grpc//:grpc++",

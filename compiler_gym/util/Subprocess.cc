@@ -17,66 +17,134 @@ using grpc::StatusCode;
 namespace fs = boost::filesystem;
 namespace bp = boost::process;
 
-Status checkCall(const std::string& cmd, int timeoutSeconds, const fs::path& workingDir) {
-  if (chdir(workingDir.string().c_str())) {
-    return Status(StatusCode::INTERNAL,
-                  fmt::format("Failed to set working directory: {}", workingDir.string()));
+namespace {
+
+/**
+ * Merge the given map<string, string> environment variables into a copy of the
+ * current process environment.
+ */
+bp::environment makeEnvironment(const google::protobuf::Map<std::string, std::string>& userEnv) {
+  bp::environment env{boost::this_process::environment()};
+  for (const auto& item : userEnv) {
+    env[item.first] = item.second;
   }
+  return env;
+}
+
+/**
+ * Convert a list of strings to boost::filesystem::path objects.
+ */
+std::vector<fs::path> makePaths(const google::protobuf::RepeatedPtrField<std::string>& strings) {
+  std::vector<fs::path> paths;
+  for (const auto& path : strings) {
+    paths.push_back(fs::path(path));
+  }
+  return paths;
+}
+
+}  // anonymous namespace
+
+LocalShellCommand::LocalShellCommand(const Command& cmd)
+    : proto_(cmd),
+      arguments_({cmd.argument().begin(), cmd.argument().end()}),
+      timeout_(std::chrono::seconds(cmd.timeout_seconds())),
+      env_(makeEnvironment(cmd.env())),
+      infiles_(makePaths(cmd.infile())),
+      outfiles_(makePaths(cmd.outfile())) {}
+
+Status LocalShellCommand::checkCall() const {
+  boost::asio::io_context stderrStream;
+  std::future<std::string> stderrFuture;
 
   try {
-    bp::child process(cmd, bp::std_out > bp::null, bp::std_err > bp::null);
-
-    if (!process.wait_for(std::chrono::seconds(timeoutSeconds))) {
-      return Status(
-          StatusCode::DEADLINE_EXCEEDED,
-          fmt::format("Command '{}' failed to complete within {} seconds", cmd, timeoutSeconds));
+    bp::child process(arguments(), bp::std_out > bp::null, bp::std_err > stderrFuture, bp::shell,
+                      stderrStream, env());
+    if (!process.wait_for(timeout())) {
+      return Status(StatusCode::DEADLINE_EXCEEDED,
+                    fmt::format("Command '{}' failed to complete within {} seconds", commandline(),
+                                timeoutSeconds()));
     }
+    stderrStream.run();
 
     if (process.exit_code()) {
-      return Status(StatusCode::INTERNAL, fmt::format("Command '{}' failed with exit code: {}", cmd,
-                                                      process.exit_code()));
+      const std::string stderr = stderrFuture.get();
+      if (stderr.size()) {
+        return Status(StatusCode::INTERNAL,
+                      fmt::format("Command '{}' failed with exit code {}: {}", commandline(),
+                                  process.exit_code(), stderr));
+      } else {
+        return Status(StatusCode::INTERNAL, fmt::format("Command '{}' failed with exit code {}",
+                                                        commandline(), process.exit_code()));
+      }
     }
   } catch (bp::process_error& e) {
     return Status(StatusCode::INTERNAL,
-                  fmt::format("Command '{}' failed with error: {}", cmd, e.what()));
+                  fmt::format("Command '{}' failed with error: {}", commandline(), e.what()));
   }
 
   return Status::OK;
 }
 
-Status checkOutput(const std::string& cmd, int timeoutSeconds, const fs::path& workingDir,
-                   std::string& stdout) {
-  if (chdir(workingDir.string().c_str())) {
-    return Status(StatusCode::INTERNAL,
-                  fmt::format("Failed to set working directory: {}", cmd, workingDir.string()));
-  }
-
+Status LocalShellCommand::checkOutput(std::string& stdout) const {
   try {
     boost::asio::io_context stdoutStream;
     std::future<std::string> stdoutFuture;
 
-    bp::child process(cmd, bp::std_in.close(), bp::std_out > stdoutFuture, bp::std_err > bp::null,
-                      stdoutStream);
+    bp::child process(arguments(), bp::std_in.close(), bp::std_out > stdoutFuture,
+                      bp::std_err > bp::null, bp::shell, stdoutStream, env());
 
-    if (!process.wait_for(std::chrono::seconds(timeoutSeconds))) {
-      return Status(
-          StatusCode::DEADLINE_EXCEEDED,
-          fmt::format("Command '{}' failed to complete within {} seconds", cmd, timeoutSeconds));
+    if (!process.wait_for(timeout())) {
+      return Status(StatusCode::DEADLINE_EXCEEDED,
+                    fmt::format("Command '{}' failed to complete within {} seconds", commandline(),
+                                timeoutSeconds()));
     }
     stdoutStream.run();
 
     if (process.exit_code()) {
-      return Status(StatusCode::INTERNAL, fmt::format("Command '{}' failed with exit code: {}", cmd,
-                                                      process.exit_code()));
+      return Status(StatusCode::INTERNAL, fmt::format("Command '{}' failed with exit code {}",
+                                                      commandline(), process.exit_code()));
     }
 
     stdout = stdoutFuture.get();
   } catch (bp::process_error& e) {
     return Status(StatusCode::INTERNAL,
-                  fmt::format("Command '{}' failed with error: {}", cmd, e.what()));
+                  fmt::format("Command '{}' failed with error: {}", commandline(), e.what()));
   }
 
   return Status::OK;
+}
+
+Status LocalShellCommand::checkInfiles() const {
+  for (const auto& infile : infiles()) {
+    if (!fs::exists(infile)) {
+      return Status(StatusCode::INTERNAL, fmt::format("Command '{}' missing required file: {}",
+                                                      commandline(), infile.string()));
+    }
+  }
+  return Status::OK;
+}
+
+Status LocalShellCommand::checkOutfiles() const {
+  for (const auto& outfile : outfiles()) {
+    if (!fs::exists(outfile)) {
+      return Status(StatusCode::INTERNAL,
+                    fmt::format("Command '{}' did not produce expected file: {}", commandline(),
+                                outfile.string()));
+    }
+  }
+  return Status::OK;
+}
+
+std::string LocalShellCommand::commandline() const {
+  std::string command;
+  const std::vector<std::string>& args = arguments();
+  for (size_t i = 0; i < args.size(); ++i) {
+    if (i) {
+      command += ' ';
+    }
+    command += args[i];
+  }
+  return command;
 }
 
 }  // namespace compiler_gym::util

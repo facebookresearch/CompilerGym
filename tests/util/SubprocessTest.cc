@@ -11,42 +11,125 @@ namespace {
 
 using grpc::StatusCode;
 
-TEST(Subprocess, checkCallTrue) { EXPECT_TRUE(checkCall("true", 60, ".").ok()); }
+TEST(Subprocess, checkCallTrue) {
+  Command proto;
+  proto.add_argument("true");
+  proto.set_timeout_seconds(10);
+  LocalShellCommand cmd(proto);
 
-TEST(Subprocess, checkCallFalse) {
-  const auto status = checkCall("false", 60, ".");
-  EXPECT_EQ(status.error_code(), StatusCode::INTERNAL);
-  EXPECT_EQ(status.error_message(), "Command 'false' failed with exit code: 1");
+  EXPECT_TRUE(cmd.checkCall().ok());
 }
 
-TEST(Subprocess, checkCallShellPipe) { EXPECT_TRUE(checkCall("echo Hello | cat", 60, ".").ok()); }
+TEST(Subprocess, checkCallFalse) {
+  Command proto;
+  proto.add_argument("false");
+  proto.set_timeout_seconds(10);
+  LocalShellCommand cmd(proto);
+
+  const auto status = cmd.checkCall();
+  EXPECT_EQ(status.error_code(), StatusCode::INTERNAL);
+  EXPECT_EQ(status.error_message(), "Command 'false' failed with exit code 1");
+}
+
+TEST(Subprocess, checkCallTwoArguments) {
+  Command proto;
+  proto.add_argument("echo");
+  proto.add_argument("Hello");
+  proto.set_timeout_seconds(10);
+  LocalShellCommand cmd(proto);
+
+  EXPECT_TRUE(cmd.checkCall().ok());
+}
+
+TEST(Subprocess, checkCallShellPipe) {
+  Command proto;
+  proto.add_argument("echo");
+  proto.add_argument("Hello");
+  proto.add_argument("|");
+  proto.add_argument("cat");
+  proto.set_timeout_seconds(10);
+  LocalShellCommand cmd(proto);
+
+  EXPECT_TRUE(cmd.checkCall().ok());
+}
 
 TEST(Subprocess, checkCallConcatenatedCommands) {
-  const auto status = checkCall("echo Hello ; echo Foo", 60, ".");
-  EXPECT_TRUE(status.ok());
+  Command proto;
+  proto.add_argument("echo");
+  proto.add_argument("Hello;");
+  proto.add_argument("echo");
+  proto.add_argument("Foo");
+  proto.set_timeout_seconds(10);
+  LocalShellCommand cmd(proto);
+
+  EXPECT_TRUE(cmd.checkCall().ok());
 }
 
 TEST(Subprocess, checkCallFirstElementInPipeFails) {
-  const auto status = checkCall("true | false", 60, ".");
-  EXPECT_TRUE(status.ok());
+  // NOTE(cummins): This demonstrates a deficiency in the API, as ideally
+  // pipefail option should be set and this command should fail.
+  Command proto;
+  proto.add_argument("false");
+  proto.add_argument("|");
+  proto.add_argument("true");
+  proto.set_timeout_seconds(10);
+  LocalShellCommand cmd(proto);
+
+  EXPECT_TRUE(cmd.checkCall().ok());
 }
 
 TEST(Subprocess, checkCallLastElementInPipeFails) {
-  const auto status = checkCall("false | true", 60, ".");
+  Command proto;
+  proto.add_argument("true");
+  proto.add_argument("|");
+  proto.add_argument("false");
+  proto.set_timeout_seconds(10);
+  LocalShellCommand cmd(proto);
+
+  const auto status = cmd.checkCall();
   EXPECT_EQ(status.error_code(), StatusCode::INTERNAL);
-  EXPECT_EQ(status.error_message(), "Command 'false | true' failed with exit code: 1");
+  EXPECT_EQ(status.error_message(), "Command 'true | false' failed with exit code 1");
+}
+
+TEST(Subprocess, failingCommandStderrCapture) {
+  Command proto;
+  proto.add_argument("echo");
+  proto.add_argument("Hello");
+  proto.add_argument(">&2");
+  proto.add_argument("|");
+  proto.add_argument("false");
+  proto.set_timeout_seconds(10);
+  LocalShellCommand cmd(proto);
+
+  const auto status = cmd.checkCall();
+  EXPECT_EQ(status.error_code(), StatusCode::INTERNAL);
+  EXPECT_EQ(status.error_message(),
+            "Command 'echo Hello >&2 | false' failed with exit code 1: Hello\n");
 }
 
 TEST(Subprocess, checkCallTimeout) {
-  const auto status = checkCall("sleep 10", 1, ".");
+  Command proto;
+  proto.add_argument("sleep");
+  proto.add_argument("10");
+  proto.set_timeout_seconds(1);
+  LocalShellCommand cmd(proto);
+
+  const auto status = cmd.checkCall();
   EXPECT_EQ(status.error_code(), StatusCode::DEADLINE_EXCEEDED);
   EXPECT_EQ(status.error_message(), "Command 'sleep 10' failed to complete within 1 seconds");
 }
 
-TEST(Subprocess, checkCallWorkingDirNotFound) {
-  const auto status = checkCall("true", 60, "not/a/real/path");
-  EXPECT_EQ(status.error_code(), StatusCode::INTERNAL);
-  EXPECT_EQ(status.error_message(), "Failed to set working directory: not/a/real/path");
+TEST(Subprocess, checkOutputEnvironmentVariable) {
+  Command proto;
+  proto.add_argument("echo");
+  proto.add_argument("Hello $NAME");
+  (*proto.mutable_env())["NAME"] = "Chris";
+  proto.set_timeout_seconds(1);
+  LocalShellCommand cmd(proto);
+
+  std::string stdout;
+  EXPECT_TRUE(cmd.checkOutput(stdout).ok());
+  EXPECT_EQ(stdout, "Hello Chris\n");
 }
 
 }  // anonymous namespace
