@@ -9,9 +9,12 @@ import classnames from "classnames";
 import { groupBy, getMaxDelta, percIncrease } from "../../utils/Helpers";
 import InstCountDict from "../../utils/InstCountDict";
 import SparkLineTable from "./SparkLineTable";
+import ModalSingleChart from "./ModalSingleChart";
 
 const InstCountsHistoricalChart = ({ sessionStates, commandLine, darkTheme, sortBy }) => {
   const [steps, setSteps] = useState([]);
+  const [showModal, setModal] = useState(false);
+  const [modalData, setModalData] = useState({});
 
   useEffect(() => {
     setSteps(commandLine.split(" input.bc -o output.bc")[0].split(" "));
@@ -82,13 +85,21 @@ const InstCountsHistoricalChart = ({ sessionStates, commandLine, darkTheme, sort
   return (
     <div
       className={classnames(
-        "mt-2 pt-2",
+        "mt-2 pt-2 wrap-modals",
         { "bg-dark text-white": darkTheme },
         { "": !darkTheme }
       )}
     >
       <h4 className="text-center">Historical Values</h4>
-      <SparkLineTable>
+      {showModal && (
+        <div className="modal_trends">
+          <div className="chart-container">
+            <ModalSingleChart data={modalData} darkTheme={darkTheme}/>
+          </div>
+          <button onClick={() => setModal(false)}>Close</button>
+        </div>
+      )}
+      <SparkLineTable setModal={setModal} setModalData={setModalData}>
         <thead>
           <tr>
             <th>InstCounts</th>

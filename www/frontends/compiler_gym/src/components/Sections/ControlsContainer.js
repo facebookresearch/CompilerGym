@@ -105,7 +105,6 @@ const ControlsContainer = () => {
       setIsLoading(true)
       if (actions !== undefined) {
         const result = await api.getActions(`${dataset}/${datasetUri}`, reward, actions, "1");
-        console.log(result);
         setSession(result);
         setActionSpace(30);
         let actionsTaken = actions.map((o, i) => `${o}.${i + 1}`);
@@ -116,7 +115,6 @@ const ControlsContainer = () => {
           });
       } else {
         const result = await api.getActions(`${dataset}/${datasetUri}`, reward, actionsIdsTaken.length ? actionsIdsTaken : "", actionsIdsTaken.length ? "1" : null );
-        console.log(result);
         setSession(result);
         setActionSpace(30);
         if (actionsIdsTaken.length) {
