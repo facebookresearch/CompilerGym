@@ -76,8 +76,11 @@ Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& 
     boost::asio::io_service clangService;
     auto stdinBuffer{boost::asio::buffer(ir)};
     bp::async_pipe stdinPipe(clangService);
+    boost::asio::io_context clangStderrStream;
+    std::future<std::string> clangStderrFuture;
 
-    bp::child clang(clangCmd, bp::std_in<stdinPipe, bp::std_out> bp::null, bp::std_err > bp::null);
+    bp::child clang(clangCmd, bp::std_in<stdinPipe, bp::std_out> bp::null,
+                    bp::std_err > clangStderrFuture, clangStderrStream);
 
     // Write the IR to stdin.
     boost::asio::async_write(
@@ -90,11 +93,14 @@ Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& 
                     fmt::format("Failed to compute .text size cost within 60 seconds"));
     }
     clang.wait();
+    clangStderrStream.run();
 
     if (clang.exit_code()) {
-      return Status(StatusCode::INVALID_ARGUMENT, fmt::format("Failed to compute .text size cost. "
-                                                              "Command returned exit code {}: {}",
-                                                              clang.exit_code(), clangCmd));
+      const std::string stderr = clangStderrFuture.get();
+      return Status(StatusCode::INVALID_ARGUMENT,
+                    fmt::format("Failed to compute .text size cost. "
+                                "Command returned exit code {}: {}. Error: {}",
+                                clang.exit_code(), clangCmd, stderr));
     }
 
     // Run llvm-size on the compiled file.
