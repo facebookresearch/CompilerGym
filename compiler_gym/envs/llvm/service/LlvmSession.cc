@@ -284,7 +284,7 @@ Status LlvmSession::runOptWithArgs(const std::vector<std::string>& optArgs) {
     bp::child opt(optCmd, bp::std_in.close(), bp::std_out > bp::null, bp::std_err > optStderrFuture,
                   optStderrStream);
 
-    if (!opt.wait_for(std::chrono::seconds(60))) {
+    if (!util::wait_for(opt, std::chrono::seconds(60))) {
       return Status(StatusCode::DEADLINE_EXCEEDED,
                     fmt::format("Failed to run opt within 60 seconds: {}", optCmd));
     }

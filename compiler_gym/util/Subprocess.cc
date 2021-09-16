@@ -59,7 +59,7 @@ Status LocalShellCommand::checkCall() const {
   try {
     bp::child process(arguments(), bp::std_out > bp::null, bp::std_err > stderrFuture, bp::shell,
                       stderrStream, env());
-    if (!process.wait_for(timeout())) {
+    if (!wait_for(process, timeout())) {
       return Status(StatusCode::DEADLINE_EXCEEDED,
                     fmt::format("Command '{}' failed to complete within {} seconds", commandline(),
                                 timeoutSeconds()));
@@ -93,7 +93,7 @@ Status LocalShellCommand::checkOutput(std::string& stdout) const {
     bp::child process(arguments(), bp::std_in.close(), bp::std_out > stdoutFuture,
                       bp::std_err > bp::null, bp::shell, stdoutStream, env());
 
-    if (!process.wait_for(timeout())) {
+    if (!wait_for(process, timeout())) {
       return Status(StatusCode::DEADLINE_EXCEEDED,
                     fmt::format("Command '{}' failed to complete within {} seconds", commandline(),
                                 timeoutSeconds()));

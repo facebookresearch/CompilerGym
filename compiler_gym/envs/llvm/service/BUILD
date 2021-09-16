@@ -133,6 +133,7 @@ cc_library(
     deps = [
         "//compiler_gym/util:GrpcStatusMacros",
         "//compiler_gym/util:RunfilesPath",
+        "//compiler_gym/util:Subprocess",
         "//compiler_gym/util:Unreachable",
         "@boost//:filesystem",
         "@boost//:process",

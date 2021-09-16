@@ -90,4 +90,19 @@ class LocalShellCommand {
   const std::vector<boost::filesystem::path> outfiles_;
 };
 
+template <typename Rep, typename Period>
+bool wait_for(boost::process::child& process, const std::chrono::duration<Rep, Period>& duration) {
+#ifdef __APPLE__
+  // FIXME(github.com/facebookresearch/CompilerGym/issues/399): Workaround for
+  // an issue on macOS wherein boost::process:child::wait_for() blocks forever
+  // at some (but not all) callsites. The problem does not occur on Linux, so
+  // instead we just use the sans-timeout boost::process:child::wait() call and
+  // rely on RPC call timeouts to handle the edge cases where commands time out.
+  process.wait();
+  return true;
+#else  // Linux
+  return process.wait_for(duration);
+#endif
+}
+
 }  // namespace compiler_gym::util

@@ -17,6 +17,7 @@
 #include "boost/filesystem.hpp"
 #include "compiler_gym/util/GrpcStatusMacros.h"
 #include "compiler_gym/util/RunfilesPath.h"
+#include "compiler_gym/util/Subprocess.h"
 #include "compiler_gym/util/Unreachable.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/Transforms/IPO.h"
@@ -112,10 +113,11 @@ Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& 
     bp::child llvmSize(llvmSizeCmd, bp::std_in.close(), bp::std_out > llvmSizeStdoutFuture,
                        bp::std_err > bp::null, llvmSizeStdoutStream);
 
-    if (!llvmSize.wait_for(std::chrono::seconds(60))) {
+    if (!util::wait_for(llvmSize, std::chrono::seconds(60))) {
       return Status(StatusCode::DEADLINE_EXCEEDED,
                     fmt::format("Failed to compute .text size cost within 60 seconds"));
     }
+
     llvmSizeStdoutStream.run();
     fs::remove(tmpFile);
     if (llvmSize.exit_code()) {
