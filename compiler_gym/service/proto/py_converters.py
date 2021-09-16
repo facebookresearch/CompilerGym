@@ -99,6 +99,10 @@ def proto_to_choice_space(choice: ChoiceSpace) -> PyChoiceSpace:
     """
     choice_type = choice.WhichOneof("space")
     if choice_type == "int64_range":
+        # The Discrete class defines a discrete space as integers in the range
+        # [0,n]. For spaces that aren't zero-based there is a Scalar class.
+        # Prefer Discrete if possible since it is part of the core gym library,
+        # else fallback to Scalar.
         if choice.int64_range.min.value:
             return PyChoiceSpace(
                 space=Scalar(
