@@ -9,12 +9,14 @@ To run these benchmarks an optimized build using bazel:
     $ bazel test -c opt --test_output=streamed //benchmarks:bench_test
 
 A record of the benchmark results is stored in
-/tmp/compiler_gym/pytest_benchmark/<device>/<run_id>_bench_test.json. Compare
+/tmp/compiler_gym_<user>/pytest_benchmark/<device>/<run_id>_bench_test.json. Compare
 multiple runs using:
 
     $ pytest-benchmark compare --group-by=name --sort=fullname \
-        /tmp/compiler_gym/pytest_benchmark/*/*_bench_test.json
+        /tmp/compiler_gym_<user>/pytest_benchmark/*/*_bench_test.json
 """
+from getpass import getuser
+
 import gym
 import pytest
 
@@ -182,7 +184,7 @@ def test_fork(benchmark, make_env):
 if __name__ == "__main__":
     main(
         extra_pytest_args=[
-            "--benchmark-storage=/tmp/compiler_gym/pytest_benchmark",
+            f"--benchmark-storage=/tmp/compiler_gym_{getuser()}/pytest_benchmark",
             "--benchmark-save=bench_test",
             "--benchmark-sort=name",
             "-x",
