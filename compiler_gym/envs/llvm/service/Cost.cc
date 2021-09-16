@@ -58,7 +58,7 @@ Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& 
   // section size using llvm-size.
   const std::string ir = moduleToString(module);
 
-  const auto tmpFile = fs::unique_path(workingDirectory / "obj-%%%%");
+  const auto tmpFile = fs::unique_path(workingDirectory / "obj-%%%%.o");
   std::string llvmSizeOutput;
 
   try {
