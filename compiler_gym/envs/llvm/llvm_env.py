@@ -159,43 +159,22 @@ class LlvmEnv(CompilerEnv):
 
         self.inst2vec = _INST2VEC_ENCODER
 
+        cpu_info_spaces = [
+            Sequence(name="name", size_range=(0, None), dtype=str),
+            Scalar(name="cores_count", min=None, max=None, dtype=int),
+            Scalar(name="l1i_cache_size", min=None, max=None, dtype=int),
+            Scalar(name="l1i_cache_count", min=None, max=None, dtype=int),
+            Scalar(name="l1d_cache_size", min=None, max=None, dtype=int),
+            Scalar(name="l1d_cache_count", min=None, max=None, dtype=int),
+            Scalar(name="l2_cache_size", min=None, max=None, dtype=int),
+            Scalar(name="l2_cache_count", min=None, max=None, dtype=int),
+            Scalar(name="l3_cache_size", min=None, max=None, dtype=int),
+            Scalar(name="l3_cache_count", min=None, max=None, dtype=int),
+            Scalar(name="l4_cache_size", min=None, max=None, dtype=int),
+            Scalar(name="l4_cache_count", min=None, max=None, dtype=int),
+        ]
         self.observation.spaces["CpuInfo"].space = DictSpace(
-            {
-                "name": Sequence(name="name", size_range=(0, None), dtype=str),
-                "cores_count": Scalar(
-                    name="cores_count", min=None, max=None, dtype=int
-                ),
-                "l1i_cache_size": Scalar(
-                    name="l1i_cache_size", min=None, max=None, dtype=int
-                ),
-                "l1i_cache_count": Scalar(
-                    name="l1i_cache_count", min=None, max=None, dtype=int
-                ),
-                "l1d_cache_size": Scalar(
-                    name="l1d_cache_size", min=None, max=None, dtype=int
-                ),
-                "l1d_cache_count": Scalar(
-                    name="l1d_cache_count", min=None, max=None, dtype=int
-                ),
-                "l2_cache_size": Scalar(
-                    name="l2_cache_size", min=None, max=None, dtype=int
-                ),
-                "l2_cache_count": Scalar(
-                    name="l2_cache_count", min=None, max=None, dtype=int
-                ),
-                "l3_cache_size": Scalar(
-                    name="l3_cache_size", min=None, max=None, dtype=int
-                ),
-                "l3_cache_count": Scalar(
-                    name="l3_cache_count", min=None, max=None, dtype=int
-                ),
-                "l4_cache_size": Scalar(
-                    name="l4_cache_size", min=None, max=None, dtype=int
-                ),
-                "l4_cache_count": Scalar(
-                    name="l4_cache_count", min=None, max=None, dtype=int
-                ),
-            },
+            {space.name: space for space in cpu_info_spaces},
             name="CpuInfo",
         )
 
