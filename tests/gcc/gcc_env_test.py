@@ -3,6 +3,8 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Tests for the GCC CompilerGym service."""
+import re
+
 import gym
 import numpy as np
 import pytest
@@ -157,7 +159,7 @@ def test_default_reward():
         observation, reward, done, info = env.step(0)
         assert observation is None
         assert reward == 0
-        assert not done
+        assert not done, info
 
 
 @with_gcc_support
@@ -166,8 +168,7 @@ def test_source_observation():
     with gym.make("gcc-v0") as env:
         env.reset()
         lines = env.source.split("\n")
-        assert lines[0].startswith('# 0 "')
-        assert lines[0].endswith('adpcm.c"')
+        assert re.match(r"# \d+ \"adpcm.c\"", lines[0])
 
 
 @with_gcc_support
