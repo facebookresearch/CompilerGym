@@ -98,7 +98,7 @@ class ExampleCompilationSession(CompilationSession):
         num_choices = len(self.action_spaces[0].choice[0].named_discrete_space.value)
 
         if len(action.choice) != 1:
-            raise ValueError("Missing choice")
+            raise ValueError("Invalid choice count")
 
         # This is the index into the action space's values ("a", "b", "c") that
         # the user selected, e.g. 0 -> "a", 1 -> "b", 2 -> "c".
