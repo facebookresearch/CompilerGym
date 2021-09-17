@@ -53,10 +53,10 @@ def test_observation_spaces(gcc_bin: str):
             "source",
         }
         assert env.observation.spaces["obj_size"].space == Scalar(
-            min=-1, max=np.iinfo(np.int64).max, dtype=int
+            name="obj_size", min=-1, max=np.iinfo(np.int64).max, dtype=int
         )
         assert env.observation.spaces["asm"].space == Sequence(
-            size_range=(0, None), dtype=str, opaque_data_format=""
+            name="asm", size_range=(0, None), dtype=str, opaque_data_format=""
         )
 
 
@@ -129,7 +129,8 @@ def test_double_reset(gcc_bin: str):
         assert env.in_episode
         env.step(env.action_space.sample())
         env.reset()
-        env.step(env.action_space.sample())
+        _, _, done, info = env.step(env.action_space.sample())
+        assert not done, info
         assert env.in_episode
 
 
