@@ -16,7 +16,6 @@ from fasteners import InterProcessLock
 from compiler_gym.datasets import Benchmark, BenchmarkSource, Dataset
 from compiler_gym.datasets.benchmark import BenchmarkWithSource
 from compiler_gym.envs.gcc.gcc import Gcc
-from compiler_gym.service.proto import BenchmarkDynamicConfig
 from compiler_gym.util.decorators import memoized_property
 from compiler_gym.util.runfiles_path import runfiles_path
 from compiler_gym.util.shell_format import plural
@@ -40,15 +39,6 @@ class CsmithBenchmark(BenchmarkWithSource):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._src = None
-        self.proto.dynamic_config.MergeFrom(
-            BenchmarkDynamicConfig(
-                build_cmd="$CC $<",
-                build_genfile="a.out",
-                run_cmd="./a.out",
-                build_cmd_timeout_seconds=60,
-                run_cmd_timeout_seconds=300,
-            )
-        )
 
     @classmethod
     def create(cls, uri: str, bitcode: bytes, src: bytes) -> Benchmark:

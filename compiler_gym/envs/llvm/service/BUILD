@@ -1,3 +1,8 @@
+# Copyright (c) Facebook, Inc. and its affiliates.
+#
+# This source code is licensed under the MIT license found in the LICENSE file
+# in the root directory of this source tree.
+#
 # This package exposes the LLVM optimization pipeline as a CompilerGym service.
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
@@ -128,14 +133,15 @@ cc_library(
     deps = [
         "//compiler_gym/util:GrpcStatusMacros",
         "//compiler_gym/util:RunfilesPath",
+        "//compiler_gym/util:Subprocess",
         "//compiler_gym/util:Unreachable",
         "@boost//:filesystem",
+        "@boost//:process",
         "@com_github_grpc_grpc//:grpc++",
         "@fmt",
         "@glog",
         "@llvm//10.0.0",
         "@magic_enum",
-        "@subprocess",
     ],
 )
 
@@ -166,6 +172,7 @@ cc_library(
         "//compiler_gym/util:GrpcStatusMacros",
         "//compiler_gym/util:RunfilesPath",
         "@boost//:filesystem",
+        "@boost//:process",
         "@fmt",
         "@glog",
         "@llvm//10.0.0",
@@ -174,7 +181,6 @@ cc_library(
         "@programl//programl/graph/format:node_link_graph",
         "@programl//programl/ir/llvm:llvm-10",
         "@programl//programl/proto:programl_cc",
-        "@subprocess",
     ],
 )
 

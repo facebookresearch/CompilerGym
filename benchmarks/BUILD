@@ -6,6 +6,7 @@ load("@rules_python//python:defs.bzl", "py_test")
 
 py_test(
     name = "bench_test",
+    timeout = "long",
     srcs = ["bench_test.py"],
     shard_count = 8,
     deps = [

@@ -7,8 +7,8 @@
 #include <fmt/format.h>
 #include <glog/logging.h>
 
+#include <chrono>
 #include <stdexcept>
-#include <subprocess/subprocess.hpp>
 #include <system_error>
 #include <thread>
 
@@ -51,26 +51,20 @@ std::unique_ptr<llvm::Module> makeModuleOrDie(llvm::LLVMContext& context, const 
   return module;
 }
 
-void substringReplace(const std::string& pattern, const std::string& replacement,
-                      std::string& str) {
-  size_t pos = 0;
-  while (true) {
-    pos = str.find(pattern, pos);
-    if (pos == std::string::npos) {
-      break;
-    }
+RealizedBenchmarkDynamicConfig realizeDynamicConfig(const BenchmarkDynamicConfig& original,
+                                                    const fs::path& scratchDirectory) {
+  BenchmarkDynamicConfig cfg;
+  cfg.CopyFrom(original);
 
-    str.replace(pos, pattern.size(), replacement);
-    pos += pattern.size();
-  }
-}
+  // Set up the environment variables.
+  (*cfg.mutable_build_cmd()->mutable_env())["CC"] =
+      util::getSiteDataPath("llvm-v0/bin/clang").string();
+  (*cfg.mutable_build_cmd()->mutable_env())["IN"] = (scratchDirectory / "out.bc").string();
 
-std::string expandBuildCommand(const std::string& cmd, const fs::path& scratchDirectory) {
-  std::string out = cmd;
-  const auto clangPath = util::getSiteDataPath("llvm-v0/bin/clang");
-  substringReplace("$CC", clangPath.string(), out);
-  substringReplace("$<", (scratchDirectory / "out.bc").string(), out);
-  return out;
+  // Register the IR as a pre-requisite build file.
+  cfg.mutable_build_cmd()->add_infile((scratchDirectory / "out.bc").string());
+
+  return RealizedBenchmarkDynamicConfig(cfg);
 }
 
 }  // anonymous namespace
@@ -141,15 +135,14 @@ Benchmark::Benchmark(const std::string& name, const Bitcode& bitcode,
                      const BaselineCosts& baselineCosts)
     : context_(std::make_unique<llvm::LLVMContext>()),
       module_(makeModuleOrDie(*context_, bitcode, name)),
-      dynamicConfig_(dynamicConfig),
-      scratchDirectory_(fs::unique_path(workingDirectory / "scratch-%%%%-%%%%")),
-      buildCmd_(expandBuildCommand(dynamicConfig.build_cmd(), scratchDirectory_)),
-      isBuildable_(dynamicConfig.build_cmd().size()),
-      isRunnable_(dynamicConfig.build_cmd().size() && dynamicConfig.run_cmd().size()),
+      scratchDirectory_(fs::path(fs::unique_path(workingDirectory / "scratch-%%%%-%%%%"))),
+      dynamicConfigProto_(dynamicConfig),
+      dynamicConfig_(realizeDynamicConfig(dynamicConfig, scratchDirectory_)),
       baselineCosts_(baselineCosts),
       name_(name),
       needsRecompile_(true),
       runtimesPerObservationCount_(kDefaultRuntimesPerObservationCount),
+      warmupRunsPerRuntimeObservationCount_(kDefaultWarmupRunsPerRuntimeObservationCount),
       buildtimesPerObservationCount_(kDefaultBuildtimesPerObservationCount) {
   sys::error_code ec;
   fs::create_directory(scratchDirectory(), ec);
@@ -162,11 +155,9 @@ Benchmark::Benchmark(const std::string& name, std::unique_ptr<llvm::LLVMContext>
                      const BaselineCosts& baselineCosts)
     : context_(std::move(context)),
       module_(std::move(module)),
-      dynamicConfig_(dynamicConfig),
-      scratchDirectory_(fs::unique_path(workingDirectory / "scratch-%%%%-%%%%")),
-      buildCmd_(expandBuildCommand(dynamicConfig.build_cmd(), scratchDirectory_)),
-      isBuildable_(dynamicConfig.build_cmd().size()),
-      isRunnable_(dynamicConfig.build_cmd().size() && dynamicConfig.run_cmd().size()),
+      scratchDirectory_(fs::path(fs::unique_path(workingDirectory / "scratch-%%%%-%%%%"))),
+      dynamicConfigProto_(dynamicConfig),
+      dynamicConfig_(realizeDynamicConfig(dynamicConfig, scratchDirectory_)),
       baselineCosts_(baselineCosts),
       name_(name),
       needsRecompile_(true) {
@@ -180,7 +171,7 @@ std::unique_ptr<Benchmark> Benchmark::clone(const fs::path& workingDirectory) co
   llvm::raw_svector_ostream ostream(bitcode);
   llvm::WriteBitcodeToFile(module(), ostream);
 
-  return std::make_unique<Benchmark>(name(), bitcode, dynamicConfig(), workingDirectory,
+  return std::make_unique<Benchmark>(name(), bitcode, dynamicConfigProto_, workingDirectory,
                                      baselineCosts());
 }
 
@@ -208,45 +199,61 @@ Status Benchmark::writeBitcodeToFile(const fs::path& path) {
 }
 
 Status Benchmark::computeRuntime(Observation& observation) {
-  if (!isRunnable()) {
+  const RealizedBenchmarkDynamicConfig& cfg = dynamicConfig();
+
+  if (!cfg.isRunnable()) {
     return Status::OK;
+  }
+
+  if (chdir(scratchDirectory().string().c_str())) {
+    return Status(StatusCode::INTERNAL,
+                  fmt::format("Failed to set working directory: {}", scratchDirectory().string()));
   }
 
   RETURN_IF_ERROR(compile());
 
   // Run the pre-execution hooks.
-  for (int i = 0; i < dynamicConfig().pre_run_cmd_size(); ++i) {
-    RETURN_IF_ERROR(util::checkCall(dynamicConfig().pre_run_cmd(i),
-                                    dynamicConfig().pre_run_cmd_timeout_seconds(),
-                                    scratchDirectory()));
+  for (const auto& preRunCommand : cfg.preRunCommands()) {
+    RETURN_IF_ERROR(preRunCommand.checkInfiles());
+    RETURN_IF_ERROR(preRunCommand.checkCall());
+    RETURN_IF_ERROR(preRunCommand.checkOutfiles());
+  }
+
+  RETURN_IF_ERROR(cfg.runCommand().checkInfiles());
+
+  // Run the warmup runs.
+  VLOG(3) << "Running " << getWarmupRunsPerRuntimeObservationCount()
+          << " warmup iterations of binary";
+  for (int i = 0; i < getRuntimesPerObservationCount(); ++i) {
+    RETURN_IF_ERROR(cfg.runCommand().checkCall());
   }
 
   // Run the binary.
-  VLOG(3) << "Run: " << dynamicConfig().run_cmd();
+  VLOG(3) << "Running " << getRuntimesPerObservationCount() << " iterations of binary";
   for (int i = 0; i < getRuntimesPerObservationCount(); ++i) {
-    const std::chrono::time_point<std::chrono::steady_clock> start =
-        std::chrono::steady_clock::now();
-    RETURN_IF_ERROR(util::checkCall(dynamicConfig().run_cmd(),
-                                    dynamicConfig().run_cmd_timeout_seconds(), scratchDirectory()));
-    const auto end = std::chrono::steady_clock::now();
-    observation.mutable_double_list()->add_value(
-        static_cast<double>(
-            std::chrono::duration_cast<std::chrono::microseconds>(end - start).count()) /
-        1000000);
+    const auto startTime = std::chrono::steady_clock::now();
+    RETURN_IF_ERROR(cfg.runCommand().checkCall());
+    const auto endTime = std::chrono::steady_clock::now();
+    const auto elapsedMicroseconds =
+        std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count();
+    observation.mutable_double_list()->add_value(static_cast<double>(elapsedMicroseconds) /
+                                                 1000000);
   }
 
+  RETURN_IF_ERROR(cfg.runCommand().checkOutfiles());
+
   // Run the post-execution hooks.
-  for (int i = 0; i < dynamicConfig().post_run_cmd_size(); ++i) {
-    RETURN_IF_ERROR(util::checkCall(dynamicConfig().post_run_cmd(i),
-                                    dynamicConfig().post_run_cmd_timeout_seconds(),
-                                    scratchDirectory()));
+  for (const auto& postRunCommand : cfg.postRunCommands()) {
+    RETURN_IF_ERROR(postRunCommand.checkInfiles());
+    RETURN_IF_ERROR(postRunCommand.checkCall());
+    RETURN_IF_ERROR(postRunCommand.checkOutfiles());
   }
 
   return Status::OK;
 }
 
 Status Benchmark::computeBuildtime(Observation& observation) {
-  if (!isBuildable()) {
+  if (!dynamicConfig().isBuildable()) {
     return Status::OK;
   }
 
@@ -259,7 +266,9 @@ Status Benchmark::computeBuildtime(Observation& observation) {
 }
 
 Status Benchmark::compile() {
-  if (!isRunnable()) {
+  const auto& cfg = dynamicConfig();
+
+  if (!cfg.isBuildable()) {
     return Status::OK;
   }
 
@@ -267,28 +276,26 @@ Status Benchmark::compile() {
     return Status::OK;
   }
 
+  VLOG(3) << "Compiling benchmark";
+
+  if (chdir(scratchDirectory().string().c_str())) {
+    return Status(StatusCode::INTERNAL,
+                  fmt::format("Failed to set working directory: {}", scratchDirectory().string()));
+  }
+
   // Write the bitcode to a file.
   RETURN_IF_ERROR(writeBitcodeToFile(scratchDirectory() / "out.bc"));
-  VLOG(3) << "Compile: " << buildCmd_;
+
+  // Check that the required sources exist.
+  RETURN_IF_ERROR(cfg.buildCommand().checkInfiles());
 
   // Build the bitcode.
   const std::chrono::time_point<std::chrono::steady_clock> start = std::chrono::steady_clock::now();
-  RETURN_IF_ERROR(
-      util::checkCall(buildCmd_, dynamicConfig().build_cmd_timeout_seconds(), scratchDirectory()));
+  RETURN_IF_ERROR(cfg.buildCommand().checkCall());
   const auto end = std::chrono::steady_clock::now();
 
-  // If an output file path was specified, check that is generated.
-  if (dynamicConfig().build_genfile().size()) {
-    fs::path bin{dynamicConfig().build_genfile()};
-    if (!bin.is_absolute()) {
-      bin = scratchDirectory() / bin;
-    }
-    if (!fs::exists(bin)) {
-      return Status(StatusCode::INTERNAL,
-                    fmt::format("Compilation command '{}' did not produce expected file: {}",
-                                buildCmd_, bin.string()));
-    }
-  }
+  // Check that the expected output files were generated.
+  RETURN_IF_ERROR(cfg.buildCommand().checkOutfiles());
 
   buildTimeMicroseconds_ =
       std::chrono::duration_cast<std::chrono::microseconds>(end - start).count();
@@ -300,5 +307,26 @@ Status Benchmark::compile() {
 bool Benchmark::applyBaselineOptimizations(unsigned optLevel, unsigned sizeLevel) {
   return applyBaselineOptimizationsToModule(&module(), optLevel, sizeLevel);
 }
+
+namespace {
+
+std::vector<util::LocalShellCommand> commandsFromProto(
+    const google::protobuf::RepeatedPtrField<Command>& cmds) {
+  std::vector<util::LocalShellCommand> outs;
+  for (const auto& cmd : cmds) {
+    outs.push_back(util::LocalShellCommand(cmd));
+  }
+  return outs;
+}
+
+}  // anonymous namespace
+
+RealizedBenchmarkDynamicConfig::RealizedBenchmarkDynamicConfig(const BenchmarkDynamicConfig& cfg)
+    : buildCommand_(cfg.build_cmd()),
+      runCommand_(cfg.run_cmd()),
+      preRunCommands_(commandsFromProto(cfg.pre_run_cmd())),
+      postRunCommands_(commandsFromProto(cfg.post_run_cmd())),
+      isBuildable_(!buildCommand_.empty()),
+      isRunnable_(!(buildCommand_.empty() || runCommand_.empty())) {}
 
 }  // namespace compiler_gym::llvm_service

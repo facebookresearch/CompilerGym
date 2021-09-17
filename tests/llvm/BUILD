@@ -238,6 +238,18 @@ py_test(
 )
 
 py_test(
+    name = "runtime_test",
+    timeout = "long",
+    srcs = ["runtime_test.py"],
+    deps = [
+        "//compiler_gym/envs/llvm",
+        "//compiler_gym/service:connection",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "service_connection_test",
     srcs = ["service_connection_test.py"],
     deps = [

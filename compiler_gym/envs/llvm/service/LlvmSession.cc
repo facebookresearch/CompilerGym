@@ -8,10 +8,12 @@
 #include <fmt/format.h>
 #include <glog/logging.h>
 
+#include <boost/process.hpp>
+#include <chrono>
+#include <future>
 #include <iomanip>
 #include <optional>
 #include <string>
-#include <subprocess/subprocess.hpp>
 
 #include "boost/filesystem.hpp"
 #include "compiler_gym/envs/llvm/service/ActionSpace.h"
@@ -40,6 +42,7 @@
 #include "programl/ir/llvm/llvm.h"
 
 namespace fs = boost::filesystem;
+namespace bp = boost::process;
 
 namespace compiler_gym::llvm_service {
 
@@ -173,6 +176,18 @@ Status LlvmSession::handleSessionParameter(const std::string& key, const std::st
     reply = value;
   } else if (key == "llvm.get_runtimes_per_observation_count") {
     reply = fmt::format("{}", benchmark().getRuntimesPerObservationCount());
+  } else if (key == "llvm.set_warmup_runs_count_per_runtime_observation") {
+    const int ivalue = std::stoi(value);
+    if (ivalue < 0) {
+      return Status(
+          StatusCode::INVALID_ARGUMENT,
+          fmt::format("warmup_runs_count_per_runtime_observation must be >= 0. Received: {}",
+                      ivalue));
+    }
+    benchmark().setWarmupRunsPerRuntimeObservationCount(ivalue);
+    reply = value;
+  } else if (key == "llvm.get_warmup_runs_count_per_runtime_observation") {
+    reply = fmt::format("{}", benchmark().getWarmupRunsPerRuntimeObservationCount());
   } else if (key == "llvm.set_buildtimes_per_observation_count") {
     const int ivalue = std::stoi(value);
     if (ivalue < 1) {
@@ -254,22 +269,37 @@ Status LlvmSession::runOptWithArgs(const std::vector<std::string>& optArgs) {
   if (!fs::exists(optPath)) {
     return Status(StatusCode::INTERNAL, fmt::format("File not found: {}", optPath.string()));
   }
-  std::vector<std::string> optCmd{optPath.string(), before_path.string(), "-o",
-                                  after_path.string()};
-  optCmd.insert(optCmd.end(), optArgs.begin(), optArgs.end());
+
+  std::string optCmd =
+      fmt::format("{} {} -o {}", optPath.string(), before_path.string(), after_path.string());
+  for (const auto& arg : optArgs) {
+    optCmd += " " + arg;
+  }
 
   // Run the opt command line.
-  auto opt = subprocess::Popen(optCmd, subprocess::output{subprocess::PIPE},
-                               subprocess::error{subprocess::PIPE});
-  const auto optOutput = opt.communicate();
-  fs::remove(before_path);
+  try {
+    boost::asio::io_context optStderrStream;
+    std::future<std::string> optStderrFuture;
 
-  if (opt.retcode()) {
-    if (fs::exists(after_path)) {
-      fs::remove(after_path);
+    bp::child opt(optCmd, bp::std_in.close(), bp::std_out > bp::null, bp::std_err > optStderrFuture,
+                  optStderrStream);
+
+    if (!util::wait_for(opt, std::chrono::seconds(60))) {
+      return Status(StatusCode::DEADLINE_EXCEEDED,
+                    fmt::format("Failed to run opt within 60 seconds: {}", optCmd));
     }
-    const std::string error(optOutput.second.buf.begin(), optOutput.second.buf.end());
-    return Status(StatusCode::INTERNAL, error);
+    optStderrStream.run();
+    if (opt.exit_code()) {
+      const std::string stderr = optStderrFuture.get();
+      return Status(StatusCode::INTERNAL,
+                    fmt::format("Opt command '{}' failed with return code {}: {}", optCmd,
+                                opt.exit_code(), stderr));
+    }
+    fs::remove(before_path);
+  } catch (bp::process_error& e) {
+    fs::remove(before_path);
+    return Status(StatusCode::INTERNAL,
+                  fmt::format("Failed to run opt command '{}': {}", optCmd, e.what()));
   }
 
   if (!fs::exists(after_path)) {

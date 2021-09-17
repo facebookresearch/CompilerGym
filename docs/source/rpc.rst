@@ -86,3 +86,6 @@ Request and Reply Messages
 
 .. doxygenstruct:: AddBenchmarkReply
    :members:
+
+.. doxygenstruct:: Command
+   :members:

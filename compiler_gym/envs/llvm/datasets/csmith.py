@@ -12,7 +12,7 @@ import numpy as np
 from compiler_gym.datasets import Benchmark, BenchmarkSource, Dataset
 from compiler_gym.datasets.benchmark import BenchmarkInitError, BenchmarkWithSource
 from compiler_gym.envs.llvm.llvm_benchmark import ClangInvocation
-from compiler_gym.service.proto import BenchmarkDynamicConfig
+from compiler_gym.service.proto import BenchmarkDynamicConfig, Command
 from compiler_gym.util.decorators import memoized_property
 from compiler_gym.util.runfiles_path import runfiles_path
 from compiler_gym.util.shell_format import plural
@@ -35,11 +35,15 @@ class CsmithBenchmark(BenchmarkWithSource):
         self._src = None
         self.proto.dynamic_config.MergeFrom(
             BenchmarkDynamicConfig(
-                build_cmd="$CC $<",
-                build_genfile="a.out",
-                run_cmd="./a.out",
-                build_cmd_timeout_seconds=60,
-                run_cmd_timeout_seconds=300,
+                build_cmd=Command(
+                    argument=["$CC", "$IN"],
+                    outfile=["a.out"],
+                    timeout_seconds=60,
+                ),
+                run_cmd=Command(
+                    argument=["./a.out"],
+                    timeout_seconds=300,
+                ),
             )
         )
 
