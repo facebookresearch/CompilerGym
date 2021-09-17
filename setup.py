@@ -83,6 +83,7 @@ setuptools.setup(
             "envs/gcc/service/compiler_gym-gcc-service",
             "envs/llvm/service/compiler_gym-llvm-service",
             "envs/llvm/service/libLLVMPolly.so",
+            "envs/llvm/service/compute_observation",
             "envs/llvm/service/passes/*.txt",
             "third_party/cbench/benchmarks.txt",
             "third_party/cbench/cbench-v*/*",

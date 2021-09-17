@@ -15,6 +15,7 @@
 #include "compiler_gym/envs/llvm/service/ActionSpace.h"
 #include "compiler_gym/envs/llvm/service/Benchmark.h"
 #include "compiler_gym/envs/llvm/service/Cost.h"
+#include "compiler_gym/envs/llvm/service/Observation.h"
 #include "compiler_gym/envs/llvm/service/ObservationSpaces.h"
 #include "compiler_gym/service/CompilationSession.h"
 #include "compiler_gym/service/proto/compiler_gym_service.grpc.pb.h"
@@ -126,7 +127,6 @@ class LlvmSession final : public CompilationSession {
   }
 
   // Immutable state.
-  const programl::ProgramGraphOptions programlOptions_;
   const std::unordered_map<std::string, LlvmObservationSpace> observationSpaceNames_;
   // Mutable state initialized in init().
   LlvmActionSpace actionSpace_;

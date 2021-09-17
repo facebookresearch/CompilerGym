@@ -55,3 +55,11 @@ Datasets
 .. autoclass:: POJ104Dataset
 
 .. autoclass:: TensorFlowDataset
+
+
+Miscellaneous
+-------------
+
+.. currentmodule:: compiler_gym.envs.llvm
+
+.. autofunction:: compute_observation

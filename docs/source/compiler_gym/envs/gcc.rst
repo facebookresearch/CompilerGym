@@ -47,7 +47,7 @@ Compiler Description
 Datasets
 --------
 
-.. currentmodule:: compiler_gym.envs.llvm.datasets
+.. currentmodule:: compiler_gym.envs.gcc.datasets
 
 .. autofunction:: get_gcc_datasets
 

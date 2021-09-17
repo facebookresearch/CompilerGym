@@ -187,15 +187,19 @@ Status Benchmark::verify_module() {
   return Status::OK;
 }
 
-Status Benchmark::writeBitcodeToFile(const fs::path& path) {
+Status writeBitcodeFile(const llvm::Module& module, const fs::path& path) {
   std::error_code error;
   llvm::raw_fd_ostream outfile(path.string(), error);
   if (error.value()) {
     return Status(StatusCode::INTERNAL,
                   fmt::format("Failed to write bitcode file: {}", path.string()));
   }
-  llvm::WriteBitcodeToFile(module(), outfile);
+  llvm::WriteBitcodeToFile(module, outfile);
   return Status::OK;
+}
+
+Status Benchmark::writeBitcodeToFile(const fs::path& path) {
+  return writeBitcodeFile(module(), path);
 }
 
 Status Benchmark::computeRuntime(Observation& observation) {

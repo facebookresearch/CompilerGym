@@ -6,6 +6,11 @@
 # This package exposes the LLVM optimization pipeline as a CompilerGym service.
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
+package(default_visibility = [
+    "//compiler_gym/envs/llvm:__subpackages__",
+    "//tests:__subpackages__",
+])
+
 # This target includes the service binary and its runtime dependencies and
 # libraries.
 filegroup(
@@ -15,7 +20,7 @@ filegroup(
     ] + select({
         "@llvm//:darwin": [],
         "//conditions:default": [
-            "//compiler_gym/envs/llvm/service:libLLVMPolly",
+            ":libLLVMPolly",
         ],
     }),
     visibility = ["//visibility:public"],
@@ -38,7 +43,6 @@ genrule(
             "chmod 555 $@"
         ),
     }),
-    visibility = ["//compiler_gym/envs/llvm:__subpackages__"],
 )
 
 # This target copies the LLVMPolly.so file from LLVM to libLLVMPolly.so.
@@ -73,7 +77,6 @@ cc_library(
         "ActionSpace.h",
         "//compiler_gym/envs/llvm/service/passes:ActionEnum.h",
     ],
-    visibility = ["//tests:__subpackages__"],
     deps = [
         "//compiler_gym/service/proto:compiler_gym_service_cc",
         "//compiler_gym/util:EnumUtil",
@@ -85,10 +88,6 @@ cc_library(
     name = "Benchmark",
     srcs = ["Benchmark.cc"],
     hdrs = ["Benchmark.h"],
-    visibility = [
-        "//compiler_gym/envs/llvm/service:__subpackages__",
-        "//tests:__subpackages__",
-    ],
     deps = [
         ":Cost",
         "//compiler_gym/service/proto:compiler_gym_service_cc",
@@ -107,10 +106,6 @@ cc_library(
     name = "BenchmarkFactory",
     srcs = ["BenchmarkFactory.cc"],
     hdrs = ["BenchmarkFactory.h"],
-    visibility = [
-        "//compiler_gym/envs/llvm/service:__subpackages__",
-        "//tests:__subpackages__",
-    ],
     deps = [
         ":Benchmark",
         ":Cost",
@@ -124,6 +119,55 @@ cc_library(
         "@glog",
         "@llvm//10.0.0",
     ],
+)
+
+filegroup(
+    name = "compute_observation-files",
+    srcs = [
+        ":compute_observation",
+    ] + select({
+        "@llvm//:darwin": [],
+        "//conditions:default": [
+            ":libLLVMPolly",
+        ],
+    }),
+)
+
+cc_binary(
+    name = "compute_observation-prelinked",
+    srcs = ["ComputeObservation.cc"],
+    copts = [
+        "-DGOOGLE_PROTOBUF_NO_RTTI",
+        "-fno-rtti",
+    ],
+    deps = [
+        ":BenchmarkFactory",
+        ":Observation",
+        ":ObservationSpaces",
+        "//compiler_gym/service/proto:compiler_gym_service_cc",
+        "@boost//:filesystem",
+        "@glog",
+        "@llvm//10.0.0",
+        "@magic_enum",
+    ],
+)
+
+genrule(
+    name = "compute_observation-bin",
+    srcs = [":compute_observation-prelinked"],
+    outs = ["compute_observation"],
+    cmd = select({
+        "@llvm//:darwin": (
+            "cp $(location :compute_observation-prelinked) $@"
+        ),
+        "//conditions:default": (
+            "cp $(location :compute_observation-prelinked) $@ && " +
+            "chmod 666 $@ && " +
+            "patchelf --set-rpath '$$ORIGIN' $@ && " +
+            "chmod 555 $@"
+        ),
+    }),
+    visibility = ["//visibility:public"],
 )
 
 cc_library(
@@ -163,6 +207,7 @@ cc_library(
         ":Benchmark",
         ":BenchmarkFactory",
         ":Cost",
+        ":Observation",
         ":ObservationSpaces",
         "//compiler_gym/service:CompilationSession",
         "//compiler_gym/service/proto:compiler_gym_service_cc_grpc",
@@ -185,10 +230,32 @@ cc_library(
 )
 
 cc_library(
+    name = "Observation",
+    srcs = ["Observation.cc"],
+    hdrs = ["Observation.h"],
+    deps = [
+        ":Benchmark",
+        ":Cost",
+        ":ObservationSpaces",
+        "//compiler_gym/service/proto:compiler_gym_service_cc_grpc",
+        "//compiler_gym/third_party/autophase:InstCount",
+        "//compiler_gym/third_party/cpuinfo",
+        "//compiler_gym/util:GrpcStatusMacros",
+        "@boost//:filesystem",
+        "@glog",
+        "@llvm//10.0.0",
+        "@magic_enum",
+        "@nlohmann_json//:json",
+        "@programl//programl/graph/format:node_link_graph",
+        "@programl//programl/ir/llvm:llvm-10",
+        "@programl//programl/proto:programl_cc",
+    ],
+)
+
+cc_library(
     name = "ObservationSpaces",
     srcs = ["ObservationSpaces.cc"],
     hdrs = ["ObservationSpaces.h"],
-    visibility = ["//tests:__subpackages__"],
     deps = [
         ":Benchmark",
         "//compiler_gym/service/proto:compiler_gym_service_cc",

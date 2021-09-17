@@ -38,7 +38,7 @@ for applying reinforcement learning to compiler optimizations.
    compiler_gym/datasets
    compiler_gym/envs
    compiler_gym/envs/gcc
-   compiler_gym/envs/llvm
+   llvm/api
    compiler_gym/leaderboard
    compiler_gym/service
    compiler_gym/spaces
