@@ -259,12 +259,12 @@ livedocs: gendocs doxygen
 # Testing #
 ###########
 
-COMPILER_GYM_SITE_DATA ?= "/tmp/compiler_gym/tests/site_data"
-COMPILER_GYM_CACHE ?= "/tmp/compiler_gym/tests/cache"
+COMPILER_GYM_SITE_DATA ?= "/tmp/compiler_gym_$(USER)/tests/site_data"
+COMPILER_GYM_CACHE ?= "/tmp/compiler_gym_$(USER)/tests/cache"
 
 # A directory that is used as the working directory for running pytest tests
 # by symlinking the tests directory into it.
-INSTALL_TEST_ROOT ?= "/tmp/compiler_gym/install_tests"
+INSTALL_TEST_ROOT ?= "/tmp/compiler_gym_$(USER)/install_tests"
 
 # The target to use. If not provided, all tests will be run. For `make test` and
 # related, this is a bazel target pattern, with default value '//...'. For `make
@@ -345,7 +345,7 @@ COMPILER_GYM_DATA_FILE_LOCATIONS = \
     $(HOME)/.local/share/compiler_gym \
     $(HOME)/logs/compiler_gym \
     /dev/shm/compiler_gym \
-    /tmp/compiler_gym \
+    /tmp/compiler_gym_$(USER) \
     $(NULL)
 
 .PHONY: clean distclean uninstall purge

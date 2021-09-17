@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 import os
 import sys
+from getpass import getuser
 from typing import List, Optional
 
 import pytest
@@ -35,8 +36,10 @@ def main(extra_pytest_args: Optional[List[str]] = None, debug_level: int = 1):
     dbg.set_debug_level(debug_level)
 
     # Keep test data isolated from user data.
-    os.environ["COMPILER_GYM_SITE_DATA"] = "/tmp/compiler_gym/tests/site_data"
-    os.environ["COMPILER_GYM_CACHE"] = "/tmp/compiler_gym/tests/cache"
+    os.environ[
+        "COMPILER_GYM_SITE_DATA"
+    ] = f"/tmp/compiler_gym_{getuser()}/tests/site_data"
+    os.environ["COMPILER_GYM_CACHE"] = f"/tmp/compiler_gym_{getuser()}/tests/cache"
 
     pytest_args = sys.argv + ["-vv"]
     # Support for sharding. If a py_test target has the shard_count attribute
