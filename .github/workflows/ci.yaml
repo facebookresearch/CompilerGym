@@ -96,21 +96,14 @@ jobs:
             - name: Install test dependencies
               run: python -m pip install -r tests/requirements.txt
 
-            - name: Set coverage path
-              run: |
-                  echo "COV_REPORT=${GITHUB_WORKSPACE}/coverage-${GITHUB_RUN_NUMBER}-${GITHUB_JOB}-${{ matrix.python }}.xml" >> $GITHUB_ENV
-
             - name: Run the test suite
-              run: make install-test-cov TEST_TARGET="tests" PYTEST_ARGS="--ignore tests/llvm"
+              run: make install-test-cov TEST_TARGET="tests" PYTEST_ARGS="--ignore tests/llvm --ignore tests/gcc"
 
-            - name: Upload code coverage report wheel
-              uses: actions/upload-artifact@v2
+            - name: Upload coverage report to Codecov
+              uses: codecov/codecov-action@v2
               with:
-                  name: coverage-reports
-                  path: ${{ env.COV_REPORT }}
-                  if-no-files-found: error
-                  retention-days: 1
-
+                  fail_ci_if_error: true
+                  verbose: true
     test-macos:
         needs: build-macos
         runs-on: macos-latest
@@ -140,21 +133,14 @@ jobs:
             - name: Install test dependencies
               run: python -m pip install -r tests/requirements.txt
 
-            - name: Set coverage path
-              run: |
-                  echo "COV_REPORT=${GITHUB_WORKSPACE}/coverage-${GITHUB_RUN_NUMBER}-${GITHUB_JOB}-${{ matrix.python }}.xml" >> $GITHUB_ENV
-
             - name: Run the test suite
-              run: make install-test-cov TEST_TARGET="tests" PYTEST_ARGS="--ignore tests/llvm"
+              run: make install-test-cov TEST_TARGET="tests" PYTEST_ARGS="--ignore tests/llvm --ignore tests/gcc"
 
-            - name: Upload code coverage report wheel
-              uses: actions/upload-artifact@v2
+            - name: Upload coverage report to Codecov
+              uses: codecov/codecov-action@v2
               with:
-                  name: coverage-reports
-                  path: ${{ env.COV_REPORT }}
-                  if-no-files-found: error
-                  retention-days: 1
-
+                  fail_ci_if_error: true
+                  verbose: true
     test-llvm-env-linux:
         needs: build-linux
         runs-on: ubuntu-latest
@@ -184,21 +170,14 @@ jobs:
             - name: Install test dependencies
               run: python -m pip install -r tests/requirements.txt
 
-            - name: Set coverage path
-              run: |
-                  echo "COV_REPORT=${GITHUB_WORKSPACE}/coverage-${GITHUB_RUN_NUMBER}-${GITHUB_JOB}-${{ matrix.python }}.xml" >> $GITHUB_ENV
-
             - name: Run the test suite
               run: make install-test-cov TEST_TARGET="tests/llvm"
 
-            - name: Upload code coverage report wheel
-              uses: actions/upload-artifact@v2
+            - name: Upload coverage report to Codecov
+              uses: codecov/codecov-action@v2
               with:
-                  name: coverage-reports
-                  path: ${{ env.COV_REPORT }}
-                  if-no-files-found: error
-                  retention-days: 1
-
+                  fail_ci_if_error: true
+                  verbose: true
     test-llvm-env-macos:
         needs: build-macos
         runs-on: macos-latest
@@ -228,21 +207,88 @@ jobs:
             - name: Install test dependencies
               run: python -m pip install -r tests/requirements.txt
 
-            - name: Set coverage path
-              run: |
-                  echo "COV_REPORT=${GITHUB_WORKSPACE}/coverage-${GITHUB_RUN_NUMBER}-${GITHUB_JOB}-${{ matrix.python }}.xml" >> $GITHUB_ENV
-
             - name: Run the test suite
               run: make install-test-cov TEST_TARGET="tests/llvm"
 
-            - name: Upload code coverage report wheel
-              uses: actions/upload-artifact@v2
+            - name: Upload coverage report to Codecov
+              uses: codecov/codecov-action@v2
               with:
-                  name: coverage-reports
-                  path: ${{ env.COV_REPORT }}
-                  if-no-files-found: error
-                  retention-days: 1
+                  fail_ci_if_error: true
+                  verbose: true
+    test-gcc-env-linux:
+        needs: build-linux
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                python: [3.9]
+        steps:
+            - uses: actions/checkout@v2
 
+            - name: Set up Python ${{ matrix.python }}
+              uses: actions/setup-python@v2
+              with:
+                  python-version: ${{ matrix.python }}
+
+            - name: Download Python wheel
+              uses: actions/download-artifact@v2
+              with:
+                  name: linux-wheel
+
+            - name: Install wheel
+              run: python -m pip install *.whl
+
+            - name: Install runtime dependencies
+              uses: ./.github/actions/install-runtime-dependencies
+
+            - name: Install test dependencies
+              run: python -m pip install -r tests/requirements.txt
+
+            - name: Run the test suite
+              run: make install-test-cov TEST_TARGET="tests/gcc"
+
+            - name: Upload coverage report to Codecov
+              uses: codecov/codecov-action@v2
+              with:
+                  fail_ci_if_error: true
+                  verbose: true
+    test-gcc-env-macos:
+        needs: build-macos
+        runs-on: macos-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                python: [3.9]
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python ${{ matrix.python }}
+              uses: actions/setup-python@v2
+              with:
+                  python-version: ${{ matrix.python }}
+
+            - name: Download Python wheel
+              uses: actions/download-artifact@v2
+              with:
+                  name: macos-wheel
+
+            - name: Install wheel
+              run: python -m pip install *.whl
+
+            - name: Install runtime dependencies
+              uses: ./.github/actions/install-runtime-dependencies
+
+            - name: Install test dependencies
+              run: python -m pip install -r tests/requirements.txt
+
+            - name: Run the test suite
+              run: make install-test-cov TEST_TARGET="tests/gcc"
+
+            - name: Upload coverage report to Codecov
+              uses: codecov/codecov-action@v2
+              with:
+                  fail_ci_if_error: true
+                  verbose: true
     test-examples-linux:
         needs: build-linux
         runs-on: ubuntu-latest
@@ -272,21 +318,14 @@ jobs:
             - name: Install test dependencies
               run: python -m pip install -r examples/requirements.txt -r tests/requirements.txt
 
-            - name: Set coverage path
-              run: |
-                  echo "COV_REPORT=${GITHUB_WORKSPACE}/coverage-${GITHUB_RUN_NUMBER}-${GITHUB_JOB}-${{ matrix.python }}.xml" >> $GITHUB_ENV
-
             - name: Run the test suite
               run: make install-test-cov TEST_TARGET="examples"
 
-            - name: Upload code coverage report wheel
-              uses: actions/upload-artifact@v2
+            - name: Upload coverage report to Codecov
+              uses: codecov/codecov-action@v2
               with:
-                  name: coverage-reports
-                  path: ${{ env.COV_REPORT }}
-                  if-no-files-found: error
-                  retention-days: 1
-
+                  fail_ci_if_error: true
+                  verbose: true
     test-examples-macos:
         needs: build-macos
         runs-on: macos-latest
@@ -316,46 +355,12 @@ jobs:
             - name: Install test dependencies
               run: python -m pip install -r examples/requirements.txt -r tests/requirements.txt
 
-            - name: Set coverage path
-              run: |
-                  echo "COV_REPORT=${GITHUB_WORKSPACE}/coverage-${GITHUB_RUN_NUMBER}-${GITHUB_JOB}-${{ matrix.python }}.xml" >> $GITHUB_ENV
-
             - name: Run the test suite
               run: make install-test-cov TEST_TARGET="examples"
 
-            - name: Upload code coverage report wheel
-              uses: actions/upload-artifact@v2
-              with:
-                  name: coverage-reports
-                  path: ${{ env.COV_REPORT }}
-                  if-no-files-found: error
-                  retention-days: 1
-
-    upload-coverage-reports:
-        needs:
-            - test-linux
-            - test-macos
-            - test-llvm-env-linux
-            - test-llvm-env-macos
-            - test-examples-linux
-            - test-examples-macos
-        if: ${{ always() }}
-        runs-on: ubuntu-latest
-        steps:
-            - name: Download coverage reports
-              uses: actions/download-artifact@v2
-              with:
-                  name: coverage-reports
-
-            - name: Enumerate the coverage reports
-              run: |
-                  ls -lh coverage*.xml
-                  echo "COV_FILES=$(ls coverage*.xml | tr '\n' ',')" >> $GITHUB_ENV
-
-            - name: Upload coverage reports to Codecov
+            - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
               with:
-                  files: ${{ env.COV_FILES }}
                   fail_ci_if_error: true
                   verbose: true
 
