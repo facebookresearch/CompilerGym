@@ -7,6 +7,7 @@ from threading import Thread
 from typing import List
 
 import gym
+from flaky import flaky
 
 from compiler_gym import CompilerEnv
 from tests.test_main import main
@@ -52,6 +53,8 @@ class ThreadedWorkerWithEnv(Thread):
         self.done = True
 
 
+# Timeout may be exceeded if the environment is slow to start.
+@flaky
 def test_running_environment_in_background_thread():
     """Test launching and running an LLVM environment in a background thread."""
     thread = ThreadedWorker(
@@ -60,7 +63,7 @@ def test_running_environment_in_background_thread():
         actions=[0, 0, 0],
     )
     thread.start()
-    thread.join(timeout=10)
+    thread.join(timeout=60)
 
     assert thread.done
     assert thread.observation is not None

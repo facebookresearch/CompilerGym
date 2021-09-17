@@ -41,7 +41,15 @@ def main(extra_pytest_args: Optional[List[str]] = None, debug_level: int = 1):
     ] = f"/tmp/compiler_gym_{getuser()}/tests/site_data"
     os.environ["COMPILER_GYM_CACHE"] = f"/tmp/compiler_gym_{getuser()}/tests/cache"
 
-    pytest_args = sys.argv + ["-vv"]
+    pytest_args = sys.argv + [
+        # Run pytest verbosely to print out test names to provide context in
+        # case of failures.
+        "-vv",
+        # Disable "Module already imported" warnings. See:
+        # https://docs.pytest.org/en/latest/how-to/usage.html#calling-pytest-from-python-code
+        "-W",
+        "ignore:Module already imported:pytest.PytestWarning",
+    ]
     # Support for sharding. If a py_test target has the shard_count attribute
     # set (in the range [1,50]), then the pytest-shard module is used to divide
     # the tests among the shards. See https://pypi.org/project/pytest-shard/
@@ -58,10 +66,10 @@ def main(extra_pytest_args: Optional[List[str]] = None, debug_level: int = 1):
     returncode = pytest.main(pytest_args)
 
     # By default pytest will fail with an error if no tests are collected.
-    # Disable that behavior here (with a warning) since there legitimate cases
-    # where we may want to run a test file with no tests in it. For example,
-    # when running on a continuous integration service where all the tests are
-    # marked with the @skip_on_ci decorator.
+    # Disable that behavior here (with a warning) since there are legitimate
+    # cases where we may want to run a test file with no tests in it. For
+    # example, when running on a continuous integration service where all the
+    # tests are marked with the @skip_on_ci decorator.
     if returncode == pytest.ExitCode.NO_TESTS_COLLECTED.value:
         print(
             "WARNING: The test suite was empty. Is that intended?",
