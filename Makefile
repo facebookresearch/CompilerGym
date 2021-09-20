@@ -300,20 +300,20 @@ define pytest
 endef
 
 install-test: install-test-setup
-	$(call pytest,--benchmark-disable -n auto -k "not fuzz" --durations=5)
+	$(call pytest,--no-success-flaky-report --benchmark-disable -n auto -k "not fuzz" --durations=5)
 
 # Note we export $CI=1 so that the tests always run as if within the CI
 # environement. This is to ensure that the reported coverage matches that of
 # the value on: https://codecov.io/gh/facebookresearch/CompilerGym
 install-test-cov: install-test-setup
-	export CI=1; $(call pytest,--benchmark-disable -n auto -k "not fuzz" --durations=5 --cov=compiler_gym --cov-report=xml:$(COV_REPORT) --cov-report=term)
+	export CI=1; $(call pytest,--no-success-flaky-report --benchmark-disable -n auto -k "not fuzz" --durations=5 --cov=compiler_gym --cov-report=xml:$(COV_REPORT) --cov-report=term)
 
 # The minimum number of seconds to run the fuzz tests in a loop for. Override
 # this at the commandline, e.g. `FUZZ_SECONDS=1800 make fuzz`.
 FUZZ_SECONDS ?= 300
 
 install-fuzz: install-test-setup
-	$(call pytest,-p no:sugar -x -vv -k fuzz --seconds=$(FUZZ_SECONDS))
+	$(call pytest,--no-success-flaky-report -p no:sugar -x -vv -k fuzz --seconds=$(FUZZ_SECONDS))
 
 post-install-test:
 	$(MAKE) -C examples/makefile_integration clean

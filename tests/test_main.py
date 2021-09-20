@@ -49,6 +49,8 @@ def main(extra_pytest_args: Optional[List[str]] = None, debug_level: int = 1):
         # https://docs.pytest.org/en/latest/how-to/usage.html#calling-pytest-from-python-code
         "-W",
         "ignore:Module already imported:pytest.PytestWarning",
+        # Disable noisy "Flaky tests passed" messages.
+        "--no-success-flaky-report",
     ]
     # Support for sharding. If a py_test target has the shard_count attribute
     # set (in the range [1,50]), then the pytest-shard module is used to divide
