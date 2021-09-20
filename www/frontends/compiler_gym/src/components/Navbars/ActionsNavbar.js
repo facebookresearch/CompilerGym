@@ -134,7 +134,6 @@ const ActionsNavbar = ({
           "1"
         );
         setSession(response);
-        //console.log(response) For debugging.
         setParams({
           dataset: searchParams.get("dataset"),
           datasetUri: searchParams.get("dataset_uri"),
