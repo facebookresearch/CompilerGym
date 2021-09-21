@@ -4,15 +4,20 @@
 # LICENSE file in the root directory of this source tree.
 """Integrations tests for the loop_tool CompilerGym environment."""
 
+import pytest
+
 import compiler_gym
 from tests.test_main import main
 
 
-def test_basic():
+@pytest.mark.parametrize("backend", ["cpu", "cuda"])
+def test_basic(backend):
     env = compiler_gym.make("looptool-v0")
     env.observation_space = "flops"
     env.reset(
-        benchmark=env.datasets.benchmark(uri="benchmark://loop_tool-v0/1024"),
+        benchmark=env.datasets.benchmark(
+            uri=f"benchmark://loop_tool-{backend}-v0/1024"
+        ),
         action_space="simple",
     )
     env.step(0)
@@ -27,15 +32,18 @@ def test_basic():
     print(o)
 
 
-def test_rand():
+@pytest.mark.parametrize("backend", ["cuda"])
+def test_rand(backend):
     env = compiler_gym.make("looptool-v0")
     env.observation_space = "flops"
     env.reset(
-        benchmark=env.datasets.benchmark(uri="benchmark://loop_tool-v0/1024"),
+        benchmark=env.datasets.benchmark(
+            uri=f"benchmark://loop_tool-{backend}-v0/1024"
+        ),
         action_space="simple",
     )
     best = 0
-    for i in range(200):
+    for i in range(20):
         a = env.action_space.sample()
         o = env.step(a)
         flops = o[0]
@@ -44,12 +52,15 @@ def test_rand():
             print(best)
 
 
-def test_induced_remainder():
+@pytest.mark.parametrize("backend", ["cpu", "cuda"])
+def test_induced_remainder(backend):
     env = compiler_gym.make("looptool-v0")
     env.observation_space = "loop_tree"
     # reset
     env.reset(
-        benchmark=env.datasets.benchmark(uri="benchmark://loop_tool-v0/1024"),
+        benchmark=env.datasets.benchmark(
+            uri=f"benchmark://loop_tool-{backend}-v0/1024"
+        ),
         action_space="simple",
     )
     # action toggle_mode
@@ -62,8 +73,8 @@ def test_induced_remainder():
     env.step(1)
     # action up
     o = env.step(1)
-    expected = """
-for a in 341 r 1 : L0 [thread]
+    expected = f"""
+for a in 341 r 1 : L0 {'cpu_parallel ' if backend=='cpu' else ''}[thread]
  for a' in 3 : L1
   for a'' in 1 : L2
    %0[a] <- read()
@@ -79,12 +90,15 @@ for a in 341 r 1 : L0 [thread]
     assert out == expected.strip(), f"{out} \n vs \n {expected.strip()}"
 
 
-def test_thread_removal():
+@pytest.mark.parametrize("backend", ["cpu", "cuda"])
+def test_thread_removal(backend):
     env = compiler_gym.make("looptool-v0")
     env.observation_space = "loop_tree"
     # reset
     env.reset(
-        benchmark=env.datasets.benchmark(uri="benchmark://loop_tool-v0/1024"),
+        benchmark=env.datasets.benchmark(
+            uri=f"benchmark://loop_tool-{backend}-v0/1024"
+        ),
         action_space="simple",
     )
     # action toggle_thread
@@ -106,12 +120,15 @@ for a in 1024 : L0
     assert out == expected.strip(), f"{out} \n vs \n {expected.strip()}"
 
 
-def test_thread_addition():
+@pytest.mark.parametrize("backend", ["cpu", "cuda"])
+def test_thread_addition(backend):
     env = compiler_gym.make("looptool-v0")
     env.observation_space = "loop_tree"
     # reset
     env.reset(
-        benchmark=env.datasets.benchmark(uri="benchmark://loop_tool-v0/1024"),
+        benchmark=env.datasets.benchmark(
+            uri=f"benchmark://loop_tool-{backend}-v0/1024"
+        ),
         action_space="simple",
     )
     # action toggle_mode
@@ -120,9 +137,9 @@ def test_thread_addition():
     env.step(1)
     # action toggle_thread
     o = env.step(3)
-    expected = """
-for a in 1024 : L0 [thread]
- for a' in 1 : L1 [thread]
+    expected = f"""
+for a in 1024 : L0 {'cpu_parallel ' if backend=='cpu' else ''}[thread]
+ for a' in 1 : L1 {'cpu_parallel ' if backend=='cpu' else ''}[thread]
   for a'' in 1 : L2
    %0[a] <- read()
   for a'' in 1 : L4

@@ -87,7 +87,11 @@ class LoopToolCompilationSession(CompilationSession):
         self, working_directory: Path, action_space: ActionSpace, benchmark: Benchmark
     ):
         super().__init__(working_directory, action_space, benchmark)
-        lt.set_default_hardware("cuda")
+        if "cuda" in benchmark.uri:
+            self.backend = "cuda"
+            lt.set_default_hardware("cuda")
+        else:
+            self.backend = "cpu"
         self.ir = lt.IR()
         self.var = self.ir.create_var("a")
         r0 = self.ir.create_node("read", [], [self.var])
@@ -227,12 +231,17 @@ class LoopToolCompilationSession(CompilationSession):
         for b in self.thread:
             if b:
                 parallel.add(t)
+                if self.backend == "cpu":
+                    loop_tree.annotate(t, "cpu_parallel")
             t = loop_tree.children(t)[0]
         return loop_tree, parallel
 
     def flops(self):
         loop_tree, parallel = self.lower()
-        c = lt.cuda(loop_tree, parallel)
+        if self.backend == "cuda":
+            c = lt.cuda(loop_tree, parallel)
+        else:
+            c = lt.cpu(loop_tree)
         A = lt.Tensor(self.size)
         B = lt.Tensor(self.size)
         C = lt.Tensor(self.size)

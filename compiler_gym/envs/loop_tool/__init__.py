@@ -50,17 +50,33 @@ class FLOPSReward(Reward):
         return reward
 
 
-class LoopToolDataset(Dataset):
+class LoopToolCUDADataset(Dataset):
     def __init__(self, *args, **kwargs):
         super().__init__(
-            name="benchmark://loop_tool-v0",
+            name="benchmark://loop_tool-cuda-v0",
             license="MIT",
             description="loop_tool dataset",
             site_data_base=site_data_path("loop_tool_dataset"),
         )
 
     def benchmark_uris(self) -> Iterable[str]:
-        return (f"loop_tool-v0/{i}" for i in range(1, 1024 * 1024 * 8))
+        return (f"loop_tool-cuda-v0/{i}" for i in range(1, 1024 * 1024 * 8))
+
+    def benchmark(self, uri: str) -> Benchmark:
+        return Benchmark(proto=benchmark.BenchmarkProto(uri=uri))
+
+
+class LoopToolCPUDataset(Dataset):
+    def __init__(self, *args, **kwargs):
+        super().__init__(
+            name="benchmark://loop_tool-cpu-v0",
+            license="MIT",
+            description="loop_tool dataset",
+            site_data_base=site_data_path("loop_tool_dataset"),
+        )
+
+    def benchmark_uris(self) -> Iterable[str]:
+        return (f"loop_tool-cpu-v0/{i}" for i in range(1, 1024 * 1024 * 8))
 
     def benchmark(self, uri: str) -> Benchmark:
         return Benchmark(proto=benchmark.BenchmarkProto(uri=uri))
@@ -72,6 +88,6 @@ register(
     kwargs={
         "service": LOOP_TOOL_SERVICE_BINARY,
         "rewards": [FLOPSReward()],
-        "datasets": [LoopToolDataset()],
+        "datasets": [LoopToolCPUDataset(), LoopToolCUDADataset()],
     },
 )
