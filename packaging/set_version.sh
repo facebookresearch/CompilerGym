@@ -1,5 +1,10 @@
 #!/usr/bin/env bash
+# Copyright (c) Facebook, Inc. and its affiliates.
 #
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+#
+# ------------------------------------------------------------------------------
 # This script is used to update any source files in the repo that have a version
 # string embedded in them. To set a new verison, call this script with the new
 # version number and todays date in yyyy-mm-dd format. For example:
