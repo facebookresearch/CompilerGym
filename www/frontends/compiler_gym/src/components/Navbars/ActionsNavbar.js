@@ -134,7 +134,6 @@ const ActionsNavbar = ({
           "1"
         );
         setSession(response);
-        console.log(response)
         setParams({
           dataset: searchParams.get("dataset"),
           datasetUri: searchParams.get("dataset_uri"),
@@ -197,7 +196,7 @@ const ActionsNavbar = ({
 
   // Append current url params into a string to generata a link.
   const getShareLink = () => {
-    let shareLink = `${window.location.href}${location.search}`;
+    let shareLink = `${window.location.href}`;
     return shareLink;
   };
 
