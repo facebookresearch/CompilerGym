@@ -1,4 +1,5 @@
 flaky==3.7.0
+psutil==5.8.0  # Implicit dependency of pytest-xdist
 pytest==6.1.0
 pytest-benchmark==3.2.3
 pytest-cov==2.11.1
