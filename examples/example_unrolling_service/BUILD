@@ -5,11 +5,10 @@
 load("@rules_python//python:defs.bzl", "py_library", "py_test")
 
 py_library(
-    name = "example_compiler_gym_service",
+    name = "example_unrolling_service",
     srcs = ["__init__.py"],
     data = [
-        "//examples/example_compiler_gym_service/service_cc:compiler_gym-example-service-cc",
-        "//examples/example_compiler_gym_service/service_py:compiler_gym-example-service-py",
+        "//examples/example_unrolling_service/service_py:example-unrolling-service-py",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -21,7 +20,7 @@ py_test(
     name = "env_tests",
     srcs = ["env_tests.py"],
     deps = [
-        ":example_compiler_gym_service",
+        ":example_unrolling_service",
         "//compiler_gym",
         "//tests:test_main",
     ],

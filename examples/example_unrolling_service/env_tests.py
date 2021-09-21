@@ -2,7 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""Tests for the example CompilerGym service."""
+"""Tests for the unrolling CompilerGym service example."""
 import logging
 import subprocess
 from pathlib import Path
@@ -22,7 +22,7 @@ from tests.test_main import main
 
 # Given that the C++ and Python service implementations have identical
 # featuresets, we can parameterize the tests and run them against both backends.
-EXAMPLE_ENVIRONMENTS = ["example-py-v0"]
+EXAMPLE_ENVIRONMENTS = ["unrolling-py-v0"]
 
 
 @pytest.fixture(scope="function", params=EXAMPLE_ENVIRONMENTS)
@@ -35,7 +35,7 @@ def env(request) -> CompilerEnv:
 @pytest.fixture(
     scope="module",
     params=[example.EXAMPLE_PY_SERVICE_BINARY],
-    ids=["example-py-v0"],
+    ids=["unrolling-py-v0"],
 )
 def bin(request) -> Path:
     yield request.param
@@ -130,7 +130,7 @@ def test_reward_before_reset(env: CompilerEnv):
 def test_reset_invalid_benchmark(env: CompilerEnv):
     """Test requesting a specific benchmark."""
     with pytest.raises(LookupError) as ctx:
-        env.reset(benchmark="example-v0/foobar")
+        env.reset(benchmark="unrolling-v0/foobar")
     assert str(ctx.value) == "Unknown program name"
 
 
@@ -211,8 +211,8 @@ def test_rewards(env: CompilerEnv):
 
 def test_benchmarks(env: CompilerEnv):
     assert list(env.datasets.benchmark_uris()) == [
-        "benchmark://example-v0/foo",
-        "benchmark://example-v0/bar",
+        "benchmark://unrolling-v0/foo",
+        "benchmark://unrolling-v0/bar",
     ]
 
 

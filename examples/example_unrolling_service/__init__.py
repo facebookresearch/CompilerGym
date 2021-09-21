@@ -12,7 +12,7 @@ from compiler_gym.util.registration import register
 from compiler_gym.util.runfiles_path import runfiles_path, site_data_path
 
 EXAMPLE_PY_SERVICE_BINARY: Path = runfiles_path(
-    "examples/example_compiler_gym_service/service_py/compiler_gym-example-service-py"
+    "examples/example_unrolling_service/service_py/example-unrolling-service-py"
 )
 
 
@@ -51,17 +51,17 @@ class RuntimeReward(Reward):
 class ExampleDataset(Dataset):
     def __init__(self, *args, **kwargs):
         super().__init__(
-            name="benchmark://example-v0",
+            name="benchmark://unrolling-v0",
             license="MIT",
             description="An example dataset",
             site_data_base=site_data_path("example_dataset"),
         )
         self._benchmarks = {
-            "benchmark://example-v0/foo": Benchmark.from_file_contents(
-                "benchmark://example-v0/foo", "Ir data".encode("utf-8")
+            "benchmark://unrolling-v0/foo": Benchmark.from_file_contents(
+                "benchmark://unrolling-v0/foo", "Ir data".encode("utf-8")
             ),
-            "benchmark://example-v0/bar": Benchmark.from_file_contents(
-                "benchmark://example-v0/bar", "Ir data".encode("utf-8")
+            "benchmark://unrolling-v0/bar": Benchmark.from_file_contents(
+                "benchmark://unrolling-v0/bar", "Ir data".encode("utf-8")
             ),
         }
 
@@ -79,7 +79,7 @@ class ExampleDataset(Dataset):
 # the example-v0 environment will be available to gym.make(...).
 
 register(
-    id="example-py-v0",
+    id="unrolling-py-v0",
     entry_point="compiler_gym.envs:CompilerEnv",
     kwargs={
         "service": EXAMPLE_PY_SERVICE_BINARY,
