@@ -9,6 +9,7 @@ from typing import List
 
 import gym
 import pytest
+from flaky import flaky
 
 from compiler_gym.envs import LlvmEnv
 from tests.pytest_plugins.common import macos_only
@@ -37,6 +38,7 @@ def process_worker_with_env(env: LlvmEnv, actions: List[int], queue: mp.Queue):
     queue.put((env, observation, reward, done, info))
 
 
+@flaky  # Test contains timeouts.
 def test_running_environment_in_background_process():
     """Test launching and running an LLVM environment in a background process."""
     queue = mp.Queue(maxsize=3)
@@ -46,8 +48,8 @@ def test_running_environment_in_background_process():
     )
     process.start()
     try:
-        process.join(timeout=10)
-        result = queue.get(timeout=10)
+        process.join(timeout=60)
+        result = queue.get(timeout=60)
         observation, reward, done, info = result
 
         assert not done

@@ -118,8 +118,9 @@ py_test(
 
 py_test(
     name = "fresh_environment_observation_reward_test",
+    timeout = "long",
     srcs = ["fresh_environment_observation_reward_test.py"],
-    shard_count = 8,
+    shard_count = 12,
     deps = [
         "//compiler_gym/envs",
         "//tests:test_main",
@@ -133,16 +134,6 @@ py_test(
     deps = [
         "//tests:test_main",
         "//tests/pytest_plugins:common",
-        "//tests/pytest_plugins:llvm",
-    ],
-)
-
-py_test(
-    name = "gvn_sink_test",
-    srcs = ["gvn_sink_test.py"],
-    deps = [
-        "//compiler_gym/envs",
-        "//tests:test_main",
         "//tests/pytest_plugins:llvm",
     ],
 )
@@ -217,7 +208,6 @@ py_test(
 
 py_test(
     name = "multiprocessing_test",
-    timeout = "short",
     srcs = ["multiprocessing_test.py"],
     flaky = 1,
     deps = [

@@ -16,7 +16,6 @@ py_test(
 
 py_test(
     name = "manual_env_bin_test",
-    timeout = "short",
     srcs = ["manual_env_bin_test.py"],
     flaky = 1,
     deps = [

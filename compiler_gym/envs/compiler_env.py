@@ -895,7 +895,8 @@ class CompilerEnv(gym.Env):
                 self.close()
             except ServiceError as e:
                 # close() can raise ServiceError if the service exists with a
-                # non-zero return code. If so,
+                # non-zero return code. We swallow the error here but propagate
+                # the diagnostic message.
                 info[
                     "error_details"
                 ] += f". Additional error during environment closing: {e}"
