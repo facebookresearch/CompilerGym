@@ -7,7 +7,7 @@ import codecs
 import json
 import pickle
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from compiler_gym.datasets import Benchmark
 from compiler_gym.envs.compiler_env import CompilerEnv
@@ -195,3 +195,11 @@ class GccEnv(CompilerEnv):
             -1 <= c < len(self.gcc_spec.options[i]) for i, c in enumerate(choices)
         )
         self.send_param("choices", ",".join(map(str, choices)))
+
+    def _init_kwargs(self) -> Dict[str, Any]:
+        """Return the arguments required to initialize a GccEnv."""
+        return {
+            # GCC has an additional gcc_bin argument.
+            "gcc_bin": self.gcc_spec.gcc.bin,
+            **super()._init_kwargs(),
+        }
