@@ -86,6 +86,15 @@ py_test(
 )
 
 py_test(
+    name = "shell_format_test",
+    srcs = ["shell_format_test.py"],
+    deps = [
+        "//compiler_gym/util",
+        "//tests:test_main",
+    ],
+)
+
+py_test(
     name = "statistics_test",
     timeout = "short",
     srcs = ["statistics_test.py"],
