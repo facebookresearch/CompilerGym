@@ -118,8 +118,9 @@ py_test(
 
 py_test(
     name = "fresh_environment_observation_reward_test",
+    timeout = "long",
     srcs = ["fresh_environment_observation_reward_test.py"],
-    shard_count = 8,
+    shard_count = 12,
     deps = [
         "//compiler_gym/envs",
         "//tests:test_main",
