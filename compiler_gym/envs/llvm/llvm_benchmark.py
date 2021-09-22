@@ -86,10 +86,11 @@ def get_compiler_includes(compiler: str) -> Iterable[Path]:
         elif line.startswith("#include <...> search starts here:"):
             in_search_list = True
     else:
-        raise OSError(
-            f"Failed to parse '#include <...>' search paths from {compiler}:\n"
-            f"{stderr.strip()}"
-        )
+        msg = f"Failed to parse '#include <...>' search paths from {compiler}"
+        stderr = stderr.strip()
+        if stderr:
+            msg += f":\n{stderr}"
+        raise OSError(msg)
 
 
 # Memoized search paths. Call get_system_includes() to access them.
@@ -115,6 +116,7 @@ def get_system_includes() -> List[Path]:
             _SYSTEM_INCLUDES = list(get_compiler_includes(system_compiler))
         except OSError as e:
             logging.warning("%s", e)
+            _SYSTEM_INCLUDES = []
     return _SYSTEM_INCLUDES
 
 

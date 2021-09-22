@@ -186,18 +186,20 @@ bdist_wheel: bazel-build
 bdist_wheel-linux-rename:
 	mv dist/compiler_gym-$(VERSION)-py3-none-linux_x86_64.whl dist/compiler_gym-$(VERSION)-py3-none-manylinux2014_x86_64.whl
 
+# The docker image to use for building the bdist_wheel-linux target. See
+# packaging/Dockerfile.
+MANYLINUX_DOCKER_IMAGE ?= chriscummins/compiler_gym-manylinux-build:2021-09-21
+
 bdist_wheel-linux:
 	rm -rf build
-	docker build -t chriscummins/compiler_gym-linux-build packaging
-	docker run -v $(ROOT):/CompilerGym --workdir /CompilerGym --rm --shm-size=8g chriscummins/compiler_gym-linux-build:latest /bin/sh -c './packaging/container_init.sh && make bdist_wheel'
-	mv dist/compiler_gym-$(VERSION)-py3-none-linux_x86_64.whl dist/compiler_gym-$(VERSION)-py3-none-manylinux2014_x86_64.whl
-	rm -rf build
+	docker pull $(MANYLINUX_DOCKER_IMAGE)
+	docker run -v $(ROOT):/CompilerGym --workdir /CompilerGym --rm --shm-size=8g $(MANYLINUX_DOCKER_IMAGE) /bin/sh -c './packaging/container_init.sh && make bdist_wheel bdist_wheel-linux-rename BAZEL_OPTS=$(BAZEL_OPTS) BAZEL_BUILD_OPTS=$(BAZEL_BUILD_OPTS) BAZEL_FETCH_OPTS=$(BAZEL_FETCH_OPTS)'
 
 bdist_wheel-linux-shell:
-	docker run -v $(ROOT):/CompilerGym --workdir /CompilerGym --rm --shm-size=8g -it --entrypoint "/bin/bash" chriscummins/compiler_gym-linux-build:latest
+	docker run -v $(ROOT):/CompilerGym --workdir /CompilerGym --rm --shm-size=8g -it --entrypoint "/bin/bash" $(MANYLINUX_DOCKER_IMAGE)
 
 bdist_wheel-linux-test:
-	docker run -v $(ROOT):/CompilerGym --workdir /CompilerGym --rm --shm-size=8g chriscummins/compiler_gym-linux-build:latest /bin/sh -c 'cd /CompilerGym && pip3 install -U pip && pip3 install dist/compiler_gym-$(VERSION)-py3-none-manylinux2014_x86_64.whl && pip install -r tests/requirements.txt && make install-test'
+	docker run -v $(ROOT):/CompilerGym --workdir /CompilerGym --rm --shm-size=8g $(MANYLINUX_DOCKER_IMAGE) /bin/sh -c 'cd /CompilerGym && pip3 install -U pip && pip3 install dist/compiler_gym-$(VERSION)-py3-none-manylinux2014_x86_64.whl && pip install -r tests/requirements.txt && make install-test'
 
 all: docs bdist_wheel bdist_wheel-linux
 

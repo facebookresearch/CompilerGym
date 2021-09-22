@@ -1,0 +1,93 @@
+---
+# This workflow is used to build the binary wheels that can be uploaded to pypi
+# for releases. It produces an artifact containing a macOS and manylinux binary
+# wheel from the requested branch. It also runs the full test suite against
+# these wheels.
+name: Build Binaries
+
+on:
+    workflow_dispatch:
+
+jobs:
+    build:
+        runs-on: ${{ matrix.os }}
+        strategy:
+            matrix:
+                os: [macos-latest, ubuntu-latest]
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Evaluate artifact name
+              run: |
+                  echo "ARTIFACT=compiler_gym-$(cat VERSION)" >> $GITHUB_ENV
+                  echo "Artifact name is $ARTIFACT"
+
+            - uses: actions/setup-python@v2
+              with:
+                  python-version: 3.9
+
+            - name: Install build dependencies
+              uses: ./.github/actions/install-build-dependencies
+
+            - name: Build Python wheel
+              run: |
+                  if [ "$(uname)" = "Darwin" ]; then
+                    make bdist_wheel
+                  else
+                    make bdist_wheel-linux
+                  fi
+              env:
+                  BAZEL_OPTS: --batch
+                  BAZEL_FETCH_OPTS: --config=ci
+                  BAZEL_BUILD_OPTS: --config=ci
+
+            - name: Upload artifact
+              uses: actions/upload-artifact@v2
+              with:
+                  name: ${{ env.ARTIFACT }}
+                  path: dist/*.whl
+                  if-no-files-found: error
+                  retention-days: 14
+
+    test:
+        needs: build
+        runs-on: ${{ matrix.os }}
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [macos-latest, ubuntu-latest]
+                python: [3.6, 3.7, 3.8, 3.9]
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Evaluate artifact name
+              run: |
+                  echo "ARTIFACT=compiler_gym-$(cat VERSION)" >> $GITHUB_ENV
+                  echo "Artifact name is $ARTIFACT"
+
+            - name: Set up Python ${{ matrix.python }}
+              uses: actions/setup-python@v2
+              with:
+                  python-version: ${{ matrix.python }}
+
+            - name: Download artifact
+              uses: actions/download-artifact@v2
+              with:
+                  name: ${{ env.ARTIFACT }}
+
+            - name: Install wheel
+              run: |
+                  if [ "$(uname)" = "Darwin" ]; then
+                    python -m pip install compiler_gym-*-macosx*.whl
+                  else
+                    python -m pip install compiler_gym-*-manylinux*.whl
+                  fi
+
+            - name: Install runtime dependencies
+              uses: ./.github/actions/install-runtime-dependencies
+
+            - name: Install test dependencies
+              run: python -m pip install -r examples/requirements.txt -r tests/requirements.txt
+
+            - name: Run the test suite
+              run: make install-test
