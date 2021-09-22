@@ -295,6 +295,11 @@ jobs:
         needs: build-macos
         runs-on: macos-latest
         steps:
+            - uses: docker-practice/actions-setup-docker@master
+
+            - name: Confirm docker install
+              run: docker version
+
             - uses: actions/checkout@v2
 
             - name: Set up Python
@@ -329,9 +334,6 @@ jobs:
         needs: build-macos
         runs-on: macos-latest
         steps:
-            - name: Stop Docker
-              run: killall Docker
-
             - uses: actions/checkout@v2
 
             - name: Set up Python
