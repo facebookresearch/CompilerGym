@@ -217,7 +217,6 @@ py_test(
 
 py_test(
     name = "multiprocessing_test",
-    timeout = "short",
     srcs = ["multiprocessing_test.py"],
     flaky = 1,
     deps = [
