@@ -13,7 +13,7 @@ import loop_tool_py as lt
 import numpy as np
 import pkg_resources
 
-from compiler_gym.service import CompilationSession
+from compiler_gym.service import CompilationSession, EnvironmentNotSupported
 from compiler_gym.service.proto import (
     Action,
     ActionSpace,
@@ -92,6 +92,10 @@ class LoopToolCompilationSession(CompilationSession):
             lt.set_default_hardware("cuda")
         else:
             self.backend = "cpu"
+        if self.backend not in lt.backends():
+            raise EnvironmentNotSupported(
+                f"Failed to load {self.backend} dataset for loop_tool.  Have you installed all required dependecies?  See <https://facebookresearch.github.io/CompilerGym/envs/loop_tool.html#installation> for details. "
+            )
         self.ir = lt.IR()
         self.var = self.ir.create_var("a")
         r0 = self.ir.create_node("read", [], [self.var])

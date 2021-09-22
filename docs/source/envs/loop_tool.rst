@@ -12,6 +12,15 @@ CompilerGym exposes the ``loop_tool`` IR for reinforcement learning through a
 .. contents:: Overview:
     :local:
 
+.. _Installation:
+
+Installation
+------------
+
+It is highly recommended you install CUDA to use ``loop_tool``.
+The package will work with most newer versions of CUDA.
+Please see NVidia's `CUDA Toolkit installation page<https://developer.nvidia.com/cuda-downloads>`_
+for details.
 
 Datasets
 --------

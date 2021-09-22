@@ -18,9 +18,6 @@ with open("README.md") as f:
         long_description = f.read()
 with open("compiler_gym/requirements.txt") as f:
     requirements = [ln.split("#")[0].rstrip() for ln in f.readlines()]
-    # Split the PyPi packages from dependency links.
-    dependency_links = [ln for ln in requirements if ln.startswith("git+")]
-    requirements = [ln for ln in requirements if not ln.startswith("git+")]
 
 # When building a bdist_wheel we need to set the appropriate tags: this package
 # includes compiled binaries, and does not include compiled python extensions.
@@ -98,7 +95,6 @@ setuptools.setup(
         ]
     },
     install_requires=requirements,
-    dependency_links=dependency_links,
     include_package_data=True,
     python_requires=">=3.6",
     classifiers=[
