@@ -7,6 +7,7 @@
 import numpy as np
 
 from compiler_gym.envs import CompilerEnv
+from compiler_gym.service.connection import ServiceError
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_DIM
 from tests.test_main import main
 
@@ -24,6 +25,13 @@ def test_step(env: CompilerEnv, action_name: str):
     assert observation.shape == (AUTOPHASE_FEATURE_DIM,)
     assert isinstance(reward, float)
     assert isinstance(done, bool)
+
+    try:
+        env.close()
+    except ServiceError as e:
+        # env.close() will raise an error if the service terminated
+        # ungracefully. In that case, the "done" flag should have been set.
+        assert done, f"Service error was raised when 'done' flag not set: {e}"
 
 
 if __name__ == "__main__":
