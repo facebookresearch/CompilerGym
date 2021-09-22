@@ -38,7 +38,8 @@ Post-installation Tests
         The same as `make install-test`, but with python test coverage
         reporting. A summary of test coverage is printed at the end of execution
         and the full details are recorded in a coverage.xml file in the project
-        root directory.
+        root directory. To print a report of file coverage to stdout at the end
+        of testing, use argument `PYTEST_ARGS="--cov-report=term"`.
 
     make install-fuzz
         Run the fuzz testing suite against an installed CompilerGym package.
@@ -306,7 +307,7 @@ install-test: install-test-setup
 # environement. This is to ensure that the reported coverage matches that of
 # the value on: https://codecov.io/gh/facebookresearch/CompilerGym
 install-test-cov: install-test-setup
-	export CI=1; $(call pytest,--no-success-flaky-report --benchmark-disable -n auto -k "not fuzz" --durations=5 --cov=compiler_gym --cov-report=xml:$(COV_REPORT) --cov-report=term)
+	export CI=1; $(call pytest,--no-success-flaky-report --benchmark-disable -n auto -k "not fuzz" --durations=5 --cov=compiler_gym --cov-report=xml:$(COV_REPORT))
 
 # The minimum number of seconds to run the fuzz tests in a loop for. Override
 # this at the commandline, e.g. `FUZZ_SECONDS=1800 make fuzz`.
