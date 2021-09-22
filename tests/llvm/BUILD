@@ -139,16 +139,6 @@ py_test(
 )
 
 py_test(
-    name = "gvn_sink_test",
-    srcs = ["gvn_sink_test.py"],
-    deps = [
-        "//compiler_gym/envs",
-        "//tests:test_main",
-        "//tests/pytest_plugins:llvm",
-    ],
-)
-
-py_test(
     name = "gym_interface_compatability",
     timeout = "short",
     srcs = ["gym_interface_compatability.py"],
