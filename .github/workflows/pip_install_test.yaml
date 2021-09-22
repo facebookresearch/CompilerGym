@@ -1,0 +1,32 @@
+---
+# This workflow pip install's teh compiler_gym package and checks that the
+# module can be imported. The goal of this workflow is to catch failures in the
+# installation process that can occur because of a breaking change in the
+# dependent packages.
+name: Pip install test
+
+on:
+    workflow_dispatch:
+    schedule:
+        - cron: 0 0 * * *  # daily
+
+jobs:
+    test:
+        runs-on: ${{ matrix.os }}
+
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [ubuntu-latest, macos-latest]
+                python: [3.6, 3.7, 3.8, 3.9]
+
+        steps:
+            - uses: actions/setup-python@v2
+              with:
+                  python-version: ${{ matrix.python }}
+
+            - name: Install python wheel
+              run: python -m pip install compiler_gym
+
+            - name: Check package version
+              run: python -c 'import compiler_gym; print(compiler_gym.__version__)'
