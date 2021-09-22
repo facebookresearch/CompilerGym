@@ -246,7 +246,6 @@ def eval_llvm_instcount_policy(policy: Policy) -> None:
 
             # Repeat the searches for the requested number of iterations.
             benchmarks *= FLAGS.n
-            benchmarks = sorted(benchmarks)
             total_count = len(benchmarks)
 
             # If we are resuming from a previous job, read the states that have
