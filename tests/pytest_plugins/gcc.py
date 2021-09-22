@@ -6,6 +6,7 @@
 
 import subprocess
 from functools import lru_cache
+from typing import Iterable
 
 import pytest
 
@@ -26,9 +27,29 @@ def system_gcc_is_available() -> bool:
         return False
 
 
+def system_gcc_path() -> str:
+    """Return the path of the system GCC as a string."""
+    return subprocess.check_output(
+        ["which", "gcc"], universal_newlines=True, stderr=subprocess.DEVNULL
+    ).strip()
+
+
 def gcc_environment_is_supported() -> bool:
     """Return whether the requirements for the GCC environment are met."""
     return docker_is_available() or system_gcc_is_available()
+
+
+def gcc_bins() -> Iterable[str]:
+    """Return a list of available GCCs."""
+    if docker_is_available():
+        yield "docker:gcc:11.2.0"
+    if system_gcc_is_available():
+        yield system_gcc_path()
+
+
+@pytest.fixture(scope="module", params=gcc_bins())
+def gcc_bin(request) -> str:
+    return request.param
 
 
 # Decorator to skip a test if GCC environment is not supported.

@@ -13,20 +13,21 @@ import compiler_gym.envs.gcc  # noqa register environments
 from compiler_gym.service import SessionNotFound
 from compiler_gym.service.connection import ServiceError
 from compiler_gym.spaces import Scalar, Sequence
-from tests.pytest_plugins.gcc import with_gcc_support, without_gcc_support
+from tests.pytest_plugins.common import with_docker, without_docker
+from tests.pytest_plugins.gcc import with_gcc_support
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.gcc"]
 
 
-@without_gcc_support
+@without_docker
 def test_gcc_env_fails_without_gcc_support():
     with pytest.raises(ServiceError):
         gym.make("gcc-v0")
 
 
-@with_gcc_support
-def test_action_space():
+@with_docker
+def test_docker_default_action_space():
     """Test that the environment reports the service's action spaces."""
     with gym.make("gcc-v0") as env:
         assert env.action_spaces[0].name == "default"
@@ -34,10 +35,9 @@ def test_action_space():
         assert env.action_spaces[0].names[0] == "-O0"
 
 
-@with_gcc_support
-def test_observation_spaces():
+def test_observation_spaces(gcc_bin: str):
     """Test that the environment reports the service's observation spaces."""
-    with gym.make("gcc-v0") as env:
+    with gym.make("gcc-v0", gcc_bin=gcc_bin) as env:
         env.reset()
         assert env.observation.spaces.keys() == {
             "asm_hash",
@@ -60,18 +60,17 @@ def test_observation_spaces():
         )
 
 
-@with_gcc_support
-def test_reward_spaces():
+def test_reward_spaces(gcc_bin: str):
     """Test that the environment reports the service's reward spaces."""
-    with gym.make("gcc-v0") as env:
+    with gym.make("gcc-v0", gcc_bin=gcc_bin) as env:
         env.reset()
         assert env.reward.spaces.keys() == {"asm_size", "obj_size"}
 
 
 @with_gcc_support
-def test_step_before_reset():
+def test_step_before_reset(gcc_bin: str):
     """Taking a step() before reset() is illegal."""
-    with gym.make("gcc-v0") as env:
+    with gym.make("gcc-v0", gcc_bin=gcc_bin) as env:
         with pytest.raises(
             SessionNotFound, match=r"Must call reset\(\) before step\(\)"
         ):
@@ -79,9 +78,9 @@ def test_step_before_reset():
 
 
 @with_gcc_support
-def test_observation_before_reset():
+def test_observation_before_reset(gcc_bin: str):
     """Taking an observation before reset() is illegal."""
-    with gym.make("gcc-v0") as env:
+    with gym.make("gcc-v0", gcc_bin=gcc_bin) as env:
         with pytest.raises(
             SessionNotFound, match=r"Must call reset\(\) before step\(\)"
         ):
@@ -89,9 +88,9 @@ def test_observation_before_reset():
 
 
 @with_gcc_support
-def test_reward_before_reset():
+def test_reward_before_reset(gcc_bin: str):
     """Taking a reward before reset() is illegal."""
-    with gym.make("gcc-v0") as env:
+    with gym.make("gcc-v0", gcc_bin=gcc_bin) as env:
         with pytest.raises(
             SessionNotFound, match=r"Must call reset\(\) before step\(\)"
         ):
@@ -99,33 +98,33 @@ def test_reward_before_reset():
 
 
 @with_gcc_support
-def test_reset_invalid_benchmark():
+def test_reset_invalid_benchmark(gcc_bin: str):
     """Test requesting a specific benchmark."""
-    with gym.make("gcc-v0") as env:
+    with gym.make("gcc-v0", gcc_bin=gcc_bin) as env:
         with pytest.raises(LookupError, match=r"'benchmark://chstone-v1"):
             env.reset(benchmark="chstone-v1/flubbedydubfishface")
 
 
 @with_gcc_support
-def test_invalid_observation_space():
+def test_invalid_observation_space(gcc_bin: str):
     """Test error handling with invalid observation space."""
-    with gym.make("gcc-v0") as env:
+    with gym.make("gcc-v0", gcc_bin=gcc_bin) as env:
         with pytest.raises(LookupError):
             env.observation_space = 100
 
 
 @with_gcc_support
-def test_invalid_reward_space():
+def test_invalid_reward_space(gcc_bin: str):
     """Test error handling with invalid reward space."""
-    with gym.make("gcc-v0") as env:
+    with gym.make("gcc-v0", gcc_bin=gcc_bin) as env:
         with pytest.raises(LookupError):
             env.reward_space = 100
 
 
 @with_gcc_support
-def test_double_reset():
+def test_double_reset(gcc_bin: str):
     """Test that reset() can be called twice."""
-    with gym.make("gcc-v0") as env:
+    with gym.make("gcc-v0", gcc_bin=gcc_bin) as env:
         env.reset()
         assert env.in_episode
         env.step(env.action_space.sample())
@@ -135,25 +134,25 @@ def test_double_reset():
 
 
 @with_gcc_support
-def test_step_out_of_range():
+def test_step_out_of_range(gcc_bin: str):
     """Test error handling with an invalid action."""
-    with gym.make("gcc-v0") as env:
+    with gym.make("gcc-v0", gcc_bin=gcc_bin) as env:
         env.reset()
         with pytest.raises(ValueError, match="Out-of-range"):
             env.step(10000)
 
 
 @with_gcc_support
-def test_default_benchmark():
+def test_default_benchmark(gcc_bin: str):
     """Test that we are working with the expected default benchmark."""
-    with gym.make("gcc-v0") as env:
+    with gym.make("gcc-v0", gcc_bin=gcc_bin) as env:
         assert env.benchmark.proto.uri == "benchmark://chstone-v0/adpcm"
 
 
 @with_gcc_support
-def test_default_reward():
+def test_default_reward(gcc_bin: str):
     """Test default reward space."""
-    with gym.make("gcc-v0") as env:
+    with gym.make("gcc-v0", gcc_bin=gcc_bin) as env:
         env.reward_space = "obj_size"
         env.reset()
         observation, reward, done, info = env.step(0)
@@ -163,15 +162,15 @@ def test_default_reward():
 
 
 @with_gcc_support
-def test_source_observation():
+def test_source_observation(gcc_bin: str):
     """Test observation spaces."""
-    with gym.make("gcc-v0") as env:
+    with gym.make("gcc-v0", gcc_bin=gcc_bin) as env:
         env.reset()
         lines = env.source.split("\n")
         assert re.match(r"# \d+ \"adpcm.c\"", lines[0])
 
 
-@with_gcc_support
+@with_docker
 def test_rtl_observation():
     """Test observation spaces."""
     with gym.make("gcc-v0") as env:
@@ -185,7 +184,7 @@ def test_rtl_observation():
         )
 
 
-@with_gcc_support
+@with_docker
 def test_asm_observation():
     """Test observation spaces."""
     with gym.make("gcc-v0") as env:
@@ -193,7 +192,7 @@ def test_asm_observation():
         assert env.asm.startswith('\t.file\t"src.c"\n\t')
 
 
-@with_gcc_support
+@with_docker
 def test_asm_size_observation():
     """Test observation spaces."""
     with gym.make("gcc-v0") as env:
@@ -201,7 +200,7 @@ def test_asm_size_observation():
         assert env.asm_size == 39876
 
 
-@with_gcc_support
+@with_docker
 def test_asm_hash_observation():
     """Test observation spaces."""
     with gym.make("gcc-v0") as env:
@@ -209,7 +208,7 @@ def test_asm_hash_observation():
         assert env.asm_hash == "f4921de395b026a55eab3844c8fe43dd"
 
 
-@with_gcc_support
+@with_docker
 def test_instruction_counts_observation():
     """Test observation spaces."""
     with gym.make("gcc-v0") as env:
@@ -268,7 +267,7 @@ def test_instruction_counts_observation():
         }
 
 
-@with_gcc_support
+@with_docker
 def test_obj_observation():
     """Test observation spaces."""
     with gym.make("gcc-v0") as env:
@@ -276,7 +275,7 @@ def test_obj_observation():
         assert env.obj[:5] == b"\x7fELF\x02"
 
 
-@with_gcc_support
+@with_docker
 def test_obj_size_observation():
     """Test observation spaces."""
     with gym.make("gcc-v0") as env:
@@ -284,7 +283,7 @@ def test_obj_size_observation():
         assert env.obj_size == 21192
 
 
-@with_gcc_support
+@with_docker
 def test_obj_hash_observation():
     """Test observation spaces."""
     with gym.make("gcc-v0") as env:
@@ -292,7 +291,7 @@ def test_obj_hash_observation():
         assert env.obj_hash == "65937217c3758faf655df98741fe1d52"
 
 
-@with_gcc_support
+@with_docker
 def test_choices_observation():
     """Test observation spaces."""
     with gym.make("gcc-v0") as env:
@@ -302,7 +301,7 @@ def test_choices_observation():
         assert all(map(lambda x: x == -1, choices))
 
 
-@with_gcc_support
+@with_docker
 def test_commandline():
     """Test observation spaces."""
     with gym.make("gcc-v0") as env:
@@ -310,7 +309,7 @@ def test_commandline():
         assert env.commandline() == "docker:gcc:11.2.0 -w -c src.c -o obj.o"
 
 
-@with_gcc_support
+@with_docker
 def test_gcc_spec():
     """Test gcc_spec param."""
     with gym.make("gcc-v0") as env:
@@ -319,7 +318,7 @@ def test_gcc_spec():
         assert min(map(len, env.gcc_spec.options)) > 0
 
 
-@with_gcc_support
+@with_docker
 def test_set_choices():
     """Test that we can set the command line parameters"""
     with gym.make("gcc-v0") as env:
@@ -332,7 +331,7 @@ def test_set_choices():
         )
 
 
-@with_gcc_support
+@with_docker
 def test_rewards():
     """Test reward spaces."""
     with gym.make("gcc-v0") as env:
@@ -345,9 +344,9 @@ def test_rewards():
 
 
 @with_gcc_support
-def test_timeout():
+def test_timeout(gcc_bin: str):
     """Test that the timeout can be set."""
-    with gym.make("gcc-v0") as env:
+    with gym.make("gcc-v0", gcc_bin=gcc_bin) as env:
         env.reset()
         env.timeout = 20
         assert env.timeout == 20
@@ -355,7 +354,7 @@ def test_timeout():
         assert env.timeout == 20
 
 
-@with_gcc_support
+@with_docker
 def test_compile():
     with gym.make("gcc-v0") as env:
         env.observation_space = "obj_size"
@@ -370,8 +369,8 @@ def test_compile():
 
 
 @with_gcc_support
-def test_fork():
-    with gym.make("gcc-v0") as env:
+def test_fork(gcc_bin: str):
+    with gym.make("gcc-v0", gcc_bin=gcc_bin) as env:
         env.reset()
         env.step(0)
         env.step(1)

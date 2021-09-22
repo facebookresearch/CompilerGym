@@ -11,7 +11,7 @@ from copy import deepcopy
 from math import isclose
 from pathlib import Path
 from time import time
-from typing import Callable, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 
 import gym
 import numpy as np
@@ -522,6 +522,17 @@ class CompilerEnv(gym.Env):
         else:
             self.observation_space_spec = None
 
+    def _init_kwargs(self) -> Dict[str, Any]:
+        """Retturn a dictionary of keyword arguments used to initialize the
+        environment.
+        """
+        return {
+            "action_space": self.action_space,
+            "benchmark": self.benchmark,
+            "connection_settings": self._connection_settings,
+            "service": self._service_endpoint,
+        }
+
     def fork(self) -> "CompilerEnv":
         """Fork a new environment with exactly the same state.
 
@@ -563,38 +574,28 @@ class CompilerEnv(gym.Env):
             )
 
             # Create a new environment that shares the connection.
-            new_env = type(self)(
-                service=self._service_endpoint,
-                action_space=self.action_space,
-                connection_settings=self._connection_settings,
-                service_connection=self.service,
-            )
+            new_env = type(self)(**self._init_kwargs(), service_connection=self.service)
 
             # Set the session ID.
             new_env._session_id = reply.session_id  # pylint: disable=protected-access
             new_env.observation.session_id = reply.session_id
 
-            # Now that we have initialized the environment with the current state,
-            # set the benchmark so that calls to new_env.reset() will correctly
-            # revert the environment to the initial benchmark state.
+            # Now that we have initialized the environment with the current
+            # state, set the benchmark so that calls to new_env.reset() will
+            # correctly revert the environment to the initial benchmark state.
             #
             # pylint: disable=protected-access
             new_env._next_benchmark = self._benchmark_in_use
 
-            # Set the "visible" name of the current benchmark to hide the fact that
-            # we loaded from a custom bitcode file.
+            # Set the "visible" name of the current benchmark to hide the fact
+            # that we loaded from a custom benchmark file.
             new_env._benchmark_in_use = self._benchmark_in_use
         except NotImplementedError:
             # Fallback implementation. If the compiler service does not support
             # the Fork() operator then we create a new independent environment
             # and apply the sequence of actions in the current environment to
             # replay the state.
-            new_env = type(self)(
-                service=self._service_endpoint,
-                action_space=self.action_space,
-                benchmark=self.benchmark,
-                connection_settings=self._connection_settings,
-            )
+            new_env = type(self)(**self._init_kwargs())
             new_env.reset()
             _, _, done, _ = new_env.step(self.actions)
             assert not done, "Failed to replay action sequence in forked environment"
