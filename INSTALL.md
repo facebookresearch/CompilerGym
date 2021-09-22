@@ -18,7 +18,7 @@ On macOS the required dependencies can be installed using
 [homebrew](https://docs.brew.sh/Installation):
 
 ```sh
-brew install bazelisk zlib
+brew install bazelisk buildifier hadolint prototool zlib
 export LDFLAGS="-L/usr/local/opt/zlib/lib"
 export CPPFLAGS="-I/usr/local/opt/zlib/include"
 export PKG_CONFIG_PATH="/usr/local/opt/zlib/lib/pkgconfig"
@@ -31,13 +31,18 @@ Now proceed to [All platforms](#all-platforms) below.
 On debian-based linux systems, install the required toolchain using:
 
 ```sh
-sudo apt install clang-9 libtinfo5 libjpeg-dev zlib1g-dev m4 make patch
-wget https://github.com/bazelbuild/bazelisk/releases/download/v1.7.5/bazelisk-linux-amd64 -O bazel
-chmod +x bazel && mkdir -p ~/.local/bin && mv -v bazel ~/.local/bin
+sudo apt install clang-9 clang-format golang libjpeg-dev libtinfo5 m4 make patch zlib1g-dev
+mkdir -pv ~/.local/bin
+wget https://github.com/bazelbuild/bazelisk/releases/download/v1.7.5/bazelisk-linux-amd64 -O ~/.local/bin/bazel
+wget https://github.com/hadolint/hadolint/releases/download/v1.19.0/hadolint-Linux-x86_64 -O ~/.local/bin/hadolint
+chmod +x ~/.local/bin/bazel ~/.local/bin/hadolint
+go get github.com/bazelbuild/buildtools/buildifier
+GO111MODULE=on go get github.com/uber/prototool/cmd/prototool@dev
 export PATH="$HOME/.local/bin:$PATH"
 export CC=clang
 export CXX=clang++
 ```
+
 
 ### All platforms
 
