@@ -22,10 +22,10 @@ from tests.test_main import main
 
 # Given that the C++ and Python service implementations have identical
 # featuresets, we can parameterize the tests and run them against both backends.
-EXAMPLE_ENVIRONMENTS = ["unrolling-py-v0"]
+UNROLLING_ENVIRONMENTS = ["unrolling-py-v0"]
 
 
-@pytest.fixture(scope="function", params=EXAMPLE_ENVIRONMENTS)
+@pytest.fixture(scope="function", params=UNROLLING_ENVIRONMENTS)
 def env(request) -> CompilerEnv:
     """Text fixture that yields an environment."""
     with gym.make(request.param) as env:
@@ -41,7 +41,7 @@ def bin(request) -> Path:
     yield request.param
 
 
-@pytest.mark.parametrize("env_id", EXAMPLE_ENVIRONMENTS)
+@pytest.mark.parametrize("env_id", UNROLLING_ENVIRONMENTS)
 def test_debug_level(env_id: str):
     """Test that debug level is set."""
     set_debug_level(3)
