@@ -25,3 +25,12 @@ py_test(
         "//tests:test_main",
     ],
 )
+
+py_binary(
+    name = "example",
+    srcs = ["example.py"],
+    deps = [
+        ":example_unrolling_service",
+        "//compiler_gym",
+    ],
+)
