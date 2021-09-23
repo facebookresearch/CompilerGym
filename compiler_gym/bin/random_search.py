@@ -99,14 +99,13 @@ def main(argv):
 
     assert FLAGS.patience >= 0, "--patience must be >= 0"
 
-    def make_env():
-        return env_from_flags(benchmark=benchmark_from_flags())
-
-    with make_env() as env:
-        env.reset()
+    # Create an environment now to catch a startup time error before we launch
+    # a bunch of workers.
+    with env_from_flags() as env:
+        env.reset(benchmark=benchmark_from_flags())
 
     env = random_search(
-        make_env=make_env,
+        make_env=lambda: env_from_flags(benchmark=benchmark_from_flags()),
         outdir=Path(FLAGS.output_dir) if FLAGS.output_dir else None,
         patience=FLAGS.patience,
         total_runtime=FLAGS.runtime,
