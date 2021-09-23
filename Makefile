@@ -197,7 +197,7 @@ MANYLINUX_DOCKER_IMAGE ?= chriscummins/compiler_gym-manylinux-build:2021-09-21
 bdist_wheel-linux:
 	rm -rf build
 	docker pull $(MANYLINUX_DOCKER_IMAGE)
-	docker run -v $(ROOT):/CompilerGym --workdir /CompilerGym --rm --shm-size=8g "$(MANYLINUX_DOCKER_IMAGE)" /bin/sh -c './packaging/compiler_gym-manylinux-build/container_init.sh && make bdist_wheel bdist_wheel-linux-rename BAZEL_OPTS="$(BAZEL_OPTS)" BAZEL_BUILD_OPTS="$(BAZEL_BUILD_OPTS)" BAZEL_FETCH_OPTS="$(BAZEL_FETCH_OPTS)"'
+	docker run -v $(ROOT):/CompilerGym --workdir /CompilerGym --rm --shm-size=8g "$(MANYLINUX_DOCKER_IMAGE)" /bin/sh -c './packaging/compiler_gym-manylinux-build/container_init.sh && make bdist_wheel bdist_wheel-linux-rename BAZEL_OPTS="$(BAZEL_OPTS)" BAZEL_BUILD_OPTS="$(BAZEL_BUILD_OPTS)" BAZEL_FETCH_OPTS="$(BAZEL_FETCH_OPTS)" && rm -rf build'
 
 bdist_wheel-linux-shell:
 	docker run -v $(ROOT):/CompilerGym --workdir /CompilerGym --rm --shm-size=8g -it --entrypoint "/bin/bash" "$(MANYLINUX_DOCKER_IMAGE)"
