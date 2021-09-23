@@ -7,8 +7,8 @@ import tempfile
 from pathlib import Path
 
 import gym
+from brute_force import run_brute_force
 
-from examples.brute_force import run_brute_force
 from tests.test_main import main
 
 

@@ -6,27 +6,6 @@ load("@rules_python//python:defs.bzl", "py_binary", "py_test")
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 
 py_binary(
-    name = "actor_critic",
-    srcs = ["actor_critic.py"],
-    deps = [
-        "//compiler_gym",
-        "//compiler_gym/util/flags",
-    ],
-)
-
-py_test(
-    name = "actor_critic_test",
-    timeout = "short",
-    srcs = ["actor_critic_test.py"],
-    deps = [
-        ":actor_critic",
-        "//compiler_gym/util",
-        "//tests:test_main",
-        "//tests/pytest_plugins:common",
-    ],
-)
-
-py_binary(
     name = "brute_force",
     srcs = ["brute_force.py"],
     visibility = ["//visibility:public"],

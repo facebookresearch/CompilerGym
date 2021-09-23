@@ -34,7 +34,6 @@ import torch.optim as optim
 from absl import app, flags
 from torch.distributions import Categorical
 
-import compiler_gym  # noqa Register environments.
 import compiler_gym.util.flags.episodes  # noqa Flag definition.
 import compiler_gym.util.flags.learning_rate  # noqa Flag definition.
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
