@@ -233,14 +233,14 @@ class CompilerEnv(gym.Env):
         self._service_endpoint: Union[str, Path] = service
         self._connection_settings = connection_settings or ConnectionOpts()
 
-        self.action_space_name = action_space
-
         self.service = service_connection or CompilerGymServiceConnection(
             endpoint=self._service_endpoint,
             opts=self._connection_settings,
             logger=self.logger,
         )
         self.datasets = Datasets(datasets or [])
+
+        self.action_space_name = action_space
 
         # If no reward space is specified, generate some from numeric observation spaces
         rewards = rewards or [
@@ -472,11 +472,17 @@ class CompilerEnv(gym.Env):
         if reward_space:
             if reward_space not in self.reward.spaces:
                 raise LookupError(f"Reward space not found: {reward_space}")
+            # The reward space remains unchanged, nothing to do.
+            if reward_space == self.reward_space:
+                return
             self.reward_space_spec = self.reward.spaces[reward_space]
             self.reward_range = (
                 self.reward_space_spec.min,
                 self.reward_space_spec.max,
             )
+            # Reset any cumulative rewards, if we're in an episode.
+            if self.in_episode:
+                self.episode_reward = 0
         else:
             # If no reward space is being used then set the reward range to
             # unbounded.
