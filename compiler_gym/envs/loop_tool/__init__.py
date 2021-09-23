@@ -83,7 +83,7 @@ class LoopToolCPUDataset(Dataset):
 
 
 register(
-    id="looptool-v0",
+    id="loop_tool-v0",
     entry_point="compiler_gym.envs.loop_tool.loop_tool_env:LoopToolEnv",
     kwargs={
         "service": LOOP_TOOL_SERVICE_BINARY,

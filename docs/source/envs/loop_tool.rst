@@ -34,7 +34,7 @@ For GPU with size 1024:
 
 .. code-block:: python
 
-    >>> env = gym.make("looptool-v0")
+    >>> env = gym.make("loop_tool-v0")
     >>> env.reset(benchmark="benchmark://loop_tool-cuda-v0/1024")
 
 The CPU variant can be created with:

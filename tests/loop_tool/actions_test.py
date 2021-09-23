@@ -13,7 +13,7 @@ from tests.test_main import main
 
 @pytest.mark.parametrize("backend", lt.backends())
 def test_basic(backend):
-    with compiler_gym.make("looptool-v0") as env:
+    with compiler_gym.make("loop_tool-v0") as env:
         env.observation_space = "flops"
         env.reset(
             benchmark=env.datasets.benchmark(
@@ -35,7 +35,7 @@ def test_basic(backend):
 
 @pytest.mark.parametrize("backend", lt.backends())
 def test_rand(backend):
-    with compiler_gym.make("looptool-v0") as env:
+    with compiler_gym.make("loop_tool-v0") as env:
         env.observation_space = "flops"
         env.reset(
             benchmark=env.datasets.benchmark(
@@ -55,7 +55,7 @@ def test_rand(backend):
 
 @pytest.mark.parametrize("backend", lt.backends())
 def test_induced_remainder(backend):
-    with compiler_gym.make("looptool-v0") as env:
+    with compiler_gym.make("loop_tool-v0") as env:
         env.observation_space = "loop_tree"
         # reset
         env.reset(
@@ -93,7 +93,7 @@ for a in 341 r 1 : L0 {'cpu_parallel ' if backend=='cpu' else ''}[thread]
 
 @pytest.mark.parametrize("backend", lt.backends())
 def test_thread_removal(backend):
-    with compiler_gym.make("looptool-v0") as env:
+    with compiler_gym.make("loop_tool-v0") as env:
         env.observation_space = "loop_tree"
         # reset
         env.reset(
@@ -123,7 +123,7 @@ for a in 1024 : L0
 
 @pytest.mark.parametrize("backend", lt.backends())
 def test_thread_addition(backend):
-    with compiler_gym.make("looptool-v0") as env:
+    with compiler_gym.make("loop_tool-v0") as env:
         env.observation_space = "loop_tree"
         # reset
         env.reset(
