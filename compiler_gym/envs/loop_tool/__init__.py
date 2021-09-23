@@ -86,8 +86,10 @@ register(
     id="loop_tool-v0",
     entry_point="compiler_gym.envs.loop_tool.loop_tool_env:LoopToolEnv",
     kwargs={
-        "service": LOOP_TOOL_SERVICE_BINARY,
-        "rewards": [FLOPSReward()],
         "datasets": [LoopToolCPUDataset(), LoopToolCUDADataset()],
+        "observation_space": "action_state",
+        "reward_space": "flops",
+        "rewards": [FLOPSReward()],
+        "service": LOOP_TOOL_SERVICE_BINARY,
     },
 )
