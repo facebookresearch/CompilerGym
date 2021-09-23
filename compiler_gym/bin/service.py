@@ -59,11 +59,12 @@ spaces, reward spaces, and action spaces, using reStructuredText syntax
 (https://www.sphinx-doc.org/en/master/usage/restructuredtext/basics.html#tables).
 
 To query the capabilities of an unmanaged service, use :code:`--service`. For
-example, query a service running at :code:`localhost:8080` using:
+example, query a service running the :code:`llvm-v0` environment at
+:code:`localhost:8080` using:
 
 .. code-block::
 
-    $ python -m compiler_gym.bin.service --service=localhost:8080
+    $ python -m compiler_gym.bin.service --env=llvm-v0 --service=localhost:8080
 
 To query the capability of a binary that implements the RPC service interface,
 use the :code:`--local_service_binary` flag:
