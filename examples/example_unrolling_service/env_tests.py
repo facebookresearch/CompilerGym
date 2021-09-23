@@ -13,7 +13,7 @@ import pytest
 from gym.spaces import Box
 
 import compiler_gym
-import examples.example_unrolling_service as example
+import examples.example_unrolling_service as unrolling_service
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.service import SessionNotFound
 from compiler_gym.spaces import NamedDiscrete, Scalar, Sequence
@@ -34,7 +34,7 @@ def env(request) -> CompilerEnv:
 
 @pytest.fixture(
     scope="module",
-    params=[example.UNROLLING_PY_SERVICE_BINARY],
+    params=[unrolling_service.UNROLLING_PY_SERVICE_BINARY],
     ids=["unrolling-py-v0"],
 )
 def bin(request) -> Path:
