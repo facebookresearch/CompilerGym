@@ -1,4 +1,5 @@
 import compiler_gym
+import examples.example_unrolling_service as unrolling_service
 
 env = compiler_gym.make(
     "unrolling-py-v0",
@@ -6,6 +7,8 @@ env = compiler_gym.make(
     observation_space="ir",
     reward_space="runtime",
 )
+
+print(unrolling_service.UNROLLING_PY_SERVICE_BINARY)
 
 observation = env.reset()
 
