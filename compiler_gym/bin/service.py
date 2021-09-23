@@ -2,7 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""This program lists the capabilities of CompilerGym services.
+"""This program can be used to query and run the CompilerGym services.
 
 Listing available environments
 ------------------------------
@@ -71,15 +71,40 @@ use the :code:`--local_service_binary` flag:
 
 .. code-block::
 
-    $ python -m compiler_gym.bin.service --local_service_binary=/path/to/service/binary
+    $ python -m compiler_gym.bin.service --env=llvm-v0 --local_service_binary=/path/to/service/binary
+
+
+Running a Service
+-----------------
+
+This module can also be used to launch a service that can then be connected to
+by other environments. Start a service by specifying a port number using:
+
+.. code-block::
+
+    $ python -m compiler_gym.bin.service --env=llvm-v0 --run_on_port=7777
+
+Environment can connect to this service by passing the :code:`<hostname>:<port>`
+address during environment initialization time. For example, in python:
+
+    >>> env = compiler_gym.make("llvm-v0", service="localhost:7777")
+
+Or at the command line:
+
+.. code-block::
+
+    $ python -m compiler_gym.bin.random_search --env=llvm-v0 --service=localhost:7777
 """
+import signal
 import sys
 from typing import Iterable
 
+import gym
 from absl import app, flags
 
 from compiler_gym.datasets import Dataset
 from compiler_gym.envs import CompilerEnv
+from compiler_gym.service.connection import ConnectionOpts
 from compiler_gym.spaces import Commandline
 from compiler_gym.util.flags.env_from_flags import env_from_flags
 from compiler_gym.util.tabulate import tabulate
@@ -89,6 +114,12 @@ flags.DEFINE_string(
     "heading_underline_char",
     "-",
     "The character to repeat to underline headings.",
+)
+flags.DEFINE_integer(
+    "run_on_port",
+    None,
+    "Is specified, serve an instance of the service on the requested port. "
+    "This never terminates.",
 )
 FLAGS = flags.FLAGS
 
@@ -229,6 +260,15 @@ def print_service_capabilities(env: CompilerEnv):
 def main(argv):
     """Main entry point."""
     assert len(argv) == 1, f"Unrecognized flags: {argv[1:]}"
+
+    if FLAGS.run_on_port:
+        assert FLAGS.env, "Must specify an --env to run"
+        settings = ConnectionOpts(script_args=["--port", str(FLAGS.run_on_port)])
+        with gym.make(FLAGS.env, connection_settings=settings) as env:
+            print(
+                f"=== Started a service on port {FLAGS.run_on_port}. Use C-c to terminate. ==="
+            )
+            signal.pause()
 
     with env_from_flags() as env:
         print_service_capabilities(env)
