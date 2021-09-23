@@ -11,7 +11,7 @@ from compiler_gym.spaces import Reward
 from compiler_gym.util.registration import register
 from compiler_gym.util.runfiles_path import runfiles_path, site_data_path
 
-EXAMPLE_PY_SERVICE_BINARY: Path = runfiles_path(
+UNROLLING_PY_SERVICE_BINARY: Path = runfiles_path(
     "examples/example_unrolling_service/service_py/example-unrolling-service-py"
 )
 
@@ -53,7 +53,7 @@ class ExampleDataset(Dataset):
         super().__init__(
             name="benchmark://unrolling-v0",
             license="MIT",
-            description="An example dataset",
+            description="Unrolling example dataset",
             site_data_base=site_data_path("example_dataset"),
         )
         self._benchmarks = {
@@ -75,14 +75,14 @@ class ExampleDataset(Dataset):
             raise LookupError("Unknown program name")
 
 
-# Register the example service on module import. After importing this module,
-# the example-v0 environment will be available to gym.make(...).
+# Register the unrolling example service on module import. After importing this module,
+# the unrolling-py-v0 environment will be available to gym.make(...).
 
 register(
     id="unrolling-py-v0",
     entry_point="compiler_gym.envs:CompilerEnv",
     kwargs={
-        "service": EXAMPLE_PY_SERVICE_BINARY,
+        "service": UNROLLING_PY_SERVICE_BINARY,
         "rewards": [RuntimeReward()],
         "datasets": [ExampleDataset()],
     },

@@ -34,7 +34,7 @@ def env(request) -> CompilerEnv:
 
 @pytest.fixture(
     scope="module",
-    params=[example.EXAMPLE_PY_SERVICE_BINARY],
+    params=[example.UNROLLING_PY_SERVICE_BINARY],
     ids=["unrolling-py-v0"],
 )
 def bin(request) -> Path:
