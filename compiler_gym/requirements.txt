@@ -5,6 +5,7 @@ fasteners>=0.15
 grpcio>=1.32.0
 gym>=0.18.0
 humanize>=2.6.0
+loop_tool_py==0.0.7
 networkx>=2.5
 numpy>=1.19.3
 protobuf>=3.13.0

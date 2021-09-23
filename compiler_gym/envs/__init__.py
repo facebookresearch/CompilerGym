@@ -5,6 +5,7 @@
 from compiler_gym.envs.compiler_env import CompilerEnv
 from compiler_gym.envs.gcc import GccEnv
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
+from compiler_gym.envs.loop_tool.loop_tool_env import LoopToolEnv
 from compiler_gym.util.registration import COMPILER_GYM_ENVS
 
 __all__ = [
@@ -12,4 +13,5 @@ __all__ = [
     "CompilerEnv",
     "GccEnv",
     "LlvmEnv",
+    "LoopToolEnv",
 ]

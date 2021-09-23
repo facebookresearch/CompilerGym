@@ -63,7 +63,8 @@ Documentation
     make livedocs
         Build the HTML documentation and serve them on localhost:8000. Changes
         to the documentation will automatically trigger incremental rebuilds
-        and reload the changes.
+        and reload the changes.  To change the host and port, set the SPHINXOPTS
+        env variable: `SPHINXOPTS="--port 1234 --host 0.0.0.0" make livedocs`
 
 
 Deployment

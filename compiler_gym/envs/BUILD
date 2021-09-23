@@ -12,6 +12,7 @@ py_library(
         ":compiler_env",
         "//compiler_gym/envs/gcc",
         "//compiler_gym/envs/llvm",
+        "//compiler_gym/envs/loop_tool",
     ],
 )
 

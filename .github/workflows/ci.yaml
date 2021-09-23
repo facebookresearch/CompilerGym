@@ -97,7 +97,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov TEST_TARGET="tests" PYTEST_ARGS="--ignore tests/llvm --ignore tests/gcc"
+              run: make install-test-cov TEST_TARGET="tests" PYTEST_ARGS="--ignore tests/llvm --ignore tests/gcc --ignore tests/loop_tool"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
@@ -358,6 +358,79 @@ jobs:
 
             - name: Run the test suite
               run: make install-test-cov TEST_TARGET="tests/gcc"
+
+            - name: Upload coverage report to Codecov
+              uses: codecov/codecov-action@v2
+              with:
+                  fail_ci_if_error: true
+                  verbose: true
+
+    test-loop_tool-env-linux:
+        needs: build-linux
+        runs-on: ubuntu-latest
+        steps:
+            - name: Set up Python
+              uses: actions/setup-python@v2
+              with:
+                  python-version: 3.9
+
+            - uses: actions/checkout@v2
+
+            - name: Download Python wheel
+              uses: actions/download-artifact@v2
+              with:
+                  name: linux-wheel
+
+            - name: Install wheel
+              run: python -m pip install *.whl
+
+            - name: Install runtime dependencies
+              uses: ./.github/actions/install-runtime-dependencies
+
+            - name: Install test dependencies
+              run: python -m pip install -r tests/requirements.txt
+
+            - name: Run the test suite
+              run: make install-test-cov TEST_TARGET="tests/loop_tool"
+
+            - name: Upload coverage report to Codecov
+              uses: codecov/codecov-action@v2
+              with:
+                  fail_ci_if_error: true
+                  verbose: true
+
+    test-loop_tool-env-macos:
+        needs: build-macos
+        runs-on: macos-latest
+        steps:
+            - uses: docker-practice/actions-setup-docker@master
+
+            - name: Confirm docker install
+              run: docker version
+
+            - uses: actions/checkout@v2
+
+            - name: Set up Python
+              uses: actions/setup-python@v2
+              with:
+                  python-version: 3.9
+
+            - name: Download Python wheel
+              uses: actions/download-artifact@v2
+              with:
+                  name: macos-wheel
+
+            - name: Install wheel
+              run: python -m pip install *.whl
+
+            - name: Install runtime dependencies
+              uses: ./.github/actions/install-runtime-dependencies
+
+            - name: Install test dependencies
+              run: python -m pip install -r tests/requirements.txt
+
+            - name: Run the test suite
+              run: make install-test-cov TEST_TARGET="tests/loop_tool"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
