@@ -23,7 +23,7 @@ from compiler_gym.service.proto import (
 from compiler_gym.service.runtime import create_and_run_compiler_gym_service
 
 
-class ExampleCompilationSession(CompilationSession):
+class UnrollingCompilationSession(CompilationSession):
     """Represents an instance of an interactive compilation session."""
 
     compiler_version: str = "1.0.0"
@@ -106,4 +106,4 @@ class ExampleCompilationSession(CompilationSession):
 
 
 if __name__ == "__main__":
-    create_and_run_compiler_gym_service(ExampleCompilationSession)
+    create_and_run_compiler_gym_service(UnrollingCompilationSession)
