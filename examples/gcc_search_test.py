@@ -7,6 +7,8 @@ import sys
 import gcc_search
 from absl.flags import FLAGS
 
+from compiler_gym.service import EnvironmentNotSupported
+
 
 def test_gcc_search_smoke_test(capsys):
     flags = [
@@ -20,13 +22,17 @@ def test_gcc_search_smoke_test(capsys):
     sys.argv = flags
     FLAGS.unparse_flags()
     FLAGS(flags)
-    gcc_search.main(
-        [
-            "gcc_search",
-            "--gcc_benchmark=benchmark://chstone-v0/aes",
-            "--search=random",
-            "--n=3",
-        ]
-    )
-    out, _ = capsys.readouterr()
-    assert "benchmark://chstone-v0/aes" in out
+
+    try:
+        gcc_search.main(
+            [
+                "gcc_search",
+                "--gcc_benchmark=benchmark://chstone-v0/aes",
+                "--search=random",
+                "--n=3",
+            ]
+        )
+        out, _ = capsys.readouterr()
+        assert "benchmark://chstone-v0/aes" in out
+    except EnvironmentNotSupported:
+        pass  # GCC environment might not be supported
