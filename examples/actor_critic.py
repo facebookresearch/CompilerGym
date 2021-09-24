@@ -36,6 +36,7 @@ from torch.distributions import Categorical
 
 import compiler_gym.util.flags.episodes  # noqa Flag definition.
 import compiler_gym.util.flags.learning_rate  # noqa Flag definition.
+import compiler_gym.util.flags.seed  # noqa Flag definition.
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.flags.env_from_flags import env_from_flags
 from compiler_gym.wrappers import ConstrainedCommandline, TimeLimit
@@ -64,7 +65,6 @@ flags.DEFINE_list(
 flags.DEFINE_integer("episode_len", 5, "Number of transitions per episode.")
 flags.DEFINE_integer("hidden_size", 64, "Latent vector size.")
 flags.DEFINE_integer("log_interval", 100, "Episodes per log output.")
-flags.DEFINE_integer("seed", 101, "Seed for all pseudo-random choices.")
 flags.DEFINE_integer("iterations", 1, "Times to redo entire training.")
 flags.DEFINE_float("exploration", 0.0, "Rate to explore random transitions.")
 flags.DEFINE_float("mean_smoothing", 0.95, "Smoothing factor for mean normalization.")

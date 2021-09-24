@@ -33,16 +33,16 @@ from typing import List, Optional
 
 import numpy as np
 from absl import app, flags
+from sensitivity_analysis.sensitivity_analysis_eval import (
+    SensitivityAnalysisResult,
+    run_sensitivity_analysis,
+)
 
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.flags.env_from_flags import env_from_flags
 from compiler_gym.util.logs import create_logging_dir
 from compiler_gym.util.timer import Timer
-from examples.sensitivity_analysis.sensitivity_analysis_eval import (
-    SensitivityAnalysisResult,
-    run_sensitivity_analysis,
-)
 
 flags.DEFINE_integer(
     "num_action_sensitivity_trials",
