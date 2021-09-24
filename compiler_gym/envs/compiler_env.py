@@ -706,30 +706,33 @@ class CompilerEnv(gym.Env):
             does not have a default benchmark to select from.
         """
 
-        def _call_with_retry(stub_method, *args, **kwargs):
-            """Call the given stub method. If it fails with an "acceptable"
-            error, abort this reset and retry.
-            """
-            try:
-                return self.service(stub_method, *args, **kwargs)
-            except (ServiceError, ServiceTransportError, TimeoutError) as e:
-                # Abort and retry on error.
-                self.logger.warning("%s on reset(): %s", type(e).__name__, e)
-                if self.service:
-                    self.service.close()
-                self.service = None
+        def _retry(error) -> Optional[ObservationType]:
+            """Abort and retry on error."""
+            self.logger.warning("%s during reset(): %s", type(error).__name__, error)
+            if self.service:
+                self.service.close()
+            self.service = None
 
-                if retry_count >= self._connection_settings.init_max_attempts:
-                    raise OSError(
-                        f"Failed to reset environment after {retry_count - 1} attempts.\n"
-                        f"Last error ({type(e).__name__}): {e}"
-                    ) from e
-                else:
-                    return self.reset(
-                        benchmark=benchmark,
-                        action_space=action_space,
-                        retry_count=retry_count + 1,
-                    )
+            if retry_count >= self._connection_settings.init_max_attempts:
+                raise OSError(
+                    f"Failed to reset environment after {retry_count - 1} attempts.\n"
+                    f"Last error ({type(error).__name__}): {error}"
+                ) from error
+            else:
+                return self.reset(
+                    benchmark=benchmark,
+                    action_space=action_space,
+                    retry_count=retry_count + 1,
+                )
+
+        def _call_with_error(
+            stub_method, *args, **kwargs
+        ) -> Tuple[Optional[Exception], Optional[Any]]:
+            """Call the given stub method. And return an <error, return> tuple."""
+            try:
+                return None, self.service(stub_method, *args, **kwargs)
+            except (ServiceError, ServiceTransportError, TimeoutError) as e:
+                return e, None
 
         if not self._next_benchmark:
             raise TypeError(
@@ -749,10 +752,17 @@ class CompilerEnv(gym.Env):
         # Stop an existing episode.
         if self.in_episode:
             self.logger.debug("Ending session %d", self._session_id)
-            _call_with_retry(
+            error, _ = _call_with_error(
                 self.service.stub.EndSession,
                 EndSessionRequest(session_id=self._session_id),
             )
+            if error:
+                self.logger.warning(
+                    "Failed to stop session %d with %s: %s",
+                    self._session_id,
+                    type(error).__name__,
+                    error,
+                )
             self._session_id = None
 
         # Update the user requested benchmark, if provided.
@@ -785,19 +795,25 @@ class CompilerEnv(gym.Env):
         )
 
         try:
-            reply = _call_with_retry(
+            error, reply = _call_with_error(
                 self.service.stub.StartSession, start_session_request
             )
+            if error:
+                return _retry(error)
         except FileNotFoundError:
-            # The benchmark was not found, so try adding it and repeating the
-            # request.
-            self.service(
+            # The benchmark was not found, so try adding it and then repeating
+            # the request.
+            error, _ = _call_with_error(
                 self.service.stub.AddBenchmark,
                 AddBenchmarkRequest(benchmark=[self._benchmark_in_use.proto]),
             )
-            reply = _call_with_retry(
+            if error:
+                return _retry(error)
+            error, reply = _call_with_error(
                 self.service.stub.StartSession, start_session_request
             )
+            if error:
+                return _retry(error)
 
         self._session_id = reply.session_id
         self.observation.session_id = reply.session_id
