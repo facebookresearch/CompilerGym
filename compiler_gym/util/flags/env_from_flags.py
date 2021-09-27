@@ -20,16 +20,20 @@ flags.DEFINE_string(
     "env",
     None,
     "The name of an environment to use. The environment must be registered with "
-    "gym. Supersedes --service and --local_service_binary.",
+    "gym.",
 )
 flags.DEFINE_string(
     "service",
     None,
-    "The hostname and port of a service to connect to. Supersedes "
-    "--local_service_binary. Has no effect if --env is set.",
+    "If set, this specifies the hostname and port of a service to connect to, "
+    "rather than creating a new environment. Use the format <hostname>:<port>. "
+    "Supersedes --local_service_binary.",
 )
 flags.DEFINE_string(
-    "local_service_binary", None, "The path of a local service binary to run."
+    "local_service_binary",
+    None,
+    "If set, this specifies the path of a local service binary to run to "
+    "provide the environment service, rather than the default service binary.",
 )
 flags.DEFINE_string(
     "observation",
@@ -111,30 +115,29 @@ def env_from_flags(benchmark: Optional[Union[str, Benchmark]] = None) -> Compile
         sys.exit(0)
 
     connection_settings = connection_settings_from_flags()
-    if FLAGS.env:
-        env = gym.make(
-            FLAGS.env, benchmark=benchmark, connection_settings=connection_settings
-        )
-        if FLAGS.observation:
-            env.observation_space = FLAGS.observation
-        if FLAGS.reward:
-            env.reward_space = FLAGS.reward
-        return env
-    elif FLAGS.service or FLAGS.local_service_binary:
-        local_service_binary = (
-            Path(FLAGS.local_service_binary) if FLAGS.local_service_binary else None
-        )
-        env = CompilerEnv(
-            service=local_service_binary or FLAGS.service,
-            connection_settings=connection_settings,
-            benchmark=benchmark,
-            observation_space=FLAGS.observation,
-            reward_space=FLAGS.reward,
-        )
-        env.reset()
-        return env
-    else:
-        raise app.UsageError("Neither --env or --local_service_binary is set")
+
+    if not FLAGS.env:
+        raise app.UsageError("--env must be set")
+
+    init_opts = {
+        "benchmark": benchmark,
+        "connection_settings": connection_settings,
+    }
+
+    if FLAGS.local_service_binary:
+        init_opts["service"] = Path(FLAGS.service)
+
+    if FLAGS.service:
+        init_opts["service"] = FLAGS.service
+
+    env = gym.make(FLAGS.env, **init_opts)
+
+    if FLAGS.observation:
+        env.observation_space = FLAGS.observation
+    if FLAGS.reward:
+        env.reward_space = FLAGS.reward
+
+    return env
 
 
 @contextmanager

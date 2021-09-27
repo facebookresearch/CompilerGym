@@ -314,7 +314,9 @@ message File {
   oneof data {
     // The raw data of the file.
     bytes contents = 1;
-    // The URI of the file which can be accessed.
+    // The URI of the file which can be accessed. Note that this requires that
+    // the compiler service and the Python frontend share a file system, which
+    // cannot be assumed for general use.
     string uri = 2;
   }
 }

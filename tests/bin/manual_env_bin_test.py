@@ -395,7 +395,7 @@ def test_missing_required_flag():
     FLAGS.unparse_flags()
     with pytest.raises(app.UsageError) as ctx:
         main(["argv0"])
-    assert str(ctx.value) == "Neither --env or --local_service_binary is set"
+    assert str(ctx.value) == "--env must be set"
 
 
 def test_ls_env():

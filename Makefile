@@ -81,6 +81,9 @@ Deployment
         Use a docker container to build a python wheel for linux. This is only
         used for making release builds. This requires docker.
 
+    make bdist_wheel-docker
+        Build a docker image containing CompilerGym.
+
     bdist_wheel-linux-shell
         Drop into a bash terminal in the docker container that is used for
         linux builds. This may be useful for debugging bdist_wheel-linux
@@ -195,13 +198,18 @@ MANYLINUX_DOCKER_IMAGE ?= chriscummins/compiler_gym-manylinux-build:2021-09-21
 bdist_wheel-linux:
 	rm -rf build
 	docker pull $(MANYLINUX_DOCKER_IMAGE)
-	docker run -v $(ROOT):/CompilerGym --workdir /CompilerGym --rm --shm-size=8g $(MANYLINUX_DOCKER_IMAGE) /bin/sh -c './packaging/container_init.sh && make bdist_wheel bdist_wheel-linux-rename BAZEL_OPTS=$(BAZEL_OPTS) BAZEL_BUILD_OPTS=$(BAZEL_BUILD_OPTS) BAZEL_FETCH_OPTS=$(BAZEL_FETCH_OPTS)'
+	docker run -v $(ROOT):/CompilerGym --workdir /CompilerGym --rm --shm-size=8g "$(MANYLINUX_DOCKER_IMAGE)" /bin/sh -c './packaging/compiler_gym-manylinux-build/container_init.sh && make bdist_wheel bdist_wheel-linux-rename BAZEL_OPTS="$(BAZEL_OPTS)" BAZEL_BUILD_OPTS="$(BAZEL_BUILD_OPTS)" BAZEL_FETCH_OPTS="$(BAZEL_FETCH_OPTS)" && rm -rf build'
 
 bdist_wheel-linux-shell:
-	docker run -v $(ROOT):/CompilerGym --workdir /CompilerGym --rm --shm-size=8g -it --entrypoint "/bin/bash" $(MANYLINUX_DOCKER_IMAGE)
+	docker run -v $(ROOT):/CompilerGym --workdir /CompilerGym --rm --shm-size=8g -it --entrypoint "/bin/bash" "$(MANYLINUX_DOCKER_IMAGE)"
 
 bdist_wheel-linux-test:
-	docker run -v $(ROOT):/CompilerGym --workdir /CompilerGym --rm --shm-size=8g $(MANYLINUX_DOCKER_IMAGE) /bin/sh -c 'cd /CompilerGym && pip3 install -U pip && pip3 install dist/compiler_gym-$(VERSION)-py3-none-manylinux2014_x86_64.whl && pip install -r tests/requirements.txt && make install-test'
+	docker run -v $(ROOT):/CompilerGym --workdir /CompilerGym --rm --shm-size=8g "$(MANYLINUX_DOCKER_IMAGE)" /bin/sh -c 'cd /CompilerGym && pip3 install -U pip && pip3 install dist/compiler_gym-$(VERSION)-py3-none-manylinux2014_x86_64.whl && pip install -r tests/requirements.txt && make install-test'
+
+bdist_wheel-docker: bdist_wheel-linux
+	cp dist/compiler_gym-$(VERSION)-py3-none-manylinux2014_x86_64.whl packaging/compiler_gym-local-wheel
+	docker build -t chriscummins/compiler_gym:latest packaging/compiler_gym-local-wheel
+	docker build -t chriscummins/compiler_gym:$(VERSION) packaging/compiler_gym-local-wheel
 
 all: docs bdist_wheel bdist_wheel-linux
 

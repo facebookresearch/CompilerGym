@@ -93,6 +93,7 @@ class ConnectionOpts(BaseModel):
     script_args: List[str] = []
     """If the service is started from a local script, this set of args is used
     on the command line. No effect when used for existing sockets."""
+
     script_env: Dict[str, str] = {}
     """If the service is started from a local script, this set of env vars is
     used on the command line. No effect when used for existing sockets."""
