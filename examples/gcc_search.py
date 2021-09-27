@@ -9,13 +9,16 @@ from typing import Callable, List, Optional, Tuple
 from absl import app, flags
 
 import compiler_gym
+import compiler_gym.util.flags.seed  # noqa Flag definition.
 from compiler_gym.envs.gcc import DEFAULT_GCC, GccEnv
 
 FLAGS = flags.FLAGS
 flags.DEFINE_string(
     "gcc_bin", DEFAULT_GCC, "Binary to use for gcc. Use docker:<image> for docker"
 )
-flags.DEFINE_list("benchmark", None, "List of benchmarks to search. Use 'all' for all")
+flags.DEFINE_list(
+    "gcc_benchmark", None, "List of benchmarks to search. Use 'all' for all"
+)
 flags.DEFINE_enum(
     "search",
     "random",
@@ -37,7 +40,6 @@ flags.DEFINE_integer(
 )
 flags.DEFINE_integer("max_range", 256, "Limit space per option", lower_bound=0)
 flags.DEFINE_integer("pop_size", 100, "Population size for GA", lower_bound=1)
-flags.DEFINE_integer("seed", None, "Random seed")
 flags.DEFINE_enum(
     "objective", "obj_size", ["asm_size", "obj_size"], "Which objective to use"
 )
@@ -438,16 +440,16 @@ def main(argv):
         benchmarks.sort()
         return benchmarks
 
-    if not FLAGS.benchmark:
+    if not FLAGS.gcc_benchmark:
         print("Benchmark not given")
         print("Select from:")
         print("\n".join(get_benchmarks()))
         return
 
-    if FLAGS.benchmark == ["all"]:
+    if FLAGS.gcc_benchmark == ["all"]:
         benchmarks = get_benchmarks()
     else:
-        benchmarks = FLAGS.benchmark
+        benchmarks = FLAGS.gcc_benchmark
 
     searches = [search_cls(benchmark=benchmark) for benchmark in benchmarks]
     for search in searches:

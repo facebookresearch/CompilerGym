@@ -14,9 +14,11 @@ py_library(
         "learning_rate.py",
         "nproc.py",
         "output_dir.py",
+        "seed.py",
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//compiler_gym/datasets",
         "//compiler_gym/envs",
         "//compiler_gym/service",
         "//compiler_gym/service/proto",

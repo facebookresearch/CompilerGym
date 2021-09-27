@@ -475,6 +475,10 @@ jobs:
               with:
                   fail_ci_if_error: true
                   verbose: true
+
+            - name: Run the tests in the source tree
+              run: cd examples && pytest .
+
     test-examples-macos:
         needs: build-macos
         runs-on: macos-latest
@@ -512,6 +516,9 @@ jobs:
               with:
                   fail_ci_if_error: true
                   verbose: true
+
+            - name: Run the tests in the source tree
+              run: cd examples && pytest .
 
     build-asan-llvm-service:
         runs-on: ubuntu-latest
