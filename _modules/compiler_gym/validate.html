@@ -104,12 +104,15 @@
 <p class="caption"><span class="caption-text">Environments</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../llvm/index.html">LLVM Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../envs/gcc.html">GCC Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/envs/gcc.html">compiler_gym.envs.gcc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/service.html">compiler_gym.service</a></li>
@@ -207,11 +210,8 @@
 <span class="k">def</span> <span class="nf">_validate_states_worker</span><span class="p">(</span>
     <span class="n">make_env</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">CompilerEnv</span><span class="p">],</span> <span class="n">state</span><span class="p">:</span> <span class="n">CompilerEnvState</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ValidationResult</span><span class="p">:</span>
-    <span class="n">env</span> <span class="o">=</span> <span class="n">make_env</span><span class="p">()</span>
-    <span class="k">try</span><span class="p">:</span>
+    <span class="k">with</span> <span class="n">make_env</span><span class="p">()</span> <span class="k">as</span> <span class="n">env</span><span class="p">:</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">validate</span><span class="p">(</span><span class="n">state</span><span class="p">)</span>
-    <span class="k">finally</span><span class="p">:</span>
-        <span class="n">env</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
     <span class="k">return</span> <span class="n">result</span>
 
 

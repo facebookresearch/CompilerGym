@@ -104,12 +104,15 @@
 <p class="caption"><span class="caption-text">Environments</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../llvm/index.html">LLVM Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../envs/gcc.html">GCC Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/envs/gcc.html">compiler_gym.envs.gcc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/service.html">compiler_gym.service</a></li>
@@ -205,7 +208,7 @@
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">BenchmarkSource</span><span class="p">,</span> <span class="n">Dataset</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets.benchmark</span> <span class="kn">import</span> <span class="n">BenchmarkInitError</span><span class="p">,</span> <span class="n">BenchmarkWithSource</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.llvm_benchmark</span> <span class="kn">import</span> <span class="n">ClangInvocation</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">BenchmarkDynamicConfig</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">BenchmarkDynamicConfig</span><span class="p">,</span> <span class="n">Command</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.decorators</span> <span class="kn">import</span> <span class="n">memoized_property</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">runfiles_path</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.shell_format</span> <span class="kn">import</span> <span class="n">plural</span>
@@ -228,11 +231,15 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_src</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">proto</span><span class="o">.</span><span class="n">dynamic_config</span><span class="o">.</span><span class="n">MergeFrom</span><span class="p">(</span>
             <span class="n">BenchmarkDynamicConfig</span><span class="p">(</span>
-                <span class="n">build_cmd</span><span class="o">=</span><span class="s2">&quot;$CC $&lt;&quot;</span><span class="p">,</span>
-                <span class="n">build_genfile</span><span class="o">=</span><span class="s2">&quot;a.out&quot;</span><span class="p">,</span>
-                <span class="n">run_cmd</span><span class="o">=</span><span class="s2">&quot;./a.out&quot;</span><span class="p">,</span>
-                <span class="n">build_cmd_timeout_seconds</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
-                <span class="n">run_cmd_timeout_seconds</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+                <span class="n">build_cmd</span><span class="o">=</span><span class="n">Command</span><span class="p">(</span>
+                    <span class="n">argument</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;$CC&quot;</span><span class="p">,</span> <span class="s2">&quot;$IN&quot;</span><span class="p">],</span>
+                    <span class="n">outfile</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a.out&quot;</span><span class="p">],</span>
+                    <span class="n">timeout_seconds</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">run_cmd</span><span class="o">=</span><span class="n">Command</span><span class="p">(</span>
+                    <span class="n">argument</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;./a.out&quot;</span><span class="p">],</span>
+                    <span class="n">timeout_seconds</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+                <span class="p">),</span>
             <span class="p">)</span>
         <span class="p">)</span>
 
@@ -275,19 +282,6 @@
 <span class="sd">    environment and that :meth:`env.reset()</span>
 <span class="sd">    &lt;compiler_gym.envs.CompilerEnv.reset&gt;` will raise :class:`BenchmarkInitError</span>
 <span class="sd">    &lt;compiler_gym.datasets.BenchmarkInitError&gt;`.</span>
-
-<span class="sd">    Installation</span>
-<span class="sd">    ------------</span>
-
-<span class="sd">    Using the CsmithDataset requires building the Csmith binary from source.</span>
-<span class="sd">    This is done automatically on the first call to :code:`install()`. Building</span>
-<span class="sd">    Csmith requires a working C++ toolchain. Install the required dependencies</span>
-<span class="sd">    using: :code:`sudo apt install -y g++ m4` on Linux, or :code:`brew install</span>
-<span class="sd">    m4` on macOS. :class:`DatasetInitError</span>
-<span class="sd">    &lt;compiler_gym.datasets.DatasetInitError&gt;` is raised if compilation fails.</span>
-<span class="sd">    See the `Csmith repo</span>
-<span class="sd">    &lt;https://github.com/csmith-project/csmith#install-csmith&gt;`_ for further</span>
-<span class="sd">    details.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -394,11 +388,11 @@
                 <span class="n">stderr</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
                     <span class="n">truncate</span><span class="p">(</span><span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">),</span> <span class="n">max_line_len</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">max_lines</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
                 <span class="p">)</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Csmith failed with seed </span><span class="si">{</span><span class="n">seed</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">stderr</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Csmith failed with seed </span><span class="si">%d</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">stderr</span><span class="p">)</span>
             <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
                 <span class="c1"># Failed to interpret the stderr output, generate a generic</span>
                 <span class="c1"># error message.</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Csmith failed with seed </span><span class="si">{</span><span class="n">seed</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Csmith failed with seed </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark_from_seed</span><span class="p">(</span>
                 <span class="n">seed</span><span class="p">,</span> <span class="n">max_retries</span><span class="o">=</span><span class="n">max_retries</span><span class="p">,</span> <span class="n">retry_count</span><span class="o">=</span><span class="n">retry_count</span> <span class="o">+</span> <span class="mi">1</span>
             <span class="p">)</span>

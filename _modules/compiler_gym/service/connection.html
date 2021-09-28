@@ -104,12 +104,15 @@
 <p class="caption"><span class="caption-text">Environments</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../envs/gcc.html">GCC Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/envs/gcc.html">compiler_gym.envs.gcc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service.html">compiler_gym.service</a></li>
@@ -204,7 +207,7 @@
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">signal</span> <span class="kn">import</span> <span class="n">Signals</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span><span class="p">,</span> <span class="n">time</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TypeVar</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">grpc</span>
 <span class="kn">from</span> <span class="nn">pydantic</span> <span class="kn">import</span> <span class="n">BaseModel</span>
@@ -279,7 +282,15 @@
 <span class="sd">    efficient in cases where the majority of calls to</span>
 <span class="sd">    :meth:`env.reset() &lt;compiler_gym.envs.CompilerEnv.reset&gt;` uses a different</span>
 <span class="sd">    benchmark. In case of benchmark re-use, leave this :code:`False`.</span>
-<span class="sd">    &quot;&quot;&quot;</span></div>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">script_args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="sd">&quot;&quot;&quot;If the service is started from a local script, this set of args is used</span>
+<span class="sd">    on the command line. No effect when used for existing sockets.&quot;&quot;&quot;</span>
+
+    <span class="n">script_env</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="sd">&quot;&quot;&quot;If the service is started from a local script, this set of env vars is</span>
+<span class="sd">    used on the command line. No effect when used for existing sockets.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="ServiceError"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.ServiceError">[docs]</a><span class="k">class</span> <span class="nc">ServiceError</span><span class="p">(</span><span class="ne">Exception</span><span class="p">):</span>
@@ -296,6 +307,11 @@
 
 <div class="viewcode-block" id="ServiceInitError"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.ServiceInitError">[docs]</a><span class="k">class</span> <span class="nc">ServiceInitError</span><span class="p">(</span><span class="n">ServiceError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Error raised if the service fails to initialize.&quot;&quot;&quot;</span></div>
+
+
+<div class="viewcode-block" id="EnvironmentNotSupported"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.EnvironmentNotSupported">[docs]</a><span class="k">class</span> <span class="nc">EnvironmentNotSupported</span><span class="p">(</span><span class="n">ServiceInitError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Error raised if the runtime requirements for an environment are not</span>
+<span class="sd">    met on the current system.&quot;&quot;&quot;</span></div>
 
 
 <div class="viewcode-block" id="ServiceTransportError"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.ServiceTransportError">[docs]</a><span class="k">class</span> <span class="nc">ServiceTransportError</span><span class="p">(</span><span class="n">ServiceError</span><span class="p">,</span> <span class="ne">OSError</span><span class="p">):</span>
@@ -476,6 +492,8 @@
         <span class="n">rpc_init_max_seconds</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">process_exit_max_seconds</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span>
+        <span class="n">script_args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">script_env</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Constructor.</span>
 
@@ -495,6 +513,8 @@
             <span class="sa">f</span><span class="s2">&quot;./</span><span class="si">{</span><span class="n">local_service_binary</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
             <span class="sa">f</span><span class="s2">&quot;--working_dir=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span>
         <span class="p">]</span>
+        <span class="c1"># Add any custom arguments</span>
+        <span class="n">cmd</span> <span class="o">+=</span> <span class="n">script_args</span>
 
         <span class="c1"># Set the root of the runfiles directory.</span>
         <span class="n">env</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
@@ -528,6 +548,9 @@
         <span class="n">args</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;COMPILER_GYM_SERVICE_ARGS&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">args</span><span class="p">:</span>
             <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">args</span><span class="p">)</span>
+
+        <span class="c1"># Add any custom environment variables</span>
+        <span class="n">env</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">script_env</span><span class="p">)</span>
 
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Exec </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">cmd</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
@@ -828,6 +851,8 @@
                         <span class="n">rpc_init_max_seconds</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">rpc_init_max_seconds</span><span class="p">,</span>
                         <span class="n">port_init_max_seconds</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">local_service_port_init_max_seconds</span><span class="p">,</span>
                         <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span>
+                        <span class="n">script_args</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">script_args</span><span class="p">,</span>
+                        <span class="n">script_env</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">script_env</span><span class="p">,</span>
                     <span class="p">)</span>
                 <span class="k">else</span><span class="p">:</span>
                     <span class="n">endpoint_name</span> <span class="o">=</span> <span class="n">endpoint</span>

@@ -104,12 +104,15 @@
 <p class="caption"><span class="caption-text">Environments</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../envs/gcc.html">GCC Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/envs/gcc.html">compiler_gym.envs.gcc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service.html">compiler_gym.service</a></li>
@@ -202,7 +205,7 @@
 <span class="kn">from</span> <span class="nn">math</span> <span class="kn">import</span> <span class="n">isclose</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">time</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">gym</span>
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
@@ -310,6 +313,11 @@
 <span class="sd">    :ivar action_spaces: A list of supported action space names.</span>
 
 <span class="sd">    :vartype action_spaces: List[str]</span>
+
+<span class="sd">    :ivar actions: The list of actions that have been performed since the</span>
+<span class="sd">        previous call to :func:`reset`.</span>
+
+<span class="sd">    :vartype actions: List[int]</span>
 
 <span class="sd">    :ivar reward_range: A tuple indicating the range of reward values. Default</span>
 <span class="sd">        range is (-inf, +inf).</span>
@@ -419,14 +427,14 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_service_endpoint</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="n">service</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_connection_settings</span> <span class="o">=</span> <span class="n">connection_settings</span> <span class="ow">or</span> <span class="n">ConnectionOpts</span><span class="p">()</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">action_space_name</span> <span class="o">=</span> <span class="n">action_space</span>
-
         <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="n">service_connection</span> <span class="ow">or</span> <span class="n">CompilerGymServiceConnection</span><span class="p">(</span>
             <span class="n">endpoint</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_service_endpoint</span><span class="p">,</span>
             <span class="n">opts</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_connection_settings</span><span class="p">,</span>
             <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">Datasets</span><span class="p">(</span><span class="n">datasets</span> <span class="ow">or</span> <span class="p">[])</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_space_name</span> <span class="o">=</span> <span class="n">action_space</span>
 
         <span class="c1"># If no reward space is specified, generate some from numeric observation spaces</span>
         <span class="n">rewards</span> <span class="o">=</span> <span class="n">rewards</span> <span class="ow">or</span> <span class="p">[</span>
@@ -658,11 +666,17 @@
         <span class="k">if</span> <span class="n">reward_space</span><span class="p">:</span>
             <span class="k">if</span> <span class="n">reward_space</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">spaces</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reward space not found: </span><span class="si">{</span><span class="n">reward_space</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># The reward space remains unchanged, nothing to do.</span>
+            <span class="k">if</span> <span class="n">reward_space</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward_space</span><span class="p">:</span>
+                <span class="k">return</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">reward_space_spec</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">reward_space</span><span class="p">]</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">reward_range</span> <span class="o">=</span> <span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">reward_space_spec</span><span class="o">.</span><span class="n">min</span><span class="p">,</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">reward_space_spec</span><span class="o">.</span><span class="n">max</span><span class="p">,</span>
             <span class="p">)</span>
+            <span class="c1"># Reset any cumulative rewards, if we&#39;re in an episode.</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">episode_reward</span> <span class="o">=</span> <span class="mi">0</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="c1"># If no reward space is being used then set the reward range to</span>
             <span class="c1"># unbounded.</span>
@@ -708,6 +722,17 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">observation_space_spec</span> <span class="o">=</span> <span class="kc">None</span>
 
+    <span class="k">def</span> <span class="nf">_init_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="sd">&quot;&quot;&quot;Retturn a dictionary of keyword arguments used to initialize the</span>
+<span class="sd">        environment.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="p">{</span>
+            <span class="s2">&quot;action_space&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span><span class="p">,</span>
+            <span class="s2">&quot;benchmark&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span><span class="p">,</span>
+            <span class="s2">&quot;connection_settings&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection_settings</span><span class="p">,</span>
+            <span class="s2">&quot;service&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_service_endpoint</span><span class="p">,</span>
+        <span class="p">}</span>
+
 <div class="viewcode-block" id="CompilerEnv.fork"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.fork">[docs]</a>    <span class="k">def</span> <span class="nf">fork</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CompilerEnv&quot;</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Fork a new environment with exactly the same state.</span>
 
@@ -749,38 +774,28 @@
             <span class="p">)</span>
 
             <span class="c1"># Create a new environment that shares the connection.</span>
-            <span class="n">new_env</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span>
-                <span class="n">service</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_service_endpoint</span><span class="p">,</span>
-                <span class="n">action_space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">action_space</span><span class="p">,</span>
-                <span class="n">connection_settings</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_connection_settings</span><span class="p">,</span>
-                <span class="n">service_connection</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="n">new_env</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_kwargs</span><span class="p">(),</span> <span class="n">service_connection</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">)</span>
 
             <span class="c1"># Set the session ID.</span>
             <span class="n">new_env</span><span class="o">.</span><span class="n">_session_id</span> <span class="o">=</span> <span class="n">reply</span><span class="o">.</span><span class="n">session_id</span>  <span class="c1"># pylint: disable=protected-access</span>
             <span class="n">new_env</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">session_id</span> <span class="o">=</span> <span class="n">reply</span><span class="o">.</span><span class="n">session_id</span>
 
-            <span class="c1"># Now that we have initialized the environment with the current state,</span>
-            <span class="c1"># set the benchmark so that calls to new_env.reset() will correctly</span>
-            <span class="c1"># revert the environment to the initial benchmark state.</span>
+            <span class="c1"># Now that we have initialized the environment with the current</span>
+            <span class="c1"># state, set the benchmark so that calls to new_env.reset() will</span>
+            <span class="c1"># correctly revert the environment to the initial benchmark state.</span>
             <span class="c1">#</span>
             <span class="c1"># pylint: disable=protected-access</span>
             <span class="n">new_env</span><span class="o">.</span><span class="n">_next_benchmark</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span>
 
-            <span class="c1"># Set the &quot;visible&quot; name of the current benchmark to hide the fact that</span>
-            <span class="c1"># we loaded from a custom bitcode file.</span>
+            <span class="c1"># Set the &quot;visible&quot; name of the current benchmark to hide the fact</span>
+            <span class="c1"># that we loaded from a custom benchmark file.</span>
             <span class="n">new_env</span><span class="o">.</span><span class="n">_benchmark_in_use</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span>
         <span class="k">except</span> <span class="ne">NotImplementedError</span><span class="p">:</span>
             <span class="c1"># Fallback implementation. If the compiler service does not support</span>
             <span class="c1"># the Fork() operator then we create a new independent environment</span>
             <span class="c1"># and apply the sequence of actions in the current environment to</span>
             <span class="c1"># replay the state.</span>
-            <span class="n">new_env</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span>
-                <span class="n">service</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_service_endpoint</span><span class="p">,</span>
-                <span class="n">action_space</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">action_space</span><span class="p">,</span>
-                <span class="n">benchmark</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span><span class="p">,</span>
-                <span class="n">connection_settings</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_connection_settings</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="n">new_env</span> <span class="o">=</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="o">**</span><span class="bp">self</span><span class="o">.</span><span class="n">_init_kwargs</span><span class="p">())</span>
             <span class="n">new_env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
             <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">new_env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">actions</span><span class="p">)</span>
             <span class="k">assert</span> <span class="ow">not</span> <span class="n">done</span><span class="p">,</span> <span class="s2">&quot;Failed to replay action sequence in forked environment&quot;</span>
@@ -890,6 +905,35 @@
 <span class="sd">        :raises TypeError: If no benchmark has been set, and the environment</span>
 <span class="sd">            does not have a default benchmark to select from.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+
+        <span class="k">def</span> <span class="nf">_retry</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ObservationType</span><span class="p">]:</span>
+            <span class="sd">&quot;&quot;&quot;Abort and retry on error.&quot;&quot;&quot;</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> during reset(): </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="kc">None</span>
+
+            <span class="k">if</span> <span class="n">retry_count</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection_settings</span><span class="o">.</span><span class="n">init_max_attempts</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Failed to reset environment after </span><span class="si">{</span><span class="n">retry_count</span> <span class="o">-</span> <span class="mi">1</span><span class="si">}</span><span class="s2"> attempts.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Last error (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span> <span class="kn">from</span> <span class="nn">error</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span>
+                    <span class="n">benchmark</span><span class="o">=</span><span class="n">benchmark</span><span class="p">,</span>
+                    <span class="n">action_space</span><span class="o">=</span><span class="n">action_space</span><span class="p">,</span>
+                    <span class="n">retry_count</span><span class="o">=</span><span class="n">retry_count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
+                <span class="p">)</span>
+
+        <span class="k">def</span> <span class="nf">_call_with_error</span><span class="p">(</span>
+            <span class="n">stub_method</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span>
+        <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">Optional</span><span class="p">[</span><span class="ne">Exception</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Any</span><span class="p">]]:</span>
+            <span class="sd">&quot;&quot;&quot;Call the given stub method. And return an &lt;error, return&gt; tuple.&quot;&quot;&quot;</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">(</span><span class="n">stub_method</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="n">ServiceError</span><span class="p">,</span> <span class="n">ServiceTransportError</span><span class="p">,</span> <span class="ne">TimeoutError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">e</span><span class="p">,</span> <span class="kc">None</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_next_benchmark</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="s2">&quot;No benchmark set. Set a benchmark using &quot;</span>
@@ -908,10 +952,17 @@
         <span class="c1"># Stop an existing episode.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Ending session </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">(</span>
+            <span class="n">error</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_call_with_error</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">EndSession</span><span class="p">,</span>
                 <span class="n">EndSessionRequest</span><span class="p">(</span><span class="n">session_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">),</span>
             <span class="p">)</span>
+            <span class="k">if</span> <span class="n">error</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="s2">&quot;Failed to stop session </span><span class="si">%d</span><span class="s2"> with </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">,</span>
+                    <span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
+                    <span class="n">error</span><span class="p">,</span>
+                <span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># Update the user requested benchmark, if provided.</span>
@@ -944,33 +995,25 @@
         <span class="p">)</span>
 
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">reply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">StartSession</span><span class="p">,</span> <span class="n">start_session_request</span><span class="p">)</span>
+            <span class="n">error</span><span class="p">,</span> <span class="n">reply</span> <span class="o">=</span> <span class="n">_call_with_error</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">StartSession</span><span class="p">,</span> <span class="n">start_session_request</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">error</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">_retry</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
         <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
-            <span class="c1"># The benchmark was not found, so try adding it and repeating the</span>
-            <span class="c1"># request.</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">(</span>
+            <span class="c1"># The benchmark was not found, so try adding it and then repeating</span>
+            <span class="c1"># the request.</span>
+            <span class="n">error</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_call_with_error</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">AddBenchmark</span><span class="p">,</span>
                 <span class="n">AddBenchmarkRequest</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span><span class="o">.</span><span class="n">proto</span><span class="p">]),</span>
             <span class="p">)</span>
-            <span class="n">reply</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">StartSession</span><span class="p">,</span> <span class="n">start_session_request</span><span class="p">)</span>
-        <span class="k">except</span> <span class="p">(</span><span class="n">ServiceError</span><span class="p">,</span> <span class="n">ServiceTransportError</span><span class="p">,</span> <span class="ne">TimeoutError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="c1"># Abort and retry on error.</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> on reset(): </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
-            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="kc">None</span>
-
-            <span class="k">if</span> <span class="n">retry_count</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection_settings</span><span class="o">.</span><span class="n">init_max_attempts</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Failed to reset environment after </span><span class="si">{</span><span class="n">retry_count</span> <span class="o">-</span> <span class="mi">1</span><span class="si">}</span><span class="s2"> attempts.</span><span class="se">\n</span><span class="s2">&quot;</span>
-                    <span class="sa">f</span><span class="s2">&quot;Last error (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span>
-                    <span class="n">benchmark</span><span class="o">=</span><span class="n">benchmark</span><span class="p">,</span>
-                    <span class="n">action_space</span><span class="o">=</span><span class="n">action_space</span><span class="p">,</span>
-                    <span class="n">retry_count</span><span class="o">=</span><span class="n">retry_count</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span>
-                <span class="p">)</span>
+            <span class="k">if</span> <span class="n">error</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">_retry</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
+            <span class="n">error</span><span class="p">,</span> <span class="n">reply</span> <span class="o">=</span> <span class="n">_call_with_error</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">StartSession</span><span class="p">,</span> <span class="n">start_session_request</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="n">error</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">_retry</span><span class="p">(</span><span class="n">error</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span> <span class="o">=</span> <span class="n">reply</span><span class="o">.</span><span class="n">session_id</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">session_id</span> <span class="o">=</span> <span class="n">reply</span><span class="o">.</span><span class="n">session_id</span>
@@ -1080,7 +1123,8 @@
                 <span class="bp">self</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="k">except</span> <span class="n">ServiceError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="c1"># close() can raise ServiceError if the service exists with a</span>
-                <span class="c1"># non-zero return code. If so,</span>
+                <span class="c1"># non-zero return code. We swallow the error here but propagate</span>
+                <span class="c1"># the diagnostic message.</span>
                 <span class="n">info</span><span class="p">[</span>
                     <span class="s2">&quot;error_details&quot;</span>
                 <span class="p">]</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;. Additional error during environment closing: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>

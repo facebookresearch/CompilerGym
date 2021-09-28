@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>RPC Service Reference &mdash; CompilerGym 0.1.10 documentation</title>
+  <title>RPC Service Reference &mdash; CompilerGym 0.2.0 documentation</title>
   
 
   
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                0.1.10
+                0.2.0
               </div>
             
           
@@ -111,12 +111,15 @@
 <p class="caption"><span class="caption-text">Environments</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="envs/gcc.html">GCC Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="envs/loop_tool.html">loop_tool Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/datasets.html">compiler_gym.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/envs/gcc.html">compiler_gym.envs.gcc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/service.html">compiler_gym.service</a></li>
@@ -543,6 +546,47 @@ whatever language makes sense for them.</p>
 <dt class="sig sig-object cpp" id="_CPPv417AddBenchmarkReply">
 <span id="_CPPv317AddBenchmarkReply"></span><span id="_CPPv217AddBenchmarkReply"></span><span id="AddBenchmarkReply"></span><span class="target" id="struct_add_benchmark_reply"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddBenchmarkReply</span></span></span><a class="headerlink" href="#_CPPv417AddBenchmarkReply" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>An <a class="reference internal" href="#namespace_compiler_gym_service_1abff6649f1c4c2a1f4106ce9b7ec8221f"><span class="std std-ref">AddBenchmark()</span></a> reply. </p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv47Command">
+<span id="_CPPv37Command"></span><span id="_CPPv27Command"></span><span id="Command"></span><span class="target" id="struct_command"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Command</span></span></span><a class="headerlink" href="#_CPPv47Command" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Representation of a command that can be executed. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="target" id="struct_command_1a45d04c4dc466f74dbde96ff0674e7bce"></span><span class="sig-name descname"><span class="pre">repeated</span> <span class="pre">string</span> <span class="pre">argument</span>&#160;&#160; <span class="pre">=</span> <span class="pre">1</span></span></dt>
+<dd><p>A list of command line arguments. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Command3envE">
+<span id="_CPPv3N7Command3envE"></span><span id="_CPPv2N7Command3envE"></span><span id="Command::env__map:string.string:"></span><span class="target" id="struct_command_1a24edb539ccd6f6d0123abf9eb651e482"></span><span class="n"><span class="pre">map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">env</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N7Command3envE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>An optional key-value mapping of environment variables to set. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N7Command15timeout_secondsE">
+<span id="_CPPv3N7Command15timeout_secondsE"></span><span id="_CPPv2N7Command15timeout_secondsE"></span><span id="Command::timeout_seconds__int32"></span><span class="target" id="struct_command_1a0ea342d896a5a75306bf89ac3eb20e0a"></span><span class="n"><span class="pre">int32</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">timeout_seconds</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><a class="headerlink" href="#_CPPv4N7Command15timeout_secondsE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The maximum runtime of the command. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="target" id="struct_command_1aa16a2918bc33923d2007de8d3c3de2af"></span><span class="sig-name descname"><span class="pre">repeated</span> <span class="pre">string</span> <span class="pre">infile</span>&#160;&#160; <span class="pre">=</span> <span class="pre">4</span></span></dt>
+<dd><p>An optional list of files that are required by this command. </p>
+<p>If set, the presence of the files will be tested for before running the command. This can be useful for providing informative error messages. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="target" id="struct_command_1a85e4dd978c14a05709d8d42dcc74bea1"></span><span class="sig-name descname"><span class="pre">repeated</span> <span class="pre">string</span> <span class="pre">outfile</span>&#160;&#160; <span class="pre">=</span> <span class="pre">5</span></span></dt>
+<dd><p>An optional list of files that are generated by this command. </p>
+<p>If set, the presence of the files will be tested for after running the command. </p>
+</dd></dl>
+
+</div>
 </dd></dl>
 
 </div>

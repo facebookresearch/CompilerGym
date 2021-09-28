@@ -1,0 +1,710 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>GCC Environment Reference &mdash; CompilerGym 0.2.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="loop_tool Environment Reference" href="loop_tool.html" />
+    <link rel="prev" title="LLVM Environment Reference" href="../llvm/index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> CompilerGym
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rpc.html">RPC Service Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Environments</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../llvm/index.html">LLVM Environment Reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">GCC Environment Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#using-docker">Using Docker</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-a-local-gcc">Using a local GCC</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#observation-spaces">Observation Spaces</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#source-rtl-assembly-object-code">Source, RTL, Assembly, Object Code</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#assembly-and-object-code-sizes">Assembly and Object Code Sizes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#assembly-and-object-code-hashes">Assembly and Object Code Hashes</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#instruction-counts">Instruction Counts</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#choices">Choices</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#reward-spaces">Reward Spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#action-space">Action Space</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="loop_tool.html">loop_tool Environment Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/compiler_gym.html">compiler_gym</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/envs/gcc.html">compiler_gym.envs.gcc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../llvm/api.html">compiler_gym.envs.llvm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/views.html">compiler_gym.views</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
+</ul>
+<p class="caption"><span class="caption-text">C++ API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/service.html">compiler_gym/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/service/runtime.html">compiler_gym/service/runtime</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/util.html">compiler_gym/util</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CompilerGym</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>GCC Environment Reference</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/envs/gcc.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="gcc-environment-reference">
+<h1>GCC Environment Reference<a class="headerlink" href="#gcc-environment-reference" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://gcc.gnu.org/">GCC</a> is a production-grade compiler for C and C++ used
+throughout industry. CompilerGym exposes GCC’s command line optimization flags
+for reinforcement learning through a <a class="reference internal" href="../compiler_gym/envs.html#compiler_gym.envs.GccEnv" title="compiler_gym.envs.GccEnv"><code class="xref py py-class docutils literal notranslate"><span class="pre">GccEnv</span></code></a>
+environment.</p>
+<div class="contents local topic" id="overview">
+<p class="topic-title">Overview:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#installation" id="id8">Installation</a></p>
+<ul>
+<li><p><a class="reference internal" href="#using-docker" id="id9">Using Docker</a></p></li>
+<li><p><a class="reference internal" href="#using-a-local-gcc" id="id10">Using a local GCC</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#datasets" id="id11">Datasets</a></p></li>
+<li><p><a class="reference internal" href="#observation-spaces" id="id12">Observation Spaces</a></p>
+<ul>
+<li><p><a class="reference internal" href="#source-rtl-assembly-object-code" id="id13">Source, RTL, Assembly, Object Code</a></p></li>
+<li><p><a class="reference internal" href="#assembly-and-object-code-sizes" id="id14">Assembly and Object Code Sizes</a></p></li>
+<li><p><a class="reference internal" href="#assembly-and-object-code-hashes" id="id15">Assembly and Object Code Hashes</a></p></li>
+<li><p><a class="reference internal" href="#instruction-counts" id="id16">Instruction Counts</a></p></li>
+<li><p><a class="reference internal" href="#choices" id="id17">Choices</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#reward-spaces" id="id18">Reward Spaces</a></p></li>
+<li><p><a class="reference internal" href="#action-space" id="id19">Action Space</a></p></li>
+</ul>
+</div>
+<div class="section" id="installation">
+<span id="id1"></span><h2><a class="toc-backref" href="#id8">Installation</a><a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>The GCC environments work with any version of GCC from 5 up to and including the
+current version at time of writing, 11.2. The environment uses Docker images to
+enable hassle free install and consistency across machines. Alternatively, any
+local installation of the compiler can be used. This selection is made by simple
+string specifier of the path or docker image name.</p>
+<div class="section" id="using-docker">
+<span id="id2"></span><h3><a class="toc-backref" href="#id9">Using Docker</a><a class="headerlink" href="#using-docker" title="Permalink to this headline">¶</a></h3>
+<p>On macOS, Docker can be installed using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">brew</span> <span class="n">install</span> <span class="n">docker</span>
+</pre></div>
+</div>
+<p>On Linux, install Docker using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">update</span> <span class="o">&amp;&amp;</span> <span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">apt</span><span class="o">-</span><span class="n">transport</span><span class="o">-</span><span class="n">https</span> <span class="n">ca</span><span class="o">-</span><span class="n">certificates</span> <span class="n">curl</span> <span class="n">gnupg</span> <span class="n">lsb</span><span class="o">-</span><span class="n">release</span>
+<span class="n">curl</span> <span class="o">-</span><span class="n">fsSL</span> <span class="n">https</span><span class="p">:</span><span class="o">//</span><span class="n">download</span><span class="o">.</span><span class="n">docker</span><span class="o">.</span><span class="n">com</span><span class="o">/</span><span class="n">linux</span><span class="o">/</span><span class="n">ubuntu</span><span class="o">/</span><span class="n">gpg</span> <span class="o">|</span> <span class="n">sudo</span> <span class="n">gpg</span> <span class="o">--</span><span class="n">dearmor</span> <span class="o">-</span><span class="n">o</span> <span class="o">/</span><span class="n">usr</span><span class="o">/</span><span class="n">share</span><span class="o">/</span><span class="n">keyrings</span><span class="o">/</span><span class="n">docker</span><span class="o">-</span><span class="n">archive</span><span class="o">-</span><span class="n">keyring</span><span class="o">.</span><span class="n">gpg</span>
+<span class="n">echo</span> \
+    <span class="s2">&quot;deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu </span><span class="se">\</span>
+<span class="s2">    $(lsb_release -cs) stable&quot;</span> <span class="o">|</span> <span class="n">sudo</span> <span class="n">tee</span> <span class="o">/</span><span class="n">etc</span><span class="o">/</span><span class="n">apt</span><span class="o">/</span><span class="n">sources</span><span class="o">.</span><span class="n">list</span><span class="o">.</span><span class="n">d</span><span class="o">/</span><span class="n">docker</span><span class="o">.</span><span class="n">list</span> <span class="o">&gt;</span> <span class="o">/</span><span class="n">dev</span><span class="o">/</span><span class="n">null</span>
+<span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">update</span> <span class="o">&amp;&amp;</span> <span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">docker</span><span class="o">-</span><span class="n">ce</span> <span class="n">docker</span><span class="o">-</span><span class="n">ce</span><span class="o">-</span><span class="n">cli</span> <span class="n">containerd</span><span class="o">.</span><span class="n">io</span>
+</pre></div>
+</div>
+<p>See the <a class="reference external" href="https://docs.docker.com/engine/install">official documentation</a> for
+alternative installation options.</p>
+<p>On both Linux and macOS, use the following command to check if Docker is
+working:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">docker</span> <span class="n">run</span> <span class="n">hello</span><span class="o">-</span><span class="n">world</span>
+</pre></div>
+</div>
+<p>Pass the argument <code class="code docutils literal notranslate"><span class="pre">gcc_bin=&quot;docker:&lt;image&gt;&quot;</span></code> when constructing a GCC
+environment to specify the name of the docker image to use. For example, to use
+the <a class="reference external" href="https://hub.docker.com/_/gcc">official</a> <code class="code docutils literal notranslate"><span class="pre">gcc:11.2.0</span></code> image:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">compiler_gym</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">compiler_gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;gcc-v0&quot;</span><span class="p">,</span> <span class="n">gcc_bin</span><span class="o">=</span><span class="s2">&quot;docker:gcc:11.2.0&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>A <a class="reference internal" href="../compiler_gym/service.html#compiler_gym.service.EnvironmentNotSupported" title="compiler_gym.service.EnvironmentNotSupported"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnvironmentNotSupported</span></code></a> exception is raised if Docker is
+not working or if an invalid image is requested:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">compiler_gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;gcc-v0&quot;</span><span class="p">)</span>
+<span class="go">EnvironmentNotSupported: Failed to initialize docker client needed by GCC environment: ...</span>
+<span class="go">Have you installed the runtime dependencies?</span>
+<span class="go">See &lt;https://facebookresearch.github.io/CompilerGym/envs/gcc.html#installation&gt; for details.</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="using-a-local-gcc">
+<span id="id3"></span><h3><a class="toc-backref" href="#id10">Using a local GCC</a><a class="headerlink" href="#using-a-local-gcc" title="Permalink to this headline">¶</a></h3>
+<p>If you would prefer to use a local GCC binary, install GCC on macOS using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">brew</span> <span class="n">install</span> <span class="n">gcc</span>
+</pre></div>
+</div>
+<p>On Linux, install GCC using:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">sudo</span> <span class="n">apt</span><span class="o">-</span><span class="n">get</span> <span class="n">install</span> <span class="n">gcc</span>
+</pre></div>
+</div>
+<p>See the <a class="reference external" href="https://gcc.gnu.org/install/">official documentation</a> for alternative
+installation options.</p>
+<p>Pass the argument <code class="code docutils literal notranslate"><span class="pre">gcc_bin=&quot;&lt;path-to-gcc&gt;&quot;</span></code> when constructing a GCC
+environment to specify the path of the GCC binary to use. For example, if a
+<code class="code docutils literal notranslate"><span class="pre">gcc-11</span></code> binary is available on the system:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">compiler_gym</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">compiler_gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;gcc-v0&quot;</span><span class="p">,</span> <span class="n">gcc_bin</span><span class="o">=</span><span class="s2">&quot;gcc-11&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Or alternatively the absolute path can be specified:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">compiler_gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;gcc-v0&quot;</span><span class="p">,</span> <span class="n">gcc_bin</span><span class="o">=</span><span class="s2">&quot;/path/to/gcc-11&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that on macOS, the default <code class="code docutils literal notranslate"><span class="pre">gcc</span></code> command is not actually GCC but
+points to LLVM. Using <code class="code docutils literal notranslate"><span class="pre">gcc_bin=&quot;gcc&quot;</span></code> on a macOS is unlikely to work.</p>
+<p>A <a class="reference internal" href="../compiler_gym/service.html#compiler_gym.service.EnvironmentNotSupported" title="compiler_gym.service.EnvironmentNotSupported"><code class="xref py py-class docutils literal notranslate"><span class="pre">EnvironmentNotSupported</span></code></a> exception is raised if the
+requested binary cannot be used:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">compiler_gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;gcc-v0&quot;</span><span class="p">,</span> <span class="n">gcc_bin</span><span class="o">=</span><span class="s2">&quot;gcc-11&quot;</span><span class="p">)</span>
+<span class="go">EnvironmentNotSupported: Failed to run GCC binary: gcc-11</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="datasets">
+<h2><a class="toc-backref" href="#id11">Datasets</a><a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h2>
+<p>We provide several datasets of open-source GCC benchmarks for use:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 10%" />
+<col style="width: 9%" />
+<col style="width: 74%" />
+<col style="width: 8%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Dataset</p></th>
+<th class="head"><p>Num. Benchmarks <a class="footnote-reference brackets" href="#f1" id="id5">1</a></p></th>
+<th class="head"><p>Description</p></th>
+<th class="head"><p>Validatable <a class="footnote-reference brackets" href="#f2" id="id6">2</a></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>benchmark://anghabench-v1</p></td>
+<td><p>1,041,333</p></td>
+<td><p>Compile-only C/C++ functions extracted from GitHub [<a class="reference external" href="http://cuda.dcc.ufmg.br/angha/">Homepage</a>, <a class="reference external" href="https://homepages.dcc.ufmg.br/~fernando/publications/papers/FaustinoCGO21.pdf">Paper</a>]</p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p>benchmark://chstone-v0</p></td>
+<td><p>12</p></td>
+<td><p>Benchmarks for C-based High-Level Synthesis [<a class="reference external" href="http://www.ertl.jp/chstone/">Homepage</a>, <a class="reference external" href="http://www.yxi.com/applications/iscas2008-300_1027.pdf">Paper</a>]</p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-even"><td><p>generator://csmith-v0</p></td>
+<td><p>∞</p></td>
+<td><p>Random conformant C99 programs [<a class="reference external" href="https://embed.cs.utah.edu/csmith/">Homepage</a>, <a class="reference external" href="http://web.cse.ohio-state.edu/~rountev.1/5343/pdf/pldi11.pdf">Paper</a>]</p></td>
+<td><p>No</p></td>
+</tr>
+<tr class="row-odd"><td><p>Total</p></td>
+<td><p>1,041,345</p></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="footnote brackets">
+<dt class="label" id="f1"><span class="brackets"><a class="fn-backref" href="#id5">1</a></span></dt>
+<dd><p>Values are for the Linux datasets. Some of the datasets contain fewer
+benchmarks on macOS.</p>
+</dd>
+<dt class="label" id="f2"><span class="brackets"><a class="fn-backref" href="#id6">2</a></span></dt>
+<dd><p>A <strong>validatable</strong> dataset is one where the behavior of the benchmarks
+can be checked by compiling the programs to binaries and executing
+them. If the benchmarks crash, or are found to have different behavior,
+then validation fails. This type of validation is used to check that
+the compiler has not broken the semantics of the program.
+See <a class="reference internal" href="../cli.html#module-compiler_gym.bin.validate" title="compiler_gym.bin.validate"><code class="xref py py-mod docutils literal notranslate"><span class="pre">compiler_gym.bin.validate</span></code></a>.</p>
+</dd>
+</dl>
+<p>All of the above datasets are available for use with the GCC environment. See
+<a class="reference internal" href="../compiler_gym/envs/gcc.html#datasets"><span class="std std-ref">compiler_gym.envs.gcc.datasets</span></a> for API
+details.</p>
+</div>
+<div class="section" id="observation-spaces">
+<h2><a class="toc-backref" href="#id12">Observation Spaces</a><a class="headerlink" href="#observation-spaces" title="Permalink to this headline">¶</a></h2>
+<p>We provide several observation spaces for GCC.</p>
+<p>Each observation is accessible from the environment’s <cite>observation</cite> field:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;asm_size&quot;</span><span class="p">]</span>
+<span class="go">36102</span>
+</pre></div>
+</div>
+<p>Each of these observations is also directly accessible as a property on the
+environment:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">asm_size</span>
+<span class="go">36102</span>
+</pre></div>
+</div>
+<div class="section" id="source-rtl-assembly-object-code">
+<h3><a class="toc-backref" href="#id13">Source, RTL, Assembly, Object Code</a><a class="headerlink" href="#source-rtl-assembly-object-code" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 18%" />
+<col style="width: 6%" />
+<col style="width: 76%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Observation space</p></th>
+<th class="head"><p>Shape</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>source</p></td>
+<td><p><cite>str</cite></p></td>
+<td><p>Preprocessed C or C++ source code prior to optimization.</p></td>
+</tr>
+<tr class="row-odd"><td><p>rtl</p></td>
+<td><p><cite>str</cite></p></td>
+<td><p><a class="reference external" href="https://gcc.gnu.org/onlinedocs/gccint/RTL.html">Register Transfer Language</a> code at the end of compilation.</p></td>
+</tr>
+<tr class="row-even"><td><p>asm</p></td>
+<td><p><cite>str</cite></p></td>
+<td><p>Assembly code at the end of optimization.</p></td>
+</tr>
+<tr class="row-odd"><td><p>obj</p></td>
+<td><p><cite>bytes</cite></p></td>
+<td><p>Binary of the object file.</p></td>
+</tr>
+</tbody>
+</table>
+<p>These four spaces return the appropriate string or bytes representation of the
+program state.</p>
+</div>
+<div class="section" id="assembly-and-object-code-sizes">
+<h3><a class="toc-backref" href="#id14">Assembly and Object Code Sizes</a><a class="headerlink" href="#assembly-and-object-code-sizes" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 28%" />
+<col style="width: 10%" />
+<col style="width: 63%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Observation space</p></th>
+<th class="head"><p>Shape</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>asm_size</p></td>
+<td><p><cite>int</cite></p></td>
+<td><p>Number of bytes in the assembly code.</p></td>
+</tr>
+<tr class="row-odd"><td><p>obj_size</p></td>
+<td><p><cite>int</cite></p></td>
+<td><p>Number of bytes in the object code.</p></td>
+</tr>
+</tbody>
+</table>
+<p>Gets the number of bytes in the assembly and object codes. This is more
+efficient than computing the sizes of the <code class="code docutils literal notranslate"><span class="pre">asm</span></code> of <code class="code docutils literal notranslate"><span class="pre">obj</span></code> spaces
+yourself.</p>
+<p>Example values:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;asm_size&quot;</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="assembly-and-object-code-hashes">
+<h3><a class="toc-backref" href="#id15">Assembly and Object Code Hashes</a><a class="headerlink" href="#assembly-and-object-code-hashes" title="Permalink to this headline">¶</a></h3>
+<p>Gets the MD5 hash the assembly and object codes.  This is more efficient than
+computing the hash of the <code class="code docutils literal notranslate"><span class="pre">asm</span></code> of <code class="code docutils literal notranslate"><span class="pre">obj</span></code> spaces yourself.</p>
+<p>Example values:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;asm_hash&quot;</span><span class="p">]</span>
+<span class="go">&#39;f4921de395b026a55eab3844c8fe43dd&#39;</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="instruction-counts">
+<h3><a class="toc-backref" href="#id16">Instruction Counts</a><a class="headerlink" href="#instruction-counts" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 23%" />
+<col style="width: 16%" />
+<col style="width: 61%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Observation space</p></th>
+<th class="head"><p>Shape</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>instruction_counts</p></td>
+<td><p><cite>Dict[str, int]</cite></p></td>
+<td><p>A map of instruction name to count as appears in the assembly file.</p></td>
+</tr>
+</tbody>
+</table>
+<p>This observation first assembles the code. Then it counts the number of each
+instruction type in the assembly, including pseudo-instructions. The instruction
+counts are returned as dictionary. If there are no instructions of a given type,
+then there will be no entry for that instruction type.</p>
+<p>Example values:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;instruction_counts&quot;</span><span class="p">]</span>
+<span class="go">{&#39;.file&#39;: 1, &#39;.text&#39;: 4, &#39;.globl&#39;: 110, &#39;.bss&#39;: 8, &#39;.align&#39;: 95,</span>
+<span class="go"> &#39;.type&#39;: 110, &#39;.size&#39;: 110, &#39;.zero&#39;: 83, &#39;.section&#39;: 10, &#39;.long&#39;: 502,</span>
+<span class="go"> &#39;.cfi&#39;: 91, &#39;pushq&#39;: 16, &#39;movq&#39;: 150, &#39;movl&#39;: 575, &#39;cmpl&#39;: 30, &#39;js&#39;: 7,</span>
+<span class="go"> &#39;jmp&#39;: 24, &#39;negl&#39;: 5, &#39;popq&#39;: 11, &#39;ret&#39;: 15, &#39;subq&#39;: 15, &#39;leaq&#39;: 40,</span>
+<span class="go"> &#39;movslq&#39;: 31, &#39;cltq&#39;: 67, &#39;imulq&#39;: 27, &#39;addq&#39;: 17, &#39;addl&#39;: 44, &#39;jle&#39;: 21,</span>
+<span class="go"> &#39;sarq&#39;: 20, &#39;call&#39;: 34, &#39;subl&#39;: 7, &#39;sarl&#39;: 9, &#39;testl&#39;: 1, &#39;cmovns&#39;: 2,</span>
+<span class="go"> &#39;jge&#39;: 3, &#39;sall&#39;: 2, &#39;orl&#39;: 1, &#39;leave&#39;: 4, &#39;andl&#39;: 2, &#39;nop&#39;: 7, &#39;cmpq&#39;: 1,</span>
+<span class="go"> &#39;salq&#39;: 7, &#39;jns&#39;: 2, &#39;jne&#39;: 1, &#39;testq&#39;: 4, &#39;negq&#39;: 1, &#39;shrl&#39;: 2,</span>
+<span class="go"> &#39;.string&#39;: 1, &#39;je&#39;: 2, &#39;.ident&#39;: 1}</span>
+</pre></div>
+</div>
+</div>
+<div class="section" id="choices">
+<h3><a class="toc-backref" href="#id17">Choices</a><a class="headerlink" href="#choices" title="Permalink to this headline">¶</a></h3>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30%" />
+<col style="width: 15%" />
+<col style="width: 56%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Observation space</p></th>
+<th class="head"><p>Shape</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>choices</p></td>
+<td><p><cite>List[int]</cite></p></td>
+<td><p>The current state of all optimization settings.</p></td>
+</tr>
+</tbody>
+</table>
+<p>This observation gives a list of all the choices that are currently made for the
+optimization settings.</p>
+<p>The number of optimization settings varies depending on which version of GCC is
+being used. The space of options can be found from the <a class="reference internal" href="../compiler_gym/envs.html#compiler_gym.envs.GccEnv.gcc_spec" title="compiler_gym.envs.GccEnv.gcc_spec"><code class="xref py py-attr docutils literal notranslate"><span class="pre">env.gcc_spec</span></code></a> attribute:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">gcc_spec</span><span class="o">.</span><span class="n">options</span>
+<span class="go">[&lt;GccOOption values=[0,1,2,3,fast,g,s]&gt;, &lt;GccFlagOption name=aggressive-loop-optimizations&gt;, ... ]</span>
+</pre></div>
+</div>
+<p>Each option has some number of possible values. For example, the <code class="code docutils literal notranslate"><span class="pre">-O</span></code>
+setting which gives coarse groupings of optimizations can take any of the seven
+forms: <code class="code docutils literal notranslate"><span class="pre">-O0</span></code>, <cite>-O1</cite>, <cite>-O2</cite>, <cite>-O3</cite>, <cite>-Ofast</cite>, <cite>-Og</cite>, <cite>-Os</cite>. Additionally, a
+setting might be missing from the command line. As another example, the second
+option in the list above can be one of <code class="code docutils literal notranslate"><span class="pre">-faggressive-loop-optimizations</span></code>,
+<code class="code docutils literal notranslate"><span class="pre">-fno-aggressive-loop-optimizations</span></code>, or missing.</p>
+<p>Each option, then, can take a value from <code class="code docutils literal notranslate"><span class="pre">[-1,</span> <span class="pre">cardinality]</span></code>, where
+<code class="code docutils literal notranslate"><span class="pre">-1</span></code> indicates that it is missing, and any other number indicates that
+choices from the option.</p>
+<p>So, if the choices are <code class="code docutils literal notranslate"><span class="pre">[4,</span> <span class="pre">0,</span> <span class="pre">-1,</span> <span class="pre">-1,</span> <span class="pre">...]</span></code> (i.e. all but the first two
+are <cite>-1</cite>), then this will correspond to command line arguments of:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="o">-</span><span class="n">Ofast</span> <span class="o">-</span><span class="n">faggressive</span><span class="o">-</span><span class="n">loop</span><span class="o">-</span><span class="n">optimizations</span>
+</pre></div>
+</div>
+<p>Example values:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="p">[</span><span class="s2">&quot;choices&quot;</span><span class="p">]</span>
+<span class="go">[4, 0, -1, -1, ...]</span>
+</pre></div>
+</div>
+<p>This observation can be read directly via a property, like the other
+observations. That property can also be set which will change the choices of the
+current optimization settings.</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">choices</span> <span class="o">=</span> <span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="nb">len</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">gcc_spec</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">choices</span>
+<span class="go">[-1, -1, -1, -1, ...]</span>
+</pre></div>
+</div>
+</div>
+</div>
+<div class="section" id="reward-spaces">
+<h2><a class="toc-backref" href="#id18">Reward Spaces</a><a class="headerlink" href="#reward-spaces" title="Permalink to this headline">¶</a></h2>
+<p>The reward spaces for the GCC environment in the CompilerGym are simple
+wrappers over two of the observations, namely <cite>asm_size</cite> and <cite>obj_size</cite>. The
+reward is the change in that value since the last action.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 29%" />
+<col style="width: 16%" />
+<col style="width: 22%" />
+<col style="width: 34%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Reward space</p></th>
+<th class="head"><p>Range</p></th>
+<th class="head"><p>Deterministic?</p></th>
+<th class="head"><p>Platform dependent? <a class="footnote-reference brackets" href="#f3" id="id7">3</a></p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>asm_size</p></td>
+<td><p>(-inf, inf)</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+</tr>
+<tr class="row-odd"><td><p>obj_size</p></td>
+<td><p>(-inf, inf)</p></td>
+<td><p>Yes</p></td>
+<td><p>Yes</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="footnote brackets">
+<dt class="label" id="f3"><span class="brackets"><a class="fn-backref" href="#id7">3</a></span></dt>
+<dd><p>The <a class="reference internal" href="#using-docker"><span class="std std-ref">Docker</span></a> environments use a Linux container
+so will produce consistent results on Linux and macOS.</p>
+</dd>
+</dl>
+</div>
+<div class="section" id="action-space">
+<h2><a class="toc-backref" href="#id19">Action Space</a><a class="headerlink" href="#action-space" title="Permalink to this headline">¶</a></h2>
+<p>GCC’s action space consists of all the available optimization flags and
+parameters that can be specified from the command line. The number of command
+line configurations is bounded. The command line options are automatically
+extracted from the “help” documentation of whichever GCC version is used. For
+GCC 11.2.0, the optimization space includes 502 options:</p>
+<ul class="simple">
+<li><p>the six <code class="code docutils literal notranslate"><span class="pre">-O&lt;n&gt;</span></code> flags, e.g. <code class="code docutils literal notranslate"><span class="pre">-O0</span></code>, <code class="code docutils literal notranslate"><span class="pre">-O3</span></code>, <code class="code docutils literal notranslate"><span class="pre">-Ofast</span></code>,
+<code class="code docutils literal notranslate"><span class="pre">-Os</span></code>.</p></li>
+<li><p>242 flags such as <code class="code docutils literal notranslate"><span class="pre">-fpeel-loops</span></code>, each of which may be missing, present,
+or negated (e.g. <code class="code docutils literal notranslate"><span class="pre">-fno-peel-loops</span></code>). Some of these flags may take
+integer or enumerated arguments which are also included in the space.</p></li>
+<li><p>260 parameterized command line flags such as
+<code class="code docutils literal notranslate"><span class="pre">--param</span> <span class="pre">inline-heuristics-hint-percent=&lt;number&gt;</span></code>. The number of options
+for each of these varies. Most take numbers, a few take enumerated values. The
+GCC action space is determined automatically from whichever version of GCC is
+being used.</p></li>
+</ul>
+<p>This gives a finite optimization space with a modest size of approximately 10<sup>4461</sup>. Earlier versions of GCC report their parameter spaces less clearly
+and so the tool finds smaller spaces when pointed at those. For example, on GCC
+5, the optimization space is only 10<sup>430</sup>.</p>
+<p>The first action space is intended to make it easy for RL tools that operate on
+a flat list of categorical actions. For every option with a cardinality of fewer
+than ten, we provide actions that directly set the choice for that action. For
+options with greater cardinalities we provide actions that add and subtract 1,
+10, 100, and 1000 to the choice integer corresponding to the option. For GCC
+11.2.0, this creates a set of 2281 actions that can modify the choices of the
+current state.</p>
+<p>So, for example, in GCC 11.2.0, the first option is the <code class="code docutils literal notranslate"><span class="pre">-O</span></code> option. This
+has 7 possible settings, other than missing: <code class="code docutils literal notranslate"><span class="pre">-O0</span></code>, <code class="code docutils literal notranslate"><span class="pre">-O1</span></code>,
+<code class="code docutils literal notranslate"><span class="pre">-O2</span></code>, <code class="code docutils literal notranslate"><span class="pre">-O3</span></code>, <code class="code docutils literal notranslate"><span class="pre">-Ofast</span></code>, <code class="code docutils literal notranslate"><span class="pre">-Og</span></code>, amd <code class="code docutils literal notranslate"><span class="pre">-Os</span></code>. Since
+this is fewer than ten, there is a corresponding action for each. Similarly,
+there are action for each of the normal GCC flags, like <code class="code docutils literal notranslate"><span class="pre">-fpeel-loops</span></code> and
+<code class="code docutils literal notranslate"><span class="pre">-fno-peel-loops</span></code>. Parameters often have more than ten options, so there
+will be actions to bump values up and down, for example, ``</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="loop_tool.html" class="btn btn-neutral float-right" title="loop_tool Environment Reference" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../llvm/index.html" class="btn btn-neutral float-left" title="LLVM Environment Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright Facebook AI Research.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    <!-- Theme Analytics -->
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'G-T95G5EVYXM', 'auto');
+    
+    ga('send', 'pageview');
+    </script>
+
+    
+   
+
+</body>
+</html>

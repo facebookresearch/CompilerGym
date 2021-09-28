@@ -4,6 +4,54 @@
 Changelog
 =========
 
+Release 0.2.0 (2021-09-28)
+--------------------------
+
+This release adds two new compiler optimization problems to CompilerGym:
+GCC command line flag optimization and CUDA loop nest optimization.
+
+-  **[GCC]** A new ``gcc-v0`` environment, authored by @hughleat,
+   exposes the command line flags of `GCC <https://gcc.gnu.org/>`__ as a
+   reinforcement learning environment. GCC is a production-grade
+   compiler for C and C++ used throughout industry. The environment
+   provides several datasets and a large, high dimensional action space
+   that works on several GCC versions. For further details check out the
+   `reference
+   documentation <https://facebookresearch.github.io/CompilerGym/envs/gcc.html>`__.
+-  **[loop_tool]** A new ``loop_tool-v0`` environment, authored by
+   @bwasti, provides an experimental intermediate representation of
+   *n*-dimensional data computation that can be lowered to both CPU and
+   GPU backends. This provides a reinforcement learning environment for
+   manipulating nests of loop computations to maximize throughput. For
+   further details check out the `reference
+   documentation <https://facebookresearch.github.io/CompilerGym/envs/loop_tool.html>`__.
+
+Other highlights of this release include:
+
+-  **[Docker]** Published a
+   `chriscummins/compiler_gym <https://hub.docker.com/repository/docker/chriscummins/compiler_gym>`__
+   docker image that can be used to run CompilerGym services in
+   standalone isolated containers
+   (`#424 <https://github.com/facebookresearch/CompilerGym/pull/424>`__).
+-  **[LLVM]** Fixed a bug in the experimental ``Runtime`` observation
+   space that caused observations to slow down over time
+   (`#398 <https://github.com/facebookresearch/CompilerGym/pull/398>`__).
+-  **[LLVM]** Added a new utility module to compute observations from
+   bitcodes
+   (`#405 <https://github.com/facebookresearch/CompilerGym/pull/405>`__).
+-  Overhauled the continuous integration services to reduce
+   computational requirements by 59.4% while increasing test coverage
+   (`#392 <https://github.com/facebookresearch/CompilerGym/pull/392>`__).
+-  Improved error reporting if computing an observation fails
+   (`#380 <https://github.com/facebookresearch/CompilerGym/pull/380>`__).
+-  Changed the return type of ``compiler_gym.random_search()`` to a
+   ``CopmilerEnv``
+   (`#387 <https://github.com/facebookresearch/CompilerGym/pull/387>`__).
+-  Numerous other bug fixes and improvements.
+
+Many thanks to code contributors: @thecoblack, @bwasti, @hughleat, and
+@sahirgomez1!
+
 Release 0.1.10 (2021-09-08)
 ---------------------------
 

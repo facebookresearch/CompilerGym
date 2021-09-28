@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Changelog &mdash; CompilerGym 0.1.10 documentation</title>
+  <title>Changelog &mdash; CompilerGym 0.2.0 documentation</title>
   
 
   
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                0.1.10
+                0.2.0
               </div>
             
           
@@ -100,6 +100,7 @@
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc.html">RPC Service Reference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#release-0-2-0-2021-09-28">Release 0.2.0 (2021-09-28)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#release-0-1-10-2021-09-08">Release 0.1.10 (2021-09-08)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#release-0-1-9-2021-06-03">Release 0.1.9 (2021-06-03)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#release-0-1-8-2021-04-30">Release 0.1.8 (2021-04-30)</a></li>
@@ -117,12 +118,15 @@
 <p class="caption"><span class="caption-text">Environments</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="envs/gcc.html">GCC Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="envs/loop_tool.html">loop_tool Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/datasets.html">compiler_gym.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/envs/gcc.html">compiler_gym.envs.gcc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/service.html">compiler_gym.service</a></li>
@@ -205,6 +209,53 @@
             
   <div class="section" id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="release-0-2-0-2021-09-28">
+<h2>Release 0.2.0 (2021-09-28)<a class="headerlink" href="#release-0-2-0-2021-09-28" title="Permalink to this headline">¶</a></h2>
+<p>This release adds two new compiler optimization problems to CompilerGym:
+GCC command line flag optimization and CUDA loop nest optimization.</p>
+<ul class="simple">
+<li><p><strong>[GCC]</strong> A new <code class="docutils literal notranslate"><span class="pre">gcc-v0</span></code> environment, authored by &#64;hughleat,
+exposes the command line flags of <a class="reference external" href="https://gcc.gnu.org/">GCC</a> as a
+reinforcement learning environment. GCC is a production-grade
+compiler for C and C++ used throughout industry. The environment
+provides several datasets and a large, high dimensional action space
+that works on several GCC versions. For further details check out the
+<a class="reference external" href="https://facebookresearch.github.io/CompilerGym/envs/gcc.html">reference
+documentation</a>.</p></li>
+<li><p><strong>[loop_tool]</strong> A new <code class="docutils literal notranslate"><span class="pre">loop_tool-v0</span></code> environment, authored by
+&#64;bwasti, provides an experimental intermediate representation of
+<em>n</em>-dimensional data computation that can be lowered to both CPU and
+GPU backends. This provides a reinforcement learning environment for
+manipulating nests of loop computations to maximize throughput. For
+further details check out the <a class="reference external" href="https://facebookresearch.github.io/CompilerGym/envs/loop_tool.html">reference
+documentation</a>.</p></li>
+</ul>
+<p>Other highlights of this release include:</p>
+<ul class="simple">
+<li><p><strong>[Docker]</strong> Published a
+<a class="reference external" href="https://hub.docker.com/repository/docker/chriscummins/compiler_gym">chriscummins/compiler_gym</a>
+docker image that can be used to run CompilerGym services in
+standalone isolated containers
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/424">#424</a>).</p></li>
+<li><p><strong>[LLVM]</strong> Fixed a bug in the experimental <code class="docutils literal notranslate"><span class="pre">Runtime</span></code> observation
+space that caused observations to slow down over time
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/398">#398</a>).</p></li>
+<li><p><strong>[LLVM]</strong> Added a new utility module to compute observations from
+bitcodes
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/405">#405</a>).</p></li>
+<li><p>Overhauled the continuous integration services to reduce
+computational requirements by 59.4% while increasing test coverage
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/392">#392</a>).</p></li>
+<li><p>Improved error reporting if computing an observation fails
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/380">#380</a>).</p></li>
+<li><p>Changed the return type of <code class="docutils literal notranslate"><span class="pre">compiler_gym.random_search()</span></code> to a
+<code class="docutils literal notranslate"><span class="pre">CopmilerEnv</span></code>
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/387">#387</a>).</p></li>
+<li><p>Numerous other bug fixes and improvements.</p></li>
+</ul>
+<p>Many thanks to code contributors: &#64;thecoblack, &#64;bwasti, &#64;hughleat, and
+&#64;sahirgomez1!</p>
+</div>
 <div class="section" id="release-0-1-10-2021-09-08">
 <h2>Release 0.1.10 (2021-09-08)<a class="headerlink" href="#release-0-1-10-2021-09-08" title="Permalink to this headline">¶</a></h2>
 <p>This release lays the foundation for several new exciting additions to

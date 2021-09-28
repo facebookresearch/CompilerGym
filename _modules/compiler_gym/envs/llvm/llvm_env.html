@@ -104,12 +104,15 @@
 <p class="caption"><span class="caption-text">Environments</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../llvm/index.html">LLVM Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../envs/gcc.html">GCC Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/envs/gcc.html">compiler_gym.envs.gcc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/service.html">compiler_gym.service</a></li>
@@ -274,11 +277,6 @@
 <span class="sd">    action, and the :meth:`LlvmEnv.commandline()</span>
 <span class="sd">    &lt;compiler_gym.envs.LlvmEnv.commandline&gt;` method can be used to produce an</span>
 <span class="sd">    equivalent LLVM opt invocation for the current environment state.</span>
-
-<span class="sd">    :ivar actions: The list of actions that have been performed since the</span>
-<span class="sd">        previous call to :func:`reset`.</span>
-
-<span class="sd">    :vartype actions: List[int]</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
@@ -375,9 +373,10 @@
             <span class="p">],</span>
         <span class="p">)</span>
 
-        <span class="c1"># If the user sets a runtimes_per_observation value, this must be</span>
-        <span class="c1"># configured on every call to reset().</span>
+        <span class="c1"># Mutable runtime configuration options that must be set on every call</span>
+        <span class="c1"># to reset.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_runtimes_per_observation_count</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_runtimes_warmup_per_observation_count</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span> <span class="o">=</span> <span class="n">_INST2VEC_ENCODER</span>
 
@@ -507,6 +506,8 @@
         <span class="c1"># non-default value.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runtimes_per_observation_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">runtime_observation_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runtimes_per_observation_count</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runtimes_warmup_per_observation_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">runtime_warmup_runs_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runtimes_warmup_per_observation_count</span>
 
         <span class="k">return</span> <span class="n">observation</span></div>
 
@@ -732,7 +733,40 @@
     <span class="nd">@runtime_observation_count</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">runtime_observation_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_runtimes_per_observation_count</span> <span class="o">=</span> <span class="n">n</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">send_param</span><span class="p">(</span><span class="s2">&quot;llvm.set_runtimes_per_observation_count&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">))</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_param</span><span class="p">(</span><span class="s2">&quot;llvm.set_runtimes_per_observation_count&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">runtime_warmup_runs_count</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;The number of warmup runs of the binary to perform before measuring</span>
+<span class="sd">        the Runtime observation space.</span>
+
+<span class="sd">        See the :ref:`Runtime observation space reference &lt;llvm/index:Runtime&gt;`</span>
+<span class="sd">        for further details.</span>
+
+<span class="sd">        Example usage:</span>
+
+<span class="sd">            &gt;&gt;&gt; env = compiler_gym.make(&quot;llvm-v0&quot;)</span>
+<span class="sd">            &gt;&gt;&gt; env.reset()</span>
+<span class="sd">            &gt;&gt;&gt; env.runtime_observation_count = 10</span>
+<span class="sd">            &gt;&gt;&gt; len(env.observation.Runtime())</span>
+<span class="sd">            10</span>
+
+<span class="sd">        :getter: Returns the number of runs that be performed before measuring</span>
+<span class="sd">            the :code:`Runtime` observation is requested.</span>
+
+<span class="sd">        :setter: Set the number of warmup runs to perform when a :code:`Runtime`</span>
+<span class="sd">            observation is requested.</span>
+
+<span class="sd">        :type: int</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_param</span><span class="p">(</span><span class="s2">&quot;llvm.get_warmup_runs_count_per_runtime_observation&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+
+    <span class="nd">@runtime_warmup_runs_count</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span> <span class="nf">runtime_warmup_runs_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_runtimes_warmup_per_observation_count</span> <span class="o">=</span> <span class="n">n</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">send_param</span><span class="p">(</span><span class="s2">&quot;llvm.set_warmup_runs_count_per_runtime_observation&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">))</span></div>
 </pre></div>
 
            </div>

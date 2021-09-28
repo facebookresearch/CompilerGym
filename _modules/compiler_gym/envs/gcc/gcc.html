@@ -1,0 +1,1001 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>compiler_gym.envs.gcc.gcc &mdash; CompilerGym 0.1.10 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../../../" src="../../../../_static/documentation_options.js"></script>
+        <script data-url_root="../../../../" id="documentation_options" src="../../../../_static/documentation_options.js"></script>
+        <script src="../../../../_static/jquery.js"></script>
+        <script src="../../../../_static/underscore.js"></script>
+        <script src="../../../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../../../_static/js/theme.js"></script>
+
+    
+    <link rel="author" title="About these documents" href="../../../../about.html" />
+    <link rel="index" title="Index" href="../../../../genindex.html" />
+    <link rel="search" title="Search" href="../../../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../../../index.html" class="icon icon-home"> CompilerGym
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.1.10
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cli.html">Command Line Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../rpc.html">RPC Service Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Environments</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../llvm/index.html">LLVM Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../envs/gcc.html">GCC Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/envs/gcc.html">compiler_gym.envs.gcc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/views.html">compiler_gym.views</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
+</ul>
+<p class="caption"><span class="caption-text">C++ API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cc/compiler_gym/service.html">compiler_gym/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cc/compiler_gym/service/runtime.html">compiler_gym/service/runtime</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../cc/compiler_gym/util.html">compiler_gym/util</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../../../index.html">CompilerGym</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+          <li><a href="../../../index.html">Module code</a> &raquo;</li>
+        
+      <li>compiler_gym.envs.gcc.gcc</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <h1>Source code for compiler_gym.envs.gcc.gcc</h1><div class="highlight"><pre>
+<span></span><span class="ch">#! /usr/bin/env python3</span>
+<span class="c1">#</span>
+<span class="c1">#  Copyright (c) Facebook, Inc. and its affiliates.</span>
+<span class="c1">#</span>
+<span class="c1"># This source code is licensed under the MIT license found in the</span>
+<span class="c1"># LICENSE file in the root directory of this source tree.</span>
+<span class="sd">&quot;&quot;&quot;Query a GCC binary for version,  optimization and param spaces.</span>
+<span class="sd">The goal of this file is to query the available settings in a GCC compiler so</span>
+<span class="sd">that they don&#39;t have to be hard coded.</span>
+
+<span class="sd">The main entry point to this file is the &#39;get_spec&#39; function which returns a</span>
+<span class="sd">GccSpec object. That object describes the version, options and parameters.</span>
+
+<span class="sd">Querying these settings is time consuming, so this file tries to cache the</span>
+<span class="sd">values in a cache directory.</span>
+
+<span class="sd">Running this file will print the gcc spec to stdout.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">math</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">pickle</span>
+<span class="kn">import</span> <span class="nn">re</span>
+<span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">import</span> <span class="nn">docker</span>
+
+<span class="kn">from</span> <span class="nn">compiler_gym.service</span> <span class="kn">import</span> <span class="n">EnvironmentNotSupported</span><span class="p">,</span> <span class="n">ServiceError</span><span class="p">,</span> <span class="n">ServiceInitError</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.filesystem</span> <span class="kn">import</span> <span class="n">atomic_file_write</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">site_data_path</span>
+
+
+<div class="viewcode-block" id="Option"><a class="viewcode-back" href="../../../../compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.Option">[docs]</a><span class="k">class</span> <span class="nc">Option</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;An Option is either a command line optimization setting or a parameter.</span>
+
+<span class="sd">    It is essentially a list of the possible values that can be taken. Each item</span>
+<span class="sd">    is command line parameter. In GCC, all of these are single settings, so only</span>
+<span class="sd">    need one string to describe them, rather than a list.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Number of available settings. Note that the absence of a value is not</span>
+<span class="sd">        included in this, it is implicit.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get the command line argument associated with an index (key).&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get the name of this option.&quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">()</span></div>
+
+
+<div class="viewcode-block" id="GccOOption"><a class="viewcode-back" href="../../../../compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.GccOOption">[docs]</a><span class="k">class</span> <span class="nc">GccOOption</span><span class="p">(</span><span class="n">Option</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This class represents the :code:`-O0`, :code:`-O1`, :code:`-O2`,</span>
+<span class="sd">    :code:`-O3`, :code:`-Os`, and :code:`-Ofast` options.</span>
+
+<span class="sd">    This class starts with no values, we fill them in with</span>
+<span class="sd">    :code:`_gcc_parse_optimize()`. The suffixes to append to :code:`-O` are</span>
+<span class="sd">    stored in self.values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="p">[]</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;-O&quot;</span> <span class="o">+</span> <span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="s2">&quot;-O&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;GccOOption values=[</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="si">}</span><span class="s2">]&gt;&quot;</span></div>
+
+
+<div class="viewcode-block" id="GccFlagOption"><a class="viewcode-back" href="../../../../compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.GccFlagOption">[docs]</a><span class="k">class</span> <span class="nc">GccFlagOption</span><span class="p">(</span><span class="n">Option</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;An ordinary :code:`-f` flag.</span>
+
+<span class="sd">    These have two possible settings. For a given flag name there are</span>
+<span class="sd">    :code:`&#39;-f&lt;name&gt;&#39; and :code:`&#39;-fno-&lt;name&gt;. If :code:`no_fno` is true, then</span>
+<span class="sd">    there is only the :code:`-f&lt;name&gt;` form.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">no_fno</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">no_fno</span> <span class="o">=</span> <span class="n">no_fno</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">no_fno</span> <span class="k">else</span> <span class="mi">2</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;-f</span><span class="si">{</span><span class="s1">&#39;&#39;</span> <span class="k">if</span> <span class="n">key</span> <span class="o">==</span> <span class="mi">0</span> <span class="k">else</span> <span class="s1">&#39;no-&#39;</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;-f</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;GccFlagOption name=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&gt;&quot;</span></div>
+
+
+<div class="viewcode-block" id="GccFlagEnumOption"><a class="viewcode-back" href="../../../../compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.GccFlagEnumOption">[docs]</a><span class="k">class</span> <span class="nc">GccFlagEnumOption</span><span class="p">(</span><span class="n">Option</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A flag of style :code:`-f&lt;name&gt;=[val1, val2, ...]`.</span>
+
+<span class="sd">    :code:`self.name` holds the name. :code:`self.values` holds the values.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">values</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;-f</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;-f</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;GccFlagEnumOption name=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, values=[</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="si">}</span><span class="s2">]&gt;&quot;</span></div>
+
+
+<div class="viewcode-block" id="GccFlagIntOption"><a class="viewcode-back" href="../../../../compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.GccFlagIntOption">[docs]</a><span class="k">class</span> <span class="nc">GccFlagIntOption</span><span class="p">(</span><span class="n">Option</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A flag of style :code:`-f&lt;name&gt;=&lt;integer&gt;` where the integer is between</span>
+<span class="sd">    min and max.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">min</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">max</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min</span> <span class="o">=</span> <span class="nb">min</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="nb">max</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">max</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">min</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;-f</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min</span> <span class="o">+</span> <span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;-f</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;GccFlagIntOption name=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, min=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min</span><span class="si">}</span><span class="s2">, max=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max</span><span class="si">}</span><span class="s2">&gt;&quot;</span></div>
+
+
+<div class="viewcode-block" id="GccFlagAlignOption"><a class="viewcode-back" href="../../../../compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.GccFlagAlignOption">[docs]</a><span class="k">class</span> <span class="nc">GccFlagAlignOption</span><span class="p">(</span><span class="n">Option</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Alignment flags. These take several forms. See the GCC documentation.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Alignment options not properly handled </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;-f</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;-f</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;GccFlagAlignOption name=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&gt;&quot;</span></div>
+
+
+<div class="viewcode-block" id="GccParamEnumOption"><a class="viewcode-back" href="../../../../compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.GccParamEnumOption">[docs]</a><span class="k">class</span> <span class="nc">GccParamEnumOption</span><span class="p">(</span><span class="n">Option</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A parameter :code:`--param=&lt;name&gt;=[val1, val2, val3]`.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">values</span> <span class="o">=</span> <span class="n">values</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;--param=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">[</span><span class="n">key</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;--param=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;&lt;GccParamEnumOption name=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, values=[</span><span class="si">{</span><span class="s1">&#39;,&#39;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">values</span><span class="p">)</span><span class="si">}</span><span class="s2">]&gt;&quot;</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="GccParamIntOption"><a class="viewcode-back" href="../../../../compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.GccParamIntOption">[docs]</a><span class="k">class</span> <span class="nc">GccParamIntOption</span><span class="p">(</span><span class="n">Option</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;A parameter :code:`--param=&lt;name&gt;=&lt;integer&gt;`, where the integer is</span>
+<span class="sd">    between min and max.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">min</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">max</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min</span> <span class="o">=</span> <span class="nb">min</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">max</span> <span class="o">=</span> <span class="nb">max</span>
+
+    <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">max</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">min</span> <span class="o">+</span> <span class="mi">1</span>
+
+    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;--param=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min</span> <span class="o">+</span> <span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__str__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;--param=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;&lt;GccParamIntOption name=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">, min=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">min</span><span class="si">}</span><span class="s2">, max=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">max</span><span class="si">}</span><span class="s2">&gt;&quot;</span></div>
+
+
+<span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">get_docker_client</span><span class="p">():</span>
+    <span class="sd">&quot;&quot;&quot;Fetch the docker client singleton.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">docker</span><span class="o">.</span><span class="n">from_env</span><span class="p">()</span>
+    <span class="k">except</span> <span class="n">docker</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">DockerException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">EnvironmentNotSupported</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Failed to initialize docker client needed by GCC environment: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">.</span><span class="se">\n</span><span class="s2">&quot;</span>
+            <span class="s2">&quot;Have you installed the runtime dependencies?</span><span class="se">\n</span><span class="s2"> See &quot;</span>
+            <span class="s2">&quot;&lt;https://facebookresearch.github.io/CompilerGym/envs/gcc.html#installation&gt; &quot;</span>
+            <span class="s2">&quot;for details.&quot;</span>
+        <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+
+
+<span class="c1"># We only need to run this function once per image.</span>
+<span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">64</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">pull_docker_image</span><span class="p">(</span><span class="n">image</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Pull the requested docker image.</span>
+
+<span class="sd">    :param image: The name of the docker image to pull.</span>
+
+<span class="sd">    :raises ServiceInitError: If pulling the docker image fails.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">client</span> <span class="o">=</span> <span class="n">get_docker_client</span><span class="p">()</span>
+        <span class="n">client</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">pull</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">image</span>
+    <span class="k">except</span> <span class="n">docker</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">DockerException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ServiceInitError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to fetch docker image &#39;</span><span class="si">{</span><span class="n">image</span><span class="si">}</span><span class="s2">&#39;: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">def</span> <span class="nf">join_docker_container</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">timeout_seconds</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Block until the container terminates, returning its output.&quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">status</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">wait</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout_seconds</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">docker</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">ReadTimeout</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># Catch and re-raise the timeout.</span>
+        <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GCC timed out after </span><span class="si">{</span><span class="n">timeout_seconds</span><span class="si">:</span><span class="s2">,d</span><span class="si">}</span><span class="s2"> seconds&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+
+    <span class="k">if</span> <span class="n">status</span><span class="p">[</span><span class="s2">&quot;StatusCode&quot;</span><span class="p">]:</span>
+        <span class="n">logs</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">logs</span> <span class="o">=</span> <span class="n">container</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">UnicodeDecodeError</span><span class="p">,</span> <span class="n">docker</span><span class="o">.</span><span class="n">errors</span><span class="o">.</span><span class="n">NotFound</span><span class="p">):</span>
+            <span class="k">pass</span>
+        <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GCC failed with returncode </span><span class="si">{</span><span class="n">status</span><span class="p">[</span><span class="s1">&#39;StatusCode&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">logs</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">container</span><span class="o">.</span><span class="n">logs</span><span class="p">(</span><span class="n">stdout</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span><span class="o">.</span><span class="n">decode</span><span class="p">()</span>
+
+
+<div class="viewcode-block" id="Gcc"><a class="viewcode-back" href="../../../../compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.Gcc">[docs]</a><span class="k">class</span> <span class="nc">Gcc</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;This class represents an instance of the GCC compiler, either as a binary</span>
+<span class="sd">    or a docker image.</span>
+
+<span class="sd">    :ivar bin: A string version of the constructor argument.</span>
+
+<span class="sd">    :vartype bin: str</span>
+
+<span class="sd">    :ivar spec: A :class:`GccSpec &lt;compiler_gym.envs.gcc.gcc.GccSpec&gt;` instance.</span>
+
+<span class="sd">    :vartype spec: GccSpec</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="nb">bin</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]):</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">bin</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="nb">bin</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bin</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="s2">&quot;docker:&quot;</span><span class="p">)</span> <span class="p">:]</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">bin</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;docker:&quot;</span><span class="p">):</span>
+            <span class="n">pull_docker_image</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">call</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_docker_run</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">call</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_subprocess_run</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">spec</span> <span class="o">=</span> <span class="n">_get_spec</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">cache_dir</span><span class="o">=</span><span class="n">site_data_path</span><span class="p">(</span><span class="s2">&quot;gcc-v0&quot;</span><span class="p">))</span>
+
+<div class="viewcode-block" id="Gcc.__call__"><a class="viewcode-back" href="../../../../compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.Gcc.__call__">[docs]</a>    <span class="k">def</span> <span class="fm">__call__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="o">*</span><span class="n">args</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
+        <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">cwd</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">volumes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Run GCC with the given args.</span>
+
+<span class="sd">        :param args: The command line arguments to append.</span>
+
+<span class="sd">        :param timeout: A timeout in seconds.</span>
+
+<span class="sd">        :param cwd: The working directory.</span>
+
+<span class="sd">        :param volumes: A dictionary of volume bindings for docker.</span>
+
+<span class="sd">        :raises TimeoutError: If GCC fails to complete within timeout.</span>
+
+<span class="sd">        :raises ServiceError: In case GCC fails.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">call</span><span class="p">(</span><span class="n">args</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="n">Path</span><span class="p">(</span><span class="n">cwd</span> <span class="ow">or</span> <span class="s2">&quot;.&quot;</span><span class="p">),</span> <span class="n">volumes</span><span class="o">=</span><span class="n">volumes</span><span class="p">)</span></div>
+
+    <span class="k">def</span> <span class="nf">_docker_run</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+        <span class="n">timeout</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
+        <span class="n">cwd</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+        <span class="n">volumes</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">cwd</span> <span class="o">=</span> <span class="n">cwd</span><span class="o">.</span><span class="n">absolute</span><span class="p">()</span><span class="o">.</span><span class="n">as_posix</span><span class="p">()</span>
+
+        <span class="n">cmd_line</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;gcc&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">args</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">timeout</span><span class="p">:</span>
+            <span class="n">cmd_line</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;timeout&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">timeout</span><span class="p">)]</span> <span class="o">+</span> <span class="n">cmd_line</span>
+
+        <span class="n">volumes_</span> <span class="o">=</span> <span class="p">{</span><span class="n">cwd</span><span class="p">:</span> <span class="p">{</span><span class="s2">&quot;bind&quot;</span><span class="p">:</span> <span class="n">cwd</span><span class="p">,</span> <span class="s2">&quot;mode&quot;</span><span class="p">:</span> <span class="s2">&quot;rw&quot;</span><span class="p">}}</span>
+        <span class="n">volumes_</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">volumes</span> <span class="ow">or</span> <span class="p">{})</span>
+
+        <span class="n">client</span> <span class="o">=</span> <span class="n">get_docker_client</span><span class="p">()</span>
+        <span class="n">container</span> <span class="o">=</span> <span class="n">client</span><span class="o">.</span><span class="n">containers</span><span class="o">.</span><span class="n">create</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">image</span><span class="p">,</span>
+            <span class="n">cmd_line</span><span class="p">,</span>
+            <span class="n">working_dir</span><span class="o">=</span><span class="n">cwd</span><span class="p">,</span>
+            <span class="n">volumes</span><span class="o">=</span><span class="n">volumes_</span><span class="p">,</span>
+        <span class="p">)</span>
+        <span class="n">container</span><span class="o">.</span><span class="n">start</span><span class="p">()</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">join_docker_container</span><span class="p">(</span><span class="n">container</span><span class="p">,</span> <span class="n">timeout_seconds</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+        <span class="k">finally</span><span class="p">:</span>
+            <span class="n">container</span><span class="o">.</span><span class="n">remove</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">_subprocess_run</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">args</span><span class="p">,</span> <span class="n">timeout</span><span class="p">,</span> <span class="n">cwd</span><span class="p">,</span> <span class="n">volumes</span><span class="p">):</span>
+        <span class="k">del</span> <span class="n">volumes</span>  <span class="c1"># Unused</span>
+
+        <span class="n">cmd_line</span> <span class="o">=</span> <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">bin</span><span class="p">]</span> <span class="o">+</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span> <span class="n">args</span><span class="p">))</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">result</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">check_output</span><span class="p">(</span>
+                <span class="n">cmd_line</span><span class="p">,</span> <span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">,</span> <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span>
+            <span class="p">)</span>
+        <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">CalledProcessError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to run </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bin</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="n">ServiceInitError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;GCC binary not found: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">bin</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">result</span></div>
+
+
+<div class="viewcode-block" id="GccSpec"><a class="viewcode-back" href="../../../../compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.GccSpec">[docs]</a><span class="k">class</span> <span class="nc">GccSpec</span><span class="p">(</span><span class="n">NamedTuple</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;This class combines all of the information about the version and options</span>
+<span class="sd">    for a GCC instance.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">gcc</span><span class="p">:</span> <span class="n">Gcc</span>
+    <span class="sd">&quot;&quot;&quot;A compiler instance.&quot;&quot;&quot;</span>
+
+    <span class="n">version</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="sd">&quot;&quot;&quot;The GCC version string.&quot;&quot;&quot;</span>
+
+    <span class="n">options</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Option</span><span class="p">]</span>
+    <span class="sd">&quot;&quot;&quot;A list of options exposed by the compiler.&quot;&quot;&quot;</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">size</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Calculate the size of the option space. This is the product of the</span>
+<span class="sd">        cardinalities of all the options.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">sz</span> <span class="o">=</span> <span class="mi">1</span>
+        <span class="k">for</span> <span class="n">option</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">options</span><span class="p">:</span>
+            <span class="c1"># Each option can be applied or not.</span>
+            <span class="n">sz</span> <span class="o">*=</span> <span class="nb">len</span><span class="p">(</span><span class="n">option</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span>
+        <span class="k">return</span> <span class="n">sz</span></div>
+
+
+<span class="k">def</span> <span class="nf">_gcc_parse_optimize</span><span class="p">(</span><span class="n">gcc</span><span class="p">:</span> <span class="n">Gcc</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Option</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Parse the optimization help string from the GCC binary to find options.&quot;&quot;&quot;</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Parsing GCC optimization space&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Call &#39;gcc --help=optimize -Q&#39;</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">gcc</span><span class="p">(</span><span class="s2">&quot;--help=optimize&quot;</span><span class="p">,</span> <span class="s2">&quot;-Q&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+    <span class="c1"># Split into lines. Ignore the first line.</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="c1"># Regex patterns to match the different options</span>
+    <span class="n">O_num_pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;-O&lt;number&gt;&quot;</span><span class="p">)</span>
+    <span class="n">O_pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;-O([a-z]+)&quot;</span><span class="p">)</span>
+    <span class="n">flag_align_eq_pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;-f(align-[-a-z]+)=&quot;</span><span class="p">)</span>
+    <span class="n">flag_pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;-f([-a-z0-9]+)&quot;</span><span class="p">)</span>
+    <span class="n">flag_enum_pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;-f([-a-z0-9]+)=</span><span class="se">\\</span><span class="s2">[([-A-Za-z_</span><span class="se">\\</span><span class="s2">|]+)</span><span class="se">\\</span><span class="s2">]&quot;</span><span class="p">)</span>
+    <span class="n">flag_interval_pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;-f([-a-z0-9]+)=&lt;([0-9]+),([0-9]+)&gt;&quot;</span><span class="p">)</span>
+    <span class="n">flag_number_pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;-f([-a-z0-9]+)=&lt;number&gt;&quot;</span><span class="p">)</span>
+
+    <span class="c1"># The list of options as it gets built up.</span>
+    <span class="n">options</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="c1"># Add a -O value</span>
+    <span class="k">def</span> <span class="nf">add_gcc_o</span><span class="p">(</span><span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="c1"># -O flag</span>
+        <span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;O&quot;</span>
+        <span class="c1"># There are multiple -O flags. We add one value at a time.</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="n">options</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">GccOOption</span><span class="p">())</span>
+        <span class="c1"># There shouldn&#39;t be any way to overwrite this with the wrong type.</span>
+        <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span> <span class="o">==</span> <span class="n">GccOOption</span>
+        <span class="n">opt</span><span class="o">.</span><span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="c1"># Add a flag</span>
+    <span class="k">def</span> <span class="nf">add_gcc_flag</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="c1"># Straight flag.</span>
+        <span class="c1"># If there is something else in its place already (like a flag enum),</span>
+        <span class="c1"># then we don&#39;t overwrite it.  Straight flags always have the lowest</span>
+        <span class="c1"># priority</span>
+        <span class="n">options</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">GccFlagOption</span><span class="p">(</span><span class="n">name</span><span class="p">))</span>
+
+    <span class="c1"># Add an enum flag</span>
+    <span class="k">def</span> <span class="nf">add_gcc_flag_enum</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="c1"># Enum flag.</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">opt</span><span class="p">:</span>
+            <span class="c1"># We should only ever be overwriting a straight flag</span>
+            <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span> <span class="o">==</span> <span class="n">GccFlagOption</span>
+        <span class="c1"># Always overwrite</span>
+        <span class="n">options</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">GccFlagEnumOption</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+
+    <span class="c1"># Add an integer flag</span>
+    <span class="k">def</span> <span class="nf">add_gcc_flag_int</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">min</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">max</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="c1"># Int flag.</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">opt</span><span class="p">:</span>
+            <span class="c1"># We should only ever be overwriting a straight flag</span>
+            <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span> <span class="o">==</span> <span class="n">GccFlagOption</span>
+        <span class="c1"># Always overwrite</span>
+        <span class="n">options</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">GccFlagIntOption</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span>
+
+    <span class="c1"># Add an align flag</span>
+    <span class="k">def</span> <span class="nf">add_gcc_flag_align</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="c1"># Align flag.</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="n">options</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">opt</span><span class="p">:</span>
+            <span class="c1"># We should only ever be overwriting a straight flag</span>
+            <span class="k">assert</span> <span class="nb">type</span><span class="p">(</span><span class="n">opt</span><span class="p">)</span> <span class="o">==</span> <span class="n">GccFlagOption</span>
+        <span class="c1"># Always overwrite</span>
+        <span class="n">options</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">GccFlagAlignOption</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
+    <span class="c1"># Parse a line from the help output</span>
+    <span class="k">def</span> <span class="nf">parse_line</span><span class="p">(</span><span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="c1"># The first bit of the line is the specification</span>
+        <span class="n">bits</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">bits</span><span class="p">:</span>
+            <span class="k">return</span>
+        <span class="n">spec</span> <span class="o">=</span> <span class="n">bits</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># -O&lt;number&gt;</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">O_num_pat</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">4</span><span class="p">):</span>
+                <span class="n">add_gcc_o</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">))</span>
+            <span class="k">return</span>
+
+        <span class="c1"># -Ostr</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">O_pat</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+            <span class="n">add_gcc_o</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+            <span class="k">return</span>
+
+        <span class="c1"># -falign-str=</span>
+        <span class="c1"># These have quite complicated semantics</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">flag_align_eq_pat</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">add_gcc_flag_align</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># -fflag</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">flag_pat</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">add_gcc_flag</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># -fflag=[a|b]</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">flag_enum_pat</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">)</span>
+            <span class="n">add_gcc_flag_enum</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># -fflag=&lt;min,max&gt;</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">flag_interval_pat</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="nb">min</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+            <span class="nb">max</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+            <span class="n">add_gcc_flag_int</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># -fflag=&lt;number&gt;</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">flag_number_pat</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="nb">min</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="nb">max</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">&lt;&lt;</span> <span class="mi">31</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="n">add_gcc_flag_int</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Unknown GCC optimization flag spec, &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+
+    <span class="c1"># Parse all the lines</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+        <span class="n">parse_line</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+    <span class="c1"># Sort and return</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">options</span><span class="o">.</span><span class="n">items</span><span class="p">()))))</span>
+
+
+<span class="k">def</span> <span class="nf">_gcc_parse_params</span><span class="p">(</span><span class="n">gcc</span><span class="p">:</span> <span class="n">Gcc</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Option</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Parse the param help string from the GCC binary to find options.&quot;&quot;&quot;</span>
+
+    <span class="c1"># Pretty much identical to _gcc_parse_optimize</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Parsing GCC param space&quot;</span><span class="p">)</span>
+
+    <span class="n">result</span> <span class="o">=</span> <span class="n">gcc</span><span class="p">(</span><span class="s2">&quot;--help=param&quot;</span><span class="p">,</span> <span class="s2">&quot;-Q&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+    <span class="n">out</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
+
+    <span class="n">param_enum_pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;--param=([-a-zA-Z0-9]+)=</span><span class="se">\\</span><span class="s2">[([-A-Za-z_</span><span class="se">\\</span><span class="s2">|]+)</span><span class="se">\\</span><span class="s2">]&quot;</span><span class="p">)</span>
+    <span class="n">param_interval_pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;--param=([-a-zA-Z0-9]+)=&lt;(-?[0-9]+),([0-9]+)&gt;&quot;</span><span class="p">)</span>
+    <span class="n">param_number_pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="s2">&quot;--param=([-a-zA-Z0-9]+)=&quot;</span><span class="p">)</span>
+    <span class="n">param_old_interval_pat</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span>
+        <span class="s2">&quot;([-a-zA-Z0-9]+)</span><span class="se">\\</span><span class="s2">s+default</span><span class="se">\\</span><span class="s2">s+(-?</span><span class="se">\\</span><span class="s2">d+)</span><span class="se">\\</span><span class="s2">s+minimum</span><span class="se">\\</span><span class="s2">s+(-?</span><span class="se">\\</span><span class="s2">d+)</span><span class="se">\\</span><span class="s2">s+maximum</span><span class="se">\\</span><span class="s2">s+(-?</span><span class="se">\\</span><span class="s2">d+)&quot;</span>
+    <span class="p">)</span>
+
+    <span class="n">params</span> <span class="o">=</span> <span class="p">{}</span>
+
+    <span class="k">def</span> <span class="nf">add_gcc_param_enum</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">values</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]):</span>
+        <span class="c1"># Enum param.</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">opt</span>
+        <span class="n">params</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">GccParamEnumOption</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">add_gcc_param_int</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">min</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">max</span><span class="p">:</span> <span class="nb">int</span><span class="p">):</span>
+        <span class="c1"># Int flag.</span>
+        <span class="n">opt</span> <span class="o">=</span> <span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+        <span class="k">assert</span> <span class="ow">not</span> <span class="n">opt</span>
+        <span class="n">params</span><span class="p">[</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">GccParamIntOption</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">is_int</span><span class="p">(</span><span class="n">s</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="nb">int</span><span class="p">(</span><span class="n">s</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">True</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="k">def</span> <span class="nf">parse_line</span><span class="p">(</span><span class="n">line</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+        <span class="n">bits</span> <span class="o">=</span> <span class="n">line</span><span class="o">.</span><span class="n">split</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">bits</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="c1"># TODO(hugh): Not sure what the correct behavior is there.</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bits</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="k">return</span>
+
+        <span class="n">spec</span> <span class="o">=</span> <span class="n">bits</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="n">default</span> <span class="o">=</span> <span class="n">bits</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
+
+        <span class="c1"># --param=name=[a|b]</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">param_enum_pat</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">values</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">)</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;|&quot;</span><span class="p">)</span>
+            <span class="k">assert</span> <span class="ow">not</span> <span class="n">default</span> <span class="ow">or</span> <span class="n">default</span> <span class="ow">in</span> <span class="n">values</span>
+            <span class="n">add_gcc_param_enum</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+            <span class="k">return</span>
+
+        <span class="c1"># --param=name=&lt;min,max&gt;</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">param_interval_pat</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="nb">min</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+            <span class="nb">max</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+            <span class="k">if</span> <span class="n">is_int</span><span class="p">(</span><span class="n">default</span><span class="p">):</span>
+                <span class="k">assert</span> <span class="ow">not</span> <span class="n">default</span> <span class="ow">or</span> <span class="nb">min</span> <span class="o">&lt;=</span> <span class="nb">int</span><span class="p">(</span><span class="n">default</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">max</span>
+                <span class="n">add_gcc_param_int</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span>
+                <span class="k">return</span>
+
+        <span class="c1"># --param=name=</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">param_number_pat</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">spec</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="nb">min</span> <span class="o">=</span> <span class="mi">0</span>
+            <span class="nb">max</span> <span class="o">=</span> <span class="mi">2</span> <span class="o">&lt;&lt;</span> <span class="mi">31</span> <span class="o">-</span> <span class="mi">1</span>
+            <span class="k">if</span> <span class="n">is_int</span><span class="p">(</span><span class="n">default</span><span class="p">):</span>
+                <span class="n">dflt</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">default</span><span class="p">)</span>
+                <span class="nb">min</span> <span class="o">=</span> <span class="nb">min</span> <span class="k">if</span> <span class="n">dflt</span> <span class="o">&gt;=</span> <span class="nb">min</span> <span class="k">else</span> <span class="n">dflt</span>
+                <span class="n">add_gcc_param_int</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span>
+                <span class="k">return</span>
+
+        <span class="c1"># name  default num minimum num maximum num</span>
+        <span class="n">m</span> <span class="o">=</span> <span class="n">param_old_interval_pat</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">m</span><span class="p">:</span>
+            <span class="n">name</span> <span class="o">=</span> <span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span>
+            <span class="n">default</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">2</span><span class="p">))</span>
+            <span class="nb">min</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">3</span><span class="p">))</span>
+            <span class="nb">max</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">m</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">4</span><span class="p">))</span>
+            <span class="k">if</span> <span class="nb">min</span> <span class="o">&lt;=</span> <span class="n">default</span> <span class="o">&lt;=</span> <span class="nb">max</span><span class="p">:</span>
+                <span class="c1"># For now we will only consider fully described params</span>
+                <span class="n">add_gcc_param_int</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span>
+                <span class="k">return</span>
+
+        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Unknown GCC param flag spec, &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+
+    <span class="c1"># breakpoint()</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
+        <span class="n">parse_line</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
+
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="n">x</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="nb">sorted</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="n">params</span><span class="o">.</span><span class="n">items</span><span class="p">()))))</span>
+
+
+<span class="k">def</span> <span class="nf">_fix_options</span><span class="p">(</span><span class="n">options</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Option</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Option</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Fixes for things that seem not to be true in the help.&quot;&quot;&quot;</span>
+
+    <span class="k">def</span> <span class="nf">keep</span><span class="p">(</span><span class="n">option</span><span class="p">:</span> <span class="n">Option</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="c1"># Ignore -flive-patching</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">option</span><span class="p">,</span> <span class="n">GccFlagEnumOption</span><span class="p">):</span>
+            <span class="k">if</span> <span class="n">option</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;live-patching&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="n">options</span> <span class="o">=</span> <span class="p">[</span><span class="n">opt</span> <span class="k">for</span> <span class="n">opt</span> <span class="ow">in</span> <span class="n">options</span> <span class="k">if</span> <span class="n">keep</span><span class="p">(</span><span class="n">opt</span><span class="p">)]</span>
+
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">option</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">options</span><span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">option</span><span class="p">,</span> <span class="n">GccParamIntOption</span><span class="p">):</span>
+            <span class="c1"># Some things say they can have -1, but can&#39;t</span>
+            <span class="k">if</span> <span class="n">option</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="s2">&quot;logical-op-non-short-circuit&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;prefetch-minimum-stride&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;sched-autopref-queue-depth&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;vect-max-peeling-for-alignment&quot;</span><span class="p">,</span>
+            <span class="p">]:</span>
+                <span class="n">option</span><span class="o">.</span><span class="n">min</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">option</span><span class="p">,</span> <span class="n">GccFlagOption</span><span class="p">):</span>
+            <span class="c1"># -fhandle-exceptions renamed to -fexceptions</span>
+            <span class="k">if</span> <span class="n">option</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;handle-exceptions&quot;</span><span class="p">:</span>
+                <span class="n">option</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;exceptions&quot;</span>
+
+            <span class="c1"># Some flags have no -fno- version</span>
+            <span class="k">if</span> <span class="n">option</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="p">[</span>
+                <span class="s2">&quot;stack-protector-all&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;stack-protector-explicit&quot;</span><span class="p">,</span>
+                <span class="s2">&quot;stack-protector-strong&quot;</span><span class="p">,</span>
+            <span class="p">]:</span>
+                <span class="n">option</span><span class="o">.</span><span class="n">no_fno</span> <span class="o">=</span> <span class="kc">True</span>
+
+            <span class="c1"># -fno-threadsafe-statics should have the no- removed</span>
+            <span class="k">if</span> <span class="n">option</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;no-threadsafe-statics&quot;</span><span class="p">:</span>
+                <span class="n">option</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="s2">&quot;threadsafe-statics&quot;</span>
+
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">option</span><span class="p">,</span> <span class="n">GccFlagIntOption</span><span class="p">):</span>
+            <span class="c1"># -fpack-struct has to be a small positive power of two</span>
+            <span class="k">if</span> <span class="n">option</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;pack-struct&quot;</span><span class="p">:</span>
+                <span class="n">values</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="mi">1</span> <span class="o">&lt;&lt;</span> <span class="n">j</span><span class="p">)</span> <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">5</span><span class="p">)]</span>
+                <span class="n">options</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">GccFlagEnumOption</span><span class="p">(</span><span class="s2">&quot;pack-struct&quot;</span><span class="p">,</span> <span class="n">values</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">options</span>
+
+
+<span class="k">def</span> <span class="nf">_gcc_get_version</span><span class="p">(</span><span class="n">gcc</span><span class="p">:</span> <span class="n">Gcc</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Get the version string&quot;&quot;&quot;</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Getting GCC version for </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">gcc</span><span class="o">.</span><span class="n">bin</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">gcc</span><span class="p">(</span><span class="s2">&quot;--version&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
+    <span class="k">except</span> <span class="n">ServiceError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">EnvironmentNotSupported</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to run GCC binary: </span><span class="si">{</span><span class="n">gcc</span><span class="o">.</span><span class="n">bin</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+    <span class="n">version</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;GCC version is </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+    <span class="k">if</span> <span class="s2">&quot;gcc&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">version</span><span class="p">:</span>
+        <span class="k">raise</span> <span class="n">ServiceInitError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid GCC version string: </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">version</span>
+
+
+<span class="k">def</span> <span class="nf">_version_hash</span><span class="p">(</span><span class="n">version</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Hash the version so we can cache the spec at that name.&quot;&quot;&quot;</span>
+    <span class="n">h</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">version</span><span class="p">:</span>
+        <span class="n">h</span> <span class="o">=</span> <span class="nb">ord</span><span class="p">(</span><span class="n">c</span><span class="p">)</span> <span class="o">+</span> <span class="mi">31</span> <span class="o">*</span> <span class="n">h</span>
+    <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">h</span> <span class="o">%</span> <span class="p">(</span><span class="mi">2</span> <span class="o">&lt;&lt;</span> <span class="mi">64</span><span class="p">))</span>
+
+
+<span class="k">def</span> <span class="nf">_get_spec</span><span class="p">(</span><span class="n">gcc</span><span class="p">:</span> <span class="n">Gcc</span><span class="p">,</span> <span class="n">cache_dir</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GccSpec</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Get the specification for a GCC executable.</span>
+
+<span class="sd">    :param gcc: The executable.</span>
+
+<span class="sd">    :param cache_dir: An optional directory to search for cached versions of the</span>
+<span class="sd">        spec.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Get the version</span>
+    <span class="n">version</span> <span class="o">=</span> <span class="n">_gcc_get_version</span><span class="p">(</span><span class="n">gcc</span><span class="p">)</span>
+
+    <span class="n">spec</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># See if there is a pickled spec in the cache_dir. First we use a hash to</span>
+    <span class="c1"># name the file.</span>
+    <span class="n">spec_path</span> <span class="o">=</span> <span class="n">cache_dir</span> <span class="o">/</span> <span class="n">_version_hash</span><span class="p">(</span><span class="n">version</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;spec.pkl&quot;</span>
+
+    <span class="c1"># Try to get the pickled version</span>
+    <span class="k">if</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">isfile</span><span class="p">(</span><span class="n">spec_path</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">spec_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">spec</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+            <span class="n">spec</span> <span class="o">=</span> <span class="n">GccSpec</span><span class="p">(</span><span class="n">gcc</span><span class="o">=</span><span class="n">gcc</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">version</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;GccSpec for version &#39;</span><span class="si">%s</span><span class="s2">&#39; read from </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">spec_path</span><span class="p">)</span>
+        <span class="k">except</span> <span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">UnpicklingError</span><span class="p">,</span> <span class="ne">EOFError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Unable to read spec from &#39;</span><span class="si">%s</span><span class="s2">&#39;: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">spec_path</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">spec</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="c1"># Pickle doesn&#39;t exist, parse</span>
+        <span class="n">optim_opts</span> <span class="o">=</span> <span class="n">_gcc_parse_optimize</span><span class="p">(</span><span class="n">gcc</span><span class="p">)</span>
+        <span class="n">param_opts</span> <span class="o">=</span> <span class="n">_gcc_parse_params</span><span class="p">(</span><span class="n">gcc</span><span class="p">)</span>
+        <span class="n">options</span> <span class="o">=</span> <span class="n">_fix_options</span><span class="p">(</span><span class="n">optim_opts</span> <span class="o">+</span> <span class="n">param_opts</span><span class="p">)</span>
+        <span class="n">spec</span> <span class="o">=</span> <span class="n">GccSpec</span><span class="p">(</span><span class="n">gcc</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">options</span><span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">spec</span><span class="o">.</span><span class="n">options</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># Cache the spec file for future.</span>
+        <span class="n">spec_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">with</span> <span class="n">atomic_file_write</span><span class="p">(</span><span class="n">spec_path</span><span class="p">,</span> <span class="n">fileobj</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+            <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
+        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;GccSpec for </span><span class="si">%s</span><span class="s2"> written to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">spec_path</span><span class="p">)</span>
+
+    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;GccSpec size is approximately 10^</span><span class="si">%.0f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">size</span><span class="p">)))</span>
+
+    <span class="k">return</span> <span class="n">spec</span>
+</pre></div>
+
+           </div>
+           
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright Facebook AI Research.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    <!-- Theme Analytics -->
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'G-T95G5EVYXM', 'auto');
+    
+    ga('send', 'pageview');
+    </script>
+
+    
+   
+
+</body>
+</html>

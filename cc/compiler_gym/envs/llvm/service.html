@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym/envs/llvm/service &mdash; CompilerGym 0.1.10 documentation</title>
+  <title>compiler_gym/envs/llvm/service &mdash; CompilerGym 0.2.0 documentation</title>
   
 
   
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                0.1.10
+                0.2.0
               </div>
             
           
@@ -106,12 +106,15 @@
 <p class="caption"><span class="caption-text">Environments</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../llvm/index.html">LLVM Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../envs/gcc.html">GCC Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/envs/gcc.html">compiler_gym.envs.gcc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/service.html">compiler_gym.service</a></li>
@@ -127,6 +130,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#benchmarkfactory-h">BenchmarkFactory.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#cost-h">Cost.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#llvmsession-h">LlvmSession.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#observation-h">Observation.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#observationspaces-h">ObservationSpaces.h</a></li>
 </ul>
 </li>
@@ -213,7 +217,8 @@ CompilerGym. The base session is implemented by a
 <li><p><a class="reference internal" href="#benchmarkfactory-h" id="id3">BenchmarkFactory.h</a></p></li>
 <li><p><a class="reference internal" href="#cost-h" id="id4">Cost.h</a></p></li>
 <li><p><a class="reference internal" href="#llvmsession-h" id="id5">LlvmSession.h</a></p></li>
-<li><p><a class="reference internal" href="#observationspaces-h" id="id6">ObservationSpaces.h</a></p></li>
+<li><p><a class="reference internal" href="#observation-h" id="id6">Observation.h</a></p></li>
+<li><p><a class="reference internal" href="#observationspaces-h" id="id7">ObservationSpaces.h</a></p></li>
 </ul>
 </div>
 <div class="section" id="actionspace-h">
@@ -300,6 +305,23 @@ CompilerGym. The base session is implemented by a
 </dd></dl>
 
 <dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service16writeBitcodeFileERKN4llvm6ModuleERKN5boost10filesystem4pathE">
+<span id="_CPPv3N12compiler_gym12llvm_service16writeBitcodeFileERKN4llvm6ModuleERKN5boost10filesystem4pathE"></span><span id="_CPPv2N12compiler_gym12llvm_service16writeBitcodeFileERKN4llvm6ModuleERKN5boost10filesystem4pathE"></span><span id="compiler_gym::llvm_service::writeBitcodeFile__llvm::ModuleCR.boost::filesystem::pathCR"></span><span class="target" id="namespacecompiler__gym_1_1llvm__service_1ad0d4b69216a72bacf430afc5688f4899"></span><span class="n"><span class="pre">grpc</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Status</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">writeBitcodeFile</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">llvm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Module</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">module</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">boost</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">filesystem</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">path</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">path</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service16writeBitcodeFileERKN4llvm6ModuleERKN5boost10filesystem4pathE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Write the module bitcode to the given path. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>module</strong> – The module to write to file. </p></li>
+<li><p><strong>path</strong> – The path of the bitcode file to write. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">OK</span></code> on success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service10makeModuleERN4llvm11LLVMContextERK7BitcodeRKNSt6stringEPN4grpc6StatusE">
 <span id="_CPPv3N12compiler_gym12llvm_service10makeModuleERN4llvm11LLVMContextERK7BitcodeRKNSt6stringEPN4grpc6StatusE"></span><span id="_CPPv2N12compiler_gym12llvm_service10makeModuleERN4llvm11LLVMContextERK7BitcodeRKNSt6stringEPN4grpc6StatusE"></span><span id="compiler_gym::llvm_service::makeModule__llvm::LLVMContextR.BitcodeCR.ssCR.grpc::StatusP"></span><span class="target" id="namespacecompiler__gym_1_1llvm__service_1a15f1cb65ddc3e38432fc7ce814fad6d7"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unique_ptr</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">llvm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Module</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">makeModule</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">llvm</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">LLVMContext</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">context</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service7BitcodeE" title="compiler_gym::llvm_service::Bitcode"><span class="n"><span class="pre">Bitcode</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">bitcode</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">name</span></span>, <span class="n"><span class="pre">grpc</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Status</span></span><span class="w"> </span><span class="p"><span class="pre">*</span></span><span class="n sig-param"><span class="pre">status</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service10makeModuleERN4llvm11LLVMContextERK7BitcodeRKNSt6stringEPN4grpc6StatusE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Construct an LLVM module from a bitcode. </p>
@@ -330,6 +352,13 @@ CompilerGym. The base session is implemented by a
 </dd></dl>
 
 <dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service44kDefaultWarmupRunsPerRuntimeObservationCountE">
+<span id="_CPPv3N12compiler_gym12llvm_service44kDefaultWarmupRunsPerRuntimeObservationCountE"></span><span id="_CPPv2N12compiler_gym12llvm_service44kDefaultWarmupRunsPerRuntimeObservationCountE"></span><span id="compiler_gym::llvm_service::kDefaultWarmupRunsPerRuntimeObservationCount__i"></span><span class="target" id="namespacecompiler__gym_1_1llvm__service_1a19924686032396d6dd8f0dfd38c988f5"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kDefaultWarmupRunsPerRuntimeObservationCount</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">5</span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service44kDefaultWarmupRunsPerRuntimeObservationCountE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The default number of warmup runs that a benchmark is executed before measuring the runtimes. </p>
+<p>This can be overriden using the “llvm.set_warmup_runs_count_per_runtime_observation” session parameter. </p>
+</dd></dl>
+
+<dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service37kDefaultBuildtimesPerObservationCountE">
 <span id="_CPPv3N12compiler_gym12llvm_service37kDefaultBuildtimesPerObservationCountE"></span><span id="_CPPv2N12compiler_gym12llvm_service37kDefaultBuildtimesPerObservationCountE"></span><span id="compiler_gym::llvm_service::kDefaultBuildtimesPerObservationCount__i"></span><span class="target" id="namespacecompiler__gym_1_1llvm__service_1a6b7ee1cc31c5d0e713a7ed1ff54f7be3"></span><span class="k"><span class="pre">constexpr</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">kDefaultBuildtimesPerObservationCount</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service37kDefaultBuildtimesPerObservationCountE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>The number of times a benchmark is built. </p>
@@ -337,6 +366,83 @@ CompilerGym. The base session is implemented by a
 </dd></dl>
 
 </div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfigE">
+<span id="_CPPv3N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfigE"></span><span id="_CPPv2N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfigE"></span><span id="compiler_gym::llvm_service::RealizedBenchmarkDynamicConfig"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_realized_benchmark_dynamic_config"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RealizedBenchmarkDynamicConfig</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfigE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;Benchmark.h&gt;</em><p>Represents a BenchmarkDynamicConfig protocol buffer. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig30RealizedBenchmarkDynamicConfigERK22BenchmarkDynamicConfig">
+<span id="_CPPv3N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig30RealizedBenchmarkDynamicConfigERK22BenchmarkDynamicConfig"></span><span id="_CPPv2N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig30RealizedBenchmarkDynamicConfigERK22BenchmarkDynamicConfig"></span><span id="compiler_gym::llvm_service::RealizedBenchmarkDynamicConfig::RealizedBenchmarkDynamicConfig__BenchmarkDynamicConfigCR"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_realized_benchmark_dynamic_config_1ad6d5bbf6f453ad5b4a6d1a10f69f7702"></span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">RealizedBenchmarkDynamicConfig</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">BenchmarkDynamicConfig</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">cfg</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig30RealizedBenchmarkDynamicConfigERK22BenchmarkDynamicConfig" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig12buildCommandEv">
+<span id="_CPPv3NK12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig12buildCommandEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig12buildCommandEv"></span><span id="compiler_gym::llvm_service::RealizedBenchmarkDynamicConfig::buildCommandC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_realized_benchmark_dynamic_config_1a91f9697f663a2d331136390a95571273"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../util.html#_CPPv4N12compiler_gym4utilE" title="compiler_gym::util"><span class="n"><span class="pre">util</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../util.html#_CPPv4N12compiler_gym4util17LocalShellCommandE" title="compiler_gym::util::LocalShellCommand"><span class="n"><span class="pre">LocalShellCommand</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">buildCommand</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig12buildCommandEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig10runCommandEv">
+<span id="_CPPv3NK12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig10runCommandEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig10runCommandEv"></span><span id="compiler_gym::llvm_service::RealizedBenchmarkDynamicConfig::runCommandC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_realized_benchmark_dynamic_config_1a8986ee821c004e8652eb75e3a05a0b8a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../util.html#_CPPv4N12compiler_gym4utilE" title="compiler_gym::util"><span class="n"><span class="pre">util</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../util.html#_CPPv4N12compiler_gym4util17LocalShellCommandE" title="compiler_gym::util::LocalShellCommand"><span class="n"><span class="pre">LocalShellCommand</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">runCommand</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig10runCommandEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig14preRunCommandsEv">
+<span id="_CPPv3NK12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig14preRunCommandsEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig14preRunCommandsEv"></span><span id="compiler_gym::llvm_service::RealizedBenchmarkDynamicConfig::preRunCommandsC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_realized_benchmark_dynamic_config_1a38fa005cab4f13a8e4a19cd05a20a4b6"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../util.html#_CPPv4N12compiler_gym4utilE" title="compiler_gym::util"><span class="n"><span class="pre">util</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../util.html#_CPPv4N12compiler_gym4util17LocalShellCommandE" title="compiler_gym::util::LocalShellCommand"><span class="n"><span class="pre">LocalShellCommand</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">preRunCommands</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig14preRunCommandsEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig15postRunCommandsEv">
+<span id="_CPPv3NK12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig15postRunCommandsEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig15postRunCommandsEv"></span><span id="compiler_gym::llvm_service::RealizedBenchmarkDynamicConfig::postRunCommandsC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_realized_benchmark_dynamic_config_1a96507883b765eda9dd12465bdfac4c7f"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../util.html#_CPPv4N12compiler_gym4utilE" title="compiler_gym::util"><span class="n"><span class="pre">util</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../util.html#_CPPv4N12compiler_gym4util17LocalShellCommandE" title="compiler_gym::util::LocalShellCommand"><span class="n"><span class="pre">LocalShellCommand</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">postRunCommands</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig15postRunCommandsEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig11isBuildableEv">
+<span id="_CPPv3NK12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig11isBuildableEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig11isBuildableEv"></span><span id="compiler_gym::llvm_service::RealizedBenchmarkDynamicConfig::isBuildableC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_realized_benchmark_dynamic_config_1a8457766643021e2741d1ccaa75756a95"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isBuildable</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig11isBuildableEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig10isRunnableEv">
+<span id="_CPPv3NK12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig10isRunnableEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig10isRunnableEv"></span><span id="compiler_gym::llvm_service::RealizedBenchmarkDynamicConfig::isRunnableC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_realized_benchmark_dynamic_config_1a674d25774a5ccbaafa3870b30405b158"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isRunnable</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig10isRunnableEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig13buildCommand_E">
+<span id="_CPPv3N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig13buildCommand_E"></span><span id="_CPPv2N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig13buildCommand_E"></span><span id="compiler_gym::llvm_service::RealizedBenchmarkDynamicConfig::buildCommand___util::LocalShellCommandC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_realized_benchmark_dynamic_config_1af5afdabf26901fea0aecb40206376cfc"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../util.html#_CPPv4N12compiler_gym4utilE" title="compiler_gym::util"><span class="n"><span class="pre">util</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../util.html#_CPPv4N12compiler_gym4util17LocalShellCommandE" title="compiler_gym::util::LocalShellCommand"><span class="n"><span class="pre">LocalShellCommand</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">buildCommand_</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig13buildCommand_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig11runCommand_E">
+<span id="_CPPv3N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig11runCommand_E"></span><span id="_CPPv2N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig11runCommand_E"></span><span id="compiler_gym::llvm_service::RealizedBenchmarkDynamicConfig::runCommand___util::LocalShellCommandC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_realized_benchmark_dynamic_config_1aff91ae67cae6d13774eae494dfbf08a2"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../util.html#_CPPv4N12compiler_gym4utilE" title="compiler_gym::util"><span class="n"><span class="pre">util</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../util.html#_CPPv4N12compiler_gym4util17LocalShellCommandE" title="compiler_gym::util::LocalShellCommand"><span class="n"><span class="pre">LocalShellCommand</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">runCommand_</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig11runCommand_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig15preRunCommands_E">
+<span id="_CPPv3N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig15preRunCommands_E"></span><span id="_CPPv2N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig15preRunCommands_E"></span><span id="compiler_gym::llvm_service::RealizedBenchmarkDynamicConfig::preRunCommands___std::vector:util::LocalShellCommand:C"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_realized_benchmark_dynamic_config_1a6cbbcdcd7f55b7a60c557bdc44f52598"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../util.html#_CPPv4N12compiler_gym4utilE" title="compiler_gym::util"><span class="n"><span class="pre">util</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../util.html#_CPPv4N12compiler_gym4util17LocalShellCommandE" title="compiler_gym::util::LocalShellCommand"><span class="n"><span class="pre">LocalShellCommand</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">preRunCommands_</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig15preRunCommands_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig16postRunCommands_E">
+<span id="_CPPv3N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig16postRunCommands_E"></span><span id="_CPPv2N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig16postRunCommands_E"></span><span id="compiler_gym::llvm_service::RealizedBenchmarkDynamicConfig::postRunCommands___std::vector:util::LocalShellCommand:C"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_realized_benchmark_dynamic_config_1a2c19d74578449e20f8c4eadd477c0bf8"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="../../util.html#_CPPv4N12compiler_gym4utilE" title="compiler_gym::util"><span class="n"><span class="pre">util</span></span></a><span class="p"><span class="pre">::</span></span><a class="reference internal" href="../../util.html#_CPPv4N12compiler_gym4util17LocalShellCommandE" title="compiler_gym::util::LocalShellCommand"><span class="n"><span class="pre">LocalShellCommand</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">postRunCommands_</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig16postRunCommands_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig12isBuildable_E">
+<span id="_CPPv3N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig12isBuildable_E"></span><span id="_CPPv2N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig12isBuildable_E"></span><span id="compiler_gym::llvm_service::RealizedBenchmarkDynamicConfig::isBuildable___bC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_realized_benchmark_dynamic_config_1a64b523d1ea4fd3f610085309fc1b85a1"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isBuildable_</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig12isBuildable_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig11isRunnable_E">
+<span id="_CPPv3N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig11isRunnable_E"></span><span id="_CPPv2N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig11isRunnable_E"></span><span id="compiler_gym::llvm_service::RealizedBenchmarkDynamicConfig::isRunnable___bC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_realized_benchmark_dynamic_config_1a72f490210d420de19c98b76095c96b94"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isRunnable_</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfig11isRunnable_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
 <dl class="cpp class">
 <dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service9BenchmarkE">
 <span id="_CPPv3N12compiler_gym12llvm_service9BenchmarkE"></span><span id="_CPPv2N12compiler_gym12llvm_service9BenchmarkE"></span><span id="compiler_gym::llvm_service::Benchmark"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Benchmark</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service9BenchmarkE" title="Permalink to this definition">¶</a><br /></dt>
@@ -435,16 +541,6 @@ CompilerGym. The base session is implemented by a
 </dd></dl>
 
 <dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym12llvm_service9Benchmark11isBuildableEv">
-<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark11isBuildableEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark11isBuildableEv"></span><span id="compiler_gym::llvm_service::Benchmark::isBuildableC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a588f55046c8ede564f80b259a9bbcc40"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isBuildable</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark11isBuildableEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
-<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym12llvm_service9Benchmark10isRunnableEv">
-<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark10isRunnableEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark10isRunnableEv"></span><span id="compiler_gym::llvm_service::Benchmark::isRunnableC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a1c62ec04966ab475defcaa57b871d92b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isRunnable</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark10isRunnableEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym12llvm_service9Benchmark4nameEv">
 <span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark4nameEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark4nameEv"></span><span id="compiler_gym::llvm_service::Benchmark::nameC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a340f8df0ff551b2283275344120fcaad"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark4nameEv" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>The name of the benchmark. </p>
@@ -499,9 +595,19 @@ CompilerGym. The base session is implemented by a
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym12llvm_service9Benchmark13dynamicConfigEv">
-<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark13dynamicConfigEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark13dynamicConfigEv"></span><span id="compiler_gym::llvm_service::Benchmark::dynamicConfigC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a3020723e7fdd1286e5f20c9cdb84f887"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">BenchmarkDynamicConfig</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">dynamicConfig</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark13dynamicConfigEv" title="Permalink to this definition">¶</a><br /></dt>
-<dd><p>A reference to the dynamic observations object. </p>
+<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark13dynamicConfigEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark13dynamicConfigEv"></span><span id="compiler_gym::llvm_service::Benchmark::dynamicConfigC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1ad5aff4807b7d6b58b89921c3c8d995af"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfigE" title="compiler_gym::llvm_service::RealizedBenchmarkDynamicConfig"><span class="n"><span class="pre">RealizedBenchmarkDynamicConfig</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">dynamicConfig</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark13dynamicConfigEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A reference to the dynamic configuration object. </p>
 </dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym12llvm_service9Benchmark11isBuildableEv">
+<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark11isBuildableEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark11isBuildableEv"></span><span id="compiler_gym::llvm_service::Benchmark::isBuildableC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a588f55046c8ede564f80b259a9bbcc40"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isBuildable</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark11isBuildableEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym12llvm_service9Benchmark10isRunnableEv">
+<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark10isRunnableEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark10isRunnableEv"></span><span id="compiler_gym::llvm_service::Benchmark::isRunnableC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a1c62ec04966ab475defcaa57b871d92b"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isRunnable</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark10isRunnableEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
 
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service9Benchmark13replaceModuleENSt10unique_ptrIN4llvm6ModuleEEE">
@@ -528,6 +634,16 @@ CompilerGym. The base session is implemented by a
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service9Benchmark30setRuntimesPerObservationCountEKi">
 <span id="_CPPv3N12compiler_gym12llvm_service9Benchmark30setRuntimesPerObservationCountEKi"></span><span id="_CPPv2N12compiler_gym12llvm_service9Benchmark30setRuntimesPerObservationCountEKi"></span><span id="compiler_gym::llvm_service::Benchmark::setRuntimesPerObservationCount__iC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a9cd4d8f590931cb4c8e53610627e9128"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setRuntimesPerObservationCount</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service9Benchmark30setRuntimesPerObservationCountEKi" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym12llvm_service9Benchmark39getWarmupRunsPerRuntimeObservationCountEv">
+<span id="_CPPv3NK12compiler_gym12llvm_service9Benchmark39getWarmupRunsPerRuntimeObservationCountEv"></span><span id="_CPPv2NK12compiler_gym12llvm_service9Benchmark39getWarmupRunsPerRuntimeObservationCountEv"></span><span id="compiler_gym::llvm_service::Benchmark::getWarmupRunsPerRuntimeObservationCountC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1ae506f732264be6452a1518a539e995ae"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">getWarmupRunsPerRuntimeObservationCount</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym12llvm_service9Benchmark39getWarmupRunsPerRuntimeObservationCountEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service9Benchmark39setWarmupRunsPerRuntimeObservationCountEKi">
+<span id="_CPPv3N12compiler_gym12llvm_service9Benchmark39setWarmupRunsPerRuntimeObservationCountEKi"></span><span id="_CPPv2N12compiler_gym12llvm_service9Benchmark39setWarmupRunsPerRuntimeObservationCountEKi"></span><span id="compiler_gym::llvm_service::Benchmark::setWarmupRunsPerRuntimeObservationCount__iC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1ad54e8b9bc584bdac972ec96d7e25b79a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="kt"><span class="pre">void</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setWarmupRunsPerRuntimeObservationCount</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service9Benchmark39setWarmupRunsPerRuntimeObservationCountEKi" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
@@ -567,28 +683,18 @@ CompilerGym. The base session is implemented by a
 <dd></dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service9Benchmark14dynamicConfig_E">
-<span id="_CPPv3N12compiler_gym12llvm_service9Benchmark14dynamicConfig_E"></span><span id="_CPPv2N12compiler_gym12llvm_service9Benchmark14dynamicConfig_E"></span><span id="compiler_gym::llvm_service::Benchmark::dynamicConfig___BenchmarkDynamicConfigC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a1a6c4e4be721c665e21c94cf7a97aece"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">BenchmarkDynamicConfig</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dynamicConfig_</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service9Benchmark14dynamicConfig_E" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service9Benchmark17scratchDirectory_E">
 <span id="_CPPv3N12compiler_gym12llvm_service9Benchmark17scratchDirectory_E"></span><span id="_CPPv2N12compiler_gym12llvm_service9Benchmark17scratchDirectory_E"></span><span id="compiler_gym::llvm_service::Benchmark::scratchDirectory___boost::filesystem::pathC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a48e4900d4baa1f3c923ac4113bec7486"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">boost</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">filesystem</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">path</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">scratchDirectory_</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service9Benchmark17scratchDirectory_E" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service9Benchmark9buildCmd_E">
-<span id="_CPPv3N12compiler_gym12llvm_service9Benchmark9buildCmd_E"></span><span id="_CPPv2N12compiler_gym12llvm_service9Benchmark9buildCmd_E"></span><span id="compiler_gym::llvm_service::Benchmark::buildCmd___ssC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1ae6252766a3f69be84455910ad06487bf"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">buildCmd_</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service9Benchmark9buildCmd_E" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service9Benchmark19dynamicConfigProto_E">
+<span id="_CPPv3N12compiler_gym12llvm_service9Benchmark19dynamicConfigProto_E"></span><span id="_CPPv2N12compiler_gym12llvm_service9Benchmark19dynamicConfigProto_E"></span><span id="compiler_gym::llvm_service::Benchmark::dynamicConfigProto___BenchmarkDynamicConfigC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1ac8c0cd2c8f74f9ee4142eb4235f29e09"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">BenchmarkDynamicConfig</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dynamicConfigProto_</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service9Benchmark19dynamicConfigProto_E" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service9Benchmark12isBuildable_E">
-<span id="_CPPv3N12compiler_gym12llvm_service9Benchmark12isBuildable_E"></span><span id="_CPPv2N12compiler_gym12llvm_service9Benchmark12isBuildable_E"></span><span id="compiler_gym::llvm_service::Benchmark::isBuildable___bC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a23cc0e3ed7da613c1f447fe7f2dfabc6"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isBuildable_</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service9Benchmark12isBuildable_E" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service9Benchmark11isRunnable_E">
-<span id="_CPPv3N12compiler_gym12llvm_service9Benchmark11isRunnable_E"></span><span id="_CPPv2N12compiler_gym12llvm_service9Benchmark11isRunnable_E"></span><span id="compiler_gym::llvm_service::Benchmark::isRunnable___bC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a17bf9f08970193c35bb09172dec48d65"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">isRunnable_</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service9Benchmark11isRunnable_E" title="Permalink to this definition">¶</a><br /></dt>
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service9Benchmark14dynamicConfig_E">
+<span id="_CPPv3N12compiler_gym12llvm_service9Benchmark14dynamicConfig_E"></span><span id="_CPPv2N12compiler_gym12llvm_service9Benchmark14dynamicConfig_E"></span><span id="compiler_gym::llvm_service::Benchmark::dynamicConfig___RealizedBenchmarkDynamicConfigC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1ae19a7831caf7e4ed9b373c0802091300"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service30RealizedBenchmarkDynamicConfigE" title="compiler_gym::llvm_service::RealizedBenchmarkDynamicConfig"><span class="n"><span class="pre">RealizedBenchmarkDynamicConfig</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dynamicConfig_</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service9Benchmark14dynamicConfig_E" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
@@ -616,6 +722,11 @@ CompilerGym. The base session is implemented by a
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service9Benchmark28runtimesPerObservationCount_E">
 <span id="_CPPv3N12compiler_gym12llvm_service9Benchmark28runtimesPerObservationCount_E"></span><span id="_CPPv2N12compiler_gym12llvm_service9Benchmark28runtimesPerObservationCount_E"></span><span id="compiler_gym::llvm_service::Benchmark::runtimesPerObservationCount___i"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1af2e5f8157674d56d2a8a05acf16d1cd7"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">runtimesPerObservationCount_</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service9Benchmark28runtimesPerObservationCount_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service9Benchmark37warmupRunsPerRuntimeObservationCount_E">
+<span id="_CPPv3N12compiler_gym12llvm_service9Benchmark37warmupRunsPerRuntimeObservationCount_E"></span><span id="_CPPv2N12compiler_gym12llvm_service9Benchmark37warmupRunsPerRuntimeObservationCount_E"></span><span id="compiler_gym::llvm_service::Benchmark::warmupRunsPerRuntimeObservationCount___i"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_benchmark_1a31244cc744404fdbed5e626799d9e6d9"></span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">warmupRunsPerRuntimeObservationCount_</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service9Benchmark37warmupRunsPerRuntimeObservationCount_E" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp var">
@@ -1048,7 +1159,7 @@ CompilerGym. The base session is implemented by a
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-functions">Private Functions</p>
 <dl class="cpp function">
 <dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service11LlvmSession18computeObservationE20LlvmObservationSpaceR11Observation">
-<span id="_CPPv3N12compiler_gym12llvm_service11LlvmSession18computeObservationE20LlvmObservationSpaceR11Observation"></span><span id="_CPPv2N12compiler_gym12llvm_service11LlvmSession18computeObservationE20LlvmObservationSpaceR11Observation"></span><span id="compiler_gym::llvm_service::LlvmSession::computeObservation__LlvmObservationSpace.ObservationR"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_llvm_session_1a041bce5f30483a37d00ed31dac5f5762"></span><span class="n"><span class="pre">grpc</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Status</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">computeObservation</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpaceE" title="compiler_gym::llvm_service::LlvmObservationSpace"><span class="n"><span class="pre">LlvmObservationSpace</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">observationSpace</span></span>, <span class="n"><span class="pre">Observation</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">observation</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service11LlvmSession18computeObservationE20LlvmObservationSpaceR11Observation" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N12compiler_gym12llvm_service11LlvmSession18computeObservationE20LlvmObservationSpaceR11Observation"></span><span id="_CPPv2N12compiler_gym12llvm_service11LlvmSession18computeObservationE20LlvmObservationSpaceR11Observation"></span><span id="compiler_gym::llvm_service::LlvmSession::computeObservation__LlvmObservationSpace.ObservationR"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_llvm_session_1a71c65f951eae38eac754e4b3819756a5"></span><span class="n"><span class="pre">grpc</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Status</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">computeObservation</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpaceE" title="compiler_gym::llvm_service::LlvmObservationSpace"><span class="n"><span class="pre">LlvmObservationSpace</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">observationSpace</span></span>, <span class="n"><span class="pre">Observation</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">observation</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service11LlvmSession18computeObservationE20LlvmObservationSpaceR11Observation" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
 
 <dl class="cpp function">
@@ -1126,11 +1237,6 @@ CompilerGym. The base session is implemented by a
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
 <dl class="cpp var">
-<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service11LlvmSession16programlOptions_E">
-<span id="_CPPv3N12compiler_gym12llvm_service11LlvmSession16programlOptions_E"></span><span id="_CPPv2N12compiler_gym12llvm_service11LlvmSession16programlOptions_E"></span><span id="compiler_gym::llvm_service::LlvmSession::programlOptions___programl::ProgramGraphOptionsC"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_llvm_session_1a3cfbde05ce408470ecefd404053451e7"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">programl</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">ProgramGraphOptions</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">programlOptions_</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service11LlvmSession16programlOptions_E" title="Permalink to this definition">¶</a><br /></dt>
-<dd></dd></dl>
-
-<dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service11LlvmSession22observationSpaceNames_E">
 <span id="_CPPv3N12compiler_gym12llvm_service11LlvmSession22observationSpaceNames_E"></span><span id="_CPPv2N12compiler_gym12llvm_service11LlvmSession22observationSpaceNames_E"></span><span id="compiler_gym::llvm_service::LlvmSession::observationSpaceNames___std::unordered_map:ss.LlvmObservationSpace:C"></span><span class="target" id="classcompiler__gym_1_1llvm__service_1_1_llvm_session_1a5c81064c707daa8166883d728c79008b"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">unordered_map</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpaceE" title="compiler_gym::llvm_service::LlvmObservationSpace"><span class="n"><span class="pre">LlvmObservationSpace</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">observationSpaceNames_</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service11LlvmSession22observationSpaceNames_E" title="Permalink to this definition">¶</a><br /></dt>
 <dd></dd></dl>
@@ -1158,8 +1264,44 @@ CompilerGym. The base session is implemented by a
 </dd></dl>
 
 </div>
+<div class="section" id="observation-h">
+<h2><a class="toc-backref" href="#id6">Observation.h</a><a class="headerlink" href="#observation-h" title="Permalink to this headline">¶</a></h2>
+<p><code class="code docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&quot;compiler_gym/envs/llvm/service/Observation.h&quot;</span></code></p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="namespacecompiler__gym"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">compiler_gym</span></span></span><br /></dt>
+<dd><dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="namespacecompiler__gym_1_1llvm__service"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">llvm_service</span></span></span><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym12llvm_service14setObservationE20LlvmObservationSpaceRKN5boost10filesystem4pathER9BenchmarkR11Observation">
+<span id="_CPPv3N12compiler_gym12llvm_service14setObservationE20LlvmObservationSpaceRKN5boost10filesystem4pathER9BenchmarkR11Observation"></span><span id="_CPPv2N12compiler_gym12llvm_service14setObservationE20LlvmObservationSpaceRKN5boost10filesystem4pathER9BenchmarkR11Observation"></span><span id="compiler_gym::llvm_service::setObservation__LlvmObservationSpace.boost::filesystem::pathCR.BenchmarkR.ObservationR"></span><span class="target" id="namespacecompiler__gym_1_1llvm__service_1aaf0dc08a6436665ddd9b401d4efa55f0"></span><span class="n"><span class="pre">grpc</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Status</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">setObservation</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpaceE" title="compiler_gym::llvm_service::LlvmObservationSpace"><span class="n"><span class="pre">LlvmObservationSpace</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">space</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">boost</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">filesystem</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">path</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">workingDirectory</span></span>, <a class="reference internal" href="#_CPPv4N12compiler_gym12llvm_service9BenchmarkE" title="compiler_gym::llvm_service::Benchmark"><span class="n"><span class="pre">Benchmark</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">benchmark</span></span>, <span class="n"><span class="pre">Observation</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">reply</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym12llvm_service14setObservationE20LlvmObservationSpaceRKN5boost10filesystem4pathER9BenchmarkR11Observation" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Compute an observation using the given space. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>space</strong> – The observation space to compute. </p></li>
+<li><p><strong>workingDirectory</strong> – A scratch directory. </p></li>
+<li><p><strong>benchmark</strong> – The benchmark to compute the observation on. </p></li>
+<li><p><strong>reply</strong> – The observation to set. </p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">OK</span></code> on success. </p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="observationspaces-h">
-<h2><a class="toc-backref" href="#id6">ObservationSpaces.h</a><a class="headerlink" href="#observationspaces-h" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id7">ObservationSpaces.h</a><a class="headerlink" href="#observationspaces-h" title="Permalink to this headline">¶</a></h2>
 <p><code class="code docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&quot;compiler_gym/envs/llvm/service/ObservationSpaces.h&quot;</span></code></p>
 <dl class="cpp type">
 <dt class="sig sig-object cpp">

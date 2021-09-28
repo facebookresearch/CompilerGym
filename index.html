@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Indices and tables &mdash; CompilerGym 0.1.10 documentation</title>
+  <title>Indices and tables &mdash; CompilerGym 0.2.0 documentation</title>
   
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.1.10
+                0.2.0
               </div>
             
           
@@ -105,12 +105,15 @@
 <p class="caption"><span class="caption-text">Environments</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="envs/gcc.html">GCC Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="envs/loop_tool.html">loop_tool Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/datasets.html">compiler_gym.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/envs/gcc.html">compiler_gym.envs.gcc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/service.html">compiler_gym.service</a></li>
@@ -210,10 +213,26 @@ for applying reinforcement learning to compiler optimizations.</p>
 <p class="caption"><span class="caption-text">Environments</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="llvm/index.html">LLVM Environment Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="llvm/index.html#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="llvm/index.html#datasets">Datasets</a></li>
 <li class="toctree-l2"><a class="reference internal" href="llvm/index.html#observation-spaces">Observation Spaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="llvm/index.html#reward-spaces">Reward Spaces</a></li>
 <li class="toctree-l2"><a class="reference internal" href="llvm/index.html#action-space">Action Space</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="envs/gcc.html">GCC Environment Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="envs/gcc.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="envs/gcc.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="envs/gcc.html#observation-spaces">Observation Spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="envs/gcc.html#reward-spaces">Reward Spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="envs/gcc.html#action-space">Action Space</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="envs/loop_tool.html">loop_tool Environment Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="envs/loop_tool.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="envs/loop_tool.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="envs/loop_tool.html#observation-spaces">Observation Spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="envs/loop_tool.html#action-spaces">Action Spaces</a></li>
 </ul>
 </li>
 </ul>
@@ -240,11 +259,18 @@ for applying reinforcement learning to compiler optimizations.</p>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/envs.html">compiler_gym.envs</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="compiler_gym/envs.html#compilerenv">CompilerEnv</a></li>
 <li class="toctree-l2"><a class="reference internal" href="compiler_gym/envs.html#llvmenv">LlvmEnv</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/envs.html#gccenv">GccEnv</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/envs/gcc.html">compiler_gym.envs.gcc</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/envs/gcc.html#compiler-description">Compiler Description</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compiler_gym/envs/gcc.html#datasets">Datasets</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="llvm/api.html">compiler_gym.envs.llvm</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="llvm/api.html#constructing-benchmarks">Constructing Benchmarks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="llvm/api.html#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="llvm/api.html#miscellaneous">Miscellaneous</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/leaderboard.html">compiler_gym.leaderboard</a><ul>
@@ -288,6 +314,7 @@ for applying reinforcement learning to compiler optimizations.</p>
 <li class="toctree-l2"><a class="reference internal" href="cc/compiler_gym/envs/llvm/service.html#benchmarkfactory-h">BenchmarkFactory.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cc/compiler_gym/envs/llvm/service.html#cost-h">Cost.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cc/compiler_gym/envs/llvm/service.html#llvmsession-h">LlvmSession.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cc/compiler_gym/envs/llvm/service.html#observation-h">Observation.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cc/compiler_gym/envs/llvm/service.html#observationspaces-h">ObservationSpaces.h</a></li>
 </ul>
 </li>
@@ -304,6 +331,7 @@ for applying reinforcement learning to compiler optimizations.</p>
 <li class="toctree-l2"><a class="reference internal" href="cc/compiler_gym/util.html#grpcstatusmacros-h">GrpcStatusMacros.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cc/compiler_gym/util.html#runfilespath-h">RunfilesPath.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cc/compiler_gym/util.html#strlenconstexpr-h">StrLenConstexpr.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="cc/compiler_gym/util.html#subprocess-h">Subprocess.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="cc/compiler_gym/util.html#unreachable-h">Unreachable.h</a></li>
 </ul>
 </li>

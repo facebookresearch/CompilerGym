@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.envs &mdash; CompilerGym 0.1.10 documentation</title>
+  <title>compiler_gym.envs &mdash; CompilerGym 0.2.0 documentation</title>
   
 
   
@@ -43,7 +43,7 @@
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="compiler_gym.envs.llvm" href="../llvm/api.html" />
+    <link rel="next" title="compiler_gym.envs.gcc" href="envs/gcc.html" />
     <link rel="prev" title="compiler_gym.datasets" href="datasets.html" /> 
 </head>
 
@@ -68,7 +68,7 @@
             
             
               <div class="version">
-                0.1.10
+                0.2.0
               </div>
             
           
@@ -106,6 +106,8 @@
 <p class="caption"><span class="caption-text">Environments</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../llvm/index.html">LLVM Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../envs/gcc.html">GCC Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../envs/loop_tool.html">loop_tool Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul class="current">
@@ -114,8 +116,10 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">compiler_gym.envs</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#compilerenv">CompilerEnv</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#llvmenv">LlvmEnv</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#gccenv">GccEnv</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="envs/gcc.html">compiler_gym.envs.gcc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="service.html">compiler_gym.service</a></li>
@@ -209,6 +213,7 @@ environment classes are available:</p>
 <ul class="simple">
 <li><p><a class="reference internal" href="#compilerenv" id="id6">CompilerEnv</a></p></li>
 <li><p><a class="reference internal" href="#llvmenv" id="id7">LlvmEnv</a></p></li>
+<li><p><a class="reference internal" href="#gccenv" id="id8">GccEnv</a></p></li>
 </ul>
 </div>
 <div class="section" id="compilerenv">
@@ -256,6 +261,8 @@ regular <code class="code docutils literal notranslate"><span class="pre">gym.En
 <li><p><strong>logger</strong> (<em>logging.Logger</em>) – A Logger instance used by the environment for communicating
 info and warnings.</p></li>
 <li><p><strong>action_spaces</strong> (<em>List</em><em>[</em><em>str</em><em>]</em>) – A list of supported action space names.</p></li>
+<li><p><strong>actions</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>) – The list of actions that have been performed since the
+previous call to <a class="reference internal" href="#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-func docutils literal notranslate"><span class="pre">reset()</span></code></a>.</p></li>
 <li><p><strong>reward_range</strong> (<em>Tuple</em><em>[</em><em>float</em><em>, </em><em>float</em><em>]</em>) – A tuple indicating the range of reward values. Default
 range is (-inf, +inf).</p></li>
 <li><p><strong>observation</strong> (<a class="reference internal" href="views.html#compiler_gym.views.ObservationView" title="compiler_gym.views.ObservationView"><em>compiler_gym.views.ObservationView</em></a>) – A view of the available observation spaces that permits
@@ -833,12 +840,6 @@ functionality. Specifically, the actions use the <a class="reference internal" h
 <code class="code docutils literal notranslate"><span class="pre">Discrete</span></code> space that provides additional documentation about each
 action, and the <a class="reference internal" href="#compiler_gym.envs.LlvmEnv.commandline" title="compiler_gym.envs.LlvmEnv.commandline"><code class="xref py py-meth docutils literal notranslate"><span class="pre">LlvmEnv.commandline()</span></code></a> method can be used to produce an
 equivalent LLVM opt invocation for the current environment state.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Variables</dt>
-<dd class="field-odd"><p><strong>actions</strong> (<em>List</em><em>[</em><em>int</em><em>]</em>) – The list of actions that have been performed since the
-previous call to <a class="reference internal" href="#compiler_gym.envs.LlvmEnv.reset" title="compiler_gym.envs.LlvmEnv.reset"><code class="xref py py-func docutils literal notranslate"><span class="pre">reset()</span></code></a>.</p>
-</dd>
-</dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="compiler_gym.envs.LlvmEnv.commandline">
 <span class="sig-name descname"><span class="pre">commandline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">textformat</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">str</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/llvm_env.html#LlvmEnv.commandline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.LlvmEnv.commandline" title="Permalink to this definition">¶</a></dt>
@@ -1062,6 +1063,36 @@ observation is requested.</p>
 </dl>
 </dd></dl>
 
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.envs.LlvmEnv.runtime_warmup_runs_count">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">runtime_warmup_runs_count</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#compiler_gym.envs.LlvmEnv.runtime_warmup_runs_count" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of warmup runs of the binary to perform before measuring
+the Runtime observation space.</p>
+<p>See the <a class="reference internal" href="../llvm/index.html#runtime"><span class="std std-ref">Runtime observation space reference</span></a>
+for further details.</p>
+<p>Example usage:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">compiler_gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-v0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">runtime_observation_count</span> <span class="o">=</span> <span class="mi">10</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">Runtime</span><span class="p">())</span>
+<span class="go">10</span>
+</pre></div>
+</div>
+<dl class="field-list simple">
+<dt class="field-odd">Getter</dt>
+<dd class="field-odd"><p>Returns the number of runs that be performed before measuring
+the <code class="code docutils literal notranslate"><span class="pre">Runtime</span></code> observation is requested.</p>
+</dd>
+<dt class="field-even">Setter</dt>
+<dd class="field-even"><p>Set the number of warmup runs to perform when a <code class="code docutils literal notranslate"><span class="pre">Runtime</span></code>
+observation is requested.</p>
+</dd>
+<dt class="field-odd">Type</dt>
+<dd class="field-odd"><p>int</p>
+</dd>
+</dl>
+</dd></dl>
+
 <dl class="py method">
 <dt class="sig sig-object py" id="compiler_gym.envs.LlvmEnv.write_bitcode">
 <span class="sig-name descname"><span class="pre">write_bitcode</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">,</span> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">pathlib.Path</span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/llvm_env.html#LlvmEnv.write_bitcode"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.LlvmEnv.write_bitcode" title="Permalink to this definition">¶</a></dt>
@@ -1093,6 +1124,112 @@ observation is requested.</p>
 </dd></dl>
 
 </div>
+<div class="section" id="gccenv">
+<h2><a class="toc-backref" href="#id8">GccEnv</a><a class="headerlink" href="#gccenv" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="compiler_gym.envs.GccEnv">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.envs.</span></span><span class="sig-name descname"><span class="pre">GccEnv</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">gcc_bin</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'docker:gcc:11.2.0'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">benchmark</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="datasets.html#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">'benchmark://chstone-v0/adpcm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">datasets_site_path</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">connection_settings</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="service.html#compiler_gym.service.ConnectionOpts" title="compiler_gym.service.connection.ConnectionOpts"><span class="pre">compiler_gym.service.connection.ConnectionOpts</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">timeout</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/envs/gcc/gcc_env.html#GccEnv"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.GccEnv" title="Permalink to this definition">¶</a></dt>
+<dd><p>A specialized CompilerEnv for GCC.</p>
+<p>This class exposes the optimization space of GCC’s command line flags
+as an environment for reinforcement learning. For further details, see the
+<a class="reference internal" href="../envs/gcc.html#installation"><span class="std std-ref">GCC Environment Reference</span></a>.</p>
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.envs.GccEnv.asm">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">asm</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#compiler_gym.envs.GccEnv.asm" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the assembly code.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.envs.GccEnv.asm_hash">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">asm_hash</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#compiler_gym.envs.GccEnv.asm_hash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a hash of the assembly code.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.envs.GccEnv.asm_size">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">asm_size</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#compiler_gym.envs.GccEnv.asm_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the assembly code size in bytes.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.envs.GccEnv.choices">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">choices</span></span><em class="property"><span class="pre">:</span> <span class="pre">List[int]</span></em><a class="headerlink" href="#compiler_gym.envs.GccEnv.choices" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the current choices</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.envs.GccEnv.commandline">
+<span class="sig-name descname"><span class="pre">commandline</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">str</span><a class="reference internal" href="../_modules/compiler_gym/envs/gcc/gcc_env.html#GccEnv.commandline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.GccEnv.commandline" title="Permalink to this definition">¶</a></dt>
+<dd><p>Return a string representing the command line options.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p>A string.</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.envs.GccEnv.gcc_spec">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">gcc_spec</span></span><em class="property"><span class="pre">:</span> <span class="pre">compiler_gym.envs.gcc.gcc.GccSpec</span></em><a class="headerlink" href="#compiler_gym.envs.GccEnv.gcc_spec" title="Permalink to this definition">¶</a></dt>
+<dd><p>A <a class="reference internal" href="envs/gcc.html#compiler_gym.envs.gcc.gcc.GccSpec" title="compiler_gym.envs.gcc.gcc.GccSpec"><code class="xref py py-class docutils literal notranslate"><span class="pre">GccSpec</span></code></a> description of
+the compiler specification.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.envs.GccEnv.instruction_counts">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">instruction_counts</span></span><em class="property"><span class="pre">:</span> <span class="pre">Dict[str,</span> <span class="pre">int]</span></em><a class="headerlink" href="#compiler_gym.envs.GccEnv.instruction_counts" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a count of the instruction types in the assembly code.</p>
+<p>Note, that it will also count fields beginning with a <code class="code docutils literal notranslate"><span class="pre">.</span></code>, like
+<code class="code docutils literal notranslate"><span class="pre">.bss</span></code> and <code class="code docutils literal notranslate"><span class="pre">.align</span></code>. Make sure to remove those if not
+needed.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.envs.GccEnv.obj">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">obj</span></span><em class="property"><span class="pre">:</span> <span class="pre">bytes</span></em><a class="headerlink" href="#compiler_gym.envs.GccEnv.obj" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the object code.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.envs.GccEnv.obj_hash">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">obj_hash</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#compiler_gym.envs.GccEnv.obj_hash" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get a hash of the object code.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.envs.GccEnv.obj_size">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">obj_size</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#compiler_gym.envs.GccEnv.obj_size" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the object code size in bytes.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.envs.GccEnv.reset">
+<span class="sig-name descname"><span class="pre">reset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">benchmark</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="datasets.html#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_space</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">retry_count</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">0</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">compiler_gym.util.gym_type_hints.ObservationType</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/envs/gcc/gcc_env.html#GccEnv.reset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.GccEnv.reset" title="Permalink to this definition">¶</a></dt>
+<dd><p>Reset the environment. This additionally sets the timeout to the
+correct value.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.envs.GccEnv.rtl">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">rtl</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#compiler_gym.envs.GccEnv.rtl" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the final rtl of the program.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.envs.GccEnv.source">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">source</span></span><em class="property"><span class="pre">:</span> <span class="pre">str</span></em><a class="headerlink" href="#compiler_gym.envs.GccEnv.source" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the source code.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.envs.GccEnv.timeout">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">timeout</span></span><em class="property"><span class="pre">:</span> <span class="pre">Optional[int]</span></em><a class="headerlink" href="#compiler_gym.envs.GccEnv.timeout" title="Permalink to this definition">¶</a></dt>
+<dd><p>Get the current compilation timeout</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
 </div>
 
 
@@ -1101,7 +1238,7 @@ observation is requested.</p>
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="../llvm/api.html" class="btn btn-neutral float-right" title="compiler_gym.envs.llvm" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="envs/gcc.html" class="btn btn-neutral float-right" title="compiler_gym.envs.gcc" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="datasets.html" class="btn btn-neutral float-left" title="compiler_gym.datasets" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 

@@ -1,0 +1,484 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>loop_tool Environment Reference &mdash; CompilerGym 0.2.0 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
+        <script data-url_root="../" id="documentation_options" src="../_static/documentation_options.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../_static/js/theme.js"></script>
+
+    
+    <link rel="author" title="About these documents" href="../about.html" />
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="compiler_gym" href="../compiler_gym/compiler_gym.html" />
+    <link rel="prev" title="GCC Environment Reference" href="gcc.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../index.html" class="icon icon-home"> CompilerGym
+          
+
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2.0
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cli.html">Command Line Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rpc.html">RPC Service Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Environments</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../llvm/index.html">LLVM Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="gcc.html">GCC Environment Reference</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">loop_tool Environment Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#datasets">Datasets</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#observation-spaces">Observation Spaces</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#action-spaces">Action Spaces</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/compiler_gym.html">compiler_gym</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/envs/gcc.html">compiler_gym.envs.gcc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../llvm/api.html">compiler_gym.envs.llvm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/views.html">compiler_gym.views</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
+</ul>
+<p class="caption"><span class="caption-text">C++ API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/service.html">compiler_gym/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/service/runtime.html">compiler_gym/service/runtime</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../cc/compiler_gym/util.html">compiler_gym/util</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">CompilerGym</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>loop_tool Environment Reference</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../_sources/envs/loop_tool.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="loop-tool-environment-reference">
+<h1>loop_tool Environment Reference<a class="headerlink" href="#loop-tool-environment-reference" title="Permalink to this headline">¶</a></h1>
+<p><a class="reference external" href="https://github.com/facebookresearch/loop_tool">loop_tool</a> is an experimental
+intermediate representation of N-dimensional data computation.
+It defines a lightweight, highly-portable and restrictive IR that can be lowered
+to both GPU and CPU backends.</p>
+<p>CompilerGym exposes the <code class="docutils literal notranslate"><span class="pre">loop_tool</span></code> IR for reinforcement learning through a
+<code class="xref py py-class docutils literal notranslate"><span class="pre">LoopToolEnv</span></code> environment.</p>
+<div class="contents local topic" id="overview">
+<p class="topic-title">Overview:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#installation" id="id2">Installation</a></p></li>
+<li><p><a class="reference internal" href="#datasets" id="id3">Datasets</a></p></li>
+<li><p><a class="reference internal" href="#observation-spaces" id="id4">Observation Spaces</a></p></li>
+<li><p><a class="reference internal" href="#action-spaces" id="id5">Action Spaces</a></p></li>
+</ul>
+</div>
+<div class="section" id="installation">
+<span id="id1"></span><h2><a class="toc-backref" href="#id2">Installation</a><a class="headerlink" href="#installation" title="Permalink to this headline">¶</a></h2>
+<p>It is highly recommended you install CUDA to use <code class="docutils literal notranslate"><span class="pre">loop_tool</span></code>.
+The package will work with most newer versions of CUDA.
+Please see NVidia’s <a class="reference external" href="https://developer.nvidia.com/cuda-downloads">CUDA Toolkit installation page</a>
+for details.</p>
+</div>
+<div class="section" id="datasets">
+<h2><a class="toc-backref" href="#id3">Datasets</a><a class="headerlink" href="#datasets" title="Permalink to this headline">¶</a></h2>
+<p>We provide a program that does a simple point-wise addition. Two datasets (one
+for CPU and one for GPU) are provided. The benchmarks within these dataset are
+generated by selecting an arbitrary size between 1 and 8x2^11 (~8M).</p>
+<p>To set a specific size, simply use the trailing term in the benchmarking uri.
+For GPU with size 1024:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;loop_tool-v0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;benchmark://loop_tool-cuda-v0/1024&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>The CPU variant can be created with:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="s2">&quot;benchmark://loop_tool-cpu-v0/1024&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Note that although the action spaces are the same, the underlying hardware is dramatically different.
+GPU threads can (and should) be used heavily, whereas CPU threading often shows little to no benefit
+at sizes greater than the number of virtual cores available.
+Further, the CPU backend should be viewed as an interpreted fallback and cannot reach
+near-peak performance as the GPU can.</p>
+</div>
+<div class="section" id="observation-spaces">
+<h2><a class="toc-backref" href="#id4">Observation Spaces</a><a class="headerlink" href="#observation-spaces" title="Permalink to this headline">¶</a></h2>
+<p>Three observation spaces are provided for tuning the compiled result.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 68%" />
+<col style="width: 32%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Observation space</p></th>
+<th class="head"><p>Type</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p>flops</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Float64</span></code></p></td>
+</tr>
+<tr class="row-odd"><td><p>loop_tree</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">String</span></code></p></td>
+</tr>
+<tr class="row-even"><td><p>action_state</p></td>
+<td><p><code class="docutils literal notranslate"><span class="pre">Int64[]</span></code></p></td>
+</tr>
+</tbody>
+</table>
+<p><code class="docutils literal notranslate"><span class="pre">flops</span></code> will benchmark the program and return the average achieved gigaflops per run.
+This includes program compilation and benchmark warmup, which may take some time.</p>
+<p><code class="docutils literal notranslate"><span class="pre">loop_tree</span></code> will return a string representation of the current loop tree associated with
+the program.  The string represents the computation in a platform-agnostic way.</p>
+<p><code class="docutils literal notranslate"><span class="pre">action_state</span></code> returns the cursor information for the current environment.
+The cursor information is composed of three values in order:
+current loop index, current loop size, current loop tail.</p>
+<p>For example, given an <code class="docutils literal notranslate"><span class="pre">action_state</span></code> of [0, 341, 1] and <code class="docutils literal notranslate"><span class="pre">loop_tree</span></code>, the
+cursor points to the first (outermost) loop:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>for a in 341 r 1 : L0 [thread] &lt;-- cursor
+ for a&#39; in 3 : L1
+  for a&#39;&#39; in 1 : L2
+   %0[a] &lt;- read()
+  for a&#39;&#39; in 1 : L4
+   %1[a] &lt;- read()
+  for a&#39;&#39; in 1 : L6
+   %2[a] &lt;- add(%0, %1)
+  for a&#39;&#39; in 1 : L8
+   %3[a] &lt;- write(%2)
+</pre></div>
+</div>
+<p>If the <code class="docutils literal notranslate"><span class="pre">action_state</span></code> were [1, 3, 0], we’d know the cursor is pointing to the
+child of the first loop:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>for a in 341 r 1 : L0 [thread]
+ for a&#39; in 3 : L1              &lt;-- cursor
+  for a&#39;&#39; in 1 : L2
+   %0[a] &lt;- read()
+  for a&#39;&#39; in 1 : L4
+   %1[a] &lt;- read()
+  for a&#39;&#39; in 1 : L6
+   %2[a] &lt;- add(%0, %1)
+  for a&#39;&#39; in 1 : L8
+   %3[a] &lt;- write(%2)
+</pre></div>
+</div>
+<p>In the case of <code class="docutils literal notranslate"><span class="pre">action_state</span></code> being [2, 1, 0], the cursor simultaneously points to
+all innermost loops.  This is an artifact of the innermost loop always being
+unrolled when the <code class="docutils literal notranslate"><span class="pre">loop_tree</span></code> is generated:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>for a in 341 r 1 : L0 [thread]
+ for a&#39; in 3 : L1
+  for a&#39;&#39; in 1 : L2            &lt;-- cursor
+   %0[a] &lt;- read()                |
+  for a&#39;&#39; in 1 : L4            &lt;--+
+   %1[a] &lt;- read()                |
+  for a&#39;&#39; in 1 : L6            &lt;--+
+   %2[a] &lt;- add(%0, %1)           |
+  for a&#39;&#39; in 1 : L8            &lt;--+
+   %3[a] &lt;- write(%2)
+</pre></div>
+</div>
+</div>
+<div class="section" id="action-spaces">
+<h2><a class="toc-backref" href="#id5">Action Spaces</a><a class="headerlink" href="#action-spaces" title="Permalink to this headline">¶</a></h2>
+<p>Currently, only a “simple” action space is available. This can be understood as control over a cursor
+that has two different modes.  Either the cursor is moving between loops or it is frozen in place and
+can be used to change the sizes of loops.</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 14%" />
+<col style="width: 86%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Action</p></th>
+<th class="head"><p>Description</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><cite>toggle_mode</cite></p></td>
+<td><p>Swaps between shifting the cursor location and shifting the size of the loop selected by the cursor</p></td>
+</tr>
+<tr class="row-odd"><td><p><cite>up</cite></p></td>
+<td><p>Either shifts the cursor inward or increases the size of the selected loop by 1</p></td>
+</tr>
+<tr class="row-even"><td><p><cite>down</cite></p></td>
+<td><p>Either shifts the cursor outward or decreases the size of the selected loop by 1</p></td>
+</tr>
+<tr class="row-odd"><td><p><cite>toggle_thread</cite></p></td>
+<td><p>Toggles the threading parameter of the selected loop</p></td>
+</tr>
+</tbody>
+</table>
+<p>The default state for the benchmark we’ve been looking at is:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>for a in 1024 : L0 [thread]
+ for a&#39; in 1 : L1
+  for a&#39;&#39; in 1 : L2
+   %0[a] &lt;- read()
+  for a&#39;&#39; in 1 : L4
+   %1[a] &lt;- read()
+  for a&#39;&#39; in 1 : L6
+   %2[a] &lt;- add(%0, %1)
+  for a&#39;&#39; in 1 : L8
+   %3[a] &lt;- write(%2)
+</pre></div>
+</div>
+<p>Now we will disable threading on the outer loop,
+enable threading on the first inner loop and then increase its size.</p>
+<p>The cursor mode starts with shifting sizes on the outermost loop.
+This means we can first run the <code class="docutils literal notranslate"><span class="pre">toggle_thread</span></code> action:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>for a in 1024 : L0
+ for a&#39; in 1 : L1
+  for a&#39;&#39; in 1 : L2
+   %0[a] &lt;- read()
+  for a&#39;&#39; in 1 : L4
+   %1[a] &lt;- read()
+  for a&#39;&#39; in 1 : L6
+   %2[a] &lt;- add(%0, %1)
+  for a&#39;&#39; in 1 : L8
+   %3[a] &lt;- write(%2)
+</pre></div>
+</div>
+<p>Now we have to swap the mode and move the cursor inward with
+<code class="docutils literal notranslate"><span class="pre">toggle_mode</span></code> and then <code class="docutils literal notranslate"><span class="pre">up</span></code>.  This won’t change the visible state
+of <code class="docutils literal notranslate"><span class="pre">loop_tree</span></code> output, but <code class="docutils literal notranslate"><span class="pre">action_state</span></code> will be updated to
+[1, 1, 0].
+Now that we have the right loop selected, we can thread it with
+<code class="docutils literal notranslate"><span class="pre">toggle_thread</span></code>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>for a in 1024 : L0
+ for a&#39; in 1 : L1 [thread]
+  for a&#39;&#39; in 1 : L2
+   %0[a] &lt;- read()
+  for a&#39;&#39; in 1 : L4
+   %1[a] &lt;- read()
+  for a&#39;&#39; in 1 : L6
+   %2[a] &lt;- add(%0, %1)
+  for a&#39;&#39; in 1 : L8
+   %3[a] &lt;- write(%2)
+</pre></div>
+</div>
+<p>After this we toggle back to size shifting and increase the size to 3:
+<code class="docutils literal notranslate"><span class="pre">toggle_mode</span></code> and <code class="docutils literal notranslate"><span class="pre">up</span></code>, <code class="docutils literal notranslate"><span class="pre">up</span></code>:</p>
+<div class="highlight-none notranslate"><div class="highlight"><pre><span></span>for a in 341 r 1 : L0
+ for a&#39; in 3 : L1 [thread]
+  for a&#39;&#39; in 1 : L2
+   %0[a] &lt;- read()
+  for a&#39;&#39; in 1 : L4
+   %1[a] &lt;- read()
+  for a&#39;&#39; in 1 : L6
+   %2[a] &lt;- add(%0, %1)
+  for a&#39;&#39; in 1 : L8
+   %3[a] &lt;- write(%2)
+</pre></div>
+</div>
+<p>The new <code class="docutils literal notranslate"><span class="pre">r</span> <span class="pre">1</span></code> we see on the first line denotes a tail iteration (of size 1).
+The compiler will automatically inject tail logic to preserve the
+functionality of the code.  <code class="docutils literal notranslate"><span class="pre">up</span></code> will always “steal” loops from the nearest
+outer loops so the tail will always be on outer loops.</p>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../compiler_gym/compiler_gym.html" class="btn btn-neutral float-right" title="compiler_gym" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="gcc.html" class="btn btn-neutral float-left" title="GCC Environment Reference" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright Facebook AI Research.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    <!-- Theme Analytics -->
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'G-T95G5EVYXM', 'auto');
+    
+    ga('send', 'pageview');
+    </script>
+
+    
+   
+
+</body>
+</html>

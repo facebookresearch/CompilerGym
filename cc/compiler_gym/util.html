@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym/util &mdash; CompilerGym 0.1.10 documentation</title>
+  <title>compiler_gym/util &mdash; CompilerGym 0.2.0 documentation</title>
   
 
   
@@ -67,7 +67,7 @@
             
             
               <div class="version">
-                0.1.10
+                0.2.0
               </div>
             
           
@@ -105,12 +105,15 @@
 <p class="caption"><span class="caption-text">Environments</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../llvm/index.html">LLVM Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../envs/gcc.html">GCC Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/envs/gcc.html">compiler_gym.envs.gcc</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/service.html">compiler_gym.service</a></li>
@@ -128,6 +131,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#grpcstatusmacros-h">GrpcStatusMacros.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#runfilespath-h">RunfilesPath.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#strlenconstexpr-h">StrLenConstexpr.h</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#subprocess-h">Subprocess.h</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#unreachable-h">Unreachable.h</a></li>
 </ul>
 </li>
@@ -206,7 +210,8 @@
 <li><p><a class="reference internal" href="#grpcstatusmacros-h" id="id2">GrpcStatusMacros.h</a></p></li>
 <li><p><a class="reference internal" href="#runfilespath-h" id="id3">RunfilesPath.h</a></p></li>
 <li><p><a class="reference internal" href="#strlenconstexpr-h" id="id4">StrLenConstexpr.h</a></p></li>
-<li><p><a class="reference internal" href="#unreachable-h" id="id5">Unreachable.h</a></p></li>
+<li><p><a class="reference internal" href="#subprocess-h" id="id5">Subprocess.h</a></p></li>
+<li><p><a class="reference internal" href="#unreachable-h" id="id6">Unreachable.h</a></p></li>
 </ul>
 </div>
 <div class="section" id="enumutil-h">
@@ -430,8 +435,178 @@ try {
 </dd></dl>
 
 </div>
+<div class="section" id="subprocess-h">
+<h2><a class="toc-backref" href="#id5">Subprocess.h</a><a class="headerlink" href="#subprocess-h" title="Permalink to this headline">¶</a></h2>
+<p><code class="code docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&quot;compiler_gym/util/Subprocess.h&quot;</span></code></p>
+<dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="namespacecompiler__gym"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">compiler_gym</span></span></span><br /></dt>
+<dd><dl class="cpp type">
+<dt class="sig sig-object cpp">
+<span class="target" id="namespacecompiler__gym_1_1util"></span><span class="k"><span class="pre">namespace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">util</span></span></span><br /></dt>
+<dd><div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-functions">Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I00EN12compiler_gym4util8wait_forEbRN5boost7process5childERKNSt6chrono8durationI3Rep6PeriodEE">
+<span id="_CPPv3I00EN12compiler_gym4util8wait_forERN5boost7process5childERKNSt6chrono8durationI3Rep6PeriodEE"></span><span id="_CPPv2I00EN12compiler_gym4util8wait_forERN5boost7process5childERKNSt6chrono8durationI3Rep6PeriodEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Rep</span></span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Period</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="namespacecompiler__gym_1_1util_1a3b0bc5921546765fbe7110020d083a99"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">wait_for</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">boost</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">process</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">child</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">process</span></span>, <span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">chrono</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">duration</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I00EN12compiler_gym4util8wait_forEbRN5boost7process5childERKNSt6chrono8durationI3Rep6PeriodEE" title="compiler_gym::util::wait_for::Rep"><span class="n"><span class="pre">Rep</span></span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference internal" href="#_CPPv4I00EN12compiler_gym4util8wait_forEbRN5boost7process5childERKNSt6chrono8durationI3Rep6PeriodEE" title="compiler_gym::util::wait_for::Period"><span class="n"><span class="pre">Period</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">duration</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I00EN12compiler_gym4util8wait_forEbRN5boost7process5childERKNSt6chrono8durationI3Rep6PeriodEE" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<dl class="cpp class">
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym4util17LocalShellCommandE">
+<span id="_CPPv3N12compiler_gym4util17LocalShellCommandE"></span><span id="_CPPv2N12compiler_gym4util17LocalShellCommandE"></span><span id="compiler_gym::util::LocalShellCommand"></span><span class="target" id="classcompiler__gym_1_1util_1_1_local_shell_command"></span><span class="k"><span class="pre">class</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LocalShellCommand</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym4util17LocalShellCommandE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><em>#include &lt;Subprocess.h&gt;</em><p>A representation of a <a class="reference internal" href="../../rpc.html#struct_command"><span class="std std-ref">Command</span></a> protocol buffer that describes a command that is run in a subshell locally on the current machine. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-functions">Public Functions</p>
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym4util17LocalShellCommand17LocalShellCommandERK7Command">
+<span id="_CPPv3N12compiler_gym4util17LocalShellCommand17LocalShellCommandERK7Command"></span><span id="_CPPv2N12compiler_gym4util17LocalShellCommand17LocalShellCommandERK7Command"></span><span id="compiler_gym::util::LocalShellCommand::LocalShellCommand__CommandCR"></span><span class="target" id="classcompiler__gym_1_1util_1_1_local_shell_command_1a69bfe443cbd0482c750b435154d151fd"></span><span class="k"><span class="pre">explicit</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">LocalShellCommand</span></span></span><span class="sig-paren">(</span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../rpc.html#_CPPv47Command" title="Command"><span class="n"><span class="pre">Command</span></span></a><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">cmd</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4N12compiler_gym4util17LocalShellCommand17LocalShellCommandERK7Command" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Constructor. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>cmd</strong> – The <a class="reference internal" href="../../rpc.html#struct_command"><span class="std std-ref">Command</span></a> protocol buffer. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym4util17LocalShellCommand9checkCallEv">
+<span id="_CPPv3NK12compiler_gym4util17LocalShellCommand9checkCallEv"></span><span id="_CPPv2NK12compiler_gym4util17LocalShellCommand9checkCallEv"></span><span id="compiler_gym::util::LocalShellCommand::checkCallC"></span><span class="target" id="classcompiler__gym_1_1util_1_1_local_shell_command_1a8c77df1a60efde8bd47bb8240dd8750d"></span><span class="n"><span class="pre">grpc</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Status</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">checkCall</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym4util17LocalShellCommand9checkCallEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Run the given command in a subshell. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">OK</span></code> on success, <code class="docutils literal notranslate"><span class="pre">DEADLINE_EXCEEDED</span></code> on timeout, or <code class="docutils literal notranslate"><span class="pre">INTERNAL</span></code> if the command returns with a non-zero returncode. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym4util17LocalShellCommand11checkOutputERNSt6stringE">
+<span id="_CPPv3NK12compiler_gym4util17LocalShellCommand11checkOutputERNSt6stringE"></span><span id="_CPPv2NK12compiler_gym4util17LocalShellCommand11checkOutputERNSt6stringE"></span><span id="compiler_gym::util::LocalShellCommand::checkOutput__ssRC"></span><span class="target" id="classcompiler__gym_1_1util_1_1_local_shell_command_1a6281582e68f62cf46b5df674cd6134d1"></span><span class="n"><span class="pre">grpc</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Status</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">checkOutput</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="n sig-param"><span class="pre">stdout</span></span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym4util17LocalShellCommand11checkOutputERNSt6stringE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Run the given command in a subshell and capture its stdout to string. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>stdout</strong> – The string to set the stdout to. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p><code class="docutils literal notranslate"><span class="pre">OK</span></code> on success, <code class="docutils literal notranslate"><span class="pre">DEADLINE_EXCEEDED</span></code> on timeout, or <code class="docutils literal notranslate"><span class="pre">INTERNAL</span></code> if the command returns with a non-zero returncode. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym4util17LocalShellCommand12checkInfilesEv">
+<span id="_CPPv3NK12compiler_gym4util17LocalShellCommand12checkInfilesEv"></span><span id="_CPPv2NK12compiler_gym4util17LocalShellCommand12checkInfilesEv"></span><span id="compiler_gym::util::LocalShellCommand::checkInfilesC"></span><span class="target" id="classcompiler__gym_1_1util_1_1_local_shell_command_1a8994787f357991cd7edffe2f46beb4c1"></span><span class="n"><span class="pre">grpc</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Status</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">checkInfiles</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym4util17LocalShellCommand12checkInfilesEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Check that the specified infiles exist. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">OK</span></code> on success, <code class="docutils literal notranslate"><span class="pre">INTERNAL</span></code> if a file is missing. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym4util17LocalShellCommand13checkOutfilesEv">
+<span id="_CPPv3NK12compiler_gym4util17LocalShellCommand13checkOutfilesEv"></span><span id="_CPPv2NK12compiler_gym4util17LocalShellCommand13checkOutfilesEv"></span><span id="compiler_gym::util::LocalShellCommand::checkOutfilesC"></span><span class="target" id="classcompiler__gym_1_1util_1_1_local_shell_command_1a8e8933f30cd0f76c419a3995685cb1c5"></span><span class="n"><span class="pre">grpc</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">Status</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">checkOutfiles</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym4util17LocalShellCommand13checkOutfilesEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Check that the specified outfiles exist. </p>
+<dl class="field-list simple">
+<dt class="field-odd">Returns</dt>
+<dd class="field-odd"><p><code class="docutils literal notranslate"><span class="pre">OK</span></code> on success, <code class="docutils literal notranslate"><span class="pre">INTERNAL</span></code> if a file is missing. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym4util17LocalShellCommand9argumentsEv">
+<span id="_CPPv3NK12compiler_gym4util17LocalShellCommand9argumentsEv"></span><span id="_CPPv2NK12compiler_gym4util17LocalShellCommand9argumentsEv"></span><span id="compiler_gym::util::LocalShellCommand::argumentsC"></span><span class="target" id="classcompiler__gym_1_1util_1_1_local_shell_command_1a928852a39bb628b6629c3c028e91d5eb"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">arguments</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym4util17LocalShellCommand9argumentsEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym4util17LocalShellCommand7timeoutEv">
+<span id="_CPPv3NK12compiler_gym4util17LocalShellCommand7timeoutEv"></span><span id="_CPPv2NK12compiler_gym4util17LocalShellCommand7timeoutEv"></span><span id="compiler_gym::util::LocalShellCommand::timeoutC"></span><span class="target" id="classcompiler__gym_1_1util_1_1_local_shell_command_1af5f1ae6f579b8d1891be6ca88843d602"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">chrono</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">seconds</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">timeout</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym4util17LocalShellCommand7timeoutEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym4util17LocalShellCommand14timeoutSecondsEv">
+<span id="_CPPv3NK12compiler_gym4util17LocalShellCommand14timeoutSecondsEv"></span><span id="_CPPv2NK12compiler_gym4util17LocalShellCommand14timeoutSecondsEv"></span><span id="compiler_gym::util::LocalShellCommand::timeoutSecondsC"></span><span class="target" id="classcompiler__gym_1_1util_1_1_local_shell_command_1af0b29e714d97f28173c1aeb5ed3b0a5a"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">int</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">timeoutSeconds</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym4util17LocalShellCommand14timeoutSecondsEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym4util17LocalShellCommand3envEv">
+<span id="_CPPv3NK12compiler_gym4util17LocalShellCommand3envEv"></span><span id="_CPPv2NK12compiler_gym4util17LocalShellCommand3envEv"></span><span id="compiler_gym::util::LocalShellCommand::envC"></span><span class="target" id="classcompiler__gym_1_1util_1_1_local_shell_command_1a4ceb4ee90985e89eeea23d0da17b2a22"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">boost</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">process</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">environment</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">env</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym4util17LocalShellCommand3envEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym4util17LocalShellCommand7infilesEv">
+<span id="_CPPv3NK12compiler_gym4util17LocalShellCommand7infilesEv"></span><span id="_CPPv2NK12compiler_gym4util17LocalShellCommand7infilesEv"></span><span id="compiler_gym::util::LocalShellCommand::infilesC"></span><span class="target" id="classcompiler__gym_1_1util_1_1_local_shell_command_1ad7040ab796f023cb6f208dbb2d161670"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">boost</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">filesystem</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">infiles</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym4util17LocalShellCommand7infilesEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym4util17LocalShellCommand8outfilesEv">
+<span id="_CPPv3NK12compiler_gym4util17LocalShellCommand8outfilesEv"></span><span id="_CPPv2NK12compiler_gym4util17LocalShellCommand8outfilesEv"></span><span id="compiler_gym::util::LocalShellCommand::outfilesC"></span><span class="target" id="classcompiler__gym_1_1util_1_1_local_shell_command_1a90b403238b3b67f9ab909b9ff9900c38"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">boost</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">filesystem</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="p"><span class="pre">&amp;</span></span><span class="sig-name descname"><span class="n"><span class="pre">outfiles</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym4util17LocalShellCommand8outfilesEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym4util17LocalShellCommand11commandlineEv">
+<span id="_CPPv3NK12compiler_gym4util17LocalShellCommand11commandlineEv"></span><span id="_CPPv2NK12compiler_gym4util17LocalShellCommand11commandlineEv"></span><span id="compiler_gym::util::LocalShellCommand::commandlineC"></span><span class="target" id="classcompiler__gym_1_1util_1_1_local_shell_command_1a29d5d7678e943408c7a5534b1b47059f"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">commandline</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym4util17LocalShellCommand11commandlineEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Get the list of command line arguments as a concatenated string. </p>
+<p>This is for debugging purposes, it should not be used to execute commands as it does no escaping of arguments. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym4util17LocalShellCommand5emptyEv">
+<span id="_CPPv3NK12compiler_gym4util17LocalShellCommand5emptyEv"></span><span id="_CPPv2NK12compiler_gym4util17LocalShellCommand5emptyEv"></span><span id="compiler_gym::util::LocalShellCommand::emptyC"></span><span class="target" id="classcompiler__gym_1_1util_1_1_local_shell_command_1a24b641948caf368f210a065cb78d2725"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">empty</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym4util17LocalShellCommand5emptyEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Returns whether this command instance has any arguments to execute. </p>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4NK12compiler_gym4util17LocalShellCommand5protoEv">
+<span id="_CPPv3NK12compiler_gym4util17LocalShellCommand5protoEv"></span><span id="_CPPv2NK12compiler_gym4util17LocalShellCommand5protoEv"></span><span id="compiler_gym::util::LocalShellCommand::protoC"></span><span class="target" id="classcompiler__gym_1_1util_1_1_local_shell_command_1ac395bed2cccccd6080ec3edaacdea604"></span><span class="k"><span class="pre">inline</span></span><span class="w"> </span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../rpc.html#_CPPv47Command" title="Command"><span class="n"><span class="pre">Command</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">proto</span></span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><span class="w"> </span><span class="k"><span class="pre">const</span></span><a class="headerlink" href="#_CPPv4NK12compiler_gym4util17LocalShellCommand5protoEv" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-private-members">Private Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym4util17LocalShellCommand6proto_E">
+<span id="_CPPv3N12compiler_gym4util17LocalShellCommand6proto_E"></span><span id="_CPPv2N12compiler_gym4util17LocalShellCommand6proto_E"></span><span id="compiler_gym::util::LocalShellCommand::proto___CommandC"></span><span class="target" id="classcompiler__gym_1_1util_1_1_local_shell_command_1aaa86b89f2967f6300aaec558a6ae1256"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><a class="reference internal" href="../../rpc.html#_CPPv47Command" title="Command"><span class="n"><span class="pre">Command</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">proto_</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym4util17LocalShellCommand6proto_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym4util17LocalShellCommand10arguments_E">
+<span id="_CPPv3N12compiler_gym4util17LocalShellCommand10arguments_E"></span><span id="_CPPv2N12compiler_gym4util17LocalShellCommand10arguments_E"></span><span id="compiler_gym::util::LocalShellCommand::arguments___std::vector:ss:C"></span><span class="target" id="classcompiler__gym_1_1util_1_1_local_shell_command_1a7628b22e2c1701eb5829d0fd81c5cfff"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">arguments_</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym4util17LocalShellCommand10arguments_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym4util17LocalShellCommand8timeout_E">
+<span id="_CPPv3N12compiler_gym4util17LocalShellCommand8timeout_E"></span><span id="_CPPv2N12compiler_gym4util17LocalShellCommand8timeout_E"></span><span id="compiler_gym::util::LocalShellCommand::timeout___std::chrono::secondsC"></span><span class="target" id="classcompiler__gym_1_1util_1_1_local_shell_command_1abacc801b2df6e40bbbdeb59d060b620e"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">chrono</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">seconds</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">timeout_</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym4util17LocalShellCommand8timeout_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym4util17LocalShellCommand4env_E">
+<span id="_CPPv3N12compiler_gym4util17LocalShellCommand4env_E"></span><span id="_CPPv2N12compiler_gym4util17LocalShellCommand4env_E"></span><span id="compiler_gym::util::LocalShellCommand::env___boost::process::environmentC"></span><span class="target" id="classcompiler__gym_1_1util_1_1_local_shell_command_1aa44dd83ce1b9245329bd23819a276e05"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">boost</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">process</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">environment</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">env_</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym4util17LocalShellCommand4env_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym4util17LocalShellCommand8infiles_E">
+<span id="_CPPv3N12compiler_gym4util17LocalShellCommand8infiles_E"></span><span id="_CPPv2N12compiler_gym4util17LocalShellCommand8infiles_E"></span><span id="compiler_gym::util::LocalShellCommand::infiles___std::vector:boost::filesystem::path:C"></span><span class="target" id="classcompiler__gym_1_1util_1_1_local_shell_command_1aaafead64026a3cbd1b64837932472109"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">boost</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">filesystem</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">infiles_</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym4util17LocalShellCommand8infiles_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N12compiler_gym4util17LocalShellCommand9outfiles_E">
+<span id="_CPPv3N12compiler_gym4util17LocalShellCommand9outfiles_E"></span><span id="_CPPv2N12compiler_gym4util17LocalShellCommand9outfiles_E"></span><span id="compiler_gym::util::LocalShellCommand::outfiles___std::vector:boost::filesystem::path:C"></span><span class="target" id="classcompiler__gym_1_1util_1_1_local_shell_command_1acab1367ac33424e1c1b1b30d9eb89826"></span><span class="k"><span class="pre">const</span></span><span class="w"> </span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">vector</span></span><span class="p"><span class="pre">&lt;</span></span><span class="n"><span class="pre">boost</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">filesystem</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">path</span></span><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">outfiles_</span></span></span><a class="headerlink" href="#_CPPv4N12compiler_gym4util17LocalShellCommand9outfiles_E" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</dd></dl>
+
+</div>
 <div class="section" id="unreachable-h">
-<h2><a class="toc-backref" href="#id5">Unreachable.h</a><a class="headerlink" href="#unreachable-h" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id6">Unreachable.h</a><a class="headerlink" href="#unreachable-h" title="Permalink to this headline">¶</a></h2>
 <p><code class="code docutils literal notranslate"><span class="pre">#include</span> <span class="pre">&quot;compiler_gym/util/Unreachable.h&quot;</span></code></p>
 <div class="breathe-sectiondef docutils container">
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-defines">Defines</p>
