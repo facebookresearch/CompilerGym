@@ -84,9 +84,8 @@ an overview of the key concepts.
 In Python, import `compiler_gym` to use the environments:
 
 ```py
->>> import gym
 >>> import compiler_gym                      # imports the CompilerGym environments
->>> env = gym.make(                          # creates a new environment
+>>> env = compiler_gym.make(                 # creates a new environment (same as gym.make)
 ...     "llvm-v0",                           # selects the compiler to use
 ...     benchmark="cbench-v1/qsort",         # selects the program to compile
 ...     observation_space="Autophase",       # selects the observation space
@@ -95,6 +94,7 @@ In Python, import `compiler_gym` to use the environments:
 >>> env.reset()                              # starts a new compilation session
 >>> env.render()                             # prints the IR of the program
 >>> env.step(env.action_space.sample())      # applies a random optimization, updates state/reward/actions
+>>> env.close()                              # closes the environment, freeing resources
 ```
 
 See the [documentation website](http://facebookresearch.github.io/CompilerGym/)
