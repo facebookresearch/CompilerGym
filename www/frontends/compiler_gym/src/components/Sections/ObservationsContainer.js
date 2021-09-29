@@ -28,7 +28,7 @@ const StateContainer = () => {
       case "ir":
         return (
           <IrStateContainer
-            irState={context.session?.ir}
+            irState={context.session?.ir || ""}
             darkTheme={themeContext.darkTheme}
           />
         );
