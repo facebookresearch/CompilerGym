@@ -78,7 +78,7 @@ def _download(urls: List[str], sha256: Optional[str], max_retries: int) -> bytes
 
     # A retry loop, and loop over all urls provided.
     last_exception = None
-    wait_time = 5
+    wait_time = 10
     for _ in range(max(max_retries, 1)):
         for url in urls:
             try:
@@ -99,7 +99,7 @@ def _download(urls: List[str], sha256: Optional[str], max_retries: int) -> bytes
 
 
 def download(
-    urls: Union[str, List[str]], sha256: Optional[str] = None, max_retries: int = 3
+    urls: Union[str, List[str]], sha256: Optional[str] = None, max_retries: int = 5
 ) -> bytes:
     """Download a file and return its contents.
 
