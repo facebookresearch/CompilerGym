@@ -32,14 +32,12 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
     space.set_name(util::enumNameToPascalCase<LlvmObservationSpace>(value));
     switch (value) {
       case LlvmObservationSpace::IR: {
-        ScalarRange irSize;
         space.mutable_string_size_range()->mutable_min()->set_value(0);
         space.set_deterministic(true);
         space.set_platform_dependent(false);
         break;
       }
       case LlvmObservationSpace::IR_SHA1: {
-        ScalarRange sha1Size;
         space.mutable_string_size_range()->mutable_min()->set_value(40);
         space.mutable_string_size_range()->mutable_max()->set_value(40);
         space.set_deterministic(true);
@@ -53,7 +51,6 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
         break;
       }
       case LlvmObservationSpace::BITCODE_FILE: {
-        ScalarRange pathLength;
         space.mutable_string_size_range()->mutable_min()->set_value(0);
         // 4096 is the maximum path length for most filesystems.
         space.mutable_string_size_range()->mutable_max()->set_value(kMaximumPathLength);
@@ -95,10 +92,8 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
       }
       case LlvmObservationSpace::PROGRAML: {
         // ProGraML serializes the graph to JSON.
-        ScalarRange encodedSize;
-        encodedSize.mutable_min()->set_value(0);
         space.set_opaque_data_format("json://networkx/MultiDiGraph");
-        *space.mutable_string_size_range() = encodedSize;
+        space.mutable_string_size_range()->mutable_min()->set_value(0);
         space.set_deterministic(true);
         space.set_platform_dependent(false);
         programl::ProgramGraph graph;
@@ -110,10 +105,8 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
       }
       case LlvmObservationSpace::PROGRAML_JSON: {
         // ProGraML serializes the graph to JSON.
-        ScalarRange encodedSize;
-        encodedSize.mutable_min()->set_value(0);
         space.set_opaque_data_format("json://");
-        *space.mutable_string_size_range() = encodedSize;
+        space.mutable_string_size_range()->mutable_min()->set_value(0);
         space.set_deterministic(true);
         space.set_platform_dependent(false);
         programl::ProgramGraph graph;
@@ -125,10 +118,8 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
       }
       case LlvmObservationSpace::CPU_INFO: {
         // Hardware info is returned as a JSON
-        ScalarRange encodedSize;
-        encodedSize.mutable_min()->set_value(0);
         space.set_opaque_data_format("json://");
-        *space.mutable_string_size_range() = encodedSize;
+        space.mutable_string_size_range()->mutable_min()->set_value(0);
         space.set_deterministic(true);
         space.set_platform_dependent(true);
         *space.mutable_default_value()->mutable_string_value() = "{}";
