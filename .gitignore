@@ -1,4 +1,5 @@
 __pycache__
+.coverage*
 .DS_Store
 .env
 /.act

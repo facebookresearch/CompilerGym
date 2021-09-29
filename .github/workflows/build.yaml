@@ -7,6 +7,10 @@ name: Build Binaries
 
 on:
     workflow_dispatch:
+    pull_request:
+        branches: [stable]
+    push:
+        branches: [stable]
 
 jobs:
     build:
@@ -49,7 +53,7 @@ jobs:
                   if-no-files-found: error
                   retention-days: 14
 
-    test:
+    examples-test:
         needs: build
         runs-on: ${{ matrix.os }}
         strategy:
@@ -89,5 +93,5 @@ jobs:
             - name: Install test dependencies
               run: python -m pip install -r examples/requirements.txt -r tests/requirements.txt
 
-            - name: Run the test suite
-              run: make install-test
+            - name: Run the examples tests
+              run: make examples-test
