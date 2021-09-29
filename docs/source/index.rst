@@ -42,6 +42,7 @@ for applying reinforcement learning to compiler optimizations.
    llvm/api
    compiler_gym/leaderboard
    compiler_gym/service
+   compiler_gym/service/runtime
    compiler_gym/spaces
    compiler_gym/views
    compiler_gym/wrappers

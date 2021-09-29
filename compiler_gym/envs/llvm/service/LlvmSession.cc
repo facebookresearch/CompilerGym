@@ -122,7 +122,12 @@ Status LlvmSession::applyAction(const Action& action, bool& endOfEpisode,
   switch (actionSpace()) {
     case LlvmActionSpace::PASSES_ALL:
       LlvmAction actionEnum;
-      RETURN_IF_ERROR(util::intToEnum(action.action(), &actionEnum));
+      if (action.choice_size() != 1) {
+        return Status(
+            StatusCode::INVALID_ARGUMENT,
+            fmt::format("Invalid choice count. Expected 1, received {}", action.choice_size()));
+      }
+      RETURN_IF_ERROR(util::intToEnum(action.choice(0).named_discrete_value_index(), &actionEnum));
       RETURN_IF_ERROR(applyPassAction(actionEnum, actionHadNoEffect));
   }
 

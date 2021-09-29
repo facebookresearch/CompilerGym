@@ -18,7 +18,9 @@ from compiler_gym.service.proto import (
     Action,
     ActionSpace,
     Benchmark,
+    ChoiceSpace,
     Int64List,
+    NamedDiscreteSpace,
     Observation,
     ObservationSpace,
     ScalarLimit,
@@ -37,12 +39,26 @@ class LoopToolCompilationSession(CompilationSession):
         ActionSpace(
             # shift around a single pre-split order, changing the size of splits
             name="simple",
-            action=["toggle_mode", "up", "down", "toggle_thread"],
+            choice=[
+                ChoiceSpace(
+                    name="controls",
+                    named_discrete_space=NamedDiscreteSpace(
+                        value=["toggle_mode", "up", "down", "toggle_thread"],
+                    ),
+                )
+            ],
         ),
         ActionSpace(
             # potentially define new splits
             name="split",
-            action=["toggle_mode", "up", "down", "toggle_thread", "split"],
+            choice=[
+                ChoiceSpace(
+                    name="controls",
+                    named_discrete_space=NamedDiscreteSpace(
+                        value=["toggle_mode", "up", "down", "toggle_thread", "split"],
+                    ),
+                )
+            ],
         ),
     ]
 
@@ -87,6 +103,7 @@ class LoopToolCompilationSession(CompilationSession):
         self, working_directory: Path, action_space: ActionSpace, benchmark: Benchmark
     ):
         super().__init__(working_directory, action_space, benchmark)
+        self.action_space = action_space
         if "cuda" in benchmark.uri:
             self.backend = "cuda"
             lt.set_default_hardware("cuda")
@@ -193,10 +210,18 @@ class LoopToolCompilationSession(CompilationSession):
         ), f"{end_size} != {self.size} ({a}, {b}), ({x}, {y}) -> ({a_}, {b_}), ({x + increment}, 0)"
 
     def apply_action(self, action: Action) -> Tuple[bool, Optional[ActionSpace], bool]:
-        logging.info("Applied action %d", action.action)
-        if action.action < 0 or action.action > len(self.action_spaces[0].action):
+        if len(action.choice) != 1:
+            raise ValueError("Invalid choice count")
+
+        choice_index = action.choice[0].named_discrete_value_index
+        if choice_index < 0 or choice_index >= len(
+            self.action_space.choice[0].named_discrete_space.value
+        ):
             raise ValueError("Out-of-range")
-        act = self.action_spaces[0].action[action.action]
+
+        logging.info("Applied action %d", choice_index)
+
+        act = self.action_space.choice[0].named_discrete_space.value[choice_index]
         if self.mode not in ["size", "select"]:
             raise RuntimeError("Invalid mode set: {}".format(self.mode))
         if act == "toggle_mode":

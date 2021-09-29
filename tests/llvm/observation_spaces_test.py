@@ -11,10 +11,10 @@ import networkx as nx
 import numpy as np
 import pytest
 from flaky import flaky
-from gym.spaces import Box
-from gym.spaces import Dict as DictSpace
 
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
+from compiler_gym.spaces import Box
+from compiler_gym.spaces import Dict as DictSpace
 from compiler_gym.spaces import Scalar, Sequence
 from tests.test_main import main
 
@@ -1326,7 +1326,7 @@ def test_add_derived_space(env: LlvmEnv):
     env.observation.add_derived_space(
         id="IrLen",
         base_id="Ir",
-        space=Box(low=0, high=float("inf"), shape=(1,), dtype=int),
+        space=Box(name="IrLen", low=0, high=float("inf"), shape=(1,), dtype=int),
         translate=lambda base: [15],
     )
 

@@ -13,7 +13,8 @@ def test_sample():
             CommandlineFlag(name="a", flag="-a", description=""),
             CommandlineFlag(name="b", flag="-b", description=""),
             CommandlineFlag(name="c", flag="-c", description=""),
-        ]
+        ],
+        name="test",
     )
     assert space.sample() in {0, 1, 2}
 
@@ -24,7 +25,8 @@ def test_contains():
             CommandlineFlag(name="a", flag="-a", description=""),
             CommandlineFlag(name="b", flag="-b", description=""),
             CommandlineFlag(name="c", flag="-c", description=""),
-        ]
+        ],
+        name="test",
     )
     assert space.contains(0)
     assert space.contains(1)
@@ -40,7 +42,8 @@ def test_commandline():
             CommandlineFlag(name="a", flag="-a", description=""),
             CommandlineFlag(name="b", flag="-b", description=""),
             CommandlineFlag(name="c", flag="-c", description=""),
-        ]
+        ],
+        name="test",
     )
 
     assert space.commandline([0, 1, 2]) == "-a -b -c"

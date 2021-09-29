@@ -31,6 +31,7 @@ from compiler_gym.service import (
 from compiler_gym.service.proto import Action, AddBenchmarkRequest
 from compiler_gym.service.proto import Benchmark as BenchmarkProto
 from compiler_gym.service.proto import (
+    Choice,
     EndSessionReply,
     EndSessionRequest,
     ForkSessionReply,
@@ -43,6 +44,7 @@ from compiler_gym.service.proto import (
     StartSessionRequest,
     StepReply,
     StepRequest,
+    proto_to_action_space,
 )
 from compiler_gym.spaces import DefaultRewardFromObservation, NamedDiscrete, Reward
 from compiler_gym.util.debug_util import get_logging_level
@@ -160,7 +162,7 @@ class CompilerEnv(gym.Env):
         service_connection: Optional[CompilerGymServiceConnection] = None,
         logger: Optional[logging.Logger] = None,
     ):
-        """Construct and initialize a CompilerGym service environment.
+        """Construct and initialize a CompilerGym environment.
 
         In normal use you should use :code:`gym.make(...)` rather than calling
         the constructor directly.
@@ -285,10 +287,12 @@ class CompilerEnv(gym.Env):
             pass
 
         # Process the available action, observation, and reward spaces.
-        self.action_spaces = [
-            self._make_action_space(space.name, space.action)
-            for space in self.service.action_spaces
+        action_spaces = [
+            proto_to_action_space(space) for space in self.service.action_spaces
         ]
+        self.action_spaces = [a.space for a in action_spaces]
+        self._make_actions = [a.make_action for a in action_spaces]
+
         self.observation = self._observation_view_type(
             raw_step=self.raw_step,
             spaces=self.service.observation_spaces,
@@ -299,6 +303,7 @@ class CompilerEnv(gym.Env):
         self._versions: Optional[GetVersionReply] = None
 
         self.action_space: Optional[Space] = None
+        self._make_action: Optional[Callable[[Any], Action]] = None
         self.observation_space: Optional[Space] = None
 
         # Mutable state initialized in reset().
@@ -413,6 +418,7 @@ class CompilerEnv(gym.Env):
             else 0
         )
         self._action_space: NamedDiscrete = self.action_spaces[index]
+        self._make_actions: Callable[[Any], Action] = self._make_actions[index]
 
     @property
     def benchmark(self) -> Benchmark:
@@ -829,8 +835,8 @@ class CompilerEnv(gym.Env):
 
         # If the action space has changed, update it.
         if reply.HasField("new_action_space"):
-            self.action_space = self._make_action_space(
-                self.action_space.name, reply.new_action_space.action
+            self.action_space, self._make_action = proto_to_action_space(
+                reply.new_action_space
             )
 
         self.reward.reset(benchmark=self.benchmark, observation_view=self.observation)
@@ -903,7 +909,9 @@ class CompilerEnv(gym.Env):
         # Send the request to the backend service.
         request = StepRequest(
             session_id=self._session_id,
-            action=[Action(action=a) for a in actions],
+            action=[
+                Action(choice=[Choice(named_discrete_value_index=a)]) for a in actions
+            ],
             observation_space=[
                 observation_space.index for observation_space in observations_to_compute
             ],
@@ -947,8 +955,8 @@ class CompilerEnv(gym.Env):
 
         # If the action space has changed, update it.
         if reply.HasField("new_action_space"):
-            self.action_space = self._make_action_space(
-                self.action_space.name, reply.action_space.action
+            self.action_space, self._make_action = proto_to_action_space(
+                reply.action_space
             )
 
         # Translate observations to python representations.
@@ -1109,18 +1117,6 @@ class CompilerEnv(gym.Env):
     def benchmarks(self) -> Iterable[str]:
         """Enumerate a (possible unbounded) list of available benchmarks."""
         return self.datasets.benchmark_uris()
-
-    def _make_action_space(self, name: str, entries: List[str]) -> Space:
-        """Create an action space from the given values.
-
-        Subclasses may override this method to produce specialized action
-        spaces.
-
-        :param name: The name of the action space.
-        :param entries: The entries in the action space.
-        :return: A :code:`gym.Space` instance.
-        """
-        return NamedDiscrete(entries, name)
 
     @property
     def _observation_view_type(self):
