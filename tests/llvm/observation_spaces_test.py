@@ -11,8 +11,6 @@ import networkx as nx
 import numpy as np
 import pytest
 from flaky import flaky
-from gym.spaces import Box
-from gym.spaces import Dict as DictSpace
 
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.spaces import Box
