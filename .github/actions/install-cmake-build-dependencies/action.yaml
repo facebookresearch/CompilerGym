@@ -1,0 +1,27 @@
+---
+name: Install CMake build dependencies
+description: Install CMake build dependencies
+runs:
+    using: composite
+    steps:
+        - uses: ./.github/actions/install-build-dependencies
+
+        - name: Install CMake dependencies
+          run: |
+              if [ "$(uname)" = "Darwin" ]; then
+                  echo "CMake build for Darwin is unimplemented."
+                  exit 1
+              else
+                  # Compiler
+                  sudo apt-get install clang++-9 lld-9 tar bzip2 ninja-build
+                  sudo apt-get install tar bzip2 ninja-build
+                  # CMake
+                  wget https://github.com/Kitware/CMake/releases/download/v3.20.5/cmake-3.20.5-linux-x86_64.sh -O /tmp/cmake.sh
+                  sudo bash /tmp/cmake.sh --prefix=/usr/local --exclude-subdir --skip-license
+                  rm /tmp/cmake.sh
+                  # protobuf
+                  sudo apt-get install autoconf libtool make
+                  # Testing
+                  sudo apt-get install coreutils
+              fi
+          shell: bash
