@@ -245,8 +245,10 @@ def test_benchmarks_iter_deprecated():
     ]
 
 
-def test_random_benchmark(mocker):
+@pytest.mark.parametrize("weight_datasets_by_size", [False, True])
+def test_random_benchmark(mocker, weight_datasets_by_size: bool):
     da = MockDataset("benchmark://foo-v0")
+    da.size = 10
     ba = MockBenchmark(uri="benchmark://foo-v0/abc")
     da.benchmark_values.append(ba)
     datasets = Datasets([da])
@@ -256,7 +258,13 @@ def test_random_benchmark(mocker):
     num_benchmarks = 5
     rng = np.random.default_rng(0)
     random_benchmarks = {
-        b.uri for b in (datasets.random_benchmark(rng) for _ in range(num_benchmarks))
+        b.uri
+        for b in (
+            datasets.random_benchmark(
+                rng, weight_datasets_by_size=weight_datasets_by_size
+            )
+            for _ in range(num_benchmarks)
+        )
     }
 
     assert da.random_benchmark.call_count == num_benchmarks
