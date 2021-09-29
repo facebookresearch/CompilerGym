@@ -20,7 +20,6 @@ import hashlib
 import math
 from enum import IntEnum
 from heapq import nlargest
-from multiprocessing import cpu_count
 from multiprocessing.pool import ThreadPool
 from queue import Queue
 from threading import Lock
@@ -29,18 +28,16 @@ from time import time
 import humanize
 from absl import app, flags
 
+import compiler_gym.util.flags.episode_length  # noqa Flag definition.
+import compiler_gym.util.flags.nproc  # noqa Flag definition.
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.flags.env_from_flags import env_from_flags
 from compiler_gym.wrappers import ConstrainedCommandline
 
 flags.DEFINE_list(
-    "actions",
+    "explore_actions",
     [],
     "A list of flag names to enumerate. If not provided, all actions are used.",
-)
-flags.DEFINE_integer("episode_length", 5, "The number of steps in each episode.")
-flags.DEFINE_integer(
-    "nproc", cpu_count(), "The number of parallel worker threads to run."
 )
 flags.DEFINE_integer(
     "topn",
@@ -57,8 +54,8 @@ FLAGS = flags.FLAGS
 
 def make_env():
     env = env_from_flags(benchmark=benchmark_from_flags())
-    if FLAGS.actions:
-        env = ConstrainedCommandline(env, flags=FLAGS.actions)
+    if FLAGS.explore_actions:
+        env = ConstrainedCommandline(env, flags=FLAGS.explore_actions)
     return env
 
 
@@ -447,8 +444,8 @@ def main(argv):
 
     print(f"Running with {FLAGS.nproc} threads.")
     assert FLAGS.nproc >= 1
+    envs = []
     try:
-        envs = []
         for _ in range(FLAGS.nproc):
             envs.append(make_env())
         compute_action_graph(envs, episode_length=FLAGS.episode_length)

@@ -1,3 +1,10 @@
+# syntax=docker/dockerfile:1
+#
+# Copyright (c) Facebook, Inc. and its affiliates.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+#
 # A linux environment for building CompilerGym wheels for Linux.
 #
 # CompilerGym builts against LLVM binaries for Ubuntu 18.04. This docker image
@@ -13,6 +20,7 @@ RUN apt-get update \
         cmake \
         curl \
         libtinfo5 \
+        m4 \
         make \
         patch \
         patchelf \

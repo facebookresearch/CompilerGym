@@ -13,8 +13,18 @@ py_library(
     data = ["//compiler_gym/envs/llvm/service"],
     visibility = ["//visibility:public"],
     deps = [
+        ":compute_observation",
         ":llvm_benchmark",
         ":llvm_env",
+        "//compiler_gym/util",
+    ],
+)
+
+py_library(
+    name = "compute_observation",
+    srcs = ["compute_observation.py"],
+    data = ["//compiler_gym/envs/llvm/service:compute_observation-files"],
+    deps = [
         "//compiler_gym/util",
     ],
 )

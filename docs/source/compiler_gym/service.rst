@@ -50,6 +50,8 @@ exception types, all inheriting from a base :class:`ServiceError
 
 .. autoexception:: ServiceError
 
+.. autoexception:: EnvironmentNotSupported
+
 .. autoexception:: ServiceInitError
 
 .. autoexception:: ServiceTransportError

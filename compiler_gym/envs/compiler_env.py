@@ -11,7 +11,7 @@ from copy import deepcopy
 from math import isclose
 from pathlib import Path
 from time import time
-from typing import Callable, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 
 import gym
 import numpy as np
@@ -119,6 +119,11 @@ class CompilerEnv(gym.Env):
     :ivar action_spaces: A list of supported action space names.
 
     :vartype action_spaces: List[str]
+
+    :ivar actions: The list of actions that have been performed since the
+        previous call to :func:`reset`.
+
+    :vartype actions: List[int]
 
     :ivar reward_range: A tuple indicating the range of reward values. Default
         range is (-inf, +inf).
@@ -228,14 +233,14 @@ class CompilerEnv(gym.Env):
         self._service_endpoint: Union[str, Path] = service
         self._connection_settings = connection_settings or ConnectionOpts()
 
-        self.action_space_name = action_space
-
         self.service = service_connection or CompilerGymServiceConnection(
             endpoint=self._service_endpoint,
             opts=self._connection_settings,
             logger=self.logger,
         )
         self.datasets = Datasets(datasets or [])
+
+        self.action_space_name = action_space
 
         # If no reward space is specified, generate some from numeric observation spaces
         rewards = rewards or [
@@ -467,11 +472,17 @@ class CompilerEnv(gym.Env):
         if reward_space:
             if reward_space not in self.reward.spaces:
                 raise LookupError(f"Reward space not found: {reward_space}")
+            # The reward space remains unchanged, nothing to do.
+            if reward_space == self.reward_space:
+                return
             self.reward_space_spec = self.reward.spaces[reward_space]
             self.reward_range = (
                 self.reward_space_spec.min,
                 self.reward_space_spec.max,
             )
+            # Reset any cumulative rewards, if we're in an episode.
+            if self.in_episode:
+                self.episode_reward = 0
         else:
             # If no reward space is being used then set the reward range to
             # unbounded.
@@ -517,6 +528,17 @@ class CompilerEnv(gym.Env):
         else:
             self.observation_space_spec = None
 
+    def _init_kwargs(self) -> Dict[str, Any]:
+        """Retturn a dictionary of keyword arguments used to initialize the
+        environment.
+        """
+        return {
+            "action_space": self.action_space,
+            "benchmark": self.benchmark,
+            "connection_settings": self._connection_settings,
+            "service": self._service_endpoint,
+        }
+
     def fork(self) -> "CompilerEnv":
         """Fork a new environment with exactly the same state.
 
@@ -558,38 +580,28 @@ class CompilerEnv(gym.Env):
             )
 
             # Create a new environment that shares the connection.
-            new_env = type(self)(
-                service=self._service_endpoint,
-                action_space=self.action_space,
-                connection_settings=self._connection_settings,
-                service_connection=self.service,
-            )
+            new_env = type(self)(**self._init_kwargs(), service_connection=self.service)
 
             # Set the session ID.
             new_env._session_id = reply.session_id  # pylint: disable=protected-access
             new_env.observation.session_id = reply.session_id
 
-            # Now that we have initialized the environment with the current state,
-            # set the benchmark so that calls to new_env.reset() will correctly
-            # revert the environment to the initial benchmark state.
+            # Now that we have initialized the environment with the current
+            # state, set the benchmark so that calls to new_env.reset() will
+            # correctly revert the environment to the initial benchmark state.
             #
             # pylint: disable=protected-access
             new_env._next_benchmark = self._benchmark_in_use
 
-            # Set the "visible" name of the current benchmark to hide the fact that
-            # we loaded from a custom bitcode file.
+            # Set the "visible" name of the current benchmark to hide the fact
+            # that we loaded from a custom benchmark file.
             new_env._benchmark_in_use = self._benchmark_in_use
         except NotImplementedError:
             # Fallback implementation. If the compiler service does not support
             # the Fork() operator then we create a new independent environment
             # and apply the sequence of actions in the current environment to
             # replay the state.
-            new_env = type(self)(
-                service=self._service_endpoint,
-                action_space=self.action_space,
-                benchmark=self.benchmark,
-                connection_settings=self._connection_settings,
-            )
+            new_env = type(self)(**self._init_kwargs())
             new_env.reset()
             _, _, done, _ = new_env.step(self.actions)
             assert not done, "Failed to replay action sequence in forked environment"
@@ -699,6 +711,35 @@ class CompilerEnv(gym.Env):
         :raises TypeError: If no benchmark has been set, and the environment
             does not have a default benchmark to select from.
         """
+
+        def _retry(error) -> Optional[ObservationType]:
+            """Abort and retry on error."""
+            self.logger.warning("%s during reset(): %s", type(error).__name__, error)
+            if self.service:
+                self.service.close()
+            self.service = None
+
+            if retry_count >= self._connection_settings.init_max_attempts:
+                raise OSError(
+                    f"Failed to reset environment after {retry_count - 1} attempts.\n"
+                    f"Last error ({type(error).__name__}): {error}"
+                ) from error
+            else:
+                return self.reset(
+                    benchmark=benchmark,
+                    action_space=action_space,
+                    retry_count=retry_count + 1,
+                )
+
+        def _call_with_error(
+            stub_method, *args, **kwargs
+        ) -> Tuple[Optional[Exception], Optional[Any]]:
+            """Call the given stub method. And return an <error, return> tuple."""
+            try:
+                return None, self.service(stub_method, *args, **kwargs)
+            except (ServiceError, ServiceTransportError, TimeoutError) as e:
+                return e, None
+
         if not self._next_benchmark:
             raise TypeError(
                 "No benchmark set. Set a benchmark using "
@@ -717,10 +758,17 @@ class CompilerEnv(gym.Env):
         # Stop an existing episode.
         if self.in_episode:
             self.logger.debug("Ending session %d", self._session_id)
-            self.service(
+            error, _ = _call_with_error(
                 self.service.stub.EndSession,
                 EndSessionRequest(session_id=self._session_id),
             )
+            if error:
+                self.logger.warning(
+                    "Failed to stop session %d with %s: %s",
+                    self._session_id,
+                    type(error).__name__,
+                    error,
+                )
             self._session_id = None
 
         # Update the user requested benchmark, if provided.
@@ -753,33 +801,25 @@ class CompilerEnv(gym.Env):
         )
 
         try:
-            reply = self.service(self.service.stub.StartSession, start_session_request)
+            error, reply = _call_with_error(
+                self.service.stub.StartSession, start_session_request
+            )
+            if error:
+                return _retry(error)
         except FileNotFoundError:
-            # The benchmark was not found, so try adding it and repeating the
-            # request.
-            self.service(
+            # The benchmark was not found, so try adding it and then repeating
+            # the request.
+            error, _ = _call_with_error(
                 self.service.stub.AddBenchmark,
                 AddBenchmarkRequest(benchmark=[self._benchmark_in_use.proto]),
             )
-            reply = self.service(self.service.stub.StartSession, start_session_request)
-        except (ServiceError, ServiceTransportError, TimeoutError) as e:
-            # Abort and retry on error.
-            self.logger.warning("%s on reset(): %s", type(e).__name__, e)
-            if self.service:
-                self.service.close()
-            self.service = None
-
-            if retry_count >= self._connection_settings.init_max_attempts:
-                raise OSError(
-                    f"Failed to reset environment after {retry_count - 1} attempts.\n"
-                    f"Last error ({type(e).__name__}): {e}"
-                ) from e
-            else:
-                return self.reset(
-                    benchmark=benchmark,
-                    action_space=action_space,
-                    retry_count=retry_count + 1,
-                )
+            if error:
+                return _retry(error)
+            error, reply = _call_with_error(
+                self.service.stub.StartSession, start_session_request
+            )
+            if error:
+                return _retry(error)
 
         self._session_id = reply.session_id
         self.observation.session_id = reply.session_id
@@ -889,7 +929,8 @@ class CompilerEnv(gym.Env):
                 self.close()
             except ServiceError as e:
                 # close() can raise ServiceError if the service exists with a
-                # non-zero return code. If so,
+                # non-zero return code. We swallow the error here but propagate
+                # the diagnostic message.
                 info[
                     "error_details"
                 ] += f". Additional error during environment closing: {e}"

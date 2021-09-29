@@ -42,16 +42,13 @@ FLAGS = flags.FLAGS
 
 def run_random_search(num_episodes, num_steps) -> None:
     """The inner loop of a load test benchmark."""
-    env = env_from_flags(benchmark=benchmark_from_flags())
-    try:
+    with env_from_flags(benchmark=benchmark_from_flags()) as env:
         for _ in range(num_episodes):
             env.reset()
             for _ in range(num_steps):
                 _, _, done, _ = env.step(env.action_space.sample())
                 if done:
                     break
-    finally:
-        env.close()
 
 
 def main(argv):

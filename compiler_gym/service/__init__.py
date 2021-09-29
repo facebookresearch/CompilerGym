@@ -6,6 +6,7 @@ from compiler_gym.service.compilation_session import CompilationSession
 from compiler_gym.service.connection import (
     CompilerGymServiceConnection,
     ConnectionOpts,
+    EnvironmentNotSupported,
     ServiceError,
     ServiceInitError,
     ServiceIsClosed,
@@ -18,6 +19,7 @@ __all__ = [
     "CompilerGymServiceConnection",
     "CompilationSession",
     "ConnectionOpts",
+    "EnvironmentNotSupported",
     "ServiceError",
     "ServiceInitError",
     "ServiceIsClosed",

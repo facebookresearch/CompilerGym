@@ -19,25 +19,19 @@ from tests.test_main import main
 @pytest.fixture(scope="function")
 def connection() -> CompilerGymServiceConnection:
     """Yields a connection to a local service."""
-    env = gym.make("llvm-v0")
-    try:
+    with gym.make("llvm-v0") as env:
         yield env.service
-    finally:
-        env.close()
 
 
 @pytest.fixture(scope="function")
 def dead_connection() -> CompilerGymServiceConnection:
     """Yields a connection to a dead local service service."""
-    env = gym.make("llvm-v0")
-    try:
+    with gym.make("llvm-v0") as env:
         # Kill the service.
         env.service.connection.process.terminate()
         env.service.connection.process.communicate()
 
         yield env.service
-    finally:
-        env.close()
 
 
 def test_create_invalid_options():

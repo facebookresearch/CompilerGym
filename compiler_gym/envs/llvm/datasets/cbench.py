@@ -20,7 +20,7 @@ from typing import Callable, Dict, List, NamedTuple, Optional
 import fasteners
 
 from compiler_gym.datasets import Benchmark, TarDatasetWithManifest
-from compiler_gym.service.proto import BenchmarkDynamicConfig
+from compiler_gym.service.proto import BenchmarkDynamicConfig, Command
 from compiler_gym.third_party import llvm
 from compiler_gym.util.download import download
 from compiler_gym.util.runfiles_path import cache_path, site_data_path
@@ -488,14 +488,22 @@ def validator(
     # Create the BenchmarkDynamicConfig object.
     cbench_data = site_data_path("llvm-v0/cbench-v1-runtime-data/runtime_data")
     DYNAMIC_CONFIGS[benchmark] = BenchmarkDynamicConfig(
-        build_cmd=" ".join(["$CC $<"] + linkopts),
-        build_genfile="a.out",
-        run_cmd=cmd.replace("$BIN", "./a.out").replace("$D", str(cbench_data)),
-        pre_run_cmd=["echo 1 > _finfo_dataset"],
-        run_genfile=[str(s) for s in outfiles],
-        build_cmd_timeout_seconds=60,
-        run_cmd_timeout_seconds=300,
-        pre_run_cmd_timeout_seconds=60,
+        build_cmd=Command(
+            argument=["$CC", "$IN"] + linkopts,
+            timeout_seconds=60,
+            outfile=["a.out"],
+        ),
+        run_cmd=Command(
+            argument=cmd.replace("$BIN", "./a.out")
+            .replace("$D", str(cbench_data))
+            .split(),
+            timeout_seconds=300,
+            infile=["a.out", "_finfo_dataset"],
+            outfile=[str(s) for s in outfiles],
+        ),
+        pre_run_cmd=[
+            Command(argument=["echo", "1", ">_finfo_dataset"], timeout_seconds=30),
+        ],
     )
 
     return True

@@ -1,5 +1,5 @@
-CXX ?= clang++
-LLVM_LINK ?= llvm-link
+CXX := clang++-11
+LLVM_LINK := llvm-link-11
 
 this_dir := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 
@@ -7,7 +7,7 @@ this_dir := $(dir $(realpath $(firstword $(MAKEFILE_LIST))))
 SRCDIR := third_party/NPB-CPP/NPB-SER/CG
 
 # The list of binary targets defined in this file.
-BINARIES := cg cg-unoptimized cg-optimized cg-gym-optimized
+BINARIES := cg cg-Oz cg-CompilerGym
 
 all: $(BINARIES)
 .DEFAULT_GOAL := all
@@ -27,26 +27,24 @@ cg: $(SRCDIR)/cg.o $(SRCDIR)/c_print_results.o $(SRCDIR)/c_randdp.o $(SRCDIR)/c_
 %.bc: %.cpp
 	$(CXX) -emit-llvm -c -O0 -Xclang -disable-O0-optnone -Xclang -disable-llvm-passes $< -o $@
 
-$(SRCDIR)/unoptimized.bc: $(SRCDIR)/cg.bc $(SRCDIR)/c_print_results.bc $(SRCDIR)/c_randdp.bc $(SRCDIR)/c_timers.bc $(SRCDIR)/wtime.bc
+cg.bc: $(SRCDIR)/cg.bc $(SRCDIR)/c_print_results.bc $(SRCDIR)/c_randdp.bc $(SRCDIR)/c_timers.bc $(SRCDIR)/wtime.bc
 	$(LLVM_LINK) $^ -o $@
 
-cg-unoptimized: $(SRCDIR)/unoptimized.bc
-	$(CXX) $< -o $@
-
-cg-optimized: $(SRCDIR)/unoptimized.bc
+cg-Oz: cg.bc
 	$(CXX) -Oz $< -o $@
 
 # Optimize through random search using CompilerGym
 # ------------------------------------------------
 
-SEARCH_TIME ?= 300
+SEARCH_TIME ?= 60
 
-$(SRCDIR)/gym-optimized.bc: $(SRCDIR)/unoptimized.bc
+cg-CompilerGym.bc: cg.bc
 	@echo "Running CompilerGym ..."
-	@mkdir -p compiler_gym_logs logs
+	@mkdir -p logs
 	@touch logs/random_search.json  # file must exist
-	@if python -m compiler_gym.bin.random_search --env=llvm-ic-v0 \
+	@if python -m compiler_gym.bin.random_search --env=llvm-v0 \
 		    --benchmark=file:///$(this_dir)/$< --runtime=$(SEARCH_TIME) \
+			--reward=IrInstructionCountOz \
 		    --output_dir=$(this_dir)/logs --fail_threshold=1; then \
         cp -v logs/optimized.bc $@; \
 	else \
@@ -54,22 +52,24 @@ $(SRCDIR)/gym-optimized.bc: $(SRCDIR)/unoptimized.bc
         cp -v $< $@; \
 	fi
 
-cg-gym-optimized: $(SRCDIR)/gym-optimized.bc
+cg-CompilerGym: cg-CompilerGym.bc
 	$(CXX) -Xlinker=--nomagic -v $< -o $@
+
+.PHONY: cg-CompilerGym.bc
 
 # Tests
 # -----
 
-test: cg cg-unoptimized cg-gym-optimized
+test: cg cg-Oz cg-CompilerGym
 	test -x cg
-	test -x cg-unoptimized
-	test -x cg-gym-optimized
+	test -x cg-Oz
+	test -x cg-CompilerGym
 
 # Tidy up
 # -------
 
 .PHONY: clean
 clean:
-	rm -rf $(SRCDIR)/*.bc $(SRCDIR)/*.o logs $(BINARIES)
+	rm -rf *.bc $(SRCDIR)/*.bc $(SRCDIR)/*.o logs $(BINARIES)
 
 .PHONY: clean

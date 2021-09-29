@@ -109,3 +109,26 @@
 .description-tooltip2 {
   font-size: smaller;
 }
+
+/*** SingleChart Modal ****/
+
+.wrap-modals {
+  position: relative;
+}
+
+.modal_trends {
+  background-color: rgba(0,0,0,0.5);
+  position: sticky;
+  height: 50vh;
+  width: 100%;
+  top: 36px;
+  right: 0;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  z-index: 10;
+  button {
+    border-radius: 10px;
+    font-size: small;
+  }
+}

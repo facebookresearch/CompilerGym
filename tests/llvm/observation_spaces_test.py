@@ -10,6 +10,7 @@ from typing import Any, Dict, List
 import networkx as nx
 import numpy as np
 import pytest
+from flaky import flaky
 from gym.spaces import Box
 from gym.spaces import Dict as DictSpace
 
@@ -1165,6 +1166,7 @@ def test_object_text_size_observation_spaces(env: LlvmEnv):
     assert value == crc32_code_sizes[sys.platform][2]
 
 
+@flaky  # Runtimes can timeout
 def test_runtime_observation_space(env: LlvmEnv):
     env.reset("cbench-v1/crc32")
     key = "Runtime"
@@ -1188,6 +1190,7 @@ def test_runtime_observation_space(env: LlvmEnv):
     assert len(set(value)) > 1
 
 
+@flaky  # Runtimes can timeout
 def test_runtime_observation_space_different_observation_count(env: LlvmEnv):
     """Test setting a custom observation count for LLVM runtimes."""
     env.reset("cbench-v1/crc32")
@@ -1208,6 +1211,7 @@ def test_runtime_observation_space_different_observation_count(env: LlvmEnv):
     assert value.shape == (5,)
 
 
+@flaky  # Runtimes can timeout
 def test_runtime_observation_space_invalid_observation_count(env: LlvmEnv):
     """Test setting an invalid custom observation count for LLVM runtimes."""
     env.reset("cbench-v1/crc32")
@@ -1233,6 +1237,7 @@ def test_runtime_observation_space_not_runnable(env: LlvmEnv):
     assert space.space.contains(value)
 
 
+@flaky  # Build can timeout
 def test_buildtime_observation_space(env: LlvmEnv):
     env.reset("cbench-v1/crc32")
     key = "Buildtime"

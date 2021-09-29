@@ -32,6 +32,14 @@ StrLenConstexpr.h
 
 .. doxygenfile:: compiler_gym/util/StrLenConstexpr.h
 
+Subprocess.h
+------------
+
+:code:`#include "compiler_gym/util/Subprocess.h"`
+
+.. doxygenfile:: compiler_gym/util/Subprocess.h
+
+
 Unreachable.h
 -------------
 

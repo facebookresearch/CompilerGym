@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 """Tests for LLVM session parameter handlers."""
 import pytest
+from flaky import flaky
 
 from compiler_gym.envs.llvm import LlvmEnv
 from compiler_gym.service import SessionNotFound
@@ -66,6 +67,7 @@ def test_benchmarks_cache_parameter_invalid_int_type(env: LlvmEnv):
         env.send_params(("service.benchmark_cache.set_max_size_in_bytes", "not an int"))
 
 
+@flaky  # Runtime can timeout.
 @pytest.mark.parametrize("n", [1, 3, 10])
 def test_runtime_observation_parameters(env: LlvmEnv, n: int):
     env.observation_space = "Runtime"

@@ -8,16 +8,19 @@
 #include <fmt/format.h>
 #include <glog/logging.h>
 
+#include <boost/process.hpp>
+#include <chrono>
+#include <future>
 #include <iomanip>
 #include <optional>
 #include <string>
-#include <subprocess/subprocess.hpp>
 
 #include "boost/filesystem.hpp"
 #include "compiler_gym/envs/llvm/service/ActionSpace.h"
 #include "compiler_gym/envs/llvm/service/Benchmark.h"
 #include "compiler_gym/envs/llvm/service/BenchmarkFactory.h"
 #include "compiler_gym/envs/llvm/service/Cost.h"
+#include "compiler_gym/envs/llvm/service/Observation.h"
 #include "compiler_gym/envs/llvm/service/ObservationSpaces.h"
 #include "compiler_gym/envs/llvm/service/passes/ActionHeaders.h"
 #include "compiler_gym/envs/llvm/service/passes/ActionSwitch.h"
@@ -40,6 +43,7 @@
 #include "programl/ir/llvm/llvm.h"
 
 namespace fs = boost::filesystem;
+namespace bp = boost::process;
 
 namespace compiler_gym::llvm_service {
 
@@ -56,17 +60,6 @@ namespace {
 llvm::TargetLibraryInfoImpl getTargetLibraryInfo(llvm::Module& module) {
   llvm::Triple triple(module.getTargetTriple());
   return llvm::TargetLibraryInfoImpl(triple);
-}
-
-Status writeBitcodeToFile(const llvm::Module& module, const fs::path& path) {
-  std::error_code error;
-  llvm::raw_fd_ostream outfile(path.string(), error);
-  if (error.value()) {
-    return Status(StatusCode::INTERNAL,
-                  fmt::format("Failed to write bitcode file: {}", path.string()));
-  }
-  llvm::WriteBitcodeToFile(module, outfile);
-  return Status::OK;
 }
 
 }  // anonymous namespace
@@ -156,8 +149,8 @@ Status LlvmSession::computeObservation(const ObservationSpace& observationSpace,
         fmt::format("Could not interpret observation space name: {}", observationSpace.name()));
   }
   const LlvmObservationSpace observationSpaceEnum = it->second;
-  RETURN_IF_ERROR(computeObservation(observationSpaceEnum, observation));
-  return Status::OK;
+
+  return setObservation(observationSpaceEnum, workingDirectory(), benchmark(), observation);
 }
 
 Status LlvmSession::handleSessionParameter(const std::string& key, const std::string& value,
@@ -173,6 +166,18 @@ Status LlvmSession::handleSessionParameter(const std::string& key, const std::st
     reply = value;
   } else if (key == "llvm.get_runtimes_per_observation_count") {
     reply = fmt::format("{}", benchmark().getRuntimesPerObservationCount());
+  } else if (key == "llvm.set_warmup_runs_count_per_runtime_observation") {
+    const int ivalue = std::stoi(value);
+    if (ivalue < 0) {
+      return Status(
+          StatusCode::INVALID_ARGUMENT,
+          fmt::format("warmup_runs_count_per_runtime_observation must be >= 0. Received: {}",
+                      ivalue));
+    }
+    benchmark().setWarmupRunsPerRuntimeObservationCount(ivalue);
+    reply = value;
+  } else if (key == "llvm.get_warmup_runs_count_per_runtime_observation") {
+    reply = fmt::format("{}", benchmark().getWarmupRunsPerRuntimeObservationCount());
   } else if (key == "llvm.set_buildtimes_per_observation_count") {
     const int ivalue = std::stoi(value);
     if (ivalue < 1) {
@@ -247,29 +252,44 @@ Status LlvmSession::runOptWithArgs(const std::vector<std::string>& optArgs) {
   // Create temporary files for `opt` to read from and write to.
   const auto before_path = fs::unique_path(workingDirectory() / "module-%%%%%%%%.bc");
   const auto after_path = fs::unique_path(workingDirectory() / "module-%%%%%%%%.bc");
-  RETURN_IF_ERROR(writeBitcodeToFile(benchmark().module(), before_path));
+  RETURN_IF_ERROR(writeBitcodeFile(benchmark().module(), before_path));
 
   // Build a command line invocation: `opt input.bc -o output.bc <optArgs...>`.
   const auto optPath = util::getSiteDataPath("llvm-v0/bin/opt");
   if (!fs::exists(optPath)) {
     return Status(StatusCode::INTERNAL, fmt::format("File not found: {}", optPath.string()));
   }
-  std::vector<std::string> optCmd{optPath.string(), before_path.string(), "-o",
-                                  after_path.string()};
-  optCmd.insert(optCmd.end(), optArgs.begin(), optArgs.end());
+
+  std::string optCmd =
+      fmt::format("{} {} -o {}", optPath.string(), before_path.string(), after_path.string());
+  for (const auto& arg : optArgs) {
+    optCmd += " " + arg;
+  }
 
   // Run the opt command line.
-  auto opt = subprocess::Popen(optCmd, subprocess::output{subprocess::PIPE},
-                               subprocess::error{subprocess::PIPE});
-  const auto optOutput = opt.communicate();
-  fs::remove(before_path);
+  try {
+    boost::asio::io_context optStderrStream;
+    std::future<std::string> optStderrFuture;
 
-  if (opt.retcode()) {
-    if (fs::exists(after_path)) {
-      fs::remove(after_path);
+    bp::child opt(optCmd, bp::std_in.close(), bp::std_out > bp::null, bp::std_err > optStderrFuture,
+                  optStderrStream);
+
+    if (!util::wait_for(opt, std::chrono::seconds(60))) {
+      return Status(StatusCode::DEADLINE_EXCEEDED,
+                    fmt::format("Failed to run opt within 60 seconds: {}", optCmd));
     }
-    const std::string error(optOutput.second.buf.begin(), optOutput.second.buf.end());
-    return Status(StatusCode::INTERNAL, error);
+    optStderrStream.run();
+    if (opt.exit_code()) {
+      const std::string stderr = optStderrFuture.get();
+      return Status(StatusCode::INTERNAL,
+                    fmt::format("Opt command '{}' failed with return code {}: {}", optCmd,
+                                opt.exit_code(), stderr));
+    }
+    fs::remove(before_path);
+  } catch (bp::process_error& e) {
+    fs::remove(before_path);
+    return Status(StatusCode::INTERNAL,
+                  fmt::format("Failed to run opt command '{}': {}", optCmd, e.what()));
   }
 
   if (!fs::exists(after_path)) {
@@ -288,185 +308,6 @@ Status LlvmSession::runOptWithArgs(const std::vector<std::string>& optArgs) {
   auto module = makeModule(benchmark().context(), bitcode, benchmark().name(), &status);
   RETURN_IF_ERROR(status);
   benchmark().replaceModule(std::move(module));
-
-  return Status::OK;
-}
-
-Status LlvmSession::computeObservation(LlvmObservationSpace space, Observation& reply) {
-  switch (space) {
-    case LlvmObservationSpace::IR: {
-      // Serialize the LLVM module to an IR string.
-      std::string ir;
-      llvm::raw_string_ostream rso(ir);
-      benchmark().module().print(rso, /*AAW=*/nullptr);
-      reply.set_string_value(ir);
-      break;
-    }
-    case LlvmObservationSpace::IR_SHA1: {
-      std::stringstream ss;
-      const BenchmarkHash hash = benchmark().module_hash();
-      // Hex encode, zero pad, and concatenate the unsigned integers that
-      // contain the hash.
-      for (uint32_t val : hash) {
-        ss << std::setfill('0') << std::setw(sizeof(BenchmarkHash::value_type) * 2) << std::hex
-           << val;
-      }
-      reply.set_string_value(ss.str());
-      break;
-    }
-    case LlvmObservationSpace::BITCODE_FILE: {
-      // Generate an output path with 16 bits of randomness.
-      const auto outpath = fs::unique_path(workingDirectory() / "module-%%%%%%%%.bc");
-      RETURN_IF_ERROR(writeBitcodeToFile(benchmark().module(), outpath));
-      reply.set_string_value(outpath.string());
-      break;
-    }
-    case LlvmObservationSpace::INST_COUNT: {
-      const auto features = InstCount::getFeatureVector(benchmark().module());
-      *reply.mutable_int64_list()->mutable_value() = {features.begin(), features.end()};
-      break;
-    }
-    case LlvmObservationSpace::AUTOPHASE: {
-      const auto features = autophase::InstCount::getFeatureVector(benchmark().module());
-      *reply.mutable_int64_list()->mutable_value() = {features.begin(), features.end()};
-      break;
-    }
-    case LlvmObservationSpace::PROGRAML:
-    case LlvmObservationSpace::PROGRAML_JSON: {
-      // Build the ProGraML graph.
-      programl::ProgramGraph graph;
-      auto status =
-          programl::ir::llvm::BuildProgramGraph(benchmark().module(), &graph, programlOptions_);
-      if (!status.ok()) {
-        return Status(StatusCode::INTERNAL, status.error_message());
-      }
-
-      // Serialize the graph to a JSON node link graph.
-      json nodeLinkGraph;
-      status = programl::graph::format::ProgramGraphToNodeLinkGraph(graph, &nodeLinkGraph);
-      if (!status.ok()) {
-        return Status(StatusCode::INTERNAL, status.error_message());
-      }
-      *reply.mutable_string_value() = nodeLinkGraph.dump();
-      break;
-    }
-    case LlvmObservationSpace::CPU_INFO: {
-      json hwinfo;
-      auto caches = {
-          std::make_tuple("l1i_cache", cpuinfo_get_l1i_caches(), cpuinfo_get_l1d_caches_count()),
-          {"l1d_cache", cpuinfo_get_l1d_caches(), cpuinfo_get_l1d_caches_count()},
-          {"l2_cache", cpuinfo_get_l2_caches(), cpuinfo_get_l2_caches_count()},
-          {"l3_cache", cpuinfo_get_l3_caches(), cpuinfo_get_l3_caches_count()},
-          {"l4_cache", cpuinfo_get_l4_caches(), cpuinfo_get_l4_caches_count()}};
-      for (auto [name, cache, count] : caches) {
-        std::string sizeName = std::string(name) + "_size";
-        std::string countName = std::string(name) + "_count";
-        if (cache) {
-          hwinfo[sizeName] = cache->size;
-          hwinfo[countName] = count;
-        } else {
-          hwinfo[sizeName] = -1;
-          hwinfo[countName] = count;
-        }
-      }
-      hwinfo["cores_count"] = cpuinfo_get_cores_count();
-      auto cpu = cpuinfo_get_packages();
-      hwinfo["name"] = cpu->name;
-      *reply.mutable_string_value() = hwinfo.dump();
-      break;
-    }
-    case LlvmObservationSpace::IR_INSTRUCTION_COUNT: {
-      double cost;
-      RETURN_IF_ERROR(setCost(LlvmCostFunction::IR_INSTRUCTION_COUNT, benchmark().module(),
-                              workingDirectory(), &cost));
-      reply.set_scalar_int64(static_cast<int64_t>(cost));
-      break;
-    }
-    case LlvmObservationSpace::IR_INSTRUCTION_COUNT_O0: {
-      const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O0,
-                                        LlvmCostFunction::IR_INSTRUCTION_COUNT);
-      reply.set_scalar_int64(static_cast<int64_t>(cost));
-      break;
-    }
-    case LlvmObservationSpace::IR_INSTRUCTION_COUNT_O3: {
-      const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O3,
-                                        LlvmCostFunction::IR_INSTRUCTION_COUNT);
-      reply.set_scalar_int64(static_cast<int64_t>(cost));
-      break;
-    }
-    case LlvmObservationSpace::IR_INSTRUCTION_COUNT_OZ: {
-      const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::Oz,
-                                        LlvmCostFunction::IR_INSTRUCTION_COUNT);
-      reply.set_scalar_int64(static_cast<int64_t>(cost));
-      break;
-    }
-    case LlvmObservationSpace::OBJECT_TEXT_SIZE_BYTES: {
-      double cost;
-      RETURN_IF_ERROR(setCost(LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES, benchmark().module(),
-                              workingDirectory(), &cost));
-      reply.set_scalar_int64(static_cast<int64_t>(cost));
-      break;
-    }
-    case LlvmObservationSpace::OBJECT_TEXT_SIZE_O0: {
-      const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O0,
-                                        LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES);
-      reply.set_scalar_int64(static_cast<int64_t>(cost));
-      break;
-    }
-    case LlvmObservationSpace::OBJECT_TEXT_SIZE_O3: {
-      const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O3,
-                                        LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES);
-      reply.set_scalar_int64(static_cast<int64_t>(cost));
-      break;
-    }
-    case LlvmObservationSpace::OBJECT_TEXT_SIZE_OZ: {
-      const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::Oz,
-                                        LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES);
-      reply.set_scalar_int64(static_cast<int64_t>(cost));
-      break;
-    }
-#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
-    case LlvmObservationSpace::TEXT_SIZE_BYTES: {
-      double cost;
-      RETURN_IF_ERROR(setCost(LlvmCostFunction::TEXT_SIZE_BYTES, benchmark().module(),
-                              workingDirectory(), &cost));
-      reply.set_scalar_int64(static_cast<int64_t>(cost));
-      break;
-    }
-    case LlvmObservationSpace::TEXT_SIZE_O0: {
-      const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O0,
-                                        LlvmCostFunction::TEXT_SIZE_BYTES);
-      reply.set_scalar_int64(static_cast<int64_t>(cost));
-      break;
-    }
-    case LlvmObservationSpace::TEXT_SIZE_O3: {
-      const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::O3,
-                                        LlvmCostFunction::TEXT_SIZE_BYTES);
-      reply.set_scalar_int64(static_cast<int64_t>(cost));
-      break;
-    }
-    case LlvmObservationSpace::TEXT_SIZE_OZ: {
-      const auto cost = getBaselineCost(benchmark().baselineCosts(), LlvmBaselinePolicy::Oz,
-                                        LlvmCostFunction::TEXT_SIZE_BYTES);
-      reply.set_scalar_int64(static_cast<int64_t>(cost));
-      break;
-    }
-#endif
-    case LlvmObservationSpace::RUNTIME: {
-      return benchmark().computeRuntime(reply);
-    }
-    case LlvmObservationSpace::IS_BUILDABLE: {
-      reply.set_scalar_int64(benchmark().isBuildable() ? 1 : 0);
-      break;
-    }
-    case LlvmObservationSpace::IS_RUNNABLE: {
-      reply.set_scalar_int64(benchmark().isRunnable() ? 1 : 0);
-      break;
-    }
-    case LlvmObservationSpace::BUILDTIME: {
-      return benchmark().computeBuildtime(reply);
-    }
-  }
 
   return Status::OK;
 }

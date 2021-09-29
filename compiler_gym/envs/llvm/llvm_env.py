@@ -83,11 +83,6 @@ class LlvmEnv(CompilerEnv):
     action, and the :meth:`LlvmEnv.commandline()
     <compiler_gym.envs.LlvmEnv.commandline>` method can be used to produce an
     equivalent LLVM opt invocation for the current environment state.
-
-    :ivar actions: The list of actions that have been performed since the
-        previous call to :func:`reset`.
-
-    :vartype actions: List[int]
     """
 
     def __init__(
@@ -184,9 +179,10 @@ class LlvmEnv(CompilerEnv):
             ],
         )
 
-        # If the user sets a runtimes_per_observation value, this must be
-        # configured on every call to reset().
+        # Mutable runtime configuration options that must be set on every call
+        # to reset.
         self._runtimes_per_observation_count: Optional[int] = None
+        self._runtimes_warmup_per_observation_count: Optional[int] = None
 
         self.inst2vec = _INST2VEC_ENCODER
 
@@ -316,6 +312,8 @@ class LlvmEnv(CompilerEnv):
         # non-default value.
         if self._runtimes_per_observation_count is not None:
             self.runtime_observation_count = self._runtimes_per_observation_count
+        if self._runtimes_warmup_per_observation_count is not None:
+            self.runtime_warmup_runs_count = self._runtimes_warmup_per_observation_count
 
         return observation
 
@@ -542,3 +540,36 @@ class LlvmEnv(CompilerEnv):
     def runtime_observation_count(self, n: int) -> None:
         self._runtimes_per_observation_count = n
         self.send_param("llvm.set_runtimes_per_observation_count", str(n))
+
+    @property
+    def runtime_warmup_runs_count(self) -> int:
+        """The number of warmup runs of the binary to perform before measuring
+        the Runtime observation space.
+
+        See the :ref:`Runtime observation space reference <llvm/index:Runtime>`
+        for further details.
+
+        Example usage:
+
+            >>> env = compiler_gym.make("llvm-v0")
+            >>> env.reset()
+            >>> env.runtime_observation_count = 10
+            >>> len(env.observation.Runtime())
+            10
+
+        :getter: Returns the number of runs that be performed before measuring
+            the :code:`Runtime` observation is requested.
+
+        :setter: Set the number of warmup runs to perform when a :code:`Runtime`
+            observation is requested.
+
+        :type: int
+        """
+        return int(
+            self.send_param("llvm.get_warmup_runs_count_per_runtime_observation", "")
+        )
+
+    @runtime_warmup_runs_count.setter
+    def runtime_warmup_runs_count(self, n: int) -> None:
+        self._runtimes_warmup_per_observation_count = n
+        self.send_param("llvm.set_warmup_runs_count_per_runtime_observation", str(n))

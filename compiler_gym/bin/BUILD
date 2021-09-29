@@ -26,7 +26,7 @@ py_binary(
         "//compiler_gym/datasets",
         "//compiler_gym/envs",
         "//compiler_gym/util",
-        "//compiler_gym/util/flags:env_from_flags",
+        "//compiler_gym/util/flags",
     ],
 )
 
@@ -35,11 +35,9 @@ py_binary(
     srcs = ["manual_env.py"],
     visibility = ["//visibility:public"],
     deps = [
-        "//compiler_gym",
         "//compiler_gym/envs",
         "//compiler_gym/util",
-        "//compiler_gym/util/flags:benchmark_from_flags",
-        "//compiler_gym/util/flags:env_from_flags",
+        "//compiler_gym/util/flags",
     ],
 )
 
@@ -48,7 +46,7 @@ py_binary(
     srcs = ["random_eval.py"],
     deps = [
         "//compiler_gym/util",
-        "//compiler_gym/util/flags:output_dir",
+        "//compiler_gym/util/flags",
     ],
 )
 
@@ -58,10 +56,7 @@ py_binary(
     visibility = ["//visibility:public"],
     deps = [
         "//compiler_gym:random_search",
-        "//compiler_gym/util/flags:benchmark_from_flags",
-        "//compiler_gym/util/flags:env_from_flags",
-        "//compiler_gym/util/flags:nproc",
-        "//compiler_gym/util/flags:output_dir",
+        "//compiler_gym/util/flags",
     ],
 )
 
@@ -72,8 +67,7 @@ py_binary(
     deps = [
         "//compiler_gym:random_replay",
         "//compiler_gym/util",
-        "//compiler_gym/util/flags:env_from_flags",
-        "//compiler_gym/util/flags:output_dir",
+        "//compiler_gym/util/flags",
     ],
 )
 
@@ -86,7 +80,7 @@ py_binary(
         "//compiler_gym/envs",
         "//compiler_gym/spaces",
         "//compiler_gym/util",
-        "//compiler_gym/util/flags:env_from_flags",
+        "//compiler_gym/util/flags",
     ],
 )
 
@@ -97,7 +91,6 @@ py_binary(
     deps = [
         "//compiler_gym:validate",
         "//compiler_gym/util",
-        "//compiler_gym/util/flags:env_from_flags",
-        "//compiler_gym/util/flags:nproc",
+        "//compiler_gym/util/flags",
     ],
 )

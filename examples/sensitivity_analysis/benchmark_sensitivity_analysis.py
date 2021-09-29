@@ -34,20 +34,20 @@ from typing import List, Optional, Union
 
 import numpy as np
 from absl import app, flags
-
-from compiler_gym.envs import CompilerEnv
-from compiler_gym.service.proto import Benchmark
-from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
-from compiler_gym.util.flags.env_from_flags import env_session_from_flags
-from compiler_gym.util.logs import create_logging_dir
-from compiler_gym.util.timer import Timer
-from examples.sensitivity_analysis.sensitivity_analysis_eval import (
+from sensitivity_analysis.sensitivity_analysis_eval import (
     SensitivityAnalysisResult,
     run_sensitivity_analysis,
 )
 
+from compiler_gym.envs import CompilerEnv
+from compiler_gym.service.proto import Benchmark
+from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
+from compiler_gym.util.flags.env_from_flags import env_from_flags
+from compiler_gym.util.logs import create_logging_dir
+from compiler_gym.util.timer import Timer
+
 flags.DEFINE_integer(
-    "num_trials",
+    "num_benchmark_sensitivity_trials",
     100,
     "The number of trials to perform when estimating the reward delta of each benchmark. "
     "A trial is a random episode of a benchmark. Increasing this number increases the "
@@ -65,14 +65,11 @@ flags.DEFINE_integer(
     "The maximum number of random steps to make in a single trial.",
 )
 flags.DEFINE_integer(
-    "nproc", cpu_count(), "The number of parallel evaluation threads to run."
-)
-flags.DEFINE_integer(
-    "max_attempts_multiplier",
+    "max_benchmark_attempts_multiplier",
     5,
     "A trial may fail because the environment crashes, or an action produces an invalid state. "
     "Limit the total number of trials performed for each action to "
-    "max_attempts_multiplier * num_trials.",
+    "max_benchmark_attempts_multiplier * num_trials.",
 )
 
 FLAGS = flags.FLAGS
@@ -94,7 +91,7 @@ def get_rewards(
         and len(rewards) < num_trials
     ):
         num_attempts += 1
-        with env_session_from_flags(benchmark=benchmark) as env:
+        with env_from_flags(benchmark=benchmark) as env:
             env.observation_space = None
             env.reward_space = None
             env.reset(benchmark=benchmark)
@@ -173,7 +170,7 @@ def main(argv):
     if benchmark:
         benchmarks = [benchmark]
     else:
-        with env_session_from_flags() as env:
+        with env_from_flags() as env:
             benchmarks = islice(env.benchmarks, 100)
 
     logs_dir = Path(
@@ -187,11 +184,11 @@ def main(argv):
         runtimes_path=runtimes_path,
         benchmarks=benchmarks,
         reward=FLAGS.reward,
-        num_trials=FLAGS.num_trials,
+        num_trials=FLAGS.num_benchmark_sensitivity_trials,
         min_steps=FLAGS.min_steps,
         max_steps=FLAGS.max_steps,
         nproc=FLAGS.nproc,
-        max_attempts_multiplier=FLAGS.max_attempts_multiplier,
+        max_attempts_multiplier=FLAGS.max_benchmark_attempts_multiplier,
     )
 
 

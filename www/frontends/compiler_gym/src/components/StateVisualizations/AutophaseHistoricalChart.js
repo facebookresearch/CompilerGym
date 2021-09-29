@@ -9,17 +9,17 @@ import classnames from "classnames";
 import { groupBy, getMaxDelta, percIncrease } from "../../utils/Helpers";
 import AutophaseDict from "../../utils/AutophaseDict";
 import SparkLineTable from "./SparkLineTable";
+import ModalSingleChart from "./ModalSingleChart";
 
-const AutophaseHistoricalChart = ({ sessionStates, darkTheme, sortBy }) => {
+const AutophaseHistoricalChart = ({ sessionStates, commandLine, darkTheme, sortBy }) => {
   const [steps, setSteps] = useState([]);
+  const [showModal, setModal] = useState(false);
+  const [modalData, setModalData] = useState({});
 
   useEffect(() => {
-    let lastState = sessionStates?.[sessionStates?.length - 1];
-    setSteps(
-      lastState?.commandline.split(" input.bc -o output.bc")[0].split(" ")
-    );
+    setSteps(commandLine.split(" input.bc -o output.bc")[0].split(" "));
     return () => {};
-  }, [sessionStates]);
+  }, [commandLine]);
 
   const sortedList = (array, name) => {
     switch (name) {
@@ -85,13 +85,21 @@ const AutophaseHistoricalChart = ({ sessionStates, darkTheme, sortBy }) => {
   return (
     <div
       className={classnames(
-        "mt-2 pt-2",
+        "mt-2 pt-2 wrap-modals",
         { "bg-dark text-white": darkTheme },
         { "": !darkTheme }
       )}
     >
       <h4 className="text-center">Historical Values</h4>
-      <SparkLineTable>
+      {showModal && (
+        <div className="modal_trends">
+          <div className="chart-container">
+            <ModalSingleChart data={modalData} darkTheme={darkTheme}/>
+          </div>
+          <button onClick={() => setModal(false)}>Close</button>
+        </div>
+      )}
+      <SparkLineTable setModal={setModal} setModalData={setModalData}>
         <thead>
           <tr>
             <th>Autophase</th>

@@ -7,10 +7,11 @@
 import React from "react";
 
 const ApiContext = React.createContext({
-    compilerGym: {},
-    session: {session_id: null, states: []},
-    setSession: () => {},
-    submitStep: () => {}
+  compilerGym: {},
+  session: { commandline: "", done: false, ir: "", states: [] },
+  setParams: () => {},
+  setSession: () => {},
+  submitStep: () => {},
 });
 
 export default ApiContext;

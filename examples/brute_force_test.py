@@ -7,9 +7,7 @@ import tempfile
 from pathlib import Path
 
 import gym
-
-from examples.brute_force import run_brute_force
-from tests.test_main import main
+from brute_force import run_brute_force
 
 
 def test_run_brute_force_smoke_test():
@@ -26,7 +24,3 @@ def test_run_brute_force_smoke_test():
 
         assert (outdir / "meta.json").is_file()
         assert (outdir / "results.csv").is_file()
-
-
-if __name__ == "__main__":
-    main(extra_pytest_args=["-s"], debug_level=2)  # Don't capture stdout/stderr.

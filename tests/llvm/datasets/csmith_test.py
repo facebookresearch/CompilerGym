@@ -9,10 +9,12 @@ from pathlib import Path
 import gym
 import numpy as np
 import pytest
+from flaky import flaky
 
 import compiler_gym.envs.llvm  # noqa register environments
 from compiler_gym.envs.llvm import LlvmEnv
 from compiler_gym.envs.llvm.datasets import CsmithBenchmark, CsmithDataset
+from compiler_gym.service import ServiceError
 from tests.pytest_plugins.common import is_ci
 from tests.test_main import main
 
@@ -21,11 +23,8 @@ pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.llvm"]
 
 @pytest.fixture(scope="module")
 def csmith_dataset() -> CsmithDataset:
-    env = gym.make("llvm-v0")
-    try:
+    with gym.make("llvm-v0") as env:
         ds = env.datasets["generator://csmith-v0"]
-    finally:
-        env.close()
     yield ds
 
 
@@ -63,6 +62,7 @@ def test_csmith_from_seed_retry_count_exceeded(csmith_dataset: CsmithDataset):
         csmith_dataset.benchmark_from_seed(seed=1, max_retries=3, retry_count=5)
 
 
+@flaky(rerun_filter=lambda err, *args: issubclass(err[0], ServiceError))
 def test_csmith_positive_runtimes(env: LlvmEnv, csmith_dataset: CsmithDataset):
     benchmark = next(csmith_dataset.benchmarks())
     env.reset(benchmark=benchmark)
@@ -71,6 +71,7 @@ def test_csmith_positive_runtimes(env: LlvmEnv, csmith_dataset: CsmithDataset):
     assert np.all(np.greater(val, 0))
 
 
+@flaky(rerun_filter=lambda err, *args: issubclass(err[0], ServiceError))
 def test_csmith_positive_buildtimes(env: LlvmEnv, csmith_dataset: CsmithDataset):
     benchmark = next(csmith_dataset.benchmarks())
     env.reset(benchmark=benchmark)

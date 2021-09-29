@@ -33,19 +33,19 @@ from typing import List, Optional
 
 import numpy as np
 from absl import app, flags
-
-from compiler_gym.envs import CompilerEnv
-from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
-from compiler_gym.util.flags.env_from_flags import env_session_from_flags
-from compiler_gym.util.logs import create_logging_dir
-from compiler_gym.util.timer import Timer
-from examples.sensitivity_analysis.sensitivity_analysis_eval import (
+from sensitivity_analysis.sensitivity_analysis_eval import (
     SensitivityAnalysisResult,
     run_sensitivity_analysis,
 )
 
+from compiler_gym.envs import CompilerEnv
+from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
+from compiler_gym.util.flags.env_from_flags import env_from_flags
+from compiler_gym.util.logs import create_logging_dir
+from compiler_gym.util.timer import Timer
+
 flags.DEFINE_integer(
-    "num_trials",
+    "num_action_sensitivity_trials",
     100,
     "The number of trials to perform when estimating the reward of each action. "
     "A trial is a random episode that ends with the determined action. Increasing "
@@ -57,20 +57,17 @@ flags.DEFINE_integer(
     25,
     "The maximum number of random steps to make before determining the reward of an action.",
 )
-flags.DEFINE_integer(
-    "nproc", cpu_count(), "The number of parallel evaluation threads to run."
-)
 flags.DEFINE_list(
     "action",
     [],
     "An optional list of actions to evaluate. If not specified, all actions will be evaluated.",
 )
 flags.DEFINE_integer(
-    "max_attempts_multiplier",
+    "max_action_attempts_multiplier",
     5,
     "A trial may fail because the environment crashes, or an action produces an invalid state. "
     "Limit the total number of trials performed for each action to "
-    "max_attempts_multiplier * num_trials.",
+    "max_action_attempts_multiplier * num_trials.",
 )
 
 FLAGS = flags.FLAGS
@@ -93,7 +90,7 @@ def get_rewards(
         and len(rewards) < num_trials
     ):
         num_attempts += 1
-        with env_session_from_flags(benchmark=benchmark) as env:
+        with env_from_flags(benchmark=benchmark) as env:
             env.observation_space = None
             env.reward_space = None
             env.reset(benchmark=benchmark)
@@ -143,7 +140,7 @@ def run_action_sensitivity_analysis(
     max_attempts_multiplier: int = 5,
 ):
     """Estimate the reward delta of a given list of actions."""
-    with env_session_from_flags() as env:
+    with env_from_flags() as env:
         action_names = env.action_space.names
 
     with ThreadPoolExecutor(max_workers=nproc) as executor:
@@ -172,7 +169,7 @@ def main(argv):
     if len(argv) != 1:
         raise app.UsageError(f"Unknown command line arguments: {argv[1:]}")
 
-    with env_session_from_flags() as env:
+    with env_from_flags() as env:
         action_names = env.action_space.names
 
     if FLAGS.action:
@@ -191,10 +188,10 @@ def main(argv):
         runtimes_path=runtimes_path,
         actions=actions,
         reward=FLAGS.reward,
-        num_trials=FLAGS.num_trials,
+        num_trials=FLAGS.num_action_sensitivity_trials,
         max_warmup_steps=FLAGS.max_warmup_steps,
         nproc=FLAGS.nproc,
-        max_attempts_multiplier=FLAGS.max_attempts_multiplier,
+        max_attempts_multiplier=FLAGS.max_action_attempts_multiplier,
     )
 
 

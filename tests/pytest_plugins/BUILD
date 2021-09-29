@@ -9,6 +9,16 @@ load("@rules_python//python:defs.bzl", "py_library")
 package(default_visibility = ["//visibility:public"])
 
 py_library(
+    name = "gcc",
+    testonly = 1,
+    srcs = ["gcc.py"],
+    deps = [
+        ":common",
+        "//compiler_gym/envs/gcc",
+    ],
+)
+
+py_library(
     name = "llvm",
     testonly = 1,
     srcs = ["llvm.py"],

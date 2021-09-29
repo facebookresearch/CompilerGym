@@ -286,12 +286,10 @@ def test_benchmark_sources(tmpwd: Path):
 
 def test_benchmark_from_file(tmpwd: Path):
     path = tmpwd / "foo.txt"
-    path.touch()
+    with open(path, "w") as f:
+        f.write("Hello, world!")
     benchmark = Benchmark.from_file("benchmark://example-v0/foo", path)
-    # Use startswith() and endswith() because macOS can add a /private prefix to
-    # paths.
-    assert benchmark.proto.program.uri.startswith("file:///")
-    assert benchmark.proto.program.uri.endswith(str(path))
+    assert benchmark.proto.program.contents.decode("utf-8") == "Hello, world!"
 
 
 def test_benchmark_from_file_not_found(tmpwd: Path):

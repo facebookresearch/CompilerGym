@@ -114,7 +114,12 @@ const SparkLine = (props) => {
     };
   }, [props.options]);
 
-  return <td ref={container}></td>;
+  const handleClick = (data) => {
+    props.setModal(true)
+    props.setModalData(data)
+  }
+
+  return <td ref={container} onClick={() => handleClick(props.options)}></td>;
 };
 
 class SparkLineTable extends React.Component {
@@ -153,24 +158,30 @@ class SparkLineTable extends React.Component {
       },
       plotOptions: {
         series: {
-            color:'#2593B8'
-        }
+          color: "#2593B8",
+        },
       },
       series: [
         {
           data: data,
           pointStart: 0,
-        }
+        },
       ],
 
       tooltip: {
         useHTML: true,
         headerFormat: `<span><b>{point.x}</b></span><br/>`,
-        pointFormat: `<span><b>Value:</b> {point.y}</span>`
+        pointFormat: `<span><b>Value:</b> {point.y}</span>`,
       },
     };
 
-    return <SparkLine options={options} />;
+    return (
+      <SparkLine
+        options={options}
+        setModal={this.props.setModal}
+        setModalData={this.props.setModalData}
+      />
+    );
   }
 
   render() {
