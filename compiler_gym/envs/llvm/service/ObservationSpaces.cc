@@ -46,6 +46,12 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
         space.set_platform_dependent(false);
         break;
       }
+      case LlvmObservationSpace::BITCODE: {
+        space.mutable_binary_size_range()->mutable_min()->set_value(0);
+        space.set_deterministic(true);
+        space.set_platform_dependent(false);
+        break;
+      }
       case LlvmObservationSpace::BITCODE_FILE: {
         ScalarRange pathLength;
         space.mutable_string_size_range()->mutable_min()->set_value(0);

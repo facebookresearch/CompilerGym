@@ -41,6 +41,7 @@ def test_observation_spaces(env: LlvmEnv):
     assert set(env.observation.spaces.keys()) == {
         "Ir",
         "IrSha1",
+        "Bitcode",
         "BitcodeFile",
         "InstCount",
         "InstCountDict",
@@ -106,11 +107,30 @@ def test_ir_sha1_observation_space(env: LlvmEnv):
 
 def test_bitcode_observation_space(env: LlvmEnv):
     env.reset("cbench-v1/crc32")
+    key = "Bitcode"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Sequence)
+    assert space.space.dtype == bytes
+    assert space.space.size_range == (0, None)
+
+    assert space.deterministic
+    assert not space.platform_dependent
+
+    value: str = env.observation[key]
+    print(value)  # For debugging in case of error.
+    assert isinstance(value, bytes)
+    assert space.space.contains(value)
+
+
+def test_bitcode_file_observation_space(env: LlvmEnv):
+    env.reset("cbench-v1/crc32")
     key = "BitcodeFile"
     space = env.observation.spaces[key]
     assert isinstance(space.space, Sequence)
     assert space.space.dtype == str
     assert space.space.size_range == (0, 4096)
+    assert not space.deterministic
+    assert not space.platform_dependent
 
     value: str = env.observation[key]
     print(value)  # For debugging in case of error.
@@ -121,8 +141,24 @@ def test_bitcode_observation_space(env: LlvmEnv):
     finally:
         os.unlink(value)
 
-    assert not space.deterministic
-    assert not space.platform_dependent
+
+@pytest.mark.parametrize(
+    "benchmark_uri", ["cbench-v1/crc32", "cbench-v1/qsort", "cbench-v1/gsm"]
+)
+def test_bitcode_file_equivalence(env: LlvmEnv, benchmark_uri: str):
+    """Test that LLVM produces the same bitcode as a file and as a byte array."""
+    env.reset(benchmark=benchmark_uri)
+
+    bitcode = env.observation.Bitcode()
+    bitcode_file = env.observation.BitcodeFile()
+
+    try:
+        with open(bitcode_file, "rb") as f:
+            bitcode_from_file = f.read()
+
+        assert bitcode == bitcode_from_file
+    finally:
+        os.unlink(bitcode_file)
 
 
 # The Autophase feature vector for benchmark://cbench-v1/crc32 in its initial
