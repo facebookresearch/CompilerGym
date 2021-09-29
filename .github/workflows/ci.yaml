@@ -14,6 +14,15 @@ jobs:
     build-linux:
         runs-on: ubuntu-latest
         steps:
+            - name: Persist the bazel cache
+              uses: actions/cache@v2
+              with:
+                  path: ~/.cache/bazel/_bazel_runner
+                  key: bazel-${{ runner.os }}-${{ hashFiles('WORKSPACE') }}-${{ hashFiles('**/BUILD') }}
+                  restore-keys: |
+                      bazel-${{ runner.os }}-${{ hashFiles('WORKSPACE') }}-
+                      bazel-${{ runner.os }}-
+
             - uses: actions/checkout@v2
 
             - uses: actions/setup-python@v2
@@ -43,6 +52,15 @@ jobs:
     build-macos:
         runs-on: macos-latest
         steps:
+            - name: Persist the bazel cache
+              uses: actions/cache@v2
+              with:
+                  path: /private/var/tmp/_bazel_runner
+                  key: bazel-${{ runner.os }}-${{ hashFiles('WORKSPACE') }}-${{ hashFiles('**/BUILD') }}
+                  restore-keys: |
+                      bazel-${{ runner.os }}-${{ hashFiles('WORKSPACE') }}-
+                      bazel-${{ runner.os }}-
+
             - uses: actions/checkout@v2
 
             - uses: actions/setup-python@v2
