@@ -97,7 +97,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov TEST_TARGET="tests" PYTEST_ARGS="--ignore tests/llvm --ignore tests/gcc --ignore tests/loop_tool"
+              run: make install-test-cov PYTEST_ARGS="--ignore tests/llvm --ignore tests/gcc --ignore tests/loop_tool"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
@@ -134,7 +134,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov TEST_TARGET="tests" PYTEST_ARGS="--ignore tests/llvm --ignore tests/gcc"
+              run: make install-test-cov PYTEST_ARGS="--ignore tests/llvm --ignore tests/gcc"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
@@ -468,16 +468,13 @@ jobs:
               run: python -m pip install -r examples/requirements.txt -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov TEST_TARGET="examples"
+              run: make examples-test
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
               with:
                   fail_ci_if_error: true
                   verbose: true
-
-            - name: Run the tests in the source tree
-              run: cd examples && pytest .
 
     test-examples-macos:
         needs: build-macos
@@ -509,16 +506,13 @@ jobs:
               run: python -m pip install -r examples/requirements.txt -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov TEST_TARGET="examples"
+              run: make examples-test
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
               with:
                   fail_ci_if_error: true
                   verbose: true
-
-            - name: Run the tests in the source tree
-              run: cd examples && pytest .
 
     build-asan-llvm-service:
         runs-on: ubuntu-latest

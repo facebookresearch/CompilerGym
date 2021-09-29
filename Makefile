@@ -51,6 +51,10 @@ Post-installation Tests
         the fuzz tests for a minimum of one minute. This requires that the
         CompilerGym package has been installed (`make install`).
 
+    make examples-test
+        Run pytest in the examples directory. This requires that the CompilerGym
+        package has been installed (`make install`).
+
 
 Documentation
 -------------
@@ -302,17 +306,20 @@ itest: bazel-fetch
 # symlinking the test directory into it so that pytest can be invoked.
 install-test-setup:
 	mkdir -p "$(INSTALL_TEST_ROOT)"
-	rm -f "$(INSTALL_TEST_ROOT)/examples" "$(INSTALL_TEST_ROOT)/tests" "$(INSTALL_TEST_ROOT)/tox.ini"
-	ln -s "$(ROOT)/examples" "$(INSTALL_TEST_ROOT)"
+	rm -f "$(INSTALL_TEST_ROOT)/tests" "$(INSTALL_TEST_ROOT)/tox.ini"
+	ln -s "$(INSTALL_TEST_ROOT)"
 	ln -s "$(ROOT)/tests" "$(INSTALL_TEST_ROOT)"
 	ln -s "$(ROOT)/tox.ini" "$(INSTALL_TEST_ROOT)"
 
 define pytest
-	cd "$(INSTALL_TEST_ROOT)" && pytest $(if $(TEST_TARGET),$(TEST_TARGET),examples tests) $(1) $(PYTEST_ARGS)
+	cd "$(INSTALL_TEST_ROOT)" && pytest $(if $(TEST_TARGET),$(TEST_TARGET),tests) $(1) $(PYTEST_ARGS)
 endef
 
-install-test: install-test-setup
+install-test: | install-test-setup
 	$(call pytest,--no-success-flaky-report --benchmark-disable -n auto -k "not fuzz" --durations=5)
+
+examples-test:
+	cd examples && pytest --no-success-flaky-report --benchmark-disable -n auto --durations=5 . --cov=compiler_gym --cov-report=xml:$(COV_REPORT) $(PYTEST_ARGS)
 
 # Note we export $CI=1 so that the tests always run as if within the CI
 # environement. This is to ensure that the reported coverage matches that of
@@ -331,7 +338,7 @@ post-install-test:
 	$(MAKE) -C examples/makefile_integration clean
 	SEARCH_TIME=3 $(MAKE) -C examples/makefile_integration test
 
-.PHONY: test post-install-test
+.PHONY: test post-install-test examples-test
 
 
 ################
