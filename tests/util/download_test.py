@@ -26,7 +26,8 @@ def test_download_timeout_retry_loop(mocker, max_retries: int):
 
     assert download._do_download_attempt.call_count == max_retries
     assert download.sleep.call_count == max_retries
-    download.sleep.assert_called_with(5 * 1.5 ** (max_retries - 1))
+    starting_wait_time = 10  # The initial wait time in seconds.
+    download.sleep.assert_called_with(starting_wait_time * 1.5 ** (max_retries - 1))
 
 
 @pytest.mark.parametrize("max_retries", [1, 2, 3, 5, 10])
