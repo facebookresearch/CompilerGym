@@ -101,7 +101,9 @@ class UnrollingCompilationSession(CompilationSession):
         os.makedirs(self._benchmark_log_dir, exist_ok=True)
         self._llvm_path = os.path.join(self._benchmark_log_dir, "version1.ll")
         # FIXME: llvm.clang_path() lead to build errors
-        os.system(f"clang -emit-llvm -S {self._src_path} -o {self._llvm_path}")
+        os.system(
+            f"clang -Xclang -disable-O0-optnone -emit-llvm -S {self._src_path} -o {self._llvm_path}"
+        )
         ir = open(self._llvm_path).read()
 
         self._observation["ir"] = Observation(string_value=ir)
@@ -114,7 +116,7 @@ class UnrollingCompilationSession(CompilationSession):
 
         print("applying action")
         os.system(
-            f"{llvm.opt_path()} --loop-unroll -unroll-count=4 {self._llvm_path} -S -o {self._llvm_path}"
+            f"{llvm.opt_path()} --loop-unroll -unroll-count=16 -unroll-threshold=0 {self._llvm_path} -S -o {self._llvm_path}"
         )
         ir = open(self._llvm_path).read()
         self._observation["ir"] = Observation(string_value=ir)
