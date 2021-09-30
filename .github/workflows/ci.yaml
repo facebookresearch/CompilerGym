@@ -577,3 +577,26 @@ jobs:
                   ASAN_OPTIONS: detect_leaks=1
                   CC: clang
                   CXX: clang++
+
+    www-build:
+        runs-on: ${{ matrix.os }}
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [ubuntu-latest, macos-latest]
+                node: [16]
+        steps:
+            - uses: actions/checkout@v2
+
+            - uses: actions/setup-python@v2
+              with:
+                  python-version: 3.9
+
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node }}
+                  cache: npm
+                  cache-dependency-path: www/frontends/compiler_gym/package-lock.json
+
+            - name: Build web frontend
+              run: make www-build
