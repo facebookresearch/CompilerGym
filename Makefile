@@ -227,7 +227,7 @@ www: www-build
 	cd www && $(PYTHON) www.py
 
 www-build:
-	cd www/frontends/compiler_gym && npm install && npm run build
+	cd www/frontends/compiler_gym && npm ci && npm run build
 
 www-image: www-build
 	cd www && docker build -t chriscummins/compiler_gym-www .
