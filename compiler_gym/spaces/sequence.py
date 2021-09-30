@@ -86,9 +86,18 @@ class Sequence(Space):
         upper_bound = float("inf") if self.size_range[1] is None else self.size_range[1]
         if not (lower_bound <= len(x) <= upper_bound):
             return False
-        for element in x:
-            if not isinstance(element, self.dtype):
+
+        # TODO(cummins): The dtype API is inconsistent. When dtype=str or
+        # dtype=bytes, we expect this to be the type of the entire sequence. But
+        # for dtype=int, we expect this to be the type of each element. We
+        # should distinguish these differences better.
+        if self.dtype in {str, bytes}:
+            if not isinstance(x, self.dtype):
                 return False
+        else:
+            for element in x:
+                if not isinstance(element, self.dtype):
+                    return False
 
         # Run the bounds check on every scalar element, if there is a scalar
         # range specified.

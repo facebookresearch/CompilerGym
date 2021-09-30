@@ -57,5 +57,12 @@ def test_contains_with_float_scalar_range():
     assert not space.contains([0.0, 0])  # wrong shape
 
 
+def test_bytes_contains():
+    space = Sequence(size_range=(0, None), dtype=bytes)
+    assert space.contains(b"Hello, world!")
+    assert space.contains(b"")
+    assert not space.contains("Hello, world!")
+
+
 if __name__ == "__main__":
     main()
