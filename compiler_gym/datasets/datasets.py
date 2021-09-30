@@ -256,7 +256,8 @@ class Datasets:
     def random_benchmark(
         self,
         random_state: Optional[np.random.Generator] = None,
-        weight_datasets_by_size: bool = False,
+        weighted: bool = False,
+        weights: Optional[Dict[str, float]] = None,
     ) -> Benchmark:
         """Select a benchmark randomly.
 
@@ -269,31 +270,46 @@ class Datasets:
         By default datasets are selected uniformly randomly. This means that
         datasets with a small number of benchmarks will be overrepresented
         compared to datasets with many benchmarks. To correct for this bias pass
-        the argument :code:`weight_datasets_by_size=True`, which is equivalent
-        to weighting the dataset choice by the number of benchmarks in each
-        dataset:
+        the argument :code:`weighted=True`, which weights the dataset choice by
+        the number of benchmarks in each dataset, equivalent to:
 
             >>> random.choices(datasets, weights=[len(p) for p in datasets])
 
         Weighting the choice of datasets by their size means that datasets with
         infinite sizes (such as random program generators) will be excluded from
-        sampling as their size is :code:`0`.
+        sampling as their size is :code:`0`. To override the weights of datasets
+        pass a :code:`weights` mapping:
+
+            >>> env.datasets.random_benchmark(weighted=True, weights={
+                "benchmark://dataset-v0": 10,
+                "benchmark://another-dataset-v0": 555,
+            })
 
         :param random_state: A random number generator. If not provided, a
             default :code:`np.random.default_rng()` is used.
 
-        :param weight_datasets_by_size: If set, weight the choice of dataset by
-            the number of benchmarks in each dataset.
+        :param weighted: If set, weight the choice of dataset by the number of
+            benchmarks in each dataset, or the value specified in the
+            :code:`weights` mapping.
+
+        :param weights: An optional mapping from dataset URI to the weight to
+            use when :code:`weighted=True`. This overrides the default value of
+            using the dataset size.
 
         :return: A :class:`Benchmark <compiler_gym.datasets.Benchmark>`
             instance.
         """
         random_state = random_state or np.random.default_rng()
         datasets: List[str] = list(self._visible_datasets)
+        # Assume weighted=True if weights dictionary is specified.
+        weighted = weighted or weights
 
-        if weight_datasets_by_size:
-            weights = np.array([self[d].size for d in datasets], dtype=float)
-            dataset = random_state.choice(datasets, p=weights / weights.sum())
+        if weighted:
+            weights: Dict[str, float] = weights or {}
+            w: List[float] = np.array(
+                [weights.get(d, self[d].size) for d in datasets], dtype=float
+            )
+            dataset = random_state.choice(datasets, p=w / w.sum())
         else:
             dataset = random_state.choice(datasets)
         return self[dataset].random_benchmark(random_state=random_state)

@@ -245,8 +245,8 @@ def test_benchmarks_iter_deprecated():
     ]
 
 
-@pytest.mark.parametrize("weight_datasets_by_size", [False, True])
-def test_random_benchmark(mocker, weight_datasets_by_size: bool):
+@pytest.mark.parametrize("weighted", [False, True])
+def test_random_benchmark(mocker, weighted: bool):
     da = MockDataset("benchmark://foo-v0")
     da.size = 10
     ba = MockBenchmark(uri="benchmark://foo-v0/abc")
@@ -260,9 +260,7 @@ def test_random_benchmark(mocker, weight_datasets_by_size: bool):
     random_benchmarks = {
         b.uri
         for b in (
-            datasets.random_benchmark(
-                rng, weight_datasets_by_size=weight_datasets_by_size
-            )
+            datasets.random_benchmark(rng, weighted=weighted)
             for _ in range(num_benchmarks)
         )
     }
