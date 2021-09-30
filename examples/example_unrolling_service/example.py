@@ -1,17 +1,11 @@
 import compiler_gym
 import examples.example_unrolling_service as unrolling_service  # noqa Register environments.
 
-# temporary hack to avoid "isort" pre-hook error
-# TODO: remove this line
-
 # TODO: avoid using hard-coded paths for benchmark files
-# benchmark = compiler_gym.envs.llvm.llvm_env.make_benchmark("/Users/melhoushi/CompilerGym-Playground/dataset/offsets1.c")
 benchmark = compiler_gym.datasets.benchmark.Benchmark.from_file(
     "unrolling-example-for-now",
     "/Users/melhoushi/CompilerGym-Playground/dataset/offsets1.c",
 )
-# benchmark = compiler_gym.datasets.benchmark.BenchmarkWithSource.create("unrolling-example-for-now", "/Users/melhoushi/CompilerGym-Playground/dataset/offsets1.c")
-# benchmark = compiler_gym.envs.llvm.llvm_benchmark.make_benchmark("/Users/melhoushi/CompilerGym-Playground/dataset/offsets1.c")
 
 env = compiler_gym.make(
     "unrolling-py-v0",
@@ -21,6 +15,8 @@ env = compiler_gym.make(
 )
 
 observation = env.reset()
+
+print("observation: ", observation)
 
 observation, reward, done, info = env.step(env.action_space.sample())
 

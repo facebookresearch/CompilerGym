@@ -13,5 +13,6 @@ py_binary(
         "//compiler_gym/service",
         "//compiler_gym/service/proto",
         "//compiler_gym/service/runtime",
+        "//compiler_gym/third_party/llvm",
     ],
 )

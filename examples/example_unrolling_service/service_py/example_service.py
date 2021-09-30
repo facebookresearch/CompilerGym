@@ -11,6 +11,7 @@ from pathlib import Path
 from typing import Optional, Tuple
 from urllib.parse import urlparse
 
+import compiler_gym.third_party.llvm as llvm
 from compiler_gym.service import CompilationSession
 from compiler_gym.service.proto import (
     Action,
@@ -30,16 +31,14 @@ class UnrollingCompilationSession(CompilationSession):
 
     compiler_version: str = "1.0.0"
 
-    # The list of actions that are supported by this service. This example uses
-    # a static (unchanging) action space, but this could be extended to support
-    # a dynamic action space.
+    # The list of actions that are supported by this service.
     action_spaces = [
         ActionSpace(
-            name="default",
+            name="unrolling",
             action=[
-                "a",
-                "b",
-                "c",
+                "-loop-unroll -unroll-count=2",
+                "-loop-unroll -unroll-count=4",
+                "-loop-unroll -unroll-count=8",
             ],
         )
     ]
@@ -93,14 +92,17 @@ class UnrollingCompilationSession(CompilationSession):
         self._observation = dict()
 
         src_uri_p = urlparse(self._benchmark.program.uri)
-        src_path = os.path.abspath(os.path.join(src_uri_p.netloc, src_uri_p.path))
+        self._src_path = os.path.abspath(os.path.join(src_uri_p.netloc, src_uri_p.path))
         # TODO: populate "timestamp" and "benchmark_name" in the path
         # TODO: add "clean_up" function to remove files and save space
-        benchmark_log_dir = "/tmp/compiler_gym/timestamp/unrolling/benchmark_name/"
-        os.makedirs(benchmark_log_dir, exist_ok=True)
-        llvm_path = os.path.join(benchmark_log_dir, "version1.ll")
-        os.system(f"clang -emit-llvm -S {src_path} -o {llvm_path}")
-        ir = open(llvm_path).read()
+        self._benchmark_log_dir = (
+            "/tmp/compiler_gym/timestamp/unrolling/benchmark_name/"
+        )
+        os.makedirs(self._benchmark_log_dir, exist_ok=True)
+        self._llvm_path = os.path.join(self._benchmark_log_dir, "version1.ll")
+        # FIXME: llvm.clang_path() lead to build errors
+        os.system(f"clang -emit-llvm -S {self._src_path} -o {self._llvm_path}")
+        ir = open(self._llvm_path).read()
 
         self._observation["ir"] = Observation(string_value=ir)
         # TODO: update "features" and "runtime" observations
@@ -109,6 +111,13 @@ class UnrollingCompilationSession(CompilationSession):
         logging.info("Applied action %d", action.action)
         if action.action < 0 or action.action > len(self.action_spaces[0].action):
             raise ValueError("Out-of-range")
+
+        print("applying action")
+        os.system(
+            f"{llvm.opt_path()} --loop-unroll -unroll-count=4 {self._llvm_path} -S -o {self._llvm_path}"
+        )
+        ir = open(self._llvm_path).read()
+        self._observation["ir"] = Observation(string_value=ir)
         return False, None, False
 
     def get_observation(self, observation_space: ObservationSpace) -> Observation:
