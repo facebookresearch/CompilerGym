@@ -58,7 +58,7 @@ def test_contains_with_float_scalar_range():
 
 
 def test_bytes_contains():
-    space = Sequence(size_range=(0, None), dtype=bytes)
+    space = Sequence(name="test", size_range=(0, None), dtype=bytes)
     assert space.contains(b"Hello, world!")
     assert space.contains(b"")
     assert not space.contains("Hello, world!")
