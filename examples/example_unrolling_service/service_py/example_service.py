@@ -91,10 +91,17 @@ class UnrollingCompilationSession(CompilationSession):
 
     def _update_observations(self):
         self._observation = dict()
-        p = urlparse(self._benchmark.program.uri)
-        final_path = os.path.abspath(os.path.join(p.netloc, p.path))
-        ir = open(final_path).read()
-        print("ir: ", ir)
+
+        src_uri_p = urlparse(self._benchmark.program.uri)
+        src_path = os.path.abspath(os.path.join(src_uri_p.netloc, src_uri_p.path))
+        # TODO: populate "timestamp" and "benchmark_name" in the path
+        # TODO: add "clean_up" function to remove files and save space
+        benchmark_log_dir = "/tmp/compiler_gym/timestamp/unrolling/benchmark_name/"
+        os.makedirs(benchmark_log_dir, exist_ok=True)
+        llvm_path = os.path.join(benchmark_log_dir, "version1.ll")
+        os.system(f"clang -emit-llvm -S {src_path} -o {llvm_path}")
+        ir = open(llvm_path).read()
+
         self._observation["ir"] = Observation(string_value=ir)
         # TODO: update "features" and "runtime" observations
 
