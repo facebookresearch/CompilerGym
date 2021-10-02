@@ -27,6 +27,64 @@ from compiler_gym.service.proto import (
 from compiler_gym.service.runtime import create_and_run_compiler_gym_service
 
 
+# TODO: move to a utils.py file?
+def extract_statistics_from_ir(ir: str):
+    stats = {"control_flow": 0, "arithmetic": 0, "memory": 0}
+    for line in ir.splitlines():
+        tokens = line.split()
+        if len(tokens) > 0:
+            opcode = tokens[0]
+            if opcode in [
+                "br",
+                "call",
+                "ret",
+                "switch",
+                "indirectbr",
+                "invoke",
+                "callbr",
+                "resume",
+                "catchswitch",
+                "catchret",
+                "cleanupret",
+                "unreachable",
+            ]:
+                stats["control_flow"] += 1
+            elif opcode in [
+                "fneg",
+                "add",
+                "fadd",
+                "sub",
+                "fsub",
+                "mul",
+                "fmul",
+                "udiv",
+                "sdiv",
+                "fdiv",
+                "urem",
+                "srem",
+                "frem",
+                "shl",
+                "lshr",
+                "ashr",
+                "and",
+                "or",
+                "xor",
+            ]:
+                stats["arithmetic"] += 1
+            elif opcode in [
+                "alloca",
+                "load",
+                "store",
+                "fence",
+                "cmpxchg",
+                "atomicrmw",
+                "getelementptr",
+            ]:
+                stats["memory"] += 1
+
+    return stats
+
+
 class UnrollingCompilationSession(CompilationSession):
     """Represents an instance of an interactive compilation session."""
 
@@ -58,15 +116,9 @@ class UnrollingCompilationSession(CompilationSession):
             name="features",
             int64_range_list=ScalarRangeList(
                 range=[
-                    ScalarRange(
-                        min=ScalarLimit(value=-100), max=ScalarLimit(value=100)
-                    ),
-                    ScalarRange(
-                        min=ScalarLimit(value=-100), max=ScalarLimit(value=100)
-                    ),
-                    ScalarRange(
-                        min=ScalarLimit(value=-100), max=ScalarLimit(value=100)
-                    ),
+                    ScalarRange(min=ScalarLimit(value=0), max=ScalarLimit(value=1e5)),
+                    ScalarRange(min=ScalarLimit(value=0), max=ScalarLimit(value=1e5)),
+                    ScalarRange(min=ScalarLimit(value=0), max=ScalarLimit(value=1e5)),
                 ]
             ),
         ),
@@ -100,6 +152,7 @@ class UnrollingCompilationSession(CompilationSession):
         self.reset()
 
     def reset(self):
+        # TODO: obtain all observations and rewards at the beginning?
         self._observation = dict()
 
         src_uri_p = urlparse(self._benchmark.program.uri)
@@ -114,6 +167,7 @@ class UnrollingCompilationSession(CompilationSession):
         self._obj_path = os.path.join(self._benchmark_log_dir, "version1.o")
         self._exe_path = os.path.join(self._benchmark_log_dir, "version1")
         # FIXME: llvm.clang_path() lead to build errors
+        # TODO: throw errors at the user if any command files
         os.system(
             f"clang -Xclang -disable-O0-optnone -emit-llvm -S {self._src_path} -o {self._llvm_path}"
         )
@@ -136,8 +190,10 @@ class UnrollingCompilationSession(CompilationSession):
             ir = open(self._llvm_path).read()
             return Observation(string_value=ir)
         elif observation_space.name == "features":
+            ir = open(self._llvm_path).read()
+            stats = extract_statistics_from_ir(ir)
             observation = Observation()
-            observation.int64_list.value[:] = [0, 0, 0]
+            observation.int64_list.value[:] = list(stats.values())
             return observation
         elif observation_space.name == "runtime":
             # TODO: use perf to measure time as it is more accurate
