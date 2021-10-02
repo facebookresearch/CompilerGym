@@ -86,6 +86,7 @@ class UnrollingCompilationSession(CompilationSession):
         super().__init__(working_directory, action_space, benchmark)
         logging.info("Started a compilation session for %s", benchmark.uri)
         self._benchmark = benchmark
+        self._action_space = action_space
         self._update_observations()
 
     def _update_observations(self):
@@ -114,9 +115,8 @@ class UnrollingCompilationSession(CompilationSession):
         if action.action < 0 or action.action > len(self.action_spaces[0].action):
             raise ValueError("Out-of-range")
 
-        print("applying action")
         os.system(
-            f"{llvm.opt_path()} --loop-unroll -unroll-count=16 -unroll-threshold=0 {self._llvm_path} -S -o {self._llvm_path}"
+            f"{llvm.opt_path()} {self._action_space.action[action.action]} {self._llvm_path} -S -o {self._llvm_path}"
         )
         ir = open(self._llvm_path).read()
         self._observation["ir"] = Observation(string_value=ir)
