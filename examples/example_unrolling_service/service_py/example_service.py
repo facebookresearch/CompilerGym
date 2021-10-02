@@ -87,9 +87,9 @@ class UnrollingCompilationSession(CompilationSession):
         logging.info("Started a compilation session for %s", benchmark.uri)
         self._benchmark = benchmark
         self._action_space = action_space
-        self._update_observations()
+        self.reset()
 
-    def _update_observations(self):
+    def reset(self):
         self._observation = dict()
 
         src_uri_p = urlparse(self._benchmark.program.uri)
@@ -101,14 +101,12 @@ class UnrollingCompilationSession(CompilationSession):
         )
         os.makedirs(self._benchmark_log_dir, exist_ok=True)
         self._llvm_path = os.path.join(self._benchmark_log_dir, "version1.ll")
+        self._obj_path = os.path.join(self._benchmark_log_dir, "version1.o")
+        self._exe_path = os.path.join(self._benchmark_log_dir, "version1")
         # FIXME: llvm.clang_path() lead to build errors
         os.system(
             f"clang -Xclang -disable-O0-optnone -emit-llvm -S {self._src_path} -o {self._llvm_path}"
         )
-        ir = open(self._llvm_path).read()
-
-        self._observation["ir"] = Observation(string_value=ir)
-        # TODO: update "features" and "runtime" observations
 
     def apply_action(self, action: Action) -> Tuple[bool, Optional[ActionSpace], bool]:
         logging.info("Applied action %d", action.action)
@@ -120,17 +118,25 @@ class UnrollingCompilationSession(CompilationSession):
         )
         ir = open(self._llvm_path).read()
         self._observation["ir"] = Observation(string_value=ir)
-        return False, None, False
+        return False, None, False  # TODO: return correct values
 
     def get_observation(self, observation_space: ObservationSpace) -> Observation:
         logging.info("Computing observation from space %s", observation_space)
         if observation_space.name == "ir":
-            return self._observation["ir"]
+            ir = open(self._llvm_path).read()
+            return Observation(string_value=ir)
         elif observation_space.name == "features":
             observation = Observation()
             observation.int64_list.value[:] = [0, 0, 0]
             return observation
         elif observation_space.name == "runtime":
+            # TODO: use perf to measure time as it is more accurate
+            os.system(
+                f"{llvm.llc_path()} -filetype=obj {self._llvm_path} -o {self._obj_path}"
+            )
+            os.system(f"clang {self._llvm_path} -o {self._exe_path}")
+            # FIXME: this is a very inaccurate way to measure time
+            os.system(f"{self._exe_path}")
             return Observation(scalar_double=0)
         else:
             raise KeyError(observation_space.name)
