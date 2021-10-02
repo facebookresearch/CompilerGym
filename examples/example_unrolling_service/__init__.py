@@ -48,6 +48,38 @@ class RuntimeReward(Reward):
         return reward
 
 
+class SizeReward(Reward):
+    """An example reward that uses changes in the "size" observation value
+    to compute incremental reward.
+    """
+
+    def __init__(self):
+        super().__init__(
+            id="size",
+            observation_spaces=["size"],
+            default_value=0,
+            default_negates_returns=True,
+            deterministic=False,
+            platform_dependent=True,
+        )
+        self.previous_size = None
+
+    def reset(self, benchmark: str, observation_view):
+        del benchmark  # unused
+        self.previous_size = None
+
+    def update(self, action, observations, observation_view):
+        del action
+        del observation_view
+
+        if self.previous_size is None:
+            self.previous_size = observations[0]
+
+        reward = float(self.previous_size - observations[0])
+        self.previous_size = observations[0]
+        return reward
+
+
 class ExampleDataset(Dataset):
     def __init__(self, *args, **kwargs):
         super().__init__(
@@ -83,7 +115,7 @@ register(
     entry_point="compiler_gym.envs:CompilerEnv",
     kwargs={
         "service": UNROLLING_PY_SERVICE_BINARY,
-        "rewards": [RuntimeReward()],
+        "rewards": [RuntimeReward(), SizeReward()],
         "datasets": [ExampleDataset()],
     },
 )

@@ -76,7 +76,16 @@ class UnrollingCompilationSession(CompilationSession):
             deterministic=False,
             platform_dependent=True,
             default_value=Observation(
-                scalar_double=0,
+                scalar_double=0,  # TODO: get default runtime when compiling with -O3?
+            ),
+        ),
+        ObservationSpace(
+            name="size",
+            scalar_double_range=ScalarRange(min=ScalarLimit(value=0)),
+            deterministic=True,
+            platform_dependent=True,
+            default_value=Observation(
+                scalar_double=0,  # TODO: get default runtime when compiling with -Oz?
             ),
         ),
     ]
@@ -135,12 +144,24 @@ class UnrollingCompilationSession(CompilationSession):
             os.system(
                 f"{llvm.llc_path()} -filetype=obj {self._llvm_path} -o {self._obj_path}"
             )
-            os.system(f"clang {self._llvm_path} -o {self._exe_path}")
+            os.system(
+                f"clang {self._llvm_path} -o {self._exe_path}"
+            )  # TODO: use -O3 here?
             # FIXME: this is a very inaccurate way to measure time
             start_time = time.time()
             os.system(f"{self._exe_path}")
             exec_time = time.time() - start_time
             return Observation(scalar_double=exec_time)
+        elif observation_space.name == "size":
+            # TODO: refactor code so that you don't redo code compilation here?
+            os.system(
+                f"{llvm.llc_path()} -filetype=obj {self._llvm_path} -o {self._obj_path}"
+            )
+            os.system(
+                f"clang {self._llvm_path} -o {self._exe_path}"
+            )  # TODO: use -Oz here?
+            binary_size = os.path.getsize(self._exe_path)
+            return Observation(scalar_double=binary_size)
         else:
             raise KeyError(observation_space.name)
 
