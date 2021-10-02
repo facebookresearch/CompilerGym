@@ -7,6 +7,7 @@
 """An example CompilerGym service in python."""
 import logging
 import os
+import time
 from pathlib import Path
 from typing import Optional, Tuple
 from urllib.parse import urlparse
@@ -136,8 +137,10 @@ class UnrollingCompilationSession(CompilationSession):
             )
             os.system(f"clang {self._llvm_path} -o {self._exe_path}")
             # FIXME: this is a very inaccurate way to measure time
+            start_time = time.time()
             os.system(f"{self._exe_path}")
-            return Observation(scalar_double=0)
+            exec_time = time.time() - start_time
+            return Observation(scalar_double=exec_time)
         else:
             raise KeyError(observation_space.name)
 
