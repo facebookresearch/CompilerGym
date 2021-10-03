@@ -5,6 +5,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """An example CompilerGym service in python."""
+import datetime
 import logging
 import os
 from pathlib import Path
@@ -157,10 +158,12 @@ class UnrollingCompilationSession(CompilationSession):
 
         src_uri_p = urlparse(self._benchmark.program.uri)
         self._src_path = os.path.abspath(os.path.join(src_uri_p.netloc, src_uri_p.path))
-        # TODO: populate "timestamp" and "benchmark_name" in the path
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+        benchmark_name = os.path.basename(self._src_path)
         # TODO: add "clean_up" function to remove files and save space
-        self._benchmark_log_dir = (
-            "/tmp/compiler_gym/timestamp/unrolling/benchmark_name/"
+        # TODO: add argument to specify defaut log directory (or use what is used somewhere else in the repo)
+        self._benchmark_log_dir = os.path.join(
+            Path.home(), ".compiler_gym_log", "unrolling", timestamp, benchmark_name
         )
         os.makedirs(self._benchmark_log_dir, exist_ok=True)
         self._llvm_path = os.path.join(self._benchmark_log_dir, "version1.ll")
