@@ -7,7 +7,6 @@
 """An example CompilerGym service in python."""
 import logging
 import os
-import time
 from pathlib import Path
 from typing import Optional, Tuple
 from urllib.parse import urlparse
@@ -25,6 +24,7 @@ from compiler_gym.service.proto import (
     ScalarRangeList,
 )
 from compiler_gym.service.runtime import create_and_run_compiler_gym_service
+from compiler_gym.util.timer import Timer
 
 
 # TODO: move to a utils.py file?
@@ -203,10 +203,12 @@ class UnrollingCompilationSession(CompilationSession):
             os.system(
                 f"clang {self._llvm_path} -o {self._exe_path}"
             )  # TODO: use -O3 here?
-            # FIXME: this is a very inaccurate way to measure time
-            start_time = time.time()
-            os.system(f"{self._exe_path}")
-            exec_time = time.time() - start_time
+            # Running 5 times and taking the average
+            with Timer() as exec_time:
+                os.system(
+                    f"{self._exe_path}; {self._exe_path}; {self._exe_path}; {self._exe_path}; {self._exe_path}"
+                )
+            exec_time = exec_time.time / 5
             return Observation(scalar_double=exec_time)
         elif observation_space.name == "size":
             # TODO: refactor code so that you don't redo code compilation here?
