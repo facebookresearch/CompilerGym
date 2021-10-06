@@ -76,6 +76,16 @@ py_test(
 )
 
 py_test(
+    name = "runfiles_path_test",
+    srcs = ["runfiles_path_test.py"],
+    deps = [
+        "//compiler_gym/util",
+        "//tests:test_main",
+        "//tests/pytest_plugins:common",
+    ],
+)
+
+py_test(
     name = "statistics_test",
     timeout = "short",
     srcs = ["statistics_test.py"],
