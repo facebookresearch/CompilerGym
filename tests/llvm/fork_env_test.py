@@ -17,10 +17,20 @@ EXAMPLE_BITCODE_FILE = runfiles_path(
 EXAMPLE_BITCODE_IR_INSTRUCTION_COUNT = 196
 
 
+def test_with_statement(env: LlvmEnv):
+    """Test that the `with` statement context manager works on forks."""
+    env.reset("cbench-v1/crc32")
+    env.step(0)
+    with env.fork() as fkd:
+        assert fkd.in_episode
+        assert fkd.actions == [0]
+    assert not fkd.in_episode
+    assert env.in_episode
+
+
 def test_fork_child_process_is_not_orphaned(env: LlvmEnv):
     env.reset("cbench-v1/crc32")
-    fkd = env.fork()
-    try:
+    with env.fork() as fkd:
         # Check that both environments share the same service.
         assert isinstance(env.service.connection.process, subprocess.Popen)
         assert isinstance(fkd.service.connection.process, subprocess.Popen)
@@ -44,8 +54,6 @@ def test_fork_child_process_is_not_orphaned(env: LlvmEnv):
 
         # Check that the service has been killed.
         assert process.poll() is not None
-    finally:
-        fkd.close()
 
 
 def test_fork_chain_child_processes_are_not_orphaned(env: LlvmEnv):
@@ -89,12 +97,9 @@ def test_fork_chain_child_processes_are_not_orphaned(env: LlvmEnv):
 def test_fork_before_reset(env: LlvmEnv):
     """Test that fork() before reset() starts an episode."""
     assert not env.in_episode
-    fkd = env.fork()
-    try:
+    with env.fork() as fkd:
         assert env.in_episode
         assert fkd.in_episode
-    finally:
-        fkd.close()
 
 
 def test_fork_closed_service(env: LlvmEnv):
@@ -107,12 +112,9 @@ def test_fork_closed_service(env: LlvmEnv):
     env.close()
     assert not env.service
 
-    fkd = env.fork()
-    try:
+    with env.fork() as fkd:
         assert env.actions == [0]
         assert fkd.actions == [0]
-    finally:
-        fkd.close()
 
 
 def test_fork_spaces_are_same(env: LlvmEnv):
@@ -120,13 +122,10 @@ def test_fork_spaces_are_same(env: LlvmEnv):
     env.reward_space = "IrInstructionCount"
     env.reset(benchmark="cbench-v1/crc32")
 
-    fkd = env.fork()
-    try:
+    with env.fork() as fkd:
         assert fkd.observation_space == env.observation_space
         assert fkd.reward_space == env.reward_space
         assert fkd.benchmark == env.benchmark
-    finally:
-        fkd.close()
 
 
 def test_fork_state(env: LlvmEnv):
@@ -134,12 +133,9 @@ def test_fork_state(env: LlvmEnv):
     env.step(0)
     assert env.actions == [0]
 
-    new_env = env.fork()
-    try:
-        assert new_env.benchmark == new_env.benchmark
-        assert new_env.actions == env.actions
-    finally:
-        new_env.close()
+    with env.fork() as fkd:
+        assert fkd.benchmark == fkd.benchmark
+        assert fkd.actions == env.actions
 
 
 def test_fork_reset(env: LlvmEnv):
@@ -148,18 +144,15 @@ def test_fork_reset(env: LlvmEnv):
     env.step(1)
     env.step(2)
 
-    new_env = env.fork()
-    try:
-        new_env.step(3)
+    with env.fork() as fkd:
+        fkd.step(3)
 
         assert env.actions == [0, 1, 2]
-        assert new_env.actions == [0, 1, 2, 3]
+        assert fkd.actions == [0, 1, 2, 3]
 
-        new_env.reset()
+        fkd.reset()
         assert env.actions == [0, 1, 2]
-        assert new_env.actions == []
-    finally:
-        new_env.close()
+        assert fkd.actions == []
 
 
 def test_fork_custom_benchmark(env: LlvmEnv):
@@ -170,27 +163,20 @@ def test_fork_custom_benchmark(env: LlvmEnv):
         """Strip the ModuleID line from IR."""
         return "\n".join(env.ir.split("\n")[1:])
 
-    new_env = env.fork()
-    try:
-        assert ir(env) == ir(new_env)
+    with env.fork() as fkd:
+        assert ir(env) == ir(fkd)
 
-        new_env.reset()
-        assert ir(env) == ir(new_env)
-    finally:
-        new_env.close()
+        fkd.reset()
+        assert ir(env) == ir(fkd)
 
 
 def test_fork_twice_test(env: LlvmEnv):
     """Test that fork() on a forked environment works."""
     env.reset(benchmark="cbench-v1/crc32")
-    fork_a = env.fork()
-    fork_b = fork_a.fork()
-    try:
-        assert env.state == fork_a.state
-        assert fork_a.state == fork_b.state
-    finally:
-        fork_a.close()
-        fork_b.close()
+    with env.fork() as fork_a:
+        with fork_a.fork() as fork_b:
+            assert env.state == fork_a.state
+            assert fork_a.state == fork_b.state
 
 
 def test_fork_modified_ir_is_the_same(env: LlvmEnv):
@@ -202,20 +188,17 @@ def test_fork_modified_ir_is_the_same(env: LlvmEnv):
     assert not done
     assert not info["action_had_no_effect"]
 
-    forked = env.fork()
-    try:
-        assert "\n".join(env.ir.split("\n")[1:]) == "\n".join(forked.ir.split("\n")[1:])
+    with env.fork() as fkd:
+        assert "\n".join(env.ir.split("\n")[1:]) == "\n".join(fkd.ir.split("\n")[1:])
 
         # Apply another action.
         _, _, done, info = env.step(env.action_space.flags.index("-gvn"))
-        _, _, done, info = forked.step(forked.action_space.flags.index("-gvn"))
+        _, _, done, info = fkd.step(fkd.action_space.flags.index("-gvn"))
         assert not done
         assert not info["action_had_no_effect"]
 
         # Check that IRs are still equivalent.
-        assert "\n".join(env.ir.split("\n")[1:]) == "\n".join(forked.ir.split("\n")[1:])
-    finally:
-        forked.close()
+        assert "\n".join(env.ir.split("\n")[1:]) == "\n".join(fkd.ir.split("\n")[1:])
 
 
 def test_fork_rewards(env: LlvmEnv, reward_space: str):
@@ -242,13 +225,10 @@ def test_fork_previous_cost_reward_update(env: LlvmEnv):
     env.reset("cbench-v1/crc32")
 
     env.step(env.action_space.flags.index("-mem2reg"))
-    fkd = env.fork()
-    try:
+    with env.fork() as fkd:
         _, a, _, _ = env.step(env.action_space.flags.index("-mem2reg"))
         _, b, _, _ = fkd.step(env.action_space.flags.index("-mem2reg"))
         assert a == b
-    finally:
-        fkd.close()
 
 
 def test_fork_previous_cost_lazy_reward_update(env: LlvmEnv):
@@ -256,14 +236,11 @@ def test_fork_previous_cost_lazy_reward_update(env: LlvmEnv):
 
     env.step(env.action_space.flags.index("-mem2reg"))
     env.reward["IrInstructionCount"]
-    fkd = env.fork()
-    try:
+    with env.fork() as fkd:
         env.step(env.action_space.flags.index("-mem2reg"))
         fkd.step(env.action_space.flags.index("-mem2reg"))
 
         assert env.reward["IrInstructionCount"] == fkd.reward["IrInstructionCount"]
-    finally:
-        fkd.close()
 
 
 if __name__ == "__main__":

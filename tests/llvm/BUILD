@@ -127,6 +127,17 @@ py_test(
 )
 
 py_test(
+    name = "fork_regression_test",
+    timeout = "long",
+    srcs = ["fork_regression_test.py"],
+    deps = [
+        "//compiler_gym/envs",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "fresh_environment_observation_reward_test",
     timeout = "long",
     srcs = ["fresh_environment_observation_reward_test.py"],
