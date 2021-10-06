@@ -21,18 +21,19 @@ pytest_plugins = ["tests.pytest_plugins.common"]
 def test_dataset__invalid_name(invalid_name: str):
     """Test that invalid dataset names raise an error on init."""
 
-    with pytest.raises(ValueError) as e_ctx:
+    with pytest.raises(
+        ValueError,
+        match=(
+            f"Invalid dataset name: '{invalid_name}'. "
+            "Dataset name must be in the form: '{{protocol}}://{{name}}-v{{version}}'"
+        ),
+    ):
         Dataset(
             name=invalid_name,
             description="A test dataset",
             license="MIT",
             site_data_base="test",
         )
-
-    assert str(e_ctx.value) == (
-        f"Invalid dataset name: '{invalid_name}'. "
-        "Dataset name must be in the form: '{{protocol}}://{{name}}-v{{version}}'"
-    )
 
 
 def test_dataset_properties():
