@@ -10,6 +10,7 @@ from typing import List
 
 import gym
 import pytest
+from flaky import flaky
 
 import compiler_gym
 from compiler_gym.compiler_env_state import (
@@ -75,6 +76,7 @@ def test_double_reset(env: LlvmEnv, always_send_benchmark_on_reset: bool):
     assert env.in_episode
 
 
+@flaky
 def test_connection_dies_default_reward(env: LlvmEnv):
     env.reward_space = "IrInstructionCount"
     env.reset(benchmark="cbench-v1/crc32")
@@ -98,6 +100,7 @@ def test_connection_dies_default_reward(env: LlvmEnv):
     assert reward == 2.5
 
 
+@flaky
 def test_connection_dies_default_reward_negated(env: LlvmEnv):
     env.reward_space = "IrInstructionCount"
     env.reset(benchmark="cbench-v1/crc32")
