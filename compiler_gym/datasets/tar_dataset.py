@@ -92,9 +92,12 @@ class TarDataset(FilesDataset):
             # Remove any partially-completed prior extraction.
             shutil.rmtree(self.site_data_path / "contents", ignore_errors=True)
 
-            logger.info("Downloading %s dataset", self.name)
+            logger.warning(
+                "Installing the %s dataset. This may take a few moments ...", self.name
+            )
+
             tar_data = io.BytesIO(download(self.tar_urls, self.tar_sha256))
-            logger.info("Unpacking %s dataset", self.name)
+            logger.info("Unpacking %s dataset to %s", self.name, self.site_data_path)
             with tarfile.open(
                 fileobj=tar_data, mode=f"r:{self.tar_compression}"
             ) as arc:
