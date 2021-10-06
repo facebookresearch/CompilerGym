@@ -359,10 +359,12 @@ install: |  init-runtime-requirements bazel-build pip-install
 # A list of all filesystem locations that CompilerGym may use for storing
 # files and data.
 COMPILER_GYM_DATA_FILE_LOCATIONS = \
-    $(HOME)/.cache/compiler_gym \
-    $(HOME)/.local/share/compiler_gym \
-    $(HOME)/logs/compiler_gym \
+    "$(HOME)/.cache/compiler_gym" \
+    "$(HOME)/.local/share/compiler_gym" \
+    "$(HOME)/logs/compiler_gym" \
     /dev/shm/compiler_gym \
+    /dev/shm/compiler_gym_$(USER) \
+    /tmp/compiler_gym \
     /tmp/compiler_gym_$(USER) \
     $(NULL)
 
