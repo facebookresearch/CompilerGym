@@ -84,6 +84,8 @@ from pathlib import Path
 from compiler_gym.envs.llvm.service.passes.common import Pass
 from compiler_gym.envs.llvm.service.passes.config import EXTRA_LLVM_HEADERS
 
+logger = logging.getLogger(__name__)
+
 
 def process_pass(pass_, headers, enum_f, switch_f):
     """Extract and process transform passes in header."""
@@ -121,8 +123,8 @@ def make_action_sources(pass_iterator, outpath: Path):
         print("};", file=enum_f)
         print("  }", file=switch_f)
 
-    logging.debug("Generated %s", switch_path.name)
-    logging.debug("Generated %s", enum_path.name)
+    logger.debug("Generated %s", switch_path.name)
+    logger.debug("Generated %s", enum_path.name)
 
     with open(include_path, "w") as f:
         print("#pragma once", file=f)
@@ -141,17 +143,17 @@ FunctionPass* createEarlyCSEMemSSAPass() {
 """,
             file=f,
         )
-    logging.debug("Generated %s", include_path.name)
+    logger.debug("Generated %s", include_path.name)
 
     with open(flags_path, "w") as f:
         print("\n".join(p.flag for p in passes), file=f)
-    logging.debug("Generated %s", flags_path.name)
+    logger.debug("Generated %s", flags_path.name)
 
     with open(descriptions_path, "w") as f:
         print("\n".join(p.description for p in passes), file=f)
-    logging.debug("Generated %s", descriptions_path.name)
+    logger.debug("Generated %s", descriptions_path.name)
 
-    logging.debug("Created genfiles for %s pass actions", total_passes)
+    logger.debug("Created genfiles for %s pass actions", total_passes)
 
 
 def main(argv):

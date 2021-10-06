@@ -7,7 +7,7 @@
 import pytest
 
 from compiler_gym.service.proto import Benchmark, File
-from compiler_gym.service.runtime.benchmark_cache import BenchmarkCache
+from compiler_gym.service.runtime.benchmark_cache import BenchmarkCache, logger
 from tests.test_main import main
 
 
@@ -57,7 +57,7 @@ def test_evict_to_capacity_on_max_size_reached(mocker):
     cache = BenchmarkCache(max_size_in_bytes=100)
 
     mocker.spy(cache, "evict_to_capacity")
-    mocker.spy(cache.logger, "info")
+    mocker.spy(logger, "info")
 
     cache["a"] = make_benchmark_of_size(30)
     cache["b"] = make_benchmark_of_size(30)
@@ -70,7 +70,7 @@ def test_evict_to_capacity_on_max_size_reached(mocker):
     assert cache.size == 2
     assert cache.size_in_bytes == 60
 
-    cache.logger.info.assert_called_once_with(
+    logger.info.assert_called_once_with(
         "Evicted %d benchmarks from cache. Benchmark cache size now %d bytes, "
         "%d items",
         2,
@@ -85,11 +85,11 @@ def test_oversized_benchmark_emits_warning(mocker):
     """
     cache = BenchmarkCache(max_size_in_bytes=10)
 
-    mocker.spy(cache.logger, "warning")
+    mocker.spy(logger, "warning")
 
     cache["test"] = make_benchmark_of_size(50)
 
-    cache.logger.warning.assert_called_once_with(
+    logger.warning.assert_called_once_with(
         "Adding new benchmark with size %d bytes exceeds total target cache "
         "size of %d bytes",
         50,
@@ -128,7 +128,7 @@ def test_evict_to_capacity_on_maximum_size_update(mocker):
     cache = BenchmarkCache(max_size_in_bytes=100)
 
     mocker.spy(cache, "evict_to_capacity")
-    mocker.spy(cache.logger, "info")
+    mocker.spy(logger, "info")
 
     cache["a"] = make_benchmark_of_size(30)
     cache["b"] = make_benchmark_of_size(30)

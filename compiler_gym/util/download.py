@@ -14,6 +14,8 @@ from compiler_gym.util.filesystem import atomic_file_write
 from compiler_gym.util.runfiles_path import cache_path
 from compiler_gym.util.truncate import truncate
 
+logger = logging.getLogger(__name__)
+
 
 class DownloadFailed(IOError):
     """Error thrown if a download fails."""
@@ -42,7 +44,7 @@ def _get_url_data(url: str) -> bytes:
 
 
 def _do_download_attempt(url: str, sha256: Optional[str]) -> bytes:
-    logging.info("Downloading %s ...", url)
+    logger.info("Downloading %s ...", url)
     content = _get_url_data(url)
     if sha256:
         # Validate the checksum.
@@ -63,7 +65,7 @@ def _do_download_attempt(url: str, sha256: Optional[str]) -> bytes:
         with atomic_file_write(path, fileobj=True) as f:
             f.write(content)
 
-    logging.debug(f"Downloaded {url}")
+    logger.debug(f"Downloaded {url}")
     return content
 
 
@@ -85,7 +87,7 @@ def _download(urls: List[str], sha256: Optional[str], max_retries: int) -> bytes
                 return _do_download_attempt(url, sha256)
             except TooManyRequests as e:
                 last_exception = e
-                logging.info(
+                logger.info(
                     "Download attempt failed with Too Many Requests error. "
                     "Watiting %.1f seconds",
                     wait_time,
@@ -93,7 +95,7 @@ def _download(urls: List[str], sha256: Optional[str], max_retries: int) -> bytes
                 sleep(wait_time)
                 wait_time *= 1.5
             except DownloadFailed as e:
-                logging.info("Download attempt failed: %s", truncate(e))
+                logger.info("Download attempt failed: %s", truncate(e))
                 last_exception = e
     raise last_exception
 

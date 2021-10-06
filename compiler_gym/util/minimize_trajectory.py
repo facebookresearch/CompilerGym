@@ -17,6 +17,8 @@ from typing import Callable, Iterable
 
 from compiler_gym.util.truncate import truncate
 
+logger = logging.getLogger(__name__)
+
 
 class MinimizationError(OSError):
     """Error raised if trajectory minimization fails."""
@@ -30,7 +32,7 @@ Hypothesis = Callable[["CompilerEnv"], bool]  # noqa: F821
 def environment_validation_fails(env: "CompilerEnv") -> bool:  # noqa: F821
     """A hypothesis that holds true if environment validation fails."""
     validation_result = env.validate()
-    logging.debug(truncate(str(validation_result), max_lines=1, max_line_len=120))
+    logger.debug(truncate(str(validation_result), max_lines=1, max_line_len=120))
     return not validation_result.okay()
 
 
@@ -38,13 +40,13 @@ def _apply_and_test(env, actions, hypothesis, flakiness) -> bool:
     """Run specific actions on environment and return whether hypothesis holds."""
     env.reset(benchmark=env.benchmark)
     for _ in range(flakiness):
-        logging.debug("Applying %d actions ...", len(actions))
+        logger.debug("Applying %d actions ...", len(actions))
         _, _, done, info = env.step(actions)
         if done:
             raise MinimizationError(
                 f"Failed to replay actions: {info.get('error_details', '')}"
             )
-        logging.debug("Applied %d actions", len(actions))
+        logger.debug("Applied %d actions", len(actions))
         if hypothesis(env):
             return True
     return False
@@ -87,7 +89,7 @@ def bisect_trajectory(
     if not all_actions:
         return env
 
-    logging.info(
+    logger.info(
         "%sisecting sequence of %d actions",
         "Reverse b" if reverse else "B",
         len(all_actions),
@@ -104,13 +106,13 @@ def bisect_trajectory(
         step += 1
         remaining_steps = int(log(max(right - left, 1), 2))
         mid = left + ((right - left) // 2)
-        logging.debug(
+        logger.debug(
             "Bisect step=%d, left=%d, right=%d, mid=%d", step, left, right, mid
         )
 
         actions = all_actions[mid:] if reverse else all_actions[:mid]
         if apply_and_test(actions):
-            logging.info(
+            logger.info(
                 "🟢 Hypothesis holds at num_actions=%d, remaining bisect steps=%d",
                 mid,
                 remaining_steps,
@@ -121,7 +123,7 @@ def bisect_trajectory(
             else:
                 right = mid - 1
         else:
-            logging.info(
+            logger.info(
                 "🔴 Hypothesis does not hold at num_actions=%d, remaining bisect steps=%d",
                 mid,
                 remaining_steps,
@@ -134,10 +136,10 @@ def bisect_trajectory(
     mid = max(left, right) - 1 if reverse else min(left, right) + 1
     if (reverse and mid < 0) or (not reverse and mid >= len(all_actions)):
         actions = all_actions
-        logging.info("Failed to reduce trajectory length using bisection")
+        logger.info("Failed to reduce trajectory length using bisection")
     else:
         actions = all_actions[mid:] if reverse else all_actions[:mid]
-        logging.info(
+        logger.info(
             "Determined that action %d of %d is the first at which the hypothesis holds: %s",
             mid,
             len(all_actions),
@@ -216,7 +218,7 @@ def random_minimization(
         for _ in range(num_to_remove):
             del candidate_actions[random.randint(0, len(candidate_actions) - 1)]
         if apply_and_test(candidate_actions):
-            logging.info(
+            logger.info(
                 "🟢 Hypothesis holds with %s of %s actions randomly removed, continuing",
                 num_to_remove,
                 len(actions),
@@ -225,14 +227,14 @@ def random_minimization(
             discard_ratio = init_discard_ratio
             yield env
         else:
-            logging.info(
+            logger.info(
                 "🔴 Hypothesis does not hold with %s of %s actions randomly removed, rolling back",
                 num_to_remove,
                 len(actions),
             )
             discard_ratio *= discard_ratio_decay
             if num_to_remove == 1:
-                logging.info(
+                logger.info(
                     "Terminating random minimization after failing with only a single action removed"
                 )
                 break
@@ -290,7 +292,7 @@ def minimize_trajectory_iteratively(
         pass_num += 1
         action_has_been_pruned = False
         action_mask = [True] * len(all_actions)
-        logging.info("Minimization pass on sequence of %d actions", len(all_actions))
+        logger.info("Minimization pass on sequence of %d actions", len(all_actions))
 
         # Inner loop. Go through every action and see if it can be removed.
         for i in range(len(action_mask)):
@@ -298,7 +300,7 @@ def minimize_trajectory_iteratively(
             action_name = env.action_space.flags[all_actions[i]]
             actions = [action for action, mask in zip(all_actions, action_mask) if mask]
             if apply_and_test(actions):
-                logging.info(
+                logger.info(
                     "🟢 Hypothesis holds with action %s removed, %d actions remaining",
                     action_name,
                     sum(action_mask),
@@ -308,7 +310,7 @@ def minimize_trajectory_iteratively(
                 yield env
             else:
                 action_mask[i] = True
-                logging.info(
+                logger.info(
                     "🔴 Hypothesis does not hold with action %s removed, %d actions remaining",
                     action_name,
                     sum(action_mask),
@@ -316,7 +318,7 @@ def minimize_trajectory_iteratively(
 
         all_actions = [action for action, mask in zip(all_actions, action_mask) if mask]
 
-    logging.info(
+    logger.info(
         "Minimization halted after %d passes, %d of %d actions removed",
         pass_num,
         actions_removed,

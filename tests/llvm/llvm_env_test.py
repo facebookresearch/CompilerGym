@@ -20,7 +20,6 @@ from compiler_gym.envs import CompilerEnv, llvm
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.service import ServiceError
 from compiler_gym.service.connection import CompilerGymServiceConnection
-from compiler_gym.util import debug_util as dbg
 from tests.pytest_plugins import llvm as llvm_plugin
 from tests.test_main import main
 
@@ -210,10 +209,6 @@ def test_ir_sha1(env: LlvmEnv, tmpwd: Path):
 def test_generate_enum_declarations(env: LlvmEnv):
     assert issubclass(llvm.observation_spaces, Enum)
     assert issubclass(llvm.reward_spaces, Enum)
-
-
-def test_logging_default_level(env: LlvmEnv):
-    assert env.logger.level == dbg.get_logging_level()
 
 
 def test_step_multiple_actions_list(env: LlvmEnv):

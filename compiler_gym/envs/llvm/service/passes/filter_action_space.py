@@ -15,6 +15,8 @@ from typing import Iterable
 from compiler_gym.envs.llvm.service.passes import config
 from compiler_gym.envs.llvm.service.passes.common import Pass
 
+logger = logging.getLogger(__name__)
+
 
 def filter_passes(pass_iterator: Iterable[Pass]) -> Iterable[Pass]:
     """Apply config.include_pass() to an input sequence of passes.
@@ -29,7 +31,7 @@ def filter_passes(pass_iterator: Iterable[Pass]) -> Iterable[Pass]:
         total_count += 1
         if config.include_pass(pass_):
             selected_count += 1
-            logging.debug(
+            logger.debug(
                 f"Selected {pass_.name} pass ({pass_.flag}) from {pass_.source}",
             )
             yield pass_

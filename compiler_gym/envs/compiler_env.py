@@ -47,7 +47,6 @@ from compiler_gym.service.proto import (
     proto_to_action_space,
 )
 from compiler_gym.spaces import DefaultRewardFromObservation, NamedDiscrete, Reward
-from compiler_gym.util.debug_util import get_logging_level
 from compiler_gym.util.gym_type_hints import (
     ActionType,
     ObservationType,
@@ -59,6 +58,13 @@ from compiler_gym.util.timer import Timer
 from compiler_gym.validation_error import ValidationError
 from compiler_gym.validation_result import ValidationResult
 from compiler_gym.views import ObservationSpaceSpec, ObservationView, RewardView
+
+logger = logging.getLogger(__name__)
+
+# NOTE(cummins): This is only required to prevent a name conflict with the now
+# deprecated CompilerEnv.logger attribute. This can be removed once the logger
+# attribute is removed, scheduled for release 0.2.3.
+_logger = logger
 
 
 def _wrapped_step(
@@ -112,11 +118,6 @@ class CompilerEnv(gym.Env):
     :ivar service: A connection to the underlying compiler service.
 
     :vartype service: compiler_gym.service.CompilerGymServiceConnection
-
-    :ivar logger: A Logger instance used by the environment for communicating
-        info and warnings.
-
-    :vartype logger: logging.Logger
 
     :ivar action_spaces: A list of supported action space names.
 
@@ -210,23 +211,23 @@ class CompilerEnv(gym.Env):
         :param service_connection: An existing compiler gym service connection
             to use.
 
-        :param logger: The logger to use for this environment. If not provided,
-            a :code:`compiler_gym.envs` logger is used and assigned the
-            verbosity returned by :func:`get_logging_level()
-            <compiler_gym.get_logging_level>`.
-
         :raises FileNotFoundError: If service is a path to a file that is not
             found.
 
         :raises TimeoutError: If the compiler service fails to initialize within
             the parameters provided in :code:`connection_settings`.
         """
-        self.metadata = {"render.modes": ["human", "ansi"]}
+        # NOTE(cummins): Logger argument deprecated and scheduled to be removed
+        # in release 0.2.3.
+        if logger:
+            warnings.warn(
+                "The `logger` argument is deprecated on CompilerEnv.__init__() "
+                "and will be removed in a future release. All CompilerEnv "
+                "instances share a logger named compiler_gym.envs.compiler_env",
+                DeprecationWarning,
+            )
 
-        if logger is None:
-            logger = logging.getLogger("compiler_gym.envs")
-            logger.setLevel(get_logging_level())
-        self.logger = logger
+        self.metadata = {"render.modes": ["human", "ansi"]}
 
         # A compiler service supports multiple simultaneous environments. This
         # session ID is used to identify this environment.
@@ -238,7 +239,6 @@ class CompilerEnv(gym.Env):
         self.service = service_connection or CompilerGymServiceConnection(
             endpoint=self._service_endpoint,
             opts=self._connection_settings,
-            logger=self.logger,
         )
         self.datasets = Datasets(datasets or [])
 
@@ -329,6 +329,17 @@ class CompilerEnv(gym.Env):
     def available_datasets(self) -> Dict[str, Dataset]:
         """A dictionary of datasets."""
         return {d.name: d for d in self.datasets}
+
+    @property
+    @deprecated(
+        version="0.2.1",
+        reason=(
+            "The `CompilerEnv.logger` attribute is deprecated. All CompilerEnv "
+            "instances share a logger named compiler_gym.envs.compiler_env"
+        ),
+    )
+    def logger(self):
+        return _logger
 
     @property
     def versions(self) -> GetVersionReply:
@@ -447,10 +458,10 @@ class CompilerEnv(gym.Env):
             )
         if isinstance(benchmark, str):
             benchmark_object = self.datasets.benchmark(benchmark)
-            self.logger.debug("Setting benchmark by name: %s", benchmark_object)
+            logger.debug("Setting benchmark by name: %s", benchmark_object)
             self._next_benchmark = benchmark_object
         elif isinstance(benchmark, Benchmark):
-            self.logger.debug("Setting benchmark: %s", benchmark.uri)
+            logger.debug("Setting benchmark: %s", benchmark.uri)
             self._next_benchmark = benchmark
         else:
             raise TypeError(
@@ -573,9 +584,7 @@ class CompilerEnv(gym.Env):
             actions = self.actions.copy()
             self.reset()
             if actions:
-                self.logger.warning(
-                    "Parent service of fork() has died, replaying state"
-                )
+                logger.warning("Parent service of fork() has died, replaying state")
                 _, _, done, _ = self.step(actions)
                 assert not done, "Failed to replay action sequence"
 
@@ -668,7 +677,7 @@ class CompilerEnv(gym.Env):
                 if reply.remaining_sessions:
                     close_service = False
             except Exception as e:
-                self.logger.warning(
+                logger.warning(
                     "Failed to end active compiler session on close(): %s (%s)",
                     e,
                     type(e).__name__,
@@ -720,7 +729,7 @@ class CompilerEnv(gym.Env):
 
         def _retry(error) -> Optional[ObservationType]:
             """Abort and retry on error."""
-            self.logger.warning("%s during reset(): %s", type(error).__name__, error)
+            logger.warning("%s during reset(): %s", type(error).__name__, error)
             if self.service:
                 self.service.close()
             self.service = None
@@ -763,13 +772,13 @@ class CompilerEnv(gym.Env):
 
         # Stop an existing episode.
         if self.in_episode:
-            self.logger.debug("Ending session %d", self._session_id)
+            logger.debug("Ending session %d", self._session_id)
             error, _ = _call_with_error(
                 self.service.stub.EndSession,
                 EndSessionRequest(session_id=self._session_id),
             )
             if error:
-                self.logger.warning(
+                logger.warning(
                     "Failed to stop session %d with %s: %s",
                     self._session_id,
                     type(error).__name__,

@@ -237,5 +237,11 @@ def test_benchmarks_iter():
     assert list(dataset) == [1, 2, 3]
 
 
+def test_logger_is_deprecated():
+    dataset = DatasetForTesting()
+    with pytest.deprecated_call(match="The `Dataset.logger` attribute is deprecated"):
+        dataset.logger
+
+
 if __name__ == "__main__":
     main()

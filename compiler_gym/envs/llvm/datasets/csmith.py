@@ -18,6 +18,8 @@ from compiler_gym.util.runfiles_path import runfiles_path
 from compiler_gym.util.shell_format import plural
 from compiler_gym.util.truncate import truncate
 
+logger = logging.getLogger(__name__)
+
 # The maximum value for the --seed argument to csmith.
 UINT_MAX = (2 ** 32) - 1
 
@@ -178,7 +180,7 @@ class CsmithDataset(Dataset):
 
         # Run csmith with the given seed and pipe the output to clang to
         # assemble a bitcode.
-        self.logger.debug("Exec csmith --seed %d", seed)
+        logger.debug("Exec csmith --seed %d", seed)
         csmith = subprocess.Popen(
             [str(self.csmith_bin_path), "--seed", str(seed)],
             stdout=subprocess.PIPE,
@@ -192,11 +194,11 @@ class CsmithDataset(Dataset):
                 stderr = "\n".join(
                     truncate(stderr.decode("utf-8"), max_line_len=200, max_lines=20)
                 )
-                logging.warning("Csmith failed with seed %d: %s", seed, stderr)
+                logger.warning("Csmith failed with seed %d: %s", seed, stderr)
             except UnicodeDecodeError:
                 # Failed to interpret the stderr output, generate a generic
                 # error message.
-                logging.warning("Csmith failed with seed %d", seed)
+                logger.warning("Csmith failed with seed %d", seed)
             return self.benchmark_from_seed(
                 seed, max_retries=max_retries, retry_count=retry_count + 1
             )

@@ -28,6 +28,8 @@ from compiler_gym.service.proto import (
     ScalarRangeList,
 )
 
+logger = logging.getLogger(__name__)
+
 
 class LoopToolCompilationSession(CompilationSession):
     """Represents an instance of an interactive loop_tool session."""
@@ -128,7 +130,7 @@ class LoopToolCompilationSession(CompilationSession):
         self.thread = [1, 0, 0]
         self.cursor = 0
         self.mode = "size"
-        logging.info("Started a compilation session for %s", benchmark.uri)
+        logger.info("Started a compilation session for %s", benchmark.uri)
 
     def resize(self, increment):
         """
@@ -219,7 +221,7 @@ class LoopToolCompilationSession(CompilationSession):
         ):
             raise ValueError("Out-of-range")
 
-        logging.info("Applied action %d", choice_index)
+        logger.info("Applied action %d", choice_index)
 
         act = self.action_space.choice[0].named_discrete_space.value[choice_index]
         if self.mode not in ["size", "select"]:

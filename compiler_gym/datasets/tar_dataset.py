@@ -5,6 +5,7 @@
 import bz2
 import gzip
 import io
+import logging
 import shutil
 import tarfile
 from threading import Lock
@@ -16,6 +17,8 @@ from compiler_gym.datasets.files_dataset import FilesDataset
 from compiler_gym.util.decorators import memoized_property
 from compiler_gym.util.download import download
 from compiler_gym.util.filesystem import atomic_file_write
+
+logger = logging.getLogger(__name__)
 
 # Module-level locks that ensures exclusive access to install routines across
 # threads. Note that these lock are shared across all TarDataset instances. We
@@ -89,9 +92,9 @@ class TarDataset(FilesDataset):
             # Remove any partially-completed prior extraction.
             shutil.rmtree(self.site_data_path / "contents", ignore_errors=True)
 
-            self.logger.info("Downloading %s dataset", self.name)
+            logger.info("Downloading %s dataset", self.name)
             tar_data = io.BytesIO(download(self.tar_urls, self.tar_sha256))
-            self.logger.info("Unpacking %s dataset", self.name)
+            logger.info("Unpacking %s dataset", self.name)
             with tarfile.open(
                 fileobj=tar_data, mode=f"r:{self.tar_compression}"
             ) as arc:
@@ -165,7 +168,7 @@ class TarDatasetWithManifest(TarDataset):
         """
         with open(self._manifest_path, encoding="utf-8") as f:
             uris = self._read_manifest(f.read())
-        self.logger.debug("Read %s manifest, %d entries", self.name, len(uris))
+        logger.debug("Read %s manifest, %d entries", self.name, len(uris))
         return uris
 
     @memoized_property
@@ -192,7 +195,7 @@ class TarDatasetWithManifest(TarDataset):
                 )
 
             # Decompress the manifest data.
-            self.logger.debug("Downloading %s manifest", self.name)
+            logger.debug("Downloading %s manifest", self.name)
             manifest_data = io.BytesIO(
                 download(self.manifest_urls, self.manifest_sha256)
             )
@@ -206,9 +209,7 @@ class TarDatasetWithManifest(TarDataset):
                 f.write(manifest_data)
 
             uris = self._read_manifest(manifest_data.decode("utf-8"))
-            self.logger.debug(
-                "Downloaded %s manifest, %d entries", self.name, len(uris)
-            )
+            logger.debug("Downloaded %s manifest, %d entries", self.name, len(uris))
             return uris
 
     @memoized_property
