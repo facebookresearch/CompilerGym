@@ -307,7 +307,6 @@ itest: bazel-fetch
 install-test-setup:
 	mkdir -p "$(INSTALL_TEST_ROOT)"
 	rm -f "$(INSTALL_TEST_ROOT)/tests" "$(INSTALL_TEST_ROOT)/tox.ini"
-	ln -s "$(INSTALL_TEST_ROOT)"
 	ln -s "$(ROOT)/tests" "$(INSTALL_TEST_ROOT)"
 	ln -s "$(ROOT)/tox.ini" "$(INSTALL_TEST_ROOT)"
 
