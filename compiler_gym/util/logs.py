@@ -3,9 +3,8 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 from pathlib import Path
-from typing import NamedTuple
 
-from deprecated import deprecated
+from deprecated.sphinx import deprecated
 
 from compiler_gym.util.runfiles_path import create_user_logs_dir
 
@@ -28,41 +27,3 @@ def create_logging_dir(name: str) -> Path:
     Use :code:`compiler_gym.util.runfiles_path.create_user_logs_dir()` instead.
     """
     return create_user_logs_dir(name)
-
-
-class ProgressLogEntry(NamedTuple):
-    """A snapshot of incremental search progress."""
-
-    runtime_seconds: float
-    total_episode_count: int
-    total_step_count: int
-    num_passes: int
-    reward: float
-
-    def to_csv(self) -> str:
-        return ",".join(
-            [
-                f"{self.runtime_seconds:.3f}",
-                str(self.total_episode_count),
-                str(self.total_step_count),
-                str(self.num_passes),
-                str(self.reward),
-            ]
-        )
-
-    @classmethod
-    def from_csv(cls, line: str) -> "ProgressLogEntry":
-        (
-            runtime_seconds,
-            total_episode_count,
-            total_step_count,
-            num_passes,
-            reward,
-        ) = line.split(",")
-        return ProgressLogEntry(
-            float(runtime_seconds),
-            int(total_episode_count),
-            int(total_step_count),
-            int(num_passes),
-            float(reward),
-        )

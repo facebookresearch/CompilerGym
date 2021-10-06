@@ -11,6 +11,7 @@ import numpy as np
 from absl import app, flags
 
 import compiler_gym.util.flags.output_dir  # noqa Flag definition.
+from compiler_gym.random_search import RandomSearchProgressLogEntry
 from compiler_gym.util import logs
 from compiler_gym.util.statistics import geometric_mean
 from compiler_gym.util.tabulate import tabulate
@@ -46,7 +47,7 @@ def eval_logs(outdir: Path) -> None:
 
         with open(str(progress_path)) as f:
             final_line = f.readlines()[-1]
-        best = logs.ProgressLogEntry.from_csv(final_line)
+        best = RandomSearchProgressLogEntry.from_csv(final_line)
 
         totals["instructions"] += meta["num_instructions"]
         totals["init_reward"].append(meta["init_reward"])

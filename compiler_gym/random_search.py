@@ -8,15 +8,54 @@ from multiprocessing import cpu_count
 from pathlib import Path
 from threading import Thread
 from time import sleep, time
-from typing import Callable, List, Optional, Union
+from typing import Callable, List, NamedTuple, Optional, Union
 
 import humanize
 
 from compiler_gym.envs import CompilerEnv
-from compiler_gym.random_replay import replay_actions
+from compiler_gym.envs.llvm import LlvmEnv
 from compiler_gym.service.connection import ServiceError
 from compiler_gym.util import logs
 from compiler_gym.util.logs import create_logging_dir
+from compiler_gym.util.tabulate import tabulate
+
+
+class RandomSearchProgressLogEntry(NamedTuple):
+    """A snapshot of incremental search progress."""
+
+    runtime_seconds: float
+    total_episode_count: int
+    total_step_count: int
+    num_passes: int
+    reward: float
+
+    def to_csv(self) -> str:
+        return ",".join(
+            [
+                f"{self.runtime_seconds:.3f}",
+                str(self.total_episode_count),
+                str(self.total_step_count),
+                str(self.num_passes),
+                str(self.reward),
+            ]
+        )
+
+    @classmethod
+    def from_csv(cls, line: str) -> "RandomSearchProgressLogEntry":
+        (
+            runtime_seconds,
+            total_episode_count,
+            total_step_count,
+            num_passes,
+            reward,
+        ) = line.split(",")
+        return RandomSearchProgressLogEntry(
+            float(runtime_seconds),
+            int(total_episode_count),
+            int(total_step_count),
+            int(num_passes),
+            float(reward),
+        )
 
 
 class RandomAgentWorker(Thread):
@@ -213,7 +252,7 @@ def random_search(
 
                 # Log the incremental progress improvements.
                 if best_returns > last_best_returns:
-                    entry = logs.ProgressLogEntry(
+                    entry = RandomSearchProgressLogEntry(
                         runtime_seconds=runtime,
                         total_episode_count=total_episode_count,
                         total_step_count=total_step_count,
@@ -252,3 +291,71 @@ def random_search(
         replay_actions(env, best_action_names, outdir)
 
     return env
+
+
+def replay_actions(env: CompilerEnv, action_names: List[str], outdir: Path):
+    logs_path = outdir / logs.BEST_ACTIONS_PROGRESS_NAME
+    start_time = time()
+
+    if isinstance(env, LlvmEnv):
+        env.write_bitcode(outdir / "unoptimized.bc")
+
+    with open(str(logs_path), "w") as f:
+        ep_reward = 0
+        for i, action in enumerate(action_names, start=1):
+            _, reward, done, _ = env.step(env.action_space.names.index(action))
+            assert not done
+            ep_reward += reward
+            print(
+                f"Step [{i:03d} / {len(action_names):03d}]: reward={reward:.4f}   \t"
+                f"episode={ep_reward:.4f}   \taction={action}"
+            )
+            progress = RandomSearchProgressLogEntry(
+                runtime_seconds=time() - start_time,
+                total_episode_count=1,
+                total_step_count=i,
+                num_passes=i,
+                reward=reward,
+            )
+            print(progress.to_csv(), action, file=f, sep=",")
+
+    if isinstance(env, LlvmEnv):
+        env.write_bitcode(outdir / "optimized.bc")
+        print(
+            tabulate(
+                [
+                    (
+                        "IR instruction count",
+                        env.observation["IrInstructionCountO0"],
+                        env.observation["IrInstructionCountOz"],
+                        env.observation["IrInstructionCount"],
+                    ),
+                    (
+                        "Object .text size (bytes)",
+                        env.observation["ObjectTextSizeO0"],
+                        env.observation["ObjectTextSizeOz"],
+                        env.observation["ObjectTextSizeBytes"],
+                    ),
+                ],
+                headers=("", "-O0", "-Oz", "final"),
+            )
+        )
+
+
+def replay_actions_from_logs(env: CompilerEnv, logdir: Path, benchmark=None) -> None:
+    best_actions_path = logdir / logs.BEST_ACTIONS_NAME
+    meta_path = logdir / logs.METADATA_NAME
+
+    assert best_actions_path.is_file(), f"File not found: {best_actions_path}"
+    assert meta_path.is_file(), f"File not found: {meta_path}"
+
+    with open(meta_path, "rb") as f:
+        meta = json.load(f)
+
+    with open(best_actions_path) as f:
+        actions = [ln.strip() for ln in f.readlines() if ln.strip()]
+
+    benchmark = benchmark or meta["benchmark"]
+    env.reward_space = meta["reward"]
+    env.reset(benchmark=benchmark)
+    replay_actions(env, actions, logdir)

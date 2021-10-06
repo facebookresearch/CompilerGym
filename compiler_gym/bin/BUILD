@@ -45,6 +45,7 @@ py_binary(
     name = "random_eval",
     srcs = ["random_eval.py"],
     deps = [
+        "//compiler_gym:random_search",
         "//compiler_gym/util",
         "//compiler_gym/util/flags",
     ],
@@ -65,7 +66,7 @@ py_binary(
     srcs = ["random_replay.py"],
     visibility = ["//visibility:public"],
     deps = [
-        "//compiler_gym:random_replay",
+        "//compiler_gym:random_search",
         "//compiler_gym/util",
         "//compiler_gym/util/flags",
     ],
