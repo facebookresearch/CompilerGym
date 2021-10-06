@@ -145,7 +145,12 @@ def _compile_and_run_bitcode_file(
         try:
             output, _ = clang.communicate(timeout=compilation_timeout_seconds)
         except subprocess.TimeoutExpired:
-            clang.kill()
+            # kill() was added in Python 3.7.
+            if sys.version_info >= (3, 7, 0):
+                clang.kill()
+            else:
+                clang.terminate()
+            clang.communicate(timeout=30)  # Wait for shutdown to complete.
             error_data["timeout"] = compilation_timeout_seconds
             return BenchmarkExecutionResult(
                 walltime_seconds=timeout_seconds,
@@ -183,7 +188,12 @@ def _compile_and_run_bitcode_file(
         with Timer() as timer:
             stdout, _ = process.communicate(timeout=timeout_seconds)
     except subprocess.TimeoutExpired:
-        process.kill()
+        # kill() was added in Python 3.7.
+        if sys.version_info >= (3, 7, 0):
+            process.kill()
+        else:
+            process.terminate()
+        process.communicate(timeout=30)  # Wait for shutdown to complete.
         error_data["timeout_seconds"] = timeout_seconds
         return BenchmarkExecutionResult(
             walltime_seconds=timeout_seconds,

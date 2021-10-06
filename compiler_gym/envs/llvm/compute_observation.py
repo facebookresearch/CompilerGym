@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 """This module defines a utility function for computing LLVM observations."""
 import subprocess
+import sys
 from pathlib import Path
 from typing import List
 
@@ -81,6 +82,12 @@ def compute_observation(
     try:
         stdout, stderr = process.communicate(timeout=timeout)
     except subprocess.TimeoutExpired as e:
+        # kill() was added in Python 3.7.
+        if sys.version_info >= (3, 7, 0):
+            process.kill()
+        else:
+            process.terminate()
+        process.communicate(timeout=timeout)  # Wait for shutdown to complete.
         raise TimeoutError(
             f"Failed to compute {observation_space.id} observation in "
             f"{timeout:.1f} {plural(int(round(timeout)), 'second', 'seconds')}"
