@@ -158,12 +158,18 @@ class UnrollingCompilationSession(CompilationSession):
 
         src_uri_p = urlparse(self._benchmark.program.uri)
         self._src_path = os.path.abspath(os.path.join(src_uri_p.netloc, src_uri_p.path))
-        timestamp = datetime.datetime.now().strftime("%Y-%m-%d-%H-%M-%S")
+        current_date = datetime.datetime.now().strftime("%Y-%m-%d")
+        current_time = datetime.datetime.now().strftime("%H-%M-%S")
         benchmark_name = os.path.basename(self._src_path)
         # TODO: add "clean_up" function to remove files and save space
         # TODO: add argument to specify defaut log directory (or use what is used somewhere else in the repo)
         self._benchmark_log_dir = os.path.join(
-            Path.home(), ".compiler_gym_log", "unrolling", timestamp, benchmark_name
+            Path.home(),
+            ".compiler_gym_log",
+            "unrolling",
+            current_date,
+            current_time,
+            benchmark_name,
         )
         os.makedirs(self._benchmark_log_dir, exist_ok=True)
         self._llvm_path = os.path.join(self._benchmark_log_dir, "version1.ll")
