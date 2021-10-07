@@ -30,21 +30,23 @@ class RuntimeReward(Reward):
             deterministic=False,
             platform_dependent=True,
         )
-        self.previous_runtime = None
+        self.baseline_runtime = 1
 
     def reset(self, benchmark: str, observation_view):
         del benchmark  # unused
-        self.previous_runtime = None
+        self.baseline_runtime = observation_view["runtime"]
 
     def update(self, action, observations, observation_view):
         del action
         del observation_view
 
-        if self.previous_runtime is None:
-            self.previous_runtime = observations[0]
+        if self.baseline_runtime is None:
+            self.baseline_runtime = observations[0]
 
-        reward = float(self.previous_runtime - observations[0])
-        self.previous_runtime = observations[0]
+        # Here we are using Contextual Bandits: the number of steps the RL agent has to take before
+        # the environment terminates is one. In Contextual Bandits the learner tries
+        # to find a single best action in the current state. It involves learning to search for best actions and trial-and-error
+        reward = float(self.baseline_runtime - observations[0]) / self.baseline_runtime
         return reward
 
 
@@ -62,21 +64,23 @@ class SizeReward(Reward):
             deterministic=False,
             platform_dependent=True,
         )
-        self.previous_size = None
+        self.baseline_size = None
 
     def reset(self, benchmark: str, observation_view):
         del benchmark  # unused
-        self.previous_size = None
+        self.baseline_size = None
 
     def update(self, action, observations, observation_view):
         del action
         del observation_view
 
-        if self.previous_size is None:
-            self.previous_size = observations[0]
+        if self.baseline_size is None:
+            self.baseline_size = observations[0]
 
-        reward = float(self.previous_size - observations[0])
-        self.previous_size = observations[0]
+        # Here we are using Contextual Bandits: the number of steps the RL agent has to take before
+        # the environment terminates is one. In Contextual Bandits the learner tries
+        # to find a single best action in the current state. It involves learning to search for best actions and trial-and-error
+        reward = float(self.baseline_size - observations[0]) / self.baseline_size
         return reward
 
 

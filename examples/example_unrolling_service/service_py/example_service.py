@@ -129,7 +129,7 @@ class UnrollingCompilationSession(CompilationSession):
             deterministic=False,
             platform_dependent=True,
             default_value=Observation(
-                scalar_double=0,  # TODO: get default runtime when compiling with -O3?
+                scalar_double=0,
             ),
         ),
         ObservationSpace(
@@ -138,7 +138,7 @@ class UnrollingCompilationSession(CompilationSession):
             deterministic=True,
             platform_dependent=True,
             default_value=Observation(
-                scalar_double=0,  # TODO: get default runtime when compiling with -Oz?
+                scalar_double=0,
             ),
         ),
     ]
@@ -153,7 +153,6 @@ class UnrollingCompilationSession(CompilationSession):
         self.reset()
 
     def reset(self):
-        # TODO: obtain all observations and rewards at the beginning?
         self._observation = dict()
 
         src_uri_p = urlparse(self._benchmark.program.uri)
@@ -172,11 +171,12 @@ class UnrollingCompilationSession(CompilationSession):
             benchmark_name,
         )
         os.makedirs(self._benchmark_log_dir, exist_ok=True)
+        # TODO: use a counter to suffix IR and obj files? Or remove the suffix?
         self._llvm_path = os.path.join(self._benchmark_log_dir, "version1.ll")
         self._obj_path = os.path.join(self._benchmark_log_dir, "version1.o")
         self._exe_path = os.path.join(self._benchmark_log_dir, "version1")
         # FIXME: llvm.clang_path() lead to build errors
-        # TODO: throw errors at the user if any command files
+        # TODO: throw exception if any command fails
         os.system(
             f"clang -Xclang -disable-O0-optnone -emit-llvm -S {self._src_path} -o {self._llvm_path}"
         )
@@ -190,6 +190,7 @@ class UnrollingCompilationSession(CompilationSession):
             f"{llvm.opt_path()} {self._action_space.action[action.action]} {self._llvm_path} -S -o {self._llvm_path}"
         )
         ir = open(self._llvm_path).read()
+        # TODO: it seems that we don't need an _observation dictionary. Perhapse "ir" string is enough
         self._observation["ir"] = Observation(string_value=ir)
         return False, None, False  # TODO: return correct values
 
@@ -209,9 +210,7 @@ class UnrollingCompilationSession(CompilationSession):
             os.system(
                 f"{llvm.llc_path()} -filetype=obj {self._llvm_path} -o {self._obj_path}"
             )
-            os.system(
-                f"clang {self._llvm_path} -o {self._exe_path}"
-            )  # TODO: use -O3 here?
+            os.system(f"clang {self._llvm_path} -O3 -o {self._exe_path}")
             # Running 5 times and taking the average
             with Timer() as exec_time:
                 os.system(
@@ -224,9 +223,7 @@ class UnrollingCompilationSession(CompilationSession):
             os.system(
                 f"{llvm.llc_path()} -filetype=obj {self._llvm_path} -o {self._obj_path}"
             )
-            os.system(
-                f"clang {self._llvm_path} -o {self._exe_path}"
-            )  # TODO: use -Oz here?
+            os.system(f"clang {self._llvm_path} -Oz -o {self._exe_path}")
             binary_size = os.path.getsize(self._exe_path)
             return Observation(scalar_double=binary_size)
         else:
