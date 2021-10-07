@@ -7,10 +7,13 @@
 #include <cpuinfo.h>
 #include <fmt/format.h>
 #include <glog/logging.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 #include <iomanip>
+#include <iostream>
 #include <optional>
+#include <stdexcept>
 #include <string>
 #include <subprocess/subprocess.hpp>
 
@@ -53,6 +56,24 @@ using BenchmarkProto = compiler_gym::Benchmark;
 using ActionSpaceProto = compiler_gym::ActionSpace;
 
 namespace {
+
+std::string exec(const char* cmd) {
+  char buffer[128];
+  std::string result = "";
+  FILE* pipe = popen(cmd, "r");
+  if (!pipe)
+    throw std::runtime_error("popen() failed!");
+  try {
+    while (fgets(buffer, sizeof buffer, pipe) != NULL) {
+      result += buffer;
+    }
+  } catch (...) {
+    pclose(pipe);
+    throw;
+  }
+  pclose(pipe);
+  return result;
+}
 
 // Return the target library information for a module.
 llvm::TargetLibraryInfoImpl getTargetLibraryInfo(llvm::Module& module) {
@@ -162,6 +183,7 @@ Status LlvmSession::computeObservation(const ObservationSpace& observationSpace,
   return Status::OK;
 }
 
+// We could use this function to pass the bambu synthesized function
 Status LlvmSession::handleSessionParameter(const std::string& key, const std::string& value,
                                            std::optional<std::string>& reply) {
   if (key == "llvm.set_runtimes_per_observation_count") {
@@ -469,20 +491,60 @@ Status LlvmSession::computeObservation(LlvmObservationSpace space, Observation& 
       return benchmark().computeBuildtime(reply);
     }
     case LlvmObservationSpace::CIRCUIT_AREA: {
+      constexpr int kBambuTimeoutSeconds = 60;
+      std::string stdout, stdout2, stdoutdis, stdoutecho;
+      util::checkOutput(">&2 echo hola > /tmp/hola_output.txt 2>&1", kBambuTimeoutSeconds,
+                        workingDirectory(), stdoutecho);
       // Write the bitcode to a file.
       RETURN_IF_ERROR(writeBitcodeToFile(benchmark().module(), workingDirectory() / "bambu.bc"));
 
       // Run bambu on the bitcode and record the stdout.
-      // TODO(ibrumar): Actually run bambu.
-      constexpr int kBambuTimeoutSeconds = 60;
-      std::string stdout;
-      util::checkOutput(fmt::format("du {}", (workingDirectory() / "bambu.bc").string()),
-                        kBambuTimeoutSeconds, workingDirectory(), stdout);
+      // util::checkOutput(fmt::format("du {}", (workingDirectory() / "bambu.bc").string()),
+      //                  kBambuTimeoutSeconds, workingDirectory(), stdout);
 
+      // for tmp_synthesis.txt we might need to add the working directory
+      util::checkOutput(
+          fmt::format("llvm-dis-10 {} -o {}", (workingDirectory() / "bambu.bc").string(),
+                      (workingDirectory() / "bambu.ll").string()),
+          kBambuTimeoutSeconds, workingDirectory(), stdoutdis);
+
+      // std::string exec(const char* cmd) {
+      // std::string cmd_out =
+      // exec(fmt::format("/home/ibrumar/tools/panda-github-install-llvm10-qm/bin/bambu {}
+      // --compiler=I386_CLANG10 --top-fname=compare -v 4 > /tmp/bambu_out.txt 2>&1" ,
+      // (workingDirectory() / "bambu.ll").string()).c_str()); std::cout << "\nThe bambu1 command
+      // output is \n" << cmd_out << "\n";
+
+      auto errCode = util::checkOutput(
+          fmt::format(
+              "/home/ibrumar/tools/panda-github-install-llvm10-qm/bin/bambu {} "
+              "--compiler=I386_CLANG10 --top-fname=compare -v 4 > /tmp/tmp_synthesis.txt 2>&1",
+              (workingDirectory() / "bambu.ll").string()),
+          kBambuTimeoutSeconds, workingDirectory(), stdout);
+      // std::ofstream myfile;
+      // myfile.open ((workingDirectory() / "/tmp/tmp_synthesis.txt").string());
+      // myfile << stdout;
+      // myfile.close();
+
+      auto errCode2 =
+          util::checkOutput(fmt::format("grep \"Total estimated area\" /tmp/tmp_synthesis.txt | "
+                                        "tail -n 1 | grep \"[0-9]*\" -o"),
+                            kBambuTimeoutSeconds, workingDirectory(), stdout2);
+      //      VLOG(1) << "\nOutput of the bambu command \n" << stdout << "\n and output of grep " <<
+      //      stdout2 << "\n";
+      // std::cout << "\nOutput of the bambu command \n" << stdout << "\n and output of grep " <<
+      // stdout2 << "\n";
+
+      // std::cout << "The error code is " << errCode.error_message() << "\n";
       // Parse the output of bambu.
       // TODO(ibrumar): Actually parse the output of bambu, including error
       // handling.
-      int area = atoi(stdout.c_str());
+      int area = atoi(stdout2.c_str());
+      if ((not errCode.ok()) or (not errCode2.ok()))
+        area = 9999999;
+      std::cout << "Area converted to integer is " << area << "\n";
+      std::cout << "Bambu execution status was  " << errCode.ok() << "and grep exec status "
+                << errCode2.ok() << "\n";
       reply.set_scalar_int64(area);
       break;
     }

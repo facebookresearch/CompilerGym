@@ -49,15 +49,17 @@ def replay_actions(env: CompilerEnv, action_names: List[str], outdir: Path):
                         env.observation["IrInstructionCountO0"],
                         env.observation["IrInstructionCountOz"],
                         env.observation["IrInstructionCount"],
+                        env.observation["CircuitArea"],
                     ),
                     (
-                        "Object .text size (bytes)",
+                        "du/bambu output reward estimate",
                         env.observation["ObjectTextSizeO0"],
                         env.observation["ObjectTextSizeOz"],
                         env.observation["ObjectTextSizeBytes"],
+                        env.observation["CircuitArea"],
                     ),
                 ],
-                headers=("", "-O0", "-Oz", "final"),
+                headers=("", "-O0", "-Oz", "final", "CircuitArea"),
             )
         )
 
