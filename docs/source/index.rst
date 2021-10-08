@@ -8,13 +8,20 @@ for applying reinforcement learning to compiler optimizations.
    :caption: User Guide
 
    getting_started
-   llvm/index
-   cli
    about
+   cli
    rpc
    changelog
    contributing
    faq
+
+.. toctree::
+   :maxdepth: 2
+   :caption: Environments
+
+   llvm/index
+   envs/gcc
+   envs/loop_tool
 
 ..
     .. toctree::
@@ -31,9 +38,11 @@ for applying reinforcement learning to compiler optimizations.
    compiler_gym/compiler_gym
    compiler_gym/datasets
    compiler_gym/envs
+   compiler_gym/envs/gcc
    llvm/api
    compiler_gym/leaderboard
    compiler_gym/service
+   compiler_gym/service/runtime
    compiler_gym/spaces
    compiler_gym/views
    compiler_gym/wrappers

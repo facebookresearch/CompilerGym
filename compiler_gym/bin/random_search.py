@@ -93,39 +93,39 @@ def main(argv):
         raise app.UsageError(f"Unknown command line arguments: {argv[1:]}")
 
     if FLAGS.ls_reward:
-        env = env_from_flags()
-        print("\n".join(sorted(env.reward.indices.keys())))
-        env.close()
+        with env_from_flags() as env:
+            print("\n".join(sorted(env.reward.indices.keys())))
         return
 
     assert FLAGS.patience >= 0, "--patience must be >= 0"
 
-    def make_env():
-        return env_from_flags(benchmark=benchmark_from_flags())
+    # Create an environment now to catch a startup time error before we launch
+    # a bunch of workers.
+    with env_from_flags() as env:
+        env.reset(benchmark=benchmark_from_flags())
 
-    env = make_env()
-    try:
-        env.reset()
-    finally:
-        env.close()
-
-    best_reward, _ = random_search(
-        make_env=make_env,
+    env = random_search(
+        make_env=lambda: env_from_flags(benchmark=benchmark_from_flags()),
         outdir=Path(FLAGS.output_dir) if FLAGS.output_dir else None,
         patience=FLAGS.patience,
         total_runtime=FLAGS.runtime,
         nproc=FLAGS.nproc,
         skip_done=FLAGS.skip_done,
     )
-
-    # Exit with error if --fail_threshold was set and the best reward does not
-    # meet this value.
-    if FLAGS.fail_threshold is not None and best_reward < FLAGS.fail_threshold:
-        print(
-            f"Best reward {best_reward:.3f} below threshold of {FLAGS.fail_threshold}",
-            file=sys.stderr,
-        )
-        sys.exit(1)
+    try:
+        # Exit with error if --fail_threshold was set and the best reward does not
+        # meet this value.
+        if (
+            FLAGS.fail_threshold is not None
+            and env.episode_reward < FLAGS.fail_threshold
+        ):
+            print(
+                f"Best reward {env.episode_reward:.3f} below threshold of {FLAGS.fail_threshold}",
+                file=sys.stderr,
+            )
+            sys.exit(1)
+    finally:
+        env.close()
 
 
 if __name__ == "__main__":

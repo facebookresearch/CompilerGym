@@ -6,26 +6,6 @@ load("@rules_python//python:defs.bzl", "py_binary", "py_test")
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 
 py_binary(
-    name = "actor_critic",
-    srcs = ["actor_critic.py"],
-    deps = [
-        "//compiler_gym",
-    ],
-)
-
-py_test(
-    name = "actor_critic_test",
-    timeout = "short",
-    srcs = ["actor_critic_test.py"],
-    deps = [
-        ":actor_critic",
-        "//compiler_gym/util",
-        "//tests:test_main",
-        "//tests/pytest_plugins:common",
-    ],
-)
-
-py_binary(
     name = "brute_force",
     srcs = ["brute_force.py"],
     visibility = ["//visibility:public"],
@@ -33,9 +13,7 @@ py_binary(
         "//compiler_gym/envs",
         "//compiler_gym/service/proto",
         "//compiler_gym/util",
-        "//compiler_gym/util/flags:benchmark_from_flags",
-        "//compiler_gym/util/flags:env_from_flags",
-        "//compiler_gym/util/flags:output_dir",
+        "//compiler_gym/util/flags",
     ],
 )
 
@@ -57,8 +35,7 @@ py_binary(
         "//compiler_gym/envs",
         "//compiler_gym/service/proto",
         "//compiler_gym/util",
-        "//compiler_gym/util/flags:benchmark_from_flags",
-        "//compiler_gym/util/flags:env_from_flags",
+        "//compiler_gym/util/flags",
     ],
 )
 
@@ -68,6 +45,7 @@ py_test(
     deps = [
         ":explore",
         "//compiler_gym",
+        "//compiler_gym/util/flags",
         "//tests:test_main",
     ],
 )
@@ -79,7 +57,7 @@ py_binary(
     deps = [
         "//compiler_gym",
         "//compiler_gym/util",
-        "//compiler_gym/util/flags:benchmark_from_flags",
+        "//compiler_gym/util/flags",
     ],
 )
 
@@ -102,8 +80,7 @@ py_binary(
     deps = [
         "//compiler_gym/envs",
         "//compiler_gym/util",
-        "//compiler_gym/util/flags:benchmark_from_flags",
-        "//compiler_gym/util/flags:env_from_flags",
+        "//compiler_gym/util/flags",
     ],
 )
 

@@ -16,9 +16,12 @@ namespace {
 
 TEST(ActionSpacesTest, getLlvmActionSpace) {
   const auto spaces = getLlvmActionSpaceList();
-  EXPECT_EQ(spaces.size(), 1);
-  EXPECT_EQ(spaces[0].name(), "PassesAll");
-  EXPECT_EQ(spaces[0].action_size(), magic_enum::enum_count<LlvmAction>());
+  ASSERT_EQ(spaces.size(), 1);
+  ASSERT_EQ(spaces[0].name(), "PassesAll");
+  ASSERT_EQ(spaces[0].choice_size(), 1);
+  ASSERT_TRUE(spaces[0].choice(0).named_discrete_space().is_commandline());
+  EXPECT_EQ(spaces[0].choice(0).named_discrete_space().value_size(),
+            magic_enum::enum_count<LlvmAction>());
 }
 
 }  // anonymous namespace

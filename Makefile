@@ -38,7 +38,8 @@ Post-installation Tests
         The same as `make install-test`, but with python test coverage
         reporting. A summary of test coverage is printed at the end of execution
         and the full details are recorded in a coverage.xml file in the project
-        root directory.
+        root directory. To print a report of file coverage to stdout at the end
+        of testing, use argument `PYTEST_ARGS="--cov-report=term"`.
 
     make install-fuzz
         Run the fuzz testing suite against an installed CompilerGym package.
@@ -49,6 +50,10 @@ Post-installation Tests
         command line, for example `FUZZ_SECONDS=60 make install-fuzz` will run
         the fuzz tests for a minimum of one minute. This requires that the
         CompilerGym package has been installed (`make install`).
+
+    make examples-test
+        Run pytest in the examples directory. This requires that the CompilerGym
+        package has been installed (`make install`).
 
 
 Documentation
@@ -62,7 +67,8 @@ Documentation
     make livedocs
         Build the HTML documentation and serve them on localhost:8000. Changes
         to the documentation will automatically trigger incremental rebuilds
-        and reload the changes.
+        and reload the changes.  To change the host and port, set the SPHINXOPTS
+        env variable: `SPHINXOPTS="--port 1234 --host 0.0.0.0" make livedocs`
 
 
 Deployment
@@ -78,6 +84,9 @@ Deployment
     make bdist_wheel-linux
         Use a docker container to build a python wheel for linux. This is only
         used for making release builds. This requires docker.
+
+    make bdist_wheel-docker
+        Build a docker image containing CompilerGym.
 
     bdist_wheel-linux-shell
         Drop into a bash terminal in the docker container that is used for
@@ -148,6 +157,8 @@ init:
 	$(PYTHON) -m pip install -r requirements.txt
 	pre-commit install
 
+init-runtime-requirements:
+	$(PYTHON) -m pip install -r compiler_gym/requirements.txt
 
 ############
 # Building #
@@ -184,18 +195,25 @@ bdist_wheel: bazel-build
 bdist_wheel-linux-rename:
 	mv dist/compiler_gym-$(VERSION)-py3-none-linux_x86_64.whl dist/compiler_gym-$(VERSION)-py3-none-manylinux2014_x86_64.whl
 
+# The docker image to use for building the bdist_wheel-linux target. See
+# packaging/Dockerfile.
+MANYLINUX_DOCKER_IMAGE ?= chriscummins/compiler_gym-manylinux-build:2021-09-21
+
 bdist_wheel-linux:
 	rm -rf build
-	docker build -t chriscummins/compiler_gym-linux-build packaging
-	docker run -v $(ROOT):/CompilerGym --workdir /CompilerGym --rm --shm-size=8g chriscummins/compiler_gym-linux-build:latest /bin/sh -c './packaging/container_init.sh && make bdist_wheel'
-	mv dist/compiler_gym-$(VERSION)-py3-none-linux_x86_64.whl dist/compiler_gym-$(VERSION)-py3-none-manylinux2014_x86_64.whl
-	rm -rf build
+	docker pull $(MANYLINUX_DOCKER_IMAGE)
+	docker run -v $(ROOT):/CompilerGym --workdir /CompilerGym --rm --shm-size=8g "$(MANYLINUX_DOCKER_IMAGE)" /bin/sh -c './packaging/compiler_gym-manylinux-build/container_init.sh && make bdist_wheel bdist_wheel-linux-rename BAZEL_OPTS="$(BAZEL_OPTS)" BAZEL_BUILD_OPTS="$(BAZEL_BUILD_OPTS)" BAZEL_FETCH_OPTS="$(BAZEL_FETCH_OPTS)" && rm -rf build'
 
 bdist_wheel-linux-shell:
-	docker run -v $(ROOT):/CompilerGym --workdir /CompilerGym --rm --shm-size=8g -it --entrypoint "/bin/bash" chriscummins/compiler_gym-linux-build:latest
+	docker run -v $(ROOT):/CompilerGym --workdir /CompilerGym --rm --shm-size=8g -it --entrypoint "/bin/bash" "$(MANYLINUX_DOCKER_IMAGE)"
 
 bdist_wheel-linux-test:
-	docker run -v $(ROOT):/CompilerGym --workdir /CompilerGym --rm --shm-size=8g chriscummins/compiler_gym-linux-build:latest /bin/sh -c 'cd /CompilerGym && pip3 install -U pip && pip3 install dist/compiler_gym-$(VERSION)-py3-none-manylinux2014_x86_64.whl && pip install -r tests/requirements.txt && make install-test'
+	docker run -v $(ROOT):/CompilerGym --workdir /CompilerGym --rm --shm-size=8g "$(MANYLINUX_DOCKER_IMAGE)" /bin/sh -c 'cd /CompilerGym && pip3 install -U pip && pip3 install dist/compiler_gym-$(VERSION)-py3-none-manylinux2014_x86_64.whl && pip install -r tests/requirements.txt && make install-test'
+
+bdist_wheel-docker: bdist_wheel-linux
+	cp dist/compiler_gym-$(VERSION)-py3-none-manylinux2014_x86_64.whl packaging/compiler_gym-local-wheel
+	docker build -t chriscummins/compiler_gym:latest packaging/compiler_gym-local-wheel
+	docker build -t chriscummins/compiler_gym:$(VERSION) packaging/compiler_gym-local-wheel
 
 all: docs bdist_wheel bdist_wheel-linux
 
@@ -209,7 +227,11 @@ www: www-build
 	cd www && $(PYTHON) www.py
 
 www-build:
-	cd www/frontends/compiler_gym && npm install && npm run build
+	cd www/frontends/compiler_gym && npm ci && npm run build
+
+www-image: www-build
+	cd www && docker build -t chriscummins/compiler_gym-www .
+	docker run -p 5000:5000 chriscummins/compiler_gym-www
 
 .PHONY: www www-build
 
@@ -253,12 +275,12 @@ livedocs: gendocs doxygen
 # Testing #
 ###########
 
-COMPILER_GYM_SITE_DATA ?= "/tmp/compiler_gym/tests/site_data"
-COMPILER_GYM_CACHE ?= "/tmp/compiler_gym/tests/cache"
+COMPILER_GYM_SITE_DATA ?= "/tmp/compiler_gym_$(USER)/tests/site_data"
+COMPILER_GYM_CACHE ?= "/tmp/compiler_gym_$(USER)/tests/cache"
 
 # A directory that is used as the working directory for running pytest tests
 # by symlinking the tests directory into it.
-INSTALL_TEST_ROOT ?= "/tmp/compiler_gym/install_tests"
+INSTALL_TEST_ROOT ?= "/tmp/compiler_gym_$(USER)/install_tests"
 
 # The target to use. If not provided, all tests will be run. For `make test` and
 # related, this is a bazel target pattern, with default value '//...'. For `make
@@ -268,6 +290,10 @@ TEST_TARGET ?=
 
 # Extra command line arguments for pytest.
 PYTEST_ARGS ?=
+
+# The path of the XML pytest coverage report to generate when running the
+# install-test-cov target.
+COV_REPORT ?= $(ROOT)/coverage.xml
 
 test: bazel-fetch
 	$(BAZEL) $(BAZEL_OPTS) test $(BAZEL_TEST_OPTS) $(if $(TEST_TARGET),$(TEST_TARGET),//...)
@@ -281,6 +307,7 @@ itest: bazel-fetch
 install-test-setup:
 	mkdir -p "$(INSTALL_TEST_ROOT)"
 	rm -f "$(INSTALL_TEST_ROOT)/tests" "$(INSTALL_TEST_ROOT)/tox.ini"
+	ln -s "$(INSTALL_TEST_ROOT)"
 	ln -s "$(ROOT)/tests" "$(INSTALL_TEST_ROOT)"
 	ln -s "$(ROOT)/tox.ini" "$(INSTALL_TEST_ROOT)"
 
@@ -288,28 +315,30 @@ define pytest
 	cd "$(INSTALL_TEST_ROOT)" && pytest $(if $(TEST_TARGET),$(TEST_TARGET),tests) $(1) $(PYTEST_ARGS)
 endef
 
-install-test: install-test-setup
-	$(call pytest,--benchmark-disable -n auto -k "not fuzz" --durations=5)
+install-test: | install-test-setup
+	$(call pytest,--no-success-flaky-report --benchmark-disable -n auto -k "not fuzz" --durations=5)
+
+examples-test:
+	cd examples && pytest --no-success-flaky-report --benchmark-disable -n auto --durations=5 . --cov=compiler_gym --cov-report=xml:$(COV_REPORT) $(PYTEST_ARGS)
 
 # Note we export $CI=1 so that the tests always run as if within the CI
 # environement. This is to ensure that the reported coverage matches that of
 # the value on: https://codecov.io/gh/facebookresearch/CompilerGym
 install-test-cov: install-test-setup
-	export CI=1; $(call pytest,--benchmark-disable -n auto -k "not fuzz" --durations=5 --cov=compiler_gym --cov-report=xml --cov-report=term)
-	@mv "$(INSTALL_TEST_ROOT)/coverage.xml" .
+	export CI=1; $(call pytest,--no-success-flaky-report --benchmark-disable -n auto -k "not fuzz" --durations=5 --cov=compiler_gym --cov-report=xml:$(COV_REPORT))
 
 # The minimum number of seconds to run the fuzz tests in a loop for. Override
 # this at the commandline, e.g. `FUZZ_SECONDS=1800 make fuzz`.
 FUZZ_SECONDS ?= 300
 
 install-fuzz: install-test-setup
-	$(call pytest,-p no:sugar -x -vv -k fuzz --seconds=$(FUZZ_SECONDS))
+	$(call pytest,--no-success-flaky-report -p no:sugar -x -vv -k fuzz --seconds=$(FUZZ_SECONDS))
 
 post-install-test:
 	$(MAKE) -C examples/makefile_integration clean
 	SEARCH_TIME=3 $(MAKE) -C examples/makefile_integration test
 
-.PHONY: test post-install-test
+.PHONY: test post-install-test examples-test
 
 
 ################
@@ -319,7 +348,7 @@ post-install-test:
 pip-install:
 	$(PYTHON) setup.py install
 
-install: | bazel-build pip-install
+install: |  init-runtime-requirements bazel-build pip-install
 
 .PHONY: pip-install install
 
@@ -335,7 +364,7 @@ COMPILER_GYM_DATA_FILE_LOCATIONS = \
     $(HOME)/.local/share/compiler_gym \
     $(HOME)/logs/compiler_gym \
     /dev/shm/compiler_gym \
-    /tmp/compiler_gym \
+    /tmp/compiler_gym_$(USER) \
     $(NULL)
 
 .PHONY: clean distclean uninstall purge

@@ -30,6 +30,8 @@ enum class LlvmObservationSpace {
   IR,
   /** The 40-digit hex SHA1 checksum of the LLVM module. */
   IR_SHA1,
+  /** Get the bitcode as a bytes array. */
+  BITCODE,
   /** Write the bitcode to a file and return its path as a string. */
   BITCODE_FILE,
   /** The counts of all instructions in a program. */

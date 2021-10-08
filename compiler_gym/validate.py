@@ -16,11 +16,8 @@ from compiler_gym.validation_result import ValidationResult
 def _validate_states_worker(
     make_env: Callable[[], CompilerEnv], state: CompilerEnvState
 ) -> ValidationResult:
-    env = make_env()
-    try:
+    with make_env() as env:
         result = env.validate(state)
-    finally:
-        env.close()
     return result
 
 

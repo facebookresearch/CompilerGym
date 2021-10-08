@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """This module defines a utility function for constructing LLVM benchmarks."""
+import logging
 import os
 import random
 import subprocess
@@ -33,25 +34,31 @@ def _communicate(process, input=None, timeout=None):
         raise
 
 
-def _get_system_includes() -> Iterable[Path]:
+def get_compiler_includes(compiler: str) -> Iterable[Path]:
     """Run the system compiler in verbose mode on a dummy input to get the
     system header search path.
     """
-    system_compiler = os.environ.get("CXX", "c++")
     # Create a temporary directory to write the compiled 'binary' to, since
     # GNU assembler does not support piping to stdout.
     with tempfile.TemporaryDirectory() as d:
-        process = subprocess.Popen(
-            [system_compiler, "-xc++", "-v", "-c", "-", "-o", str(Path(d) / "a.out")],
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.PIPE,
-            stdin=subprocess.PIPE,
-            universal_newlines=True,
-        )
+        try:
+            process = subprocess.Popen(
+                [compiler, "-xc++", "-v", "-c", "-", "-o", str(Path(d) / "a.out")],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.PIPE,
+                stdin=subprocess.PIPE,
+                universal_newlines=True,
+            )
+        except FileNotFoundError as e:
+            raise OSError(
+                f"Failed to invoke {compiler}. "
+                f"Is there a working system compiler?\n"
+                f"Error: {e}"
+            ) from e
         _, stderr = _communicate(process, input="", timeout=30)
     if process.returncode:
         raise OSError(
-            f"Failed to invoke {system_compiler}. "
+            f"Failed to invoke {compiler}. "
             f"Is there a working system compiler?\n"
             f"Error: {stderr.strip()}"
         )
@@ -79,10 +86,11 @@ def _get_system_includes() -> Iterable[Path]:
         elif line.startswith("#include <...> search starts here:"):
             in_search_list = True
     else:
-        raise OSError(
-            f"Failed to parse '#include <...>' search paths from {system_compiler}:\n"
-            f"{stderr.strip()}"
-        )
+        msg = f"Failed to parse '#include <...>' search paths from {compiler}"
+        stderr = stderr.strip()
+        if stderr:
+            msg += f":\n{stderr}"
+        raise OSError(msg)
 
 
 # Memoized search paths. Call get_system_includes() to access them.
@@ -103,7 +111,12 @@ def get_system_includes() -> List[Path]:
     # Memoize the system includes paths.
     global _SYSTEM_INCLUDES
     if _SYSTEM_INCLUDES is None:
-        _SYSTEM_INCLUDES = list(_get_system_includes())
+        system_compiler = os.environ.get("CXX", "c++")
+        try:
+            _SYSTEM_INCLUDES = list(get_compiler_includes(system_compiler))
+        except OSError as e:
+            logging.warning("%s", e)
+            _SYSTEM_INCLUDES = []
     return _SYSTEM_INCLUDES
 
 

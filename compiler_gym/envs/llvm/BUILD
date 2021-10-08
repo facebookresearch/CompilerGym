@@ -13,8 +13,18 @@ py_library(
     data = ["//compiler_gym/envs/llvm/service"],
     visibility = ["//visibility:public"],
     deps = [
+        ":compute_observation",
         ":llvm_benchmark",
         ":llvm_env",
+        "//compiler_gym/util",
+    ],
+)
+
+py_library(
+    name = "compute_observation",
+    srcs = ["compute_observation.py"],
+    data = ["//compiler_gym/envs/llvm/service:compute_observation-files"],
+    deps = [
         "//compiler_gym/util",
     ],
 )
@@ -34,9 +44,6 @@ py_library(
 py_library(
     name = "llvm_env",
     srcs = ["llvm_env.py"],
-    data = [
-        "//compiler_gym/envs/llvm/service/passes:actions_genfiles",
-    ],
     deps = [
         ":llvm_benchmark",
         ":llvm_rewards",
@@ -76,5 +83,9 @@ genrule(
 py_binary(
     name = "make_specs",
     srcs = ["make_specs.py"],
-    deps = [":llvm_env"],
+    data = ["//compiler_gym/envs/llvm/service/passes:flag_descriptions.txt"],
+    deps = [
+        ":llvm_env",
+        "//compiler_gym/util",
+    ],
 )

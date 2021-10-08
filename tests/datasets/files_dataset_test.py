@@ -34,7 +34,8 @@ def populated_dataset(request) -> FilesDataset:
         (df / "a").mkdir(parents=True)
         (df / "b").mkdir()
 
-        (df / "e.txt").touch()
+        with open(df / "e.txt", "w") as f:
+            f.write("e")
         (df / "f.txt").touch()
         (df / "g.jpg").touch()
         (df / "a" / "a.txt").touch()
@@ -84,14 +85,14 @@ def test_populated_dataset_benchmark_lookup(populated_dataset: FilesDataset):
     bm = populated_dataset.benchmark("benchmark://test-v0/e.txt")
     assert bm.uri == "benchmark://test-v0/e.txt"
     assert bm.proto.uri == "benchmark://test-v0/e.txt"
-    assert bm.proto.program.uri == f"file:///{populated_dataset.dataset_root}/e.txt"
+    assert bm.proto.program.contents.decode("utf-8") == "e"
 
 
 def test_populated_dataset_first_file(populated_dataset: FilesDataset):
     bm = next(populated_dataset.benchmarks())
     assert bm.uri == "benchmark://test-v0/e.txt"
     assert bm.proto.uri == "benchmark://test-v0/e.txt"
-    assert bm.proto.program.uri == f"file:///{populated_dataset.dataset_root}/e.txt"
+    assert bm.proto.program.contents.decode("utf-8") == "e"
 
 
 def test_populated_dataset_benchmark_lookup_not_found(populated_dataset: FilesDataset):

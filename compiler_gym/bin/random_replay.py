@@ -36,9 +36,9 @@ def main(argv):
         output_dir / logs.METADATA_NAME
     ).is_file(), f"Invalid --output_dir: {output_dir}"
 
-    env = env_from_flags()
-    benchmark = benchmark_from_flags()
-    replay_actions_from_logs(env, output_dir, benchmark=benchmark)
+    with env_from_flags() as env:
+        benchmark = benchmark_from_flags()
+        replay_actions_from_logs(env, output_dir, benchmark=benchmark)
 
 
 if __name__ == "__main__":

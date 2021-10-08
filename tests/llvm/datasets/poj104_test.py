@@ -21,11 +21,8 @@ pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.llvm"]
 
 @pytest.fixture(scope="module")
 def poj104_dataset() -> POJ104Dataset:
-    env = gym.make("llvm-v0")
-    try:
+    with gym.make("llvm-v0") as env:
         ds = env.datasets["poj104-v1"]
-    finally:
-        env.close()
     yield ds
 
 

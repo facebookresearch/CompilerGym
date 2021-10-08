@@ -31,18 +31,14 @@ pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.llvm"]
 def env(request) -> CompilerEnv:
     """Create an LLVM environment."""
     if request.param == "local":
-        env = gym.make("llvm-v0")
-        try:
+        with gym.make("llvm-v0") as env:
             yield env
-        finally:
-            env.close()
     else:
         service = CompilerGymServiceConnection(llvm.LLVM_SERVICE_BINARY)
-        env = LlvmEnv(service=service.connection.url)
         try:
-            yield env
+            with LlvmEnv(service=service.connection.url) as env:
+                yield env
         finally:
-            env.close()
             service.close()
 
 
@@ -78,23 +74,6 @@ def test_double_reset(env: LlvmEnv, always_send_benchmark_on_reset: bool):
     env.reset(benchmark="cbench-v1/crc32")
     env.reset(benchmark="cbench-v1/crc32")
     assert env.in_episode
-
-
-def test_commandline_no_actions(env: LlvmEnv):
-    env.reset(benchmark="cbench-v1/crc32")
-    assert env.commandline() == "opt  input.bc -o output.bc"
-    assert env.commandline_to_actions(env.commandline()) == []
-
-
-def test_commandline(env: LlvmEnv):
-    env.reset(benchmark="cbench-v1/crc32")
-    env.step(env.action_space.flags.index("-mem2reg"))
-    env.step(env.action_space.flags.index("-reg2mem"))
-    assert env.commandline() == "opt -mem2reg -reg2mem input.bc -o output.bc"
-    assert env.commandline_to_actions(env.commandline()) == [
-        env.action_space.flags.index("-mem2reg"),
-        env.action_space.flags.index("-reg2mem"),
-    ]
 
 
 def test_connection_dies_default_reward(env: LlvmEnv):
@@ -165,13 +144,9 @@ def test_apply_state(env: LlvmEnv):
     env.reset(benchmark="cbench-v1/crc32")
     env.step(env.action_space.flags.index("-mem2reg"))
 
-    other = gym.make("llvm-v0", reward_space="IrInstructionCount")
-    try:
+    with gym.make("llvm-v0", reward_space="IrInstructionCount") as other:
         other.apply(env.state)
-
         assert other.state == env.state
-    finally:
-        other.close()
 
 
 def test_set_observation_space_from_spec(env: LlvmEnv):

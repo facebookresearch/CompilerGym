@@ -11,25 +11,50 @@ py_library(
     srcs = ["__init__.py"],
     visibility = ["//visibility:public"],
     deps = [
+        ":box",
         ":commandline",
+        ":dict",
+        ":discrete",
         ":named_discrete",
         ":reward",
         ":scalar",
         ":sequence",
+        ":tuple",
     ],
+)
+
+py_library(
+    name = "box",
+    srcs = ["box.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
 )
 
 py_library(
     name = "commandline",
     srcs = ["commandline.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
     deps = [
         ":named_discrete",
     ],
 )
 
 py_library(
+    name = "dict",
+    srcs = ["dict.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
+)
+
+py_library(
+    name = "discrete",
+    srcs = ["discrete.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
+)
+
+py_library(
     name = "named_discrete",
     srcs = ["named_discrete.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
+    deps = [":discrete"],
 )
 
 py_library(
@@ -45,6 +70,7 @@ py_library(
 py_library(
     name = "scalar",
     srcs = ["scalar.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
 )
 
 py_library(
@@ -53,4 +79,10 @@ py_library(
     deps = [
         ":scalar",
     ],
+)
+
+py_library(
+    name = "tuple",
+    srcs = ["tuple.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
 )

@@ -27,3 +27,9 @@ LlvmEnv
 
 .. autoclass:: LlvmEnv
    :members:
+
+GccEnv
+-------
+
+.. autoclass:: GccEnv
+   :members:

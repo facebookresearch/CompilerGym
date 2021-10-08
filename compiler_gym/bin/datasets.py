@@ -148,8 +148,7 @@ def main(argv):
     if len(argv) != 1:
         raise app.UsageError(f"Unknown command line arguments: {argv[1:]}")
 
-    env = env_from_flags()
-    try:
+    with env_from_flags() as env:
         invalidated_manifest = False
 
         for name_or_url in FLAGS.download:
@@ -182,8 +181,6 @@ def main(argv):
         print(
             summarize_datasets(env.datasets),
         )
-    finally:
-        env.close()
 
 
 if __name__ == "__main__":

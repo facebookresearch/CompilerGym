@@ -14,4 +14,5 @@
 set -euxo pipefail
 
 apt-get update
-grep -v grpc compiler_gym/requirements.txt | xargs pip3 install
+pip3 install --no-cache-dir -U setuptools pip wheel
+grep -v grpc compiler_gym/requirements.txt | xargs pip3 install --no-cache-dir

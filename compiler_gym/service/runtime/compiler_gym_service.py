@@ -63,6 +63,14 @@ def exception_to_grpc_status(context):  # pragma: no cover
 
 class CompilerGymService(CompilerGymServiceServicerStub):  # pragma: no cover
     def __init__(self, working_directory: Path, compilation_session_type):
+        """Constructor.
+
+        :param working_directory: The working directory for this service.
+
+        :param compilation_session_type: The :class:`CompilationSession
+            <compiler_gym.service.CompilationSession>` type that this service
+            implements.
+        """
         self.working_directory = working_directory
         self.benchmarks = BenchmarkCache()
 

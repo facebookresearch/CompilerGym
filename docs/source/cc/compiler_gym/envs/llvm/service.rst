@@ -45,6 +45,13 @@ LlvmSession.h
 
 .. doxygenfile:: compiler_gym/envs/llvm/service/LlvmSession.h
 
+Observation.h
+-------------
+
+:code:`#include "compiler_gym/envs/llvm/service/Observation.h"`
+
+.. doxygenfile:: compiler_gym/envs/llvm/service/Observation.h
+
 ObservationSpaces.h
 -------------------
 

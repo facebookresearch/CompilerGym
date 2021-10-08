@@ -1,0 +1,67 @@
+# Copyright (c) Facebook, Inc. and its affiliates.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Cummins"
+  given-names: "Chris"
+  orcid: "https://orcid.org/https://orcid.org/0000-0002-9382-4302"
+- family-names: "Wasti"
+  given-names: "Bram"
+- family-names: "Guo"
+  given-names: "Jiadong"
+- family-names: "Cui"
+  given-names: "Brandon"
+- family-names: "Ansel"
+  given-names: "Jason"
+- family-names: "Gomez"
+  given-names: "Sahir"
+- family-names: "Jain"
+  given-names: "Somya"
+- family-names: "Liu"
+  given-names: "Jia"
+- family-names: "Teytaud"
+  given-names: "Olivier"
+- family-names: "Steiner"
+  given-names: "Benoit"
+- family-names: "Tian"
+  given-names: "Yuandong"
+- family-names: "Leather"
+  given-names: "Hugh"
+title: "CompilerGym"
+version: 0.2.0
+date-released: 2021-09-28
+url: "https://github.com/facebookresearch/CompilerGym"
+preferred-citation:
+  type: article
+  authors:
+  - family-names: "Cummins"
+    given-names: "Chris"
+    orcid: "https://orcid.org/https://orcid.org/0000-0002-9382-4302"
+  - family-names: "Wasti"
+    given-names: "Bram"
+  - family-names: "Guo"
+    given-names: "Jiadong"
+  - family-names: "Cui"
+    given-names: "Brandon"
+  - family-names: "Ansel"
+    given-names: "Jason"
+  - family-names: "Gomez"
+    given-names: "Sahir"
+  - family-names: "Jain"
+    given-names: "Somya"
+  - family-names: "Liu"
+    given-names: "Jia"
+  - family-names: "Teytaud"
+    given-names: "Olivier"
+  - family-names: "Steiner"
+    given-names: "Benoit"
+  - family-names: "Tian"
+    given-names: "Yuandong"
+  - family-names: "Leather"
+    given-names: "Hugh"
+  journal: "arXiv:2109.08267"
+  title: "CompilerGym: Robust, Performant Compiler Optimization Environments for AI Research"
+  year: 2021

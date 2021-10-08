@@ -9,6 +9,7 @@ import tempfile
 from pathlib import Path
 from typing import List
 
+import docker
 import pytest
 from absl import flags as absl_flags
 
@@ -25,6 +26,15 @@ def is_ci() -> bool:
 def in_bazel() -> bool:
     """Return whether running under bazel."""
     return os.environ.get("TEST_WORKSPACE", "") != ""
+
+
+def docker_is_available() -> bool:
+    """Return whether docker is available."""
+    try:
+        docker.from_env()
+        return True
+    except docker.errors.DockerException:
+        return False
 
 
 # Decorator to skip a test in the CI environment.
@@ -46,9 +56,19 @@ macos_only = pytest.mark.skipif(
 # Decorator to mark a test as skipped if not running under bazel.
 bazel_only = pytest.mark.skipif(not in_bazel(), reason="bazel only")
 
-# Decorator to make a test as skipped if not running in the `install-test`
+# Decorator to mark a test as skipped if not running in the `install-test`
 # environment.
 install_test_only = pytest.mark.skipif(in_bazel(), reason="install-test only")
+
+# Decorator to skip a test if docker is not available.
+with_docker = pytest.mark.skipif(
+    not docker_is_available(), reason="Docker is not available"
+)
+
+# Decorator to skip a test if docker is available.
+without_docker = pytest.mark.skipif(
+    docker_is_available(), reason="Docker is not available"
+)
 
 
 @pytest.fixture(scope="function")

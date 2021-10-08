@@ -278,11 +278,13 @@ class Benchmark:
         path = Path(path)
         if not path.is_file():
             raise FileNotFoundError(path)
-        return cls(
-            proto=BenchmarkProto(
-                uri=uri, program=File(uri=f"file:///{path.absolute()}")
-            ),
-        )
+        # Read the file data into memory and embed it inside the File protocol
+        # buffer. An alternative would be to simply embed the file path in the
+        # File.uri field, but this won't work for distributed services which
+        # don't share a filesystem.
+        with open(path, "rb") as f:
+            contents = f.read()
+        return cls(proto=BenchmarkProto(uri=uri, program=File(contents=contents)))
 
     @classmethod
     def from_file_contents(cls, uri: str, data: bytes):

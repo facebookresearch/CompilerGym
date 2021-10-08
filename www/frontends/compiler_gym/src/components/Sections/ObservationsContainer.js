@@ -17,18 +17,18 @@ import {
 const StateContainer = () => {
   const context = useContext(ApiContext);
   const themeContext = useContext(ThemeContext);
-  const envState = context.session.states;
+  const states = context.session.states;
   const [stateSelector, setStateSelector] = useState("ir");
 
-  const last_observation = envState && envState[envState.length - 1];
-  const previous_observation = envState && envState[envState.length - 2];
+  const last_observation = states && states[states.length - 1];
+  const previous_observation = states && states[states.length - 2];
 
   const renderState = () => {
     switch (stateSelector) {
       case "ir":
         return (
           <IrStateContainer
-            irState={last_observation?.ir}
+            irState={context.session?.ir}
             darkTheme={themeContext.darkTheme}
           />
         );
@@ -36,6 +36,7 @@ const StateContainer = () => {
         return (
           <InstcountsStateContainer
             sessionStates={context.session.states}
+            commandLine={context.session.commandline}
             instcount={last_observation?.instcount}
             prev_instcount ={previous_observation?.instcount || {}}
             darkTheme={themeContext.darkTheme}
@@ -45,6 +46,7 @@ const StateContainer = () => {
         return (
           <AutophaseStateContainer
             sessionStates={context.session.states}
+            commandLine={context.session.commandline}
             autophase={last_observation?.autophase}
             prev_authophase ={previous_observation?.autophase || {}}
             darkTheme={themeContext.darkTheme}

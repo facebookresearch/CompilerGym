@@ -225,20 +225,19 @@ def eval_llvm_instcount_policy(policy: Policy) -> None:
         assert len(argv) == 1, f"Unknown args: {argv[:1]}"
         assert FLAGS.n > 0, "n must be > 0"
 
-        env = gym.make("llvm-ic-v0")
+        with gym.make("llvm-ic-v0") as env:
 
-        # Stream verbose CompilerGym logs to file.
-        logger = logging.getLogger("compiler_gym")
-        logger.setLevel(logging.DEBUG)
-        env.logger.setLevel(logging.DEBUG)
-        log_handler = logging.FileHandler(FLAGS.leaderboard_logfile)
-        logger.addHandler(log_handler)
-        logger.propagate = False
+            # Stream verbose CompilerGym logs to file.
+            logger = logging.getLogger("compiler_gym")
+            logger.setLevel(logging.DEBUG)
+            env.logger.setLevel(logging.DEBUG)
+            log_handler = logging.FileHandler(FLAGS.leaderboard_logfile)
+            logger.addHandler(log_handler)
+            logger.propagate = False
 
-        print(f"Writing results to {FLAGS.leaderboard_results}")
-        print(f"Writing logs to {FLAGS.leaderboard_logfile}")
+            print(f"Writing results to {FLAGS.leaderboard_results}")
+            print(f"Writing logs to {FLAGS.leaderboard_logfile}")
 
-        try:
             # Build the list of benchmarks to evaluate.
             benchmarks = env.datasets[FLAGS.test_dataset].benchmark_uris()
             if FLAGS.max_benchmarks:
@@ -247,7 +246,6 @@ def eval_llvm_instcount_policy(policy: Policy) -> None:
 
             # Repeat the searches for the requested number of iterations.
             benchmarks *= FLAGS.n
-            benchmarks = sorted(benchmarks)
             total_count = len(benchmarks)
 
             # If we are resuming from a previous job, read the states that have
@@ -301,8 +299,6 @@ def eval_llvm_instcount_policy(policy: Policy) -> None:
                 worker.alive = False
                 # User interrupt, don't validate.
                 FLAGS.validate = False
-        finally:
-            env.close()
 
         if FLAGS.validate:
             FLAGS.env = "llvm-ic-v0"

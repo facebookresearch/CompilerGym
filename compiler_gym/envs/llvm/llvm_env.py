@@ -9,8 +9,6 @@ from pathlib import Path
 from typing import Iterable, List, Optional, Union, cast
 
 import numpy as np
-from gym.spaces import Box
-from gym.spaces import Dict as DictSpace
 
 from compiler_gym.datasets import Benchmark, BenchmarkInitError, Dataset
 from compiler_gym.envs.compiler_env import CompilerEnv
@@ -21,38 +19,13 @@ from compiler_gym.envs.llvm.llvm_rewards import (
     CostFunctionReward,
     NormalizedReward,
 )
-from compiler_gym.spaces import Commandline, CommandlineFlag, Scalar, Sequence
+from compiler_gym.spaces import Box, Commandline
+from compiler_gym.spaces import Dict as DictSpace
+from compiler_gym.spaces import Scalar, Sequence
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_NAMES
 from compiler_gym.third_party.inst2vec import Inst2vecEncoder
 from compiler_gym.third_party.llvm import download_llvm_files
 from compiler_gym.third_party.llvm.instcount import INST_COUNT_FEATURE_NAMES
-from compiler_gym.util.runfiles_path import runfiles_path
-
-_ACTIONS_LIST = Path(
-    runfiles_path("compiler_gym/envs/llvm/service/passes/actions_list.txt")
-)
-
-_FLAGS_LIST = Path(
-    runfiles_path("compiler_gym/envs/llvm/service/passes/actions_flags.txt")
-)
-
-_DESCRIPTIONS_LIST = Path(
-    runfiles_path("compiler_gym/envs/llvm/service/passes/actions_descriptions.txt")
-)
-
-
-def _read_list_file(path: Path) -> Iterable[str]:
-    with open(str(path)) as f:
-        for action in f:
-            if action.strip():
-                yield action.strip()
-
-
-# TODO(github.com/facebookresearch/CompilerGym/issues/122): Replace text file
-# parsing with build-generated python modules and import them.
-_ACTIONS = list(_read_list_file(_ACTIONS_LIST))
-_FLAGS = dict(zip(_ACTIONS, _read_list_file(_FLAGS_LIST)))
-_DESCRIPTIONS = dict(zip(_ACTIONS, _read_list_file(_DESCRIPTIONS_LIST)))
 
 _INST2VEC_ENCODER = Inst2vecEncoder()
 
@@ -83,11 +56,6 @@ class LlvmEnv(CompilerEnv):
     action, and the :meth:`LlvmEnv.commandline()
     <compiler_gym.envs.LlvmEnv.commandline>` method can be used to produce an
     equivalent LLVM opt invocation for the current environment state.
-
-    :ivar actions: The list of actions that have been performed since the
-        previous call to :func:`reset`.
-
-    :vartype actions: List[int]
     """
 
     def __init__(
@@ -192,40 +160,47 @@ class LlvmEnv(CompilerEnv):
             ],
         )
 
-        # If the user sets a runtimes_per_observation value, this must be
-        # configured on every call to reset().
+        # Mutable runtime configuration options that must be set on every call
+        # to reset.
         self._runtimes_per_observation_count: Optional[int] = None
+        self._runtimes_warmup_per_observation_count: Optional[int] = None
 
         self.inst2vec = _INST2VEC_ENCODER
 
+        cpu_info_spaces = [
+            Sequence(name="name", size_range=(0, None), dtype=str),
+            Scalar(name="cores_count", min=None, max=None, dtype=int),
+            Scalar(name="l1i_cache_size", min=None, max=None, dtype=int),
+            Scalar(name="l1i_cache_count", min=None, max=None, dtype=int),
+            Scalar(name="l1d_cache_size", min=None, max=None, dtype=int),
+            Scalar(name="l1d_cache_count", min=None, max=None, dtype=int),
+            Scalar(name="l2_cache_size", min=None, max=None, dtype=int),
+            Scalar(name="l2_cache_count", min=None, max=None, dtype=int),
+            Scalar(name="l3_cache_size", min=None, max=None, dtype=int),
+            Scalar(name="l3_cache_count", min=None, max=None, dtype=int),
+            Scalar(name="l4_cache_size", min=None, max=None, dtype=int),
+            Scalar(name="l4_cache_count", min=None, max=None, dtype=int),
+        ]
         self.observation.spaces["CpuInfo"].space = DictSpace(
-            {
-                "name": Sequence(size_range=(0, None), dtype=str),
-                "cores_count": Scalar(min=None, max=None, dtype=int),
-                "l1i_cache_size": Scalar(min=None, max=None, dtype=int),
-                "l1i_cache_count": Scalar(min=None, max=None, dtype=int),
-                "l1d_cache_size": Scalar(min=None, max=None, dtype=int),
-                "l1d_cache_count": Scalar(min=None, max=None, dtype=int),
-                "l2_cache_size": Scalar(min=None, max=None, dtype=int),
-                "l2_cache_count": Scalar(min=None, max=None, dtype=int),
-                "l3_cache_size": Scalar(min=None, max=None, dtype=int),
-                "l3_cache_count": Scalar(min=None, max=None, dtype=int),
-                "l4_cache_size": Scalar(min=None, max=None, dtype=int),
-                "l4_cache_count": Scalar(min=None, max=None, dtype=int),
-            }
+            {space.name: space for space in cpu_info_spaces},
+            name="CpuInfo",
         )
 
         self.observation.add_derived_space(
             id="Inst2vecPreprocessedText",
             base_id="Ir",
-            space=Sequence(size_range=(0, None), dtype=str),
+            space=Sequence(
+                name="Inst2vecPreprocessedText", size_range=(0, None), dtype=str
+            ),
             translate=self.inst2vec.preprocess,
             default_value="",
         )
         self.observation.add_derived_space(
             id="Inst2vecEmbeddingIndices",
             base_id="Ir",
-            space=Sequence(size_range=(0, None), dtype=np.int32),
+            space=Sequence(
+                name="Inst2vecEmbeddingIndices", size_range=(0, None), dtype=np.int32
+            ),
             translate=lambda base_observation: self.inst2vec.encode(
                 self.inst2vec.preprocess(base_observation)
             ),
@@ -234,7 +209,7 @@ class LlvmEnv(CompilerEnv):
         self.observation.add_derived_space(
             id="Inst2vec",
             base_id="Ir",
-            space=Sequence(size_range=(0, None), dtype=np.ndarray),
+            space=Sequence(name="Inst2vec", size_range=(0, None), dtype=np.ndarray),
             translate=lambda base_observation: self.inst2vec.embed(
                 self.inst2vec.encode(self.inst2vec.preprocess(base_observation))
             ),
@@ -248,9 +223,12 @@ class LlvmEnv(CompilerEnv):
             base_id="InstCount",
             space=DictSpace(
                 {
-                    f"{name}Count": Scalar(min=0, max=None, dtype=int)
+                    f"{name}Count": Scalar(
+                        name=f"{name}Count", min=0, max=None, dtype=int
+                    )
                     for name in INST_COUNT_FEATURE_NAMES
-                }
+                },
+                name="InstCountDict",
             ),
             translate=lambda base_observation: {
                 f"{name}Count": val
@@ -262,6 +240,7 @@ class LlvmEnv(CompilerEnv):
             id="InstCountNorm",
             base_id="InstCount",
             space=Box(
+                name="InstCountNorm",
                 low=0,
                 high=1,
                 shape=(len(INST_COUNT_FEATURE_NAMES) - 1,),
@@ -277,9 +256,12 @@ class LlvmEnv(CompilerEnv):
             base_id="InstCountNorm",
             space=DictSpace(
                 {
-                    f"{name}Density": Scalar(min=0, max=None, dtype=int)
+                    f"{name}Density": Scalar(
+                        name=f"{name}Density", min=0, max=None, dtype=int
+                    )
                     for name in INST_COUNT_FEATURE_NAMES[1:]
-                }
+                },
+                name="InstCountNormDict",
             ),
             translate=lambda base_observation: {
                 f"{name}Density": val
@@ -292,9 +274,10 @@ class LlvmEnv(CompilerEnv):
             base_id="Autophase",
             space=DictSpace(
                 {
-                    name: Scalar(min=0, max=None, dtype=int)
+                    name: Scalar(name=name, min=0, max=None, dtype=int)
                     for name in AUTOPHASE_FEATURE_NAMES
-                }
+                },
+                name="AutophaseDict",
             ),
             translate=lambda base_observation: {
                 name: val
@@ -324,6 +307,8 @@ class LlvmEnv(CompilerEnv):
         # non-default value.
         if self._runtimes_per_observation_count is not None:
             self.runtime_observation_count = self._runtimes_per_observation_count
+        if self._runtimes_warmup_per_observation_count is not None:
+            self.runtime_warmup_runs_count = self._runtimes_warmup_per_observation_count
 
         return observation
 
@@ -423,15 +408,6 @@ class LlvmEnv(CompilerEnv):
             timeout=timeout,
         )
 
-    def _make_action_space(self, name: str, entries: List[str]) -> Commandline:
-        flags = [
-            CommandlineFlag(
-                name=entry, flag=_FLAGS[entry], description=_DESCRIPTIONS[entry]
-            )
-            for entry in entries
-        ]
-        return Commandline(items=flags, name=name)
-
     def commandline(  # pylint: disable=arguments-differ
         self, textformat: bool = False
     ) -> str:
@@ -523,8 +499,10 @@ class LlvmEnv(CompilerEnv):
 
     @property
     def runtime_observation_count(self) -> int:
-        """The number of runtimes to return for the :code:`Runtime` observation
-        space.
+        """The number of runtimes to return for the Runtime observation space.
+
+        See the :ref:`Runtime observation space reference <llvm/index:Runtime>`
+        for further details.
 
         Example usage:
 
@@ -539,6 +517,8 @@ class LlvmEnv(CompilerEnv):
 
         :setter: Set the number of runtimes to compute when a :code:`Runtime`
             observation is requested.
+
+        :type: int
         """
         return int(self.send_param("llvm.get_runtimes_per_observation_count", ""))
 
@@ -546,3 +526,36 @@ class LlvmEnv(CompilerEnv):
     def runtime_observation_count(self, n: int) -> None:
         self._runtimes_per_observation_count = n
         self.send_param("llvm.set_runtimes_per_observation_count", str(n))
+
+    @property
+    def runtime_warmup_runs_count(self) -> int:
+        """The number of warmup runs of the binary to perform before measuring
+        the Runtime observation space.
+
+        See the :ref:`Runtime observation space reference <llvm/index:Runtime>`
+        for further details.
+
+        Example usage:
+
+            >>> env = compiler_gym.make("llvm-v0")
+            >>> env.reset()
+            >>> env.runtime_observation_count = 10
+            >>> len(env.observation.Runtime())
+            10
+
+        :getter: Returns the number of runs that be performed before measuring
+            the :code:`Runtime` observation is requested.
+
+        :setter: Set the number of warmup runs to perform when a :code:`Runtime`
+            observation is requested.
+
+        :type: int
+        """
+        return int(
+            self.send_param("llvm.get_warmup_runs_count_per_runtime_observation", "")
+        )
+
+    @runtime_warmup_runs_count.setter
+    def runtime_warmup_runs_count(self, n: int) -> None:
+        self._runtimes_warmup_per_observation_count = n
+        self.send_param("llvm.set_warmup_runs_count_per_runtime_observation", str(n))

@@ -22,15 +22,14 @@ FUZZ_TIME_SECONDS = 2
 @pytest.mark.timeout(600)
 def test_fuzz(benchmark_name: str):
     """Run randomly selected actions on a benchmark until a minimum amount of time has elapsed."""
-    env = gym.make(
+    with gym.make(
         "llvm-v0",
         reward_space="IrInstructionCount",
         observation_space="Autophase",
         benchmark=benchmark_name,
-    )
-    env.reset()
+    ) as env:
+        env.reset()
 
-    try:
         # Take a random step until a predetermined amount of time has elapsed.
         end_time = time() + FUZZ_TIME_SECONDS
         while time() < end_time:
@@ -52,8 +51,6 @@ def test_fuzz(benchmark_name: str):
                 assert isinstance(observation, np.ndarray)
                 assert observation.shape == (AUTOPHASE_FEATURE_DIM,)
                 assert isinstance(reward, float)
-    finally:
-        env.close()
 
 
 if __name__ == "__main__":

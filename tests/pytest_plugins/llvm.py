@@ -16,10 +16,6 @@ from compiler_gym.envs.llvm.datasets.cbench import VALIDATORS
 from compiler_gym.third_party import llvm
 from compiler_gym.util.runfiles_path import runfiles_path
 
-ACTIONS_LIST = Path(
-    runfiles_path("compiler_gym/envs/llvm/service/passes/actions_flags.txt")
-)
-
 BENCHMARKS_LIST = Path(runfiles_path("compiler_gym/third_party/cbench/benchmarks.txt"))
 
 
@@ -30,7 +26,6 @@ def _read_list_file(path: Path) -> Iterable[str]:
                 yield action.strip()
 
 
-ACTION_NAMES = list(_read_list_file(ACTIONS_LIST))
 BENCHMARK_NAMES = list(_read_list_file(BENCHMARKS_LIST))
 
 # Skip ghostscript on CI as it is just too heavy.
@@ -40,6 +35,7 @@ if bool(os.environ.get("CI")):
     ]
 
 with gym.make("llvm-v0") as env:
+    ACTION_NAMES = list(env.action_space.names)
     OBSERVATION_SPACE_NAMES = sorted(env.observation.spaces.keys())
     REWARD_SPACE_NAMES = sorted(env.reward.spaces.keys())
     DATASET_NAMES = sorted(d.name for d in env.datasets)
@@ -98,11 +94,8 @@ def non_validatable_cbench_uri(request) -> str:
 @pytest.fixture(scope="function")
 def env() -> LlvmEnv:
     """Create an LLVM environment."""
-    env = gym.make("llvm-v0")
-    try:
-        yield env
-    finally:
-        env.close()
+    with gym.make("llvm-v0") as env_:
+        yield env_
 
 
 @pytest.fixture(scope="module")

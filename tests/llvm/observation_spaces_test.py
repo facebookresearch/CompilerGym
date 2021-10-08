@@ -10,10 +10,11 @@ from typing import Any, Dict, List
 import networkx as nx
 import numpy as np
 import pytest
-from gym.spaces import Box
-from gym.spaces import Dict as DictSpace
+from flaky import flaky
 
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
+from compiler_gym.spaces import Box
+from compiler_gym.spaces import Dict as DictSpace
 from compiler_gym.spaces import Scalar, Sequence
 from tests.test_main import main
 
@@ -40,6 +41,7 @@ def test_observation_spaces(env: LlvmEnv):
     assert set(env.observation.spaces.keys()) == {
         "Ir",
         "IrSha1",
+        "Bitcode",
         "BitcodeFile",
         "CircuitArea",
         "InstCount",
@@ -106,11 +108,30 @@ def test_ir_sha1_observation_space(env: LlvmEnv):
 
 def test_bitcode_observation_space(env: LlvmEnv):
     env.reset("cbench-v1/crc32")
+    key = "Bitcode"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Sequence)
+    assert space.space.dtype == bytes
+    assert space.space.size_range == (0, None)
+
+    assert space.deterministic
+    assert not space.platform_dependent
+
+    value: str = env.observation[key]
+    print(value)  # For debugging in case of error.
+    assert isinstance(value, bytes)
+    assert space.space.contains(value)
+
+
+def test_bitcode_file_observation_space(env: LlvmEnv):
+    env.reset("cbench-v1/crc32")
     key = "BitcodeFile"
     space = env.observation.spaces[key]
     assert isinstance(space.space, Sequence)
     assert space.space.dtype == str
     assert space.space.size_range == (0, 4096)
+    assert not space.deterministic
+    assert not space.platform_dependent
 
     value: str = env.observation[key]
     print(value)  # For debugging in case of error.
@@ -121,8 +142,24 @@ def test_bitcode_observation_space(env: LlvmEnv):
     finally:
         os.unlink(value)
 
-    assert not space.deterministic
-    assert not space.platform_dependent
+
+@pytest.mark.parametrize(
+    "benchmark_uri", ["cbench-v1/crc32", "cbench-v1/qsort", "cbench-v1/gsm"]
+)
+def test_bitcode_file_equivalence(env: LlvmEnv, benchmark_uri: str):
+    """Test that LLVM produces the same bitcode as a file and as a byte array."""
+    env.reset(benchmark=benchmark_uri)
+
+    bitcode = env.observation.Bitcode()
+    bitcode_file = env.observation.BitcodeFile()
+
+    try:
+        with open(bitcode_file, "rb") as f:
+            bitcode_from_file = f.read()
+
+        assert bitcode == bitcode_from_file
+    finally:
+        os.unlink(bitcode_file)
 
 
 # The Autophase feature vector for benchmark://cbench-v1/crc32 in its initial
@@ -1166,6 +1203,7 @@ def test_object_text_size_observation_spaces(env: LlvmEnv):
     assert value == crc32_code_sizes[sys.platform][2]
 
 
+@flaky  # Runtimes can timeout
 def test_runtime_observation_space(env: LlvmEnv):
     env.reset("cbench-v1/crc32")
     key = "Runtime"
@@ -1189,6 +1227,7 @@ def test_runtime_observation_space(env: LlvmEnv):
     assert len(set(value)) > 1
 
 
+@flaky  # Runtimes can timeout
 def test_runtime_observation_space_different_observation_count(env: LlvmEnv):
     """Test setting a custom observation count for LLVM runtimes."""
     env.reset("cbench-v1/crc32")
@@ -1209,6 +1248,7 @@ def test_runtime_observation_space_different_observation_count(env: LlvmEnv):
     assert value.shape == (5,)
 
 
+@flaky  # Runtimes can timeout
 def test_runtime_observation_space_invalid_observation_count(env: LlvmEnv):
     """Test setting an invalid custom observation count for LLVM runtimes."""
     env.reset("cbench-v1/crc32")
@@ -1234,6 +1274,7 @@ def test_runtime_observation_space_not_runnable(env: LlvmEnv):
     assert space.space.contains(value)
 
 
+@flaky  # Build can timeout
 def test_buildtime_observation_space(env: LlvmEnv):
     env.reset("cbench-v1/crc32")
     key = "Buildtime"
@@ -1322,7 +1363,7 @@ def test_add_derived_space(env: LlvmEnv):
     env.observation.add_derived_space(
         id="IrLen",
         base_id="Ir",
-        space=Box(low=0, high=float("inf"), shape=(1,), dtype=int),
+        space=Box(name="IrLen", low=0, high=float("inf"), shape=(1,), dtype=int),
         translate=lambda base: [15],
     )
 

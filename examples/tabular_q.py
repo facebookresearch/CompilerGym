@@ -16,11 +16,14 @@ from typing import Dict, NamedTuple
 import gym
 from absl import app, flags
 
+import compiler_gym.util.flags.episode_length  # noqa Flag definition.
+import compiler_gym.util.flags.episodes  # noqa Flag definition.
+import compiler_gym.util.flags.learning_rate  # noqa Flag definition.
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.timer import Timer
 
 flags.DEFINE_list(
-    "actions",
+    "tabular_q_actions",
     [
         "-break-crit-edges",
         "-early-cse-memssa",
@@ -46,13 +49,10 @@ flags.DEFINE_list(
     [19, 22, 51],
     "Indices of Alphaphase features that are used to construct a state",
 )
-flags.DEFINE_float("learning_rate", 0.1, "learning rate of the q-learning.")
-flags.DEFINE_integer("episodes", 2000, "number of episodes used to learn.")
 flags.DEFINE_integer(
     "log_every", 50, "number of episode interval where progress is reported."
 )
 flags.DEFINE_float("epsilon", 0.2, "Epsilon rate of exploration. ")
-flags.DEFINE_integer("episode_length", 5, "The number of steps in each episode.")
 FLAGS = flags.FLAGS
 
 
@@ -87,22 +87,27 @@ def make_q_table_key(autophase_feature, action, step):
     Finally, we add the action index to the key.
     """
     return StateActionTuple(
-        *autophase_feature[FLAGS.features_indices], step, FLAGS.actions.index(action)
+        *autophase_feature[FLAGS.features_indices],
+        step,
+        FLAGS.tabular_q_actions.index(action),
     )
 
 
 def select_action(q_table, ob, step, epsilon=0.0):
-    qs = [q_table.get(make_q_table_key(ob, act, step), -1) for act in FLAGS.actions]
+    qs = [
+        q_table.get(make_q_table_key(ob, act, step), -1)
+        for act in FLAGS.tabular_q_actions
+    ]
     if random.random() < epsilon:
-        return random.choice(FLAGS.actions)
+        return random.choice(FLAGS.tabular_q_actions)
     max_indices = [i for i, x in enumerate(qs) if x == max(qs)]
     # Breaking ties at random by selecting any of the indices.
-    return FLAGS.actions[random.choice(max_indices)]
+    return FLAGS.tabular_q_actions[random.choice(max_indices)]
 
 
 def get_max_q_value(q_table, ob, step):
     max_q = 0
-    for act in FLAGS.actions:
+    for act in FLAGS.tabular_q_actions:
         hashed = make_q_table_key(ob, act, step)
         max_q = max(q_table.get(hashed, 0), max_q)
     return max_q
@@ -189,19 +194,16 @@ def main(argv):
     q_table: Dict[StateActionTuple, float] = {}
     benchmark = benchmark_from_flags()
     assert benchmark, "You must specify a benchmark using the --benchmark flag"
-    env = gym.make("llvm-ic-v0", benchmark=benchmark)
-    env.observation_space = "Autophase"
 
-    try:
+    with gym.make("llvm-ic-v0", benchmark=benchmark) as env:
+        env.observation_space = "Autophase"
+
         # Train a Q-table.
         with Timer("Constructing Q-table"):
             train(q_table, env)
 
         # Rollout resulting policy.
         rollout(q_table, env, printout=True)
-
-    finally:
-        env.close()
 
 
 if __name__ == "__main__":

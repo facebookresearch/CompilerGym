@@ -10,11 +10,20 @@ load("@rules_python//python:defs.bzl", "py_library")
 
 py_library(
     name = "proto",
-    srcs = ["__init__.py"],
+    srcs = [
+        "__init__.py",
+        "py_converters.py",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         ":compiler_gym_service_py",
         ":compiler_gym_service_py_grpc",
+        "//compiler_gym/spaces:commandline",
+        "//compiler_gym/spaces:dict",
+        "//compiler_gym/spaces:discrete",
+        "//compiler_gym/spaces:named_discrete",
+        "//compiler_gym/spaces:scalar",
+        "//compiler_gym/spaces:tuple",
     ],
 )
 

@@ -7,9 +7,10 @@ from typing import Callable, Optional, Union
 
 import networkx as nx
 import numpy as np
-from gym.spaces import Box, Space
+from gym.spaces import Space
 
 from compiler_gym.service.proto import Observation, ObservationSpace, ScalarRange
+from compiler_gym.spaces.box import Box
 from compiler_gym.spaces.scalar import Scalar
 from compiler_gym.spaces.sequence import Sequence
 from compiler_gym.util.gym_type_hints import ObservationType
@@ -115,6 +116,7 @@ class ObservationSpaceSpec:
         def make_box(scalar_range_list, dtype, defaults):
             bounds = [_scalar_range2tuple(r, defaults) for r in scalar_range_list]
             return Box(
+                name=proto.name,
                 low=np.array([b[0] for b in bounds], dtype=dtype),
                 high=np.array([b[1] for b in bounds], dtype=dtype),
                 dtype=dtype,
@@ -123,6 +125,7 @@ class ObservationSpaceSpec:
         def make_scalar(scalar_range, dtype, defaults):
             scalar_range_tuple = _scalar_range2tuple(scalar_range, defaults)
             return Scalar(
+                name=proto.name,
                 min=dtype(scalar_range_tuple[0]),
                 max=dtype(scalar_range_tuple[1]),
                 dtype=dtype,
@@ -130,6 +133,7 @@ class ObservationSpaceSpec:
 
         def make_seq(size_range, dtype, defaults, scalar_range=None):
             return Sequence(
+                name=proto.name,
                 size_range=_scalar_range2tuple(size_range, defaults),
                 dtype=dtype,
                 opaque_data_format=proto.opaque_data_format,

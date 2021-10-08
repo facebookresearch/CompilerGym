@@ -12,7 +12,7 @@ import numpy as np
 from compiler_gym.datasets import Benchmark, BenchmarkSource, Dataset
 from compiler_gym.datasets.benchmark import BenchmarkInitError, BenchmarkWithSource
 from compiler_gym.envs.llvm.llvm_benchmark import ClangInvocation
-from compiler_gym.service.proto import BenchmarkDynamicConfig
+from compiler_gym.service.proto import BenchmarkDynamicConfig, Command
 from compiler_gym.util.decorators import memoized_property
 from compiler_gym.util.runfiles_path import runfiles_path
 from compiler_gym.util.shell_format import plural
@@ -35,11 +35,15 @@ class CsmithBenchmark(BenchmarkWithSource):
         self._src = None
         self.proto.dynamic_config.MergeFrom(
             BenchmarkDynamicConfig(
-                build_cmd="$CC $<",
-                build_genfile="a.out",
-                run_cmd="./a.out",
-                build_cmd_timeout_seconds=60,
-                run_cmd_timeout_seconds=300,
+                build_cmd=Command(
+                    argument=["$CC", "$IN"],
+                    outfile=["a.out"],
+                    timeout_seconds=60,
+                ),
+                run_cmd=Command(
+                    argument=["./a.out"],
+                    timeout_seconds=300,
+                ),
             )
         )
 
@@ -82,19 +86,6 @@ class CsmithDataset(Dataset):
     environment and that :meth:`env.reset()
     <compiler_gym.envs.CompilerEnv.reset>` will raise :class:`BenchmarkInitError
     <compiler_gym.datasets.BenchmarkInitError>`.
-
-    Installation
-    ------------
-
-    Using the CsmithDataset requires building the Csmith binary from source.
-    This is done automatically on the first call to :code:`install()`. Building
-    Csmith requires a working C++ toolchain. Install the required dependencies
-    using: :code:`sudo apt install -y g++ m4` on Linux, or :code:`brew install
-    m4` on macOS. :class:`DatasetInitError
-    <compiler_gym.datasets.DatasetInitError>` is raised if compilation fails.
-    See the `Csmith repo
-    <https://github.com/csmith-project/csmith#install-csmith>`_ for further
-    details.
     """
 
     def __init__(
@@ -201,11 +192,11 @@ class CsmithDataset(Dataset):
                 stderr = "\n".join(
                     truncate(stderr.decode("utf-8"), max_line_len=200, max_lines=20)
                 )
-                logging.info(f"Csmith failed with seed {seed}: {stderr}")
+                logging.warning("Csmith failed with seed %d: %s", seed, stderr)
             except UnicodeDecodeError:
                 # Failed to interpret the stderr output, generate a generic
                 # error message.
-                logging.info(f"Csmith failed with seed {seed}")
+                logging.warning("Csmith failed with seed %d", seed)
             return self.benchmark_from_seed(
                 seed, max_retries=max_retries, retry_count=retry_count + 1
             )

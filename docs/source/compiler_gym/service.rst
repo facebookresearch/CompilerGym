@@ -13,6 +13,10 @@ client and service is managed by the :class:`CompilerGymServiceConnection
 .. contents:: Document contents:
     :local:
 
+
+The CompilationSession Interface
+--------------------------------
+
 .. autoclass:: CompilationSession
    :members:
 
@@ -49,6 +53,8 @@ exception types, all inheriting from a base :class:`ServiceError
 <compiler_gym.service.ServiceError>` class:
 
 .. autoexception:: ServiceError
+
+.. autoexception:: EnvironmentNotSupported
 
 .. autoexception:: ServiceInitError
 

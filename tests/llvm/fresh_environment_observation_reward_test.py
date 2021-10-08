@@ -4,12 +4,15 @@
 # LICENSE file in the root directory of this source tree.
 """Integrations tests for the LLVM CompilerGym environments."""
 
+from flaky import flaky
+
 from compiler_gym.envs import CompilerEnv
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
+@flaky  # Runtime can timeout
 def test_step(env: CompilerEnv, observation_space: str, reward_space: str):
     """Request every combination of observation and reward in a fresh environment."""
     env.reward_space = None

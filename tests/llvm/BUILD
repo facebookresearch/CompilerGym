@@ -5,6 +5,16 @@
 load("@rules_python//python:defs.bzl", "py_test")
 
 py_test(
+    name = "action_space_test",
+    srcs = ["action_space_test.py"],
+    deps = [
+        "//compiler_gym/envs",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "all_actions_single_step_test",
     timeout = "long",
     srcs = ["all_actions_single_step_test.py"],
@@ -41,6 +51,16 @@ py_test(
 )
 
 py_test(
+    name = "compute_observation_test",
+    srcs = ["compute_observation_test.py"],
+    deps = [
+        "//compiler_gym/envs/llvm",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "custom_benchmarks_test",
     srcs = ["custom_benchmarks_test.py"],
     data = [
@@ -63,7 +83,9 @@ py_test(
     srcs = ["datasets_pickle_test.py"],
     deps = [
         "//compiler_gym/datasets",
+        "//compiler_gym/envs/llvm",
         "//tests:test_main",
+        "//tests/pytest_plugins:common",
         "//tests/pytest_plugins:llvm",
     ],
 )
@@ -105,9 +127,21 @@ py_test(
 )
 
 py_test(
+    name = "fork_regression_test",
+    timeout = "long",
+    srcs = ["fork_regression_test.py"],
+    deps = [
+        "//compiler_gym/envs",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "fresh_environment_observation_reward_test",
+    timeout = "long",
     srcs = ["fresh_environment_observation_reward_test.py"],
-    shard_count = 8,
+    shard_count = 12,
     deps = [
         "//compiler_gym/envs",
         "//tests:test_main",
@@ -126,22 +160,13 @@ py_test(
 )
 
 py_test(
-    name = "gvn_sink_test",
-    srcs = ["gvn_sink_test.py"],
-    deps = [
-        "//compiler_gym/envs",
-        "//tests:test_main",
-        "//tests/pytest_plugins:llvm",
-    ],
-)
-
-py_test(
     name = "gym_interface_compatability",
     timeout = "short",
     srcs = ["gym_interface_compatability.py"],
     deps = [
-        "//compiler_gym",
+        "//compiler_gym/envs/llvm",
         "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
     ],
 )
 
@@ -204,7 +229,6 @@ py_test(
 
 py_test(
     name = "multiprocessing_test",
-    timeout = "short",
     srcs = ["multiprocessing_test.py"],
     flaky = 1,
     deps = [
@@ -229,6 +253,18 @@ py_test(
     srcs = ["reward_spaces_test.py"],
     deps = [
         "//compiler_gym/envs",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
+    name = "runtime_test",
+    timeout = "long",
+    srcs = ["runtime_test.py"],
+    deps = [
+        "//compiler_gym/envs/llvm",
+        "//compiler_gym/service:connection",
         "//tests:test_main",
         "//tests/pytest_plugins:llvm",
     ],

@@ -84,9 +84,8 @@ an overview of the key concepts.
 In Python, import `compiler_gym` to use the environments:
 
 ```py
->>> import gym
 >>> import compiler_gym                      # imports the CompilerGym environments
->>> env = gym.make(                          # creates a new environment
+>>> env = compiler_gym.make(                 # creates a new environment (same as gym.make)
 ...     "llvm-v0",                           # selects the compiler to use
 ...     benchmark="cbench-v1/qsort",         # selects the program to compile
 ...     observation_space="Autophase",       # selects the observation space
@@ -95,6 +94,7 @@ In Python, import `compiler_gym` to use the environments:
 >>> env.reset()                              # starts a new compilation session
 >>> env.render()                             # prints the IR of the program
 >>> env.step(env.action_space.sample())      # applies a random optimization, updates state/reward/actions
+>>> env.close()                              # closes the environment, freeing resources
 ```
 
 See the [documentation website](http://facebookresearch.github.io/CompilerGym/)
@@ -143,13 +143,14 @@ We welcome contributions to CompilerGym. If you are interested in contributing p
 
 ## Citation
 
-If you use CompilerGym in any of your work, please cite:
+If you use CompilerGym in any of your work, please cite [our
+paper](https://arxiv.org/pdf/2109.08267.pdf):
 
 ```
-@Misc{CompilerGym,
-  author = {Cummins, Chris and Leather, Hugh and Steiner, Benoit and He, Horace and Chintala, Soumith},
-  title = {{CompilerGym}: A Reinforcement Learning Toolkit for Compilers},
-  howpublished = {\url{https://github.com/facebookresearch/CompilerGym/}},
-  year = {2020}
+@article{CompilerGym,
+      title={{CompilerGym: Robust, Performant Compiler Optimization Environments for AI Research}},
+      author={Chris Cummins and Bram Wasti and Jiadong Guo and Brandon Cui and Jason Ansel and Sahir Gomez and Somya Jain and Jia Liu and Olivier Teytaud and Benoit Steiner and Yuandong Tian and Hugh Leather},
+      journal={arXiv:2109.08267},
+      year={2021},
 }
 ```

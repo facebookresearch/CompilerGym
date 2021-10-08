@@ -81,4 +81,3 @@ def replay_actions_from_logs(env: CompilerEnv, logdir: Path, benchmark=None) -> 
     env.reward_space = meta["reward"]
     env.reset(benchmark=benchmark)
     replay_actions(env, actions, logdir)
-    env.close()

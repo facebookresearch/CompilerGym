@@ -10,8 +10,7 @@ from tests.test_main import main
 
 
 def test_default_dataset_list():
-    env = gym.make("llvm-v0")
-    try:
+    with gym.make("llvm-v0") as env:
         assert list(d.name for d in env.datasets) == [
             "benchmark://cbench-v1",
             "benchmark://anghabench-v1",
@@ -28,8 +27,6 @@ def test_default_dataset_list():
             "generator://csmith-v0",
             "generator://llvm-stress-v0",
         ]
-    finally:
-        env.close()
 
 
 if __name__ == "__main__":
