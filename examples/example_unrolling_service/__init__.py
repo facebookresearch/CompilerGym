@@ -84,7 +84,7 @@ class SizeReward(Reward):
         return reward
 
 
-class ExampleDataset(Dataset):
+class UnrollingDataset(Dataset):
     def __init__(self, *args, **kwargs):
         super().__init__(
             name="benchmark://unrolling-v0",
@@ -93,11 +93,13 @@ class ExampleDataset(Dataset):
             site_data_base=site_data_path("example_dataset"),
         )
         self._benchmarks = {
-            "benchmark://unrolling-v0/foo": Benchmark.from_file_contents(
-                "benchmark://unrolling-v0/foo", "Ir data".encode("utf-8")
+            "benchmark://unrolling-v0/offsets1": Benchmark.from_file(
+                "benchmark://unrolling-v0/offsets1",
+                "/Users/melhoushi/CompilerGym-Playground/dataset/offsets1.c",
             ),
-            "benchmark://unrolling-v0/bar": Benchmark.from_file_contents(
-                "benchmark://unrolling-v0/bar", "Ir data".encode("utf-8")
+            "benchmark://unrolling-v0/conv2d": Benchmark.from_file(
+                "benchmark://unrolling-v0/conv2d",
+                "/Users/melhoushi/CompilerGym-Playground/dataset/conv2d.c",
             ),
         }
 
@@ -120,6 +122,6 @@ register(
     kwargs={
         "service": UNROLLING_PY_SERVICE_BINARY,
         "rewards": [RuntimeReward(), SizeReward()],
-        "datasets": [ExampleDataset()],
+        "datasets": [UnrollingDataset()],
     },
 )

@@ -1,16 +1,12 @@
 import compiler_gym
 import examples.example_unrolling_service as unrolling_service  # noqa Register environments.
 
-# TODO: avoid using hard-coded paths for benchmark files
-benchmark = compiler_gym.datasets.benchmark.Benchmark.from_file(
-    "unrolling-example-for-now",
-    "/Users/melhoushi/CompilerGym-Playground/dataset/offsets1.c",
-)
+benchmark = "unrolling-v0/conv2d"
 
 env = compiler_gym.make(
     "unrolling-py-v0",
-    benchmark=benchmark,  # "unrolling-v0/foo"
-    observation_space="ir",
+    benchmark=benchmark,
+    observation_space="features",
     reward_space="runtime",
 )
 
