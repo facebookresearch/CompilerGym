@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """This module demonstrates how to """
+import os
 from pathlib import Path
 from typing import Iterable
 
@@ -90,16 +91,19 @@ class UnrollingDataset(Dataset):
             name="benchmark://unrolling-v0",
             license="MIT",
             description="Unrolling example dataset",
-            site_data_base=site_data_path("example_dataset"),
+            site_data_base=site_data_path(
+                "example_dataset"
+            ),  # TODO: what should we set this to? we are not using it
         )
+        benchmarks_dir_path = os.path.join(os.path.dirname(__file__), "benchmarks")
         self._benchmarks = {
             "benchmark://unrolling-v0/offsets1": Benchmark.from_file(
                 "benchmark://unrolling-v0/offsets1",
-                "/Users/melhoushi/CompilerGym-Playground/dataset/offsets1.c",
+                os.path.join(benchmarks_dir_path, "offsets1.c"),
             ),
             "benchmark://unrolling-v0/conv2d": Benchmark.from_file(
                 "benchmark://unrolling-v0/conv2d",
-                "/Users/melhoushi/CompilerGym-Playground/dataset/conv2d.c",
+                os.path.join(benchmarks_dir_path, "conv2d.c"),
             ),
         }
 

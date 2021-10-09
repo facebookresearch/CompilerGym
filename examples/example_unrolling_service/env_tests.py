@@ -211,8 +211,8 @@ def test_rewards(env: CompilerEnv):
 
 def test_benchmarks(env: CompilerEnv):
     assert list(env.datasets.benchmark_uris()) == [
-        "benchmark://unrolling-v0/foo",
-        "benchmark://unrolling-v0/bar",
+        "benchmark://unrolling-v0/offsets1",
+        "benchmark://unrolling-v0/conv2d",
     ]
 
 

@@ -159,9 +159,12 @@ class UnrollingCompilationSession(CompilationSession):
         self._src_path = os.path.abspath(os.path.join(src_uri_p.netloc, src_uri_p.path))
         current_date = datetime.datetime.now().strftime("%Y-%m-%d")
         current_time = datetime.datetime.now().strftime("%H-%M-%S")
+        # TODO: assert that the path exists
         benchmark_name = os.path.basename(self._src_path)
+
         # TODO: add "clean_up" function to remove files and save space
         # TODO: add argument to specify defaut log directory (or use what is used somewhere else in the repo)
+        # maybe use `with tempfile.TemporaryDirectory() as d:`
         self._benchmark_log_dir = os.path.join(
             Path.home(),
             ".compiler_gym_log",
