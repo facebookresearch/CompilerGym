@@ -5,7 +5,6 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """An example CompilerGym service in python."""
-import datetime
 import logging
 import os
 from pathlib import Path
@@ -101,27 +100,12 @@ class UnrollingCompilationSession(CompilationSession):
 
         src_uri_p = urlparse(self._benchmark.program.uri)
         self._src_path = os.path.abspath(os.path.join(src_uri_p.netloc, src_uri_p.path))
-        current_date = datetime.datetime.now().strftime("%Y-%m-%d")
-        current_time = datetime.datetime.now().strftime("%H-%M-%S")
         # TODO: assert that the path exists
-        benchmark_name = os.path.basename(self._src_path)
 
-        # TODO: add "clean_up" function to remove files and save space
-        # TODO: add argument to specify defaut log directory (or use what is used somewhere else in the repo)
-        # maybe use `with tempfile.TemporaryDirectory() as d:`
-        self._benchmark_log_dir = os.path.join(
-            Path.home(),
-            ".compiler_gym_log",
-            "unrolling",
-            current_date,
-            current_time,
-            benchmark_name,
-        )
-        os.makedirs(self._benchmark_log_dir, exist_ok=True)
         # TODO: use a counter to suffix IR and obj files? Or remove the suffix?
-        self._llvm_path = os.path.join(self._benchmark_log_dir, "version1.ll")
-        self._obj_path = os.path.join(self._benchmark_log_dir, "version1.o")
-        self._exe_path = os.path.join(self._benchmark_log_dir, "version1")
+        self._llvm_path = os.path.join(self.working_dir, "version1.ll")
+        self._obj_path = os.path.join(self.working_dir, "version1.o")
+        self._exe_path = os.path.join(self.working_dir, "version1")
         # FIXME: llvm.clang_path() lead to build errors
         # TODO: throw exception if any command fails
         os.system(
