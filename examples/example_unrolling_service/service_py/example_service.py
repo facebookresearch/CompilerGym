@@ -12,6 +12,8 @@ from pathlib import Path
 from typing import Optional, Tuple
 from urllib.parse import urlparse
 
+import utils
+
 import compiler_gym.third_party.llvm as llvm
 from compiler_gym.service import CompilationSession
 from compiler_gym.service.proto import (
@@ -26,64 +28,6 @@ from compiler_gym.service.proto import (
 )
 from compiler_gym.service.runtime import create_and_run_compiler_gym_service
 from compiler_gym.util.timer import Timer
-
-
-# TODO: move to a utils.py file?
-def extract_statistics_from_ir(ir: str):
-    stats = {"control_flow": 0, "arithmetic": 0, "memory": 0}
-    for line in ir.splitlines():
-        tokens = line.split()
-        if len(tokens) > 0:
-            opcode = tokens[0]
-            if opcode in [
-                "br",
-                "call",
-                "ret",
-                "switch",
-                "indirectbr",
-                "invoke",
-                "callbr",
-                "resume",
-                "catchswitch",
-                "catchret",
-                "cleanupret",
-                "unreachable",
-            ]:
-                stats["control_flow"] += 1
-            elif opcode in [
-                "fneg",
-                "add",
-                "fadd",
-                "sub",
-                "fsub",
-                "mul",
-                "fmul",
-                "udiv",
-                "sdiv",
-                "fdiv",
-                "urem",
-                "srem",
-                "frem",
-                "shl",
-                "lshr",
-                "ashr",
-                "and",
-                "or",
-                "xor",
-            ]:
-                stats["arithmetic"] += 1
-            elif opcode in [
-                "alloca",
-                "load",
-                "store",
-                "fence",
-                "cmpxchg",
-                "atomicrmw",
-                "getelementptr",
-            ]:
-                stats["memory"] += 1
-
-    return stats
 
 
 class UnrollingCompilationSession(CompilationSession):
@@ -204,7 +148,7 @@ class UnrollingCompilationSession(CompilationSession):
             return Observation(string_value=ir)
         elif observation_space.name == "features":
             ir = open(self._llvm_path).read()
-            stats = extract_statistics_from_ir(ir)
+            stats = utils.extract_statistics_from_ir(ir)
             observation = Observation()
             observation.int64_list.value[:] = list(stats.values())
             return observation
