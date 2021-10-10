@@ -97,12 +97,12 @@ class UnrollingCompilationSession(CompilationSession):
 
         src_uri_p = urlparse(self._benchmark.program.uri)
         self._src_path = os.path.abspath(os.path.join(src_uri_p.netloc, src_uri_p.path))
+        benchmark_name = os.path.basename(self._src_path).split(".")[0]  # noqa
         # TODO: assert that the path exists
 
-        # TODO: use a counter to suffix IR and obj files? Or remove the suffix?
-        self._llvm_path = os.path.join(self.working_dir, "version1.ll")
-        self._obj_path = os.path.join(self.working_dir, "version1.o")
-        self._exe_path = os.path.join(self.working_dir, "version1")
+        self._llvm_path = os.path.join(self.working_dir, "{benchmark_name}.ll")
+        self._obj_path = os.path.join(self.working_dir, "{benchmark_name}.o")
+        self._exe_path = os.path.join(self.working_dir, "{benchmark_name}")
         # FIXME: llvm.clang_path() lead to build errors
         # TODO: throw exception if any command fails
         os.system(
