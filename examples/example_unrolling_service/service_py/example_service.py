@@ -93,9 +93,6 @@ class UnrollingCompilationSession(CompilationSession):
         logging.info("Started a compilation session for %s", benchmark.uri)
         self._benchmark = benchmark
         self._action_space = action_space
-        self.reset()
-
-    def reset(self):
         self._observation = dict()
 
         src_uri_p = urlparse(self._benchmark.program.uri)
