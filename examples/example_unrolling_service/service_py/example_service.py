@@ -18,6 +18,7 @@ import numpy as np
 import utils
 
 import compiler_gym.third_party.llvm as llvm
+from compiler_gym.datasets import BenchmarkInitError
 from compiler_gym.service import CompilationSession
 from compiler_gym.service.proto import (
     Action,
@@ -31,7 +32,6 @@ from compiler_gym.service.proto import (
 )
 from compiler_gym.service.runtime import create_and_run_compiler_gym_service
 from compiler_gym.util.commands import run_command
-from compiler_gym.util.timer import Timer
 
 
 class UnrollingCompilationSession(CompilationSession):
@@ -177,16 +177,22 @@ class UnrollingCompilationSession(CompilationSession):
                 timeout=30,
             )
 
-            # TODO: use more accurate methods to measure time
+            # TODO: add documentation that benchmarks need print out execution time
             # Running 5 times and taking the average of middle 3
             exec_times = []
             for _ in range(5):
-                with Timer() as exec_time:
-                    run_command(
-                        [self._exe_path],
-                        timeout=30,
+                stdout = run_command(
+                    [self._exe_path],
+                    timeout=30,
+                )
+                try:
+                    exec_times.append(int(stdout))
+                except ValueError:
+                    raise BenchmarkInitError(
+                        f"Error in parsing execution time from output of command\n"
+                        f"Please ensure that the source code of the benchmark measures execution time and prints to stdout\n"
+                        f"Stdout of the program: {stdout}"
                     )
-                exec_times.append(exec_time.time)
             exec_times = np.sort(exec_times)
             avg_exec_time = np.mean(exec_times[1:4])
             return Observation(scalar_double=avg_exec_time)

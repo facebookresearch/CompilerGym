@@ -1,3 +1,5 @@
+#include "header.h"
+
 #ifndef N
 #define N 1000000
 #endif
@@ -17,7 +19,8 @@ __attribute__((noinline)) void example1(int* ret) {
 
 int main(int argc, char* argv[]) {
   int dummy = 0;
-  example1(&dummy);
+  // TODO: initialize tensors
+  BENCH("example1", example1(&dummy), 100, dummy);
 
   return 0;
 }
