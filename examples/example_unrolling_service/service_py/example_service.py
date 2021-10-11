@@ -102,9 +102,9 @@ class UnrollingCompilationSession(CompilationSession):
         self._src_path = os.path.abspath(os.path.join(src_uri_p.netloc, src_uri_p.path))
         benchmark_name = os.path.basename(self._src_path).split(".")[0]  # noqa
 
-        self._llvm_path = os.path.join(self.working_dir, "{benchmark_name}.ll")
-        self._obj_path = os.path.join(self.working_dir, "{benchmark_name}.o")
-        self._exe_path = os.path.join(self.working_dir, "{benchmark_name}")
+        self._llvm_path = os.path.join(self.working_dir, f"{benchmark_name}.ll")
+        self._obj_path = os.path.join(self.working_dir, f"{benchmark_name}.o")
+        self._exe_path = os.path.join(self.working_dir, f"{benchmark_name}")
         # FIXME: llvm.clang_path() lead to build errors if the source file includes a header file
         run_command(
             [
