@@ -95,7 +95,6 @@ class UnrollingCompilationSession(CompilationSession):
         logging.info("Started a compilation session for %s", benchmark.uri)
         self._benchmark = benchmark
         self._action_space = action_space
-        self._observation = dict()
 
         src_uri_p = urlparse(self._benchmark.program.uri)
         self._src_path = os.path.abspath(os.path.join(src_uri_p.netloc, src_uri_p.path))
@@ -128,9 +127,6 @@ class UnrollingCompilationSession(CompilationSession):
         os.system(
             f"{llvm.opt_path()} {self._action_space.action[action.action]} {self._llvm_path} -S -o {self._llvm_path}"
         )
-        ir = open(self._llvm_path).read()
-        # TODO: it seems that we don't need an _observation dictionary. Perhapse "ir" string is enough
-        self._observation["ir"] = Observation(string_value=ir)
         return False, None, False  # TODO: return correct values
 
     def get_observation(self, observation_space: ObservationSpace) -> Observation:
