@@ -25,22 +25,31 @@ jobs:
         steps:
             - uses: actions/checkout@v2
 
+            - name: Persist the bazel cache
+              uses: actions/cache@v2
+              with:
+                  path: ~/.cache/bazel/_bazel_runner
+                  key: bazel-${{ hashFiles('WORKSPACE') }}-${{ hashFiles('**/BUILD') }}
+                  restore-keys: |
+                      bazel-${{ hashFiles('WORKSPACE') }}-
+                      bazel-
+
             - name: Set up Python
               uses: actions/setup-python@v2
               with:
                   python-version: 3.9
 
-            - name: Download Python wheel
-              uses: dawidd6/action-download-artifact@v2
-              with:
-                  workflow: ci.yml
-                  workflow_conclusion: success
-                  branch: development
-                  event: push
-                  name: linux-wheel
+            - name: Install build dependencies
+              uses: ./.github/actions/install-build-dependencies
 
-            - name: Install wheel
-              run: python -m pip install *.whl
+            - name: Build and install Python wheel
+              run: make install
+              env:
+                  CC: clang
+                  CXX: clang++
+                  BAZEL_OPTS: --batch
+                  BAZEL_FETCH_OPTS: --config=ci
+                  BAZEL_BUILD_OPTS: --config=ci
 
             - name: Install runtime dependencies
               uses: ./.github/actions/install-runtime-dependencies
