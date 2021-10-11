@@ -17,7 +17,7 @@ __attribute__((noinline)) void example1(int* ret) {
   *ret = A[N - 1];
 }
 
-int main(int argc, char* argv[]) {
+__attribute__((optnone)) int main(int argc, char* argv[]) {
   int dummy = 0;
   // TODO: initialize tensors
   BENCH("example1", example1(&dummy), 100, dummy);

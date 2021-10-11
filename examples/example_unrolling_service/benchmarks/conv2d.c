@@ -64,7 +64,7 @@ void conv2d(int* ret) {
   *ret = y[N - 1][Oh - 1][Ow - 1][Oc - 1];
 }
 
-int main(int argc, char* argv[]) {
+__attribute__((optnone)) int main(int argc, char* argv[]) {
   int dummy = 0;
   // TODO: initialize tensors
   BENCH("conv2d", conv2d(&dummy), 100, dummy);
