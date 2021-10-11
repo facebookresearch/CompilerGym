@@ -275,12 +275,12 @@ livedocs: gendocs doxygen
 # Testing #
 ###########
 
-COMPILER_GYM_SITE_DATA ?= "/tmp/compiler_gym_$(USER)/tests/site_data"
-COMPILER_GYM_CACHE ?= "/tmp/compiler_gym_$(USER)/tests/cache"
+COMPILER_GYM_SITE_DATA ?= /tmp/compiler_gym_$(USER)/tests/site_data
+COMPILER_GYM_CACHE ?= /tmp/compiler_gym_$(USER)/tests/cache
 
 # A directory that is used as the working directory for running pytest tests
 # by symlinking the tests directory into it.
-INSTALL_TEST_ROOT ?= "/tmp/compiler_gym_$(USER)/install_tests"
+INSTALL_TEST_ROOT ?= /tmp/compiler_gym_$(USER)/install_tests
 
 # The target to use. If not provided, all tests will be run. For `make test` and
 # related, this is a bazel target pattern, with default value '//...'. For `make
@@ -307,7 +307,6 @@ itest: bazel-fetch
 install-test-setup:
 	mkdir -p "$(INSTALL_TEST_ROOT)"
 	rm -f "$(INSTALL_TEST_ROOT)/tests" "$(INSTALL_TEST_ROOT)/tox.ini"
-	ln -s "$(INSTALL_TEST_ROOT)"
 	ln -s "$(ROOT)/tests" "$(INSTALL_TEST_ROOT)"
 	ln -s "$(ROOT)/tox.ini" "$(INSTALL_TEST_ROOT)"
 
@@ -360,10 +359,12 @@ install: |  init-runtime-requirements bazel-build pip-install
 # A list of all filesystem locations that CompilerGym may use for storing
 # files and data.
 COMPILER_GYM_DATA_FILE_LOCATIONS = \
-    $(HOME)/.cache/compiler_gym \
-    $(HOME)/.local/share/compiler_gym \
-    $(HOME)/logs/compiler_gym \
+    "$(HOME)/.cache/compiler_gym" \
+    "$(HOME)/.local/share/compiler_gym" \
+    "$(HOME)/logs/compiler_gym" \
     /dev/shm/compiler_gym \
+    /dev/shm/compiler_gym_$(USER) \
+    /tmp/compiler_gym \
     /tmp/compiler_gym_$(USER) \
     $(NULL)
 

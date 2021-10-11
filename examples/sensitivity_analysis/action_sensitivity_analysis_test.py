@@ -4,9 +4,11 @@
 # LICENSE file in the root directory of this source tree.
 """End-to-end test of //compiler_gym/bin:action_sensitivity_analysis."""
 
+import sys
 import tempfile
 from pathlib import Path
 
+import pytest
 from absl.flags import FLAGS
 from sensitivity_analysis.action_sensitivity_analysis import (
     run_action_sensitivity_analysis,
@@ -14,6 +16,11 @@ from sensitivity_analysis.action_sensitivity_analysis import (
 from sensitivity_analysis.sensitivity_analysis_eval import run_sensitivity_analysis_eval
 
 
+@pytest.mark.xfail(
+    sys.platform == "darwin",
+    strict=True,
+    reason="github.com/facebookresearch/CompilerGym/issues/459",
+)
 def test_run_action_sensitivity_analysis():
     actions = [0, 1]
     env = "llvm-v0"

@@ -2,6 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+import logging
 import subprocess
 import sys
 from concurrent.futures import as_completed
@@ -15,6 +16,8 @@ from compiler_gym.util import thread_pool
 from compiler_gym.util.download import download
 from compiler_gym.util.filesystem import atomic_file_write
 from compiler_gym.util.truncate import truncate
+
+logger = logging.getLogger(__name__)
 
 
 class POJ104Dataset(TarDatasetWithManifest):
@@ -101,7 +104,7 @@ class POJ104Dataset(TarDatasetWithManifest):
                         "-std=c++11",
                     ],
                 ).command(outpath=tmp_bitcode_path)
-                self.logger.debug("Exec %s", compile_cmd)
+                logger.debug("Exec %s", compile_cmd)
                 clang = subprocess.Popen(
                     compile_cmd,
                     stdin=subprocess.PIPE,

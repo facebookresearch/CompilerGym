@@ -10,11 +10,18 @@ from pathlib import Path
 from typing import Dict, Iterable, Optional, Union
 
 import numpy as np
+from deprecated.sphinx import deprecated
 from deprecated.sphinx import deprecated as mark_deprecated
 
 from compiler_gym.datasets.benchmark import Benchmark
 from compiler_gym.datasets.uri import DATASET_NAME_RE
-from compiler_gym.util.debug_util import get_logging_level
+
+logger = logging.getLogger(__name__)
+
+# NOTE(cummins): This is only required to prevent a name conflict with the now
+# deprecated Dataset.logger attribute. This can be removed once the logger
+# attribute is removed, scheduled for release 0.2.3.
+_logger = logger
 
 
 class Dataset:
@@ -43,7 +50,6 @@ class Dataset:
         references: Optional[Dict[str, str]] = None,
         deprecated: Optional[str] = None,
         sort_order: int = 0,
-        logger: Optional[logging.Logger] = None,
         validatable: str = "No",
     ):
         """Constructor.
@@ -100,7 +106,6 @@ class Dataset:
         self._deprecation_message = deprecated
         self._validatable = validatable
 
-        self._logger = logger
         self.sort_order = sort_order
         self.benchmark_class = benchmark_class
 
@@ -112,19 +117,19 @@ class Dataset:
         return self.name
 
     @property
+    @deprecated(
+        version="0.2.1",
+        reason=(
+            "The `Dataset.logger` attribute is deprecated. All Dataset "
+            "instances share a logger named compiler_gym.datasets"
+        ),
+    )
     def logger(self) -> logging.Logger:
         """The logger for this dataset.
 
         :type: logging.Logger
         """
-        # NOTE(cummins): Default logger instantiation is deferred since in
-        # Python 3.6 the Logger instance contains an un-pickle-able Rlock()
-        # which can prevent gym.make() from working. This is a workaround that
-        # can be removed once Python 3.6 support is dropped.
-        if self._logger is None:
-            self._logger = logging.getLogger("compiler_gym.datasets")
-            self._logger.setLevel(get_logging_level())
-        return self._logger
+        return _logger
 
     @property
     def name(self) -> str:

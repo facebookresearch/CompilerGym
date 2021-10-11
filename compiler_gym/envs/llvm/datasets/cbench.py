@@ -27,6 +27,8 @@ from compiler_gym.util.runfiles_path import cache_path, site_data_path
 from compiler_gym.util.timer import Timer
 from compiler_gym.validation_result import ValidationError
 
+logger = logging.getLogger(__name__)
+
 _CBENCH_TARS = {
     "macos": (
         "https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v1-macos.tar.bz2",
@@ -94,7 +96,6 @@ def _compile_and_run_bitcode_file(
     linkopts: List[str],
     env: Dict[str, str],
     num_runs: int,
-    logger: logging.Logger,
     sanitizer: Optional[LlvmSanitizer] = None,
     timeout_seconds: float = 300,
     compilation_timeout_seconds: float = 60,
@@ -144,7 +145,12 @@ def _compile_and_run_bitcode_file(
         try:
             output, _ = clang.communicate(timeout=compilation_timeout_seconds)
         except subprocess.TimeoutExpired:
-            clang.kill()
+            # kill() was added in Python 3.7.
+            if sys.version_info >= (3, 7, 0):
+                clang.kill()
+            else:
+                clang.terminate()
+            clang.communicate(timeout=30)  # Wait for shutdown to complete.
             error_data["timeout"] = compilation_timeout_seconds
             return BenchmarkExecutionResult(
                 walltime_seconds=timeout_seconds,
@@ -182,7 +188,12 @@ def _compile_and_run_bitcode_file(
         with Timer() as timer:
             stdout, _ = process.communicate(timeout=timeout_seconds)
     except subprocess.TimeoutExpired:
-        process.kill()
+        # kill() was added in Python 3.7.
+        if sys.version_info >= (3, 7, 0):
+            process.kill()
+        else:
+            process.terminate()
+        process.communicate(timeout=30)  # Wait for shutdown to complete.
         error_data["timeout_seconds"] = timeout_seconds
         return BenchmarkExecutionResult(
             walltime_seconds=timeout_seconds,
@@ -317,7 +328,6 @@ def _make_cBench_validator(
                         linkopts=linkopts + ["-O2"],
                         # Always assume safe.
                         sanitizer=None,
-                        logger=env.logger,
                         env=os_env,
                     )
                     if gold_standard.error:
@@ -354,7 +364,6 @@ def _make_cBench_validator(
                 num_runs=num_runs,
                 linkopts=linkopts,
                 sanitizer=sanitizer,
-                logger=env.logger,
                 env=os_env,
             )
 
@@ -409,9 +418,7 @@ def _make_cBench_validator(
                 # Timeout errors can be raised by the environment in case of a
                 # slow step / observation, and should be retried.
                 pass
-            env.logger.warning(
-                "Validation callback failed, attempt=%d/%d", j, flakiness
-            )
+            logger.warning("Validation callback failed, attempt=%d/%d", j, flakiness)
         return error
 
     return flaky_wrapped_cb

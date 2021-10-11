@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 """Module for resolving paths to LLVM binaries and libraries."""
 import io
+import logging
 import shutil
 import sys
 import tarfile
@@ -15,6 +16,8 @@ from fasteners import InterProcessLock
 
 from compiler_gym.util.download import download
 from compiler_gym.util.runfiles_path import cache_path, site_data_path
+
+logger = logging.getLogger(__name__)
 
 # The data archive containing LLVM binaries and libraries.
 _LLVM_URL, _LLVM_SHA256 = {
@@ -37,6 +40,10 @@ _LLVM_UNPACKED_LOCATION: Optional[Path] = None
 
 def _download_llvm_files(destination: Path) -> Path:
     """Download and unpack the LLVM data pack."""
+    logger.warning(
+        "Installing the CompilerGym LLVM environment runtime. This may take a few moments ..."
+    )
+
     # Tidy up an incomplete unpack.
     shutil.rmtree(destination, ignore_errors=True)
 

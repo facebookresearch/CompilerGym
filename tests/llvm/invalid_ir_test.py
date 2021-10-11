@@ -22,10 +22,8 @@ def test_reset_invalid_ir(env: LlvmEnv):
     """Test that setting the $CXX to an invalid binary raises an error."""
     benchmark = llvm.make_benchmark(INVALID_IR_PATH)
 
-    with pytest.raises(BenchmarkInitError) as e_ctx:
+    with pytest.raises(BenchmarkInitError, match="Failed to compute .text size cost"):
         env.reset(benchmark=benchmark)
-
-    assert "Failed to compute .text size cost" in str(e_ctx.value)
 
 
 if __name__ == "__main__":

@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 import io
+import logging
 import shutil
 import subprocess
 import tarfile
@@ -18,6 +19,8 @@ from compiler_gym.envs.llvm.llvm_benchmark import ClangInvocation
 from compiler_gym.util.download import download
 from compiler_gym.util.filesystem import atomic_file_write
 from compiler_gym.util.truncate import truncate
+
+logger = logging.getLogger(__name__)
 
 _CLGEN_INSTALL_LOCK = Lock()
 
@@ -93,7 +96,7 @@ class CLgenDataset(TarDatasetWithManifest):
 
             # Download the libclc headers.
             shutil.rmtree(self.libclc_dir, ignore_errors=True)
-            self.logger.info("Downloading OpenCL headers")
+            logger.info("Downloading OpenCL headers")
             tar_data = io.BytesIO(
                 download(
                     "https://dl.fbaipublicfiles.com/compiler_gym/libclc-v0.tar.bz2",
@@ -148,7 +151,7 @@ class CLgenDataset(TarDatasetWithManifest):
                         "-w",  # No warnings.
                     ],
                 ).command(outpath=tmp_bc_path)
-                self.logger.debug("Exec %s", compile_command)
+                logger.debug("Exec %s", compile_command)
                 clang = subprocess.Popen(
                     compile_command,
                     stdin=subprocess.PIPE,

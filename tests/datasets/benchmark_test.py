@@ -294,11 +294,8 @@ def test_benchmark_from_file(tmpwd: Path):
 
 def test_benchmark_from_file_not_found(tmpwd: Path):
     path = tmpwd / "foo.txt"
-    with pytest.raises(FileNotFoundError) as e_ctx:
+    with pytest.raises(FileNotFoundError, match=str(path)):
         Benchmark.from_file("benchmark://example-v0/foo", path)
-
-    # Use  endswith() because macOS can add a /private prefix to paths.
-    assert str(e_ctx.value).endswith(str(path))
 
 
 def test_dataset_equality_and_sorting():

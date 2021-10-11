@@ -20,6 +20,8 @@ from compiler_gym.third_party import llvm
 from compiler_gym.util.runfiles_path import transient_cache_path
 from compiler_gym.util.thread_pool import get_thread_pool_executor
 
+logger = logging.getLogger(__name__)
+
 
 def _communicate(process, input=None, timeout=None):
     """subprocess.communicate() which kills subprocess on timeout."""
@@ -31,6 +33,7 @@ def _communicate(process, input=None, timeout=None):
             process.kill()
         else:
             process.terminate()
+        process.communicate(timeout=timeout)  # Wait for shutdown to complete.
         raise
 
 
@@ -115,7 +118,7 @@ def get_system_includes() -> List[Path]:
         try:
             _SYSTEM_INCLUDES = list(get_compiler_includes(system_compiler))
         except OSError as e:
-            logging.warning("%s", e)
+            logger.warning("%s", e)
             _SYSTEM_INCLUDES = []
     return _SYSTEM_INCLUDES
 

@@ -147,13 +147,11 @@ def test_datasets_get_item_lookup_miss():
     da = MockDataset("benchmark://foo-v0")
     datasets = Datasets([da])
 
-    with pytest.raises(LookupError) as e_ctx:
+    with pytest.raises(LookupError, match=r"^Dataset not found: benchmark://bar-v0$"):
         datasets.dataset("benchmark://bar-v0")
-    assert str(e_ctx.value) == "Dataset not found: benchmark://bar-v0"
 
-    with pytest.raises(LookupError) as e_ctx:
+    with pytest.raises(LookupError, match=r"^Dataset not found: benchmark://bar-v0$"):
         _ = datasets["benchmark://bar-v0"]
-    assert str(e_ctx.value) == "Dataset not found: benchmark://bar-v0"
 
 
 def test_benchmark_lookup_by_uri():
