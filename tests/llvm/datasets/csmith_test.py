@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Tests for the Csmith dataset."""
+import sys
 from itertools import islice
 from pathlib import Path
 
@@ -62,6 +63,11 @@ def test_csmith_from_seed_retry_count_exceeded(csmith_dataset: CsmithDataset):
         csmith_dataset.benchmark_from_seed(seed=1, max_retries=3, retry_count=5)
 
 
+@pytest.mark.xfail(
+    sys.platform == "darwin",
+    strict=True,
+    reason="github.com/facebookresearch/CompilerGym/issues/459",
+)
 @flaky(rerun_filter=lambda err, *args: issubclass(err[0], ServiceError))
 def test_csmith_positive_runtimes(env: LlvmEnv, csmith_dataset: CsmithDataset):
     benchmark = next(csmith_dataset.benchmarks())
@@ -71,6 +77,11 @@ def test_csmith_positive_runtimes(env: LlvmEnv, csmith_dataset: CsmithDataset):
     assert np.all(np.greater(val, 0))
 
 
+@pytest.mark.xfail(
+    sys.platform == "darwin",
+    strict=True,
+    reason="github.com/facebookresearch/CompilerGym/issues/459",
+)
 @flaky(rerun_filter=lambda err, *args: issubclass(err[0], ServiceError))
 def test_csmith_positive_buildtimes(env: LlvmEnv, csmith_dataset: CsmithDataset):
     benchmark = next(csmith_dataset.benchmarks())

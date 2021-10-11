@@ -1202,6 +1202,11 @@ def test_object_text_size_observation_spaces(env: LlvmEnv):
     assert value == crc32_code_sizes[sys.platform][2]
 
 
+@pytest.mark.xfail(
+    sys.platform == "darwin",
+    strict=True,
+    reason="github.com/facebookresearch/CompilerGym/issues/459",
+)
 @flaky  # Runtimes can timeout
 def test_runtime_observation_space(env: LlvmEnv):
     env.reset("cbench-v1/crc32")
@@ -1226,6 +1231,11 @@ def test_runtime_observation_space(env: LlvmEnv):
     assert len(set(value)) > 1
 
 
+@pytest.mark.xfail(
+    sys.platform == "darwin",
+    strict=True,
+    reason="github.com/facebookresearch/CompilerGym/issues/459",
+)
 @flaky  # Runtimes can timeout
 def test_runtime_observation_space_different_observation_count(env: LlvmEnv):
     """Test setting a custom observation count for LLVM runtimes."""
@@ -1247,6 +1257,11 @@ def test_runtime_observation_space_different_observation_count(env: LlvmEnv):
     assert value.shape == (5,)
 
 
+@pytest.mark.xfail(
+    sys.platform == "darwin",
+    strict=True,
+    reason="github.com/facebookresearch/CompilerGym/issues/459",
+)
 @flaky  # Runtimes can timeout
 def test_runtime_observation_space_invalid_observation_count(env: LlvmEnv):
     """Test setting an invalid custom observation count for LLVM runtimes."""
@@ -1273,6 +1288,11 @@ def test_runtime_observation_space_not_runnable(env: LlvmEnv):
     assert space.space.contains(value)
 
 
+@pytest.mark.xfail(
+    sys.platform == "darwin",
+    strict=True,
+    reason="github.com/facebookresearch/CompilerGym/issues/459",
+)
 @flaky  # Build can timeout
 def test_buildtime_observation_space(env: LlvmEnv):
     env.reset("cbench-v1/crc32")
