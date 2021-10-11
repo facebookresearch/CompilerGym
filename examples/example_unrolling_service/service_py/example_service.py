@@ -105,7 +105,6 @@ class UnrollingCompilationSession(CompilationSession):
         self._obj_path = os.path.join(self.working_dir, "{benchmark_name}.o")
         self._exe_path = os.path.join(self.working_dir, "{benchmark_name}")
         # FIXME: llvm.clang_path() lead to build errors
-        # TODO: throw exception if any command fails
         run_command(
             [
                 "clang",
@@ -117,7 +116,7 @@ class UnrollingCompilationSession(CompilationSession):
                 "-o",
                 self._llvm_path,
             ],
-            timeout=20,
+            timeout=30,
         )
 
     def apply_action(self, action: Action) -> Tuple[bool, Optional[ActionSpace], bool]:
@@ -146,8 +145,15 @@ class UnrollingCompilationSession(CompilationSession):
             return observation
         elif observation_space.name == "runtime":
             # TODO: use perf to measure time as it is more accurate
-            os.system(
-                f"{llvm.llc_path()} -filetype=obj {self._llvm_path} -o {self._obj_path}"
+            run_command(
+                [
+                    llvm.llc_path(),
+                    "-filetype=obj",
+                    self._llvm_path,
+                    "-o",
+                    self._obj_path,
+                ],
+                timeout=30,
             )
             os.system(f"clang {self._llvm_path} -O3 -o {self._exe_path}")
             # Running 5 times and taking the average
