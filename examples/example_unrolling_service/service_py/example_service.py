@@ -5,8 +5,11 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """An example CompilerGym service in python."""
+import filecmp
 import logging
 import os
+import shutil
+import tempfile
 from pathlib import Path
 from typing import Optional, Tuple
 from urllib.parse import urlparse
@@ -124,10 +127,20 @@ class UnrollingCompilationSession(CompilationSession):
         if action.action < 0 or action.action > len(self.action_spaces[0].action):
             raise ValueError("Out-of-range")
 
+        # make a tmp copy of the LLVM file to compare its contents after applying the action
+        llvm_path_before = tempfile.NamedTemporaryFile().name
+        shutil.copyfile(self._llvm_path, llvm_path_before)
+
         os.system(
             f"{llvm.opt_path()} {self._action_space.action[action.action]} {self._llvm_path} -S -o {self._llvm_path}"
         )
-        return False, None, False  # TODO: return correct values
+
+        end_of_session = False  # TODO: this needs investigation: for how long can we apply loop unrolling? e.g., detect if there are no more loops in the IR?
+        new_action_space = None
+        action_had_no_effect = filecmp.cmp(
+            llvm_path_before, self._llvm_path, shallow=False
+        )
+        return (end_of_session, new_action_space, action_had_no_effect)
 
     def get_observation(self, observation_space: ObservationSpace) -> Observation:
         logging.info("Computing observation from space %s", observation_space)
