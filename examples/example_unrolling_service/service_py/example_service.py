@@ -18,7 +18,6 @@ import numpy as np
 import utils
 
 import compiler_gym.third_party.llvm as llvm
-from compiler_gym.datasets import BenchmarkInitError
 from compiler_gym.service import CompilationSession
 from compiler_gym.service.proto import (
     Action,
@@ -188,7 +187,7 @@ class UnrollingCompilationSession(CompilationSession):
                 try:
                     exec_times.append(int(stdout))
                 except ValueError:
-                    raise BenchmarkInitError(
+                    raise ValueError(
                         f"Error in parsing execution time from output of command\n"
                         f"Please ensure that the source code of the benchmark measures execution time and prints to stdout\n"
                         f"Stdout of the program: {stdout}"
