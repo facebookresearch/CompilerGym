@@ -11,6 +11,12 @@ on:
     workflow_dispatch:
     schedule:
         - cron: 0 9 * * 1-5  # every weekday at 9am
+    # FIXME: Just for debugging:
+    push:
+        branches:
+            - development
+            - stable
+    pull_request:
 
 jobs:
     fuzz:
