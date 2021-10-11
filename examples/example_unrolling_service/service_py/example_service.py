@@ -15,7 +15,7 @@ from typing import Optional, Tuple
 from urllib.parse import urlparse
 
 import numpy as np
-import utils  # TODO: return back its contents to this file?
+import utils
 
 import compiler_gym.third_party.llvm as llvm
 from compiler_gym.service import CompilationSession
@@ -102,12 +102,11 @@ class UnrollingCompilationSession(CompilationSession):
         src_uri_p = urlparse(self._benchmark.program.uri)
         self._src_path = os.path.abspath(os.path.join(src_uri_p.netloc, src_uri_p.path))
         benchmark_name = os.path.basename(self._src_path).split(".")[0]  # noqa
-        # TODO: assert that the path exists
 
         self._llvm_path = os.path.join(self.working_dir, "{benchmark_name}.ll")
         self._obj_path = os.path.join(self.working_dir, "{benchmark_name}.o")
         self._exe_path = os.path.join(self.working_dir, "{benchmark_name}")
-        # FIXME: llvm.clang_path() lead to build errors
+        # FIXME: llvm.clang_path() lead to build errors if the source file includes a header file
         run_command(
             [
                 "clang",
