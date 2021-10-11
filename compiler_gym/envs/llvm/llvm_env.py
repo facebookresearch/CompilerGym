@@ -68,6 +68,7 @@ class LlvmEnv(CompilerEnv):
         # First perform a one-time download of LLVM binaries that are needed by
         # the LLVM service and are not included by the pip-installed package.
         download_llvm_files()
+        self.inst2vec = _INST2VEC_ENCODER
         super().__init__(
             *args,
             **kwargs,
@@ -150,14 +151,114 @@ class LlvmEnv(CompilerEnv):
                     platform_dependent=True,
                 ),
             ],
+            derived_observation_spaces=[
+                {
+                    "id": "Inst2vecPreprocessedText",
+                    "base_id": "Ir",
+                    "space": Sequence(
+                        name="Inst2vecPreprocessedText", size_range=(0, None), dtype=str
+                    ),
+                    "translate": self.inst2vec.preprocess,
+                    "default_value": "",
+                },
+                {
+                    "id": "Inst2vecEmbeddingIndices",
+                    "base_id": "Ir",
+                    "space": Sequence(
+                        name="Inst2vecEmbeddingIndices",
+                        size_range=(0, None),
+                        dtype=np.int32,
+                    ),
+                    "translate": lambda base_observation: self.inst2vec.encode(
+                        self.inst2vec.preprocess(base_observation)
+                    ),
+                    "default_value": np.array([self.inst2vec.vocab["!UNK"]]),
+                },
+                {
+                    "id": "Inst2vec",
+                    "base_id": "Ir",
+                    "space": Sequence(
+                        name="Inst2vec", size_range=(0, None), dtype=np.ndarray
+                    ),
+                    "translate": lambda base_observation: self.inst2vec.embed(
+                        self.inst2vec.encode(self.inst2vec.preprocess(base_observation))
+                    ),
+                    "default_value": np.vstack(
+                        [self.inst2vec.embeddings[self.inst2vec.vocab["!UNK"]]]
+                    ),
+                },
+                {
+                    "id": "InstCountDict",
+                    "base_id": "InstCount",
+                    "space": DictSpace(
+                        {
+                            f"{name}Count": Scalar(
+                                name=f"{name}Count", min=0, max=None, dtype=int
+                            )
+                            for name in INST_COUNT_FEATURE_NAMES
+                        },
+                        name="InstCountDict",
+                    ),
+                    "translate": lambda base_observation: {
+                        f"{name}Count": val
+                        for name, val in zip(INST_COUNT_FEATURE_NAMES, base_observation)
+                    },
+                },
+                {
+                    "id": "InstCountNorm",
+                    "base_id": "InstCount",
+                    "space": Box(
+                        name="InstCountNorm",
+                        low=0,
+                        high=1,
+                        shape=(len(INST_COUNT_FEATURE_NAMES) - 1,),
+                        dtype=np.float32,
+                    ),
+                    "translate": lambda base_observation: (
+                        base_observation[1:] / max(base_observation[0], 1)
+                    ).astype(np.float32),
+                },
+                {
+                    "id": "InstCountNormDict",
+                    "base_id": "InstCountNorm",
+                    "space": DictSpace(
+                        {
+                            f"{name}Density": Scalar(
+                                name=f"{name}Density", min=0, max=None, dtype=int
+                            )
+                            for name in INST_COUNT_FEATURE_NAMES[1:]
+                        },
+                        name="InstCountNormDict",
+                    ),
+                    "translate": lambda base_observation: {
+                        f"{name}Density": val
+                        for name, val in zip(
+                            INST_COUNT_FEATURE_NAMES[1:], base_observation
+                        )
+                    },
+                },
+                {
+                    "id": "AutophaseDict",
+                    "base_id": "Autophase",
+                    "space": DictSpace(
+                        {
+                            name: Scalar(name=name, min=0, max=None, dtype=int)
+                            for name in AUTOPHASE_FEATURE_NAMES
+                        },
+                        name="AutophaseDict",
+                    ),
+                    "translate": lambda base_observation: {
+                        name: val
+                        for name, val in zip(AUTOPHASE_FEATURE_NAMES, base_observation)
+                    },
+                },
+            ],
         )
 
         # Mutable runtime configuration options that must be set on every call
         # to reset.
         self._runtimes_per_observation_count: Optional[int] = None
         self._runtimes_warmup_per_observation_count: Optional[int] = None
-
-        self.inst2vec = _INST2VEC_ENCODER
 
         cpu_info_spaces = [
             Sequence(name="name", size_range=(0, None), dtype=str),
@@ -176,105 +277,6 @@ class LlvmEnv(CompilerEnv):
         self.observation.spaces["CpuInfo"].space = DictSpace(
             {space.name: space for space in cpu_info_spaces},
             name="CpuInfo",
-        )
-
-        self.observation.add_derived_space(
-            id="Inst2vecPreprocessedText",
-            base_id="Ir",
-            space=Sequence(
-                name="Inst2vecPreprocessedText", size_range=(0, None), dtype=str
-            ),
-            translate=self.inst2vec.preprocess,
-            default_value="",
-        )
-        self.observation.add_derived_space(
-            id="Inst2vecEmbeddingIndices",
-            base_id="Ir",
-            space=Sequence(
-                name="Inst2vecEmbeddingIndices", size_range=(0, None), dtype=np.int32
-            ),
-            translate=lambda base_observation: self.inst2vec.encode(
-                self.inst2vec.preprocess(base_observation)
-            ),
-            default_value=np.array([self.inst2vec.vocab["!UNK"]]),
-        )
-        self.observation.add_derived_space(
-            id="Inst2vec",
-            base_id="Ir",
-            space=Sequence(name="Inst2vec", size_range=(0, None), dtype=np.ndarray),
-            translate=lambda base_observation: self.inst2vec.embed(
-                self.inst2vec.encode(self.inst2vec.preprocess(base_observation))
-            ),
-            default_value=np.vstack(
-                [self.inst2vec.embeddings[self.inst2vec.vocab["!UNK"]]]
-            ),
-        )
-
-        self.observation.add_derived_space(
-            id="InstCountDict",
-            base_id="InstCount",
-            space=DictSpace(
-                {
-                    f"{name}Count": Scalar(
-                        name=f"{name}Count", min=0, max=None, dtype=int
-                    )
-                    for name in INST_COUNT_FEATURE_NAMES
-                },
-                name="InstCountDict",
-            ),
-            translate=lambda base_observation: {
-                f"{name}Count": val
-                for name, val in zip(INST_COUNT_FEATURE_NAMES, base_observation)
-            },
-        )
-
-        self.observation.add_derived_space(
-            id="InstCountNorm",
-            base_id="InstCount",
-            space=Box(
-                name="InstCountNorm",
-                low=0,
-                high=1,
-                shape=(len(INST_COUNT_FEATURE_NAMES) - 1,),
-                dtype=np.float32,
-            ),
-            translate=lambda base_observation: (
-                base_observation[1:] / max(base_observation[0], 1)
-            ).astype(np.float32),
-        )
-
-        self.observation.add_derived_space(
-            id="InstCountNormDict",
-            base_id="InstCountNorm",
-            space=DictSpace(
-                {
-                    f"{name}Density": Scalar(
-                        name=f"{name}Density", min=0, max=None, dtype=int
-                    )
-                    for name in INST_COUNT_FEATURE_NAMES[1:]
-                },
-                name="InstCountNormDict",
-            ),
-            translate=lambda base_observation: {
-                f"{name}Density": val
-                for name, val in zip(INST_COUNT_FEATURE_NAMES[1:], base_observation)
-            },
-        )
-
-        self.observation.add_derived_space(
-            id="AutophaseDict",
-            base_id="Autophase",
-            space=DictSpace(
-                {
-                    name: Scalar(name=name, min=0, max=None, dtype=int)
-                    for name in AUTOPHASE_FEATURE_NAMES
-                },
-                name="AutophaseDict",
-            ),
-            translate=lambda base_observation: {
-                name: val
-                for name, val in zip(AUTOPHASE_FEATURE_NAMES, base_observation)
-            },
         )
 
     def reset(self, *args, **kwargs):

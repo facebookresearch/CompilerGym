@@ -135,5 +135,18 @@ class ObservationView:
         base_space = self.spaces[base_id]
         self._add_space(base_space.make_derived_space(id=id, **kwargs))
 
+    # NOTE(github.com/facebookresearch/CompilerGym/issues/461): This method will
+    # be renamed to add_derived_space() once the current method with that name
+    # is removed.
+    def add_derived_space_internal(
+        self,
+        id: str,
+        base_id: str,
+        **kwargs,
+    ) -> None:
+        """Internal API for adding a new observation space."""
+        base_space = self.spaces[base_id]
+        self._add_space(base_space.make_derived_space(id=id, **kwargs))
+
     def __repr__(self):
         return f"ObservationView[{', '.join(sorted(self.spaces.keys()))}]"

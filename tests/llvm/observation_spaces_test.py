@@ -7,6 +7,7 @@ import os
 import sys
 from typing import Any, Dict, List
 
+import gym
 import networkx as nx
 import numpy as np
 import pytest
@@ -1397,6 +1398,20 @@ def test_add_derived_space(env: LlvmEnv):
     value = env.observation.IrLen()
     assert isinstance(value, list)
     assert value == [15]
+
+
+def test_derived_space_constructor():
+    """Test that derived observation space can be specified at construction
+    time.
+    """
+    with gym.make("llvm-v0") as env:
+        env.observation_space = "AutophaseDict"
+        a = env.reset()
+
+    with gym.make("llvm-v0", observation_space="AutophaseDict") as env:
+        b = env.reset()
+
+    assert a == b
 
 
 if __name__ == "__main__":

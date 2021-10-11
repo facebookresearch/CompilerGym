@@ -159,6 +159,7 @@ class CompilerEnv(gym.Env):
         observation_space: Optional[Union[str, ObservationSpaceSpec]] = None,
         reward_space: Optional[Union[str, Reward]] = None,
         action_space: Optional[str] = None,
+        derived_observation_spaces: Optional[List[Dict[str, Any]]] = None,
         connection_settings: Optional[ConnectionOpts] = None,
         service_connection: Optional[CompilerGymServiceConnection] = None,
         logger: Optional[logging.Logger] = None,
@@ -204,6 +205,10 @@ class CompilerEnv(gym.Env):
 
         :param action_space: The name of the action space to use. If not
             specified, the default action space for this compiler is used.
+
+        :param derived_observation_spaces: An optional list of arguments to be
+            passed to :meth:`env.observation.add_derived_space()
+            <compiler_gym.views.observation.Observation.add_derived_space>`.
 
         :param connection_settings: The settings used to establish a connection
             with the remote service.
@@ -298,6 +303,11 @@ class CompilerEnv(gym.Env):
             spaces=self.service.observation_spaces,
         )
         self.reward = self._reward_view_type(rewards, self.observation)
+
+        # Register any derived observation spaces now so that the observation
+        # space can be set below.
+        for derived_observation_space in derived_observation_spaces or []:
+            self.observation.add_derived_space_internal(**derived_observation_space)
 
         # Lazily evaluated version strings.
         self._versions: Optional[GetVersionReply] = None
