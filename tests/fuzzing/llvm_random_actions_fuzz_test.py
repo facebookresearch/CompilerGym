@@ -20,15 +20,20 @@ FUZZ_TIME_SECONDS = 2
 
 
 @pytest.mark.timeout(600)
-def test_fuzz(benchmark_name: str):
+def test_fuzz(observation_space: str, reward_space: str):
     """Run randomly selected actions on a benchmark until a minimum amount of time has elapsed."""
     with gym.make(
         "llvm-v0",
-        reward_space="IrInstructionCount",
-        observation_space="Autophase",
-        benchmark=benchmark_name,
+        reward_space=reward_space,
     ) as env:
-        env.reset()
+        # TODO(github.com/facebookresearch/CompilerGym/issues/461): Merge into
+        # constructor arguments.
+        env.observation_space = observation_space
+
+        benchmark = env.datasets["generator://llvm-stress-v0"].random_benchmark()
+        print(benchmark.uri)  # For debugging in case of failure.
+
+        env.reset(benchmark=benchmark)
 
         # Take a random step until a predetermined amount of time has elapsed.
         end_time = time() + FUZZ_TIME_SECONDS
@@ -42,10 +47,12 @@ def test_fuzz(benchmark_name: str):
                 assert isinstance(reward, float)
                 env = gym.make(
                     "llvm-v0",
-                    reward_space="IrInstructionCount",
-                    observation_space="Autophase",
-                    benchmark=benchmark_name,
+                    reward_space=reward_space,
+                    benchmark=benchmark,
                 )
+                # TODO(github.com/facebookresearch/CompilerGym/issues/461):
+                # Merge into constructor arguments.
+                env.observation_space = observation_space
                 env.reset()
             else:
                 assert isinstance(observation, np.ndarray)

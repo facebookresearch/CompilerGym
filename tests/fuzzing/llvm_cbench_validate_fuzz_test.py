@@ -23,6 +23,7 @@ def test_fuzz(env: LlvmEnv):
     """This test generates a random trajectory and validates the semantics."""
     benchmark = random.choice(VALIDATABLE_CBENCH_URIS)
     num_actions = random.randint(*RANDOM_TRAJECTORY_LENGTH_RANGE)
+    print(benchmark)
 
     while True:
         env.reset(benchmark=benchmark)
