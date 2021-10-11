@@ -155,7 +155,8 @@ class UnrollingCompilationSession(CompilationSession):
                 ],
                 timeout=30,
             )
-            os.system(f"clang {self._llvm_path} -O3 -o {self._exe_path}")
+
+            os.system(f"clang {self._obj_path} -O3 -o {self._exe_path}")
             # Running 5 times and taking the average
             with Timer() as exec_time:
                 os.system(
@@ -168,7 +169,7 @@ class UnrollingCompilationSession(CompilationSession):
             os.system(
                 f"{llvm.llc_path()} -filetype=obj {self._llvm_path} -o {self._obj_path}"
             )
-            os.system(f"clang {self._llvm_path} -Oz -o {self._exe_path}")
+            os.system(f"clang {self._obj_path} -Oz -o {self._exe_path}")
             binary_size = os.path.getsize(self._exe_path)
             return Observation(scalar_double=binary_size)
         else:
