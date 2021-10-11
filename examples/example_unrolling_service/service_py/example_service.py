@@ -11,7 +11,7 @@ from pathlib import Path
 from typing import Optional, Tuple
 from urllib.parse import urlparse
 
-import utils
+import utils  # TODO: return back its contents to this file?
 
 import compiler_gym.third_party.llvm as llvm
 from compiler_gym.service import CompilationSession
@@ -26,6 +26,7 @@ from compiler_gym.service.proto import (
     ScalarRangeList,
 )
 from compiler_gym.service.runtime import create_and_run_compiler_gym_service
+from compiler_gym.util.commands import run_command
 from compiler_gym.util.timer import Timer
 
 
@@ -105,8 +106,18 @@ class UnrollingCompilationSession(CompilationSession):
         self._exe_path = os.path.join(self.working_dir, "{benchmark_name}")
         # FIXME: llvm.clang_path() lead to build errors
         # TODO: throw exception if any command fails
-        os.system(
-            f"clang -Xclang -disable-O0-optnone -emit-llvm -S {self._src_path} -o {self._llvm_path}"
+        run_command(
+            [
+                "clang",
+                "-Xclang",
+                "-disable-O0-optnone",
+                "-emit-llvm",
+                "-S",
+                self._src_path,
+                "-o",
+                self._llvm_path,
+            ],
+            timeout=20,
         )
 
     def apply_action(self, action: Action) -> Tuple[bool, Optional[ActionSpace], bool]:

@@ -10,6 +10,7 @@ py_library(
     srcs = [
         "__init__.py",
         "capture_output.py",
+        "commands.py",
         "debug_util.py",
         "decorators.py",
         "download.py",
