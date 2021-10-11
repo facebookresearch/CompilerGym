@@ -4,6 +4,8 @@
 # LICENSE file in the root directory of this source tree.
 from typing import Callable, Dict, List
 
+from deprecated.sphinx import deprecated
+
 from compiler_gym.service.connection import ServiceError
 from compiler_gym.service.proto import ObservationSpace
 from compiler_gym.util.gym_type_hints import (
@@ -93,6 +95,13 @@ class ObservationView:
         # env.observation.FooBar().
         setattr(self, space.id, lambda: self[space.id])
 
+    @deprecated(
+        version="0.2.1",
+        reason=(
+            "Use the derived_observation_spaces argument to CompilerEnv constructor. "
+            "See <https://github.com/facebookresearch/CompilerGym/issues/461>."
+        ),
+    )
     def add_derived_space(
         self,
         id: str,
