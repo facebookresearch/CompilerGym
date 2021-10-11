@@ -129,10 +129,20 @@ class UnrollingCompilationSession(CompilationSession):
         llvm_path_before = tempfile.NamedTemporaryFile().name
         shutil.copyfile(self._llvm_path, llvm_path_before)
 
-        os.system(
-            f"{llvm.opt_path()} {self._action_space.action[action.action]} {self._llvm_path} -S -o {self._llvm_path}"
-        )
+        # separate arguments string to list of string, because `run_command` requires each argument to be passed as a separate item in a list
+        action_arguments_list = self._action_space.action[action.action].split()
 
+        run_command(
+            [
+                str(llvm.opt_path()),
+                *action_arguments_list,
+                self._llvm_path,
+                "-S",
+                "-o",
+                self._llvm_path,
+            ],
+            timeout=30,
+        )
         end_of_session = False  # TODO: this needs investigation: for how long can we apply loop unrolling? e.g., detect if there are no more loops in the IR?
         new_action_space = None
         action_had_no_effect = filecmp.cmp(
