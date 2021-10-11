@@ -31,8 +31,12 @@ jobs:
                   python-version: 3.9
 
             - name: Download Python wheel
-              uses: actions/download-artifact@v2
+              uses: dawidd6/action-download-artifact@v2
               with:
+                  workflow: ci.yml
+                  workflow_conclusion: success
+                  branch: development
+                  event: push
                   name: linux-wheel
 
             - name: Install wheel
