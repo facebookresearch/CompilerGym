@@ -121,7 +121,11 @@ class UnrollingCompilationSession(CompilationSession):
         )
 
     def apply_action(self, action: Action) -> Tuple[bool, Optional[ActionSpace], bool]:
-        logging.info("Applied action %d", action.action)
+        logging.info(
+            "Applied action %d, equivalent command-line arguments: '%s'",
+            action.action,
+            self._action_space.action[action.action],
+        )
         if action.action < 0 or action.action > len(self.action_spaces[0].action):
             raise ValueError("Out-of-range")
 
