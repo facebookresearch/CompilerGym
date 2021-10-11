@@ -144,7 +144,7 @@ class UnrollingCompilationSession(CompilationSession):
             observation.int64_list.value[:] = list(stats.values())
             return observation
         elif observation_space.name == "runtime":
-            # TODO: use perf to measure time as it is more accurate
+            # compile LLVM to object file
             run_command(
                 [
                     llvm.llc_path(),
@@ -156,7 +156,17 @@ class UnrollingCompilationSession(CompilationSession):
                 timeout=30,
             )
 
-            os.system(f"clang {self._obj_path} -O3 -o {self._exe_path}")
+            # build object file to binary
+            run_command(
+                [
+                    "clang",
+                    self._obj_path,
+                    "-O3",
+                    "-o",
+                    self._exe_path,
+                ],
+                timeout=30,
+            )
             # Running 5 times and taking the average
             with Timer() as exec_time:
                 os.system(
@@ -165,11 +175,29 @@ class UnrollingCompilationSession(CompilationSession):
             exec_time = exec_time.time / 5
             return Observation(scalar_double=exec_time)
         elif observation_space.name == "size":
-            # TODO: refactor code so that you don't redo code compilation here?
-            os.system(
-                f"{llvm.llc_path()} -filetype=obj {self._llvm_path} -o {self._obj_path}"
+            # compile LLVM to object file
+            run_command(
+                [
+                    llvm.llc_path(),
+                    "-filetype=obj",
+                    self._llvm_path,
+                    "-o",
+                    self._obj_path,
+                ],
+                timeout=30,
             )
-            os.system(f"clang {self._obj_path} -Oz -o {self._exe_path}")
+
+            # build object file to binary
+            run_command(
+                [
+                    "clang",
+                    self._obj_path,
+                    "-Oz",
+                    "-o",
+                    self._exe_path,
+                ],
+                timeout=30,
+            )
             binary_size = os.path.getsize(self._exe_path)
             return Observation(scalar_double=binary_size)
         else:
