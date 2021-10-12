@@ -5,7 +5,6 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """An example CompilerGym service in python."""
-import filecmp
 import logging
 import os
 import shutil
@@ -136,9 +135,10 @@ class UnrollingCompilationSession(CompilationSession):
         # separate arguments string to list of string, because `run_command` requires each argument to be passed as a separate item in a list
         action_arguments_list = self._action_space.action[action.action].split()
 
+        # apply action
         run_command(
             [
-                str(llvm.opt_path()),
+                llvm.opt_path(),
                 *action_arguments_list,
                 self._llvm_path,
                 "-S",
@@ -147,11 +147,15 @@ class UnrollingCompilationSession(CompilationSession):
             ],
             timeout=30,
         )
+
+        # compare the IR files to check if the action had an effect
+        diff_res = os.system(
+            f"{llvm.llvm_diff_path()} {llvm_path_before} {self._llvm_path} >/dev/null 2>&1"
+        )
+
         end_of_session = False  # TODO: this needs investigation: for how long can we apply loop unrolling? e.g., detect if there are no more loops in the IR?
         new_action_space = None
-        action_had_no_effect = filecmp.cmp(
-            llvm_path_before, self._llvm_path, shallow=False
-        )
+        action_had_no_effect = diff_res == 0
         return (end_of_session, new_action_space, action_had_no_effect)
 
     def get_observation(self, observation_space: ObservationSpace) -> Observation:
