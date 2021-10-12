@@ -6,6 +6,8 @@
 
 Usage: make_specs.py <service_binary> <output_path>.
 """
+import signal
+
 # TODO: As we add support for more compilers we could generalize this script
 # to work with other compiler services rather than hardcoding to LLVM.
 import sys
@@ -19,10 +21,23 @@ with open(
 ) as f:
     _FLAG_DESCRIPTIONS = [ln.rstrip() for ln in f.readlines()]
 
+# The maximum number of seconds to wait before timing out.
+TIMEOUT_SECONDS = 300
+
+
+def timeout_handler(signum, frame):
+    del signum  # unused
+    del frame  # unused
+    print(f"error: Timeout reached after {TIMEOUT_SECONDS:,d} seconds", file=sys.stderr)
+    sys.exit(1)
+
 
 def main(argv):
     assert len(argv) == 3, "Usage: make_specs.py <service_binary> <output_path>"
     service_path, output_path = argv[1:]
+
+    signal.signal(signal.SIGALRM, timeout_handler)
+    signal.alarm(TIMEOUT_SECONDS)
 
     with LlvmEnv(Path(service_path)) as env:
         with open(output_path, "w") as f:

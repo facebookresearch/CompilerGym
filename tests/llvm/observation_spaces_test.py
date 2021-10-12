@@ -7,6 +7,7 @@ import os
 import sys
 from typing import Any, Dict, List
 
+import gym
 import networkx as nx
 import numpy as np
 import pytest
@@ -1379,12 +1380,15 @@ def test_is_buildable_observation_space_not_buildable(env: LlvmEnv):
 
 def test_add_derived_space(env: LlvmEnv):
     env.reset()
-    env.observation.add_derived_space(
-        id="IrLen",
-        base_id="Ir",
-        space=Box(name="IrLen", low=0, high=float("inf"), shape=(1,), dtype=int),
-        translate=lambda base: [15],
-    )
+    with pytest.deprecated_call(
+        match="Use the derived_observation_spaces argument to CompilerEnv constructor."
+    ):
+        env.observation.add_derived_space(
+            id="IrLen",
+            base_id="Ir",
+            space=Box(name="IrLen", low=0, high=float("inf"), shape=(1,), dtype=int),
+            translate=lambda base: [15],
+        )
 
     value = env.observation["IrLen"]
     assert isinstance(value, list)
@@ -1394,6 +1398,20 @@ def test_add_derived_space(env: LlvmEnv):
     value = env.observation.IrLen()
     assert isinstance(value, list)
     assert value == [15]
+
+
+def test_derived_space_constructor():
+    """Test that derived observation space can be specified at construction
+    time.
+    """
+    with gym.make("llvm-v0") as env:
+        env.observation_space = "AutophaseDict"
+        a = env.reset()
+
+    with gym.make("llvm-v0", observation_space="AutophaseDict") as env:
+        b = env.reset()
+
+    assert a == b
 
 
 if __name__ == "__main__":
