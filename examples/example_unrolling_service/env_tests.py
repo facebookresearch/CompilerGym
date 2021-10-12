@@ -82,8 +82,12 @@ def test_action_space(env: CompilerEnv):
     """Test that the environment reports the service's action spaces."""
     assert env.action_spaces == [
         NamedDiscrete(
-            name="default",
-            items=["a", "b", "c"],
+            name="unrolling",
+            items=[
+                "-loop-unroll -unroll-count=2",
+                "-loop-unroll -unroll-count=4",
+                "-loop-unroll -unroll-count=8",
+            ],
         )
     ]
 
@@ -91,14 +95,17 @@ def test_action_space(env: CompilerEnv):
 def test_observation_spaces(env: CompilerEnv):
     """Test that the environment reports the service's observation spaces."""
     env.reset()
-    assert env.observation.spaces.keys() == {"ir", "features", "runtime"}
+    assert env.observation.spaces.keys() == {"ir", "features", "runtime", "size"}
     assert env.observation.spaces["ir"].space == Sequence(
         size_range=(0, None), dtype=str, opaque_data_format=""
     )
     assert env.observation.spaces["features"].space == Box(
-        shape=(3,), low=-100, high=100, dtype=int
+        shape=(3,), low=0, high=1e5, dtype=int
     )
     assert env.observation.spaces["runtime"].space == Scalar(
+        min=0, max=np.inf, dtype=float
+    )
+    assert env.observation.spaces["size"].space == Scalar(
         min=0, max=np.inf, dtype=float
     )
 
@@ -106,7 +113,7 @@ def test_observation_spaces(env: CompilerEnv):
 def test_reward_spaces(env: CompilerEnv):
     """Test that the environment reports the service's reward spaces."""
     env.reset()
-    assert env.reward.spaces.keys() == {"runtime"}
+    assert env.reward.spaces.keys() == {"runtime", "size"}
 
 
 def test_step_before_reset(env: CompilerEnv):
@@ -168,10 +175,10 @@ def test_default_ir_observation(env: CompilerEnv):
     """Test default observation space."""
     env.observation_space = "ir"
     observation = env.reset()
-    assert observation == "Hello, world!"
+    assert len(observation) > 0
 
     observation, reward, done, info = env.step(0)
-    assert observation == "Hello, world!"
+    assert len(observation) > 0
     assert reward is None
     assert not done
 
@@ -183,7 +190,7 @@ def test_default_features_observation(env: CompilerEnv):
     assert isinstance(observation, np.ndarray)
     assert observation.shape == (3,)
     assert observation.dtype == np.int64
-    assert observation.tolist() == [0, 0, 0]
+    assert all(obs >= 0 for obs in observation.tolist())
 
 
 def test_default_reward(env: CompilerEnv):
@@ -192,21 +199,21 @@ def test_default_reward(env: CompilerEnv):
     env.reset()
     observation, reward, done, info = env.step(0)
     assert observation is None
-    assert reward == 0
+    assert reward is not None
     assert not done
 
 
 def test_observations(env: CompilerEnv):
     """Test observation spaces."""
     env.reset()
-    assert env.observation["ir"] == "Hello, world!"
-    np.testing.assert_array_equal(env.observation["features"], [0, 0, 0])
+    assert len(env.observation["ir"]) > 0
+    np.testing.assert_array_less([-1, -1, -1], env.observation["features"])
 
 
 def test_rewards(env: CompilerEnv):
     """Test reward spaces."""
     env.reset()
-    assert env.reward["runtime"] == 0
+    assert env.reward["runtime"] is not None
 
 
 def test_benchmarks(env: CompilerEnv):
