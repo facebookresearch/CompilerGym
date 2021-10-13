@@ -5,10 +5,12 @@
 """Tests for the example CompilerGym service."""
 import subprocess
 from pathlib import Path
+from time import sleep
 
 import gym
 import numpy as np
 import pytest
+from flaky import flaky
 
 import examples.example_compiler_gym_service as example
 from compiler_gym.envs import CompilerEnv
@@ -223,6 +225,23 @@ def test_fork(env: CompilerEnv):
         assert other_env.actions == [0, 1]
     finally:
         other_env.close()
+
+
+@flaky  # Timeout-based test.
+def test_force_working_dir(bin: Path, tmpdir):
+    """Test that expected files are generated in the working directory."""
+    tmpdir = Path(tmpdir) / "subdir"
+    service = subprocess.Popen([str(bin), "--working_dir", str(tmpdir)])
+    try:
+        for _ in range(10):
+            sleep(0.5)
+            if (tmpdir / "pid.txt").is_file() and (tmpdir / "port.txt").is_file():
+                break
+        else:
+            pytest.fail(f"PID file not found in {tmpdir}: {list(tmpdir.iterdir())}")
+    finally:
+        service.terminate()
+        service.communicate(timeout=60)
 
 
 if __name__ == "__main__":
