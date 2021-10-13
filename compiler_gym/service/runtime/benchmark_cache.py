@@ -46,13 +46,6 @@ class BenchmarkCache:
 
     def __setitem__(self, uri: str, benchmark: Benchmark):
         """Add benchmark to cache."""
-        logger.debug(
-            "Caching benchmark %s. Cache size = %d bytes, %d items",
-            uri,
-            self.size_in_bytes,
-            self.size,
-        )
-
         # Remove any existing value to keep the cache size consistent.
         if uri in self._benchmarks:
             self._size_in_bytes -= self._benchmarks[uri].ByteSize()
@@ -79,6 +72,13 @@ class BenchmarkCache:
 
         self._benchmarks[uri] = benchmark
         self._size_in_bytes += size
+
+        logger.debug(
+            "Cached benchmark %s. Cache size = %d bytes, %d items",
+            uri,
+            self.size_in_bytes,
+            self.size,
+        )
 
     def evict_to_capacity(self, target_size_in_bytes: Optional[int] = None) -> None:
         """Evict benchmarks randomly to reduce the capacity below 50%."""
