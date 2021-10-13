@@ -3,9 +3,9 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """This module demonstrates how to """
+import subprocess
 from pathlib import Path
 from typing import Iterable
-import subprocess
 
 from compiler_gym.datasets import Benchmark, Dataset
 from compiler_gym.envs.llvm.llvm_benchmark import get_system_includes
@@ -39,24 +39,16 @@ class RuntimeReward(Reward):
             deterministic=False,
             platform_dependent=True,
         )
-        self.baseline_runtime = 1
+        self.baseline_runtime = 0
 
     def reset(self, benchmark: str, observation_view):
         del benchmark  # unused
         self.baseline_runtime = observation_view["runtime"]
 
     def update(self, action, observations, observation_view):
-        del action
-        del observation_view
-
-        if self.baseline_runtime is None:
-            self.baseline_runtime = observations[0]
-
-        # Here we are using Contextual Bandits: the number of steps the RL agent has to take before
-        # the environment terminates is one. In Contextual Bandits the learner tries
-        # to find a single best action in the current state. It involves learning to search for best actions and trial-and-error
-        reward = float(self.baseline_runtime - observations[0]) / self.baseline_runtime
-        return reward
+        del action  # unused
+        del observation_view  # unused
+        return float(self.baseline_runtime - observations[0]) / self.baseline_runtime
 
 
 class SizeReward(Reward):
@@ -73,24 +65,16 @@ class SizeReward(Reward):
             deterministic=False,
             platform_dependent=True,
         )
-        self.baseline_size = None
+        self.baseline_size = 0
 
     def reset(self, benchmark: str, observation_view):
         del benchmark  # unused
-        self.baseline_size = None
+        self.baseline_runtime = observation_view["size"]
 
     def update(self, action, observations, observation_view):
-        del action
-        del observation_view
-
-        if self.baseline_size is None:
-            self.baseline_size = observations[0]
-
-        # Here we are using Contextual Bandits: the number of steps the RL agent has to take before
-        # the environment terminates is one. In Contextual Bandits the learner tries
-        # to find a single best action in the current state. It involves learning to search for best actions and trial-and-error
-        reward = float(self.baseline_size - observations[0]) / self.baseline_size
-        return reward
+        del action  # unused
+        del observation_view  # unused
+        return float(self.baseline_size - observations[0]) / self.baseline_size
 
 
 class UnrollingDataset(Dataset):
