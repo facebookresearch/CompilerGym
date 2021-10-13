@@ -3,50 +3,31 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Tests for the unrolling CompilerGym service example."""
-import logging
 import subprocess
 from pathlib import Path
 
 import gym
 import numpy as np
 import pytest
-from gym.spaces import Box
 
 import compiler_gym
 import examples.example_unrolling_service as unrolling_service
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.service import SessionNotFound
-from compiler_gym.spaces import NamedDiscrete, Scalar, Sequence
-from compiler_gym.util.debug_util import set_debug_level
+from compiler_gym.spaces import Box, NamedDiscrete, Scalar, Sequence
 from tests.test_main import main
 
-# Given that the C++ and Python service implementations have identical
-# featuresets, we can parameterize the tests and run them against both backends.
-UNROLLING_ENVIRONMENTS = ["unrolling-py-v0"]
 
-
-@pytest.fixture(scope="function", params=UNROLLING_ENVIRONMENTS)
-def env(request) -> CompilerEnv:
+@pytest.fixture(scope="function")
+def env() -> CompilerEnv:
     """Text fixture that yields an environment."""
-    with gym.make(request.param) as env:
-        yield env
+    with gym.make("unrolling-py-v0") as env_:
+        yield env_
 
 
-@pytest.fixture(
-    scope="module",
-    params=[unrolling_service.UNROLLING_PY_SERVICE_BINARY],
-    ids=["unrolling-py-v0"],
-)
-def bin(request) -> Path:
-    yield request.param
-
-
-@pytest.mark.parametrize("env_id", UNROLLING_ENVIRONMENTS)
-def test_debug_level(env_id: str):
-    """Test that debug level is set."""
-    set_debug_level(3)
-    with gym.make(env_id) as env:
-        assert env.logger.level == logging.DEBUG
+@pytest.fixture(scope="module")
+def bin() -> Path:
+    return unrolling_service.UNROLLING_PY_SERVICE_BINARY
 
 
 def test_invalid_arguments(bin: Path):
@@ -97,16 +78,16 @@ def test_observation_spaces(env: CompilerEnv):
     env.reset()
     assert env.observation.spaces.keys() == {"ir", "features", "runtime", "size"}
     assert env.observation.spaces["ir"].space == Sequence(
-        size_range=(0, None), dtype=str, opaque_data_format=""
+        name="ir", size_range=(0, None), dtype=str, opaque_data_format=""
     )
     assert env.observation.spaces["features"].space == Box(
-        shape=(3,), low=0, high=1e5, dtype=int
+        name="features", shape=(3,), low=0, high=1e5, dtype=int
     )
     assert env.observation.spaces["runtime"].space == Scalar(
-        min=0, max=np.inf, dtype=float
+        name="runtime", min=0, max=np.inf, dtype=float
     )
     assert env.observation.spaces["size"].space == Scalar(
-        min=0, max=np.inf, dtype=float
+        name="size", min=0, max=np.inf, dtype=float
     )
 
 
@@ -157,9 +138,7 @@ def test_double_reset(env: CompilerEnv):
     """Test that reset() can be called twice."""
     env.reset()
     assert env.in_episode
-    env.step(env.action_space.sample())
     env.reset()
-    env.step(env.action_space.sample())
     assert env.in_episode
 
 
@@ -178,9 +157,9 @@ def test_default_ir_observation(env: CompilerEnv):
     assert len(observation) > 0
 
     observation, reward, done, info = env.step(0)
+    assert not done, info
     assert len(observation) > 0
     assert reward is None
-    assert not done
 
 
 def test_default_features_observation(env: CompilerEnv):
@@ -198,9 +177,9 @@ def test_default_reward(env: CompilerEnv):
     env.reward_space = "runtime"
     env.reset()
     observation, reward, done, info = env.step(0)
+    assert not done, info
     assert observation is None
     assert reward is not None
-    assert not done
 
 
 def test_observations(env: CompilerEnv):
