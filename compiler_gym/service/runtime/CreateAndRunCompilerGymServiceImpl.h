@@ -69,21 +69,16 @@ template <typename CompilationSessionType>
 
   // Set up the working and logging directories.
   boost::filesystem::path workingDirectory{FLAGS_working_dir};
-  bool createdWorkingDir = false;
   if (FLAGS_working_dir.empty()) {
     // If no working directory was set, create one.
     workingDirectory = boost::filesystem::unique_path(boost::filesystem::temp_directory_path() /
                                                       "compiler_gym-service-%%%%-%%%%");
-    boost::filesystem::create_directories(workingDirectory / "logs");
     FLAGS_working_dir = workingDirectory.string();
-    createdWorkingDir = true;
   }
 
+  // Create amd set the logging directory.
+  boost::filesystem::create_directories(workingDirectory / "logs");
   FLAGS_log_dir = workingDirectory.string() + "/logs";
-  if (!createdWorkingDir && !boost::filesystem::is_directory(FLAGS_log_dir)) {
-    std::cerr << "ERROR: logging directory '" << FLAGS_log_dir << "' not found";
-    exit(1);
-  }
 
   google::InitGoogleLogging(argv[0]);
 
