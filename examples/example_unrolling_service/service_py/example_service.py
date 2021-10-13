@@ -22,6 +22,8 @@ from compiler_gym.service.proto import (
     Action,
     ActionSpace,
     Benchmark,
+    ChoiceSpace,
+    NamedDiscreteSpace,
     Observation,
     ObservationSpace,
     ScalarLimit,
@@ -41,10 +43,17 @@ class UnrollingCompilationSession(CompilationSession):
     action_spaces = [
         ActionSpace(
             name="unrolling",
-            action=[
-                "-loop-unroll -unroll-count=2",
-                "-loop-unroll -unroll-count=4",
-                "-loop-unroll -unroll-count=8",
+            choice=[
+                ChoiceSpace(
+                    name="unroll_choice",
+                    named_discrete_space=NamedDiscreteSpace(
+                        value=[
+                            "-loop-unroll -unroll-count=2",
+                            "-loop-unroll -unroll-count=4",
+                            "-loop-unroll -unroll-count=8",
+                        ],
+                    ),
+                )
             ],
         )
     ]
@@ -120,26 +129,33 @@ class UnrollingCompilationSession(CompilationSession):
         )
 
     def apply_action(self, action: Action) -> Tuple[bool, Optional[ActionSpace], bool]:
-        logging.info(
-            "Applied action %d, equivalent command-line arguments: '%s'",
-            action.action,
-            self._action_space.action[action.action],
-        )
-        if action.action < 0 or action.action > len(self.action_spaces[0].action):
+        num_choices = len(self._action_space.choice[0].named_discrete_space.value)
+
+        if len(action.choice) != 1:
+            raise ValueError("Invalid choice count")
+
+        # This is the index into the action space's values ("a", "b", "c") that
+        # the user selected, e.g. 0 -> "a", 1 -> "b", 2 -> "c".
+        choice_index = action.choice[0].named_discrete_value_index
+        if choice_index < 0 or choice_index >= num_choices:
             raise ValueError("Out-of-range")
+
+        cmd = self._action_space.choice[0].named_discrete_space.value[choice_index]
+        logging.info(
+            "Applying action %d, equivalent command-line arguments: '%s'",
+            choice_index,
+            cmd,
+        )
 
         # make a tmp copy of the LLVM file to compare its contents after applying the action
         llvm_path_before = tempfile.NamedTemporaryFile().name
         shutil.copyfile(self._llvm_path, llvm_path_before)
 
-        # separate arguments string to list of string, because `run_command` requires each argument to be passed as a separate item in a list
-        action_arguments_list = self._action_space.action[action.action].split()
-
         # apply action
         run_command(
             [
                 llvm.opt_path(),
-                *action_arguments_list,
+                *cmd.split(),
                 self._llvm_path,
                 "-S",
                 "-o",
