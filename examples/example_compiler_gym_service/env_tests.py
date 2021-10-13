@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Tests for the example CompilerGym service."""
+import socket
 import subprocess
 from pathlib import Path
 from time import sleep
@@ -242,6 +243,58 @@ def test_force_working_dir(bin: Path, tmpdir):
     finally:
         service.terminate()
         service.communicate(timeout=60)
+
+
+def unsafe_select_unused_port() -> int:
+    """Try and select an unused port that on the local system.
+
+    There is nothing to prevent the port number returned by this function from
+    being claimed by another process or thread, so it is liable to race conditions
+    """
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(("", 0))
+    s.listen(1)
+    port = s.getsockname()[1]
+    s.close()
+    return port
+
+
+def port_is_free(port: int) -> bool:
+    """Determine if a port is in use"""
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.bind(("", port))
+        return True
+    except OSError:
+        return False
+    finally:
+        s.close()
+
+
+@flaky  # Unsafe free port allocation
+def test_force_port(bin: Path, tmpdir):
+    """Test that a forced --port value is respected."""
+    port = unsafe_select_unused_port()
+    assert port_is_free(port)  # Sanity check
+
+    tmpdir = Path(tmpdir)
+    p = subprocess.Popen([str(bin), "--port", str(port), "--working_dir", str(tmpdir)])
+    try:
+        for _ in range(10):
+            sleep(0.5)
+            if (tmpdir / "pid.txt").is_file() and (tmpdir / "port.txt").is_file():
+                break
+        else:
+            pytest.fail(f"PID file not found in {tmpdir}: {list(tmpdir.iterdir())}")
+
+        with open(tmpdir / "port.txt") as f:
+            actual_port = int(f.read())
+
+        assert actual_port == port
+        assert not port_is_free(actual_port)
+    finally:
+        p.terminate()
+        p.communicate(timeout=60)
 
 
 if __name__ == "__main__":
