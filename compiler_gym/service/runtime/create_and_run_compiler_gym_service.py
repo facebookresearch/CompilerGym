@@ -106,7 +106,9 @@ def create_and_run_compiler_gym_service(
         compiler_gym_service_pb2_grpc.add_CompilerGymServiceServicer_to_server(
             service, server
         )
-        port = server.add_insecure_port("0.0.0.0:0")
+
+        address = f"0.0.0.0:{FLAGS.port}" if FLAGS.port else "0.0.0.0:0"
+        port = server.add_insecure_port(address)
 
         with atomic_file_write(working_dir / "port.txt", fileobj=True, mode="w") as f:
             f.write(str(port))
