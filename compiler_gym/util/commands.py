@@ -40,4 +40,5 @@ def communicate(process, input=None, timeout=None):
             process.kill()
         else:
             process.terminate()
+        process.communicate(timeout=timeout)  # Wait for shutdown to complete.
         raise
