@@ -11,7 +11,6 @@ import shutil
 import tempfile
 from pathlib import Path
 from typing import Optional, Tuple
-from urllib.parse import urlparse
 
 import numpy as np
 import utils
@@ -106,17 +105,24 @@ class UnrollingCompilationSession(CompilationSession):
         self._benchmark = benchmark
         self._action_space = action_space
 
-        src_uri_p = urlparse(self._benchmark.program.uri)
-        self._src_path = os.path.abspath(os.path.join(src_uri_p.netloc, src_uri_p.path))
-        benchmark_name = os.path.basename(self._src_path).split(".")[0]  # noqa
+        # Resolve the paths to LLVM binaries once now.
+        self._clang = str(llvm.clang_path())
+        self._llc = str(llvm.llc_path())
+        self._llvm_diff = str(llvm.llvm_diff_path())
+        self._opt = str(llvm.opt_path())
 
-        self._llvm_path = os.path.join(self.working_dir, f"{benchmark_name}.ll")
-        self._obj_path = os.path.join(self.working_dir, f"{benchmark_name}.o")
-        self._exe_path = os.path.join(self.working_dir, f"{benchmark_name}")
-        # FIXME: llvm.clang_path() lead to build errors if the source file includes a header file
+        # Dump the benchmark source to disk.
+        self._src_path = str(self.working_dir / "benchmark.c")
+        with open(self.working_dir / "benchmark.c", "wb") as f:
+            f.write(benchmark.program.contents)
+
+        self._llvm_path = str(self.working_dir / "benchmark.ll")
+        self._obj_path = str(self.working_dir / "benchmark.o")
+        self._exe_path = str(self.working_dir / "benchmark.exe")
+
         run_command(
             [
-                "clang",
+                self._clang,
                 "-Xclang",
                 "-disable-O0-optnone",
                 "-emit-llvm",
@@ -154,7 +160,7 @@ class UnrollingCompilationSession(CompilationSession):
         # apply action
         run_command(
             [
-                llvm.opt_path(),
+                self._opt,
                 *cmd.split(),
                 self._llvm_path,
                 "-S",
@@ -189,7 +195,7 @@ class UnrollingCompilationSession(CompilationSession):
             # compile LLVM to object file
             run_command(
                 [
-                    llvm.llc_path(),
+                    self._llc,
                     "-filetype=obj",
                     self._llvm_path,
                     "-o",
@@ -233,7 +239,7 @@ class UnrollingCompilationSession(CompilationSession):
             # compile LLVM to object file
             run_command(
                 [
-                    llvm.llc_path(),
+                    self._llc,
                     "-filetype=obj",
                     self._llvm_path,
                     "-o",
