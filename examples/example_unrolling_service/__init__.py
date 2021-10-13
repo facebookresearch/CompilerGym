@@ -3,17 +3,25 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """This module demonstrates how to """
-import os
 from pathlib import Path
 from typing import Iterable
+import subprocess
 
 from compiler_gym.datasets import Benchmark, Dataset
+from compiler_gym.envs.llvm.llvm_benchmark import get_system_includes
 from compiler_gym.spaces import Reward
+from compiler_gym.third_party import llvm
 from compiler_gym.util.registration import register
 from compiler_gym.util.runfiles_path import runfiles_path, site_data_path
 
 UNROLLING_PY_SERVICE_BINARY: Path = runfiles_path(
     "examples/example_unrolling_service/service_py/example-unrolling-service-py"
+)
+
+BENCHMARKS_PATH: Path = runfiles_path("examples/example_unrolling_service/benchmarks")
+
+NEURO_VECTORIZER_HEADER: Path = runfiles_path(
+    "compiler_gym/third_party/neuro-vectorizer/header.h"
 )
 
 
@@ -95,17 +103,39 @@ class UnrollingDataset(Dataset):
                 "example_dataset"
             ),  # TODO: what should we set this to? we are not using it
         )
-        benchmarks_dir_path = os.path.join(os.path.dirname(__file__), "benchmarks")
+
         self._benchmarks = {
-            "benchmark://unrolling-v0/offsets1": Benchmark.from_file(
+            "benchmark://unrolling-v0/offsets1": Benchmark.from_file_contents(
                 "benchmark://unrolling-v0/offsets1",
-                os.path.join(benchmarks_dir_path, "offsets1.c"),
+                self.preprocess(BENCHMARKS_PATH / "offsets1.c"),
             ),
-            "benchmark://unrolling-v0/conv2d": Benchmark.from_file(
+            "benchmark://unrolling-v0/conv2d": Benchmark.from_file_contents(
                 "benchmark://unrolling-v0/conv2d",
-                os.path.join(benchmarks_dir_path, "conv2d.c"),
+                self.preprocess(BENCHMARKS_PATH / "conv2d.c"),
             ),
         }
+
+    @staticmethod
+    def preprocess(src: Path) -> bytes:
+        """Front a C source through the compiler frontend."""
+        # TODO(github.com/facebookresearch/CompilerGym/issues/325): We can skip
+        # this pre-processing, or do it on the service side, once support for
+        # multi-file benchmarks lands.
+        cmd = [
+            str(llvm.clang_path()),
+            "-E",
+            "-o",
+            "-",
+            "-I",
+            str(NEURO_VECTORIZER_HEADER.parent),
+            src,
+        ]
+        for directory in get_system_includes():
+            cmd += ["-isystem", str(directory)]
+        return subprocess.check_output(
+            cmd,
+            timeout=300,
+        )
 
     def benchmark_uris(self) -> Iterable[str]:
         yield from self._benchmarks.keys()

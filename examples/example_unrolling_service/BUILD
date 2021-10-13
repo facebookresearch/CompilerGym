@@ -8,13 +8,12 @@ py_library(
     name = "example_unrolling_service",
     srcs = ["__init__.py"],
     data = [
-        "//examples/example_unrolling_service/benchmarks:conv2d.c",
-        "//examples/example_unrolling_service/benchmarks:header.h",
-        "//examples/example_unrolling_service/benchmarks:offsets1.c",
+        "//examples/example_unrolling_service/benchmarks",
         "//examples/example_unrolling_service/service_py:example-unrolling-service-py",
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//compiler_gym/envs/llvm",
         "//compiler_gym/util",
     ],
 )
