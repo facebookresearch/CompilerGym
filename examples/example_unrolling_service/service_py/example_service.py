@@ -186,14 +186,17 @@ class UnrollingCompilationSession(CompilationSession):
         new_action_space = None
         return (end_of_session, new_action_space, action_had_no_effect)
 
+    @property
+    def ir(self) -> str:
+        with open(self._llvm_path) as f:
+            return f.read()
+
     def get_observation(self, observation_space: ObservationSpace) -> Observation:
-        logging.info("Computing observation from space %s", observation_space)
+        logging.info("Computing observation from space %s", observation_space.name)
         if observation_space.name == "ir":
-            ir = open(self._llvm_path).read()
-            return Observation(string_value=ir)
+            return Observation(string_value=self.ir)
         elif observation_space.name == "features":
-            ir = open(self._llvm_path).read()
-            stats = utils.extract_statistics_from_ir(ir)
+            stats = utils.extract_statistics_from_ir(self.ir)
             observation = Observation()
             observation.int64_list.value[:] = list(stats.values())
             return observation
