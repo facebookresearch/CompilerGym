@@ -8,7 +8,7 @@
 import logging
 import os
 import shutil
-import tempfile
+import subprocess
 from pathlib import Path
 from typing import Optional, Tuple
 
@@ -117,6 +117,7 @@ class UnrollingCompilationSession(CompilationSession):
             f.write(benchmark.program.contents)
 
         self._llvm_path = str(self.working_dir / "benchmark.ll")
+        self._llvm_before_path = str(self.working_dir / "benchmark.previous.ll")
         self._obj_path = str(self.working_dir / "benchmark.o")
         self._exe_path = str(self.working_dir / "benchmark.exe")
 
@@ -153,9 +154,8 @@ class UnrollingCompilationSession(CompilationSession):
             cmd,
         )
 
-        # make a tmp copy of the LLVM file to compare its contents after applying the action
-        llvm_path_before = tempfile.NamedTemporaryFile().name
-        shutil.copyfile(self._llvm_path, llvm_path_before)
+        # make a copy of the LLVM file to compare its contents after applying the action
+        shutil.copyfile(self._llvm_path, self._llvm_before_path)
 
         # apply action
         run_command(
@@ -171,13 +171,19 @@ class UnrollingCompilationSession(CompilationSession):
         )
 
         # compare the IR files to check if the action had an effect
-        diff_res = os.system(
-            f"{llvm.llvm_diff_path()} {llvm_path_before} {self._llvm_path} >/dev/null 2>&1"
-        )
+        try:
+            subprocess.check_call(
+                [self._llvm_diff, self._llvm_before_path, self._llvm_path],
+                stdout=subprocess.DEVNULL,
+                stderr=subprocess.DEVNULL,
+                timeout=60,
+            )
+            action_had_no_effect = True
+        except subprocess.CalledProcessError:
+            action_had_no_effect = False
 
         end_of_session = False  # TODO: this needs investigation: for how long can we apply loop unrolling? e.g., detect if there are no more loops in the IR?
         new_action_space = None
-        action_had_no_effect = diff_res == 0
         return (end_of_session, new_action_space, action_had_no_effect)
 
     def get_observation(self, observation_space: ObservationSpace) -> Observation:
