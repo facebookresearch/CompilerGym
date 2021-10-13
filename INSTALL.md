@@ -18,7 +18,7 @@ On macOS the required dependencies can be installed using
 [homebrew](https://docs.brew.sh/Installation):
 
 ```sh
-brew install bazelisk buildifier hadolint prototool zlib
+brew install bazelisk buildifier clang-format hadolint prototool zlib
 export LDFLAGS="-L/usr/local/opt/zlib/lib"
 export CPPFLAGS="-I/usr/local/opt/zlib/include"
 export PKG_CONFIG_PATH="/usr/local/opt/zlib/lib/pkgconfig"
