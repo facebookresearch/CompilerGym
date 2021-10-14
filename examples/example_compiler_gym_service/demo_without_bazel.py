@@ -2,22 +2,28 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""This module defines and registers the example gym environments."""
+"""This script demonstrates how the Python example service without needing
+to use the bazel build system. Usage:
+
+    $ python example_compiler_gym_service/demo_without_bazel.py
+
+It is equivalent in behavior to the demo.py script in this directory.
+"""
+import logging
 from pathlib import Path
 from typing import Iterable
+
+import gym
 
 from compiler_gym.datasets import Benchmark, Dataset
 from compiler_gym.spaces import Reward
 from compiler_gym.util.registration import register
-from compiler_gym.util.runfiles_path import runfiles_path, site_data_path
+from compiler_gym.util.runfiles_path import site_data_path
 
-EXAMPLE_CC_SERVICE_BINARY: Path = runfiles_path(
-    "examples/example_compiler_gym_service/service_cc/compiler_gym-example-service-cc"
+EXAMPLE_PY_SERVICE_BINARY: Path = Path(
+    "example_compiler_gym_service/service_py/example_service.py"
 )
-
-EXAMPLE_PY_SERVICE_BINARY: Path = runfiles_path(
-    "examples/example_compiler_gym_service/service_py/compiler_gym-example-service-py"
-)
+assert EXAMPLE_PY_SERVICE_BINARY.is_file(), "Service script not found"
 
 
 class RuntimeReward(Reward):
@@ -79,20 +85,9 @@ class ExampleDataset(Dataset):
             raise LookupError("Unknown program name")
 
 
-# Register the example service on module import. After importing this module,
-# the example-v0 environment will be available to gym.make(...).
+# Register the environment for use with gym.make(...).
 register(
-    id="example-cc-v0",
-    entry_point="compiler_gym.envs:CompilerEnv",
-    kwargs={
-        "service": EXAMPLE_CC_SERVICE_BINARY,
-        "rewards": [RuntimeReward()],
-        "datasets": [ExampleDataset()],
-    },
-)
-
-register(
-    id="example-py-v0",
+    id="example-v0",
     entry_point="compiler_gym.envs:CompilerEnv",
     kwargs={
         "service": EXAMPLE_PY_SERVICE_BINARY,
@@ -100,3 +95,20 @@ register(
         "datasets": [ExampleDataset()],
     },
 )
+
+
+def main():
+    # Use debug verbosity to print out extra logging information.
+    logging.basicConfig(level=logging.DEBUG)
+
+    # Create the environment using the regular gym.make(...) interface.
+    with gym.make("example-v0") as env:
+        env.reset()
+        for _ in range(20):
+            observation, reward, done, info = env.step(env.action_space.sample())
+            if done:
+                env.reset()
+
+
+if __name__ == "__main__":
+    main()
