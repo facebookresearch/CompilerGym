@@ -99,9 +99,19 @@ def lli_path() -> Path:
     return download_llvm_files() / "bin/lli"
 
 
+def llc_path() -> Path:
+    """Return the path of llc."""
+    return download_llvm_files() / "bin/llc"
+
+
 def llvm_as_path() -> Path:
     """Return the path of llvm-as."""
     return download_llvm_files() / "bin/llvm-as"
+
+
+def llvm_dis_path() -> Path:
+    """Return the path of llvm-as."""
+    return download_llvm_files() / "bin/llvm-dis"
 
 
 def llvm_link_path() -> Path:
