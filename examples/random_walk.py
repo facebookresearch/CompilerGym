@@ -7,8 +7,8 @@
 Example usage:
 
     # Run a random walk on cBench example program using instruction count reward.
-    $ python3 examples/random_walk.py --env=llvm-v0 --step_min=100 --step_max=100 \
-      --benchmark=cbench-v1/dijkstra --reward=IrInstructionCount
+    $ python3 random_walk.py --env=llvm-v0 --step_min=100 --step_max=100 \
+          --benchmark=cbench-v1/dijkstra --reward=IrInstructionCount
 """
 import random
 
@@ -39,7 +39,7 @@ def run_random_walk(env: CompilerEnv, step_count: int) -> None:
         fewer steps will be performed if any of the actions lead the
         environment to end the episode.
     """
-    rewards, actions = [], []
+    rewards = []
 
     step_num = 0
     with Timer() as episode_time:
@@ -48,14 +48,13 @@ def run_random_walk(env: CompilerEnv, step_count: int) -> None:
             action_index = env.action_space.sample()
             with Timer() as step_time:
                 observation, reward, done, info = env.step(action_index)
-            print(f"\n=== Step {humanize.intcomma(step_num)} ===")
             print(
+                f"\n=== Step {humanize.intcomma(step_num)} ===\n"
                 f"Action:       {env.action_space.names[action_index]} "
-                f"(changed={not info.get('action_had_no_effect')})"
+                f"(changed={not info.get('action_had_no_effect')})\n"
+                f"Reward:       {reward}"
             )
             rewards.append(reward)
-            actions.append(env.action_space.names[action_index])
-            print(f"Reward:       {reward}")
             if env.observation_space:
                 print(f"Observation:\n{observation}")
             print(f"Step time:    {step_time}")
@@ -71,27 +70,18 @@ def run_random_walk(env: CompilerEnv, step_count: int) -> None:
 
     print(
         f"\nCompleted {emph(humanize.intcomma(step_num))} steps in {episode_time} "
-        f"({step_num / episode_time.time:.1f} steps / sec)."
-    )
-    print(f"Total reward: {sum(rewards)}")
-    print(
+        f"({step_num / episode_time.time:.1f} steps / sec).\n"
+        f"Total reward: {sum(rewards)}\n"
         f"Max reward:   {max(rewards)} ({reward_percentage(max(rewards), rewards)} "
         f"at step {humanize.intcomma(rewards.index(max(rewards)) + 1)})"
     )
-
-    def remove_no_change(rewards, actions):
-        return [a for (r, a) in zip(rewards, actions) if r != 0]
-
-    actions = remove_no_change(rewards, actions)
-    print("Effective actions from trajectory: " + ", ".join(actions))
 
 
 def main(argv):
     """Main entry point."""
     assert len(argv) == 1, f"Unrecognized flags: {argv[1:]}"
 
-    benchmark = benchmark_from_flags()
-    with env_from_flags(benchmark) as env:
+    with env_from_flags(benchmark=benchmark_from_flags()) as env:
         step_min = min(FLAGS.step_min, FLAGS.step_max)
         step_max = max(FLAGS.step_min, FLAGS.step_max)
         run_random_walk(env=env, step_count=random.randint(step_min, step_max))
