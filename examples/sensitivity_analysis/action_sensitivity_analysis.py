@@ -2,12 +2,11 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""Determine the typical reward delta of different actions using random trials.
+"""Estimate the immediate reward of different actions using random trials.
 
-This script estimates the change in reward that running a specific action has
-by running trials. A trial is a random episode that ends with the determined
-action. Reward delta is the amount that the reward signal changes from running
-that action: (reward_after - reward_before) / reward_before.
+This script estimates the immediate reward that running a specific action has by
+running trials. A trial is a random episode that ends with the determined
+action.
 
 Example Usage
 -------------
@@ -20,7 +19,7 @@ benchmark:
         --benchmark=cbench-v1/crc32 --num_trials=100 \
         --action=AddDiscriminatorsPass,AggressiveDcepass,AggressiveInstCombinerPass
 
-Evaluate the single-step reward delta of all actions on LLVM codesize:
+Evaluate the single-step immediate reward of all actions on LLVM codesize:
 
     $ bazel run -c opt //compiler_gym/bin:action_ensitivity_analysis -- \
         --env=llvm-v0 --reward=IrInstructionCountO3
@@ -81,7 +80,7 @@ def get_rewards(
     max_warmup_steps: int,
     max_attempts_multiplier: int = 5,
 ) -> SensitivityAnalysisResult:
-    """Run random trials to get a list of num_trials reward deltas."""
+    """Run random trials to get a list of num_trials immediate rewards."""
     rewards, runtimes = [], []
     benchmark = benchmark_from_flags()
     num_attempts = 0
@@ -109,24 +108,18 @@ def run_one_trial(
     env: CompilerEnv, reward_space: str, action: int, max_warmup_steps: int
 ) -> Optional[float]:
     """Run a random number of "warmup" steps in an environment, then compute
-    the reward delta of the given action.
+    the immediate reward of the given action.
 
-        :return: The ratio of reward improvement.
+    :return: An immediate reward.
     """
     num_warmup_steps = random.randint(0, max_warmup_steps)
-    for _ in range(num_warmup_steps):
-        _, _, done, _ = env.step(env.action_space.sample())
-        if done:
-            return None
-    # Force reward calculation.
-    init_reward = env.reward[reward_space]
-    assert init_reward is not None
-    _, _, done, _ = env.step(action)
+    warmup_actions = [env.action_space.sample() for _ in range(num_warmup_steps)]
+    env.reward_space = reward_space
+    _, _, done, _ = env.step(warmup_actions)
     if done:
         return None
-    reward_after = env.reward[reward_space]
-    assert reward_after is not None
-    return reward_after
+    _, (reward,), done, _ = env.step(action, rewards=[reward_space])
+    return None if done else reward
 
 
 def run_action_sensitivity_analysis(
@@ -139,7 +132,7 @@ def run_action_sensitivity_analysis(
     nproc: int = cpu_count(),
     max_attempts_multiplier: int = 5,
 ):
-    """Estimate the reward delta of a given list of actions."""
+    """Estimate the immediate reward of a given list of actions."""
     with env_from_flags() as env:
         action_names = env.action_space.names
 

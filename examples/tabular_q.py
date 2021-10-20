@@ -2,9 +2,9 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-
 """Simple compiler gym tabular q learning example.
-Usage python tabular_q.py --benchmark=<benchmark>
+
+Usage: python tabular_q.py --benchmark=<benchmark>
 
 Using selected features from Autophase observation space, given a specific training
 program as gym environment, find the best action sequence using online q learning.

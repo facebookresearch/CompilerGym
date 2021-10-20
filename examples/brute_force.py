@@ -9,14 +9,15 @@ length and evaluates them, logging the incremental rewards of each.
 
 Example usage:
 
-    $ $ python -m compiler_gym.bin.brute_force \
-       --env=llvm-ic-v0 --benchmark=cbench-v1/dijkstra \
-       --episode_length=10 --actions=-sroa,-mem2reg,-newgvn
-    Enumerating all episodes of 3 actions x 10 steps
-    Started 24 brute force workers for benchmark cbench-v1/dijkstra using reward IrInstructionCountOz.
-    === Running 59,049 trials ===
-    Runtime: 3 minutes. Progress: 100.00%. Best reward found: 101.1905%.
-    Ending jobs ... completed 59,049 of 59,049 trials (100.000%)
+    $ python brute_force.py --env=llvm-ic-v0 --benchmark=cbench-v1/dijkstra \
+          --episode_length=8 --brute_force_action_list=-sroa,-mem2reg,-newgvn
+
+    Enumerating all episodes of 3 actions x 8 steps
+    Started 24 brute force workers for benchmark benchmark://cbench-v1/dijkstra using reward IrInstructionCountOz.
+    === Running 6,561 trials ===
+    Runtime: 8 seconds. Progress: 100.00%. Best reward found: 0.8571428571428572.
+    Ending jobs ... I1014 12:04:51.671775 3245811 CreateAndRunCompilerGymServiceImpl.h:128] Service "/dev/shm/compiler_gym_cec/s/1014T120451-646797-5770" listening on 37505, PID = 3245811
+    completed 6,561 of 6,561 trials (100.000%), best sequence -mem2reg -mem2reg -sroa -sroa -mem2reg -sroa -sroa -newgvn
 
 Use --help to list the configurable options.
 """
@@ -306,8 +307,7 @@ def main(argv):
 
     with env_from_flags(benchmark) as env:
         env.reset()
-        benchmark = env.benchmark
-        sanitized_benchmark_uri = "/".join(benchmark.split("/")[-2:])
+        sanitized_benchmark_uri = "/".join(str(env.benchmark).split("/")[-2:])
     logs_dir = Path(
         FLAGS.output_dir or create_logging_dir(f"brute_force/{sanitized_benchmark_uri}")
     )

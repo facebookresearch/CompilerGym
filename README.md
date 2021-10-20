@@ -97,9 +97,9 @@ In Python, import `compiler_gym` to use the environments:
 >>> env.close()                              # closes the environment, freeing resources
 ```
 
-See the [documentation website](http://facebookresearch.github.io/CompilerGym/)
-for tutorials, further details, and API reference. See the [examples](/examples)
-directory for pytorch integration, agent implementations, etc.
+See the [examples](/examples) directory for agent implementations, environment
+extensions, and more. See the [documentation
+website](http://facebookresearch.github.io/CompilerGym/) for the API reference.
 
 
 ## Leaderboards

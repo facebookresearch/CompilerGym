@@ -2,13 +2,11 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""Determine the typical reward delta of a benchmark using random trials.
+"""Estimate the cumulative reward of random episodes on benchmarks.
 
-This script estimates the change in reward that running a random episode has
-on a benchmark by running trials. A trial is an episode in which a random
-number of random actions are performed. Reward delta is the amount that the
-reward signal changes from the initial to final action:
-(reward_end - reward_init) / reward_init.
+This script estimates the cumulative reward for a random episode on a benchmark
+by running trials. A trial is an episode in which a random number of random
+actions are performed and the total cumulative reward is recorded.
 
 Example Usage
 -------------
@@ -20,7 +18,7 @@ benchmark:
         --env=llvm-v0 --reward=IrInstructionCountO3 \
         --benchmark=cBench-crc32 --num_trials=50
 
-Evaluate the LLVM codesize reward delta on all benchmarks:
+Evaluate the LLVM codesize episode reward on all benchmarks:
 
     $ bazel run -c opt //compiler_gym/bin:benchmark_sensitivity_analysis -- \
         --env=llvm-v0 --reward=IrInstructionCountO3
@@ -49,7 +47,7 @@ from compiler_gym.util.timer import Timer
 flags.DEFINE_integer(
     "num_benchmark_sensitivity_trials",
     100,
-    "The number of trials to perform when estimating the reward delta of each benchmark. "
+    "The number of trials to perform when estimating the episode reward of each benchmark. "
     "A trial is a random episode of a benchmark. Increasing this number increases the "
     "number of trials performed, leading to a higher fidelity estimate of the reward "
     "potential for a benchmark.",
@@ -83,7 +81,7 @@ def get_rewards(
     max_steps: int,
     max_attempts_multiplier: int = 5,
 ) -> SensitivityAnalysisResult:
-    """Run random trials to get a list of num_trials reward deltas."""
+    """Run random trials to get a list of num_trials episode rewards."""
     rewards, runtimes = [], []
     num_attempts = 0
     while (
@@ -110,21 +108,18 @@ def get_rewards(
 def run_one_trial(
     env: CompilerEnv, reward_space: str, min_steps: int, max_steps: int
 ) -> Optional[float]:
-    """Run a random number of "warmup" steps in an environment, then compute
-    the reward delta of the given action.
+    """Run a random number of random steps in an environment and return the
+    cumulative reward.
 
-        :return: The ratio of reward improvement.
+    :return: A cumulative reward.
     """
     num_steps = random.randint(min_steps, max_steps)
-    init_reward = env.reward[reward_space]
-    assert init_reward is not None
-    for _ in range(num_steps):
-        _, _, done, _ = env.step(env.action_space.sample())
-        if done:
-            return None
-    reward_after = env.reward[reward_space]
-    assert reward_after is not None
-    return reward_after
+    warmup_actions = [env.action_space.sample() for _ in range(num_steps)]
+    env.reward_space = reward_space
+    _, _, done, _ = env.step(warmup_actions)
+    if done:
+        return None
+    return env.episode_reward
 
 
 def run_benchmark_sensitivity_analysis(
@@ -138,7 +133,7 @@ def run_benchmark_sensitivity_analysis(
     nproc: int = cpu_count(),
     max_attempts_multiplier: int = 5,
 ):
-    """Estimate the reward delta of a given list of benchmarks."""
+    """Estimate the cumulative reward of random walks on a list of benchmarks."""
     with ThreadPoolExecutor(max_workers=nproc) as executor:
         analysis_futures = [
             executor.submit(

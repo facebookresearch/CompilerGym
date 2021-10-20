@@ -57,6 +57,7 @@ class Environment {
     }
 
     StartSessionRequest startRequest;
+    startRequest.mutable_benchmark()->set_uri(benchmark_);
     StartSessionReply startReply;
     RETURN_IF_ERROR(service_.StartSession(nullptr, &startRequest, &startReply));
     sessionId_ = startReply.session_id();
@@ -138,8 +139,9 @@ Status runSearch(const fs::path& workingDir, std::vector<int>* bestActions, int6
 void runThread(std::vector<int>* bestActions, int64_t* bestCost) {
   const fs::path workingDir = fs::unique_path();
   fs::create_directories(workingDir);
-  if (!runSearch(workingDir, bestActions, bestCost).ok()) {
-    LOG(ERROR) << "Search failed";
+  const auto status = runSearch(workingDir, bestActions, bestCost);
+  if (!status.ok()) {
+    LOG(ERROR) << "ERROR " << status.error_code() << ": " << status.error_message();
   }
   fs::remove_all(workingDir);
 }

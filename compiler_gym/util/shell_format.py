@@ -28,3 +28,8 @@ def emph(stringable: Any) -> str:
 def plural(quantity: int, singular: str, plural: str) -> str:
     """Return the singular or plural word."""
     return singular if quantity == 1 else plural
+
+
+def indent(string: str, n=4) -> str:
+    """Indent a multi-line string by given number of spaces."""
+    return "\n".join(" " * n + x for x in str(string).split("\n"))
