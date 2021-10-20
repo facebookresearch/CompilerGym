@@ -514,12 +514,15 @@ class LlvmEnv(CompilerEnv):
 
         :type: int
         """
-        return int(self.send_param("llvm.get_runtimes_per_observation_count", ""))
+        return self._runtimes_per_observation_count or int(
+            self.send_param("llvm.get_runtimes_per_observation_count", "")
+        )
 
     @runtime_observation_count.setter
     def runtime_observation_count(self, n: int) -> None:
         self._runtimes_per_observation_count = n
-        self.send_param("llvm.set_runtimes_per_observation_count", str(n))
+        if self.in_episode:
+            self.send_param("llvm.set_runtimes_per_observation_count", str(n))
 
     @property
     def runtime_warmup_runs_count(self) -> int:
@@ -545,11 +548,22 @@ class LlvmEnv(CompilerEnv):
 
         :type: int
         """
-        return int(
+        return self._runtimes_warmup_per_observation_count or int(
             self.send_param("llvm.get_warmup_runs_count_per_runtime_observation", "")
         )
 
     @runtime_warmup_runs_count.setter
     def runtime_warmup_runs_count(self, n: int) -> None:
         self._runtimes_warmup_per_observation_count = n
-        self.send_param("llvm.set_warmup_runs_count_per_runtime_observation", str(n))
+        if self.in_episode:
+            self.send_param(
+                "llvm.set_warmup_runs_count_per_runtime_observation", str(n)
+            )
+
+    def fork(self):
+        fkd = super().fork()
+        if self.runtime_observation_count is not None:
+            fkd.runtime_observation_count = self.runtime_observation_count
+        if self.runtime_warmup_runs_count is not None:
+            fkd.runtime_warmup_runs_count = self.runtime_warmup_runs_count
+        return fkd

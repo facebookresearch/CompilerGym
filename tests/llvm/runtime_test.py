@@ -149,5 +149,47 @@ def test_invalid_runtime_count(env: LlvmEnv):
         env.runtime_observation_count = -1
 
 
+def test_runtime_observation_count_before_reset(env: LlvmEnv):
+    """Test setting property before reset() is called."""
+    env.runtime_observation_count = 10
+    assert env.runtime_observation_count == 10
+    env.reset()
+    assert env.runtime_observation_count == 10
+
+
+def test_runtime_warmup_runs_count_before_reset(env: LlvmEnv):
+    """Test setting property before reset() is called."""
+    env.runtime_warmup_runs_count = 10
+    assert env.runtime_warmup_runs_count == 10
+    env.reset()
+    assert env.runtime_warmup_runs_count == 10
+
+
+def test_runtime_observation_count_fork(env: LlvmEnv):
+    """Test that custom count properties propagate on fork()."""
+    env.runtime_observation_count = 2
+    env.runtime_warmup_runs_count = 1
+
+    with env.fork() as fkd:
+        assert fkd.runtime_observation_count == 2
+        assert fkd.runtime_warmup_runs_count == 1
+
+    env.reset()
+    with env.fork() as fkd:
+        assert fkd.runtime_observation_count == 2
+        assert fkd.runtime_warmup_runs_count == 1
+
+
+def test_default_runtime_observation_count_fork(env: LlvmEnv):
+    """Test that default property values propagate on fork()."""
+    env.reset()
+    rc = env.runtime_observation_count
+    wc = env.runtime_warmup_runs_count
+
+    with env.fork() as fkd:
+        assert fkd.runtime_observation_count == rc
+        assert fkd.runtime_warmup_runs_count == wc
+
+
 if __name__ == "__main__":
     main()
