@@ -8,31 +8,19 @@ question not answered here? File an issue on the `GitHub issue tracker
 .. contents:: Topics:
     :local:
 
-General
--------
-
-
 What can I do with this?
-~~~~~~~~~~~~~~~~~~~~~~~~
+------------------------
 
-This projects lets you control the decisions that a compiler makes when
-optimizing a program. Currently, it lets you control the selection and ordering
-of optimization passes for LLVM in order to minimize the size of the code.
-
-We wrote a small wrapper around the OpenAI gym environment which lets you step
-through the optimization of a program using a text user interface. Have a play
-around with it to better understand what is going on:
-
-::
-
-    $ python -m compiler_gym.bin.manual_env --env=llvm-v0
-
-Once you get the hang of things, try submitting your best algorithm to our
-`leaderboards <https://github.com/facebookresearch/CompilerGym#leaderboards>`_!
+CompilerGym lets you control the decisions that a compiler makes when optimizing
+a program. Currently, it lets you control the selection and ordering of
+optimization passes for LLVM, the command line flags for the GCC compiler, and
+the order of loop nests for CUDA. The goal is to steer the compiler towards
+producing the best compiled program, as determined by a reward signal that
+measures some property of the program such as its code size or execution time.
 
 
 Do I have to use reinforcement learning?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+----------------------------------------
 
 No. We think that the the gym provides a useful abstraction for sequential
 decision making. You may use any technique you wish to explore the optimization
@@ -40,7 +28,7 @@ space.
 
 
 What features are going to be added in the future?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+--------------------------------------------------
 
 See :ref:`roadmap <about:roadmap>`.
 
