@@ -1082,3 +1082,61 @@ transforms as a discrete space.
 +-----------------------------------+------------------------------------------------------------------------------+
 | `-mergereturn`                    | Unify function exit nodes                                                    |
 +-----------------------------------+------------------------------------------------------------------------------+
+
+
+FAQ
+---
+
+Is this really a sequential decision process?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Yes. Compilers frequently package individual transformations as "optimization
+passes" which are then applied in a sequential order. Usually this order is
+fixed (e.g. `real world example
+<https://github.com/llvm/llvm-project/blob/71a8e4e7d6b947c8b954ec0763ff7969b3879d7b/llvm/lib/Transforms/IPO/PassManagerBuilder.cpp#L517-L922>`_).
+The CompilerGym LLVM environment replaces that fixed order with a sequential
+decision process where any pass may be applied at any stage.
+
+
+When does the environment consider an episode “done”?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+The compiler itself doesn't have a signal for termination. Actions are like
+rewrite rules, it is up to the user to decide when no more improvement can be
+achieved from further rewrites. E.g. for simple random search we can use
+`"patience"
+<https://github.com/facebookresearch/CompilerGym/blob/8fa65c232d2bf6a7347af44565579c60775162ac/compiler_gym/bin/random_search.py#L33-L40>`_.
+The only exception is if the compiler crashes, or the code ends up in an
+unexpected state - we have to abort. This happens.
+
+
+How do I run this on my own program?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+By compiling your program to an unoptimized LLVM bitcode file. This can be done
+automatically for C/C++ programs using the :meth:`env.make_benchmark()
+<compiler_gym.envs.llvm.make_benchmark>` API, or you can do this yourself using
+clang:
+
+::
+
+    $ clang -emit-llvm -c -O0 -Xclang -disable-O0-optnone -Xclang -disable-llvm-passes myapp.c
+
+Then pass the path of the generated `.bc` file to the CompilerGym command-line
+tools using the `--benchmark` flag, e.g.
+
+::
+
+    $ bazel run -c opt //compiler_gym/bin:random_search -- \
+        --env=llvm-ic-v0 \
+        --benchmark=file:///$PWD/myapp.bc
+
+
+Should I always try different actions?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Some optimization actions may be called multiple times after other actions. An
+example of this is `dead code elimination
+<https://en.wikipedia.org/wiki/Dead_code_elimination>`_, which can be used to
+"clean up mess" generated from a previous action. So repeating the same action
+in different context can bring improvements.
