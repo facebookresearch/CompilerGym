@@ -24,7 +24,10 @@ Do I have to use reinforcement learning?
 
 No. We think that the the gym provides a useful abstraction for sequential
 decision making. You may use any technique you wish to explore the optimization
-space.
+space. Researchers have had success using search techniques, genetic algorithms,
+supervised and unsupervised machine learning, and deep reinforcement learning.
+Take a look at `this paper <https://chriscummins.cc/pub/2020-fdl.pdf>`_ for a
+brief introduction to the field.
 
 
 What features are going to be added in the future?
