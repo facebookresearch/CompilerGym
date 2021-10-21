@@ -6,11 +6,11 @@
  */
 
 a {
-	color: #ee4c2c;
+	color: #dc373c;
 }
 
 a:visited {
-	color: #ee4c2c;
+	color: #dc373c;
 }
 
 /* Logo and header */
@@ -18,7 +18,7 @@ div.wy-side-nav-search, .wy-nav-top {
 	background-color: #f3f4f7;
 }
 div.wy-side-nav-search a {
-	color: #ee4c2c;
+	color: #dc373c;
 }
 .wy-nav-top, .wy-nav-top a {
 	color: #6c6c6d;
@@ -39,7 +39,7 @@ div.wy-side-scroll a {
 	color: #6c6c6d;
 }
 .wy-menu-vertical li.current>a, .wy-menu-vertical li.on a {
-	color: #ee4c2c;
+	color: #dc373c;
 }
 .wy-menu-vertical a:hover {
 	background-color: #f3f4f7;

@@ -69,6 +69,7 @@ html_theme_options = {
     "analytics_id": "G-T95G5EVYXM",
     "collapse_navigation": True,
     "display_version": True,
+    "logo_only": True,
 }
 
 html_css_files = [
@@ -76,6 +77,8 @@ html_css_files = [
 ]
 
 html_static_path = ["_static"]
+
+html_logo = "_static/img/logo.png"
 
 # -- Breathe configuration -
 

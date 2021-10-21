@@ -1,13 +1,21 @@
-![CompilerGym](https://github.com/facebookresearch/CompilerGym/raw/development/docs/source/_static/img/logo.png)
+![CompilerGym](docs/source/_static/img/logo-padded.png)
 
 <p align="center">
-  <!-- PyPi Version -->
+  <!-- Getting started colab -->
+  <a href="https://colab.research.google.com/github/facebookresearch/CompilerGym/blob/stable/examples/getting-started.ipynb">
+      <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Colab" height="20">
+  </a>
+  <!-- Supported python versions list -->
   <a href="https://pypi.org/project/compiler-gym/">
-      <img src="https://badge.fury.io/py/compiler-gym.svg" alt="PyPI version" height="20">
+      <img src="https://img.shields.io/pypi/pyversions/compiler-gym" alt="Python versions" height="20">
   </a>
   <!-- Downloads counter -->
   <a href="https://pypi.org/project/compiler-gym/">
       <img src="https://pepy.tech/badge/compiler-gym" alt="PyPi Downloads" height="20">
+  </a>
+  <!-- PyPi Version -->
+  <a href="https://pypi.org/project/compiler-gym/">
+      <img src="https://badge.fury.io/py/compiler-gym.svg" alt="PyPI version" height="20">
   </a>
   <!-- license -->
   <a href="https://tldrlegal.com/license/mit-license">
@@ -16,10 +24,6 @@
   <!-- CI status -->
   <a href="https://github.com/facebookresearch/CompilerGym/actions?query=workflow%3ACI+branch%3Adevelopment">
       <img src="https://github.com/facebookresearch/CompilerGym/workflows/CI/badge.svg?branch=development" alt="CI status" height="20">
-  </a>
-  <!-- Getting started colab -->
-  <a href="https://colab.research.google.com/github/facebookresearch/CompilerGym/blob/stable/examples/getting-started.ipynb">
-      <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Colab" height="20">
   </a>
 </p>
 
