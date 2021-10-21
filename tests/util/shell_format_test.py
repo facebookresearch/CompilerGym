@@ -9,7 +9,7 @@ from tests.test_main import main
 
 def test_indent():
     assert fmt.indent("abc") == "    abc"
-    assert fmt.indent("abc", indent=2) == "  abc"
+    assert fmt.indent("abc", n=2) == "  abc"
     assert fmt.indent("abc\ndef") == "    abc\n    def"
 
 
