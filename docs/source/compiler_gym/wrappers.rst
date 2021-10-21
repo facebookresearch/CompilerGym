@@ -66,3 +66,11 @@ Datasets wrappers
 .. autoclass:: RandomOrderBenchmarks
 
     .. automethod:: __init__
+
+
+LLVM Environment wrappers
+-------------------------
+
+.. autoclass:: RuntimePointEstimateReward
+
+    .. automethod:: __init__

@@ -5,8 +5,6 @@
 """Unit tests for //compiler_gym/wrappers."""
 from compiler_gym.envs.llvm import LlvmEnv
 from compiler_gym.wrappers import TimeLimit
-
-# from gym.wrappers import TimeLimit
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
