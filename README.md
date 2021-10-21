@@ -1,4 +1,4 @@
-![CompilerGym](https://github.com/facebookresearch/CompilerGym/raw/development/docs/source/_static/img/logo.png)
+![CompilerGym](docs/source/_static/img/logo-padded.png)
 
 <p align="center">
   <!-- Getting started colab -->
