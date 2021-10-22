@@ -3,6 +3,8 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Unit tests for compiler_gym.wrappers.llvm."""
+import sys
+
 import numpy as np
 import pytest
 from flaky import flaky
@@ -52,6 +54,11 @@ def test_fork(env: LlvmEnv):
         assert fkd.reward_space_spec.id == "runtime"
 
 
+@pytest.mark.xfail(
+    sys.platform == "darwin",
+    strict=True,
+    reason="github.com/facebookresearch/CompilerGym/issues/459",
+)
 @pytest.mark.parametrize("runtime_count", [1, 3, 5])
 @pytest.mark.parametrize("warmup_count", [0, 1, 3])
 @pytest.mark.parametrize("estimator", [np.median, min])
