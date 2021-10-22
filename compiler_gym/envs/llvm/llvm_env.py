@@ -520,9 +520,11 @@ class LlvmEnv(CompilerEnv):
 
     @runtime_observation_count.setter
     def runtime_observation_count(self, n: int) -> None:
-        self._runtimes_per_observation_count = n
         if self.in_episode:
             self.send_param("llvm.set_runtimes_per_observation_count", str(n))
+        # NOTE(cummins): Keep this after the send_param() call because
+        # send_param() will raise an error if the valid is invalid.
+        self._runtimes_per_observation_count = n
 
     @property
     def runtime_warmup_runs_count(self) -> int:
@@ -554,11 +556,13 @@ class LlvmEnv(CompilerEnv):
 
     @runtime_warmup_runs_count.setter
     def runtime_warmup_runs_count(self, n: int) -> None:
-        self._runtimes_warmup_per_observation_count = n
         if self.in_episode:
             self.send_param(
                 "llvm.set_warmup_runs_count_per_runtime_observation", str(n)
             )
+        # NOTE(cummins): Keep this after the send_param() call because
+        # send_param() will raise an error if the valid is invalid.
+        self._runtimes_warmup_per_observation_count = n
 
     def fork(self):
         fkd = super().fork()
