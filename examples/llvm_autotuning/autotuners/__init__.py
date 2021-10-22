@@ -23,6 +23,19 @@ from compiler_gym.util.timer import Timer
 
 
 class Autotuner(BaseModel):
+    """This class represents an instance of an autotuning algorithm.
+
+    After instantiating from a config dict, instances of this class can be used
+    to tune CompilerEnv instances:
+
+        >>> autotuner = Autotuner(
+            algorithm="greedy",
+            optimization_target="codesize",
+            search_time_seconds=1800,
+        )
+        >>> env = compiler_gym.make("llvm-v0")
+        >>> autotuner(env)
+    """
 
     algorithm: str
     """The name of the autotuner algorithm."""

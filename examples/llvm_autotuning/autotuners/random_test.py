@@ -23,6 +23,6 @@ def test_autotune():
         assert result.benchmark == "benchmark://cbench-v1/crc32"
         assert result.walltime >= 3
         assert result.commandline == env.commandline()
-        assert env.episode_reward
+        assert env.episode_reward >= 0
         assert env.benchmark == "benchmark://cbench-v1/crc32"
         assert env.reward_space == "IrInstructionCount"

@@ -1,0 +1,4 @@
+---
+benchmarks:
+    - dataset: generator://csmith-v0
+      max_benchmarks: 50
