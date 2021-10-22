@@ -1,1 +1,4 @@
+nevergrad>=0.4.3
+opentuner>=0.8.5
+submitit>=1.2.0
 torch>=1.6.0

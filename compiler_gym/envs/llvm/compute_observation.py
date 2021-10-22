@@ -11,6 +11,7 @@ from typing import List
 import google.protobuf.text_format
 
 from compiler_gym.service.proto import Observation
+from compiler_gym.util.gym_type_hints import ObservationType
 from compiler_gym.util.runfiles_path import runfiles_path
 from compiler_gym.util.shell_format import plural
 from compiler_gym.views.observation_space_spec import ObservationSpaceSpec
@@ -35,7 +36,7 @@ def pascal_case_to_enum(pascal_case: str) -> str:
 
 def compute_observation(
     observation_space: ObservationSpaceSpec, bitcode: Path, timeout: float = 300
-):
+) -> ObservationType:
     """Compute an LLVM observation.
 
     This is a utility function that uses a standalone C++ binary to compute an
