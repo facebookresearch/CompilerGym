@@ -149,7 +149,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov PYTEST_ARGS="--ignore tests/llvm --ignore tests/gcc"
+              run: make install-test-cov PYTEST_ARGS="--ignore tests/llvm --ignore tests/gcc --ignore tests/loop_tool"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
