@@ -17,6 +17,11 @@ from tests.test_main import main
 pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
+@pytest.mark.xfail(
+    sys.platform == "darwin",
+    strict=True,
+    reason="github.com/facebookresearch/CompilerGym/issues/459",
+)
 def test_invalid_runtime_count(env: LlvmEnv):
     env = RuntimePointEstimateReward(env, runtime_count=-10)
     with pytest.raises(
@@ -25,6 +30,11 @@ def test_invalid_runtime_count(env: LlvmEnv):
         env.reset()
 
 
+@pytest.mark.xfail(
+    sys.platform == "darwin",
+    strict=True,
+    reason="github.com/facebookresearch/CompilerGym/issues/459",
+)
 def test_invalid_warmup_count(env: LlvmEnv):
     env = RuntimePointEstimateReward(env, warmup_count=-10)
     with pytest.raises(
@@ -48,6 +58,11 @@ def test_reward_range_not_runnable_benchmark(env: LlvmEnv):
         env.reset(benchmark="benchmark://npb-v0/1")
 
 
+@pytest.mark.xfail(
+    sys.platform == "darwin",
+    strict=True,
+    reason="github.com/facebookresearch/CompilerGym/issues/459",
+)
 def test_fork(env: LlvmEnv):
     env = RuntimePointEstimateReward(env)
     with env.fork() as fkd:
