@@ -4,6 +4,9 @@
 # LICENSE file in the root directory of this source tree.
 """Tests for LlvmEnv.fork()."""
 import subprocess
+import sys
+
+import pytest
 
 from compiler_gym.envs import LlvmEnv
 from compiler_gym.util.runfiles_path import runfiles_path
@@ -201,6 +204,10 @@ def test_fork_modified_ir_is_the_same(env: LlvmEnv):
         assert "\n".join(env.ir.split("\n")[1:]) == "\n".join(fkd.ir.split("\n")[1:])
 
 
+@pytest.mark.xfail(
+    sys.platform == "darwin",
+    reason="github.com/facebookresearch/CompilerGym/issues/459",
+)
 def test_fork_rewards(env: LlvmEnv, reward_space: str):
     """Test that rewards are equal after fork() is called."""
     env.reward_space = reward_space

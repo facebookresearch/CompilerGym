@@ -4,7 +4,9 @@
 # LICENSE file in the root directory of this source tree.
 """Smoke test for examples/example_compiler_gym_service/demo_without_bazel.py"""
 from example_compiler_gym_service.demo_without_bazel import main
+from flaky import flaky
 
 
+@flaky
 def test_demo_without_bazel():
     main()
