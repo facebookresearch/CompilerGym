@@ -8,7 +8,10 @@ load("@rules_cc//cc:defs.bzl", "cc_binary")
 
 cc_binary(
     name = "loop_unroller",
-    srcs = ["loop_unroller.cc"],
+    srcs = [
+        "IRCanonicalizer.h",
+        "loop_unroller.cc",
+    ],
     copts = [
         "-Wall",
         "-fdiagnostics-color=always",

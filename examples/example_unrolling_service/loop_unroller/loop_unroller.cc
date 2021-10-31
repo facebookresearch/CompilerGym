@@ -1,381 +1,633 @@
-//==============================================================================
-// Estimate best and worst case execution time of LLVM code.
-//
-// Hugh Leather hughleat@gmail.com 2020-06-30
-//==============================================================================
+#include <algorithm>
+#include <vector>
 
-#include <cassert>
-#include <fstream>
-#include <iostream>
-#include <limits>
-#include <queue>
-#include <unordered_map>
-
-#include "llvm/Analysis/TargetTransformInfo.h"
-#include "llvm/IR/CFG.h"
+#include "IRCanonicalizer.h"
+#include "llvm/ADT/SetVector.h"
+#include "llvm/ADT/SmallPtrSet.h"
+#include "llvm/ADT/SmallVector.h"
+#include "llvm/IR/BasicBlock.h"
+#include "llvm/IR/Function.h"
+#include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/InstIterator.h"
+#include "llvm/IR/Module.h"
+#include "llvm/IR/Verifier.h"
 #include "llvm/IRReader/IRReader.h"
 #include "llvm/Pass.h"
-#include "llvm/Passes/PassBuilder.h"
+#include "llvm/Support/CommandLine.h"
+#include "llvm/Support/FileSystem.h"
 #include "llvm/Support/SourceMgr.h"
-#include "llvm/Support/raw_ostream.h"
 
 using namespace llvm;
-using namespace std;
 
-//------------------------------------------------------------------------------
-// Command line options
-//------------------------------------------------------------------------------
-cl::OptionCategory bwcetCategory{"bwcet options"};
+char IRCanonicalizer::ID = 0;
 
-cl::list<std::string> inputFiles(cl::Positional, cl::desc{"<Modules to analyse>"},
-                                 cl::value_desc{"bitcode filename"}, cl::OneOrMore,
-                                 cl::cat{bwcetCategory});
+/// Entry method to the IRCanonicalizer.
+///
+/// \param M Module to canonicalize.
+bool IRCanonicalizer::runOnFunction(Function& F) {
+  nameFunctionArguments(F);
+  nameBasicBlocks(F);
 
-cl::opt<string> outputFilename("output", cl::desc("Specify output filename (default to std out)"),
-                               cl::value_desc("output filename"), cl::init("-"),
-                               cl::cat{bwcetCategory});
-cl::alias outputFilenameA("o", cl::desc("Alias for --output"), cl::aliasopt(outputFilename),
-                          cl::cat{bwcetCategory});
+  SmallVector<Instruction*, 16> Outputs = collectOutputInstructions(F);
 
-enum OutputFormat { TXT, JSON, CSV };
-cl::opt<OutputFormat> outputFormat("format", cl::desc("Choose output format"),
-                                   cl::values(clEnumVal(TXT, "Human readable format (default)"),
-                                              clEnumVal(JSON, "JSON format"),
-                                              clEnumVal(CSV, "CSV format")),
-                                   cl::init(TXT), cl::cat{bwcetCategory});
-cl::alias outputFormatA("f", cl::desc("Alias for --format"), cl::aliasopt(outputFormat),
-                        cl::cat{bwcetCategory});
+  if (!PreserveOrder)
+    reorderInstructions(Outputs);
 
-cl::opt<TargetTransformInfo::TargetCostKind> costKind(
-    "cost-kind", cl::desc("Target cost kind"), cl::init(TargetTransformInfo::TCK_RecipThroughput),
-    cl::values(clEnumValN(TargetTransformInfo::TCK_RecipThroughput, "throughput",
-                          "Reciprocal throughput (default)"),
-               clEnumValN(TargetTransformInfo::TCK_Latency, "latency", "Instruction latency"),
-               clEnumValN(TargetTransformInfo::TCK_CodeSize, "code-size", "Code size")),
-    cl::cat{bwcetCategory});
-cl::alias costKindA("k", cl::desc("Alias for --cost-kind"), cl::aliasopt(costKind),
-                    cl::cat{bwcetCategory});
+  nameInstructions(Outputs);
 
-//------------------------------------------------------------------------------
-// Determine if CFG is a DAG.
-//------------------------------------------------------------------------------
-// Colour for DFS
-enum Colour { WHITE, GREY, BLACK };
-// DFS
-bool isDAG(const BasicBlock* bb, unordered_map<const BasicBlock*, Colour>& colour) {
-  switch (colour[bb]) {
-    case BLACK:
-      return true;
-    case GREY:
-      return false;
-    case WHITE: {
-      colour[bb] = GREY;
-      for (const auto* succ : successors(bb)) {
-        if (!isDAG(succ, colour))
-          return false;
-      }
-      colour[bb] = BLACK;
-      return true;
+  for (auto& I : instructions(F)) {
+    if (!PreserveOrder) {
+      if (ReorderOperands && I.isCommutative())
+        reorderInstructionOperandsByNames(&I);
+
+      if (auto* PN = dyn_cast<PHINode>(&I))
+        reorderPHIIncomingValues(PN);
+    }
+
+    foldInstructionName(&I);
+  }
+
+  return true;
+}
+
+/// Numbers arguments.
+///
+/// \param F Function whose arguments will be renamed.
+void IRCanonicalizer::nameFunctionArguments(Function& F) {
+  int ArgumentCounter = 0;
+  for (auto& A : F.args()) {
+    if (RenameAll || A.getName().empty()) {
+      A.setName("a" + Twine(ArgumentCounter));
+      ++ArgumentCounter;
     }
   }
 }
-bool isDAG(const Function& f) {
-  unordered_map<const BasicBlock*, Colour> colour;
-  return isDAG(&f.getEntryBlock(), colour);
-}
 
-//------------------------------------------------------------------------------
-// Get min and max cost of functions and basic blocks
-//------------------------------------------------------------------------------
-TargetIRAnalysis tira;
-unique_ptr<TargetTransformInfoWrapperPass> ttiwp((TargetTransformInfoWrapperPass*)
-                                                     createTargetTransformInfoWrapperPass(tira));
-using CostT = double;
+/// Names basic blocks using a generated hash for each basic block in
+/// a function considering the opcode and the order of output instructions.
+///
+/// \param F Function containing basic blocks to rename.
+void IRCanonicalizer::nameBasicBlocks(Function& F) {
+  for (auto& B : F) {
+    // Initialize to a magic constant, so the state isn't zero.
+    uint64_t Hash = MagicHashConstant;
 
-CostT getCost(const BasicBlock& bb, const TargetTransformInfo& tti) {
-  CostT cost = 0;
-  for (const auto& insn : bb) {
-    cost += tti.getInstructionCost(&insn, costKind);
+    // Hash considering output instruction opcodes.
+    for (auto& I : B)
+      if (isOutput(&I))
+        Hash = hashing::detail::hash_16_bytes(Hash, I.getOpcode());
+
+    if (RenameAll || B.getName().empty()) {
+      // Name basic block. Substring hash to make diffs more readable.
+      B.setName("bb" + std::to_string(Hash).substr(0, 5));
+    }
   }
-  return cost;
 }
-CostT minCost(const Function& f, unordered_map<const BasicBlock*, CostT> bbCost) {
-  // Cost of best path (path with minimum cost)
-  CostT best = numeric_limits<CostT>::infinity();
-  // The exit block with the best path cost
-  const BasicBlock* bestBB = nullptr;
-  // Predecessors
-  unordered_map<const BasicBlock*, const BasicBlock*> pred;
-  // Map of costs into each vertex
-  unordered_map<const BasicBlock*, CostT> costIn;
-  // Priority queue
-  set<pair<CostT, const BasicBlock*>> q;
-  // Pointers into q - so we can change priority
-  unordered_map<const BasicBlock*, decltype(q.begin())> iter;
-  // Initialise cost
-  for (const BasicBlock& v : f.getBasicBlockList()) costIn[&v] = numeric_limits<CostT>::infinity();
-  auto start = &f.getEntryBlock();
-  costIn[start] = 0;
-  // Push into q (and remember iterator)
-  auto iti = q.insert({costIn[start], start});
-  iter[start] = iti.first;
-  // Do the search
-  while (!q.empty()) {
-    // Pop from the q
-    auto top = q.begin();
-    const BasicBlock* v = top->second;
-    CostT cIn = top->first;
-    q.erase(top);
-    iter.erase(v);
-    assert(cIn == costIn[v]);
 
-    // Get the cost out of this node
-    int cOut = cIn + bbCost[v];
-    // Count the successors as we process them
-    int numSuccs = 0;
-    // Process each successor
-    for (const auto* succ : successors(v)) {
-      numSuccs++;
-      // Update if the cost is better
-      if (cOut < costIn[succ]) {
-        // Set the new cost
-        costIn[succ] = cOut;
-        // Delete from the queue if already in there
-        if (iter.count(succ)) {
-          auto it = iter[succ];
-          q.erase(it);
+/// Names instructions graphically.
+/// This method is a wrapper for recursive nameInstruction().
+///
+/// \see nameInstruction()
+/// \param Outputs Vector of pointers to output instructions collected top-down.
+void IRCanonicalizer::nameInstructions(SmallVector<Instruction*, 16>& Outputs) {
+  // Keeping track of visited instructions while naming (even depth first) is
+  // necessary only to avoid infinite loops on PHI nodes.
+  SmallPtrSet<const Instruction*, 32> Visited;
+
+  for (auto& I : Outputs) nameInstruction(I, Visited);
+}
+
+/// Names instructions graphically (recursive) in accordance with the
+/// def-use tree, starting from the initial instructions (defs), finishing at
+/// the output (top-most user) instructions (depth-first).
+///
+/// \param I Instruction to be renamed.
+void IRCanonicalizer::nameInstruction(Instruction* I,
+                                      SmallPtrSet<const Instruction*, 32>& Visited) {
+  // Keeping track of visited instructions while naming (even depth first) is
+  // necessary only to avoid infinite loops on PHI nodes.
+  if (!Visited.count(I)) {
+    Visited.insert(I);
+
+    // Determine the type of instruction to name.
+    if (isInitialInstruction(I)) {
+      // This is an initial instruction.
+      nameAsInitialInstruction(I);
+    } else {
+      // This must be a regular instruction.
+      nameAsRegularInstruction(I, Visited);
+    }
+  }
+}
+
+/// Names instruction following the scheme:
+/// vl00000Callee(Operands)
+///
+/// Where 00000 is a hash calculated considering instruction's opcode and output
+/// footprint. Callee's name is only included when instruction's type is
+/// CallInst. In cases where instruction is commutative, operands list is also
+/// sorted.
+///
+/// Renames instruction only when RenameAll flag is raised or instruction is
+/// unnamed.
+///
+/// \see getOutputFootprint()
+/// \param I Instruction to be renamed.
+void IRCanonicalizer::nameAsInitialInstruction(Instruction* I) {
+  if (I->getType()->isVoidTy() || (!I->getName().empty() && !RenameAll))
+    return;
+
+  // Instruction operands for further sorting.
+  SmallVector<SmallString<64>, 4> Operands;
+
+  // Collect operands.
+  for (auto& OP : I->operands()) {
+    if (!isa<Function>(OP)) {
+      std::string TextRepresentation;
+      raw_string_ostream Stream(TextRepresentation);
+      OP->printAsOperand(Stream, false);
+      Operands.push_back(StringRef(Stream.str()));
+    }
+  }
+
+  if (I->isCommutative())
+    llvm::sort(Operands);
+
+  // Initialize to a magic constant, so the state isn't zero.
+  uint64_t Hash = MagicHashConstant;
+
+  // Consider instruction's opcode in the hash.
+  Hash = hashing::detail::hash_16_bytes(Hash, I->getOpcode());
+
+  SmallPtrSet<const Instruction*, 32> Visited;
+  // Get output footprint for I.
+  SetVector<int> OutputFootprint = getOutputFootprint(I, Visited);
+
+  // Consider output footprint in the hash.
+  for (const int& Output : OutputFootprint) Hash = hashing::detail::hash_16_bytes(Hash, Output);
+
+  // Base instruction name.
+  SmallString<256> Name;
+  Name.append("vl" + std::to_string(Hash).substr(0, 5));
+
+  // In case of CallInst, consider callee in the instruction name.
+  if (const auto* CI = dyn_cast<CallInst>(I)) {
+    Function* F = CI->getCalledFunction();
+
+    if (F != nullptr) {
+      Name.append(F->getName());
+    }
+  }
+
+  Name.append("(");
+  for (unsigned long i = 0; i < Operands.size(); ++i) {
+    Name.append(Operands[i]);
+
+    if (i < Operands.size() - 1)
+      Name.append(", ");
+  }
+  Name.append(")");
+
+  I->setName(Name);
+}
+
+/// Names instruction following the scheme:
+/// op00000Callee(Operands)
+///
+/// Where 00000 is a hash calculated considering instruction's opcode, its
+/// operands' opcodes and order. Callee's name is only included when
+/// instruction's type is CallInst. In cases where instruction is commutative,
+/// operand list is also sorted.
+///
+/// Names instructions recursively in accordance with the def-use tree,
+/// starting from the initial instructions (defs), finishing at
+/// the output (top-most user) instructions (depth-first).
+///
+/// Renames instruction only when RenameAll flag is raised or instruction is
+/// unnamed.
+///
+/// \see getOutputFootprint()
+/// \param I Instruction to be renamed.
+void IRCanonicalizer::nameAsRegularInstruction(Instruction* I,
+                                               SmallPtrSet<const Instruction*, 32>& Visited) {
+  // Instruction operands for further sorting.
+  SmallVector<SmallString<128>, 4> Operands;
+
+  // The name of a regular instruction depends
+  // on the names of its operands. Hence, all
+  // operands must be named first in the use-def
+  // walk.
+
+  // Collect operands.
+  for (auto& OP : I->operands()) {
+    if (auto* IOP = dyn_cast<Instruction>(OP)) {
+      // Walk down the use-def chain.
+      nameInstruction(IOP, Visited);
+      Operands.push_back(IOP->getName());
+    } else if (isa<Value>(OP) && !isa<Function>(OP)) {
+      // This must be an immediate value.
+      std::string TextRepresentation;
+      raw_string_ostream Stream(TextRepresentation);
+      OP->printAsOperand(Stream, false);
+      Operands.push_back(StringRef(Stream.str()));
+    }
+  }
+
+  if (I->isCommutative())
+    llvm::sort(Operands.begin(), Operands.end());
+
+  // Initialize to a magic constant, so the state isn't zero.
+  uint64_t Hash = MagicHashConstant;
+
+  // Consider instruction opcode in the hash.
+  Hash = hashing::detail::hash_16_bytes(Hash, I->getOpcode());
+
+  // Operand opcodes for further sorting (commutative).
+  SmallVector<int, 4> OperandsOpcodes;
+
+  // Collect operand opcodes for hashing.
+  for (auto& OP : I->operands())
+    if (auto* IOP = dyn_cast<Instruction>(OP))
+      OperandsOpcodes.push_back(IOP->getOpcode());
+
+  if (I->isCommutative())
+    llvm::sort(OperandsOpcodes.begin(), OperandsOpcodes.end());
+
+  // Consider operand opcodes in the hash.
+  for (const int Code : OperandsOpcodes) Hash = hashing::detail::hash_16_bytes(Hash, Code);
+
+  // Base instruction name.
+  SmallString<512> Name;
+  Name.append("op" + std::to_string(Hash).substr(0, 5));
+
+  // In case of CallInst, consider callee in the instruction name.
+  if (const auto* CI = dyn_cast<CallInst>(I))
+    if (const Function* F = CI->getCalledFunction())
+      Name.append(F->getName());
+
+  Name.append("(");
+  for (unsigned long i = 0; i < Operands.size(); ++i) {
+    Name.append(Operands[i]);
+
+    if (i < Operands.size() - 1)
+      Name.append(", ");
+  }
+  Name.append(")");
+
+  if ((I->getName().empty() || RenameAll) && !I->getType()->isVoidTy())
+    I->setName(Name);
+}
+
+/// Shortens instruction's name. This method removes called function name from
+/// the instruction name and substitutes the call chain with a corresponding
+/// list of operands.
+///
+/// Examples:
+/// op00000Callee(op00001Callee(...), vl00000Callee(1, 2), ...)  ->
+/// op00000(op00001, vl00000, ...) vl00000Callee(1, 2)  ->  vl00000(1, 2)
+///
+/// This method omits output instructions and pre-output (instructions directly
+/// used by an output instruction) instructions (by default). By default it also
+/// does not affect user named instructions.
+///
+/// \param I Instruction whose name will be folded.
+void IRCanonicalizer::foldInstructionName(Instruction* I) {
+  // If this flag is raised, fold all regular
+  // instructions (including pre-outputs).
+  if (!FoldPreoutputs) {
+    // Don't fold if one of the users is an output instruction.
+    for (auto* U : I->users())
+      if (auto* IU = dyn_cast<Instruction>(U))
+        if (isOutput(IU))
+          return;
+  }
+
+  // Don't fold if it is an output instruction or has no op prefix.
+  if (isOutput(I) || I->getName().substr(0, 2) != "op")
+    return;
+
+  // Instruction operands.
+  SmallVector<SmallString<64>, 4> Operands;
+
+  for (auto& OP : I->operands()) {
+    if (const Instruction* IOP = dyn_cast<Instruction>(OP)) {
+      bool HasCanonicalName =
+          I->getName().substr(0, 2) == "op" || I->getName().substr(0, 2) == "vl";
+
+      Operands.push_back(HasCanonicalName ? IOP->getName().substr(0, 7) : IOP->getName());
+    }
+  }
+
+  if (I->isCommutative())
+    llvm::sort(Operands.begin(), Operands.end());
+
+  SmallString<256> Name;
+  Name.append(I->getName().substr(0, 7));
+
+  Name.append("(");
+  for (unsigned long i = 0; i < Operands.size(); ++i) {
+    Name.append(Operands[i]);
+
+    if (i < Operands.size() - 1)
+      Name.append(", ");
+  }
+  Name.append(")");
+
+  I->setName(Name);
+}
+
+/// Reorders instructions by walking up the tree from each operand of an output
+/// instruction and reducing the def-use distance.
+/// This method assumes that output instructions were collected top-down,
+/// otherwise the def-use chain may be broken.
+/// This method is a wrapper for recursive reorderInstruction().
+///
+/// \see reorderInstruction()
+/// \param Outputs Vector of pointers to output instructions collected top-down.
+void IRCanonicalizer::reorderInstructions(SmallVector<Instruction*, 16>& Outputs) {
+  // This method assumes output instructions were collected top-down,
+  // otherwise the def-use chain may be broken.
+
+  SmallPtrSet<const Instruction*, 32> Visited;
+
+  // Walk up the tree.
+  for (auto& I : Outputs)
+    for (auto& OP : I->operands())
+      if (auto* IOP = dyn_cast<Instruction>(OP))
+        reorderInstruction(IOP, I, Visited);
+}
+
+/// Reduces def-use distance or places instruction at the end of the basic
+/// block. Continues to walk up the def-use tree recursively. Used by
+/// reorderInstructions().
+///
+/// \see reorderInstructions()
+/// \param Used Pointer to the instruction whose value is used by the \p User.
+/// \param User Pointer to the instruction which uses the \p Used.
+/// \param Visited Set of visited instructions.
+void IRCanonicalizer::reorderInstruction(Instruction* Used, Instruction* User,
+                                         SmallPtrSet<const Instruction*, 32>& Visited) {
+  if (!Visited.count(Used)) {
+    Visited.insert(Used);
+
+    if (!isa<PHINode>(Used) && !Used->isEHPad()) {
+      // Do not move PHI nodes and 'pad' instructions to ensure they are first
+      // in a basic block. Also do not move their operands before them.
+
+      if (Used->getParent() == User->getParent()) {
+        // If Used and User share the same basic block move Used just before
+        // User.
+        Used->moveBefore(User);
+      } else {
+        // Otherwise move Used to the end of the basic block before the
+        // terminator.
+        Used->moveBefore(&Used->getParent()->back());
+      }
+
+      for (auto& OP : Used->operands()) {
+        if (auto* IOP = dyn_cast<Instruction>(OP)) {
+          // Walk up the def-use tree.
+          reorderInstruction(IOP, Used, Visited);
         }
-        // Insert into the queue (and remember iterator)
-        auto iti = q.insert({cOut, succ});
-        iter[succ] = iti.first;
-        // Remember predecessor
-        pred[succ] = v;
       }
     }
-    // Update best if this is an exit block (no successors) and we have a better cost
-    if (numSuccs == 0 && best > cOut) {
-      best = cOut;
-      bestBB = v;
+  }
+}
+
+/// Reorders instruction's operands alphabetically. This method assumes
+/// that passed instruction is commutative. Changing the operand order
+/// in other instructions may change the semantics.
+///
+/// \param I Instruction whose operands will be reordered.
+void IRCanonicalizer::reorderInstructionOperandsByNames(Instruction* I) {
+  // This method assumes that passed I is commutative,
+  // changing the order of operands in other instructions
+  // may change the semantics.
+
+  // Instruction operands for further sorting.
+  SmallVector<std::pair<std::string, Value*>, 4> Operands;
+
+  // Collect operands.
+  for (auto& OP : I->operands()) {
+    if (auto* VOP = dyn_cast<Value>(OP)) {
+      if (isa<Instruction>(VOP)) {
+        // This is an an instruction.
+        Operands.push_back(std::pair<std::string, Value*>(VOP->getName(), VOP));
+      } else {
+        std::string TextRepresentation;
+        raw_string_ostream Stream(TextRepresentation);
+        OP->printAsOperand(Stream, false);
+        Operands.push_back(std::pair<std::string, Value*>(Stream.str(), VOP));
+      }
     }
   }
-  return best;
-}
-CostT maxCost(const Function& f, unordered_map<const BasicBlock*, CostT> bbCost) {
-  // Cost of best path (path with minimum cost)
-  CostT best = 0;
-  // The exit block with the best path cost
-  const BasicBlock* bestBB = nullptr;
-  // Predecessors
-  unordered_map<const BasicBlock*, const BasicBlock*> pred;
-  // Map of costs into each vertex
-  unordered_map<const BasicBlock*, CostT> costIn;
-  // Priority queue
-  struct RCmp {
-    bool operator()(const pair<CostT, const BasicBlock*>& a,
-                    const pair<CostT, const BasicBlock*>& b) const {
-      if (a.first == b.first)
-        return a.second < b.second;
-      return a.first > b.first;
-    }
-  };
-  set<pair<CostT, const BasicBlock*>, RCmp> q;
-  // Pointers into q - so we can change priority
-  unordered_map<const BasicBlock*, decltype(q.begin())> iter;
-  // Initialise cost
-  for (const BasicBlock& v : f.getBasicBlockList()) costIn[&v] = 0;
-  auto start = &f.getEntryBlock();
-  costIn[start] = 0;
-  // Push into q (and remember iterator)
-  auto iti = q.insert({costIn[start], start});
-  iter[start] = iti.first;
-  // Do the search
-  while (!q.empty()) {
-    // Pop from the q
-    auto top = q.begin();
-    const BasicBlock* v = top->second;
-    CostT cIn = top->first;
-    q.erase(top);
-    iter.erase(v);
-    assert(cIn == costIn[v]);
 
-    // Get the cost out of this node
-    int cOut = cIn + bbCost[v];
-    // Count the successors as we process them
-    int numSuccs = 0;
-    // Process each successor
-    for (const auto* succ : successors(v)) {
-      numSuccs++;
-      // Update if the cost is better
-      if (cOut > costIn[succ]) {
-        // Set the new cost
-        costIn[succ] = cOut;
-        // Delete from the queue if already in there
-        if (iter.count(succ)) {
-          auto it = iter[succ];
-          q.erase(it);
+  // Sort operands.
+  llvm::sort(Operands.begin(), Operands.end(), llvm::less_first());
+
+  // Reorder operands.
+  unsigned Position = 0;
+  for (auto& OP : I->operands()) {
+    OP.set(Operands[Position].second);
+    Position++;
+  }
+}
+
+/// Reorders PHI node's values according to the names of corresponding basic
+/// blocks.
+///
+/// \param PN PHI node to canonicalize.
+void IRCanonicalizer::reorderPHIIncomingValues(PHINode* PN) {
+  // Values for further sorting.
+  SmallVector<std::pair<Value*, BasicBlock*>, 2> Values;
+
+  // Collect blocks and corresponding values.
+  for (auto& BB : PN->blocks()) {
+    Value* V = PN->getIncomingValueForBlock(BB);
+    Values.push_back(std::pair<Value*, BasicBlock*>(V, BB));
+  }
+
+  // Sort values according to the name of a basic block.
+  llvm::sort(Values, [](const std::pair<Value*, BasicBlock*>& LHS,
+                        const std::pair<Value*, BasicBlock*>& RHS) {
+    return LHS.second->getName() < RHS.second->getName();
+  });
+
+  // Swap.
+  for (unsigned i = 0; i < Values.size(); ++i) {
+    PN->setIncomingBlock(i, Values[i].second);
+    PN->setIncomingValue(i, Values[i].first);
+  }
+}
+
+/// Returns a vector of output instructions. An output is an instruction which
+/// has side-effects or is a terminator instruction. Uses isOutput().
+///
+/// \see isOutput()
+/// \param F Function to collect outputs from.
+SmallVector<Instruction*, 16> IRCanonicalizer::collectOutputInstructions(Function& F) {
+  // Output instructions are collected top-down in each function,
+  // any change may break the def-use chain in reordering methods.
+  SmallVector<Instruction*, 16> Outputs;
+
+  for (auto& I : instructions(F))
+    if (isOutput(&I))
+      Outputs.push_back(&I);
+
+  return Outputs;
+}
+
+/// Helper method checking whether the instruction may have side effects or is
+/// a terminator instruction.
+///
+/// \param I Considered instruction.
+bool IRCanonicalizer::isOutput(const Instruction* I) {
+  // Outputs are such instructions which may have side effects or are a
+  // terminator.
+  if (I->mayHaveSideEffects() || I->isTerminator())
+    return true;
+
+  return false;
+}
+
+/// Helper method checking whether the instruction has users and only
+/// immediate operands.
+///
+/// \param I Considered instruction.
+bool IRCanonicalizer::isInitialInstruction(const Instruction* I) {
+  // Initial instructions are such instructions whose values are used by
+  // other instructions, yet they only depend on immediate values.
+  return !I->user_empty() && hasOnlyImmediateOperands(I);
+}
+
+/// Helper method checking whether the instruction has only immediate operands.
+///
+/// \param I Considered instruction.
+bool IRCanonicalizer::hasOnlyImmediateOperands(const Instruction* I) {
+  for (const auto& OP : I->operands())
+    if (isa<Instruction>(OP))
+      return false;  // Found non-immediate operand (instruction).
+
+  return true;
+}
+
+/// Helper method returning indices (distance from the beginning of the basic
+/// block) of outputs using the \p I (eliminates repetitions). Walks down the
+/// def-use tree recursively.
+///
+/// \param I Considered instruction.
+/// \param Visited Set of visited instructions.
+SetVector<int> IRCanonicalizer::getOutputFootprint(Instruction* I,
+                                                   SmallPtrSet<const Instruction*, 32>& Visited) {
+  // Vector containing indexes of outputs (no repetitions),
+  // which use I in the order of walking down the def-use tree.
+  SetVector<int> Outputs;
+
+  if (!Visited.count(I)) {
+    Visited.insert(I);
+
+    if (isOutput(I)) {
+      // Gets output instruction's parent function.
+      Function* Func = I->getParent()->getParent();
+
+      // Finds and inserts the index of the output to the vector.
+      unsigned Count = 0;
+      for (const auto& B : *Func) {
+        for (const auto& E : B) {
+          if (&E == I)
+            Outputs.insert(Count);
+          Count++;
         }
-        // Insert into the queue (and remember iterator)
-        auto iti = q.insert({cOut, succ});
-        iter[succ] = iti.first;
-        // Remember predecessor
-        pred[succ] = v;
+      }
+
+      // Returns to the used instruction.
+      return Outputs;
+    }
+
+    for (auto* U : I->users()) {
+      if (auto* UI = dyn_cast<Instruction>(U)) {
+        // Vector for outputs which use UI.
+        SetVector<int> OutputsUsingUI = getOutputFootprint(UI, Visited);
+
+        // Insert the indexes of outputs using UI.
+        Outputs.insert(OutputsUsingUI.begin(), OutputsUsingUI.end());
       }
     }
-    // Update best if this is an exit block (no successors) and we have a better cost
-    if (numSuccs == 0 && best < cOut) {
-      best = cOut;
-      bestBB = v;
-    }
   }
-  return best;
+
+  // Return to the used instruction.
+  return Outputs;
 }
 
-pair<CostT, CostT> getCost(const Function& f) {
-  auto& tti = ttiwp->getTTI(f);
+/// Reads a module from a file.
+/// On error, messages are written to stderr and null is returned.
+///
+/// \param Context LLVM Context for the module.
+/// \param Name Input file name.
+static std::unique_ptr<Module> readModule(LLVMContext& Context, StringRef Name) {
+  SMDiagnostic Diag;
+  std::unique_ptr<Module> Module = parseIRFile(Name, Diag, Context);
 
-  // Precompute BB costs.
-  unordered_map<const BasicBlock*, CostT> bbCost;
-  for (const auto& bb : f.getBasicBlockList()) bbCost[&bb] = getCost(bb, tti);
+  if (!Module)
+    Diag.print("llvm-canon", errs());
 
-  if (isDAG(f)) {
-    return {minCost(f, bbCost), maxCost(f, bbCost)};
-  } else {
-    return {minCost(f, bbCost), numeric_limits<CostT>::infinity()};
-  }
+  return Module;
 }
 
-//------------------------------------------------------------------------------
-// Visitor functions, called to process the module
-//------------------------------------------------------------------------------
-void visit(const Function& f, ostream& os) {
-  auto costs = getCost(f);
-  switch (outputFormat) {
-    case TXT: {
-      os << "  Function: " << f.getName().str() << " ";
-      os << "min=" << costs.first << " ";
-      os << "max=" << costs.second << endl;
-      break;
-    }
-    case JSON: {
-      os << "{";
-      os << "\"function\":\"" << f.getName().str() << "\",";
-      os << "\"min\":" << costs.first;
-      if (costs.second != numeric_limits<CostT>::infinity()) {
-        os << ",\"max\":" << costs.second;
-      }
-      os << "}";
-      break;
-    }
-    case CSV: {
-      os << f.getParent()->getName().str() << ",";
-      os << f.getName().str() << ",";
-      os << costs.first << ",";
-      if (costs.second != numeric_limits<CostT>::infinity()) {
-        os << costs.second;
-      }
-      os << "\n";
-      break;
-    }
-  }
-}
-void visit(const Module& m, ostream& os) {
-  switch (outputFormat) {
-    case TXT: {
-      os << "Module: " << m.getName().str() << "\n";
-      for (const auto& f : m.functions()) visit(f, os);
-      break;
-    }
-    case JSON: {
-      os << "{";
-      os << "\"module\":\"" << m.getName().str() << "\",";
-      os << "\"functions\":[";
-      bool isFirst = true;
-      for (const auto& f : m.functions()) {
-        if (!isFirst)
-          os << ",";
-        else
-          isFirst = false;
-        visit(f, os);
-      }
-      os << "]}";
-      break;
-    }
-    case CSV: {
-      for (const auto& f : m.functions()) visit(f, os);
-      break;
-    }
-  }
-}
-void visit(const string& filename, ostream& os) {
-  // Parse the IR file passed on the command line.
-  SMDiagnostic err;
-  LLVMContext ctx;
-  unique_ptr<Module> m = parseIRFile(filename, err, ctx);
+/// Input LLVM module file name.
+cl::opt<std::string> InputFilename("f", cl::desc("Specify input filename"),
+                                   cl::value_desc("filename"), cl::Required);
+/// Output LLVM module file name.
+cl::opt<std::string> OutputFilename("o", cl::desc("Specify output filename"),
+                                    cl::value_desc("filename"), cl::Required);
 
-  if (!m)
-    throw err;
+/// \name Canonicalizer flags.
+/// @{
+/// Preserves original order of instructions.
+cl::opt<bool> PreserveOrder("preserve-order", cl::desc("Preserves original instruction order"));
+/// Renames all instructions (including user-named).
+cl::opt<bool> RenameAll("rename-all", cl::desc("Renames all instructions (including user-named)"));
+/// Folds all regular instructions (including pre-outputs).
+cl::opt<bool> FoldPreoutputs("fold-all",
+                             cl::desc("Folds all regular instructions (including pre-outputs)"));
+/// Sorts and reorders operands in commutative instructions.
+cl::opt<bool> ReorderOperands("reorder-operands",
+                              cl::desc("Sorts and reorders operands in commutative instructions"));
+/// @}
 
-  // Run the analysis and print the results
-  visit(*m, os);
-}
-void visit(const vector<string>& filenames, ostream& os) {
-  switch (outputFormat) {
-    case TXT: {
-      for (const auto& fn : filenames) visit(fn, os);
-      break;
-    }
-    case JSON: {
-      os << "[";
-      bool isFirst = true;
-      for (const auto& fn : filenames) {
-        if (!isFirst)
-          os << ",";
-        else
-          isFirst = false;
-        visit(fn, os);
-      }
-      os << "]\n";
-      break;
-    }
-    case CSV: {
-      os << "Module, Function, DAG, Min, Max\n";
-      for (const auto& fn : filenames) visit(fn, os);
-      break;
-    }
-  }
-}
-//------------------------------------------------------------------------------
-// Driver
-//------------------------------------------------------------------------------
 int main(int argc, char** argv) {
-  // Hide all options apart from the ones specific to this tool
-  cl::HideUnrelatedOptions(bwcetCategory);
+  cl::ParseCommandLineOptions(argc, argv,
+                              " LLVM-Canon\n\n"
+                              " This tool aims to transform LLVM Modules into canonical form by"
+                              " reordering and renaming instructions while preserving the same"
+                              " semantics. Making it easier to spot semantic differences while"
+                              " diffing two modules which have undergone different passes.\n");
 
-  cl::ParseCommandLineOptions(
-      argc, argv,
-      "Estimates the best and worst case runtime for each function the input IR file\n");
+  LLVMContext Context;
 
-  try {
-    // Get the output file
-    unique_ptr<ostream> ofs(outputFilename == "-" ? nullptr : new ofstream(outputFilename.c_str()));
-    if (ofs && !ofs->good()) {
-      throw "Error opening output file: " + outputFilename;
-    }
-    ostream& os = ofs ? *ofs : cout;
+  std::unique_ptr<Module> Module = readModule(Context, InputFilename);
 
-    // Makes sure llvm_shutdown() is called (which cleans up LLVM objects)
-    // http://llvm.org/docs/ProgrammersManual.html#ending-execution-with-llvm-shutdown
-    llvm_shutdown_obj shutdown_obj;
+  if (!Module)
+    return 1;
 
-    // Do the work
-    visit(inputFiles, os);
+  IRCanonicalizer Canonicalizer(PreserveOrder, RenameAll, FoldPreoutputs, ReorderOperands);
 
-  } catch (string e) {
-    errs() << e;
-    return -1;
-  } catch (SMDiagnostic e) {
-    e.print(argv[0], errs(), false);
-    return -1;
+  for (auto& Function : *Module) {
+    Canonicalizer.runOnFunction(Function);
   }
+
+  if (verifyModule(*Module, &errs()))
+    return 1;
+
+  std::error_code EC;
+  raw_fd_ostream OutputStream(OutputFilename, EC, sys::fs::OF_None);
+
+  if (EC) {
+    errs() << EC.message();
+    return 1;
+  }
+
+  Module->print(OutputStream, nullptr, false);
+  OutputStream.close();
   return 0;
 }
