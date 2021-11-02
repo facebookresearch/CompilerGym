@@ -120,13 +120,13 @@ int main(int argc, char** argv) {
   if (!Module)
     return 1;
 
-  LoopUnroller Canonicalizer;
+  LoopUnroller Unroller;
 
 #if (METHOD == 1)
-  Canonicalizer.runOnModule(*Module);
+  Unroller.runOnModule(*Module);
 #elif (METHOD == 2)
   for (auto& Function : *Module) {
-    Canonicalizer.runOnFunction(Function);
+    Unroller.runOnFunction(Function);
   }
 #endif
 
