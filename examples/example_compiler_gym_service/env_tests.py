@@ -252,7 +252,7 @@ def unsafe_select_unused_port() -> int:
     being claimed by another process or thread, so it is liable to race conditions
     """
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(("", 0))
+    s.bind(("127.0.0.1", 0))
     s.listen(1)
     port = s.getsockname()[1]
     s.close()
@@ -263,7 +263,7 @@ def port_is_free(port: int) -> bool:
     """Determine if a port is in use"""
     s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     try:
-        s.bind(("", port))
+        s.bind(("127.0.0.1", port))
         return True
     except OSError:
         return False
