@@ -24,15 +24,10 @@ class LoopUnroller : public llvm::FunctionPass {
 
   LoopUnroller() : FunctionPass(ID) {}
 
-  bool runOnFunction(llvm::Function& F) override;
+  bool runOnFunction(llvm::Function& F) override { return true; }
 };
 
 char LoopUnroller::ID = 0;
-
-/// Entry method to the LoopUnroller.
-///
-/// \param M Module to canonicalize.
-bool LoopUnroller::runOnFunction(Function& F) { return true; }
 
 /// Reads a module from a file.
 /// On error, messages are written to stderr and null is returned.
