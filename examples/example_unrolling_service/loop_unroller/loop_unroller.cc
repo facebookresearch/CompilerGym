@@ -1,7 +1,6 @@
 #include <algorithm>
 #include <vector>
 
-#include "IRCanonicalizer.h"
 #include "llvm/ADT/SetVector.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/SmallVector.h"

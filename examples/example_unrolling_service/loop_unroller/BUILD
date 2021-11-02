@@ -9,7 +9,6 @@ load("@rules_cc//cc:defs.bzl", "cc_binary")
 cc_binary(
     name = "loop_unroller",
     srcs = [
-        "IRCanonicalizer.h",
         "loop_unroller.cc",
     ],
     copts = [
