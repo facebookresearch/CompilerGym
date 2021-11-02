@@ -18,21 +18,21 @@
 
 using namespace llvm;
 
-class IRCanonicalizer : public llvm::FunctionPass {
+class LoopUnroller : public llvm::FunctionPass {
  public:
   static char ID;
 
-  IRCanonicalizer() : FunctionPass(ID) {}
+  LoopUnroller() : FunctionPass(ID) {}
 
   bool runOnFunction(llvm::Function& F) override;
 };
 
-char IRCanonicalizer::ID = 0;
+char LoopUnroller::ID = 0;
 
-/// Entry method to the IRCanonicalizer.
+/// Entry method to the LoopUnroller.
 ///
 /// \param M Module to canonicalize.
-bool IRCanonicalizer::runOnFunction(Function& F) { return true; }
+bool LoopUnroller::runOnFunction(Function& F) { return true; }
 
 /// Reads a module from a file.
 /// On error, messages are written to stderr and null is returned.
@@ -69,7 +69,7 @@ int main(int argc, char** argv) {
   if (!Module)
     return 1;
 
-  IRCanonicalizer Canonicalizer;
+  LoopUnroller Canonicalizer;
 
   for (auto& Function : *Module) {
     Canonicalizer.runOnFunction(Function);
