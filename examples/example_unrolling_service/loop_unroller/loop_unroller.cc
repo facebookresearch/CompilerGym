@@ -21,6 +21,11 @@
 using namespace llvm;
 #define DEBUG_TYPE "LoopUnroller"
 
+#define METHOD 1
+
+#if (METHOD == 1)
+// obtained from https://stackoverflow.com/a/33565910/3880948
+// Error: error: no member named 'ID' in 'llvm::LoopInfo'
 class LoopUnroller : public llvm::ModulePass {
  public:
   static char ID;
@@ -48,6 +53,35 @@ class LoopUnroller : public llvm::ModulePass {
     }
   }
 };
+#elif (METHOD == 2)
+// based on advice from https://stackoverflow.com/a/30353625/3880948
+// Error message: Assertion failed: (Resolver && "Pass has not been inserted into a PassManager
+// object!"), function getAnalysis, file
+// external/clang-llvm-10.0.0-x86_64-apple-darwin/include/llvm/PassAnalysisSupport.h, line 221.
+class LoopUnroller : public llvm::FunctionPass {
+ public:
+  static char ID;
+
+  LoopUnroller() : FunctionPass(ID) {}
+
+  virtual void getAnalysisUsage(AnalysisUsage& AU) const { AU.addRequired<LoopInfoWrapperPass>(); }
+
+  bool runOnFunction(llvm::Function& F) override {
+    loopcounter = 0;
+    LoopInfo& LI = getAnalysis<LoopInfoWrapperPass>().getLoopInfo();
+    for (BasicBlock& BB : F) {
+      Loop* L = LI.getLoopFor(&BB);
+      if (L)  // if not null
+        loopcounter++;
+    }
+    LLVM_DEBUG(dbgs() << "Found " << loopcounter << " loops.\n");
+    return false;
+  }
+
+ private:
+  int loopcounter = 0;
+};
+#endif  // METHOD
 
 char LoopUnroller::ID = 0;
 
@@ -88,10 +122,13 @@ int main(int argc, char** argv) {
 
   LoopUnroller Canonicalizer;
 
+#if (METHOD == 1)
   Canonicalizer.runOnModule(*Module);
-  // for (auto& Function : *Module) {
-  //   Canonicalizer.runOnFunction(Function);
-  // }
+#elif (METHOD == 2)
+  for (auto& Function : *Module) {
+    Canonicalizer.runOnFunction(Function);
+  }
+#endif
 
   if (verifyModule(*Module, &errs()))
     return 1;
