@@ -4,6 +4,7 @@
 #include "llvm/ADT/SetVector.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/SmallVector.h"
+#include "llvm/Analysis/LoopInfo.h"
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/IRBuilder.h"
@@ -13,18 +14,39 @@
 #include "llvm/IRReader/IRReader.h"
 #include "llvm/Pass.h"
 #include "llvm/Support/CommandLine.h"
+#include "llvm/Support/Debug.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/SourceMgr.h"
 
 using namespace llvm;
+#define DEBUG_TYPE "LoopUnroller"
 
-class LoopUnroller : public llvm::FunctionPass {
+class LoopUnroller : public llvm::ModulePass {
  public:
   static char ID;
 
-  LoopUnroller() : FunctionPass(ID) {}
+  LoopUnroller() : ModulePass(ID) {}
 
-  bool runOnFunction(llvm::Function& F) override { return true; }
+  bool runOnModule(llvm::Module& M) override {
+    loopcounter = 0;
+    for (auto IT = M.begin(), END = M.end(); IT != END; ++IT) {
+      LoopInfo& LI = getAnalysis<LoopInfo>(*IT);
+      for (LoopInfo::iterator LIT = LI.begin(), LEND = LI.end(); LIT != LEND; ++LIT) {
+        handleLoop(*LIT);
+      }
+    }
+    LLVM_DEBUG(dbgs() << "Found " << loopcounter << " loops.\n");
+    return false;
+  }
+
+ private:
+  int loopcounter = 0;
+  void handleLoop(Loop* L) {
+    ++loopcounter;
+    for (Loop* SL : L->getSubLoops()) {
+      handleLoop(SL);
+    }
+  }
 };
 
 char LoopUnroller::ID = 0;
@@ -66,9 +88,10 @@ int main(int argc, char** argv) {
 
   LoopUnroller Canonicalizer;
 
-  for (auto& Function : *Module) {
-    Canonicalizer.runOnFunction(Function);
-  }
+  Canonicalizer.runOnModule(*Module);
+  // for (auto& Function : *Module) {
+  //   Canonicalizer.runOnFunction(Function);
+  // }
 
   if (verifyModule(*Module, &errs()))
     return 1;
