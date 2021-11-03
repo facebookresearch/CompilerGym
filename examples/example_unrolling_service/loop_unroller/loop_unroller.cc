@@ -1,4 +1,7 @@
 #include <algorithm>
+#include <iostream>
+#include <string>
+#include <unordered_map>
 #include <vector>
 
 #include "llvm/ADT/SetVector.h"
@@ -9,81 +12,58 @@
 #include "llvm/IR/Function.h"
 #include "llvm/IR/IRBuilder.h"
 #include "llvm/IR/InstIterator.h"
+#include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Verifier.h"
 #include "llvm/IRReader/IRReader.h"
+#include "llvm/InitializePasses.h"
 #include "llvm/Pass.h"
 #include "llvm/Support/CommandLine.h"
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/SourceMgr.h"
+#include "llvm/Support/ToolOutputFile.h"
 
 using namespace llvm;
-#define DEBUG_TYPE "LoopUnroller"
 
-#define METHOD 1
+/// Input LLVM module file name.
+cl::opt<std::string> InputFilename(cl::Positional, cl::desc("Specify input filename"),
+                                   cl::value_desc("filename"), cl::init("-"));
+/// Output LLVM module file name.
+cl::opt<std::string> OutputFilename("o", cl::desc("Specify output filename"),
+                                    cl::value_desc("filename"), cl::init("-"));
 
-#if (METHOD == 1)
-// obtained from https://stackoverflow.com/a/33565910/3880948
-// Error: error: no member named 'ID' in 'llvm::LoopInfo'
-class LoopUnroller : public llvm::ModulePass {
+namespace llvm {
+// The INITIALIZE_PASS_XXX macros put the initialiser in the llvm namespace.
+void initializeLoopCounterPass(PassRegistry& Registry);
+}  // namespace llvm
+
+class LoopCounter : public llvm::FunctionPass {
  public:
   static char ID;
+  std::unordered_map<std::string, int> counts;
 
-  LoopUnroller() : ModulePass(ID) {}
+  LoopCounter() : FunctionPass(ID) {}
 
-  bool runOnModule(llvm::Module& M) override {
-    loopcounter = 0;
-    for (auto IT = M.begin(), END = M.end(); IT != END; ++IT) {
-      LoopInfo& LI = getAnalysis<LoopInfo>(*IT);
-      for (LoopInfo::iterator LIT = LI.begin(), LEND = LI.end(); LIT != LEND; ++LIT) {
-        handleLoop(*LIT);
-      }
-    }
-    LLVM_DEBUG(dbgs() << "Found " << loopcounter << " loops.\n");
-    return false;
+  virtual void getAnalysisUsage(AnalysisUsage& AU) const override {
+    AU.addRequired<LoopInfoWrapperPass>();
   }
-
- private:
-  int loopcounter = 0;
-  void handleLoop(Loop* L) {
-    ++loopcounter;
-    for (Loop* SL : L->getSubLoops()) {
-      handleLoop(SL);
-    }
-  }
-};
-#elif (METHOD == 2)
-// based on advice from https://stackoverflow.com/a/30353625/3880948
-// Error message: Assertion failed: (Resolver && "Pass has not been inserted into a PassManager
-// object!"), function getAnalysis, file
-// external/clang-llvm-10.0.0-x86_64-apple-darwin/include/llvm/PassAnalysisSupport.h, line 221.
-class LoopUnroller : public llvm::FunctionPass {
- public:
-  static char ID;
-
-  LoopUnroller() : FunctionPass(ID) {}
-
-  virtual void getAnalysisUsage(AnalysisUsage& AU) const { AU.addRequired<LoopInfoWrapperPass>(); }
 
   bool runOnFunction(llvm::Function& F) override {
-    loopcounter = 0;
     LoopInfo& LI = getAnalysis<LoopInfoWrapperPass>().getLoopInfo();
-    for (BasicBlock& BB : F) {
-      Loop* L = LI.getLoopFor(&BB);
-      if (L)  // if not null
-        loopcounter++;
-    }
-    LLVM_DEBUG(dbgs() << "Found " << loopcounter << " loops.\n");
+    auto Loops = LI.getLoopsInPreorder();
+
+    // Should reall account for module, too.
+    counts[F.getName().str()] = Loops.size();
     return false;
   }
-
- private:
-  int loopcounter = 0;
 };
-#endif  // METHOD
 
-char LoopUnroller::ID = 0;
+// Initialise the pass. We have to declare the dependencies we use.
+char LoopCounter::ID = 0;
+INITIALIZE_PASS_BEGIN(LoopCounter, "count-loops", "Count loops", false, false)
+INITIALIZE_PASS_DEPENDENCY(LoopInfoWrapperPass)
+INITIALIZE_PASS_END(LoopCounter, "count-loops", "Count loops", false, false)
 
 /// Reads a module from a file.
 /// On error, messages are written to stderr and null is returned.
@@ -95,53 +75,45 @@ static std::unique_ptr<Module> readModule(LLVMContext& Context, StringRef Name) 
   std::unique_ptr<Module> Module = parseIRFile(Name, Diag, Context);
 
   if (!Module)
-    Diag.print("llvm-canon", errs());
+    Diag.print("llvm-counter", errs());
 
   return Module;
 }
 
-/// Input LLVM module file name.
-cl::opt<std::string> InputFilename("f", cl::desc("Specify input filename"),
-                                   cl::value_desc("filename"), cl::Required);
-/// Output LLVM module file name.
-cl::opt<std::string> OutputFilename("o", cl::desc("Specify output filename"),
-                                    cl::value_desc("filename"), cl::Required);
-
 int main(int argc, char** argv) {
   cl::ParseCommandLineOptions(argc, argv,
-                              " LLVM-Unroller\n\n"
-                              " This tool aims to give users fine grain control on which loops to "
-                              "unroll and by which factor.\n");
+                              " LLVM-Counter\n\n"
+                              " Count the loops in a bitcode file.\n");
 
   LLVMContext Context;
+  SMDiagnostic Err;
+  SourceMgr SM;
+  std::error_code EC;
+
+  ToolOutputFile Out(OutputFilename, EC, sys::fs::OF_None);
+  if (EC) {
+    Err = SMDiagnostic(OutputFilename, SourceMgr::DK_Error,
+                       "Could not open output file: " + EC.message());
+    Err.print(argv[0], errs());
+    return 1;
+  }
 
   std::unique_ptr<Module> Module = readModule(Context, InputFilename);
 
   if (!Module)
     return 1;
 
-  LoopUnroller Unroller;
+  // Run the pass
+  initializeLoopCounterPass(*PassRegistry::getPassRegistry());
+  legacy::PassManager PM;
+  LoopCounter* Counter = new LoopCounter();
+  PM.add(Counter);
+  PM.run(*Module);
 
-#if (METHOD == 1)
-  Unroller.runOnModule(*Module);
-#elif (METHOD == 2)
-  for (auto& Function : *Module) {
-    Unroller.runOnFunction(Function);
-  }
-#endif
-
-  if (verifyModule(*Module, &errs()))
-    return 1;
-
-  std::error_code EC;
-  raw_fd_ostream OutputStream(OutputFilename, EC, sys::fs::OF_None);
-
-  if (EC) {
-    errs() << EC.message();
-    return 1;
+  for (auto& x : Counter->counts) {
+    Out.os() << x.first << ' ' << x.second << '\n';
   }
 
-  Module->print(OutputStream, nullptr, false);
-  OutputStream.close();
+  Out.keep();
   return 0;
 }
