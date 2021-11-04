@@ -49,7 +49,7 @@ include(cmake_installed_test)
 #     iree::awesome
 # )
 function(cmake_cc_test)
-  if(NOT IREE_BUILD_TESTS)
+  if(NOT CMAKE_BUILD_TESTS)
     return()
   endif()
 
@@ -88,8 +88,8 @@ function(cmake_cc_test)
   )
   target_include_directories(${_NAME} SYSTEM
     PUBLIC
-      "$<BUILD_INTERFACE:${IREE_SOURCE_DIR}>"
-      "$<BUILD_INTERFACE:${IREE_BINARY_DIR}>"
+      "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>"
+      "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>"
   )
   target_compile_definitions(${_NAME}
     PUBLIC
@@ -97,12 +97,12 @@ function(cmake_cc_test)
   )
   target_compile_options(${_NAME}
     PRIVATE
-      ${IREE_DEFAULT_COPTS}
+      ${CMAKE_DEFAULT_COPTS}
       ${_RULE_COPTS}
   )
   target_link_options(${_NAME}
     PRIVATE
-      ${IREE_DEFAULT_LINKOPTS}
+      ${CMAKE_DEFAULT_LINKOPTS}
       ${_RULE_LINKOPTS}
   )
 
@@ -117,9 +117,9 @@ function(cmake_cc_test)
   cmake_add_data_dependencies(NAME ${_NAME} DATA ${_RULE_DATA})
 
   # Add all IREE targets to a folder in the IDE for organization.
-  set_property(TARGET ${_NAME} PROPERTY FOLDER ${IREE_IDE_FOLDER}/test)
+  set_property(TARGET ${_NAME} PROPERTY FOLDER ${CMAKE_IDE_FOLDER}/test)
 
-  set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD ${IREE_CXX_STANDARD})
+  set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD ${CMAKE_CXX_STANDARD})
   set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
 
   list(APPEND _RULE_DEPS "gmock")
@@ -140,7 +140,7 @@ function(cmake_cc_test)
       NAME
         ${_TEST_NAME}
       COMMAND
-        "${CMAKE_SOURCE_DIR}/build_tools/cmake/run_android_test.${IREE_HOST_SCRIPT_EXT}"
+        "${CMAKE_SOURCE_DIR}/build_tools/cmake/run_android_test.${CMAKE_HOST_SCRIPT_EXT}"
         "${_ANDROID_REL_DIR}/$<TARGET_FILE_NAME:${_NAME}>"
     )
     # Use environment variables to instruct the script to push artifacts
@@ -161,7 +161,7 @@ function(cmake_cc_test)
       COMMAND
         # We run all our tests through a custom test runner to allow temp
         # directory cleanup upon test completion.
-        "${CMAKE_SOURCE_DIR}/build_tools/cmake/run_test.${IREE_HOST_SCRIPT_EXT}"
+        "${CMAKE_SOURCE_DIR}/build_tools/cmake/run_test.${CMAKE_HOST_SCRIPT_EXT}"
         "$<TARGET_FILE:${_NAME}>"
       INSTALLED_COMMAND
         # Must match install destination below.

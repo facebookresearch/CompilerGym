@@ -28,7 +28,7 @@ include(CMakeParseArguments)
 # Also in IDE, target will appear in ${PACKAGE} folder while non PUBLIC will be
 # in ${PACKAGE}/internal.
 # TESTONLY: When added, this target will only be built if user passes
-#    -DIREE_BUILD_TESTS=ON to CMake.
+#    -DCMAKE_BUILD_TESTS=ON to CMake.
 #
 # Note:
 # By default, external_cc_library will always create a library named
@@ -76,7 +76,7 @@ function(external_cc_library)
     ${ARGN}
   )
 
-  if(_RULE_TESTONLY AND NOT IREE_BUILD_TESTS)
+  if(_RULE_TESTONLY AND NOT CMAKE_BUILD_TESTS)
     return()
   endif()
 
@@ -113,18 +113,18 @@ function(external_cc_library)
     )
     target_include_directories(${_NAME} SYSTEM
       PUBLIC
-        "$<BUILD_INTERFACE:${IREE_SOURCE_DIR}>"
-        "$<BUILD_INTERFACE:${IREE_BINARY_DIR}>"
+        "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>"
+        "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>"
         "$<BUILD_INTERFACE:${_RULE_INCLUDES}>"
     )
     target_compile_options(${_NAME}
       PRIVATE
         ${_RULE_COPTS}
-        ${IREE_DEFAULT_COPTS}
+        ${CMAKE_DEFAULT_COPTS}
     )
     target_link_options(${_NAME}
       PRIVATE
-        ${IREE_DEFAULT_LINKOPTS}
+        ${CMAKE_DEFAULT_LINKOPTS}
         ${_RULE_LINKOPTS}
     )
     target_link_libraries(${_NAME}
@@ -147,25 +147,25 @@ function(external_cc_library)
     endif()
 
     # INTERFACE libraries can't have the CXX_STANDARD property set
-    set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD ${IREE_CXX_STANDARD})
+    set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD ${CMAKE_CXX_STANDARD})
     set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
   else()
     # Generating header-only library
     add_library(${_NAME} INTERFACE)
     target_include_directories(${_NAME} SYSTEM
       INTERFACE
-        "$<BUILD_INTERFACE:${IREE_SOURCE_DIR}>"
-        "$<BUILD_INTERFACE:${IREE_BINARY_DIR}>"
+        "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>"
+        "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>"
         "$<BUILD_INTERFACE:${_RULE_INCLUDES}>"
     )
     target_compile_options(${_NAME}
       INTERFACE
-        ${IREE_DEFAULT_COPTS}
+        ${CMAKE_DEFAULT_COPTS}
         ${_RULE_COPTS}
     )
     target_link_options(${_NAME}
       INTERFACE
-        ${IREE_DEFAULT_LINKOPTS}
+        ${CMAKE_DEFAULT_LINKOPTS}
         ${_RULE_LINKOPTS}
     )
     target_link_libraries(${_NAME}

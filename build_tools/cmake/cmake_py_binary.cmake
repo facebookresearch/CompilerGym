@@ -1,13 +1,13 @@
-# Copied from https://github.com/google/iree/blob/main/build_tools/cmake/iree_cc_binary.cmake[
+# Copied from https://github.com/google/iree/blob/main/build_tools/cmake/cmake_cc_binary.cmake[
 # Copyright 2019 The IREE Authors
 #
 # Licensed under the Apache License v2.0 with LLVM Exceptions.
 # See https://llvm.org/LICENSE.txt for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
-include(iree_py_library)
+include(cmake_py_library)
 
-# iree_cc_binary()
+# cmake_cc_binary()
 #
 # CMake function to imitate Bazel's py_binary rule.
 #
@@ -19,16 +19,16 @@ include(iree_py_library)
 # DEPS: List of other libraries to be linked in to the binary targets
 # PUBLIC: Add this so that this binary will be exported under iree::
 # Also in IDE, target will appear in IREE folder while non PUBLIC will be in IREE/internal.
-# TESTONLY: When added, this target will only be built if user passes -DIREE_BUILD_TESTS=ON to CMake.
+# TESTONLY: When added, this target will only be built if user passes -DCMAKE_BUILD_TESTS=ON to CMake.
 #
 # Note:
-# iree_py_binary will create a binary called ${PACKAGE_NAME}_${NAME}, e.g.
-# iree_base_foo with two alias (readonly) targets, a qualified
+# cmake_py_binary will create a binary called ${PACKAGE_NAME}_${NAME}, e.g.
+# cmake_base_foo with two alias (readonly) targets, a qualified
 # ${PACKAGE_NS}::${NAME} and an unqualified ${NAME}. Thus NAME must be globally
 # unique in the project.
 #
-function(iree_py_binary)
+function(cmake_py_binary)
   # Currently the same as adding a library.
   # When install rules are added they will need to split.
-  iree_py_library(${ARGV})
+  cmake_py_library(${ARGV})
 endfunction()

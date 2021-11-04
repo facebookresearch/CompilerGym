@@ -18,7 +18,7 @@ include(CMakeParseArguments)
 #             "--reader"
 # PUBLIC: Add this so that this library will be exported under iree::
 # Also in IDE, target will appear in IREE folder while non PUBLIC will be in IREE/internal.
-# TESTONLY: When added, this target will only be built if user passes -DIREE_BUILD_TESTS=ON to CMake.
+# TESTONLY: When added, this target will only be built if user passes -DCMAKE_BUILD_TESTS=ON to CMake.
 #
 # Note:
 # By default, flatbuffer_c_library will always create a library named ${NAME},
@@ -52,7 +52,7 @@ function(flatbuffer_c_library)
     ${ARGN}
   )
 
-  if(_RULE_TESTONLY AND NOT IREE_BUILD_TESTS)
+  if(_RULE_TESTONLY AND NOT CMAKE_BUILD_TESTS)
     return()
   endif()
 
@@ -94,7 +94,7 @@ function(flatbuffer_c_library)
     COMMAND
       "${_FLATCC_BIN}"
           -o "${CMAKE_CURRENT_BINARY_DIR}"
-          -I "${IREE_ROOT_DIR}"
+          -I "${CMAKE_ROOT_DIR}"
           ${_RULE_FLATCC_ARGS}
           "${_RULE_SRCS}"
     WORKING_DIRECTORY
@@ -117,18 +117,18 @@ function(flatbuffer_c_library)
   add_dependencies(${_NAME} ${_GEN_TARGET})
   target_include_directories(${_NAME} SYSTEM
     INTERFACE
-      "$<BUILD_INTERFACE:${IREE_SOURCE_DIR}>"
-      "$<BUILD_INTERFACE:${IREE_BINARY_DIR}>"
+      "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>"
+      "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>"
       ${CMAKE_CURRENT_BINARY_DIR}
     )
   target_link_libraries(${_NAME}
     INTERFACE
-      ${IREE_DEFAULT_LINKOPTS}
+      ${CMAKE_DEFAULT_LINKOPTS}
   )
   target_compile_options(${_NAME}
     INTERFACE
-      "-I${IREE_ROOT_DIR}/third_party/flatcc/include/"
-      "-I${IREE_ROOT_DIR}/third_party/flatcc/include/flatcc/reflection/"
+      "-I${CMAKE_ROOT_DIR}/third_party/flatcc/include/"
+      "-I${CMAKE_ROOT_DIR}/third_party/flatcc/include/flatcc/reflection/"
   )
 
   # Alias the cmake_package_name library to iree::package::name.

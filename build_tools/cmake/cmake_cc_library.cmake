@@ -24,7 +24,7 @@ include(CMakeParseArguments)
 # LINKOPTS: List of link options
 # PUBLIC: Add this so that this library will be exported under iree::
 # Also in IDE, target will appear in IREE folder while non PUBLIC will be in IREE/internal.
-# TESTONLY: When added, this target will only be built if user passes -DIREE_BUILD_TESTS=ON to CMake.
+# TESTONLY: When added, this target will only be built if user passes -DCMAKE_BUILD_TESTS=ON to CMake.
 # SHARED: If set, will compile to a shared object.
 #
 # Note:
@@ -66,7 +66,7 @@ function(cmake_cc_library)
     ${ARGN}
   )
 
-  if(_RULE_TESTONLY AND NOT IREE_BUILD_TESTS)
+  if(_RULE_TESTONLY AND NOT CMAKE_BUILD_TESTS)
     return()
   endif()
 
@@ -112,8 +112,8 @@ function(cmake_cc_library)
     )
     target_include_directories(${_NAME} SYSTEM
       PUBLIC
-        "$<BUILD_INTERFACE:${IREE_SOURCE_DIR}>"
-        "$<BUILD_INTERFACE:${IREE_BINARY_DIR}>"
+        "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>"
+        "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>"
     )
     target_include_directories(${_NAME}
       PUBLIC
@@ -121,12 +121,12 @@ function(cmake_cc_library)
     )
     target_compile_options(${_NAME}
       PRIVATE
-        ${IREE_DEFAULT_COPTS}
+        ${CMAKE_DEFAULT_COPTS}
         ${_RULE_COPTS}
     )
     target_link_options(${_NAME}
       PRIVATE
-        ${IREE_DEFAULT_LINKOPTS}
+        ${CMAKE_DEFAULT_LINKOPTS}
         ${_RULE_LINKOPTS}
     )
     target_link_libraries(${_NAME}
@@ -142,27 +142,27 @@ function(cmake_cc_library)
 
     # Add all IREE targets to a folder in the IDE for organization.
     if(_RULE_PUBLIC)
-      set_property(TARGET ${_NAME} PROPERTY FOLDER ${IREE_IDE_FOLDER})
+      set_property(TARGET ${_NAME} PROPERTY FOLDER ${CMAKE_IDE_FOLDER})
     elseif(_RULE_TESTONLY)
-      set_property(TARGET ${_NAME} PROPERTY FOLDER ${IREE_IDE_FOLDER}/test)
+      set_property(TARGET ${_NAME} PROPERTY FOLDER ${CMAKE_IDE_FOLDER}/test)
     else()
-      set_property(TARGET ${_NAME} PROPERTY FOLDER ${IREE_IDE_FOLDER}/internal)
+      set_property(TARGET ${_NAME} PROPERTY FOLDER ${CMAKE_IDE_FOLDER}/internal)
     endif()
 
     # INTERFACE libraries can't have the CXX_STANDARD property set.
-    set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD ${IREE_CXX_STANDARD})
+    set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD ${CMAKE_CXX_STANDARD})
     set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
   else()
     # Generating header-only library.
     add_library(${_NAME} INTERFACE)
     target_include_directories(${_NAME} SYSTEM
       INTERFACE
-        "$<BUILD_INTERFACE:${IREE_SOURCE_DIR}>"
-        "$<BUILD_INTERFACE:${IREE_BINARY_DIR}>"
+        "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>"
+        "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>"
     )
     target_link_options(${_NAME}
       INTERFACE
-        ${IREE_DEFAULT_LINKOPTS}
+        ${CMAKE_DEFAULT_LINKOPTS}
         ${_RULE_LINKOPTS}
     )
     target_link_libraries(${_NAME}

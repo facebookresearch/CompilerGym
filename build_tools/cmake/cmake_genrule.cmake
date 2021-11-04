@@ -22,7 +22,7 @@ include(cmake_macros)
 # CMD: Command to run
 # PUBLIC: Add this so that this library will be exported under iree::
 # Also in IDE, target will appear in IREE folder while non PUBLIC will be in IREE/internal.
-# TESTONLY: When added, this target will only be built if user passes -DIREE_BUILD_TESTS=ON to CMake.
+# TESTONLY: When added, this target will only be built if user passes -DCMAKE_BUILD_TESTS=ON to CMake.
 #
 # Note:
 # By default, cmake_genrule will always create a library named cmake_${NAME},
@@ -38,7 +38,7 @@ function(cmake_genrule)
     ${ARGN}
   )
 
-  if(_RULE_TESTONLY AND NOT IREE_BUILD_TESTS)
+  if(_RULE_TESTONLY AND NOT CMAKE_BUILD_TESTS)
     return()
   endif()
 

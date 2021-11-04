@@ -26,7 +26,7 @@ include(cmake_installed_test)
 # cmake_base_foo_test.
 #
 function(cmake_py_test)
-  if(NOT IREE_BUILD_TESTS)
+  if(NOT CMAKE_BUILD_TESTS)
     return()
   endif()
 
@@ -56,9 +56,9 @@ function(cmake_py_test)
     TEST_NAME "${_NAME_PATH}"
     LABELS "${_RULE_LABELS}"
     ENVIRONMENT
-      "PYTHONPATH=${IREE_BINARY_DIR}/compiler-api/python_package:${IREE_BINARY_DIR}/bindings/python:$ENV{PYTHONPATH}"
+      "PYTHONPATH=${CMAKE_BINARY_DIR}/compiler-api/python_package:${CMAKE_BINARY_DIR}/bindings/python:$ENV{PYTHONPATH}"
     COMMAND
-      "${IREE_SOURCE_DIR}/build_tools/cmake/run_test.${IREE_HOST_SCRIPT_EXT}"
+      "${CMAKE_SOURCE_DIR}/build_tools/cmake/run_test.${CMAKE_HOST_SCRIPT_EXT}"
       "${Python3_EXECUTABLE}"
       "${_SRC_DIR}/${_RULE_SRCS}"
       ${_RULE_ARGS}

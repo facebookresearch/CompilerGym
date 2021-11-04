@@ -190,7 +190,7 @@ function(cmake_pyext_module)
   target_compile_options(
     ${_NAME} PRIVATE
     ${ARG_COPTS}
-    ${IREE_DEFAULT_COPTS}
+    ${CMAKE_DEFAULT_COPTS}
     ${_RTTI_AND_EXCEPTION_COPTS}
   )
 

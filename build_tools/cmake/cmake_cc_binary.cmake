@@ -1,4 +1,4 @@
-# Copied from https://github.com/google/iree/blob/main/build_tools/cmake/iree_cc_binary.cmake[
+# Copied from https://github.com/google/iree/blob/main/build_tools/cmake/cmake_cc_binary.cmake[
 # Copyright 2019 The IREE Authors
 #
 # Licensed under the Apache License v2.0 with LLVM Exceptions.
@@ -7,7 +7,7 @@
 
 include(CMakeParseArguments)
 
-# iree_cc_binary()
+# cmake_cc_binary()
 #
 # CMake function to imitate Bazel's cc_binary rule.
 #
@@ -23,13 +23,13 @@ include(CMakeParseArguments)
 # HOSTONLY: host only; compile using host toolchain when cross-compiling
 #
 # Note:
-# iree_cc_binary will create a binary called ${PACKAGE_NAME}_${NAME}, e.g.
-# iree_base_foo with two alias (readonly) targets, a qualified
+# cmake_cc_binary will create a binary called ${PACKAGE_NAME}_${NAME}, e.g.
+# cmake_base_foo with two alias (readonly) targets, a qualified
 # ${PACKAGE_NS}::${NAME} and an unqualified ${NAME}. Thus NAME must be globally
 # unique in the project.
 #
 # Usage:
-# iree_cc_library(
+# cmake_cc_library(
 #   NAME
 #     awesome
 #   HDRS
@@ -39,7 +39,7 @@ include(CMakeParseArguments)
 #   PUBLIC
 # )
 #
-# iree_cc_binary(
+# cmake_cc_binary(
 #   NAME
 #     awesome_tool
 #   SRCS
@@ -47,7 +47,7 @@ include(CMakeParseArguments)
 #   DEPS
 #     iree::awesome
 # )
-function(iree_cc_binary)
+function(cmake_cc_binary)
   cmake_parse_arguments(
     _RULE
     "HOSTONLY;TESTONLY"
@@ -56,17 +56,17 @@ function(iree_cc_binary)
     ${ARGN}
   )
 
-  if(_RULE_TESTONLY AND NOT IREE_BUILD_TESTS)
+  if(_RULE_TESTONLY AND NOT CMAKE_BUILD_TESTS)
     return()
   endif()
 
-  # Prefix the library with the package name, so we get: iree_package_name
-  iree_package_name(_PACKAGE_NAME)
-  iree_package_ns(_PACKAGE_NS)
+  # Prefix the library with the package name, so we get: cmake_package_name
+  cmake_package_name(_PACKAGE_NAME)
+  cmake_package_ns(_PACKAGE_NS)
   set(_NAME "${_PACKAGE_NAME}_${_RULE_NAME}")
 
   add_executable(${_NAME} "")
-  # Alias the iree_package_name binary to iree::package::name.
+  # Alias the cmake_package_name binary to iree::package::name.
   # This lets us more clearly map to Bazel and makes it possible to
   # disambiguate the underscores in paths vs. the separators.
   add_executable(${_PACKAGE_NS}::${_RULE_NAME} ALIAS ${_NAME})
@@ -75,7 +75,7 @@ function(iree_cc_binary)
   # example, foo/bar/ library 'bar' would end up as 'foo::bar'. This isn't
   # likely to be common for binaries, but is consistent with the behavior for
   # libraries and in Bazel.
-  iree_package_dir(_PACKAGE_DIR)
+  cmake_package_dir(_PACKAGE_DIR)
   if(${_RULE_NAME} STREQUAL ${_PACKAGE_DIR})
     add_executable(${_PACKAGE_NS} ALIAS ${_NAME})
   endif()
@@ -102,8 +102,8 @@ function(iree_cc_binary)
   endif()
   target_include_directories(${_NAME} SYSTEM
     PUBLIC
-      "$<BUILD_INTERFACE:${IREE_SOURCE_DIR}>"
-      "$<BUILD_INTERFACE:${IREE_BINARY_DIR}>"
+      "$<BUILD_INTERFACE:${CMAKE_SOURCE_DIR}>"
+      "$<BUILD_INTERFACE:${CMAKE_BINARY_DIR}>"
   )
   target_compile_definitions(${_NAME}
     PUBLIC
@@ -111,12 +111,12 @@ function(iree_cc_binary)
   )
   target_compile_options(${_NAME}
     PRIVATE
-      ${IREE_DEFAULT_COPTS}
+      ${CMAKE_DEFAULT_COPTS}
       ${_RULE_COPTS}
   )
   target_link_options(${_NAME}
     PRIVATE
-      ${IREE_DEFAULT_LINKOPTS}
+      ${CMAKE_DEFAULT_LINKOPTS}
       ${_RULE_LINKOPTS}
   )
 
@@ -127,12 +127,12 @@ function(iree_cc_binary)
     PUBLIC
       ${_RULE_DEPS}
   )
-  iree_add_data_dependencies(NAME ${_NAME} DATA ${_RULE_DATA})
+  cmake_add_data_dependencies(NAME ${_NAME} DATA ${_RULE_DATA})
 
   # Add all IREE targets to a folder in the IDE for organization.
-  set_property(TARGET ${_NAME} PROPERTY FOLDER ${IREE_IDE_FOLDER}/binaries)
+  set_property(TARGET ${_NAME} PROPERTY FOLDER ${CMAKE_IDE_FOLDER}/binaries)
 
-  set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD ${IREE_CXX_STANDARD})
+  set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD ${CMAKE_CXX_STANDARD})
   set_property(TARGET ${_NAME} PROPERTY CXX_STANDARD_REQUIRED ON)
 
   install(TARGETS ${_NAME}
