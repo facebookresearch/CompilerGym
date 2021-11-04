@@ -1,8 +1,8 @@
 # See: https://bazel.build/versions/master/docs/bazel-user-manual.html#flag--compilation_mode
 
 # This project requires C++17.
-build --cxxopt='-std=c++17' --host_cxxopt='-std=c++17'
-test --cxxopt='-std=c++17' --host_cxxopt='-std=c++17'
+build --cxxopt='-std=c++17'
+test --cxxopt='-std=c++17'
 
 # Workaround for broken grpc build on macOS.
 # See: https://github.com/bazelbuild/bazel/issues/4341
