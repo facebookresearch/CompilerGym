@@ -11,6 +11,27 @@ on:
         - cron: 0 0 * * 0 # weekly
 
 jobs:
+    build-linux-cmake:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+
+            - uses: actions/setup-python@v2
+              with:
+                  python-version: 3.9
+
+            - name: Install build dependencies
+              uses: ./.github/actions/install-build-dependencies
+
+            - name: CMake Configure
+              run: |
+                  mkdir -p ~cmake_build
+                  cd ~cmake_build
+                  cmake .. 2>&1 | tee cmake-out
+                  ! grep --quiet -e '-- Configuring incomplete, errors occurred!' cmake-out
+              env:
+                  CC: clang
+                  CXX: clang++
     build-linux:
         runs-on: ubuntu-latest
         steps:

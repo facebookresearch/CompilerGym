@@ -1,0 +1,11 @@
+include_guard(GLOBAL)
+
+function(write_cache_script _DST_FILE)
+  file(WRITE "${_DST_FILE}" "")
+  set(_VARS CMAKE_BUILD_TYPE CMAKE_GENERATOR CMAKE_C_COMPILER CMAKE_CXX_STANDARD CMAKE_CXX_COMPILER CMAKE_GENERATOR_TOOLSET CMAKE_GENERATOR_PLATFORM)
+  foreach(_VAR in ${_VARS})
+    if(DEFINED ${_VAR})
+      file(APPEND "${_DST_FILE}" "set(${_VAR} ${${_VAR}})\n")
+    endif()
+  endforeach()
+endfunction()

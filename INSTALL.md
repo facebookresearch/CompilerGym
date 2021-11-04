@@ -87,3 +87,27 @@ environment using:
 
     conda deactivate
     conda env remove -n compiler_gym
+
+## CMake
+```
+export SOURCE_DIR=<path to source directory>
+export BOULD_DIR=<path to build directory>
+cmake \
+  -S "$SOURCE_DIR" \
+  -B "$BUILD_DIR"
+
+cmake  --build "$BUILD_DIR"
+```
+### Dependencies
+By default most dependencies are built together with Compiler Gym. To search for a dependency instead use:
+```
+-DCOMPILER_GYM_<dependency>_PROVIDER=external
+```
+#### Dependency Arguments
+* `COMPILER_GYM_BOOST_PROVIDER`
+* `COMPILER_GYM_GFLAGS_PROVIDER`
+* `COMPILER_GYM_GLOG_PROVIDER`
+* `COMPILER_GYM_GRPC_PROVIDER`
+* `COMPILER_GYM_GTEST_PROVIDER`
+* `COMPILER_GYM_NLOHMANN_JSON_PROVIDER`
+* `COMPILER_GYM_PROTOBUF_PROVIDER`
