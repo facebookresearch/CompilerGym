@@ -56,10 +56,6 @@ class LoopCounter : public llvm::FunctionPass {
     // Should really account for module, too.
     counts[F.getName().str()] = Loops.size();
 
-    for (auto ALoop : Loops) {
-      addStringMetadataToLoop(ALoop, "llvm.loop.unroll.enable");
-    }
-
     return false;
   }
 };
@@ -69,6 +65,40 @@ char LoopCounter::ID = 0;
 INITIALIZE_PASS_BEGIN(LoopCounter, "count-loops", "Count loops", false, false)
 INITIALIZE_PASS_DEPENDENCY(LoopInfoWrapperPass)
 INITIALIZE_PASS_END(LoopCounter, "count-loops", "Count loops", false, false)
+
+// The INITIALIZE_PASS_XXX macros put the initialiser in the llvm namespace.
+void initializeLoopUnrollConfiguratorPass(PassRegistry& Registry);
+
+class LoopUnrollConfigurator : public llvm::FunctionPass {
+ public:
+  static char ID;
+
+  LoopUnrollConfigurator() : FunctionPass(ID) {}
+
+  virtual void getAnalysisUsage(AnalysisUsage& AU) const override {
+    AU.addRequired<LoopInfoWrapperPass>();
+  }
+
+  bool runOnFunction(llvm::Function& F) override {
+    LoopInfo& LI = getAnalysis<LoopInfoWrapperPass>().getLoopInfo();
+    auto Loops = LI.getLoopsInPreorder();
+
+    // Should really account for module, too.
+    for (auto ALoop : Loops) {
+      addStringMetadataToLoop(ALoop, "llvm.loop.unroll.enable");
+    }
+
+    return false;
+  }
+};
+
+// Initialise the pass. We have to declare the dependencies we use.
+char LoopUnrollConfigurator::ID = 1;
+INITIALIZE_PASS_BEGIN(LoopUnrollConfigurator, "unroll-loops-configurator",
+                      "Configurates loop unrolling", false, false)
+INITIALIZE_PASS_DEPENDENCY(LoopInfoWrapperPass)
+INITIALIZE_PASS_END(LoopUnrollConfigurator, "unroll-loops-configurator",
+                    "Configurates loop unrolling", false, false)
 
 /// Reads a module from a file.
 /// On error, messages are written to stderr and null is returned.
@@ -113,14 +143,14 @@ int main(int argc, char** argv) {
   initializeLoopCounterPass(*PassRegistry::getPassRegistry());
   legacy::PassManager PM;
   LoopCounter* Counter = new LoopCounter();
-  // LoopUnrollConfigurator* UnrollConfigurator = new LoopUnrollConfigurator();
+  LoopUnrollConfigurator* UnrollConfigurator = new LoopUnrollConfigurator();
   PM.add(Counter);
-  // PM.add(UnrollConfigurator);
+  PM.add(UnrollConfigurator);
   // PM.add(createLoopUnrollPass());
   PM.run(*Module);
 
   for (auto& x : Counter->counts) {
-    Out.os() << x.first << ' ' << x.second << '\n';
+    llvm::dbgs() << x.first << ": " << x.second << " loops" << '\n';
   }
 
   Module->print(Out.os(), nullptr, false);
