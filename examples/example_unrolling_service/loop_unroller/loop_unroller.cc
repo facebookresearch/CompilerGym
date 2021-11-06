@@ -23,9 +23,11 @@
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/ToolOutputFile.h"
+#include "llvm/Transforms/Utils/LoopUtils.h"
 
 using namespace llvm;
 
+namespace llvm {
 /// Input LLVM module file name.
 cl::opt<std::string> InputFilename(cl::Positional, cl::desc("Specify input filename"),
                                    cl::value_desc("filename"), cl::init("-"));
@@ -33,10 +35,8 @@ cl::opt<std::string> InputFilename(cl::Positional, cl::desc("Specify input filen
 cl::opt<std::string> OutputFilename("o", cl::desc("Specify output filename"),
                                     cl::value_desc("filename"), cl::init("-"));
 
-namespace llvm {
 // The INITIALIZE_PASS_XXX macros put the initialiser in the llvm namespace.
 void initializeLoopCounterPass(PassRegistry& Registry);
-}  // namespace llvm
 
 class LoopCounter : public llvm::FunctionPass {
  public:
@@ -53,8 +53,13 @@ class LoopCounter : public llvm::FunctionPass {
     LoopInfo& LI = getAnalysis<LoopInfoWrapperPass>().getLoopInfo();
     auto Loops = LI.getLoopsInPreorder();
 
-    // Should reall account for module, too.
+    // Should really account for module, too.
     counts[F.getName().str()] = Loops.size();
+
+    for (auto ALoop : Loops) {
+      addStringMetadataToLoop(ALoop, "llvm.loop.unroll.enable");
+    }
+
     return false;
   }
 };
@@ -79,6 +84,7 @@ static std::unique_ptr<Module> readModule(LLVMContext& Context, StringRef Name) 
 
   return Module;
 }
+}  // namespace llvm
 
 int main(int argc, char** argv) {
   cl::ParseCommandLineOptions(argc, argv,
@@ -103,17 +109,23 @@ int main(int argc, char** argv) {
   if (!Module)
     return 1;
 
-  // Run the pass
+  // Run the passes
   initializeLoopCounterPass(*PassRegistry::getPassRegistry());
   legacy::PassManager PM;
   LoopCounter* Counter = new LoopCounter();
+  // LoopUnrollConfigurator* UnrollConfigurator = new LoopUnrollConfigurator();
   PM.add(Counter);
+  // PM.add(UnrollConfigurator);
+  // PM.add(createLoopUnrollPass());
   PM.run(*Module);
 
   for (auto& x : Counter->counts) {
     Out.os() << x.first << ' ' << x.second << '\n';
   }
 
+  Module->print(Out.os(), nullptr, false);
+
   Out.keep();
+
   return 0;
 }
