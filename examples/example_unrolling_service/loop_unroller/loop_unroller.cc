@@ -36,6 +36,13 @@ cl::opt<std::string> InputFilename(cl::Positional, cl::desc("Specify input filen
 cl::opt<std::string> OutputFilename("o", cl::desc("Specify output filename"),
                                     cl::value_desc("filename"), cl::init("-"));
 
+static cl::opt<bool> UnrollEnable("funroll-loops", cl::desc("Enable loop unrolling"),
+                                  cl::init(true));
+
+extern cl::opt<unsigned> UnrollCount(
+    "funroll-count", cl::desc("Use this unroll count for all loops including those with "
+                              "unroll_count pragma values, for testing purposes"));
+
 // The INITIALIZE_PASS_XXX macros put the initialiser in the llvm namespace.
 void initializeLoopCounterPass(PassRegistry& Registry);
 
@@ -86,8 +93,10 @@ class LoopUnrollConfigurator : public llvm::FunctionPass {
 
     // Should really account for module, too.
     for (auto ALoop : Loops) {
-      addStringMetadataToLoop(ALoop, "llvm.loop.unroll.enable", true);
-      addStringMetadataToLoop(ALoop, "llvm.loop.unroll.count", 4);
+      if (UnrollEnable)
+        addStringMetadataToLoop(ALoop, "llvm.loop.unroll.enable", UnrollEnable);
+      if (UnrollCount)
+        addStringMetadataToLoop(ALoop, "llvm.loop.unroll.count", UnrollCount);
     }
 
     return false;
