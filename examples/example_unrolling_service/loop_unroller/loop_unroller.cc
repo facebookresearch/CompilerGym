@@ -23,6 +23,7 @@
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/ToolOutputFile.h"
+#include "llvm/Transforms/Scalar.h"
 #include "llvm/Transforms/Utils/LoopUtils.h"
 
 using namespace llvm;
@@ -85,7 +86,8 @@ class LoopUnrollConfigurator : public llvm::FunctionPass {
 
     // Should really account for module, too.
     for (auto ALoop : Loops) {
-      addStringMetadataToLoop(ALoop, "llvm.loop.unroll.enable");
+      addStringMetadataToLoop(ALoop, "llvm.loop.unroll.enable", true);
+      addStringMetadataToLoop(ALoop, "llvm.loop.unroll.count", 4);
     }
 
     return false;
@@ -114,6 +116,7 @@ static std::unique_ptr<Module> readModule(LLVMContext& Context, StringRef Name) 
 
   return Module;
 }
+
 }  // namespace llvm
 
 int main(int argc, char** argv) {
@@ -146,7 +149,7 @@ int main(int argc, char** argv) {
   LoopUnrollConfigurator* UnrollConfigurator = new LoopUnrollConfigurator();
   PM.add(Counter);
   PM.add(UnrollConfigurator);
-  // PM.add(createLoopUnrollPass());
+  PM.add(createLoopUnrollPass());
   PM.run(*Module);
 
   for (auto& x : Counter->counts) {
