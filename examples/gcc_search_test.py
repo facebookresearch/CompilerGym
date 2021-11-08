@@ -2,37 +2,76 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+import subprocess
 import sys
+from functools import lru_cache
+from pathlib import Path
+from typing import Iterable
 
+import docker
 import gcc_search
+import pytest
 from absl.flags import FLAGS
 
-from compiler_gym.service import EnvironmentNotSupported
+
+def docker_is_available() -> bool:
+    """Return whether docker is available."""
+    try:
+        docker.from_env()
+        return True
+    except docker.errors.DockerException:
+        return False
 
 
-def test_gcc_search_smoke_test(capsys):
+@lru_cache(maxsize=2)
+def system_gcc_is_available() -> bool:
+    """Return whether there is a system GCC available."""
+    try:
+        stdout = subprocess.check_output(
+            ["gcc", "--version"], universal_newlines=True, stderr=subprocess.DEVNULL
+        )
+        # On some systems "gcc" may alias to a different compiler, so check for
+        # the presence of the name "gcc" in the first line of output.
+        return "gcc" in stdout.split("\n")[0].lower()
+    except (subprocess.CalledProcessError, FileNotFoundError):
+        return False
+
+
+def system_gcc_path() -> str:
+    """Return the path of the system GCC as a string."""
+    return subprocess.check_output(
+        ["which", "gcc"], universal_newlines=True, stderr=subprocess.DEVNULL
+    ).strip()
+
+
+def gcc_bins() -> Iterable[str]:
+    """Return a list of available GCCs."""
+    if docker_is_available():
+        yield "docker:gcc:11.2.0"
+    if system_gcc_is_available():
+        yield system_gcc_path()
+
+
+@pytest.fixture(scope="module", params=gcc_bins())
+def gcc_bin(request) -> str:
+    return request.param
+
+
+def test_gcc_search_smoke_test(gcc_bin: str, capsys, tmpdir: Path):
+    tmpdir = Path(tmpdir)
     flags = [
         "argv0",
         "--seed=0",
-        "--episode_len=2",
-        "--episodes=10",
-        "--log_interval=5",
-        "--benchmark=cbench-v1/crc32",
+        f"--log={tmpdir}/log.csv",
+        f"--gcc_bin={gcc_bin}",
+        "--gcc_benchmark=benchmark://chstone-v0/aes",
+        "--search=random",
+        "--n=3",
     ]
     sys.argv = flags
     FLAGS.unparse_flags()
     FLAGS(flags)
 
-    try:
-        gcc_search.main(
-            [
-                "gcc_search",
-                "--gcc_benchmark=benchmark://chstone-v0/aes",
-                "--search=random",
-                "--n=3",
-            ]
-        )
-        out, _ = capsys.readouterr()
-        assert "benchmark://chstone-v0/aes" in out
-    except EnvironmentNotSupported:
-        pass  # GCC environment might not be supported
+    gcc_search.main([])
+    out, _ = capsys.readouterr()
+    assert "benchmark://chstone-v0/aes" in out
