@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 import random
 from itertools import islice
+from pathlib import Path
 from typing import Callable, List, Optional, Tuple
 
 from absl import app, flags
@@ -11,6 +12,7 @@ from absl import app, flags
 import compiler_gym
 import compiler_gym.util.flags.seed  # noqa Flag definition.
 from compiler_gym.envs.gcc import DEFAULT_GCC, GccEnv
+from compiler_gym.util.runfiles_path import create_user_logs_dir
 
 FLAGS = flags.FLAGS
 flags.DEFINE_string(
@@ -28,7 +30,12 @@ flags.DEFINE_enum(
 flags.DEFINE_integer(
     "timeout", 20, "Timeout for each compilation in seconds", lower_bound=1
 )
-flags.DEFINE_string("log", None, "Filename to log progress")
+flags.DEFINE_string(
+    "log",
+    None,
+    "Filename to log progress. "
+    "Defaults to ~/logs/compiler_gym/gcc_autotuning/<timestamp>/log.csv",
+)
 flags.DEFINE_integer(
     "n", 100, "Maximum number of compilations per benchmark", lower_bound=1
 )
@@ -74,7 +81,8 @@ class ChoicesSearchPoint:
 class ChoicesSearch:
     """Base class for searches."""
 
-    def __init__(self, benchmark: str):
+    def __init__(self, logfile: Path, benchmark: str):
+        self.logfile = logfile
         self.benchmark = benchmark
         # We record the best point as we go
         self.best = ChoicesSearchPoint(None, None)
@@ -127,11 +135,8 @@ class ChoicesSearch:
         bname = self.benchmark.replace("benchmark://", "")
 
         scale = self.baseline.size / pt.size if pt.size != 0 else "-"
-        if FLAGS.log:
-            with open(FLAGS.log, "a") as f:
-                print(
-                    f"{scale}, {pt.size}, {n}, {','.join(map(str, pt.choices))}", file=f
-                )
+        with open(self.logfile, "a") as f:
+            print(f"{scale}, {pt.size}, {n}, {','.join(map(str, pt.choices))}", file=f)
 
         print(
             f"{bname} scale={scale}, size={pt.size}, n={n}, choices={','.join(map(lambda c: str(c) if c != -1 else '-', pt.choices))}"
@@ -140,9 +145,6 @@ class ChoicesSearch:
 
 class RandomChoicesSearch(ChoicesSearch):
     """A simple random search"""
-
-    def __init__(self, benchmark: str):
-        super().__init__(benchmark)
 
     def random_choices(self) -> List:
         """Get a random set of choices"""
@@ -161,9 +163,6 @@ class RandomChoicesSearch(ChoicesSearch):
 class RandomWalkActionsSearch(ChoicesSearch):
     """Randomly select actions"""
 
-    def __init__(self, benchmark: str):
-        super().__init__(benchmark)
-
     def step(self, env):
         before = env.choices
         for i in range(FLAGS.actions_per_step):
@@ -178,9 +177,6 @@ class RandomWalkActionsSearch(ChoicesSearch):
 
 class HillClimbActionsSearch(ChoicesSearch):
     """Randomly select actions and accept if they make things better"""
-
-    def __init__(self, benchmark: str):
-        super().__init__(benchmark)
 
     def step(self, env):
         best = self.best.choices if self.best.choices is not None else env.choices
@@ -201,8 +197,8 @@ class GAChoicesSearch(ChoicesSearch):
     mutator_fn = Callable[[List[int]], List[int]]
     replace_fn = Callable[[List[List[int]]], int]
 
-    def __init__(self, benchmark: str):
-        super().__init__(benchmark)
+    def __init__(self, logfile: Path, benchmark: str):
+        super().__init__(logfile=logfile, benchmark=benchmark)
         self.pop = []
 
         # Operators
@@ -419,6 +415,8 @@ class GAChoicesSearch(ChoicesSearch):
 
 
 def main(argv):
+    del argv  # Unused.
+
     search_map = {
         "random": RandomChoicesSearch,
         "action-walk": RandomWalkActionsSearch,
@@ -451,7 +449,16 @@ def main(argv):
     else:
         benchmarks = FLAGS.gcc_benchmark
 
-    searches = [search_cls(benchmark=benchmark) for benchmark in benchmarks]
+    logfile = (
+        FLAGS.log
+        if FLAGS.log
+        else (create_user_logs_dir("gcc_autotuning") / "logs.csv")
+    )
+    print("Logging results to", logfile)
+
+    searches = [
+        search_cls(logfile=logfile, benchmark=benchmark) for benchmark in benchmarks
+    ]
     for search in searches:
         search.run()
 
