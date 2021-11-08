@@ -23,6 +23,12 @@ class JustKeepGoingEnv(CompilerEnvWrapper):
         |/\\     /
             |  /
             |/
+
+    Usage:
+
+        >>> env = compiler_gym.make("llvm-v0")
+        >>> env = JustKeepGoingEnv(env)
+        # enjoy ...
     """
 
     def step(self, *args, **kwargs):
