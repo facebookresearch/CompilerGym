@@ -4,9 +4,17 @@
 # LICENSE file in the root directory of this source tree.
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
+alias(
+    name = "loop_unroller",
+    actual = "//examples/example_unrolling_service/loop_unroller:loop_unroller",
+)
+
 py_binary(
     name = "example-unrolling-service-py",
     srcs = ["example_service.py"],
+    data = [
+        ":loop_unroller",
+    ],
     main = "example_service.py",
     visibility = ["//visibility:public"],
     deps = [

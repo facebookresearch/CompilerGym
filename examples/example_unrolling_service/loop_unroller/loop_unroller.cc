@@ -36,7 +36,7 @@ cl::opt<std::string> InputFilename(cl::Positional, cl::desc("Specify input filen
 cl::opt<std::string> OutputFilename("o", cl::desc("Specify output filename"),
                                     cl::value_desc("filename"), cl::init("-"));
 
-static cl::opt<bool> UnrollEnable("funroll-loops", cl::desc("Enable loop unrolling"),
+static cl::opt<bool> UnrollEnable("floop-unroll", cl::desc("Enable loop unrolling"),
                                   cl::init(true));
 
 extern cl::opt<unsigned> UnrollCount(
