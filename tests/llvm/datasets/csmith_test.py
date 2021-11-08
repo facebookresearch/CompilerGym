@@ -68,7 +68,7 @@ def test_csmith_from_seed_retry_count_exceeded(csmith_dataset: CsmithDataset):
     strict=True,
     reason="github.com/facebookresearch/CompilerGym/issues/459",
 )
-@flaky(rerun_filter=lambda err, *args: issubclass(err[0], ServiceError))
+@flaky(max_runs=5, rerun_filter=lambda err, *args: issubclass(err[0], ServiceError))
 def test_csmith_positive_runtimes(env: LlvmEnv, csmith_dataset: CsmithDataset):
     benchmark = next(csmith_dataset.benchmarks())
     env.reset(benchmark=benchmark)
@@ -82,7 +82,7 @@ def test_csmith_positive_runtimes(env: LlvmEnv, csmith_dataset: CsmithDataset):
     strict=True,
     reason="github.com/facebookresearch/CompilerGym/issues/459",
 )
-@flaky(rerun_filter=lambda err, *args: issubclass(err[0], ServiceError))
+@flaky(max_runs=5, rerun_filter=lambda err, *args: issubclass(err[0], ServiceError))
 def test_csmith_positive_buildtimes(env: LlvmEnv, csmith_dataset: CsmithDataset):
     benchmark = next(csmith_dataset.benchmarks())
     env.reset(benchmark=benchmark)

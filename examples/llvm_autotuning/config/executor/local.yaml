@@ -1,0 +1,5 @@
+---
+type: local
+# Specifies the number of parallel worker processes. If -1, defaults to the
+# number of cores on the machine.
+cpus: -1

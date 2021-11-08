@@ -9,6 +9,7 @@ you think is missing? If so, please [contribute](/CONTRIBUTING.md)!
 
 - [Autotuning](#autotuning)
   - [Performing a random walk of an environment](#performing-a-random-walk-of-an-environment)
+  - [LLVM Autotuning (genetic algorithms, greedy search, + more)](#llvm-autotuning-genetic-algorithms-greedy-search--more)
   - [GCC Autotuning (genetic algorithms, hill climbing, + more)](#gcc-autotuning-genetic-algorithms-hill-climbing--more)
   - [Makefile integration](#makefile-integration)
   - [Random search using the LLVM C++ API](#random-search-using-the-llvm-c-api)
@@ -59,6 +60,14 @@ Max reward:   111.0 (+68.94% at step 31)
 ```
 
 For further details run: `python random_walk.py --help`.
+
+
+### LLVM Autotuning (genetic algorithms, greedy search, + more)
+
+The [llvm_autotuning](llvm_autotuning/) directory contains a framework for
+running autotuning experiments on the LLVM environments and several
+implementations of autotuners. See the [llvm_autotuning](llvm_autotuning/)
+directory for further details.
 
 
 ### GCC Autotuning (genetic algorithms, hill climbing, + more)

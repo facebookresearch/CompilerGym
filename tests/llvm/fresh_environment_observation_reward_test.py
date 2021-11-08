@@ -16,7 +16,6 @@ pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 @pytest.mark.xfail(
     sys.platform == "darwin",
-    strict=True,
     reason="github.com/facebookresearch/CompilerGym/issues/459",
 )
 @flaky  # Runtime can timeout
