@@ -12,6 +12,7 @@ from absl import app, flags
 import compiler_gym
 import compiler_gym.util.flags.seed  # noqa Flag definition.
 from compiler_gym.envs.gcc import DEFAULT_GCC, GccEnv
+from compiler_gym.service import ServiceError
 from compiler_gym.util.runfiles_path import create_user_logs_dir
 
 FLAGS = flags.FLAGS
@@ -108,6 +109,12 @@ class ChoicesSearch:
 
     def objective(self, env) -> int:
         """Get the objective from an environment"""
+        # Retry loop to defend against flaky environment.
+        for _ in range(3):
+            try:
+                return env.observation[FLAGS.objective]
+            except ServiceError:
+                env.reset()
         return env.observation[FLAGS.objective]
 
     def step(self, env) -> ChoicesSearchPoint:
