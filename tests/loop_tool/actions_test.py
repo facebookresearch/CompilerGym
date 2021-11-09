@@ -15,163 +15,143 @@ backends = ["cpu"]  # TODO swap to lt.backends() when CUDA interaction is fixed
 @pytest.mark.parametrize("backend", backends)
 def test_basic(backend):
     with compiler_gym.make("loop_tool-v0") as env:
-        env.observation_space = "vars"
-        env.reset(
-            benchmark=env.datasets.benchmark(
-                uri=f"benchmark://loop_tool-{backend}-v0/32"
-            ),
-            action_space="simple",
-        )
-        env.step(0)
-        env.step(1)
-        env.step(0)
-        env.step(1)
-        env.step(1)
-        env.step(0)
-        env.step(1)
-        env.step(0)
-        o = env.step(1)
-        print(o)
-
-
-@pytest.mark.parametrize("backend", backends)
-def test_rand(backend):
-    with compiler_gym.make("loop_tool-v0") as env:
-        env.observation_space = "flops"
-        env.reset(
-            benchmark=env.datasets.benchmark(
-                uri=f"benchmark://loop_tool-{backend}-v0/128"
-            ),
-            action_space="simple",
-        )
-        best = 0
-        for i in range(10):
-            a = env.action_space.sample()
-            o = env.step(a)
-            flops = o[0]
-            if flops > best:
-                best = flops
-                print(best)
-
-
-@pytest.mark.parametrize("backend", backends)
-def test_induced_remainder(backend):
-    with compiler_gym.make("loop_tool-v0") as env:
-        env.observation_space = "vars"
-        # reset
-        env.reset(
-            benchmark=env.datasets.benchmark(
-                uri=f"benchmark://loop_tool-{backend}-v0/32"
-            ),
-            action_space="simple",
-        )
-        # action toggle_mode
-        o = env.step(0)
-        vs = o[0].strip().split(",")
-        assert len(vs) == 1
-        v = vs[0]
-        # action up
-        env.step(1)
-        # action toggle_mode
-        env.step(0)
-        # action up
-        env.step(1)
-        # action up
         env.observation_space = "loop_tree"
-        o = env.step(1)
-        expected = f"""
-for {v} in 10 r 2 : L0 {'parallel ' if backend=='cpu' else ''}[thread]
- for {v}' in 3 : L1
-  for {v}'' in 1 : L2
-   %0[{v}] <- read()
-  for {v}'' in 1 : L4
-   %1[{v}] <- read()
-  for {v}'' in 1 : L6
-   %2[{v}] <- add(%0, %1)
-  for {v}'' in 1 : L8
-   %3[{v}] <- write(%2)
-"""
-        lines = o[0].strip().split("\n")
-        out = "\n".join(line.rstrip() for line in lines)
-        assert out == expected.strip(), f"{out} \n vs \n {expected.strip()}"
-
-
-@pytest.mark.parametrize("backend", backends)
-def test_thread_removal(backend):
-    with compiler_gym.make("loop_tool-v0") as env:
-        env.observation_space = "vars"
-        # reset
         env.reset(
             benchmark=env.datasets.benchmark(
                 uri=f"benchmark://loop_tool-{backend}-v0/32"
             ),
-            action_space="simple",
+            action_space="default",
         )
-        # action toggle_thread
-        o = env.step(3)
-        vs = o[0].strip().split(",")
-        assert len(vs) == 1
-        v = vs[0]
+        # actions = [ "up", "down", "resize", "split", "disable_reuse", "thread", ]
+        _, _, _, info = env.step(env.action_space["up"])
+        _, _, _, info = env.step(env.action_space["resize"])
+        assert info["new_action_space"]
 
-        # action toggle_thread
-        env.step(3)
-        # action toggle_thread
-        env.observation_space = "loop_tree"
-        o = env.step(3)
-        expected = f"""
-for {v} in 32 : L0
- for {v}' in 1 : L1
-  for {v}'' in 1 : L2
-   %0[{v}] <- read()
-  for {v}'' in 1 : L4
-   %1[{v}] <- read()
-  for {v}'' in 1 : L6
-   %2[{v}] <- add(%0, %1)
-  for {v}'' in 1 : L8
-   %3[{v}] <- write(%2)
-"""
-        lines = o[0].strip().split("\n")
-        out = "\n".join(line.rstrip() for line in lines)
-        assert out == expected.strip(), f"{out} \n vs \n {expected.strip()}"
+        _, reward, _, info = env.step(8)  # resize 8 bigger
+        assert info["new_action_space"]
+        assert 0, reward
 
 
-@pytest.mark.parametrize("backend", backends)
-def test_thread_addition(backend):
-    with compiler_gym.make("loop_tool-v0") as env:
-        env.observation_space = "vars"
-        # reset
-        env.reset(
-            benchmark=env.datasets.benchmark(
-                uri=f"benchmark://loop_tool-{backend}-v0/32"
-            ),
-            action_space="simple",
-        )
-        # action toggle_mode
-        o = env.step(0)
-        vs = o[0].strip().split(",")
-        assert len(vs) == 1
-        v = vs[0]
-
-        # action up
-        env.step(1)
-        env.observation_space = "loop_tree"
-        # action toggle_thread
-        o = env.step(3)
-        expected = f"""
-for {v} in 32 : L0 {'parallel ' if backend=='cpu' else ''}[thread]
- for {v}' in 1 : L1 {'parallel ' if backend=='cpu' else ''}[thread]
-  for {v}'' in 1 : L2
-   %0[{v}] <- read()
-  for {v}'' in 1 : L4
-   %1[{v}] <- read()
-  for {v}'' in 1 : L6
-   %2[{v}] <- add(%0, %1)
-  for {v}'' in 1 : L8
-   %3[{v}] <- write(%2)
-"""
-        lines = o[0].strip().split("\n")
-        out = "\n".join(line.rstrip() for line in lines)
-        assert out == expected.strip(), f"{out} \n vs \n {expected.strip()}"
+# @pytest.mark.parametrize("backend", lt.backends())
+# def test_rand(backend):
+#    with compiler_gym.make("loop_tool-v0") as env:
+#        env.observation_space = "flops"
+#        env.reset(
+#            benchmark=env.datasets.benchmark(
+#                uri=f"benchmark://loop_tool-{backend}-v0/128"
+#            ),
+#            action_space="simple",
+#        )
+#        best = 0
+#        for i in range(10):
+#            a = env.action_space.sample()
+#            o = env.step(a)
+#            flops = o[0]
+#            if flops > best:
+#                best = flops
+#                print(best)
+#
+#
+# @pytest.mark.parametrize("backend", lt.backends())
+# def test_induced_remainder(backend):
+#    with compiler_gym.make("loop_tool-v0") as env:
+#        env.observation_space = "loop_tree"
+#        # reset
+#        env.reset(
+#            benchmark=env.datasets.benchmark(
+#                uri=f"benchmark://loop_tool-{backend}-v0/1024"
+#            ),
+#            action_space="simple",
+#        )
+#        # action toggle_mode
+#        env.step(0)
+#        # action up
+#        env.step(1)
+#        # action toggle_mode
+#        env.step(0)
+#        # action up
+#        env.step(1)
+#        # action up
+#        o = env.step(1)
+#        expected = f"""
+# for a in 341 r 1 : L0 {'cpu_parallel ' if backend=='cpu' else ''}[thread]
+# for a' in 3 : L1
+#  for a'' in 1 : L2
+#   %0[a] <- read()
+#  for a'' in 1 : L4
+#   %1[a] <- read()
+#  for a'' in 1 : L6
+#   %2[a] <- add(%0, %1)
+#  for a'' in 1 : L8
+#   %3[a] <- write(%2)
+# """
+#        lines = o[0].strip().split("\n")
+#        out = "\n".join(line.rstrip() for line in lines)
+#        assert out == expected.strip(), f"{out} \n vs \n {expected.strip()}"
+#
+#
+# @pytest.mark.parametrize("backend", lt.backends())
+# def test_thread_removal(backend):
+#    with compiler_gym.make("loop_tool-v0") as env:
+#        env.observation_space = "loop_tree"
+#        # reset
+#        env.reset(
+#            benchmark=env.datasets.benchmark(
+#                uri=f"benchmark://loop_tool-{backend}-v0/1024"
+#            ),
+#            action_space="simple",
+#        )
+#        # action toggle_thread
+#        o = env.step(3)
+#        expected = """
+# for a in 1024 : L0
+# for a' in 1 : L1
+#  for a'' in 1 : L2
+#   %0[a] <- read()
+#  for a'' in 1 : L4
+#   %1[a] <- read()
+#  for a'' in 1 : L6
+#   %2[a] <- add(%0, %1)
+#  for a'' in 1 : L8
+#   %3[a] <- write(%2)
+# """
+#        lines = o[0].strip().split("\n")
+#        out = "\n".join(line.rstrip() for line in lines)
+#        assert out == expected.strip(), f"{out} \n vs \n {expected.strip()}"
+#
+#
+# @pytest.mark.parametrize("backend", lt.backends())
+# def test_thread_addition(backend):
+#    with compiler_gym.make("loop_tool-v0") as env:
+#        env.observation_space = "loop_tree"
+#        # reset
+#        env.reset(
+#            benchmark=env.datasets.benchmark(
+#                uri=f"benchmark://loop_tool-{backend}-v0/1024"
+#            ),
+#            action_space="simple",
+#        )
+#        # action toggle_mode
+#        env.step(0)
+#        # action up
+#        env.step(1)
+#        # action toggle_thread
+#        o = env.step(3)
+#        expected = f"""
+# for a in 1024 : L0 {'cpu_parallel ' if backend=='cpu' else ''}[thread]
+# for a' in 1 : L1 {'cpu_parallel ' if backend=='cpu' else ''}[thread]
+#  for a'' in 1 : L2
+#   %0[a] <- read()
+#  for a'' in 1 : L4
+#   %1[a] <- read()
+#  for a'' in 1 : L6
+#   %2[a] <- add(%0, %1)
+#  for a'' in 1 : L8
+#   %3[a] <- write(%2)
+# """
+#        lines = o[0].strip().split("\n")
+#        out = "\n".join(line.rstrip() for line in lines)
+#        assert out == expected.strip(), f"{out} \n vs \n {expected.strip()}"
 
 
 if __name__ == "__main__":

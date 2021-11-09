@@ -35,29 +35,33 @@ class LoopToolCompilationSession(CompilationSession):
     """Represents an instance of an interactive loop_tool session."""
 
     compiler_version: str = pkg_resources.get_distribution("loop-tool-py").version
+    resize_space = ActionSpace(
+        name="resize",
+        choice=[
+            ChoiceSpace(
+                name="size",
+                int64_range=ScalarRange(
+                    # min=ScalarLimit(), max=ScalarLimit(value=1)
+                ),
+            ),
+        ],
+    )
 
-    # keep it simple for now: 1 variable, 1 nest
     action_spaces = [
         ActionSpace(
-            # shift around a single pre-split order, changing the size of splits
-            name="simple",
+            name="default",
             choice=[
                 ChoiceSpace(
                     name="controls",
                     named_discrete_space=NamedDiscreteSpace(
-                        value=["toggle_mode", "up", "down", "toggle_thread"],
-                    ),
-                )
-            ],
-        ),
-        ActionSpace(
-            # potentially define new splits
-            name="split",
-            choice=[
-                ChoiceSpace(
-                    name="controls",
-                    named_discrete_space=NamedDiscreteSpace(
-                        value=["toggle_mode", "up", "down", "toggle_thread", "split"],
+                        value=[
+                            "up",
+                            "down",
+                            "resize",
+                            "split",
+                            "disable_reuse",
+                            "thread",
+                        ]
                     ),
                 )
             ],
@@ -232,32 +236,30 @@ class LoopToolCompilationSession(CompilationSession):
 
         logger.info("Applied action %d", choice_index)
 
+        if self.mode == "resize":
+            self.mode = "default"
+            self.resize(self.action_space.choice[0].int64_value)
+            return False, self.action_spaces[0], False
         act = self.action_space.choice[0].named_discrete_space.value[choice_index]
-        if self.mode not in ["size", "select"]:
-            raise RuntimeError("Invalid mode set: {}".format(self.mode))
-        if act == "toggle_mode":
-            if self.mode == "size":
-                self.mode = "select"
-            elif self.mode == "select":
-                self.mode = "size"
-        if act == "toggle_thread":
-            self.thread[self.cursor] = not self.thread[self.cursor]
-        if act == "down":
-            # always loop around
-            if self.mode == "size":
-                self.resize(-1)
-            elif self.mode == "select":
-                next_cursor = (self.cursor - 1) % len(self.order)
-                self.cursor = next_cursor
-        if act == "up":
-            # always loop around
-            if self.mode == "size":
-                self.resize(1)
-            elif self.mode == "select":
-                next_cursor = (self.cursor + 1) % len(self.order)
-                self.cursor = next_cursor
 
-        return False, None, False
+        if act == "down":
+            next_cursor = (self.cursor - 1) % len(self.order)
+            self.cursor = next_cursor
+        elif act == "up":
+            next_cursor = (self.cursor + 1) % len(self.order)
+            self.cursor = next_cursor
+        elif act == "resize":
+            return False, self.resize_space, False
+        elif act == "split":
+            pass
+        elif act == "disable_reuse":
+            pass
+        elif act == "thread":
+            self.thread[self.cursor] = not self.thread[self.cursor]
+        else:
+            raise ValueError("Invalid action: {}".format(act))
+
+        return False, self.action_spaces[0], False
 
     def lower(self):
         for n in self.ir.nodes:
