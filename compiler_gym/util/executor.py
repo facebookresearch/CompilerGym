@@ -13,7 +13,6 @@ from typing import Optional
 
 from pydantic import BaseModel, Field, validator
 from pydantic.class_validators import root_validator
-from submitit import AutoExecutor
 
 logger = logging.getLogger(__name__)
 
@@ -79,6 +78,13 @@ class Executor(BaseModel):
     def get_executor(self, logs_dir: Path, cpus=None) -> "Executor":
         cpus = cpus or self.cpus
         if self.type == self.Type.SLURM:
+            try:
+                from submitit import AutoExecutor
+            except ImportError as e:
+                raise OSError(
+                    "Using the slurm executor requires the submitit library. "
+                    "Install submitit using: python -m pip install submitit"
+                ) from e
             executor = AutoExecutor(folder=logs_dir)
             executor.update_parameters(
                 timeout_min=int(round(self.timeout_hours * 60)),
