@@ -57,15 +57,16 @@ def gcc_bin(request) -> str:
     return request.param
 
 
-def test_gcc_search_smoke_test(gcc_bin: str, capsys, tmpdir: Path):
+@pytest.mark.parametrize("search", ["random", "genetic"])
+def test_gcc_search_smoke_test(search: str, gcc_bin: str, capsys, tmpdir: Path):
     tmpdir = Path(tmpdir)
     flags = [
         "argv0",
         "--seed=0",
-        f"--log={tmpdir}/log.csv",
+        f"--output_dir={tmpdir}",
         f"--gcc_bin={gcc_bin}",
         "--gcc_benchmark=benchmark://chstone-v0/aes",
-        "--search=random",
+        f"--search={search}",
         "--n=3",
     ]
     sys.argv = flags
@@ -75,3 +76,4 @@ def test_gcc_search_smoke_test(gcc_bin: str, capsys, tmpdir: Path):
     gcc_search.main([])
     out, _ = capsys.readouterr()
     assert "benchmark://chstone-v0/aes" in out
+    assert (tmpdir / "results.csv").is_file()

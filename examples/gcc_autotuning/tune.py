@@ -2,17 +2,23 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+"""Autotuning script for GCC command line options.
+"""
 import random
 from itertools import islice
 from pathlib import Path
-from typing import Callable, List, Optional, Tuple
+from typing import Callable, Dict, List, NamedTuple, Optional, Tuple
 
 from absl import app, flags
+from gcc_autotuning.info import info
 
 import compiler_gym
+import compiler_gym.util.flags.nproc  # noqa Flag definition.
+import compiler_gym.util.flags.output_dir  # noqa Flag definition.
 import compiler_gym.util.flags.seed  # noqa Flag definition.
 from compiler_gym.envs.gcc import DEFAULT_GCC, GccEnv
 from compiler_gym.service import ServiceError
+from compiler_gym.util.executor import Executor
 from compiler_gym.util.runfiles_path import create_user_logs_dir
 
 FLAGS = flags.FLAGS
@@ -20,25 +26,27 @@ flags.DEFINE_string(
     "gcc_bin", DEFAULT_GCC, "Binary to use for gcc. Use docker:<image> for docker"
 )
 flags.DEFINE_list(
-    "gcc_benchmark", None, "List of benchmarks to search. Use 'all' for all"
+    "gcc_benchmark",
+    None,
+    "List of benchmarks to search. Use 'all' for all. "
+    "Defaults to the 12 CHStone benchmarks.",
 )
-flags.DEFINE_enum(
+flags.DEFINE_list(
     "search",
-    "random",
-    ["random", "action-walk", "action-climb", "genetic"],
-    "Type of search to perform",
+    ["random", "hillclimb", "genetic"],
+    "Type of search to perform. One of: {random,action-walk,hillclimb,genetic}",
 )
 flags.DEFINE_integer(
     "timeout", 20, "Timeout for each compilation in seconds", lower_bound=1
 )
-flags.DEFINE_string(
-    "log",
-    None,
-    "Filename to log progress. "
-    "Defaults to ~/logs/compiler_gym/gcc_autotuning/<timestamp>/log.csv",
+flags.DEFINE_integer(
+    "gcc_search_budget",
+    100,
+    "Maximum number of compilations per benchmark",
+    lower_bound=1,
 )
 flags.DEFINE_integer(
-    "n", 100, "Maximum number of compilations per benchmark", lower_bound=1
+    "gcc_search_repetitions", 1, "Number of times to repeat each search", lower_bound=1
 )
 flags.DEFINE_integer(
     "actions_per_step",
@@ -84,6 +92,7 @@ class ChoicesSearch:
 
     def __init__(self, logfile: Path, benchmark: str):
         self.logfile = logfile
+        self.logfile.touch()
         self.benchmark = benchmark
         # We record the best point as we go
         self.best = ChoicesSearchPoint(None, None)
@@ -98,7 +107,7 @@ class ChoicesSearch:
         env.close()
 
         # The number of points to search
-        self.n = FLAGS.n
+        self.n = FLAGS.gcc_search_budget
 
     def make(self) -> GccEnv:
         """Make an environment"""
@@ -143,10 +152,7 @@ class ChoicesSearch:
 
         scaled_size = self.baseline.size / pt.size if pt.size != 0 else "-"
         with open(self.logfile, "a") as f:
-            print(
-                f"{self.benchmark}, {scaled_size}, {pt.size}, {n}, {','.join(map(str, pt.choices))}",
-                file=f,
-            )
+            print(self.benchmark, scaled_size, pt.size, n, *pt.choices, sep=",", file=f)
 
         print(
             f"{bname} scaled_size={scaled_size}, size={pt.size}, n={n}, choices={','.join(map(lambda c: str(c) if c != -1 else '-', pt.choices))}"
@@ -175,8 +181,7 @@ class RandomWalkActionsSearch(ChoicesSearch):
 
     def step(self, env):
         before = env.choices
-        for i in range(FLAGS.actions_per_step):
-            env.step(env.action_space.sample())
+        env.step([env.action_space.sample() for _ in range(FLAGS.actions_per_step)])
         after = env.choices
         size = self.objective(env)
         pt = ChoicesSearchPoint(after, size)
@@ -191,8 +196,7 @@ class HillClimbActionsSearch(ChoicesSearch):
     def step(self, env):
         best = self.best.choices if self.best.choices is not None else env.choices
         env.choices = best
-        for i in range(FLAGS.actions_per_step):
-            env.step(env.action_space.sample())
+        env.step([env.action_space.sample() for _ in range(FLAGS.actions_per_step)])
         after = env.choices
         size = self.objective(env)
         return ChoicesSearchPoint(after, size)
@@ -424,66 +428,122 @@ class GAChoicesSearch(ChoicesSearch):
         return pt
 
 
+_SEARCH_CLASS_MAP: Dict[str, ChoicesSearch] = {
+    "random": RandomChoicesSearch,
+    "action-walk": RandomWalkActionsSearch,
+    "hillclimb": HillClimbActionsSearch,
+    "genetic": GAChoicesSearch,
+}
+
+
+class SearchResult(NamedTuple):
+    search: str
+    benchmark: str
+    best_size: int
+    baseline_size: int
+
+    @property
+    def scaled_best(self) -> float:
+        return self.baseline_size / self.best_size
+
+
+def run_search(search: str, logfile: Path, benchmark: str) -> SearchResult:
+    """Run a search and return the search class instance."""
+    search_class = _SEARCH_CLASS_MAP[search]
+    job: ChoicesSearch = search_class(logfile=logfile, benchmark=benchmark)
+    job.run()
+    return SearchResult(
+        search=search,
+        benchmark=benchmark,
+        best_size=job.best.size,
+        baseline_size=job.baseline.size,
+    )
+
+
 def main(argv):
     del argv  # Unused.
 
-    search_map = {
-        "random": RandomChoicesSearch,
-        "action-walk": RandomWalkActionsSearch,
-        "action-climb": HillClimbActionsSearch,
-        "genetic": GAChoicesSearch,
-    }
-    search_cls = search_map[FLAGS.search]
+    # Validate the --search values now.
+    for search in FLAGS.search:
+        if search not in _SEARCH_CLASS_MAP:
+            raise app.UsageError(f"Invalid --search value: {search}")
 
     if FLAGS.seed:
         random.seed(FLAGS.seed)
 
-    def get_benchmarks():
+    def get_benchmarks_from_all_datasets():
+        """Enumerate first 50 benchmarks from each dataset."""
         benchmarks = []
-        env = compiler_gym.make("gcc-v0", gcc_bin=FLAGS.gcc_bin)
-        env.reset()
-        for dataset in env.datasets:
-            benchmarks += islice(dataset.benchmark_uris(), 50)
-        env.close()
+        with compiler_gym.make("gcc-v0", gcc_bin=FLAGS.gcc_bin) as env:
+            env.reset()
+            for dataset in env.datasets:
+                benchmarks += islice(dataset.benchmark_uris(), 50)
         benchmarks.sort()
         return benchmarks
 
-    if not FLAGS.gcc_benchmark:
-        print("Benchmark not given")
-        print("Select from:")
-        print("\n".join(get_benchmarks()))
-        return
+    def get_chstone_benchmark_uris() -> List:
+        with compiler_gym.make("gcc-v0", gcc_bin=FLAGS.gcc_bin) as env:
+            return list(env.datasets["benchmark://chstone-v0"].benchmark_uris())
 
     if FLAGS.gcc_benchmark == ["all"]:
-        benchmarks = get_benchmarks()
-    else:
+        benchmarks = get_benchmarks_from_all_datasets()
+    elif FLAGS.gcc_benchmark:
         benchmarks = FLAGS.gcc_benchmark
+    else:
+        benchmarks = get_chstone_benchmark_uris()
 
-    logfile = (
-        FLAGS.log
-        if FLAGS.log
-        else (create_user_logs_dir("gcc_autotuning") / "logs.csv")
+    logdir = (
+        Path(FLAGS.output_dir)
+        if FLAGS.output_dir
+        else create_user_logs_dir("gcc_autotuning")
     )
-    logfile.parent.mkdir(exist_ok=True, parents=True)
-    logfile.touch()
-    print("Logging results to", logfile)
-
-    searches = [
-        search_cls(logfile=logfile, benchmark=benchmark) for benchmark in benchmarks
-    ]
-    for search in searches:
-        search.run()
-
-    for search in searches:
-        print(search.benchmark, search.best)
-
-    for search in searches:
+    logdir.mkdir(exist_ok=True, parents=True)
+    with open(logdir / "results.csv", "w") as f:
         print(
-            search.benchmark,
-            search.best.size,
-            search.baseline.size,
-            search.baseline.size / search.best.size,
+            "search",
+            "benchmark",
+            "scaled_size",
+            "size",
+            "baseline_size",
+            sep=",",
+            file=f,
         )
+    print("Logging results to", logdir)
+
+    # Parallel execution environment. Use flag --nproc to control the number of
+    # worker processes.
+    executor = Executor(type="local", timeout_hours=12, cpus=FLAGS.nproc, block=True)
+    with executor.get_executor(logs_dir=logdir) as session:
+        jobs = []
+        # Submit each search instance as a separate job.
+        for _ in range(FLAGS.gcc_search_repetitions):
+            for search in FLAGS.search:
+                for benchmark in benchmarks:
+                    jobs.append(
+                        session.submit(
+                            run_search,
+                            search=search,
+                            logfile=logdir / f"search-job-{len(jobs):04d}-log.csv",
+                            benchmark=benchmark,
+                        )
+                    )
+
+        for job in jobs:
+            result = job.result()
+            print(result.benchmark, f"{result.scaled_best:.3f}x", sep="\t")
+            with open(logdir / "results.csv", "a") as f:
+                print(
+                    result.search,
+                    result.benchmark,
+                    result.scaled_best,
+                    result.best_size,
+                    result.baseline_size,
+                    sep=",",
+                    file=f,
+                )
+
+    # Print results aggregates.
+    info([logdir])
 
 
 if __name__ == "__main__":
