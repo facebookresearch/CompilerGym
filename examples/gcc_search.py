@@ -141,12 +141,15 @@ class ChoicesSearch:
         """Log the current point"""
         bname = self.benchmark.replace("benchmark://", "")
 
-        scale = self.baseline.size / pt.size if pt.size != 0 else "-"
+        scaled_size = self.baseline.size / pt.size if pt.size != 0 else "-"
         with open(self.logfile, "a") as f:
-            print(f"{scale}, {pt.size}, {n}, {','.join(map(str, pt.choices))}", file=f)
+            print(
+                f"{self.benchmark}, {scaled_size}, {pt.size}, {n}, {','.join(map(str, pt.choices))}",
+                file=f,
+            )
 
         print(
-            f"{bname} scale={scale}, size={pt.size}, n={n}, choices={','.join(map(lambda c: str(c) if c != -1 else '-', pt.choices))}"
+            f"{bname} scaled_size={scaled_size}, size={pt.size}, n={n}, choices={','.join(map(lambda c: str(c) if c != -1 else '-', pt.choices))}"
         )
 
 
@@ -461,6 +464,8 @@ def main(argv):
         if FLAGS.log
         else (create_user_logs_dir("gcc_autotuning") / "logs.csv")
     )
+    logfile.parent.mkdir(exist_ok=True, parents=True)
+    logfile.touch()
     print("Logging results to", logfile)
 
     searches = [
