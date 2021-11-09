@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 
 
 class Executor(BaseModel):
-    """Defines the execution environment for jobs.
+    """Defines an execution environment for jobs.
 
     E.g. a node on a cluster, the local machine, etc. To create jobs,
     instantiate this class and submit functions to using the executor API:
@@ -76,7 +76,7 @@ class Executor(BaseModel):
     # === Start of public API. ===
 
     @contextmanager
-    def get_executor(self, logs_dir: Path, cpus=None):
+    def get_executor(self, logs_dir: Path, cpus=None) -> "Executor":
         cpus = cpus or self.cpus
         if self.type == self.Type.SLURM:
             executor = AutoExecutor(folder=logs_dir)

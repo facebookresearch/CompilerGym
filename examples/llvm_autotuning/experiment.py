@@ -12,10 +12,10 @@ import pandas as pd
 import yaml
 from llvm_autotuning.autotuners import Autotuner
 from llvm_autotuning.benchmarks import Benchmarks
-from llvm_autotuning.executor import Executor
 from pydantic import BaseModel, Field
 
 from compiler_gym import CompilerEnvStateWriter
+from compiler_gym.util.executor import Executor
 
 logger = logging.getLogger(__name__)
 

@@ -2,11 +2,12 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""Integration tests for the LLVM autotuners."""
+"""Unit tests for compiler_gym.util.executor."""
 import sys
 
 import pytest
-from llvm_autotuning.executor import Executor
+
+from compiler_gym.util.executor import Executor
 
 
 def _hello_fn():

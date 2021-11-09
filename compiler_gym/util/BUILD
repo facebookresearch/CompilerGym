@@ -14,6 +14,7 @@ py_library(
         "debug_util.py",
         "decorators.py",
         "download.py",
+        "executor.py",
         "filesystem.py",
         "gym_type_hints.py",
         "logs.py",
