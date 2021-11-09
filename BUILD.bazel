@@ -25,6 +25,8 @@ py_library(
         "//compiler_gym/service",
         "//compiler_gym/service/runtime",
         "//compiler_gym/spaces",
+        "//compiler_gym/util",
+        "//compiler_gym/util/flags",
         "//compiler_gym/views",
     ],
 )
