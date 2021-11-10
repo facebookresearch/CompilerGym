@@ -9,8 +9,8 @@ from pathlib import Path
 from typing import Iterable
 
 import docker
-import gcc_search
 import pytest
+import tune
 from absl.flags import FLAGS
 
 
@@ -58,7 +58,7 @@ def gcc_bin(request) -> str:
 
 
 @pytest.mark.parametrize("search", ["random", "hillclimb", "genetic"])
-def test_gcc_search_smoke_test(search: str, gcc_bin: str, capsys, tmpdir: Path):
+def test_tune_smoke_test(search: str, gcc_bin: str, capsys, tmpdir: Path):
     tmpdir = Path(tmpdir)
     flags = [
         "argv0",
@@ -74,7 +74,7 @@ def test_gcc_search_smoke_test(search: str, gcc_bin: str, capsys, tmpdir: Path):
     FLAGS.unparse_flags()
     FLAGS(flags)
 
-    gcc_search.main([])
+    tune.main([])
     out, _ = capsys.readouterr()
     assert "benchmark://chstone-v0/aes" in out
     assert (tmpdir / "results.csv").is_file()
