@@ -57,7 +57,7 @@ def gcc_bin(request) -> str:
     return request.param
 
 
-@pytest.mark.parametrize("search", ["random", "genetic"])
+@pytest.mark.parametrize("search", ["random", "hillclimb", "genetic"])
 def test_gcc_search_smoke_test(search: str, gcc_bin: str, capsys, tmpdir: Path):
     tmpdir = Path(tmpdir)
     flags = [
@@ -67,7 +67,8 @@ def test_gcc_search_smoke_test(search: str, gcc_bin: str, capsys, tmpdir: Path):
         f"--gcc_bin={gcc_bin}",
         "--gcc_benchmark=benchmark://chstone-v0/aes",
         f"--search={search}",
-        "--n=3",
+        "--pop_size=3",
+        "--gcc_search_budget=6",
     ]
     sys.argv = flags
     FLAGS.unparse_flags()

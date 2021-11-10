@@ -1,3 +1,4 @@
+geneticalgorithm>=1.0.2
 nevergrad>=0.4.3
 opentuner>=0.8.5
 submitit>=1.2.0
