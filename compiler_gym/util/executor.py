@@ -75,8 +75,11 @@ class Executor(BaseModel):
     # === Start of public API. ===
 
     @contextmanager
-    def get_executor(self, logs_dir: Path, cpus=None) -> "Executor":
+    def get_executor(
+        self, logs_dir: Path, timeout_hours: Optional[int] = None, cpus=None
+    ) -> "Executor":
         cpus = cpus or self.cpus
+        timeout_hours = timeout_hours or self.timeout_hours
         if self.type == self.Type.SLURM:
             try:
                 from submitit import AutoExecutor
@@ -87,7 +90,7 @@ class Executor(BaseModel):
                 ) from e
             executor = AutoExecutor(folder=logs_dir)
             executor.update_parameters(
-                timeout_min=int(round(self.timeout_hours * 60)),
+                timeout_min=int(round(timeout_hours * 60)),
                 nodes=1,
                 cpus_per_task=cpus,
                 slurm_partition=self.slurm_partition,
@@ -97,7 +100,7 @@ class Executor(BaseModel):
             executor, name = (
                 LocalParallelExecutor(
                     cpus=multiprocessing.cpu_count() if cpus == -1 else cpus,
-                    timeout_seconds=int(round(self.timeout_hours * 3600)),
+                    timeout_seconds=int(round(timeout_hours * 3600)),
                 ),
                 "local",
             )
