@@ -4,6 +4,8 @@ import setuptools
 
 with open("../VERSION") as f:
     version = f.read().strip()
+with open("requirements.txt") as f:
+    requirements = [ln.split("#")[0].rstrip() for ln in f.readlines()]
 
 setuptools.setup(
     name="compiler_gym_examples",
@@ -12,6 +14,7 @@ setuptools.setup(
     author="Facebook AI Research",
     url="https://github.com/facebookresearch/CompilerGym",
     license="MIT",
+    install_requires=requirements,
     packages=[
         "llvm_autotuning",
         "llvm_autotuning.autotuners",
