@@ -30,7 +30,7 @@ def experiments_from_paths(log_dirs: List[Path]) -> List[Experiment]:
 
 @app.command()
 def info(
-    log_dirs: List[Path] = ["~/logs/llvm_autotuning"],
+    log_dirs: List[Path] = ["~/logs/compiler_gym/llvm_autotuning"],
     all_runs: bool = False,
     group_by_working_directory: bool = False,
 ):

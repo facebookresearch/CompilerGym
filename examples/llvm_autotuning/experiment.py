@@ -168,7 +168,7 @@ def _experiment_worker(
     with autotuner.optimization_target.make_env(benchmark) as env:
         env.seed(seed)
         env.action_space.seed(seed)
-        state = autotuner(benchmark, seed=seed)
+        state = autotuner(env, seed=seed)
 
     logger.info("State %s", state)
     with CompilerEnvStateWriter(open(results_path, "w")) as writer:

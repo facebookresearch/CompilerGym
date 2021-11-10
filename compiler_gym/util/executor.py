@@ -53,7 +53,7 @@ class Executor(BaseModel):
     Only used for :code:`Type.SLURM` executors.
     """
 
-    cpus: int = Field(default=1, allow_mutation=False, ge=1)
+    cpus: int = Field(default=1, allow_mutation=False, ge=-1)
     """The number of CPU threads to provision.
 
     If the type of executor is :code:`Type.SLURM`, this is the number of CPU

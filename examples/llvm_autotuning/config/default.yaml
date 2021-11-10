@@ -5,7 +5,7 @@ defaults:
     - benchmarks: cbench
 search_time_seconds: 3600
 # The base directory for logs and other runtime artifacts.
-outputs: ~/logs/compiler_gym/llvm_autotuning
+outputs: ${env:HOME}/logs/compiler_gym/llvm_autotuning
 # The top subdirectory to arrange files in. Use this to group related runs by
 # some logical naming.
 experiment: unnamed_experiment

@@ -9,6 +9,7 @@ search strategies.
 - [Usage](#usage)
   - [Running autotuning experiments](#running-autotuning-experiments)
   - [Overview of results](#overview-of-results)
+- [Reproducing the results from our paper](#reproducing-the-results-from-our-paper)
 
 
 ## Autotuners
@@ -74,7 +75,7 @@ python -m llvm_autotuning.tune -m \
     experiment=my-experiment \
     outputs=/tmp/logs \
     executor.cpus=32 \
-    num_replicas=10 \
+    num_replicas=1 \
     autotuner=nevergrad \
     autotuner.optimization_target=codesize \
     autotuner.search_time_seconds=600
@@ -113,4 +114,61 @@ e.g.:
 
 ```
 python -m llvm_autotuning.info /path/to/logs/dir/a ~/logs_dir_b
+```
+
+
+## Reproducing the results from our paper
+
+To reproduce the experiments in Section VII.C of [our
+paper](https://arxiv.org/pdf/2109.08267.pdf), run:
+
+```sh
+export AUTOTUNER=greedy; export TARGET=codesize; \
+python -m llvm_autotuning.tune -m \
+    experiment="$AUTOTUNER-${TARGET}" \
+    autotuner="$AUTOTUNER" \
+    autotuner.optimization_target="$TARGET"
+```
+
+where `AUTOTUNER` is one of `greedy`, `random`, `nevergrad`, or `opentuner`; and
+`TARGET` is one of `codesize`, `binsize`, or `runtime`. The parameters for each
+of the autotuners defaults to those identified by sweeping the hyperparameters
+on a holdout set of 50 CSmith benchmarks using codesize reward.
+
+To reproduce the hyperparameter sweeps for random search:
+
+```sh
+export TARGET=codesize; \
+python -m llvm_autotuning.tune -m \
+    experiment=random-"${TARGET}"-tuning \
+    autotuner=random \
+    autotuner.optimization_target="$TARGET" \
+    benchmarks=csmith-50 \
+    autotuner.algorithm_config.patience=5,10,25,50,75,100,125,150,175,200,225,250,275,300,325,350
+```
+
+To reproduce the hyperparameter sweeps for
+[Nevergrad](https://facebookresearch.github.io/nevergrad/):
+
+```sh
+export TARGET=codesize; \
+python -m llvm_autotuning.tune -m \
+    experiment=nevergrad-"${TARGET}"-tuning \
+    autotuner=nevergrad \
+    autotuner.optimization_target="$TARGET" \
+    benchmarks=csmith-50 \
+    autotuner.algorithm_config.episode_length=50,100,150,200,250,300,350,400 \
+    autotuner.algorithm_config.optimizer=DiscreteOnePlusOne,PortfolioDiscreteOnePlusOne,DiscreteLenglerOnePlusOne,AdaptiveDiscreteOnePlusOne,AnisotropicAdaptiveDiscreteOnePlusOne,DiscreteBSOOnePlusOne,DiscreteDoerrOnePlusOne,OptimisticDiscreteOnePlusOne,NoisyDiscreteOnePlusOne,DoubleFastGADiscreteOnePlusOne,RecombiningPortfolioOptimisticNoisyDiscreteOnePlusOne,MultiDiscrete,PSO,DE,NGOpt,TwoPointsDE,CMandAS2
+```
+
+To reproduce the hyperparameter sweep for [OpenTuner](https://opentuner.org/):
+
+```sh
+export TARGET=codesize; \
+python -m llvm_autotuning.tune -m \
+    experiment=opentuner-"${TARGET}"-tuning \
+    autotuner=opentuner \
+    autotuner.optimization_target="$TARGET" \
+    benchmarks=csmith-50 \
+    autotuner.algorithm_config.max_copies_of_pass=1,2,4,8,16,32,64
 ```
