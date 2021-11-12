@@ -9,7 +9,7 @@ search strategies.
 - [Usage](#usage)
   - [Running autotuning experiments](#running-autotuning-experiments)
   - [Overview of results](#overview-of-results)
-- [Reproducing the results from our paper](#reproducing-the-results-from-our-paper)
+- [Reproducing the experiments from our paper](#reproducing-the-experiments-from-our-paper)
 
 
 ## Autotuners
@@ -117,7 +117,7 @@ python -m llvm_autotuning.info /path/to/logs/dir/a ~/logs_dir_b
 ```
 
 
-## Reproducing the results from our paper
+## Reproducing the experiments from our paper
 
 To reproduce the experiments in Section VII.C of [our
 paper](https://arxiv.org/pdf/2109.08267.pdf), run:
