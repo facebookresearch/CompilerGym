@@ -70,6 +70,12 @@ class Executor(BaseModel):
     :code:`Type.DEBUG` and :code:`Type.NOOP`.
     """
 
+    gpus: int = Field(default=0, allow_mutation=False, ge=0)
+    """The number of GPUs to provision.
+
+    This is used only by the :code:`Type.SLURM` executor.
+    """
+
     timeout_hours: float = Field(default=12, allow_mutation=False, gt=0)
 
     block: bool = Field(default=False, allow_mutation=False)
@@ -99,6 +105,7 @@ class Executor(BaseModel):
                 timeout_min=int(round(timeout_hours * 60)),
                 nodes=1,
                 cpus_per_task=cpus,
+                gpus_per_node=self.gpus,
                 slurm_partition=self.slurm_partition,
             )
             name = self.slurm_partition
