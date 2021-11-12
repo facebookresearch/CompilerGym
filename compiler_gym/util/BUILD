@@ -17,6 +17,7 @@ py_library(
         "executor.py",
         "filesystem.py",
         "gym_type_hints.py",
+        "logging.py",
         "logs.py",
         "minimize_trajectory.py",
         "parallelization.py",
