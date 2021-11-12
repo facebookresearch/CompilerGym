@@ -112,7 +112,7 @@ class Executor(BaseModel):
         elif self.type == self.Type.LOCAL:
             executor, name = (
                 LocalParallelExecutor(
-                    cpus=multiprocessing.cpu_count() if cpus == -1 else cpus,
+                    cpus=cpus,
                     timeout_seconds=int(round(timeout_hours * 3600)),
                 ),
                 "local",
@@ -157,11 +157,18 @@ class Executor(BaseModel):
             assert value, f"Must specify a partition for executor: {values['executor']}"
         return value
 
+    @validator("cpus", pre=True)
+    def validate_cpus(cls, value, *, values, **kwargs):
+        del kwargs
+        # -1 CPU count defaults to CPU count.
+        if values["type"] == cls.Type.LOCAL and value == -1:
+            return cpu_count()
+        return value
+
     @root_validator
     def local_always_blocks(cls, values):
         if values["type"] == cls.Type.LOCAL or values["type"] == cls.Type.NOOP:
             values["block"] = True
-
         return values
 
     class Config:
