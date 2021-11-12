@@ -3,7 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 from itertools import cycle
-from typing import Iterable, Optional, Union
+from typing import Callable, Iterable, Optional, Union
 
 import numpy as np
 
@@ -106,6 +106,47 @@ class CycleOverBenchmarks(IterateOverBenchmarks):
         """
         super().__init__(
             env, benchmarks=cycle(benchmarks), fork_shares_iterator=fork_shares_iterator
+        )
+
+
+class CycleOverBenchmarksIterator(CompilerEnvWrapper):
+    """Same as :class:`CycleOverBenchmarks
+    <compiler_gym.wrappers.CycleOverBenchmarks>` except that the user generates
+    the iterator.
+    """
+
+    def __init__(
+        self,
+        env: CompilerEnv,
+        make_benchmark_iterator: Callable[[], Iterable[BenchmarkLike]],
+    ):
+        """Constructor.
+
+        :param env: The environment to wrap.
+
+        :param make_benchmark_iterator: A callback that returns an iterator over
+            a sequence of benchmarks. Once the iterator is exhausted, this
+            callback is called to produce a new iterator.
+        """
+        super().__init__(env)
+        self.make_benchmark_iterator = make_benchmark_iterator
+        self.benchmarks = iter(self.make_benchmark_iterator())
+
+    def reset(self, benchmark: Optional[BenchmarkLike] = None, **kwargs):
+        if benchmark is not None:
+            raise TypeError("Benchmark passed toIterateOverBenchmarks.reset()")
+        try:
+            benchmark: BenchmarkLike = next(self.benchmarks)
+        except StopIteration:
+            self.benchmarks = iter(self.make_benchmark_iterator())
+            benchmark: BenchmarkLike = next(self.benchmarks)
+
+        return self.env.reset(benchmark=benchmark)
+
+    def fork(self) -> "CycleOverBenchmarksIterator":
+        return CycleOverBenchmarksIterator(
+            env=self.env.fork(),
+            make_benchmark_iterator=self.make_benchmark_iterator,
         )
 
 

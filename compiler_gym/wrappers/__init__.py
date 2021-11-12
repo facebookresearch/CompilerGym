@@ -16,6 +16,7 @@ from compiler_gym.wrappers.core import (
 )
 from compiler_gym.wrappers.datasets import (
     CycleOverBenchmarks,
+    CycleOverBenchmarksIterator,
     IterateOverBenchmarks,
     RandomOrderBenchmarks,
 )
@@ -28,10 +29,11 @@ __all__ = [
     "CompilerEnvWrapper",
     "ConstrainedCommandline",
     "CycleOverBenchmarks",
+    "CycleOverBenchmarksIterator",
     "IterateOverBenchmarks",
-    "RuntimePointEstimateReward",
     "ObservationWrapper",
     "RandomOrderBenchmarks",
     "RewardWrapper",
+    "RuntimePointEstimateReward",
     "TimeLimit",
 ]
