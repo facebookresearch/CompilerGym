@@ -88,7 +88,7 @@ class Executor(BaseModel):
 
     @contextmanager
     def get_executor(
-        self, logs_dir: Path, timeout_hours: Optional[int] = None, cpus=None
+        self, logs_dir: Path, timeout_hours: Optional[float] = None, cpus=None
     ) -> "Executor":
         cpus = cpus or self.cpus
         timeout_hours = timeout_hours or self.timeout_hours
