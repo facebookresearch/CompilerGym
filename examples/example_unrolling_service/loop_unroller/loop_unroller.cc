@@ -138,14 +138,6 @@ int main(int argc, char** argv) {
   SourceMgr SM;
   std::error_code EC;
 
-  ToolOutputFile Out(OutputFilename, EC, sys::fs::OF_None);
-  if (EC) {
-    Err = SMDiagnostic(OutputFilename, SourceMgr::DK_Error,
-                       "Could not open output file: " + EC.message());
-    Err.print(argv[0], errs());
-    return 1;
-  }
-
   std::unique_ptr<Module> Module = readModule(Context, InputFilename);
 
   if (!Module)
@@ -161,12 +153,20 @@ int main(int argc, char** argv) {
   PM.add(createLoopUnrollPass());
   PM.run(*Module);
 
+  // Log loop stats
   for (auto& x : Counter->counts) {
     llvm::dbgs() << x.first << ": " << x.second << " loops" << '\n';
   }
 
+  // Output modified IR
+  ToolOutputFile Out(OutputFilename, EC, sys::fs::OF_None);
+  if (EC) {
+    Err = SMDiagnostic(OutputFilename, SourceMgr::DK_Error,
+                       "Could not open output file: " + EC.message());
+    Err.print(argv[0], errs());
+    return 1;
+  }
   Module->print(Out.os(), nullptr, false);
-
   Out.keep();
 
   return 0;

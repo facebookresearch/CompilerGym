@@ -172,12 +172,11 @@ class UnrollingCompilationSession(CompilationSession):
                 # convert -<argument> to -f<argument>
                 arg = arg[0] + "f" + arg[1:]
                 args[i] = arg
-            print("args: ", args)
             run_command(
                 [
-                    "loop_unroller",
-                    *args,
+                    "../loop_unroller/loop_unroller",
                     self._llvm_path,
+                    *args,
                     "-o",
                     self._llvm_path,
                 ],
