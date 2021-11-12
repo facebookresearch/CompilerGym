@@ -1,7 +1,12 @@
+# Copyright (c) Facebook, Inc. and its affiliates.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+
 import torch
+import numpy as np
 import torch.nn as nn
 import dgl
-import utils.math_utils as math_utils
 
 
 class GNNEncoder(nn.Module):
@@ -92,8 +97,8 @@ class GNNEncoder(nn.Module):
         """
         preds, _ = self.forward(g)
         preds = preds.squeeze(1)
-        scaled_labels = math_utils.rescale(labels, eps=eps)
-        inv_scale_pred = math_utils.inv_rescale(preds, eps=eps)
+        scaled_labels = rescale(labels, eps=eps)
+        inv_scale_pred = inv_rescale(preds, eps=eps)
 
         return (
             self.mse_loss(preds, scaled_labels),
@@ -112,3 +117,44 @@ class GNNEncoder(nn.Module):
     def get_edge_embedding(self, g):
         # TODO: this should can be for positional embeddings
         pass
+
+
+def rescale(x, eps=1e-3):
+    sign = get_sign(x)
+    x_abs = get_abs(x)
+    if isinstance(x, np.ndarray):
+        return sign * (np.sqrt(x_abs + 1) - 1) + eps * x
+    else:
+        return sign * ((x_abs + 1).sqrt() - 1) + eps * x
+
+
+def inv_rescale(x, eps=1e-3):
+    sign = get_sign(x)
+    x_abs = get_abs(x)
+    if eps == 0:
+        return sign * (x * x + 2.0 * x_abs)
+    else:
+        return sign * (
+            (((1.0 + 4.0 * eps * (x_abs + 1.0 + eps)).sqrt() - 1.0) / (2.0 * eps)).pow(
+                2
+            )
+            - 1.0
+        )
+
+
+def get_sign(x):
+    if isinstance(x, np.ndarray):
+        return np.sign(x)
+    elif isinstance(x, torch.Tensor):
+        return x.sign()
+    else:
+        raise NotImplementedError(f"Data type: {type(x)} is not implemented")
+
+
+def get_abs(x):
+    if isinstance(x, np.ndarray):
+        return np.abs(x)
+    elif isinstance(x, torch.Tensor):
+        return x.abs()
+    else:
+        raise NotImplementedError(f"Data type: {type(x)} is not implemented")
