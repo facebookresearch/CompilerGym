@@ -54,7 +54,7 @@ static cl::opt<unsigned> UnrollCount(
 static cl::opt<bool> Force("f", cl::desc("Enable binary output on terminals"));
 
 // Output assembly
-static cl::opt<bool> OutputAssembly("S", cl::desc("Write output as LLVM assembly"), cl::Hidden);
+static cl::opt<bool> OutputAssembly("S", cl::desc("Write output as LLVM assembly"));
 
 // Preserve use list order
 static cl::opt<bool> PreserveBitcodeUseListOrder(
