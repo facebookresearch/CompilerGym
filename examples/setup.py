@@ -18,6 +18,8 @@ setuptools.setup(
     packages=[
         "llvm_autotuning",
         "llvm_autotuning.autotuners",
+        "llvm_rl",
+        "llvm_rl.model",
     ],
     python_requires=">=3.8",
     platforms=[distutils.util.get_platform()],

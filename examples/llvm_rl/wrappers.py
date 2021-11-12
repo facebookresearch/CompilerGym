@@ -10,7 +10,36 @@ import gym
 import numpy as np
 
 from compiler_gym.envs import CompilerEnv, LlvmEnv
-from compiler_gym.wrappers import ConstrainedCommandline, ObservationWrapper
+from compiler_gym.wrappers import (
+    ConstrainedCommandline,
+    ObservationWrapper,
+    RewardWrapper,
+)
+
+
+class ClampedReward(RewardWrapper):
+    """A wrapper class that clamps reward signal within a bounded range,
+    optionally with some leaking for out-of-range values.
+    """
+
+    def __init__(
+        self,
+        env: CompilerEnv,
+        min: float = -1,
+        max: float = 1,
+        leakiness_factor: float = 0.001,
+    ):
+        super().__init__(env)
+        self.min = min
+        self.max = max
+        self.leakiness_factor = leakiness_factor
+
+    def reward(self, reward: float) -> float:
+        if reward > self.max:
+            return self.max + (reward - self.max) * self.leakiness_factor
+        elif reward < self.min:
+            return self.min + (reward - self.min) * self.leakiness_factor
+        return reward
 
 
 class AutophaseNormalizedFeatures(ObservationWrapper):
@@ -38,8 +67,10 @@ class AutophaseNormalizedFeatures(ObservationWrapper):
 
     def observation(self, observation):
         if observation[self.TotalInsts_index] <= 0:
-            return np.zeros(observation.shape)
-        return np.clip(observation / observation[self.TotalInsts_index], 0, 1)
+            return np.zeros(observation.shape, dtype=np.float32)
+        return np.clip(
+            observation.astype(np.float32) / observation[self.TotalInsts_index], 0, 1
+        )
 
 
 class ConcatActionsHistogram(ObservationWrapper):
@@ -90,7 +121,9 @@ class ConcatActionsHistogram(ObservationWrapper):
         )
 
     def reset(self, *args, **kwargs):
-        self.histogram = np.zeros((self.action_space.n,))
+        self.histogram = np.zeros(
+            (self.action_space.n,), dtype=self.env.observation_space.dtype
+        )
         return super().reset(*args, **kwargs)
 
     def step(self, action: Union[int, List[int]], observations=None, **kwargs):
@@ -101,7 +134,9 @@ class ConcatActionsHistogram(ObservationWrapper):
         return super().step(action, **kwargs)
 
     def observation(self, observation):
-        return np.concatenate((observation, self.histogram))
+        return np.concatenate((observation, self.histogram)).astype(
+            self.env.observation_space.dtype
+        )
 
 
 class AutophaseActionSpace(ConstrainedCommandline):

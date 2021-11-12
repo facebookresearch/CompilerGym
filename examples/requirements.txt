@@ -1,6 +1,10 @@
 geneticalgorithm>=1.0.2
+hydra-core==1.1.0
+keras==2.6.0
 nevergrad>=0.4.3
 opentuner>=0.8.5
 submitit>=1.2.0
 submitit>=1.2.0
+tensorflow==2.6.0
 torch>=1.6.0
+typer[all]>=0.3.2
