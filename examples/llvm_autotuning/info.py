@@ -94,6 +94,13 @@ def info(
     else:
         df = df.groupby(["experiment", "timestamp", "config"]).mean()
 
+    # Cast float back to int.
+    df["num_benchmarks"] = [int(x) for x in df["num_benchmarks"]]
+    df["num_results"] = [int(x) for x in df["num_results"]]
+
+    # Better column names.
+    df = df.rename(columns={"reward": "geomean_reward", "walltime": "walltime (s)"})
+
     pd.set_option("display.max_rows", None)
     print(df)
 

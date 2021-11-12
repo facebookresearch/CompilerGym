@@ -26,3 +26,14 @@ hydra:
         dir: ${outputs}/${experiment}/${now:%Y-%m-%d}/${now:%H-%M-%S}
         subdir: ${experiment}-C${hydra.job.num}
     output_subdir: hydra
+    job_logging:
+        version: 1
+        formatters:
+            simple:
+                format: '%(asctime)s %(name)s] %(message)s'
+                datefmt: '%M%d %H:%m:%S'
+        handlers:
+            console:
+                class: logging.StreamHandler
+                formatter: simple
+                stream: ext://sys.stdout
