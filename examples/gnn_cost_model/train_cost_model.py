@@ -1,3 +1,14 @@
+# Copyright (c) Facebook, Inc. and its affiliates.
+#
+# This source code is licensed under the MIT license found in the
+# LICENSE file in the root directory of this source tree.
+"""
+This module trains the a cost model with a GNN on a LLVM-IR
+transition database predicting some output reward (the default is instruction count).
+Example usage:
+    $ python train_cost_model.py --num_epoch 10 --batch_size 16 --dataset_size 64
+"""
+
 import os
 import time
 import collections
@@ -9,10 +20,11 @@ import torch.nn as nn
 import torch
 from torch.utils.data import DataLoader
 from absl import app, flags
+import pickle
 
 from model import GNNEncoder
 from compiler_gym_dataset import CompilerGymDataset
-import utils.parsing_utils as parsing_utils
+
 
 flags.DEFINE_list(
     "flags",
@@ -73,11 +85,13 @@ def dataset_looper(epoch_num, data_loader, model, device, optimizer=None, train=
 
             times["model_backward"] += time.time() - t1
             t1 = time.time()
-    avg_loss, avg_unscaled, avg_grad_clip = (
+    avg_loss, avg_unscaled = (
         np.mean(losses),
         np.mean(unscaled_mse),
-        np.mean(epoch_grad_clip),
     )
+    avg_grad_clip = None
+    if train:
+        avg_grad_clip = np.mean(epoch_grad_clip)
     print(
         f"Epoch num {epoch_num} training {train} took: {times}, loss: {avg_loss}, unscaled: {avg_unscaled}, grad_clip {avg_grad_clip}"
     )
@@ -103,7 +117,6 @@ def train(dataset, data_loader, model, num_epoch, device):
 def main(argv):
     """Main entry point."""
     del argv  # unused
-    # root_pth = "/checkpoint/bcui/compiler_gym/replay_dataset/cbench/06-23/"
     root_pth = (
         "/checkpoint/bcui/compiler_gym/replay_dataset/frozen/2021-06-15-cbench-v1.db"
     )
@@ -111,7 +124,8 @@ def main(argv):
     batch_size = FLAGS.batch_size
     device = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 
-    vocab = parsing_utils.load_vocab(node_vocab_pth)
+    vocab_fp = open(node_vocab_pth, "rb")
+    vocab = pickle.load(vocab_fp)
     model = GNNEncoder(len(vocab), 64)
 
     # This is required to get the vocab into the right state
@@ -126,6 +140,7 @@ def main(argv):
     )
 
     train(dataset, dataset_loader, model, FLAGS.num_epoch, device)
+    vocab_fp.close()
 
 
 if __name__ == "__main__":
