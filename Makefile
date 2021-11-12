@@ -317,7 +317,10 @@ endef
 install-test: | install-test-setup
 	$(call pytest,--no-success-flaky-report --benchmark-disable -n auto -k "not fuzz" --durations=5)
 
-examples-test:
+examples-pip-install:
+	cd examples && python setup.py install
+
+examples-test: examples-pip-install
 	cd examples && pytest --no-success-flaky-report --benchmark-disable -n auto --durations=5 . --cov=compiler_gym --cov-report=xml:$(COV_REPORT) $(PYTEST_ARGS)
 
 # Note we export $CI=1 so that the tests always run as if within the CI
@@ -337,7 +340,7 @@ post-install-test:
 	$(MAKE) -C examples/makefile_integration clean
 	SEARCH_TIME=3 $(MAKE) -C examples/makefile_integration test
 
-.PHONY: test post-install-test examples-test
+.PHONY: test post-install-test examples-pip-install examples-test
 
 
 ################
