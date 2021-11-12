@@ -8,13 +8,19 @@ from collections import deque
 from contextlib import contextmanager
 from enum import Enum
 from itertools import islice
+from os import cpu_count
 from pathlib import Path
+from threading import Lock
 from typing import Optional
 
 from pydantic import BaseModel, Field, validator
 from pydantic.class_validators import root_validator
 
 logger = logging.getLogger(__name__)
+
+
+_executor_lock = Lock()
+_executor = None
 
 
 class Executor(BaseModel):
@@ -122,6 +128,18 @@ class Executor(BaseModel):
 
         if hasattr(executor.unwrapped, "close"):
             executor.unwrapped.close()
+
+    @staticmethod
+    def get_default_local_executor():
+        """Return a singleton :code:`Executor`.
+
+        :returns: An executor.
+        """
+        with _executor_lock:
+            global _executor
+            if _executor is None:
+                _executor = Executor(type="local", cpus=cpu_count())
+            return _executor
 
     # === Start of implementation details. ===
 
