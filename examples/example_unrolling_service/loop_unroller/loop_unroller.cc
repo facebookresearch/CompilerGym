@@ -12,9 +12,11 @@
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Analysis/LoopInfo.h"
+#include "llvm/Bitcode/BitcodeWriterPass.h"
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Function.h"
 #include "llvm/IR/IRBuilder.h"
+#include "llvm/IR/IRPrintingPasses.h"
 #include "llvm/IR/InstIterator.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/IR/Module.h"
@@ -26,6 +28,7 @@
 #include "llvm/Support/Debug.h"
 #include "llvm/Support/FileSystem.h"
 #include "llvm/Support/SourceMgr.h"
+#include "llvm/Support/SystemUtils.h"
 #include "llvm/Support/ToolOutputFile.h"
 #include "llvm/Transforms/Scalar.h"
 #include "llvm/Transforms/Utils/LoopUtils.h"
@@ -43,9 +46,24 @@ cl::opt<std::string> OutputFilename("o", cl::desc("Specify output filename"),
 static cl::opt<bool> UnrollEnable("floop-unroll", cl::desc("Enable loop unrolling"),
                                   cl::init(true));
 
-extern cl::opt<unsigned> UnrollCount(
+static cl::opt<unsigned> UnrollCount(
     "funroll-count", cl::desc("Use this unroll count for all loops including those with "
                               "unroll_count pragma values, for testing purposes"));
+
+// Force binary on terminals
+static cl::opt<bool> Force("f", cl::desc("Enable binary output on terminals"));
+
+// Output assembly
+static cl::opt<bool> OutputAssembly("S", cl::desc("Write output as LLVM assembly"), cl::Hidden);
+
+// Preserve use list order
+static cl::opt<bool> PreserveBitcodeUseListOrder(
+    "preserve-bc-uselistorder", cl::desc("Preserve use-list order when writing LLVM bitcode."),
+    cl::init(true), cl::Hidden);
+
+static cl::opt<bool> PreserveAssemblyUseListOrder(
+    "preserve-ll-uselistorder", cl::desc("Preserve use-list order when writing LLVM assembly."),
+    cl::init(false), cl::Hidden);
 
 // The INITIALIZE_PASS_XXX macros put the initialiser in the llvm namespace.
 void initializeLoopCounterPass(PassRegistry& Registry);
@@ -147,6 +165,15 @@ int main(int argc, char** argv) {
   if (!Module)
     return 1;
 
+  // Prepare output
+  ToolOutputFile Out(OutputFilename, EC, sys::fs::OF_None);
+  if (EC) {
+    Err = SMDiagnostic(OutputFilename, SourceMgr::DK_Error,
+                       "Could not open output file: " + EC.message());
+    Err.print(argv[0], errs());
+    return 1;
+  }
+
   // Run the passes
   initializeLoopCounterPass(*PassRegistry::getPassRegistry());
   legacy::PassManager PM;
@@ -155,6 +182,12 @@ int main(int argc, char** argv) {
   PM.add(Counter);
   PM.add(UnrollConfigurator);
   PM.add(createLoopUnrollPass());
+  // Passes to output the module
+  if (OutputAssembly) {
+    PM.add(createPrintModulePass(Out.os(), "", PreserveAssemblyUseListOrder));
+  } else if (Force || !CheckBitcodeOutputToConsole(Out.os())) {
+    PM.add(createBitcodeWriterPass(Out.os(), PreserveBitcodeUseListOrder));
+  }
   PM.run(*Module);
 
   // Log loop stats
@@ -162,15 +195,6 @@ int main(int argc, char** argv) {
     llvm::dbgs() << x.first << ": " << x.second << " loops" << '\n';
   }
 
-  // Output modified IR
-  ToolOutputFile Out(OutputFilename, EC, sys::fs::OF_None);
-  if (EC) {
-    Err = SMDiagnostic(OutputFilename, SourceMgr::DK_Error,
-                       "Could not open output file: " + EC.message());
-    Err.print(argv[0], errs());
-    return 1;
-  }
-  Module->print(Out.os(), nullptr, false);
   Out.keep();
 
   return 0;

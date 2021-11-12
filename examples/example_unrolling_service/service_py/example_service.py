@@ -177,6 +177,7 @@ class UnrollingCompilationSession(CompilationSession):
                     "../loop_unroller/loop_unroller",
                     self._llvm_path,
                     *args,
+                    "-S",
                     "-o",
                     self._llvm_path,
                 ],

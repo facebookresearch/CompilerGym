@@ -2,5 +2,5 @@ LLVM's opt does not always enforce the unrolling options passed as cli arguments
 
 To run the custom unroller:
 ```
-bazel run //examples/example_unrolling_service/loop_unroller:loop_unroller -- <input>.ll -o <output>.ll  --funroll-count=<num>
+bazel run //examples/example_unrolling_service/loop_unroller:loop_unroller -- <input>.ll --funroll-count=<num> -S -o <output>.ll
 ```
