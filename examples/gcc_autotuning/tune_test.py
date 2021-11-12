@@ -10,8 +10,9 @@ from typing import Iterable
 
 import docker
 import pytest
-import tune
 from absl.flags import FLAGS
+
+from . import tune
 
 
 def docker_is_available() -> bool:

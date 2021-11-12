@@ -11,7 +11,6 @@ from typing import List, NamedTuple
 
 import numpy as np
 from absl import app, flags
-from gcc_autotuning.info import info
 from geneticalgorithm import geneticalgorithm as ga
 
 import compiler_gym
@@ -23,6 +22,8 @@ from compiler_gym.envs.gcc import DEFAULT_GCC
 from compiler_gym.service import ServiceError
 from compiler_gym.util.executor import Executor
 from compiler_gym.util.runfiles_path import create_user_logs_dir
+
+from .info import info
 
 FLAGS = flags.FLAGS
 flags.DEFINE_string(
