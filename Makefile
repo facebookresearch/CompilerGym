@@ -354,7 +354,10 @@ post-install-test:
 # Installation #
 ################
 
-pip-install:
+# We run uninstall as a dependency of install to prevent conflicting
+# CompilerGym versions co-existing in the same Python environment.
+
+pip-install: uninstall
 	$(PYTHON) setup.py install
 
 install: |  init-runtime-requirements bazel-build pip-install
