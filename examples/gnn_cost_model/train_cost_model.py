@@ -58,7 +58,7 @@ def dataset_looper(epoch_num, data_loader, model, device, optimizer=None, train=
     unscaled_mse = []
     epoch_grad_clip = []
     t1 = time.time()
-    for iter, data in enumerate(data_loader):
+    for data in data_loader:
         if data is None:
             continue
         graph, labels = data
