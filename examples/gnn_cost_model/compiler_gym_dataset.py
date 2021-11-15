@@ -2,23 +2,14 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-
-import sqlite3
-import collections
-from sqlite3 import Error
 import pickle
+import sqlite3
 import zlib
-import time
-import os
-from concurrent.futures import ProcessPoolExecutor
 
 import dgl
 import numpy as np
-from dgl.data import DGLDataset
-from dgl.data.utils import save_graphs
-from dgl.data.utils import load_graphs
 import torch
-from torch.utils.data import DataLoader
+from dgl.data import DGLDataset
 
 
 class CompilerGymDataset(DGLDataset):
@@ -258,9 +249,11 @@ def update_graph_with_vocab(graph_fn, features, vocab):
             idx = graph_item[0]
 
             if feature_name in vocab:
-                assert feature in curr_vocab
+                # Lookup vocab item, or map to out-of-vocab index if item is not
+                # found.
+                vocab_index = curr_vocab.get(feature, len(curr_vocab))
                 update_networkx_feature(
-                    graph_fn, idx, f"{feature_name}_idx", curr_vocab[feature]
+                    graph_fn, idx, f"{feature_name}_idx", vocab_index
                 )
             else:
                 assert isinstance(
