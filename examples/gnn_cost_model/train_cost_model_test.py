@@ -2,10 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-
 """Tests for examples/gnn_cost_model/train_cost_model_test.py"""
-
-
 import sys
 
 from absl import flags

@@ -3,32 +3,32 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """
-This module trains the a cost model with a GNN on a LLVM-IR
-transition database predicting some output reward (the default is instruction count).
+This module trains a cost model with a GNN on a LLVM-IR transition database
+predicting some output reward (the default is instruction count).
+
 Example usage:
+
     $ python train_cost_model.py --num_epoch 10 --batch_size 16 --dataset_size 64
 """
 
-import os
-import time
 import collections
-import matplotlib.pyplot as plt
-import numpy as np
-
-import dgl
-import torch.nn as nn
-import torch
-from torch.utils.data import DataLoader
-from absl import app, flags
 import pickle
+import time
 
-from model import GNNEncoder
+import numpy as np
+import torch
+from absl import app, flags
 from compiler_gym_dataset import CompilerGymDataset
-
+from model import GNNEncoder
+from torch.utils.data import DataLoader
 
 flags.DEFINE_list(
     "flags",
-    ["-dataset-size", "-num_epoch", "-batch_size",],
+    [
+        "-dataset-size",
+        "-num_epoch",
+        "-batch_size",
+    ],
     "List of possible flags for training",
 )
 flags.DEFINE_integer(
