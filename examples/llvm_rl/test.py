@@ -6,7 +6,7 @@ import sys
 from pathlib import Path
 from typing import List
 
-from paper.rl.model import Model
+from llvm_rl.model import Model
 
 
 def main(argv):

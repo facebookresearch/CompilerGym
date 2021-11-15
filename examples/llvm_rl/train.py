@@ -42,6 +42,7 @@ def main(config: DictConfig) -> None:
         sys.exit(1)
 
     model.train()
+    model.test()
 
 
 if __name__ == "__main__":

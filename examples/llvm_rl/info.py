@@ -9,11 +9,12 @@ from typing import List
 
 import humanize
 import pandas as pd
-from llvm_rl.model import Model, init_logging
+from llvm_rl.model import Model
 from pydantic import ValidationError
 from tabulate import tabulate
 from typer import Typer
 
+from compiler_gym.util.logging import init_logging
 from compiler_gym.util.statistics import geometric_mean
 
 app = Typer()
@@ -24,7 +25,7 @@ def models_from_paths(log_dirs: List[Path]):
     models: List[Model] = []
     for path in log_dirs:
         try:
-            models += Model.from_logsdir(Path(path))
+            models += Model.from_logsdir(Path(path).expanduser())
         except ValidationError as e:
             print(e, file=sys.stderr)
             sys.exit(1)
@@ -32,7 +33,7 @@ def models_from_paths(log_dirs: List[Path]):
 
 
 @app.command()
-def train(log_dirs: List[Path]):
+def train(log_dirs: List[Path] = ["~/logs/compiler_gym/llvm_rl"]):
     init_logging()
 
     models = models_from_paths(log_dirs)
@@ -146,8 +147,6 @@ def train(log_dirs: List[Path]):
             "test_checkpoint",
             "train_geomean",
             "val_geomean",
-            # "test_ic_geomean",
-            # "test_os_geomean",
         ]
     ]
 
@@ -155,7 +154,10 @@ def train(log_dirs: List[Path]):
 
 
 @app.command()
-def test(log_dirs: List[Path]):
+def test(
+    log_dirs: List[Path] = ["~/logs/compiler_gym/llvm_rl"],
+    format_for_latex: bool = False,
+):
     models = models_from_paths(log_dirs)
 
     # Print everything.
@@ -166,7 +168,7 @@ def test(log_dirs: List[Path]):
     dfs = {}
     for model in models:
         for trial, df in model.test_dataframes.items():
-            df["dataset"] = [
+            df["test_set"] = [
                 re.search(r"^((benchmark|generator)://)(.+)-v[012]/", d).group(3)
                 for d in df["benchmark"]
             ]
@@ -177,23 +179,23 @@ def test(log_dirs: List[Path]):
             gmean_df = (
                 df[
                     [
-                        "dataset",
+                        "test_set",
                         "instruction_count_reduction",
                         "object_size_reduction",
                     ]
                 ]
-                .groupby(["dataset"])
+                .groupby(["test_set"])
                 .agg(geometric_mean)
             )
 
             mean_df = (
                 df[
                     [
-                        "dataset",
+                        "test_set",
                         "inference_walltime_seconds",
                     ]
                 ]
-                .groupby(["dataset"])
+                .groupby(["test_set"])
                 .mean()
             )
 
@@ -201,30 +203,19 @@ def test(log_dirs: List[Path]):
             df = df.reset_index()
             df.insert(0, "trial", trial)
 
-            # FIXME: Format for LaTeX
-            # df["instruction_count_reduction"] = [f"${float(d):.3f}\\times$" for d in df["instruction_count_reduction"]]
-            # df["object_size_reduction"] = [f"${float(d):.3f}\\times$" for d in df["object_size_reduction"]]
+            if format_for_latex:
+                df["instruction_count_reduction"] = [
+                    f"${float(d):.3f}\\times$"
+                    for d in df["instruction_count_reduction"]
+                ]
+                df["object_size_reduction"] = [
+                    f"${float(d):.3f}\\times$" for d in df["object_size_reduction"]
+                ]
 
             print()
             print(tabulate(df, headers="keys", showindex=False, tablefmt="psql"))
 
             dfs[trial] = df
-
-    # FIXME: Format for paper:
-    #
-    # df = pd.concat((
-    #     # Instcounts
-    #     dfs["algo-a2c-R0"][["instruction_count_reduction"]],
-    #     dfs["algo-impala-R0"][["instruction_count_reduction"]],
-    #     dfs["algo-ppo-R0"][["instruction_count_reduction"]],
-    #     # Objsize
-    #     dfs["algo-a2c-R0"][["object_size_reduction"]],
-    #     dfs["algo-impala-R0"][["object_size_reduction"]],
-    #     dfs["algo-ppo-R0"][["object_size_reduction"]],
-    # ), axis=1)
-    #
-    # for _, row in df.iterrows():
-    #     print("&"," & ".join(row), "\\\\")
 
 
 if __name__ == "__main__":

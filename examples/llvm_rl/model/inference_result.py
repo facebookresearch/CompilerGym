@@ -42,9 +42,11 @@ class InferenceResult(BaseModel):
     """The final runtime, normalized to -Oz."""
 
     @classmethod
-    def from_agent(cls, env: CompilerEnv, agent, runtimes_count: int = 30):
-        # We calculate our own reward at the end using the reward_util
-        # module, no need for incremental rewards during inference.
+    def from_agent(
+        cls, env: CompilerEnv, agent, runtime: bool = True, runtimes_count: int = 30
+    ):
+        # We calculate our own reward at the end, no need for incremental
+        # rewards during inference.
         env.reward_space = None
 
         # Run inference on the environment.
@@ -67,7 +69,7 @@ class InferenceResult(BaseModel):
         runtimes_final = []
 
         try:
-            if env.unwrapped.observation["IsRunnable"]:
+            if runtime and env.unwrapped.observation["IsRunnable"]:
                 env.send_param(
                     "llvm.set_runtimes_per_observation_count", str(runtimes_count)
                 )

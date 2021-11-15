@@ -4,7 +4,6 @@
 # LICENSE file in the root directory of this source tree.
 import json
 import logging
-import sys
 from datetime import datetime
 from pathlib import Path
 from typing import Any, Dict, Iterable, List, Optional
@@ -17,6 +16,7 @@ from pydantic import BaseModel, Field
 from ray import tune
 
 from compiler_gym.util.executor import Executor
+from compiler_gym.util.logging import init_logging
 from compiler_gym.util.shell_format import indent, plural
 from compiler_gym.util.statistics import geometric_mean
 
@@ -355,7 +355,7 @@ class Model(BaseModel):
             # validation set.
             "evaluation_num_episodes": evaluation_num_episodes,
             # 1 checkpoint = 1 evaluation.
-            "evaluation_interval": self.agent.checkpoint_freq,
+            "evaluation_interval": 1,
             # Argument dictionary passed to make_env().
             "env_config": {"type": "training"},
             "evaluation_config": {
@@ -407,7 +407,9 @@ def test_job(model: Model, checkpoint: Path, outputs_dir: Path) -> None:
         test_benchmarks = list(model.testing.benchmark_uris_iterator(env))
         for i, benchmark in enumerate(test_benchmarks, start=1):
             env.reset(benchmark=benchmark)
-            result = InferenceResult.from_agent(env, agent)
+            result = InferenceResult.from_agent(
+                env, agent, runtime=model.environment.reward_space == "Runtime"
+            )
             logger.info(
                 "Test %s of %s: %s",
                 f"{i:,d}",
@@ -447,7 +449,7 @@ def train_job(model: Model, seed: int, replica_id: int) -> None:
     ray.init(
         num_cpus=model.executor.cpus,
         num_gpus=model.executor.gpus,
-        include_dashboard=True,
+        include_dashboard=False,
     )
 
     logger.info("Registered RLlib environment %s", model.environment.rllib_id)
@@ -513,14 +515,3 @@ def merge(a, b, path=None):
         else:
             a[key] = b[key]
     return a
-
-
-def init_logging():
-    logger.setLevel(logging.DEBUG)
-    handler = logging.StreamHandler(sys.stdout)
-    handler.setLevel(logging.DEBUG)
-    formatter = logging.Formatter(
-        "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
-    )
-    handler.setFormatter(formatter)
-    logger.addHandler(handler)
