@@ -10,7 +10,6 @@ from typing import List
 import pandas as pd
 from llvm_autotuning.experiment import Experiment
 from pydantic import ValidationError
-from tabulate import tabulate
 from typer import Typer
 
 from compiler_gym.util.statistics import geometric_mean
@@ -55,13 +54,11 @@ def info(
         print("No results")
 
     df = pd.concat(dfs)
-    df = (
-        df.groupby(["timestamp", "search"])[["scaled_size"]]
-        .agg(geometric_mean)
-        .reset_index()
-    )
-    df = df.rename(columns={"scaled_size": "geomean_binsize_reduction"})
-    print(tabulate(df, showindex=False, headers="keys", tablefmt="grid"))
+    df = df.groupby(["timestamp", "search"])[["scaled_size"]].agg(geometric_mean)
+    df = df.rename(columns={"scaled_size": "geomean_reward"})
+
+    pd.set_option("display.max_rows", None)
+    print(df)
 
 
 if __name__ == "__main__":
