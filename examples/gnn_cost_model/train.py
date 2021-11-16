@@ -152,7 +152,7 @@ def download_and_unpack_database(db: str, sha256: str) -> Path:
         if not (local_dir / ".installed").is_file():
             tar_data = io.BytesIO(download(db, sha256))
 
-            local_dir.mkdir(parents=True)
+            local_dir.mkdir(parents=True, exist_ok=True)
             logger.info("Unpacking database to %s ...", local_dir)
             with tarfile.open(fileobj=tar_data, mode="r:bz2") as arc:
                 arc.extractall(str(local_dir))
