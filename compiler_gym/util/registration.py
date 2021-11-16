@@ -30,7 +30,7 @@ def _parse_version_string(version):
 def register(id: str, order_enforce: bool = False, **kwargs):
     COMPILER_GYM_ENVS.append(id)
 
-    # As of gym==0.21.0 a new OrderEforce wrapper is enabled by default. Turn
+    # As of gym==0.21.0 a new OrderEnforcing wrapper is enabled by default. Turn
     # this off as CompilerEnv already enforces this and the wrapper obscures the
     # docstrings of the base class.
     gym_version = _parse_version_string(gym.__version__)
