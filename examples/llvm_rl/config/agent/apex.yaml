@@ -1,0 +1,11 @@
+---
+type: ApexTrainer
+args:
+    hiddens: [256]
+    num_workers: 16  # NOTE(cummins): Device specific
+    framework: tf
+    horizon: 45
+    evaluation_config:
+        explore: false
+checkpoint_freq: 10
+checkpoint_at_end: true

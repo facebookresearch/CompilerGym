@@ -8,6 +8,7 @@ import pytest
 from compiler_gym.envs.llvm import LlvmEnv
 from compiler_gym.wrappers import (
     CycleOverBenchmarks,
+    CycleOverBenchmarksIterator,
     IterateOverBenchmarks,
     RandomOrderBenchmarks,
 )
@@ -164,6 +165,44 @@ def test_cycle_over_benchmarks_fork_shared_iterator(env: LlvmEnv):
         assert fkd.benchmark == "benchmark://cbench-v1/crc32"
     finally:
         fkd.close()
+
+
+def test_cycle_over_benchmarks_iterator(env):
+    env = CycleOverBenchmarksIterator(
+        env,
+        make_benchmark_iterator=lambda: (
+            "benchmark://cbench-v1/dijkstra",
+            "benchmark://cbench-v1/qsort",
+            "benchmark://cbench-v1/adpcm",
+        ),
+    )
+
+    env.reset()
+    assert env.benchmark == "benchmark://cbench-v1/dijkstra"
+
+    env.reset()
+    assert env.benchmark == "benchmark://cbench-v1/qsort"
+
+    env.reset()
+    assert env.benchmark == "benchmark://cbench-v1/adpcm"
+
+    env.reset()
+    assert env.benchmark == "benchmark://cbench-v1/dijkstra"
+
+    env.reset()
+    assert env.benchmark == "benchmark://cbench-v1/qsort"
+
+    with env.fork() as fkd:
+        fkd.reset()
+        assert fkd.benchmark == "benchmark://cbench-v1/dijkstra"
+
+        fkd.reset()
+        assert fkd.benchmark == "benchmark://cbench-v1/qsort"
+        assert env.benchmark == "benchmark://cbench-v1/qsort"
+
+        env.reset()
+        assert fkd.benchmark == "benchmark://cbench-v1/qsort"
+        assert env.benchmark == "benchmark://cbench-v1/adpcm"
 
 
 def test_random_order_benchmarks(env: LlvmEnv):

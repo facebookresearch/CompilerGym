@@ -4,10 +4,9 @@
 # LICENSE file in the root directory of this source tree.
 import numpy as np
 import pytest
+from llvm_rl import wrappers
 
 import compiler_gym
-
-from . import autophase_wrappers as wrappers
 
 
 @pytest.fixture(scope="function")

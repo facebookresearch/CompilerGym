@@ -72,11 +72,11 @@ directory for further details.
 
 ### GCC Autotuning (genetic algorithms, hill climbing, + more)
 
-The [gcc_search.py](gcc_search.py) script contains implementations of several
-autotuning techniques for the GCC environment. It was used to produce the
-results for the GCC experiments in the [CompilerGym
-whitepaper](https://arxiv.org/pdf/2109.08267.pdf). For further details run:
-`python gcc_search.py --help`.
+The [gcc_autotuning/tune.py](gcc_autotuning/tune.py) script contains
+implementations of several autotuning techniques for the GCC environment. It was
+used to produce the results for the GCC experiments in the [CompilerGym
+whitepaper](https://arxiv.org/pdf/2109.08267.pdf). See the
+[gcc_autotuning](gcc_autotuning/) directory for further details.
 
 
 ### Makefile integration

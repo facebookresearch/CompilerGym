@@ -96,7 +96,7 @@ class CLgenDataset(TarDatasetWithManifest):
 
             # Download the libclc headers.
             shutil.rmtree(self.libclc_dir, ignore_errors=True)
-            logger.info("Downloading OpenCL headers")
+            logger.info("Downloading OpenCL headers ...")
             tar_data = io.BytesIO(
                 download(
                     "https://dl.fbaipublicfiles.com/compiler_gym/libclc-v0.tar.bz2",

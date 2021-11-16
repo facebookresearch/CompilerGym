@@ -17,6 +17,7 @@ import gym
 
 from compiler_gym.datasets import Benchmark, Dataset
 from compiler_gym.spaces import Reward
+from compiler_gym.util.logging import init_logging
 from compiler_gym.util.registration import register
 from compiler_gym.util.runfiles_path import site_data_path
 
@@ -99,7 +100,7 @@ register(
 
 def main():
     # Use debug verbosity to print out extra logging information.
-    logging.basicConfig(level=logging.DEBUG)
+    init_logging(level=logging.DEBUG)
 
     # Create the environment using the regular gym.make(...) interface.
     with gym.make("example-v0") as env:

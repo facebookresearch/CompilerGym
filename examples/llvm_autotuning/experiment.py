@@ -12,10 +12,10 @@ import pandas as pd
 import yaml
 from llvm_autotuning.autotuners import Autotuner
 from llvm_autotuning.benchmarks import Benchmarks
-from llvm_autotuning.executor import Executor
 from pydantic import BaseModel, Field
 
 from compiler_gym import CompilerEnvStateWriter
+from compiler_gym.util.executor import Executor
 
 logger = logging.getLogger(__name__)
 
@@ -168,7 +168,7 @@ def _experiment_worker(
     with autotuner.optimization_target.make_env(benchmark) as env:
         env.seed(seed)
         env.action_space.seed(seed)
-        state = autotuner(benchmark, seed=seed)
+        state = autotuner(env, seed=seed)
 
     logger.info("State %s", state)
     with CompilerEnvStateWriter(open(results_path, "w")) as writer:

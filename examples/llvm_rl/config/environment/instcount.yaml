@@ -1,0 +1,10 @@
+---
+id: llvm-v0
+max_episode_steps: 45
+observation_space: InstCount
+reward_space: IrInstructionCountOz
+wrappers:
+    - wrapper: AutophaseActionSpace
+    - wrapper: ClampedReward
+      args:
+          leakiness_factor: 0.001

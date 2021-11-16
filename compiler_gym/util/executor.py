@@ -8,18 +8,23 @@ from collections import deque
 from contextlib import contextmanager
 from enum import Enum
 from itertools import islice
+from os import cpu_count
 from pathlib import Path
+from threading import Lock
 from typing import Optional
 
 from pydantic import BaseModel, Field, validator
 from pydantic.class_validators import root_validator
-from submitit import AutoExecutor
 
 logger = logging.getLogger(__name__)
 
 
+_executor_lock = Lock()
+_executor = None
+
+
 class Executor(BaseModel):
-    """Defines the execution environment for jobs.
+    """Defines an execution environment for jobs.
 
     E.g. a node on a cluster, the local machine, etc. To create jobs,
     instantiate this class and submit functions to using the executor API:
@@ -54,7 +59,7 @@ class Executor(BaseModel):
     Only used for :code:`Type.SLURM` executors.
     """
 
-    cpus: int = Field(default=1, allow_mutation=False, ge=1)
+    cpus: int = Field(default=1, allow_mutation=False, ge=-1)
     """The number of CPU threads to provision.
 
     If the type of executor is :code:`Type.SLURM`, this is the number of CPU
@@ -63,6 +68,12 @@ class Executor(BaseModel):
     thread pool. If the value is -1 and the executor is :code:`Type.LOCAL`, the
     number of physical cores on the machine is used. Has no effect for
     :code:`Type.DEBUG` and :code:`Type.NOOP`.
+    """
+
+    gpus: int = Field(default=0, allow_mutation=False, ge=0)
+    """The number of GPUs to provision.
+
+    This is used only by the :code:`Type.SLURM` executor.
     """
 
     timeout_hours: float = Field(default=12, allow_mutation=False, gt=0)
@@ -76,22 +87,33 @@ class Executor(BaseModel):
     # === Start of public API. ===
 
     @contextmanager
-    def get_executor(self, logs_dir: Path, cpus=None):
+    def get_executor(
+        self, logs_dir: Path, timeout_hours: Optional[float] = None, cpus=None
+    ) -> "Executor":
         cpus = cpus or self.cpus
+        timeout_hours = timeout_hours or self.timeout_hours
         if self.type == self.Type.SLURM:
+            try:
+                from submitit import AutoExecutor
+            except ImportError as e:
+                raise OSError(
+                    "Using the slurm executor requires the submitit library. "
+                    "Install submitit using: python -m pip install submitit"
+                ) from e
             executor = AutoExecutor(folder=logs_dir)
             executor.update_parameters(
-                timeout_min=int(round(self.timeout_hours * 60)),
+                timeout_min=int(round(timeout_hours * 60)),
                 nodes=1,
                 cpus_per_task=cpus,
+                gpus_per_node=self.gpus,
                 slurm_partition=self.slurm_partition,
             )
             name = self.slurm_partition
         elif self.type == self.Type.LOCAL:
             executor, name = (
                 LocalParallelExecutor(
-                    cpus=multiprocessing.cpu_count() if cpus == -1 else cpus,
-                    timeout_seconds=int(round(self.timeout_hours * 3600)),
+                    cpus=cpus,
+                    timeout_seconds=int(round(timeout_hours * 3600)),
                 ),
                 "local",
             )
@@ -114,6 +136,18 @@ class Executor(BaseModel):
         if hasattr(executor.unwrapped, "close"):
             executor.unwrapped.close()
 
+    @staticmethod
+    def get_default_local_executor():
+        """Return a singleton :code:`Executor`.
+
+        :returns: An executor.
+        """
+        with _executor_lock:
+            global _executor
+            if _executor is None:
+                _executor = Executor(type="local", cpus=cpu_count())
+            return _executor
+
     # === Start of implementation details. ===
 
     @validator("slurm_partition")
@@ -123,11 +157,18 @@ class Executor(BaseModel):
             assert value, f"Must specify a partition for executor: {values['executor']}"
         return value
 
+    @validator("cpus", pre=True)
+    def validate_cpus(cls, value, *, values, **kwargs):
+        del kwargs
+        # -1 CPU count defaults to CPU count.
+        if values["type"] == cls.Type.LOCAL and value == -1:
+            return cpu_count()
+        return value
+
     @root_validator
     def local_always_blocks(cls, values):
         if values["type"] == cls.Type.LOCAL or values["type"] == cls.Type.NOOP:
             values["block"] = True
-
         return values
 
     class Config:

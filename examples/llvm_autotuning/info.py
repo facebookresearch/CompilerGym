@@ -30,7 +30,7 @@ def experiments_from_paths(log_dirs: List[Path]) -> List[Experiment]:
 
 @app.command()
 def info(
-    log_dirs: List[Path] = ["~/logs/llvm_autotuning"],
+    log_dirs: List[Path] = ["~/logs/compiler_gym/llvm_autotuning"],
     all_runs: bool = False,
     group_by_working_directory: bool = False,
 ):
@@ -93,6 +93,13 @@ def info(
         df = df.groupby(["working_directory"]).mean()
     else:
         df = df.groupby(["experiment", "timestamp", "config"]).mean()
+
+    # Cast float back to int.
+    df["num_benchmarks"] = [int(x) for x in df["num_benchmarks"]]
+    df["num_results"] = [int(x) for x in df["num_results"]]
+
+    # Better column names.
+    df = df.rename(columns={"reward": "geomean_reward", "walltime": "walltime (s)"})
 
     pd.set_option("display.max_rows", None)
     print(df)

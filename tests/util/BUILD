@@ -33,6 +33,15 @@ py_test(
     ],
 )
 
+py_test(
+    name = "executor_test",
+    srcs = ["executor_test.py"],
+    deps = [
+        "//compiler_gym/util",
+        "//tests:test_main",
+    ],
+)
+
 cc_test(
     name = "EnumUtilTest",
     srcs = ["EnumUtilTest.cc"],

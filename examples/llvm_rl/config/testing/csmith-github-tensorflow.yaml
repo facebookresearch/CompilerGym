@@ -1,0 +1,11 @@
+---
+timeout_hours: 1
+exploration: false
+runs_per_benchmark: 1
+benchmarks:
+    - dataset: generator://csmith-v0
+      max_benchmarks: 50
+    - dataset: benchmark://github-v0
+      max_benchmarks: 50
+    - dataset: benchmark://tensorflow-v0
+      max_benchmarks: 50

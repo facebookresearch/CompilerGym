@@ -1,0 +1,12 @@
+---
+timeout_hours: 168
+episodes: 100000
+benchmarks:
+    - dataset: benchmark://github-v0
+      max_benchmarks: 100000
+      benchmarks_start_at: 100 # offset the test + validation sets
+validation:
+    benchmarks:
+        - dataset: benchmark://github-v0
+          max_benchmarks: 50
+          benchmarks_start_at: 50 # offset the test set
