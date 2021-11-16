@@ -98,7 +98,11 @@ class UnrollingCompilationSession(CompilationSession):
     ]
 
     def __init__(
-        self, working_directory: Path, action_space: ActionSpace, benchmark: Benchmark
+        self,
+        working_directory: Path,
+        action_space: ActionSpace,
+        benchmark: Benchmark,
+        use_custom_opt: bool = True,
     ):
         super().__init__(working_directory, action_space, benchmark)
         logging.info("Started a compilation session for %s", benchmark.uri)
@@ -110,6 +114,9 @@ class UnrollingCompilationSession(CompilationSession):
         self._llc = str(llvm.llc_path())
         self._llvm_diff = str(llvm.llvm_diff_path())
         self._opt = str(llvm.opt_path())
+        # LLVM's opt does not always enforce the unrolling options passed as cli arguments. Hence, we created our own exeutable with custom unrolling pass in examples/example_unrolling_service/loop_unroller that enforces the unrolling factors passed in its cli.
+        # if self._use_custom_opt is true, use our custom exeutable, otherwise use LLVM's opt
+        self._use_custom_opt = use_custom_opt
 
         # Dump the benchmark source to disk.
         self._src_path = str(self.working_dir / "benchmark.c")
@@ -147,28 +154,47 @@ class UnrollingCompilationSession(CompilationSession):
         if choice_index < 0 or choice_index >= num_choices:
             raise ValueError("Out-of-range")
 
-        cmd = self._action_space.choice[0].named_discrete_space.value[choice_index]
+        args = self._action_space.choice[0].named_discrete_space.value[choice_index]
         logging.info(
             "Applying action %d, equivalent command-line arguments: '%s'",
             choice_index,
-            cmd,
+            args,
         )
+        args = args.split()
 
         # make a copy of the LLVM file to compare its contents after applying the action
         shutil.copyfile(self._llvm_path, self._llvm_before_path)
 
         # apply action
-        run_command(
-            [
-                self._opt,
-                *cmd.split(),
-                self._llvm_path,
-                "-S",
-                "-o",
-                self._llvm_path,
-            ],
-            timeout=30,
-        )
+        if self._use_custom_opt:
+            # our custom unroller has an additional `f` at the beginning of each argument
+            for i, arg in enumerate(args):
+                # convert -<argument> to -f<argument>
+                arg = arg[0] + "f" + arg[1:]
+                args[i] = arg
+            run_command(
+                [
+                    "../loop_unroller/loop_unroller",
+                    self._llvm_path,
+                    *args,
+                    "-S",
+                    "-o",
+                    self._llvm_path,
+                ],
+                timeout=30,
+            )
+        else:
+            run_command(
+                [
+                    self._opt,
+                    *args,
+                    self._llvm_path,
+                    "-S",
+                    "-o",
+                    self._llvm_path,
+                ],
+                timeout=30,
+            )
 
         # compare the IR files to check if the action had an effect
         try:
