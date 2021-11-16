@@ -169,7 +169,8 @@ python -m llvm_rl.train -m \
     experiment=algo \
     agent=a2c,apex,impala,ppo \
     num_replicas=10 \
-    training=csmith
+    training=csmith \
+    testing=all
 ```
 
 ### Section VII.H: Effect of training set
@@ -179,7 +180,8 @@ python -m llvm_rl.train -m \
     experiment=training_set \
     agent=ppo \
     num_replicas=10 \
-    training=csmith,github,tensorflow
+    training=csmith,github,tensorflow \
+    testing=csmith,github,tensorflow
 ```
 
 
@@ -190,5 +192,7 @@ python -m llvm_rl.train -m \
     experiment=observation_space \
     agent=ppo \
     num_replicas=10 \
-    environment=autophase,autophase-with-history,instcount,instcount-with-history
+    environment=autophase,autophase-with-history,instcount,instcount-with-history \
+    training=csmith \
+    testing=cbench
 ```

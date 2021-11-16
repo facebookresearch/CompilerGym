@@ -2,8 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""Autotuning script for GCC command line options.
-"""
+"""Autotuning script for GCC command line options."""
 import random
 from itertools import islice, product
 from multiprocessing import Lock
@@ -132,7 +131,7 @@ def genetic_algorithm(env: CompilerEnv):
 def objective(env) -> int:
     """Get the objective from an environment"""
     # Retry loop to defend against flaky environment.
-    for _ in range(3):
+    for _ in range(5):
         try:
             return env.observation[FLAGS.objective]
         except ServiceError as e:

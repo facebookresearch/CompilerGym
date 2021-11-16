@@ -26,16 +26,13 @@ from absl import app, flags
 from fasteners import InterProcessLock
 from torch.utils.data import DataLoader
 
+import compiler_gym.util.flags.nproc  # noqa flag definition
 from compiler_gym.util.download import download
 from compiler_gym.util.runfiles_path import cache_path, transient_cache_path
 from compiler_gym.util.timer import Timer, humanize_duration
 
 from .compiler_gym_dataset import CompilerGymDataset
 from .model import GNNEncoder
-
-logger = logging.getLogger(__name__)
-
-_DB_DOWNLOAD_LOCK = Lock()
 
 flags.DEFINE_integer(
     "dataset_size", -1, "How large should the dataset be, -1 if no constraint"
@@ -69,16 +66,9 @@ flags.DEFINE_string(
 FLAGS = flags.FLAGS
 
 
-def get_dataset(file_dir, batch_size, vocab, num_workers=16, dataset_size=-1):
-    dataset = CompilerGymDataset(file_dir, vocab=vocab, dataset_size=dataset_size)
-    train_data_loader = DataLoader(
-        dataset,
-        batch_size=batch_size,
-        shuffle=True,
-        num_workers=num_workers,
-        collate_fn=dataset.collate_fn,
-    )
-    return dataset, train_data_loader
+logger = logging.getLogger(__name__)
+
+_DB_DOWNLOAD_LOCK = Lock()
 
 
 def dataset_looper(epoch_num, data_loader, model, device, optimizer=None, train=True):
@@ -194,8 +184,13 @@ def main(argv):
     model.to(FLAGS.device)
     print(model)
 
-    dataset, dataset_loader = get_dataset(
-        root_pth, FLAGS.batch_size, vocab, dataset_size=FLAGS.dataset_size
+    dataset = CompilerGymDataset(root_pth, vocab=vocab, dataset_size=FLAGS.dataset_size)
+    dataset_loader = DataLoader(
+        dataset,
+        batch_size=FLAGS.batch_size,
+        shuffle=True,
+        num_workers=FLAGS.nproc,
+        collate_fn=dataset.collate_fn,
     )
 
     train(dataset, dataset_loader, model, FLAGS.num_epoch, FLAGS.device)
