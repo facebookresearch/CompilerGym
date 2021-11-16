@@ -61,8 +61,8 @@ and file a [Pull Request](#pull-requests). Please include:
 2. A CSV file of your results. The
    [compiler_gym.leaderboard](https://facebookresearch.github.io/CompilerGym/compiler_gym/leaderboard.html)
    package provides utilities to help generate results using your agent.
-3. A write-up of your approach. You may use the [submission
-   template]([/leaderboard/SUBMISSION_TEMPLATE.md](https://raw.githubusercontent.com/facebookresearch/CompilerGym/development/leaderboard/SUBMISSION_TEMPLATE.md))
+3. A write-up of your approach. You may use the submission template
+   ([leaderboard/SUBMISSION_TEMPLATE.md](https://raw.githubusercontent.com/facebookresearch/CompilerGym/development/leaderboard/SUBMISSION_TEMPLATE.md))
    as a guide.
 
 Please make sure to update to the latest CompilerGym release prior to
