@@ -11,12 +11,10 @@ from typing import Any, Dict, Iterable, List, Optional
 import pandas as pd
 import ray
 import yaml
-from fasteners import InterProcessLock
 from pydantic import BaseModel, Field
 from ray import tune
 
 from compiler_gym.util.executor import Executor
-from compiler_gym.util.logging import init_logging
 from compiler_gym.util.shell_format import indent, plural
 from compiler_gym.util.statistics import geometric_mean
 
@@ -143,11 +141,6 @@ class Model(BaseModel):
             test_dir = checkpoint.parent.parent
             assert (test_dir / "progress.csv").is_file()
 
-            # Make sure there aren't any other test jobs. Don't block on error,
-            # just fail.
-            lock = InterProcessLock(test_dir / ".test-lock")
-            lock.acquire(blocking=False)
-
             # Try not to have to launch a job.
             if (test_dir / "test-meta.json").is_file():
                 with open(test_dir / "test-meta.json") as f:
@@ -159,7 +152,7 @@ class Model(BaseModel):
                         )
                         continue
 
-            jobs.append((lock, checkpoint, test_dir))
+            jobs.append((checkpoint, test_dir))
 
         # Submit all the jobs now.
         with self.executor.get_executor(
@@ -169,11 +162,7 @@ class Model(BaseModel):
             # Single threaded evaluation loop.
             cpus=2,
         ) as executor:
-            for lock, checkpoint, test_dir in jobs:
-                # Let go of the test lock. This begins the section of code where
-                # races can occur if someone else comes along and grabs the lock
-                # before the test job can take it over.
-                lock.release()
+            for checkpoint, test_dir in jobs:
                 executor.submit(
                     test_job, model=self, checkpoint=checkpoint, outputs_dir=test_dir
                 )
@@ -371,12 +360,6 @@ class Model(BaseModel):
 
 
 def test_job(model: Model, checkpoint: Path, outputs_dir: Path) -> None:
-    init_logging()
-
-    # Make sure there aren't any other test jobs. Don't block on error,
-    # just fail.
-    InterProcessLock(outputs_dir / ".test-lock").acquire(blocking=False)
-
     logger.info(
         "Initializing ray with 2 cpus and %d GPUs",
         model.executor.gpus,
@@ -437,8 +420,6 @@ def test_job(model: Model, checkpoint: Path, outputs_dir: Path) -> None:
 
 
 def train_job(model: Model, seed: int, replica_id: int) -> None:
-    init_logging()
-
     logger.info(
         "Initializing ray with %d %s and %d %s",
         model.executor.cpus,
