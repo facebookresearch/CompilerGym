@@ -6,15 +6,21 @@ import random
 import subprocess
 import tempfile
 import warnings
+from pathlib import Path
 
+import numpy as np
+from llvm_autotuning.optimization_target import OptimizationTarget
+
+from compiler_gym.envs import CompilerEnv
+from compiler_gym.envs.llvm import compute_observation
 from compiler_gym.service.connection import ServiceError
+from compiler_gym.third_party.llvm import opt_path
+from compiler_gym.util.runfiles_path import transient_cache_path
 
 # Ignore import deprecation warnings from opentuner.
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
-import numpy as np  # noqa: E402
-import opentuner as os  # noqa: E402
-from llvm_autotuning.optimization_target import OptimizationTarget  # noqa: E402
+import opentuner as ot  # noqa: E402
 from opentuner import (  # noqa: E402
     ConfigurationManipulator,
     MeasurementInterface,
@@ -24,11 +30,6 @@ from opentuner import (  # noqa: E402
 from opentuner.search.binaryga import BinaryGA  # noqa: E402
 from opentuner.search.manipulator import BooleanParameter  # noqa: E402
 from opentuner.tuningrunmain import TuningRunMain  # noqa: E402
-
-from compiler_gym.envs import CompilerEnv  # noqa: E402
-from compiler_gym.envs.llvm import compute_observation  # noqa: E402
-from compiler_gym.third_party.llvm import opt_path  # noqa: E402
-from compiler_gym.util.runfiles_path import transient_cache_path  # noqa: E402
 
 
 def opentuner_ga(
@@ -52,7 +53,7 @@ def opentuner_ga(
     cache_dir = transient_cache_path("llvm_autotuning")
     cache_dir.mkdir(exist_ok=True, parents=True)
     with tempfile.TemporaryDirectory(dir=cache_dir, prefix="opentuner-") as tmpdir:
-        argparser = os.default_argparser()
+        argparser = ot.default_argparser()
         args = argparser.parse_args(
             args=[
                 f"--stop-after={search_time_seconds}",
@@ -63,7 +64,7 @@ def opentuner_ga(
                 "--parallelism=1",
             ]
         )
-        os.search.technique.register(
+        ot.search.technique.register(
             BinaryGA(
                 population=population,
                 tournament=tournament,
@@ -181,14 +182,16 @@ class LlvmOptFlagsTuner(MeasurementInterface):
             # Run opt to produce an optimized bitcode file.
             cmd = [
                 self.opt,
-                str(self.unoptimized_path),
+                self.unoptimized_path,
                 "-o",
-                str(self.tmp_optimized_path),
+                self.tmp_optimized_path,
             ]
             cmd += self.serialize_flags(desired_result.configuration.data)
             subprocess.check_call(
                 cmd, timeout=300, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
             )
+            if not Path(self.tmp_optimized_path).is_file():
+                return Result(time=float("inf"))
         except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
             return Result(time=float("inf"))
 
