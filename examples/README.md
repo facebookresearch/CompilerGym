@@ -23,6 +23,9 @@ you think is missing? If so, please [contribute](/CONTRIBUTING.md)!
 - [Miscellaneous](#miscellaneous)
   - [Exhaustive search of bounded action spaces](#exhaustive-search-of-bounded-action-spaces)
   - [Estimating the immediate and cumulative reward of actions and benchmarks](#estimating-the-immediate-and-cumulative-reward-of-actions-and-benchmarks)
+  - [Sweeping the inner loop size of CUDA loop nests](#sweeping-the-inner-loop-size-of-cuda-loop-nests)
+  - [Micro-benchmarking environment operation times](#micro-benchmarking-environment-operation-times)
+  - [Supervised graph learning to estimate LLVM IR instruction count](#supervised-graph-learning-to-estimate-llvm-ir-instruction-count)
 
 
 ## Autotuning
@@ -233,3 +236,44 @@ environment parameters:
   This script estimates the cumulative reward for a random episode on a
   benchmark by running trials. A trial is an episode in which a random number of
   random actions are performed and the total cumulative reward is recorded.
+
+
+### Sweeping the inner loop size of CUDA loop nests
+
+The script [loop_tool_sweep.py](loop_tool_sweep.py) demonstrates using the
+`loop_tool-v0` environment to sweep the inner loop size of a loop nest. For
+details run `python loop_tool_sweep.py --help`.
+
+
+### Micro-benchmarking environment operation times
+
+The script [op_benchmarks.py](op_benchmarks.py) is used to benchmark the various
+operation types of CompilerGym environments. To collect new measurements, run
+one of the following commands:
+
+```
+python -m op_benchmarks {run,init,reset,step,observations} --env=<env> --n=<count>
+```
+
+where `--env` is the environment to benchmark and `--n` is the number of
+measurements of each operation to gather. For example:
+
+```
+python -m op_benchmarks run --env=llvm-v0 --n=100
+```
+
+Aggregate and print measurements using:
+
+```
+python -m op_benchmarks info
+```
+
+See `python op_benchmarks.py --help` for more details.
+
+
+### Supervised graph learning to estimate LLVM IR instruction count
+
+The script [gnn_cost_model/train.py](gnn_cost_model/train.py) demonstrates how
+to train a cost model with a GNN on a LLVM-IR transition database predicting
+some output reward (the default is instruction count). See `python
+gnn_cost_model/train.py --help` for more details.

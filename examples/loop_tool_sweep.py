@@ -2,6 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+"""Sweep the inner loop size of CUDA loop nests."""
 import logging
 from itertools import product
 from pathlib import Path
