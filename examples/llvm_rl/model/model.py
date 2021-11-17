@@ -157,8 +157,7 @@ class Model(BaseModel):
         # Submit all the jobs now.
         with self.executor.get_executor(
             logs_dir=self.working_directory / "slurm",
-            # Provision an extra hour for RLlib overhead.
-            timeout_hours=self.testing.timeout_hours + 1,
+            timeout_hours=self.testing.timeout_hours,
             # Single threaded evaluation loop.
             cpus=2,
         ) as executor:
