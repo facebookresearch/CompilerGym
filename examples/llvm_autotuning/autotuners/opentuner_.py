@@ -186,7 +186,9 @@ class LlvmOptFlagsTuner(MeasurementInterface):
                 str(self.tmp_optimized_path),
             ]
             cmd += self.serialize_flags(desired_result.configuration.data)
-            subprocess.check_call(cmd, timeout=300)
+            subprocess.check_call(
+                cmd, timeout=300, stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL
+            )
         except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
             return Result(time=float("inf"))
 
