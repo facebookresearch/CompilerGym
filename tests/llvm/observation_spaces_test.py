@@ -1229,8 +1229,6 @@ def test_runtime_observation_space(env: LlvmEnv):
     for buildtime in value:
         assert buildtime > 0
 
-    assert len(set(value)) > 1
-
 
 @pytest.mark.xfail(
     sys.platform == "darwin",
