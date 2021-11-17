@@ -15,5 +15,5 @@ runs:
         # if run from pytest / bazel. Suppress errors if DGL is not installed.
         - name: Initialize DGL
           run: |
-              python -c 'import dgl; print(dgl.__version__)' || true
+              python3 -c 'import dgl; print(dgl.__version__)' || true
           shell: bash
