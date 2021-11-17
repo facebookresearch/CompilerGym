@@ -3,7 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Configuration for building an action space from a list of LLVM passes."""
-from compiler_gym.envs.llvm.service.passes.common import Pass
+from common import Pass
 
 # A set of headers that must be included.
 EXTRA_LLVM_HEADERS = {
