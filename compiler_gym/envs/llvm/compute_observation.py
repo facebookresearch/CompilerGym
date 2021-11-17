@@ -108,7 +108,9 @@ def compute_observation(
     try:
         stdout = stdout.decode("utf-8")
     except UnicodeDecodeError as e:
-        raise ValueError(f"Failed to parse {observation_space.id} observation: {e}")
+        raise ValueError(
+            f"Failed to parse {observation_space.id} observation: {e}"
+        ) from e
 
     observation = Observation()
     try:
