@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Contributing &mdash; CompilerGym 0.2.0 documentation</title>
+  <title>Contributing &mdash; CompilerGym 0.2.1 documentation</title>
   
 
   
@@ -58,9 +58,12 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> CompilerGym
+            <a href="index.html">
           
 
+          
+            
+            <img src="_static/logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -68,7 +71,7 @@
             
             
               <div class="version">
-                0.2.0
+                0.2.1
               </div>
             
           
@@ -125,6 +128,7 @@
 <li class="toctree-l1"><a class="reference internal" href="llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/service/runtime.html">compiler_gym.service.runtime</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
@@ -256,7 +260,8 @@ and create your branch from <code class="docutils literal notranslate"><span cla
 source</a>
 to set up your environment.</p></li>
 <li><p>If you’ve added code that should be tested, add tests.</p></li>
-<li><p>If you’ve changed APIs, update the <a class="reference external" href="/docs/source">documentation</a>.</p></li>
+<li><p>If you’ve changed APIs, update the
+<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/tree/development/docs/source">documentation</a>.</p></li>
 <li><p>Ensure the <code class="docutils literal notranslate"><span class="pre">make</span> <span class="pre">test</span></code> suite passes.</p></li>
 <li><p>Make sure your code lints (see <a class="reference external" href="#code-style">Code Style</a> below).</p></li>
 <li><p>If you haven’t already, complete the <a class="reference external" href="#contributor-license-agreement-cla">Contributor License Agreement
@@ -273,8 +278,9 @@ include:</p>
 <li><p>A CSV file of your results. The
 <a class="reference external" href="https://facebookresearch.github.io/CompilerGym/compiler_gym/leaderboard.html">compiler_gym.leaderboard</a>
 package provides utilities to help generate results using your agent.</p></li>
-<li><p>A write-up of your approach. You may use the <a class="reference external" href="/leaderboard/SUBMISSION_TEMPLATE.md">submission
-template</a> as a guide.</p></li>
+<li><p>A write-up of your approach. You may use the submission template
+(<a class="reference external" href="https://raw.githubusercontent.com/facebookresearch/CompilerGym/development/leaderboard/SUBMISSION_TEMPLATE.md">leaderboard/SUBMISSION_TEMPLATE.md</a>)
+as a guide.</p></li>
 </ol>
 <p>Please make sure to update to the latest CompilerGym release prior to
 submission. We do not require that you submit the source code for your
@@ -299,8 +305,9 @@ character line length and <code class="docutils literal notranslate"><span class
 </ul>
 <p>We use <a class="reference external" href="https://pre-commit.com/">pre-commit</a> to ensure that code is
 formatted prior to committing. Before submitting pull requests, please
-run pre-commit. See the <a class="reference external" href="/.pre-commit-config.yaml">config file</a> for
-installation and usage instructions.</p>
+run pre-commit. See
+<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/blob/development/INSTALL.md">INSTALL.md</a>
+for installation and usage instructions.</p>
 <p>Other common sense rules we encourage are:</p>
 <ul class="simple">
 <li><p>Prefer descriptive names over short ones.</p></li>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.datasets.dataset &mdash; CompilerGym 0.1.10 documentation</title>
+  <title>compiler_gym.datasets.dataset &mdash; CompilerGym 0.2.1 documentation</title>
   
 
   
@@ -56,9 +56,12 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> CompilerGym
+            <a href="../../../index.html">
           
 
+          
+            
+            <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -66,7 +69,7 @@
             
             
               <div class="version">
-                0.1.10
+                0.2.1
               </div>
             
           
@@ -116,6 +119,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service/runtime.html">compiler_gym.service.runtime</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
@@ -204,11 +208,18 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+<span class="kn">from</span> <span class="nn">deprecated.sphinx</span> <span class="kn">import</span> <span class="n">deprecated</span>
 <span class="kn">from</span> <span class="nn">deprecated.sphinx</span> <span class="kn">import</span> <span class="n">deprecated</span> <span class="k">as</span> <span class="n">mark_deprecated</span>
 
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets.benchmark</span> <span class="kn">import</span> <span class="n">Benchmark</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets.uri</span> <span class="kn">import</span> <span class="n">DATASET_NAME_RE</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.util.debug_util</span> <span class="kn">import</span> <span class="n">get_logging_level</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1"># NOTE(cummins): This is only required to prevent a name conflict with the now</span>
+<span class="c1"># deprecated Dataset.logger attribute. This can be removed once the logger</span>
+<span class="c1"># attribute is removed, scheduled for release 0.2.3.</span>
+<span class="n">_logger</span> <span class="o">=</span> <span class="n">logger</span>
 
 
 <div class="viewcode-block" id="Dataset"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Dataset">[docs]</a><span class="k">class</span> <span class="nc">Dataset</span><span class="p">:</span>
@@ -237,7 +248,6 @@
         <span class="n">references</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">deprecated</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">sort_order</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
-        <span class="n">logger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">validatable</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;No&quot;</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Constructor.</span>
@@ -294,7 +304,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_deprecation_message</span> <span class="o">=</span> <span class="n">deprecated</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validatable</span> <span class="o">=</span> <span class="n">validatable</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logger</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">sort_order</span> <span class="o">=</span> <span class="n">sort_order</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">benchmark_class</span> <span class="o">=</span> <span class="n">benchmark_class</span>
 
@@ -306,19 +315,19 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
 
     <span class="nd">@property</span>
+    <span class="nd">@deprecated</span><span class="p">(</span>
+        <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.2.1&quot;</span><span class="p">,</span>
+        <span class="n">reason</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;The `Dataset.logger` attribute is deprecated. All Dataset &quot;</span>
+            <span class="s2">&quot;instances share a logger named compiler_gym.datasets&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
     <span class="k">def</span> <span class="nf">logger</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;The logger for this dataset.</span>
 
 <span class="sd">        :type: logging.Logger</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="c1"># NOTE(cummins): Default logger instantiation is deferred since in</span>
-        <span class="c1"># Python 3.6 the Logger instance contains an un-pickle-able Rlock()</span>
-        <span class="c1"># which can prevent gym.make() from working. This is a workaround that</span>
-        <span class="c1"># can be removed once Python 3.6 support is dropped.</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;compiler_gym.datasets&quot;</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">get_logging_level</span><span class="p">())</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_logger</span>
+        <span class="k">return</span> <span class="n">_logger</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>

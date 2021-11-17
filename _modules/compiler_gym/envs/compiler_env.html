@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.envs.compiler_env &mdash; CompilerGym 0.1.10 documentation</title>
+  <title>compiler_gym.envs.compiler_env &mdash; CompilerGym 0.2.1 documentation</title>
   
 
   
@@ -56,9 +56,12 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> CompilerGym
+            <a href="../../../index.html">
           
 
+          
+            
+            <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -66,7 +69,7 @@
             
             
               <div class="version">
-                0.1.10
+                0.2.1
               </div>
             
           
@@ -116,6 +119,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service/runtime.html">compiler_gym.service.runtime</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
@@ -225,6 +229,7 @@
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">Action</span><span class="p">,</span> <span class="n">AddBenchmarkRequest</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">Benchmark</span> <span class="k">as</span> <span class="n">BenchmarkProto</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="p">(</span>
+    <span class="n">Choice</span><span class="p">,</span>
     <span class="n">EndSessionReply</span><span class="p">,</span>
     <span class="n">EndSessionRequest</span><span class="p">,</span>
     <span class="n">ForkSessionReply</span><span class="p">,</span>
@@ -237,9 +242,9 @@
     <span class="n">StartSessionRequest</span><span class="p">,</span>
     <span class="n">StepReply</span><span class="p">,</span>
     <span class="n">StepRequest</span><span class="p">,</span>
+    <span class="n">proto_to_action_space</span><span class="p">,</span>
 <span class="p">)</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.spaces</span> <span class="kn">import</span> <span class="n">DefaultRewardFromObservation</span><span class="p">,</span> <span class="n">NamedDiscrete</span><span class="p">,</span> <span class="n">Reward</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.util.debug_util</span> <span class="kn">import</span> <span class="n">get_logging_level</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.gym_type_hints</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">ActionType</span><span class="p">,</span>
     <span class="n">ObservationType</span><span class="p">,</span>
@@ -251,6 +256,13 @@
 <span class="kn">from</span> <span class="nn">compiler_gym.validation_error</span> <span class="kn">import</span> <span class="n">ValidationError</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.validation_result</span> <span class="kn">import</span> <span class="n">ValidationResult</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.views</span> <span class="kn">import</span> <span class="n">ObservationSpaceSpec</span><span class="p">,</span> <span class="n">ObservationView</span><span class="p">,</span> <span class="n">RewardView</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
+<span class="c1"># NOTE(cummins): This is only required to prevent a name conflict with the now</span>
+<span class="c1"># deprecated CompilerEnv.logger attribute. This can be removed once the logger</span>
+<span class="c1"># attribute is removed, scheduled for release 0.2.3.</span>
+<span class="n">_logger</span> <span class="o">=</span> <span class="n">logger</span>
 
 
 <span class="k">def</span> <span class="nf">_wrapped_step</span><span class="p">(</span>
@@ -305,11 +317,6 @@
 
 <span class="sd">    :vartype service: compiler_gym.service.CompilerGymServiceConnection</span>
 
-<span class="sd">    :ivar logger: A Logger instance used by the environment for communicating</span>
-<span class="sd">        info and warnings.</span>
-
-<span class="sd">    :vartype logger: logging.Logger</span>
-
 <span class="sd">    :ivar action_spaces: A list of supported action space names.</span>
 
 <span class="sd">    :vartype action_spaces: List[str]</span>
@@ -350,11 +357,12 @@
         <span class="n">observation_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">reward_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Reward</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">action_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">derived_observation_spaces</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">connection_settings</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ConnectionOpts</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">service_connection</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CompilerGymServiceConnection</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">logger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Construct and initialize a CompilerGym service environment.</span>
+        <span class="sd">&quot;&quot;&quot;Construct and initialize a CompilerGym environment.</span>
 
 <span class="sd">        In normal use you should use :code:`gym.make(...)` rather than calling</span>
 <span class="sd">        the constructor directly.</span>
@@ -396,16 +404,15 @@
 <span class="sd">        :param action_space: The name of the action space to use. If not</span>
 <span class="sd">            specified, the default action space for this compiler is used.</span>
 
+<span class="sd">        :param derived_observation_spaces: An optional list of arguments to be</span>
+<span class="sd">            passed to :meth:`env.observation.add_derived_space()</span>
+<span class="sd">            &lt;compiler_gym.views.observation.Observation.add_derived_space&gt;`.</span>
+
 <span class="sd">        :param connection_settings: The settings used to establish a connection</span>
 <span class="sd">            with the remote service.</span>
 
 <span class="sd">        :param service_connection: An existing compiler gym service connection</span>
 <span class="sd">            to use.</span>
-
-<span class="sd">        :param logger: The logger to use for this environment. If not provided,</span>
-<span class="sd">            a :code:`compiler_gym.envs` logger is used and assigned the</span>
-<span class="sd">            verbosity returned by :func:`get_logging_level()</span>
-<span class="sd">            &lt;compiler_gym.get_logging_level&gt;`.</span>
 
 <span class="sd">        :raises FileNotFoundError: If service is a path to a file that is not</span>
 <span class="sd">            found.</span>
@@ -413,12 +420,17 @@
 <span class="sd">        :raises TimeoutError: If the compiler service fails to initialize within</span>
 <span class="sd">            the parameters provided in :code:`connection_settings`.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;render.modes&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;human&quot;</span><span class="p">,</span> <span class="s2">&quot;ansi&quot;</span><span class="p">]}</span>
+        <span class="c1"># NOTE(cummins): Logger argument deprecated and scheduled to be removed</span>
+        <span class="c1"># in release 0.2.3.</span>
+        <span class="k">if</span> <span class="n">logger</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;The `logger` argument is deprecated on CompilerEnv.__init__() &quot;</span>
+                <span class="s2">&quot;and will be removed in a future release. All CompilerEnv &quot;</span>
+                <span class="s2">&quot;instances share a logger named compiler_gym.envs.compiler_env&quot;</span><span class="p">,</span>
+                <span class="ne">DeprecationWarning</span><span class="p">,</span>
+            <span class="p">)</span>
 
-        <span class="k">if</span> <span class="n">logger</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;compiler_gym.envs&quot;</span><span class="p">)</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">setLevel</span><span class="p">(</span><span class="n">get_logging_level</span><span class="p">())</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;render.modes&quot;</span><span class="p">:</span> <span class="p">[</span><span class="s2">&quot;human&quot;</span><span class="p">,</span> <span class="s2">&quot;ansi&quot;</span><span class="p">]}</span>
 
         <span class="c1"># A compiler service supports multiple simultaneous environments. This</span>
         <span class="c1"># session ID is used to identify this environment.</span>
@@ -430,7 +442,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="n">service_connection</span> <span class="ow">or</span> <span class="n">CompilerGymServiceConnection</span><span class="p">(</span>
             <span class="n">endpoint</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_service_endpoint</span><span class="p">,</span>
             <span class="n">opts</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_connection_settings</span><span class="p">,</span>
-            <span class="n">logger</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span> <span class="o">=</span> <span class="n">Datasets</span><span class="p">(</span><span class="n">datasets</span> <span class="ow">or</span> <span class="p">[])</span>
 
@@ -479,20 +490,28 @@
             <span class="k">pass</span>
 
         <span class="c1"># Process the available action, observation, and reward spaces.</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">action_spaces</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_make_action_space</span><span class="p">(</span><span class="n">space</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">space</span><span class="o">.</span><span class="n">action</span><span class="p">)</span>
-            <span class="k">for</span> <span class="n">space</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">action_spaces</span>
+        <span class="n">action_spaces</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">proto_to_action_space</span><span class="p">(</span><span class="n">space</span><span class="p">)</span> <span class="k">for</span> <span class="n">space</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">action_spaces</span>
         <span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">action_spaces</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">space</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">action_spaces</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_make_actions</span> <span class="o">=</span> <span class="p">[</span><span class="n">a</span><span class="o">.</span><span class="n">make_action</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">action_spaces</span><span class="p">]</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">observation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_observation_view_type</span><span class="p">(</span>
             <span class="n">raw_step</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">raw_step</span><span class="p">,</span>
             <span class="n">spaces</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">observation_spaces</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">reward</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_reward_view_type</span><span class="p">(</span><span class="n">rewards</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="p">)</span>
 
+        <span class="c1"># Register any derived observation spaces now so that the observation</span>
+        <span class="c1"># space can be set below.</span>
+        <span class="k">for</span> <span class="n">derived_observation_space</span> <span class="ow">in</span> <span class="n">derived_observation_spaces</span> <span class="ow">or</span> <span class="p">[]:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">add_derived_space_internal</span><span class="p">(</span><span class="o">**</span><span class="n">derived_observation_space</span><span class="p">)</span>
+
         <span class="c1"># Lazily evaluated version strings.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_versions</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">GetVersionReply</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Space</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_make_action</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Action</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">observation_space</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Space</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
         <span class="c1"># Mutable state initialized in reset().</span>
@@ -518,6 +537,17 @@
     <span class="k">def</span> <span class="nf">available_datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;A dictionary of datasets.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="p">{</span><span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">}</span>
+
+    <span class="nd">@property</span>
+    <span class="nd">@deprecated</span><span class="p">(</span>
+        <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.2.1&quot;</span><span class="p">,</span>
+        <span class="n">reason</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;The `CompilerEnv.logger` attribute is deprecated. All CompilerEnv &quot;</span>
+            <span class="s2">&quot;instances share a logger named compiler_gym.envs.compiler_env&quot;</span>
+        <span class="p">),</span>
+    <span class="p">)</span>
+    <span class="k">def</span> <span class="nf">logger</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="k">return</span> <span class="n">_logger</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">versions</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">GetVersionReply</span><span class="p">:</span>
@@ -607,6 +637,7 @@
             <span class="k">else</span> <span class="mi">0</span>
         <span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_action_space</span><span class="p">:</span> <span class="n">NamedDiscrete</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">action_spaces</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_make_actions</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Action</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_actions</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">benchmark</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
@@ -635,10 +666,10 @@
             <span class="p">)</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">benchmark</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
             <span class="n">benchmark_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">benchmark</span><span class="p">(</span><span class="n">benchmark</span><span class="p">)</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Setting benchmark by name: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">benchmark_object</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Setting benchmark by name: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">benchmark_object</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_next_benchmark</span> <span class="o">=</span> <span class="n">benchmark_object</span>
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">benchmark</span><span class="p">,</span> <span class="n">Benchmark</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Setting benchmark: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">benchmark</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Setting benchmark: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">benchmark</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_next_benchmark</span> <span class="o">=</span> <span class="n">benchmark</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
@@ -761,9 +792,7 @@
             <span class="n">actions</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">actions</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
             <span class="k">if</span> <span class="n">actions</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                    <span class="s2">&quot;Parent service of fork() has died, replaying state&quot;</span>
-                <span class="p">)</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Parent service of fork() has died, replaying state&quot;</span><span class="p">)</span>
                 <span class="n">_</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">actions</span><span class="p">)</span>
                 <span class="k">assert</span> <span class="ow">not</span> <span class="n">done</span><span class="p">,</span> <span class="s2">&quot;Failed to replay action sequence&quot;</span>
 
@@ -856,7 +885,7 @@
                 <span class="k">if</span> <span class="n">reply</span><span class="o">.</span><span class="n">remaining_sessions</span><span class="p">:</span>
                     <span class="n">close_service</span> <span class="o">=</span> <span class="kc">False</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                     <span class="s2">&quot;Failed to end active compiler session on close(): </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
                     <span class="n">e</span><span class="p">,</span>
                     <span class="nb">type</span><span class="p">(</span><span class="n">e</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
@@ -908,7 +937,7 @@
 
         <span class="k">def</span> <span class="nf">_retry</span><span class="p">(</span><span class="n">error</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ObservationType</span><span class="p">]:</span>
             <span class="sd">&quot;&quot;&quot;Abort and retry on error.&quot;&quot;&quot;</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> during reset(): </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> during reset(): </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">error</span><span class="p">)</span>
             <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="p">:</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">service</span> <span class="o">=</span> <span class="kc">None</span>
@@ -951,13 +980,13 @@
 
         <span class="c1"># Stop an existing episode.</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Ending session </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Ending session </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">)</span>
             <span class="n">error</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">_call_with_error</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">EndSession</span><span class="p">,</span>
                 <span class="n">EndSessionRequest</span><span class="p">(</span><span class="n">session_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">),</span>
             <span class="p">)</span>
             <span class="k">if</span> <span class="n">error</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                     <span class="s2">&quot;Failed to stop session </span><span class="si">%d</span><span class="s2"> with </span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span>
                     <span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">,</span>
                     <span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span>
@@ -1023,8 +1052,8 @@
 
         <span class="c1"># If the action space has changed, update it.</span>
         <span class="k">if</span> <span class="n">reply</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;new_action_space&quot;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_action_space</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">reply</span><span class="o">.</span><span class="n">new_action_space</span><span class="o">.</span><span class="n">action</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_action</span> <span class="o">=</span> <span class="n">proto_to_action_space</span><span class="p">(</span>
+                <span class="n">reply</span><span class="o">.</span><span class="n">new_action_space</span>
             <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">reward</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span><span class="p">,</span> <span class="n">observation_view</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="p">)</span>
@@ -1097,7 +1126,9 @@
         <span class="c1"># Send the request to the backend service.</span>
         <span class="n">request</span> <span class="o">=</span> <span class="n">StepRequest</span><span class="p">(</span>
             <span class="n">session_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_session_id</span><span class="p">,</span>
-            <span class="n">action</span><span class="o">=</span><span class="p">[</span><span class="n">Action</span><span class="p">(</span><span class="n">action</span><span class="o">=</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">],</span>
+            <span class="n">action</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">Action</span><span class="p">(</span><span class="n">choice</span><span class="o">=</span><span class="p">[</span><span class="n">Choice</span><span class="p">(</span><span class="n">named_discrete_value_index</span><span class="o">=</span><span class="n">a</span><span class="p">)])</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">actions</span>
+            <span class="p">],</span>
             <span class="n">observation_space</span><span class="o">=</span><span class="p">[</span>
                 <span class="n">observation_space</span><span class="o">.</span><span class="n">index</span> <span class="k">for</span> <span class="n">observation_space</span> <span class="ow">in</span> <span class="n">observations_to_compute</span>
             <span class="p">],</span>
@@ -1141,8 +1172,8 @@
 
         <span class="c1"># If the action space has changed, update it.</span>
         <span class="k">if</span> <span class="n">reply</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;new_action_space&quot;</span><span class="p">):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_action_space</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="n">reply</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">action</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">action_space</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_make_action</span> <span class="o">=</span> <span class="n">proto_to_action_space</span><span class="p">(</span>
+                <span class="n">reply</span><span class="o">.</span><span class="n">action_space</span>
             <span class="p">)</span>
 
         <span class="c1"># Translate observations to python representations.</span>
@@ -1303,18 +1334,6 @@
     <span class="k">def</span> <span class="nf">benchmarks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Enumerate a (possible unbounded) list of available benchmarks.&quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">benchmark_uris</span><span class="p">()</span>
-
-    <span class="k">def</span> <span class="nf">_make_action_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">entries</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Space</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Create an action space from the given values.</span>
-
-<span class="sd">        Subclasses may override this method to produce specialized action</span>
-<span class="sd">        spaces.</span>
-
-<span class="sd">        :param name: The name of the action space.</span>
-<span class="sd">        :param entries: The entries in the action space.</span>
-<span class="sd">        :return: A :code:`gym.Space` instance.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="n">NamedDiscrete</span><span class="p">(</span><span class="n">entries</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_observation_view_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>

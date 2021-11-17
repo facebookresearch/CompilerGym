@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.envs.llvm.compute_observation &mdash; CompilerGym 0.1.10 documentation</title>
+  <title>compiler_gym.envs.llvm.compute_observation &mdash; CompilerGym 0.2.1 documentation</title>
   
 
   
@@ -56,9 +56,12 @@
           
 
           
-            <a href="../../../../index.html" class="icon icon-home"> CompilerGym
+            <a href="../../../../index.html">
           
 
+          
+            
+            <img src="../../../../_static/logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -66,7 +69,7 @@
             
             
               <div class="version">
-                0.1.10
+                0.2.1
               </div>
             
           
@@ -116,6 +119,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/service/runtime.html">compiler_gym.service.runtime</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
@@ -198,12 +202,14 @@
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
 <span class="sd">&quot;&quot;&quot;This module defines a utility function for computing LLVM observations.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span>
 
 <span class="kn">import</span> <span class="nn">google.protobuf.text_format</span>
 
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">Observation</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.gym_type_hints</span> <span class="kn">import</span> <span class="n">ObservationType</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">runfiles_path</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.shell_format</span> <span class="kn">import</span> <span class="n">plural</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.views.observation_space_spec</span> <span class="kn">import</span> <span class="n">ObservationSpaceSpec</span>
@@ -228,7 +234,7 @@
 
 <div class="viewcode-block" id="compute_observation"><a class="viewcode-back" href="../../../../llvm/api.html#compiler_gym.envs.llvm.compute_observation">[docs]</a><span class="k">def</span> <span class="nf">compute_observation</span><span class="p">(</span>
     <span class="n">observation_space</span><span class="p">:</span> <span class="n">ObservationSpaceSpec</span><span class="p">,</span> <span class="n">bitcode</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span> <span class="n">timeout</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">300</span>
-<span class="p">):</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ObservationType</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Compute an LLVM observation.</span>
 
 <span class="sd">    This is a utility function that uses a standalone C++ binary to compute an</span>
@@ -275,6 +281,12 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="n">stdout</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="c1"># kill() was added in Python 3.7.</span>
+        <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">process</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">process</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+        <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>  <span class="c1"># Wait for shutdown to complete.</span>
         <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
             <span class="sa">f</span><span class="s2">&quot;Failed to compute </span><span class="si">{</span><span class="n">observation_space</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> observation in &quot;</span>
             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">timeout</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">plural</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="nb">round</span><span class="p">(</span><span class="n">timeout</span><span class="p">)),</span> <span class="s1">&#39;second&#39;</span><span class="p">,</span> <span class="s1">&#39;seconds&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
@@ -294,7 +306,9 @@
     <span class="k">try</span><span class="p">:</span>
         <span class="n">stdout</span> <span class="o">=</span> <span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
     <span class="k">except</span> <span class="ne">UnicodeDecodeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to parse </span><span class="si">{</span><span class="n">observation_space</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> observation: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+            <span class="sa">f</span><span class="s2">&quot;Failed to parse </span><span class="si">{</span><span class="n">observation_space</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> observation: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 
     <span class="n">observation</span> <span class="o">=</span> <span class="n">Observation</span><span class="p">()</span>
     <span class="k">try</span><span class="p">:</span>

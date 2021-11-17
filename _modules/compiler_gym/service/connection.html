@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.service.connection &mdash; CompilerGym 0.1.10 documentation</title>
+  <title>compiler_gym.service.connection &mdash; CompilerGym 0.2.1 documentation</title>
   
 
   
@@ -56,9 +56,12 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> CompilerGym
+            <a href="../../../index.html">
           
 
+          
+            
+            <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -66,7 +69,7 @@
             
             
               <div class="version">
-                0.1.10
+                0.2.1
               </div>
             
           
@@ -116,6 +119,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service/runtime.html">compiler_gym.service.runtime</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
@@ -219,7 +223,7 @@
     <span class="n">GetSpacesRequest</span><span class="p">,</span>
     <span class="n">ObservationSpace</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.util.debug_util</span> <span class="kn">import</span> <span class="n">get_debug_level</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.debug_util</span> <span class="kn">import</span> <span class="n">get_debug_level</span><span class="p">,</span> <span class="n">logging_level_to_debug_level</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">runfiles_path</span><span class="p">,</span>
     <span class="n">site_data_path</span><span class="p">,</span>
@@ -235,6 +239,8 @@
     <span class="c1"># https://putridparrot.com/blog/the-unavailable-trying-to-connect-an-http1-x-server-grpc-error/</span>
     <span class="p">(</span><span class="s2">&quot;grpc.enable_http_proxy&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
 <span class="p">]</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="ConnectionOpts"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.ConnectionOpts">[docs]</a><span class="k">class</span> <span class="nc">ConnectionOpts</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
@@ -352,16 +358,14 @@
 <span class="k">class</span> <span class="nc">Connection</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Base class for service connections.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">channel</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Constructor. Don&#39;t instantiate this directly, use the subclasses.</span>
 
 <span class="sd">        :param channel: The RPC channel to use.</span>
 <span class="sd">        :param url: The URL of the RPC service.</span>
-<span class="sd">        :param logger: A logger instance that will be used for logging messages.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">channel</span> <span class="o">=</span> <span class="n">channel</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">url</span> <span class="o">=</span> <span class="n">url</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stub</span> <span class="o">=</span> <span class="n">CompilerGymServiceStub</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">channel</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">:</span> <span class="n">GetSpacesReply</span> <span class="o">=</span> <span class="bp">self</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">stub</span><span class="o">.</span><span class="n">GetSpaces</span><span class="p">,</span> <span class="n">GetSpacesRequest</span><span class="p">())</span>
 
@@ -417,7 +421,7 @@
                             <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">()</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">max_retries</span><span class="si">}</span><span class="s2"> retries)&quot;</span>
                         <span class="p">)</span> <span class="kn">from</span> <span class="bp">None</span>
                     <span class="n">remaining</span> <span class="o">=</span> <span class="n">max_retries</span> <span class="o">-</span> <span class="n">attempt</span>
-                    <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                    <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                         <span class="s2">&quot;</span><span class="si">%s</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%d</span><span class="s2"> </span><span class="si">%s</span><span class="s2"> remaining)&quot;</span><span class="p">,</span>
                         <span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="p">,</span>
                         <span class="n">e</span><span class="o">.</span><span class="n">details</span><span class="p">(),</span>
@@ -491,7 +495,6 @@
         <span class="n">port_init_max_seconds</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">rpc_init_max_seconds</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
         <span class="n">process_exit_max_seconds</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-        <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span>
         <span class="n">script_args</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
         <span class="n">script_env</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
     <span class="p">):</span>
@@ -527,7 +530,9 @@
         <span class="c1"># Set the verbosity of the service. The logging level of the service is</span>
         <span class="c1"># the debug level - 1, so that COMPILER_GYM_DEBUG=3 will cause VLOG(2)</span>
         <span class="c1"># and lower to be logged to stdout.</span>
-        <span class="n">debug_level</span> <span class="o">=</span> <span class="n">get_debug_level</span><span class="p">()</span>
+        <span class="n">debug_level</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span>
+            <span class="n">get_debug_level</span><span class="p">(),</span> <span class="n">logging_level_to_debug_level</span><span class="p">(</span><span class="n">logger</span><span class="o">.</span><span class="n">getEffectiveLevel</span><span class="p">())</span>
+        <span class="p">)</span>
         <span class="k">if</span> <span class="n">debug_level</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
             <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;--alsologtostderr&quot;</span><span class="p">)</span>
             <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;-v=</span><span class="si">{</span><span class="n">debug_level</span> <span class="o">-</span> <span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
@@ -594,7 +599,11 @@
             <span class="n">sleep</span><span class="p">(</span><span class="n">wait_secs</span><span class="p">)</span>
             <span class="n">wait_secs</span> <span class="o">*=</span> <span class="mf">1.2</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+            <span class="c1"># kill() was added in Python 3.7.</span>
+            <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">rpc_init_max_seconds</span><span class="p">)</span>
             <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>
             <span class="k">raise</span> <span class="ne">TimeoutError</span><span class="p">(</span>
@@ -623,7 +632,11 @@
                 <span class="p">)</span>
                 <span class="n">wait_secs</span> <span class="o">*=</span> <span class="mf">1.2</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+            <span class="c1"># kill() was added in Python 3.7.</span>
+            <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">process_exit_max_seconds</span><span class="p">)</span>
 
             <span class="c1"># Include the last few lines of logs generated by the compiler</span>
@@ -639,7 +652,7 @@
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rpc_init_max_seconds</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> seconds.</span><span class="si">{</span><span class="n">logs_message</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">loglines</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Fetch any available log lines from the service backend.</span>
@@ -672,14 +685,19 @@
                     <span class="sa">f</span><span class="s2">&quot;Service exited with returncode </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">returncode</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="p">)</span>
         <span class="k">except</span> <span class="ne">ProcessLookupError</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Service process not found at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Service process not found at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
             <span class="c1"># Try and kill it and then walk away.</span>
             <span class="k">try</span><span class="p">:</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+                <span class="c1"># kill() was added in Python 3.7.</span>
+                <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
             <span class="k">except</span><span class="p">:</span>  <span class="c1"># noqa</span>
                 <span class="k">pass</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Abandoning orphan service at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Abandoning orphan service at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>
         <span class="k">finally</span><span class="p">:</span>
             <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">,</span> <span class="n">ignore_errors</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
@@ -692,7 +710,7 @@
 <span class="k">class</span> <span class="nc">UnmanagedConnection</span><span class="p">(</span><span class="n">Connection</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;A connection to a service that is not managed by this process.&quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rpc_init_max_seconds</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span> <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">):</span>
+    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">rpc_init_max_seconds</span><span class="p">:</span> <span class="nb">float</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Constructor.</span>
 
 <span class="sd">        :param url: The URL of the service to connect to.</span>
@@ -723,7 +741,7 @@
                 <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">rpc_init_max_seconds</span><span class="si">:</span><span class="s2">.1f</span><span class="si">}</span><span class="s2"> seconds&quot;</span>
             <span class="p">)</span>
 
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">url</span><span class="p">,</span> <span class="n">logger</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span>
@@ -782,7 +800,6 @@
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">endpoint</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
         <span class="n">opts</span><span class="p">:</span> <span class="n">ConnectionOpts</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">logger</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Constructor.</span>
 
@@ -798,7 +815,6 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">opts</span> <span class="o">=</span> <span class="n">opts</span> <span class="ow">or</span> <span class="n">ConnectionOpts</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stub</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">logger</span> <span class="o">=</span> <span class="n">logger</span> <span class="ow">or</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_establish_connection</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">action_spaces</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ActionSpace</span><span class="p">]</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span>
@@ -810,7 +826,7 @@
 
     <span class="k">def</span> <span class="nf">_establish_connection</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Create and establish a connection.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_connection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">logger</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">connection</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_create_connection</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">opts</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">stub</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">connection</span><span class="o">.</span><span class="n">stub</span>
 
     <span class="nd">@classmethod</span>
@@ -818,7 +834,6 @@
         <span class="bp">cls</span><span class="p">,</span>
         <span class="n">endpoint</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
         <span class="n">opts</span><span class="p">:</span> <span class="n">ConnectionOpts</span><span class="p">,</span>
-        <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Connection</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Initialize the service connection, either by connecting to an RPC</span>
 <span class="sd">        service or by starting a locally-managed subprocess.</span>
@@ -850,7 +865,6 @@
                         <span class="n">process_exit_max_seconds</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">local_service_exit_max_seconds</span><span class="p">,</span>
                         <span class="n">rpc_init_max_seconds</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">rpc_init_max_seconds</span><span class="p">,</span>
                         <span class="n">port_init_max_seconds</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">local_service_port_init_max_seconds</span><span class="p">,</span>
-                        <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span>
                         <span class="n">script_args</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">script_args</span><span class="p">,</span>
                         <span class="n">script_env</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">script_env</span><span class="p">,</span>
                     <span class="p">)</span>
@@ -859,7 +873,6 @@
                     <span class="k">return</span> <span class="n">UnmanagedConnection</span><span class="p">(</span>
                         <span class="n">url</span><span class="o">=</span><span class="n">endpoint</span><span class="p">,</span>
                         <span class="n">rpc_init_max_seconds</span><span class="o">=</span><span class="n">opts</span><span class="o">.</span><span class="n">rpc_init_max_seconds</span><span class="p">,</span>
-                        <span class="n">logger</span><span class="o">=</span><span class="n">logger</span><span class="p">,</span>
                     <span class="p">)</span>
             <span class="k">except</span> <span class="p">(</span><span class="ne">TimeoutError</span><span class="p">,</span> <span class="n">ServiceError</span><span class="p">,</span> <span class="ne">NotImplementedError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="c1"># Catch preventable errors so that we can retry:</span>

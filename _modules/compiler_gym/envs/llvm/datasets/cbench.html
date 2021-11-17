@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.envs.llvm.datasets.cbench &mdash; CompilerGym 0.1.10 documentation</title>
+  <title>compiler_gym.envs.llvm.datasets.cbench &mdash; CompilerGym 0.2.1 documentation</title>
   
 
   
@@ -56,9 +56,12 @@
           
 
           
-            <a href="../../../../../index.html" class="icon icon-home"> CompilerGym
+            <a href="../../../../../index.html">
           
 
+          
+            
+            <img src="../../../../../_static/logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -66,7 +69,7 @@
             
             
               <div class="version">
-                0.1.10
+                0.2.1
               </div>
             
           
@@ -116,6 +119,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/service/runtime.html">compiler_gym.service.runtime</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
@@ -223,6 +227,8 @@
 <span class="kn">from</span> <span class="nn">compiler_gym.util.timer</span> <span class="kn">import</span> <span class="n">Timer</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.validation_result</span> <span class="kn">import</span> <span class="n">ValidationError</span>
 
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
 <span class="n">_CBENCH_TARS</span> <span class="o">=</span> <span class="p">{</span>
     <span class="s2">&quot;macos&quot;</span><span class="p">:</span> <span class="p">(</span>
         <span class="s2">&quot;https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-cBench-v1-macos.tar.bz2&quot;</span><span class="p">,</span>
@@ -290,7 +296,6 @@
     <span class="n">linkopts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
     <span class="n">env</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">],</span>
     <span class="n">num_runs</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
-    <span class="n">logger</span><span class="p">:</span> <span class="n">logging</span><span class="o">.</span><span class="n">Logger</span><span class="p">,</span>
     <span class="n">sanitizer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LlvmSanitizer</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">timeout_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">300</span><span class="p">,</span>
     <span class="n">compilation_timeout_seconds</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mi">60</span><span class="p">,</span>
@@ -340,7 +345,12 @@
         <span class="k">try</span><span class="p">:</span>
             <span class="n">output</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">clang</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">compilation_timeout_seconds</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
-            <span class="n">clang</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+            <span class="c1"># kill() was added in Python 3.7.</span>
+            <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+                <span class="n">clang</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">clang</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+            <span class="n">clang</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>  <span class="c1"># Wait for shutdown to complete.</span>
             <span class="n">error_data</span><span class="p">[</span><span class="s2">&quot;timeout&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">compilation_timeout_seconds</span>
             <span class="k">return</span> <span class="n">BenchmarkExecutionResult</span><span class="p">(</span>
                 <span class="n">walltime_seconds</span><span class="o">=</span><span class="n">timeout_seconds</span><span class="p">,</span>
@@ -378,7 +388,12 @@
         <span class="k">with</span> <span class="n">Timer</span><span class="p">()</span> <span class="k">as</span> <span class="n">timer</span><span class="p">:</span>
             <span class="n">stdout</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout_seconds</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
-        <span class="n">process</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+        <span class="c1"># kill() was added in Python 3.7.</span>
+        <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
+            <span class="n">process</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">process</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
+        <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>  <span class="c1"># Wait for shutdown to complete.</span>
         <span class="n">error_data</span><span class="p">[</span><span class="s2">&quot;timeout_seconds&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timeout_seconds</span>
         <span class="k">return</span> <span class="n">BenchmarkExecutionResult</span><span class="p">(</span>
             <span class="n">walltime_seconds</span><span class="o">=</span><span class="n">timeout_seconds</span><span class="p">,</span>
@@ -513,7 +528,6 @@
                         <span class="n">linkopts</span><span class="o">=</span><span class="n">linkopts</span> <span class="o">+</span> <span class="p">[</span><span class="s2">&quot;-O2&quot;</span><span class="p">],</span>
                         <span class="c1"># Always assume safe.</span>
                         <span class="n">sanitizer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span>
-                        <span class="n">logger</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
                         <span class="n">env</span><span class="o">=</span><span class="n">os_env</span><span class="p">,</span>
                     <span class="p">)</span>
                     <span class="k">if</span> <span class="n">gold_standard</span><span class="o">.</span><span class="n">error</span><span class="p">:</span>
@@ -550,7 +564,6 @@
                 <span class="n">num_runs</span><span class="o">=</span><span class="n">num_runs</span><span class="p">,</span>
                 <span class="n">linkopts</span><span class="o">=</span><span class="n">linkopts</span><span class="p">,</span>
                 <span class="n">sanitizer</span><span class="o">=</span><span class="n">sanitizer</span><span class="p">,</span>
-                <span class="n">logger</span><span class="o">=</span><span class="n">env</span><span class="o">.</span><span class="n">logger</span><span class="p">,</span>
                 <span class="n">env</span><span class="o">=</span><span class="n">os_env</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -605,9 +618,7 @@
                 <span class="c1"># Timeout errors can be raised by the environment in case of a</span>
                 <span class="c1"># slow step / observation, and should be retried.</span>
                 <span class="k">pass</span>
-            <span class="n">env</span><span class="o">.</span><span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
-                <span class="s2">&quot;Validation callback failed, attempt=</span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">flakiness</span>
-            <span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Validation callback failed, attempt=</span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">flakiness</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">error</span>
 
     <span class="k">return</span> <span class="n">flaky_wrapped_cb</span>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.wrappers &mdash; CompilerGym 0.2.0 documentation</title>
+  <title>compiler_gym.wrappers &mdash; CompilerGym 0.2.1 documentation</title>
   
 
   
@@ -58,9 +58,12 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> CompilerGym
+            <a href="../index.html">
           
 
+          
+            
+            <img src="../_static/logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -68,7 +71,7 @@
             
             
               <div class="version">
-                0.2.0
+                0.2.1
               </div>
             
           
@@ -118,12 +121,14 @@
 <li class="toctree-l1"><a class="reference internal" href="../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="service/runtime.html">compiler_gym.service.runtime</a></li>
 <li class="toctree-l1"><a class="reference internal" href="spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="views.html">compiler_gym.views</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">compiler_gym.wrappers</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#base-wrappers">Base wrappers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#action-space-wrappers">Action space wrappers</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#datasets-wrappers">Datasets wrappers</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#llvm-environment-wrappers">LLVM Environment wrappers</a></li>
 </ul>
 </li>
 </ul>
@@ -209,6 +214,7 @@
 <li><p><a class="reference internal" href="#base-wrappers" id="id1">Base wrappers</a></p></li>
 <li><p><a class="reference internal" href="#action-space-wrappers" id="id2">Action space wrappers</a></p></li>
 <li><p><a class="reference internal" href="#datasets-wrappers" id="id3">Datasets wrappers</a></p></li>
+<li><p><a class="reference internal" href="#llvm-environment-wrappers" id="id4">LLVM Environment wrappers</a></p></li>
 </ul>
 </div>
 <div class="section" id="base-wrappers">
@@ -414,6 +420,29 @@ one environment than the other.</p></li>
 </dd></dl>
 
 <dl class="py class">
+<dt class="sig sig-object py" id="compiler_gym.wrappers.CycleOverBenchmarksIterator">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.wrappers.</span></span><span class="sig-name descname"><span class="pre">CycleOverBenchmarksIterator</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv" title="compiler_gym.envs.compiler_env.CompilerEnv"><span class="pre">compiler_gym.envs.compiler_env.CompilerEnv</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">make_benchmark_iterator</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="datasets.html#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/wrappers/datasets.html#CycleOverBenchmarksIterator"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.wrappers.CycleOverBenchmarksIterator" title="Permalink to this definition">¶</a></dt>
+<dd><p>Same as <a class="reference internal" href="#compiler_gym.wrappers.CycleOverBenchmarks" title="compiler_gym.wrappers.CycleOverBenchmarks"><code class="xref py py-class docutils literal notranslate"><span class="pre">CycleOverBenchmarks</span></code></a> except that the user generates
+the iterator.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.wrappers.CycleOverBenchmarksIterator.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv" title="compiler_gym.envs.compiler_env.CompilerEnv"><span class="pre">compiler_gym.envs.compiler_env.CompilerEnv</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">make_benchmark_iterator</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Callable</span><span class="p"><span class="pre">[</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span> </span><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="datasets.html#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/wrappers/datasets.html#CycleOverBenchmarksIterator.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.wrappers.CycleOverBenchmarksIterator.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>env</strong> – The environment to wrap.</p></li>
+<li><p><strong>make_benchmark_iterator</strong> – A callback that returns an iterator over
+a sequence of benchmarks. Once the iterator is exhausted, this
+callback is called to produce a new iterator.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
 <dt class="sig sig-object py" id="compiler_gym.wrappers.RandomOrderBenchmarks">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.wrappers.</span></span><span class="sig-name descname"><span class="pre">RandomOrderBenchmarks</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">env</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv" title="compiler_gym.envs.compiler_env.CompilerEnv"><span class="pre">compiler_gym.envs.compiler_env.CompilerEnv</span></a></span></em>, <em class="sig-param"><span class="n"><span class="pre">benchmarks</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Iterable</span><span class="p"><span class="pre">[</span></span><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><a class="reference internal" href="datasets.html#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.random._generator.Generator</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/wrappers/datasets.html#RandomOrderBenchmarks"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.wrappers.RandomOrderBenchmarks" title="Permalink to this definition">¶</a></dt>
 <dd><p>Select randomly from a list of benchmarks on each call to <a class="reference internal" href="envs.html#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">reset()</span></code></a>.</p>
@@ -436,6 +465,38 @@ benchmarks.</p>
 this input iterator is evaluated during construction.</p></li>
 <li><p><strong>rng</strong> – A random number generator to use for random benchmark
 selection.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="llvm-environment-wrappers">
+<h2><a class="toc-backref" href="#id4">LLVM Environment wrappers</a><a class="headerlink" href="#llvm-environment-wrappers" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="compiler_gym.wrappers.RuntimePointEstimateReward">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.wrappers.</span></span><span class="sig-name descname"><span class="pre">RuntimePointEstimateReward</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">env:</span> <span class="pre">compiler_gym.envs.llvm.llvm_env.LlvmEnv,</span> <span class="pre">runtime_count:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">30,</span> <span class="pre">warmup_count:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0,</span> <span class="pre">estimator:</span> <span class="pre">Callable[[Iterable[float]],</span> <span class="pre">float]</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">median&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/wrappers/llvm.html#RuntimePointEstimateReward"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.wrappers.RuntimePointEstimateReward" title="Permalink to this definition">¶</a></dt>
+<dd><p>LLVM wrapper that uses a point estimate of program runtime as reward.</p>
+<p>This class wraps an LLVM environment and registers a new runtime reward
+space. Runtime is estimated from one or more runtime measurements, after
+optionally running one or more warmup runs. At each step, reward is the
+change in runtime estimate from the runtime estimate at the previous step.</p>
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.wrappers.RuntimePointEstimateReward.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">env:</span> <span class="pre">compiler_gym.envs.llvm.llvm_env.LlvmEnv,</span> <span class="pre">runtime_count:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">30,</span> <span class="pre">warmup_count:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0,</span> <span class="pre">estimator:</span> <span class="pre">Callable[[Iterable[float]],</span> <span class="pre">float]</span> <span class="pre">=</span> <span class="pre">&lt;function</span> <span class="pre">median&gt;</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/wrappers/llvm.html#RuntimePointEstimateReward.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.wrappers.RuntimePointEstimateReward.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>env</strong> – The environment to wrap.</p></li>
+<li><p><strong>runtime_count</strong> – The number of times to execute the binary when
+estimating the runtime.</p></li>
+<li><p><strong>warmup_count</strong> – The number of warmup runs of the binary to perform
+before measuring the runtime.</p></li>
+<li><p><strong>estimator</strong> – A function that takes a list of runtime measurements
+and produces a point estimate.</p></li>
 </ul>
 </dd>
 </dl>

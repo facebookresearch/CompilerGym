@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.envs.llvm.llvm_env &mdash; CompilerGym 0.1.10 documentation</title>
+  <title>compiler_gym.envs.llvm.llvm_env &mdash; CompilerGym 0.2.1 documentation</title>
   
 
   
@@ -56,9 +56,12 @@
           
 
           
-            <a href="../../../../index.html" class="icon icon-home"> CompilerGym
+            <a href="../../../../index.html">
           
 
+          
+            
+            <img src="../../../../_static/logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -66,7 +69,7 @@
             
             
               <div class="version">
-                0.1.10
+                0.2.1
               </div>
             
           
@@ -116,6 +119,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/service/runtime.html">compiler_gym.service.runtime</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
@@ -203,8 +207,6 @@
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">cast</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">gym.spaces</span> <span class="kn">import</span> <span class="n">Box</span>
-<span class="kn">from</span> <span class="nn">gym.spaces</span> <span class="kn">import</span> <span class="n">Dict</span> <span class="k">as</span> <span class="n">DictSpace</span>
 
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">BenchmarkInitError</span><span class="p">,</span> <span class="n">Dataset</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.envs.compiler_env</span> <span class="kn">import</span> <span class="n">CompilerEnv</span>
@@ -215,38 +217,13 @@
     <span class="n">CostFunctionReward</span><span class="p">,</span>
     <span class="n">NormalizedReward</span><span class="p">,</span>
 <span class="p">)</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.spaces</span> <span class="kn">import</span> <span class="n">Commandline</span><span class="p">,</span> <span class="n">CommandlineFlag</span><span class="p">,</span> <span class="n">Scalar</span><span class="p">,</span> <span class="n">Sequence</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.spaces</span> <span class="kn">import</span> <span class="n">Box</span><span class="p">,</span> <span class="n">Commandline</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.spaces</span> <span class="kn">import</span> <span class="n">Dict</span> <span class="k">as</span> <span class="n">DictSpace</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.spaces</span> <span class="kn">import</span> <span class="n">Scalar</span><span class="p">,</span> <span class="n">Sequence</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.third_party.autophase</span> <span class="kn">import</span> <span class="n">AUTOPHASE_FEATURE_NAMES</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.third_party.inst2vec</span> <span class="kn">import</span> <span class="n">Inst2vecEncoder</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.third_party.llvm</span> <span class="kn">import</span> <span class="n">download_llvm_files</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.third_party.llvm.instcount</span> <span class="kn">import</span> <span class="n">INST_COUNT_FEATURE_NAMES</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">runfiles_path</span>
-
-<span class="n">_ACTIONS_LIST</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span>
-    <span class="n">runfiles_path</span><span class="p">(</span><span class="s2">&quot;compiler_gym/envs/llvm/service/passes/actions_list.txt&quot;</span><span class="p">)</span>
-<span class="p">)</span>
-
-<span class="n">_FLAGS_LIST</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span>
-    <span class="n">runfiles_path</span><span class="p">(</span><span class="s2">&quot;compiler_gym/envs/llvm/service/passes/actions_flags.txt&quot;</span><span class="p">)</span>
-<span class="p">)</span>
-
-<span class="n">_DESCRIPTIONS_LIST</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span>
-    <span class="n">runfiles_path</span><span class="p">(</span><span class="s2">&quot;compiler_gym/envs/llvm/service/passes/actions_descriptions.txt&quot;</span><span class="p">)</span>
-<span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_read_list_file</span><span class="p">(</span><span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">f</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">action</span><span class="o">.</span><span class="n">strip</span><span class="p">():</span>
-                <span class="k">yield</span> <span class="n">action</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
-
-
-<span class="c1"># TODO(github.com/facebookresearch/CompilerGym/issues/122): Replace text file</span>
-<span class="c1"># parsing with build-generated python modules and import them.</span>
-<span class="n">_ACTIONS</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">_read_list_file</span><span class="p">(</span><span class="n">_ACTIONS_LIST</span><span class="p">))</span>
-<span class="n">_FLAGS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">_ACTIONS</span><span class="p">,</span> <span class="n">_read_list_file</span><span class="p">(</span><span class="n">_FLAGS_LIST</span><span class="p">)))</span>
-<span class="n">_DESCRIPTIONS</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="nb">zip</span><span class="p">(</span><span class="n">_ACTIONS</span><span class="p">,</span> <span class="n">_read_list_file</span><span class="p">(</span><span class="n">_DESCRIPTIONS_LIST</span><span class="p">)))</span>
 
 <span class="n">_INST2VEC_ENCODER</span> <span class="o">=</span> <span class="n">Inst2vecEncoder</span><span class="p">()</span>
 
@@ -289,6 +266,7 @@
         <span class="c1"># First perform a one-time download of LLVM binaries that are needed by</span>
         <span class="c1"># the LLVM service and are not included by the pip-installed package.</span>
         <span class="n">download_llvm_files</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span> <span class="o">=</span> <span class="n">_INST2VEC_ENCODER</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="o">*</span><span class="n">args</span><span class="p">,</span>
             <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
@@ -371,6 +349,108 @@
                     <span class="n">platform_dependent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="p">),</span>
             <span class="p">],</span>
+            <span class="n">derived_observation_spaces</span><span class="o">=</span><span class="p">[</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;Inst2vecPreprocessedText&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;base_id&quot;</span><span class="p">:</span> <span class="s2">&quot;Ir&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;space&quot;</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">(</span>
+                        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Inst2vecPreprocessedText&quot;</span><span class="p">,</span> <span class="n">size_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;translate&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span><span class="o">.</span><span class="n">preprocess</span><span class="p">,</span>
+                    <span class="s2">&quot;default_value&quot;</span><span class="p">:</span> <span class="s2">&quot;&quot;</span><span class="p">,</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;Inst2vecEmbeddingIndices&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;base_id&quot;</span><span class="p">:</span> <span class="s2">&quot;Ir&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;space&quot;</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">(</span>
+                        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Inst2vecEmbeddingIndices&quot;</span><span class="p">,</span>
+                        <span class="n">size_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
+                        <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;translate&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">base_observation</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span><span class="o">.</span><span class="n">preprocess</span><span class="p">(</span><span class="n">base_observation</span><span class="p">)</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;default_value&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span><span class="o">.</span><span class="n">vocab</span><span class="p">[</span><span class="s2">&quot;!UNK&quot;</span><span class="p">]]),</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;Inst2vec&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;base_id&quot;</span><span class="p">:</span> <span class="s2">&quot;Ir&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;space&quot;</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">(</span>
+                        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;Inst2vec&quot;</span><span class="p">,</span> <span class="n">size_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;translate&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">base_observation</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span>
+                        <span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span><span class="o">.</span><span class="n">preprocess</span><span class="p">(</span><span class="n">base_observation</span><span class="p">))</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;default_value&quot;</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
+                        <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span><span class="o">.</span><span class="n">embeddings</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span><span class="o">.</span><span class="n">vocab</span><span class="p">[</span><span class="s2">&quot;!UNK&quot;</span><span class="p">]]]</span>
+                    <span class="p">),</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;InstCountDict&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;base_id&quot;</span><span class="p">:</span> <span class="s2">&quot;InstCount&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;space&quot;</span><span class="p">:</span> <span class="n">DictSpace</span><span class="p">(</span>
+                        <span class="p">{</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">Count&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span>
+                                <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">Count&quot;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span>
+                            <span class="p">)</span>
+                            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">INST_COUNT_FEATURE_NAMES</span>
+                        <span class="p">},</span>
+                        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;InstCountDict&quot;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;translate&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">base_observation</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">Count&quot;</span><span class="p">:</span> <span class="n">val</span>
+                        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">INST_COUNT_FEATURE_NAMES</span><span class="p">,</span> <span class="n">base_observation</span><span class="p">)</span>
+                    <span class="p">},</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;InstCountNorm&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;base_id&quot;</span><span class="p">:</span> <span class="s2">&quot;InstCount&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;space&quot;</span><span class="p">:</span> <span class="n">Box</span><span class="p">(</span>
+                        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;InstCountNorm&quot;</span><span class="p">,</span>
+                        <span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+                        <span class="n">high</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                        <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">INST_COUNT_FEATURE_NAMES</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,),</span>
+                        <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;translate&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">base_observation</span><span class="p">:</span> <span class="p">(</span>
+                        <span class="n">base_observation</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">base_observation</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
+                    <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;InstCountNormDict&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;base_id&quot;</span><span class="p">:</span> <span class="s2">&quot;InstCountNorm&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;space&quot;</span><span class="p">:</span> <span class="n">DictSpace</span><span class="p">(</span>
+                        <span class="p">{</span>
+                            <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">Density&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span>
+                                <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">Density&quot;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span>
+                            <span class="p">)</span>
+                            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">INST_COUNT_FEATURE_NAMES</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+                        <span class="p">},</span>
+                        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;InstCountNormDict&quot;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;translate&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">base_observation</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">Density&quot;</span><span class="p">:</span> <span class="n">val</span>
+                        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span>
+                            <span class="n">INST_COUNT_FEATURE_NAMES</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">base_observation</span>
+                        <span class="p">)</span>
+                    <span class="p">},</span>
+                <span class="p">},</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="s2">&quot;AutophaseDict&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;base_id&quot;</span><span class="p">:</span> <span class="s2">&quot;Autophase&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;space&quot;</span><span class="p">:</span> <span class="n">DictSpace</span><span class="p">(</span>
+                        <span class="p">{</span>
+                            <span class="n">name</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+                            <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">AUTOPHASE_FEATURE_NAMES</span>
+                        <span class="p">},</span>
+                        <span class="n">name</span><span class="o">=</span><span class="s2">&quot;AutophaseDict&quot;</span><span class="p">,</span>
+                    <span class="p">),</span>
+                    <span class="s2">&quot;translate&quot;</span><span class="p">:</span> <span class="k">lambda</span> <span class="n">base_observation</span><span class="p">:</span> <span class="p">{</span>
+                        <span class="n">name</span><span class="p">:</span> <span class="n">val</span>
+                        <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">AUTOPHASE_FEATURE_NAMES</span><span class="p">,</span> <span class="n">base_observation</span><span class="p">)</span>
+                    <span class="p">},</span>
+                <span class="p">},</span>
+            <span class="p">],</span>
         <span class="p">)</span>
 
         <span class="c1"># Mutable runtime configuration options that must be set on every call</span>
@@ -378,110 +458,23 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">_runtimes_per_observation_count</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_runtimes_warmup_per_observation_count</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span> <span class="o">=</span> <span class="n">_INST2VEC_ENCODER</span>
-
+        <span class="n">cpu_info_spaces</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">Sequence</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;name&quot;</span><span class="p">,</span> <span class="n">size_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">),</span>
+            <span class="n">Scalar</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;cores_count&quot;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+            <span class="n">Scalar</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;l1i_cache_size&quot;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+            <span class="n">Scalar</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;l1i_cache_count&quot;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+            <span class="n">Scalar</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;l1d_cache_size&quot;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+            <span class="n">Scalar</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;l1d_cache_count&quot;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+            <span class="n">Scalar</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;l2_cache_size&quot;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+            <span class="n">Scalar</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;l2_cache_count&quot;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+            <span class="n">Scalar</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;l3_cache_size&quot;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+            <span class="n">Scalar</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;l3_cache_count&quot;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+            <span class="n">Scalar</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;l4_cache_size&quot;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+            <span class="n">Scalar</span><span class="p">(</span><span class="n">name</span><span class="o">=</span><span class="s2">&quot;l4_cache_count&quot;</span><span class="p">,</span> <span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
+        <span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="s2">&quot;CpuInfo&quot;</span><span class="p">]</span><span class="o">.</span><span class="n">space</span> <span class="o">=</span> <span class="n">DictSpace</span><span class="p">(</span>
-            <span class="p">{</span>
-                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">Sequence</span><span class="p">(</span><span class="n">size_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">),</span>
-                <span class="s2">&quot;cores_count&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
-                <span class="s2">&quot;l1i_cache_size&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
-                <span class="s2">&quot;l1i_cache_count&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
-                <span class="s2">&quot;l1d_cache_size&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
-                <span class="s2">&quot;l1d_cache_count&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
-                <span class="s2">&quot;l2_cache_size&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
-                <span class="s2">&quot;l2_cache_count&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
-                <span class="s2">&quot;l3_cache_size&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
-                <span class="s2">&quot;l3_cache_count&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
-                <span class="s2">&quot;l4_cache_size&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
-                <span class="s2">&quot;l4_cache_count&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">),</span>
-            <span class="p">}</span>
-        <span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">add_derived_space</span><span class="p">(</span>
-            <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;Inst2vecPreprocessedText&quot;</span><span class="p">,</span>
-            <span class="n">base_id</span><span class="o">=</span><span class="s2">&quot;Ir&quot;</span><span class="p">,</span>
-            <span class="n">space</span><span class="o">=</span><span class="n">Sequence</span><span class="p">(</span><span class="n">size_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">str</span><span class="p">),</span>
-            <span class="n">translate</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span><span class="o">.</span><span class="n">preprocess</span><span class="p">,</span>
-            <span class="n">default_value</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">add_derived_space</span><span class="p">(</span>
-            <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;Inst2vecEmbeddingIndices&quot;</span><span class="p">,</span>
-            <span class="n">base_id</span><span class="o">=</span><span class="s2">&quot;Ir&quot;</span><span class="p">,</span>
-            <span class="n">space</span><span class="o">=</span><span class="n">Sequence</span><span class="p">(</span><span class="n">size_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">),</span>
-            <span class="n">translate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">base_observation</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span><span class="o">.</span><span class="n">preprocess</span><span class="p">(</span><span class="n">base_observation</span><span class="p">)</span>
-            <span class="p">),</span>
-            <span class="n">default_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span><span class="o">.</span><span class="n">vocab</span><span class="p">[</span><span class="s2">&quot;!UNK&quot;</span><span class="p">]]),</span>
-        <span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">add_derived_space</span><span class="p">(</span>
-            <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;Inst2vec&quot;</span><span class="p">,</span>
-            <span class="n">base_id</span><span class="o">=</span><span class="s2">&quot;Ir&quot;</span><span class="p">,</span>
-            <span class="n">space</span><span class="o">=</span><span class="n">Sequence</span><span class="p">(</span><span class="n">size_range</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">),</span>
-            <span class="n">translate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">base_observation</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span><span class="o">.</span><span class="n">embed</span><span class="p">(</span>
-                <span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span><span class="o">.</span><span class="n">preprocess</span><span class="p">(</span><span class="n">base_observation</span><span class="p">))</span>
-            <span class="p">),</span>
-            <span class="n">default_value</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">vstack</span><span class="p">(</span>
-                <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span><span class="o">.</span><span class="n">embeddings</span><span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">inst2vec</span><span class="o">.</span><span class="n">vocab</span><span class="p">[</span><span class="s2">&quot;!UNK&quot;</span><span class="p">]]]</span>
-            <span class="p">),</span>
-        <span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">add_derived_space</span><span class="p">(</span>
-            <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;InstCountDict&quot;</span><span class="p">,</span>
-            <span class="n">base_id</span><span class="o">=</span><span class="s2">&quot;InstCount&quot;</span><span class="p">,</span>
-            <span class="n">space</span><span class="o">=</span><span class="n">DictSpace</span><span class="p">(</span>
-                <span class="p">{</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">Count&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-                    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">INST_COUNT_FEATURE_NAMES</span>
-                <span class="p">}</span>
-            <span class="p">),</span>
-            <span class="n">translate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">base_observation</span><span class="p">:</span> <span class="p">{</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">Count&quot;</span><span class="p">:</span> <span class="n">val</span>
-                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">INST_COUNT_FEATURE_NAMES</span><span class="p">,</span> <span class="n">base_observation</span><span class="p">)</span>
-            <span class="p">},</span>
-        <span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">add_derived_space</span><span class="p">(</span>
-            <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;InstCountNorm&quot;</span><span class="p">,</span>
-            <span class="n">base_id</span><span class="o">=</span><span class="s2">&quot;InstCount&quot;</span><span class="p">,</span>
-            <span class="n">space</span><span class="o">=</span><span class="n">Box</span><span class="p">(</span>
-                <span class="n">low</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
-                <span class="n">high</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
-                <span class="n">shape</span><span class="o">=</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">INST_COUNT_FEATURE_NAMES</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">,),</span>
-                <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">,</span>
-            <span class="p">),</span>
-            <span class="n">translate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">base_observation</span><span class="p">:</span> <span class="p">(</span>
-                <span class="n">base_observation</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span> <span class="o">/</span> <span class="nb">max</span><span class="p">(</span><span class="n">base_observation</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="mi">1</span><span class="p">)</span>
-            <span class="p">)</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">),</span>
-        <span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">add_derived_space</span><span class="p">(</span>
-            <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;InstCountNormDict&quot;</span><span class="p">,</span>
-            <span class="n">base_id</span><span class="o">=</span><span class="s2">&quot;InstCountNorm&quot;</span><span class="p">,</span>
-            <span class="n">space</span><span class="o">=</span><span class="n">DictSpace</span><span class="p">(</span>
-                <span class="p">{</span>
-                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">Density&quot;</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-                    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">INST_COUNT_FEATURE_NAMES</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
-                <span class="p">}</span>
-            <span class="p">),</span>
-            <span class="n">translate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">base_observation</span><span class="p">:</span> <span class="p">{</span>
-                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">Density&quot;</span><span class="p">:</span> <span class="n">val</span>
-                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">INST_COUNT_FEATURE_NAMES</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">base_observation</span><span class="p">)</span>
-            <span class="p">},</span>
-        <span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="o">.</span><span class="n">add_derived_space</span><span class="p">(</span>
-            <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;AutophaseDict&quot;</span><span class="p">,</span>
-            <span class="n">base_id</span><span class="o">=</span><span class="s2">&quot;Autophase&quot;</span><span class="p">,</span>
-            <span class="n">space</span><span class="o">=</span><span class="n">DictSpace</span><span class="p">(</span>
-                <span class="p">{</span>
-                    <span class="n">name</span><span class="p">:</span> <span class="n">Scalar</span><span class="p">(</span><span class="nb">min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span> <span class="nb">max</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
-                    <span class="k">for</span> <span class="n">name</span> <span class="ow">in</span> <span class="n">AUTOPHASE_FEATURE_NAMES</span>
-                <span class="p">}</span>
-            <span class="p">),</span>
-            <span class="n">translate</span><span class="o">=</span><span class="k">lambda</span> <span class="n">base_observation</span><span class="p">:</span> <span class="p">{</span>
-                <span class="n">name</span><span class="p">:</span> <span class="n">val</span>
-                <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">val</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">AUTOPHASE_FEATURE_NAMES</span><span class="p">,</span> <span class="n">base_observation</span><span class="p">)</span>
-            <span class="p">},</span>
+            <span class="p">{</span><span class="n">space</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">space</span> <span class="k">for</span> <span class="n">space</span> <span class="ow">in</span> <span class="n">cpu_info_spaces</span><span class="p">},</span>
+            <span class="n">name</span><span class="o">=</span><span class="s2">&quot;CpuInfo&quot;</span><span class="p">,</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="LlvmEnv.reset"><a class="viewcode-back" href="../../../../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.reset">[docs]</a>    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
@@ -607,15 +600,6 @@
             <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">,</span>
         <span class="p">)</span></div>
 
-    <span class="k">def</span> <span class="nf">_make_action_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">entries</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Commandline</span><span class="p">:</span>
-        <span class="n">flags</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">CommandlineFlag</span><span class="p">(</span>
-                <span class="n">name</span><span class="o">=</span><span class="n">entry</span><span class="p">,</span> <span class="n">flag</span><span class="o">=</span><span class="n">_FLAGS</span><span class="p">[</span><span class="n">entry</span><span class="p">],</span> <span class="n">description</span><span class="o">=</span><span class="n">_DESCRIPTIONS</span><span class="p">[</span><span class="n">entry</span><span class="p">]</span>
-            <span class="p">)</span>
-            <span class="k">for</span> <span class="n">entry</span> <span class="ow">in</span> <span class="n">entries</span>
-        <span class="p">]</span>
-        <span class="k">return</span> <span class="n">Commandline</span><span class="p">(</span><span class="n">items</span><span class="o">=</span><span class="n">flags</span><span class="p">,</span> <span class="n">name</span><span class="o">=</span><span class="n">name</span><span class="p">)</span>
-
 <div class="viewcode-block" id="LlvmEnv.commandline"><a class="viewcode-back" href="../../../../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.commandline">[docs]</a>    <span class="k">def</span> <span class="nf">commandline</span><span class="p">(</span>  <span class="c1"># pylint: disable=arguments-differ</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">textformat</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
@@ -728,12 +712,17 @@
 
 <span class="sd">        :type: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">send_param</span><span class="p">(</span><span class="s2">&quot;llvm.get_runtimes_per_observation_count&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">))</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runtimes_per_observation_count</span> <span class="ow">or</span> <span class="nb">int</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_param</span><span class="p">(</span><span class="s2">&quot;llvm.get_runtimes_per_observation_count&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
 
     <span class="nd">@runtime_observation_count</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">runtime_observation_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_param</span><span class="p">(</span><span class="s2">&quot;llvm.set_runtimes_per_observation_count&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
+        <span class="c1"># NOTE(cummins): Keep this after the send_param() call because</span>
+        <span class="c1"># send_param() will raise an error if the valid is invalid.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_runtimes_per_observation_count</span> <span class="o">=</span> <span class="n">n</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">send_param</span><span class="p">(</span><span class="s2">&quot;llvm.set_runtimes_per_observation_count&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">))</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">runtime_warmup_runs_count</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
@@ -759,14 +748,27 @@
 
 <span class="sd">        :type: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="nb">int</span><span class="p">(</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_runtimes_warmup_per_observation_count</span> <span class="ow">or</span> <span class="nb">int</span><span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">send_param</span><span class="p">(</span><span class="s2">&quot;llvm.get_warmup_runs_count_per_runtime_observation&quot;</span><span class="p">,</span> <span class="s2">&quot;&quot;</span><span class="p">)</span>
         <span class="p">)</span>
 
     <span class="nd">@runtime_warmup_runs_count</span><span class="o">.</span><span class="n">setter</span>
     <span class="k">def</span> <span class="nf">runtime_warmup_runs_count</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">n</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">send_param</span><span class="p">(</span>
+                <span class="s2">&quot;llvm.set_warmup_runs_count_per_runtime_observation&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+            <span class="p">)</span>
+        <span class="c1"># NOTE(cummins): Keep this after the send_param() call because</span>
+        <span class="c1"># send_param() will raise an error if the valid is invalid.</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_runtimes_warmup_per_observation_count</span> <span class="o">=</span> <span class="n">n</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">send_param</span><span class="p">(</span><span class="s2">&quot;llvm.set_warmup_runs_count_per_runtime_observation&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">n</span><span class="p">))</span></div>
+
+<div class="viewcode-block" id="LlvmEnv.fork"><a class="viewcode-back" href="../../../../compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.fork">[docs]</a>    <span class="k">def</span> <span class="nf">fork</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
+        <span class="n">fkd</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">fork</span><span class="p">()</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">runtime_observation_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fkd</span><span class="o">.</span><span class="n">runtime_observation_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runtime_observation_count</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">runtime_warmup_runs_count</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">fkd</span><span class="o">.</span><span class="n">runtime_warmup_runs_count</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runtime_warmup_runs_count</span>
+        <span class="k">return</span> <span class="n">fkd</span></div></div>
 </pre></div>
 
            </div>

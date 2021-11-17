@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.datasets &mdash; CompilerGym 0.2.0 documentation</title>
+  <title>compiler_gym.datasets &mdash; CompilerGym 0.2.1 documentation</title>
   
 
   
@@ -58,9 +58,12 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> CompilerGym
+            <a href="../index.html">
           
 
+          
+            
+            <img src="../_static/logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -68,7 +71,7 @@
             
             
               <div class="version">
-                0.2.0
+                0.2.1
               </div>
             
           
@@ -126,6 +129,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="service/runtime.html">compiler_gym.service.runtime</a></li>
 <li class="toctree-l1"><a class="reference internal" href="spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="wrappers.html">compiler_gym.wrappers</a></li>
@@ -494,7 +498,7 @@ class is new and is likely to change in the future.</p>
 <h2><a class="toc-backref" href="#id2">Dataset</a><a class="headerlink" href="#dataset" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="compiler_gym.datasets.Dataset">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.datasets.</span></span><span class="sig-name descname"><span class="pre">Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">name:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">description:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">license:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">site_data_base:</span> <span class="pre">pathlib.Path</span></em>, <em class="sig-param"><span class="pre">benchmark_class=&lt;class</span> <span class="pre">'compiler_gym.datasets.benchmark.Benchmark'&gt;</span></em>, <em class="sig-param"><span class="pre">references:</span> <span class="pre">Optional[Dict[str</span></em>, <em class="sig-param"><span class="pre">str]]</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">deprecated:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">sort_order:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0</span></em>, <em class="sig-param"><span class="pre">logger:</span> <span class="pre">Optional[logging.Logger]</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">validatable:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'No'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.datasets.</span></span><span class="sig-name descname"><span class="pre">Dataset</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">name:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">description:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">license:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">site_data_base:</span> <span class="pre">pathlib.Path</span></em>, <em class="sig-param"><span class="pre">benchmark_class=&lt;class</span> <span class="pre">'compiler_gym.datasets.benchmark.Benchmark'&gt;</span></em>, <em class="sig-param"><span class="pre">references:</span> <span class="pre">Optional[Dict[str</span></em>, <em class="sig-param"><span class="pre">str]]</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">deprecated:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">sort_order:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0</span></em>, <em class="sig-param"><span class="pre">validatable:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'No'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset" title="Permalink to this definition">¶</a></dt>
 <dd><p>A dataset is a collection of benchmarks.</p>
 <p>The Dataset class has methods for installing and managing groups of
 benchmarks, for listing the available benchmark URIs, and for instantiating
@@ -505,7 +509,7 @@ minimum, subclasses must implement the <a class="reference internal" href="#comp
 helpful.</p>
 <dl class="py method">
 <dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">name:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">description:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">license:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">site_data_base:</span> <span class="pre">pathlib.Path</span></em>, <em class="sig-param"><span class="pre">benchmark_class=&lt;class</span> <span class="pre">'compiler_gym.datasets.benchmark.Benchmark'&gt;</span></em>, <em class="sig-param"><span class="pre">references:</span> <span class="pre">Optional[Dict[str</span></em>, <em class="sig-param"><span class="pre">str]]</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">deprecated:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">sort_order:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0</span></em>, <em class="sig-param"><span class="pre">logger:</span> <span class="pre">Optional[logging.Logger]</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">validatable:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'No'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.__init__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="pre">name:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">description:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">license:</span> <span class="pre">str</span></em>, <em class="sig-param"><span class="pre">site_data_base:</span> <span class="pre">pathlib.Path</span></em>, <em class="sig-param"><span class="pre">benchmark_class=&lt;class</span> <span class="pre">'compiler_gym.datasets.benchmark.Benchmark'&gt;</span></em>, <em class="sig-param"><span class="pre">references:</span> <span class="pre">Optional[Dict[str</span></em>, <em class="sig-param"><span class="pre">str]]</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">deprecated:</span> <span class="pre">Optional[str]</span> <span class="pre">=</span> <span class="pre">None</span></em>, <em class="sig-param"><span class="pre">sort_order:</span> <span class="pre">int</span> <span class="pre">=</span> <span class="pre">0</span></em>, <em class="sig-param"><span class="pre">validatable:</span> <span class="pre">str</span> <span class="pre">=</span> <span class="pre">'No'</span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/datasets/dataset.html#Dataset.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Dataset.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -715,11 +719,17 @@ automatically on first use, or by calling <a class="reference internal" href="#c
 <dt class="sig sig-object py" id="compiler_gym.datasets.Dataset.logger">
 <em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">logger</span></span><em class="property"><span class="pre">:</span> <span class="pre">logging.Logger</span></em><a class="headerlink" href="#compiler_gym.datasets.Dataset.logger" title="Permalink to this definition">¶</a></dt>
 <dd><p>The logger for this dataset.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Type</dt>
+<blockquote>
+<div><dl class="field-list simple">
+<dt class="field-odd">type</dt>
 <dd class="field-odd"><p>logging.Logger</p>
 </dd>
 </dl>
+</div></blockquote>
+<div class="deprecated">
+<p><span class="versionmodified deprecated">Deprecated since version 0.2.1: </span>The <cite>Dataset.logger</cite> attribute is deprecated. All Dataset
+instances share a logger named compiler_gym.datasets</p>
+</div>
 </dd></dl>
 
 <dl class="py property">
@@ -773,7 +783,7 @@ information, download links, papers, etc.</p>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Type</dt>
-<dd class="field-odd"><p>Dict[str, str]</p>
+<dd class="field-odd"><p><a class="reference internal" href="spaces.html#compiler_gym.spaces.Dict" title="compiler_gym.spaces.Dict">Dict</a>[str, str]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -1302,31 +1312,42 @@ marked as deprecated.</p>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="compiler_gym.datasets.Datasets.random_benchmark">
-<span class="sig-name descname"><span class="pre">random_benchmark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.random._generator.Generator</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.random_benchmark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.random_benchmark" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">random_benchmark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">random_state</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.random._generator.Generator</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weighted</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">bool</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">float</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <a class="reference internal" href="#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.benchmark.Benchmark"><span class="pre">compiler_gym.datasets.benchmark.Benchmark</span></a><a class="reference internal" href="../_modules/compiler_gym/datasets/datasets.html#Datasets.random_benchmark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.datasets.Datasets.random_benchmark" title="Permalink to this definition">¶</a></dt>
 <dd><p>Select a benchmark randomly.</p>
-<p>First, a dataset is selected uniformly randomly using
-<code class="code docutils literal notranslate"><span class="pre">random_state.choice(list(datasets))</span></code>. The
-<a class="reference internal" href="#compiler_gym.datasets.Dataset.random_benchmark" title="compiler_gym.datasets.Dataset.random_benchmark"><code class="xref py py-meth docutils literal notranslate"><span class="pre">random_benchmark()</span></code></a> method of that dataset
-is then called to select a benchmark.</p>
-<p>Note that the distribution of benchmarks selected by this method is not
-biased by the size of each dataset, since datasets are selected
-uniformly. This means that datasets with a small number of benchmarks
-will be overrepresented compared to datasets with many benchmarks. To
-correct for this bias, use the number of benchmarks in each dataset as
-a weight for the random selection:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">finite_datasets</span> <span class="o">=</span> <span class="p">[</span><span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">env</span><span class="o">.</span><span class="n">datasets</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">!=</span> <span class="n">math</span><span class="o">.</span><span class="n">inf</span><span class="p">]</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span> <span class="o">=</span> <span class="n">rng</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span>
-<span class="go">    finite_datasets,</span>
-<span class="go">    p=[len(d) for d in finite_datasets]</span>
-<span class="go">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">dataset</span><span class="o">.</span><span class="n">random_benchmark</span><span class="p">(</span><span class="n">random_state</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span>
+<p>First, a dataset is selected randomly using
+<code class="code docutils literal notranslate"><span class="pre">random_state.choice(list(datasets))</span></code>. Then the
+<a class="reference internal" href="#compiler_gym.datasets.Dataset.random_benchmark" title="compiler_gym.datasets.Dataset.random_benchmark"><code class="xref py py-meth docutils literal notranslate"><span class="pre">random_benchmark()</span></code></a> method of the chosen
+dataset is called to select a benchmark.</p>
+<p>By default datasets are selected uniformly randomly. This means that
+datasets with a small number of benchmarks will be overrepresented
+compared to datasets with many benchmarks. To correct for this bias pass
+the argument <code class="code docutils literal notranslate"><span class="pre">weighted=True</span></code>, which weights the dataset choice by
+the number of benchmarks in each dataset, equivalent to:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">random</span><span class="o">.</span><span class="n">choices</span><span class="p">(</span><span class="n">datasets</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="n">p</span><span class="p">)</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">datasets</span><span class="p">])</span>
+</pre></div>
+</div>
+<p>Weighting the choice of datasets by their size means that datasets with
+infinite sizes (such as random program generators) will be excluded from
+sampling as their size is <code class="code docutils literal notranslate"><span class="pre">0</span></code>. To override the weights of datasets
+pass a <code class="code docutils literal notranslate"><span class="pre">weights</span></code> mapping:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">random_benchmark</span><span class="p">(</span><span class="n">weighted</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">weights</span><span class="o">=</span><span class="p">{</span>
+<span class="go">    &quot;benchmark://dataset-v0&quot;: 10,</span>
+<span class="go">    &quot;benchmark://another-dataset-v0&quot;: 555,</span>
+<span class="go">})</span>
 </pre></div>
 </div>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
-<dd class="field-odd"><p><strong>random_state</strong> – A random number generator. If not provided, a
-default <code class="code docutils literal notranslate"><span class="pre">np.random.default_rng()</span></code> is used.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>random_state</strong> – A random number generator. If not provided, a
+default <code class="code docutils literal notranslate"><span class="pre">np.random.default_rng()</span></code> is used.</p></li>
+<li><p><strong>weighted</strong> – If set, weight the choice of dataset by the number of
+benchmarks in each dataset, or the value specified in the
+<code class="code docutils literal notranslate"><span class="pre">weights</span></code> mapping.</p></li>
+<li><p><strong>weights</strong> – An optional mapping from dataset URI to the weight to
+use when <code class="code docutils literal notranslate"><span class="pre">weighted=True</span></code>. This overrides the default value of
+using the dataset size.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns</dt>
 <dd class="field-even"><p>A <a class="reference internal" href="#compiler_gym.datasets.Benchmark" title="compiler_gym.datasets.Benchmark"><code class="xref py py-class docutils literal notranslate"><span class="pre">Benchmark</span></code></a>

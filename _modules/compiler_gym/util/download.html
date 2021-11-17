@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.util.download &mdash; CompilerGym 0.1.10 documentation</title>
+  <title>compiler_gym.util.download &mdash; CompilerGym 0.2.1 documentation</title>
   
 
   
@@ -56,9 +56,12 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> CompilerGym
+            <a href="../../../index.html">
           
 
+          
+            
+            <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -66,7 +69,7 @@
             
             
               <div class="version">
-                0.1.10
+                0.2.1
               </div>
             
           
@@ -105,6 +108,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/gcc.html">GCC Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
@@ -115,6 +119,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service/runtime.html">compiler_gym.service.runtime</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
@@ -207,6 +212,8 @@
 <span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">cache_path</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.truncate</span> <span class="kn">import</span> <span class="n">truncate</span>
 
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
+
 
 <span class="k">class</span> <span class="nc">DownloadFailed</span><span class="p">(</span><span class="ne">IOError</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;Error thrown if a download fails.&quot;&quot;&quot;</span>
@@ -235,7 +242,7 @@
 
 
 <span class="k">def</span> <span class="nf">_do_download_attempt</span><span class="p">(</span><span class="n">url</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">sha256</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Downloading </span><span class="si">%s</span><span class="s2"> ...&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Downloading </span><span class="si">%s</span><span class="s2"> ...&quot;</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
     <span class="n">content</span> <span class="o">=</span> <span class="n">_get_url_data</span><span class="p">(</span><span class="n">url</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">sha256</span><span class="p">:</span>
         <span class="c1"># Validate the checksum.</span>
@@ -256,7 +263,7 @@
         <span class="k">with</span> <span class="n">atomic_file_write</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="n">fileobj</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">f</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="n">content</span><span class="p">)</span>
 
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloaded </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Downloaded </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">content</span>
 
 
@@ -271,14 +278,14 @@
 
     <span class="c1"># A retry loop, and loop over all urls provided.</span>
     <span class="n">last_exception</span> <span class="o">=</span> <span class="kc">None</span>
-    <span class="n">wait_time</span> <span class="o">=</span> <span class="mi">5</span>
+    <span class="n">wait_time</span> <span class="o">=</span> <span class="mi">10</span>
     <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">max_retries</span><span class="p">,</span> <span class="mi">1</span><span class="p">)):</span>
         <span class="k">for</span> <span class="n">url</span> <span class="ow">in</span> <span class="n">urls</span><span class="p">:</span>
             <span class="k">try</span><span class="p">:</span>
                 <span class="k">return</span> <span class="n">_do_download_attempt</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">sha256</span><span class="p">)</span>
             <span class="k">except</span> <span class="n">TooManyRequests</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="n">last_exception</span> <span class="o">=</span> <span class="n">e</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span>
                     <span class="s2">&quot;Download attempt failed with Too Many Requests error. &quot;</span>
                     <span class="s2">&quot;Watiting </span><span class="si">%.1f</span><span class="s2"> seconds&quot;</span><span class="p">,</span>
                     <span class="n">wait_time</span><span class="p">,</span>
@@ -286,13 +293,13 @@
                 <span class="n">sleep</span><span class="p">(</span><span class="n">wait_time</span><span class="p">)</span>
                 <span class="n">wait_time</span> <span class="o">*=</span> <span class="mf">1.5</span>
             <span class="k">except</span> <span class="n">DownloadFailed</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">logging</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Download attempt failed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">truncate</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
+                <span class="n">logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Download attempt failed: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">truncate</span><span class="p">(</span><span class="n">e</span><span class="p">))</span>
                 <span class="n">last_exception</span> <span class="o">=</span> <span class="n">e</span>
     <span class="k">raise</span> <span class="n">last_exception</span>
 
 
 <div class="viewcode-block" id="download"><a class="viewcode-back" href="../../../compiler_gym/compiler_gym.html#compiler_gym.download">[docs]</a><span class="k">def</span> <span class="nf">download</span><span class="p">(</span>
-    <span class="n">urls</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">sha256</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span>
+    <span class="n">urls</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]],</span> <span class="n">sha256</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="n">max_retries</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bytes</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Download a file and return its contents.</span>
 

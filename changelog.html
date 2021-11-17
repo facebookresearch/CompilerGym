@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Changelog &mdash; CompilerGym 0.2.0 documentation</title>
+  <title>Changelog &mdash; CompilerGym 0.2.1 documentation</title>
   
 
   
@@ -58,9 +58,12 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> CompilerGym
+            <a href="index.html">
           
 
+          
+            
+            <img src="_static/logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -68,7 +71,7 @@
             
             
               <div class="version">
-                0.2.0
+                0.2.1
               </div>
             
           
@@ -100,6 +103,7 @@
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc.html">RPC Service Reference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#release-0-2-1-2021-11-17">Release 0.2.1 (2021-11-17)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#release-0-2-0-2021-09-28">Release 0.2.0 (2021-09-28)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#release-0-1-10-2021-09-08">Release 0.1.10 (2021-09-08)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#release-0-1-9-2021-06-03">Release 0.1.9 (2021-06-03)</a></li>
@@ -130,6 +134,7 @@
 <li class="toctree-l1"><a class="reference internal" href="llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/service/runtime.html">compiler_gym.service.runtime</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
@@ -209,6 +214,61 @@
             
   <div class="section" id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="release-0-2-1-2021-11-17">
+<h2>Release 0.2.1 (2021-11-17)<a class="headerlink" href="#release-0-2-1-2021-11-17" title="Permalink to this headline">¶</a></h2>
+<p>Highlights of this release include:</p>
+<ul class="simple">
+<li><p><strong>[Complex and composite action spaces]</strong> Added a new schema for
+describing action spaces
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/369">#369</a>).
+This complete overhaul enables a much richer set of actions to be
+exposed, such as composite actions spaces, dictionaries, and
+continuous actions.</p></li>
+<li><p><strong>[State Transition Dataset]</strong> We have released the first iteration
+of the state transition dataset, a large collection of
+(state,action,reward) tuples for the LLVM environments, suitable for
+large-scale supervised learning. We have added an example learned
+cost model using a graph neural network in
+<code class="docutils literal notranslate"><span class="pre">examples/gnn_cost_model</span></code>
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/484">#484</a>,
+thanks &#64;bcui19!).</p></li>
+<li><p><strong>[New examples]</strong> We have added several new examples to the
+<code class="docutils literal notranslate"><span class="pre">examples/</span></code> directory, including a new loop unrolling demo based on
+LLVM
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/477">#477</a>,
+thanks &#64;mostafaelhoushi!), a loop tool demo
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/457">#457</a>,
+thanks &#64;bwasti!), micro-benchmarks for operations, and example
+reinforcement learning scripts
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/484">#484</a>).
+See <code class="docutils literal notranslate"><span class="pre">examples/README.md</span></code> for details. We also overhauled the
+example compiler gym service
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/467">#467</a>).</p></li>
+<li><p><strong>[New logo]</strong> Thanks Christy for designing a great new logo for
+CompilerGym!
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/471">#471</a>)</p></li>
+<li><p><strong>[llvm]</strong> Added a new <code class="docutils literal notranslate"><span class="pre">Bitcode</span></code> observation space
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/442">#442</a>).</p></li>
+<li><p>Numerous bug fixes and improvements.</p></li>
+</ul>
+<p>Deprecations and breaking changes:</p>
+<ul class="simple">
+<li><p><strong>[Backend API change]</strong> Out-of-tree compiler services will require
+updating to the new action space API
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/369">#369</a>).</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">env.observation.add_derived_space()</span></code> method has been
+deprecated and will be removed in a future release. Please use the
+new <code class="docutils literal notranslate"><span class="pre">derived_observation_spaces</span></code> argument to the <code class="docutils literal notranslate"><span class="pre">CompilerEnv</span></code>
+constructor
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/463">#463</a>).</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">compiler_gym.utils.logs</span></code> module has been deprecated. Use
+<code class="docutils literal notranslate"><span class="pre">compiler_gym.utils.runfiles_path</span></code> instead
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/453">#453</a>).</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">compiler_gym.replay_search</span></code> module has been deprecated and
+merged into the <code class="docutils literal notranslate"><span class="pre">compiler_gym.random_search</span></code>
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/453">#453</a>).</p></li>
+</ul>
+</div>
 <div class="section" id="release-0-2-0-2021-09-28">
 <h2>Release 0.2.0 (2021-09-28)<a class="headerlink" href="#release-0-2-0-2021-09-28" title="Permalink to this headline">¶</a></h2>
 <p>This release adds two new compiler optimization problems to CompilerGym:
@@ -249,7 +309,7 @@ computational requirements by 59.4% while increasing test coverage
 <li><p>Improved error reporting if computing an observation fails
 (<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/380">#380</a>).</p></li>
 <li><p>Changed the return type of <code class="docutils literal notranslate"><span class="pre">compiler_gym.random_search()</span></code> to a
-<code class="docutils literal notranslate"><span class="pre">CopmilerEnv</span></code>
+<code class="docutils literal notranslate"><span class="pre">CompilerEnv</span></code>
 (<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/387">#387</a>).</p></li>
 <li><p>Numerous other bug fixes and improvements.</p></li>
 </ul>

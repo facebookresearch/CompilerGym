@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.wrappers.datasets &mdash; CompilerGym 0.1.10 documentation</title>
+  <title>compiler_gym.wrappers.datasets &mdash; CompilerGym 0.2.1 documentation</title>
   
 
   
@@ -56,9 +56,12 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> CompilerGym
+            <a href="../../../index.html">
           
 
+          
+            
+            <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -66,7 +69,7 @@
             
             
               <div class="version">
-                0.1.10
+                0.2.1
               </div>
             
           
@@ -116,6 +119,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service/runtime.html">compiler_gym.service.runtime</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
@@ -197,7 +201,7 @@
 <span class="c1"># This source code is licensed under the MIT license found in the</span>
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
 <span class="kn">from</span> <span class="nn">itertools</span> <span class="kn">import</span> <span class="n">cycle</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
@@ -301,6 +305,47 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
             <span class="n">env</span><span class="p">,</span> <span class="n">benchmarks</span><span class="o">=</span><span class="n">cycle</span><span class="p">(</span><span class="n">benchmarks</span><span class="p">),</span> <span class="n">fork_shares_iterator</span><span class="o">=</span><span class="n">fork_shares_iterator</span>
         <span class="p">)</span></div></div>
+
+
+<div class="viewcode-block" id="CycleOverBenchmarksIterator"><a class="viewcode-back" href="../../../compiler_gym/wrappers.html#compiler_gym.wrappers.CycleOverBenchmarksIterator">[docs]</a><span class="k">class</span> <span class="nc">CycleOverBenchmarksIterator</span><span class="p">(</span><span class="n">CompilerEnvWrapper</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Same as :class:`CycleOverBenchmarks</span>
+<span class="sd">    &lt;compiler_gym.wrappers.CycleOverBenchmarks&gt;` except that the user generates</span>
+<span class="sd">    the iterator.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+
+<div class="viewcode-block" id="CycleOverBenchmarksIterator.__init__"><a class="viewcode-back" href="../../../compiler_gym/wrappers.html#compiler_gym.wrappers.CycleOverBenchmarksIterator.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">env</span><span class="p">:</span> <span class="n">CompilerEnv</span><span class="p">,</span>
+        <span class="n">make_benchmark_iterator</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[],</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">BenchmarkLike</span><span class="p">]],</span>
+    <span class="p">):</span>
+        <span class="sd">&quot;&quot;&quot;Constructor.</span>
+
+<span class="sd">        :param env: The environment to wrap.</span>
+
+<span class="sd">        :param make_benchmark_iterator: A callback that returns an iterator over</span>
+<span class="sd">            a sequence of benchmarks. Once the iterator is exhausted, this</span>
+<span class="sd">            callback is called to produce a new iterator.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">make_benchmark_iterator</span> <span class="o">=</span> <span class="n">make_benchmark_iterator</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">benchmarks</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">make_benchmark_iterator</span><span class="p">())</span></div>
+
+    <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">benchmark</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BenchmarkLike</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
+        <span class="k">if</span> <span class="n">benchmark</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;Benchmark passed toIterateOverBenchmarks.reset()&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">benchmark</span><span class="p">:</span> <span class="n">BenchmarkLike</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">benchmarks</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">StopIteration</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">benchmarks</span> <span class="o">=</span> <span class="nb">iter</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">make_benchmark_iterator</span><span class="p">())</span>
+            <span class="n">benchmark</span><span class="p">:</span> <span class="n">BenchmarkLike</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">benchmarks</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="n">benchmark</span><span class="o">=</span><span class="n">benchmark</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">fork</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;CycleOverBenchmarksIterator&quot;</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">CycleOverBenchmarksIterator</span><span class="p">(</span>
+            <span class="n">env</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">fork</span><span class="p">(),</span>
+            <span class="n">make_benchmark_iterator</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">make_benchmark_iterator</span><span class="p">,</span>
+        <span class="p">)</span></div>
 
 
 <div class="viewcode-block" id="RandomOrderBenchmarks"><a class="viewcode-back" href="../../../compiler_gym/wrappers.html#compiler_gym.wrappers.RandomOrderBenchmarks">[docs]</a><span class="k">class</span> <span class="nc">RandomOrderBenchmarks</span><span class="p">(</span><span class="n">IterateOverBenchmarks</span><span class="p">):</span>

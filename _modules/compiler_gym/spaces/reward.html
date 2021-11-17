@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.spaces.reward &mdash; CompilerGym 0.1.10 documentation</title>
+  <title>compiler_gym.spaces.reward &mdash; CompilerGym 0.2.0 documentation</title>
   
 
   
@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                0.1.10
+                0.2.0
               </div>
             
           
@@ -91,7 +91,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../about.html">About</a></li>
@@ -101,13 +101,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Environments</span></p>
+<p class="caption" role="heading"><span class="caption-text">Environments</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -116,11 +116,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service/runtime.html">compiler_gym.service.runtime</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
 </ul>
-<p class="caption"><span class="caption-text">C++ API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">C++ API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/service.html">compiler_gym/service</a></li>
@@ -232,6 +233,8 @@
 
 <div class="viewcode-block" id="Reward.__init__"><a class="viewcode-back" href="../../../compiler_gym/spaces.html#compiler_gym.spaces.Reward.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
+        <span class="c1"># TODO(github.com/facebookresearch/CompilerGym/issues/381): Rename `id`</span>
+        <span class="c1"># to `name` for consistency with the other space classes.</span>
         <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">observation_spaces</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">default_value</span><span class="p">:</span> <span class="n">RewardType</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
@@ -271,6 +274,7 @@
 <span class="sd">            execution environment of the service.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">name</span><span class="o">=</span><span class="nb">id</span><span class="p">,</span>
             <span class="nb">min</span><span class="o">=-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span> <span class="k">if</span> <span class="nb">min</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">min</span><span class="p">,</span>
             <span class="nb">max</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span> <span class="k">if</span> <span class="nb">max</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="nb">max</span><span class="p">,</span>
             <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>

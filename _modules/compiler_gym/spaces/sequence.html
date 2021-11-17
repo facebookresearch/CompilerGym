@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.spaces.sequence &mdash; CompilerGym 0.1.10 documentation</title>
+  <title>compiler_gym.spaces.sequence &mdash; CompilerGym 0.2.0 documentation</title>
   
 
   
@@ -66,7 +66,7 @@
             
             
               <div class="version">
-                0.1.10
+                0.2.0
               </div>
             
           
@@ -91,7 +91,7 @@
               
             
             
-              <p class="caption"><span class="caption-text">User Guide</span></p>
+              <p class="caption" role="heading"><span class="caption-text">User Guide</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../about.html">About</a></li>
@@ -101,13 +101,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../contributing.html">Contributing</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../faq.html">Frequently Asked Questions</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Environments</span></p>
+<p class="caption" role="heading"><span class="caption-text">Environments</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/gcc.html">GCC Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
 </ul>
-<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">Python API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/compiler_gym.html">compiler_gym</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/datasets.html">compiler_gym.datasets</a></li>
@@ -116,11 +116,12 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service/runtime.html">compiler_gym.service.runtime</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
 </ul>
-<p class="caption"><span class="caption-text">C++ API Reference</span></p>
+<p class="caption" role="heading"><span class="caption-text">C++ API Reference</span></p>
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../cc/compiler_gym/service.html">compiler_gym/service</a></li>
@@ -235,6 +236,7 @@
 
 <div class="viewcode-block" id="Sequence.__init__"><a class="viewcode-back" href="../../../compiler_gym/spaces.html#compiler_gym.spaces.Sequence.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
+        <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">size_range</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">),</span>
         <span class="n">dtype</span><span class="o">=</span><span class="nb">bytes</span><span class="p">,</span>
         <span class="n">opaque_data_format</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -242,20 +244,26 @@
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Constructor.</span>
 
+<span class="sd">        :param name: The name of the space.</span>
+
 <span class="sd">        :param size_range: A tuple indicating the `(lower, upper)` bounds for</span>
 <span class="sd">            sequence lengths. An upper bound of `None` means no upper bound. All</span>
 <span class="sd">            sequences must have a lower bound of length &gt;= 0.</span>
+
 <span class="sd">        :param dtype: The data type for each element in a sequence.</span>
+
 <span class="sd">        :param opaque_data_format: An optional string describing an opaque data</span>
 <span class="sd">            format, e.g. a data structure that is serialized to a string/binary</span>
 <span class="sd">            array for transmission to the client. It is up to the client and</span>
 <span class="sd">            service to agree on how to decode observations using this value. For</span>
 <span class="sd">            example, an opaque_data_format of `string_json` could be used to</span>
 <span class="sd">            indicate that the observation is a string-serialized JSON value.</span>
-<span class="sd">        :param scalar_range: If specified, this denotes the legal range of</span>
-<span class="sd">            each element in the sequence. This is enforced by</span>
-<span class="sd">            :meth:`contains() &lt;compiler_gym.spaces.Sequence.contains&gt;` checks.</span>
+
+<span class="sd">        :param scalar_range: If specified, this denotes the legal range of each</span>
+<span class="sd">            element in the sequence. This is enforced by :meth:`contains()</span>
+<span class="sd">            &lt;compiler_gym.spaces.Sequence.contains&gt;` checks.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">size_range</span> <span class="o">=</span> <span class="n">size_range</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">=</span> <span class="n">dtype</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">opaque_data_format</span> <span class="o">=</span> <span class="n">opaque_data_format</span>
@@ -273,9 +281,18 @@
         <span class="n">upper_bound</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="s2">&quot;inf&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">size_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">is</span> <span class="kc">None</span> <span class="k">else</span> <span class="bp">self</span><span class="o">.</span><span class="n">size_range</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">lower_bound</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">upper_bound</span><span class="p">):</span>
             <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
-            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+
+        <span class="c1"># TODO(cummins): The dtype API is inconsistent. When dtype=str or</span>
+        <span class="c1"># dtype=bytes, we expect this to be the type of the entire sequence. But</span>
+        <span class="c1"># for dtype=int, we expect this to be the type of each element. We</span>
+        <span class="c1"># should distinguish these differences better.</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="ow">in</span> <span class="p">{</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">}:</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">False</span>
 
         <span class="c1"># Run the bounds check on every scalar element, if there is a scalar</span>
         <span class="c1"># range specified.</span>

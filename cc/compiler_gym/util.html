@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym/util &mdash; CompilerGym 0.2.0 documentation</title>
+  <title>compiler_gym/util &mdash; CompilerGym 0.2.1 documentation</title>
   
 
   
@@ -57,9 +57,12 @@
           
 
           
-            <a href="../../index.html" class="icon icon-home"> CompilerGym
+            <a href="../../index.html">
           
 
+          
+            
+            <img src="../../_static/logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -67,7 +70,7 @@
             
             
               <div class="version">
-                0.2.0
+                0.2.1
               </div>
             
           
@@ -117,6 +120,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/service/runtime.html">compiler_gym.service.runtime</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
@@ -245,6 +249,21 @@
 <span id="_CPPv3I0EN12compiler_gym4util20enumNameToPascalCaseENSt8optionalI4EnumEE"></span><span id="_CPPv2I0EN12compiler_gym4util20enumNameToPascalCaseENSt8optionalI4EnumEE"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Enum</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="namespacecompiler__gym_1_1util_1af858d32dd9021ea54dde947b04642873"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">enumNameToPascalCase</span></span></span><span class="sig-paren">(</span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">optional</span></span><span class="p"><span class="pre">&lt;</span></span><a class="reference internal" href="#_CPPv4I0EN12compiler_gym4util20enumNameToPascalCaseENSt6stringENSt8optionalI4EnumEE" title="compiler_gym::util::enumNameToPascalCase::Enum"><span class="n"><span class="pre">Enum</span></span></a><span class="p"><span class="pre">&gt;</span></span><span class="w"> </span><span class="n sig-param"><span class="pre">value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN12compiler_gym4util20enumNameToPascalCaseENSt6stringENSt8optionalI4EnumEE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>Convert an UPPER_SNAKE_CASE enum name to PascalCase. </p>
 <p>E.g. <code class="docutils literal notranslate"><span class="pre">MyEnum::MY_ENUM_VALUE</span> <span class="pre">-&gt;</span> <span class="pre">&quot;MyEnumValue&quot;</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>value</strong> – An enum. </p>
+</dd>
+<dt class="field-even">Returns</dt>
+<dd class="field-even"><p>A string. </p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="cpp function">
+<dt class="sig sig-object cpp" id="_CPPv4I0EN12compiler_gym4util25enumNameToCommandlineFlagENSt6stringE4Enum">
+<span id="_CPPv3I0EN12compiler_gym4util25enumNameToCommandlineFlagE4Enum"></span><span id="_CPPv2I0EN12compiler_gym4util25enumNameToCommandlineFlagE4Enum"></span><span class="k"><span class="pre">template</span></span><span class="p"><span class="pre">&lt;</span></span><span class="k"><span class="pre">typename</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Enum</span></span></span><span class="p"><span class="pre">&gt;</span></span><br /><span class="target" id="namespacecompiler__gym_1_1util_1ae409fd902012512ace1bc034bad8194c"></span><span class="n"><span class="pre">std</span></span><span class="p"><span class="pre">::</span></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">enumNameToCommandlineFlag</span></span></span><span class="sig-paren">(</span><a class="reference internal" href="#_CPPv4I0EN12compiler_gym4util25enumNameToCommandlineFlagENSt6stringE4Enum" title="compiler_gym::util::enumNameToCommandlineFlag::Enum"><span class="n"><span class="pre">Enum</span></span></a><span class="w"> </span><span class="n sig-param"><span class="pre">value</span></span><span class="sig-paren">)</span><a class="headerlink" href="#_CPPv4I0EN12compiler_gym4util25enumNameToCommandlineFlagENSt6stringE4Enum" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Convert an UPPER_SNAKE_CASE enum name to -flag-name. </p>
+<p>E.g. <code class="docutils literal notranslate"><span class="pre">MyEnum::MY_ENUM_VALUE</span> <span class="pre">-&gt;</span> <span class="pre">&quot;-my-enum-value&quot;</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
 <dd class="field-odd"><p><strong>value</strong> – An enum. </p>

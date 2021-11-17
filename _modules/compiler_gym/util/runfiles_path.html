@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.util.runfiles_path &mdash; CompilerGym 0.1.10 documentation</title>
+  <title>compiler_gym.util.runfiles_path &mdash; CompilerGym 0.2.1 documentation</title>
   
 
   
@@ -56,9 +56,12 @@
           
 
           
-            <a href="../../../index.html" class="icon icon-home"> CompilerGym
+            <a href="../../../index.html">
           
 
+          
+            
+            <img src="../../../_static/logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -66,7 +69,7 @@
             
             
               <div class="version">
-                0.1.10
+                0.2.1
               </div>
             
           
@@ -105,6 +108,7 @@
 <ul>
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/index.html">LLVM Environment Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../envs/gcc.html">GCC Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
 </ul>
 <p class="caption"><span class="caption-text">Python API Reference</span></p>
 <ul>
@@ -115,6 +119,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/service/runtime.html">compiler_gym.service.runtime</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
@@ -197,13 +202,19 @@
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
 <span class="sd">&quot;&quot;&quot;Module for resolving a runfiles path.&quot;&quot;&quot;</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
 <span class="kn">from</span> <span class="nn">getpass</span> <span class="kn">import</span> <span class="n">getuser</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
+<span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Lock</span>
+<span class="kn">from</span> <span class="nn">time</span> <span class="kn">import</span> <span class="n">sleep</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 
 <span class="c1"># NOTE(cummins): Moving this file may require updating this relative path.</span>
 <span class="n">_PACKAGE_ROOT</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="vm">__file__</span><span class="p">),</span> <span class="s2">&quot;../../&quot;</span><span class="p">))</span><span class="o">.</span><span class="n">resolve</span><span class="p">(</span>
     <span class="n">strict</span><span class="o">=</span><span class="kc">True</span>
 <span class="p">)</span>
+
+<span class="n">_CREATE_LOGGING_DIR_LOCK</span> <span class="o">=</span> <span class="n">Lock</span><span class="p">()</span>
 
 
 <span class="k">def</span> <span class="nf">runfiles_path</span><span class="p">(</span><span class="n">relpath</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
@@ -317,6 +328,48 @@
     <span class="k">else</span><span class="p">:</span>
         <span class="c1"># Fallback to using the regular cache.</span>
         <span class="k">return</span> <span class="n">cache_path</span><span class="p">(</span><span class="n">relpath</span><span class="p">)</span></div>
+
+
+<span class="k">def</span> <span class="nf">create_user_logs_dir</span><span class="p">(</span><span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="nb">dir</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
+    <span class="sd">&quot;&quot;&quot;Create a directory for writing logs to.</span>
+
+<span class="sd">    Defaults to ~/logs/compiler_gym base directory, set the</span>
+<span class="sd">    :code:`COMPILER_GYM_LOGS` environment variable to override this.</span>
+
+<span class="sd">    Example use:</span>
+
+<span class="sd">        &gt;&gt;&gt; create_user_logs_dir(&quot;my_experiment&quot;)</span>
+<span class="sd">        Path(&quot;~/logs/compiler_gym/my_experiment/2020-11-03T11:00:00&quot;)</span>
+
+<span class="sd">    :param name: The grouping name for the logs.</span>
+
+<span class="sd">    :return: A unique timestamped directory for logging. This directory exists.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">base_dir</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span>
+        <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;COMPILER_GYM_LOGS&quot;</span><span class="p">,</span> <span class="nb">dir</span> <span class="ow">or</span> <span class="s2">&quot;~/logs/compiler_gym&quot;</span><span class="p">)</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">expanduser</span><span class="p">()</span>
+    <span class="n">group_dir</span> <span class="o">=</span> <span class="n">base_dir</span> <span class="o">/</span> <span class="n">name</span>
+
+    <span class="k">with</span> <span class="n">_CREATE_LOGGING_DIR_LOCK</span><span class="p">:</span>
+        <span class="c1"># Require that logging directory timestamps are unique by waiting until</span>
+        <span class="c1"># a unique timestamp is generated.</span>
+        <span class="k">while</span> <span class="kc">True</span><span class="p">:</span>
+            <span class="n">now</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span>
+            <span class="n">subdirs</span> <span class="o">=</span> <span class="n">now</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y-%m-</span><span class="si">%d</span><span class="s2">/%H-%M-%S&quot;</span><span class="p">)</span>
+
+            <span class="n">logs_dir</span> <span class="o">=</span> <span class="n">group_dir</span> <span class="o">/</span> <span class="n">subdirs</span>
+            <span class="k">if</span> <span class="n">logs_dir</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+                <span class="n">sleep</span><span class="p">(</span><span class="mf">0.3</span><span class="p">)</span>
+                <span class="k">continue</span>
+
+            <span class="n">logs_dir</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+            <span class="c1"># Create a symlink to the &quot;latest&quot; logs results.</span>
+            <span class="k">if</span> <span class="p">(</span><span class="n">group_dir</span> <span class="o">/</span> <span class="s2">&quot;latest&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
+                <span class="n">os</span><span class="o">.</span><span class="n">unlink</span><span class="p">(</span><span class="n">group_dir</span> <span class="o">/</span> <span class="s2">&quot;latest&quot;</span><span class="p">)</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">symlink</span><span class="p">(</span><span class="n">subdirs</span><span class="p">,</span> <span class="n">group_dir</span> <span class="o">/</span> <span class="s2">&quot;latest&quot;</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">logs_dir</span>
 </pre></div>
 
            </div>

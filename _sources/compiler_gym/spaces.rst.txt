@@ -11,6 +11,56 @@ observation spaces available to compilers.
 .. currentmodule:: compiler_gym.spaces
 
 
+Commandline
+-----------
+
+.. autoclass:: Commandline
+   :members:
+
+   .. automethod:: __init__
+
+.. autoclass:: CommandlineFlag
+   :members:
+
+
+Dict
+----
+
+.. autoclass:: Dict
+   :members:
+
+   .. automethod:: __init__
+
+
+Discrete
+--------
+
+.. autoclass:: Discrete
+   :members:
+
+   .. automethod:: __init__
+
+
+NamedDiscrete
+-------------
+
+.. autoclass:: NamedDiscrete
+   :members:
+
+   .. automethod:: __init__
+
+   .. automethod:: __getitem__
+
+
+Reward
+------
+
+.. autoclass:: Reward
+   :members:
+
+   .. automethod:: __init__
+
+
 Scalar
 ------
 
@@ -29,33 +79,10 @@ Sequence
    .. automethod:: __init__
 
 
-NamedDiscrete
--------------
+Tuple
+-----
 
-.. autoclass:: NamedDiscrete
-   :members:
-
-   .. automethod:: __init__
-
-   .. automethod:: __getitem__
-
-
-Commandline
------------
-
-.. autoclass:: Commandline
-   :members:
-
-   .. automethod:: __init__
-
-.. autoclass:: CommandlineFlag
-   :members:
-
-
-Reward
-------
-
-.. autoclass:: Reward
+.. autoclass:: Tuple
    :members:
 
    .. automethod:: __init__

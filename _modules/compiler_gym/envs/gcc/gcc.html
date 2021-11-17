@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.envs.gcc.gcc &mdash; CompilerGym 0.1.10 documentation</title>
+  <title>compiler_gym.envs.gcc.gcc &mdash; CompilerGym 0.2.1 documentation</title>
   
 
   
@@ -56,9 +56,12 @@
           
 
           
-            <a href="../../../../index.html" class="icon icon-home"> CompilerGym
+            <a href="../../../../index.html">
           
 
+          
+            
+            <img src="../../../../_static/logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -66,7 +69,7 @@
             
             
               <div class="version">
-                0.1.10
+                0.2.1
               </div>
             
           
@@ -116,6 +119,7 @@
 <li class="toctree-l1"><a class="reference internal" href="../../../../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/service/runtime.html">compiler_gym.service.runtime</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../../../../compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
@@ -225,6 +229,8 @@
 <span class="kn">from</span> <span class="nn">compiler_gym.service</span> <span class="kn">import</span> <span class="n">EnvironmentNotSupported</span><span class="p">,</span> <span class="n">ServiceError</span><span class="p">,</span> <span class="n">ServiceInitError</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.filesystem</span> <span class="kn">import</span> <span class="n">atomic_file_write</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">site_data_path</span>
+
+<span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="Option"><a class="viewcode-back" href="../../../../compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.Option">[docs]</a><span class="k">class</span> <span class="nc">Option</span><span class="p">:</span>
@@ -350,7 +356,7 @@
     <span class="sd">&quot;&quot;&quot;Alignment flags. These take several forms. See the GCC documentation.&quot;&quot;&quot;</span>
 
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Alignment options not properly handled </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Alignment options not properly handled </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">name</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="n">name</span>
 
     <span class="k">def</span> <span class="fm">__len__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -584,7 +590,7 @@
 <span class="k">def</span> <span class="nf">_gcc_parse_optimize</span><span class="p">(</span><span class="n">gcc</span><span class="p">:</span> <span class="n">Gcc</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Option</span><span class="p">]:</span>
     <span class="sd">&quot;&quot;&quot;Parse the optimization help string from the GCC binary to find options.&quot;&quot;&quot;</span>
 
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Parsing GCC optimization space&quot;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Parsing GCC optimization space&quot;</span><span class="p">)</span>
 
     <span class="c1"># Call &#39;gcc --help=optimize -Q&#39;</span>
     <span class="n">result</span> <span class="o">=</span> <span class="n">gcc</span><span class="p">(</span><span class="s2">&quot;--help=optimize&quot;</span><span class="p">,</span> <span class="s2">&quot;-Q&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
@@ -713,7 +719,7 @@
             <span class="n">add_gcc_flag_int</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span>
             <span class="k">return</span>
 
-        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Unknown GCC optimization flag spec, &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Unknown GCC optimization flag spec, &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
 
     <span class="c1"># Parse all the lines</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
@@ -727,7 +733,7 @@
     <span class="sd">&quot;&quot;&quot;Parse the param help string from the GCC binary to find options.&quot;&quot;&quot;</span>
 
     <span class="c1"># Pretty much identical to _gcc_parse_optimize</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Parsing GCC param space&quot;</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Parsing GCC param space&quot;</span><span class="p">)</span>
 
     <span class="n">result</span> <span class="o">=</span> <span class="n">gcc</span><span class="p">(</span><span class="s2">&quot;--help=param&quot;</span><span class="p">,</span> <span class="s2">&quot;-Q&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)[</span><span class="mi">1</span><span class="p">:]</span>
@@ -816,7 +822,7 @@
                 <span class="n">add_gcc_param_int</span><span class="p">(</span><span class="n">name</span><span class="p">,</span> <span class="nb">min</span><span class="p">,</span> <span class="nb">max</span><span class="p">)</span>
                 <span class="k">return</span>
 
-        <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Unknown GCC param flag spec, &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Unknown GCC param flag spec, &#39;</span><span class="si">%s</span><span class="s2">&#39;&quot;</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span>
 
     <span class="c1"># breakpoint()</span>
     <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">out</span><span class="p">:</span>
@@ -876,13 +882,13 @@
 
 <span class="k">def</span> <span class="nf">_gcc_get_version</span><span class="p">(</span><span class="n">gcc</span><span class="p">:</span> <span class="n">Gcc</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Get the version string&quot;&quot;&quot;</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Getting GCC version for </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">gcc</span><span class="o">.</span><span class="n">bin</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Getting GCC version for </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">gcc</span><span class="o">.</span><span class="n">bin</span><span class="p">)</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">gcc</span><span class="p">(</span><span class="s2">&quot;--version&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">60</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">ServiceError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">EnvironmentNotSupported</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to run GCC binary: </span><span class="si">{</span><span class="n">gcc</span><span class="o">.</span><span class="n">bin</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
     <span class="n">version</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)[</span><span class="mi">0</span><span class="p">]</span>
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;GCC version is </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;GCC version is </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">version</span><span class="p">)</span>
     <span class="k">if</span> <span class="s2">&quot;gcc&quot;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">version</span><span class="p">:</span>
         <span class="k">raise</span> <span class="n">ServiceInitError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid GCC version string: </span><span class="si">{</span><span class="n">version</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
     <span class="k">return</span> <span class="n">version</span>
@@ -918,9 +924,9 @@
             <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">spec_path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
                 <span class="n">spec</span> <span class="o">=</span> <span class="n">pickle</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
             <span class="n">spec</span> <span class="o">=</span> <span class="n">GccSpec</span><span class="p">(</span><span class="n">gcc</span><span class="o">=</span><span class="n">gcc</span><span class="p">,</span> <span class="n">version</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">version</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="n">spec</span><span class="o">.</span><span class="n">options</span><span class="p">)</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;GccSpec for version &#39;</span><span class="si">%s</span><span class="s2">&#39; read from </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">spec_path</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;GccSpec for version &#39;</span><span class="si">%s</span><span class="s2">&#39; read from </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">spec_path</span><span class="p">)</span>
         <span class="k">except</span> <span class="p">(</span><span class="n">pickle</span><span class="o">.</span><span class="n">UnpicklingError</span><span class="p">,</span> <span class="ne">EOFError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Unable to read spec from &#39;</span><span class="si">%s</span><span class="s2">&#39;: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">spec_path</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Unable to read spec from &#39;</span><span class="si">%s</span><span class="s2">&#39;: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">spec_path</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
 
     <span class="k">if</span> <span class="n">spec</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
         <span class="c1"># Pickle doesn&#39;t exist, parse</span>
@@ -935,9 +941,9 @@
         <span class="n">spec_path</span><span class="o">.</span><span class="n">parent</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">with</span> <span class="n">atomic_file_write</span><span class="p">(</span><span class="n">spec_path</span><span class="p">,</span> <span class="n">fileobj</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">pickle</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">spec</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
-        <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;GccSpec for </span><span class="si">%s</span><span class="s2"> written to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">spec_path</span><span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;GccSpec for </span><span class="si">%s</span><span class="s2"> written to </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">version</span><span class="p">,</span> <span class="n">spec_path</span><span class="p">)</span>
 
-    <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;GccSpec size is approximately 10^</span><span class="si">%.0f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">size</span><span class="p">)))</span>
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;GccSpec size is approximately 10^</span><span class="si">%.0f</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">round</span><span class="p">(</span><span class="n">math</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">spec</span><span class="o">.</span><span class="n">size</span><span class="p">)))</span>
 
     <span class="k">return</span> <span class="n">spec</span>
 </pre></div>

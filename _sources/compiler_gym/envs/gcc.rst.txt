@@ -2,7 +2,7 @@ compiler_gym.envs.gcc
 ======================
 
 The :code:`compiler_gym.envs.gcc` module contains datasets and API extensions
-for the :doc:`GCC Environments <index>`. See :class:`GccEnv
+for the :doc:`GCC Environments </envs/gcc>`. See :class:`GccEnv
 <compiler_gym.envs.GccEnv>` for the class definition.
 
 .. contents:: Document contents:

@@ -1,0 +1,432 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" >
+<head>
+  <meta charset="utf-8" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  
+  <title>compiler_gym.service.runtime &mdash; CompilerGym 0.2.1 documentation</title>
+  
+
+  
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
+
+  
+  
+
+  
+  
+
+  
+
+  
+  <!--[if lt IE 9]>
+    <script src="../../_static/js/html5shiv.min.js"></script>
+  <![endif]-->
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="../../" src="../../_static/documentation_options.js"></script>
+        <script data-url_root="../../" id="documentation_options" src="../../_static/documentation_options.js"></script>
+        <script src="../../_static/jquery.js"></script>
+        <script src="../../_static/underscore.js"></script>
+        <script src="../../_static/doctools.js"></script>
+    
+    <script type="text/javascript" src="../../_static/js/theme.js"></script>
+
+    
+    <link rel="author" title="About these documents" href="../../about.html" />
+    <link rel="index" title="Index" href="../../genindex.html" />
+    <link rel="search" title="Search" href="../../search.html" />
+    <link rel="next" title="compiler_gym.spaces" href="../spaces.html" />
+    <link rel="prev" title="compiler_gym.service" href="../service.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="../../index.html">
+          
+
+          
+            
+            <img src="../../_static/logo.png" class="logo" alt="Logo"/>
+          
+          </a>
+
+          
+            
+            
+              <div class="version">
+                0.2.1
+              </div>
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">User Guide</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../about.html">About</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cli.html">Command Line Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rpc.html">RPC Service Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../changelog.html">Changelog</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../contributing.html">Contributing</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../faq.html">Frequently Asked Questions</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Environments</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../llvm/index.html">LLVM Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../envs/gcc.html">GCC Environment Reference</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../envs/loop_tool.html">loop_tool Environment Reference</a></li>
+</ul>
+<p class="caption"><span class="caption-text">Python API Reference</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../compiler_gym.html">compiler_gym</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../datasets.html">compiler_gym.datasets</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../envs.html">compiler_gym.envs</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../envs/gcc.html">compiler_gym.envs.gcc</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../llvm/api.html">compiler_gym.envs.llvm</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../leaderboard.html">compiler_gym.leaderboard</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../service.html">compiler_gym.service</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">compiler_gym.service.runtime</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#module-compiler_gym.service.runtime">Common Runtime</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#compilergymservice">CompilerGymService</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#benchmarkcache">BenchmarkCache</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../spaces.html">compiler_gym.spaces</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../views.html">compiler_gym.views</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../wrappers.html">compiler_gym.wrappers</a></li>
+</ul>
+<p class="caption"><span class="caption-text">C++ API Reference</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../cc/compiler_gym/envs/llvm/service.html">compiler_gym/envs/llvm/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cc/compiler_gym/service.html">compiler_gym/service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cc/compiler_gym/service/runtime.html">compiler_gym/service/runtime</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../cc/compiler_gym/util.html">compiler_gym/util</a></li>
+</ul>
+
+            
+          
+        </div>
+        
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">CompilerGym</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="../../index.html" class="icon icon-home"></a> &raquo;</li>
+        
+      <li>compiler_gym.service.runtime</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+          
+            <a href="../../_sources/compiler_gym/service/runtime.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="compiler-gym-service-runtime">
+<h1>compiler_gym.service.runtime<a class="headerlink" href="#compiler-gym-service-runtime" title="Permalink to this headline">¶</a></h1>
+<p>CompilerGym uses a client/server architecture. Services provide an interface for
+manipulating compiler behavior. Clients are Python frontend objects that provide
+a reinforcement learning abstraction on top of the service. Communication
+between the service and client is done <a class="reference internal" href="../../rpc.html"><span class="doc">using RPC</span></a>. The connection between the
+client and service is managed by the <a class="reference internal" href="../service.html#compiler_gym.service.CompilerGymServiceConnection" title="compiler_gym.service.CompilerGymServiceConnection"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompilerGymServiceConnection</span></code></a> object.</p>
+<div class="contents local topic" id="document-contents">
+<p class="topic-title">Document contents:</p>
+<ul class="simple">
+<li><p><a class="reference internal" href="#module-compiler_gym.service.runtime" id="id1">Common Runtime</a></p></li>
+<li><p><a class="reference internal" href="#compilergymservice" id="id2">CompilerGymService</a></p></li>
+<li><p><a class="reference internal" href="#benchmarkcache" id="id3">BenchmarkCache</a></p></li>
+</ul>
+</div>
+<div class="section" id="module-compiler_gym.service.runtime">
+<span id="common-runtime"></span><h2><a class="toc-backref" href="#id1">Common Runtime</a><a class="headerlink" href="#module-compiler_gym.service.runtime" title="Permalink to this headline">¶</a></h2>
+<dl class="py function">
+<dt class="sig sig-object py" id="compiler_gym.service.runtime.create_and_run_compiler_gym_service">
+<span class="sig-prename descclassname"><span class="pre">compiler_gym.service.runtime.</span></span><span class="sig-name descname"><span class="pre">create_and_run_compiler_gym_service</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">compilation_session_type</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Type</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="../service.html#compiler_gym.service.CompilationSession" title="compiler_gym.service.compilation_session.CompilationSession"><span class="pre">compiler_gym.service.compilation_session.CompilationSession</span></a><span class="p"><span class="pre">]</span></span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/compiler_gym/service/runtime/create_and_run_compiler_gym_service.html#create_and_run_compiler_gym_service"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.runtime.create_and_run_compiler_gym_service" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create and run an RPC service for the given compilation session.</p>
+<p>This should be called on its own in a self contained script to implement a
+compilation service. Example:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span> <span class="nn">compiler_gym.service</span> <span class="kn">import</span> <span class="n">runtime</span>
+<span class="kn">from</span> <span class="nn">my_compiler_service</span> <span class="kn">import</span> <span class="n">MyCompilationSession</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">runtime</span><span class="o">.</span><span class="n">create_and_run_compiler_gym_service</span><span class="p">(</span><span class="n">MyCompilationSession</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>This function never returns.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><p><strong>compilation_session_type</strong> – A sublass of <a class="reference internal" href="../service.html#compiler_gym.service.CompilationSession" title="compiler_gym.service.CompilationSession"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompilationSession</span></code></a> that provides implementations
+of the abstract methods.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</div>
+<div class="section" id="compilergymservice">
+<h2><a class="toc-backref" href="#id2">CompilerGymService</a><a class="headerlink" href="#compilergymservice" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="compiler_gym.service.runtime.compiler_gym_service.CompilerGymService">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.service.runtime.compiler_gym_service.</span></span><span class="sig-name descname"><span class="pre">CompilerGymService</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">working_directory</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compilation_session_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/compiler_gym/service/runtime/compiler_gym_service.html#CompilerGymService"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.runtime.compiler_gym_service.CompilerGymService" title="Permalink to this definition">¶</a></dt>
+<dd><blockquote>
+<div><dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">working_directory</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compilation_session_type</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/compiler_gym/service/runtime/compiler_gym_service.html#CompilerGymService.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Constructor.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters</dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>working_directory</strong> – The working directory for this service.</p></li>
+<li><p><strong>compilation_session_type</strong> – The <a class="reference internal" href="../service.html#compiler_gym.service.CompilationSession" title="compiler_gym.service.CompilationSession"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompilationSession</span></code></a> type that this service
+implements.</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.AddBenchmark">
+<span class="sig-name descname"><span class="pre">AddBenchmark</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.AddBenchmarkRequest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.AddBenchmarkReply</span><a class="reference internal" href="../../_modules/compiler_gym/service/runtime/compiler_gym_service.html#CompilerGymService.AddBenchmark"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.AddBenchmark" title="Permalink to this definition">¶</a></dt>
+<dd><p>Register a new benchmark.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.EndSession">
+<span class="sig-name descname"><span class="pre">EndSession</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.EndSessionRequest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.EndSessionReply</span><a class="reference internal" href="../../_modules/compiler_gym/service/runtime/compiler_gym_service.html#CompilerGymService.EndSession"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.EndSession" title="Permalink to this definition">¶</a></dt>
+<dd><p>End a CompilerGym service session. If the requested session does not exist,
+this returns an error.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.GetSpaces">
+<span class="sig-name descname"><span class="pre">GetSpaces</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.GetSpacesRequest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.GetSpacesReply</span><a class="reference internal" href="../../_modules/compiler_gym/service/runtime/compiler_gym_service.html#CompilerGymService.GetSpaces"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.GetSpaces" title="Permalink to this definition">¶</a></dt>
+<dd><p>Request the action and observation spaces that this service supports. The
+service responds with an initial action space, and a list of available
+observation and reward spaces.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.GetVersion">
+<span class="sig-name descname"><span class="pre">GetVersion</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.GetVersionRequest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.GetVersionReply</span><a class="reference internal" href="../../_modules/compiler_gym/service/runtime/compiler_gym_service.html#CompilerGymService.GetVersion"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.GetVersion" title="Permalink to this definition">¶</a></dt>
+<dd><p>Request version strings from the service.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.SendSessionParameter">
+<span class="sig-name descname"><span class="pre">SendSessionParameter</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.SendSessionParameterRequest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.SendSessionParameterReply</span><a class="reference internal" href="../../_modules/compiler_gym/service/runtime/compiler_gym_service.html#CompilerGymService.SendSessionParameter"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.SendSessionParameter" title="Permalink to this definition">¶</a></dt>
+<dd><p>Transmit &lt;key, value&gt; parameters to a session. Each parameter generates a
+string response. It us up to the client/service to agree on a common schema
+for encoding and decoding these parameters. An unknown key/value returns
+grpc::StatusCode::INVALID_ARGUMENT.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.StartSession">
+<span class="sig-name descname"><span class="pre">StartSession</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.StartSessionRequest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.StartSessionReply</span><a class="reference internal" href="../../_modules/compiler_gym/service/runtime/compiler_gym_service.html#CompilerGymService.StartSession"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.StartSession" title="Permalink to this definition">¶</a></dt>
+<dd><p>Create a new compilation session.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.Step">
+<span class="sig-name descname"><span class="pre">Step</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.StepRequest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.StepReply</span><a class="reference internal" href="../../_modules/compiler_gym/service/runtime/compiler_gym_service.html#CompilerGymService.Step"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.Step" title="Permalink to this definition">¶</a></dt>
+<dd><p>Apply a list of optimization decisions and compute a list of observations
+for a session. Optimization decisions are selected from the last
+ActionSpace returned by a call to GetSpaces() or Step(). Valid observations
+are queried using GetSpaces(). This returns an error if the requested
+session does not exist.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+<div class="section" id="benchmarkcache">
+<h2><a class="toc-backref" href="#id3">BenchmarkCache</a><a class="headerlink" href="#benchmarkcache" title="Permalink to this headline">¶</a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="compiler_gym.service.runtime.benchmark_cache.BenchmarkCache">
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.service.runtime.benchmark_cache.</span></span><span class="sig-name descname"><span class="pre">BenchmarkCache</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_size_in_bytes</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">54525952</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.random._generator.Generator</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/compiler_gym/service/runtime/benchmark_cache.html#BenchmarkCache"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.runtime.benchmark_cache.BenchmarkCache" title="Permalink to this definition">¶</a></dt>
+<dd><p>An in-memory cache of Benchmark messages.</p>
+<p>This object caches Benchmark messages by URI. Once the cache reaches a
+predetermined size, benchmarks are evicted randomly until the capacity is
+reduced to 50%.</p>
+<blockquote>
+<div><dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.runtime.benchmark_cache.BenchmarkCache.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">max_size_in_bytes</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">int</span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">54525952</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rng</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">numpy.random._generator.Generator</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../../_modules/compiler_gym/service/runtime/benchmark_cache.html#BenchmarkCache.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.runtime.benchmark_cache.BenchmarkCache.__init__" title="Permalink to this definition">¶</a></dt>
+<dd><p>Initialize self.  See help(type(self)) for accurate signature.</p>
+</dd></dl>
+
+</div></blockquote>
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.runtime.benchmark_cache.BenchmarkCache.evict_to_capacity">
+<span class="sig-name descname"><span class="pre">evict_to_capacity</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">target_size_in_bytes</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">None</span><a class="reference internal" href="../../_modules/compiler_gym/service/runtime/benchmark_cache.html#BenchmarkCache.evict_to_capacity"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.runtime.benchmark_cache.BenchmarkCache.evict_to_capacity" title="Permalink to this definition">¶</a></dt>
+<dd><p>Evict benchmarks randomly to reduce the capacity below 50%.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.service.runtime.benchmark_cache.BenchmarkCache.max_size_in_bytes">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">max_size_in_bytes</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#compiler_gym.service.runtime.benchmark_cache.BenchmarkCache.max_size_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>The maximum size of the cache.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.service.runtime.benchmark_cache.BenchmarkCache.size">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">size</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#compiler_gym.service.runtime.benchmark_cache.BenchmarkCache.size" title="Permalink to this definition">¶</a></dt>
+<dd><p>The number of items in the cache.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="compiler_gym.service.runtime.benchmark_cache.BenchmarkCache.size_in_bytes">
+<em class="property"><span class="pre">property</span> </em><span class="sig-name descname"><span class="pre">size_in_bytes</span></span><em class="property"><span class="pre">:</span> <span class="pre">int</span></em><a class="headerlink" href="#compiler_gym.service.runtime.benchmark_cache.BenchmarkCache.size_in_bytes" title="Permalink to this definition">¶</a></dt>
+<dd><p>The combined size of the elements in the cache, excluding the
+cache overhead.</p>
+</dd></dl>
+
+</dd></dl>
+
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+        <a href="../spaces.html" class="btn btn-neutral float-right" title="compiler_gym.spaces" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="../service.html" class="btn btn-neutral float-left" title="compiler_gym.service" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &#169; Copyright Facebook AI Research.
+
+    </p>
+  </div>
+    
+    
+    
+    Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    
+    provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+    <!-- Theme Analytics -->
+    <script>
+    (function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+      (i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+      m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+    })(window,document,'script','https://www.google-analytics.com/analytics.js','ga');
+
+    ga('create', 'G-T95G5EVYXM', 'auto');
+    
+    ga('send', 'pageview');
+    </script>
+
+    
+   
+
+</body>
+</html>

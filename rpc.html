@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>RPC Service Reference &mdash; CompilerGym 0.2.0 documentation</title>
+  <title>RPC Service Reference &mdash; CompilerGym 0.2.1 documentation</title>
   
 
   
@@ -58,9 +58,12 @@
           
 
           
-            <a href="index.html" class="icon icon-home"> CompilerGym
+            <a href="index.html">
           
 
+          
+            
+            <img src="_static/logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -68,7 +71,7 @@
             
             
               <div class="version">
-                0.2.0
+                0.2.1
               </div>
             
           
@@ -102,6 +105,7 @@
 <li class="toctree-l2"><a class="reference internal" href="#how-it-works">How it Works</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#compilergymservice">CompilerGymService</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#request-and-reply-messages">Request and Reply Messages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#core-message-types">Core Message Types</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
@@ -123,6 +127,7 @@
 <li class="toctree-l1"><a class="reference internal" href="llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/service.html">compiler_gym.service</a></li>
+<li class="toctree-l1"><a class="reference internal" href="compiler_gym/service/runtime.html">compiler_gym.service.runtime</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="compiler_gym/wrappers.html">compiler_gym.wrappers</a></li>
@@ -210,6 +215,7 @@ compiler backends.</p>
 <li><p><a class="reference internal" href="#how-it-works" id="id1">How it Works</a></p></li>
 <li><p><a class="reference internal" href="#compilergymservice" id="id2">CompilerGymService</a></p></li>
 <li><p><a class="reference internal" href="#request-and-reply-messages" id="id3">Request and Reply Messages</a></p></li>
+<li><p><a class="reference internal" href="#core-message-types" id="id4">Core Message Types</a></p></li>
 </ul>
 </div>
 <div class="section" id="how-it-works">
@@ -220,17 +226,12 @@ can be used by compilers to expose the incremental compilation of a program as
 an interactive environment. The service is defined using <a class="reference external" href="https://grpc.io/">gRPC</a>, and the individual requests and responses are defined
 using <a class="reference external" href="https://developers.google.com/protocol-buffers">protocol buffers</a>. The
 protocol buffer schema is then used to generate bindings in a programming
-language of choice. Protocol buffers support a wide range of programming
-languages, allowing compiler developers to expose their optimization problems in
-whatever language makes sense for them.</p>
-<p>To use the service from C++, include the generated protocol buffer header:</p>
-<div class="highlight-c++ notranslate"><div class="highlight"><pre><span></span><span class="cp">#include</span> <span class="cpf">&quot;compiler_gym/service/proto/compiler_gym_service.pb.h&quot;</span><span class="cp"></span>
-</pre></div>
-</div>
-<p>To use the service from Python, import the generated protocol buffer module:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">compiler_gym.service.proto</span>
-</pre></div>
-</div>
+language of choice.</p>
+<p>Protocol buffers support a wide range of programming languages, allowing
+compiler developers to expose their optimization problems in whatever language
+makes sense for them. For Python and C++ we also provide a common runtime that
+offers a higher level of abstraction and takes care of much of the boilerplate
+required for RPC communication. For further details check out the <a class="reference internal" href="cc/compiler_gym/service.html#compilationsession-h"><span class="std std-ref">C++</span></a> or <a class="reference internal" href="compiler_gym/service.html#compiler_gym.service.CompilationSession" title="compiler_gym.service.CompilationSession"><code class="xref py py-class docutils literal notranslate"><span class="pre">Python</span> <span class="pre">class</span></code></a> documentation.</p>
 </div>
 <div class="section" id="compilergymservice">
 <h2><a class="toc-backref" href="#id2">CompilerGymService</a><a class="headerlink" href="#compilergymservice" title="Permalink to this headline">¶</a></h2>
@@ -278,7 +279,7 @@ whatever language makes sense for them.</p>
 <dt class="sig sig-object cpp">
 <span class="target" id="namespace_compiler_gym_service_1a6f01eb170e54de8fcc198bea9791334d"></span><span class="sig-name descname"><span class="pre">rpc</span> <span class="pre">Step</span> <span class="pre">(StepRequest)</span> <span class="pre">returns(StepReply)</span></span></dt>
 <dd><p>Apply a list of optimization decisions and compute a list of observations for a session. </p>
-<p>Optimization decisions are selected from the last ActionSpace returned by a call to <a class="reference internal" href="#namespace_compiler_gym_service_1a4a87b6809c5013e51c594c0452a44385"><span class="std std-ref">GetSpaces()</span></a> or <a class="reference internal" href="#namespace_compiler_gym_service_1a6f01eb170e54de8fcc198bea9791334d"><span class="std std-ref">Step()</span></a>. Valid observations are queried using <a class="reference internal" href="#namespace_compiler_gym_service_1a4a87b6809c5013e51c594c0452a44385"><span class="std std-ref">GetSpaces()</span></a>. This returns an error if the requested session does not exist. </p>
+<p>Optimization decisions are selected from the last <a class="reference internal" href="#struct_action_space"><span class="std std-ref">ActionSpace</span></a> returned by a call to <a class="reference internal" href="#namespace_compiler_gym_service_1a4a87b6809c5013e51c594c0452a44385"><span class="std std-ref">GetSpaces()</span></a> or <a class="reference internal" href="#namespace_compiler_gym_service_1a6f01eb170e54de8fcc198bea9791334d"><span class="std std-ref">Step()</span></a>. Valid observations are queried using <a class="reference internal" href="#namespace_compiler_gym_service_1a4a87b6809c5013e51c594c0452a44385"><span class="std std-ref">GetSpaces()</span></a>. This returns an error if the requested session does not exist. </p>
 </dd></dl>
 
 <dl class="cpp function">
@@ -342,8 +343,7 @@ whatever language makes sense for them.</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp">
 <span class="target" id="struct_get_spaces_reply_1ad0affed83d206a02f00dba63be3c14e7"></span><span class="sig-name descname"><span class="pre">repeated</span> <span class="pre">ActionSpace</span> <span class="pre">action_space_list</span>&#160;&#160; <span class="pre">=</span> <span class="pre">1</span></span></dt>
-<dd><p>The initial space of actions. </p>
-<p>Subsequent calls to step() may produce a new action space. </p>
+<dd><p>A list of one or more action spaces that the service supports. </p>
 </dd></dl>
 
 <dl class="cpp var">
@@ -364,7 +364,7 @@ whatever language makes sense for them.</p>
 <p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N19StartSessionRequest9benchmarkE">
-<span id="_CPPv3N19StartSessionRequest9benchmarkE"></span><span id="_CPPv2N19StartSessionRequest9benchmarkE"></span><span id="StartSessionRequest::benchmark__Benchmark"></span><span class="target" id="struct_start_session_request_1acc0057af1569e08a9bb21a19d6b3d398"></span><span class="n"><span class="pre">Benchmark</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">benchmark</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">4</span></span><a class="headerlink" href="#_CPPv4N19StartSessionRequest9benchmarkE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N19StartSessionRequest9benchmarkE"></span><span id="_CPPv2N19StartSessionRequest9benchmarkE"></span><span id="StartSessionRequest::benchmark__Benchmark"></span><span class="target" id="struct_start_session_request_1acc0057af1569e08a9bb21a19d6b3d398"></span><a class="reference internal" href="#_CPPv49Benchmark" title="Benchmark"><span class="n"><span class="pre">Benchmark</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">benchmark</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">4</span></span><a class="headerlink" href="#_CPPv4N19StartSessionRequest9benchmarkE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>The benchmark to use. </p>
 </dd></dl>
 
@@ -399,7 +399,7 @@ whatever language makes sense for them.</p>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N17StartSessionReply16new_action_spaceE">
-<span id="_CPPv3N17StartSessionReply16new_action_spaceE"></span><span id="_CPPv2N17StartSessionReply16new_action_spaceE"></span><span id="StartSessionReply::new_action_space__ActionSpace"></span><span class="target" id="struct_start_session_reply_1a8d990aa23f2a2ae2f8cf07bb9455b793"></span><span class="n"><span class="pre">ActionSpace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">new_action_space</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><a class="headerlink" href="#_CPPv4N17StartSessionReply16new_action_spaceE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N17StartSessionReply16new_action_spaceE"></span><span id="_CPPv2N17StartSessionReply16new_action_spaceE"></span><span id="StartSessionReply::new_action_space__ActionSpace"></span><span class="target" id="struct_start_session_reply_1a8d990aa23f2a2ae2f8cf07bb9455b793"></span><a class="reference internal" href="#_CPPv411ActionSpace" title="ActionSpace"><span class="n"><span class="pre">ActionSpace</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">new_action_space</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><a class="headerlink" href="#_CPPv4N17StartSessionReply16new_action_spaceE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>A new action space. </p>
 <p>This is set only if, after initializing the session, the action space has changed from the default action space returned by <a class="reference internal" href="#namespace_compiler_gym_service_1a4a87b6809c5013e51c594c0452a44385"><span class="std std-ref">GetSpaces()</span></a>. If set, the environment should discard the previous action space and replace it with this one. Else, the action space remains unchanged. </p>
 </dd></dl>
@@ -522,7 +522,7 @@ whatever language makes sense for them.</p>
 
 <dl class="cpp var">
 <dt class="sig sig-object cpp" id="_CPPv4N9StepReply16new_action_spaceE">
-<span id="_CPPv3N9StepReply16new_action_spaceE"></span><span id="_CPPv2N9StepReply16new_action_spaceE"></span><span id="StepReply::new_action_space__ActionSpace"></span><span class="target" id="struct_step_reply_1af0058904ffc313a6ad28150cc99a3fbc"></span><span class="n"><span class="pre">ActionSpace</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">new_action_space</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><a class="headerlink" href="#_CPPv4N9StepReply16new_action_spaceE" title="Permalink to this definition">¶</a><br /></dt>
+<span id="_CPPv3N9StepReply16new_action_spaceE"></span><span id="_CPPv2N9StepReply16new_action_spaceE"></span><span id="StepReply::new_action_space__ActionSpace"></span><span class="target" id="struct_step_reply_1af0058904ffc313a6ad28150cc99a3fbc"></span><a class="reference internal" href="#_CPPv411ActionSpace" title="ActionSpace"><span class="n"><span class="pre">ActionSpace</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">new_action_space</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><a class="headerlink" href="#_CPPv4N9StepReply16new_action_spaceE" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>A new action space. </p>
 <p>This field is set if, as a result of running the requested action, the action space has changed. Else, the action space remains unchanged. </p>
 </dd></dl>
@@ -540,12 +540,384 @@ whatever language makes sense for them.</p>
 <dt class="sig sig-object cpp" id="_CPPv419AddBenchmarkRequest">
 <span id="_CPPv319AddBenchmarkRequest"></span><span id="_CPPv219AddBenchmarkRequest"></span><span id="AddBenchmarkRequest"></span><span class="target" id="struct_add_benchmark_request"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddBenchmarkRequest</span></span></span><a class="headerlink" href="#_CPPv419AddBenchmarkRequest" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>An <a class="reference internal" href="#namespace_compiler_gym_service_1abff6649f1c4c2a1f4106ce9b7ec8221f"><span class="std std-ref">AddBenchmark()</span></a> request. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="target" id="struct_add_benchmark_request_1ab935cf597b987c9bc48a2756dd447176"></span><span class="sig-name descname"><span class="pre">repeated</span> <span class="pre">Benchmark</span> <span class="pre">benchmark</span>&#160;&#160; <span class="pre">=</span> <span class="pre">1</span></span></dt>
+<dd><p>A list of benchmarks to add. </p>
+</dd></dl>
+
+</div>
 </dd></dl>
 
 <dl class="cpp struct">
 <dt class="sig sig-object cpp" id="_CPPv417AddBenchmarkReply">
 <span id="_CPPv317AddBenchmarkReply"></span><span id="_CPPv217AddBenchmarkReply"></span><span id="AddBenchmarkReply"></span><span class="target" id="struct_add_benchmark_reply"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">AddBenchmarkReply</span></span></span><a class="headerlink" href="#_CPPv417AddBenchmarkReply" title="Permalink to this definition">¶</a><br /></dt>
 <dd><p>An <a class="reference internal" href="#namespace_compiler_gym_service_1abff6649f1c4c2a1f4106ce9b7ec8221f"><span class="std std-ref">AddBenchmark()</span></a> reply. </p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv427SendSessionParameterRequest">
+<span id="_CPPv327SendSessionParameterRequest"></span><span id="_CPPv227SendSessionParameterRequest"></span><span id="SendSessionParameterRequest"></span><span class="target" id="struct_send_session_parameter_request"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SendSessionParameterRequest</span></span></span><a class="headerlink" href="#_CPPv427SendSessionParameterRequest" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A <a class="reference internal" href="#namespace_compiler_gym_service_1a5c30050f6831c39575bfb50d00201519"><span class="std std-ref">SendSessionParameter()</span></a> request. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N27SendSessionParameterRequest10session_idE">
+<span id="_CPPv3N27SendSessionParameterRequest10session_idE"></span><span id="_CPPv2N27SendSessionParameterRequest10session_idE"></span><span id="SendSessionParameterRequest::session_id__int64"></span><span class="target" id="struct_send_session_parameter_request_1a8a5b6ef44e2121b710f655c4404b3884"></span><span class="n"><span class="pre">int64</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">session_id</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N27SendSessionParameterRequest10session_idE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The ID of the session. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="target" id="struct_send_session_parameter_request_1a76d8e77a8ffeca6415e1627a81a6767a"></span><span class="sig-name descname"><span class="pre">repeated</span> <span class="pre">SessionParameter</span> <span class="pre">parameter</span>&#160;&#160; <span class="pre">=</span> <span class="pre">2</span></span></dt>
+<dd><p>A list of &lt;key, value&gt; parameters to pass to the session. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv425SendSessionParameterReply">
+<span id="_CPPv325SendSessionParameterReply"></span><span id="_CPPv225SendSessionParameterReply"></span><span id="SendSessionParameterReply"></span><span class="target" id="struct_send_session_parameter_reply"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SendSessionParameterReply</span></span></span><a class="headerlink" href="#_CPPv425SendSessionParameterReply" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A <a class="reference internal" href="#namespace_compiler_gym_service_1a5c30050f6831c39575bfb50d00201519"><span class="std std-ref">SendSessionParameter()</span></a> reply. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="target" id="struct_send_session_parameter_reply_1a5c7f9559f5180da26e8c684a479efa7c"></span><span class="sig-name descname"><span class="pre">repeated</span> <span class="pre">string</span> <span class="pre">reply</span>&#160;&#160; <span class="pre">=</span> <span class="pre">1</span></span></dt>
+<dd><p>A list of response messages, one per parameter request. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+</div>
+<div class="section" id="core-message-types">
+<h2><a class="toc-backref" href="#id4">Core Message Types</a><a class="headerlink" href="#core-message-types" title="Permalink to this headline">¶</a></h2>
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv411ActionSpace">
+<span id="_CPPv311ActionSpace"></span><span id="_CPPv211ActionSpace"></span><span id="ActionSpace"></span><span class="target" id="struct_action_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ActionSpace</span></span></span><a class="headerlink" href="#_CPPv411ActionSpace" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>an <code class="docutils literal notranslate"><span class="pre">n</span></code>-dimensional action space. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11ActionSpace4nameE">
+<span id="_CPPv3N11ActionSpace4nameE"></span><span id="_CPPv2N11ActionSpace4nameE"></span><span id="ActionSpace::name__string"></span><span class="target" id="struct_action_space_1a4e1a9cb51995e842bc5f9bdc5f531e8e"></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N11ActionSpace4nameE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The name of the action space. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="target" id="struct_action_space_1a10188fb8010b77e41b61853f9e219895"></span><span class="sig-name descname"><span class="pre">repeated</span> <span class="pre">ChoiceSpace</span> <span class="pre">choice</span>&#160;&#160; <span class="pre">=</span> <span class="pre">2</span></span></dt>
+<dd><p>The list of choices that comprise this action. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11ActionSpace13named_choicesE">
+<span id="_CPPv3N11ActionSpace13named_choicesE"></span><span id="_CPPv2N11ActionSpace13named_choicesE"></span><span id="ActionSpace::named_choices__b"></span><span class="target" id="struct_action_space_1a7b9f3025b57dc86cebfdd0529fc71019"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">named_choices</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><a class="headerlink" href="#_CPPv4N11ActionSpace13named_choicesE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>An optional list of names for the choices. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv46Action">
+<span id="_CPPv36Action"></span><span id="_CPPv26Action"></span><span id="Action"></span><span class="target" id="struct_action"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Action</span></span></span><a class="headerlink" href="#_CPPv46Action" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>An action. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="target" id="struct_action_1ad5e4a1a71f36a882ff2d6257d4d76829"></span><span class="sig-name descname"><span class="pre">repeated</span> <span class="pre">Choice</span> <span class="pre">choice</span>&#160;&#160; <span class="pre">=</span> <span class="pre">1</span></span></dt>
+<dd><p>A list of choices that corresponds to the <a class="reference internal" href="#struct_action_space"><span class="std std-ref">ActionSpace</span></a>’s choice list. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv411ChoiceSpace">
+<span id="_CPPv311ChoiceSpace"></span><span id="_CPPv211ChoiceSpace"></span><span id="ChoiceSpace"></span><span class="target" id="struct_choice_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ChoiceSpace</span></span></span><a class="headerlink" href="#_CPPv411ChoiceSpace" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The space for a single choice. An <a class="reference internal" href="#struct_action"><span class="std std-ref">Action</span></a> comprises one or more choices. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11ChoiceSpace4nameE">
+<span id="_CPPv3N11ChoiceSpace4nameE"></span><span id="_CPPv2N11ChoiceSpace4nameE"></span><span id="ChoiceSpace::name__string"></span><span class="target" id="struct_choice_space_1a24a909b4e7559b343abaadf8692d1663"></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N11ChoiceSpace4nameE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>An optional name for this choice. </p>
+<p>Only required if <a class="reference internal" href="#struct_action_space_1a7b9f3025b57dc86cebfdd0529fc71019"><span class="std std-ref">ActionSpace.named_choices</span></a> is set. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="target" id="struct_choice_space_1a158b59186ef579049b993a9fb699e317"></span><span class="sig-name descname"><span class="pre">oneof</span> <span class="pre">space</span>&#160;&#160; <span class="pre">=</span> <span class="pre">{</span>&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160; <span class="pre">ScalarRange</span> <span class="pre">int64_range</span> <span class="pre">=</span> <span class="pre">2</span></span></dt>
+<dd><p>The choice space. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11ChoiceSpace12double_rangeE">
+<span id="_CPPv3N11ChoiceSpace12double_rangeE"></span><span id="_CPPv2N11ChoiceSpace12double_rangeE"></span><span id="ChoiceSpace::double_range__ScalarRange"></span><span class="target" id="struct_choice_space_1ab26d0244fd75d5c740ff9e1941113b11"></span><a class="reference internal" href="#_CPPv411ScalarRange" title="ScalarRange"><span class="n"><span class="pre">ScalarRange</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">double_range</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><a class="headerlink" href="#_CPPv4N11ChoiceSpace12double_rangeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A possibly bounded real-valued choice. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11ChoiceSpace20named_discrete_spaceE">
+<span id="_CPPv3N11ChoiceSpace20named_discrete_spaceE"></span><span id="_CPPv2N11ChoiceSpace20named_discrete_spaceE"></span><span id="ChoiceSpace::named_discrete_space__NamedDiscreteSpace"></span><span class="target" id="struct_choice_space_1a4f928e4d6931c53f43dfa54a3ae47e43"></span><a class="reference internal" href="#_CPPv418NamedDiscreteSpace" title="NamedDiscreteSpace"><span class="n"><span class="pre">NamedDiscreteSpace</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">named_discrete_space</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">4</span></span><a class="headerlink" href="#_CPPv4N11ChoiceSpace20named_discrete_spaceE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A discrete space in which every point in the space is named. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv46Choice">
+<span id="_CPPv36Choice"></span><span id="_CPPv26Choice"></span><span id="Choice"></span><span class="target" id="struct_choice"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Choice</span></span></span><a class="headerlink" href="#_CPPv46Choice" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A single choice. An <a class="reference internal" href="#struct_action"><span class="std std-ref">Action</span></a> comprises one or more Choices. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="target" id="struct_choice_1a5a5cea494c7220a7d6a86c5af02d67ae"></span><span class="sig-name descname"><span class="pre">oneof</span> <span class="pre">value</span>&#160; <span class="pre">{int64</span> <span class="pre">int64_value</span> <span class="pre">=</span> <span class="pre">1</span></span></dt>
+<dd><p>The value of the choice, corresponding to the <a class="reference internal" href="#struct_choice_space"><span class="std std-ref">ChoiceSpace</span></a> from the <a class="reference internal" href="#struct_action_space_1a10188fb8010b77e41b61853f9e219895"><span class="std std-ref">ActionSpace.choice</span></a> list. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv416ObservationSpace">
+<span id="_CPPv316ObservationSpace"></span><span id="_CPPv216ObservationSpace"></span><span id="ObservationSpace"></span><span class="target" id="struct_observation_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ObservationSpace</span></span></span><a class="headerlink" href="#_CPPv416ObservationSpace" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The description of a space of observations. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16ObservationSpace4nameE">
+<span id="_CPPv3N16ObservationSpace4nameE"></span><span id="_CPPv2N16ObservationSpace4nameE"></span><span id="ObservationSpace::name__string"></span><span class="target" id="struct_observation_space_1aafbfb1f58779092e99239da4dd9be060"></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">name</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N16ObservationSpace4nameE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The name of the observation space. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="target" id="struct_observation_space_1a42fb99064f0e002fdd132ad8cad3a39d"></span><span class="sig-name descname"><span class="pre">oneof</span> <span class="pre">shape</span>&#160;&#160; <span class="pre">=</span> <span class="pre">{</span>&#160;&#160;&#160;&#160; <span class="pre">ScalarRangeList</span> <span class="pre">int64_range_list</span> <span class="pre">=</span> <span class="pre">2</span></span></dt>
+<dd><p>The shape of the observation space. </p>
+<p>All Observations from an <a class="reference internal" href="#struct_observation_space"><span class="std std-ref">ObservationSpace</span></a> have the same shape. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16ObservationSpace17string_size_rangeE">
+<span id="_CPPv3N16ObservationSpace17string_size_rangeE"></span><span id="_CPPv2N16ObservationSpace17string_size_rangeE"></span><span id="ObservationSpace::string_size_range__ScalarRange"></span><span class="target" id="struct_observation_space_1ab6b18b63c58cc4bfd770f1c739d954b4"></span><a class="reference internal" href="#_CPPv411ScalarRange" title="ScalarRange"><span class="n"><span class="pre">ScalarRange</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">string_size_range</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">4</span></span><a class="headerlink" href="#_CPPv4N16ObservationSpace17string_size_rangeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>For character and byte arrays, the _size_range field describes the range of possible sizes, e.g. </p>
+<p>a string_size_range of [10, +inf] means that observations are strings of at least 10 characters in length. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16ObservationSpace18scalar_int64_rangeE">
+<span id="_CPPv3N16ObservationSpace18scalar_int64_rangeE"></span><span id="_CPPv2N16ObservationSpace18scalar_int64_rangeE"></span><span id="ObservationSpace::scalar_int64_range__ScalarRange"></span><span class="target" id="struct_observation_space_1adced9b41d38eec679f9d823bc57a17b1"></span><a class="reference internal" href="#_CPPv411ScalarRange" title="ScalarRange"><span class="n"><span class="pre">ScalarRange</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">scalar_int64_range</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">10</span></span><a class="headerlink" href="#_CPPv4N16ObservationSpace18scalar_int64_rangeE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>For scalar values, the _range field describes the bounds of the scalar value. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16ObservationSpace15double_sequenceE">
+<span id="_CPPv3N16ObservationSpace15double_sequenceE"></span><span id="_CPPv2N16ObservationSpace15double_sequenceE"></span><span id="ObservationSpace::double_sequence__SequenceSpace"></span><span class="target" id="struct_observation_space_1a32ac1cdfb3bec6193084e333c9cee00c"></span><a class="reference internal" href="#_CPPv413SequenceSpace" title="SequenceSpace"><span class="n"><span class="pre">SequenceSpace</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">double_sequence</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">12</span></span><a class="headerlink" href="#_CPPv4N16ObservationSpace15double_sequenceE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A variable-length sequence of elements. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16ObservationSpace18opaque_data_formatE">
+<span id="_CPPv3N16ObservationSpace18opaque_data_formatE"></span><span id="_CPPv2N16ObservationSpace18opaque_data_formatE"></span><span id="ObservationSpace::opaque_data_format__string"></span><span class="target" id="struct_observation_space_1a34e3b90e687e6197f41d5757bb31eb27"></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">opaque_data_format</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">6</span></span><a class="headerlink" href="#_CPPv4N16ObservationSpace18opaque_data_formatE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>An optional string describing an opaque data format, e.g. </p>
+<p>a data structure that is serialized to a string/binary array for transmission back to the client. It is up to the client and service to agree on how to decode observations using this value. For example, an opaque_data_format of “string_json” could be used to indicate that the observation is a string-serialized JSON value. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16ObservationSpace13deterministicE">
+<span id="_CPPv3N16ObservationSpace13deterministicE"></span><span id="_CPPv2N16ObservationSpace13deterministicE"></span><span id="ObservationSpace::deterministic__b"></span><span class="target" id="struct_observation_space_1a7e2c352d76914b393ec2ee6f6526dbdd"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">deterministic</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">7</span></span><a class="headerlink" href="#_CPPv4N16ObservationSpace13deterministicE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Whether the observation space is deterministic. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16ObservationSpace18platform_dependentE">
+<span id="_CPPv3N16ObservationSpace18platform_dependentE"></span><span id="_CPPv2N16ObservationSpace18platform_dependentE"></span><span id="ObservationSpace::platform_dependent__b"></span><span class="target" id="struct_observation_space_1a39c2d90953863e837c1d00f8ee3bbc60"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">platform_dependent</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">8</span></span><a class="headerlink" href="#_CPPv4N16ObservationSpace18platform_dependentE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Whether the observations depend on the service execution environment. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16ObservationSpace13default_valueE">
+<span id="_CPPv3N16ObservationSpace13default_valueE"></span><span id="_CPPv2N16ObservationSpace13default_valueE"></span><span id="ObservationSpace::default_value__Observation"></span><span class="target" id="struct_observation_space_1a0cb7b21d09ebf94fa680a766cff67206"></span><a class="reference internal" href="#_CPPv411Observation" title="Observation"><span class="n"><span class="pre">Observation</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">default_value</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">9</span></span><a class="headerlink" href="#_CPPv4N16ObservationSpace13default_valueE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A default observation. </p>
+<p>This value should be used by the client in lieu of a true observation if the compiler service terminates abruptly, such as a crash while applying an action. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv411Observation">
+<span id="_CPPv311Observation"></span><span id="_CPPv211Observation"></span><span id="Observation"></span><span class="target" id="struct_observation"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Observation</span></span></span><a class="headerlink" href="#_CPPv411Observation" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>An observations from a compiler. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="target" id="struct_observation_1a75c9fce7eb102b547875527dbbb56dad"></span><span class="sig-name descname"><span class="pre">oneof</span> <span class="pre">value</span>&#160;&#160; <span class="pre">=</span> <span class="pre">{</span>&#160;&#160;&#160;&#160; <span class="pre">Int64List</span> <span class="pre">int64_list</span> <span class="pre">=</span> <span class="pre">1</span></span></dt>
+<dd><p>A point in an <a class="reference internal" href="#struct_observation_space"><span class="std std-ref">ObservationSpace</span></a> is <em>either</em> a scalar or vector of integers or real values, a string, or an opaque byte array. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv418NamedDiscreteSpace">
+<span id="_CPPv318NamedDiscreteSpace"></span><span id="_CPPv218NamedDiscreteSpace"></span><span id="NamedDiscreteSpace"></span><span class="target" id="struct_named_discrete_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">NamedDiscreteSpace</span></span></span><a class="headerlink" href="#_CPPv418NamedDiscreteSpace" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A discrete space in which every point in the space is named. </p>
+<p>This can be used for representing enumerations. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="target" id="struct_named_discrete_space_1a465d6987ffff251aa1f49a03978ba293"></span><span class="sig-name descname"><span class="pre">repeated</span> <span class="pre">string</span> <span class="pre">value</span>&#160;&#160; <span class="pre">=</span> <span class="pre">1</span></span></dt>
+<dd><p>A list of names for every value in the space. </p>
+<p>The order in which these values are returned is used. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N18NamedDiscreteSpace14is_commandlineE">
+<span id="_CPPv3N18NamedDiscreteSpace14is_commandlineE"></span><span id="_CPPv2N18NamedDiscreteSpace14is_commandlineE"></span><span id="NamedDiscreteSpace::is_commandline__b"></span><span class="target" id="struct_named_discrete_space_1a9da00f970baa96f8d9086c93b1ca9ba9"></span><span class="kt"><span class="pre">bool</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">is_commandline</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N18NamedDiscreteSpace14is_commandlineE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>If true, the set of space can be interpreted as a list of command line flags. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv49Int64List">
+<span id="_CPPv39Int64List"></span><span id="_CPPv29Int64List"></span><span id="Int64List"></span><span class="target" id="struct_int64_list"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Int64List</span></span></span><a class="headerlink" href="#_CPPv49Int64List" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A list of 64 bit integers. </p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv410DoubleList">
+<span id="_CPPv310DoubleList"></span><span id="_CPPv210DoubleList"></span><span id="DoubleList"></span><span class="target" id="struct_double_list"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">DoubleList</span></span></span><a class="headerlink" href="#_CPPv410DoubleList" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A list of doubles. </p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv411ScalarRange">
+<span id="_CPPv311ScalarRange"></span><span id="_CPPv211ScalarRange"></span><span id="ScalarRange"></span><span class="target" id="struct_scalar_range"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ScalarRange</span></span></span><a class="headerlink" href="#_CPPv411ScalarRange" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The [min, max] range of a scalar. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11ScalarRange3minE">
+<span id="_CPPv3N11ScalarRange3minE"></span><span id="_CPPv2N11ScalarRange3minE"></span><span id="ScalarRange::min__ScalarLimit"></span><span class="target" id="struct_scalar_range_1a4f653d640cbdbeea60dd38023003cbb7"></span><a class="reference internal" href="#_CPPv411ScalarLimit" title="ScalarLimit"><span class="n"><span class="pre">ScalarLimit</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">min</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N11ScalarRange3minE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The minimum value (inclusive). If not set, the value is -inf. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N11ScalarRange3maxE">
+<span id="_CPPv3N11ScalarRange3maxE"></span><span id="_CPPv2N11ScalarRange3maxE"></span><span id="ScalarRange::max__ScalarLimit"></span><span class="target" id="struct_scalar_range_1a8e53edf9ac882247feb306e6c233b95b"></span><a class="reference internal" href="#_CPPv411ScalarLimit" title="ScalarLimit"><span class="n"><span class="pre">ScalarLimit</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">max</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N11ScalarRange3maxE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The maximum value (inclusive). If not set, the value is +inf. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv411ScalarLimit">
+<span id="_CPPv311ScalarLimit"></span><span id="_CPPv211ScalarLimit"></span><span id="ScalarLimit"></span><span class="target" id="struct_scalar_limit"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ScalarLimit</span></span></span><a class="headerlink" href="#_CPPv411ScalarLimit" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Representation of the upper or lower limit of a scalar. </p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv415ScalarRangeList">
+<span id="_CPPv315ScalarRangeList"></span><span id="_CPPv215ScalarRangeList"></span><span id="ScalarRangeList"></span><span class="target" id="struct_scalar_range_list"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">ScalarRangeList</span></span></span><a class="headerlink" href="#_CPPv415ScalarRangeList" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A list of scalar ranges. </p>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv413SequenceSpace">
+<span id="_CPPv313SequenceSpace"></span><span id="_CPPv213SequenceSpace"></span><span id="SequenceSpace"></span><span class="target" id="struct_sequence_space"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SequenceSpace</span></span></span><a class="headerlink" href="#_CPPv413SequenceSpace" title="Permalink to this definition">¶</a><br /></dt>
+<dd></dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv49Benchmark">
+<span id="_CPPv39Benchmark"></span><span id="_CPPv29Benchmark"></span><span id="Benchmark"></span><span class="target" id="struct_benchmark"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">Benchmark</span></span></span><a class="headerlink" href="#_CPPv49Benchmark" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Representation of the input to a compiler. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9Benchmark3uriE">
+<span id="_CPPv3N9Benchmark3uriE"></span><span id="_CPPv2N9Benchmark3uriE"></span><span id="Benchmark::uri__string"></span><span class="target" id="struct_benchmark_1aaca16215c7f8bc854867ea6c4120dc7d"></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uri</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N9Benchmark3uriE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The name of the benchmark to add. </p>
+<p>In case of conflict with an existing benchmark, this new benchmark replaces the existing one. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9Benchmark7programE">
+<span id="_CPPv3N9Benchmark7programE"></span><span id="_CPPv2N9Benchmark7programE"></span><span id="Benchmark::program__File"></span><span class="target" id="struct_benchmark_1a37d1f2a03191188e127b16d11d3a3b5b"></span><a class="reference internal" href="#_CPPv44File" title="File"><span class="n"><span class="pre">File</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">program</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N9Benchmark7programE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The description of the program that is being compiled. </p>
+<p>It is up to the service to determine how to interpret this file, and it is the responsibility of the client to ensure that it provides the correct format. For example, the service could expect that this file contains serialized IR data, or an input source file. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N9Benchmark14dynamic_configE">
+<span id="_CPPv3N9Benchmark14dynamic_configE"></span><span id="_CPPv2N9Benchmark14dynamic_configE"></span><span id="Benchmark::dynamic_config__BenchmarkDynamicConfig"></span><span class="target" id="struct_benchmark_1acf1f71ca48630d8cf9e4287d7860fded"></span><a class="reference internal" href="#_CPPv422BenchmarkDynamicConfig" title="BenchmarkDynamicConfig"><span class="n"><span class="pre">BenchmarkDynamicConfig</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">dynamic_config</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">3</span></span><a class="headerlink" href="#_CPPv4N9Benchmark14dynamic_configE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>An optional configuration option that details how to build and run the benchmark program. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv44File">
+<span id="_CPPv34File"></span><span id="_CPPv24File"></span><span id="File"></span><span class="target" id="struct_file"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">File</span></span></span><a class="headerlink" href="#_CPPv44File" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A <a class="reference internal" href="#struct_file"><span class="std std-ref">File</span></a> message represents a file object. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N4File3uriE">
+<span id="_CPPv3N4File3uriE"></span><span id="_CPPv2N4File3uriE"></span><span id="File::uri__string"></span><span class="target" id="struct_file_1a9080fef478973339f4816d03f075176c"></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">uri</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N4File3uriE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>The URI of the file which can be accessed. </p>
+<p>Note that this requires that the compiler service and the Python frontend share a file system, which cannot be assumed for general use. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv422BenchmarkDynamicConfig">
+<span id="_CPPv322BenchmarkDynamicConfig"></span><span id="_CPPv222BenchmarkDynamicConfig"></span><span id="BenchmarkDynamicConfig"></span><span class="target" id="struct_benchmark_dynamic_config"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">BenchmarkDynamicConfig</span></span></span><a class="headerlink" href="#_CPPv422BenchmarkDynamicConfig" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>Description of how to build and run a benchmark binary. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N22BenchmarkDynamicConfig9build_cmdE">
+<span id="_CPPv3N22BenchmarkDynamicConfig9build_cmdE"></span><span id="_CPPv2N22BenchmarkDynamicConfig9build_cmdE"></span><span id="BenchmarkDynamicConfig::build_cmd__Command"></span><span class="target" id="struct_benchmark_dynamic_config_1a561a15f9acbf86379d500d5020314e06"></span><a class="reference internal" href="#_CPPv47Command" title="Command"><span class="n"><span class="pre">Command</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">build_cmd</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N22BenchmarkDynamicConfig9build_cmdE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A command to execute to build the benchmark for dynamic execution. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N22BenchmarkDynamicConfig7run_cmdE">
+<span id="_CPPv3N22BenchmarkDynamicConfig7run_cmdE"></span><span id="_CPPv2N22BenchmarkDynamicConfig7run_cmdE"></span><span id="BenchmarkDynamicConfig::run_cmd__Command"></span><span class="target" id="struct_benchmark_dynamic_config_1ab6edbf57c8898a834b691d1bd9e73a3b"></span><a class="reference internal" href="#_CPPv47Command" title="Command"><span class="n"><span class="pre">Command</span></span></a><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">run_cmd</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N22BenchmarkDynamicConfig7run_cmdE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A command to execute to run the benchmark. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="target" id="struct_benchmark_dynamic_config_1a065a368c965c85ff341eea274a35eb82"></span><span class="sig-name descname"><span class="pre">repeated</span> <span class="pre">Command</span> <span class="pre">pre_run_cmd</span>&#160;&#160; <span class="pre">=</span> <span class="pre">3</span></span></dt>
+<dd><p>A list of commands to execute before running the benchmark. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp">
+<span class="target" id="struct_benchmark_dynamic_config_1a1c3afff18937404e5698597b556e2906"></span><span class="sig-name descname"><span class="pre">repeated</span> <span class="pre">Command</span> <span class="pre">post_run_cmd</span>&#160;&#160; <span class="pre">=</span> <span class="pre">4</span></span></dt>
+<dd><p>A list of commands to execute after running the benchmark. </p>
+</dd></dl>
+
+</div>
 </dd></dl>
 
 <dl class="cpp struct">
@@ -584,6 +956,27 @@ whatever language makes sense for them.</p>
 <span class="target" id="struct_command_1a85e4dd978c14a05709d8d42dcc74bea1"></span><span class="sig-name descname"><span class="pre">repeated</span> <span class="pre">string</span> <span class="pre">outfile</span>&#160;&#160; <span class="pre">=</span> <span class="pre">5</span></span></dt>
 <dd><p>An optional list of files that are generated by this command. </p>
 <p>If set, the presence of the files will be tested for after running the command. </p>
+</dd></dl>
+
+</div>
+</dd></dl>
+
+<dl class="cpp struct">
+<dt class="sig sig-object cpp" id="_CPPv416SessionParameter">
+<span id="_CPPv316SessionParameter"></span><span id="_CPPv216SessionParameter"></span><span id="SessionParameter"></span><span class="target" id="struct_session_parameter"></span><span class="k"><span class="pre">struct</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">SessionParameter</span></span></span><a class="headerlink" href="#_CPPv416SessionParameter" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>An arbitrary string parameter value for a session. </p>
+<div class="breathe-sectiondef docutils container">
+<p class="breathe-sectiondef-title rubric" id="breathe-section-title-public-members">Public Members</p>
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16SessionParameter3keyE">
+<span id="_CPPv3N16SessionParameter3keyE"></span><span id="_CPPv2N16SessionParameter3keyE"></span><span id="SessionParameter::key__string"></span><span class="target" id="struct_session_parameter_1a3a9e524a558fe4198f6d14469360e451"></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">key</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">1</span></span><a class="headerlink" href="#_CPPv4N16SessionParameter3keyE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A string key. </p>
+</dd></dl>
+
+<dl class="cpp var">
+<dt class="sig sig-object cpp" id="_CPPv4N16SessionParameter5valueE">
+<span id="_CPPv3N16SessionParameter5valueE"></span><span id="_CPPv2N16SessionParameter5valueE"></span><span id="SessionParameter::value__string"></span><span class="target" id="struct_session_parameter_1a54c032c9efba21b61f0f0383bc241e2b"></span><span class="n"><span class="pre">string</span></span><span class="w"> </span><span class="sig-name descname"><span class="n"><span class="pre">value</span></span></span><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="m"><span class="pre">2</span></span><a class="headerlink" href="#_CPPv4N16SessionParameter5valueE" title="Permalink to this definition">¶</a><br /></dt>
+<dd><p>A string value. </p>
 </dd></dl>
 
 </div>

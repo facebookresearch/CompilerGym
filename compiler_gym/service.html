@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.service &mdash; CompilerGym 0.2.0 documentation</title>
+  <title>compiler_gym.service &mdash; CompilerGym 0.2.1 documentation</title>
   
 
   
@@ -43,7 +43,7 @@
     <link rel="author" title="About these documents" href="../about.html" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="compiler_gym.spaces" href="spaces.html" />
+    <link rel="next" title="compiler_gym.service.runtime" href="service/runtime.html" />
     <link rel="prev" title="compiler_gym.leaderboard" href="leaderboard.html" /> 
 </head>
 
@@ -58,9 +58,12 @@
           
 
           
-            <a href="../index.html" class="icon icon-home"> CompilerGym
+            <a href="../index.html">
           
 
+          
+            
+            <img src="../_static/logo.png" class="logo" alt="Logo"/>
           
           </a>
 
@@ -68,7 +71,7 @@
             
             
               <div class="version">
-                0.2.0
+                0.2.1
               </div>
             
           
@@ -118,11 +121,13 @@
 <li class="toctree-l1"><a class="reference internal" href="../llvm/api.html">compiler_gym.envs.llvm</a></li>
 <li class="toctree-l1"><a class="reference internal" href="leaderboard.html">compiler_gym.leaderboard</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">compiler_gym.service</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#the-compilationsession-interface">The CompilationSession Interface</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#the-connection-object">The connection object</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#configuring-the-connection">Configuring the connection</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#exceptions">Exceptions</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="service/runtime.html">compiler_gym.service.runtime</a></li>
 <li class="toctree-l1"><a class="reference internal" href="spaces.html">compiler_gym.spaces</a></li>
 <li class="toctree-l1"><a class="reference internal" href="views.html">compiler_gym.views</a></li>
 <li class="toctree-l1"><a class="reference internal" href="wrappers.html">compiler_gym.wrappers</a></li>
@@ -210,11 +215,14 @@ client and service is managed by the <a class="reference internal" href="#compil
 <div class="contents local topic" id="document-contents">
 <p class="topic-title">Document contents:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#the-connection-object" id="id3">The connection object</a></p></li>
-<li><p><a class="reference internal" href="#configuring-the-connection" id="id4">Configuring the connection</a></p></li>
-<li><p><a class="reference internal" href="#exceptions" id="id5">Exceptions</a></p></li>
+<li><p><a class="reference internal" href="#the-compilationsession-interface" id="id3">The CompilationSession Interface</a></p></li>
+<li><p><a class="reference internal" href="#the-connection-object" id="id4">The connection object</a></p></li>
+<li><p><a class="reference internal" href="#configuring-the-connection" id="id5">Configuring the connection</a></p></li>
+<li><p><a class="reference internal" href="#exceptions" id="id6">Exceptions</a></p></li>
 </ul>
 </div>
+<div class="section" id="the-compilationsession-interface">
+<h2><a class="toc-backref" href="#id3">The CompilationSession Interface</a><a class="headerlink" href="#the-compilationsession-interface" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="compiler_gym.service.CompilationSession">
 <em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.service.</span></span><span class="sig-name descname"><span class="pre">CompilationSession</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">working_dir</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">pathlib.Path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">action_space</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.ActionSpace</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">benchmark</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.Benchmark</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/service/compilation_session.html#CompilationSession"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.CompilationSession" title="Permalink to this definition">¶</a></dt>
@@ -334,11 +342,12 @@ decoding these parameters.</p>
 
 </dd></dl>
 
+</div>
 <div class="section" id="the-connection-object">
-<h2><a class="toc-backref" href="#id3">The connection object</a><a class="headerlink" href="#the-connection-object" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id4">The connection object</a><a class="headerlink" href="#the-connection-object" title="Permalink to this headline">¶</a></h2>
 <dl class="py class">
 <dt class="sig sig-object py" id="compiler_gym.service.CompilerGymServiceConnection">
-<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.service.</span></span><span class="sig-name descname"><span class="pre">CompilerGymServiceConnection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opts</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#compiler_gym.service.ConnectionOpts" title="compiler_gym.service.connection.ConnectionOpts"><span class="pre">compiler_gym.service.connection.ConnectionOpts</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">logging.Logger</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/service/connection.html#CompilerGymServiceConnection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.CompilerGymServiceConnection" title="Permalink to this definition">¶</a></dt>
+<em class="property"><span class="pre">class</span> </em><span class="sig-prename descclassname"><span class="pre">compiler_gym.service.</span></span><span class="sig-name descname"><span class="pre">CompilerGymServiceConnection</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opts</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#compiler_gym.service.ConnectionOpts" title="compiler_gym.service.connection.ConnectionOpts"><span class="pre">compiler_gym.service.connection.ConnectionOpts</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/service/connection.html#CompilerGymServiceConnection"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.CompilerGymServiceConnection" title="Permalink to this definition">¶</a></dt>
 <dd><p>A connection to a compiler gym service.</p>
 <p>There are two types of service connections: managed and unmanaged. The type
 of connection is determined by the endpoint. If a “host:port” URL is provided,
@@ -386,7 +395,7 @@ service.</p></li>
 </dl>
 <dl class="py method">
 <dt class="sig sig-object py" id="compiler_gym.service.CompilerGymServiceConnection.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opts</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#compiler_gym.service.ConnectionOpts" title="compiler_gym.service.connection.ConnectionOpts"><span class="pre">compiler_gym.service.connection.ConnectionOpts</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">logger</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><span class="pre">logging.Logger</span><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/service/connection.html#CompilerGymServiceConnection.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.CompilerGymServiceConnection.__init__" title="Permalink to this definition">¶</a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoint</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Union</span><span class="p"><span class="pre">[</span></span><span class="pre">str</span><span class="p"><span class="pre">,</span> </span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opts</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">Optional</span><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#compiler_gym.service.ConnectionOpts" title="compiler_gym.service.connection.ConnectionOpts"><span class="pre">compiler_gym.service.connection.ConnectionOpts</span></a><span class="p"><span class="pre">]</span></span></span> <span class="o"><span class="pre">=</span></span> <span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/compiler_gym/service/connection.html#CompilerGymServiceConnection.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.CompilerGymServiceConnection.__init__" title="Permalink to this definition">¶</a></dt>
 <dd><p>Constructor.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters</dt>
@@ -486,7 +495,7 @@ service process is replaced.</p>
 
 </div>
 <div class="section" id="configuring-the-connection">
-<h2><a class="toc-backref" href="#id4">Configuring the connection</a><a class="headerlink" href="#configuring-the-connection" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id5">Configuring the connection</a><a class="headerlink" href="#configuring-the-connection" title="Permalink to this headline">¶</a></h2>
 <p>The <a class="reference internal" href="#compiler_gym.service.ConnectionOpts" title="compiler_gym.service.ConnectionOpts"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConnectionOpts</span></code></a> object is used
 to configure the options used for managing a service connection.</p>
 <dl class="py class">
@@ -582,7 +591,7 @@ used on the command line. No effect when used for existing sockets.</p>
 
 </div>
 <div class="section" id="exceptions">
-<h2><a class="toc-backref" href="#id5">Exceptions</a><a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h2>
+<h2><a class="toc-backref" href="#id6">Exceptions</a><a class="headerlink" href="#exceptions" title="Permalink to this headline">¶</a></h2>
 <p>In general, errors raised by the service are converted to the equivalent builtin
 exception type, e.g., <cite>ValueError</cite> for invalid method arguments, and
 <cite>FileNotFound</cite> for resource errors. However, some error cases are not well
@@ -634,7 +643,7 @@ met on the current system.</p>
           </div>
           <footer>
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
-        <a href="spaces.html" class="btn btn-neutral float-right" title="compiler_gym.spaces" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="service/runtime.html" class="btn btn-neutral float-right" title="compiler_gym.service.runtime" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
         <a href="leaderboard.html" class="btn btn-neutral float-left" title="compiler_gym.leaderboard" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
     </div>
 
