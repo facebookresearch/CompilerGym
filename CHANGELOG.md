@@ -1,3 +1,52 @@
+## Release 0.2.1 (2021-11-17)
+
+Highlights of this release include:
+
+- **[Complex and composite action spaces]** Added a new schema for describing
+  action spaces
+  ([#369](https://github.com/facebookresearch/CompilerGym/pull/369)). This
+  complete overhaul enables a much richer set of actions to be exposed, such as
+  composite actions spaces, dictionaries, and continuous actions.
+- **[State Transition Dataset]** We have released the first iteration of the
+  state transition dataset, a large collection of (state,action,reward) tuples
+  for the LLVM environments, suitable for large-scale supervised learning. We
+  have added an example learned cost model using a graph neural network in
+  `examples/gnn_cost_model`
+  ([#484](https://github.com/facebookresearch/CompilerGym/pull/484), thanks
+  @bcui19!).
+- **[New examples]** We have added several new examples to the `examples/`
+  directory, including a new loop unrolling demo based on LLVM
+  ([#477](https://github.com/facebookresearch/CompilerGym/pull/477), thanks
+  @mostafaelhoushi!), a loop tool demo
+  ([#457](https://github.com/facebookresearch/CompilerGym/pull/457), thanks
+  @bwasti!), micro-benchmarks for operations, and example reinforcement learning
+  scripts ([#484](https://github.com/facebookresearch/CompilerGym/pull/484)).
+  See `examples/README.md` for details. We also overhauled the example compiler
+  gym service
+  ([#467](https://github.com/facebookresearch/CompilerGym/pull/467)).
+- **[New logo]** Thanks Christy for designing a great new logo for CompilerGym!
+  ([#471](https://github.com/facebookresearch/CompilerGym/pull/471))
+- **[llvm]** Added a new `Bitcode` observation space
+  ([#442](https://github.com/facebookresearch/CompilerGym/pull/442)).
+- Numerous bug fixes and improvements.
+
+Deprecations and breaking changes:
+
+- **[Backend API change]** Out-of-tree compiler services will require updating
+  to the new action space API
+  ([#369](https://github.com/facebookresearch/CompilerGym/pull/369)).
+- The `env.observation.add_derived_space()` method has been deprecated and will
+  be removed in a future release. Please use the new
+  `derived_observation_spaces` argument to the `CompilerEnv` constructor
+  ([#463](https://github.com/facebookresearch/CompilerGym/pull/463)).
+- The `compiler_gym.utils.logs` module has been deprecated. Use
+  `compiler_gym.utils.runfiles_path` instead
+  ([#453](https://github.com/facebookresearch/CompilerGym/pull/453)).
+- The `compiler_gym.replay_search` module has been deprecated and merged into
+  the `compiler_gym.random_search`
+  ([#453](https://github.com/facebookresearch/CompilerGym/pull/453)).
+
+
 ## Release 0.2.0 (2021-09-28)
 
 This release adds two new compiler optimization problems to CompilerGym: GCC
