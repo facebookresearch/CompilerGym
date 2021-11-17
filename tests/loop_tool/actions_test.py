@@ -6,11 +6,13 @@
 
 import loop_tool_py as lt
 import pytest
+from flaky import flaky
 
 import compiler_gym
 from tests.test_main import main
 
 
+@flaky
 @pytest.mark.parametrize("backend", lt.backends())
 def test_basic(backend):
     with compiler_gym.make("loop_tool-v0") as env:
@@ -33,6 +35,7 @@ def test_basic(backend):
         print(o)
 
 
+@flaky
 @pytest.mark.parametrize("backend", lt.backends())
 def test_rand(backend):
     with compiler_gym.make("loop_tool-v0") as env:
@@ -53,6 +56,7 @@ def test_rand(backend):
                 print(best)
 
 
+@flaky
 @pytest.mark.parametrize("backend", lt.backends())
 def test_induced_remainder(backend):
     with compiler_gym.make("loop_tool-v0") as env:
@@ -91,6 +95,7 @@ for a in 341 r 1 : L0 {'cpu_parallel ' if backend=='cpu' else ''}[thread]
         assert out == expected.strip(), f"{out} \n vs \n {expected.strip()}"
 
 
+@flaky
 @pytest.mark.parametrize("backend", lt.backends())
 def test_thread_removal(backend):
     with compiler_gym.make("loop_tool-v0") as env:
@@ -121,6 +126,7 @@ for a in 1024 : L0
         assert out == expected.strip(), f"{out} \n vs \n {expected.strip()}"
 
 
+@flaky
 @pytest.mark.parametrize("backend", lt.backends())
 def test_thread_addition(backend):
     with compiler_gym.make("loop_tool-v0") as env:
