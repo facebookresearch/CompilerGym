@@ -12,6 +12,7 @@ py_library(
     srcs = ["__init__.py"],
     visibility = ["//visibility:public"],
     deps = [
+        ":random_replay",
         ":random_search",
         ":validate",
         "//compiler_gym/bin",
@@ -41,6 +42,7 @@ py_library(
     srcs = ["random_replay.py"],
     visibility = ["//visibility:public"],
     deps = [
+        ":random_search",
         "//compiler_gym/envs",
         "//compiler_gym/util",
     ],
@@ -52,7 +54,6 @@ py_library(
     data = ["//compiler_gym/envs/llvm/service"],
     visibility = ["//visibility:public"],
     deps = [
-        ":random_replay",
         "//compiler_gym/envs",
         "//compiler_gym/service:connection",
         "//compiler_gym/util",

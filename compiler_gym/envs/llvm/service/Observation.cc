@@ -59,6 +59,13 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
       reply.set_string_value(ss.str());
       break;
     }
+    case LlvmObservationSpace::BITCODE: {
+      std::string bitcode;
+      llvm::raw_string_ostream outbuffer(bitcode);
+      llvm::WriteBitcodeToFile(benchmark.module(), outbuffer);
+      reply.set_binary_value(outbuffer.str());
+      break;
+    }
     case LlvmObservationSpace::BITCODE_FILE: {
       // Generate an output path with 16 bits of randomness.
       const auto outpath = fs::unique_path(workingDirectory / "module-%%%%%%%%.bc");

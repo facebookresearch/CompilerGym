@@ -14,7 +14,7 @@ from compiler_gym.service import SessionNotFound
 from compiler_gym.service.connection import ServiceError
 from compiler_gym.spaces import Scalar, Sequence
 from tests.pytest_plugins.common import with_docker, without_docker
-from tests.pytest_plugins.gcc import with_gcc_support
+from tests.pytest_plugins.gcc import docker_is_available, with_gcc_support
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.gcc"]
@@ -35,7 +35,12 @@ def test_docker_default_action_space():
         assert env.action_spaces[0].names[0] == "-O0"
 
 
-def test_observation_spaces(gcc_bin: str):
+@pytest.mark.xfail(
+    not docker_is_available(),
+    strict=True,
+    reason="github.com/facebookresearch/CompilerGym/issues/459",
+)
+def test_observation_spaces_failing_because_of_bug(gcc_bin: str):
     """Test that the environment reports the service's observation spaces."""
     with gym.make("gcc-v0", gcc_bin=gcc_bin) as env:
         env.reset()
@@ -53,10 +58,10 @@ def test_observation_spaces(gcc_bin: str):
             "source",
         }
         assert env.observation.spaces["obj_size"].space == Scalar(
-            min=-1, max=np.iinfo(np.int64).max, dtype=int
+            name="obj_size", min=-1, max=np.iinfo(np.int64).max, dtype=int
         )
         assert env.observation.spaces["asm"].space == Sequence(
-            size_range=(0, None), dtype=str, opaque_data_format=""
+            name="asm", size_range=(0, None), dtype=str, opaque_data_format=""
         )
 
 
@@ -129,7 +134,8 @@ def test_double_reset(gcc_bin: str):
         assert env.in_episode
         env.step(env.action_space.sample())
         env.reset()
-        env.step(env.action_space.sample())
+        _, _, done, info = env.step(env.action_space.sample())
+        assert not done, info
         assert env.in_episode
 
 

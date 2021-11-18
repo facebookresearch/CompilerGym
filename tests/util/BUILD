@@ -33,6 +33,15 @@ py_test(
     ],
 )
 
+py_test(
+    name = "executor_test",
+    srcs = ["executor_test.py"],
+    deps = [
+        "//compiler_gym/util",
+        "//tests:test_main",
+    ],
+)
+
 cc_test(
     name = "EnumUtilTest",
     srcs = ["EnumUtilTest.cc"],
@@ -69,6 +78,25 @@ py_test(
     name = "parallelization_test",
     timeout = "short",
     srcs = ["parallelization_test.py"],
+    deps = [
+        "//compiler_gym/util",
+        "//tests:test_main",
+    ],
+)
+
+py_test(
+    name = "runfiles_path_test",
+    srcs = ["runfiles_path_test.py"],
+    deps = [
+        "//compiler_gym/util",
+        "//tests:test_main",
+        "//tests/pytest_plugins:common",
+    ],
+)
+
+py_test(
+    name = "shell_format_test",
+    srcs = ["shell_format_test.py"],
     deps = [
         "//compiler_gym/util",
         "//tests:test_main",

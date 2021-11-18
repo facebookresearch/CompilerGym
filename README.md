@@ -1,13 +1,21 @@
-![CompilerGym](https://github.com/facebookresearch/CompilerGym/raw/development/docs/source/_static/img/logo.png)
+![CompilerGym](https://github.com/facebookresearch/CompilerGym/raw/development/docs/source/_static/img/logo-padded.png)
 
 <p align="center">
-  <!-- PyPi Version -->
+  <!-- Getting started colab -->
+  <a href="https://colab.research.google.com/github/facebookresearch/CompilerGym/blob/stable/examples/getting-started.ipynb">
+      <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Colab" height="20">
+  </a>
+  <!-- Supported python versions list -->
   <a href="https://pypi.org/project/compiler-gym/">
-      <img src="https://badge.fury.io/py/compiler-gym.svg" alt="PyPI version" height="20">
+      <img src="https://img.shields.io/pypi/pyversions/compiler-gym" alt="Python versions" height="20">
   </a>
   <!-- Downloads counter -->
   <a href="https://pypi.org/project/compiler-gym/">
       <img src="https://pepy.tech/badge/compiler-gym" alt="PyPi Downloads" height="20">
+  </a>
+  <!-- PyPi Version -->
+  <a href="https://pypi.org/project/compiler-gym/">
+      <img src="https://badge.fury.io/py/compiler-gym.svg" alt="PyPI version" height="20">
   </a>
   <!-- license -->
   <a href="https://tldrlegal.com/license/mit-license">
@@ -16,10 +24,6 @@
   <!-- CI status -->
   <a href="https://github.com/facebookresearch/CompilerGym/actions?query=workflow%3ACI+branch%3Adevelopment">
       <img src="https://github.com/facebookresearch/CompilerGym/workflows/CI/badge.svg?branch=development" alt="CI status" height="20">
-  </a>
-  <!-- Getting started colab -->
-  <a href="https://colab.research.google.com/github/facebookresearch/CompilerGym/blob/stable/examples/getting-started.ipynb">
-      <img src="https://colab.research.google.com/assets/colab-badge.svg" alt="Colab" height="20">
   </a>
 </p>
 
@@ -84,9 +88,8 @@ an overview of the key concepts.
 In Python, import `compiler_gym` to use the environments:
 
 ```py
->>> import gym
 >>> import compiler_gym                      # imports the CompilerGym environments
->>> env = gym.make(                          # creates a new environment
+>>> env = compiler_gym.make(                 # creates a new environment (same as gym.make)
 ...     "llvm-v0",                           # selects the compiler to use
 ...     benchmark="cbench-v1/qsort",         # selects the program to compile
 ...     observation_space="Autophase",       # selects the observation space
@@ -95,11 +98,12 @@ In Python, import `compiler_gym` to use the environments:
 >>> env.reset()                              # starts a new compilation session
 >>> env.render()                             # prints the IR of the program
 >>> env.step(env.action_space.sample())      # applies a random optimization, updates state/reward/actions
+>>> env.close()                              # closes the environment, freeing resources
 ```
 
-See the [documentation website](http://facebookresearch.github.io/CompilerGym/)
-for tutorials, further details, and API reference. See the [examples](/examples)
-directory for pytorch integration, agent implementations, etc.
+See the [examples](/examples) directory for agent implementations, environment
+extensions, and more. See the [documentation
+website](http://facebookresearch.github.io/CompilerGym/) for the API reference.
 
 
 ## Leaderboards

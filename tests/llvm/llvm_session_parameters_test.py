@@ -3,6 +3,8 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Tests for LLVM session parameter handlers."""
+import sys
+
 import pytest
 from flaky import flaky
 
@@ -67,6 +69,11 @@ def test_benchmarks_cache_parameter_invalid_int_type(env: LlvmEnv):
         env.send_params(("service.benchmark_cache.set_max_size_in_bytes", "not an int"))
 
 
+@pytest.mark.xfail(
+    sys.platform == "darwin",
+    strict=True,
+    reason="github.com/facebookresearch/CompilerGym/issues/459",
+)
 @flaky  # Runtime can timeout.
 @pytest.mark.parametrize("n", [1, 3, 10])
 def test_runtime_observation_parameters(env: LlvmEnv, n: int):

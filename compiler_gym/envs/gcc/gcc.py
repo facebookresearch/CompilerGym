@@ -32,6 +32,8 @@ from compiler_gym.service import EnvironmentNotSupported, ServiceError, ServiceI
 from compiler_gym.util.filesystem import atomic_file_write
 from compiler_gym.util.runfiles_path import site_data_path
 
+logger = logging.getLogger(__name__)
+
 
 class Option:
     """An Option is either a command line optimization setting or a parameter.
@@ -156,7 +158,7 @@ class GccFlagAlignOption(Option):
     """Alignment flags. These take several forms. See the GCC documentation."""
 
     def __init__(self, name: str):
-        logging.warning("Alignment options not properly handled %s", name)
+        logger.warning("Alignment options not properly handled %s", name)
         self.name = name
 
     def __len__(self):
@@ -390,7 +392,7 @@ class GccSpec(NamedTuple):
 def _gcc_parse_optimize(gcc: Gcc) -> List[Option]:
     """Parse the optimization help string from the GCC binary to find options."""
 
-    logging.debug("Parsing GCC optimization space")
+    logger.debug("Parsing GCC optimization space")
 
     # Call 'gcc --help=optimize -Q'
     result = gcc("--help=optimize", "-Q", timeout=60)
@@ -519,7 +521,7 @@ def _gcc_parse_optimize(gcc: Gcc) -> List[Option]:
             add_gcc_flag_int(name, min, max)
             return
 
-        logging.warning("Unknown GCC optimization flag spec, '%s'", line)
+        logger.warning("Unknown GCC optimization flag spec, '%s'", line)
 
     # Parse all the lines
     for line in out:
@@ -533,7 +535,7 @@ def _gcc_parse_params(gcc: Gcc) -> List[Option]:
     """Parse the param help string from the GCC binary to find options."""
 
     # Pretty much identical to _gcc_parse_optimize
-    logging.debug("Parsing GCC param space")
+    logger.debug("Parsing GCC param space")
 
     result = gcc("--help=param", "-Q", timeout=60)
     out = result.split("\n")[1:]
@@ -622,7 +624,7 @@ def _gcc_parse_params(gcc: Gcc) -> List[Option]:
                 add_gcc_param_int(name, min, max)
                 return
 
-        logging.warning("Unknown GCC param flag spec, '%s'", line)
+        logger.warning("Unknown GCC param flag spec, '%s'", line)
 
     # breakpoint()
     for line in out:
@@ -682,13 +684,13 @@ def _fix_options(options: List[Option]) -> List[Option]:
 
 def _gcc_get_version(gcc: Gcc) -> str:
     """Get the version string"""
-    logging.debug("Getting GCC version for %s", gcc.bin)
+    logger.debug("Getting GCC version for %s", gcc.bin)
     try:
         result = gcc("--version", timeout=60)
     except ServiceError as e:
         raise EnvironmentNotSupported(f"Failed to run GCC binary: {gcc.bin}") from e
     version = result.split("\n")[0]
-    logging.debug("GCC version is %s", version)
+    logger.debug("GCC version is %s", version)
     if "gcc" not in version:
         raise ServiceInitError(f"Invalid GCC version string: {version}")
     return version
@@ -724,9 +726,9 @@ def _get_spec(gcc: Gcc, cache_dir: Path) -> Optional[GccSpec]:
             with open(spec_path, "rb") as f:
                 spec = pickle.load(f)
             spec = GccSpec(gcc=gcc, version=spec.version, options=spec.options)
-            logging.debug("GccSpec for version '%s' read from %s", version, spec_path)
+            logger.debug("GccSpec for version '%s' read from %s", version, spec_path)
         except (pickle.UnpicklingError, EOFError) as e:
-            logging.warning("Unable to read spec from '%s': %s", spec_path, e)
+            logger.warning("Unable to read spec from '%s': %s", spec_path, e)
 
     if spec is None:
         # Pickle doesn't exist, parse
@@ -741,8 +743,8 @@ def _get_spec(gcc: Gcc, cache_dir: Path) -> Optional[GccSpec]:
         spec_path.parent.mkdir(exist_ok=True, parents=True)
         with atomic_file_write(spec_path, fileobj=True) as f:
             pickle.dump(spec, f)
-        logging.debug("GccSpec for %s written to %s", version, spec_path)
+        logger.debug("GccSpec for %s written to %s", version, spec_path)
 
-    logging.debug("GccSpec size is approximately 10^%.0f", round(math.log(spec.size)))
+    logger.debug("GccSpec size is approximately 10^%.0f", round(math.log(spec.size)))
 
     return spec

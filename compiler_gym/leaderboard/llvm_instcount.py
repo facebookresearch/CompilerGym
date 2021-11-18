@@ -230,7 +230,6 @@ def eval_llvm_instcount_policy(policy: Policy) -> None:
             # Stream verbose CompilerGym logs to file.
             logger = logging.getLogger("compiler_gym")
             logger.setLevel(logging.DEBUG)
-            env.logger.setLevel(logging.DEBUG)
             log_handler = logging.FileHandler(FLAGS.leaderboard_logfile)
             logger.addHandler(log_handler)
             logger.propagate = False

@@ -14,6 +14,15 @@ jobs:
     build-linux:
         runs-on: ubuntu-latest
         steps:
+            - name: Persist the bazel cache
+              uses: actions/cache@v2
+              with:
+                  path: ~/.cache/bazel/_bazel_runner
+                  key: bazel-${{ runner.os }}-${{ hashFiles('WORKSPACE') }}-${{ hashFiles('**/BUILD') }}
+                  restore-keys: |
+                      bazel-${{ runner.os }}-${{ hashFiles('WORKSPACE') }}-
+                      bazel-${{ runner.os }}-
+
             - uses: actions/checkout@v2
 
             - uses: actions/setup-python@v2
@@ -43,6 +52,15 @@ jobs:
     build-macos:
         runs-on: macos-latest
         steps:
+            - name: Persist the bazel cache
+              uses: actions/cache@v2
+              with:
+                  path: /private/var/tmp/_bazel_runner
+                  key: bazel-${{ runner.os }}-${{ hashFiles('WORKSPACE') }}-${{ hashFiles('**/BUILD') }}
+                  restore-keys: |
+                      bazel-${{ runner.os }}-${{ hashFiles('WORKSPACE') }}-
+                      bazel-${{ runner.os }}-
+
             - uses: actions/checkout@v2
 
             - uses: actions/setup-python@v2
@@ -101,9 +119,6 @@ jobs:
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
-              with:
-                  fail_ci_if_error: true
-                  verbose: true
     test-macos:
         needs: build-macos
         runs-on: macos-latest
@@ -134,13 +149,10 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov PYTEST_ARGS="--ignore tests/llvm --ignore tests/gcc"
+              run: make install-test-cov PYTEST_ARGS="--ignore tests/llvm --ignore tests/gcc --ignore tests/loop_tool"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
-              with:
-                  fail_ci_if_error: true
-                  verbose: true
     test-llvm-env-linux:
         needs: build-linux
         runs-on: ubuntu-latest
@@ -175,9 +187,6 @@ jobs:
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
-              with:
-                  fail_ci_if_error: true
-                  verbose: true
     test-llvm-env-macos:
         needs: build-macos
         runs-on: macos-latest
@@ -212,9 +221,6 @@ jobs:
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
-              with:
-                  fail_ci_if_error: true
-                  verbose: true
     test-gcc-env-linux:
         needs: build-linux
         runs-on: ubuntu-latest
@@ -249,9 +255,6 @@ jobs:
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
-              with:
-                  fail_ci_if_error: true
-                  verbose: true
     test-gcc-env-linux-no-docker:
         needs: build-linux
         runs-on: ubuntu-latest
@@ -288,9 +291,6 @@ jobs:
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
-              with:
-                  fail_ci_if_error: true
-                  verbose: true
 
     test-gcc-env-macos:
         needs: build-macos
@@ -327,9 +327,6 @@ jobs:
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
-              with:
-                  fail_ci_if_error: true
-                  verbose: true
 
     test-gcc-env-macos-no-docker:
         needs: build-macos
@@ -361,9 +358,6 @@ jobs:
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
-              with:
-                  fail_ci_if_error: true
-                  verbose: true
 
     test-loop_tool-env-linux:
         needs: build-linux
@@ -395,9 +389,6 @@ jobs:
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
-              with:
-                  fail_ci_if_error: true
-                  verbose: true
 
     test-loop_tool-env-macos:
         needs: build-macos
@@ -434,9 +425,6 @@ jobs:
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
-              with:
-                  fail_ci_if_error: true
-                  verbose: true
 
     test-examples-linux:
         needs: build-linux
@@ -461,20 +449,17 @@ jobs:
             - name: Install wheel
               run: python -m pip install *.whl
 
-            - name: Install runtime dependencies
-              uses: ./.github/actions/install-runtime-dependencies
-
             - name: Install test dependencies
               run: python -m pip install -r examples/requirements.txt -r tests/requirements.txt
+
+            - name: Install runtime dependencies
+              uses: ./.github/actions/install-runtime-dependencies
 
             - name: Run the test suite
               run: make examples-test
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
-              with:
-                  fail_ci_if_error: true
-                  verbose: true
 
     test-examples-macos:
         needs: build-macos
@@ -499,20 +484,17 @@ jobs:
             - name: Install wheel
               run: python -m pip install *.whl
 
-            - name: Install runtime dependencies
-              uses: ./.github/actions/install-runtime-dependencies
-
             - name: Install test dependencies
               run: python -m pip install -r examples/requirements.txt -r tests/requirements.txt
+
+            - name: Install runtime dependencies
+              uses: ./.github/actions/install-runtime-dependencies
 
             - name: Run the test suite
               run: make examples-test
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
-              with:
-                  fail_ci_if_error: true
-                  verbose: true
 
     build-asan-llvm-service:
         runs-on: ubuntu-latest
@@ -595,3 +577,26 @@ jobs:
                   ASAN_OPTIONS: detect_leaks=1
                   CC: clang
                   CXX: clang++
+
+    www-build:
+        runs-on: ${{ matrix.os }}
+        strategy:
+            fail-fast: false
+            matrix:
+                os: [ubuntu-latest, macos-latest]
+                node: [16]
+        steps:
+            - uses: actions/checkout@v2
+
+            - uses: actions/setup-python@v2
+              with:
+                  python-version: 3.9
+
+            - uses: actions/setup-node@v2
+              with:
+                  node-version: ${{ matrix.node }}
+                  cache: npm
+                  cache-dependency-path: www/frontends/compiler_gym/package-lock.json
+
+            - name: Build web frontend
+              run: make www-build

@@ -1,0 +1,7 @@
+---
+algorithm: nevergrad
+optimization_target: codesize
+search_time_seconds: 3600
+algorithm_config:
+    episode_length: 325
+    optimizer: DiscreteLenglerOnePlusOne

@@ -1,0 +1,33 @@
+---
+timeout_hours: 1
+exploration: false
+runs_per_benchmark: 1
+benchmarks:
+    - dataset: benchmark://anghabench-v1
+      max_benchmarks: 50
+    - dataset: benchmark://blas-v0
+      max_benchmarks: 50
+    - dataset: benchmark://cbench-v1
+      max_benchmarks: 50
+    - dataset: benchmark://chstone-v0
+      max_benchmarks: 50
+    - dataset: benchmark://clgen-v0
+      max_benchmarks: 50
+    - dataset: generator://csmith-v0
+      max_benchmarks: 50
+    - dataset: benchmark://github-v0
+      max_benchmarks: 50
+    - dataset: benchmark://linux-v0
+      max_benchmarks: 50
+    - dataset: generator://llvm-stress-v0
+      max_benchmarks: 50
+    - dataset: benchmark://mibench-v0
+      max_benchmarks: 50
+    - dataset: benchmark://npb-v0
+      max_benchmarks: 50
+    - dataset: benchmark://opencv-v0
+      max_benchmarks: 50
+    - dataset: benchmark://poj104-v1
+      max_benchmarks: 50
+    - dataset: benchmark://tensorflow-v0
+      max_benchmarks: 50

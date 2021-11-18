@@ -31,6 +31,7 @@ from compiler_gym.service import (
 from compiler_gym.service.proto import Action, AddBenchmarkRequest
 from compiler_gym.service.proto import Benchmark as BenchmarkProto
 from compiler_gym.service.proto import (
+    Choice,
     EndSessionReply,
     EndSessionRequest,
     ForkSessionReply,
@@ -43,9 +44,9 @@ from compiler_gym.service.proto import (
     StartSessionRequest,
     StepReply,
     StepRequest,
+    proto_to_action_space,
 )
 from compiler_gym.spaces import DefaultRewardFromObservation, NamedDiscrete, Reward
-from compiler_gym.util.debug_util import get_logging_level
 from compiler_gym.util.gym_type_hints import (
     ActionType,
     ObservationType,
@@ -57,6 +58,13 @@ from compiler_gym.util.timer import Timer
 from compiler_gym.validation_error import ValidationError
 from compiler_gym.validation_result import ValidationResult
 from compiler_gym.views import ObservationSpaceSpec, ObservationView, RewardView
+
+logger = logging.getLogger(__name__)
+
+# NOTE(cummins): This is only required to prevent a name conflict with the now
+# deprecated CompilerEnv.logger attribute. This can be removed once the logger
+# attribute is removed, scheduled for release 0.2.3.
+_logger = logger
 
 
 def _wrapped_step(
@@ -111,11 +119,6 @@ class CompilerEnv(gym.Env):
 
     :vartype service: compiler_gym.service.CompilerGymServiceConnection
 
-    :ivar logger: A Logger instance used by the environment for communicating
-        info and warnings.
-
-    :vartype logger: logging.Logger
-
     :ivar action_spaces: A list of supported action space names.
 
     :vartype action_spaces: List[str]
@@ -156,11 +159,12 @@ class CompilerEnv(gym.Env):
         observation_space: Optional[Union[str, ObservationSpaceSpec]] = None,
         reward_space: Optional[Union[str, Reward]] = None,
         action_space: Optional[str] = None,
+        derived_observation_spaces: Optional[List[Dict[str, Any]]] = None,
         connection_settings: Optional[ConnectionOpts] = None,
         service_connection: Optional[CompilerGymServiceConnection] = None,
         logger: Optional[logging.Logger] = None,
     ):
-        """Construct and initialize a CompilerGym service environment.
+        """Construct and initialize a CompilerGym environment.
 
         In normal use you should use :code:`gym.make(...)` rather than calling
         the constructor directly.
@@ -202,16 +206,15 @@ class CompilerEnv(gym.Env):
         :param action_space: The name of the action space to use. If not
             specified, the default action space for this compiler is used.
 
+        :param derived_observation_spaces: An optional list of arguments to be
+            passed to :meth:`env.observation.add_derived_space()
+            <compiler_gym.views.observation.Observation.add_derived_space>`.
+
         :param connection_settings: The settings used to establish a connection
             with the remote service.
 
         :param service_connection: An existing compiler gym service connection
             to use.
-
-        :param logger: The logger to use for this environment. If not provided,
-            a :code:`compiler_gym.envs` logger is used and assigned the
-            verbosity returned by :func:`get_logging_level()
-            <compiler_gym.get_logging_level>`.
 
         :raises FileNotFoundError: If service is a path to a file that is not
             found.
@@ -219,12 +222,17 @@ class CompilerEnv(gym.Env):
         :raises TimeoutError: If the compiler service fails to initialize within
             the parameters provided in :code:`connection_settings`.
         """
-        self.metadata = {"render.modes": ["human", "ansi"]}
+        # NOTE(cummins): Logger argument deprecated and scheduled to be removed
+        # in release 0.2.3.
+        if logger:
+            warnings.warn(
+                "The `logger` argument is deprecated on CompilerEnv.__init__() "
+                "and will be removed in a future release. All CompilerEnv "
+                "instances share a logger named compiler_gym.envs.compiler_env",
+                DeprecationWarning,
+            )
 
-        if logger is None:
-            logger = logging.getLogger("compiler_gym.envs")
-            logger.setLevel(get_logging_level())
-        self.logger = logger
+        self.metadata = {"render.modes": ["human", "ansi"]}
 
         # A compiler service supports multiple simultaneous environments. This
         # session ID is used to identify this environment.
@@ -236,7 +244,6 @@ class CompilerEnv(gym.Env):
         self.service = service_connection or CompilerGymServiceConnection(
             endpoint=self._service_endpoint,
             opts=self._connection_settings,
-            logger=self.logger,
         )
         self.datasets = Datasets(datasets or [])
 
@@ -285,20 +292,28 @@ class CompilerEnv(gym.Env):
             pass
 
         # Process the available action, observation, and reward spaces.
-        self.action_spaces = [
-            self._make_action_space(space.name, space.action)
-            for space in self.service.action_spaces
+        action_spaces = [
+            proto_to_action_space(space) for space in self.service.action_spaces
         ]
+        self.action_spaces = [a.space for a in action_spaces]
+        self._make_actions = [a.make_action for a in action_spaces]
+
         self.observation = self._observation_view_type(
             raw_step=self.raw_step,
             spaces=self.service.observation_spaces,
         )
         self.reward = self._reward_view_type(rewards, self.observation)
 
+        # Register any derived observation spaces now so that the observation
+        # space can be set below.
+        for derived_observation_space in derived_observation_spaces or []:
+            self.observation.add_derived_space_internal(**derived_observation_space)
+
         # Lazily evaluated version strings.
         self._versions: Optional[GetVersionReply] = None
 
         self.action_space: Optional[Space] = None
+        self._make_action: Optional[Callable[[Any], Action]] = None
         self.observation_space: Optional[Space] = None
 
         # Mutable state initialized in reset().
@@ -324,6 +339,17 @@ class CompilerEnv(gym.Env):
     def available_datasets(self) -> Dict[str, Dataset]:
         """A dictionary of datasets."""
         return {d.name: d for d in self.datasets}
+
+    @property
+    @deprecated(
+        version="0.2.1",
+        reason=(
+            "The `CompilerEnv.logger` attribute is deprecated. All CompilerEnv "
+            "instances share a logger named compiler_gym.envs.compiler_env"
+        ),
+    )
+    def logger(self):
+        return _logger
 
     @property
     def versions(self) -> GetVersionReply:
@@ -413,6 +439,7 @@ class CompilerEnv(gym.Env):
             else 0
         )
         self._action_space: NamedDiscrete = self.action_spaces[index]
+        self._make_actions: Callable[[Any], Action] = self._make_actions[index]
 
     @property
     def benchmark(self) -> Benchmark:
@@ -441,10 +468,10 @@ class CompilerEnv(gym.Env):
             )
         if isinstance(benchmark, str):
             benchmark_object = self.datasets.benchmark(benchmark)
-            self.logger.debug("Setting benchmark by name: %s", benchmark_object)
+            logger.debug("Setting benchmark by name: %s", benchmark_object)
             self._next_benchmark = benchmark_object
         elif isinstance(benchmark, Benchmark):
-            self.logger.debug("Setting benchmark: %s", benchmark.uri)
+            logger.debug("Setting benchmark: %s", benchmark.uri)
             self._next_benchmark = benchmark
         else:
             raise TypeError(
@@ -567,9 +594,7 @@ class CompilerEnv(gym.Env):
             actions = self.actions.copy()
             self.reset()
             if actions:
-                self.logger.warning(
-                    "Parent service of fork() has died, replaying state"
-                )
+                logger.warning("Parent service of fork() has died, replaying state")
                 _, _, done, _ = self.step(actions)
                 assert not done, "Failed to replay action sequence"
 
@@ -662,7 +687,7 @@ class CompilerEnv(gym.Env):
                 if reply.remaining_sessions:
                     close_service = False
             except Exception as e:
-                self.logger.warning(
+                logger.warning(
                     "Failed to end active compiler session on close(): %s (%s)",
                     e,
                     type(e).__name__,
@@ -714,7 +739,7 @@ class CompilerEnv(gym.Env):
 
         def _retry(error) -> Optional[ObservationType]:
             """Abort and retry on error."""
-            self.logger.warning("%s during reset(): %s", type(error).__name__, error)
+            logger.warning("%s during reset(): %s", type(error).__name__, error)
             if self.service:
                 self.service.close()
             self.service = None
@@ -757,13 +782,13 @@ class CompilerEnv(gym.Env):
 
         # Stop an existing episode.
         if self.in_episode:
-            self.logger.debug("Ending session %d", self._session_id)
+            logger.debug("Ending session %d", self._session_id)
             error, _ = _call_with_error(
                 self.service.stub.EndSession,
                 EndSessionRequest(session_id=self._session_id),
             )
             if error:
-                self.logger.warning(
+                logger.warning(
                     "Failed to stop session %d with %s: %s",
                     self._session_id,
                     type(error).__name__,
@@ -829,8 +854,8 @@ class CompilerEnv(gym.Env):
 
         # If the action space has changed, update it.
         if reply.HasField("new_action_space"):
-            self.action_space = self._make_action_space(
-                self.action_space.name, reply.new_action_space.action
+            self.action_space, self._make_action = proto_to_action_space(
+                reply.new_action_space
             )
 
         self.reward.reset(benchmark=self.benchmark, observation_view=self.observation)
@@ -903,7 +928,9 @@ class CompilerEnv(gym.Env):
         # Send the request to the backend service.
         request = StepRequest(
             session_id=self._session_id,
-            action=[Action(action=a) for a in actions],
+            action=[
+                Action(choice=[Choice(named_discrete_value_index=a)]) for a in actions
+            ],
             observation_space=[
                 observation_space.index for observation_space in observations_to_compute
             ],
@@ -947,8 +974,8 @@ class CompilerEnv(gym.Env):
 
         # If the action space has changed, update it.
         if reply.HasField("new_action_space"):
-            self.action_space = self._make_action_space(
-                self.action_space.name, reply.action_space.action
+            self.action_space, self._make_action = proto_to_action_space(
+                reply.action_space
             )
 
         # Translate observations to python representations.
@@ -1109,18 +1136,6 @@ class CompilerEnv(gym.Env):
     def benchmarks(self) -> Iterable[str]:
         """Enumerate a (possible unbounded) list of available benchmarks."""
         return self.datasets.benchmark_uris()
-
-    def _make_action_space(self, name: str, entries: List[str]) -> Space:
-        """Create an action space from the given values.
-
-        Subclasses may override this method to produce specialized action
-        spaces.
-
-        :param name: The name of the action space.
-        :param entries: The entries in the action space.
-        :return: A :code:`gym.Space` instance.
-        """
-        return NamedDiscrete(entries, name)
 
     @property
     def _observation_view_type(self):

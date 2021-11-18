@@ -68,3 +68,18 @@ def set_debug_level(level: int) -> None:
     :param level: The debugging level to use.
     """
     os.environ["COMPILER_GYM_DEBUG"] = str(level)
+    logging.getLogger("compiler_gym").setLevel(
+        _DEBUG_LEVEL_LOGGING_LEVEL_MAP.get(level, logging.DEBUG)
+    )
+
+
+def logging_level_to_debug_level(logging_level: int) -> int:
+    """Convert a python logging level to a debug level.
+
+    See :func:`get_debug_level` for a description of the debug levels.
+
+    :param logging_level: A python logging level.
+
+    :returns: An integer logging level in the range :code:`[0,3]`.
+    """
+    return max(_LOGGING_LEVEL_DEBUG_LEVEL_MAP.get(logging_level, 1) - 1, 0)

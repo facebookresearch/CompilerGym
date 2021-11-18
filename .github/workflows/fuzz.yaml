@@ -14,33 +14,42 @@ on:
 
 jobs:
     fuzz:
-        runs-on: ${{ matrix.os }}
-
-        strategy:
-            fail-fast: false
-            matrix:
-                os: [ubuntu-latest, macos-latest]
-                python: [3.9]
+        runs-on: ubuntu-latest
 
         steps:
             - uses: actions/checkout@v2
 
-            - name: Set up Python ${{ matrix.python }}
+            - name: Persist the bazel cache
+              uses: actions/cache@v2
+              with:
+                  path: ~/.cache/bazel/_bazel_runner
+                  key: bazel-${{ hashFiles('WORKSPACE') }}-${{ hashFiles('**/BUILD') }}
+                  restore-keys: |
+                      bazel-${{ hashFiles('WORKSPACE') }}-
+                      bazel-
+
+            - name: Set up Python
               uses: actions/setup-python@v2
               with:
-                  python-version: ${{ matrix.python }}
+                  python-version: 3.9
 
             - name: Install build dependencies
               uses: ./.github/actions/install-build-dependencies
 
-            - name: Install
+            - name: Build and install Python wheel
               run: make install
               env:
                   CC: clang
                   CXX: clang++
                   BAZEL_OPTS: --batch
                   BAZEL_FETCH_OPTS: --config=ci
-                  BAZEL_TEST_OPTS: --config=ci
+                  BAZEL_BUILD_OPTS: --config=ci
 
-            - name: Test
+            - name: Install runtime dependencies
+              uses: ./.github/actions/install-runtime-dependencies
+
+            - name: Install test dependencies
+              run: python -m pip install -r tests/requirements.txt
+
+            - name: Fuzz test
               run: FUZZ_TIME=600 make install-fuzz

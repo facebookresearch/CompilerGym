@@ -32,6 +32,8 @@ from compiler_gym.service.proto import (
 from compiler_gym.service.runtime.benchmark_cache import BenchmarkCache
 from compiler_gym.util.version import __version__
 
+logger = logging.getLogger(__name__)
+
 # NOTE(cummins): The CompilerGymService class is used in a subprocess by a
 # compiler service, so code coverage tracking does not work. As such we use "#
 # pragma: no cover" annotation for all definitions in this file.
@@ -63,6 +65,14 @@ def exception_to_grpc_status(context):  # pragma: no cover
 
 class CompilerGymService(CompilerGymServiceServicerStub):  # pragma: no cover
     def __init__(self, working_directory: Path, compilation_session_type):
+        """Constructor.
+
+        :param working_directory: The working directory for this service.
+
+        :param compilation_session_type: The :class:`CompilationSession
+            <compiler_gym.service.CompilationSession>` type that this service
+            implements.
+        """
         self.working_directory = working_directory
         self.benchmarks = BenchmarkCache()
 
@@ -77,7 +87,7 @@ class CompilerGymService(CompilerGymServiceServicerStub):  # pragma: no cover
     def GetVersion(self, request: GetVersionRequest, context) -> GetVersionReply:
         del context  # Unused
         del request  # Unused
-        logging.debug("GetVersion()")
+        logger.debug("GetVersion()")
         return GetVersionReply(
             service_version=__version__,
             compiler_version=self.compilation_session_type.compiler_version,
@@ -85,7 +95,7 @@ class CompilerGymService(CompilerGymServiceServicerStub):  # pragma: no cover
 
     def GetSpaces(self, request: GetSpacesRequest, context) -> GetSpacesReply:
         del request  # Unused
-        logging.debug("GetSpaces()")
+        logger.debug("GetSpaces()")
         with exception_to_grpc_status(context):
             return GetSpacesReply(
                 action_space_list=self.action_spaces,
@@ -94,7 +104,7 @@ class CompilerGymService(CompilerGymServiceServicerStub):  # pragma: no cover
 
     def StartSession(self, request: StartSessionRequest, context) -> StartSessionReply:
         """Create a new compilation session."""
-        logging.debug(
+        logger.debug(
             "StartSession(id=%d, benchmark=%s), %d active sessions",
             self.next_session_id,
             request.benchmark.uri,
@@ -140,7 +150,7 @@ class CompilerGymService(CompilerGymServiceServicerStub):  # pragma: no cover
 
     def EndSession(self, request: EndSessionRequest, context) -> EndSessionReply:
         del context  # Unused
-        logging.debug(
+        logger.debug(
             "EndSession(id=%d), %d sessions remaining",
             request.session_id,
             len(self.sessions) - 1,
@@ -152,7 +162,7 @@ class CompilerGymService(CompilerGymServiceServicerStub):  # pragma: no cover
             return EndSessionReply(remaining_sessions=len(self.sessions))
 
     def Step(self, request: StepRequest, context) -> StepReply:
-        logging.debug("Step()")
+        logger.debug("Step()")
         reply = StepReply()
 
         if request.session_id not in self.sessions:

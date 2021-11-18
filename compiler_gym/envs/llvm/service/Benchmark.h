@@ -33,13 +33,13 @@ using Bitcode = llvm::SmallString<0>;
 /** The number of times a benchmark is executed. This can be overriden using
  * the "llvm.set_runtimes_per_observation_count" session parameter.
  */
-constexpr int kDefaultRuntimesPerObservationCount = 30;
+constexpr int kDefaultRuntimesPerObservationCount = 1;
 
 /** The default number of warmup runs that a benchmark is executed before measuring the runtimes.
  * This can be overriden using the "llvm.set_warmup_runs_count_per_runtime_observation" session
  * parameter.
  */
-constexpr int kDefaultWarmupRunsPerRuntimeObservationCount = 5;
+constexpr int kDefaultWarmupRunsPerRuntimeObservationCount = 0;
 
 /** The number of times a benchmark is built. This can be overriden using
  * the "llvm.set_buildtimes_per_observation_count" session parameter.

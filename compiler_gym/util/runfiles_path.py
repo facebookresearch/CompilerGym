@@ -4,13 +4,19 @@
 # LICENSE file in the root directory of this source tree.
 """Module for resolving a runfiles path."""
 import os
+from datetime import datetime
 from getpass import getuser
 from pathlib import Path
+from threading import Lock
+from time import sleep
+from typing import Optional
 
 # NOTE(cummins): Moving this file may require updating this relative path.
 _PACKAGE_ROOT = Path(os.path.join(os.path.dirname(__file__), "../../")).resolve(
     strict=True
 )
+
+_CREATE_LOGGING_DIR_LOCK = Lock()
 
 
 def runfiles_path(relpath: str) -> Path:
@@ -124,3 +130,45 @@ def transient_cache_path(relpath: str) -> Path:
     else:
         # Fallback to using the regular cache.
         return cache_path(relpath)
+
+
+def create_user_logs_dir(name: str, dir: Optional[Path] = None) -> Path:
+    """Create a directory for writing logs to.
+
+    Defaults to ~/logs/compiler_gym base directory, set the
+    :code:`COMPILER_GYM_LOGS` environment variable to override this.
+
+    Example use:
+
+        >>> create_user_logs_dir("my_experiment")
+        Path("~/logs/compiler_gym/my_experiment/2020-11-03T11:00:00")
+
+    :param name: The grouping name for the logs.
+
+    :return: A unique timestamped directory for logging. This directory exists.
+    """
+    base_dir = Path(
+        os.environ.get("COMPILER_GYM_LOGS", dir or "~/logs/compiler_gym")
+    ).expanduser()
+    group_dir = base_dir / name
+
+    with _CREATE_LOGGING_DIR_LOCK:
+        # Require that logging directory timestamps are unique by waiting until
+        # a unique timestamp is generated.
+        while True:
+            now = datetime.now()
+            subdirs = now.strftime("%Y-%m-%d/%H-%M-%S")
+
+            logs_dir = group_dir / subdirs
+            if logs_dir.is_dir():
+                sleep(0.3)
+                continue
+
+            logs_dir.mkdir(parents=True, exist_ok=False)
+
+            # Create a symlink to the "latest" logs results.
+            if (group_dir / "latest").exists():
+                os.unlink(group_dir / "latest")
+            os.symlink(subdirs, group_dir / "latest")
+
+            return logs_dir

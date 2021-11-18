@@ -63,6 +63,19 @@ Datasets wrappers
     .. automethod:: __init__
 
 
+.. autoclass:: CycleOverBenchmarksIterator
+
+    .. automethod:: __init__
+
+
 .. autoclass:: RandomOrderBenchmarks
+
+    .. automethod:: __init__
+
+
+LLVM Environment wrappers
+-------------------------
+
+.. autoclass:: RuntimePointEstimateReward
 
     .. automethod:: __init__

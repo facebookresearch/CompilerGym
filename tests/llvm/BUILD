@@ -5,6 +5,16 @@
 load("@rules_python//python:defs.bzl", "py_test")
 
 py_test(
+    name = "action_space_test",
+    srcs = ["action_space_test.py"],
+    deps = [
+        "//compiler_gym/envs",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "all_actions_single_step_test",
     timeout = "long",
     srcs = ["all_actions_single_step_test.py"],
@@ -109,6 +119,17 @@ py_test(
     data = [
         "//compiler_gym/third_party/cbench:crc32",
     ],
+    deps = [
+        "//compiler_gym/envs",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
+    name = "fork_regression_test",
+    timeout = "long",
+    srcs = ["fork_regression_test.py"],
     deps = [
         "//compiler_gym/envs",
         "//tests:test_main",

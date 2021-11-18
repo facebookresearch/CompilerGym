@@ -1,0 +1,6 @@
+---
+algorithm: opentuner_ga
+optimization_target: codesize
+search_time_seconds: 3600
+algorithm_config:
+    max_copies_of_pass: 4

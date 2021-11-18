@@ -1,0 +1,12 @@
+---
+type: PPOTrainer
+args:
+    model:
+        fcnet_hiddens: [256, 256]
+        fcnet_activation: relu
+    framework: tf
+    horizon: 45
+    evaluation_config:
+        explore: false
+checkpoint_freq: 10
+checkpoint_at_end: true

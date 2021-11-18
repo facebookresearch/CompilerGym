@@ -144,9 +144,8 @@ def test_validation_result_equality_different_errors_order():
 
 
 def test_validation_result_join_no_inputs():
-    with pytest.raises(ValueError) as e_ctx:
+    with pytest.raises(ValueError, match=r"^No states to join$"):
         ValidationResult.join([])
-    assert str(e_ctx.value) == "No states to join"
 
 
 def test_validation_result_join_one_input():

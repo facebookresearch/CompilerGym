@@ -10,11 +10,14 @@ py_library(
     srcs = [
         "__init__.py",
         "capture_output.py",
+        "commands.py",
         "debug_util.py",
         "decorators.py",
         "download.py",
+        "executor.py",
         "filesystem.py",
         "gym_type_hints.py",
+        "logging.py",
         "logs.py",
         "minimize_trajectory.py",
         "parallelization.py",
@@ -92,6 +95,9 @@ cc_library(
     name = "Unreachable",
     hdrs = ["Unreachable.h"],
     visibility = ["//visibility:public"],
+    deps = [
+        "@glog",
+    ],
 )
 
 genrule(

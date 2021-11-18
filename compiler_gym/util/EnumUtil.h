@@ -58,6 +58,28 @@ std::string enumNameToPascalCase(std::optional<Enum> value) {
 }
 
 /**
+ * Convert an UPPER_SNAKE_CASE enum name to -flag-name.
+ *
+ * E.g. `MyEnum::MY_ENUM_VALUE -> "-my-enum-value"`.
+ *
+ * @param value An enum.
+ * @return A string.
+ */
+template <typename Enum>
+std::string enumNameToCommandlineFlag(Enum value) {
+  const std::string name(magic_enum::enum_name<Enum>(value));
+  std::string out{"-"};
+  for (size_t i = 0; i < name.size(); ++i) {
+    if (name[i] == '_') {
+      out.push_back('-');
+    } else {
+      out.push_back(tolower(name[i]));
+    }
+  }
+  return out;
+}
+
+/**
  * Enumerate all values of an optional Enum, including `std::nullopt`.
  *
  * @return A vector of optional enum values.

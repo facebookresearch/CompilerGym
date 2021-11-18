@@ -86,6 +86,7 @@ class LlvmStressDataset(Dataset):
         )
 
         stdout, _ = llvm_as.communicate(timeout=60)
+        llvm_stress.communicate(timeout=60)
         if llvm_stress.returncode or llvm_as.returncode:
             raise BenchmarkInitError("Failed to generate benchmark")
 

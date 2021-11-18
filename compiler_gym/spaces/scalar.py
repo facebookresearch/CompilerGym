@@ -15,19 +15,28 @@ class Scalar(Space):
     __slots__ = ["min", "max", "dtype"]
 
     def __init__(
-        self, min: Optional[float] = None, max: Optional[float] = None, dtype=np.float64
+        self,
+        name: str,
+        min: Optional[float] = None,
+        max: Optional[float] = None,
+        dtype=np.float64,
     ):
         """Constructor.
 
+        :param name: The name of the space.
+
         :param min: The lower bound for a value in this space. If None, there is
             no lower bound.
+
         :param max: The upper bound for a value in this space. If None, there is
             no upper bound.
+
         :param dtype: The type of this scalar.
         """
         self.min = min
         self.max = max
         self.dtype = dtype
+        self.name = name
 
     def sample(self):
         min = 0 if self.min is None else self.min

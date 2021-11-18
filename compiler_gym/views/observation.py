@@ -4,6 +4,8 @@
 # LICENSE file in the root directory of this source tree.
 from typing import Callable, Dict, List
 
+from deprecated.sphinx import deprecated
+
 from compiler_gym.service.connection import ServiceError
 from compiler_gym.service.proto import ObservationSpace
 from compiler_gym.util.gym_type_hints import (
@@ -93,6 +95,13 @@ class ObservationView:
         # env.observation.FooBar().
         setattr(self, space.id, lambda: self[space.id])
 
+    @deprecated(
+        version="0.2.1",
+        reason=(
+            "Use the derived_observation_spaces argument to CompilerEnv constructor. "
+            "See <https://github.com/facebookresearch/CompilerGym/issues/461>."
+        ),
+    )
     def add_derived_space(
         self,
         id: str,
@@ -123,6 +132,19 @@ class ObservationView:
             :func:`ObservationSpaceSpec.make_derived_space
             <compiler_gym.views.ObservationSpaceSpec.make_derived_space>`.
         """
+        base_space = self.spaces[base_id]
+        self._add_space(base_space.make_derived_space(id=id, **kwargs))
+
+    # NOTE(github.com/facebookresearch/CompilerGym/issues/461): This method will
+    # be renamed to add_derived_space() once the current method with that name
+    # is removed.
+    def add_derived_space_internal(
+        self,
+        id: str,
+        base_id: str,
+        **kwargs,
+    ) -> None:
+        """Internal API for adding a new observation space."""
         base_space = self.spaces[base_id]
         self._add_space(base_space.make_derived_space(id=id, **kwargs))
 

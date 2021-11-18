@@ -29,6 +29,12 @@ TEST(EnumUtilTest, optionalEnumNameToPascalCase) {
   EXPECT_EQ(enumNameToPascalCase<Fruit>(std::nullopt), "None");
 }
 
+TEST(EnumUtilTest, enumNameToCommandlineFlag) {
+  EXPECT_EQ(enumNameToCommandlineFlag(Fruit::APPLES), "-apples");
+  EXPECT_EQ(enumNameToCommandlineFlag(Fruit::UNRIPE_bAnAnAs), "-unripe-bananas");
+  EXPECT_EQ(enumNameToCommandlineFlag(Fruit::is_tomato_even_a_fruit), "-is-tomato-even-a-fruit");
+}
+
 TEST(EnumUtilTest, optionalEnumValues) {
   const auto values = optionalEnumValues<Fruit>();
   ASSERT_EQ(values.size(), 4);

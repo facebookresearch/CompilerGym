@@ -8,8 +8,7 @@ from pathlib import Path
 
 import gym
 
-from compiler_gym.random_replay import replay_actions_from_logs
-from compiler_gym.random_search import random_search
+from compiler_gym.random_search import random_search, replay_actions_from_logs
 from tests.pytest_plugins.common import set_command_line_flags
 from tests.test_main import main
 

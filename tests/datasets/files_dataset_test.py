@@ -96,12 +96,10 @@ def test_populated_dataset_first_file(populated_dataset: FilesDataset):
 
 
 def test_populated_dataset_benchmark_lookup_not_found(populated_dataset: FilesDataset):
-    with pytest.raises(LookupError) as e_ctx:
+    with pytest.raises(
+        LookupError, match=r"^Benchmark not found: benchmark://test-v0/not/a/file"
+    ):
         populated_dataset.benchmark("benchmark://test-v0/not/a/file")
-
-    assert str(e_ctx.value).startswith(
-        "Benchmark not found: benchmark://test-v0/not/a/file"
-    )
 
 
 def test_populated_dataset_with_file_extension_filter(populated_dataset: FilesDataset):

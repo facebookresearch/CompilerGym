@@ -147,13 +147,11 @@ def test_datasets_get_item_lookup_miss():
     da = MockDataset("benchmark://foo-v0")
     datasets = Datasets([da])
 
-    with pytest.raises(LookupError) as e_ctx:
+    with pytest.raises(LookupError, match=r"^Dataset not found: benchmark://bar-v0$"):
         datasets.dataset("benchmark://bar-v0")
-    assert str(e_ctx.value) == "Dataset not found: benchmark://bar-v0"
 
-    with pytest.raises(LookupError) as e_ctx:
+    with pytest.raises(LookupError, match=r"^Dataset not found: benchmark://bar-v0$"):
         _ = datasets["benchmark://bar-v0"]
-    assert str(e_ctx.value) == "Dataset not found: benchmark://bar-v0"
 
 
 def test_benchmark_lookup_by_uri():
@@ -245,8 +243,10 @@ def test_benchmarks_iter_deprecated():
     ]
 
 
-def test_random_benchmark(mocker):
+@pytest.mark.parametrize("weighted", [False, True])
+def test_random_benchmark(mocker, weighted: bool):
     da = MockDataset("benchmark://foo-v0")
+    da.size = 10
     ba = MockBenchmark(uri="benchmark://foo-v0/abc")
     da.benchmark_values.append(ba)
     datasets = Datasets([da])
@@ -256,7 +256,11 @@ def test_random_benchmark(mocker):
     num_benchmarks = 5
     rng = np.random.default_rng(0)
     random_benchmarks = {
-        b.uri for b in (datasets.random_benchmark(rng) for _ in range(num_benchmarks))
+        b.uri
+        for b in (
+            datasets.random_benchmark(rng, weighted=weighted)
+            for _ in range(num_benchmarks)
+        )
     }
 
     assert da.random_benchmark.call_count == num_benchmarks

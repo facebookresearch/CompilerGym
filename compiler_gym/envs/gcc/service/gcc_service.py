@@ -19,16 +19,20 @@ from urllib.request import urlopen
 
 from compiler_gym.envs.gcc import Gcc, Option
 from compiler_gym.service import CompilationSession
-from compiler_gym.service.proto import Action as ProtoAction
+from compiler_gym.service.proto import Action as ActionProto
 from compiler_gym.service.proto import (
     ActionSpace,
     Benchmark,
+    ChoiceSpace,
+    NamedDiscreteSpace,
     Observation,
     ObservationSpace,
     ScalarLimit,
     ScalarRange,
     ScalarRangeList,
 )
+
+logger = logging.getLogger(__name__)
 
 
 def make_gcc_compilation_session(gcc_bin: str):
@@ -64,7 +68,19 @@ def make_gcc_compilation_session(gcc_bin: str):
             actions.append(IncrAction(option, i, 1000))
             actions.append(IncrAction(option, i, -1000))
 
-    action_spaces_ = [ActionSpace(name="default", action=list(map(str, actions)))]
+    action_spaces_ = [
+        ActionSpace(
+            name="default",
+            choice=[
+                ChoiceSpace(
+                    name="default",
+                    named_discrete_space=NamedDiscreteSpace(
+                        value=[str(a) for a in actions]
+                    ),
+                )
+            ],
+        )
+    ]
 
     observation_spaces_ = [
         # A string of the source code
@@ -214,6 +230,10 @@ def make_gcc_compilation_session(gcc_bin: str):
             # Initially the choices and the spec, etc are empty. They will be
             # initialised lazily
             self._choices = None
+
+        @property
+        def num_actions(self) -> int:
+            return len(self.action_spaces[0].choice[0].named_discrete_space.value)
 
         @property
         def choices(self) -> List[int]:
@@ -384,7 +404,7 @@ def make_gcc_compilation_session(gcc_bin: str):
             """Compile the benchmark"""
             if not self._obj:
                 self.prepare_files()
-                logging.debug(
+                logger.debug(
                     "Compiling: %s", " ".join(map(str, self.obj_command_line()))
                 )
                 gcc(
@@ -402,7 +422,7 @@ def make_gcc_compilation_session(gcc_bin: str):
             """Assemble the benchmark"""
             if not self._asm:
                 self.prepare_files()
-                logging.debug(
+                logger.debug(
                     "Assembling: %s", " ".join(map(str, self.asm_command_line()))
                 )
                 gcc(
@@ -421,7 +441,7 @@ def make_gcc_compilation_session(gcc_bin: str):
             """Dump the RTL (and assemble the benchmark)"""
             if not self._rtl:
                 self.prepare_files()
-                logging.debug(
+                logger.debug(
                     "Dumping RTL: %s", " ".join(map(str, self.rtl_command_line()))
                 )
                 gcc(
@@ -451,20 +471,22 @@ def make_gcc_compilation_session(gcc_bin: str):
             self._asm_hash = None
 
         def apply_action(
-            self, proto_action: ProtoAction
+            self, action_proto: ActionProto
         ) -> Tuple[bool, Optional[ActionSpace], bool]:
             """Apply an action."""
-            if proto_action.action < 0 or proto_action.action > len(
-                self.action_spaces[0].action
-            ):
+            if len(action_proto.choice) != 1:
+                raise ValueError("Invalid choice count")
+
+            choice_index = action_proto.choice[0].named_discrete_value_index
+            if choice_index < 0 or choice_index >= self.num_actions:
                 raise ValueError("Out-of-range")
 
             # Get the action
-            action = actions[proto_action.action]
+            action = actions[choice_index]
             # Apply the action to this session and check if we changed anything
             old_choices = self.choices.copy()
             action(self)
-            logging.debug("Applied action %s", action)
+            logger.debug("Applied action %s", action)
 
             # Reset the internal variables if this action has caused a change in the
             # choices

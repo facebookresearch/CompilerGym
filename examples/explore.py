@@ -285,13 +285,11 @@ class NodeTypeStats:
 # Compute an action graph and use it to find the optimal sequence
 # within episode_length actions. Uses as many threads as there are
 # elements in envs.
-def compute_action_graph(envs, episode_length):
+def compute_action_graph(pool, envs, episode_length):
     assert len(envs) >= 1
     env_queue = Queue()
     for env in envs:
         env_queue.put(env)
-    pool = ThreadPool(len(envs))
-
     stats = NodeTypeStats(action_count=env.action_space.n)
     graph = StateGraph(edges_per_node=env.action_space.n)
 
@@ -448,7 +446,8 @@ def main(argv):
     try:
         for _ in range(FLAGS.nproc):
             envs.append(make_env())
-        compute_action_graph(envs, episode_length=FLAGS.episode_length)
+        with ThreadPool(len(envs)) as pool:
+            compute_action_graph(pool, envs, episode_length=FLAGS.episode_length)
     finally:
         for env in envs:
             env.close()

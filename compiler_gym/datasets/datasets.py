@@ -3,7 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 from collections import deque
-from typing import Dict, Iterable, Optional, Set, TypeVar
+from typing import Dict, Iterable, List, Optional, Set, TypeVar
 
 import numpy as np
 
@@ -254,39 +254,64 @@ class Datasets:
         return dataset.benchmark(uri)
 
     def random_benchmark(
-        self, random_state: Optional[np.random.Generator] = None
+        self,
+        random_state: Optional[np.random.Generator] = None,
+        weighted: bool = False,
+        weights: Optional[Dict[str, float]] = None,
     ) -> Benchmark:
         """Select a benchmark randomly.
 
-        First, a dataset is selected uniformly randomly using
-        :code:`random_state.choice(list(datasets))`. The
+        First, a dataset is selected randomly using
+        :code:`random_state.choice(list(datasets))`. Then the
         :meth:`random_benchmark()
-        <compiler_gym.datasets.Dataset.random_benchmark>` method of that dataset
-        is then called to select a benchmark.
+        <compiler_gym.datasets.Dataset.random_benchmark>` method of the chosen
+        dataset is called to select a benchmark.
 
-        Note that the distribution of benchmarks selected by this method is not
-        biased by the size of each dataset, since datasets are selected
-        uniformly. This means that datasets with a small number of benchmarks
-        will be overrepresented compared to datasets with many benchmarks. To
-        correct for this bias, use the number of benchmarks in each dataset as
-        a weight for the random selection:
+        By default datasets are selected uniformly randomly. This means that
+        datasets with a small number of benchmarks will be overrepresented
+        compared to datasets with many benchmarks. To correct for this bias pass
+        the argument :code:`weighted=True`, which weights the dataset choice by
+        the number of benchmarks in each dataset, equivalent to:
 
-            >>> rng = np.random.default_rng()
-            >>> finite_datasets = [d for d in env.datasets if len(d) != math.inf]
-            >>> dataset = rng.choice(
-                finite_datasets,
-                p=[len(d) for d in finite_datasets]
-            )
-            >>> dataset.random_benchmark(random_state=rng)
+            >>> random.choices(datasets, weights=[len(p) for p in datasets])
+
+        Weighting the choice of datasets by their size means that datasets with
+        infinite sizes (such as random program generators) will be excluded from
+        sampling as their size is :code:`0`. To override the weights of datasets
+        pass a :code:`weights` mapping:
+
+            >>> env.datasets.random_benchmark(weighted=True, weights={
+                "benchmark://dataset-v0": 10,
+                "benchmark://another-dataset-v0": 555,
+            })
 
         :param random_state: A random number generator. If not provided, a
             default :code:`np.random.default_rng()` is used.
+
+        :param weighted: If set, weight the choice of dataset by the number of
+            benchmarks in each dataset, or the value specified in the
+            :code:`weights` mapping.
+
+        :param weights: An optional mapping from dataset URI to the weight to
+            use when :code:`weighted=True`. This overrides the default value of
+            using the dataset size.
 
         :return: A :class:`Benchmark <compiler_gym.datasets.Benchmark>`
             instance.
         """
         random_state = random_state or np.random.default_rng()
-        dataset = random_state.choice(list(self._visible_datasets))
+        datasets: List[str] = list(self._visible_datasets)
+        # Assume weighted=True if weights dictionary is specified.
+        weighted = weighted or weights
+
+        if weighted:
+            weights: Dict[str, float] = weights or {}
+            w: List[float] = np.array(
+                [weights.get(d, self[d].size) for d in datasets], dtype=float
+            )
+            dataset = random_state.choice(datasets, p=w / w.sum())
+        else:
+            dataset = random_state.choice(datasets)
         return self[dataset].random_benchmark(random_state=random_state)
 
     @property

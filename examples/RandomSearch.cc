@@ -57,6 +57,7 @@ class Environment {
     }
 
     StartSessionRequest startRequest;
+    startRequest.mutable_benchmark()->set_uri(benchmark_);
     StartSessionReply startReply;
     RETURN_IF_ERROR(service_.StartSession(nullptr, &startRequest, &startReply));
     sessionId_ = startReply.session_id();
@@ -89,7 +90,7 @@ class Environment {
     StepReply reply;
 
     request.set_session_id(sessionId_);
-    request.add_action()->set_action(static_cast<int>(action));
+    request.add_action()->add_choice()->set_named_discrete_value_index(static_cast<int>(action));
     request.add_observation_space(static_cast<int>(observationSpace));
     RETURN_IF_ERROR(service_.Step(nullptr, &request, &reply));
     CHECK(reply.observation_size() == 1);
@@ -138,8 +139,9 @@ Status runSearch(const fs::path& workingDir, std::vector<int>* bestActions, int6
 void runThread(std::vector<int>* bestActions, int64_t* bestCost) {
   const fs::path workingDir = fs::unique_path();
   fs::create_directories(workingDir);
-  if (!runSearch(workingDir, bestActions, bestCost).ok()) {
-    LOG(ERROR) << "Search failed";
+  const auto status = runSearch(workingDir, bestActions, bestCost);
+  if (!status.ok()) {
+    LOG(ERROR) << "ERROR " << status.error_code() << ": " << status.error_message();
   }
   fs::remove_all(workingDir);
 }

@@ -87,11 +87,11 @@ jobs:
                     python -m pip install compiler_gym-*-manylinux*.whl
                   fi
 
-            - name: Install runtime dependencies
-              uses: ./.github/actions/install-runtime-dependencies
-
             - name: Install test dependencies
               run: python -m pip install -r examples/requirements.txt -r tests/requirements.txt
+
+            - name: Install runtime dependencies
+              uses: ./.github/actions/install-runtime-dependencies
 
             - name: Run the examples tests
               run: make examples-test

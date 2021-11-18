@@ -10,36 +10,36 @@ from tests.test_main import main
 
 
 def test_empty_space():
-    space = NamedDiscrete([])
+    space = NamedDiscrete([], name="test")
     assert space.n == 0
     assert space.names == []
 
 
 def test_invalid_name_lookup():
-    space = NamedDiscrete(["foo"])
+    space = NamedDiscrete(["foo"], name="test")
     with pytest.raises(ValueError):
         _ = space["bar"]
 
 
 def test_space_size():
-    space = NamedDiscrete(["a", "b", "c"])
+    space = NamedDiscrete(["a", "b", "c"], name="test")
     assert space.n == 3
 
 
 def test_name_lookup():
-    space = NamedDiscrete(["a", "b", "c"])
+    space = NamedDiscrete(["a", "b", "c"], name="test")
     assert space["a"] == 0
     assert space["b"] == 1
     assert space["c"] == 2
 
 
 def test_repr():
-    space = NamedDiscrete(["foo", "bar"])
+    space = NamedDiscrete(["foo", "bar"], name="test")
     assert str(space) == "NamedDiscrete([foo, bar])"
 
 
 def test_to_string():
-    space = NamedDiscrete(["foo", "bar"])
+    space = NamedDiscrete(["foo", "bar"], name="test")
     assert space.to_string(0) == "foo"
     assert space.to_string([0]) == "foo"
     assert space.to_string([0, 0, 1]) == "foo foo bar"

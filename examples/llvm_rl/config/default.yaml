@@ -1,0 +1,39 @@
+---
+defaults:
+    - agent: ppo
+    - environment: autophase-with-history
+    - training: csmith
+    - testing: cbench
+executor:
+    # One of: {local, slurm, debug, noop}.
+    type: local
+    # Specifies the number of parallel worker processes. If -1, defaults to the
+    # number of cores on the machine.
+    cpus: -1
+# The base directory for logs and other runtime artifacts.
+outputs: ${env:HOME}/logs/compiler_gym/llvm_rl
+# The top subdirectory to arrange files in. Use this to group related runs by
+# some logical naming.
+experiment: unnamed_experiment
+num_replicas: 10
+# Use hydra to manage the output directory layout. Multi-run and single runs
+# share the same directory layout (there just won't be a multirun.yaml file for
+# the individual runs).
+hydra:
+    run:
+        dir: ${outputs}/${experiment}/${now:%Y-%m-%d}/${now:%H-%M-%S}/${experiment}-C0
+    sweep:
+        dir: ${outputs}/${experiment}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+        subdir: ${experiment}-C${hydra.job.num}
+    output_subdir: hydra
+    job_logging:
+        version: 1
+        formatters:
+            simple:
+                format: '%(asctime)s %(name)s] %(message)s'
+                datefmt: '%M%d %H:%m:%S'
+        handlers:
+            console:
+                class: logging.StreamHandler
+                formatter: simple
+                stream: ext://sys.stdout

@@ -8,12 +8,14 @@ import tempfile
 from pathlib import Path
 
 from absl.flags import FLAGS
+from flaky import flaky
 from sensitivity_analysis.action_sensitivity_analysis import (
     run_action_sensitivity_analysis,
 )
 from sensitivity_analysis.sensitivity_analysis_eval import run_sensitivity_analysis_eval
 
 
+@flaky
 def test_run_action_sensitivity_analysis():
     actions = [0, 1]
     env = "llvm-v0"

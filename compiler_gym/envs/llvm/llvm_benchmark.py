@@ -7,31 +7,19 @@ import logging
 import os
 import random
 import subprocess
-import sys
 import tempfile
 from concurrent.futures import as_completed
 from datetime import datetime
 from pathlib import Path
-from signal import Signals
 from typing import Iterable, List, Optional, Union
 
 from compiler_gym.datasets import Benchmark, BenchmarkInitError
 from compiler_gym.third_party import llvm
+from compiler_gym.util.commands import communicate, run_command
 from compiler_gym.util.runfiles_path import transient_cache_path
 from compiler_gym.util.thread_pool import get_thread_pool_executor
 
-
-def _communicate(process, input=None, timeout=None):
-    """subprocess.communicate() which kills subprocess on timeout."""
-    try:
-        return process.communicate(input=input, timeout=timeout)
-    except subprocess.TimeoutExpired:
-        # kill() was added in Python 3.7.
-        if sys.version_info >= (3, 7, 0):
-            process.kill()
-        else:
-            process.terminate()
-        raise
+logger = logging.getLogger(__name__)
 
 
 def get_compiler_includes(compiler: str) -> Iterable[Path]:
@@ -55,7 +43,7 @@ def get_compiler_includes(compiler: str) -> Iterable[Path]:
                 f"Is there a working system compiler?\n"
                 f"Error: {e}"
             ) from e
-        _, stderr = _communicate(process, input="", timeout=30)
+        _, stderr = communicate(process, input="", timeout=30)
     if process.returncode:
         raise OSError(
             f"Failed to invoke {compiler}. "
@@ -115,7 +103,7 @@ def get_system_includes() -> List[Path]:
         try:
             _SYSTEM_INCLUDES = list(get_compiler_includes(system_compiler))
         except OSError as e:
-            logging.warning("%s", e)
+            logger.warning("%s", e)
             _SYSTEM_INCLUDES = []
     return _SYSTEM_INCLUDES
 
@@ -184,26 +172,6 @@ class ClangInvocation:
             DEFAULT_COPT + copt + [str(path)],
             system_includes=system_includes,
             timeout=timeout,
-        )
-
-
-def _run_command(cmd: List[str], timeout: int):
-    process = subprocess.Popen(
-        cmd, stdout=subprocess.DEVNULL, stderr=subprocess.PIPE, universal_newlines=True
-    )
-    _, stderr = _communicate(process, timeout=timeout)
-    if process.returncode:
-        returncode = process.returncode
-        try:
-            # Try and decode the name of a signal. Signal returncodes
-            # are negative.
-            returncode = f"{returncode} ({Signals(abs(returncode)).name})"
-        except ValueError:
-            pass
-        raise BenchmarkInitError(
-            f"Compilation job failed with returncode {returncode}\n"
-            f"Command: {' '.join(cmd)}\n"
-            f"Stderr: {stderr.strip()}"
         )
 
 
@@ -366,10 +334,10 @@ def make_benchmark(
 
             # Fire off the clang and llvm-as jobs.
             futures = [
-                executor.submit(_run_command, job.command(out), job.timeout)
+                executor.submit(run_command, job.command(out), job.timeout)
                 for job, out in zip(clang_jobs, clang_outs)
             ] + [
-                executor.submit(_run_command, command, timeout)
+                executor.submit(run_command, command, timeout)
                 for command in llvm_as_commands
             ]
 
@@ -401,7 +369,7 @@ def make_benchmark(
             llvm_link = subprocess.Popen(
                 llvm_link_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
             )
-            bitcode, stderr = _communicate(llvm_link, timeout=timeout)
+            bitcode, stderr = communicate(llvm_link, timeout=timeout)
             if llvm_link.returncode:
                 raise BenchmarkInitError(
                     f"Failed to link LLVM bitcodes with error: {stderr.decode('utf-8')}"

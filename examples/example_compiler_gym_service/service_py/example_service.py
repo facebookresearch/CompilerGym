@@ -14,6 +14,8 @@ from compiler_gym.service.proto import (
     Action,
     ActionSpace,
     Benchmark,
+    ChoiceSpace,
+    NamedDiscreteSpace,
     Observation,
     ObservationSpace,
     ScalarLimit,
@@ -28,16 +30,23 @@ class ExampleCompilationSession(CompilationSession):
 
     compiler_version: str = "1.0.0"
 
-    # The list of actions that are supported by this service. This example uses
-    # a static (unchanging) action space, but this could be extended to support
-    # a dynamic action space.
+    # The action spaces supported by this service. Here we will implement a
+    # single action space, called "default", that represents a command line with
+    # three options: "a", "b", and "c".
     action_spaces = [
         ActionSpace(
             name="default",
-            action=[
-                "a",
-                "b",
-                "c",
+            choice=[
+                ChoiceSpace(
+                    name="optimization_choice",
+                    named_discrete_space=NamedDiscreteSpace(
+                        value=[
+                            "a",
+                            "b",
+                            "c",
+                        ],
+                    ),
+                )
             ],
         )
     ]
@@ -86,9 +95,22 @@ class ExampleCompilationSession(CompilationSession):
         logging.info("Started a compilation session for %s", benchmark.uri)
 
     def apply_action(self, action: Action) -> Tuple[bool, Optional[ActionSpace], bool]:
-        logging.info("Applied action %d", action.action)
-        if action.action < 0 or action.action > len(self.action_spaces[0].action):
+        num_choices = len(self.action_spaces[0].choice[0].named_discrete_space.value)
+
+        if len(action.choice) != 1:
+            raise ValueError("Invalid choice count")
+
+        # This is the index into the action space's values ("a", "b", "c") that
+        # the user selected, e.g. 0 -> "a", 1 -> "b", 2 -> "c".
+        choice_index = action.choice[0].named_discrete_value_index
+        logging.info("Applying action %d", choice_index)
+
+        if choice_index < 0 or choice_index >= num_choices:
             raise ValueError("Out-of-range")
+
+        # Here is where we would run the actual action to update the environment's
+        # state.
+
         return False, None, False
 
     def get_observation(self, observation_space: ObservationSpace) -> Observation:

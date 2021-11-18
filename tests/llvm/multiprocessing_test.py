@@ -62,7 +62,7 @@ def test_running_environment_in_background_process():
             process.kill()
         else:
             process.terminate()
-        process.join()
+        process.join(timeout=60)
 
 
 @macos_only

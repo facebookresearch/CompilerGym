@@ -3,8 +3,6 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Unit tests for //compiler_gym/envs."""
-import logging
-
 import gym
 import pytest
 from flaky import flaky
@@ -36,12 +34,11 @@ def test_benchmark_set_in_reset(env: LlvmEnv):
     assert env.benchmark == "benchmark://cbench-v1/dijkstra"
 
 
-def test_logger_forced():
-    logger = logging.getLogger("test_logger")
-    with gym.make("llvm-v0") as env_a:
-        with gym.make("llvm-v0", logger=logger) as env_b:
-            assert env_a.logger != logger
-            assert env_b.logger == logger
+def test_logger_is_deprecated(env: LlvmEnv):
+    with pytest.deprecated_call(
+        match="The `CompilerEnv.logger` attribute is deprecated"
+    ):
+        env.logger
 
 
 def test_uri_substring_no_match(env: LlvmEnv):

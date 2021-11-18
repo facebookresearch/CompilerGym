@@ -85,7 +85,7 @@ void InstCount::visitBasicBlock(BasicBlock& BB) {
         UncondBranches++;
       }
     }
-    for (int i = 0; i < I.getNumOperands(); i++) {
+    for (int i = 0; i < static_cast<int>(I.getNumOperands()); i++) {
       Value* v = I.getOperand(i);
       // Type* t = v->getType();
       if (auto* c = dyn_cast<Constant>(v)) {

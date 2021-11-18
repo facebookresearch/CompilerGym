@@ -3,21 +3,20 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Tests for the example CompilerGym service."""
-import logging
+import socket
 import subprocess
 from pathlib import Path
+from time import sleep
 
 import gym
 import numpy as np
 import pytest
-from gym.spaces import Box
+from flaky import flaky
 
-import compiler_gym
 import examples.example_compiler_gym_service as example
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.service import SessionNotFound
-from compiler_gym.spaces import NamedDiscrete, Scalar, Sequence
-from compiler_gym.util.debug_util import set_debug_level
+from compiler_gym.spaces import Box, NamedDiscrete, Scalar, Sequence
 from tests.test_main import main
 
 # Given that the C++ and Python service implementations have identical
@@ -39,14 +38,6 @@ def env(request) -> CompilerEnv:
 )
 def bin(request) -> Path:
     yield request.param
-
-
-@pytest.mark.parametrize("env_id", EXAMPLE_ENVIRONMENTS)
-def test_debug_level(env_id: str):
-    """Test that debug level is set."""
-    set_debug_level(3)
-    with gym.make(env_id) as env:
-        assert env.logger.level == logging.DEBUG
 
 
 def test_invalid_arguments(bin: Path):
@@ -74,7 +65,6 @@ def test_invalid_arguments(bin: Path):
 
 def test_versions(env: CompilerEnv):
     """Tests the GetVersion() RPC endpoint."""
-    assert env.version == compiler_gym.__version__
     assert env.compiler_version == "1.0.0"
 
 
@@ -93,13 +83,13 @@ def test_observation_spaces(env: CompilerEnv):
     env.reset()
     assert env.observation.spaces.keys() == {"ir", "features", "runtime"}
     assert env.observation.spaces["ir"].space == Sequence(
-        size_range=(0, None), dtype=str, opaque_data_format=""
+        name="test", size_range=(0, None), dtype=str, opaque_data_format=""
     )
     assert env.observation.spaces["features"].space == Box(
-        shape=(3,), low=-100, high=100, dtype=int
+        name="test", shape=(3,), low=-100, high=100, dtype=int
     )
     assert env.observation.spaces["runtime"].space == Scalar(
-        min=0, max=np.inf, dtype=float
+        name="test", min=0, max=np.inf, dtype=float
     )
 
 
@@ -150,9 +140,19 @@ def test_double_reset(env: CompilerEnv):
     """Test that reset() can be called twice."""
     env.reset()
     assert env.in_episode
-    env.step(env.action_space.sample())
     env.reset()
-    env.step(env.action_space.sample())
+    assert env.in_episode
+
+
+def test_double_reset_with_step(env: CompilerEnv):
+    """Test that reset() can be called twice with a step."""
+    env.reset()
+    assert env.in_episode
+    _, _, done, info = env.step(env.action_space.sample())
+    assert not done, info
+    env.reset()
+    _, _, done, info = env.step(env.action_space.sample())
+    assert not done, info
     assert env.in_episode
 
 
@@ -226,6 +226,75 @@ def test_fork(env: CompilerEnv):
         assert other_env.actions == [0, 1]
     finally:
         other_env.close()
+
+
+@flaky  # Timeout-based test.
+def test_force_working_dir(bin: Path, tmpdir):
+    """Test that expected files are generated in the working directory."""
+    tmpdir = Path(tmpdir) / "subdir"
+    service = subprocess.Popen([str(bin), "--working_dir", str(tmpdir)])
+    try:
+        for _ in range(10):
+            sleep(0.5)
+            if (tmpdir / "pid.txt").is_file() and (tmpdir / "port.txt").is_file():
+                break
+        else:
+            pytest.fail(f"PID file not found in {tmpdir}: {list(tmpdir.iterdir())}")
+    finally:
+        service.terminate()
+        service.communicate(timeout=60)
+
+
+def unsafe_select_unused_port() -> int:
+    """Try and select an unused port that on the local system.
+
+    There is nothing to prevent the port number returned by this function from
+    being claimed by another process or thread, so it is liable to race conditions
+    """
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    s.bind(("127.0.0.1", 0))
+    s.listen(1)
+    port = s.getsockname()[1]
+    s.close()
+    return port
+
+
+def port_is_free(port: int) -> bool:
+    """Determine if a port is in use"""
+    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    try:
+        s.bind(("127.0.0.1", port))
+        return True
+    except OSError:
+        return False
+    finally:
+        s.close()
+
+
+@flaky  # Unsafe free port allocation
+def test_force_port(bin: Path, tmpdir):
+    """Test that a forced --port value is respected."""
+    port = unsafe_select_unused_port()
+    assert port_is_free(port)  # Sanity check
+
+    tmpdir = Path(tmpdir)
+    p = subprocess.Popen([str(bin), "--port", str(port), "--working_dir", str(tmpdir)])
+    try:
+        for _ in range(10):
+            sleep(0.5)
+            if (tmpdir / "pid.txt").is_file() and (tmpdir / "port.txt").is_file():
+                break
+        else:
+            pytest.fail(f"PID file not found in {tmpdir}: {list(tmpdir.iterdir())}")
+
+        with open(tmpdir / "port.txt") as f:
+            actual_port = int(f.read())
+
+        assert actual_port == port
+        assert not port_is_free(actual_port)
+    finally:
+        p.terminate()
+        p.communicate(timeout=60)
 
 
 if __name__ == "__main__":

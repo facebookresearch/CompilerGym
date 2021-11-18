@@ -80,6 +80,8 @@ cc_library(
     deps = [
         "//compiler_gym/service/proto:compiler_gym_service_cc",
         "//compiler_gym/util:EnumUtil",
+        "//compiler_gym/util:Unreachable",
+        "@fmt",
         "@magic_enum",
     ],
 )

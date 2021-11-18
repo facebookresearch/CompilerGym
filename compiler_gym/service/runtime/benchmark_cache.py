@@ -11,6 +11,8 @@ from compiler_gym.service.proto import Benchmark
 
 MAX_SIZE_IN_BYTES = 512 * 104 * 1024
 
+logger = logging.getLogger(__name__)
+
 
 class BenchmarkCache:
     """An in-memory cache of Benchmark messages.
@@ -24,11 +26,9 @@ class BenchmarkCache:
         self,
         max_size_in_bytes: int = MAX_SIZE_IN_BYTES,
         rng: Optional[np.random.Generator] = None,
-        logger: Optional[logging.Logger] = None,
     ):
         self._max_size_in_bytes = max_size_in_bytes
         self.rng = rng or np.random.default_rng()
-        self.logger = logger or logging.getLogger("compiler_gym")
 
         self._benchmarks: Dict[str, Benchmark] = {}
         self._size_in_bytes = 0
@@ -46,13 +46,6 @@ class BenchmarkCache:
 
     def __setitem__(self, uri: str, benchmark: Benchmark):
         """Add benchmark to cache."""
-        self.logger.debug(
-            "Caching benchmark %s. Cache size = %d bytes, %d items",
-            uri,
-            self.size_in_bytes,
-            self.size,
-        )
-
         # Remove any existing value to keep the cache size consistent.
         if uri in self._benchmarks:
             self._size_in_bytes -= self._benchmarks[uri].ByteSize()
@@ -61,14 +54,14 @@ class BenchmarkCache:
         size = benchmark.ByteSize()
         if self.size_in_bytes + size > self.max_size_in_bytes:
             if size > self.max_size_in_bytes:
-                self.logger.warning(
+                logger.warning(
                     "Adding new benchmark with size %d bytes exceeds total "
                     "target cache size of %d bytes",
                     size,
                     self.max_size_in_bytes,
                 )
             else:
-                self.logger.debug(
+                logger.debug(
                     "Adding new benchmark with size %d bytes "
                     "exceeds maximum size %d bytes, %d items",
                     size,
@@ -79,6 +72,13 @@ class BenchmarkCache:
 
         self._benchmarks[uri] = benchmark
         self._size_in_bytes += size
+
+        logger.debug(
+            "Cached benchmark %s. Cache size = %d bytes, %d items",
+            uri,
+            self.size_in_bytes,
+            self.size,
+        )
 
     def evict_to_capacity(self, target_size_in_bytes: Optional[int] = None) -> None:
         """Evict benchmarks randomly to reduce the capacity below 50%."""
@@ -96,7 +96,7 @@ class BenchmarkCache:
             del self._benchmarks[key]
 
         if evicted:
-            self.logger.info(
+            logger.info(
                 "Evicted %d benchmarks from cache. "
                 "Benchmark cache size now %d bytes, %d items",
                 evicted,

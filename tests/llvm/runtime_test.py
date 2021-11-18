@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Integrations tests for LLVM runtime support."""
+import sys
 from pathlib import Path
 
 import numpy as np
@@ -16,6 +17,11 @@ from tests.test_main import main
 pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
+@pytest.mark.xfail(
+    sys.platform == "darwin",
+    strict=True,
+    reason="github.com/facebookresearch/CompilerGym/issues/459",
+)
 @pytest.mark.parametrize("runtime_observation_count", [1, 3, 5])
 def test_custom_benchmark_runtime(env: LlvmEnv, tmpdir, runtime_observation_count: int):
     env.reset()
@@ -50,6 +56,11 @@ def test_custom_benchmark_runtime(env: LlvmEnv, tmpdir, runtime_observation_coun
     assert np.all(runtimes > 0)
 
 
+@pytest.mark.xfail(
+    sys.platform == "darwin",
+    strict=True,
+    reason="github.com/facebookresearch/CompilerGym/issues/459",
+)
 @flaky
 def test_custom_benchmark_runtimes_differ(env: LlvmEnv, tmpdir):
     """Same as above, but test that runtimes differ from run to run."""
@@ -136,6 +147,48 @@ def test_invalid_runtime_count(env: LlvmEnv):
         ValueError, match=r"runtimes_per_observation_count must be >= 1"
     ):
         env.runtime_observation_count = -1
+
+
+def test_runtime_observation_count_before_reset(env: LlvmEnv):
+    """Test setting property before reset() is called."""
+    env.runtime_observation_count = 10
+    assert env.runtime_observation_count == 10
+    env.reset()
+    assert env.runtime_observation_count == 10
+
+
+def test_runtime_warmup_runs_count_before_reset(env: LlvmEnv):
+    """Test setting property before reset() is called."""
+    env.runtime_warmup_runs_count = 10
+    assert env.runtime_warmup_runs_count == 10
+    env.reset()
+    assert env.runtime_warmup_runs_count == 10
+
+
+def test_runtime_observation_count_fork(env: LlvmEnv):
+    """Test that custom count properties propagate on fork()."""
+    env.runtime_observation_count = 2
+    env.runtime_warmup_runs_count = 1
+
+    with env.fork() as fkd:
+        assert fkd.runtime_observation_count == 2
+        assert fkd.runtime_warmup_runs_count == 1
+
+    env.reset()
+    with env.fork() as fkd:
+        assert fkd.runtime_observation_count == 2
+        assert fkd.runtime_warmup_runs_count == 1
+
+
+def test_default_runtime_observation_count_fork(env: LlvmEnv):
+    """Test that default property values propagate on fork()."""
+    env.reset()
+    rc = env.runtime_observation_count
+    wc = env.runtime_warmup_runs_count
+
+    with env.fork() as fkd:
+        assert fkd.runtime_observation_count == rc
+        assert fkd.runtime_warmup_runs_count == wc
 
 
 if __name__ == "__main__":

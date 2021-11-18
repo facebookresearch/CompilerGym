@@ -36,6 +36,8 @@ from typing import Dict, Iterable, List, Optional, Tuple
 from compiler_gym.envs.llvm.service.passes.common import Pass
 from compiler_gym.envs.llvm.service.passes.config import CREATE_PASS_NAME_MAP
 
+logger = logging.getLogger(__name__)
+
 # A regular expression to match the start of an invocation of one of the
 # InitializePass helper macros.
 INITIALIZE_PASS_RE = r"(INITIALIZE_PASS|INITIALIZE_PASS_BEGIN|INITIALIZE_PASS_WITH_OPTIONS|INITIALIZE_PASS_WITH_OPTIONS_BEGIN)\("
@@ -221,11 +223,11 @@ def handle_file(source_path: Path) -> Tuple[Path, List[Pass]]:
             sys.exit(1)
 
     if passes:
-        logging.debug(
+        logger.debug(
             f"Extracted {len(passes)} {'passes' if len(passes) - 1 else 'pass'} from {source_path}",
         )
     else:
-        logging.debug(f"Found no passes in {source_path}")
+        logger.debug(f"Found no passes in {source_path}")
 
     return passes
 
@@ -245,7 +247,7 @@ def main(argv):
             universal_newlines=True,
         )
         matching_paths += grep.strip().split("\n")
-        logging.debug("Processing %s files ...", len(matching_paths))
+        logger.debug("Processing %s files ...", len(matching_paths))
         paths = [Path(path) for path in matching_paths]
 
     # Build a list of pass entries.

@@ -21,18 +21,19 @@ pytest_plugins = ["tests.pytest_plugins.common"]
 def test_dataset__invalid_name(invalid_name: str):
     """Test that invalid dataset names raise an error on init."""
 
-    with pytest.raises(ValueError) as e_ctx:
+    with pytest.raises(
+        ValueError,
+        match=(
+            f"Invalid dataset name: '{invalid_name}'. "
+            "Dataset name must be in the form: '{{protocol}}://{{name}}-v{{version}}'"
+        ),
+    ):
         Dataset(
             name=invalid_name,
             description="A test dataset",
             license="MIT",
             site_data_base="test",
         )
-
-    assert str(e_ctx.value) == (
-        f"Invalid dataset name: '{invalid_name}'. "
-        "Dataset name must be in the form: '{{protocol}}://{{name}}-v{{version}}'"
-    )
 
 
 def test_dataset_properties():
@@ -234,6 +235,12 @@ def test_benchmarks_iter():
     dataset = DatasetForTesting()
     assert list(dataset.benchmarks()) == [1, 2, 3]
     assert list(dataset) == [1, 2, 3]
+
+
+def test_logger_is_deprecated():
+    dataset = DatasetForTesting()
+    with pytest.deprecated_call(match="The `Dataset.logger` attribute is deprecated"):
+        dataset.logger
 
 
 if __name__ == "__main__":

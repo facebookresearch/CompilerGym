@@ -122,24 +122,61 @@ message StepReply {
   repeated Observation observation = 4;
 }
 
-// A description of an action space.
-//
-// \warning This message format is likely to change. This currently only
-//     supports flat action spaces of categorical values. In the future we will
-//     want to replace this with a more extensible representation that supports
-//     parameterized actions, and actions of different types (e.g. optimization
-//     passes vs optimization contexts).
+// A description of an action space. An action space consists of one or more
+// choices that can be made by an agent in a call to Step(). An action space
+// with a single choice is scalar; an action-space with `n` choices represents
+// an `n`-dimensional action space.
 message ActionSpace {
   // The name of the action space.
   string name = 1;
-  // A list of discrete action names.
-  repeated string action = 2;
+  // The list of choices that comprise this action.
+  repeated ChoiceSpace choice = 2;
+  // An optional list of names for the choices.
+  bool named_choices = 3;
 }
 
 // An action.
 message Action {
-  // An index into the ActionSpace.action list.
-  int32 action = 1;
+  // A list of choices that corresponds to the ActionSpace's choice list.
+  repeated Choice choice = 1;
+}
+
+// The space for a single choice. An Action comprises one or more choices.
+message ChoiceSpace {
+  // An optional name for this choice. Only required if
+  // ActionSpace.named_choices is set.
+  string name = 1;
+  // The choice space.
+  oneof space {
+    // A bounded integer choice.
+    ScalarRange int64_range = 2;
+    // A possibly bounded real-valued choice.
+    ScalarRange double_range = 3;
+    // A discrete space in which every point in the space is named.
+    NamedDiscreteSpace named_discrete_space = 4;
+  }
+}
+
+// A single choice. An Action comprises one or more Choices.
+message Choice {
+  // The value of the choice, corresponding to the ChoiceSpace from the
+  // ActionSpace.choice list.
+  oneof value {
+    int64 int64_value = 1;
+    double double_value = 2;
+    int64 named_discrete_value_index = 3;
+  }
+}
+
+// A discrete space in which every point in the space is named. This can be used
+// for representing enumerations.
+message NamedDiscreteSpace {
+  // A list of names for every value in the space. The order in which these
+  // values are returned is used.
+  repeated string value = 1;
+  // If true, the set of space can be interpreted as a list of command line
+  // flags.
+  bool is_commandline = 2;
 }
 
 // An observations from a compiler.
@@ -256,8 +293,7 @@ message GetSpacesRequest {}
 
 // A GetSpaces() reply.
 message GetSpacesReply {
-  // The initial space of actions. Subsequent calls to step() may produce
-  // a new action space.
+  // A list of one or more action spaces that the service supports.
   repeated ActionSpace action_space_list = 1;
   // A list of available observation spaces. A service may support one or more
   // observation spaces.
@@ -323,6 +359,7 @@ message File {
 
 // An AddBenchmark() request.
 message AddBenchmarkRequest {
+  // A list of benchmarks to add.
   repeated Benchmark benchmark = 1;
 }
 
@@ -331,7 +368,9 @@ message AddBenchmarkReply {}
 
 // An arbitrary string parameter value for a session.
 message SessionParameter {
+  // A string key.
   string key = 1;
+  // A string value.
   string value = 2;
 }
 
