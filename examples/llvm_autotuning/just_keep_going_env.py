@@ -12,8 +12,8 @@ logger = logging.getLogger(__name__)
 # TODO(github.com/facebookresearch/CompilerGym/issues/469): Once step() and
 # reset() no longer raise exceptions than this wrapper class can be removed.
 class JustKeepGoingEnv(CompilerEnvWrapper):
-    """This wrapper class prevents the step(), reset(), or close() methods from
-    raising an exception.
+    """This wrapper class prevents the step() and close() methods from raising
+    an exception.
 
         Just keep swimming ...
             |\\    o
@@ -56,12 +56,16 @@ class JustKeepGoingEnv(CompilerEnvWrapper):
             return default_observation, default_reward, True, {"error_details": str(e)}
 
     def reset(self, *args, **kwargs):
-        try:
-            return super().reset(*args, **kwargs)
-        except Exception as e:  # pylint: disable=broad-except
-            logger.warning("reset() error, retrying: %s", e)
-            self.close()
-            return self.reset(*args, **kwargs)
+        for _ in range(5):
+            try:
+                return super().reset(*args, **kwargs)
+            except Exception as e:  # pylint: disable=broad-except
+                logger.warning("reset() error, retrying: %s", e)
+                self.close()
+                return self.reset(*args, **kwargs)
+
+        # No more retries.
+        return super().reset(*args, **kwargs)
 
     def close(self):
         try:

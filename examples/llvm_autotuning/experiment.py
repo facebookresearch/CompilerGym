@@ -165,11 +165,14 @@ class Experiment(BaseModel):
 def _experiment_worker(
     autotuner: Autotuner, benchmark: str, results_path: Path, seed: int
 ) -> None:
-    with autotuner.optimization_target.make_env(benchmark) as env:
-        env.seed(seed)
-        env.action_space.seed(seed)
-        state = autotuner(env, seed=seed)
+    try:
+        with autotuner.optimization_target.make_env(benchmark) as env:
+            env.seed(seed)
+            env.action_space.seed(seed)
+            state = autotuner(env, seed=seed)
 
-    logger.info("State %s", state)
-    with CompilerEnvStateWriter(open(results_path, "w")) as writer:
-        writer.write_state(state, flush=True)
+        logger.info("State %s", state)
+        with CompilerEnvStateWriter(open(results_path, "w")) as writer:
+            writer.write_state(state, flush=True)
+    except Exception as e:  # pylint: disable=broad-except
+        logger.warning("Autotuner failed on benchmark %s: %s", benchmark, e)

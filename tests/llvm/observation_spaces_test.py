@@ -1218,8 +1218,8 @@ def test_runtime_observation_space(env: LlvmEnv):
     value: np.ndarray = env.observation[key]
     print(value.tolist())  # For debugging in case of error.
     assert isinstance(value, np.ndarray)
-    assert env.runtime_observation_count == 30
-    assert value.shape == (30,)
+    assert env.runtime_observation_count == 1
+    assert value.shape == (1,)
 
     assert not space.deterministic
     assert space.platform_dependent
@@ -1228,8 +1228,6 @@ def test_runtime_observation_space(env: LlvmEnv):
 
     for buildtime in value:
         assert buildtime > 0
-
-    assert len(set(value)) > 1
 
 
 @pytest.mark.xfail(
