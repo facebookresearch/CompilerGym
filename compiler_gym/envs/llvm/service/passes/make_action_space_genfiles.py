@@ -81,8 +81,8 @@ import logging
 import sys
 from pathlib import Path
 
-from compiler_gym.envs.llvm.service.passes.common import Pass
-from compiler_gym.envs.llvm.service.passes.config import EXTRA_LLVM_HEADERS
+from common import Pass
+from config import EXTRA_LLVM_HEADERS
 
 logger = logging.getLogger(__name__)
 

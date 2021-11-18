@@ -33,8 +33,8 @@ import sys
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
 
-from compiler_gym.envs.llvm.service.passes.common import Pass
-from compiler_gym.envs.llvm.service.passes.config import CREATE_PASS_NAME_MAP
+from common import Pass
+from config import CREATE_PASS_NAME_MAP
 
 logger = logging.getLogger(__name__)
 
