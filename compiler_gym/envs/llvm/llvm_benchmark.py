@@ -259,7 +259,9 @@ def make_benchmark(
 
     :raises TypeError: If the inputs are of unsupported types.
 
-    :raises OSError: If a compilation job fails.
+    :raises OSError: If a suitable compiler cannot be found.
+
+    :raises BenchmarkInitError: If a compilation job fails.
 
     :raises TimeoutExpired: If a compilation job exceeds :code:`timeout`
         seconds.
