@@ -8,7 +8,6 @@ executor:
     # Specifies the number of parallel worker processes. If -1, defaults to the
     # number of cores on the machine.
     cpus: -1
-search_time_seconds: 3600
 # The base directory for logs and other runtime artifacts.
 outputs: ${env:HOME}/logs/compiler_gym/llvm_autotuning
 # The top subdirectory to arrange files in. Use this to group related runs by
