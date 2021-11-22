@@ -746,7 +746,7 @@ class CompilerEnv(gym.Env):
 
             if retry_count >= self._connection_settings.init_max_attempts:
                 raise OSError(
-                    f"Failed to reset environment after {retry_count - 1} attempts.\n"
+                    f"Failed to reset environment using benchmark {self.benchmark} after {retry_count - 1} attempts.\n"
                     f"Last error ({type(error).__name__}): {error}"
                 ) from error
             else:
