@@ -236,6 +236,9 @@ WWW_OUTS = \
 	www/frontends/compiler_gym/node_modules \
 	$(NULL)
 
+# The name of the docker image built by the "www-image" target.
+WWW_IMAGE_TAG ?= chriscummins/compiler_gym-www
+
 www: www-build
 	cd www && $(PYTHON) www.py
 
@@ -243,8 +246,8 @@ www-build:
 	cd www/frontends/compiler_gym && npm ci && npm run build
 
 www-image: www-build
-	cd www && docker build -t chriscummins/compiler_gym-www .
-	docker run -p 5000:5000 chriscummins/compiler_gym-www
+	cd www && docker build -t "$(WWW_IMAGE_TAG)" .
+	docker run -p 5000:5000 "$(WWW_IMAGE_TAG)"
 
 .PHONY: www www-build
 
