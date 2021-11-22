@@ -12,6 +12,7 @@ import gym
 import pytest
 
 from compiler_gym.datasets import Benchmark
+from compiler_gym.datasets.uri import BENCHMARK_URI_RE
 from compiler_gym.envs import LlvmEnv, llvm
 from compiler_gym.service.proto import Benchmark as BenchmarkProto
 from compiler_gym.service.proto import File
@@ -115,7 +116,8 @@ def test_custom_benchmark_constructor():
 def test_make_benchmark_single_bitcode(env: LlvmEnv):
     benchmark = llvm.make_benchmark(EXAMPLE_BITCODE_FILE)
 
-    assert benchmark == f"file:///{EXAMPLE_BITCODE_FILE}"
+    assert benchmark == f"benchmark://file-v0{EXAMPLE_BITCODE_FILE}"
+    assert BENCHMARK_URI_RE.match(benchmark.uri)
 
     with open(EXAMPLE_BITCODE_FILE, "rb") as f:
         contents = f.read()
@@ -131,7 +133,8 @@ def test_make_benchmark_single_bitcode(env: LlvmEnv):
 def test_make_benchmark_single_ll():
     """Test passing a single .ll file into make_benchmark()."""
     benchmark = llvm.make_benchmark(INVALID_IR_PATH)
-    assert benchmark.uri.startswith("benchmark://user/")
+    assert benchmark.uri.startswith("benchmark://user-v0/")
+    assert BENCHMARK_URI_RE.match(benchmark.uri)
 
 
 def test_make_benchmark_single_clang_job(env: LlvmEnv):

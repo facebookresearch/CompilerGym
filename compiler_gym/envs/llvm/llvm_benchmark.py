@@ -277,7 +277,7 @@ def make_benchmark(
             raise FileNotFoundError(path)
 
         if path.suffix == ".bc":
-            bitcodes.append(path)
+            bitcodes.append(path.absolute())
         elif path.suffix in {".c", ".cxx", ".cpp", ".cc"}:
             clang_jobs.append(
                 ClangInvocation.from_c_file(
@@ -307,7 +307,9 @@ def make_benchmark(
     # Shortcut if we only have a single pre-compiled bitcode.
     if len(bitcodes) == 1 and not clang_jobs:
         bitcode = bitcodes[0]
-        return Benchmark.from_file(uri=f"file:///{bitcode}", path=bitcode)
+        return Benchmark.from_file(
+            uri=os.path.join("benchmark://file-v0", bitcode), path=bitcode
+        )
 
     tmpdir_root = transient_cache_path(".")
     tmpdir_root.mkdir(exist_ok=True, parents=True)
@@ -378,5 +380,5 @@ def make_benchmark(
                 )
 
     timestamp = datetime.now().strftime("%Y%m%HT%H%M%S")
-    uri = f"benchmark://user/{timestamp}-{random.randrange(16**4):04x}"
+    uri = f"benchmark://user-v0/{timestamp}-{random.randrange(16**4):04x}"
     return Benchmark.from_file_contents(uri, bitcode)
