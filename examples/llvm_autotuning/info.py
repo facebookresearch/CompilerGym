@@ -42,6 +42,8 @@ def info(
         if not len(df):
             continue
 
+        df.to_csv(experiment.working_directory / "results.csv", index=False)
+
         walltimes = df[["benchmark", "walltime"]].groupby("benchmark").mean()
         rewards = df[["benchmark", "reward"]].groupby("benchmark").agg(geometric_mean)
         num_results = len(df)
