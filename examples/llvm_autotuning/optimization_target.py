@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 import logging
 from enum import Enum
+from pathlib import Path
 from threading import Lock
 
 import numpy as np
@@ -32,7 +33,12 @@ class OptimizationTarget(str, Enum):
         }[self.value]
 
     def make_env(self, benchmark: str) -> LlvmEnv:
-        env: LlvmEnv = compiler_gym.make("llvm-v0", benchmark=benchmark)
+        env: LlvmEnv = compiler_gym.make("llvm-v0")
+
+        if benchmark.startswith("file:///"):
+            benchmark = env.make_benchmark(Path(benchmark[len("file:///") :]))
+
+        env.benchmark = benchmark
 
         if self.value == OptimizationTarget.CODESIZE:
             env.reward_space = "IrInstructionCountOz"
@@ -70,15 +76,13 @@ class OptimizationTarget(str, Enum):
             raise ValueError("Failed to replay environment's actions")
 
         if self.value == OptimizationTarget.CODESIZE:
-            return (
-                env.observation.IrInstructionCountOz()
-                / env.observation.IrInstructionCount()
+            return env.observation.IrInstructionCountOz() / max(
+                env.observation.IrInstructionCount(), 1
             )
 
         if self.value == OptimizationTarget.BINSIZE:
-            return (
-                env.observation.ObjectTextSizeOz()
-                / env.observation.ObjectTextSizeBytes()
+            return env.observation.ObjectTextSizeOz() / max(
+                env.observation.ObjectTextSizeBytes(), 1
             )
 
         if self.value == OptimizationTarget.RUNTIME:
@@ -98,7 +102,7 @@ class OptimizationTarget(str, Enum):
 
                 logger.debug("O3 runtimes: %s", o3_runtimes)
                 logger.debug("Final runtimes: %s", final_runtimes)
-                speedup = np.median(o3_runtimes) / np.median(final_runtimes)
+                speedup = np.median(o3_runtimes) / max(np.median(final_runtimes), 1e-12)
                 logger.debug("Speedup: %.4f", speedup)
 
                 return speedup
