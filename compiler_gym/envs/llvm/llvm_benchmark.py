@@ -305,11 +305,9 @@ def make_benchmark(
                 raise TypeError(f"Invalid input type: {type(input).__name__}")
 
     # Shortcut if we only have a single pre-compiled bitcode.
-    if len(bitcodes) == 1 and not clang_jobs:
+    if len(bitcodes) == 1 and not clang_jobs and not ll_paths:
         bitcode = bitcodes[0]
-        return Benchmark.from_file(
-            uri=os.path.join("benchmark://file-v0", bitcode), path=bitcode
-        )
+        return Benchmark.from_file(uri=f"benchmark://file-v0{bitcode}", path=bitcode)
 
     tmpdir_root = transient_cache_path(".")
     tmpdir_root.mkdir(exist_ok=True, parents=True)
