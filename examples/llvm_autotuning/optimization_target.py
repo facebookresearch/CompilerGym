@@ -6,11 +6,13 @@ import logging
 from enum import Enum
 from pathlib import Path
 from threading import Lock
+from typing import Union
 
 import numpy as np
 from llvm_autotuning.just_keep_going_env import JustKeepGoingEnv
 
 import compiler_gym
+from compiler_gym.datasets import Benchmark
 from compiler_gym.envs import LlvmEnv
 from compiler_gym.wrappers import RuntimePointEstimateReward
 
@@ -32,10 +34,12 @@ class OptimizationTarget(str, Enum):
             OptimizationTarget.RUNTIME: "Runtime",
         }[self.value]
 
-    def make_env(self, benchmark: str) -> LlvmEnv:
+    def make_env(self, benchmark: Union[str, Benchmark]) -> LlvmEnv:
         env: LlvmEnv = compiler_gym.make("llvm-v0")
 
-        if benchmark.startswith("file:///"):
+        # TODO(cummins): This does not work with custom benchmarks, as the URI
+        # will not be known to the new environment.
+        if str(benchmark).startswith("file:///"):
             benchmark = env.make_benchmark(Path(benchmark[len("file:///") :]))
 
         env.benchmark = benchmark
