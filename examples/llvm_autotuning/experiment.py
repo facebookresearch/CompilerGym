@@ -83,7 +83,7 @@ class Experiment(BaseModel):
                             self.working_directory / f"results-{results_num:03d}.csv"
                         )
                         errors_path = (
-                            self.working_directory / f"errors-{results_num:03d}.csv"
+                            self.working_directory / f"errors-{results_num:03d}.json"
                         )
                         executor.submit(
                             _experiment_worker,
