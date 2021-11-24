@@ -20,11 +20,11 @@ This is an example of how to create your own CompilerGym environment. All paths 
 
 Run `example.py` example:
 ```sh
-$ bazel run //examples/example_unrolling_service:example
+$ bazel run //examples/loop_optimizations_service:example
 ```
 
 Run `env_tests.py` unit tests:
 
 ```sh
-$ bazel test //examples/example_unrolling_service:env_tests
+$ bazel test //examples/loop_optimizations_service:env_tests
 ```

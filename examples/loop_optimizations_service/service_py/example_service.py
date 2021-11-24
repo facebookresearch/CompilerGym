@@ -41,18 +41,36 @@ class UnrollingCompilationSession(CompilationSession):
     # The list of actions that are supported by this service.
     action_spaces = [
         ActionSpace(
-            name="unrolling",
+            name="loop-opt",
             choice=[
                 ChoiceSpace(
-                    name="unroll_choice",
+                    name="interleave",
                     named_discrete_space=NamedDiscreteSpace(
                         value=[
+                            "-disable-loop-unrolling",
                             "-loop-unroll -unroll-count=2",
                             "-loop-unroll -unroll-count=4",
                             "-loop-unroll -unroll-count=8",
+                            "-loop-unroll -unroll-count=16",
+                            "-loop-unroll -unroll-count=32",
+                            "-loop-unroll -unroll-count=64",
                         ],
                     ),
-                )
+                ),
+                ChoiceSpace(
+                    name="vectorize",
+                    named_discrete_space=NamedDiscreteSpace(
+                        value=[
+                            "-disable-loop-vectorize",
+                            "-loop-vectorize -force-vector-width=2",
+                            "-loop-vectorize -force-vector-width=4",
+                            "-loop-vectorize -force-vector-width=8",
+                            "-loop-vectorize -force-vector-width=16",
+                            "-loop-vectorize -force-vector-width=32",
+                            "-loop-vectorize -force-vector-width=64",
+                        ],
+                    ),
+                ),
             ],
         )
     ]
@@ -102,7 +120,7 @@ class UnrollingCompilationSession(CompilationSession):
         working_directory: Path,
         action_space: ActionSpace,
         benchmark: Benchmark,
-        use_custom_opt: bool = True,
+        use_custom_opt: bool = False,
     ):
         super().__init__(working_directory, action_space, benchmark)
         logging.info("Started a compilation session for %s", benchmark.uri)
