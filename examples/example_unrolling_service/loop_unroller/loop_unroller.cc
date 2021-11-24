@@ -72,6 +72,7 @@ class LoopCounter : public llvm::FunctionPass {
  public:
   static char ID;
   std::unordered_map<std::string, int> counts;
+  std::vector<int> line_numbers;
 
   LoopCounter() : FunctionPass(ID) {}
 
@@ -85,6 +86,15 @@ class LoopCounter : public llvm::FunctionPass {
 
     // Should really account for module, too.
     counts[F.getName().str()] = Loops.size();
+
+    for (auto L : Loops) {
+      // any of these lines throws "dyld: lazy symbol binding failed: Symbol not found" error
+      L->getLoopID()->dump();
+      // L->dump();
+      // L->getLocRange().getStart().dump();
+      // L->getLocRange().getEnd().dump();
+      // line_numbers.push_back( L->getStartLoc().getLine());
+    }
 
     return false;
   }
@@ -114,11 +124,11 @@ class LoopUnrollConfigurator : public llvm::FunctionPass {
     auto Loops = LI.getLoopsInPreorder();
 
     // Should really account for module, too.
-    for (auto ALoop : Loops) {
+    for (auto L : Loops) {
       if (UnrollEnable)
-        addStringMetadataToLoop(ALoop, "llvm.loop.unroll.enable", UnrollEnable);
+        addStringMetadataToLoop(L, "llvm.loop.unroll.enable", UnrollEnable);
       if (UnrollCount)
-        addStringMetadataToLoop(ALoop, "llvm.loop.unroll.count", UnrollCount);
+        addStringMetadataToLoop(L, "llvm.loop.unroll.count", UnrollCount);
     }
 
     return false;
@@ -193,6 +203,9 @@ int main(int argc, char** argv) {
   // Log loop stats
   for (auto& x : Counter->counts) {
     llvm::dbgs() << x.first << ": " << x.second << " loops" << '\n';
+  }
+  for (auto& x : Counter->line_numbers) {
+    llvm::dbgs() << x << '\n';
   }
 
   Out.keep();
