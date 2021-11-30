@@ -32,6 +32,9 @@ jobs:
             - name: Install build dependencies
               uses: ./.github/actions/install-build-dependencies
 
+            - name: Nuke the cache
+              run: make distclean
+
             - name: Build Python wheel
               run: make bdist_wheel bdist_wheel-linux-rename
               env:
@@ -69,6 +72,9 @@ jobs:
 
             - name: Install build dependencies
               uses: ./.github/actions/install-build-dependencies
+
+            - name: Nuke the cache
+              run: make distclean
 
             - name: Build Python wheel
               run: make bdist_wheel
