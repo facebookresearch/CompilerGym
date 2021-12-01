@@ -14,7 +14,7 @@ print("observation: ", observation)
 
 print()
 
-observation, reward, done, info = env.step(env.action_space.sample())
+observation, reward, done, info = env.step(0, 32)
 print("observation: ", observation)
 print("reward: ", reward)
 print("done: ", done)

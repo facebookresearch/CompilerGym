@@ -22,7 +22,6 @@ from compiler_gym.service.proto import (
     ActionSpace,
     Benchmark,
     ChoiceSpace,
-    NamedDiscreteSpace,
     Observation,
     ObservationSpace,
     ScalarLimit,
@@ -44,31 +43,17 @@ class UnrollingCompilationSession(CompilationSession):
             name="loop-opt",
             choice=[
                 ChoiceSpace(
-                    name="interleave",
-                    named_discrete_space=NamedDiscreteSpace(
-                        value=[
-                            "-disable-loop-unrolling",
-                            "-loop-unroll -unroll-count=2",
-                            "-loop-unroll -unroll-count=4",
-                            "-loop-unroll -unroll-count=8",
-                            "-loop-unroll -unroll-count=16",
-                            "-loop-unroll -unroll-count=32",
-                            "-loop-unroll -unroll-count=64",
-                        ],
+                    name="unroll",
+                    int64_range=ScalarRange(
+                        min=ScalarLimit(value=0),
+                        max=None,  # no upper bound
                     ),
                 ),
                 ChoiceSpace(
                     name="vectorize",
-                    named_discrete_space=NamedDiscreteSpace(
-                        value=[
-                            "-disable-loop-vectorize",
-                            "-loop-vectorize -force-vector-width=2",
-                            "-loop-vectorize -force-vector-width=4",
-                            "-loop-vectorize -force-vector-width=8",
-                            "-loop-vectorize -force-vector-width=16",
-                            "-loop-vectorize -force-vector-width=32",
-                            "-loop-vectorize -force-vector-width=64",
-                        ],
+                    int64_range=ScalarRange(
+                        min=ScalarLimit(value=0),
+                        max=None,  # no upper bound
                     ),
                 ),
             ],
