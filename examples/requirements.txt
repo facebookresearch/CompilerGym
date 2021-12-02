@@ -11,7 +11,7 @@ pandas>=1.1.5
 ray[default,rllib]==1.8.0
 submitit>=1.2.0
 submitit>=1.2.0
-tensorflow==2.6.0
+tensorflow==2.6.1
 torch>=1.6.0
 typer[all]>=0.3.2
 typing-extensions~=3.7.4  # Pin version for tensorflow.
