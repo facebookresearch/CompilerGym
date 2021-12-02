@@ -14,6 +14,7 @@ ENV COMPILER_GYM_VERSION=0.1.10
 # Put the runtime downloads in a convenient location.
 ENV COMPILER_GYM_CACHE=/compiler_gym/cache
 ENV COMPILER_GYM_SITE_DATA=/compiler_gym/site_data
+ENV COMPILER_GYM_TRANSIENT_CACHE=/compiler_gym/cache/transient
 
 # We need a C/C++ toolchain to build the CompilerGym python dependencies and to
 # provide the system includes for the LLVM environment.
