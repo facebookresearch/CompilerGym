@@ -35,6 +35,13 @@ def test_docker_default_action_space():
         assert env.action_spaces[0].names[0] == "-O0"
 
 
+def test_gcc_bin(gcc_bin: str):
+    """Test that the environment reports the service's reward spaces."""
+    with gym.make("gcc-v0", gcc_bin=gcc_bin) as env:
+        env.reset()
+        assert env.gcc_spec.gcc.bin == gcc_bin
+
+
 @pytest.mark.xfail(
     not docker_is_available(),
     strict=True,
