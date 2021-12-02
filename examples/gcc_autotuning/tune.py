@@ -161,7 +161,7 @@ class SearchResult(NamedTuple):
 def run_search(search: str, benchmark: str, seed: int) -> SearchResult:
     """Run a search and return the search class instance."""
     with GCC_ENV_CONSTRUCTOR_LOCK:
-        env = compiler_gym.make("gcc-v0")
+        env = compiler_gym.make("gcc-v0", gcc_bin=FLAGS.gcc_bin)
 
     try:
         random.seed(seed)
