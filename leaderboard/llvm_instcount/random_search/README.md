@@ -126,5 +126,5 @@ value for the search on the test set. For example:
 $ python random_search.py \
     --search_time=30 \
     --patience_ratio=1.25 \
-    --logfile=results_p125_t30.csv
+    --leaderboard_results=results_p125_t30.csv
 ```
