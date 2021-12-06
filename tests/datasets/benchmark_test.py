@@ -49,7 +49,6 @@ def test_invalid_benchmark_uris():
     assert not BENCHMARK_URI_RE.match("benchmark://cbench-v0/")  # Missing benchmark ID
 
     # Invalid benchmark ID
-    assert not BENCHMARK_URI_RE.match("benchmark://cbench-v1/ whitespace")  # Whitespace
     assert not BENCHMARK_URI_RE.match("benchmark://cbench-v1/\t")  # Whitespace
 
 
@@ -90,6 +89,7 @@ def test_benchmark_uri_id():
         )
         == "foo/123.txt"
     )
+    # Query parameters are allowed in benchmark URIs.
     assert (
         _rgx_match(
             BENCHMARK_URI_RE,
@@ -98,6 +98,12 @@ def test_benchmark_uri_id():
         )
         == "foo/123?param=true&false"
     )
+    # Whitespace is allowed in benchmark URIs.
+    assert (
+        _rgx_match(
+            BENCHMARK_URI_RE, "benchmark_name", "benchmark://cbench-v1/ white space"
+        )
+    ) == " white space"
 
 
 def test_benchmark_attribute_outside_init():
