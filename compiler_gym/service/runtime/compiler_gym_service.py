@@ -189,11 +189,10 @@ class CompilerGymService(CompilerGymServiceServicerStub):  # pragma: no cover
             context.set_details(f"Session not found: {request.session_id}")
             return reply
 
-        session = self.sessions[request.session_id]
-
         reply.action_had_no_effect = True
 
         with exception_to_grpc_status(context):
+            session = self.sessions[request.session_id]
             for action in request.action:
                 reply.end_of_session, nas, ahne = session.apply_action(action)
                 reply.action_had_no_effect &= ahne
