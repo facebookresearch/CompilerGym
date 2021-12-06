@@ -18,6 +18,8 @@ from compiler_gym.service.proto import (
 from compiler_gym.service.proto import (
     EndSessionReply,
     EndSessionRequest,
+    ForkSessionReply,
+    ForkSessionRequest,
     GetSpacesReply,
     GetSpacesRequest,
     GetVersionReply,
@@ -145,6 +147,22 @@ class CompilerGymService(CompilerGymServiceServicerStub):  # pragma: no cover
 
             reply.session_id = self.next_session_id
             self.sessions[reply.session_id] = session
+            self.next_session_id += 1
+
+        return reply
+
+    def ForkSession(self, request: ForkSessionRequest, context) -> ForkSessionReply:
+        logger.debug(
+            "ForkSession(id=%d), [%s]",
+            request.session_id,
+            self.next_session_id,
+        )
+
+        reply = ForkSessionReply()
+        with exception_to_grpc_status(context):
+            session = self.sessions[request.session_id]
+            self.sessions[reply.session_id] = session.fork()
+            reply.session_id = self.next_session_id
             self.next_session_id += 1
 
         return reply
