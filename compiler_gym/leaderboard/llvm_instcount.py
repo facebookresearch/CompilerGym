@@ -282,7 +282,7 @@ def eval_llvm_instcount_policy(policy: Policy) -> None:
                         "\r\033[2A"
                         "\033[K"
                         f"Runtime: {humanize_duration_hms(time)}. "
-                        f"Estimated completion: {humanize_duration_hms(time + mean_walltime * remaining_count)}. "
+                        f"Estimated completion: {humanize_duration_hms(mean_walltime * remaining_count)}. "
                         f"Completed: {humanize.intcomma(done_count)} / {humanize.intcomma(total_count)} "
                         f"({done_count / total_count:.1%})."
                         "\n\033[K"
