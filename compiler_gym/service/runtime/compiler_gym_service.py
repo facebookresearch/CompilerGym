@@ -42,6 +42,7 @@ logger = logging.getLogger(__name__)
 @contextmanager
 def exception_to_grpc_status(context):  # pragma: no cover
     def handle_exception_as(exception, code):
+        logger.warning("%s: %s", type(exception).__name__, exception)
         context.set_code(code)
         context.set_details(str(exception))
 
