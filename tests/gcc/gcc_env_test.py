@@ -35,6 +35,10 @@ def test_docker_default_action_space():
         assert env.action_spaces[0].names[0] == "-O0"
 
 
+@pytest.mark.xfail(
+    not docker_is_available(),
+    reason="github.com/facebookresearch/CompilerGym/issues/459",
+)
 def test_gcc_bin(gcc_bin: str):
     """Test that the environment reports the service's reward spaces."""
     with gym.make("gcc-v0", gcc_bin=gcc_bin) as env:
@@ -44,7 +48,6 @@ def test_gcc_bin(gcc_bin: str):
 
 @pytest.mark.xfail(
     not docker_is_available(),
-    strict=True,
     reason="github.com/facebookresearch/CompilerGym/issues/459",
 )
 def test_observation_spaces_failing_because_of_bug(gcc_bin: str):
