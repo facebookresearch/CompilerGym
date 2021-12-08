@@ -163,7 +163,13 @@ Benchmark::Benchmark(const std::string& name, std::unique_ptr<llvm::LLVMContext>
       needsRecompile_(true) {
   sys::error_code ec;
   fs::create_directory(scratchDirectory(), ec);
-  CHECK(!ec) << "Failed to create scratch directory: " << scratchDirectory();
+  CHECK(!ec) << "Failed to create scratch directory: " << scratchDirectory().string();
+}
+
+void Benchmark::close() {
+  sys::error_code ec;
+  fs::remove_all(scratchDirectory(), ec);
+  CHECK(!ec) << "Failed to delete scratch directory: " << scratchDirectory().string();
 }
 
 std::unique_ptr<Benchmark> Benchmark::clone(const fs::path& workingDirectory) const {

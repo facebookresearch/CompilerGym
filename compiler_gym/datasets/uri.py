@@ -18,7 +18,7 @@ DATASET_NAME_RE = re.compile(DATASET_NAME_PATTERN)
 #     {{protocol}}://{{dataset}}/{{id}}
 #
 # Example matches: "benchmark://foo-v0/foo" or "generator://bar-v1/foo/bar.txt".
-BENCHMARK_URI_PATTERN = r"(?P<dataset>(?P<dataset_protocol>[a-zA-z0-9-_]+)://(?P<dataset_name>[a-zA-z0-9-_]+-v(?P<dataset_version>[0-9]+)))/(?P<benchmark_name>[^\s]+)$"
+BENCHMARK_URI_PATTERN = r"(?P<dataset>(?P<dataset_protocol>[a-zA-z0-9-_]+)://(?P<dataset_name>[a-zA-z0-9-_]+-v(?P<dataset_version>[0-9]+)))/(?P<benchmark_name>.+)$"
 BENCHMARK_URI_RE = re.compile(BENCHMARK_URI_PATTERN)
 
 

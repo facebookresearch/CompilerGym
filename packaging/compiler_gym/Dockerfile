@@ -9,11 +9,10 @@ FROM python:3.8-slim-buster
 
 LABEL maintainer="Chris Cummins <cummins@fb.com>"
 
-# The version of CompilerGym to install.
-ENV COMPILER_GYM_VERSION=0.1.10
 # Put the runtime downloads in a convenient location.
 ENV COMPILER_GYM_CACHE=/compiler_gym/cache
 ENV COMPILER_GYM_SITE_DATA=/compiler_gym/site_data
+ENV COMPILER_GYM_TRANSIENT_CACHE=/compiler_gym/cache/transient
 
 # We need a C/C++ toolchain to build the CompilerGym python dependencies and to
 # provide the system includes for the LLVM environment.
@@ -27,6 +26,9 @@ RUN apt-get update \
 
 # Create an unversioned library for libtinfo5 so that -ltinfo works.
 RUN ln -s /lib/x86_64-linux-gnu/libtinfo.so.5 /lib/x86_64-linux-gnu/libtinfo.so
+
+# The version of CompilerGym to install.
+ENV COMPILER_GYM_VERSION=0.2.1
 
 # Install CompilerGym.
 RUN python3 -m pip install --no-cache-dir 'compiler_gym=='"$COMPILER_GYM_VERSION"

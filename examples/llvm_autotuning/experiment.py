@@ -5,7 +5,7 @@
 import json
 import logging
 from pathlib import Path
-from typing import Iterable, List
+from typing import Dict, Iterable, List
 
 import gym
 import pandas as pd
@@ -80,13 +80,17 @@ class Experiment(BaseModel):
                     for benchmark in self.benchmarks.benchmark_uris_iterator(env):
                         results_num += 1
                         results_path = (
-                            self.working_directory / f"results-{results_num}.csv"
+                            self.working_directory / f"results-{results_num:03d}.csv"
+                        )
+                        errors_path = (
+                            self.working_directory / f"errors-{results_num:03d}.json"
                         )
                         executor.submit(
                             _experiment_worker,
                             autotuner=self.autotuner,
                             benchmark=benchmark,
                             results_path=results_path,
+                            errors_path=errors_path,
                             seed=self.seed + replica_num,
                         )
 
@@ -107,6 +111,18 @@ class Experiment(BaseModel):
         for path in self.working_directory.iterdir():
             if path.is_file() and path.name.startswith("results-"):
                 yield path
+
+    @property
+    def errors(self) -> Iterable[Dict[str, str]]:
+        """Return an iterator over errors.
+
+        An error is a dictionary with keys: "benchmark", "error_type", and
+        "error_message".
+        """
+        for path in self.working_directory.iterdir():
+            if path.is_file() and path.name.startswith("errors-"):
+                with open(path, "r") as f:
+                    yield json.load(f)
 
     @property
     def configuration_number(self) -> str:
@@ -163,16 +179,30 @@ class Experiment(BaseModel):
 
 
 def _experiment_worker(
-    autotuner: Autotuner, benchmark: str, results_path: Path, seed: int
+    autotuner: Autotuner,
+    benchmark: str,
+    results_path: Path,
+    errors_path: Path,
+    seed: int,
 ) -> None:
     try:
         with autotuner.optimization_target.make_env(benchmark) as env:
             env.seed(seed)
             env.action_space.seed(seed)
             state = autotuner(env, seed=seed)
-
-        logger.info("State %s", state)
-        with CompilerEnvStateWriter(open(results_path, "w")) as writer:
-            writer.write_state(state, flush=True)
     except Exception as e:  # pylint: disable=broad-except
         logger.warning("Autotuner failed on benchmark %s: %s", benchmark, e)
+        with open(errors_path, "w") as f:
+            json.dump(
+                {
+                    "benchmark": benchmark,
+                    "error_type": type(e).__name__,
+                    "error_message": str(e),
+                },
+                f,
+            )
+        return
+
+    logger.info("State %s", state)
+    with CompilerEnvStateWriter(open(results_path, "w")) as writer:
+        writer.write_state(state, flush=True)

@@ -62,7 +62,9 @@ class BenchmarksEntry(BaseModel):
         del kwargs
         del values
         for uri in value:
-            assert BENCHMARK_URI_RE.match(uri), f"Invalid benchmark URI: {uri}"
+            assert BENCHMARK_URI_RE.match(uri) or uri.startswith(
+                "file:///"
+            ), f"Invalid benchmark URI: {uri}"
         return list(value)
 
     def _benchmark_iterator(

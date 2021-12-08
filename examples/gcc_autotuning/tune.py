@@ -7,7 +7,7 @@ import random
 from itertools import islice, product
 from multiprocessing import Lock
 from pathlib import Path
-from typing import List, NamedTuple
+from typing import NamedTuple
 
 import numpy as np
 from absl import app, flags
@@ -161,7 +161,7 @@ class SearchResult(NamedTuple):
 def run_search(search: str, benchmark: str, seed: int) -> SearchResult:
     """Run a search and return the search class instance."""
     with GCC_ENV_CONSTRUCTOR_LOCK:
-        env = compiler_gym.make("gcc-v0")
+        env = compiler_gym.make("gcc-v0", gcc_bin=FLAGS.gcc_bin)
 
     try:
         random.seed(seed)
@@ -191,24 +191,22 @@ def main(argv):
         if search not in _SEARCH_FUNCTIONS:
             raise app.UsageError(f"Invalid --search value: {search}")
 
-    def get_benchmarks_from_all_datasets():
-        """Enumerate first 50 benchmarks from each dataset."""
+    def get_benchmarks():
         benchmarks = []
         with compiler_gym.make("gcc-v0", gcc_bin=FLAGS.gcc_bin) as env:
             env.reset()
-            for dataset in env.datasets:
-                benchmarks += islice(dataset.benchmark_uris(), 50)
+            if FLAGS.gcc_benchmark == ["all"]:
+                for dataset in env.datasets:
+                    benchmarks += islice(dataset.benchmark_uris(), 50)
+            elif FLAGS.gcc_benchmark:
+                for uri in FLAGS.gcc_benchmark:
+                    benchmarks.append(env.datasets.benchmark(uri).uri)
+            else:
+                benchmarks = list(
+                    env.datasets["benchmark://chstone-v0"].benchmark_uris()
+                )
         benchmarks.sort()
         return benchmarks
-
-    def get_chstone_benchmark_uris() -> List:
-        with compiler_gym.make("gcc-v0", gcc_bin=FLAGS.gcc_bin) as env:
-            return list(env.datasets["benchmark://chstone-v0"].benchmark_uris())
-
-    if FLAGS.gcc_benchmark == ["all"]:
-        benchmarks = get_benchmarks_from_all_datasets()
-    else:
-        benchmarks = FLAGS.gcc_benchmark or get_chstone_benchmark_uris()
 
     logdir = (
         Path(FLAGS.output_dir)
@@ -234,8 +232,13 @@ def main(argv):
     with executor.get_executor(logs_dir=logdir) as session:
         jobs = []
         # Submit each search instance as a separate job.
-        grid = product(range(FLAGS.gcc_search_repetitions), FLAGS.search, benchmarks)
+        grid = product(
+            range(FLAGS.gcc_search_repetitions), FLAGS.search, get_benchmarks()
+        )
         for _, search, benchmark in grid:
+            if not benchmark:
+                raise app.UsageError("Empty benchmark name not allowed")
+
             jobs.append(
                 session.submit(
                     run_search,

@@ -130,6 +130,8 @@ class Benchmark {
             std::unique_ptr<llvm::Module> module, const BenchmarkDynamicConfig& dynamicConfig,
             const boost::filesystem::path& workingDirectory, const BaselineCosts& baselineCosts);
 
+  void close();
+
   /**
    * Make a copy of the benchmark.
    *

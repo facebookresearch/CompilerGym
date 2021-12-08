@@ -99,6 +99,7 @@ Status BenchmarkFactory::addBitcode(const std::string& uri, const Bitcode& bitco
       auto iterator = std::next(std::begin(benchmarks_), index);
 
       // Evict the benchmark from the pool of loaded benchmarks.
+      iterator->second.close();
       benchmarks_.erase(iterator);
     }
   }

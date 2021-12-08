@@ -18,6 +18,8 @@ from compiler_gym.service.proto import (
 from compiler_gym.service.proto import (
     EndSessionReply,
     EndSessionRequest,
+    ForkSessionReply,
+    ForkSessionRequest,
     GetSpacesReply,
     GetSpacesRequest,
     GetVersionReply,
@@ -42,6 +44,7 @@ logger = logging.getLogger(__name__)
 @contextmanager
 def exception_to_grpc_status(context):  # pragma: no cover
     def handle_exception_as(exception, code):
+        logger.warning("%s: %s", type(exception).__name__, exception)
         context.set_code(code)
         context.set_details(str(exception))
 
@@ -148,6 +151,22 @@ class CompilerGymService(CompilerGymServiceServicerStub):  # pragma: no cover
 
         return reply
 
+    def ForkSession(self, request: ForkSessionRequest, context) -> ForkSessionReply:
+        logger.debug(
+            "ForkSession(id=%d), [%s]",
+            request.session_id,
+            self.next_session_id,
+        )
+
+        reply = ForkSessionReply()
+        with exception_to_grpc_status(context):
+            session = self.sessions[request.session_id]
+            self.sessions[reply.session_id] = session.fork()
+            reply.session_id = self.next_session_id
+            self.next_session_id += 1
+
+        return reply
+
     def EndSession(self, request: EndSessionRequest, context) -> EndSessionReply:
         del context  # Unused
         logger.debug(
@@ -170,11 +189,10 @@ class CompilerGymService(CompilerGymServiceServicerStub):  # pragma: no cover
             context.set_details(f"Session not found: {request.session_id}")
             return reply
 
-        session = self.sessions[request.session_id]
-
         reply.action_had_no_effect = True
 
         with exception_to_grpc_status(context):
+            session = self.sessions[request.session_id]
             for action in request.action:
                 reply.end_of_session, nas, ahne = session.apply_action(action)
                 reply.action_had_no_effect &= ahne

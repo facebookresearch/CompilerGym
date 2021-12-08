@@ -43,6 +43,9 @@ def test_csmith_random_select(gcc_bin: str, index: int, tmpwd: Path):
         assert (tmpwd / "source.c").is_file()
 
 
+@pytest.mark.xfail(
+    reason="github.com/facebookresearch/CompilerGym/issues/459",
+)
 @with_gcc_support
 def test_random_benchmark(gcc_bin: str):
     with gym.make("gcc-v0", gcc_bin=gcc_bin) as env:
