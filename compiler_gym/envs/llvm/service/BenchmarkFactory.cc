@@ -38,6 +38,15 @@ BenchmarkFactory::BenchmarkFactory(const boost::filesystem::path& workingDirecto
   VLOG(2) << "BenchmarkFactory initialized";
 }
 
+BenchmarkFactory::~BenchmarkFactory() { close(); }
+
+void BenchmarkFactory::close() {
+  VLOG(2) << "BenchmarkFactory closing with " << benchmarks_.size() << " entries";
+  for (auto& entry : benchmarks_) {
+    entry.second.close();
+  }
+}
+
 Status BenchmarkFactory::getBenchmark(const BenchmarkProto& benchmarkMessage,
                                       std::unique_ptr<Benchmark>* benchmark) {
   // Check if the benchmark has already been loaded into memory.
