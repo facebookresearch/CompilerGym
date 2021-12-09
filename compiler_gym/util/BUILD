@@ -68,6 +68,7 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "@boost//:filesystem",
+        "@fmt",
     ],
 )
 
