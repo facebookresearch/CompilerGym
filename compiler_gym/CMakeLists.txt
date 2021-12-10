@@ -112,3 +112,50 @@ cg_py_library(
     compiler_gym::util::util
   PUBLIC
 )
+
+set(_PY_PKG_IN_DIR "${CMAKE_CURRENT_BINARY_DIR}/..")
+cmake_path(RELATIVE_PATH _PY_PKG_IN_DIR BASE_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/..")
+set(_PY_PKG_OUT_DIR "${CMAKE_CURRENT_BINARY_DIR}/../py_pkg")
+string(CONCAT _CMD
+  "cd \"${CMAKE_CURRENT_SOURCE_DIR}/..\""
+  " && \"${Python3_EXECUTABLE}\" setup.py"
+  " --build-dir \"${_PY_PKG_OUT_DIR}/build\""
+  " bdist_wheel"
+  " --package-dir \"${_PY_PKG_IN_DIR}\""
+  " --dist-dir \"${_PY_PKG_OUT_DIR}/dist\""
+  " --bdist-dir \"${_PY_PKG_OUT_DIR}/bdist\"")
+string(CONCAT _CMD_GET_WHEEL_FILENAME "${_CMD}" " --get-wheel-filename")
+execute_process(COMMAND
+  bash -c "${_CMD_GET_WHEEL_FILENAME}"
+  OUTPUT_VARIABLE _PY_PGK_FILE_NAME
+  COMMAND_ERROR_IS_FATAL ANY)
+string(CONCAT _BUILD_CMD
+  "rm -rf \"${_PY_PKG_OUT_DIR}/build\""
+  " && ${_CMD}")
+cg_genrule(
+  NAME python_package
+  COMMAND "${_BUILD_CMD}"
+  OUTS "${_PY_PKG_OUT_DIR}/dist/${_PY_PGK_FILE_NAME}"
+  DEPENDS
+    compiler_gym::third_party::cbench::benchmarks_list
+    compiler_gym::third_party::cbench::crc32
+    compiler_gym::compiler_gym
+    compiler_gym::bin::bin
+    compiler_gym::datasets::datasets
+    compiler_gym::envs::envs
+    compiler_gym::service::service
+    compiler_gym::service::runtime::runtime
+    compiler_gym::spaces::spaces
+    compiler_gym::util::util
+    compiler_gym::util::flags::flags
+    compiler_gym::views::views
+)
+
+string(CONCAT _CMD
+  "\"${Python3_EXECUTABLE}\" -m pip install --upgrade --no-deps --force-reinstall"
+    " \"${_PY_PKG_OUT_DIR}/dist/${_PY_PGK_FILE_NAME}\"")
+cg_genrule(
+  NAME install_python_package
+  COMMAND "${_CMD}"
+  DEPENDS ::python_package
+  EXCLUDE_FROM_ALL)

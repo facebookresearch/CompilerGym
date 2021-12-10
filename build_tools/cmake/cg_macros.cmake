@@ -62,10 +62,13 @@ endfunction()
 # Example when called from proj/base/CMakeLists.txt:
 #   proj::base
 function(cg_package_ns PACKAGE_NS)
-  string(REPLACE ${COMPILER_GYM_ROOT_DIR} "" _PACKAGE ${CMAKE_CURRENT_LIST_DIR})
-  string(SUBSTRING ${_PACKAGE} 1 -1 _PACKAGE)
-  string(REPLACE "/" "::" _PACKAGE_NS ${_PACKAGE})
-  set(${PACKAGE_NS} ${_PACKAGE_NS} PARENT_SCOPE)
+  string(REPLACE "${COMPILER_GYM_ROOT_DIR}" "" _PACKAGE "${CMAKE_CURRENT_LIST_DIR}")
+  string(LENGTH "${_PACKAGE}" _LENGTH)
+  if (_LENGTH)
+    string(SUBSTRING "${_PACKAGE}" 1 -1 _PACKAGE)
+  endif()
+  string(REPLACE "/" "::" _PACKAGE_NS "${_PACKAGE}")
+  set(${PACKAGE_NS} "${_PACKAGE_NS}" PARENT_SCOPE)
 endfunction()
 
 # Sets ${PACKAGE_NAME} to the root relative package name.
@@ -106,7 +109,9 @@ function(canonize_bazel_target_names _RESULT _BAZEL_TARGETS)
   foreach(_TARGET ${_BAZEL_TARGETS})
     if (NOT _TARGET MATCHES ":")
       # local target
-      set(_TARGET "${_PACKAGE_NS}::${_TARGET}")
+      if (NOT _PACKAGE_NS STREQUAL "")
+        set(_TARGET "${_PACKAGE_NS}::${_TARGET}")
+      endif()
     endif()
     list(APPEND _RES "${_TARGET}")
   endforeach()
