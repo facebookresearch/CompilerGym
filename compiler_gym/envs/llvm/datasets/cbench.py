@@ -288,7 +288,7 @@ def _make_cBench_validator(
     def validator_cb(env: "LlvmEnv") -> Optional[ValidationError]:  # noqa: F821
         """The validation callback."""
         with _CBENCH_DOWNLOAD_THREAD_LOCK:
-            with fasteners.InterProcessLock(cache_path("cbench-v1-runtime-data.LOCK")):
+            with fasteners.InterProcessLock(cache_path(".cbench-v1-runtime-data.LOCK")):
                 download_cBench_runtime_data()
 
         cbench_data = site_data_path("llvm-v0/cbench-v1-runtime-data/runtime_data")
@@ -557,7 +557,7 @@ class CBenchDataset(TarDatasetWithManifest):
     def install(self):
         super().install()
         with _CBENCH_DOWNLOAD_THREAD_LOCK:
-            with fasteners.InterProcessLock(cache_path("cbench-v1-runtime-data.LOCK")):
+            with fasteners.InterProcessLock(cache_path(".cbench-v1-runtime-data.LOCK")):
                 download_cBench_runtime_data()
 
 
