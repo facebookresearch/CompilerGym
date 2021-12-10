@@ -37,5 +37,7 @@ print("reward: ", reward)
 print("done: ", done)
 print("info: ", info)
 
+env.reset()
+
 # TODO: implement write_bitcode(..) or write_ir(..)
 # env.write_bitcode("/tmp/output.bc")
