@@ -21,7 +21,7 @@ benchmarks:
       max_benchmarks: 50
     - dataset: generator://llvm-stress-v0
       max_benchmarks: 50
-    - dataset: benchmark://mibench-v0
+    - dataset: benchmark://mibench-v1
       max_benchmarks: 50
     - dataset: benchmark://npb-v0
       max_benchmarks: 50

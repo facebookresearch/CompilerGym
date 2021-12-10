@@ -19,7 +19,7 @@ def test_default_dataset_list():
             "benchmark://clgen-v0",
             "benchmark://github-v0",
             "benchmark://linux-v0",
-            "benchmark://mibench-v0",
+            "benchmark://mibench-v1",
             "benchmark://npb-v0",
             "benchmark://opencv-v0",
             "benchmark://poj104-v1",
