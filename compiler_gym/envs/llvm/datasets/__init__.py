@@ -111,6 +111,30 @@ class LinuxDataset(TarDatasetWithManifest):
 class MibenchDataset(TarDatasetWithManifest):
     def __init__(self, site_data_base: Path, sort_order: int = 0):
         super().__init__(
+            name="benchmark://mibench-v1",
+            tar_urls=[
+                "https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-mibench-v1.tar.bz2"
+            ],
+            tar_sha256="795b80d3198bc96e394823a4cb294d256845beffccce52fea0e3446395212bb5",
+            manifest_urls=[
+                "https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-mibench-v0-manifest.bz2"
+            ],
+            manifest_sha256="8ed985d685b48f444a3312cd84ccc5debda4a839850e442a3cdc93910ba0dc5f",
+            references={
+                "Paper": "http://vhosts.eecs.umich.edu/mibench/Publications/MiBench.pdf"
+            },
+            license="BSD 3-Clause",
+            strip_prefix="mibench-v1",
+            description="C benchmarks",
+            benchmark_file_suffix=".bc",
+            site_data_base=site_data_base,
+            sort_order=sort_order,
+        )
+
+
+class MibenchV0Dataset(TarDatasetWithManifest):
+    def __init__(self, site_data_base: Path, sort_order: int = 0):
+        super().__init__(
             name="benchmark://mibench-v0",
             tar_urls=[
                 "https://dl.fbaipublicfiles.com/compiler_gym/llvm_bitcodes-10.0.0-mibench-v0.tar.bz2"
@@ -129,6 +153,7 @@ class MibenchDataset(TarDatasetWithManifest):
             benchmark_file_suffix=".bc",
             site_data_base=site_data_base,
             sort_order=sort_order,
+            deprecated="Please use mibench-v1",
         )
 
 
@@ -259,6 +284,7 @@ def get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset
     yield LinuxDataset(site_data_base=site_data_base, sort_order=0)
     yield LlvmStressDataset(site_data_base=site_data_base, sort_order=0)
     yield MibenchDataset(site_data_base=site_data_base, sort_order=0)
+    yield MibenchV0Dataset(site_data_base=site_data_base, sort_order=100)
     yield NPBDataset(site_data_base=site_data_base, sort_order=0)
     yield OpenCVDataset(site_data_base=site_data_base, sort_order=0)
     yield POJ104Dataset(site_data_base=site_data_base, sort_order=0)
