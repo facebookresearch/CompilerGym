@@ -47,12 +47,12 @@ class UnrollingCompilationSession(CompilationSession):
                     name="unroll",
                     named_discrete_space=NamedDiscreteSpace(
                         value=[
-                            "-loop-unroll=false",
-                            "-loop-unroll -unroll-count=2",
-                            "-loop-unroll -unroll-count=4",
-                            "-loop-unroll -unroll-count=8",
-                            "-loop-unroll -unroll-count=16",
-                            "-loop-unroll -unroll-count=32",
+                            "--disable-loop-unrolling",
+                            "--loop-unroll --unroll-count=2",
+                            "--loop-unroll --unroll-count=4",
+                            "--loop-unroll --unroll-count=8",
+                            "--loop-unroll --unroll-count=16",
+                            "--loop-unroll --unroll-count=32",
                         ]
                     ),
                 ),
@@ -70,6 +70,7 @@ class UnrollingCompilationSession(CompilationSession):
                     ),
                 ),
             ],
+            named_choices=True,
         )
     ]
 
@@ -162,7 +163,7 @@ class UnrollingCompilationSession(CompilationSession):
         num_choices = len(self._action_space.choice[0].named_discrete_space.value)
 
         if len(action.choice) != 1:
-            raise ValueError("Invalid choice count")
+            raise ValueError("Currently we support one choice at a time")
 
         # This is the index into the action space's values ("a", "b", "c") that
         # the user selected, e.g. 0 -> "a", 1 -> "b", 2 -> "c".

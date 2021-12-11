@@ -14,7 +14,10 @@ print("observation: ", observation)
 
 print()
 
-observation, reward, done, info = env.step({"unroll": 7, "vectorize": 32})
+# TODO: these methods are not working:
+#    - env.step(env.action_space.sample())
+#    - env.step({"unroll": 0, "vectorize": 2})
+observation, reward, done, info = env.step({0: 4, 1: 3})
 print("observation: ", observation)
 print("reward: ", reward)
 print("done: ", done)
