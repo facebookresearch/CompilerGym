@@ -14,7 +14,7 @@ print("observation: ", observation)
 
 print()
 
-observation, reward, done, info = env.step(0, 32)
+observation, reward, done, info = env.step({"unroll": 7, "vectorize": 32})
 print("observation: ", observation)
 print("reward: ", reward)
 print("done: ", done)

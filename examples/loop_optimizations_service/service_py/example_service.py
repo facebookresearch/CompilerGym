@@ -22,6 +22,7 @@ from compiler_gym.service.proto import (
     ActionSpace,
     Benchmark,
     ChoiceSpace,
+    NamedDiscreteSpace,
     Observation,
     ObservationSpace,
     ScalarLimit,
@@ -44,16 +45,28 @@ class UnrollingCompilationSession(CompilationSession):
             choice=[
                 ChoiceSpace(
                     name="unroll",
-                    int64_range=ScalarRange(
-                        min=ScalarLimit(value=0),
-                        max=None,  # no upper bound
+                    named_discrete_space=NamedDiscreteSpace(
+                        value=[
+                            "-loop-unroll=false",
+                            "-loop-unroll -unroll-count=2",
+                            "-loop-unroll -unroll-count=4",
+                            "-loop-unroll -unroll-count=8",
+                            "-loop-unroll -unroll-count=16",
+                            "-loop-unroll -unroll-count=32",
+                        ]
                     ),
                 ),
                 ChoiceSpace(
                     name="vectorize",
-                    int64_range=ScalarRange(
-                        min=ScalarLimit(value=0),
-                        max=None,  # no upper bound
+                    named_discrete_space=NamedDiscreteSpace(
+                        value=[
+                            "-loop-vectorize=false",
+                            "-loop-vectorize -force-vector-width=2",
+                            "-loop-vectorize -force-vector-width=4",
+                            "-loop-vectorize -force-vector-width=8",
+                            "-loop-vectorize -force-vector-width=16",
+                            "-loop-vectorize -force-vector-width=32",
+                        ]
                     ),
                 ),
             ],
