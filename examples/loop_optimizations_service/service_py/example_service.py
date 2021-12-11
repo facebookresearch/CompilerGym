@@ -44,33 +44,23 @@ class UnrollingCompilationSession(CompilationSession):
             name="loop-opt",
             choice=[
                 ChoiceSpace(
-                    name="unroll",
+                    name="loop-opt",
                     named_discrete_space=NamedDiscreteSpace(
                         value=[
-                            "--disable-loop-unrolling",
                             "--loop-unroll --unroll-count=2",
                             "--loop-unroll --unroll-count=4",
                             "--loop-unroll --unroll-count=8",
                             "--loop-unroll --unroll-count=16",
                             "--loop-unroll --unroll-count=32",
-                        ]
-                    ),
-                ),
-                ChoiceSpace(
-                    name="vectorize",
-                    named_discrete_space=NamedDiscreteSpace(
-                        value=[
-                            "-loop-vectorize=false",
-                            "-loop-vectorize -force-vector-width=2",
-                            "-loop-vectorize -force-vector-width=4",
-                            "-loop-vectorize -force-vector-width=8",
-                            "-loop-vectorize -force-vector-width=16",
-                            "-loop-vectorize -force-vector-width=32",
+                            "--loop-vectorize -force-vector-width=2",
+                            "--loop-vectorize -force-vector-width=4",
+                            "--loop-vectorize -force-vector-width=8",
+                            "--loop-vectorize -force-vector-width=16",
+                            "--loop-vectorize -force-vector-width=32",
                         ]
                     ),
                 ),
             ],
-            named_choices=True,
         )
     ]
 

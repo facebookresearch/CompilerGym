@@ -17,13 +17,14 @@ print()
 # TODO: these methods are not working:
 #    - env.step(env.action_space.sample())
 #    - env.step({"unroll": 0, "vectorize": 2})
-observation, reward, done, info = env.step({0: 4, 1: 3})
-print("observation: ", observation)
-print("reward: ", reward)
-print("done: ", done)
-print("info: ", info)
+for i in range(env.action_space.n):
+    observation, reward, done, info = env.step(i)
+    print("observation: ", observation)
+    print("reward: ", reward)
+    print("done: ", done)
+    print("info: ", info)
 
-print()
+    print()
 
 observation, reward, done, info = env.step(env.action_space.sample())
 print("observation: ", observation)
