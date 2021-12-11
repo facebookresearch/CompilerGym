@@ -11,6 +11,7 @@
 #include "llvm/ADT/SetVector.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/SmallVector.h"
+#include "llvm/Analysis/LoopAccessAnalysis.h"
 #include "llvm/Analysis/LoopInfo.h"
 #include "llvm/Bitcode/BitcodeWriterPass.h"
 #include "llvm/IR/BasicBlock.h"
@@ -32,6 +33,7 @@
 #include "llvm/Support/ToolOutputFile.h"
 #include "llvm/Transforms/Scalar.h"
 #include "llvm/Transforms/Utils/LoopUtils.h"
+#include "llvm/Transforms/Vectorize.h"
 
 using namespace llvm;
 
@@ -43,12 +45,19 @@ cl::opt<std::string> InputFilename(cl::Positional, cl::desc("Specify input filen
 cl::opt<std::string> OutputFilename("o", cl::desc("Specify output filename"),
                                     cl::value_desc("filename"), cl::init("-"));
 
+/// Loop Optimizations
 static cl::opt<bool> UnrollEnable("floop-unroll", cl::desc("Enable loop unrolling"),
-                                  cl::init(true));
+                                  cl::init(false));
 
 static cl::opt<unsigned> UnrollCount(
     "funroll-count", cl::desc("Use this unroll count for all loops including those with "
                               "unroll_count pragma values, for testing purposes"));
+
+static cl::opt<bool> VectorizeEnable("floop-vectorize", cl::desc("Enable loop vectorize"),
+                                     cl::init("false"));
+
+static cl::opt<unsigned> VectorizationFactor("fforce-vector-width",
+                                             cl::desc("Sets the SIMD width. Zero is autoselect."));
 
 // Force binary on terminals
 static cl::opt<bool> Force("f", cl::desc("Enable binary output on terminals"));
@@ -119,6 +128,10 @@ class LoopUnrollConfigurator : public llvm::FunctionPass {
         addStringMetadataToLoop(ALoop, "llvm.loop.unroll.enable", UnrollEnable);
       if (UnrollCount)
         addStringMetadataToLoop(ALoop, "llvm.loop.unroll.count", UnrollCount);
+      if (VectorizeEnable)
+        addStringMetadataToLoop(ALoop, "llvm.loop.vectorize.enable", VectorizeEnable);
+      if (VectorizationFactor)
+        addStringMetadataToLoop(ALoop, "llvm.loop.vectorize.factor", VectorizationFactor);
     }
 
     return false;
@@ -182,6 +195,7 @@ int main(int argc, char** argv) {
   PM.add(Counter);
   PM.add(UnrollConfigurator);
   PM.add(createLoopUnrollPass());
+  PM.add(createLoopVectorizePass());
   // Passes to output the module
   if (OutputAssembly) {
     PM.add(createPrintModulePass(Out.os(), "", PreserveAssemblyUseListOrder));

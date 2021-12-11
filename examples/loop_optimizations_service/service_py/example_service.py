@@ -109,7 +109,7 @@ class UnrollingCompilationSession(CompilationSession):
         working_directory: Path,
         action_space: ActionSpace,
         benchmark: Benchmark,
-        use_custom_opt: bool = False,
+        use_custom_opt: bool = True,
     ):
         super().__init__(working_directory, action_space, benchmark)
         logging.info("Started a compilation session for %s", benchmark.uri)
@@ -176,8 +176,8 @@ class UnrollingCompilationSession(CompilationSession):
         if self._use_custom_opt:
             # our custom unroller has an additional `f` at the beginning of each argument
             for i, arg in enumerate(args):
-                # convert -<argument> to -f<argument>
-                arg = arg[0] + "f" + arg[1:]
+                # convert --<argument> to --f<argument>
+                arg = arg[0:2] + "f" + arg[2:]
                 args[i] = arg
             run_command(
                 [
