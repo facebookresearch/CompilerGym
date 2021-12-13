@@ -11,10 +11,18 @@ import signal
 # TODO: As we add support for more compilers we could generalize this script
 # to work with other compiler services rather than hardcoding to LLVM.
 import sys
+import types
 from pathlib import Path
 
-from compiler_gym.envs.llvm.llvm_env import LlvmEnv
-from compiler_gym.util.runfiles_path import runfiles_path
+# TODO(github.com/facebookresearch/CompilerGym/issues/506): Avoids circular
+# dependency during specs.py generation, because it is imported from
+# compiler_gym.envs.llvm before being generated.
+sys.modules["compiler_gym.envs.llvm.is_making_specs"] = types.ModuleType(
+    "compiler_gym.envs.llvm.is_making_specs"
+)
+
+from compiler_gym.envs.llvm.llvm_env import LlvmEnv  # noqa: E402
+from compiler_gym.util.runfiles_path import runfiles_path  # noqa: E402
 
 with open(
     runfiles_path("compiler_gym/envs/llvm/service/passes/flag_descriptions.txt")

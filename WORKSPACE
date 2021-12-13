@@ -285,9 +285,9 @@ http_file(
 http_archive(
     name = "cpuinfo",
     build_file_content = all_content,
-    sha256 = "18a99130ced1eaacab2ba8f75a1435f9955aab54fa0436b60468f020876ee902",
-    strip_prefix = "cpuinfo-63b254577ed77a8004a9be6ac707f3dccc4e1fd9",
-    urls = ["https://github.com/pytorch/cpuinfo/archive/63b254577ed77a8004a9be6ac707f3dccc4e1fd9.tar.gz"],
+    sha256 = "b9874dbb2f9436c9d0d7f42aaf3f94f1af3da37bc0b250268760ada2507ca543",
+    strip_prefix = "cpuinfo-2e79955ecaec85da13ac8f1245a8b2afa10d31c2",
+    urls = ["https://github.com/pytorch/cpuinfo/archive/2e79955ecaec85da13ac8f1245a8b2afa10d31c2.tar.gz"],
 )
 
 # === Csmith ===
