@@ -33,7 +33,7 @@ from compiler_gym.service.runtime import create_and_run_compiler_gym_service
 from compiler_gym.util.commands import run_command
 
 
-class UnrollingCompilationSession(CompilationSession):
+class LoopsOptCompilationSession(CompilationSession):
     """Represents an instance of an interactive compilation session."""
 
     compiler_version: str = "1.0.0"
@@ -121,7 +121,8 @@ class UnrollingCompilationSession(CompilationSession):
         self._llc = str(llvm.llc_path())
         self._llvm_diff = str(llvm.llvm_diff_path())
         self._opt = str(llvm.opt_path())
-        # LLVM's opt does not always enforce the unrolling options passed as cli arguments. Hence, we created our own exeutable with custom unrolling pass in examples/example_unrolling_service/loop_unroller that enforces the unrolling factors passed in its cli.
+        # LLVM's opt does not always enforce the loop optimization options passed as cli arguments.
+        # Hence, we created our own exeutable with custom unrolling and vectorization pass in examples/loops_opt_service/opt_loops that enforces the unrolling and vectorization factors passed in its cli.
         # if self._use_custom_opt is true, use our custom exeutable, otherwise use LLVM's opt
         self._use_custom_opt = use_custom_opt
 
@@ -174,7 +175,7 @@ class UnrollingCompilationSession(CompilationSession):
 
         # apply action
         if self._use_custom_opt:
-            # our custom unroller has an additional `f` at the beginning of each argument
+            # our custom opt-loops has an additional `f` at the beginning of each argument
             for i, arg in enumerate(args):
                 # convert --<argument> to --f<argument>
                 arg = arg[0:2] + "f" + arg[2:]
@@ -215,7 +216,7 @@ class UnrollingCompilationSession(CompilationSession):
         except subprocess.CalledProcessError:
             action_had_no_effect = False
 
-        end_of_session = False  # TODO: this needs investigation: for how long can we apply loop unrolling? e.g., detect if there are no more loops in the IR?
+        end_of_session = False  # TODO: this needs investigation: for how long can we apply loop optimizations? e.g., detect if there are no more loops in the IR? or look at the metadata?
         new_action_space = None
         return (end_of_session, new_action_space, action_had_no_effect)
 
@@ -308,4 +309,4 @@ class UnrollingCompilationSession(CompilationSession):
 
 
 if __name__ == "__main__":
-    create_and_run_compiler_gym_service(UnrollingCompilationSession)
+    create_and_run_compiler_gym_service(LoopsOptCompilationSession)

@@ -11,7 +11,7 @@ import numpy as np
 import pytest
 
 import compiler_gym
-import examples.loop_optimizations_service as unrolling_service
+import examples.loop_optimizations_service as loop_optimizations_service
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.service import SessionNotFound
 from compiler_gym.spaces import Box, NamedDiscrete, Scalar, Sequence
@@ -27,7 +27,7 @@ def env() -> CompilerEnv:
 
 @pytest.fixture(scope="module")
 def bin() -> Path:
-    return unrolling_service.UNROLLING_PY_SERVICE_BINARY
+    return loop_optimizations_service.LOOPS_OPT_PY_SERVICE_BINARY
 
 
 def test_invalid_arguments(bin: Path):

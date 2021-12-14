@@ -14,7 +14,7 @@ from compiler_gym.third_party import llvm
 from compiler_gym.util.registration import register
 from compiler_gym.util.runfiles_path import runfiles_path, site_data_path
 
-UNROLLING_PY_SERVICE_BINARY: Path = runfiles_path(
+LOOPS_OPT_PY_SERVICE_BINARY: Path = runfiles_path(
     "examples/loop_optimizations_service/service_py/loops-opt-service-py"
 )
 
@@ -77,28 +77,28 @@ class SizeReward(Reward):
         return float(self.baseline_size - observations[0]) / self.baseline_size
 
 
-class UnrollingDataset(Dataset):
+class LoopsDataset(Dataset):
     def __init__(self, *args, **kwargs):
         super().__init__(
-            name="benchmark://unrolling-v0",
+            name="benchmark://loops-opt-v0",
             license="MIT",
-            description="Unrolling example dataset",
+            description="Loops optimization dataset",
             site_data_base=site_data_path(
                 "example_dataset"
             ),  # TODO: what should we set this to? we are not using it
         )
 
         self._benchmarks = {
-            "benchmark://unrolling-v0/add": Benchmark.from_file_contents(
-                "benchmark://unrolling-v0/add",
+            "benchmark://loops-opt-v0/add": Benchmark.from_file_contents(
+                "benchmark://loops-opt-v0/add",
                 self.preprocess(BENCHMARKS_PATH / "add.c"),
             ),
-            "benchmark://unrolling-v0/offsets1": Benchmark.from_file_contents(
-                "benchmark://unrolling-v0/offsets1",
+            "benchmark://loops-opt-v0/offsets1": Benchmark.from_file_contents(
+                "benchmark://loops-opt-v0/offsets1",
                 self.preprocess(BENCHMARKS_PATH / "offsets1.c"),
             ),
-            "benchmark://unrolling-v0/conv2d": Benchmark.from_file_contents(
-                "benchmark://unrolling-v0/conv2d",
+            "benchmark://loops-opt-v0/conv2d": Benchmark.from_file_contents(
+                "benchmark://loops-opt-v0/conv2d",
                 self.preprocess(BENCHMARKS_PATH / "conv2d.c"),
             ),
         }
@@ -136,14 +136,14 @@ class UnrollingDataset(Dataset):
 
 
 # Register the unrolling example service on module import. After importing this module,
-# the unrolling-py-v0 environment will be available to gym.make(...).
+# the loops-opt-py-v0 environment will be available to gym.make(...).
 
 register(
-    id="unrolling-py-v0",
+    id="loops-opt-py-v0",
     entry_point="compiler_gym.envs:CompilerEnv",
     kwargs={
-        "service": UNROLLING_PY_SERVICE_BINARY,
+        "service": LOOPS_OPT_PY_SERVICE_BINARY,
         "rewards": [RuntimeReward(), SizeReward()],
-        "datasets": [UnrollingDataset()],
+        "datasets": [LoopsDataset()],
     },
 )

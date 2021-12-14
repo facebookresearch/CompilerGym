@@ -1,9 +1,9 @@
 import compiler_gym
-import examples.loop_optimizations_service as unrolling_service  # noqa Register environments.
+import examples.loop_optimizations_service as loop_optimizations_service  # noqa Register environments.
 
 env = compiler_gym.make(
-    "unrolling-py-v0",
-    benchmark="unrolling-v0/add",
+    "loops-opt-py-v0",
+    benchmark="loops-opt-v0/add",
     observation_space="ir",
     reward_space="runtime",
 )
