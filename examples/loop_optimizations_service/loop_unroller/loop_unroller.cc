@@ -154,13 +154,13 @@ INITIALIZE_PASS_DEPENDENCY(LoopInfoWrapperPass)
 INITIALIZE_PASS_END(LoopCounter, "count-loops", "Count loops", false, false)
 
 // The INITIALIZE_PASS_XXX macros put the initialiser in the llvm namespace.
-void initializeLoopUnrollConfiguratorPass(PassRegistry& Registry);
+void initializeLoopConfiguratorPassPass(PassRegistry& Registry);
 
-class LoopUnrollConfigurator : public llvm::FunctionPass {
+class LoopConfiguratorPass : public llvm::FunctionPass {
  public:
   static char ID;
 
-  LoopUnrollConfigurator() : FunctionPass(ID) {}
+  LoopConfiguratorPass() : FunctionPass(ID) {}
 
   virtual void getAnalysisUsage(AnalysisUsage& AU) const override {
     AU.addRequired<LoopInfoWrapperPass>();
@@ -187,11 +187,11 @@ class LoopUnrollConfigurator : public llvm::FunctionPass {
 };
 
 // Initialise the pass. We have to declare the dependencies we use.
-char LoopUnrollConfigurator::ID = 1;
-INITIALIZE_PASS_BEGIN(LoopUnrollConfigurator, "unroll-loops-configurator",
+char LoopConfiguratorPass::ID = 1;
+INITIALIZE_PASS_BEGIN(LoopConfiguratorPass, "unroll-loops-configurator",
                       "Configurates loop unrolling", false, false)
 INITIALIZE_PASS_DEPENDENCY(LoopInfoWrapperPass)
-INITIALIZE_PASS_END(LoopUnrollConfigurator, "unroll-loops-configurator",
+INITIALIZE_PASS_END(LoopConfiguratorPass, "unroll-loops-configurator",
                     "Configurates loop unrolling", false, false)
 
 /// Reads a module from a file.
@@ -238,9 +238,9 @@ int main(int argc, char** argv) {
   initializeLoopCounterPass(*PassRegistry::getPassRegistry());
   OptCustomPassManager PM;
   LoopCounter* Counter = new LoopCounter();
-  LoopUnrollConfigurator* UnrollConfigurator = new LoopUnrollConfigurator();
+  LoopConfiguratorPass* LoopConfigurator = new LoopConfiguratorPass();
   PM.add(Counter);
-  PM.add(UnrollConfigurator);
+  PM.add(LoopConfigurator);
   PM.add(createLoopUnrollPass());
   PM.add(createLICMPass());
   PM.add(createLoopVectorizePass(false, false));
