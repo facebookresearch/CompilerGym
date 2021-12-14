@@ -19,7 +19,6 @@ from compiler_gym.datasets import Benchmark, Dataset
 from compiler_gym.spaces import Reward
 from compiler_gym.util.logging import init_logging
 from compiler_gym.util.registration import register
-from compiler_gym.util.runfiles_path import site_data_path
 
 EXAMPLE_PY_SERVICE_BINARY: Path = Path(
     "example_compiler_gym_service/service_py/example_service.py"
@@ -65,7 +64,6 @@ class ExampleDataset(Dataset):
             name="benchmark://example-v0",
             license="MIT",
             description="An example dataset",
-            site_data_base=site_data_path("example_dataset"),
         )
         self._benchmarks = {
             "benchmark://example-v0/foo": Benchmark.from_file_contents(

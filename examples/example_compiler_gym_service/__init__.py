@@ -9,7 +9,7 @@ from typing import Iterable
 from compiler_gym.datasets import Benchmark, Dataset
 from compiler_gym.spaces import Reward
 from compiler_gym.util.registration import register
-from compiler_gym.util.runfiles_path import runfiles_path, site_data_path
+from compiler_gym.util.runfiles_path import runfiles_path
 
 EXAMPLE_CC_SERVICE_BINARY: Path = runfiles_path(
     "examples/example_compiler_gym_service/service_cc/compiler_gym-example-service-cc"
@@ -58,7 +58,6 @@ class ExampleDataset(Dataset):
             name="benchmark://example-v0",
             license="MIT",
             description="An example dataset",
-            site_data_base=site_data_path("example_dataset"),
         )
         self._benchmarks = {
             "benchmark://example-v0/foo": Benchmark.from_file_contents(
