@@ -45,7 +45,7 @@ class Dataset:
         name: str,
         description: str,
         license: str,  # pylint: disable=redefined-builtin
-        site_data_base: Path,
+        site_data_base: Optional[Path] = None,
         benchmark_class=Benchmark,
         references: Optional[Dict[str, str]] = None,
         deprecated: Optional[str] = None,
@@ -61,8 +61,15 @@ class Dataset:
 
         :param license: The name of the dataset's license.
 
-        :param site_data_base: The base path of a directory that will be used to
-            store installed files.
+        :param site_data_base: An optional directory that can be used by the
+            dataset to house the "site data", i.e. persistent files on disk. The
+            site data directory is a subdirectory of this :code:`site_data_base`
+            path, which can be shared by multiple datasets. If not provided, the
+            :attr:`dataset.site_data_path
+            <compiler_gym.datasets.Dataset.site_data_path>` attribute will raise
+            an error. Use :attr:`dataset.has_site_data
+            <compiler_gym.datasets.Dataset.has_site_data>` to check if a site
+            data path was set.
 
         :param benchmark_class: The class to use when instantiating benchmarks.
             It must have the same constructor signature as :class:`Benchmark
@@ -110,8 +117,11 @@ class Dataset:
         self.benchmark_class = benchmark_class
 
         # Set up the site data name.
-        basename = components.group("dataset_name")
-        self._site_data_path = Path(site_data_base).resolve() / self.protocol / basename
+        if site_data_base:
+            basename = components.group("dataset_name")
+            self._site_data_path = (
+                Path(site_data_base).resolve() / self.protocol / basename
+            )
 
     def __repr__(self):
         return self.name
@@ -213,13 +223,26 @@ class Dataset:
         return self._validatable
 
     @property
+    def has_site_data(self) -> bool:
+        """Return whether the dataset has a site data directory.
+
+        :type: bool
+        """
+        return hasattr(self, "_site_data_path")
+
+    @property
     def site_data_path(self) -> Path:
         """The filesystem path used to store persistent dataset files.
 
         This directory may not exist.
 
         :type: Path
+
+        :raises ValueError: If no site data path was specified at constructor
+            time.
         """
+        if not self.has_site_data:
+            raise ValueError(f"Dataset has no site data path: {self.name}")
         return self._site_data_path
 
     @property
@@ -228,6 +251,9 @@ class Dataset:
 
         :type: int
         """
+        if not self.has_site_data:
+            return 0
+
         if not self.site_data_path.is_dir():
             return 0
 
@@ -314,7 +340,7 @@ class Dataset:
         <compiler_gym.datasets.Dataset.install>`. The dataset can still be used
         after calling this method.
         """
-        if self.site_data_path.is_dir():
+        if self.has_site_data() and self.site_data_path.is_dir():
             shutil.rmtree(self.site_data_path)
 
     def benchmarks(self) -> Iterable[Benchmark]:

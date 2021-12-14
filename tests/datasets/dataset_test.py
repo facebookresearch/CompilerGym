@@ -243,5 +243,30 @@ def test_logger_is_deprecated():
         dataset.logger
 
 
+def test_with_site_data():
+    """Test the dataset property values."""
+    dataset = Dataset(
+        name="benchmark://test-v0",
+        description="A test dataset",
+        license="MIT",
+        site_data_base="test",
+    )
+    assert dataset.has_site_data
+
+
+def test_without_site_data():
+    """Test the dataset property values."""
+    dataset = Dataset(
+        name="benchmark://test-v0",
+        description="A test dataset",
+        license="MIT",
+    )
+    assert not dataset.has_site_data
+    with pytest.raises(
+        ValueError, match=r"^Dataset has no site data path: benchmark://test-v0$"
+    ):
+        dataset.site_data_path  # noqa
+
+
 if __name__ == "__main__":
     main()
