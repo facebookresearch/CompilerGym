@@ -31,7 +31,9 @@
 #include "llvm/Support/SourceMgr.h"
 #include "llvm/Support/SystemUtils.h"
 #include "llvm/Support/ToolOutputFile.h"
+#include "llvm/Transforms/IPO/PassManagerBuilder.h"
 #include "llvm/Transforms/Scalar.h"
+#include "llvm/Transforms/Utils/Debugify.h"
 #include "llvm/Transforms/Utils/LoopUtils.h"
 #include "llvm/Transforms/Vectorize.h"
 
@@ -74,8 +76,54 @@ static cl::opt<bool> PreserveAssemblyUseListOrder(
     "preserve-ll-uselistorder", cl::desc("Preserve use-list order when writing LLVM assembly."),
     cl::init(false), cl::Hidden);
 
+// added from opt.cpp
+static cl::opt<bool> DebugifyEach(
+    "debugify-each", cl::desc("Start each pass with debugify and end it with check-debugify"));
+
 // The INITIALIZE_PASS_XXX macros put the initialiser in the llvm namespace.
 void initializeLoopCounterPass(PassRegistry& Registry);
+
+class OptCustomPassManager : public legacy::PassManager {
+  DebugifyStatsMap DIStatsMap;
+
+ public:
+  using super = legacy::PassManager;
+
+  void add(Pass* P) override {
+    // Wrap each pass with (-check)-debugify passes if requested, making
+    // exceptions for passes which shouldn't see -debugify instrumentation.
+    bool WrapWithDebugify =
+        DebugifyEach && !P->getAsImmutablePass() && !isIRPrintingPass(P) && !isBitcodeWriterPass(P);
+    if (!WrapWithDebugify) {
+      super::add(P);
+      return;
+    }
+
+    // Apply -debugify/-check-debugify before/after each pass and collect
+    // debug info loss statistics.
+    PassKind Kind = P->getPassKind();
+    StringRef Name = P->getPassName();
+
+    // TODO: Implement Debugify for LoopPass.
+    switch (Kind) {
+      case PT_Function:
+        super::add(createDebugifyFunctionPass());
+        super::add(P);
+        super::add(createCheckDebugifyFunctionPass(true, Name, &DIStatsMap));
+        break;
+      case PT_Module:
+        super::add(createDebugifyModulePass());
+        super::add(P);
+        super::add(createCheckDebugifyModulePass(true, Name, &DIStatsMap));
+        break;
+      default:
+        super::add(P);
+        break;
+    }
+  }
+
+  const DebugifyStatsMap& getDebugifyStatsMap() const { return DIStatsMap; }
+};
 
 class LoopCounter : public llvm::FunctionPass {
  public:
@@ -131,7 +179,7 @@ class LoopUnrollConfigurator : public llvm::FunctionPass {
       if (VectorizeEnable)
         addStringMetadataToLoop(ALoop, "llvm.loop.vectorize.enable", VectorizeEnable);
       if (VectorizationFactor)
-        addStringMetadataToLoop(ALoop, "llvm.loop.vectorize.factor", VectorizationFactor);
+        addStringMetadataToLoop(ALoop, "llvm.loop.vectorize.width", VectorizationFactor);
     }
 
     return false;
@@ -187,16 +235,20 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  // Run the passes
   initializeLoopCounterPass(*PassRegistry::getPassRegistry());
-  legacy::PassManager PM;
+  OptCustomPassManager PM;
   LoopCounter* Counter = new LoopCounter();
   LoopUnrollConfigurator* UnrollConfigurator = new LoopUnrollConfigurator();
   PM.add(Counter);
   PM.add(UnrollConfigurator);
   PM.add(createLoopUnrollPass());
-  PM.add(createLoopVectorizePass());
-  // Passes to output the module
+  PM.add(createLICMPass());
+  PM.add(createLoopVectorizePass(false, false));
+  PassManagerBuilder Builder;
+  Builder.LoopVectorize = VectorizeEnable;
+  Builder.populateModulePassManager(PM);
+
+  // PM to output the module
   if (OutputAssembly) {
     PM.add(createPrintModulePass(Out.os(), "", PreserveAssemblyUseListOrder));
   } else if (Force || !CheckBitcodeOutputToConsole(Out.os())) {
