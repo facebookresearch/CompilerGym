@@ -3,12 +3,11 @@ dgl==0.6.1
 geneticalgorithm>=1.0.2
 hydra-core==1.1.0
 keras==2.6.0
-matplotlib>=3.3.0
+matplotlib>=3.5.0
 nevergrad>=0.4.3
-numpy~=1.19.2  # Pin version for tensorflow.
 opentuner>=0.8.5
 pandas>=1.1.5
-ray[default,rllib]==1.8.0
+ray[default,rllib]==1.9.0
 submitit>=1.2.0
 submitit>=1.2.0
 tensorflow==2.6.1
