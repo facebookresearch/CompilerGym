@@ -337,7 +337,7 @@ examples-pip-install:
 	cd examples && python setup.py install
 
 examples-test: examples-pip-install
-	cd examples && pytest --no-success-flaky-report --benchmark-disable -n auto --durations=5 . --cov=compiler_gym --cov-report=xml:$(COV_REPORT) $(PYTEST_ARGS)
+	cd examples && pytest --nbmake --no-success-flaky-report --benchmark-disable -n auto --durations=5 . --cov=compiler_gym --cov-report=xml:$(COV_REPORT) $(PYTEST_ARGS)
 
 # Note we export $CI=1 so that the tests always run as if within the CI
 # environement. This is to ensure that the reported coverage matches that of
