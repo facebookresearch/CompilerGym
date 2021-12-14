@@ -308,7 +308,7 @@ cc_binary(
 genrule(
     name = "strip-optnone-bin",
     srcs = [":strip-optnone-attribute-prelinked"],
-    outs = ["strip-optnone"],
+    outs = ["strip-optnone-attribute"],
     cmd = select({
         "@llvm//:darwin": (
             "cp $(location :strip-optnone-attribute-prelinked) $@"

@@ -34,12 +34,15 @@ namespace {
 
 BenchmarkHash getModuleHash(const llvm::Module& module) {
   BenchmarkHash hash;
-  llvm::SmallVector<char, 256> buffer;
+  Bitcode bitcode;
+
   // Writing the entire bitcode to a buffer that is then discarded is
   // inefficient.
-  llvm::BitcodeWriter writer(buffer);
-  writer.writeModule(module, /*ShouldPreserveUseListOrder=*/false,
-                     /*Index=*/nullptr, /*GenerateHash=*/true, &hash);
+  llvm::raw_svector_ostream ostream(bitcode);
+  llvm::WriteBitcodeToFile(module, ostream,
+                           /*ShouldPreserveUseListOrder=*/false,
+                           /*Index=*/nullptr, /*GenerateHash=*/true, &hash);
+
   return hash;
 }
 
