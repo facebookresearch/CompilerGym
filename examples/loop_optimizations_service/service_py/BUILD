@@ -8,7 +8,7 @@ py_binary(
     name = "example-unrolling-service-py",
     srcs = ["example_service.py"],
     data = [
-        "//examples/loop_optimizations_service/loop_unroller",
+        "//examples/loop_optimizations_service/opt_loops",
     ],
     main = "example_service.py",
     visibility = ["//visibility:public"],

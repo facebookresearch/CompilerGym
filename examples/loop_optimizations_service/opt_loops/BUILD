@@ -7,9 +7,9 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary")
 
 cc_binary(
-    name = "loop_unroller",
+    name = "opt_loops",
     srcs = [
-        "loop_unroller.cc",
+        "opt_loops.cc",
     ],
     copts = [
         "-Wall",

@@ -181,7 +181,7 @@ class UnrollingCompilationSession(CompilationSession):
                 args[i] = arg
             run_command(
                 [
-                    "../loop_unroller/loop_unroller",
+                    "../opt_loops/opt_loops",
                     self._llvm_path,
                     *args,
                     "-S",
