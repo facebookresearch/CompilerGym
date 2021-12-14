@@ -9,7 +9,7 @@ py_library(
     srcs = ["__init__.py"],
     data = [
         "//examples/loop_optimizations_service/benchmarks",
-        "//examples/loop_optimizations_service/service_py:example-unrolling-service-py",
+        "//examples/loop_optimizations_service/service_py:loops-opt-service-py",
     ],
     visibility = ["//visibility:public"],
     deps = [

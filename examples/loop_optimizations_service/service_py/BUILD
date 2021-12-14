@@ -5,12 +5,12 @@
 load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
 py_binary(
-    name = "example-unrolling-service-py",
-    srcs = ["example_service.py"],
+    name = "loops-opt-service-py",
+    srcs = ["loops_opt_service.py"],
     data = [
         "//examples/loop_optimizations_service/opt_loops",
     ],
-    main = "example_service.py",
+    main = "loops_opt_service.py",
     visibility = ["//visibility:public"],
     deps = [
         "//compiler_gym/service",

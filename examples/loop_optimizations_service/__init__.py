@@ -15,7 +15,7 @@ from compiler_gym.util.registration import register
 from compiler_gym.util.runfiles_path import runfiles_path, site_data_path
 
 UNROLLING_PY_SERVICE_BINARY: Path = runfiles_path(
-    "examples/loop_optimizations_service/service_py/example-unrolling-service-py"
+    "examples/loop_optimizations_service/service_py/loops-opt-service-py"
 )
 
 BENCHMARKS_PATH: Path = runfiles_path("examples/loop_optimizations_service/benchmarks")
