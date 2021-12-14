@@ -89,6 +89,10 @@ class UnrollingDataset(Dataset):
         )
 
         self._benchmarks = {
+            "benchmark://unrolling-v0/add": Benchmark.from_file_contents(
+                "benchmark://unrolling-v0/add",
+                self.preprocess(BENCHMARKS_PATH / "add.c"),
+            ),
             "benchmark://unrolling-v0/offsets1": Benchmark.from_file_contents(
                 "benchmark://unrolling-v0/offsets1",
                 self.preprocess(BENCHMARKS_PATH / "offsets1.c"),

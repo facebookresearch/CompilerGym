@@ -3,8 +3,8 @@ import examples.loop_optimizations_service as unrolling_service  # noqa Register
 
 env = compiler_gym.make(
     "unrolling-py-v0",
-    benchmark="unrolling-v0/offsets1",
-    observation_space="features",
+    benchmark="unrolling-v0/add",
+    observation_space="ir",
     reward_space="runtime",
 )
 compiler_gym.set_debug_level(4)  # TODO: check why this has no effect
@@ -17,14 +17,13 @@ print()
 # TODO: these methods are not working:
 #    - env.step(env.action_space.sample())
 #    - env.step({"unroll": 0, "vectorize": 2})
-for i in range(env.action_space.n):
-    observation, reward, done, info = env.step(i)
-    print("observation: ", observation)
-    print("reward: ", reward)
-    print("done: ", done)
-    print("info: ", info)
+observation, reward, done, info = env.step(7)
+print("observation: ", observation)
+print("reward: ", reward)
+print("done: ", done)
+print("info: ", info)
 
-    print()
+print()
 
 observation, reward, done, info = env.step(env.action_space.sample())
 print("observation: ", observation)
