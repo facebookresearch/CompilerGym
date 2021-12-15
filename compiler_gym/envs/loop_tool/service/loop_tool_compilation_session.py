@@ -84,6 +84,15 @@ class LoopToolCompilationSession(CompilationSession):
             ),
         ),
         ObservationSpace(
+            name="vars",
+            string_size_range=ScalarRange(),
+            deterministic=True,
+            platform_dependent=False,
+            default_value=Observation(
+                string_value="",
+            ),
+        ),
+        ObservationSpace(
             name="action_state",
             int64_range_list=ScalarRangeList(
                 range=[
@@ -115,21 +124,21 @@ class LoopToolCompilationSession(CompilationSession):
             raise EnvironmentNotSupported(
                 f"Failed to load {self.backend} dataset for loop_tool.  Have you installed all required dependecies?  See <https://facebookresearch.github.io/CompilerGym/envs/loop_tool.html#installation> for details. "
             )
-        self.ir = lt.IR()
-        self.var = self.ir.create_var("a")
-        r0 = self.ir.create_node("read", [], [self.var])
-        r1 = self.ir.create_node("read", [], [self.var])
-        add = self.ir.create_node("add", [r0, r1], [self.var])
-        w = self.ir.create_node("write", [add], [self.var])
-        self.ir.set_inputs([r0, r1])
-        self.ir.set_outputs([w])
         self.size = int(benchmark.uri.split("/")[-1])
-        self.Ap = np.random.randn(self.size)
-        self.Bp = np.random.randn(self.size)
         self.order = [(self.size, 0), (1, 0), (1, 0)]
         self.thread = [1, 0, 0]
         self.cursor = 0
         self.mode = "size"
+        self.Ap = np.random.randn(self.size)
+        self.Bp = np.random.randn(self.size)
+        self.A = lt.Tensor(self.size).set(self.Ap)
+        self.B = lt.Tensor(self.size).set(self.Bp)
+        N = lt.Symbol("N")
+        self.C = self.A.to(N) + self.B.to(N)
+
+        self.ir = self.C.ir
+        self.var = self.ir.vars[0]
+
         logger.info("Started a compilation session for %s", benchmark.uri)
 
     def resize(self, increment):
@@ -263,7 +272,7 @@ class LoopToolCompilationSession(CompilationSession):
             if b:
                 parallel.add(t)
                 if self.backend == "cpu":
-                    loop_tree.annotate(t, "cpu_parallel")
+                    loop_tree.annotate(t, "parallel")
             t = loop_tree.children(t)[0]
         return loop_tree, parallel
 
@@ -273,9 +282,9 @@ class LoopToolCompilationSession(CompilationSession):
             c = lt.cuda(loop_tree, parallel)
         else:
             c = lt.cpu(loop_tree)
-        A = lt.Tensor(self.size)
-        B = lt.Tensor(self.size)
-        C = lt.Tensor(self.size)
+        A = lt.RawTensor(self.size)
+        B = lt.RawTensor(self.size)
+        C = lt.RawTensor(self.size)
         A.set(self.Ap)
         B.set(self.Bp)
         iters = 1000
@@ -299,6 +308,10 @@ class LoopToolCompilationSession(CompilationSession):
             return observation
         elif observation_space.name == "flops":
             return Observation(scalar_double=self.flops())
+        elif observation_space.name == "vars":
+            return Observation(
+                string_value=",".join(self.ir.dump_var(i) for i in self.ir.vars)
+            )
         elif observation_space.name == "loop_tree":
             loop_tree, parallel = self.lower()
             return Observation(
