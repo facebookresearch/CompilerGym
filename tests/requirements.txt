@@ -9,3 +9,4 @@ pytest-stress==1.0.1
 pytest-sugar==0.9.4
 pytest-timeout==1.4.2
 pytest-xdist==2.4.0
+setuptools<59 # v59 causes pkg_resources.require in test_setuptools_version to fail

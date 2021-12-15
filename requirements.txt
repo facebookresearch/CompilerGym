@@ -1,3 +1,4 @@
+-r compiler_gym/requirements_build.txt
 -r compiler_gym/requirements.txt
 -r docs/requirements.txt
 -r examples/requirements.txt
