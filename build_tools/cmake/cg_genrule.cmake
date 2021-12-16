@@ -15,7 +15,7 @@ include(cg_macros)
 function(cg_genrule)
   cmake_parse_arguments(
     _RULE
-    "PUBLIC;TESTONLY"
+    "PUBLIC;TESTONLY;EXCLUDE_FROM_ALL"
     "NAME;COMMAND"
     "SRCS;OUTS;DEPENDS;ABS_DEPENDS"
     ${ARGN}
@@ -52,16 +52,34 @@ function(cg_genrule)
   # Substitute special Bazel references
   string(REPLACE  "$@" "${_OUTS}" _CMD "${_RULE_COMMAND}")
   string(REPLACE  "$(@D)" "${_OUTS_DIR}" _CMD "${_CMD}")
-  #string(REPLACE  "$<" "\"${_SRCS}\"" _CMD "${_CMD}")
 
-  add_custom_command(
-    OUTPUT ${_OUTS}
-    COMMAND bash -c "${_CMD}"
-    DEPENDS ${_DEPS} ${_SRCS}
-    VERBATIM
-  )
+  if(_OUTS)
+    add_custom_command(
+      OUTPUT ${_OUTS}
+      COMMAND bash -c "${_CMD}"
+      DEPENDS ${_DEPS} ${_SRCS}
+      VERBATIM
+      USES_TERMINAL
+    )
+  endif()
 
-  add_custom_target(${_NAME} ALL DEPENDS ${_OUTS})
+  if(_RULE_EXCLUDE_FROM_ALL)
+    unset(_ALL)
+  else()
+    set(_ALL ALL)
+  endif()
+
+  if(_OUTS)
+    add_custom_target(${_NAME} ${_ALL} DEPENDS ${_OUTS})
+  else()
+    add_custom_target(
+      ${_NAME} ${_ALL}
+      COMMAND bash -c "${_CMD}"
+      DEPENDS ${_DEPS} ${_SRCS}
+      VERBATIM
+      USES_TERMINAL)
+  endif()
+
   set_target_properties(${_NAME} PROPERTIES
     OUTPUTS "${_OUTS}")
 

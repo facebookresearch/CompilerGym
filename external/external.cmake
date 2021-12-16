@@ -143,6 +143,9 @@ if(COMPILER_GYM_PROTOBUF_PROVIDER STREQUAL "internal")
     COMMAND_ERROR_IS_FATAL ANY
   )
   list(PREPEND CMAKE_PREFIX_PATH "${CMAKE_CURRENT_BINARY_DIR}/external/protobuf/install")
+  if(NOT DEFINED Protobuf_USE_STATIC_LIBS)
+    set(Protobuf_USE_STATIC_LIBS ON)
+  endif()
 endif()
 find_package(Protobuf REQUIRED)
 
@@ -444,6 +447,9 @@ if(COMPILER_GYM_BOOST_PROVIDER STREQUAL "internal")
   build_external_cmake_project(
     NAME boost
     SRC_DIR "${CMAKE_CURRENT_LIST_DIR}/boost")
+    if (NOT DEFINED Boost_USE_STATIC_LIBS)
+      set(Boost_USE_STATIC_LIBS ON)
+    endif()
 endif()
 find_package(Boost REQUIRED COMPONENTS filesystem headers)
 

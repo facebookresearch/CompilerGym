@@ -48,7 +48,16 @@ execute_process(
       "CFLAGS=${CMAKE_C_FLAGS} $ENV{CFLAGS}"
       "CXXFLAGS=-std=c++${CMAKE_CXX_STANDARD} ${CMAKE_CXX_FLAGS} $ENV{CFLAGS}"
       "LDFLAGS=-Wl,-rpath,${CMAKE_INSTALL_PREFIX}/lib ${CMAKE_STATIC_LINKER_FLAGS_INIT} ${CMAKE_SHARED_LINKER_FLAGS_INIT} ${CMAKE_EXE_LINKER_FLAGS_INIT} ${CMAKE_STATIC_LINKER_FLAGS} ${CMAKE_SHARED_LINKER_FLAGS} ${CMAKE_EXE_LINKER_FLAGS} $ENV{LDFLAGS}"
-      ./configure "--prefix=${CMAKE_INSTALL_PREFIX}"
+      ./configure
+        "--prefix=${CMAKE_INSTALL_PREFIX}"
+        # --enable-shared=no seems to not work. It still produces shared libraries.
+        "--enable-shared=no"
+  WORKING_DIRECTORY "${GIT_REPOSITORY_DIR}"
+  COMMAND_ERROR_IS_FATAL ANY)
+
+
+execute_process(
+  COMMAND "${CMAKE_COMMAND}" -E remove_directory "${CMAKE_INSTALL_PREFIX}"
   WORKING_DIRECTORY "${GIT_REPOSITORY_DIR}"
   COMMAND_ERROR_IS_FATAL ANY)
 

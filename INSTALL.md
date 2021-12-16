@@ -93,6 +93,8 @@ environment using:
 
 ## Building from source with CMake
 
+Darwin is not supported with CMake.
+
 ### Dependency instructions for Ubuntu
 
 ```bash

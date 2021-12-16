@@ -80,17 +80,13 @@ jobs:
                   cmake --build ~/cmake_build
               shell: bash
 
-            - name: Install runtime dependencies
-              uses: ./.github/actions/install-runtime-dependencies
-
-            - name: Install test dependencies
-              run: python -m pip install -r tests/requirements.txt
-
-            - name: Run the test suite
-              run: |
-                  cd ~/cmake_build
-                  ctest --parallel $(nproc) --tests-regex tests/ --label-exclude manual
-              shell: bash
+            - name: Upload Python wheel
+              uses: actions/upload-artifact@v2
+              with:
+                  name: linux-wheel-cmake
+                  path: ~/cmake_build/py_pkg/dist/*.whl
+                  if-no-files-found: error
+                  retention-days: 7
 
     build-macos:
         runs-on: macos-latest
@@ -165,6 +161,38 @@ jobs:
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
+
+    test-linux-cmake:
+        needs: build-linux-cmake
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                python: [3.9]
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python ${{ matrix.python }}
+              uses: actions/setup-python@v2
+              with:
+                  python-version: ${{ matrix.python }}
+
+            - name: Download Python wheel
+              uses: actions/download-artifact@v2
+              with:
+                  name: linux-wheel-cmake
+
+            - name: Install wheel
+              run: python -m pip install *.whl
+
+            - name: Install runtime dependencies
+              uses: ./.github/actions/install-runtime-dependencies
+
+            - name: Install test dependencies
+              run: python -m pip install -r tests/requirements.txt
+
+            - name: Run the test suite
+              run: make install-test
 
     test-macos:
         needs: build-macos
