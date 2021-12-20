@@ -15,7 +15,7 @@ runs:
                   sudo apt-get install -y clang-9 patchelf
               fi
               python -m pip install -U pip wheel
-              python -m pip install -r compiler_gym/requirements.txt
+              python -m pip install -r compiler_gym/requirements_build.txt
           shell: bash
           env:
               LDFLAGS: -L/usr/local/opt/zlib/lib

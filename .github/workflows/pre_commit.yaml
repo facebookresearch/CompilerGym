@@ -51,7 +51,6 @@ jobs:
 
             - name: Install Python dependencies
               run: |
-                  sudo apt-get install python3-setuptools
                   python3 -m pip install --upgrade wheel
                   python3 -m pip install -r requirements_pre_commit.txt
                   python3 -m isort --version
