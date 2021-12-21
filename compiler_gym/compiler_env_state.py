@@ -9,7 +9,6 @@ from typing import Iterable, List, Optional, TextIO
 
 from pydantic import BaseModel, Field, validator
 
-from compiler_gym.datasets.uri import BENCHMARK_URI_PATTERN
 from compiler_gym.util.truncate import truncate
 
 
@@ -23,7 +22,6 @@ class CompilerEnvState(BaseModel):
 
     benchmark: str = Field(
         allow_mutation=False,
-        regex=BENCHMARK_URI_PATTERN,
         examples=[
             "benchmark://cbench-v1/crc32",
             "generator://csmith-v0/0",

@@ -11,6 +11,7 @@ import numpy as np
 
 from compiler_gym.datasets import Benchmark, BenchmarkSource, Dataset
 from compiler_gym.datasets.benchmark import BenchmarkInitError, BenchmarkWithSource
+from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.envs.llvm.llvm_benchmark import ClangInvocation
 from compiler_gym.service.proto import BenchmarkDynamicConfig, Command
 from compiler_gym.util.decorators import memoized_property
@@ -149,8 +150,9 @@ class CsmithDataset(Dataset):
     def benchmark_uris(self) -> Iterable[str]:
         return (f"{self.name}/{i}" for i in range(UINT_MAX))
 
-    def benchmark(self, uri: str) -> CsmithBenchmark:
-        return self.benchmark_from_seed(int(uri.split("/")[-1]))
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> CsmithBenchmark:
+        seed = int(uri.path[1:])
+        return self.benchmark_from_seed(seed)
 
     def _random_benchmark(self, random_state: np.random.Generator) -> Benchmark:
         seed = random_state.integers(UINT_MAX)

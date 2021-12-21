@@ -103,7 +103,7 @@ class Benchmark:
         return hash(self.uri)
 
     @property
-    def uri(self) -> str:
+    def uri(self) -> BenchmarkUri:
         """The URI of the benchmark.
 
         Benchmark URIs should be unique, that is, that two URIs with the same
@@ -113,7 +113,7 @@ class Benchmark:
 
         :return: A URI string. :type: string
         """
-        return self._proto.uri
+        return BenchmarkUri.from_string(self._proto.uri)
 
     @property
     def proto(self) -> BenchmarkProto:

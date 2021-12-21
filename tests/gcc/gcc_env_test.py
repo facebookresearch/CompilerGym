@@ -116,7 +116,9 @@ def test_reward_before_reset(gcc_bin: str):
 def test_reset_invalid_benchmark(gcc_bin: str):
     """Test requesting a specific benchmark."""
     with gym.make("gcc-v0", gcc_bin=gcc_bin) as env:
-        with pytest.raises(LookupError, match=r"'benchmark://chstone-v1"):
+        with pytest.raises(
+            LookupError, match=r"Dataset not found: benchmark://chstone-v1"
+        ):
             env.reset(benchmark="chstone-v1/flubbedydubfishface")
 
 

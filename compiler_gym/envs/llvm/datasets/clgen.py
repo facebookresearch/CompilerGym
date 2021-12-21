@@ -15,6 +15,7 @@ from fasteners import InterProcessLock
 
 from compiler_gym.datasets import Benchmark, BenchmarkInitError, TarDatasetWithManifest
 from compiler_gym.datasets.benchmark import BenchmarkWithSource
+from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.envs.llvm.llvm_benchmark import ClangInvocation
 from compiler_gym.util.download import download
 from compiler_gym.util.filesystem import atomic_file_write
@@ -117,10 +118,10 @@ class CLgenDataset(TarDatasetWithManifest):
 
             self._opencl_headers_installed_marker.touch()
 
-    def benchmark(self, uri: str) -> Benchmark:
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
         self.install()
 
-        benchmark_name = uri[len(self.name) + 1 :]
+        benchmark_name = uri.path[1:]
         if not benchmark_name:
             raise LookupError(f"No benchmark specified: {uri}")
 

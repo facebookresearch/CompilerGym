@@ -20,6 +20,7 @@ from typing import Callable, Dict, List, NamedTuple, Optional
 import fasteners
 
 from compiler_gym.datasets import Benchmark, TarDatasetWithManifest
+from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.service.proto import BenchmarkDynamicConfig, Command
 from compiler_gym.third_party import llvm
 from compiler_gym.util.download import download
@@ -494,7 +495,8 @@ def validator(
 
     # Create the BenchmarkDynamicConfig object.
     cbench_data = site_data_path("llvm-v0/cbench-v1-runtime-data/runtime_data")
-    DYNAMIC_CONFIGS[benchmark].append(
+    uri = BenchmarkUri.from_string(benchmark)
+    DYNAMIC_CONFIGS[uri.path].append(
         BenchmarkDynamicConfig(
             build_cmd=Command(
                 argument=["$CC", "$IN"] + linkopts,
@@ -518,20 +520,6 @@ def validator(
     return True
 
 
-class CBenchBenchmark(Benchmark):
-    """A cBench benchmmark."""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for val in VALIDATORS.get(self.uri, []):
-            self.add_validation_callback(val)
-        if DYNAMIC_CONFIGS[self.uri]:
-            # TODO(github.com/facebookresearch/CompilerGym/issues/370): Add
-            # support for multiple datasets.
-            config = DYNAMIC_CONFIGS[self.uri][-1]
-            self.proto.dynamic_config.MergeFrom(config)
-
-
 class CBenchDataset(TarDatasetWithManifest):
     def __init__(self, site_data_base: Path):
         platform = {"darwin": "macos"}.get(sys.platform, sys.platform)
@@ -552,7 +540,7 @@ class CBenchDataset(TarDatasetWithManifest):
             manifest_sha256="eeffd7593aeb696a160fd22e6b0c382198a65d0918b8440253ea458cfe927741",
             strip_prefix="cBench-v1",
             benchmark_file_suffix=".bc",
-            benchmark_class=CBenchBenchmark,
+            benchmark_class=Benchmark,
             site_data_base=site_data_base,
             sort_order=-1,
             validatable="Partially",
@@ -563,6 +551,20 @@ class CBenchDataset(TarDatasetWithManifest):
         with _CBENCH_DOWNLOAD_THREAD_LOCK:
             with fasteners.InterProcessLock(cache_path(".cbench-v1-runtime-data.LOCK")):
                 download_cBench_runtime_data()
+
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
+        benchmark = super().benchmark_from_parsed_uri(uri)
+
+        for val in VALIDATORS.get(str(uri), []):
+            self.add_validation_callback(val)
+
+        if DYNAMIC_CONFIGS[uri.path]:
+            # TODO(github.com/facebookresearch/CompilerGym/issues/370): Add
+            # support for multiple datasets.
+            config = DYNAMIC_CONFIGS[uri.path][-1]
+            self.proto.dynamic_config.MergeFrom(config)
+
+        return benchmark
 
 
 class CBenchLegacyDataset2(TarDatasetWithManifest):
@@ -593,7 +595,6 @@ class CBenchLegacyDataset2(TarDatasetWithManifest):
             benchmark_file_suffix=".bc",
             site_data_base=site_data_base,
             sort_order=sort_order,
-            benchmark_class=CBenchBenchmark,
             deprecated=deprecated,
             validatable="Partially",
         )
@@ -657,8 +658,8 @@ VALIDATORS: Dict[
 ] = defaultdict(list)
 
 
-# A map from benchmark name to a list of BenchmarkDynamicConfig messages, one
-# per dataset.
+# A map from cBench benchmark path to a list of BenchmarkDynamicConfig messages,
+# one per dataset.
 DYNAMIC_CONFIGS: Dict[str, List[BenchmarkDynamicConfig]] = defaultdict(list)
 
 

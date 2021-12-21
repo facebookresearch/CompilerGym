@@ -8,6 +8,7 @@ from pathlib import Path
 import pytest
 
 from compiler_gym.datasets.dataset import Dataset
+from compiler_gym.datasets.uri import BenchmarkUri
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.common"]
@@ -201,11 +202,8 @@ class DatasetForTesting(Dataset):
     def benchmark_uris(self):
         return sorted(self._benchmarks)
 
-    def benchmark(self, uri):
-        if uri:
-            return self._benchmarks[uri]
-        else:
-            return next(iter(self._benchmarks.values()))
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri):
+        return self._benchmarks[str(uri)]
 
     @property
     def size(self):

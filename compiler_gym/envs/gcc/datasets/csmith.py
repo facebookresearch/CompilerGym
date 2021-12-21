@@ -15,6 +15,7 @@ from fasteners import InterProcessLock
 
 from compiler_gym.datasets import Benchmark, BenchmarkSource, Dataset
 from compiler_gym.datasets.benchmark import BenchmarkWithSource
+from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.envs.gcc.gcc import Gcc
 from compiler_gym.util.decorators import memoized_property
 from compiler_gym.util.runfiles_path import runfiles_path
@@ -139,8 +140,8 @@ class CsmithDataset(Dataset):
     def benchmark_uris(self) -> Iterable[str]:
         return (f"{self.name}/{i}" for i in range(UINT_MAX))
 
-    def benchmark(self, uri: str) -> CsmithBenchmark:
-        return self.benchmark_from_seed(int(uri.split("/")[-1]))
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> CsmithBenchmark:
+        return self.benchmark_from_seed(int(uri.path[1:]))
 
     def _random_benchmark(self, random_state: np.random.Generator) -> Benchmark:
         seed = random_state.integers(UINT_MAX)

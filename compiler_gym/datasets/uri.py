@@ -4,7 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 """This module contains utility code for working with URIs."""
 import re
-from typing import Dict, List
+from typing import Dict, List, Union
 from urllib.parse import ParseResult, parse_qs, urlencode, urlparse, urlunparse
 
 from deprecated.sphinx import deprecated
@@ -141,3 +141,12 @@ class BenchmarkUri(BaseModel):
 
     def __str__(self) -> str:
         return repr(self)
+
+    def __hash__(self) -> int:
+        return hash(str(self))
+
+    def __eq__(self, other: Union["BenchmarkUri", str]) -> bool:
+        return str(self) == str(other)
+
+    def __lt__(self, other: Union["BenchmarkUri", str]) -> bool:
+        return str(self) < str(other)

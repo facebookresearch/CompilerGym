@@ -811,7 +811,7 @@ class CompilerEnv(gym.Env):
         if self.service.opts.always_send_benchmark_on_reset:
             self._benchmark_in_use_proto = self._benchmark_in_use.proto
         else:
-            self._benchmark_in_use_proto.uri = self._benchmark_in_use.uri
+            self._benchmark_in_use_proto.uri = str(self._benchmark_in_use.uri)
 
         start_session_request = StartSessionRequest(
             benchmark=self._benchmark_in_use_proto,

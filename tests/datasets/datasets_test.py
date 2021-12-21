@@ -7,6 +7,7 @@ import numpy as np
 import pytest
 
 from compiler_gym.datasets.datasets import Datasets, round_robin_iterables
+from compiler_gym.datasets.uri import BenchmarkUri
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.common"]
@@ -34,11 +35,11 @@ class MockDataset:
     def benchmarks(self):
         yield from self.benchmark_values
 
-    def benchmark(self, uri):
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri):
         for b in self.benchmark_values:
-            if b.uri == uri:
+            if b.uri == str(uri):
                 return b
-        raise KeyError(uri)
+        raise KeyError(str(uri))
 
     def random_benchmark(self, random_state=None):
         return random_state.choice(self.benchmark_values)

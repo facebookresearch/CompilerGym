@@ -9,8 +9,11 @@ from concurrent.futures import as_completed
 from pathlib import Path
 from typing import Optional
 
+import numpy as np
+
 from compiler_gym.datasets import Benchmark, BenchmarkInitError, TarDatasetWithManifest
 from compiler_gym.datasets.benchmark import BenchmarkWithSource
+from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.envs.llvm.llvm_benchmark import ClangInvocation
 from compiler_gym.util import thread_pool
 from compiler_gym.util.download import download
@@ -69,7 +72,7 @@ class POJ104Dataset(TarDatasetWithManifest):
             sort_order=sort_order,
         )
 
-    def benchmark(self, uri: Optional[str] = None) -> Benchmark:
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
         self.install()
         if uri is None or len(uri) <= len(self.name) + 1:
             return self._get_benchmark_by_index(self.random.integers(self.size))
@@ -127,6 +130,12 @@ class POJ104Dataset(TarDatasetWithManifest):
                 )
 
         return BenchmarkWithSource.create(uri, bitcode_path, "source.cc", cc_file_path)
+
+    def random_benchmark(
+        self, random_state: Optional[np.random.Generator] = None
+    ) -> Benchmark:
+        random_state = random_state or np.random.default_rng()
+        return self._get_benchmark_by_index(random_state.integers(self.size))
 
     @staticmethod
     def preprocess_poj104_source(src: str) -> str:

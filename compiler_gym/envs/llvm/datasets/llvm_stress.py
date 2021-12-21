@@ -10,6 +10,7 @@ import numpy as np
 
 from compiler_gym.datasets import Benchmark, Dataset
 from compiler_gym.datasets.benchmark import BenchmarkInitError
+from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.third_party import llvm
 
 # The maximum value for the --seed argument to llvm-stress.
@@ -55,8 +56,9 @@ class LlvmStressDataset(Dataset):
     def benchmark_uris(self) -> Iterable[str]:
         return (f"{self.name}/{i}" for i in range(UINT_MAX))
 
-    def benchmark(self, uri: str) -> Benchmark:
-        return self.benchmark_from_seed(int(uri.split("/")[-1]))
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
+        seed = int(uri.path[1:])
+        return self.benchmark_from_seed(seed)
 
     def _random_benchmark(self, random_state: np.random.Generator) -> Benchmark:
         seed = random_state.integers(UINT_MAX)
