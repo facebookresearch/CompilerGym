@@ -278,10 +278,10 @@ doxygen-rst:
 	cd docs && $(PYTHON) generate_cc_rst.py
 
 docs: gendocs bazel-build doxygen
-	PYTHONPATH=$(ROOT)/bazel-bin/package.runfiles/CompilerGym sphinx-build -M html docs/source docs/build $(SPHINXOPTS)
+	cd docs/source && PYTHONPATH=$(ROOT)/bazel-bin/package.runfiles/CompilerGym sphinx-build -M html . ../build $(SPHINXOPTS)
 
 livedocs: gendocs doxygen
-	PYTHONPATH=$(ROOT)/bazel-bin/package.runfiles/CompilerGym sphinx-autobuild docs/source docs/build $(SPHINXOPTS) --pre-build 'make gendocs bazel-build doxygen' --watch compiler_gym
+	cd docs/source && PYTHONPATH=$(ROOT)/bazel-bin/package.runfiles/CompilerGym sphinx-autobuild . ../build $(SPHINXOPTS) --pre-build 'make -C ../.. gendocs bazel-build doxygen' --watch ../../compiler_gym
 
 
 .PHONY: doxygen doxygen-rst
