@@ -84,5 +84,22 @@ def test_cbench_v1_deprecation(env: LlvmEnv):
         env.datasets.benchmark("benchmark://cBench-v1/crc32")
 
 
+def test_cbench_v1_dataset_param(env: LlvmEnv):
+    a = env.datasets.benchmark("cbench-v1/qsort?dataset=0")
+    b = env.datasets.benchmark("cbench-v1/qsort?dataset=0")  # same as a
+    c = env.datasets.benchmark("cbench-v1/qsort?dataset=1")
+
+    assert a.proto.dynamic_config == b.proto.dynamic_config  # sanity check
+    assert a.proto.dynamic_config != c.proto.dynamic_config  # sanity check
+
+
+def test_cbench_v1_dataset_out_of_range(env: LlvmEnv):
+    with pytest.raises(ValueError, match="Invalid dataset: 50"):
+        env.datasets.benchmark("cbench-v1/qsort?dataset=50")
+
+    with pytest.raises(ValueError, match="Invalid dataset: abc"):
+        env.datasets.benchmark("cbench-v1/qsort?dataset=abc")
+
+
 if __name__ == "__main__":
     main()

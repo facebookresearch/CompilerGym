@@ -556,13 +556,23 @@ class CBenchDataset(TarDatasetWithManifest):
         benchmark = super().benchmark_from_parsed_uri(uri)
 
         for val in VALIDATORS.get(str(uri), []):
-            self.add_validation_callback(val)
+            benchmark.add_validation_callback(val)
 
+        # Parse the "dataset" parameter to determine the correct dynamic
+        # configuration to use.
         if DYNAMIC_CONFIGS[uri.path]:
-            # TODO(github.com/facebookresearch/CompilerGym/issues/370): Add
-            # support for multiple datasets.
-            config = DYNAMIC_CONFIGS[uri.path][-1]
-            self.proto.dynamic_config.MergeFrom(config)
+            cfgs = DYNAMIC_CONFIGS[uri.path]
+            dataset = uri.params.get("dataset", ["0"])
+
+            try:
+                dataset_index = int(dataset[-1])
+            except (ValueError, TypeError) as e:
+                raise ValueError(f"Invalid dataset: {dataset[-1]}") from e
+
+            if dataset_index < 0 or dataset_index >= len(cfgs):
+                raise ValueError(f"Invalid dataset: {dataset_index}")
+
+            benchmark.proto.dynamic_config.MergeFrom(cfgs[dataset_index])
 
         return benchmark
 
