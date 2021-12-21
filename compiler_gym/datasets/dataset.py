@@ -10,7 +10,9 @@ from pathlib import Path
 from typing import Dict, Iterable, Optional, Union
 
 import numpy as np
-from deprecated.sphinx import deprecated
+
+# The "deprecated" name is used as a constructor argument to Dataset, so rename
+# this import to prevent shadowing.
 from deprecated.sphinx import deprecated as mark_deprecated
 
 from compiler_gym.datasets.benchmark import Benchmark
@@ -127,7 +129,7 @@ class Dataset:
         return self.name
 
     @property
-    @deprecated(
+    @mark_deprecated(
         version="0.2.1",
         reason=(
             "The `Dataset.logger` attribute is deprecated. All Dataset "
