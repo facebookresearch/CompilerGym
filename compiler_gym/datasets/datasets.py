@@ -2,7 +2,9 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+import os
 from collections import deque
+from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Set, TypeVar
 
 import numpy as np
@@ -10,6 +12,7 @@ import numpy as np
 from compiler_gym.datasets.benchmark import Benchmark
 from compiler_gym.datasets.dataset import Dataset
 from compiler_gym.datasets.uri import BenchmarkUri
+from compiler_gym.service.proto import Benchmark as BenchmarkProto
 
 T = TypeVar("T")
 
@@ -278,6 +281,24 @@ class Datasets:
         :return: A :class:`Benchmark <compiler_gym.datasets.Benchmark>`
             instance.
         """
+        if uri.scheme == "proto":
+            path = Path(os.path.normpath(f"{uri.dataset}/{uri.path}"))
+            if not path.is_file():
+                raise FileNotFoundError(str(path))
+
+            proto = BenchmarkProto()
+            with open(path, "rb") as f:
+                proto.ParseFromString(f.read())
+
+            return Benchmark(proto=proto)
+
+        if uri.scheme == "file":
+            path = Path(os.path.normpath(f"{uri.dataset}/{uri.path}"))
+            if not path.is_file():
+                raise FileNotFoundError(str(path))
+
+            return Benchmark.from_file(uri=uri, path=path)
+
         dataset = self.dataset_from_parsed_uri(uri)
         return dataset.benchmark_from_parsed_uri(uri)
 
