@@ -494,23 +494,25 @@ def validator(
 
     # Create the BenchmarkDynamicConfig object.
     cbench_data = site_data_path("llvm-v0/cbench-v1-runtime-data/runtime_data")
-    DYNAMIC_CONFIGS[benchmark] = BenchmarkDynamicConfig(
-        build_cmd=Command(
-            argument=["$CC", "$IN"] + linkopts,
-            timeout_seconds=60,
-            outfile=["a.out"],
-        ),
-        run_cmd=Command(
-            argument=cmd.replace("$BIN", "./a.out")
-            .replace("$D", str(cbench_data))
-            .split(),
-            timeout_seconds=300,
-            infile=["a.out", "_finfo_dataset"],
-            outfile=[str(s) for s in outfiles],
-        ),
-        pre_run_cmd=[
-            Command(argument=["echo", "1", ">_finfo_dataset"], timeout_seconds=30),
-        ],
+    DYNAMIC_CONFIGS[benchmark].append(
+        BenchmarkDynamicConfig(
+            build_cmd=Command(
+                argument=["$CC", "$IN"] + linkopts,
+                timeout_seconds=60,
+                outfile=["a.out"],
+            ),
+            run_cmd=Command(
+                argument=cmd.replace("$BIN", "./a.out")
+                .replace("$D", str(cbench_data))
+                .split(),
+                timeout_seconds=300,
+                infile=["a.out", "_finfo_dataset"],
+                outfile=[str(s) for s in outfiles],
+            ),
+            pre_run_cmd=[
+                Command(argument=["echo", "1", ">_finfo_dataset"], timeout_seconds=30),
+            ],
+        )
     )
 
     return True
@@ -523,9 +525,11 @@ class CBenchBenchmark(Benchmark):
         super().__init__(*args, **kwargs)
         for val in VALIDATORS.get(self.uri, []):
             self.add_validation_callback(val)
-        self.proto.dynamic_config.MergeFrom(
-            DYNAMIC_CONFIGS.get(self.uri, BenchmarkDynamicConfig())
-        )
+        if DYNAMIC_CONFIGS[self.uri]:
+            # TODO(github.com/facebookresearch/CompilerGym/issues/370): Add
+            # support for multiple datasets.
+            config = DYNAMIC_CONFIGS[self.uri][-1]
+            self.proto.dynamic_config.MergeFrom(config)
 
 
 class CBenchDataset(TarDatasetWithManifest):
@@ -653,8 +657,9 @@ VALIDATORS: Dict[
 ] = defaultdict(list)
 
 
-# A map from benchmark name to BenchmarkDynamicConfig messages.
-DYNAMIC_CONFIGS: Dict[str, Optional[BenchmarkDynamicConfig]] = {}
+# A map from benchmark name to a list of BenchmarkDynamicConfig messages, one
+# per dataset.
+DYNAMIC_CONFIGS: Dict[str, List[BenchmarkDynamicConfig]] = defaultdict(list)
 
 
 def validate_sha_output(result: BenchmarkExecutionResult) -> Optional[str]:
