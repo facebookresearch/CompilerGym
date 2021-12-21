@@ -5,6 +5,8 @@
 """This module contains utility code for working with URIs."""
 import re
 
+from deprecated.sphinx import deprecated
+
 # Regular expression that matches the full two-part URI prefix of a dataset:
 #     {{protocol}}://{{dataset}}
 #
@@ -22,6 +24,10 @@ BENCHMARK_URI_PATTERN = r"(?P<dataset>(?P<dataset_protocol>[a-zA-z0-9-_]+)://(?P
 BENCHMARK_URI_RE = re.compile(BENCHMARK_URI_PATTERN)
 
 
+@deprecated(
+    version="0.2.2",
+    reason=("Use the new compiler_gym.datasets.BenchmarkUri class to parse URIs"),
+)
 def resolve_uri_protocol(uri: str) -> str:
     """Require that the URI has a protocol by applying a default "benchmark"
     protocol if none is set."""
