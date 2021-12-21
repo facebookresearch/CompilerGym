@@ -17,18 +17,18 @@ from tests.test_main import main
 pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
-def test_add_benchmark_invalid_protocol(env: CompilerEnv):
+def test_add_benchmark_invalid_scheme(env: CompilerEnv):
     with pytest.raises(ValueError) as ctx:
         env.reset(
             benchmark=Benchmark(
                 BenchmarkProto(
-                    uri="benchmark://foo", program=File(uri="https://invalid/protocol")
+                    uri="benchmark://foo", program=File(uri="https://invalid/scheme")
                 ),
             )
         )
     assert str(ctx.value) == (
         "Invalid benchmark data URI. "
-        'Only the file:/// protocol is supported: "https://invalid/protocol"'
+        'Only the file:/// scheme is supported: "https://invalid/scheme"'
     )
 
 

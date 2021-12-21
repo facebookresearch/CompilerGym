@@ -9,7 +9,7 @@ import numpy as np
 
 from compiler_gym.datasets.benchmark import Benchmark
 from compiler_gym.datasets.dataset import Dataset
-from compiler_gym.datasets.uri import BENCHMARK_URI_RE, resolve_uri_protocol
+from compiler_gym.datasets.uri import BENCHMARK_URI_RE, BenchmarkUri
 
 T = TypeVar("T")
 
@@ -131,12 +131,13 @@ class Datasets:
 
         :raises LookupError: If :code:`dataset` is not found.
         """
-        dataset_name = resolve_uri_protocol(dataset)
+        uri = BenchmarkUri.from_string(dataset)
+        key = f"{uri.scheme}://{uri.dataset}"
 
-        if dataset_name not in self._datasets:
-            raise LookupError(f"Dataset not found: {dataset_name}")
+        if key not in self._datasets:
+            raise LookupError(f"Dataset not found: {key}")
 
-        return self._datasets[dataset_name]
+        return self._datasets[key]
 
     def __getitem__(self, dataset: str) -> Dataset:
         """Lookup a dataset.
@@ -155,7 +156,7 @@ class Datasets:
         :param key: The name of the dataset.
         :param dataset: The dataset to add.
         """
-        dataset_name = resolve_uri_protocol(key)
+        dataset_name = BenchmarkUri.canonicalize(key)
 
         self._datasets[dataset_name] = dataset
         if not dataset.deprecated:
@@ -173,7 +174,7 @@ class Datasets:
         :return: :code:`True` if the dataset was removed, :code:`False` if it
             was already removed.
         """
-        dataset_name = resolve_uri_protocol(dataset)
+        dataset_name = BenchmarkUri.canonicalize(dataset)
         if dataset_name in self._visible_datasets:
             self._visible_datasets.remove(dataset_name)
         del self._datasets[dataset_name]
@@ -242,7 +243,7 @@ class Datasets:
         :return: A :class:`Benchmark <compiler_gym.datasets.Benchmark>`
             instance.
         """
-        uri = resolve_uri_protocol(uri)
+        uri = BenchmarkUri.canonicalize(uri)
 
         match = BENCHMARK_URI_RE.match(uri)
         if not match:

@@ -291,7 +291,7 @@ The 'tutorial' command will give a step by step guide."""
             self.benchmarks += islice(dataset.benchmark_uris(), 50)
         self.benchmarks.sort()
 
-        # Strip default benchmark:// protocol.
+        # Strip default benchmark:// scheme.
         for i, benchmark in enumerate(self.benchmarks):
             if benchmark.startswith("benchmark://"):
                 self.benchmarks[i] = benchmark[len("benchmark://") :]

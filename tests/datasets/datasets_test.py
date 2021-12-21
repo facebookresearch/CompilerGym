@@ -135,7 +135,7 @@ def test_datasets_get_item():
     assert datasets["benchmark://foo-v0"] == da
 
 
-def test_datasets_get_item_default_protocol():
+def test_datasets_get_item_default_scheme():
     da = MockDataset("benchmark://foo-v0")
     datasets = Datasets([da])
 

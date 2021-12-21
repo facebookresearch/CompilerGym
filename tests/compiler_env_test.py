@@ -52,7 +52,7 @@ def test_uri_substring_no_match(env: LlvmEnv):
         env.reset(benchmark="benchmark://cbench-v1/cr")
 
 
-def test_uri_substring_candidate_no_match_infer_protocol(env: LlvmEnv):
+def test_uri_substring_candidate_no_match_infer_scheme(env: LlvmEnv):
     env.reset(benchmark="cbench-v1/crc32")
     assert env.benchmark == "benchmark://cbench-v1/crc32"
 

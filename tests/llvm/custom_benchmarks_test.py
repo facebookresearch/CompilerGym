@@ -83,10 +83,10 @@ def test_invalid_benchmark_path_contents(env: LlvmEnv):
             env.reset(benchmark=benchmark)
 
 
-def test_benchmark_path_invalid_protocol(env: LlvmEnv):
+def test_benchmark_path_invalid_scheme(env: LlvmEnv):
     benchmark = Benchmark(
         BenchmarkProto(
-            uri="benchmark://new", program=File(uri="invalid_protocol://test")
+            uri="benchmark://new", program=File(uri="invalid_scheme://test")
         ),
     )
 
@@ -94,7 +94,7 @@ def test_benchmark_path_invalid_protocol(env: LlvmEnv):
         ValueError,
         match=(
             "Invalid benchmark data URI. "
-            'Only the file:/// protocol is supported: "invalid_protocol://test"'
+            'Only the file:/// scheme is supported: "invalid_scheme://test"'
         ),
     ):
         env.reset(benchmark=benchmark)
