@@ -26,6 +26,7 @@ from compiler_gym.third_party import llvm
 from compiler_gym.util.download import download
 from compiler_gym.util.runfiles_path import cache_path, site_data_path
 from compiler_gym.util.timer import Timer
+from compiler_gym.util.truncate import truncate
 from compiler_gym.validation_result import ValidationError
 
 logger = logging.getLogger(__name__)
@@ -419,7 +420,12 @@ def _make_cBench_validator(
                 # Timeout errors can be raised by the environment in case of a
                 # slow step / observation, and should be retried.
                 pass
-            logger.warning("Validation callback failed, attempt=%d/%d", j, flakiness)
+            logger.warning(
+                "Validation callback failed (%s), attempt=%d/%d",
+                truncate(str(error), max_line_len=50, max_lines=1),
+                j,
+                flakiness,
+            )
         return error
 
     return flaky_wrapped_cb
