@@ -23,6 +23,7 @@ from compiler_gym.datasets import Benchmark, TarDatasetWithManifest
 from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.service.proto import BenchmarkDynamicConfig, Command
 from compiler_gym.third_party import llvm
+from compiler_gym.util.commands import Popen
 from compiler_gym.util.download import download
 from compiler_gym.util.runfiles_path import cache_path, site_data_path
 from compiler_gym.util.timer import Timer
@@ -137,36 +138,30 @@ def _compile_and_run_bitcode_file(
         error_data["compile_cmd"] = compile_cmd
         logger.debug("compile: %s", compile_cmd)
         assert not binary.is_file()
-        clang = subprocess.Popen(
-            compile_cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            universal_newlines=True,
-            env={"PATH": f"{clang_path.parent}:{os.environ.get('PATH', '')}"},
-        )
         try:
-            output, _ = clang.communicate(timeout=compilation_timeout_seconds)
+            with Popen(
+                compile_cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                universal_newlines=True,
+                env={"PATH": f"{clang_path.parent}:{os.environ.get('PATH', '')}"},
+            ) as clang:
+                output, _ = clang.communicate(timeout=compilation_timeout_seconds)
+                if clang.returncode:
+                    error_data["output"] = output
+                    return BenchmarkExecutionResult(
+                        walltime_seconds=timeout_seconds,
+                        error=ValidationError(
+                            type="Compilation failed",
+                            data=error_data,
+                        ),
+                    )
         except subprocess.TimeoutExpired:
-            # kill() was added in Python 3.7.
-            if sys.version_info >= (3, 7, 0):
-                clang.kill()
-            else:
-                clang.terminate()
-            clang.communicate(timeout=30)  # Wait for shutdown to complete.
             error_data["timeout"] = compilation_timeout_seconds
             return BenchmarkExecutionResult(
                 walltime_seconds=timeout_seconds,
                 error=ValidationError(
                     type="Compilation timeout",
-                    data=error_data,
-                ),
-            )
-        if clang.returncode:
-            error_data["output"] = output
-            return BenchmarkExecutionResult(
-                walltime_seconds=timeout_seconds,
-                error=ValidationError(
-                    type="Compilation failed",
                     data=error_data,
                 ),
             )
@@ -176,26 +171,18 @@ def _compile_and_run_bitcode_file(
         error_data["run_cmd"] = cmd.replace("$BIN", f"{lli_path.name} benchmark.bc")
         run_env["PATH"] = str(lli_path.parent)
 
+    logger.debug("exec: %s", error_data["run_cmd"])
     try:
-        logger.debug("exec: %s", error_data["run_cmd"])
-        process = subprocess.Popen(
+        with Timer() as timer, Popen(
             error_data["run_cmd"],
             shell=True,
             stderr=subprocess.STDOUT,
             stdout=subprocess.PIPE,
             env=run_env,
             cwd=cwd,
-        )
-
-        with Timer() as timer:
+        ) as process:
             stdout, _ = process.communicate(timeout=timeout_seconds)
     except subprocess.TimeoutExpired:
-        # kill() was added in Python 3.7.
-        if sys.version_info >= (3, 7, 0):
-            process.kill()
-        else:
-            process.terminate()
-        process.communicate(timeout=30)  # Wait for shutdown to complete.
         error_data["timeout_seconds"] = timeout_seconds
         return BenchmarkExecutionResult(
             walltime_seconds=timeout_seconds,
@@ -390,24 +377,24 @@ def _make_cBench_validator(
                         type="Output not generated",
                         data={"path": path.name, "command": cmd},
                     )
-                diff = subprocess.Popen(
+                with Popen(
                     ["diff", str(path), f"{path}.gold_standard"],
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
-                )
-                stdout, _ = diff.communicate()
-                if diff.returncode:
-                    try:
-                        stdout = stdout.decode("utf-8")
-                        return ValidationError(
-                            type="Wrong output (file)",
-                            data={"path": path.name, "diff": stdout},
-                        )
-                    except UnicodeDecodeError:
-                        return ValidationError(
-                            type="Wrong output (file)",
-                            data={"path": path.name, "diff": "<binary>"},
-                        )
+                ) as diff:
+                    stdout, _ = diff.communicate(timeout=300)
+                    if diff.returncode:
+                        try:
+                            stdout = stdout.decode("utf-8")
+                            return ValidationError(
+                                type="Wrong output (file)",
+                                data={"path": path.name, "diff": stdout},
+                            )
+                        except UnicodeDecodeError:
+                            return ValidationError(
+                                type="Wrong output (file)",
+                                data={"path": path.name, "diff": "<binary>"},
+                            )
 
     def flaky_wrapped_cb(env: "LlvmEnv") -> Optional[ValidationError]:  # noqa: F821
         """Wrap the validation callback in a flakiness retry loop."""

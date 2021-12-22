@@ -17,6 +17,7 @@ from compiler_gym.datasets.benchmark import BenchmarkWithSource
 from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.envs.llvm.llvm_benchmark import ClangInvocation
 from compiler_gym.util import thread_pool
+from compiler_gym.util.commands import Popen
 from compiler_gym.util.download import download
 from compiler_gym.util.filesystem import atomic_file_write
 from compiler_gym.util.truncate import truncate
@@ -107,13 +108,18 @@ class POJ104Dataset(TarDatasetWithManifest):
                     ],
                 ).command(outpath=tmp_bitcode_path)
                 logger.debug("Exec %s", compile_cmd)
-                clang = subprocess.Popen(
-                    compile_cmd,
-                    stdin=subprocess.PIPE,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                )
-                _, stderr = clang.communicate(src.encode("utf-8"), timeout=300)
+                try:
+                    with Popen(
+                        compile_cmd,
+                        stdin=subprocess.PIPE,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                    ) as clang:
+                        _, stderr = clang.communicate(
+                            input=src.encode("utf-8"), timeout=300
+                        )
+                except subprocess.TimeoutExpired:
+                    raise BenchmarkInitError(f"Benchmark compilation timed out: {uri}")
 
             if clang.returncode:
                 compile_cmd = " ".join(compile_cmd)

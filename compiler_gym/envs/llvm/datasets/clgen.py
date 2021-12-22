@@ -18,6 +18,7 @@ from compiler_gym.datasets import Benchmark, BenchmarkInitError, TarDatasetWithM
 from compiler_gym.datasets.benchmark import BenchmarkWithSource
 from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.envs.llvm.llvm_benchmark import ClangInvocation
+from compiler_gym.util.commands import Popen, communicate
 from compiler_gym.util.download import download
 from compiler_gym.util.filesystem import atomic_file_write
 from compiler_gym.util.truncate import truncate
@@ -154,13 +155,16 @@ class CLgenDataset(TarDatasetWithManifest):
                     ],
                 ).command(outpath=tmp_bc_path)
                 logger.debug("Exec %s", compile_command)
-                clang = subprocess.Popen(
-                    compile_command,
-                    stdin=subprocess.PIPE,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                )
-                _, stderr = clang.communicate(timeout=300)
+                try:
+                    with Popen(
+                        compile_command,
+                        stdin=subprocess.PIPE,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                    ) as clang:
+                        _, stderr = communicate(clang, timeout=300)
+                except subprocess.TimeoutExpired:
+                    raise BenchmarkInitError(f"Benchmark compilation timed out: {uri}")
 
             if clang.returncode:
                 compile_command = " ".join(compile_command)

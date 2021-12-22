@@ -15,7 +15,7 @@ from typing import Iterable, List, Optional, Union
 
 from compiler_gym.datasets import Benchmark, BenchmarkInitError
 from compiler_gym.third_party import llvm
-from compiler_gym.util.commands import communicate, run_command
+from compiler_gym.util.commands import Popen, run_command
 from compiler_gym.util.runfiles_path import transient_cache_path
 from compiler_gym.util.thread_pool import get_thread_pool_executor
 
@@ -30,26 +30,26 @@ def get_compiler_includes(compiler: str) -> Iterable[Path]:
     # GNU assembler does not support piping to stdout.
     with tempfile.TemporaryDirectory() as d:
         try:
-            process = subprocess.Popen(
+            with Popen(
                 [compiler, "-xc++", "-v", "-c", "-", "-o", str(Path(d) / "a.out")],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.PIPE,
                 stdin=subprocess.PIPE,
                 universal_newlines=True,
-            )
+            ) as process:
+                _, stderr = process.communicate(input="", timeout=30)
+                if process.returncode:
+                    raise OSError(
+                        f"Failed to invoke {compiler}. "
+                        f"Is there a working system compiler?\n"
+                        f"Error: {stderr.strip()}"
+                    )
         except FileNotFoundError as e:
             raise OSError(
                 f"Failed to invoke {compiler}. "
                 f"Is there a working system compiler?\n"
                 f"Error: {e}"
             ) from e
-        _, stderr = communicate(process, input="", timeout=30)
-    if process.returncode:
-        raise OSError(
-            f"Failed to invoke {compiler}. "
-            f"Is there a working system compiler?\n"
-            f"Error: {stderr.strip()}"
-        )
 
     # Parse the compiler output that matches the conventional output format
     # used by clang and GCC:
@@ -368,14 +368,14 @@ def make_benchmark(
             llvm_link_cmd = [str(llvm.llvm_link_path()), "-o", "-"] + [
                 str(path) for path in bitcodes + clang_outs
             ]
-            llvm_link = subprocess.Popen(
+            with Popen(
                 llvm_link_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-            )
-            bitcode, stderr = communicate(llvm_link, timeout=timeout)
-            if llvm_link.returncode:
-                raise BenchmarkInitError(
-                    f"Failed to link LLVM bitcodes with error: {stderr.decode('utf-8')}"
-                )
+            ) as llvm_link:
+                bitcode, stderr = llvm_link.communicate(timeout=timeout)
+                if llvm_link.returncode:
+                    raise BenchmarkInitError(
+                        f"Failed to link LLVM bitcodes with error: {stderr.decode('utf-8')}"
+                    )
 
     timestamp = datetime.now().strftime("%Y%m%HT%H%M%S")
     uri = f"benchmark://user-v0/{timestamp}-{random.randrange(16**4):04x}"

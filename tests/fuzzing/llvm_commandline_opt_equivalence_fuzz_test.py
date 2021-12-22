@@ -10,6 +10,7 @@ from pathlib import Path
 import pytest
 
 from compiler_gym.envs import LlvmEnv
+from compiler_gym.util.commands import Popen
 from tests.pytest_plugins.random_util import apply_random_trajectory
 from tests.test_main import main
 
@@ -52,19 +53,18 @@ def test_fuzz(env: LlvmEnv, tmpwd: Path, llvm_opt: Path, llvm_diff: Path):
     assert Path("output.ll").is_file()
     os.rename("output.ll", "opt.ll")
 
-    diff = subprocess.Popen(
+    with Popen(
         [llvm_diff, "opt.ll", "env.ll"],
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         universal_newlines=True,
-    )
-    stdout, stderr = diff.communicate(timeout=300)
-
-    if diff.returncode:
-        pytest.fail(
-            f"Opt produced different output to CompilerGym "
-            f"(returncode: {diff.returncode}):\n{stdout}\n{stderr}"
-        )
+    ) as diff:
+        stdout, stderr = diff.communicate(timeout=300)
+        if diff.returncode:
+            pytest.fail(
+                f"Opt produced different output to CompilerGym "
+                f"(returncode: {diff.returncode}):\n{stdout}\n{stderr}"
+            )
 
 
 if __name__ == "__main__":

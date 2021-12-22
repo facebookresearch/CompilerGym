@@ -28,6 +28,7 @@ from compiler_gym.service import (
     ServiceTransportError,
     SessionNotFound,
 )
+from compiler_gym.service.connection import ServiceIsClosed
 from compiler_gym.service.proto import Action, AddBenchmarkRequest
 from compiler_gym.service.proto import Benchmark as BenchmarkProto
 from compiler_gym.service.proto import (
@@ -686,6 +687,10 @@ class CompilerEnv(gym.Env):
                 # not kill it.
                 if reply.remaining_sessions:
                     close_service = False
+            except ServiceIsClosed:
+                # This error can be safely ignored as it means that the service
+                # is already offline.
+                pass
             except Exception as e:
                 logger.warning(
                     "Failed to end active compiler session on close(): %s (%s)",

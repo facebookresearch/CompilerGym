@@ -12,6 +12,7 @@ from compiler_gym.datasets import Benchmark, Dataset
 from compiler_gym.datasets.benchmark import BenchmarkInitError
 from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.third_party import llvm
+from compiler_gym.util.commands import Popen
 
 # The maximum value for the --seed argument to llvm-stress.
 UINT_MAX = (2 ** 32) - 1
@@ -75,21 +76,23 @@ class LlvmStressDataset(Dataset):
 
         # Run llvm-stress with the given seed and pipe the output to llvm-as to
         # assemble a bitcode.
-        llvm_stress = subprocess.Popen(
-            [str(llvm.llvm_stress_path()), f"--seed={seed}"],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-        llvm_as = subprocess.Popen(
-            [str(llvm.llvm_as_path()), "-"],
-            stdin=llvm_stress.stdout,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )
-
-        stdout, _ = llvm_as.communicate(timeout=60)
-        llvm_stress.communicate(timeout=60)
-        if llvm_stress.returncode or llvm_as.returncode:
-            raise BenchmarkInitError("Failed to generate benchmark")
+        try:
+            with Popen(
+                [str(llvm.llvm_stress_path()), f"--seed={seed}"],
+                stdout=subprocess.PIPE,
+                stderr=subprocess.PIPE,
+            ) as llvm_stress:
+                with Popen(
+                    [str(llvm.llvm_as_path()), "-"],
+                    stdin=llvm_stress.stdout,
+                    stdout=subprocess.PIPE,
+                    stderr=subprocess.PIPE,
+                ) as llvm_as:
+                    stdout, _ = llvm_as.communicate(timeout=60)
+                    llvm_stress.communicate(timeout=60)
+                    if llvm_stress.returncode or llvm_as.returncode:
+                        raise BenchmarkInitError("Failed to generate benchmark")
+        except subprocess.TimeoutExpired:
+            raise BenchmarkInitError("Benchmark generation timed out")
 
         return Benchmark.from_file_contents(f"{self.name}/{seed}", stdout)
