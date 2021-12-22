@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 import logging
+import os
 import subprocess
 import sys
 from concurrent.futures import as_completed
@@ -74,11 +75,9 @@ class POJ104Dataset(TarDatasetWithManifest):
 
     def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
         self.install()
-        if uri is None or len(uri) <= len(self.name) + 1:
-            return self._get_benchmark_by_index(self.random.integers(self.size))
 
         # The absolute path of the file, without an extension.
-        path_stem = self.dataset_root / uri[len(self.name) + 1 :]
+        path_stem = os.path.normpath(f"{self.dataset_root}/{uri.path}")
 
         # If the file does not exist, compile it on-demand.
         bitcode_path = Path(f"{path_stem}.bc")

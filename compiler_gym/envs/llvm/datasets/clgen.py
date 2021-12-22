@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 import io
 import logging
+import os
 import shutil
 import subprocess
 import tarfile
@@ -126,7 +127,7 @@ class CLgenDataset(TarDatasetWithManifest):
             raise LookupError(f"No benchmark specified: {uri}")
 
         # The absolute path of the file, without an extension.
-        path_stem = self.dataset_root / uri[len(self.name) + 1 :]
+        path_stem = os.path.normpath(f"{self.dataset_root}/{uri.path}")
 
         bc_path, cl_path = Path(f"{path_stem}.bc"), Path(f"{path_stem}.cl")
 

@@ -329,9 +329,12 @@ The 'tutorial' command will give a step by step guide."""
 
     def set_prompt(self):
         """Set the prompt - shows the benchmark name"""
-        benchmark_name = self.env.benchmark.uri
-        if benchmark_name.startswith("benchmark://"):
-            benchmark_name = benchmark_name[len("benchmark://") :]
+        uri = self.env.benchmark.uri
+        benchmark_name = (
+            f"{uri.dataset}{uri.path}"
+            if uri.scheme == "benchmark"
+            else f"{uri.scheme}://{uri.dataset}{uri.path}"
+        )
         prompt = f"compiler_gym:{benchmark_name}>"
         self.prompt = f"\n{emph(prompt)} "
 

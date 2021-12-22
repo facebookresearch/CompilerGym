@@ -32,7 +32,7 @@ EXAMPLE_BITCODE_IR_INSTRUCTION_COUNT = 242
 def test_reset_invalid_benchmark(env: LlvmEnv):
     invalid_benchmark = "an invalid benchmark"
     with pytest.raises(
-        ValueError, match=f"Invalid benchmark URI: 'benchmark://{invalid_benchmark}'"
+        LookupError, match=f"Dataset not found: benchmark://{invalid_benchmark}"
     ):
         env.reset(benchmark=invalid_benchmark)
 
