@@ -118,11 +118,14 @@ class POJ104Dataset(TarDatasetWithManifest):
             if clang.returncode:
                 compile_cmd = " ".join(compile_cmd)
                 error = truncate(stderr.decode("utf-8"), max_lines=20, max_line_len=100)
+                if tmp_bitcode_path.is_file():
+                    tmp_bitcode_path.unlink()
                 raise BenchmarkInitError(
                     f"Compilation job failed!\n"
                     f"Command: {compile_cmd}\n"
                     f"Error: {error}"
                 )
+
             if not bitcode_path.is_file():
                 raise BenchmarkInitError(
                     f"Compilation job failed to produce output file!\nCommand: {compile_cmd}"
