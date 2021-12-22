@@ -9,6 +9,7 @@ from typing import Iterable, List, Optional, TextIO
 
 from pydantic import BaseModel, Field, validator
 
+from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.util.truncate import truncate
 
 
@@ -47,6 +48,12 @@ class CompilerEnvState(BaseModel):
         if v is not None:
             assert v >= 0, "Walltime cannot be negative"
         return v
+
+    @validator("benchmark", pre=True)
+    def validate_benchmark(cls, value):
+        if isinstance(value, BenchmarkUri):
+            return str(value)
+        return value
 
     @property
     def has_reward(self) -> bool:

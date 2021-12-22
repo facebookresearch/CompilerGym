@@ -123,7 +123,7 @@ class UnrollingDataset(Dataset):
         )
 
     def benchmark_uris(self) -> Iterable[str]:
-        yield from self._benchmarks.keys()
+        yield from (f"benchmark://unrolling-v0{k}" for k in self._benchmarks.keys())
 
     def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
         if uri.path in self._benchmarks:

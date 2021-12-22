@@ -6,11 +6,12 @@ import logging
 from typing import List
 
 import numpy as np
-from pydantic import BaseModel
+from pydantic import BaseModel, validator
 from ray.rllib.agents.dqn import ApexTrainer, R2D2Trainer  # noqa
 from ray.rllib.agents.impala import ImpalaTrainer  # noqa
 from ray.rllib.agents.ppo import PPOTrainer  # noqa
 
+from compiler_gym.datasets import BenchmarkUri
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.util.timer import Timer
 
@@ -118,3 +119,9 @@ class InferenceResult(BaseModel):
             runtime_reduction=np.median(runtimes_o3 or [0])
             / max(np.median(runtimes_final or [0]), 1),
         )
+
+    @validator("benchmark", pre=True)
+    def validate_benchmark(cls, value):
+        if isinstance(value, BenchmarkUri):
+            return str(value)
+        return value

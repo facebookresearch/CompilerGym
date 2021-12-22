@@ -67,18 +67,18 @@ class ExampleDataset(Dataset):
             description="An example dataset",
         )
         self._benchmarks = {
-            "benchmark://example-v0/foo": Benchmark.from_file_contents(
+            "/foo": Benchmark.from_file_contents(
                 "benchmark://example-v0/foo", "Ir data".encode("utf-8")
             ),
-            "benchmark://example-v0/bar": Benchmark.from_file_contents(
+            "/bar": Benchmark.from_file_contents(
                 "benchmark://example-v0/bar", "Ir data".encode("utf-8")
             ),
         }
 
     def benchmark_uris(self) -> Iterable[str]:
-        yield from self._benchmarks.keys()
+        yield from (f"benchmark://example-v0{k}" for k in self._benchmarks.keys())
 
-    def benchmark_from_parsed_uris(self, uri: BenchmarkUri) -> Benchmark:
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
         if uri.path in self._benchmarks:
             return self._benchmarks[uri.path]
         else:
