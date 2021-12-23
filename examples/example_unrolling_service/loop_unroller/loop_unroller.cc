@@ -35,7 +35,8 @@
 
 using namespace llvm;
 
-namespace llvm {
+namespace {
+
 /// Input LLVM module file name.
 cl::opt<std::string> InputFilename(cl::Positional, cl::desc("Specify input filename"),
                                    cl::value_desc("filename"), cl::init("-"));
@@ -65,9 +66,6 @@ static cl::opt<bool> PreserveAssemblyUseListOrder(
     "preserve-ll-uselistorder", cl::desc("Preserve use-list order when writing LLVM assembly."),
     cl::init(false), cl::Hidden);
 
-// The INITIALIZE_PASS_XXX macros put the initialiser in the llvm namespace.
-void initializeLoopCounterPass(PassRegistry& Registry);
-
 class LoopCounter : public llvm::FunctionPass {
  public:
   static char ID;
@@ -89,15 +87,6 @@ class LoopCounter : public llvm::FunctionPass {
     return false;
   }
 };
-
-// Initialise the pass. We have to declare the dependencies we use.
-char LoopCounter::ID = 0;
-INITIALIZE_PASS_BEGIN(LoopCounter, "count-loops", "Count loops", false, false)
-INITIALIZE_PASS_DEPENDENCY(LoopInfoWrapperPass)
-INITIALIZE_PASS_END(LoopCounter, "count-loops", "Count loops", false, false)
-
-// The INITIALIZE_PASS_XXX macros put the initialiser in the llvm namespace.
-void initializeLoopUnrollConfiguratorPass(PassRegistry& Registry);
 
 class LoopUnrollConfigurator : public llvm::FunctionPass {
  public:
@@ -125,13 +114,7 @@ class LoopUnrollConfigurator : public llvm::FunctionPass {
   }
 };
 
-// Initialise the pass. We have to declare the dependencies we use.
 char LoopUnrollConfigurator::ID = 1;
-INITIALIZE_PASS_BEGIN(LoopUnrollConfigurator, "unroll-loops-configurator",
-                      "Configurates loop unrolling", false, false)
-INITIALIZE_PASS_DEPENDENCY(LoopInfoWrapperPass)
-INITIALIZE_PASS_END(LoopUnrollConfigurator, "unroll-loops-configurator",
-                    "Configurates loop unrolling", false, false)
 
 /// Reads a module from a file.
 /// On error, messages are written to stderr and null is returned.
@@ -148,7 +131,28 @@ static std::unique_ptr<Module> readModule(LLVMContext& Context, StringRef Name) 
   return Module;
 }
 
+char LoopCounter::ID = 0;
+
+}  // anonymous namespace
+
+namespace llvm {
+
+// The INITIALIZE_PASS_XXX macros put the initialiser in the llvm namespace.
+void initializeLoopCounterPass(PassRegistry& Registry);
+void initializeLoopUnrollConfiguratorPass(PassRegistry& Registry);
+
 }  // namespace llvm
+
+// Initialise the passes. We have to declare the dependencies we use.
+INITIALIZE_PASS_BEGIN(LoopUnrollConfigurator, "unroll-loops-configurator",
+                      "Configurates loop unrolling", false, false)
+INITIALIZE_PASS_DEPENDENCY(LoopInfoWrapperPass)
+INITIALIZE_PASS_END(LoopUnrollConfigurator, "unroll-loops-configurator",
+                    "Configurates loop unrolling", false, false)
+
+INITIALIZE_PASS_BEGIN(LoopCounter, "count-loops", "Count loops", false, false)
+INITIALIZE_PASS_DEPENDENCY(LoopInfoWrapperPass)
+INITIALIZE_PASS_END(LoopCounter, "count-loops", "Count loops", false, false)
 
 int main(int argc, char** argv) {
   cl::ParseCommandLineOptions(argc, argv,
