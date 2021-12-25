@@ -98,7 +98,7 @@ Darwin is not supported with CMake.
 ### Dependency instructions for Ubuntu
 
 ```bash
-sudo apt-get install lld-9 \
+sudo apt-get install g++ lld-9 \
   autoconf libtool ninja-build ccache git \
 ```
 
@@ -132,10 +132,13 @@ cmake -GNinja \
   -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \ # For faster rebuilds, can be removed
   -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=lld" -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=lld" -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=lld" \ # For faster builds, can be removed
   -DPython3_FIND_VIRTUALENV=FIRST \
+  -DCMAKE_BUILD_WITH_INSTALL_RPATH=true \
   -S "<path to source directory>" \
   -B "<path to build directory>"
 
 cmake  --build "<path to build directory>"
+
+pip install <path to build directory>/py_pkg/dist/compiler_gym*.whl --force-reinstall
 ```
 Additional optional configuration arguments:
 
