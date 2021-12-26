@@ -2,7 +2,21 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""This module demonstrates how to """
+"""This script demonstrates how the Python example service without needing
+to use the bazel build system.
+
+Prerequisite:
+    # In the repo's INSTALL.md, follow the 'Building from source using CMake' instructions with `-DCOMPILER_GYM_BUILD_EXAMPLES=ON` added to the `cmake` command
+    # Then copy the `loop_unroller` binary
+    $ cd <path to source directory>/examples
+    $ cp <path to build directory>/examples/example_unrolling_service/loop_unroller/loop_unroller ./example_unrolling_service/loop_unroller/
+
+Usage:
+
+    $ python example_unrolling_service/examples_without_bazel.py
+
+It is equivalent in behavior to the example.py script in this directory.
+"""
 import os
 import subprocess
 from pathlib import Path
