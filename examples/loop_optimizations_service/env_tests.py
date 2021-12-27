@@ -21,7 +21,7 @@ from tests.test_main import main
 @pytest.fixture(scope="function")
 def env() -> CompilerEnv:
     """Text fixture that yields an environment."""
-    with gym.make("unrolling-py-v0") as env_:
+    with gym.make("loops-opt-py-v0") as env_:
         yield env_
 
 
@@ -63,11 +63,18 @@ def test_action_space(env: CompilerEnv):
     """Test that the environment reports the service's action spaces."""
     assert env.action_spaces == [
         NamedDiscrete(
-            name="unrolling",
+            name="loop-opt",
             items=[
-                "-loop-unroll -unroll-count=2",
-                "-loop-unroll -unroll-count=4",
-                "-loop-unroll -unroll-count=8",
+                "--loop-unroll --unroll-count=2",
+                "--loop-unroll --unroll-count=4",
+                "--loop-unroll --unroll-count=8",
+                "--loop-unroll --unroll-count=16",
+                "--loop-unroll --unroll-count=32",
+                "--loop-vectorize -force-vector-width=2",
+                "--loop-vectorize -force-vector-width=4",
+                "--loop-vectorize -force-vector-width=8",
+                "--loop-vectorize -force-vector-width=16",
+                "--loop-vectorize -force-vector-width=32",
             ],
         )
     ]
@@ -118,7 +125,7 @@ def test_reward_before_reset(env: CompilerEnv):
 def test_reset_invalid_benchmark(env: CompilerEnv):
     """Test requesting a specific benchmark."""
     with pytest.raises(LookupError) as ctx:
-        env.reset(benchmark="unrolling-v0/foobar")
+        env.reset(benchmark="loops-opt-v0/foobar")
     assert str(ctx.value) == "Unknown program name"
 
 
@@ -197,8 +204,9 @@ def test_rewards(env: CompilerEnv):
 
 def test_benchmarks(env: CompilerEnv):
     assert list(env.datasets.benchmark_uris()) == [
-        "benchmark://unrolling-v0/offsets1",
-        "benchmark://unrolling-v0/conv2d",
+        "benchmark://loops-opt-v0/add",
+        "benchmark://loops-opt-v0/offsets1",
+        "benchmark://loops-opt-v0/conv2d",
     ]
 
 
