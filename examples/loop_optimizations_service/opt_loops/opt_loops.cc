@@ -80,22 +80,6 @@ static cl::opt<bool> PreserveAssemblyUseListOrder(
 static cl::opt<bool> DebugifyEach(
     "debugify-each", cl::desc("Start each pass with debugify and end it with check-debugify"));
 
-// TODO:
-// output loops configuration file (json), also provide any current annotations (e.g., h)
-// input json file with opts for each loop
-// option to insert meta data without running pass
-// --annotate-only
-// --run-dependencies= true|false
-// --force
-// python wrapper: pybind. APIs to get loops/modules/etc. as objects, and then APIs to modify
-//      loops = module.get_loops()
-//      for loop in loops:
-//            loop.set_metadata()    loop.run_unrolling(factor),     loop.get_observation()
-//    in the future: module.get_functions(), module.get_call_sites()
-// run-vectorize-and-dependencies as well as run-vectorize (only)
-// callback mechanism: e.g., loop unroller asks for unrolling factor, and we intercept with a
-// callback function
-
 class OptCustomPassManager : public legacy::PassManager {
   DebugifyStatsMap DIStatsMap;
 
