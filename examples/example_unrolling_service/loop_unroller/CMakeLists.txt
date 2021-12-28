@@ -13,8 +13,6 @@ cg_cc_binary(
   SRCS
     "loop_unroller.cc"
   COPTS
-    "-Wall"
-    "-fdiagnostics-color=always"
     "-fno-rtti"
   ABS_DEPS
     ${_LLVM_LIBS}
