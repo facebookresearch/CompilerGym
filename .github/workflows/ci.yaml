@@ -75,6 +75,7 @@ jobs:
                       -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=lld" \
                       -DPython3_FIND_VIRTUALENV=FIRST \
                       -DCOMPILER_GYM_BUILD_TESTS=ON \
+                      -DCOMPILER_GYM_BUILD_EXAMPLES=ON \
                       -S . \
                       -B ~/cmake_build
                   cmake --build ~/cmake_build
