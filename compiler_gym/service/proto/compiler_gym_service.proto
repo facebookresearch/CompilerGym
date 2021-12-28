@@ -15,6 +15,8 @@ option java_multiple_files = true;
 option java_outer_classname = "CompilerGymServiceProto";
 option java_package = "com.compiler_gym";
 
+import "google/protobuf/any.proto";
+
 // The CompilerGymService is the interface that exposes the incremental
 // optimization of a program as an interactive environment.
 service CompilerGymService {
@@ -88,7 +90,7 @@ message StartSessionReply {
   // unchanged.
   ActionSpace new_action_space = 3;
   // Observed states after completing the action.
-  repeated Observation observation = 4;
+  repeated Event observation = 4;
 }
 
 // A Step() request.
@@ -96,7 +98,7 @@ message StepRequest {
   // The ID of the session.
   int64 session_id = 1;
   // A list of actions to execute, in order.
-  repeated Action action = 2;
+  repeated Event action = 2;
   // A list of indices into the GetSpacesReply.observation_space_list
   repeated int32 observation_space = 3;
 }
@@ -119,53 +121,130 @@ message StepReply {
   // remains unchanged.
   ActionSpace new_action_space = 3;
   // Observed states after completing the action.
-  repeated Observation observation = 4;
+  repeated Event observation = 4;
 }
 
-// A description of an action space. An action space consists of one or more
-// choices that can be made by an agent in a call to Step(). An action space
-// with a single choice is scalar; an action-space with `n` choices represents
-// an `n`-dimensional action space.
-message ActionSpace {
-  // The name of the action space.
-  string name = 1;
-  // The list of choices that comprise this action.
-  repeated ChoiceSpace choice = 2;
-  // An optional list of names for the choices.
-  bool named_choices = 3;
+message BooleanTensor {
+  repeated uint64 shape = 1;
+  // Flattened tensor of shape `shape` with C-like index order.
+  repeated bool value = 2;
 }
 
-// An action.
-message Action {
-  // A list of choices that corresponds to the ActionSpace's choice list.
-  repeated Choice choice = 1;
+message ByteTensor {
+  repeated uint64 shape = 1;
+  // Flattened tensor of shape `shape` with C-like index order.
+  bytes value = 2;
 }
 
-// The space for a single choice. An Action comprises one or more choices.
-message ChoiceSpace {
-  // An optional name for this choice. Only required if
-  // ActionSpace.named_choices is set.
-  string name = 1;
-  // The choice space.
-  oneof space {
-    // A bounded integer choice.
-    ScalarRange int64_range = 2;
-    // A possibly bounded real-valued choice.
-    ScalarRange double_range = 3;
-    // A discrete space in which every point in the space is named.
-    NamedDiscreteSpace named_discrete_space = 4;
+message Int64Tensor {
+  repeated uint64 shape = 1;
+  // Flattened tensor of shape `shape` with C-like index order.
+  repeated sint64 value = 2;
+}
+
+message FloatTensor {
+  repeated uint64 shape = 1;
+  // Flattened tensor of shape `shape` with C-like index order.
+  repeated float value = 2;
+}
+
+message DoubleTensor {
+  repeated uint64 shape = 1;
+  // Flattened tensor of shape `shape` with C-like index order.
+  repeated double value = 2;
+}
+
+message StringTensor {
+  repeated uint64 shape = 1;
+  // Flattened tensor of shape `shape` with C-like index order.
+  repeated string value = 2;
+}
+
+// The [min, max] range of a boolean scalar.
+message BooleanRange {
+  // The minimum value (inclusive). If not set, the value is 0 (false).
+  oneof optional_min {
+    bool min = 1;
+  }
+  // The maximum value (inclusive). If not set, the value is 1 (true).
+  oneof optional_max {
+    bool max = 2;
   }
 }
 
-// A single choice. An Action comprises one or more Choices.
-message Choice {
-  // The value of the choice, corresponding to the ChoiceSpace from the
-  // ActionSpace.choice list.
-  oneof value {
-    int64 int64_value = 1;
-    double double_value = 2;
-    int64 named_discrete_value_index = 3;
+// The [min, max] range of an int64 scalar.
+message Int64Range {
+  // The minimum value (inclusive). If not set, the value is -2^63.
+  oneof optional_min {
+    sint64 min = 1;
   }
+  // The maximum value (inclusive). If not set, the value is 2^63 - 1.
+  oneof optional_max {
+    sint64 max = 2;
+  }
+}
+
+// The [min, max] range of an double scalar.
+message FloatRange {
+  // The minimum value (inclusive). If not set, the value is -inf.
+  oneof optional_min {
+    float min = 1;
+  }
+  // The maximum value (inclusive). If not set, the value is +inf.
+  oneof optional_max {
+    float max = 2;
+  }
+}
+
+// The [min, max] range of an double scalar.
+message DoubleRange {
+  // The minimum value (inclusive). If not set, the value is -inf.
+  oneof optional_min {
+    double min = 1;
+  }
+  // The maximum value (inclusive). If not set, the value is +inf.
+  oneof optional_max {
+    double max = 2;
+  }
+}
+
+message BooleanBox {
+  BooleanTensor low = 1;
+  BooleanTensor high = 2;
+}
+
+message ByteBox {
+  ByteTensor low = 1;
+  ByteTensor high = 2;
+}
+
+message Int64Box {
+  Int64Tensor low = 1;
+  Int64Tensor high = 2;
+}
+
+message FloatBox {
+  FloatTensor low = 1;
+  FloatTensor high = 2;
+}
+
+message DoubleBox {
+  DoubleTensor low = 1;
+  DoubleTensor high = 2;
+}
+
+// A list of spaces.
+message ListSpace {
+  repeated Space space = 1;
+}
+
+message DictSpace {
+  map<string, Space> space = 1;
+}
+
+// A discrete space in :math:`{ 0, 1, \\dots, n-1 }`.
+message DiscreteSpace {
+  int64 n = 1;
 }
 
 // A discrete space in which every point in the space is named. This can be used
@@ -173,95 +252,133 @@ message Choice {
 message NamedDiscreteSpace {
   // A list of names for every value in the space. The order in which these
   // values are returned is used.
-  repeated string value = 1;
-  // If true, the set of space can be interpreted as a list of command line
-  // flags.
-  bool is_commandline = 2;
+  repeated string name = 1;
 }
 
-// An observations from a compiler.
-message Observation {
-  // A point in an ObservationSpace is _either_ a scalar or vector of integers
-  // or real values, a string, or an opaque byte array.
+message BooleanSequenceSpace {
+  Int64Range length_range = 1;
+  BooleanRange scalar_range = 2;
+}
+
+message ByteSequenceSpace {
+  Int64Range length_range = 1;
+  Int64Range scalar_range = 2;
+}
+
+message BytesSequenceSpace {
+  // Number of byte arrays in the sequence.
+  Int64Range length_range = 1;
+}
+
+message Int64SequenceSpace {
+  Int64Range length_range = 1;
+  Int64Range scalar_range = 2;
+}
+
+message FloatSequenceSpace {
+  Int64Range length_range = 1;
+  FloatRange scalar_range = 2;
+}
+
+message DoubleSequenceSpace {
+  Int64Range length_range = 1;
+  DoubleRange scalar_range = 2;
+}
+
+message StringSequenceSpace {
+  // The number of strings in the sequence.
+  Int64Range length_range = 1;
+}
+
+message StringSpace {
+  Int64Range length_range = 1;
+}
+
+// Can be used in Space.any_value or Event.any_value to describe an opaque
+// serialized data.
+message Opaque {
+  string format = 1;
+  bytes data = 2;
+}
+
+message CommandlineSpace {
+  repeated string name = 1;
+}
+
+message Space {
+  string type_id = 2;
   oneof value {
-    Int64List int64_list = 1;
-    DoubleList double_list = 2;
-    string string_value = 3;
-    bytes binary_value = 4;
-    int64 scalar_int64 = 5;
-    double scalar_double = 6;
+    ListSpace space_list = 3;
+    DictSpace space_dict = 4;
+    DiscreteSpace discrete = 5;
+    NamedDiscreteSpace named_discrete = 6;
+    BooleanRange boolean_value = 7;
+    Int64Range int64_value = 8;
+    FloatRange float_value = 9;
+    DoubleRange double_value = 10;
+    StringSpace string_value = 11;
+    BooleanSequenceSpace boolean_sequence = 12;
+    ByteSequenceSpace byte_sequence = 13;
+    BytesSequenceSpace bytes_sequence = 14;
+    Int64SequenceSpace int64_sequence = 15;
+    FloatSequenceSpace float_sequence = 16;
+    DoubleSequenceSpace double_sequence = 17;
+    StringSequenceSpace string_sequence = 18;
+    BooleanBox boolean_box = 19;
+    ByteBox byte_box = 20;
+    Int64Box int64_box = 21;
+    FloatBox float_box = 22;
+    DoubleBox double_box = 23;
+    google.protobuf.Any any_value = 24;
   }
 }
 
-// A list of 64 bit integers.
-message Int64List {
-  repeated int64 value = 1;
-}
-
-// A list of doubles.
-message DoubleList {
-  repeated double value = 1;
-}
-
-// The [min, max] range of a scalar.
-message ScalarRange {
-  // The minimum value (inclusive). If not set, the value is -inf.
-  ScalarLimit min = 1;
-  // The maximum value (inclusive). If not set, the value is +inf.
-  ScalarLimit max = 2;
-}
-
-// Representation of the upper or lower limit of a scalar.
-message ScalarLimit {
-  double value = 1;
-}
-
-// A list of scalar ranges.
-message ScalarRangeList {
-  repeated ScalarRange range = 1;
-}
-
-message SequenceSpace {
-  ScalarRange length_range = 1;
-  ScalarRange scalar_range = 2;
-}
-
-// The description of a space of observations.
 message ObservationSpace {
-  // The name of the observation space.
   string name = 1;
-  // The shape of the observation space. All Observations
-  // from an ObservationSpace have the same shape.
-  oneof shape {
-    ScalarRangeList int64_range_list = 2;
-    ScalarRangeList double_range_list = 3;
-    // For character and byte arrays, the _size_range field describes the range of
-    // possible sizes, e.g. a string_size_range of [10, +inf] means that
-    // observations are strings of at least 10 characters in length.
-    ScalarRange string_size_range = 4;
-    ScalarRange binary_size_range = 5;
-    // For scalar values, the _range field describes the bounds of the scalar
-    // value.
-    ScalarRange scalar_int64_range = 10;
-    ScalarRange scalar_double_range = 11;
-    // A variable-length sequence of elements.
-    SequenceSpace double_sequence = 12;
-  }
-  // An optional string describing an opaque data format, e.g. a data structure
-  // that is serialized to a string/binary array for transmission back to the
-  // client. It is up to the client and service to agree on how to decode
-  // observations using this value. For example, an opaque_data_format of
-  // "string_json" could be used to indicate that the observation is a
-  // string-serialized JSON value.
-  string opaque_data_format = 6;
+  Space space = 2;
   // Whether the observation space is deterministic.
-  bool deterministic = 7;
+  bool deterministic = 3;
   // Whether the observations depend on the service execution environment.
-  bool platform_dependent = 8;
+  bool platform_dependent = 4;
   // A default observation. This value should be used by the client in lieu
   // of a true observation if the compiler service terminates abruptly, such as
   // a crash while applying an action.
-  Observation default_value = 9;
+  Event default_observation = 5;
+}
+
+message ActionSpace {
+  string name = 1;
+  Space space = 2;
+}
+
+message ListEvent {
+  repeated Event event = 1;
+}
+
+message DictEvent {
+  map<string, Event> event = 1;
+}
+
+// Common structure shared between actions and observations.
+message Event {
+  string type_id = 1;
+  oneof value {
+    ListEvent event_list = 2;
+    DictEvent event_dict = 3;
+    bool boolean_value = 4;
+    sint64 int64_value = 5;
+    float float_value = 6;
+    double double_value = 7;
+    string string_value = 8;
+    // Fixed and variable length sequences are represented as one-dimensional tensor.
+    BooleanTensor boolean_tensor = 9;
+    ByteTensor byte_tensor = 10;
+    Int64Tensor int64_tensor = 11;
+    FloatTensor float_tensor = 12;
+    DoubleTensor double_tensor = 13;
+    StringTensor string_tensor = 14;
+    google.protobuf.Any any_value = 15;
+  }
 }
 
 // A Fork() request.

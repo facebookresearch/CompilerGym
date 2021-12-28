@@ -13,6 +13,7 @@ py_library(
     deps = [
         ":box",
         ":commandline",
+        ":common",
         ":dict",
         ":discrete",
         ":named_discrete",
@@ -21,6 +22,12 @@ py_library(
         ":sequence",
         ":tuple",
     ],
+)
+
+py_library(
+    name = "common",
+    srcs = ["common.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
 )
 
 py_library(
@@ -71,12 +78,15 @@ py_library(
     name = "scalar",
     srcs = ["scalar.py"],
     visibility = ["//compiler_gym:__subpackages__"],
+    deps = [":common"],
 )
 
 py_library(
     name = "sequence",
     srcs = ["sequence.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
     deps = [
+        ":common",
         ":scalar",
     ],
 )

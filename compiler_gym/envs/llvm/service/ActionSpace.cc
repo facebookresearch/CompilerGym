@@ -16,26 +16,24 @@ namespace compiler_gym::llvm_service {
 std::vector<ActionSpace> getLlvmActionSpaceList() {
   std::vector<ActionSpace> spaces;
   spaces.reserve(magic_enum::enum_count<LlvmActionSpace>());
-  for (const auto& value : magic_enum::enum_values<LlvmActionSpace>()) {
-    ActionSpace space;
-    space.set_name(util::enumNameToPascalCase<LlvmActionSpace>(value));
-    switch (value) {
+  for (const auto& enumValue : magic_enum::enum_values<LlvmActionSpace>()) {
+    ActionSpace actionSpace;
+    actionSpace.set_name(util::enumNameToPascalCase<LlvmActionSpace>(enumValue));
+    Space& space = *actionSpace.mutable_space();
+    switch (enumValue) {
       case LlvmActionSpace::PASSES_ALL: {
-        ChoiceSpace* flagChoice = space.add_choice();
-        flagChoice->set_name("flag");
-
-        NamedDiscreteSpace* flagChoiceSpace = flagChoice->mutable_named_discrete_space();
-        flagChoiceSpace->set_is_commandline(true);
-        for (const auto& value : magic_enum::enum_values<LlvmAction>()) {
-          flagChoiceSpace->add_value(util::enumNameToCommandlineFlag<LlvmAction>(value));
+        CommandlineSpace flagValue;
+        for (const auto& enumValue : magic_enum::enum_values<LlvmAction>()) {
+          flagValue.add_name(util::enumNameToCommandlineFlag<LlvmAction>(enumValue));
         }
+        space.mutable_any_value()->PackFrom(flagValue);
       } break;
       default:
         UNREACHABLE(fmt::format("Unknown LLVM action space {}",
-                                util::enumNameToPascalCase<LlvmActionSpace>(value)));
+                                util::enumNameToPascalCase<LlvmActionSpace>(enumValue)));
     }
 
-    spaces.push_back(space);
+    spaces.push_back(actionSpace);
   }
   return spaces;
 }

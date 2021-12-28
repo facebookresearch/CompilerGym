@@ -36,4 +36,5 @@ ExternalProject_Add_Step(protobuf build_protobuf
         -P "${CMAKE_CURRENT_SOURCE_DIR}/build_protobuf.cmake"
   DEPENDEES update
   WORKING_DIRECTORY "${CMAKE_CURRENT_BINARY_DIR}/protobuf/src/protobuf"
+  USES_TERMINAL TRUE
 )

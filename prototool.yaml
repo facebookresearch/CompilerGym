@@ -1,0 +1,7 @@
+---
+protoc:
+    version: 3.13.0
+    includes:
+        - compiler_gym/service/proto
+lint:
+    group: uber1

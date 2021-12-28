@@ -46,7 +46,7 @@ int main(int argc, char** argv) {
     CHECK(status.ok()) << "Failed to compute observation: " << status.error_message();
   }
 
-  Observation observation;
+  Event observation;
   {
     const auto status = setObservation(observationSpace, workingDirectory, *benchmark, observation);
     CHECK(status.ok()) << "Failed to compute observation: " << status.error_message();

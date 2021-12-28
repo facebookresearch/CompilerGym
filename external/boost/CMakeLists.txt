@@ -45,4 +45,6 @@ ExternalProject_Add(
       cxxstd=${CMAKE_CXX_STANDARD}
       install
   INSTALL_COMMAND ""
+  USES_TERMINAL_CONFIGURE TRUE
+  USES_TERMINAL_BUILD TRUE
 )

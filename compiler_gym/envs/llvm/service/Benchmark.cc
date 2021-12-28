@@ -221,7 +221,7 @@ Status Benchmark::writeBitcodeToFile(const fs::path& path) {
   return writeBitcodeFile(module(), path);
 }
 
-Status Benchmark::computeRuntime(Observation& observation) {
+Status Benchmark::computeRuntime(Event& observation) {
   const RealizedBenchmarkDynamicConfig& cfg = dynamicConfig();
 
   if (!cfg.isRunnable()) {
@@ -253,14 +253,15 @@ Status Benchmark::computeRuntime(Observation& observation) {
 
   // Run the binary.
   VLOG(3) << "Running " << getRuntimesPerObservationCount() << " iterations of binary";
+  *observation.mutable_double_tensor()->mutable_shape()->Add() = getRuntimesPerObservationCount();
   for (int i = 0; i < getRuntimesPerObservationCount(); ++i) {
     const auto startTime = std::chrono::steady_clock::now();
     RETURN_IF_ERROR(cfg.runCommand().checkCall());
     const auto endTime = std::chrono::steady_clock::now();
     const auto elapsedMicroseconds =
         std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count();
-    observation.mutable_double_list()->add_value(static_cast<double>(elapsedMicroseconds) /
-                                                 1000000);
+    *observation.mutable_double_tensor()->mutable_value()->Add() =
+        static_cast<double>(elapsedMicroseconds) / 1000000;
   }
 
   RETURN_IF_ERROR(cfg.runCommand().checkOutfiles());
@@ -275,15 +276,16 @@ Status Benchmark::computeRuntime(Observation& observation) {
   return Status::OK;
 }
 
-Status Benchmark::computeBuildtime(Observation& observation) {
+Status Benchmark::computeBuildtime(Event& observation) {
   if (!dynamicConfig().isBuildable()) {
     return Status::OK;
   }
 
   RETURN_IF_ERROR(compile());
 
-  observation.mutable_double_list()->add_value(static_cast<double>(lastBuildTimeMicroseconds()) /
-                                               1000000);
+  *observation.mutable_double_tensor()->mutable_shape()->Add() = 1;
+  *observation.mutable_double_tensor()->mutable_value()->Add() =
+      static_cast<double>(lastBuildTimeMicroseconds()) / 1000000;
 
   return Status::OK;
 }

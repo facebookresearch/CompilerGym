@@ -18,11 +18,13 @@ py_library(
     deps = [
         ":compiler_gym_service_py",
         ":compiler_gym_service_py_grpc",
+        "//compiler_gym/spaces:box",
         "//compiler_gym/spaces:commandline",
         "//compiler_gym/spaces:dict",
         "//compiler_gym/spaces:discrete",
         "//compiler_gym/spaces:named_discrete",
         "//compiler_gym/spaces:scalar",
+        "//compiler_gym/spaces:sequence",
         "//compiler_gym/spaces:tuple",
     ],
 )
@@ -31,6 +33,7 @@ proto_library(
     name = "compiler_gym_service",
     srcs = ["compiler_gym_service.proto"],
     visibility = ["//visibility:public"],
+    deps = ["@com_google_protobuf//:any_proto"],
 )
 
 py_proto_library(

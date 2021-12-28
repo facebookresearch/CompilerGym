@@ -13,21 +13,22 @@ from pathlib import Path
 from typing import Optional, Tuple
 
 import numpy as np
-import utils
 
 import compiler_gym.third_party.llvm as llvm
+import examples.loop_optimizations_service.service_py.utils as utils
 from compiler_gym.service import CompilationSession
 from compiler_gym.service.proto import (
-    Action,
     ActionSpace,
     Benchmark,
-    ChoiceSpace,
+    DoubleRange,
+    Event,
+    Int64Box,
+    Int64Range,
+    Int64Tensor,
     NamedDiscreteSpace,
-    Observation,
     ObservationSpace,
-    ScalarLimit,
-    ScalarRange,
-    ScalarRangeList,
+    Space,
+    StringSpace,
 )
 from compiler_gym.service.runtime import create_and_run_compiler_gym_service
 from compiler_gym.util.commands import run_command
@@ -42,25 +43,22 @@ class LoopsOptCompilationSession(CompilationSession):
     action_spaces = [
         ActionSpace(
             name="loop-opt",
-            choice=[
-                ChoiceSpace(
-                    name="loop-opt",
-                    named_discrete_space=NamedDiscreteSpace(
-                        value=[
-                            "--loop-unroll --unroll-count=2",
-                            "--loop-unroll --unroll-count=4",
-                            "--loop-unroll --unroll-count=8",
-                            "--loop-unroll --unroll-count=16",
-                            "--loop-unroll --unroll-count=32",
-                            "--loop-vectorize -force-vector-width=2",
-                            "--loop-vectorize -force-vector-width=4",
-                            "--loop-vectorize -force-vector-width=8",
-                            "--loop-vectorize -force-vector-width=16",
-                            "--loop-vectorize -force-vector-width=32",
-                        ]
-                    ),
+            space=Space(
+                named_discrete=NamedDiscreteSpace(
+                    name=[
+                        "--loop-unroll --unroll-count=2",
+                        "--loop-unroll --unroll-count=4",
+                        "--loop-unroll --unroll-count=8",
+                        "--loop-unroll --unroll-count=16",
+                        "--loop-unroll --unroll-count=32",
+                        "--loop-vectorize -force-vector-width=2",
+                        "--loop-vectorize -force-vector-width=4",
+                        "--loop-vectorize -force-vector-width=8",
+                        "--loop-vectorize -force-vector-width=16",
+                        "--loop-vectorize -force-vector-width=32",
+                    ]
                 ),
-            ],
+            ),
         )
     ]
 
@@ -69,37 +67,36 @@ class LoopsOptCompilationSession(CompilationSession):
     observation_spaces = [
         ObservationSpace(
             name="ir",
-            string_size_range=ScalarRange(min=ScalarLimit(value=0)),
+            space=Space(string_value=StringSpace(length_range=Int64Range(min=0))),
             deterministic=True,
             platform_dependent=False,
-            default_value=Observation(string_value=""),
+            default_observation=Event(string_value=""),
         ),
         ObservationSpace(
             name="features",
-            int64_range_list=ScalarRangeList(
-                range=[
-                    ScalarRange(min=ScalarLimit(value=0), max=ScalarLimit(value=1e5)),
-                    ScalarRange(min=ScalarLimit(value=0), max=ScalarLimit(value=1e5)),
-                    ScalarRange(min=ScalarLimit(value=0), max=ScalarLimit(value=1e5)),
-                ]
+            space=Space(
+                int64_box=Int64Box(
+                    low=Int64Tensor(shape=[3], value=[0, 0, 0]),
+                    high=Int64Tensor(shape=[3], value=[int(1e5), int(1e5), int(1e5)]),
+                )
             ),
         ),
         ObservationSpace(
             name="runtime",
-            scalar_double_range=ScalarRange(min=ScalarLimit(value=0)),
+            space=Space(double_value=DoubleRange(min=0)),
             deterministic=False,
             platform_dependent=True,
-            default_value=Observation(
-                scalar_double=0,
+            default_observation=Event(
+                double_value=0,
             ),
         ),
         ObservationSpace(
             name="size",
-            scalar_double_range=ScalarRange(min=ScalarLimit(value=0)),
+            space=Space(double_value=DoubleRange(min=0)),
             deterministic=True,
             platform_dependent=True,
-            default_value=Observation(
-                scalar_double=0,
+            default_observation=Event(
+                double_value=0,
             ),
         ),
     ]
@@ -150,19 +147,16 @@ class LoopsOptCompilationSession(CompilationSession):
             timeout=30,
         )
 
-    def apply_action(self, action: Action) -> Tuple[bool, Optional[ActionSpace], bool]:
-        num_choices = len(self._action_space.choice[0].named_discrete_space.value)
-
-        if len(action.choice) != 1:
-            raise ValueError("Currently we support one choice at a time")
+    def apply_action(self, action: Event) -> Tuple[bool, Optional[ActionSpace], bool]:
+        num_choices = len(self._action_space.space.named_discrete.name)
 
         # This is the index into the action space's values ("a", "b", "c") that
         # the user selected, e.g. 0 -> "a", 1 -> "b", 2 -> "c".
-        choice_index = action.choice[0].named_discrete_value_index
+        choice_index = action.int64_value
         if choice_index < 0 or choice_index >= num_choices:
             raise ValueError("Out-of-range")
 
-        args = self._action_space.choice[0].named_discrete_space.value[choice_index]
+        args = self._action_space.space.named_discrete.name[choice_index]
         logging.info(
             "Applying action %d, equivalent command-line arguments: '%s'",
             choice_index,
@@ -225,14 +219,14 @@ class LoopsOptCompilationSession(CompilationSession):
         with open(self._llvm_path) as f:
             return f.read()
 
-    def get_observation(self, observation_space: ObservationSpace) -> Observation:
+    def get_observation(self, observation_space: ObservationSpace) -> Event:
         logging.info("Computing observation from space %s", observation_space.name)
         if observation_space.name == "ir":
-            return Observation(string_value=self.ir)
+            return Event(string_value=self.ir)
         elif observation_space.name == "features":
             stats = utils.extract_statistics_from_ir(self.ir)
-            observation = Observation()
-            observation.int64_list.value[:] = list(stats.values())
+            vals = stats.values()
+            observation = Event(int64_tensor=Int64Tensor(shape=[len(vals)], value=vals))
             return observation
         elif observation_space.name == "runtime":
             # compile LLVM to object file
@@ -277,7 +271,7 @@ class LoopsOptCompilationSession(CompilationSession):
                     )
             exec_times = np.sort(exec_times)
             avg_exec_time = np.mean(exec_times[1:4])
-            return Observation(scalar_double=avg_exec_time)
+            return Event(double_value=avg_exec_time)
         elif observation_space.name == "size":
             # compile LLVM to object file
             run_command(
@@ -303,7 +297,7 @@ class LoopsOptCompilationSession(CompilationSession):
                 timeout=30,
             )
             binary_size = os.path.getsize(self._exe_path)
-            return Observation(scalar_double=binary_size)
+            return Event(double_value=binary_size)
         else:
             raise KeyError(observation_space.name)
 

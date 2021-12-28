@@ -24,6 +24,6 @@ namespace compiler_gym::llvm_service {
  */
 grpc::Status setObservation(LlvmObservationSpace space,
                             const boost::filesystem::path& workingDirectory, Benchmark& benchmark,
-                            Observation& reply);
+                            Event& reply);
 
 }  // namespace compiler_gym::llvm_service

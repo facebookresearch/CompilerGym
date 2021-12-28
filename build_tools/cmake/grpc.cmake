@@ -59,6 +59,7 @@ function(cc_grpc_library)
       --descriptor_set_in "${_DESCRIPTOR_SET_FILE}"
       --grpc_out "${_HEADER_DST_DIR}"
       --plugin "protoc-gen-grpc=${_GRPC_CPP_PLUGIN_EXECUTABLE}"
+      --experimental_allow_proto3_optional
       "${_RELATIVE_PROTO_FILE}"
     DEPENDS "${Protobuf_PROTOC_EXECUTABLE}" "${_DESCRIPTOR_SET_FILE}" "${_PROTO_FILE}" ${_DEPS}
     VERBATIM)
@@ -112,6 +113,7 @@ function(py_grpc_library)
       --proto_path "${CMAKE_SOURCE_DIR}"
       --descriptor_set_in "${_DESCRIPTOR_SET_FILE}"
       --grpc_python_out "${CMAKE_BINARY_DIR}"
+      --experimental_allow_proto3_optional
       "${_RELATIVE_PROTO_FILE}"
     DEPENDS "${Python3_EXECUTABLE}" "${_DESCRIPTOR_SET_FILE}" "${_PROTO_FILE}" ${_DEPS}
     VERBATIM)

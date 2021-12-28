@@ -165,14 +165,14 @@ class Benchmark {
    *
    * If the benchmark is not runnable, the list is empty.
    */
-  grpc::Status computeRuntime(Observation& observation);
+  grpc::Status computeRuntime(Event& observation);
 
   /**
    * Compute a list of buildtimes.
    *
    * If the benchmark is not buildable, the list is empty.
    */
-  grpc::Status computeBuildtime(Observation& observation);
+  grpc::Status computeBuildtime(Event& observation);
 
   grpc::Status compile();
 

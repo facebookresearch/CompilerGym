@@ -34,6 +34,7 @@ function(proto_library)
     COMMAND "${Protobuf_PROTOC_EXECUTABLE}"
       --proto_path "${CMAKE_SOURCE_DIR}"
       --descriptor_set_out "${_DST_FILE}"
+      --experimental_allow_proto3_optional
       "${_RELATIVE_PROTO_FILE}"
     DEPENDS "${Protobuf_PROTOC_EXECUTABLE}" "${_SRC_FILE}" ${_RULE_DEPS}
     VERBATIM)
@@ -85,6 +86,7 @@ function(cc_proto_library)
       --proto_path "${CMAKE_SOURCE_DIR}"
       --descriptor_set_in "${_DESCRIPTOR_SET_FILE}"
       --cpp_out "${_HEADER_DST_DIR}"
+      --experimental_allow_proto3_optional
       "${_RELATIVE_PROTO_FILE}"
     DEPENDS
       "${Protobuf_PROTOC_EXECUTABLE}"
@@ -139,6 +141,7 @@ function(py_proto_library)
       --proto_path "${CMAKE_SOURCE_DIR}"
       --descriptor_set_in "${_DESCRIPTOR_SET_FILE}"
       --python_out "${CMAKE_BINARY_DIR}"
+      --experimental_allow_proto3_optional
       "${_RELATIVE_PROTO_FILE}"
     DEPENDS
       "${Protobuf_PROTOC_EXECUTABLE}"
