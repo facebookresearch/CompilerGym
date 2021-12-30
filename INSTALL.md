@@ -148,6 +148,12 @@ Additional optional configuration arguments:
     -DCOMPILER_GYM_BUILD_TESTS=ON
     ```
 
+* Builds additional tools required by some examples.
+
+    ```bash
+    -DCOMPILER_GYM_BUILD_EXAMPLES=ON
+    ```
+
 * For faster linking.
 
     ```bash

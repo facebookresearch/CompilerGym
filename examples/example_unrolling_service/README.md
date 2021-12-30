@@ -28,3 +28,17 @@ Run `env_tests.py` unit tests:
 ```sh
 $ bazel test //examples/example_unrolling_service:env_tests
 ```
+
+### Using the python service without bazel
+
+Because the python service contains no compiled code, it can be run directly as
+a standalone script without using the bazel build system.
+
+1. Build the `loop_unroller` custom tool that modifies the unrolling factor of each loop in a LLVM IR file:
+Follow the [Building from source using CMake](../../INSTALL.md#building-from-source-with-cmake) instructions with `-DCOMPILER_GYM_BUILD_EXAMPLES=ON` added to the `cmake` command.
+
+2. Run the example
+```sh
+$ cd examples
+$ python3 example_compiler_gym_service/demo_without_bazel.py
+```

@@ -27,6 +27,7 @@ list(APPEND CMAKE_MODULE_PATH
 )
 
 set(COMPILER_GYM_BUILD_TESTS OFF CACHE BOOL "Enable Compiler Gym tests.")
+set(COMPILER_GYM_BUILD_EXAMPLES OFF CACHE BOOL "Enable Comiler Gym examples.")
 
 include(cg_macros)
 include(cg_copts)
@@ -65,4 +66,7 @@ add_subdirectory(compiler_gym)
 if(COMPILER_GYM_BUILD_TESTS)
   enable_testing()
   add_subdirectory(tests)
+endif()
+if(COMPILER_GYM_BUILD_EXAMPLES)
+  add_subdirectory(examples)
 endif()

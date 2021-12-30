@@ -2,7 +2,11 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+"""This script demonstrates how the example services defined in this directory
+can be used as gym environments. Usage:
 
+    $ bazel run -c opt //examples/example_unrolling_service:example
+"""
 import compiler_gym
 import examples.example_unrolling_service as unrolling_service  # noqa Register environments.
 
