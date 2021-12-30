@@ -7,10 +7,7 @@ to use the bazel build system.
 
 Prerequisite:
     # In the repo's INSTALL.md, follow the 'Building from source using CMake' instructions with `-DCOMPILER_GYM_BUILD_EXAMPLES=ON` added to the `cmake` command
-    # Then copy the `loop_unroller` binary
     $ cd <path to source directory>/examples
-    $ cp <path to build directory>/examples/example_unrolling_service/loop_unroller/loop_unroller ./example_unrolling_service/loop_unroller/
-
 Usage:
 
     $ python example_unrolling_service/examples_without_bazel.py
