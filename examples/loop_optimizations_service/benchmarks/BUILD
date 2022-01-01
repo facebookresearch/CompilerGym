@@ -5,7 +5,10 @@
 
 filegroup(
     name = "benchmarks",
-    srcs = glob(["*.c"]) + [
+    srcs = [
+        "add.c",
+        "conv2d.c",
+        "offsets1.c",
         "//compiler_gym/third_party/neuro-vectorizer:header",
     ],
     visibility = ["//visibility:public"],

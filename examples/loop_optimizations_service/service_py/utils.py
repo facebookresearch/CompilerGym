@@ -3,7 +3,8 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
-
+# A prelminary, fragile approach to extract statistics
+# TODO: replace with AutpPhase features
 def extract_statistics_from_ir(ir: str):
     stats = {"control_flow": 0, "arithmetic": 0, "memory": 0}
     for line in ir.splitlines():
