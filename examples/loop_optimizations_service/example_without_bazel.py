@@ -2,7 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""This script demonstrates how the Python example service without needing
+"""This script uses the loop optimizations service without needing
 to use the bazel build system.
 
 Prerequisite:
@@ -10,11 +10,10 @@ Prerequisite:
     $ cd <path to source directory>/examples
 Usage:
 
-    $ python example_unrolling_service/examples_without_bazel.py
+    $ python loop_optimizations_service/examples_without_bazel.py
 
 It is equivalent in behavior to the example.py script in this directory.
 """
-import os
 import subprocess
 from pathlib import Path
 from typing import Iterable
@@ -26,12 +25,11 @@ from compiler_gym.spaces import Reward
 from compiler_gym.third_party import llvm
 from compiler_gym.util.registration import register
 
-UNROLLING_PY_SERVICE_BINARY: Path = Path(
-    "example_unrolling_service/service_py/example_service.py"
+LOOPS_OPT_PY_SERVICE_BINARY: Path = Path(
+    "loop_optimizations_service/service_py/loops_opt_service.py"
 )
-assert UNROLLING_PY_SERVICE_BINARY.is_file(), "Service script not found"
 
-BENCHMARKS_PATH: Path = Path("example_unrolling_service/benchmarks")
+BENCHMARKS_PATH: Path = Path("loop_optimizations_service/benchmarks")
 
 NEURO_VECTORIZER_HEADER: Path = Path(
     "../compiler_gym/third_party/neuro-vectorizer/header.h"
@@ -90,22 +88,26 @@ class SizeReward(Reward):
         return float(self.baseline_size - observations[0]) / self.baseline_size
 
 
-class UnrollingDataset(Dataset):
+class LoopsDataset(Dataset):
     def __init__(self, *args, **kwargs):
         super().__init__(
-            name="benchmark://unrolling-v0",
+            name="benchmark://loops-opt-v0",
             license="MIT",
-            description="Unrolling example dataset",
+            description="Loops optimization dataset",
         )
 
         self._benchmarks = {
-            "benchmark://unrolling-v0/offsets1": Benchmark.from_file_contents(
-                "benchmark://unrolling-v0/offsets1",
-                self.preprocess(os.path.join(BENCHMARKS_PATH, "offsets1.c")),
+            "benchmark://loops-opt-v0/add": Benchmark.from_file_contents(
+                "benchmark://loops-opt-v0/add",
+                self.preprocess(BENCHMARKS_PATH / "add.c"),
             ),
-            "benchmark://unrolling-v0/conv2d": Benchmark.from_file_contents(
-                "benchmark://unrolling-v0/conv2d",
-                self.preprocess(os.path.join(BENCHMARKS_PATH, "conv2d.c")),
+            "benchmark://loops-opt-v0/offsets1": Benchmark.from_file_contents(
+                "benchmark://loops-opt-v0/offsets1",
+                self.preprocess(BENCHMARKS_PATH / "offsets1.c"),
+            ),
+            "benchmark://loops-opt-v0/conv2d": Benchmark.from_file_contents(
+                "benchmark://loops-opt-v0/conv2d",
+                self.preprocess(BENCHMARKS_PATH / "conv2d.c"),
             ),
         }
 
@@ -142,22 +144,22 @@ class UnrollingDataset(Dataset):
 
 
 # Register the unrolling example service on module import. After importing this module,
-# the unrolling-py-v0 environment will be available to gym.make(...).
+# the loops-opt-py-v0 environment will be available to gym.make(...).
 
 register(
-    id="unrolling-py-v0",
+    id="loops-opt-py-v0",
     entry_point="compiler_gym.envs:CompilerEnv",
     kwargs={
-        "service": UNROLLING_PY_SERVICE_BINARY,
+        "service": LOOPS_OPT_PY_SERVICE_BINARY,
         "rewards": [RuntimeReward(), SizeReward()],
-        "datasets": [UnrollingDataset()],
+        "datasets": [LoopsDataset()],
     },
 )
 
 with compiler_gym.make(
-    "unrolling-py-v0",
-    benchmark="unrolling-v0/offsets1",
-    observation_space="features",
+    "loops-opt-py-v0",
+    benchmark="loops-opt-v0/add",
+    observation_space="ir",
     reward_space="runtime",
 ) as env:
     compiler_gym.set_debug_level(4)  # TODO: check why this has no effect
@@ -173,13 +175,7 @@ with compiler_gym.make(
     print("done: ", done)
     print("info: ", info)
 
-    print()
-
-    observation, reward, done, info = env.step(env.action_space.sample())
-    print("observation: ", observation)
-    print("reward: ", reward)
-    print("done: ", done)
-    print("info: ", info)
+    env.close()
 
     # TODO: implement write_bitcode(..) or write_ir(..)
     # env.write_bitcode("/tmp/output.bc")

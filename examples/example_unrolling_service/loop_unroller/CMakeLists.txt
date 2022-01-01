@@ -22,5 +22,5 @@ cg_cc_binary(
     ${LLVM_DEFINITIONS}
 )
 
-ADD_CUSTOM_TARGET(link_target ALL
+ADD_CUSTOM_TARGET(link_loop_unroller_target ALL
                   COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_BINARY_DIR}/examples/example_unrolling_service/loop_unroller/loop_unroller ${CMAKE_SOURCE_DIR}/examples/example_unrolling_service/loop_unroller/loop_unroller)
