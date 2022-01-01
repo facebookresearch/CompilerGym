@@ -2,7 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""This script demonstrates how the Python example service without needing
+"""This script uses the loop optimizations service without needing
 to use the bazel build system.
 
 Prerequisite:
@@ -10,7 +10,7 @@ Prerequisite:
     $ cd <path to source directory>/examples
 Usage:
 
-    $ python example_unrolling_service/examples_without_bazel.py
+    $ python loop_optimizations_service/examples_without_bazel.py
 
 It is equivalent in behavior to the example.py script in this directory.
 """
