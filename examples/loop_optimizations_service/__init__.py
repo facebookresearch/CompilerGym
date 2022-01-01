@@ -12,7 +12,7 @@ from compiler_gym.envs.llvm.llvm_benchmark import get_system_includes
 from compiler_gym.spaces import Reward
 from compiler_gym.third_party import llvm
 from compiler_gym.util.registration import register
-from compiler_gym.util.runfiles_path import runfiles_path, site_data_path
+from compiler_gym.util.runfiles_path import runfiles_path
 
 LOOPS_OPT_PY_SERVICE_BINARY: Path = runfiles_path(
     "examples/loop_optimizations_service/service_py/loops-opt-service-py"
@@ -83,9 +83,6 @@ class LoopsDataset(Dataset):
             name="benchmark://loops-opt-v0",
             license="MIT",
             description="Loops optimization dataset",
-            site_data_base=site_data_path(
-                "example_dataset"
-            ),  # TODO: what should we set this to? we are not using it
         )
 
         self._benchmarks = {
