@@ -140,6 +140,13 @@ class LoopCounter : public llvm::FunctionPass {
     // Should really account for module, too.
     counts[F.getName().str()] = Loops.size();
 
+    std::error_code EC;
+    ToolOutputFile LoopsLog("/tmp/loops.log", EC, sys::fs::OF_None);
+    for (auto L : Loops) {
+      L->print(LoopsLog.os(), true, true);
+    }
+    LoopsLog.keep();
+
     return false;
   }
 };
