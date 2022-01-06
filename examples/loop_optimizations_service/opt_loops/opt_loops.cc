@@ -127,7 +127,13 @@ class LoopCounter : public llvm::FunctionPass {
   static char ID;
   std::unordered_map<std::string, int> counts;
 
-  LoopCounter() : FunctionPass(ID) {}
+  LoopCounter() : LoopCounter("/tmp/loops.log") {}
+
+  LoopCounter(StringRef Filename) : FunctionPass(ID) {
+    // Prepare loops log
+    std::error_code EC;
+    LoopsLog = new ToolOutputFile(Filename, EC, sys::fs::OF_None);
+  }
 
   virtual void getAnalysisUsage(AnalysisUsage& AU) const override {
     AU.addRequired<LoopInfoWrapperPass>();
@@ -140,15 +146,16 @@ class LoopCounter : public llvm::FunctionPass {
     // Should really account for module, too.
     counts[F.getName().str()] = Loops.size();
 
-    std::error_code EC;
-    ToolOutputFile LoopsLog("/tmp/loops.log", EC, sys::fs::OF_None);
     for (auto L : Loops) {
-      L->print(LoopsLog.os(), true, true);
+      L->print(LoopsLog->os(), true, true);
     }
-    LoopsLog.keep();
+    LoopsLog->keep();
 
     return false;
   }
+
+ protected:
+  ToolOutputFile* LoopsLog;
 };
 
 char LoopCounter::ID = 0;
@@ -219,6 +226,10 @@ INITIALIZE_PASS_DEPENDENCY(LoopInfoWrapperPass)
 INITIALIZE_PASS_END(LoopConfiguratorPass, "unroll-loops-configurator",
                     "Configurates loop unrolling", false, false)
 
+namespace llvm {
+Pass* createLoopCounterPass(StringRef Filename) { return new LoopCounter(Filename); }
+}  // end namespace llvm
+
 int main(int argc, char** argv) {
   cl::ParseCommandLineOptions(argc, argv,
                               " LLVM-Counter\n\n"
@@ -245,9 +256,9 @@ int main(int argc, char** argv) {
 
   initializeLoopCounterPass(*PassRegistry::getPassRegistry());
   OptCustomPassManager PM;
-  LoopCounter* Counter = new LoopCounter();
+  // LoopCounter* Counter = new LoopCounter("/tmp/loops.log");
   LoopConfiguratorPass* LoopConfigurator = new LoopConfiguratorPass();
-  PM.add(Counter);
+  PM.add(createLoopCounterPass("/tmp/loops.log"));
   PM.add(LoopConfigurator);
   PM.add(createLoopUnrollPass());
   PM.add(createLICMPass());
@@ -263,11 +274,6 @@ int main(int argc, char** argv) {
     PM.add(createBitcodeWriterPass(Out.os(), PreserveBitcodeUseListOrder));
   }
   PM.run(*Module);
-
-  // Log loop stats
-  for (auto& x : Counter->counts) {
-    llvm::dbgs() << x.first << ": " << x.second << " loops" << '\n';
-  }
 
   Out.keep();
 
