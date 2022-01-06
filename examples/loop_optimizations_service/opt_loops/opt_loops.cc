@@ -122,14 +122,14 @@ class OptCustomPassManager : public legacy::PassManager {
   const DebugifyStatsMap& getDebugifyStatsMap() const { return DIStatsMap; }
 };
 
-class LoopCounter : public llvm::FunctionPass {
+class LoopLog : public llvm::FunctionPass {
  public:
   static char ID;
   std::unordered_map<std::string, int> counts;
 
-  LoopCounter() : LoopCounter("/tmp/loops.log") {}
+  LoopLog() : LoopLog("/tmp/loops.log") {}
 
-  LoopCounter(StringRef Filename) : FunctionPass(ID) {
+  LoopLog(StringRef Filename) : FunctionPass(ID) {
     // Prepare loops log
     std::error_code EC;
     LoopsLog = new ToolOutputFile(Filename, EC, sys::fs::OF_None);
@@ -158,7 +158,7 @@ class LoopCounter : public llvm::FunctionPass {
   ToolOutputFile* LoopsLog;
 };
 
-char LoopCounter::ID = 0;
+char LoopLog::ID = 0;
 
 class LoopConfiguratorPass : public llvm::FunctionPass {
  public:
@@ -211,14 +211,14 @@ static std::unique_ptr<Module> readModule(LLVMContext& Context, StringRef Name) 
 
 namespace llvm {
 // The INITIALIZE_PASS_XXX macros put the initialiser in the llvm namespace.
-void initializeLoopCounterPass(PassRegistry& Registry);
+void initializeLoopLogPass(PassRegistry& Registry);
 void initializeLoopConfiguratorPassPass(PassRegistry& Registry);
 }  // namespace llvm
 
 // Initialise the pass. We have to declare the dependencies we use.
-INITIALIZE_PASS_BEGIN(LoopCounter, "count-loops", "Count loops", false, false)
+INITIALIZE_PASS_BEGIN(LoopLog, "count-loops", "Count loops", false, false)
 INITIALIZE_PASS_DEPENDENCY(LoopInfoWrapperPass)
-INITIALIZE_PASS_END(LoopCounter, "count-loops", "Count loops", false, false)
+INITIALIZE_PASS_END(LoopLog, "count-loops", "Count loops", false, false)
 
 INITIALIZE_PASS_BEGIN(LoopConfiguratorPass, "unroll-loops-configurator",
                       "Configurates loop unrolling", false, false)
@@ -227,7 +227,7 @@ INITIALIZE_PASS_END(LoopConfiguratorPass, "unroll-loops-configurator",
                     "Configurates loop unrolling", false, false)
 
 namespace llvm {
-Pass* createLoopCounterPass(StringRef Filename) { return new LoopCounter(Filename); }
+Pass* createLoopLogPass(StringRef Filename) { return new LoopLog(Filename); }
 }  // end namespace llvm
 
 int main(int argc, char** argv) {
@@ -254,11 +254,10 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  initializeLoopCounterPass(*PassRegistry::getPassRegistry());
+  initializeLoopLogPass(*PassRegistry::getPassRegistry());
   OptCustomPassManager PM;
-  // LoopCounter* Counter = new LoopCounter("/tmp/loops.log");
   LoopConfiguratorPass* LoopConfigurator = new LoopConfiguratorPass();
-  PM.add(createLoopCounterPass("/tmp/loops.log"));
+  PM.add(createLoopLogPass("/tmp/loops.log"));
   PM.add(LoopConfigurator);
   PM.add(createLoopUnrollPass());
   PM.add(createLICMPass());
