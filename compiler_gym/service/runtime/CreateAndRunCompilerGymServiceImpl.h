@@ -76,7 +76,7 @@ template <typename CompilationSessionType>
     FLAGS_working_dir = workingDirectory.string();
   }
 
-  // Create amd set the logging directory.
+  // Create and set the logging directory.
   boost::filesystem::create_directories(workingDirectory / "logs");
   FLAGS_log_dir = workingDirectory.string() + "/logs";
 
