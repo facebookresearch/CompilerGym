@@ -164,9 +164,9 @@ class LoopLog : public llvm::FunctionPass {
     // Should really account for module, too.
     counts[F.getName().str()] = Loops.size();
 
-    Output yout(llvm::dbgs());
+    Output yout(LoopsLog->os());
     for (auto L : Loops) {
-      L->print(LoopsLog->os(), true, true);
+      // L->print(LoopsLog->os(), true, true);
       yout << L;
     }
     LoopsLog->keep();
