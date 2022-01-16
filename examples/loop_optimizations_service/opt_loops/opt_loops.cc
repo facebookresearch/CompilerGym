@@ -38,18 +38,20 @@
 #include "llvm/Transforms/Vectorize.h"
 
 using namespace llvm;
+
 using llvm::yaml::IO;
 using llvm::yaml::ScalarEnumerationTraits;
 
 template <>
-struct llvm::yaml::MappingTraits<Loop> {
-  static void mapping(IO& io, Loop& L) {
+struct llvm::yaml::MappingTraits<Loop*> {
+  static void mapping(IO& io, Loop*& L) {
+    auto name = L->getName();
+
     std::string str;
     llvm::raw_string_ostream stream(str);
-    L.print(stream, true, true);
-    auto LId = L.getLoopID()->getMetadataID();
+    L->print(stream, true, true);
 
-    io.mapRequired("id", LId);
+    io.mapRequired("name", name);
     io.mapOptional("llvm", stream.str());
   }
 };
@@ -137,6 +139,7 @@ class OptCustomPassManager : public legacy::PassManager {
   const DebugifyStatsMap& getDebugifyStatsMap() const { return DIStatsMap; }
 };
 
+using llvm::yaml::Output;
 class LoopLog : public llvm::FunctionPass {
  public:
   static char ID;
@@ -161,8 +164,10 @@ class LoopLog : public llvm::FunctionPass {
     // Should really account for module, too.
     counts[F.getName().str()] = Loops.size();
 
+    Output yout(llvm::dbgs());
     for (auto L : Loops) {
       L->print(LoopsLog->os(), true, true);
+      yout << L;
     }
     LoopsLog->keep();
 
