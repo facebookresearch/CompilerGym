@@ -38,6 +38,21 @@
 #include "llvm/Transforms/Vectorize.h"
 
 using namespace llvm;
+using llvm::yaml::IO;
+using llvm::yaml::ScalarEnumerationTraits;
+
+template <>
+struct llvm::yaml::MappingTraits<Loop> {
+  static void mapping(IO& io, Loop& L) {
+    std::string str;
+    llvm::raw_string_ostream stream(str);
+    L.print(stream, true, true);
+    auto LId = L.getLoopID()->getMetadataID();
+
+    io.mapRequired("id", LId);
+    io.mapOptional("llvm", stream.str());
+  }
+};
 
 namespace {
 /// Input LLVM module file name.
