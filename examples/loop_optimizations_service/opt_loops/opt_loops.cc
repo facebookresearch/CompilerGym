@@ -45,14 +45,14 @@ using llvm::yaml::ScalarEnumerationTraits;
 template <>
 struct llvm::yaml::MappingTraits<Loop*> {
   static void mapping(IO& io, Loop*& L) {
-    auto name = L->getName();
+    std::string name = L->getName();
 
     std::string str;
     llvm::raw_string_ostream stream(str);
     L->print(stream, true, true);
 
     io.mapRequired("name", name);
-    io.mapOptional("llvm", stream.str());
+    io.mapOptional("llvm", str);
   }
 };
 
@@ -150,7 +150,7 @@ class LoopLog : public llvm::FunctionPass {
   LoopLog(StringRef Filename) : FunctionPass(ID) {
     // Prepare loops log
     std::error_code EC;
-    LoopsLog = new ToolOutputFile(Filename, EC, sys::fs::OF_None);
+    LoopsLog = new raw_fd_ostream(Filename, EC);
   }
 
   virtual void getAnalysisUsage(AnalysisUsage& AU) const override {
@@ -164,18 +164,17 @@ class LoopLog : public llvm::FunctionPass {
     // Should really account for module, too.
     counts[F.getName().str()] = Loops.size();
 
-    Output yout(LoopsLog->os());
+    Output yout(*LoopsLog);
     for (auto L : Loops) {
-      // L->print(LoopsLog->os(), true, true);
       yout << L;
     }
-    LoopsLog->keep();
+    LoopsLog->close();
 
     return false;
   }
 
  protected:
-  ToolOutputFile* LoopsLog;
+  raw_fd_ostream* LoopsLog;
 };
 
 char LoopLog::ID = 0;
