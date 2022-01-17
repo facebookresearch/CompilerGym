@@ -146,9 +146,7 @@ class LoopLog : public llvm::FunctionPass {
   static char ID;
   std::unordered_map<std::string, int> counts;
 
-  LoopLog() : LoopLog(*(new raw_fd_ostream("/tmp/loops.log", EC))) {}
-
-  LoopLog(raw_fd_ostream& FileLog) : FunctionPass(ID), LoopsLog(FileLog) {}
+  LoopLog(yaml::Output& Yaml = *(new yaml::Output(llvm::dbgs()))) : FunctionPass(ID), Yaml(Yaml) {}
 
   virtual void getAnalysisUsage(AnalysisUsage& AU) const override {
     AU.addRequired<LoopInfoWrapperPass>();
@@ -161,17 +159,15 @@ class LoopLog : public llvm::FunctionPass {
     // Should really account for module, too.
     counts[F.getName().str()] = Loops.size();
 
-    yaml::Output yout(LoopsLog);
     for (auto L : Loops) {
-      yout << L;
+      Yaml << L;
     }
 
     return false;
   }
 
  protected:
-  raw_fd_ostream& LoopsLog;
-  std::error_code EC;
+  yaml::Output& Yaml;
 };
 
 char LoopLog::ID = 0;
@@ -243,7 +239,7 @@ INITIALIZE_PASS_END(LoopConfiguratorPass, "unroll-loops-configurator",
                     "Configurates loop unrolling", false, false)
 
 namespace llvm {
-Pass* createLoopLogPass(raw_fd_ostream& FileLog) { return new LoopLog(FileLog); }
+Pass* createLoopLogPass(yaml::Output& Yaml) { return new LoopLog(Yaml); }
 }  // end namespace llvm
 
 int main(int argc, char** argv) {
@@ -272,11 +268,12 @@ int main(int argc, char** argv) {
 
   // Prepare loops dump/configuration yaml file
   raw_fd_ostream ToolConfigFile("/tmp/loops.log", EC);
+  yaml::Output Yaml(ToolConfigFile);
 
   initializeLoopLogPass(*PassRegistry::getPassRegistry());
   OptCustomPassManager PM;
   LoopConfiguratorPass* LoopConfigurator = new LoopConfiguratorPass();
-  PM.add(createLoopLogPass(ToolConfigFile));
+  PM.add(createLoopLogPass(Yaml));
   PM.add(LoopConfigurator);
   PM.add(createLoopUnrollPass());
   PM.add(createLICMPass());
