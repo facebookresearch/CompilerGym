@@ -39,6 +39,7 @@
 
 using namespace llvm;
 
+using namespace llvm::yaml;
 using llvm::yaml::IO;
 using llvm::yaml::ScalarEnumerationTraits;
 
@@ -145,13 +146,9 @@ class LoopLog : public llvm::FunctionPass {
   static char ID;
   std::unordered_map<std::string, int> counts;
 
-  LoopLog() : LoopLog("/tmp/loops.log") {}
+  LoopLog() : LoopLog(*(new raw_fd_ostream("/tmp/loops.log", EC))) {}
 
-  LoopLog(StringRef Filename) : FunctionPass(ID) {
-    // Prepare loops log
-    std::error_code EC;
-    LoopsLog = new raw_fd_ostream(Filename, EC);
-  }
+  LoopLog(raw_fd_ostream& FileLog) : FunctionPass(ID), LoopsLog(FileLog) {}
 
   virtual void getAnalysisUsage(AnalysisUsage& AU) const override {
     AU.addRequired<LoopInfoWrapperPass>();
@@ -164,17 +161,17 @@ class LoopLog : public llvm::FunctionPass {
     // Should really account for module, too.
     counts[F.getName().str()] = Loops.size();
 
-    Output yout(*LoopsLog);
+    yaml::Output yout(LoopsLog);
     for (auto L : Loops) {
       yout << L;
     }
-    LoopsLog->close();
 
     return false;
   }
 
  protected:
-  raw_fd_ostream* LoopsLog;
+  raw_fd_ostream& LoopsLog;
+  std::error_code EC;
 };
 
 char LoopLog::ID = 0;
@@ -246,7 +243,7 @@ INITIALIZE_PASS_END(LoopConfiguratorPass, "unroll-loops-configurator",
                     "Configurates loop unrolling", false, false)
 
 namespace llvm {
-Pass* createLoopLogPass(StringRef Filename) { return new LoopLog(Filename); }
+Pass* createLoopLogPass(raw_fd_ostream& FileLog) { return new LoopLog(FileLog); }
 }  // end namespace llvm
 
 int main(int argc, char** argv) {
@@ -264,7 +261,7 @@ int main(int argc, char** argv) {
   if (!Module)
     return 1;
 
-  // Prepare output
+  // Prepare output IR file
   ToolOutputFile Out(OutputFilename, EC, sys::fs::OF_None);
   if (EC) {
     Err = SMDiagnostic(OutputFilename, SourceMgr::DK_Error,
@@ -273,10 +270,13 @@ int main(int argc, char** argv) {
     return 1;
   }
 
+  // Prepare loops dump/configuration yaml file
+  raw_fd_ostream ToolConfigFile("/tmp/loops.log", EC);
+
   initializeLoopLogPass(*PassRegistry::getPassRegistry());
   OptCustomPassManager PM;
   LoopConfiguratorPass* LoopConfigurator = new LoopConfiguratorPass();
-  PM.add(createLoopLogPass("/tmp/loops.log"));
+  PM.add(createLoopLogPass(ToolConfigFile));
   PM.add(LoopConfigurator);
   PM.add(createLoopUnrollPass());
   PM.add(createLICMPass());
@@ -294,6 +294,7 @@ int main(int argc, char** argv) {
   PM.run(*Module);
 
   Out.keep();
+  ToolConfigFile.close();
 
   return 0;
 }
