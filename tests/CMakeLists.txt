@@ -30,6 +30,17 @@ cg_py_test(
 
 cg_py_test(
   NAME
+    env_copy_test
+  SRCS
+    "env_copy_test.py"
+  DEPS
+    compiler_gym::envs::envs
+    tests::pytest_plugins::llvm
+    tests::test_main
+)
+
+cg_py_test(
+  NAME
     make_test
   SRCS
     "make_test.py"

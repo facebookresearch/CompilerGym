@@ -1322,3 +1322,12 @@ class CompilerEnv(gym.Env):
             )
 
         return list(reply.reply)
+
+    def __copy__(self) -> "CompilerEnv":
+        raise TypeError(
+            "CompilerEnv instances do not support shallow copies. Use deepcopy()"
+        )
+
+    def __deepcopy__(self, memo) -> "CompilerEnv":
+        del memo  # unused
+        return self.fork()
