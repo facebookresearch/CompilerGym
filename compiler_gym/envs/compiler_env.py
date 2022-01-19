@@ -330,18 +330,6 @@ class CompilerEnv(gym.Env):
 
     @property
     @deprecated(
-        version="0.1.8",
-        reason=(
-            "Use :meth:`env.datasets.datasets() <compiler_gym.datasets.Datasets.datasets>` instead. "
-            "`More information <https://github.com/facebookresearch/CompilerGym/issues/45>`_."
-        ),
-    )
-    def available_datasets(self) -> Dict[str, Dataset]:
-        """A dictionary of datasets."""
-        return {d.name: d for d in self.datasets}
-
-    @property
-    @deprecated(
         version="0.2.1",
         reason=(
             "The `CompilerEnv.logger` attribute is deprecated. All CompilerEnv "
@@ -1126,18 +1114,6 @@ class CompilerEnv(gym.Env):
             raise ValueError(f"Invalid mode: {mode}")
 
     @property
-    @deprecated(
-        version="0.1.8",
-        reason=(
-            "Use :meth:`env.datasets.benchmarks() <compiler_gym.datasets.Datasets.benchmarks>` instead. "
-            "`More information <https://github.com/facebookresearch/CompilerGym/issues/45>`_."
-        ),
-    )
-    def benchmarks(self) -> Iterable[str]:
-        """Enumerate a (possible unbounded) list of available benchmarks."""
-        return self.datasets.benchmark_uris()
-
-    @property
     def _observation_view_type(self):
         """Returns the type for observation views.
 
@@ -1152,76 +1128,6 @@ class CompilerEnv(gym.Env):
         Subclasses may override this to extend the default reward view.
         """
         return RewardView
-
-    @deprecated(
-        version="0.1.8",
-        reason=(
-            "Datasets are now installed automatically, there is no need to call :code:`require()`. "
-            "`More information <https://github.com/facebookresearch/CompilerGym/issues/45>`_."
-        ),
-    )
-    def require_datasets(self, datasets: List[Union[str, Dataset]]) -> bool:
-        """Deprecated function for managing datasets.
-
-        Datasets are now installed automatically. See :class:`env.datasets
-        <compiler_gym.datasets.Datasets>`.
-
-        :param datasets: A list of datasets to require. Each dataset is the name
-            of an available dataset, the URL of a dataset to download, or a
-            :class:`Dataset <compiler_gym.datasets.Dataset>` instance.
-
-        :return: :code:`True` if one or more datasets were downloaded, or
-            :code:`False` if all datasets were already available.
-        """
-        return False
-
-    @deprecated(
-        version="0.1.8",
-        reason=(
-            "Use :meth:`env.datasets.require() <compiler_gym.datasets.Datasets.require>` instead. "
-            "`More information <https://github.com/facebookresearch/CompilerGym/issues/45>`_."
-        ),
-    )
-    def require_dataset(self, dataset: Union[str, Dataset]) -> bool:
-        """Deprecated function for managing datasets.
-
-        Datasets are now installed automatically. See :class:`env.datasets
-        <compiler_gym.datasets.Datasets>`.
-
-        :param dataset: The name of the dataset to download, the URL of the
-            dataset, or a :class:`Dataset <compiler_gym.datasets.Dataset>`
-            instance.
-
-        :return: :code:`True` if the dataset was downloaded, or :code:`False` if
-            the dataset was already available.
-        """
-        return False
-
-    @deprecated(
-        version="0.1.8",
-        reason=(
-            "Use :meth:`env.datasets.add() <compiler_gym.datasets.Datasets.require>` instead. "
-            "`More information <https://github.com/facebookresearch/CompilerGym/issues/45>`_."
-        ),
-    )
-    def register_dataset(self, dataset: Dataset) -> bool:
-        """Register a new dataset.
-
-        Example usage:
-
-            >>> my_dataset = Dataset(name="my-dataset-v0", ...)
-            >>> env = gym.make("llvm-v0")
-            >>> env.register_dataset(my_dataset)
-            >>> env.benchmark = "my-dataset-v0/1"
-
-        :param dataset: A :class:`Dataset <compiler_gym.datasets.Dataset>`
-            instance describing the new dataset.
-
-        :return: :code:`True` if the dataset was added, else :code:`False`.
-
-        :raises ValueError: If a dataset with this name is already registered.
-        """
-        return self.datasets.add(dataset)
 
     def apply(self, state: CompilerEnvState) -> None:  # noqa
         """Replay this state on the given an environment.
@@ -1348,28 +1254,6 @@ class CompilerEnv(gym.Env):
             errors=errors,
             **validation,
         )
-
-    @deprecated(
-        version="0.1.8",
-        reason=(
-            "Use :meth:`env.validate() "
-            "<compiler_gym.datasets.Benchmark.validate>` instead. "
-            "`More information <https://github.com/facebookresearch/CompilerGym/issues/45>`_."
-        ),
-    )
-    def get_benchmark_validation_callback(
-        self,
-    ) -> Optional[Callable[["CompilerEnv"], Iterable[ValidationError]]]:
-        """Return a callback that validates benchmark semantics, if available."""
-
-        def composed(env):
-            for validation_cb in self.benchmark.validation_callbacks():
-                errors = validation_cb(env)
-                if errors:
-                    yield from errors
-
-        if self.benchmark.validation_callbacks():
-            return composed
 
     def send_param(self, key: str, value: str) -> str:
         """Send a single <key, value> parameter to the compiler service.

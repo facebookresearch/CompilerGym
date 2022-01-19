@@ -7,17 +7,6 @@ cg_add_all_subdirs()
 
 cg_py_test(
   NAME
-    datasets_bin_test
-  SRCS
-    "datasets_bin_test.py"
-  DEPS
-    compiler_gym::bin::datasets
-    tests::pytest_plugins::common
-    tests::test_main
-)
-
-cg_py_test(
-  NAME
     manual_env_bin_test
   SRCS
     "manual_env_bin_test.py"
