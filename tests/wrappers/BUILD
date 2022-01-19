@@ -59,3 +59,13 @@ py_test(
         "//tests/pytest_plugins:llvm",
     ],
 )
+
+py_test(
+    name = "validation_test",
+    srcs = ["validation_test.py"],
+    deps = [
+        "//compiler_gym/wrappers",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)

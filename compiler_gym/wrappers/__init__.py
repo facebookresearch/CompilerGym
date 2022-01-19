@@ -46,6 +46,8 @@ from compiler_gym.wrappers.datasets import (
 from compiler_gym.wrappers.llvm import RuntimePointEstimateReward
 from compiler_gym.wrappers.time_limit import TimeLimit
 
+from .validation import ValidateBenchmarkAfterEveryStep
+
 __all__ = [
     "ActionWrapper",
     "CommandlineWithTerminalAction",
@@ -59,4 +61,5 @@ __all__ = [
     "RewardWrapper",
     "RuntimePointEstimateReward",
     "TimeLimit",
+    "ValidateBenchmarkAfterEveryStep",
 ]
