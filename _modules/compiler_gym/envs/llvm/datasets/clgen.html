@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.envs.llvm.datasets.clgen &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>compiler_gym.envs.llvm.datasets.clgen &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../../../../../_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="../../../../../_static/favicon.png"/>
   
 
   
@@ -69,7 +71,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -204,6 +206,7 @@
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
 <span class="kn">import</span> <span class="nn">io</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">import</span> <span class="nn">tarfile</span>
@@ -215,7 +218,9 @@
 
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">BenchmarkInitError</span><span class="p">,</span> <span class="n">TarDatasetWithManifest</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets.benchmark</span> <span class="kn">import</span> <span class="n">BenchmarkWithSource</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets.uri</span> <span class="kn">import</span> <span class="n">BenchmarkUri</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.llvm_benchmark</span> <span class="kn">import</span> <span class="n">ClangInvocation</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.commands</span> <span class="kn">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">communicate</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.download</span> <span class="kn">import</span> <span class="n">download</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.filesystem</span> <span class="kn">import</span> <span class="n">atomic_file_write</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.truncate</span> <span class="kn">import</span> <span class="n">truncate</span>
@@ -317,15 +322,15 @@
 
             <span class="bp">self</span><span class="o">.</span><span class="n">_opencl_headers_installed_marker</span><span class="o">.</span><span class="n">touch</span><span class="p">()</span>
 
-    <span class="k">def</span> <span class="nf">benchmark</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">benchmark_from_parsed_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="n">BenchmarkUri</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">install</span><span class="p">()</span>
 
-        <span class="n">benchmark_name</span> <span class="o">=</span> <span class="n">uri</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span>
+        <span class="n">benchmark_name</span> <span class="o">=</span> <span class="n">uri</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">benchmark_name</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No benchmark specified: </span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># The absolute path of the file, without an extension.</span>
-        <span class="n">path_stem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_root</span> <span class="o">/</span> <span class="n">uri</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span>
+        <span class="n">path_stem</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_root</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">uri</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="n">bc_path</span><span class="p">,</span> <span class="n">cl_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path_stem</span><span class="si">}</span><span class="s2">.bc&quot;</span><span class="p">),</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path_stem</span><span class="si">}</span><span class="s2">.cl&quot;</span><span class="p">)</span>
 
@@ -352,13 +357,16 @@
                     <span class="p">],</span>
                 <span class="p">)</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">outpath</span><span class="o">=</span><span class="n">tmp_bc_path</span><span class="p">)</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Exec </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">compile_command</span><span class="p">)</span>
-                <span class="n">clang</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
-                    <span class="n">compile_command</span><span class="p">,</span>
-                    <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-                    <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-                    <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-                <span class="p">)</span>
-                <span class="n">_</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">clang</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="n">Popen</span><span class="p">(</span>
+                        <span class="n">compile_command</span><span class="p">,</span>
+                        <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                        <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                        <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                    <span class="p">)</span> <span class="k">as</span> <span class="n">clang</span><span class="p">:</span>
+                        <span class="n">_</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">communicate</span><span class="p">(</span><span class="n">clang</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+                <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">BenchmarkInitError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Benchmark compilation timed out: </span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">clang</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
                 <span class="n">compile_command</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">compile_command</span><span class="p">)</span>

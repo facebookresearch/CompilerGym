@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.wrappers.datasets &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>compiler_gym.wrappers.datasets &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
   
 
   
@@ -69,7 +71,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -355,9 +357,11 @@
 <span class="sd">    .. note::</span>
 
 <span class="sd">        Uniform random selection is provided by evaluating the input benchmarks</span>
-<span class="sd">        iterator into a list and sampling randomly from the list. This will not</span>
-<span class="sd">        work for random iteration over infinite or very large iterables of</span>
-<span class="sd">        benchmarks.</span>
+<span class="sd">        iterator into a list and sampling randomly from the list. For very large</span>
+<span class="sd">        and infinite iterables of benchmarks you must use the</span>
+<span class="sd">        :class:`IterateOverBenchmarks</span>
+<span class="sd">        &lt;compiler_gym.wrappers.IterateOverBenchmarks&gt;` wrapper with your own</span>
+<span class="sd">        random sampling iterator.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="RandomOrderBenchmarks.__init__"><a class="viewcode-back" href="../../../compiler_gym/wrappers.html#compiler_gym.wrappers.RandomOrderBenchmarks.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>

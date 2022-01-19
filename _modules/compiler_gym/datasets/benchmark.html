@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.datasets.benchmark &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>compiler_gym.datasets.benchmark &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
   
 
   
@@ -69,7 +71,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -204,6 +206,7 @@
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets.uri</span> <span class="kn">import</span> <span class="n">BenchmarkUri</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">Benchmark</span> <span class="k">as</span> <span class="n">BenchmarkProto</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">File</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util</span> <span class="kn">import</span> <span class="n">thread_pool</span>
@@ -300,7 +303,7 @@
         <span class="k">return</span> <span class="nb">hash</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
 
     <span class="nd">@property</span>
-    <span class="k">def</span> <span class="nf">uri</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">uri</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BenchmarkUri</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;The URI of the benchmark.</span>
 
 <span class="sd">        Benchmark URIs should be unique, that is, that two URIs with the same</span>
@@ -310,7 +313,7 @@
 
 <span class="sd">        :return: A URI string. :type: string</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_proto</span><span class="o">.</span><span class="n">uri</span>
+        <span class="k">return</span> <span class="n">BenchmarkUri</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_proto</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">proto</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">BenchmarkProto</span><span class="p">:</span>
@@ -461,7 +464,7 @@
         <span class="k">return</span> <span class="nb">len</span><span class="p">(</span><span class="n">uniq_paths</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Benchmark.from_file"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Benchmark.from_file">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">from_file</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">BenchmarkUri</span><span class="p">],</span> <span class="n">path</span><span class="p">:</span> <span class="n">Path</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Construct a benchmark from a file.</span>
 
 <span class="sd">        :param uri: The URI of the benchmark.</span>
@@ -482,10 +485,10 @@
         <span class="c1"># don&#39;t share a filesystem.</span>
         <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
             <span class="n">contents</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">proto</span><span class="o">=</span><span class="n">BenchmarkProto</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">,</span> <span class="n">program</span><span class="o">=</span><span class="n">File</span><span class="p">(</span><span class="n">contents</span><span class="o">=</span><span class="n">contents</span><span class="p">)))</span></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">proto</span><span class="o">=</span><span class="n">BenchmarkProto</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uri</span><span class="p">),</span> <span class="n">program</span><span class="o">=</span><span class="n">File</span><span class="p">(</span><span class="n">contents</span><span class="o">=</span><span class="n">contents</span><span class="p">)))</span></div>
 
 <div class="viewcode-block" id="Benchmark.from_file_contents"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Benchmark.from_file_contents">[docs]</a>    <span class="nd">@classmethod</span>
-    <span class="k">def</span> <span class="nf">from_file_contents</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">):</span>
+    <span class="k">def</span> <span class="nf">from_file_contents</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">BenchmarkUri</span><span class="p">],</span> <span class="n">data</span><span class="p">:</span> <span class="nb">bytes</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Construct a benchmark from raw data.</span>
 
 <span class="sd">        :param uri: The URI of the benchmark.</span>
@@ -493,7 +496,7 @@
 <span class="sd">        :param data: An array of bytes that will be passed to the compiler</span>
 <span class="sd">            service.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">proto</span><span class="o">=</span><span class="n">BenchmarkProto</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">,</span> <span class="n">program</span><span class="o">=</span><span class="n">File</span><span class="p">(</span><span class="n">contents</span><span class="o">=</span><span class="n">data</span><span class="p">)))</span></div>
+        <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span><span class="n">proto</span><span class="o">=</span><span class="n">BenchmarkProto</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">uri</span><span class="p">),</span> <span class="n">program</span><span class="o">=</span><span class="n">File</span><span class="p">(</span><span class="n">contents</span><span class="o">=</span><span class="n">data</span><span class="p">)))</span></div>
 
     <span class="k">def</span> <span class="fm">__eq__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">other</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;Benchmark&quot;</span><span class="p">]):</span>
         <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">other</span><span class="p">,</span> <span class="n">Benchmark</span><span class="p">):</span>

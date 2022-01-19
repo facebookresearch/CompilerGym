@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.leaderboard.llvm_instcount &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>compiler_gym.leaderboard.llvm_instcount &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
   
 
   
@@ -69,7 +71,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -380,6 +382,12 @@
 
 <span class="sd">    &gt;&gt;&gt; eval_llvm_instcount_policy(my_policy)</span>
 
+<span class="sd">    The :func:`eval_llvm_instcount_policy()</span>
+<span class="sd">    &lt;compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy&gt;`</span>
+<span class="sd">    function calls the policy function for each benchmark in the dataset, one at</span>
+<span class="sd">    a time, from a single thread. Stateful policies can assume thread safe</span>
+<span class="sd">    access to member variables.</span>
+
 <span class="sd">    Put together as a complete example, a leaderboard submission script may look</span>
 <span class="sd">    like:</span>
 
@@ -401,7 +409,8 @@
 <span class="sd">    defines a number of commandline flags that can be overriden to control the</span>
 <span class="sd">    behavior of the evaluation. For example the flag :code:`--n` determines the</span>
 <span class="sd">    number of times the policy is run on each benchmark (default is 10), and</span>
-<span class="sd">    :code:`--leaderboard_results` determines the path of the generated results file:</span>
+<span class="sd">    :code:`--leaderboard_results` determines the path of the generated results</span>
+<span class="sd">    file:</span>
 
 <span class="sd">    .. code-block::</span>
 
@@ -480,7 +489,7 @@
                         <span class="s2">&quot;</span><span class="se">\r\033</span><span class="s2">[2A&quot;</span>
                         <span class="s2">&quot;</span><span class="se">\033</span><span class="s2">[K&quot;</span>
                         <span class="sa">f</span><span class="s2">&quot;Runtime: </span><span class="si">{</span><span class="n">humanize_duration_hms</span><span class="p">(</span><span class="n">time</span><span class="p">)</span><span class="si">}</span><span class="s2">. &quot;</span>
-                        <span class="sa">f</span><span class="s2">&quot;Estimated completion: </span><span class="si">{</span><span class="n">humanize_duration_hms</span><span class="p">(</span><span class="n">time</span> <span class="o">+</span> <span class="n">mean_walltime</span> <span class="o">*</span> <span class="n">remaining_count</span><span class="p">)</span><span class="si">}</span><span class="s2">. &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;Estimated completion: </span><span class="si">{</span><span class="n">humanize_duration_hms</span><span class="p">(</span><span class="n">mean_walltime</span> <span class="o">*</span> <span class="n">remaining_count</span><span class="p">)</span><span class="si">}</span><span class="s2">. &quot;</span>
                         <span class="sa">f</span><span class="s2">&quot;Completed: </span><span class="si">{</span><span class="n">humanize</span><span class="o">.</span><span class="n">intcomma</span><span class="p">(</span><span class="n">done_count</span><span class="p">)</span><span class="si">}</span><span class="s2"> / </span><span class="si">{</span><span class="n">humanize</span><span class="o">.</span><span class="n">intcomma</span><span class="p">(</span><span class="n">total_count</span><span class="p">)</span><span class="si">}</span><span class="s2"> &quot;</span>
                         <span class="sa">f</span><span class="s2">&quot;(</span><span class="si">{</span><span class="n">done_count</span> <span class="o">/</span> <span class="n">total_count</span><span class="si">:</span><span class="s2">.1%</span><span class="si">}</span><span class="s2">).&quot;</span>
                         <span class="s2">&quot;</span><span class="se">\n\033</span><span class="s2">[K&quot;</span>

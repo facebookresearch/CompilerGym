@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.envs.gcc.datasets.chstone &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>compiler_gym.envs.gcc.datasets.chstone &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../../../../../_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="../../../../../_static/favicon.png"/>
   
 
   
@@ -69,7 +71,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -202,10 +204,12 @@
 <span class="c1">#</span>
 <span class="c1"># This source code is licensed under the MIT license found in the</span>
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span>
 
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">TarDatasetWithManifest</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets.uri</span> <span class="kn">import</span> <span class="n">BenchmarkUri</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.envs.gcc.gcc</span> <span class="kn">import</span> <span class="n">Gcc</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.decorators</span> <span class="kn">import</span> <span class="n">memoized_property</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.filesystem</span> <span class="kn">import</span> <span class="n">atomic_file_write</span>
@@ -282,12 +286,8 @@
         <span class="c1"># expensive.</span>
         <span class="k">return</span> <span class="n">Gcc</span><span class="p">(</span><span class="nb">bin</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">gcc_bin</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">benchmark</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">benchmark_from_parsed_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="n">BenchmarkUri</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">install</span><span class="p">()</span>
-
-        <span class="n">benchmark_name</span> <span class="o">=</span> <span class="n">uri</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">benchmark_name</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;No benchmark specified: </span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># Most of the source files are named after the parent directory, but not</span>
         <span class="c1"># all.</span>
@@ -296,8 +296,8 @@
             <span class="s2">&quot;motion&quot;</span><span class="p">:</span> <span class="s2">&quot;mpeg2.c&quot;</span><span class="p">,</span>
             <span class="s2">&quot;sha&quot;</span><span class="p">:</span> <span class="s2">&quot;sha_driver.c&quot;</span><span class="p">,</span>
             <span class="s2">&quot;jpeg&quot;</span><span class="p">:</span> <span class="s2">&quot;main.c&quot;</span><span class="p">,</span>
-        <span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">benchmark_name</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">benchmark_name</span><span class="si">}</span><span class="s2">.c&quot;</span><span class="p">)</span>
-        <span class="n">source_dir_path</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_root</span> <span class="o">/</span> <span class="n">benchmark_name</span>
+        <span class="p">}</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">uri</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">uri</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span><span class="si">}</span><span class="s2">.c&quot;</span><span class="p">)</span>
+        <span class="n">source_dir_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_root</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">uri</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
         <span class="n">source_path</span> <span class="o">=</span> <span class="n">source_dir_path</span> <span class="o">/</span> <span class="n">c_file_name</span>
         <span class="n">preprocessed_path</span> <span class="o">=</span> <span class="n">source_dir_path</span> <span class="o">/</span> <span class="s2">&quot;src.c&quot;</span>
 
@@ -312,7 +312,7 @@
                 <span class="c1"># TODO(github.com/facebookresearch/CompilerGym/issues/325): Send</span>
                 <span class="c1"># over the unprocessed code to the service, have the service</span>
                 <span class="c1"># preprocess. Until then, we do it client side with GCC having</span>
-                <span class="c1"># to fixed by an environment variable</span>
+                <span class="c1"># to be fixed by an environment variable.</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">gcc</span><span class="p">(</span>
                     <span class="s2">&quot;-E&quot;</span><span class="p">,</span>
                     <span class="s2">&quot;-o&quot;</span><span class="p">,</span>

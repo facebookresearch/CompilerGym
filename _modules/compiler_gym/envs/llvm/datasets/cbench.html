@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.envs.llvm.datasets.cbench &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>compiler_gym.envs.llvm.datasets.cbench &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../../../../../_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="../../../../../_static/favicon.png"/>
   
 
   
@@ -69,7 +71,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -220,8 +222,10 @@
 <span class="kn">import</span> <span class="nn">fasteners</span>
 
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">TarDatasetWithManifest</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets.uri</span> <span class="kn">import</span> <span class="n">BenchmarkUri</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">BenchmarkDynamicConfig</span><span class="p">,</span> <span class="n">Command</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.third_party</span> <span class="kn">import</span> <span class="n">llvm</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.commands</span> <span class="kn">import</span> <span class="n">Popen</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.download</span> <span class="kn">import</span> <span class="n">download</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">cache_path</span><span class="p">,</span> <span class="n">site_data_path</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.timer</span> <span class="kn">import</span> <span class="n">Timer</span>
@@ -335,36 +339,30 @@
         <span class="n">error_data</span><span class="p">[</span><span class="s2">&quot;compile_cmd&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">compile_cmd</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;compile: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">compile_cmd</span><span class="p">)</span>
         <span class="k">assert</span> <span class="ow">not</span> <span class="n">binary</span><span class="o">.</span><span class="n">is_file</span><span class="p">()</span>
-        <span class="n">clang</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
-            <span class="n">compile_cmd</span><span class="p">,</span>
-            <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-            <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
-            <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="n">env</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;PATH&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">clang_path</span><span class="o">.</span><span class="n">parent</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;PATH&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">},</span>
-        <span class="p">)</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">output</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">clang</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">compilation_timeout_seconds</span><span class="p">)</span>
+            <span class="k">with</span> <span class="n">Popen</span><span class="p">(</span>
+                <span class="n">compile_cmd</span><span class="p">,</span>
+                <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
+                <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="n">env</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;PATH&quot;</span><span class="p">:</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">clang_path</span><span class="o">.</span><span class="n">parent</span><span class="si">}</span><span class="s2">:</span><span class="si">{</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;PATH&#39;</span><span class="p">,</span> <span class="s1">&#39;&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">},</span>
+            <span class="p">)</span> <span class="k">as</span> <span class="n">clang</span><span class="p">:</span>
+                <span class="n">output</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">clang</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">compilation_timeout_seconds</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">clang</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
+                    <span class="n">error_data</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span>
+                    <span class="k">return</span> <span class="n">BenchmarkExecutionResult</span><span class="p">(</span>
+                        <span class="n">walltime_seconds</span><span class="o">=</span><span class="n">timeout_seconds</span><span class="p">,</span>
+                        <span class="n">error</span><span class="o">=</span><span class="n">ValidationError</span><span class="p">(</span>
+                            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;Compilation failed&quot;</span><span class="p">,</span>
+                            <span class="n">data</span><span class="o">=</span><span class="n">error_data</span><span class="p">,</span>
+                        <span class="p">),</span>
+                    <span class="p">)</span>
         <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
-            <span class="c1"># kill() was added in Python 3.7.</span>
-            <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
-                <span class="n">clang</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">clang</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
-            <span class="n">clang</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>  <span class="c1"># Wait for shutdown to complete.</span>
             <span class="n">error_data</span><span class="p">[</span><span class="s2">&quot;timeout&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">compilation_timeout_seconds</span>
             <span class="k">return</span> <span class="n">BenchmarkExecutionResult</span><span class="p">(</span>
                 <span class="n">walltime_seconds</span><span class="o">=</span><span class="n">timeout_seconds</span><span class="p">,</span>
                 <span class="n">error</span><span class="o">=</span><span class="n">ValidationError</span><span class="p">(</span>
                     <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;Compilation timeout&quot;</span><span class="p">,</span>
-                    <span class="n">data</span><span class="o">=</span><span class="n">error_data</span><span class="p">,</span>
-                <span class="p">),</span>
-            <span class="p">)</span>
-        <span class="k">if</span> <span class="n">clang</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
-            <span class="n">error_data</span><span class="p">[</span><span class="s2">&quot;output&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">output</span>
-            <span class="k">return</span> <span class="n">BenchmarkExecutionResult</span><span class="p">(</span>
-                <span class="n">walltime_seconds</span><span class="o">=</span><span class="n">timeout_seconds</span><span class="p">,</span>
-                <span class="n">error</span><span class="o">=</span><span class="n">ValidationError</span><span class="p">(</span>
-                    <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;Compilation failed&quot;</span><span class="p">,</span>
                     <span class="n">data</span><span class="o">=</span><span class="n">error_data</span><span class="p">,</span>
                 <span class="p">),</span>
             <span class="p">)</span>
@@ -374,26 +372,18 @@
         <span class="n">error_data</span><span class="p">[</span><span class="s2">&quot;run_cmd&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">cmd</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;$BIN&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">lli_path</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> benchmark.bc&quot;</span><span class="p">)</span>
         <span class="n">run_env</span><span class="p">[</span><span class="s2">&quot;PATH&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">lli_path</span><span class="o">.</span><span class="n">parent</span><span class="p">)</span>
 
+    <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;exec: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">error_data</span><span class="p">[</span><span class="s2">&quot;run_cmd&quot;</span><span class="p">])</span>
     <span class="k">try</span><span class="p">:</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;exec: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">error_data</span><span class="p">[</span><span class="s2">&quot;run_cmd&quot;</span><span class="p">])</span>
-        <span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+        <span class="k">with</span> <span class="n">Timer</span><span class="p">()</span> <span class="k">as</span> <span class="n">timer</span><span class="p">,</span> <span class="n">Popen</span><span class="p">(</span>
             <span class="n">error_data</span><span class="p">[</span><span class="s2">&quot;run_cmd&quot;</span><span class="p">],</span>
             <span class="n">shell</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
             <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
             <span class="n">env</span><span class="o">=</span><span class="n">run_env</span><span class="p">,</span>
             <span class="n">cwd</span><span class="o">=</span><span class="n">cwd</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="k">with</span> <span class="n">Timer</span><span class="p">()</span> <span class="k">as</span> <span class="n">timer</span><span class="p">:</span>
+        <span class="p">)</span> <span class="k">as</span> <span class="n">process</span><span class="p">:</span>
             <span class="n">stdout</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout_seconds</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
-        <span class="c1"># kill() was added in Python 3.7.</span>
-        <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">version_info</span> <span class="o">&gt;=</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">0</span><span class="p">):</span>
-            <span class="n">process</span><span class="o">.</span><span class="n">kill</span><span class="p">()</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">process</span><span class="o">.</span><span class="n">terminate</span><span class="p">()</span>
-        <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>  <span class="c1"># Wait for shutdown to complete.</span>
         <span class="n">error_data</span><span class="p">[</span><span class="s2">&quot;timeout_seconds&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">timeout_seconds</span>
         <span class="k">return</span> <span class="n">BenchmarkExecutionResult</span><span class="p">(</span>
             <span class="n">walltime_seconds</span><span class="o">=</span><span class="n">timeout_seconds</span><span class="p">,</span>
@@ -488,7 +478,7 @@
     <span class="k">def</span> <span class="nf">validator_cb</span><span class="p">(</span><span class="n">env</span><span class="p">:</span> <span class="s2">&quot;LlvmEnv&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ValidationError</span><span class="p">]:</span>  <span class="c1"># noqa: F821</span>
         <span class="sd">&quot;&quot;&quot;The validation callback.&quot;&quot;&quot;</span>
         <span class="k">with</span> <span class="n">_CBENCH_DOWNLOAD_THREAD_LOCK</span><span class="p">:</span>
-            <span class="k">with</span> <span class="n">fasteners</span><span class="o">.</span><span class="n">InterProcessLock</span><span class="p">(</span><span class="n">cache_path</span><span class="p">(</span><span class="s2">&quot;cbench-v1-runtime-data.LOCK&quot;</span><span class="p">)):</span>
+            <span class="k">with</span> <span class="n">fasteners</span><span class="o">.</span><span class="n">InterProcessLock</span><span class="p">(</span><span class="n">cache_path</span><span class="p">(</span><span class="s2">&quot;.cbench-v1-runtime-data.LOCK&quot;</span><span class="p">)):</span>
                 <span class="n">download_cBench_runtime_data</span><span class="p">()</span>
 
         <span class="n">cbench_data</span> <span class="o">=</span> <span class="n">site_data_path</span><span class="p">(</span><span class="s2">&quot;llvm-v0/cbench-v1-runtime-data/runtime_data&quot;</span><span class="p">)</span>
@@ -588,24 +578,24 @@
                         <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;Output not generated&quot;</span><span class="p">,</span>
                         <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;command&quot;</span><span class="p">:</span> <span class="n">cmd</span><span class="p">},</span>
                     <span class="p">)</span>
-                <span class="n">diff</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+                <span class="k">with</span> <span class="n">Popen</span><span class="p">(</span>
                     <span class="p">[</span><span class="s2">&quot;diff&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">),</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">.gold_standard&quot;</span><span class="p">],</span>
                     <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
                     <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">STDOUT</span><span class="p">,</span>
-                <span class="p">)</span>
-                <span class="n">stdout</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">diff</span><span class="o">.</span><span class="n">communicate</span><span class="p">()</span>
-                <span class="k">if</span> <span class="n">diff</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
-                    <span class="k">try</span><span class="p">:</span>
-                        <span class="n">stdout</span> <span class="o">=</span> <span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
-                        <span class="k">return</span> <span class="n">ValidationError</span><span class="p">(</span>
-                            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;Wrong output (file)&quot;</span><span class="p">,</span>
-                            <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;diff&quot;</span><span class="p">:</span> <span class="n">stdout</span><span class="p">},</span>
-                        <span class="p">)</span>
-                    <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
-                        <span class="k">return</span> <span class="n">ValidationError</span><span class="p">(</span>
-                            <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;Wrong output (file)&quot;</span><span class="p">,</span>
-                            <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;diff&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;binary&gt;&quot;</span><span class="p">},</span>
-                        <span class="p">)</span>
+                <span class="p">)</span> <span class="k">as</span> <span class="n">diff</span><span class="p">:</span>
+                    <span class="n">stdout</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">diff</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">diff</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">stdout</span> <span class="o">=</span> <span class="n">stdout</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">)</span>
+                            <span class="k">return</span> <span class="n">ValidationError</span><span class="p">(</span>
+                                <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;Wrong output (file)&quot;</span><span class="p">,</span>
+                                <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;diff&quot;</span><span class="p">:</span> <span class="n">stdout</span><span class="p">},</span>
+                            <span class="p">)</span>
+                        <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
+                            <span class="k">return</span> <span class="n">ValidationError</span><span class="p">(</span>
+                                <span class="nb">type</span><span class="o">=</span><span class="s2">&quot;Wrong output (file)&quot;</span><span class="p">,</span>
+                                <span class="n">data</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;path&quot;</span><span class="p">:</span> <span class="n">path</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="s2">&quot;diff&quot;</span><span class="p">:</span> <span class="s2">&quot;&lt;binary&gt;&quot;</span><span class="p">},</span>
+                            <span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">flaky_wrapped_cb</span><span class="p">(</span><span class="n">env</span><span class="p">:</span> <span class="s2">&quot;LlvmEnv&quot;</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ValidationError</span><span class="p">]:</span>  <span class="c1"># noqa: F821</span>
         <span class="sd">&quot;&quot;&quot;Wrap the validation callback in a flakiness retry loop.&quot;&quot;&quot;</span>
@@ -618,7 +608,12 @@
                 <span class="c1"># Timeout errors can be raised by the environment in case of a</span>
                 <span class="c1"># slow step / observation, and should be retried.</span>
                 <span class="k">pass</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Validation callback failed, attempt=</span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">flakiness</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
+                <span class="s2">&quot;Validation callback failed (</span><span class="si">%s</span><span class="s2">), attempt=</span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
+                <span class="n">error</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
+                <span class="n">j</span><span class="p">,</span>
+                <span class="n">flakiness</span><span class="p">,</span>
+            <span class="p">)</span>
         <span class="k">return</span> <span class="n">error</span>
 
     <span class="k">return</span> <span class="n">flaky_wrapped_cb</span>
@@ -694,38 +689,29 @@
 
     <span class="c1"># Create the BenchmarkDynamicConfig object.</span>
     <span class="n">cbench_data</span> <span class="o">=</span> <span class="n">site_data_path</span><span class="p">(</span><span class="s2">&quot;llvm-v0/cbench-v1-runtime-data/runtime_data&quot;</span><span class="p">)</span>
-    <span class="n">DYNAMIC_CONFIGS</span><span class="p">[</span><span class="n">benchmark</span><span class="p">]</span> <span class="o">=</span> <span class="n">BenchmarkDynamicConfig</span><span class="p">(</span>
-        <span class="n">build_cmd</span><span class="o">=</span><span class="n">Command</span><span class="p">(</span>
-            <span class="n">argument</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;$CC&quot;</span><span class="p">,</span> <span class="s2">&quot;$IN&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">linkopts</span><span class="p">,</span>
-            <span class="n">timeout_seconds</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
-            <span class="n">outfile</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a.out&quot;</span><span class="p">],</span>
-        <span class="p">),</span>
-        <span class="n">run_cmd</span><span class="o">=</span><span class="n">Command</span><span class="p">(</span>
-            <span class="n">argument</span><span class="o">=</span><span class="n">cmd</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;$BIN&quot;</span><span class="p">,</span> <span class="s2">&quot;./a.out&quot;</span><span class="p">)</span>
-            <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;$D&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">cbench_data</span><span class="p">))</span>
-            <span class="o">.</span><span class="n">split</span><span class="p">(),</span>
-            <span class="n">timeout_seconds</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
-            <span class="n">infile</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a.out&quot;</span><span class="p">,</span> <span class="s2">&quot;_finfo_dataset&quot;</span><span class="p">],</span>
-            <span class="n">outfile</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">outfiles</span><span class="p">],</span>
-        <span class="p">),</span>
-        <span class="n">pre_run_cmd</span><span class="o">=</span><span class="p">[</span>
-            <span class="n">Command</span><span class="p">(</span><span class="n">argument</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;echo&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;_finfo_dataset&quot;</span><span class="p">],</span> <span class="n">timeout_seconds</span><span class="o">=</span><span class="mi">30</span><span class="p">),</span>
-        <span class="p">],</span>
+    <span class="n">uri</span> <span class="o">=</span> <span class="n">BenchmarkUri</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">benchmark</span><span class="p">)</span>
+    <span class="n">DYNAMIC_CONFIGS</span><span class="p">[</span><span class="n">uri</span><span class="o">.</span><span class="n">path</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+        <span class="n">BenchmarkDynamicConfig</span><span class="p">(</span>
+            <span class="n">build_cmd</span><span class="o">=</span><span class="n">Command</span><span class="p">(</span>
+                <span class="n">argument</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;$CC&quot;</span><span class="p">,</span> <span class="s2">&quot;$IN&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">linkopts</span><span class="p">,</span>
+                <span class="n">timeout_seconds</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
+                <span class="n">outfile</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a.out&quot;</span><span class="p">],</span>
+            <span class="p">),</span>
+            <span class="n">run_cmd</span><span class="o">=</span><span class="n">Command</span><span class="p">(</span>
+                <span class="n">argument</span><span class="o">=</span><span class="n">cmd</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;$BIN&quot;</span><span class="p">,</span> <span class="s2">&quot;./a.out&quot;</span><span class="p">)</span>
+                <span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;$D&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">cbench_data</span><span class="p">))</span>
+                <span class="o">.</span><span class="n">split</span><span class="p">(),</span>
+                <span class="n">timeout_seconds</span><span class="o">=</span><span class="mi">300</span><span class="p">,</span>
+                <span class="n">infile</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a.out&quot;</span><span class="p">,</span> <span class="s2">&quot;_finfo_dataset&quot;</span><span class="p">],</span>
+                <span class="n">outfile</span><span class="o">=</span><span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">outfiles</span><span class="p">],</span>
+            <span class="p">),</span>
+            <span class="n">pre_run_cmd</span><span class="o">=</span><span class="p">[</span>
+                <span class="n">Command</span><span class="p">(</span><span class="n">argument</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;echo&quot;</span><span class="p">,</span> <span class="s2">&quot;1&quot;</span><span class="p">,</span> <span class="s2">&quot;&gt;_finfo_dataset&quot;</span><span class="p">],</span> <span class="n">timeout_seconds</span><span class="o">=</span><span class="mi">30</span><span class="p">),</span>
+            <span class="p">],</span>
+        <span class="p">)</span>
     <span class="p">)</span>
 
     <span class="k">return</span> <span class="kc">True</span>
-
-
-<span class="k">class</span> <span class="nc">CBenchBenchmark</span><span class="p">(</span><span class="n">Benchmark</span><span class="p">):</span>
-    <span class="sd">&quot;&quot;&quot;A cBench benchmmark.&quot;&quot;&quot;</span>
-
-    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">VALIDATORS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">,</span> <span class="p">[]):</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">add_validation_callback</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">proto</span><span class="o">.</span><span class="n">dynamic_config</span><span class="o">.</span><span class="n">MergeFrom</span><span class="p">(</span>
-            <span class="n">DYNAMIC_CONFIGS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">uri</span><span class="p">,</span> <span class="n">BenchmarkDynamicConfig</span><span class="p">())</span>
-        <span class="p">)</span>
 
 
 <div class="viewcode-block" id="CBenchDataset"><a class="viewcode-back" href="../../../../../llvm/api.html#compiler_gym.envs.llvm.datasets.CBenchDataset">[docs]</a><span class="k">class</span> <span class="nc">CBenchDataset</span><span class="p">(</span><span class="n">TarDatasetWithManifest</span><span class="p">):</span>
@@ -748,7 +734,7 @@
             <span class="n">manifest_sha256</span><span class="o">=</span><span class="s2">&quot;eeffd7593aeb696a160fd22e6b0c382198a65d0918b8440253ea458cfe927741&quot;</span><span class="p">,</span>
             <span class="n">strip_prefix</span><span class="o">=</span><span class="s2">&quot;cBench-v1&quot;</span><span class="p">,</span>
             <span class="n">benchmark_file_suffix</span><span class="o">=</span><span class="s2">&quot;.bc&quot;</span><span class="p">,</span>
-            <span class="n">benchmark_class</span><span class="o">=</span><span class="n">CBenchBenchmark</span><span class="p">,</span>
+            <span class="n">benchmark_class</span><span class="o">=</span><span class="n">Benchmark</span><span class="p">,</span>
             <span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span>
             <span class="n">sort_order</span><span class="o">=-</span><span class="mi">1</span><span class="p">,</span>
             <span class="n">validatable</span><span class="o">=</span><span class="s2">&quot;Partially&quot;</span><span class="p">,</span>
@@ -757,8 +743,32 @@
     <span class="k">def</span> <span class="nf">install</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">install</span><span class="p">()</span>
         <span class="k">with</span> <span class="n">_CBENCH_DOWNLOAD_THREAD_LOCK</span><span class="p">:</span>
-            <span class="k">with</span> <span class="n">fasteners</span><span class="o">.</span><span class="n">InterProcessLock</span><span class="p">(</span><span class="n">cache_path</span><span class="p">(</span><span class="s2">&quot;cbench-v1-runtime-data.LOCK&quot;</span><span class="p">)):</span>
-                <span class="n">download_cBench_runtime_data</span><span class="p">()</span></div>
+            <span class="k">with</span> <span class="n">fasteners</span><span class="o">.</span><span class="n">InterProcessLock</span><span class="p">(</span><span class="n">cache_path</span><span class="p">(</span><span class="s2">&quot;.cbench-v1-runtime-data.LOCK&quot;</span><span class="p">)):</span>
+                <span class="n">download_cBench_runtime_data</span><span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">benchmark_from_parsed_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="n">BenchmarkUri</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
+        <span class="n">benchmark</span> <span class="o">=</span> <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">benchmark_from_parsed_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">val</span> <span class="ow">in</span> <span class="n">VALIDATORS</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">uri</span><span class="p">),</span> <span class="p">[]):</span>
+            <span class="n">benchmark</span><span class="o">.</span><span class="n">add_validation_callback</span><span class="p">(</span><span class="n">val</span><span class="p">)</span>
+
+        <span class="c1"># Parse the &quot;dataset&quot; parameter to determine the correct dynamic</span>
+        <span class="c1"># configuration to use.</span>
+        <span class="k">if</span> <span class="n">DYNAMIC_CONFIGS</span><span class="p">[</span><span class="n">uri</span><span class="o">.</span><span class="n">path</span><span class="p">]:</span>
+            <span class="n">cfgs</span> <span class="o">=</span> <span class="n">DYNAMIC_CONFIGS</span><span class="p">[</span><span class="n">uri</span><span class="o">.</span><span class="n">path</span><span class="p">]</span>
+            <span class="n">dataset</span> <span class="o">=</span> <span class="n">uri</span><span class="o">.</span><span class="n">params</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;dataset&quot;</span><span class="p">,</span> <span class="p">[</span><span class="s2">&quot;0&quot;</span><span class="p">])</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">dataset_index</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">dataset</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">])</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid dataset: </span><span class="si">{</span><span class="n">dataset</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
+
+            <span class="k">if</span> <span class="n">dataset_index</span> <span class="o">&lt;</span> <span class="mi">0</span> <span class="ow">or</span> <span class="n">dataset_index</span> <span class="o">&gt;=</span> <span class="nb">len</span><span class="p">(</span><span class="n">cfgs</span><span class="p">):</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid dataset: </span><span class="si">{</span><span class="n">dataset_index</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+            <span class="n">benchmark</span><span class="o">.</span><span class="n">proto</span><span class="o">.</span><span class="n">dynamic_config</span><span class="o">.</span><span class="n">MergeFrom</span><span class="p">(</span><span class="n">cfgs</span><span class="p">[</span><span class="n">dataset_index</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">benchmark</span></div>
 
 
 <span class="k">class</span> <span class="nc">CBenchLegacyDataset2</span><span class="p">(</span><span class="n">TarDatasetWithManifest</span><span class="p">):</span>
@@ -789,7 +799,6 @@
             <span class="n">benchmark_file_suffix</span><span class="o">=</span><span class="s2">&quot;.bc&quot;</span><span class="p">,</span>
             <span class="n">site_data_base</span><span class="o">=</span><span class="n">site_data_base</span><span class="p">,</span>
             <span class="n">sort_order</span><span class="o">=</span><span class="n">sort_order</span><span class="p">,</span>
-            <span class="n">benchmark_class</span><span class="o">=</span><span class="n">CBenchBenchmark</span><span class="p">,</span>
             <span class="n">deprecated</span><span class="o">=</span><span class="n">deprecated</span><span class="p">,</span>
             <span class="n">validatable</span><span class="o">=</span><span class="s2">&quot;Partially&quot;</span><span class="p">,</span>
         <span class="p">)</span>
@@ -853,8 +862,9 @@
 <span class="p">]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
 
 
-<span class="c1"># A map from benchmark name to BenchmarkDynamicConfig messages.</span>
-<span class="n">DYNAMIC_CONFIGS</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">BenchmarkDynamicConfig</span><span class="p">]]</span> <span class="o">=</span> <span class="p">{}</span>
+<span class="c1"># A map from cBench benchmark path to a list of BenchmarkDynamicConfig messages,</span>
+<span class="c1"># one per dataset.</span>
+<span class="n">DYNAMIC_CONFIGS</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">BenchmarkDynamicConfig</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
 
 
 <span class="k">def</span> <span class="nf">validate_sha_output</span><span class="p">(</span><span class="n">result</span><span class="p">:</span> <span class="n">BenchmarkExecutionResult</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>

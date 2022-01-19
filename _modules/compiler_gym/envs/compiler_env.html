@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.envs.compiler_env &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>compiler_gym.envs.compiler_env &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
   
 
   
@@ -69,7 +71,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -218,6 +220,7 @@
 
 <span class="kn">from</span> <span class="nn">compiler_gym.compiler_env_state</span> <span class="kn">import</span> <span class="n">CompilerEnvState</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">,</span> <span class="n">Datasets</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets.uri</span> <span class="kn">import</span> <span class="n">BenchmarkUri</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">CompilerGymServiceConnection</span><span class="p">,</span>
     <span class="n">ConnectionOpts</span><span class="p">,</span>
@@ -226,6 +229,7 @@
     <span class="n">ServiceTransportError</span><span class="p">,</span>
     <span class="n">SessionNotFound</span><span class="p">,</span>
 <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.service.connection</span> <span class="kn">import</span> <span class="n">ServiceIsClosed</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">Action</span><span class="p">,</span> <span class="n">AddBenchmarkRequest</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">Benchmark</span> <span class="k">as</span> <span class="n">BenchmarkProto</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="p">(</span>
@@ -528,18 +532,6 @@
 
     <span class="nd">@property</span>
     <span class="nd">@deprecated</span><span class="p">(</span>
-        <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.1.8&quot;</span><span class="p">,</span>
-        <span class="n">reason</span><span class="o">=</span><span class="p">(</span>
-            <span class="s2">&quot;Use :meth:`env.datasets.datasets() &lt;compiler_gym.datasets.Datasets.datasets&gt;` instead. &quot;</span>
-            <span class="s2">&quot;`More information &lt;https://github.com/facebookresearch/CompilerGym/issues/45&gt;`_.&quot;</span>
-        <span class="p">),</span>
-    <span class="p">)</span>
-    <span class="k">def</span> <span class="nf">available_datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;A dictionary of datasets.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="p">{</span><span class="n">d</span><span class="o">.</span><span class="n">name</span><span class="p">:</span> <span class="n">d</span> <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="p">}</span>
-
-    <span class="nd">@property</span>
-    <span class="nd">@deprecated</span><span class="p">(</span>
         <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.2.1&quot;</span><span class="p">,</span>
         <span class="n">reason</span><span class="o">=</span><span class="p">(</span>
             <span class="s2">&quot;The `CompilerEnv.logger` attribute is deprecated. All CompilerEnv &quot;</span>
@@ -659,7 +651,7 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span>
 
     <span class="nd">@benchmark</span><span class="o">.</span><span class="n">setter</span>
-    <span class="k">def</span> <span class="nf">benchmark</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">benchmark</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Benchmark</span><span class="p">]):</span>
+    <span class="k">def</span> <span class="nf">benchmark</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">benchmark</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">BenchmarkUri</span><span class="p">]):</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">in_episode</span><span class="p">:</span>
             <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
                 <span class="s2">&quot;Changing the benchmark has no effect until reset() is called&quot;</span>
@@ -671,6 +663,10 @@
         <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">benchmark</span><span class="p">,</span> <span class="n">Benchmark</span><span class="p">):</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Setting benchmark: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">benchmark</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_next_benchmark</span> <span class="o">=</span> <span class="n">benchmark</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">benchmark</span><span class="p">,</span> <span class="n">BenchmarkUri</span><span class="p">):</span>
+            <span class="n">benchmark_object</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">benchmark_from_parsed_uri</span><span class="p">(</span><span class="n">benchmark</span><span class="p">)</span>
+            <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Setting benchmark by name: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">benchmark_object</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_next_benchmark</span> <span class="o">=</span> <span class="n">benchmark_object</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Expected a Benchmark or str, received: &#39;</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">benchmark</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
@@ -884,6 +880,10 @@
                 <span class="c1"># not kill it.</span>
                 <span class="k">if</span> <span class="n">reply</span><span class="o">.</span><span class="n">remaining_sessions</span><span class="p">:</span>
                     <span class="n">close_service</span> <span class="o">=</span> <span class="kc">False</span>
+            <span class="k">except</span> <span class="n">ServiceIsClosed</span><span class="p">:</span>
+                <span class="c1"># This error can be safely ignored as it means that the service</span>
+                <span class="c1"># is already offline.</span>
+                <span class="k">pass</span>
             <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                     <span class="s2">&quot;Failed to end active compiler session on close(): </span><span class="si">%s</span><span class="s2"> (</span><span class="si">%s</span><span class="s2">)&quot;</span><span class="p">,</span>
@@ -944,7 +944,7 @@
 
             <span class="k">if</span> <span class="n">retry_count</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_connection_settings</span><span class="o">.</span><span class="n">init_max_attempts</span><span class="p">:</span>
                 <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Failed to reset environment after </span><span class="si">{</span><span class="n">retry_count</span> <span class="o">-</span> <span class="mi">1</span><span class="si">}</span><span class="s2"> attempts.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;Failed to reset environment using benchmark </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span><span class="si">}</span><span class="s2"> after </span><span class="si">{</span><span class="n">retry_count</span> <span class="o">-</span> <span class="mi">1</span><span class="si">}</span><span class="s2"> attempts.</span><span class="se">\n</span><span class="s2">&quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;Last error (</span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="n">error</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="p">)</span> <span class="kn">from</span> <span class="nn">error</span>
             <span class="k">else</span><span class="p">:</span>
@@ -1009,7 +1009,7 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service</span><span class="o">.</span><span class="n">opts</span><span class="o">.</span><span class="n">always_send_benchmark_on_reset</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use_proto</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span><span class="o">.</span><span class="n">proto</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use_proto</span><span class="o">.</span><span class="n">uri</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span><span class="o">.</span><span class="n">uri</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use_proto</span><span class="o">.</span><span class="n">uri</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use</span><span class="o">.</span><span class="n">uri</span><span class="p">)</span>
 
         <span class="n">start_session_request</span> <span class="o">=</span> <span class="n">StartSessionRequest</span><span class="p">(</span>
             <span class="n">benchmark</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_in_use_proto</span><span class="p">,</span>
@@ -1324,18 +1324,6 @@
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid mode: </span><span class="si">{</span><span class="n">mode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
 
     <span class="nd">@property</span>
-    <span class="nd">@deprecated</span><span class="p">(</span>
-        <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.1.8&quot;</span><span class="p">,</span>
-        <span class="n">reason</span><span class="o">=</span><span class="p">(</span>
-            <span class="s2">&quot;Use :meth:`env.datasets.benchmarks() &lt;compiler_gym.datasets.Datasets.benchmarks&gt;` instead. &quot;</span>
-            <span class="s2">&quot;`More information &lt;https://github.com/facebookresearch/CompilerGym/issues/45&gt;`_.&quot;</span>
-        <span class="p">),</span>
-    <span class="p">)</span>
-    <span class="k">def</span> <span class="nf">benchmarks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="sd">&quot;&quot;&quot;Enumerate a (possible unbounded) list of available benchmarks.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">benchmark_uris</span><span class="p">()</span>
-
-    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">_observation_view_type</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Returns the type for observation views.</span>
 
@@ -1350,76 +1338,6 @@
 <span class="sd">        Subclasses may override this to extend the default reward view.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">return</span> <span class="n">RewardView</span>
-
-<div class="viewcode-block" id="CompilerEnv.require_datasets"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.require_datasets">[docs]</a>    <span class="nd">@deprecated</span><span class="p">(</span>
-        <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.1.8&quot;</span><span class="p">,</span>
-        <span class="n">reason</span><span class="o">=</span><span class="p">(</span>
-            <span class="s2">&quot;Datasets are now installed automatically, there is no need to call :code:`require()`. &quot;</span>
-            <span class="s2">&quot;`More information &lt;https://github.com/facebookresearch/CompilerGym/issues/45&gt;`_.&quot;</span>
-        <span class="p">),</span>
-    <span class="p">)</span>
-    <span class="k">def</span> <span class="nf">require_datasets</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">datasets</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">]])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Deprecated function for managing datasets.</span>
-
-<span class="sd">        Datasets are now installed automatically. See :class:`env.datasets</span>
-<span class="sd">        &lt;compiler_gym.datasets.Datasets&gt;`.</span>
-
-<span class="sd">        :param datasets: A list of datasets to require. Each dataset is the name</span>
-<span class="sd">            of an available dataset, the URL of a dataset to download, or a</span>
-<span class="sd">            :class:`Dataset &lt;compiler_gym.datasets.Dataset&gt;` instance.</span>
-
-<span class="sd">        :return: :code:`True` if one or more datasets were downloaded, or</span>
-<span class="sd">            :code:`False` if all datasets were already available.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="kc">False</span></div>
-
-<div class="viewcode-block" id="CompilerEnv.require_dataset"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.require_dataset">[docs]</a>    <span class="nd">@deprecated</span><span class="p">(</span>
-        <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.1.8&quot;</span><span class="p">,</span>
-        <span class="n">reason</span><span class="o">=</span><span class="p">(</span>
-            <span class="s2">&quot;Use :meth:`env.datasets.require() &lt;compiler_gym.datasets.Datasets.require&gt;` instead. &quot;</span>
-            <span class="s2">&quot;`More information &lt;https://github.com/facebookresearch/CompilerGym/issues/45&gt;`_.&quot;</span>
-        <span class="p">),</span>
-    <span class="p">)</span>
-    <span class="k">def</span> <span class="nf">require_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dataset</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Deprecated function for managing datasets.</span>
-
-<span class="sd">        Datasets are now installed automatically. See :class:`env.datasets</span>
-<span class="sd">        &lt;compiler_gym.datasets.Datasets&gt;`.</span>
-
-<span class="sd">        :param dataset: The name of the dataset to download, the URL of the</span>
-<span class="sd">            dataset, or a :class:`Dataset &lt;compiler_gym.datasets.Dataset&gt;`</span>
-<span class="sd">            instance.</span>
-
-<span class="sd">        :return: :code:`True` if the dataset was downloaded, or :code:`False` if</span>
-<span class="sd">            the dataset was already available.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="kc">False</span></div>
-
-<div class="viewcode-block" id="CompilerEnv.register_dataset"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.register_dataset">[docs]</a>    <span class="nd">@deprecated</span><span class="p">(</span>
-        <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.1.8&quot;</span><span class="p">,</span>
-        <span class="n">reason</span><span class="o">=</span><span class="p">(</span>
-            <span class="s2">&quot;Use :meth:`env.datasets.add() &lt;compiler_gym.datasets.Datasets.require&gt;` instead. &quot;</span>
-            <span class="s2">&quot;`More information &lt;https://github.com/facebookresearch/CompilerGym/issues/45&gt;`_.&quot;</span>
-        <span class="p">),</span>
-    <span class="p">)</span>
-    <span class="k">def</span> <span class="nf">register_dataset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="n">Dataset</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;Register a new dataset.</span>
-
-<span class="sd">        Example usage:</span>
-
-<span class="sd">            &gt;&gt;&gt; my_dataset = Dataset(name=&quot;my-dataset-v0&quot;, ...)</span>
-<span class="sd">            &gt;&gt;&gt; env = gym.make(&quot;llvm-v0&quot;)</span>
-<span class="sd">            &gt;&gt;&gt; env.register_dataset(my_dataset)</span>
-<span class="sd">            &gt;&gt;&gt; env.benchmark = &quot;my-dataset-v0/1&quot;</span>
-
-<span class="sd">        :param dataset: A :class:`Dataset &lt;compiler_gym.datasets.Dataset&gt;`</span>
-<span class="sd">            instance describing the new dataset.</span>
-
-<span class="sd">        :return: :code:`True` if the dataset was added, else :code:`False`.</span>
-
-<span class="sd">        :raises ValueError: If a dataset with this name is already registered.</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">datasets</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="CompilerEnv.apply"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.apply">[docs]</a>    <span class="k">def</span> <span class="nf">apply</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">state</span><span class="p">:</span> <span class="n">CompilerEnvState</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>  <span class="c1"># noqa</span>
         <span class="sd">&quot;&quot;&quot;Replay this state on the given an environment.</span>
@@ -1546,28 +1464,6 @@
             <span class="n">errors</span><span class="o">=</span><span class="n">errors</span><span class="p">,</span>
             <span class="o">**</span><span class="n">validation</span><span class="p">,</span>
         <span class="p">)</span></div>
-
-<div class="viewcode-block" id="CompilerEnv.get_benchmark_validation_callback"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.get_benchmark_validation_callback">[docs]</a>    <span class="nd">@deprecated</span><span class="p">(</span>
-        <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.1.8&quot;</span><span class="p">,</span>
-        <span class="n">reason</span><span class="o">=</span><span class="p">(</span>
-            <span class="s2">&quot;Use :meth:`env.validate() &quot;</span>
-            <span class="s2">&quot;&lt;compiler_gym.datasets.Benchmark.validate&gt;` instead. &quot;</span>
-            <span class="s2">&quot;`More information &lt;https://github.com/facebookresearch/CompilerGym/issues/45&gt;`_.&quot;</span>
-        <span class="p">),</span>
-    <span class="p">)</span>
-    <span class="k">def</span> <span class="nf">get_benchmark_validation_callback</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="s2">&quot;CompilerEnv&quot;</span><span class="p">],</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ValidationError</span><span class="p">]]]:</span>
-        <span class="sd">&quot;&quot;&quot;Return a callback that validates benchmark semantics, if available.&quot;&quot;&quot;</span>
-
-        <span class="k">def</span> <span class="nf">composed</span><span class="p">(</span><span class="n">env</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">validation_cb</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span><span class="o">.</span><span class="n">validation_callbacks</span><span class="p">():</span>
-                <span class="n">errors</span> <span class="o">=</span> <span class="n">validation_cb</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">errors</span><span class="p">:</span>
-                    <span class="k">yield from</span> <span class="n">errors</span>
-
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span><span class="o">.</span><span class="n">validation_callbacks</span><span class="p">():</span>
-            <span class="k">return</span> <span class="n">composed</span></div>
 
 <div class="viewcode-block" id="CompilerEnv.send_param"><a class="viewcode-back" href="../../../compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.send_param">[docs]</a>    <span class="k">def</span> <span class="nf">send_param</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Send a single &lt;key, value&gt; parameter to the compiler service.</span>

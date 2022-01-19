@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.service.runtime.compiler_gym_service &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>compiler_gym.service.runtime.compiler_gym_service &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="../../../../_static/favicon.png"/>
   
 
   
@@ -69,7 +71,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -216,6 +218,8 @@
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="p">(</span>
     <span class="n">EndSessionReply</span><span class="p">,</span>
     <span class="n">EndSessionRequest</span><span class="p">,</span>
+    <span class="n">ForkSessionReply</span><span class="p">,</span>
+    <span class="n">ForkSessionRequest</span><span class="p">,</span>
     <span class="n">GetSpacesReply</span><span class="p">,</span>
     <span class="n">GetSpacesRequest</span><span class="p">,</span>
     <span class="n">GetVersionReply</span><span class="p">,</span>
@@ -240,6 +244,7 @@
 <span class="nd">@contextmanager</span>
 <span class="k">def</span> <span class="nf">exception_to_grpc_status</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
     <span class="k">def</span> <span class="nf">handle_exception_as</span><span class="p">(</span><span class="n">exception</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">exception</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">exception</span><span class="p">)</span>
         <span class="n">context</span><span class="o">.</span><span class="n">set_code</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
         <span class="n">context</span><span class="o">.</span><span class="n">set_details</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">exception</span><span class="p">))</span>
 
@@ -346,6 +351,22 @@
 
         <span class="k">return</span> <span class="n">reply</span></div>
 
+<div class="viewcode-block" id="CompilerGymService.ForkSession"><a class="viewcode-back" href="../../../../compiler_gym/service/runtime.html#compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.ForkSession">[docs]</a>    <span class="k">def</span> <span class="nf">ForkSession</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">ForkSessionRequest</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ForkSessionReply</span><span class="p">:</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
+            <span class="s2">&quot;ForkSession(id=</span><span class="si">%d</span><span class="s2">), [</span><span class="si">%s</span><span class="s2">]&quot;</span><span class="p">,</span>
+            <span class="n">request</span><span class="o">.</span><span class="n">session_id</span><span class="p">,</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">next_session_id</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">reply</span> <span class="o">=</span> <span class="n">ForkSessionReply</span><span class="p">()</span>
+        <span class="k">with</span> <span class="n">exception_to_grpc_status</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">session_id</span><span class="p">]</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="n">reply</span><span class="o">.</span><span class="n">session_id</span><span class="p">]</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">fork</span><span class="p">()</span>
+            <span class="n">reply</span><span class="o">.</span><span class="n">session_id</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">next_session_id</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">next_session_id</span> <span class="o">+=</span> <span class="mi">1</span>
+
+        <span class="k">return</span> <span class="n">reply</span></div>
+
 <div class="viewcode-block" id="CompilerGymService.EndSession"><a class="viewcode-back" href="../../../../compiler_gym/service/runtime.html#compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.EndSession">[docs]</a>    <span class="k">def</span> <span class="nf">EndSession</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request</span><span class="p">:</span> <span class="n">EndSessionRequest</span><span class="p">,</span> <span class="n">context</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EndSessionReply</span><span class="p">:</span>
         <span class="k">del</span> <span class="n">context</span>  <span class="c1"># Unused</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span>
@@ -368,11 +389,10 @@
             <span class="n">context</span><span class="o">.</span><span class="n">set_details</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Session not found: </span><span class="si">{</span><span class="n">request</span><span class="o">.</span><span class="n">session_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
             <span class="k">return</span> <span class="n">reply</span>
 
-        <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">session_id</span><span class="p">]</span>
-
         <span class="n">reply</span><span class="o">.</span><span class="n">action_had_no_effect</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="k">with</span> <span class="n">exception_to_grpc_status</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>
+            <span class="n">session</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">sessions</span><span class="p">[</span><span class="n">request</span><span class="o">.</span><span class="n">session_id</span><span class="p">]</span>
             <span class="k">for</span> <span class="n">action</span> <span class="ow">in</span> <span class="n">request</span><span class="o">.</span><span class="n">action</span><span class="p">:</span>
                 <span class="n">reply</span><span class="o">.</span><span class="n">end_of_session</span><span class="p">,</span> <span class="n">nas</span><span class="p">,</span> <span class="n">ahne</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">apply_action</span><span class="p">(</span><span class="n">action</span><span class="p">)</span>
                 <span class="n">reply</span><span class="o">.</span><span class="n">action_had_no_effect</span> <span class="o">&amp;=</span> <span class="n">ahne</span>

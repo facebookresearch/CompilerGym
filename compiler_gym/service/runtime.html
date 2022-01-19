@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.service.runtime &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>compiler_gym.service.runtime &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../../_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="../../_static/favicon.png"/>
   
 
   
@@ -71,7 +73,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -277,6 +279,14 @@ implements.</p></li>
 <span class="sig-name descname"><span class="pre">EndSession</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.EndSessionRequest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.EndSessionReply</span><a class="reference internal" href="../../_modules/compiler_gym/service/runtime/compiler_gym_service.html#CompilerGymService.EndSession"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.EndSession" title="Permalink to this definition">¶</a></dt>
 <dd><p>End a CompilerGym service session. If the requested session does not exist,
 this returns an error.</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.ForkSession">
+<span class="sig-name descname"><span class="pre">ForkSession</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">request</span></span><span class="p"><span class="pre">:</span></span> <span class="n"><span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.ForkSessionRequest</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">context</span></span></em><span class="sig-paren">)</span> &#x2192; <span class="pre">compiler_gym.service.proto.compiler_gym_service_pb2.ForkSessionReply</span><a class="reference internal" href="../../_modules/compiler_gym/service/runtime/compiler_gym_service.html#CompilerGymService.ForkSession"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.ForkSession" title="Permalink to this definition">¶</a></dt>
+<dd><p>Fork a session. This creates a new session in exactly the same state. The
+new session must be terminated with EndSession() once done. This returns
+an error if the session to fork does not exist.</p>
 </dd></dl>
 
 <dl class="py method">

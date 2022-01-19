@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.envs.llvm.datasets.csmith &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>compiler_gym.envs.llvm.datasets.csmith &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../../../../../_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="../../../../../_static/favicon.png"/>
   
 
   
@@ -69,7 +71,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -211,8 +213,10 @@
 
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">BenchmarkSource</span><span class="p">,</span> <span class="n">Dataset</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets.benchmark</span> <span class="kn">import</span> <span class="n">BenchmarkInitError</span><span class="p">,</span> <span class="n">BenchmarkWithSource</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets.uri</span> <span class="kn">import</span> <span class="n">BenchmarkUri</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.llvm_benchmark</span> <span class="kn">import</span> <span class="n">ClangInvocation</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">BenchmarkDynamicConfig</span><span class="p">,</span> <span class="n">Command</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.commands</span> <span class="kn">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">communicate</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.decorators</span> <span class="kn">import</span> <span class="n">memoized_property</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">runfiles_path</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.shell_format</span> <span class="kn">import</span> <span class="n">plural</span>
@@ -349,8 +353,9 @@
     <span class="k">def</span> <span class="nf">benchmark_uris</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="k">return</span> <span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="s2">&quot;</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">UINT_MAX</span><span class="p">))</span>
 
-    <span class="k">def</span> <span class="nf">benchmark</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CsmithBenchmark</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark_from_seed</span><span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">uri</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]))</span>
+    <span class="k">def</span> <span class="nf">benchmark_from_parsed_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="n">BenchmarkUri</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CsmithBenchmark</span><span class="p">:</span>
+        <span class="n">seed</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">uri</span><span class="o">.</span><span class="n">path</span><span class="p">[</span><span class="mi">1</span><span class="p">:])</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark_from_seed</span><span class="p">(</span><span class="n">seed</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">_random_benchmark</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">random_state</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
         <span class="n">seed</span> <span class="o">=</span> <span class="n">random_state</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="n">UINT_MAX</span><span class="p">)</span>
@@ -381,43 +386,48 @@
         <span class="c1"># Run csmith with the given seed and pipe the output to clang to</span>
         <span class="c1"># assemble a bitcode.</span>
         <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Exec csmith --seed </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
-        <span class="n">csmith</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
-            <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">csmith_bin_path</span><span class="p">),</span> <span class="s2">&quot;--seed&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">seed</span><span class="p">)],</span>
-            <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-            <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-        <span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="k">with</span> <span class="n">Popen</span><span class="p">(</span>
+                <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">csmith_bin_path</span><span class="p">),</span> <span class="s2">&quot;--seed&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">seed</span><span class="p">)],</span>
+                <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+            <span class="p">)</span> <span class="k">as</span> <span class="n">csmith</span><span class="p">:</span>
+                <span class="c1"># Generate the C source.</span>
+                <span class="n">src</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">communicate</span><span class="p">(</span><span class="n">csmith</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">csmith</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
+                    <span class="k">try</span><span class="p">:</span>
+                        <span class="n">stderr</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+                            <span class="n">truncate</span><span class="p">(</span>
+                                <span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">),</span> <span class="n">max_line_len</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">max_lines</span><span class="o">=</span><span class="mi">20</span>
+                            <span class="p">)</span>
+                        <span class="p">)</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Csmith failed with seed </span><span class="si">%d</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">stderr</span><span class="p">)</span>
+                    <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
+                        <span class="c1"># Failed to interpret the stderr output, generate a generic</span>
+                        <span class="c1"># error message.</span>
+                        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Csmith failed with seed </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark_from_seed</span><span class="p">(</span>
+                        <span class="n">seed</span><span class="p">,</span> <span class="n">max_retries</span><span class="o">=</span><span class="n">max_retries</span><span class="p">,</span> <span class="n">retry_count</span><span class="o">=</span><span class="n">retry_count</span> <span class="o">+</span> <span class="mi">1</span>
+                    <span class="p">)</span>
 
-        <span class="c1"># Generate the C source.</span>
-        <span class="n">src</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">csmith</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">csmith</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
-            <span class="k">try</span><span class="p">:</span>
-                <span class="n">stderr</span> <span class="o">=</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
-                    <span class="n">truncate</span><span class="p">(</span><span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">),</span> <span class="n">max_line_len</span><span class="o">=</span><span class="mi">200</span><span class="p">,</span> <span class="n">max_lines</span><span class="o">=</span><span class="mi">20</span><span class="p">)</span>
-                <span class="p">)</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Csmith failed with seed </span><span class="si">%d</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="p">,</span> <span class="n">stderr</span><span class="p">)</span>
-            <span class="k">except</span> <span class="ne">UnicodeDecodeError</span><span class="p">:</span>
-                <span class="c1"># Failed to interpret the stderr output, generate a generic</span>
-                <span class="c1"># error message.</span>
-                <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Csmith failed with seed </span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">seed</span><span class="p">)</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark_from_seed</span><span class="p">(</span>
-                <span class="n">seed</span><span class="p">,</span> <span class="n">max_retries</span><span class="o">=</span><span class="n">max_retries</span><span class="p">,</span> <span class="n">retry_count</span><span class="o">=</span><span class="n">retry_count</span> <span class="o">+</span> <span class="mi">1</span>
-            <span class="p">)</span>
-
-        <span class="c1"># Compile to IR.</span>
-        <span class="n">clang</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">clang_compile_command</span><span class="p">,</span>
-            <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-            <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-            <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">DEVNULL</span><span class="p">,</span>
-        <span class="p">)</span>
-        <span class="n">stdout</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">clang</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">src</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">clang</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
-            <span class="n">compile_cmd</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clang_compile_command</span><span class="p">)</span>
+            <span class="c1"># Compile to IR.</span>
+            <span class="k">with</span> <span class="n">Popen</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">clang_compile_command</span><span class="p">,</span>
+                <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">DEVNULL</span><span class="p">,</span>
+            <span class="p">)</span> <span class="k">as</span> <span class="n">clang</span><span class="p">:</span>
+                <span class="n">stdout</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">communicate</span><span class="p">(</span><span class="n">clang</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="n">src</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">clang</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
+                    <span class="n">compile_cmd</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">clang_compile_command</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="n">BenchmarkInitError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Compilation job failed!</span><span class="se">\n</span><span class="s2">&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;Csmith seed: </span><span class="si">{</span><span class="n">seed</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;Command: </span><span class="si">{</span><span class="n">compile_cmd</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
+        <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
             <span class="k">raise</span> <span class="n">BenchmarkInitError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Compilation job failed!</span><span class="se">\n</span><span class="s2">&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Csmith seed: </span><span class="si">{</span><span class="n">seed</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
-                <span class="sa">f</span><span class="s2">&quot;Command: </span><span class="si">{</span><span class="n">compile_cmd</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Benchmark generation using seed </span><span class="si">{</span><span class="n">seed</span><span class="si">}</span><span class="s2"> timed out&quot;</span>
             <span class="p">)</span>
 
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark_class</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">seed</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">stdout</span><span class="p">,</span> <span class="n">src</span><span class="p">)</span></div>

@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.leaderboard &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>compiler_gym.leaderboard &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
   
 
   
@@ -71,7 +73,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -298,6 +300,10 @@ function, passing it your policy as its only argument:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">eval_llvm_instcount_policy</span><span class="p">(</span><span class="n">my_policy</span><span class="p">)</span>
 </pre></div>
 </div>
+<p>The <a class="reference internal" href="#compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy" title="compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy"><code class="xref py py-func docutils literal notranslate"><span class="pre">eval_llvm_instcount_policy()</span></code></a>
+function calls the policy function for each benchmark in the dataset, one at
+a time, from a single thread. Stateful policies can assume thread safe
+access to member variables.</p>
 <p>Put together as a complete example, a leaderboard submission script may look
 like:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># my_policy.py</span>
@@ -316,7 +322,8 @@ like:</p>
 defines a number of commandline flags that can be overriden to control the
 behavior of the evaluation. For example the flag <code class="code docutils literal notranslate"><span class="pre">--n</span></code> determines the
 number of times the policy is run on each benchmark (default is 10), and
-<code class="code docutils literal notranslate"><span class="pre">--leaderboard_results</span></code> determines the path of the generated results file:</p>
+<code class="code docutils literal notranslate"><span class="pre">--leaderboard_results</span></code> determines the path of the generated results
+file:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span>$ python my_policy.py --n=5 --leaderboard_results=my_policy_results.csv
 </pre></div>
 </div>

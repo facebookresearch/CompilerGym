@@ -353,7 +353,7 @@ current state.
 
 So, for example, in GCC 11.2.0, the first option is the :code:`-O` option. This
 has 7 possible settings, other than missing: :code:`-O0`, :code:`-O1`,
-:code:`-O2`, :code:`-O3`, :code:`-Ofast`, :code:`-Og`, amd :code:`-Os`. Since
+:code:`-O2`, :code:`-O3`, :code:`-Ofast`, :code:`-Og`, and :code:`-Os`. Since
 this is fewer than ten, there is a corresponding action for each. Similarly,
 there are action for each of the normal GCC flags, like :code:`-fpeel-loops` and
 :code:`-fno-peel-loops`. Parameters often have more than ten options, so there

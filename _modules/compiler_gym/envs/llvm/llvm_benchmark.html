@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.envs.llvm.llvm_benchmark &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>compiler_gym.envs.llvm.llvm_benchmark &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="../../../../_static/favicon.png"/>
   
 
   
@@ -69,7 +71,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -213,7 +215,7 @@
 
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">BenchmarkInitError</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.third_party</span> <span class="kn">import</span> <span class="n">llvm</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.util.commands</span> <span class="kn">import</span> <span class="n">communicate</span><span class="p">,</span> <span class="n">run_command</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.commands</span> <span class="kn">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">run_command</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">transient_cache_path</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.thread_pool</span> <span class="kn">import</span> <span class="n">get_thread_pool_executor</span>
 
@@ -228,26 +230,26 @@
     <span class="c1"># GNU assembler does not support piping to stdout.</span>
     <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
-            <span class="n">process</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+            <span class="k">with</span> <span class="n">Popen</span><span class="p">(</span>
                 <span class="p">[</span><span class="n">compiler</span><span class="p">,</span> <span class="s2">&quot;-xc++&quot;</span><span class="p">,</span> <span class="s2">&quot;-v&quot;</span><span class="p">,</span> <span class="s2">&quot;-c&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;a.out&quot;</span><span class="p">)],</span>
                 <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">DEVNULL</span><span class="p">,</span>
                 <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
                 <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
                 <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
-            <span class="p">)</span>
+            <span class="p">)</span> <span class="k">as</span> <span class="n">process</span><span class="p">:</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">process</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Failed to invoke </span><span class="si">{</span><span class="n">compiler</span><span class="si">}</span><span class="s2">. &quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;Is there a working system compiler?</span><span class="se">\n</span><span class="s2">&quot;</span>
+                        <span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">stderr</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
         <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
                 <span class="sa">f</span><span class="s2">&quot;Failed to invoke </span><span class="si">{</span><span class="n">compiler</span><span class="si">}</span><span class="s2">. &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;Is there a working system compiler?</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">communicate</span><span class="p">(</span><span class="n">process</span><span class="p">,</span> <span class="nb">input</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
-    <span class="k">if</span> <span class="n">process</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
-        <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
-            <span class="sa">f</span><span class="s2">&quot;Failed to invoke </span><span class="si">{</span><span class="n">compiler</span><span class="si">}</span><span class="s2">. &quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Is there a working system compiler?</span><span class="se">\n</span><span class="s2">&quot;</span>
-            <span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">stderr</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="p">)</span>
 
     <span class="c1"># Parse the compiler output that matches the conventional output format</span>
     <span class="c1"># used by clang and GCC:</span>
@@ -381,10 +383,34 @@
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Create a benchmark for use by LLVM environments.</span>
 
-<span class="sd">    This function takes one or more inputs and uses them to create a benchmark</span>
-<span class="sd">    that can be passed to :meth:`compiler_gym.envs.LlvmEnv.reset`.</span>
+<span class="sd">    This function takes one or more inputs and uses them to create an LLVM</span>
+<span class="sd">    bitcode benchmark that can be passed to</span>
+<span class="sd">    :meth:`compiler_gym.envs.LlvmEnv.reset`.</span>
 
-<span class="sd">    For single-source C/C++ programs, you can pass the path of the source file:</span>
+<span class="sd">    The following input types are supported:</span>
+
+<span class="sd">    +-----------------------------------------------------+---------------------+-------------------------------------------------------------+</span>
+<span class="sd">    | **File Suffix**                                     | **Treated as**      | **Converted using**                                         |</span>
+<span class="sd">    +-----------------------------------------------------+---------------------+-------------------------------------------------------------+</span>
+<span class="sd">    | :code:`.bc`                                         | LLVM IR bitcode     | No conversion required.                                     |</span>
+<span class="sd">    +-----------------------------------------------------+---------------------+-------------------------------------------------------------+</span>
+<span class="sd">    | :code:`.ll`                                         | LLVM IR text format | Assembled to bitcode using llvm-as.                         |</span>
+<span class="sd">    +-----------------------------------------------------+---------------------+-------------------------------------------------------------+</span>
+<span class="sd">    | :code:`.c`, :code:`.cc`, :code:`.cpp`, :code:`.cxx` | C / C++ source      | Compiled to bitcode using clang and the given :code:`copt`. |</span>
+<span class="sd">    +-----------------------------------------------------+---------------------+-------------------------------------------------------------+</span>
+
+<span class="sd">    .. note::</span>
+
+<span class="sd">        The LLVM IR format has no compatability guarantees between versions (see</span>
+<span class="sd">        `LLVM docs</span>
+<span class="sd">        &lt;https://llvm.org/docs/DeveloperPolicy.html#ir-backwards-compatibility&gt;`_).</span>
+<span class="sd">        You must ensure that any :code:`.bc` and :code:`.ll` files are</span>
+<span class="sd">        compatible with the LLVM version used by CompilerGym, which can be</span>
+<span class="sd">        reported using :func:`env.compiler_version</span>
+<span class="sd">        &lt;compiler_gym.envs.CompilerEnv.compiler_version&gt;`.</span>
+
+<span class="sd">    E.g. for single-source C/C++ programs, you can pass the path of the source</span>
+<span class="sd">    file:</span>
 
 <span class="sd">        &gt;&gt;&gt; benchmark = make_benchmark(&#39;my_app.c&#39;)</span>
 <span class="sd">        &gt;&gt;&gt; env = gym.make(&quot;llvm-v0&quot;)</span>
@@ -407,7 +433,7 @@
 <span class="sd">    clang:</span>
 
 <span class="sd">        &gt;&gt;&gt; benchmark = make_benchmark(</span>
-<span class="sd">            ClangInvocation([&#39;/path/to/my_app.c&#39;], timeout=10)</span>
+<span class="sd">            ClangInvocation([&#39;/path/to/my_app.c&#39;], system_includes=False, timeout=10)</span>
 <span class="sd">        )</span>
 
 <span class="sd">    For multi-file programs, pass a list of inputs that will be compiled</span>
@@ -417,27 +443,8 @@
 <span class="sd">            &#39;main.c&#39;,</span>
 <span class="sd">            &#39;lib.cpp&#39;,</span>
 <span class="sd">            &#39;lib2.bc&#39;,</span>
+<span class="sd">            &#39;foo/input.bc&#39;</span>
 <span class="sd">        ])</span>
-
-<span class="sd">    If you already have prepared bitcode files, those can be linked and used</span>
-<span class="sd">    directly:</span>
-
-<span class="sd">        &gt;&gt;&gt; benchmark = make_benchmark([</span>
-<span class="sd">            &#39;bitcode1.bc&#39;,</span>
-<span class="sd">            &#39;bitcode2.bc&#39;,</span>
-<span class="sd">        ])</span>
-
-<span class="sd">    Text-format LLVM assembly can also be used:</span>
-
-<span class="sd">        &gt;&gt;&gt; benchmark = make_benchmark(&#39;module.ll&#39;)</span>
-
-<span class="sd">    .. note::</span>
-
-<span class="sd">        LLVM bitcode compatibility is</span>
-<span class="sd">        `not guaranteed &lt;https://llvm.org/docs/DeveloperPolicy.html#ir-backwards-compatibility&gt;`_,</span>
-<span class="sd">        so you must ensure that any precompiled bitcodes are compatible with the</span>
-<span class="sd">        LLVM version used by CompilerGym, which can be queried using</span>
-<span class="sd">        :func:`env.compiler_version &lt;compiler_gym.envs.CompilerEnv.compiler_version&gt;`.</span>
 
 <span class="sd">    :param inputs: An input, or list of inputs.</span>
 
@@ -457,7 +464,9 @@
 
 <span class="sd">    :raises TypeError: If the inputs are of unsupported types.</span>
 
-<span class="sd">    :raises OSError: If a compilation job fails.</span>
+<span class="sd">    :raises OSError: If a suitable compiler cannot be found.</span>
+
+<span class="sd">    :raises BenchmarkInitError: If a compilation job fails.</span>
 
 <span class="sd">    :raises TimeoutExpired: If a compilation job exceeds :code:`timeout`</span>
 <span class="sd">        seconds.</span>
@@ -473,8 +482,8 @@
             <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">path</span><span class="o">.</span><span class="n">suffix</span> <span class="o">==</span> <span class="s2">&quot;.bc&quot;</span><span class="p">:</span>
-            <span class="n">bitcodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
-        <span class="k">elif</span> <span class="n">path</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;.c&quot;</span><span class="p">,</span> <span class="s2">&quot;.cxx&quot;</span><span class="p">,</span> <span class="s2">&quot;.cpp&quot;</span><span class="p">,</span> <span class="s2">&quot;.cc&quot;</span><span class="p">}:</span>
+            <span class="n">bitcodes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">path</span><span class="o">.</span><span class="n">absolute</span><span class="p">())</span>
+        <span class="k">elif</span> <span class="n">path</span><span class="o">.</span><span class="n">suffix</span> <span class="ow">in</span> <span class="p">{</span><span class="s2">&quot;.c&quot;</span><span class="p">,</span> <span class="s2">&quot;.cc&quot;</span><span class="p">,</span> <span class="s2">&quot;.cpp&quot;</span><span class="p">,</span> <span class="s2">&quot;.cxx&quot;</span><span class="p">}:</span>
             <span class="n">clang_jobs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
                 <span class="n">ClangInvocation</span><span class="o">.</span><span class="n">from_c_file</span><span class="p">(</span>
                     <span class="n">path</span><span class="p">,</span> <span class="n">copt</span><span class="o">=</span><span class="n">copt</span><span class="p">,</span> <span class="n">system_includes</span><span class="o">=</span><span class="n">system_includes</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span>
@@ -501,9 +510,9 @@
                 <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid input type: </span><span class="si">{</span><span class="nb">type</span><span class="p">(</span><span class="nb">input</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
     <span class="c1"># Shortcut if we only have a single pre-compiled bitcode.</span>
-    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bitcodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">clang_jobs</span><span class="p">:</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">bitcodes</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">clang_jobs</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">ll_paths</span><span class="p">:</span>
         <span class="n">bitcode</span> <span class="o">=</span> <span class="n">bitcodes</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="k">return</span> <span class="n">Benchmark</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;file:///</span><span class="si">{</span><span class="n">bitcode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">bitcode</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">Benchmark</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;benchmark://file-v0</span><span class="si">{</span><span class="n">bitcode</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">bitcode</span><span class="p">)</span>
 
     <span class="n">tmpdir_root</span> <span class="o">=</span> <span class="n">transient_cache_path</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
     <span class="n">tmpdir_root</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
@@ -564,17 +573,17 @@
             <span class="n">llvm_link_cmd</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">llvm</span><span class="o">.</span><span class="n">llvm_link_path</span><span class="p">()),</span> <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="p">[</span>
                 <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span> <span class="k">for</span> <span class="n">path</span> <span class="ow">in</span> <span class="n">bitcodes</span> <span class="o">+</span> <span class="n">clang_outs</span>
             <span class="p">]</span>
-            <span class="n">llvm_link</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+            <span class="k">with</span> <span class="n">Popen</span><span class="p">(</span>
                 <span class="n">llvm_link_cmd</span><span class="p">,</span> <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span> <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span>
-            <span class="p">)</span>
-            <span class="n">bitcode</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">communicate</span><span class="p">(</span><span class="n">llvm_link</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">llvm_link</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
-                <span class="k">raise</span> <span class="n">BenchmarkInitError</span><span class="p">(</span>
-                    <span class="sa">f</span><span class="s2">&quot;Failed to link LLVM bitcodes with error: </span><span class="si">{</span><span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
-                <span class="p">)</span>
+            <span class="p">)</span> <span class="k">as</span> <span class="n">llvm_link</span><span class="p">:</span>
+                <span class="n">bitcode</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">llvm_link</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">timeout</span><span class="o">=</span><span class="n">timeout</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">llvm_link</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">BenchmarkInitError</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Failed to link LLVM bitcodes with error: </span><span class="si">{</span><span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">&#39;utf-8&#39;</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+                    <span class="p">)</span>
 
     <span class="n">timestamp</span> <span class="o">=</span> <span class="n">datetime</span><span class="o">.</span><span class="n">now</span><span class="p">()</span><span class="o">.</span><span class="n">strftime</span><span class="p">(</span><span class="s2">&quot;%Y%m%HT%H%M%S&quot;</span><span class="p">)</span>
-    <span class="n">uri</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;benchmark://user/</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">random</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">16</span><span class="o">**</span><span class="mi">4</span><span class="p">)</span><span class="si">:</span><span class="s2">04x</span><span class="si">}</span><span class="s2">&quot;</span>
+    <span class="n">uri</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;benchmark://user-v0/</span><span class="si">{</span><span class="n">timestamp</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">random</span><span class="o">.</span><span class="n">randrange</span><span class="p">(</span><span class="mi">16</span><span class="o">**</span><span class="mi">4</span><span class="p">)</span><span class="si">:</span><span class="s2">04x</span><span class="si">}</span><span class="s2">&quot;</span>
     <span class="k">return</span> <span class="n">Benchmark</span><span class="o">.</span><span class="n">from_file_contents</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">bitcode</span><span class="p">)</span></div>
 </pre></div>
 

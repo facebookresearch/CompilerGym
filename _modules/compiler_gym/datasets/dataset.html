@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.datasets.dataset &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>compiler_gym.datasets.dataset &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
   
 
   
@@ -69,7 +71,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -202,17 +204,20 @@
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
 <span class="kn">import</span> <span class="nn">logging</span>
 <span class="kn">import</span> <span class="nn">os</span>
+<span class="kn">import</span> <span class="nn">re</span>
 <span class="kn">import</span> <span class="nn">shutil</span>
 <span class="kn">import</span> <span class="nn">warnings</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
-<span class="kn">from</span> <span class="nn">deprecated.sphinx</span> <span class="kn">import</span> <span class="n">deprecated</span>
+
+<span class="c1"># The &quot;deprecated&quot; name is used as a constructor argument to Dataset, so rename</span>
+<span class="c1"># this import to prevent shadowing.</span>
 <span class="kn">from</span> <span class="nn">deprecated.sphinx</span> <span class="kn">import</span> <span class="n">deprecated</span> <span class="k">as</span> <span class="n">mark_deprecated</span>
 
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets.benchmark</span> <span class="kn">import</span> <span class="n">Benchmark</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.datasets.uri</span> <span class="kn">import</span> <span class="n">DATASET_NAME_RE</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets.uri</span> <span class="kn">import</span> <span class="n">BenchmarkUri</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
@@ -220,6 +225,9 @@
 <span class="c1"># deprecated Dataset.logger attribute. This can be removed once the logger</span>
 <span class="c1"># attribute is removed, scheduled for release 0.2.3.</span>
 <span class="n">_logger</span> <span class="o">=</span> <span class="n">logger</span>
+
+<span class="n">_DATASET_VERSION_PATTERN</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;[a-zA-z0-9-_]+-v(?P&lt;version&gt;[0-9]+)&quot;</span>
+<span class="n">_DATASET_VERSION_RE</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="n">_DATASET_VERSION_PATTERN</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="Dataset"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Dataset">[docs]</a><span class="k">class</span> <span class="nc">Dataset</span><span class="p">:</span>
@@ -243,7 +251,7 @@
         <span class="n">name</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">description</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">license</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>  <span class="c1"># pylint: disable=redefined-builtin</span>
-        <span class="n">site_data_base</span><span class="p">:</span> <span class="n">Path</span><span class="p">,</span>
+        <span class="n">site_data_base</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">benchmark_class</span><span class="o">=</span><span class="n">Benchmark</span><span class="p">,</span>
         <span class="n">references</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">deprecated</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
@@ -252,15 +260,22 @@
     <span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Constructor.</span>
 
-<span class="sd">        :param name: The name of the dataset. Must conform to the pattern</span>
-<span class="sd">            :code:`{{protocol}}://{{name}}-v{{version}}`.</span>
+<span class="sd">        :param name: The name of the dataset, in the format:</span>
+<span class="sd">            :code:`scheme://name`.</span>
 
 <span class="sd">        :param description: A short human-readable description of the dataset.</span>
 
 <span class="sd">        :param license: The name of the dataset&#39;s license.</span>
 
-<span class="sd">        :param site_data_base: The base path of a directory that will be used to</span>
-<span class="sd">            store installed files.</span>
+<span class="sd">        :param site_data_base: An optional directory that can be used by the</span>
+<span class="sd">            dataset to house the &quot;site data&quot;, i.e. persistent files on disk. The</span>
+<span class="sd">            site data directory is a subdirectory of this :code:`site_data_base`</span>
+<span class="sd">            path, which can be shared by multiple datasets. If not provided, the</span>
+<span class="sd">            :attr:`dataset.site_data_path</span>
+<span class="sd">            &lt;compiler_gym.datasets.Dataset.site_data_path&gt;` attribute will raise</span>
+<span class="sd">            an error. Use :attr:`dataset.has_site_data</span>
+<span class="sd">            &lt;compiler_gym.datasets.Dataset.has_site_data&gt;` to check if a site</span>
+<span class="sd">            data path was set.</span>
 
 <span class="sd">        :param benchmark_class: The class to use when instantiating benchmarks.</span>
 <span class="sd">            It must have the same constructor signature as :class:`Benchmark</span>
@@ -290,16 +305,15 @@
 <span class="sd">        :raises ValueError: If :code:`name` does not match the expected type.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_name</span> <span class="o">=</span> <span class="n">name</span>
-        <span class="n">components</span> <span class="o">=</span> <span class="n">DATASET_NAME_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">components</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Invalid dataset name: &#39;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
-                <span class="s2">&quot;Dataset name must be in the form: &#39;{{protocol}}://{{name}}-v{{version}}&#39;&quot;</span>
-            <span class="p">)</span>
+
+        <span class="n">uri</span> <span class="o">=</span> <span class="n">BenchmarkUri</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">name</span><span class="p">)</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_description</span> <span class="o">=</span> <span class="n">description</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_license</span> <span class="o">=</span> <span class="n">license</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span> <span class="o">=</span> <span class="n">components</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;dataset_protocol&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_version</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">components</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;dataset_version&quot;</span><span class="p">))</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_scheme</span> <span class="o">=</span> <span class="n">uri</span><span class="o">.</span><span class="n">scheme</span>
+
+        <span class="n">match</span> <span class="o">=</span> <span class="n">_DATASET_VERSION_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">uri</span><span class="o">.</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_version</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;version&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">match</span> <span class="k">else</span> <span class="mi">0</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_references</span> <span class="o">=</span> <span class="n">references</span> <span class="ow">or</span> <span class="p">{}</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_deprecation_message</span> <span class="o">=</span> <span class="n">deprecated</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_validatable</span> <span class="o">=</span> <span class="n">validatable</span>
@@ -308,14 +322,16 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">benchmark_class</span> <span class="o">=</span> <span class="n">benchmark_class</span>
 
         <span class="c1"># Set up the site data name.</span>
-        <span class="n">basename</span> <span class="o">=</span> <span class="n">components</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;dataset_name&quot;</span><span class="p">)</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">_site_data_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">site_data_base</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">protocol</span> <span class="o">/</span> <span class="n">basename</span></div>
+        <span class="k">if</span> <span class="n">site_data_base</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_site_data_path</span> <span class="o">=</span> <span class="p">(</span>
+                <span class="n">Path</span><span class="p">(</span><span class="n">site_data_base</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span> <span class="o">/</span> <span class="n">uri</span><span class="o">.</span><span class="n">scheme</span> <span class="o">/</span> <span class="n">uri</span><span class="o">.</span><span class="n">dataset</span>
+            <span class="p">)</span></div>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">name</span>
 
     <span class="nd">@property</span>
-    <span class="nd">@deprecated</span><span class="p">(</span>
+    <span class="nd">@mark_deprecated</span><span class="p">(</span>
         <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.2.1&quot;</span><span class="p">,</span>
         <span class="n">reason</span><span class="o">=</span><span class="p">(</span>
             <span class="s2">&quot;The `Dataset.logger` attribute is deprecated. All Dataset &quot;</span>
@@ -354,16 +370,27 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_license</span>
 
     <span class="nd">@property</span>
+    <span class="nd">@mark_deprecated</span><span class="p">(</span>
+        <span class="n">version</span><span class="o">=</span><span class="s2">&quot;0.2.2&quot;</span><span class="p">,</span> <span class="n">reason</span><span class="o">=</span><span class="s2">&quot;The `protocol` attribute has been renamed `scheme`&quot;</span>
+    <span class="p">)</span>
     <span class="k">def</span> <span class="nf">protocol</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The URI protocol that is used to identify benchmarks in this dataset.</span>
+        <span class="sd">&quot;&quot;&quot;The URI scheme that is used to identify benchmarks in this dataset.</span>
 
 <span class="sd">        :type: str</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_protocol</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">scheme</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">scheme</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;The URI scheme that is used to identify benchmarks in this dataset.</span>
+
+<span class="sd">        :type: str</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scheme</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">version</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
-        <span class="sd">&quot;&quot;&quot;The version tag for this dataset.</span>
+        <span class="sd">&quot;&quot;&quot;The version tag for this dataset. Defaults to zero.</span>
 
 <span class="sd">        :type: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -411,13 +438,26 @@
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_validatable</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span> <span class="nf">has_site_data</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return whether the dataset has a site data directory.</span>
+
+<span class="sd">        :type: bool</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="nb">hasattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="s2">&quot;_site_data_path&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">site_data_path</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;The filesystem path used to store persistent dataset files.</span>
 
 <span class="sd">        This directory may not exist.</span>
 
 <span class="sd">        :type: Path</span>
+
+<span class="sd">        :raises ValueError: If no site data path was specified at constructor</span>
+<span class="sd">            time.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_site_data</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset has no site data path: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_site_data_path</span>
 
     <span class="nd">@property</span>
@@ -426,6 +466,9 @@
 
 <span class="sd">        :type: int</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_site_data</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mi">0</span>
+
         <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_data_path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
             <span class="k">return</span> <span class="mi">0</span>
 
@@ -512,7 +555,7 @@
 <span class="sd">        &lt;compiler_gym.datasets.Dataset.install&gt;`. The dataset can still be used</span>
 <span class="sd">        after calling this method.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_data_path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">has_site_data</span><span class="p">()</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">site_data_path</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
             <span class="n">shutil</span><span class="o">.</span><span class="n">rmtree</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">site_data_path</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Dataset.benchmarks"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Dataset.benchmarks">[docs]</a>    <span class="k">def</span> <span class="nf">benchmarks</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Benchmark</span><span class="p">]:</span>
@@ -565,6 +608,24 @@
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract class&quot;</span><span class="p">)</span></div>
 
+<div class="viewcode-block" id="Dataset.benchmark_from_parsed_uri"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Dataset.benchmark_from_parsed_uri">[docs]</a>    <span class="k">def</span> <span class="nf">benchmark_from_parsed_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="n">BenchmarkUri</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Select a benchmark.</span>
+
+<span class="sd">        Subclasses must implement this method. Implementors may assume that the</span>
+<span class="sd">        URI is well formed and that the :code:`scheme` and :code:`dataset`</span>
+<span class="sd">        components are correct.</span>
+
+<span class="sd">        :param uri: The parsed URI of the benchmark to return.</span>
+
+<span class="sd">        :return: A :class:`Benchmark &lt;compiler_gym.datasets.Benchmark&gt;`</span>
+<span class="sd">            instance.</span>
+
+<span class="sd">        :raise LookupError: If :code:`uri` is not found.</span>
+
+<span class="sd">        :raise ValueError: If the URI is invalid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract class&quot;</span><span class="p">)</span></div>
+
 <div class="viewcode-block" id="Dataset.benchmark"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Dataset.benchmark">[docs]</a>    <span class="k">def</span> <span class="nf">benchmark</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Select a benchmark.</span>
 
@@ -574,8 +635,10 @@
 <span class="sd">            instance.</span>
 
 <span class="sd">        :raise LookupError: If :code:`uri` is not found.</span>
+
+<span class="sd">        :raise ValueError: If the URI is invalid.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">raise</span> <span class="ne">NotImplementedError</span><span class="p">(</span><span class="s2">&quot;abstract class&quot;</span><span class="p">)</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark_from_parsed_uri</span><span class="p">(</span><span class="n">BenchmarkUri</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">uri</span><span class="p">))</span></div>
 
 <div class="viewcode-block" id="Dataset.random_benchmark"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Dataset.random_benchmark">[docs]</a>    <span class="k">def</span> <span class="nf">random_benchmark</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span> <span class="n">random_state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>

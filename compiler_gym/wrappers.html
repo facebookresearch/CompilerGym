@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.wrappers &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>compiler_gym.wrappers &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="../_static/favicon.png"/>
   
 
   
@@ -71,7 +73,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -207,7 +209,29 @@
             
   <div class="section" id="module-compiler_gym.wrappers">
 <span id="compiler-gym-wrappers"></span><h1>compiler_gym.wrappers<a class="headerlink" href="#module-compiler_gym.wrappers" title="Permalink to this headline">¶</a></h1>
-<p>The <code class="code docutils literal notranslate"><span class="pre">compiler_gym.wrappers</span></code> module provides.</p>
+<p>The <code class="code docutils literal notranslate"><span class="pre">compiler_gym.wrappers</span></code> module provides a set of classes that can
+be used to transform an environment in a modular way.</p>
+<p>For example:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">compiler_gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-v0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">TimeLimit</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">CycleOverBenchmarks</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">env</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">benchmarks</span><span class="o">=</span><span class="p">[</span>
+<span class="gp">... </span>        <span class="s2">&quot;benchmark://cbench-v1/crc32&quot;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="s2">&quot;benchmark://cbench-v1/qsort&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">],</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>CompilerGym environments are incompatible with the <a class="reference external" href="https://github.com/openai/gym/tree/master/gym/wrappers">OpenAI Gym wrappers</a>. This is because
+CompilerGym extends the environment API with additional arguments and
+methods. You must use the wrappers from this module when wrapping
+CompilerGym environments. We provide a set of base wrappers that are
+equivalent to those in OpenAI Gym that you can use to write your own
+wrappers.</p>
+</div>
 <div class="contents local topic" id="document-contents">
 <p class="topic-title">Document contents:</p>
 <ul class="simple">
@@ -449,9 +473,10 @@ callback is called to produce a new iterator.</p></li>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
 <p>Uniform random selection is provided by evaluating the input benchmarks
-iterator into a list and sampling randomly from the list. This will not
-work for random iteration over infinite or very large iterables of
-benchmarks.</p>
+iterator into a list and sampling randomly from the list. For very large
+and infinite iterables of benchmarks you must use the
+<a class="reference internal" href="#compiler_gym.wrappers.IterateOverBenchmarks" title="compiler_gym.wrappers.IterateOverBenchmarks"><code class="xref py py-class docutils literal notranslate"><span class="pre">IterateOverBenchmarks</span></code></a> wrapper with your own
+random sampling iterator.</p>
 </div>
 <dl class="py method">
 <dt class="sig sig-object py" id="compiler_gym.wrappers.RandomOrderBenchmarks.__init__">

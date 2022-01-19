@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.envs.llvm.llvm_env &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>compiler_gym.envs.llvm.llvm_env &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../../../../_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="../../../../_static/favicon.png"/>
   
 
   
@@ -69,7 +71,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -515,13 +517,36 @@
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Create a benchmark for use with this environment.</span>
 
-<span class="sd">        This function takes one or more inputs and uses them to create a</span>
-<span class="sd">        benchmark that can be passed to :meth:`compiler_gym.envs.LlvmEnv.reset`.</span>
+<span class="sd">        This function takes one or more inputs and uses them to create an LLVM</span>
+<span class="sd">        bitcode benchmark that can be passed to</span>
+<span class="sd">        :meth:`compiler_gym.envs.LlvmEnv.reset`.</span>
 
-<span class="sd">        For single-source C/C++ programs, you can pass the path of the source</span>
+<span class="sd">        The following input types are supported:</span>
+
+<span class="sd">        +-----------------------------------------------------+---------------------+-------------------------------------------------------------+</span>
+<span class="sd">        | **File Suffix**                                     | **Treated as**      | **Converted using**                                         |</span>
+<span class="sd">        +-----------------------------------------------------+---------------------+-------------------------------------------------------------+</span>
+<span class="sd">        | :code:`.bc`                                         | LLVM IR bitcode     | No conversion required.                                     |</span>
+<span class="sd">        +-----------------------------------------------------+---------------------+-------------------------------------------------------------+</span>
+<span class="sd">        | :code:`.ll`                                         | LLVM IR text format | Assembled to bitcode using llvm-as.                         |</span>
+<span class="sd">        +-----------------------------------------------------+---------------------+-------------------------------------------------------------+</span>
+<span class="sd">        | :code:`.c`, :code:`.cc`, :code:`.cpp`, :code:`.cxx` | C / C++ source      | Compiled to bitcode using clang and the given :code:`copt`. |</span>
+<span class="sd">        +-----------------------------------------------------+---------------------+-------------------------------------------------------------+</span>
+
+<span class="sd">        .. note::</span>
+
+<span class="sd">            The LLVM IR format has no compatability guarantees between versions (see</span>
+<span class="sd">            `LLVM docs</span>
+<span class="sd">            &lt;https://llvm.org/docs/DeveloperPolicy.html#ir-backwards-compatibility&gt;`_).</span>
+<span class="sd">            You must ensure that any :code:`.bc` and :code:`.ll` files are</span>
+<span class="sd">            compatible with the LLVM version used by CompilerGym, which can be</span>
+<span class="sd">            reported using :func:`env.compiler_version</span>
+<span class="sd">            &lt;compiler_gym.envs.CompilerEnv.compiler_version&gt;`.</span>
+
+<span class="sd">        E.g. for single-source C/C++ programs, you can pass the path of the source</span>
 <span class="sd">        file:</span>
 
-<span class="sd">            &gt;&gt;&gt; benchmark = make_benchmark(&#39;my_app.c&#39;)</span>
+<span class="sd">            &gt;&gt;&gt; benchmark = env.make_benchmark(&#39;my_app.c&#39;)</span>
 <span class="sd">            &gt;&gt;&gt; env = gym.make(&quot;llvm-v0&quot;)</span>
 <span class="sd">            &gt;&gt;&gt; env.reset(benchmark=benchmark)</span>
 
@@ -534,41 +559,26 @@
 <span class="sd">        Additional compile-time arguments to clang can be provided using the</span>
 <span class="sd">        :code:`copt` argument:</span>
 
-<span class="sd">            &gt;&gt;&gt; benchmark = make_benchmark(&#39;/path/to/my_app.cpp&#39;, copt=[&#39;-O2&#39;])</span>
+<span class="sd">            &gt;&gt;&gt; benchmark = env.make_benchmark(&#39;/path/to/my_app.cpp&#39;, copt=[&#39;-O2&#39;])</span>
 
 <span class="sd">        If you need more fine-grained control over the options, you can directly</span>
 <span class="sd">        construct a :class:`ClangInvocation</span>
 <span class="sd">        &lt;compiler_gym.envs.llvm.ClangInvocation&gt;` to pass a list of arguments to</span>
 <span class="sd">        clang:</span>
 
-<span class="sd">            &gt;&gt;&gt; benchmark = make_benchmark(</span>
-<span class="sd">                ClangInvocation([&#39;/path/to/my_app.c&#39;], timeout=10)</span>
+<span class="sd">            &gt;&gt;&gt; benchmark = env.make_benchmark(</span>
+<span class="sd">                ClangInvocation([&#39;/path/to/my_app.c&#39;], system_includes=False, timeout=10)</span>
 <span class="sd">            )</span>
 
 <span class="sd">        For multi-file programs, pass a list of inputs that will be compiled</span>
 <span class="sd">        separately and then linked to a single module:</span>
 
-<span class="sd">            &gt;&gt;&gt; benchmark = make_benchmark([</span>
+<span class="sd">            &gt;&gt;&gt; benchmark = env.make_benchmark([</span>
 <span class="sd">                &#39;main.c&#39;,</span>
 <span class="sd">                &#39;lib.cpp&#39;,</span>
 <span class="sd">                &#39;lib2.bc&#39;,</span>
+<span class="sd">                &#39;foo/input.bc&#39;</span>
 <span class="sd">            ])</span>
-
-<span class="sd">        If you already have prepared bitcode files, those can be linked and used</span>
-<span class="sd">        directly:</span>
-
-<span class="sd">            &gt;&gt;&gt; benchmark = make_benchmark([</span>
-<span class="sd">                &#39;bitcode1.bc&#39;,</span>
-<span class="sd">                &#39;bitcode2.bc&#39;,</span>
-<span class="sd">            ])</span>
-
-<span class="sd">        .. note::</span>
-
-<span class="sd">            LLVM bitcode compatibility is</span>
-<span class="sd">            `not guaranteed &lt;https://llvm.org/docs/DeveloperPolicy.html#ir-backwards-compatibility&gt;`_,</span>
-<span class="sd">            so you must ensure that any precompiled bitcodes are compatible with the</span>
-<span class="sd">            LLVM version used by CompilerGym, which can be queried using</span>
-<span class="sd">            :func:`LlvmEnv.compiler_version &lt;compiler_gym.envs.CompilerEnv.compiler_version&gt;`.</span>
 
 <span class="sd">        :param inputs: An input, or list of inputs.</span>
 
@@ -588,7 +598,9 @@
 
 <span class="sd">        :raises TypeError: If the inputs are of unsupported types.</span>
 
-<span class="sd">        :raises OSError: If a compilation job fails.</span>
+<span class="sd">        :raises OSError: If a suitable compiler cannot be found.</span>
+
+<span class="sd">        :raises BenchmarkInitError: If a compilation job fails.</span>
 
 <span class="sd">        :raises TimeoutExpired: If a compilation job exceeds :code:`timeout`</span>
 <span class="sd">            seconds.</span>

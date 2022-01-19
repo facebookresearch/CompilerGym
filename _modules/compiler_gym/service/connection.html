@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.service.connection &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>compiler_gym.service.connection &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
   
 
   
@@ -69,7 +71,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -415,6 +417,12 @@
                     <span class="c1"># For &quot;unavailable&quot; errors we retry with exponential</span>
                     <span class="c1"># backoff. This is because this error can be caused by an</span>
                     <span class="c1"># overloaded service, a flaky connection, etc.</span>
+
+                    <span class="c1"># Early exit in case we can detect that the service is down</span>
+                    <span class="c1"># and so there is no use in retrying the RPC call.</span>
+                    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">service_is_down</span><span class="p">():</span>
+                        <span class="k">raise</span> <span class="n">ServiceIsClosed</span><span class="p">(</span><span class="s2">&quot;Service is offline&quot;</span><span class="p">)</span>
+
                     <span class="n">attempt</span> <span class="o">+=</span> <span class="mi">1</span>
                     <span class="k">if</span> <span class="n">attempt</span> <span class="o">&gt;</span> <span class="n">max_retries</span><span class="p">:</span>
                         <span class="k">raise</span> <span class="n">ServiceTransportError</span><span class="p">(</span>
@@ -465,6 +473,14 @@
 <span class="sd">        :return: An iterator over lines of logs.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">yield from</span> <span class="p">()</span>
+
+    <span class="k">def</span> <span class="nf">service_is_down</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return true if the service is known to be dead.</span>
+
+<span class="sd">        Subclasses can use this for fast checks that a service is down to avoid</span>
+<span class="sd">        retry loops.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="kc">False</span>
 
 
 <span class="k">def</span> <span class="nf">make_working_dir</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">Path</span><span class="p">:</span>
@@ -654,6 +670,10 @@
 
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
 
+    <span class="k">def</span> <span class="nf">service_is_down</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Return true if the service subprocess has terminated.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span>
+
     <span class="k">def</span> <span class="nf">loglines</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
         <span class="sd">&quot;&quot;&quot;Fetch any available log lines from the service backend.</span>
 
@@ -684,6 +704,9 @@
                 <span class="k">raise</span> <span class="n">ServiceError</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;Service exited with returncode </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">returncode</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="p">)</span>
+        <span class="k">except</span> <span class="n">ServiceIsClosed</span><span class="p">:</span>
+            <span class="c1"># The service has already been closed, nothing to do.</span>
+            <span class="k">pass</span>
         <span class="k">except</span> <span class="ne">ProcessLookupError</span><span class="p">:</span>
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;Service process not found at </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">working_dir</span><span class="p">)</span>
         <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>

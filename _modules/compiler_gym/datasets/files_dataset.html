@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.datasets.files_dataset &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>compiler_gym.datasets.files_dataset &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
   
 
   
@@ -69,7 +71,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -207,6 +209,7 @@
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets.dataset</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">Dataset</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets.uri</span> <span class="kn">import</span> <span class="n">BenchmarkUri</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.decorators</span> <span class="kn">import</span> <span class="n">memoized_property</span>
 
 
@@ -309,14 +312,19 @@
         <span class="k">else</span><span class="p">:</span>
             <span class="k">yield from</span> <span class="bp">self</span><span class="o">.</span><span class="n">_benchmark_uris_iter</span></div>
 
-<div class="viewcode-block" id="FilesDataset.benchmark"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.FilesDataset.benchmark">[docs]</a>    <span class="k">def</span> <span class="nf">benchmark</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
+<div class="viewcode-block" id="FilesDataset.benchmark_from_parsed_uri"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.FilesDataset.benchmark_from_parsed_uri">[docs]</a>    <span class="k">def</span> <span class="nf">benchmark_from_parsed_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="n">BenchmarkUri</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">install</span><span class="p">()</span>
 
-        <span class="n">relpath</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">uri</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:]</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">benchmark_file_suffix</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="n">abspath</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_root</span> <span class="o">/</span> <span class="n">relpath</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">abspath</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
-            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Benchmark not found: </span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s2"> (file not found: </span><span class="si">{</span><span class="n">abspath</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark_class</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">abspath</span><span class="p">)</span></div>
+        <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span>
+            <span class="c1"># Use normpath() rather than joinpath() because uri.path may start</span>
+            <span class="c1"># with a leading &#39;/&#39;.</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_root</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">uri</span><span class="o">.</span><span class="n">path</span><span class="si">}{</span><span class="bp">self</span><span class="o">.</span><span class="n">benchmark_file_suffix</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Benchmark not found: </span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s2"> (file not found: </span><span class="si">{</span><span class="n">path</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark_class</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">path</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_random_benchmark</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">random_state</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark</span><span class="p">(</span><span class="n">random_state</span><span class="o">.</span><span class="n">choice</span><span class="p">(</span><span class="nb">list</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">benchmark_uris</span><span class="p">())))</span></div>

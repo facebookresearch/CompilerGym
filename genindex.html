@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Index &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>Index &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="_static/favicon.png"/>
   
 
   
@@ -69,7 +71,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -386,8 +388,6 @@
 </li>
       <li><a href="cc/compiler_gym/util.html#c.ASSERT_OK">ASSERT_OK (C macro)</a>
 </li>
-      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.available_datasets">available_datasets (compiler_gym.envs.CompilerEnv property)</a>
-</li>
   </ul></td>
 </tr></table>
 
@@ -411,8 +411,6 @@
       <ul>
         <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Datasets.benchmark">(compiler_gym.datasets.Datasets method)</a>
 </li>
-        <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.FilesDataset.benchmark">(compiler_gym.datasets.FilesDataset method)</a>
-</li>
       </ul></li>
       <li><a href="rpc.html#_CPPv4N9Benchmark14dynamic_configE">Benchmark::dynamic_config (C++ member)</a>
 </li>
@@ -420,10 +418,20 @@
 </li>
       <li><a href="rpc.html#_CPPv4N9Benchmark3uriE">Benchmark::uri (C++ member)</a>
 </li>
+      <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset.benchmark_from_parsed_uri">benchmark_from_parsed_uri() (compiler_gym.datasets.Dataset method)</a>
+
+      <ul>
+        <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Datasets.benchmark_from_parsed_uri">(compiler_gym.datasets.Datasets method)</a>
+</li>
+        <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.FilesDataset.benchmark_from_parsed_uri">(compiler_gym.datasets.FilesDataset method)</a>
+</li>
+      </ul></li>
       <li><a href="compiler_gym/compiler_gym.html#compiler_gym.ValidationResult.benchmark_semantics_validated">benchmark_semantics_validated (compiler_gym.ValidationResult attribute)</a>
 </li>
       <li><a href="compiler_gym/compiler_gym.html#compiler_gym.ValidationResult.benchmark_semantics_validation_failed">benchmark_semantics_validation_failed (compiler_gym.ValidationResult attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset.benchmark_uris">benchmark_uris() (compiler_gym.datasets.Dataset method)</a>
 
       <ul>
@@ -434,8 +442,6 @@
         <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.TarDatasetWithManifest.benchmark_uris">(compiler_gym.datasets.TarDatasetWithManifest method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compiler_gym/service/runtime.html#compiler_gym.service.runtime.benchmark_cache.BenchmarkCache">BenchmarkCache (class in compiler_gym.service.runtime.benchmark_cache)</a>
 </li>
       <li><a href="rpc.html#_CPPv422BenchmarkDynamicConfig">BenchmarkDynamicConfig (C++ struct)</a>
@@ -446,8 +452,6 @@
 </li>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.BenchmarkInitError">BenchmarkInitError (class in compiler_gym.datasets)</a>
 </li>
-      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.benchmarks">benchmarks (compiler_gym.envs.CompilerEnv property)</a>
-</li>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset.benchmarks">benchmarks() (compiler_gym.datasets.Dataset method)</a>
 
       <ul>
@@ -455,6 +459,8 @@
 </li>
       </ul></li>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.BenchmarkSource">BenchmarkSource (class in compiler_gym.datasets)</a>
+</li>
+      <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.BenchmarkUri">BenchmarkUri (class in compiler_gym.datasets)</a>
 </li>
       <li><a href="llvm/api.html#compiler_gym.envs.llvm.datasets.BlasDataset">BlasDataset (class in compiler_gym.envs.llvm.datasets)</a>
 </li>
@@ -633,6 +639,8 @@
 </li>
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4NK12compiler_gym12llvm_service9Benchmark5cloneERKN5boost10filesystem4pathE">compiler_gym::llvm_service::Benchmark::clone (C++ function)</a>
 </li>
+      <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service9Benchmark5closeEv">compiler_gym::llvm_service::Benchmark::close (C++ function)</a>
+</li>
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service9Benchmark7compileEv">compiler_gym::llvm_service::Benchmark::compile (C++ function)</a>
 </li>
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service9Benchmark16computeBuildtimeER11Observation">compiler_gym::llvm_service::Benchmark::computeBuildtime (C++ function)</a>
@@ -709,6 +717,8 @@
 </li>
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service16BenchmarkFactory11benchmarks_E">compiler_gym::llvm_service::BenchmarkFactory::benchmarks_ (C++ member)</a>
 </li>
+      <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service16BenchmarkFactory5closeEv">compiler_gym::llvm_service::BenchmarkFactory::close (C++ function)</a>
+</li>
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service16BenchmarkFactory12getBenchmarkERKN12compiler_gym9BenchmarkEPNSt10unique_ptrI9BenchmarkEE">compiler_gym::llvm_service::BenchmarkFactory::getBenchmark (C++ function)</a>
 </li>
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service16BenchmarkFactory12getSingletonERKN5boost10filesystem4pathENSt8optionalINSt10mt19937_64EEE6size_t">compiler_gym::llvm_service::BenchmarkFactory::getSingleton (C++ function)</a>
@@ -720,6 +730,8 @@
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service16BenchmarkFactory5rand_E">compiler_gym::llvm_service::BenchmarkFactory::rand_ (C++ member)</a>
 </li>
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service16BenchmarkFactory17workingDirectory_E">compiler_gym::llvm_service::BenchmarkFactory::workingDirectory_ (C++ member)</a>
+</li>
+      <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service16BenchmarkFactoryD0Ev">compiler_gym::llvm_service::BenchmarkFactory::~BenchmarkFactory (C++ function)</a>
 </li>
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service13BenchmarkHashE">compiler_gym::llvm_service::BenchmarkHash (C++ type)</a>
 </li>
@@ -779,10 +791,10 @@
 </li>
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpace12IS_BUILDABLEE">compiler_gym::llvm_service::LlvmObservationSpace::IS_BUILDABLE (C++ enumerator)</a>
 </li>
-      <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpace11IS_RUNNABLEE">compiler_gym::llvm_service::LlvmObservationSpace::IS_RUNNABLE (C++ enumerator)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpace11IS_RUNNABLEE">compiler_gym::llvm_service::LlvmObservationSpace::IS_RUNNABLE (C++ enumerator)</a>
+</li>
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpace22OBJECT_TEXT_SIZE_BYTESE">compiler_gym::llvm_service::LlvmObservationSpace::OBJECT_TEXT_SIZE_BYTES (C++ enumerator)</a>
 </li>
       <li><a href="cc/compiler_gym/envs/llvm/service.html#_CPPv4N12compiler_gym12llvm_service20LlvmObservationSpace19OBJECT_TEXT_SIZE_O0E">compiler_gym::llvm_service::LlvmObservationSpace::OBJECT_TEXT_SIZE_O0 (C++ enumerator)</a>
@@ -1089,16 +1101,20 @@
 </li>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset">Dataset (class in compiler_gym.datasets)</a>
 </li>
+      <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.BenchmarkUri.dataset">dataset (compiler_gym.datasets.BenchmarkUri attribute)</a>
+</li>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Datasets.dataset">dataset() (compiler_gym.datasets.Datasets method)</a>
+</li>
+      <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Datasets.dataset_from_parsed_uri">dataset_from_parsed_uri() (compiler_gym.datasets.Datasets method)</a>
 </li>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.DatasetInitError">DatasetInitError (class in compiler_gym.datasets)</a>
 </li>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Datasets">Datasets (class in compiler_gym.datasets)</a>
 </li>
-      <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Datasets.datasets">datasets() (compiler_gym.datasets.Datasets method)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Datasets.datasets">datasets() (compiler_gym.datasets.Datasets method)</a>
+</li>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset.deprecated">deprecated (compiler_gym.datasets.Dataset property)</a>
 </li>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset.description">description (compiler_gym.datasets.Dataset property)</a>
@@ -1169,6 +1185,8 @@
         <li><a href="compiler_gym/service.html#compiler_gym.service.CompilationSession.fork">(compiler_gym.service.CompilationSession method)</a>
 </li>
       </ul></li>
+      <li><a href="compiler_gym/service/runtime.html#compiler_gym.service.runtime.compiler_gym_service.CompilerGymService.ForkSession">ForkSession() (compiler_gym.service.runtime.compiler_gym_service.CompilerGymService method)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="rpc.html#_CPPv416ForkSessionReply">ForkSessionReply (C++ struct)</a>
@@ -1178,6 +1196,8 @@
       <li><a href="rpc.html#_CPPv418ForkSessionRequest">ForkSessionRequest (C++ struct)</a>
 </li>
       <li><a href="rpc.html#_CPPv4N18ForkSessionRequest10session_idE">ForkSessionRequest::session_id (C++ member)</a>
+</li>
+      <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.BenchmarkUri.fragment">fragment (compiler_gym.datasets.BenchmarkUri attribute)</a>
 </li>
       <li><a href="compiler_gym/spaces.html#compiler_gym.spaces.Commandline.from_commandline">from_commandline() (compiler_gym.spaces.Commandline method)</a>
 </li>
@@ -1216,8 +1236,6 @@
       <li><a href="compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.GccParamIntOption">GccParamIntOption (class in compiler_gym.envs.gcc.gcc)</a>
 </li>
       <li><a href="compiler_gym/envs/gcc.html#compiler_gym.envs.gcc.gcc.GccSpec">GccSpec (class in compiler_gym.envs.gcc.gcc)</a>
-</li>
-      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.get_benchmark_validation_callback">get_benchmark_validation_callback() (compiler_gym.envs.CompilerEnv method)</a>
 </li>
       <li><a href="compiler_gym/compiler_gym.html#compiler_gym.get_debug_level">get_debug_level() (in module compiler_gym)</a>
 </li>
@@ -1262,6 +1280,8 @@
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compiler_gym/compiler_gym.html#compiler_gym.CompilerEnvState.has_reward">has_reward (compiler_gym.CompilerEnvState property)</a>
+</li>
+      <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset.has_site_data">has_site_data (compiler_gym.datasets.Dataset property)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -1460,10 +1480,14 @@
 <h2 id="P">P</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="llvm/api.html#compiler_gym.envs.llvm.datasets.POJ104Dataset">POJ104Dataset (class in compiler_gym.envs.llvm.datasets)</a>
+      <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.BenchmarkUri.params">params (compiler_gym.datasets.BenchmarkUri attribute)</a>
+</li>
+      <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.BenchmarkUri.path">path (compiler_gym.datasets.BenchmarkUri attribute)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="llvm/api.html#compiler_gym.envs.llvm.datasets.POJ104Dataset">POJ104Dataset (class in compiler_gym.envs.llvm.datasets)</a>
+</li>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Benchmark.proto">proto (compiler_gym.datasets.Benchmark property)</a>
 </li>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset.protocol">protocol (compiler_gym.datasets.Dataset property)</a>
@@ -1490,18 +1514,12 @@
 </li>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset.references">references (compiler_gym.datasets.Dataset property)</a>
 </li>
-      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.register_dataset">register_dataset() (compiler_gym.envs.CompilerEnv method)</a>
-</li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.render">render() (compiler_gym.envs.CompilerEnv method)</a>
 
       <ul>
         <li><a href="compiler_gym/envs.html#compiler_gym.envs.LlvmEnv.render">(compiler_gym.envs.LlvmEnv method)</a>
 </li>
       </ul></li>
-      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.require_dataset">require_dataset() (compiler_gym.envs.CompilerEnv method)</a>
-</li>
-      <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.require_datasets">require_datasets() (compiler_gym.envs.CompilerEnv method)</a>
-</li>
       <li><a href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reset">reset() (compiler_gym.envs.CompilerEnv method)</a>
 
       <ul>
@@ -1518,10 +1536,10 @@
 </li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.ConnectionOpts.retry_wait_backoff_exponent">retry_wait_backoff_exponent (compiler_gym.service.ConnectionOpts attribute)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="compiler_gym/service.html#compiler_gym.service.ConnectionOpts.retry_wait_seconds">retry_wait_seconds (compiler_gym.service.ConnectionOpts attribute)</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="cc/compiler_gym/util.html#c.RETURN_IF_ERROR">RETURN_IF_ERROR (C macro)</a>
 </li>
       <li><a href="compiler_gym/wrappers.html#compiler_gym.wrappers.ActionWrapper.reverse_action">reverse_action() (compiler_gym.wrappers.ActionWrapper method)</a>
@@ -1582,6 +1600,12 @@
 </li>
       <li><a href="rpc.html#_CPPv415ScalarRangeList">ScalarRangeList (C++ struct)</a>
 </li>
+      <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.BenchmarkUri.scheme">scheme (compiler_gym.datasets.BenchmarkUri attribute)</a>
+
+      <ul>
+        <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset.scheme">(compiler_gym.datasets.Dataset property)</a>
+</li>
+      </ul></li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.ConnectionOpts.script_args">script_args (compiler_gym.service.ConnectionOpts attribute)</a>
 </li>
       <li><a href="compiler_gym/service.html#compiler_gym.service.ConnectionOpts.script_env">script_env (compiler_gym.service.ConnectionOpts attribute)</a>
@@ -1618,10 +1642,10 @@
 </li>
       <li><a href="rpc.html#_CPPv4N16SessionParameter5valueE">SessionParameter::value (C++ member)</a>
 </li>
-      <li><a href="compiler_gym/compiler_gym.html#compiler_gym.set_debug_level">set_debug_level() (in module compiler_gym)</a>
-</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="compiler_gym/compiler_gym.html#compiler_gym.set_debug_level">set_debug_level() (in module compiler_gym)</a>
+</li>
       <li><a href="compiler_gym/datasets.html#compiler_gym.datasets.Dataset.site_data_path">site_data_path (compiler_gym.datasets.Dataset property)</a>
 </li>
       <li><a href="compiler_gym/compiler_gym.html#compiler_gym.site_data_path">site_data_path() (in module compiler_gym)</a>

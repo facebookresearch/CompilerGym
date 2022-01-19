@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.envs.llvm.datasets.poj104 &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>compiler_gym.envs.llvm.datasets.poj104 &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../../../../../_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="../../../../../_static/favicon.png"/>
   
 
   
@@ -69,7 +71,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -203,16 +205,21 @@
 <span class="c1"># This source code is licensed under the MIT license found in the</span>
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
 <span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">as_completed</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span>
 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
+
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">BenchmarkInitError</span><span class="p">,</span> <span class="n">TarDatasetWithManifest</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets.benchmark</span> <span class="kn">import</span> <span class="n">BenchmarkWithSource</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets.uri</span> <span class="kn">import</span> <span class="n">BenchmarkUri</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.llvm_benchmark</span> <span class="kn">import</span> <span class="n">ClangInvocation</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util</span> <span class="kn">import</span> <span class="n">thread_pool</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.commands</span> <span class="kn">import</span> <span class="n">Popen</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.download</span> <span class="kn">import</span> <span class="n">download</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.filesystem</span> <span class="kn">import</span> <span class="n">atomic_file_write</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.truncate</span> <span class="kn">import</span> <span class="n">truncate</span>
@@ -269,13 +276,11 @@
             <span class="n">sort_order</span><span class="o">=</span><span class="n">sort_order</span><span class="p">,</span>
         <span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">benchmark</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
+    <span class="k">def</span> <span class="nf">benchmark_from_parsed_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="n">BenchmarkUri</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">install</span><span class="p">()</span>
-        <span class="k">if</span> <span class="n">uri</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="nb">len</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
-            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_benchmark_by_index</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
 
         <span class="c1"># The absolute path of the file, without an extension.</span>
-        <span class="n">path_stem</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_root</span> <span class="o">/</span> <span class="n">uri</span><span class="p">[</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">name</span><span class="p">)</span> <span class="o">+</span> <span class="mi">1</span> <span class="p">:]</span>
+        <span class="n">path_stem</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">dataset_root</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">uri</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
         <span class="c1"># If the file does not exist, compile it on-demand.</span>
         <span class="n">bitcode_path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">path_stem</span><span class="si">}</span><span class="s2">.bc&quot;</span><span class="p">)</span>
@@ -305,28 +310,42 @@
                     <span class="p">],</span>
                 <span class="p">)</span><span class="o">.</span><span class="n">command</span><span class="p">(</span><span class="n">outpath</span><span class="o">=</span><span class="n">tmp_bitcode_path</span><span class="p">)</span>
                 <span class="n">logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;Exec </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">compile_cmd</span><span class="p">)</span>
-                <span class="n">clang</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
-                    <span class="n">compile_cmd</span><span class="p">,</span>
-                    <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-                    <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-                    <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
-                <span class="p">)</span>
-                <span class="n">_</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">clang</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="n">src</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">),</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span><span class="p">)</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="k">with</span> <span class="n">Popen</span><span class="p">(</span>
+                        <span class="n">compile_cmd</span><span class="p">,</span>
+                        <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                        <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                        <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+                    <span class="p">)</span> <span class="k">as</span> <span class="n">clang</span><span class="p">:</span>
+                        <span class="n">_</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">clang</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span>
+                            <span class="nb">input</span><span class="o">=</span><span class="n">src</span><span class="o">.</span><span class="n">encode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">),</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">300</span>
+                        <span class="p">)</span>
+                <span class="k">except</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">TimeoutExpired</span><span class="p">:</span>
+                    <span class="k">raise</span> <span class="n">BenchmarkInitError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Benchmark compilation timed out: </span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
 
             <span class="k">if</span> <span class="n">clang</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
                 <span class="n">compile_cmd</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">compile_cmd</span><span class="p">)</span>
                 <span class="n">error</span> <span class="o">=</span> <span class="n">truncate</span><span class="p">(</span><span class="n">stderr</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s2">&quot;utf-8&quot;</span><span class="p">),</span> <span class="n">max_lines</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span> <span class="n">max_line_len</span><span class="o">=</span><span class="mi">100</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">tmp_bitcode_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                    <span class="n">tmp_bitcode_path</span><span class="o">.</span><span class="n">unlink</span><span class="p">()</span>
                 <span class="k">raise</span> <span class="n">BenchmarkInitError</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;Compilation job failed!</span><span class="se">\n</span><span class="s2">&quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;Command: </span><span class="si">{</span><span class="n">compile_cmd</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
                     <span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">error</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="p">)</span>
+
             <span class="k">if</span> <span class="ow">not</span> <span class="n">bitcode_path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
                 <span class="k">raise</span> <span class="n">BenchmarkInitError</span><span class="p">(</span>
                     <span class="sa">f</span><span class="s2">&quot;Compilation job failed to produce output file!</span><span class="se">\n</span><span class="s2">Command: </span><span class="si">{</span><span class="n">compile_cmd</span><span class="si">}</span><span class="s2">&quot;</span>
                 <span class="p">)</span>
 
         <span class="k">return</span> <span class="n">BenchmarkWithSource</span><span class="o">.</span><span class="n">create</span><span class="p">(</span><span class="n">uri</span><span class="p">,</span> <span class="n">bitcode_path</span><span class="p">,</span> <span class="s2">&quot;source.cc&quot;</span><span class="p">,</span> <span class="n">cc_file_path</span><span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">random_benchmark</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">random_state</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">Generator</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
+        <span class="n">random_state</span> <span class="o">=</span> <span class="n">random_state</span> <span class="ow">or</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">()</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_get_benchmark_by_index</span><span class="p">(</span><span class="n">random_state</span><span class="o">.</span><span class="n">integers</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">size</span><span class="p">))</span>
 
     <span class="nd">@staticmethod</span>
     <span class="k">def</span> <span class="nf">preprocess_poj104_source</span><span class="p">(</span><span class="n">src</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>

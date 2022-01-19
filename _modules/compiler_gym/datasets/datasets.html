@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.datasets.datasets &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>compiler_gym.datasets.datasets &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
   
 
   
@@ -69,7 +71,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -200,14 +202,17 @@
 <span class="c1">#</span>
 <span class="c1"># This source code is licensed under the MIT license found in the</span>
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
+<span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">deque</span>
+<span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Set</span><span class="p">,</span> <span class="n">TypeVar</span>
 
 <span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets.benchmark</span> <span class="kn">import</span> <span class="n">Benchmark</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets.dataset</span> <span class="kn">import</span> <span class="n">Dataset</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.datasets.uri</span> <span class="kn">import</span> <span class="n">BENCHMARK_URI_RE</span><span class="p">,</span> <span class="n">resolve_uri_protocol</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets.uri</span> <span class="kn">import</span> <span class="n">BenchmarkUri</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">Benchmark</span> <span class="k">as</span> <span class="n">BenchmarkProto</span>
 
 <span class="n">T</span> <span class="o">=</span> <span class="n">TypeVar</span><span class="p">(</span><span class="s2">&quot;T&quot;</span><span class="p">)</span>
 
@@ -329,12 +334,33 @@
 
 <span class="sd">        :raises LookupError: If :code:`dataset` is not found.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">dataset_name</span> <span class="o">=</span> <span class="n">resolve_uri_protocol</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_from_parsed_uri</span><span class="p">(</span><span class="n">BenchmarkUri</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">dataset</span><span class="p">))</span></div>
 
-        <span class="k">if</span> <span class="n">dataset_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset not found: </span><span class="si">{</span><span class="n">dataset_name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="Datasets.dataset_from_parsed_uri"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Datasets.dataset_from_parsed_uri">[docs]</a>    <span class="k">def</span> <span class="nf">dataset_from_parsed_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="n">BenchmarkUri</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Get a dataset.</span>
 
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">[</span><span class="n">dataset_name</span><span class="p">]</span></div>
+<span class="sd">        Return the corresponding :meth:`Dataset</span>
+<span class="sd">        &lt;compiler_gym.datasets.Dataset&gt;`. Name lookup will succeed whether or</span>
+<span class="sd">        not the dataset is deprecated.</span>
+
+<span class="sd">        :param uri: A parsed URI.</span>
+
+<span class="sd">        :return: A :meth:`Dataset &lt;compiler_gym.datasets.Dataset&gt;` instance.</span>
+
+<span class="sd">        :raises LookupError: If :code:`dataset` is not found.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset_key_from_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">LookupError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dataset not found: </span><span class="si">{</span><span class="n">key</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span> <span class="nf">_dataset_key_from_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">:</span> <span class="n">BenchmarkUri</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">uri</span><span class="o">.</span><span class="n">scheme</span> <span class="ow">and</span> <span class="n">uri</span><span class="o">.</span><span class="n">dataset</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid benchmark URI: &#39;</span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">uri</span><span class="o">.</span><span class="n">scheme</span><span class="si">}</span><span class="s2">://</span><span class="si">{</span><span class="n">uri</span><span class="o">.</span><span class="n">dataset</span><span class="si">}</span><span class="s2">&quot;</span>
 
 <div class="viewcode-block" id="Datasets.__getitem__"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Datasets.__getitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__getitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dataset</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Lookup a dataset.</span>
@@ -353,11 +379,11 @@
 <span class="sd">        :param key: The name of the dataset.</span>
 <span class="sd">        :param dataset: The dataset to add.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">dataset_name</span> <span class="o">=</span> <span class="n">resolve_uri_protocol</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset_key_from_uri</span><span class="p">(</span><span class="n">BenchmarkUri</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
 
-        <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">[</span><span class="n">dataset_name</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">dataset</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">dataset</span><span class="o">.</span><span class="n">deprecated</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_visible_datasets</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">dataset_name</span><span class="p">)</span></div>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visible_datasets</span><span class="o">.</span><span class="n">add</span><span class="p">(</span><span class="n">key</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Datasets.__delitem__"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Datasets.__delitem__">[docs]</a>    <span class="k">def</span> <span class="fm">__delitem__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Remove a dataset from the collection.</span>
@@ -371,10 +397,11 @@
 <span class="sd">        :return: :code:`True` if the dataset was removed, :code:`False` if it</span>
 <span class="sd">            was already removed.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">dataset_name</span> <span class="o">=</span> <span class="n">resolve_uri_protocol</span><span class="p">(</span><span class="n">dataset</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">dataset_name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visible_datasets</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_visible_datasets</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">dataset_name</span><span class="p">)</span>
-        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">[</span><span class="n">dataset_name</span><span class="p">]</span></div>
+        <span class="n">key</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_dataset_key_from_uri</span><span class="p">(</span><span class="n">BenchmarkUri</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">dataset</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_visible_datasets</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_visible_datasets</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">key</span><span class="p">)</span>
+        <span class="k">del</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">[</span><span class="n">key</span><span class="p">]</span></div>
 
 <div class="viewcode-block" id="Datasets.__contains__"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Datasets.__contains__">[docs]</a>    <span class="k">def</span> <span class="fm">__contains__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dataset</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Returns whether the dataset is contained.&quot;&quot;&quot;</span>
@@ -440,16 +467,40 @@
 <span class="sd">        :return: A :class:`Benchmark &lt;compiler_gym.datasets.Benchmark&gt;`</span>
 <span class="sd">            instance.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="n">uri</span> <span class="o">=</span> <span class="n">resolve_uri_protocol</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">benchmark_from_parsed_uri</span><span class="p">(</span><span class="n">BenchmarkUri</span><span class="o">.</span><span class="n">from_string</span><span class="p">(</span><span class="n">uri</span><span class="p">))</span></div>
 
-        <span class="n">match</span> <span class="o">=</span> <span class="n">BENCHMARK_URI_RE</span><span class="o">.</span><span class="n">match</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">match</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Invalid benchmark URI: &#39;</span><span class="si">{</span><span class="n">uri</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+<div class="viewcode-block" id="Datasets.benchmark_from_parsed_uri"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Datasets.benchmark_from_parsed_uri">[docs]</a>    <span class="k">def</span> <span class="nf">benchmark_from_parsed_uri</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">uri</span><span class="p">:</span> <span class="n">BenchmarkUri</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Benchmark</span><span class="p">:</span>
+        <span class="sd">&quot;&quot;&quot;Select a benchmark.</span>
 
-        <span class="n">dataset_name</span> <span class="o">=</span> <span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="s2">&quot;dataset&quot;</span><span class="p">)</span>
-        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_datasets</span><span class="p">[</span><span class="n">dataset_name</span><span class="p">]</span>
+<span class="sd">        Returns the corresponding :class:`Benchmark</span>
+<span class="sd">        &lt;compiler_gym.datasets.Benchmark&gt;`, regardless of whether the containing</span>
+<span class="sd">        dataset is installed or deprecated.</span>
 
-        <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">benchmark</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span></div>
+<span class="sd">        :param uri: The parsed URI of the benchmark to return.</span>
+
+<span class="sd">        :return: A :class:`Benchmark &lt;compiler_gym.datasets.Benchmark&gt;`</span>
+<span class="sd">            instance.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">uri</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;proto&quot;</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">uri</span><span class="o">.</span><span class="n">dataset</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">uri</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+
+            <span class="n">proto</span> <span class="o">=</span> <span class="n">BenchmarkProto</span><span class="p">()</span>
+            <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">path</span><span class="p">,</span> <span class="s2">&quot;rb&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+                <span class="n">proto</span><span class="o">.</span><span class="n">ParseFromString</span><span class="p">(</span><span class="n">f</span><span class="o">.</span><span class="n">read</span><span class="p">())</span>
+
+            <span class="k">return</span> <span class="n">Benchmark</span><span class="p">(</span><span class="n">proto</span><span class="o">=</span><span class="n">proto</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">uri</span><span class="o">.</span><span class="n">scheme</span> <span class="o">==</span> <span class="s2">&quot;file&quot;</span><span class="p">:</span>
+            <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">normpath</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">uri</span><span class="o">.</span><span class="n">dataset</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="n">uri</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">))</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">path</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
+                <span class="k">raise</span> <span class="ne">FileNotFoundError</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">))</span>
+
+            <span class="k">return</span> <span class="n">Benchmark</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="n">uri</span><span class="o">=</span><span class="n">uri</span><span class="p">,</span> <span class="n">path</span><span class="o">=</span><span class="n">path</span><span class="p">)</span>
+
+        <span class="n">dataset</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">dataset_from_parsed_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">dataset</span><span class="o">.</span><span class="n">benchmark_from_parsed_uri</span><span class="p">(</span><span class="n">uri</span><span class="p">)</span></div>
 
 <div class="viewcode-block" id="Datasets.random_benchmark"><a class="viewcode-back" href="../../../compiler_gym/datasets.html#compiler_gym.datasets.Datasets.random_benchmark">[docs]</a>    <span class="k">def</span> <span class="nf">random_benchmark</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>

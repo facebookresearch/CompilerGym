@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>Changelog &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>Changelog &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="_static/favicon.png"/>
   
 
   
@@ -71,7 +73,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -103,6 +105,7 @@
 <li class="toctree-l1"><a class="reference internal" href="cli.html">Command Line Reference</a></li>
 <li class="toctree-l1"><a class="reference internal" href="rpc.html">RPC Service Reference</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Changelog</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#release-0-2-2-2022-01-19">Release 0.2.2 (2022-01-19)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#release-0-2-1-2021-11-17">Release 0.2.1 (2021-11-17)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#release-0-2-0-2021-09-28">Release 0.2.0 (2021-09-28)</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#release-0-1-10-2021-09-08">Release 0.1.10 (2021-09-08)</a></li>
@@ -214,6 +217,67 @@
             
   <div class="section" id="changelog">
 <h1>Changelog<a class="headerlink" href="#changelog" title="Permalink to this headline">¶</a></h1>
+<div class="section" id="release-0-2-2-2022-01-19">
+<h2>Release 0.2.2 (2022-01-19)<a class="headerlink" href="#release-0-2-2-2022-01-19" title="Permalink to this headline">¶</a></h2>
+<p>Amongst the highlights of this release are support for building with
+CMake and a new compiler environment based on loop unrolling. Many
+thanks to &#64;sogartar, &#64;mostafaelhoushi, &#64;KyleHerndon, and &#64;yqtianust for
+code contributions!</p>
+<ul class="simple">
+<li><p>Added support for building CompilerGym from source on Linux using
+<strong>CMake</strong>
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/498">#498</a>,
+<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/478">#478</a>).
+The new build system coexists with the bazel build and enables
+customization over the CMake configuration used to build the LLVM
+environment. See
+<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/blob/development/INSTALL.md#building-from-source-with-cmake">INSTALL.md</a>
+for details. Credit: &#64;sogartar, &#64;KyleHerndon.</p></li>
+<li><p>Added an environment for loop optimizations in LLVM
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/530">#530</a>,
+<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/529">#529</a>,
+<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/517">#517</a>).
+This new example environment provides control over loop unrolling
+factors and demonstrates how to build a standalone LLVM binary using
+the new CMake build system. Credit: &#64;mostafaelhoushi.</p></li>
+<li><p>Added a new <code class="docutils literal notranslate"><span class="pre">BenchmarkUri</span></code> class and API for parsing URIs
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/525">#525</a>).
+This enables benchmarks to have optional parameters that can be used
+by the backend services to modify their behavior.</p></li>
+<li><p><strong>[llvm]</strong> Enabled runtime reward to be calculated on systems where
+<code class="docutils literal notranslate"><span class="pre">/dev/shm</span></code> does not permit executables
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/510">#510</a>).</p></li>
+<li><p><strong>[llvm]</strong> Added a new <code class="docutils literal notranslate"><span class="pre">benchmark://mibench-v1</span></code> dataset and
+deprecated <code class="docutils literal notranslate"><span class="pre">benchmark://mibench-v0</span></code>
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/511">#511</a>).
+If you are using <code class="docutils literal notranslate"><span class="pre">mibench-v0</span></code>, please update to the new version.</p></li>
+<li><p><strong>[llvm]</strong> Enabled all 20 of the cBench runtime datasets to be used
+by the <code class="docutils literal notranslate"><span class="pre">benchmark://cbench-v1</span></code> dataset
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/525">#525</a>).</p></li>
+<li><p>Made the <code class="docutils literal notranslate"><span class="pre">site_data_base</span></code> argument of the <code class="docutils literal notranslate"><span class="pre">Dataset</span></code> class
+constructor optional
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/pull/518">#518</a>).</p></li>
+<li><p>Added support for building CompilerGym from source on macOS Monterey
+(<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/issues/494">#494</a>).</p></li>
+<li><p>Removed the legacy dataset scripts and APIs that were deprecated in
+v0.1.8. Please use the <a class="reference external" href="https://compilergym.com/compiler_gym/datasets.html#datasets">new dataset
+API</a>.
+The following has been removed:</p>
+<ul>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">compiler_gym.bin.datasets</span></code> script.</p></li>
+<li><p>The properties: <code class="docutils literal notranslate"><span class="pre">CompilerEnv.available_datasets</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">CompilerEnv.benchmarks</span></code>.</p></li>
+<li><p>The <code class="docutils literal notranslate"><span class="pre">CompilerEnv.require_dataset()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">CompilerEnv.require_datasets()</span></code>,
+<code class="docutils literal notranslate"><span class="pre">CompilerEnv.register_dataset()</span></code>, and
+<code class="docutils literal notranslate"><span class="pre">CompilerEnv.get_benchmark_validation_callback()</span></code> methods.</p></li>
+</ul>
+</li>
+<li><p>Numerous other bug fixes and improvements.</p></li>
+</ul>
+<p><strong>Full Change Log</strong>:
+<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/compare/v0.2.1...v0.2.2">v0.2.1…v0.2.2</a></p>
+</div>
 <div class="section" id="release-0-2-1-2021-11-17">
 <h2>Release 0.2.1 (2021-11-17)<a class="headerlink" href="#release-0-2-1-2021-11-17" title="Permalink to this headline">¶</a></h2>
 <p>Highlights of this release include:</p>
