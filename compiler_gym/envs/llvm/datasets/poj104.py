@@ -3,16 +3,21 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 import logging
+import os
 import subprocess
 import sys
 from concurrent.futures import as_completed
 from pathlib import Path
 from typing import Optional
 
+import numpy as np
+
 from compiler_gym.datasets import Benchmark, BenchmarkInitError, TarDatasetWithManifest
 from compiler_gym.datasets.benchmark import BenchmarkWithSource
+from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.envs.llvm.llvm_benchmark import ClangInvocation
 from compiler_gym.util import thread_pool
+from compiler_gym.util.commands import Popen
 from compiler_gym.util.download import download
 from compiler_gym.util.filesystem import atomic_file_write
 from compiler_gym.util.truncate import truncate
@@ -69,13 +74,11 @@ class POJ104Dataset(TarDatasetWithManifest):
             sort_order=sort_order,
         )
 
-    def benchmark(self, uri: Optional[str] = None) -> Benchmark:
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
         self.install()
-        if uri is None or len(uri) <= len(self.name) + 1:
-            return self._get_benchmark_by_index(self.random.integers(self.size))
 
         # The absolute path of the file, without an extension.
-        path_stem = self.dataset_root / uri[len(self.name) + 1 :]
+        path_stem = os.path.normpath(f"{self.dataset_root}/{uri.path}")
 
         # If the file does not exist, compile it on-demand.
         bitcode_path = Path(f"{path_stem}.bc")
@@ -105,28 +108,42 @@ class POJ104Dataset(TarDatasetWithManifest):
                     ],
                 ).command(outpath=tmp_bitcode_path)
                 logger.debug("Exec %s", compile_cmd)
-                clang = subprocess.Popen(
-                    compile_cmd,
-                    stdin=subprocess.PIPE,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                )
-                _, stderr = clang.communicate(src.encode("utf-8"), timeout=300)
+                try:
+                    with Popen(
+                        compile_cmd,
+                        stdin=subprocess.PIPE,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                    ) as clang:
+                        _, stderr = clang.communicate(
+                            input=src.encode("utf-8"), timeout=300
+                        )
+                except subprocess.TimeoutExpired:
+                    raise BenchmarkInitError(f"Benchmark compilation timed out: {uri}")
 
             if clang.returncode:
                 compile_cmd = " ".join(compile_cmd)
                 error = truncate(stderr.decode("utf-8"), max_lines=20, max_line_len=100)
+                if tmp_bitcode_path.is_file():
+                    tmp_bitcode_path.unlink()
                 raise BenchmarkInitError(
                     f"Compilation job failed!\n"
                     f"Command: {compile_cmd}\n"
                     f"Error: {error}"
                 )
+
             if not bitcode_path.is_file():
                 raise BenchmarkInitError(
                     f"Compilation job failed to produce output file!\nCommand: {compile_cmd}"
                 )
 
         return BenchmarkWithSource.create(uri, bitcode_path, "source.cc", cc_file_path)
+
+    def random_benchmark(
+        self, random_state: Optional[np.random.Generator] = None
+    ) -> Benchmark:
+        random_state = random_state or np.random.default_rng()
+        return self._get_benchmark_by_index(random_state.integers(self.size))
 
     @staticmethod
     def preprocess_poj104_source(src: str) -> str:

@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 """Simple parallelized random search."""
 import json
+import os
 from multiprocessing import cpu_count
 from pathlib import Path
 from threading import Thread
@@ -155,8 +156,9 @@ def random_search(
 
         benchmark_uri = env.benchmark.uri
         if not outdir:
-            sanitized_benchmark_uri = "/".join(benchmark_uri.split("/")[-2:])
-            outdir = create_logging_dir(f"random/{sanitized_benchmark_uri}")
+            outdir = create_logging_dir(
+                os.path.normpath(f"random/{benchmark_uri.scheme}/{benchmark_uri.path}")
+            )
         outdir = Path(outdir)
 
         if not env.reward_space:
@@ -177,7 +179,7 @@ def random_search(
         # Write a metadata file.
         metadata = {
             "env": env.spec.id if env.spec else "",
-            "benchmark": benchmark_uri,
+            "benchmark": str(benchmark_uri),
             "reward": reward_space_name,
             "patience": patience,
         }

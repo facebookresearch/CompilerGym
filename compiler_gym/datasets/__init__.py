@@ -19,12 +19,14 @@ from compiler_gym.datasets.dataset import (
 from compiler_gym.datasets.datasets import Datasets
 from compiler_gym.datasets.files_dataset import FilesDataset
 from compiler_gym.datasets.tar_dataset import TarDataset, TarDatasetWithManifest
+from compiler_gym.datasets.uri import BenchmarkUri
 
 __all__ = [
     "activate",
     "Benchmark",
     "BenchmarkInitError",
     "BenchmarkSource",
+    "BenchmarkUri",
     "Dataset",
     "DatasetInitError",
     "Datasets",

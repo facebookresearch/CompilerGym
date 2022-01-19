@@ -20,6 +20,7 @@ from gym.spaces import Space
 
 from compiler_gym.compiler_env_state import CompilerEnvState
 from compiler_gym.datasets import Benchmark, Dataset, Datasets
+from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.service import (
     CompilerGymServiceConnection,
     ConnectionOpts,
@@ -28,6 +29,7 @@ from compiler_gym.service import (
     ServiceTransportError,
     SessionNotFound,
 )
+from compiler_gym.service.connection import ServiceIsClosed
 from compiler_gym.service.proto import Action, AddBenchmarkRequest
 from compiler_gym.service.proto import Benchmark as BenchmarkProto
 from compiler_gym.service.proto import (
@@ -461,7 +463,7 @@ class CompilerEnv(gym.Env):
         return self._benchmark_in_use
 
     @benchmark.setter
-    def benchmark(self, benchmark: Union[str, Benchmark]):
+    def benchmark(self, benchmark: Union[str, Benchmark, BenchmarkUri]):
         if self.in_episode:
             warnings.warn(
                 "Changing the benchmark has no effect until reset() is called"
@@ -473,6 +475,10 @@ class CompilerEnv(gym.Env):
         elif isinstance(benchmark, Benchmark):
             logger.debug("Setting benchmark: %s", benchmark.uri)
             self._next_benchmark = benchmark
+        elif isinstance(benchmark, BenchmarkUri):
+            benchmark_object = self.datasets.benchmark_from_parsed_uri(benchmark)
+            logger.debug("Setting benchmark by name: %s", benchmark_object)
+            self._next_benchmark = benchmark_object
         else:
             raise TypeError(
                 f"Expected a Benchmark or str, received: '{type(benchmark).__name__}'"
@@ -686,6 +692,10 @@ class CompilerEnv(gym.Env):
                 # not kill it.
                 if reply.remaining_sessions:
                     close_service = False
+            except ServiceIsClosed:
+                # This error can be safely ignored as it means that the service
+                # is already offline.
+                pass
             except Exception as e:
                 logger.warning(
                     "Failed to end active compiler session on close(): %s (%s)",
@@ -811,7 +821,7 @@ class CompilerEnv(gym.Env):
         if self.service.opts.always_send_benchmark_on_reset:
             self._benchmark_in_use_proto = self._benchmark_in_use.proto
         else:
-            self._benchmark_in_use_proto.uri = self._benchmark_in_use.uri
+            self._benchmark_in_use_proto.uri = str(self._benchmark_in_use.uri)
 
         start_session_request = StartSessionRequest(
             benchmark=self._benchmark_in_use_proto,

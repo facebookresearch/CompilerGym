@@ -217,6 +217,12 @@ class Connection:
                     # For "unavailable" errors we retry with exponential
                     # backoff. This is because this error can be caused by an
                     # overloaded service, a flaky connection, etc.
+
+                    # Early exit in case we can detect that the service is down
+                    # and so there is no use in retrying the RPC call.
+                    if self.service_is_down():
+                        raise ServiceIsClosed("Service is offline")
+
                     attempt += 1
                     if attempt > max_retries:
                         raise ServiceTransportError(
@@ -267,6 +273,14 @@ class Connection:
         :return: An iterator over lines of logs.
         """
         yield from ()
+
+    def service_is_down(self) -> bool:
+        """Return true if the service is known to be dead.
+
+        Subclasses can use this for fast checks that a service is down to avoid
+        retry loops.
+        """
+        return False
 
 
 def make_working_dir() -> Path:
@@ -456,6 +470,10 @@ class ManagedConnection(Connection):
 
         super().__init__(channel, url)
 
+    def service_is_down(self) -> bool:
+        """Return true if the service subprocess has terminated."""
+        return self.process.poll() is not None
+
     def loglines(self) -> Iterable[str]:
         """Fetch any available log lines from the service backend.
 
@@ -486,6 +504,9 @@ class ManagedConnection(Connection):
                 raise ServiceError(
                     f"Service exited with returncode {self.process.returncode}"
                 )
+        except ServiceIsClosed:
+            # The service has already been closed, nothing to do.
+            pass
         except ProcessLookupError:
             logger.warning("Service process not found at %s", self.working_dir)
         except subprocess.TimeoutExpired:

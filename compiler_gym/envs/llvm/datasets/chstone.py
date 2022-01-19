@@ -9,6 +9,7 @@ from typing import Iterable
 
 from compiler_gym.datasets import Benchmark, TarDatasetWithManifest
 from compiler_gym.datasets.benchmark import BenchmarkWithSource
+from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.envs.llvm.llvm_benchmark import ClangInvocation
 from compiler_gym.util import thread_pool
 from compiler_gym.util.filesystem import atomic_file_write
@@ -74,10 +75,10 @@ class CHStoneDataset(TarDatasetWithManifest):
     def benchmark_uris(self) -> Iterable[str]:
         yield from URIS
 
-    def benchmark(self, uri: str) -> Benchmark:
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
         self.install()
 
-        benchmark_name = uri[len(self.name) + 1 :]
+        benchmark_name = uri.path[1:]
         if not benchmark_name:
             raise LookupError(f"No benchmark specified: {uri}")
 

@@ -9,7 +9,7 @@ from typing import Iterable, List, Optional, TextIO
 
 from pydantic import BaseModel, Field, validator
 
-from compiler_gym.datasets.uri import BENCHMARK_URI_PATTERN
+from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.util.truncate import truncate
 
 
@@ -23,7 +23,6 @@ class CompilerEnvState(BaseModel):
 
     benchmark: str = Field(
         allow_mutation=False,
-        regex=BENCHMARK_URI_PATTERN,
         examples=[
             "benchmark://cbench-v1/crc32",
             "generator://csmith-v0/0",
@@ -49,6 +48,12 @@ class CompilerEnvState(BaseModel):
         if v is not None:
             assert v >= 0, "Walltime cannot be negative"
         return v
+
+    @validator("benchmark", pre=True)
+    def validate_benchmark(cls, value):
+        if isinstance(value, BenchmarkUri):
+            return str(value)
+        return value
 
     @property
     def has_reward(self) -> bool:

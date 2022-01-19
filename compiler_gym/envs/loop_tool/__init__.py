@@ -7,6 +7,7 @@ from pathlib import Path
 from typing import Iterable
 
 from compiler_gym.datasets import Benchmark, Dataset, benchmark
+from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.spaces import Reward
 from compiler_gym.util.registration import register
 from compiler_gym.util.runfiles_path import runfiles_path
@@ -61,8 +62,8 @@ class LoopToolCUDADataset(Dataset):
     def benchmark_uris(self) -> Iterable[str]:
         return (f"loop_tool-cuda-v0/{i}" for i in range(1, 1024 * 1024 * 8))
 
-    def benchmark(self, uri: str) -> Benchmark:
-        return Benchmark(proto=benchmark.BenchmarkProto(uri=uri))
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
+        return Benchmark(proto=benchmark.BenchmarkProto(uri=str(uri)))
 
 
 class LoopToolCPUDataset(Dataset):
@@ -76,8 +77,8 @@ class LoopToolCPUDataset(Dataset):
     def benchmark_uris(self) -> Iterable[str]:
         return (f"loop_tool-cpu-v0/{i}" for i in range(1, 1024 * 1024 * 8))
 
-    def benchmark(self, uri: str) -> Benchmark:
-        return Benchmark(proto=benchmark.BenchmarkProto(uri=uri))
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
+        return Benchmark(proto=benchmark.BenchmarkProto(uri=str(uri)))
 
 
 register(

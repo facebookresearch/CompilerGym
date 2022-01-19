@@ -3,10 +3,14 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Unit tests for //compiler_gym/datasets."""
+from pathlib import Path
+
 import numpy as np
 import pytest
 
 from compiler_gym.datasets.datasets import Datasets, round_robin_iterables
+from compiler_gym.datasets.uri import BenchmarkUri
+from compiler_gym.service.proto import Benchmark as BenchmarkProto
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.common"]
@@ -34,11 +38,11 @@ class MockDataset:
     def benchmarks(self):
         yield from self.benchmark_values
 
-    def benchmark(self, uri):
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri):
         for b in self.benchmark_values:
-            if b.uri == uri:
+            if b.uri == str(uri):
                 return b
-        raise KeyError(uri)
+        raise KeyError(str(uri))
 
     def random_benchmark(self, random_state=None):
         return random_state.choice(self.benchmark_values)
@@ -135,7 +139,7 @@ def test_datasets_get_item():
     assert datasets["benchmark://foo-v0"] == da
 
 
-def test_datasets_get_item_default_protocol():
+def test_datasets_get_item_default_scheme():
     da = MockDataset("benchmark://foo-v0")
     datasets = Datasets([da])
 
@@ -266,6 +270,43 @@ def test_random_benchmark(mocker, weighted: bool):
     assert da.random_benchmark.call_count == num_benchmarks
     assert len(random_benchmarks) == 1
     assert next(iter(random_benchmarks)) == "benchmark://foo-v0/abc"
+
+
+def test_dataset_proto_scheme(tmpdir):
+    """Test the proto:// scheme handler."""
+    tmpdir = Path(tmpdir)
+    datasets = Datasets(datasets={})
+
+    proto = BenchmarkProto(uri="hello world")
+    with open(tmpdir / "file.pb", "wb") as f:
+        f.write(proto.SerializeToString())
+
+    benchmark = datasets.benchmark(f"proto://{tmpdir}/file.pb")
+
+    assert benchmark.proto.uri == "hello world"
+    assert benchmark.uri == "benchmark://hello world"
+
+
+def test_dataset_proto_scheme_file_not_found(tmpdir):
+    tmpdir = Path(tmpdir)
+    datasets = Datasets(datasets={})
+    with pytest.raises(FileNotFoundError):
+        datasets.benchmark(f"proto://{tmpdir}/not_a_file")
+
+
+def test_dataset_file_scheme(tmpdir):
+    """Test the file:// scheme handler."""
+    tmpdir = Path(tmpdir)
+    datasets = Datasets(datasets={})
+
+    with open(tmpdir / "file.dat", "w") as f:
+        f.write("hello, world")
+
+    benchmark = datasets.benchmark(f"file://{tmpdir}/file.dat")
+
+    assert benchmark.proto.uri == f"file://{tmpdir}/file.dat"
+    assert benchmark.proto.program.contents == b"hello, world"
+    assert benchmark.uri == f"file://{tmpdir}/file.dat"
 
 
 if __name__ == "__main__":

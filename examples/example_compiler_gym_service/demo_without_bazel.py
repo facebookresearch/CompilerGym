@@ -16,6 +16,7 @@ from typing import Iterable
 import gym
 
 from compiler_gym.datasets import Benchmark, Dataset
+from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.spaces import Reward
 from compiler_gym.util.logging import init_logging
 from compiler_gym.util.registration import register
@@ -66,20 +67,20 @@ class ExampleDataset(Dataset):
             description="An example dataset",
         )
         self._benchmarks = {
-            "benchmark://example-v0/foo": Benchmark.from_file_contents(
+            "/foo": Benchmark.from_file_contents(
                 "benchmark://example-v0/foo", "Ir data".encode("utf-8")
             ),
-            "benchmark://example-v0/bar": Benchmark.from_file_contents(
+            "/bar": Benchmark.from_file_contents(
                 "benchmark://example-v0/bar", "Ir data".encode("utf-8")
             ),
         }
 
     def benchmark_uris(self) -> Iterable[str]:
-        yield from self._benchmarks.keys()
+        yield from (f"benchmark://example-v0{k}" for k in self._benchmarks.keys())
 
-    def benchmark(self, uri: str) -> Benchmark:
-        if uri in self._benchmarks:
-            return self._benchmarks[uri]
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
+        if uri.path in self._benchmarks:
+            return self._benchmarks[uri.path]
         else:
             raise LookupError("Unknown program name")
 

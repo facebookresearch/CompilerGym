@@ -70,11 +70,11 @@ Status BenchmarkFactory::getBenchmark(const BenchmarkProto& benchmarkMessage,
     }
     case compiler_gym::File::DataCase::kUri: {
       VLOG(3) << "LLVM benchmark cache miss, read from URI: " << benchmarkMessage.uri();
-      // Check the protocol of the benchmark URI.
+      // Check the scheme of the benchmark URI.
       if (programFile.uri().find("file:///") != 0) {
         return Status(StatusCode::INVALID_ARGUMENT,
                       fmt::format("Invalid benchmark data URI. "
-                                  "Only the file:/// protocol is supported: \"{}\"",
+                                  "Only the file:/// scheme is supported: \"{}\"",
                                   programFile.uri()));
       }
 

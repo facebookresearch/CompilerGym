@@ -113,8 +113,8 @@ class ValidationResult(BaseModel):
         )
 
     def __repr__(self):
-        # Remove default-protocol prefix to improve output readability.
-        benchmark = re.sub(r"^benchmark://", "", self.state.benchmark)
+        # Remove default-scheme prefix to improve output readability.
+        benchmark = re.sub(r"^benchmark://", "", str(self.state.benchmark))
 
         if not self.okay():
             msg = ", ".join(self.error_details.strip().split("\n"))

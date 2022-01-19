@@ -15,6 +15,15 @@ py_test(
 )
 
 py_test(
+    name = "commands_test",
+    srcs = ["commands_test.py"],
+    deps = [
+        "//compiler_gym/util",
+        "//tests:test_main",
+    ],
+)
+
+py_test(
     name = "debug_util_test",
     srcs = ["debug_util_test.py"],
     deps = [

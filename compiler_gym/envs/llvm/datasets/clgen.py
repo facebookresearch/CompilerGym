@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 import io
 import logging
+import os
 import shutil
 import subprocess
 import tarfile
@@ -15,7 +16,9 @@ from fasteners import InterProcessLock
 
 from compiler_gym.datasets import Benchmark, BenchmarkInitError, TarDatasetWithManifest
 from compiler_gym.datasets.benchmark import BenchmarkWithSource
+from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.envs.llvm.llvm_benchmark import ClangInvocation
+from compiler_gym.util.commands import Popen, communicate
 from compiler_gym.util.download import download
 from compiler_gym.util.filesystem import atomic_file_write
 from compiler_gym.util.truncate import truncate
@@ -117,15 +120,15 @@ class CLgenDataset(TarDatasetWithManifest):
 
             self._opencl_headers_installed_marker.touch()
 
-    def benchmark(self, uri: str) -> Benchmark:
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
         self.install()
 
-        benchmark_name = uri[len(self.name) + 1 :]
+        benchmark_name = uri.path[1:]
         if not benchmark_name:
             raise LookupError(f"No benchmark specified: {uri}")
 
         # The absolute path of the file, without an extension.
-        path_stem = self.dataset_root / uri[len(self.name) + 1 :]
+        path_stem = os.path.normpath(f"{self.dataset_root}/{uri.path}")
 
         bc_path, cl_path = Path(f"{path_stem}.bc"), Path(f"{path_stem}.cl")
 
@@ -152,13 +155,16 @@ class CLgenDataset(TarDatasetWithManifest):
                     ],
                 ).command(outpath=tmp_bc_path)
                 logger.debug("Exec %s", compile_command)
-                clang = subprocess.Popen(
-                    compile_command,
-                    stdin=subprocess.PIPE,
-                    stdout=subprocess.PIPE,
-                    stderr=subprocess.PIPE,
-                )
-                _, stderr = clang.communicate(timeout=300)
+                try:
+                    with Popen(
+                        compile_command,
+                        stdin=subprocess.PIPE,
+                        stdout=subprocess.PIPE,
+                        stderr=subprocess.PIPE,
+                    ) as clang:
+                        _, stderr = communicate(clang, timeout=300)
+                except subprocess.TimeoutExpired:
+                    raise BenchmarkInitError(f"Benchmark compilation timed out: {uri}")
 
             if clang.returncode:
                 compile_command = " ".join(compile_command)

@@ -108,7 +108,7 @@ class Executor(BaseModel):
                 gpus_per_node=self.gpus,
                 slurm_partition=self.slurm_partition,
             )
-            name = self.slurm_partition
+            name = self.slurm_partition or "slurm"  # default value for logging
         elif self.type == self.Type.LOCAL:
             executor, name = (
                 LocalParallelExecutor(
