@@ -1,3 +1,57 @@
+## Release 0.2.2 (2022-01-19)
+
+Amongst the highlights of this release are support for building with CMake and a
+new compiler environment based on loop unrolling. Many thanks to @sogartar,
+@mostafaelhoushi, @KyleHerndon, and @yqtianust for code contributions!
+
+- Added support for building CompilerGym from source on Linux using **CMake**
+  ([#498](https://github.com/facebookresearch/CompilerGym/pull/498),
+  [#478](https://github.com/facebookresearch/CompilerGym/pull/478)). The new
+  build system coexists with the bazel build and enables customization over the
+  CMake configuration used to build the LLVM environment. See
+  [INSTALL.md](https://github.com/facebookresearch/CompilerGym/blob/development/INSTALL.md#building-from-source-with-cmake)
+  for details. Credit: @sogartar, @KyleHerndon.
+- Added an environment for loop optimizations in LLVM
+  ([#530](https://github.com/facebookresearch/CompilerGym/pull/530),
+  [#529](https://github.com/facebookresearch/CompilerGym/pull/529),
+  [#517](https://github.com/facebookresearch/CompilerGym/pull/517)). This new
+  example environment provides control over loop unrolling factors and
+  demonstrates how to build a standalone LLVM binary using the new CMake build
+  system. Credit: @mostafaelhoushi.
+- Added a new `BenchmarkUri` class and API for parsing URIs
+  ([#525](https://github.com/facebookresearch/CompilerGym/pull/525)). This
+  enables benchmarks to have optional parameters that can be used by the backend
+  services to modify their behavior.
+- **[llvm]** Enabled runtime reward to be calculated on systems where `/dev/shm`
+  does not permit executables
+  ([#510](https://github.com/facebookresearch/CompilerGym/pull/510)).
+- **[llvm]** Added a new `benchmark://mibench-v1` dataset and deprecated
+  `benchmark://mibench-v0`
+  ([#511](https://github.com/facebookresearch/CompilerGym/pull/511)). If you are
+  using `mibench-v0`, please update to the new version.
+- **[llvm]** Enabled all 20 of the cBench runtime datasets to be used by the
+  `benchmark://cbench-v1` dataset
+  ([#525](https://github.com/facebookresearch/CompilerGym/pull/525)).
+- Made the `site_data_base` argument of the `Dataset` class constructor optional
+  ([#518](https://github.com/facebookresearch/CompilerGym/pull/518)).
+- Added support for building CompilerGym from source on macOS Monterey
+  ([#494](https://github.com/facebookresearch/CompilerGym/issues/494)).
+- Removed the legacy dataset scripts and APIs that were deprecated in v0.1.8.
+  Please use the [new dataset
+  API](https://compilergym.com/compiler_gym/datasets.html#datasets). The
+  following has been removed:
+    - The `compiler_gym.bin.datasets` script.
+    - The properties: `CompilerEnv.available_datasets`, and
+      `CompilerEnv.benchmarks`.
+    - The `CompilerEnv.require_dataset()`, `CompilerEnv.require_datasets()`,
+      `CompilerEnv.register_dataset()`, and
+      `CompilerEnv.get_benchmark_validation_callback()` methods.
+- Numerous other bug fixes and improvements.
+
+**Full Change Log**:
+[v0.2.1...v0.2.2](https://github.com/facebookresearch/CompilerGym/compare/v0.2.1...v0.2.2)
+
+
 ## Release 0.2.1 (2021-11-17)
 
 Highlights of this release include:
