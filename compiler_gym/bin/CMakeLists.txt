@@ -9,26 +9,12 @@ cg_py_library(
   NAME
     bin
   DEPS
-    ::datasets
     ::manual_env
     ::random_replay
     ::random_search
     ::service
     ::validate
   PUBLIC
-)
-
-cg_py_binary(
-  NAME
-    datasets
-  SRCS
-    "datasets.py"
-  DEPS
-    ::service
-    compiler_gym::datasets::datasets
-    compiler_gym::envs::envs
-    compiler_gym::util::util
-    compiler_gym::util::flags::flags
 )
 
 cg_py_binary(

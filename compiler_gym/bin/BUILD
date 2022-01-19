@@ -8,25 +8,11 @@ py_library(
     name = "bin",
     visibility = ["//visibility:public"],
     deps = [
-        ":datasets",
         ":manual_env",
         ":random_replay",
         ":random_search",
         ":service",
         ":validate",
-    ],
-)
-
-py_binary(
-    name = "datasets",
-    srcs = ["datasets.py"],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":service",
-        "//compiler_gym/datasets",
-        "//compiler_gym/envs",
-        "//compiler_gym/util",
-        "//compiler_gym/util/flags",
     ],
 )
 
