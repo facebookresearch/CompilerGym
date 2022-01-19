@@ -157,9 +157,11 @@ class RandomOrderBenchmarks(IterateOverBenchmarks):
     .. note::
 
         Uniform random selection is provided by evaluating the input benchmarks
-        iterator into a list and sampling randomly from the list. This will not
-        work for random iteration over infinite or very large iterables of
-        benchmarks.
+        iterator into a list and sampling randomly from the list. For very large
+        and infinite iterables of benchmarks you must use the
+        :class:`IterateOverBenchmarks
+        <compiler_gym.wrappers.IterateOverBenchmarks>` wrapper with your own
+        random sampling iterator.
     """
 
     def __init__(
