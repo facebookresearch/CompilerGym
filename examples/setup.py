@@ -13,6 +13,8 @@ with open("../VERSION") as f:
     version = f.read().strip()
 with open("requirements.txt") as f:
     requirements = [ln.split("#")[0].rstrip() for ln in f.readlines()]
+with open("../tests/requirements.txt") as f:
+    requirements += [ln.split("#")[0].rstrip() for ln in f.readlines()]
 
 setuptools.setup(
     name="compiler_gym_examples",
