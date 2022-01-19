@@ -48,11 +48,14 @@ def resolve_uri_protocol(uri: str) -> str:
 
 
 class BenchmarkUri(BaseModel):
-    """A URI string used to look up a benchmark.
+    """A URI used to identify a benchmark, and optionally a set of parameters
+    for the benchmark.
 
-    A benchmark URI has the following format:
+    A URI has the following format:
 
-    :code:`scheme://dataset/path?params#fragment`
+    .. code-block::
+
+        scheme://dataset/path?params#fragment
 
     where:
 
@@ -81,11 +84,11 @@ class BenchmarkUri(BaseModel):
 
     A benchmark URI may resolve to zero or more benchmarks, for example:
 
-    * :code:`csmith-v0` resolves to any benchmark from the
+    * :code:`benchmark://csmith-v0` resolves to any benchmark from the
       :code:`benchmark://csmith-v0` dataset.
 
-    * :code:`benchmark://cbench-v0/qsort` resolves to the path :code:`/qsort`
-      within the dataset :code:`benchmark://cbench-v0`.
+    * :code:`cbench-v0/qsort` resolves to the path :code:`/qsort`
+      within the dataset :code:`benchmark://cbench-v0` using the default scheme.
 
     * :code:`benchmark://cbench-v0/qsort?debug=true` also resolves to the path
       :code:`/qsort` within the dataset :code:`benchmark://cbench-v0`, but with
