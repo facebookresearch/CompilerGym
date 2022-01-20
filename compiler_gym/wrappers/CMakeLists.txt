@@ -15,6 +15,7 @@ cg_py_library(
     "datasets.py"
     "llvm.py"
     "time_limit.py"
+    "validation.py"
   DEPS
     compiler_gym::datasets::datasets
     compiler_gym::envs::envs
