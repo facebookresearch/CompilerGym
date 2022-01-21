@@ -20,8 +20,10 @@ from typing import Callable, Dict, List, NamedTuple, Optional
 import fasteners
 
 from compiler_gym.datasets import Benchmark, TarDatasetWithManifest
+from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.service.proto import BenchmarkDynamicConfig, Command
 from compiler_gym.third_party import llvm
+from compiler_gym.util.commands import Popen
 from compiler_gym.util.download import download
 from compiler_gym.util.runfiles_path import cache_path, site_data_path
 from compiler_gym.util.timer import Timer
@@ -135,36 +137,30 @@ def _compile_and_run_bitcode_file(
         error_data["compile_cmd"] = compile_cmd
         logger.debug("compile: %s", compile_cmd)
         assert not binary.is_file()
-        clang = subprocess.Popen(
-            compile_cmd,
-            stdout=subprocess.PIPE,
-            stderr=subprocess.STDOUT,
-            universal_newlines=True,
-            env={"PATH": f"{clang_path.parent}:{os.environ.get('PATH', '')}"},
-        )
         try:
-            output, _ = clang.communicate(timeout=compilation_timeout_seconds)
+            with Popen(
+                compile_cmd,
+                stdout=subprocess.PIPE,
+                stderr=subprocess.STDOUT,
+                universal_newlines=True,
+                env={"PATH": f"{clang_path.parent}:{os.environ.get('PATH', '')}"},
+            ) as clang:
+                output, _ = clang.communicate(timeout=compilation_timeout_seconds)
+                if clang.returncode:
+                    error_data["output"] = output
+                    return BenchmarkExecutionResult(
+                        walltime_seconds=timeout_seconds,
+                        error=ValidationError(
+                            type="Compilation failed",
+                            data=error_data,
+                        ),
+                    )
         except subprocess.TimeoutExpired:
-            # kill() was added in Python 3.7.
-            if sys.version_info >= (3, 7, 0):
-                clang.kill()
-            else:
-                clang.terminate()
-            clang.communicate(timeout=30)  # Wait for shutdown to complete.
             error_data["timeout"] = compilation_timeout_seconds
             return BenchmarkExecutionResult(
                 walltime_seconds=timeout_seconds,
                 error=ValidationError(
                     type="Compilation timeout",
-                    data=error_data,
-                ),
-            )
-        if clang.returncode:
-            error_data["output"] = output
-            return BenchmarkExecutionResult(
-                walltime_seconds=timeout_seconds,
-                error=ValidationError(
-                    type="Compilation failed",
                     data=error_data,
                 ),
             )
@@ -174,26 +170,18 @@ def _compile_and_run_bitcode_file(
         error_data["run_cmd"] = cmd.replace("$BIN", f"{lli_path.name} benchmark.bc")
         run_env["PATH"] = str(lli_path.parent)
 
+    logger.debug("exec: %s", error_data["run_cmd"])
     try:
-        logger.debug("exec: %s", error_data["run_cmd"])
-        process = subprocess.Popen(
+        with Timer() as timer, Popen(
             error_data["run_cmd"],
             shell=True,
             stderr=subprocess.STDOUT,
             stdout=subprocess.PIPE,
             env=run_env,
             cwd=cwd,
-        )
-
-        with Timer() as timer:
+        ) as process:
             stdout, _ = process.communicate(timeout=timeout_seconds)
     except subprocess.TimeoutExpired:
-        # kill() was added in Python 3.7.
-        if sys.version_info >= (3, 7, 0):
-            process.kill()
-        else:
-            process.terminate()
-        process.communicate(timeout=30)  # Wait for shutdown to complete.
         error_data["timeout_seconds"] = timeout_seconds
         return BenchmarkExecutionResult(
             walltime_seconds=timeout_seconds,
@@ -288,7 +276,7 @@ def _make_cBench_validator(
     def validator_cb(env: "LlvmEnv") -> Optional[ValidationError]:  # noqa: F821
         """The validation callback."""
         with _CBENCH_DOWNLOAD_THREAD_LOCK:
-            with fasteners.InterProcessLock(cache_path("cbench-v1-runtime-data.LOCK")):
+            with fasteners.InterProcessLock(cache_path(".cbench-v1-runtime-data.LOCK")):
                 download_cBench_runtime_data()
 
         cbench_data = site_data_path("llvm-v0/cbench-v1-runtime-data/runtime_data")
@@ -388,24 +376,24 @@ def _make_cBench_validator(
                         type="Output not generated",
                         data={"path": path.name, "command": cmd},
                     )
-                diff = subprocess.Popen(
+                with Popen(
                     ["diff", str(path), f"{path}.gold_standard"],
                     stdout=subprocess.PIPE,
                     stderr=subprocess.STDOUT,
-                )
-                stdout, _ = diff.communicate()
-                if diff.returncode:
-                    try:
-                        stdout = stdout.decode("utf-8")
-                        return ValidationError(
-                            type="Wrong output (file)",
-                            data={"path": path.name, "diff": stdout},
-                        )
-                    except UnicodeDecodeError:
-                        return ValidationError(
-                            type="Wrong output (file)",
-                            data={"path": path.name, "diff": "<binary>"},
-                        )
+                ) as diff:
+                    stdout, _ = diff.communicate(timeout=300)
+                    if diff.returncode:
+                        try:
+                            stdout = stdout.decode("utf-8")
+                            return ValidationError(
+                                type="Wrong output (file)",
+                                data={"path": path.name, "diff": stdout},
+                            )
+                        except UnicodeDecodeError:
+                            return ValidationError(
+                                type="Wrong output (file)",
+                                data={"path": path.name, "diff": "<binary>"},
+                            )
 
     def flaky_wrapped_cb(env: "LlvmEnv") -> Optional[ValidationError]:  # noqa: F821
         """Wrap the validation callback in a flakiness retry loop."""
@@ -418,7 +406,12 @@ def _make_cBench_validator(
                 # Timeout errors can be raised by the environment in case of a
                 # slow step / observation, and should be retried.
                 pass
-            logger.warning("Validation callback failed, attempt=%d/%d", j, flakiness)
+            logger.warning(
+                "Validation callback failed (%s), attempt=%d/%d",
+                error.type,
+                j,
+                flakiness,
+            )
         return error
 
     return flaky_wrapped_cb
@@ -494,38 +487,29 @@ def validator(
 
     # Create the BenchmarkDynamicConfig object.
     cbench_data = site_data_path("llvm-v0/cbench-v1-runtime-data/runtime_data")
-    DYNAMIC_CONFIGS[benchmark] = BenchmarkDynamicConfig(
-        build_cmd=Command(
-            argument=["$CC", "$IN"] + linkopts,
-            timeout_seconds=60,
-            outfile=["a.out"],
-        ),
-        run_cmd=Command(
-            argument=cmd.replace("$BIN", "./a.out")
-            .replace("$D", str(cbench_data))
-            .split(),
-            timeout_seconds=300,
-            infile=["a.out", "_finfo_dataset"],
-            outfile=[str(s) for s in outfiles],
-        ),
-        pre_run_cmd=[
-            Command(argument=["echo", "1", ">_finfo_dataset"], timeout_seconds=30),
-        ],
+    uri = BenchmarkUri.from_string(benchmark)
+    DYNAMIC_CONFIGS[uri.path].append(
+        BenchmarkDynamicConfig(
+            build_cmd=Command(
+                argument=["$CC", "$IN"] + linkopts,
+                timeout_seconds=60,
+                outfile=["a.out"],
+            ),
+            run_cmd=Command(
+                argument=cmd.replace("$BIN", "./a.out")
+                .replace("$D", str(cbench_data))
+                .split(),
+                timeout_seconds=300,
+                infile=["a.out", "_finfo_dataset"],
+                outfile=[str(s) for s in outfiles],
+            ),
+            pre_run_cmd=[
+                Command(argument=["echo", "1", ">_finfo_dataset"], timeout_seconds=30),
+            ],
+        )
     )
 
     return True
-
-
-class CBenchBenchmark(Benchmark):
-    """A cBench benchmmark."""
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        for val in VALIDATORS.get(self.uri, []):
-            self.add_validation_callback(val)
-        self.proto.dynamic_config.MergeFrom(
-            DYNAMIC_CONFIGS.get(self.uri, BenchmarkDynamicConfig())
-        )
 
 
 class CBenchDataset(TarDatasetWithManifest):
@@ -548,7 +532,7 @@ class CBenchDataset(TarDatasetWithManifest):
             manifest_sha256="eeffd7593aeb696a160fd22e6b0c382198a65d0918b8440253ea458cfe927741",
             strip_prefix="cBench-v1",
             benchmark_file_suffix=".bc",
-            benchmark_class=CBenchBenchmark,
+            benchmark_class=Benchmark,
             site_data_base=site_data_base,
             sort_order=-1,
             validatable="Partially",
@@ -557,8 +541,32 @@ class CBenchDataset(TarDatasetWithManifest):
     def install(self):
         super().install()
         with _CBENCH_DOWNLOAD_THREAD_LOCK:
-            with fasteners.InterProcessLock(cache_path("cbench-v1-runtime-data.LOCK")):
+            with fasteners.InterProcessLock(cache_path(".cbench-v1-runtime-data.LOCK")):
                 download_cBench_runtime_data()
+
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
+        benchmark = super().benchmark_from_parsed_uri(uri)
+
+        for val in VALIDATORS.get(str(uri), []):
+            benchmark.add_validation_callback(val)
+
+        # Parse the "dataset" parameter to determine the correct dynamic
+        # configuration to use.
+        if DYNAMIC_CONFIGS[uri.path]:
+            cfgs = DYNAMIC_CONFIGS[uri.path]
+            dataset = uri.params.get("dataset", ["0"])
+
+            try:
+                dataset_index = int(dataset[-1])
+            except (ValueError, TypeError) as e:
+                raise ValueError(f"Invalid dataset: {dataset[-1]}") from e
+
+            if dataset_index < 0 or dataset_index >= len(cfgs):
+                raise ValueError(f"Invalid dataset: {dataset_index}")
+
+            benchmark.proto.dynamic_config.MergeFrom(cfgs[dataset_index])
+
+        return benchmark
 
 
 class CBenchLegacyDataset2(TarDatasetWithManifest):
@@ -589,7 +597,6 @@ class CBenchLegacyDataset2(TarDatasetWithManifest):
             benchmark_file_suffix=".bc",
             site_data_base=site_data_base,
             sort_order=sort_order,
-            benchmark_class=CBenchBenchmark,
             deprecated=deprecated,
             validatable="Partially",
         )
@@ -653,8 +660,9 @@ VALIDATORS: Dict[
 ] = defaultdict(list)
 
 
-# A map from benchmark name to BenchmarkDynamicConfig messages.
-DYNAMIC_CONFIGS: Dict[str, Optional[BenchmarkDynamicConfig]] = {}
+# A map from cBench benchmark path to a list of BenchmarkDynamicConfig messages,
+# one per dataset.
+DYNAMIC_CONFIGS: Dict[str, List[BenchmarkDynamicConfig]] = defaultdict(list)
 
 
 def validate_sha_output(result: BenchmarkExecutionResult) -> Optional[str]:

@@ -34,12 +34,15 @@ namespace {
 
 BenchmarkHash getModuleHash(const llvm::Module& module) {
   BenchmarkHash hash;
-  llvm::SmallVector<char, 256> buffer;
+  Bitcode bitcode;
+
   // Writing the entire bitcode to a buffer that is then discarded is
   // inefficient.
-  llvm::BitcodeWriter writer(buffer);
-  writer.writeModule(module, /*ShouldPreserveUseListOrder=*/false,
-                     /*Index=*/nullptr, /*GenerateHash=*/true, &hash);
+  llvm::raw_svector_ostream ostream(bitcode);
+  llvm::WriteBitcodeToFile(module, ostream,
+                           /*ShouldPreserveUseListOrder=*/false,
+                           /*Index=*/nullptr, /*GenerateHash=*/true, &hash);
+
   return hash;
 }
 
@@ -65,6 +68,24 @@ RealizedBenchmarkDynamicConfig realizeDynamicConfig(const BenchmarkDynamicConfig
   cfg.mutable_build_cmd()->add_infile((scratchDirectory / "out.bc").string());
 
   return RealizedBenchmarkDynamicConfig(cfg);
+}
+
+/**
+ * Create a temporary directory to use as a scratch pad for on-disk storage.
+ * This directory is guaranteed to exist.
+ *
+ * Errors in this function are fatal.
+ *
+ * @return fs::path A path.
+ */
+fs::path createScratchDirectoryOrDie() {
+  const fs::path cacheRoot = util::getCacheRootPath();
+  const fs::path dir = fs::unique_path(cacheRoot / "benchmark-scratch-%%%%-%%%%");
+
+  sys::error_code ec;
+  fs::create_directories(dir, ec);
+  CHECK(!ec) << "Failed to create scratch directory: " << dir;
+  return dir;
 }
 
 }  // anonymous namespace
@@ -135,7 +156,7 @@ Benchmark::Benchmark(const std::string& name, const Bitcode& bitcode,
                      const BaselineCosts& baselineCosts)
     : context_(std::make_unique<llvm::LLVMContext>()),
       module_(makeModuleOrDie(*context_, bitcode, name)),
-      scratchDirectory_(fs::path(fs::unique_path(workingDirectory / "scratch-%%%%-%%%%"))),
+      scratchDirectory_(createScratchDirectoryOrDie()),
       dynamicConfigProto_(dynamicConfig),
       dynamicConfig_(realizeDynamicConfig(dynamicConfig, scratchDirectory_)),
       baselineCosts_(baselineCosts),
@@ -143,11 +164,7 @@ Benchmark::Benchmark(const std::string& name, const Bitcode& bitcode,
       needsRecompile_(true),
       runtimesPerObservationCount_(kDefaultRuntimesPerObservationCount),
       warmupRunsPerRuntimeObservationCount_(kDefaultWarmupRunsPerRuntimeObservationCount),
-      buildtimesPerObservationCount_(kDefaultBuildtimesPerObservationCount) {
-  sys::error_code ec;
-  fs::create_directory(scratchDirectory(), ec);
-  CHECK(!ec) << "Failed to create scratch directory: " << scratchDirectory();
-}
+      buildtimesPerObservationCount_(kDefaultBuildtimesPerObservationCount) {}
 
 Benchmark::Benchmark(const std::string& name, std::unique_ptr<llvm::LLVMContext> context,
                      std::unique_ptr<llvm::Module> module,
@@ -155,15 +172,17 @@ Benchmark::Benchmark(const std::string& name, std::unique_ptr<llvm::LLVMContext>
                      const BaselineCosts& baselineCosts)
     : context_(std::move(context)),
       module_(std::move(module)),
-      scratchDirectory_(fs::path(fs::unique_path(workingDirectory / "scratch-%%%%-%%%%"))),
+      scratchDirectory_(createScratchDirectoryOrDie()),
       dynamicConfigProto_(dynamicConfig),
       dynamicConfig_(realizeDynamicConfig(dynamicConfig, scratchDirectory_)),
       baselineCosts_(baselineCosts),
       name_(name),
-      needsRecompile_(true) {
+      needsRecompile_(true) {}
+
+void Benchmark::close() {
   sys::error_code ec;
-  fs::create_directory(scratchDirectory(), ec);
-  CHECK(!ec) << "Failed to create scratch directory: " << scratchDirectory();
+  fs::remove_all(scratchDirectory(), ec);
+  CHECK(!ec) << "Failed to delete scratch directory: " << scratchDirectory().string();
 }
 
 std::unique_ptr<Benchmark> Benchmark::clone(const fs::path& workingDirectory) const {

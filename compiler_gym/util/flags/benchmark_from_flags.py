@@ -13,9 +13,9 @@ from compiler_gym.datasets import Benchmark
 flags.DEFINE_string(
     "benchmark",
     None,
-    "The URI of the benchmark to use. Use the benchmark:// protocol to "
-    "reference named benchmarks, or the file:/// protocol to reference paths "
-    "to program data. If no protocol is specified, benchmark:// is implied.",
+    "The URI of the benchmark to use. Use the benchmark:// scheme to "
+    "reference named benchmarks, or the file:/// scheme to reference paths "
+    "to program data. If no scheme is specified, benchmark:// is implied.",
 )
 
 FLAGS = flags.FLAGS

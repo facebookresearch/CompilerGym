@@ -22,11 +22,6 @@ def test_state_from_dict_empty():
         CompilerEnvState(**{})
 
 
-def test_state_invalid_benchmark_uri():
-    with pytest.raises(PydanticValidationError, match="benchmark"):
-        CompilerEnvState(benchmark="invalid", walltime=100, reward=1.5, commandline="")
-
-
 def test_state_invalid_walltime():
     with pytest.raises(PydanticValidationError, match="Walltime cannot be negative"):
         CompilerEnvState(
@@ -290,15 +285,6 @@ def test_state_from_csv_invalid_format():
     with pytest.raises(
         ValueError, match=r"Expected 4 columns in the first row of CSV: \['abcdef'\]"
     ):
-        next(iter(reader))
-
-
-def test_state_from_csv_invalid_benchmark_uri():
-    buf = StringIO(
-        "benchmark,reward,walltime,commandline\n" "invalid-uri,2.0,5.0,-a -b -c\n"
-    )
-    reader = CompilerEnvStateReader(buf)
-    with pytest.raises(ValueError, match="string does not match regex"):
         next(iter(reader))
 
 

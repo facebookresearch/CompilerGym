@@ -80,6 +80,8 @@ html_static_path = ["_static"]
 
 html_logo = "_static/img/logo.png"
 
+html_favicon = "_static/img/favicon.png"
+
 # -- Breathe configuration -
 
 breathe_default_project = "CompilerGym"

@@ -1,18 +1,15 @@
-aiohttp<3.8.0  # Pin version for ray.
 aioredis<2.0.0  # Pin version for ray.
 dgl==0.6.1
 geneticalgorithm>=1.0.2
 hydra-core==1.1.0
 keras==2.6.0
-matplotlib>=3.3.0
+matplotlib>=3.3.4
 nevergrad>=0.4.3
-numpy~=1.19.2  # Pin version for tensorflow.
 opentuner>=0.8.5
 pandas>=1.1.5
-ray[default,rllib]==1.4.1
+ray[default,rllib]==1.9.0
 submitit>=1.2.0
 submitit>=1.2.0
-tensorflow==2.6.0
+tensorflow==2.6.1
 torch>=1.6.0
 typer[all]>=0.3.2
-typing-extensions~=3.7.4  # Pin version for tensorflow.

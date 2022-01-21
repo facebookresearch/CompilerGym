@@ -28,6 +28,9 @@ main() {
     sed -e 's/^date-released:.*$/date-released: '"$date"'/' -i CITATION.cff
     echo "Wrote CITATION.cff"
 
-    git add -p VERSION CITATION.cff
+    sed -e 's/^compiler_gym==.*$/compiler_gym=='"$version"'/' -i www/requirements.txt
+    echo "Wrote www/requirements.txt"
+
+    git add -p VERSION CITATION.cff www/requirements.txt
 }
 main $@

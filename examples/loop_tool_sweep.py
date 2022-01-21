@@ -25,6 +25,7 @@ def wrapped_step(env, action):
         if done:
             logger.warning("Step failed: %s", info["error_details"])
             env.reset()
+
     return observation, reward, done, info
 
 

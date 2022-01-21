@@ -8,32 +8,12 @@ from pathlib import Path
 import pytest
 
 from compiler_gym.datasets.dataset import Dataset
+from compiler_gym.datasets.uri import BenchmarkUri
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.common"]
 
 # pylint: disable=abstract-method
-
-
-@pytest.mark.parametrize(
-    "invalid_name", ["benchmark://test", "test-v0", "benchmark://v0"]
-)
-def test_dataset__invalid_name(invalid_name: str):
-    """Test that invalid dataset names raise an error on init."""
-
-    with pytest.raises(
-        ValueError,
-        match=(
-            f"Invalid dataset name: '{invalid_name}'. "
-            "Dataset name must be in the form: '{{protocol}}://{{name}}-v{{version}}'"
-        ),
-    ):
-        Dataset(
-            name=invalid_name,
-            description="A test dataset",
-            license="MIT",
-            site_data_base="test",
-        )
 
 
 def test_dataset_properties():
@@ -46,7 +26,7 @@ def test_dataset_properties():
     )
 
     assert dataset.name == "benchmark://test-v0"
-    assert dataset.protocol == "benchmark"
+    assert dataset.scheme == "benchmark"
     assert dataset.description == "A test dataset"
     assert dataset.license == "MIT"
 
@@ -64,6 +44,20 @@ def test_dataset_optional_properties():
     assert not dataset.deprecated
     assert dataset.sort_order == 0
     assert dataset.validatable == "No"
+
+
+def test_dataset_default_version():
+    """Test the dataset property values."""
+    dataset = Dataset(
+        name="benchmark://test",
+        description="A test dataset",
+        license="MIT",
+        site_data_base="test",
+    )
+
+    assert dataset.name == "benchmark://test"
+    assert dataset.scheme == "benchmark"
+    assert dataset.version == 0
 
 
 def test_dataset_optional_properties_explicit_values():
@@ -90,14 +84,14 @@ def test_dataset_optional_properties_explicit_values():
 def test_dataset_inferred_properties():
     """Test the values of inferred dataset properties."""
     dataset = Dataset(
-        name="benchmark://test-v0",
+        name="benchmark://test-v2",
         description="A test dataset",
         license="MIT",
         site_data_base="test",
     )
 
-    assert dataset.protocol == "benchmark"
-    assert dataset.version == 0
+    assert dataset.scheme == "benchmark"
+    assert dataset.version == 2
 
 
 def test_dataset_properties_read_only(tmpwd: Path):
@@ -208,11 +202,8 @@ class DatasetForTesting(Dataset):
     def benchmark_uris(self):
         return sorted(self._benchmarks)
 
-    def benchmark(self, uri):
-        if uri:
-            return self._benchmarks[uri]
-        else:
-            return next(iter(self._benchmarks.values()))
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri):
+        return self._benchmarks[str(uri)]
 
     @property
     def size(self):
@@ -241,6 +232,31 @@ def test_logger_is_deprecated():
     dataset = DatasetForTesting()
     with pytest.deprecated_call(match="The `Dataset.logger` attribute is deprecated"):
         dataset.logger
+
+
+def test_with_site_data():
+    """Test the dataset property values."""
+    dataset = Dataset(
+        name="benchmark://test-v0",
+        description="A test dataset",
+        license="MIT",
+        site_data_base="test",
+    )
+    assert dataset.has_site_data
+
+
+def test_without_site_data():
+    """Test the dataset property values."""
+    dataset = Dataset(
+        name="benchmark://test-v0",
+        description="A test dataset",
+        license="MIT",
+    )
+    assert not dataset.has_site_data
+    with pytest.raises(
+        ValueError, match=r"^Dataset has no site data path: benchmark://test-v0$"
+    ):
+        dataset.site_data_path  # noqa
 
 
 if __name__ == "__main__":

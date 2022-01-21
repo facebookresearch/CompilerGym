@@ -5,16 +5,6 @@
 load("@rules_python//python:defs.bzl", "py_test")
 
 py_test(
-    name = "datasets_bin_test",
-    srcs = ["datasets_bin_test.py"],
-    deps = [
-        "//compiler_gym/bin:datasets",
-        "//tests:test_main",
-        "//tests/pytest_plugins:common",
-    ],
-)
-
-py_test(
     name = "manual_env_bin_test",
     srcs = ["manual_env_bin_test.py"],
     flaky = 1,

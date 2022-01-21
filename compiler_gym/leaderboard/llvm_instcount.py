@@ -182,6 +182,12 @@ def eval_llvm_instcount_policy(policy: Policy) -> None:
 
     >>> eval_llvm_instcount_policy(my_policy)
 
+    The :func:`eval_llvm_instcount_policy()
+    <compiler_gym.leaderboard.llvm_instcount.eval_llvm_instcount_policy>`
+    function calls the policy function for each benchmark in the dataset, one at
+    a time, from a single thread. Stateful policies can assume thread safe
+    access to member variables.
+
     Put together as a complete example, a leaderboard submission script may look
     like:
 
@@ -203,7 +209,8 @@ def eval_llvm_instcount_policy(policy: Policy) -> None:
     defines a number of commandline flags that can be overriden to control the
     behavior of the evaluation. For example the flag :code:`--n` determines the
     number of times the policy is run on each benchmark (default is 10), and
-    :code:`--leaderboard_results` determines the path of the generated results file:
+    :code:`--leaderboard_results` determines the path of the generated results
+    file:
 
     .. code-block::
 
@@ -282,7 +289,7 @@ def eval_llvm_instcount_policy(policy: Policy) -> None:
                         "\r\033[2A"
                         "\033[K"
                         f"Runtime: {humanize_duration_hms(time)}. "
-                        f"Estimated completion: {humanize_duration_hms(time + mean_walltime * remaining_count)}. "
+                        f"Estimated completion: {humanize_duration_hms(mean_walltime * remaining_count)}. "
                         f"Completed: {humanize.intcomma(done_count)} / {humanize.intcomma(total_count)} "
                         f"({done_count / total_count:.1%})."
                         "\n\033[K"

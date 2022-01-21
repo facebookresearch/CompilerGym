@@ -25,6 +25,7 @@ import itertools
 import json
 import logging
 import math
+import os
 import sys
 from pathlib import Path
 from queue import Queue
@@ -180,7 +181,7 @@ def run_brute_force(
         reward_space_name = env.reward_space.id
 
         actions = [env.action_space.names.index(a) for a in action_names]
-        benchmark_uri = env.benchmark.uri
+        benchmark_uri = str(env.benchmark)
 
         meta = {
             "env": env.spec.id,
@@ -307,10 +308,12 @@ def main(argv):
 
     with env_from_flags(benchmark) as env:
         env.reset()
-        sanitized_benchmark_uri = "/".join(str(env.benchmark).split("/")[-2:])
-    logs_dir = Path(
-        FLAGS.output_dir or create_logging_dir(f"brute_force/{sanitized_benchmark_uri}")
-    )
+        logs_dir = Path(
+            FLAGS.output_dir
+            or create_logging_dir(
+                f'brute_force/{os.path.normpath(f"random/{env.benchmark.uri.scheme}/{env.benchmark.uri.path}")}'
+            )
+        )
 
     run_brute_force(
         make_env=lambda: env_from_flags(benchmark_from_flags()),

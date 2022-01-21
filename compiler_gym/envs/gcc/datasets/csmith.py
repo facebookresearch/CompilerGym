@@ -15,7 +15,9 @@ from fasteners import InterProcessLock
 
 from compiler_gym.datasets import Benchmark, BenchmarkSource, Dataset
 from compiler_gym.datasets.benchmark import BenchmarkWithSource
+from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.envs.gcc.gcc import Gcc
+from compiler_gym.util.commands import Popen
 from compiler_gym.util.decorators import memoized_property
 from compiler_gym.util.runfiles_path import runfiles_path
 from compiler_gym.util.shell_format import plural
@@ -139,8 +141,8 @@ class CsmithDataset(Dataset):
     def benchmark_uris(self) -> Iterable[str]:
         return (f"{self.name}/{i}" for i in range(UINT_MAX))
 
-    def benchmark(self, uri: str) -> CsmithBenchmark:
-        return self.benchmark_from_seed(int(uri.split("/")[-1]))
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> CsmithBenchmark:
+        return self.benchmark_from_seed(int(uri.path[1:]))
 
     def _random_benchmark(self, random_state: np.random.Generator) -> Benchmark:
         seed = random_state.integers(UINT_MAX)
@@ -197,27 +199,27 @@ class CsmithDataset(Dataset):
         # Run csmith with the given seed and pipe the output to clang to
         # assemble a bitcode.
         logger.debug("Exec csmith --seed %d", seed)
-        csmith = subprocess.Popen(
+        with Popen(
             [str(self.csmith_bin_path), "--seed", str(seed)],
             stdout=subprocess.PIPE,
             stderr=subprocess.PIPE,
-        )
+        ) as csmith:
+            # Generate the C source.
+            src, stderr = csmith.communicate(timeout=300)
 
-        # Generate the C source.
-        src, stderr = csmith.communicate(timeout=300)
-        if csmith.returncode:
-            try:
-                stderr = "\n".join(
-                    truncate(stderr.decode("utf-8"), max_line_len=200, max_lines=20)
+            if csmith.returncode:
+                try:
+                    stderr = "\n".join(
+                        truncate(stderr.decode("utf-8"), max_line_len=200, max_lines=20)
+                    )
+                    logger.warning("Csmith failed with seed %d: %s", seed, stderr)
+                except UnicodeDecodeError:
+                    # Failed to interpret the stderr output, generate a generic
+                    # error message.
+                    logger.warning("Csmith failed with seed %d", seed)
+                return self.benchmark_from_seed(
+                    seed, max_retries=max_retries, retry_count=retry_count + 1
                 )
-                logger.warning("Csmith failed with seed %d: %s", seed, stderr)
-            except UnicodeDecodeError:
-                # Failed to interpret the stderr output, generate a generic
-                # error message.
-                logger.warning("Csmith failed with seed %d", seed)
-            return self.benchmark_from_seed(
-                seed, max_retries=max_retries, retry_count=retry_count + 1
-            )
 
         # Pre-process the source.
         with tempfile.TemporaryDirectory() as tmpdir:

@@ -18,6 +18,9 @@ from tests.test_main import main
 pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.gcc"]
 
 
+@pytest.mark.xfail(
+    reason="github.com/facebookresearch/CompilerGym/issues/459",
+)
 @with_gcc_support
 def test_csmith_size(gcc_bin: str):
     with gym.make("gcc-v0", gcc_bin=gcc_bin) as env:
@@ -27,6 +30,9 @@ def test_csmith_size(gcc_bin: str):
         assert len(csmith_dataset) == 0
 
 
+@pytest.mark.xfail(
+    reason="github.com/facebookresearch/CompilerGym/issues/459",
+)
 @with_gcc_support
 @pytest.mark.parametrize("index", range(3) if is_ci() else range(10))
 def test_csmith_random_select(gcc_bin: str, index: int, tmpwd: Path):
@@ -43,6 +49,9 @@ def test_csmith_random_select(gcc_bin: str, index: int, tmpwd: Path):
         assert (tmpwd / "source.c").is_file()
 
 
+@pytest.mark.xfail(
+    reason="github.com/facebookresearch/CompilerGym/issues/459",
+)
 @with_gcc_support
 def test_random_benchmark(gcc_bin: str):
     with gym.make("gcc-v0", gcc_bin=gcc_bin) as env:
@@ -59,6 +68,9 @@ def test_random_benchmark(gcc_bin: str):
         assert len(random_benchmarks) == num_benchmarks
 
 
+@pytest.mark.xfail(
+    reason="github.com/facebookresearch/CompilerGym/issues/459",
+)
 @with_gcc_support
 def test_csmith_from_seed_retry_count_exceeded(gcc_bin: str):
     with gym.make("gcc-v0", gcc_bin=gcc_bin) as env:

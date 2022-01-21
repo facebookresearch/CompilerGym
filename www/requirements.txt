@@ -1,3 +1,3 @@
-compiler_gym==0.1.9
+compiler_gym==0.2.2
 Flask==2.0.1
 Flask-Cors==3.0.10

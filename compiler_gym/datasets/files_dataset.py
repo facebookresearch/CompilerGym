@@ -9,6 +9,7 @@ from typing import Iterable, List
 import numpy as np
 
 from compiler_gym.datasets.dataset import Benchmark, Dataset
+from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.util.decorators import memoized_property
 
 
@@ -111,14 +112,19 @@ class FilesDataset(Dataset):
         else:
             yield from self._benchmark_uris_iter
 
-    def benchmark(self, uri: str) -> Benchmark:
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
         self.install()
 
-        relpath = f"{uri[len(self.name) + 1:]}{self.benchmark_file_suffix}"
-        abspath = self.dataset_root / relpath
-        if not abspath.is_file():
-            raise LookupError(f"Benchmark not found: {uri} (file not found: {abspath})")
-        return self.benchmark_class.from_file(uri, abspath)
+        path = Path(
+            # Use normpath() rather than joinpath() because uri.path may start
+            # with a leading '/'.
+            os.path.normpath(
+                f"{self.dataset_root}/{uri.path}{self.benchmark_file_suffix}"
+            )
+        )
+        if not path.is_file():
+            raise LookupError(f"Benchmark not found: {uri} (file not found: {path})")
+        return self.benchmark_class.from_file(uri, path)
 
     def _random_benchmark(self, random_state: np.random.Generator) -> Benchmark:
         return self.benchmark(random_state.choice(list(self.benchmark_uris())))

@@ -2,14 +2,17 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+import os
 from collections import deque
+from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Set, TypeVar
 
 import numpy as np
 
 from compiler_gym.datasets.benchmark import Benchmark
 from compiler_gym.datasets.dataset import Dataset
-from compiler_gym.datasets.uri import BENCHMARK_URI_RE, resolve_uri_protocol
+from compiler_gym.datasets.uri import BenchmarkUri
+from compiler_gym.service.proto import Benchmark as BenchmarkProto
 
 T = TypeVar("T")
 
@@ -131,12 +134,33 @@ class Datasets:
 
         :raises LookupError: If :code:`dataset` is not found.
         """
-        dataset_name = resolve_uri_protocol(dataset)
+        return self.dataset_from_parsed_uri(BenchmarkUri.from_string(dataset))
 
-        if dataset_name not in self._datasets:
-            raise LookupError(f"Dataset not found: {dataset_name}")
+    def dataset_from_parsed_uri(self, uri: BenchmarkUri) -> Dataset:
+        """Get a dataset.
 
-        return self._datasets[dataset_name]
+        Return the corresponding :meth:`Dataset
+        <compiler_gym.datasets.Dataset>`. Name lookup will succeed whether or
+        not the dataset is deprecated.
+
+        :param uri: A parsed URI.
+
+        :return: A :meth:`Dataset <compiler_gym.datasets.Dataset>` instance.
+
+        :raises LookupError: If :code:`dataset` is not found.
+        """
+        key = self._dataset_key_from_uri(uri)
+
+        if key not in self._datasets:
+            raise LookupError(f"Dataset not found: {key}")
+
+        return self._datasets[key]
+
+    @staticmethod
+    def _dataset_key_from_uri(uri: BenchmarkUri) -> str:
+        if not (uri.scheme and uri.dataset):
+            raise ValueError(f"Invalid benchmark URI: '{uri}'")
+        return f"{uri.scheme}://{uri.dataset}"
 
     def __getitem__(self, dataset: str) -> Dataset:
         """Lookup a dataset.
@@ -155,11 +179,11 @@ class Datasets:
         :param key: The name of the dataset.
         :param dataset: The dataset to add.
         """
-        dataset_name = resolve_uri_protocol(key)
+        key = self._dataset_key_from_uri(BenchmarkUri.from_string(key))
 
-        self._datasets[dataset_name] = dataset
+        self._datasets[key] = dataset
         if not dataset.deprecated:
-            self._visible_datasets.add(dataset_name)
+            self._visible_datasets.add(key)
 
     def __delitem__(self, dataset: str):
         """Remove a dataset from the collection.
@@ -173,10 +197,11 @@ class Datasets:
         :return: :code:`True` if the dataset was removed, :code:`False` if it
             was already removed.
         """
-        dataset_name = resolve_uri_protocol(dataset)
-        if dataset_name in self._visible_datasets:
-            self._visible_datasets.remove(dataset_name)
-        del self._datasets[dataset_name]
+        key = self._dataset_key_from_uri(BenchmarkUri.from_string(dataset))
+
+        if key in self._visible_datasets:
+            self._visible_datasets.remove(key)
+        del self._datasets[key]
 
     def __contains__(self, dataset: str) -> bool:
         """Returns whether the dataset is contained."""
@@ -242,16 +267,40 @@ class Datasets:
         :return: A :class:`Benchmark <compiler_gym.datasets.Benchmark>`
             instance.
         """
-        uri = resolve_uri_protocol(uri)
+        return self.benchmark_from_parsed_uri(BenchmarkUri.from_string(uri))
 
-        match = BENCHMARK_URI_RE.match(uri)
-        if not match:
-            raise ValueError(f"Invalid benchmark URI: '{uri}'")
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
+        """Select a benchmark.
 
-        dataset_name = match.group("dataset")
-        dataset = self._datasets[dataset_name]
+        Returns the corresponding :class:`Benchmark
+        <compiler_gym.datasets.Benchmark>`, regardless of whether the containing
+        dataset is installed or deprecated.
 
-        return dataset.benchmark(uri)
+        :param uri: The parsed URI of the benchmark to return.
+
+        :return: A :class:`Benchmark <compiler_gym.datasets.Benchmark>`
+            instance.
+        """
+        if uri.scheme == "proto":
+            path = Path(os.path.normpath(f"{uri.dataset}/{uri.path}"))
+            if not path.is_file():
+                raise FileNotFoundError(str(path))
+
+            proto = BenchmarkProto()
+            with open(path, "rb") as f:
+                proto.ParseFromString(f.read())
+
+            return Benchmark(proto=proto)
+
+        if uri.scheme == "file":
+            path = Path(os.path.normpath(f"{uri.dataset}/{uri.path}"))
+            if not path.is_file():
+                raise FileNotFoundError(str(path))
+
+            return Benchmark.from_file(uri=uri, path=path)
+
+        dataset = self.dataset_from_parsed_uri(uri)
+        return dataset.benchmark_from_parsed_uri(uri)
 
     def random_benchmark(
         self,

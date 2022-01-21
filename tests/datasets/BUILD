@@ -46,3 +46,14 @@ py_test(
         "//tests/pytest_plugins:common",
     ],
 )
+
+py_test(
+    name = "uri_test",
+    timeout = "short",
+    srcs = ["uri_test.py"],
+    deps = [
+        "//compiler_gym/datasets",
+        "//tests:test_main",
+        "//tests/pytest_plugins:common",
+    ],
+)

@@ -2,12 +2,13 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""This module demonstrates how to """
+"""This module defines and registers the example gym environments."""
 import subprocess
 from pathlib import Path
 from typing import Iterable
 
 from compiler_gym.datasets import Benchmark, Dataset
+from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.envs.llvm.llvm_benchmark import get_system_includes
 from compiler_gym.spaces import Reward
 from compiler_gym.third_party import llvm
@@ -89,11 +90,11 @@ class UnrollingDataset(Dataset):
         )
 
         self._benchmarks = {
-            "benchmark://unrolling-v0/offsets1": Benchmark.from_file_contents(
+            "/offsets1": Benchmark.from_file_contents(
                 "benchmark://unrolling-v0/offsets1",
                 self.preprocess(BENCHMARKS_PATH / "offsets1.c"),
             ),
-            "benchmark://unrolling-v0/conv2d": Benchmark.from_file_contents(
+            "/conv2d": Benchmark.from_file_contents(
                 "benchmark://unrolling-v0/conv2d",
                 self.preprocess(BENCHMARKS_PATH / "conv2d.c"),
             ),
@@ -122,11 +123,11 @@ class UnrollingDataset(Dataset):
         )
 
     def benchmark_uris(self) -> Iterable[str]:
-        yield from self._benchmarks.keys()
+        yield from (f"benchmark://unrolling-v0{k}" for k in self._benchmarks.keys())
 
-    def benchmark(self, uri: str) -> Benchmark:
-        if uri in self._benchmarks:
-            return self._benchmarks[uri]
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
+        if uri.path in self._benchmarks:
+            return self._benchmarks[uri.path]
         else:
             raise LookupError("Unknown program name")
 

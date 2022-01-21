@@ -20,6 +20,7 @@ from gym.spaces import Space
 
 from compiler_gym.compiler_env_state import CompilerEnvState
 from compiler_gym.datasets import Benchmark, Dataset, Datasets
+from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.service import (
     CompilerGymServiceConnection,
     ConnectionOpts,
@@ -28,6 +29,7 @@ from compiler_gym.service import (
     ServiceTransportError,
     SessionNotFound,
 )
+from compiler_gym.service.connection import ServiceIsClosed
 from compiler_gym.service.proto import Action, AddBenchmarkRequest
 from compiler_gym.service.proto import Benchmark as BenchmarkProto
 from compiler_gym.service.proto import (
@@ -330,18 +332,6 @@ class CompilerEnv(gym.Env):
 
     @property
     @deprecated(
-        version="0.1.8",
-        reason=(
-            "Use :meth:`env.datasets.datasets() <compiler_gym.datasets.Datasets.datasets>` instead. "
-            "`More information <https://github.com/facebookresearch/CompilerGym/issues/45>`_."
-        ),
-    )
-    def available_datasets(self) -> Dict[str, Dataset]:
-        """A dictionary of datasets."""
-        return {d.name: d for d in self.datasets}
-
-    @property
-    @deprecated(
         version="0.2.1",
         reason=(
             "The `CompilerEnv.logger` attribute is deprecated. All CompilerEnv "
@@ -461,7 +451,7 @@ class CompilerEnv(gym.Env):
         return self._benchmark_in_use
 
     @benchmark.setter
-    def benchmark(self, benchmark: Union[str, Benchmark]):
+    def benchmark(self, benchmark: Union[str, Benchmark, BenchmarkUri]):
         if self.in_episode:
             warnings.warn(
                 "Changing the benchmark has no effect until reset() is called"
@@ -473,6 +463,10 @@ class CompilerEnv(gym.Env):
         elif isinstance(benchmark, Benchmark):
             logger.debug("Setting benchmark: %s", benchmark.uri)
             self._next_benchmark = benchmark
+        elif isinstance(benchmark, BenchmarkUri):
+            benchmark_object = self.datasets.benchmark_from_parsed_uri(benchmark)
+            logger.debug("Setting benchmark by name: %s", benchmark_object)
+            self._next_benchmark = benchmark_object
         else:
             raise TypeError(
                 f"Expected a Benchmark or str, received: '{type(benchmark).__name__}'"
@@ -686,6 +680,10 @@ class CompilerEnv(gym.Env):
                 # not kill it.
                 if reply.remaining_sessions:
                     close_service = False
+            except ServiceIsClosed:
+                # This error can be safely ignored as it means that the service
+                # is already offline.
+                pass
             except Exception as e:
                 logger.warning(
                     "Failed to end active compiler session on close(): %s (%s)",
@@ -746,7 +744,7 @@ class CompilerEnv(gym.Env):
 
             if retry_count >= self._connection_settings.init_max_attempts:
                 raise OSError(
-                    f"Failed to reset environment after {retry_count - 1} attempts.\n"
+                    f"Failed to reset environment using benchmark {self.benchmark} after {retry_count - 1} attempts.\n"
                     f"Last error ({type(error).__name__}): {error}"
                 ) from error
             else:
@@ -811,7 +809,7 @@ class CompilerEnv(gym.Env):
         if self.service.opts.always_send_benchmark_on_reset:
             self._benchmark_in_use_proto = self._benchmark_in_use.proto
         else:
-            self._benchmark_in_use_proto.uri = self._benchmark_in_use.uri
+            self._benchmark_in_use_proto.uri = str(self._benchmark_in_use.uri)
 
         start_session_request = StartSessionRequest(
             benchmark=self._benchmark_in_use_proto,
@@ -1126,18 +1124,6 @@ class CompilerEnv(gym.Env):
             raise ValueError(f"Invalid mode: {mode}")
 
     @property
-    @deprecated(
-        version="0.1.8",
-        reason=(
-            "Use :meth:`env.datasets.benchmarks() <compiler_gym.datasets.Datasets.benchmarks>` instead. "
-            "`More information <https://github.com/facebookresearch/CompilerGym/issues/45>`_."
-        ),
-    )
-    def benchmarks(self) -> Iterable[str]:
-        """Enumerate a (possible unbounded) list of available benchmarks."""
-        return self.datasets.benchmark_uris()
-
-    @property
     def _observation_view_type(self):
         """Returns the type for observation views.
 
@@ -1152,76 +1138,6 @@ class CompilerEnv(gym.Env):
         Subclasses may override this to extend the default reward view.
         """
         return RewardView
-
-    @deprecated(
-        version="0.1.8",
-        reason=(
-            "Datasets are now installed automatically, there is no need to call :code:`require()`. "
-            "`More information <https://github.com/facebookresearch/CompilerGym/issues/45>`_."
-        ),
-    )
-    def require_datasets(self, datasets: List[Union[str, Dataset]]) -> bool:
-        """Deprecated function for managing datasets.
-
-        Datasets are now installed automatically. See :class:`env.datasets
-        <compiler_gym.datasets.Datasets>`.
-
-        :param datasets: A list of datasets to require. Each dataset is the name
-            of an available dataset, the URL of a dataset to download, or a
-            :class:`Dataset <compiler_gym.datasets.Dataset>` instance.
-
-        :return: :code:`True` if one or more datasets were downloaded, or
-            :code:`False` if all datasets were already available.
-        """
-        return False
-
-    @deprecated(
-        version="0.1.8",
-        reason=(
-            "Use :meth:`env.datasets.require() <compiler_gym.datasets.Datasets.require>` instead. "
-            "`More information <https://github.com/facebookresearch/CompilerGym/issues/45>`_."
-        ),
-    )
-    def require_dataset(self, dataset: Union[str, Dataset]) -> bool:
-        """Deprecated function for managing datasets.
-
-        Datasets are now installed automatically. See :class:`env.datasets
-        <compiler_gym.datasets.Datasets>`.
-
-        :param dataset: The name of the dataset to download, the URL of the
-            dataset, or a :class:`Dataset <compiler_gym.datasets.Dataset>`
-            instance.
-
-        :return: :code:`True` if the dataset was downloaded, or :code:`False` if
-            the dataset was already available.
-        """
-        return False
-
-    @deprecated(
-        version="0.1.8",
-        reason=(
-            "Use :meth:`env.datasets.add() <compiler_gym.datasets.Datasets.require>` instead. "
-            "`More information <https://github.com/facebookresearch/CompilerGym/issues/45>`_."
-        ),
-    )
-    def register_dataset(self, dataset: Dataset) -> bool:
-        """Register a new dataset.
-
-        Example usage:
-
-            >>> my_dataset = Dataset(name="my-dataset-v0", ...)
-            >>> env = gym.make("llvm-v0")
-            >>> env.register_dataset(my_dataset)
-            >>> env.benchmark = "my-dataset-v0/1"
-
-        :param dataset: A :class:`Dataset <compiler_gym.datasets.Dataset>`
-            instance describing the new dataset.
-
-        :return: :code:`True` if the dataset was added, else :code:`False`.
-
-        :raises ValueError: If a dataset with this name is already registered.
-        """
-        return self.datasets.add(dataset)
 
     def apply(self, state: CompilerEnvState) -> None:  # noqa
         """Replay this state on the given an environment.
@@ -1349,28 +1265,6 @@ class CompilerEnv(gym.Env):
             **validation,
         )
 
-    @deprecated(
-        version="0.1.8",
-        reason=(
-            "Use :meth:`env.validate() "
-            "<compiler_gym.datasets.Benchmark.validate>` instead. "
-            "`More information <https://github.com/facebookresearch/CompilerGym/issues/45>`_."
-        ),
-    )
-    def get_benchmark_validation_callback(
-        self,
-    ) -> Optional[Callable[["CompilerEnv"], Iterable[ValidationError]]]:
-        """Return a callback that validates benchmark semantics, if available."""
-
-        def composed(env):
-            for validation_cb in self.benchmark.validation_callbacks():
-                errors = validation_cb(env)
-                if errors:
-                    yield from errors
-
-        if self.benchmark.validation_callbacks():
-            return composed
-
     def send_param(self, key: str, value: str) -> str:
         """Send a single <key, value> parameter to the compiler service.
 
@@ -1428,3 +1322,12 @@ class CompilerEnv(gym.Env):
             )
 
         return list(reply.reply)
+
+    def __copy__(self) -> "CompilerEnv":
+        raise TypeError(
+            "CompilerEnv instances do not support shallow copies. Use deepcopy()"
+        )
+
+    def __deepcopy__(self, memo) -> "CompilerEnv":
+        del memo  # unused
+        return self.fork()

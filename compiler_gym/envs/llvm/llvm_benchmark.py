@@ -15,7 +15,7 @@ from typing import Iterable, List, Optional, Union
 
 from compiler_gym.datasets import Benchmark, BenchmarkInitError
 from compiler_gym.third_party import llvm
-from compiler_gym.util.commands import communicate, run_command
+from compiler_gym.util.commands import Popen, run_command
 from compiler_gym.util.runfiles_path import transient_cache_path
 from compiler_gym.util.thread_pool import get_thread_pool_executor
 
@@ -30,26 +30,26 @@ def get_compiler_includes(compiler: str) -> Iterable[Path]:
     # GNU assembler does not support piping to stdout.
     with tempfile.TemporaryDirectory() as d:
         try:
-            process = subprocess.Popen(
+            with Popen(
                 [compiler, "-xc++", "-v", "-c", "-", "-o", str(Path(d) / "a.out")],
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.PIPE,
                 stdin=subprocess.PIPE,
                 universal_newlines=True,
-            )
+            ) as process:
+                _, stderr = process.communicate(input="", timeout=30)
+                if process.returncode:
+                    raise OSError(
+                        f"Failed to invoke {compiler}. "
+                        f"Is there a working system compiler?\n"
+                        f"Error: {stderr.strip()}"
+                    )
         except FileNotFoundError as e:
             raise OSError(
                 f"Failed to invoke {compiler}. "
                 f"Is there a working system compiler?\n"
                 f"Error: {e}"
             ) from e
-        _, stderr = communicate(process, input="", timeout=30)
-    if process.returncode:
-        raise OSError(
-            f"Failed to invoke {compiler}. "
-            f"Is there a working system compiler?\n"
-            f"Error: {stderr.strip()}"
-        )
 
     # Parse the compiler output that matches the conventional output format
     # used by clang and GCC:
@@ -183,10 +183,34 @@ def make_benchmark(
 ) -> Benchmark:
     """Create a benchmark for use by LLVM environments.
 
-    This function takes one or more inputs and uses them to create a benchmark
-    that can be passed to :meth:`compiler_gym.envs.LlvmEnv.reset`.
+    This function takes one or more inputs and uses them to create an LLVM
+    bitcode benchmark that can be passed to
+    :meth:`compiler_gym.envs.LlvmEnv.reset`.
 
-    For single-source C/C++ programs, you can pass the path of the source file:
+    The following input types are supported:
+
+    +-----------------------------------------------------+---------------------+-------------------------------------------------------------+
+    | **File Suffix**                                     | **Treated as**      | **Converted using**                                         |
+    +-----------------------------------------------------+---------------------+-------------------------------------------------------------+
+    | :code:`.bc`                                         | LLVM IR bitcode     | No conversion required.                                     |
+    +-----------------------------------------------------+---------------------+-------------------------------------------------------------+
+    | :code:`.ll`                                         | LLVM IR text format | Assembled to bitcode using llvm-as.                         |
+    +-----------------------------------------------------+---------------------+-------------------------------------------------------------+
+    | :code:`.c`, :code:`.cc`, :code:`.cpp`, :code:`.cxx` | C / C++ source      | Compiled to bitcode using clang and the given :code:`copt`. |
+    +-----------------------------------------------------+---------------------+-------------------------------------------------------------+
+
+    .. note::
+
+        The LLVM IR format has no compatability guarantees between versions (see
+        `LLVM docs
+        <https://llvm.org/docs/DeveloperPolicy.html#ir-backwards-compatibility>`_).
+        You must ensure that any :code:`.bc` and :code:`.ll` files are
+        compatible with the LLVM version used by CompilerGym, which can be
+        reported using :func:`env.compiler_version
+        <compiler_gym.envs.CompilerEnv.compiler_version>`.
+
+    E.g. for single-source C/C++ programs, you can pass the path of the source
+    file:
 
         >>> benchmark = make_benchmark('my_app.c')
         >>> env = gym.make("llvm-v0")
@@ -209,7 +233,7 @@ def make_benchmark(
     clang:
 
         >>> benchmark = make_benchmark(
-            ClangInvocation(['/path/to/my_app.c'], timeout=10)
+            ClangInvocation(['/path/to/my_app.c'], system_includes=False, timeout=10)
         )
 
     For multi-file programs, pass a list of inputs that will be compiled
@@ -219,27 +243,8 @@ def make_benchmark(
             'main.c',
             'lib.cpp',
             'lib2.bc',
+            'foo/input.bc'
         ])
-
-    If you already have prepared bitcode files, those can be linked and used
-    directly:
-
-        >>> benchmark = make_benchmark([
-            'bitcode1.bc',
-            'bitcode2.bc',
-        ])
-
-    Text-format LLVM assembly can also be used:
-
-        >>> benchmark = make_benchmark('module.ll')
-
-    .. note::
-
-        LLVM bitcode compatibility is
-        `not guaranteed <https://llvm.org/docs/DeveloperPolicy.html#ir-backwards-compatibility>`_,
-        so you must ensure that any precompiled bitcodes are compatible with the
-        LLVM version used by CompilerGym, which can be queried using
-        :func:`env.compiler_version <compiler_gym.envs.CompilerEnv.compiler_version>`.
 
     :param inputs: An input, or list of inputs.
 
@@ -259,7 +264,9 @@ def make_benchmark(
 
     :raises TypeError: If the inputs are of unsupported types.
 
-    :raises OSError: If a compilation job fails.
+    :raises OSError: If a suitable compiler cannot be found.
+
+    :raises BenchmarkInitError: If a compilation job fails.
 
     :raises TimeoutExpired: If a compilation job exceeds :code:`timeout`
         seconds.
@@ -275,8 +282,8 @@ def make_benchmark(
             raise FileNotFoundError(path)
 
         if path.suffix == ".bc":
-            bitcodes.append(path)
-        elif path.suffix in {".c", ".cxx", ".cpp", ".cc"}:
+            bitcodes.append(path.absolute())
+        elif path.suffix in {".c", ".cc", ".cpp", ".cxx"}:
             clang_jobs.append(
                 ClangInvocation.from_c_file(
                     path, copt=copt, system_includes=system_includes, timeout=timeout
@@ -303,9 +310,9 @@ def make_benchmark(
                 raise TypeError(f"Invalid input type: {type(input).__name__}")
 
     # Shortcut if we only have a single pre-compiled bitcode.
-    if len(bitcodes) == 1 and not clang_jobs:
+    if len(bitcodes) == 1 and not clang_jobs and not ll_paths:
         bitcode = bitcodes[0]
-        return Benchmark.from_file(uri=f"file:///{bitcode}", path=bitcode)
+        return Benchmark.from_file(uri=f"benchmark://file-v0{bitcode}", path=bitcode)
 
     tmpdir_root = transient_cache_path(".")
     tmpdir_root.mkdir(exist_ok=True, parents=True)
@@ -366,15 +373,15 @@ def make_benchmark(
             llvm_link_cmd = [str(llvm.llvm_link_path()), "-o", "-"] + [
                 str(path) for path in bitcodes + clang_outs
             ]
-            llvm_link = subprocess.Popen(
+            with Popen(
                 llvm_link_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-            )
-            bitcode, stderr = communicate(llvm_link, timeout=timeout)
-            if llvm_link.returncode:
-                raise BenchmarkInitError(
-                    f"Failed to link LLVM bitcodes with error: {stderr.decode('utf-8')}"
-                )
+            ) as llvm_link:
+                bitcode, stderr = llvm_link.communicate(timeout=timeout)
+                if llvm_link.returncode:
+                    raise BenchmarkInitError(
+                        f"Failed to link LLVM bitcodes with error: {stderr.decode('utf-8')}"
+                    )
 
     timestamp = datetime.now().strftime("%Y%m%HT%H%M%S")
-    uri = f"benchmark://user/{timestamp}-{random.randrange(16**4):04x}"
+    uri = f"benchmark://user-v0/{timestamp}-{random.randrange(16**4):04x}"
     return Benchmark.from_file_contents(uri, bitcode)

@@ -27,6 +27,16 @@ py_test(
 )
 
 py_test(
+    name = "env_copy_test",
+    srcs = ["env_copy_test.py"],
+    deps = [
+        "//compiler_gym/envs",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "make_test",
     timeout = "short",
     srcs = ["make_test.py"],

@@ -102,11 +102,11 @@ py_repositories()
 
 http_archive(
     name = "rules_proto",
-    sha256 = "8e7d59a5b12b233be5652e3d29f42fba01c7cbab09f6b3a8d0a57ed6d1e9a0da",
-    strip_prefix = "rules_proto-7e4afce6fe62dbff0a4a03450143146f9f2d7488",
+    sha256 = "66bfdf8782796239d3875d37e7de19b1d94301e8972b3cbd2446b332429b4df1",
+    strip_prefix = "rules_proto-4.0.0",
     urls = [
-        "https://mirror.bazel.build/github.com/bazelbuild/rules_proto/archive/7e4afce6fe62dbff0a4a03450143146f9f2d7488.tar.gz",
-        "https://github.com/bazelbuild/rules_proto/archive/7e4afce6fe62dbff0a4a03450143146f9f2d7488.tar.gz",
+        "https://mirror.bazel.build/github.com/bazelbuild/rules_proto/archive/refs/tags/4.0.0.tar.gz",
+        "https://github.com/bazelbuild/rules_proto/archive/refs/tags/4.0.0.tar.gz",
     ],
 )
 
@@ -285,9 +285,9 @@ http_file(
 http_archive(
     name = "cpuinfo",
     build_file_content = all_content,
-    sha256 = "18a99130ced1eaacab2ba8f75a1435f9955aab54fa0436b60468f020876ee902",
-    strip_prefix = "cpuinfo-63b254577ed77a8004a9be6ac707f3dccc4e1fd9",
-    urls = ["https://github.com/pytorch/cpuinfo/archive/63b254577ed77a8004a9be6ac707f3dccc4e1fd9.tar.gz"],
+    sha256 = "b9874dbb2f9436c9d0d7f42aaf3f94f1af3da37bc0b250268760ada2507ca543",
+    strip_prefix = "cpuinfo-2e79955ecaec85da13ac8f1245a8b2afa10d31c2",
+    urls = ["https://github.com/pytorch/cpuinfo/archive/2e79955ecaec85da13ac8f1245a8b2afa10d31c2.tar.gz"],
 )
 
 # === Csmith ===

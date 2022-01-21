@@ -32,7 +32,7 @@ EXAMPLE_BITCODE_IR_INSTRUCTION_COUNT = 242
 def test_reset_invalid_benchmark(env: LlvmEnv):
     invalid_benchmark = "an invalid benchmark"
     with pytest.raises(
-        ValueError, match=f"Invalid benchmark URI: 'benchmark://{invalid_benchmark}'"
+        LookupError, match=f"Dataset not found: benchmark://{invalid_benchmark}"
     ):
         env.reset(benchmark=invalid_benchmark)
 
@@ -82,10 +82,10 @@ def test_invalid_benchmark_path_contents(env: LlvmEnv):
             env.reset(benchmark=benchmark)
 
 
-def test_benchmark_path_invalid_protocol(env: LlvmEnv):
+def test_benchmark_path_invalid_scheme(env: LlvmEnv):
     benchmark = Benchmark(
         BenchmarkProto(
-            uri="benchmark://new", program=File(uri="invalid_protocol://test")
+            uri="benchmark://new", program=File(uri="invalid_scheme://test")
         ),
     )
 
@@ -93,7 +93,7 @@ def test_benchmark_path_invalid_protocol(env: LlvmEnv):
         ValueError,
         match=(
             "Invalid benchmark data URI. "
-            'Only the file:/// protocol is supported: "invalid_protocol://test"'
+            'Only the file:/// scheme is supported: "invalid_scheme://test"'
         ),
     ):
         env.reset(benchmark=benchmark)
@@ -115,7 +115,9 @@ def test_custom_benchmark_constructor():
 def test_make_benchmark_single_bitcode(env: LlvmEnv):
     benchmark = llvm.make_benchmark(EXAMPLE_BITCODE_FILE)
 
-    assert benchmark == f"file:///{EXAMPLE_BITCODE_FILE}"
+    assert benchmark == f"benchmark://file-v0{EXAMPLE_BITCODE_FILE}"
+    assert benchmark.uri.scheme == "benchmark"
+    assert benchmark.uri.dataset == "file-v0"
 
     with open(EXAMPLE_BITCODE_FILE, "rb") as f:
         contents = f.read()
@@ -131,7 +133,9 @@ def test_make_benchmark_single_bitcode(env: LlvmEnv):
 def test_make_benchmark_single_ll():
     """Test passing a single .ll file into make_benchmark()."""
     benchmark = llvm.make_benchmark(INVALID_IR_PATH)
-    assert benchmark.uri.startswith("benchmark://user/")
+    assert benchmark.uri.startswith("benchmark://user-v0/")
+    assert benchmark.uri.scheme == "benchmark"
+    assert benchmark.uri.dataset == "user-v0"
 
 
 def test_make_benchmark_single_clang_job(env: LlvmEnv):

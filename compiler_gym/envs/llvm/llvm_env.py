@@ -317,13 +317,36 @@ class LlvmEnv(CompilerEnv):
     ) -> Benchmark:
         """Create a benchmark for use with this environment.
 
-        This function takes one or more inputs and uses them to create a
-        benchmark that can be passed to :meth:`compiler_gym.envs.LlvmEnv.reset`.
+        This function takes one or more inputs and uses them to create an LLVM
+        bitcode benchmark that can be passed to
+        :meth:`compiler_gym.envs.LlvmEnv.reset`.
 
-        For single-source C/C++ programs, you can pass the path of the source
+        The following input types are supported:
+
+        +-----------------------------------------------------+---------------------+-------------------------------------------------------------+
+        | **File Suffix**                                     | **Treated as**      | **Converted using**                                         |
+        +-----------------------------------------------------+---------------------+-------------------------------------------------------------+
+        | :code:`.bc`                                         | LLVM IR bitcode     | No conversion required.                                     |
+        +-----------------------------------------------------+---------------------+-------------------------------------------------------------+
+        | :code:`.ll`                                         | LLVM IR text format | Assembled to bitcode using llvm-as.                         |
+        +-----------------------------------------------------+---------------------+-------------------------------------------------------------+
+        | :code:`.c`, :code:`.cc`, :code:`.cpp`, :code:`.cxx` | C / C++ source      | Compiled to bitcode using clang and the given :code:`copt`. |
+        +-----------------------------------------------------+---------------------+-------------------------------------------------------------+
+
+        .. note::
+
+            The LLVM IR format has no compatability guarantees between versions (see
+            `LLVM docs
+            <https://llvm.org/docs/DeveloperPolicy.html#ir-backwards-compatibility>`_).
+            You must ensure that any :code:`.bc` and :code:`.ll` files are
+            compatible with the LLVM version used by CompilerGym, which can be
+            reported using :func:`env.compiler_version
+            <compiler_gym.envs.CompilerEnv.compiler_version>`.
+
+        E.g. for single-source C/C++ programs, you can pass the path of the source
         file:
 
-            >>> benchmark = make_benchmark('my_app.c')
+            >>> benchmark = env.make_benchmark('my_app.c')
             >>> env = gym.make("llvm-v0")
             >>> env.reset(benchmark=benchmark)
 
@@ -336,41 +359,26 @@ class LlvmEnv(CompilerEnv):
         Additional compile-time arguments to clang can be provided using the
         :code:`copt` argument:
 
-            >>> benchmark = make_benchmark('/path/to/my_app.cpp', copt=['-O2'])
+            >>> benchmark = env.make_benchmark('/path/to/my_app.cpp', copt=['-O2'])
 
         If you need more fine-grained control over the options, you can directly
         construct a :class:`ClangInvocation
         <compiler_gym.envs.llvm.ClangInvocation>` to pass a list of arguments to
         clang:
 
-            >>> benchmark = make_benchmark(
-                ClangInvocation(['/path/to/my_app.c'], timeout=10)
+            >>> benchmark = env.make_benchmark(
+                ClangInvocation(['/path/to/my_app.c'], system_includes=False, timeout=10)
             )
 
         For multi-file programs, pass a list of inputs that will be compiled
         separately and then linked to a single module:
 
-            >>> benchmark = make_benchmark([
+            >>> benchmark = env.make_benchmark([
                 'main.c',
                 'lib.cpp',
                 'lib2.bc',
+                'foo/input.bc'
             ])
-
-        If you already have prepared bitcode files, those can be linked and used
-        directly:
-
-            >>> benchmark = make_benchmark([
-                'bitcode1.bc',
-                'bitcode2.bc',
-            ])
-
-        .. note::
-
-            LLVM bitcode compatibility is
-            `not guaranteed <https://llvm.org/docs/DeveloperPolicy.html#ir-backwards-compatibility>`_,
-            so you must ensure that any precompiled bitcodes are compatible with the
-            LLVM version used by CompilerGym, which can be queried using
-            :func:`LlvmEnv.compiler_version <compiler_gym.envs.CompilerEnv.compiler_version>`.
 
         :param inputs: An input, or list of inputs.
 
@@ -390,7 +398,9 @@ class LlvmEnv(CompilerEnv):
 
         :raises TypeError: If the inputs are of unsupported types.
 
-        :raises OSError: If a compilation job fails.
+        :raises OSError: If a suitable compiler cannot be found.
+
+        :raises BenchmarkInitError: If a compilation job fails.
 
         :raises TimeoutExpired: If a compilation job exceeds :code:`timeout`
             seconds.

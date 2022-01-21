@@ -62,6 +62,10 @@ class BenchmarkFactory {
     return instance;
   }
 
+  ~BenchmarkFactory();
+
+  void close();
+
   /**
    * Get the requested named benchmark.
    *

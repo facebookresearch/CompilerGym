@@ -33,8 +33,8 @@ import sys
 from pathlib import Path
 from typing import Dict, Iterable, List, Optional, Tuple
 
-from compiler_gym.envs.llvm.service.passes.common import Pass
-from compiler_gym.envs.llvm.service.passes.config import CREATE_PASS_NAME_MAP
+from common import Pass
+from config import CREATE_PASS_NAME_MAP
 
 logger = logging.getLogger(__name__)
 
@@ -242,10 +242,17 @@ def main(argv):
     else:
         # Get the names of all files which contain a pass definition.
         matching_paths = []
-        grep = subprocess.check_output(
-            ["grep", "-l", "-E", rf"^\s*{INITIALIZE_PASS_RE}", "-R", "lib/"],
-            universal_newlines=True,
-        )
+        try:
+            grep = subprocess.check_output(
+                ["grep", "-l", "-E", rf"^\s*{INITIALIZE_PASS_RE}", "-R", "lib/"],
+                universal_newlines=True,
+            )
+        except subprocess.CalledProcessError:
+            print(
+                f"fatal: Failed to find any LLVM pass declarations in {root}",
+                file=sys.stderr,
+            )
+            sys.exit(1)
         matching_paths += grep.strip().split("\n")
         logger.debug("Processing %s files ...", len(matching_paths))
         paths = [Path(path) for path in matching_paths]

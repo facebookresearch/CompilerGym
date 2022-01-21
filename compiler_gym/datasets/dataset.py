@@ -4,17 +4,20 @@
 # LICENSE file in the root directory of this source tree.
 import logging
 import os
+import re
 import shutil
 import warnings
 from pathlib import Path
 from typing import Dict, Iterable, Optional, Union
 
 import numpy as np
-from deprecated.sphinx import deprecated
+
+# The "deprecated" name is used as a constructor argument to Dataset, so rename
+# this import to prevent shadowing.
 from deprecated.sphinx import deprecated as mark_deprecated
 
 from compiler_gym.datasets.benchmark import Benchmark
-from compiler_gym.datasets.uri import DATASET_NAME_RE
+from compiler_gym.datasets.uri import BenchmarkUri
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +25,9 @@ logger = logging.getLogger(__name__)
 # deprecated Dataset.logger attribute. This can be removed once the logger
 # attribute is removed, scheduled for release 0.2.3.
 _logger = logger
+
+_DATASET_VERSION_PATTERN = r"[a-zA-z0-9-_]+-v(?P<version>[0-9]+)"
+_DATASET_VERSION_RE = re.compile(_DATASET_VERSION_PATTERN)
 
 
 class Dataset:
@@ -45,7 +51,7 @@ class Dataset:
         name: str,
         description: str,
         license: str,  # pylint: disable=redefined-builtin
-        site_data_base: Path,
+        site_data_base: Optional[Path] = None,
         benchmark_class=Benchmark,
         references: Optional[Dict[str, str]] = None,
         deprecated: Optional[str] = None,
@@ -54,15 +60,22 @@ class Dataset:
     ):
         """Constructor.
 
-        :param name: The name of the dataset. Must conform to the pattern
-            :code:`{{protocol}}://{{name}}-v{{version}}`.
+        :param name: The name of the dataset, in the format:
+            :code:`scheme://name`.
 
         :param description: A short human-readable description of the dataset.
 
         :param license: The name of the dataset's license.
 
-        :param site_data_base: The base path of a directory that will be used to
-            store installed files.
+        :param site_data_base: An optional directory that can be used by the
+            dataset to house the "site data", i.e. persistent files on disk. The
+            site data directory is a subdirectory of this :code:`site_data_base`
+            path, which can be shared by multiple datasets. If not provided, the
+            :attr:`dataset.site_data_path
+            <compiler_gym.datasets.Dataset.site_data_path>` attribute will raise
+            an error. Use :attr:`dataset.has_site_data
+            <compiler_gym.datasets.Dataset.has_site_data>` to check if a site
+            data path was set.
 
         :param benchmark_class: The class to use when instantiating benchmarks.
             It must have the same constructor signature as :class:`Benchmark
@@ -92,16 +105,15 @@ class Dataset:
         :raises ValueError: If :code:`name` does not match the expected type.
         """
         self._name = name
-        components = DATASET_NAME_RE.match(name)
-        if not components:
-            raise ValueError(
-                f"Invalid dataset name: '{name}'. "
-                "Dataset name must be in the form: '{{protocol}}://{{name}}-v{{version}}'"
-            )
+
+        uri = BenchmarkUri.from_string(name)
+
         self._description = description
         self._license = license
-        self._protocol = components.group("dataset_protocol")
-        self._version = int(components.group("dataset_version"))
+        self._scheme = uri.scheme
+
+        match = _DATASET_VERSION_RE.match(uri.dataset)
+        self._version = int(match.group("version") if match else 0)
         self._references = references or {}
         self._deprecation_message = deprecated
         self._validatable = validatable
@@ -110,14 +122,16 @@ class Dataset:
         self.benchmark_class = benchmark_class
 
         # Set up the site data name.
-        basename = components.group("dataset_name")
-        self._site_data_path = Path(site_data_base).resolve() / self.protocol / basename
+        if site_data_base:
+            self._site_data_path = (
+                Path(site_data_base).resolve() / uri.scheme / uri.dataset
+            )
 
     def __repr__(self):
         return self.name
 
     @property
-    @deprecated(
+    @mark_deprecated(
         version="0.2.1",
         reason=(
             "The `Dataset.logger` attribute is deprecated. All Dataset "
@@ -156,16 +170,27 @@ class Dataset:
         return self._license
 
     @property
+    @mark_deprecated(
+        version="0.2.2", reason="The `protocol` attribute has been renamed `scheme`"
+    )
     def protocol(self) -> str:
-        """The URI protocol that is used to identify benchmarks in this dataset.
+        """The URI scheme that is used to identify benchmarks in this dataset.
 
         :type: str
         """
-        return self._protocol
+        return self.scheme
+
+    @property
+    def scheme(self) -> str:
+        """The URI scheme that is used to identify benchmarks in this dataset.
+
+        :type: str
+        """
+        return self._scheme
 
     @property
     def version(self) -> int:
-        """The version tag for this dataset.
+        """The version tag for this dataset. Defaults to zero.
 
         :type: int
         """
@@ -213,13 +238,26 @@ class Dataset:
         return self._validatable
 
     @property
+    def has_site_data(self) -> bool:
+        """Return whether the dataset has a site data directory.
+
+        :type: bool
+        """
+        return hasattr(self, "_site_data_path")
+
+    @property
     def site_data_path(self) -> Path:
         """The filesystem path used to store persistent dataset files.
 
         This directory may not exist.
 
         :type: Path
+
+        :raises ValueError: If no site data path was specified at constructor
+            time.
         """
+        if not self.has_site_data:
+            raise ValueError(f"Dataset has no site data path: {self.name}")
         return self._site_data_path
 
     @property
@@ -228,6 +266,9 @@ class Dataset:
 
         :type: int
         """
+        if not self.has_site_data:
+            return 0
+
         if not self.site_data_path.is_dir():
             return 0
 
@@ -314,7 +355,7 @@ class Dataset:
         <compiler_gym.datasets.Dataset.install>`. The dataset can still be used
         after calling this method.
         """
-        if self.site_data_path.is_dir():
+        if self.has_site_data() and self.site_data_path.is_dir():
             shutil.rmtree(self.site_data_path)
 
     def benchmarks(self) -> Iterable[Benchmark]:
@@ -367,6 +408,24 @@ class Dataset:
         """
         raise NotImplementedError("abstract class")
 
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
+        """Select a benchmark.
+
+        Subclasses must implement this method. Implementors may assume that the
+        URI is well formed and that the :code:`scheme` and :code:`dataset`
+        components are correct.
+
+        :param uri: The parsed URI of the benchmark to return.
+
+        :return: A :class:`Benchmark <compiler_gym.datasets.Benchmark>`
+            instance.
+
+        :raise LookupError: If :code:`uri` is not found.
+
+        :raise ValueError: If the URI is invalid.
+        """
+        raise NotImplementedError("abstract class")
+
     def benchmark(self, uri: str) -> Benchmark:
         """Select a benchmark.
 
@@ -376,8 +435,10 @@ class Dataset:
             instance.
 
         :raise LookupError: If :code:`uri` is not found.
+
+        :raise ValueError: If the URI is invalid.
         """
-        raise NotImplementedError("abstract class")
+        return self.benchmark_from_parsed_uri(BenchmarkUri.from_string(uri))
 
     def random_benchmark(
         self, random_state: Optional[np.random.Generator] = None

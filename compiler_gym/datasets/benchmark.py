@@ -6,6 +6,7 @@ from concurrent.futures import as_completed
 from pathlib import Path
 from typing import Callable, Iterable, List, NamedTuple, Optional, Union
 
+from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.service.proto import Benchmark as BenchmarkProto
 from compiler_gym.service.proto import File
 from compiler_gym.util import thread_pool
@@ -102,7 +103,7 @@ class Benchmark:
         return hash(self.uri)
 
     @property
-    def uri(self) -> str:
+    def uri(self) -> BenchmarkUri:
         """The URI of the benchmark.
 
         Benchmark URIs should be unique, that is, that two URIs with the same
@@ -112,7 +113,7 @@ class Benchmark:
 
         :return: A URI string. :type: string
         """
-        return self._proto.uri
+        return BenchmarkUri.from_string(self._proto.uri)
 
     @property
     def proto(self) -> BenchmarkProto:
@@ -263,7 +264,7 @@ class Benchmark:
         return len(uniq_paths)
 
     @classmethod
-    def from_file(cls, uri: str, path: Path):
+    def from_file(cls, uri: Union[str, BenchmarkUri], path: Path):
         """Construct a benchmark from a file.
 
         :param uri: The URI of the benchmark.
@@ -284,10 +285,10 @@ class Benchmark:
         # don't share a filesystem.
         with open(path, "rb") as f:
             contents = f.read()
-        return cls(proto=BenchmarkProto(uri=uri, program=File(contents=contents)))
+        return cls(proto=BenchmarkProto(uri=str(uri), program=File(contents=contents)))
 
     @classmethod
-    def from_file_contents(cls, uri: str, data: bytes):
+    def from_file_contents(cls, uri: Union[str, BenchmarkUri], data: bytes):
         """Construct a benchmark from raw data.
 
         :param uri: The URI of the benchmark.
@@ -295,7 +296,7 @@ class Benchmark:
         :param data: An array of bytes that will be passed to the compiler
             service.
         """
-        return cls(proto=BenchmarkProto(uri=uri, program=File(contents=data)))
+        return cls(proto=BenchmarkProto(uri=str(uri), program=File(contents=data)))
 
     def __eq__(self, other: Union[str, "Benchmark"]):
         if isinstance(other, Benchmark):

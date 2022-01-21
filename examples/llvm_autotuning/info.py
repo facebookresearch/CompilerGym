@@ -33,14 +33,23 @@ def info(
     log_dirs: List[Path] = ["~/logs/compiler_gym/llvm_autotuning"],
     all_runs: bool = False,
     group_by_working_directory: bool = False,
+    only_nonzero_reward: bool = False,
 ):
     experiments = experiments_from_paths(log_dirs)
 
     results = []
     for experiment in experiments:
         df = experiment.dataframe
+
+        # Exclude runs where reward was zero, used for pruning false results if
+        # the environment is flaky or can fail.
+        if only_nonzero_reward:
+            df = df[df.reward != 0]
+
         if not len(df):
             continue
+
+        df.to_csv(experiment.working_directory / "results.csv", index=False)
 
         walltimes = df[["benchmark", "walltime"]].groupby("benchmark").mean()
         rewards = df[["benchmark", "reward"]].groupby("benchmark").agg(geometric_mean)

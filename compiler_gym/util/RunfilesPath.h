@@ -22,4 +22,11 @@ boost::filesystem::path getRunfilesPath(const std::string& relPath);
  */
 boost::filesystem::path getSiteDataPath(const std::string& relPath);
 
+/**
+ * Resolve the root of the cache path.
+ *
+ * @return boost::filesystem::path A path.
+ */
+boost::filesystem::path getCacheRootPath();
+
 }  // namespace compiler_gym::util

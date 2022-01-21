@@ -2,10 +2,12 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+import os
 from pathlib import Path
 from typing import Iterable
 
 from compiler_gym.datasets import Benchmark, TarDatasetWithManifest
+from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.envs.gcc.gcc import Gcc
 from compiler_gym.util.decorators import memoized_property
 from compiler_gym.util.filesystem import atomic_file_write
@@ -82,12 +84,8 @@ class CHStoneDataset(TarDatasetWithManifest):
         # expensive.
         return Gcc(bin=self.gcc_bin)
 
-    def benchmark(self, uri: str) -> Benchmark:
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
         self.install()
-
-        benchmark_name = uri[len(self.name) + 1 :]
-        if not benchmark_name:
-            raise LookupError(f"No benchmark specified: {uri}")
 
         # Most of the source files are named after the parent directory, but not
         # all.
@@ -96,8 +94,8 @@ class CHStoneDataset(TarDatasetWithManifest):
             "motion": "mpeg2.c",
             "sha": "sha_driver.c",
             "jpeg": "main.c",
-        }.get(benchmark_name, f"{benchmark_name}.c")
-        source_dir_path = self.dataset_root / benchmark_name
+        }.get(uri.path[1:], f"{uri.path[1:]}.c")
+        source_dir_path = Path(os.path.normpath(f"{self.dataset_root}/{uri.path}"))
         source_path = source_dir_path / c_file_name
         preprocessed_path = source_dir_path / "src.c"
 
@@ -112,7 +110,7 @@ class CHStoneDataset(TarDatasetWithManifest):
                 # TODO(github.com/facebookresearch/CompilerGym/issues/325): Send
                 # over the unprocessed code to the service, have the service
                 # preprocess. Until then, we do it client side with GCC having
-                # to fixed by an environment variable
+                # to be fixed by an environment variable.
                 self.gcc(
                     "-E",
                     "-o",

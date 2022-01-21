@@ -7,8 +7,7 @@ from typing import Iterable, List, Union
 
 from pydantic import BaseModel, Field, root_validator, validator
 
-from compiler_gym.datasets import Benchmark
-from compiler_gym.datasets.uri import BENCHMARK_URI_RE, DATASET_NAME_PATTERN
+from compiler_gym.datasets import Benchmark, BenchmarkUri
 from compiler_gym.envs.llvm import LlvmEnv
 
 
@@ -17,7 +16,7 @@ class BenchmarksEntry(BaseModel):
 
     # === Start of fields list. ===
 
-    dataset: str = Field(default=None, allow_mutation=False, regex=DATASET_NAME_PATTERN)
+    dataset: str = Field(default=None, allow_mutation=False)
     """The name of a dataset to iterate over. If set, benchmarks are produced
     by iterating over this dataset in order. If not set, the :code:`uris` list
     must be provided.
@@ -62,7 +61,8 @@ class BenchmarksEntry(BaseModel):
         del kwargs
         del values
         for uri in value:
-            assert BENCHMARK_URI_RE.match(uri), f"Invalid benchmark URI: {uri}"
+            uri = BenchmarkUri.from_string(uri)
+            assert uri.scheme and uri.dataset, f"Invalid benchmark URI: {uri}"
         return list(value)
 
     def _benchmark_iterator(

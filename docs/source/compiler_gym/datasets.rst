@@ -12,6 +12,13 @@ that can be installed and made available for use.
 .. currentmodule:: compiler_gym.datasets
 
 
+BenchmarkUri
+------------
+
+.. autoclass:: BenchmarkUri
+  :members:
+
+
 Benchmark
 ---------
 

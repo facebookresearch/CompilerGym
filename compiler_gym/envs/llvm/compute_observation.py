@@ -4,13 +4,13 @@
 # LICENSE file in the root directory of this source tree.
 """This module defines a utility function for computing LLVM observations."""
 import subprocess
-import sys
 from pathlib import Path
 from typing import List
 
 import google.protobuf.text_format
 
 from compiler_gym.service.proto import Observation
+from compiler_gym.util.commands import Popen
 from compiler_gym.util.gym_type_hints import ObservationType
 from compiler_gym.util.runfiles_path import runfiles_path
 from compiler_gym.util.shell_format import plural
@@ -74,36 +74,29 @@ def compute_observation(
 
     observation_space_name = pascal_case_to_enum(observation_space.id)
 
-    process = subprocess.Popen(
-        [str(_COMPUTE_OBSERVATION_BIN), observation_space_name, str(bitcode)],
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-
     try:
-        stdout, stderr = process.communicate(timeout=timeout)
+        with Popen(
+            [str(_COMPUTE_OBSERVATION_BIN), observation_space_name, str(bitcode)],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+        ) as process:
+            stdout, stderr = process.communicate(timeout=timeout)
+
+            if process.returncode:
+                try:
+                    stderr = stderr.decode("utf-8")
+                    raise ValueError(
+                        f"Failed to compute {observation_space.id} observation: {stderr}"
+                    )
+                except UnicodeDecodeError as e:
+                    raise ValueError(
+                        f"Failed to compute {observation_space.id} observation"
+                    ) from e
     except subprocess.TimeoutExpired as e:
-        # kill() was added in Python 3.7.
-        if sys.version_info >= (3, 7, 0):
-            process.kill()
-        else:
-            process.terminate()
-        process.communicate(timeout=timeout)  # Wait for shutdown to complete.
         raise TimeoutError(
             f"Failed to compute {observation_space.id} observation in "
             f"{timeout:.1f} {plural(int(round(timeout)), 'second', 'seconds')}"
         ) from e
-
-    if process.returncode:
-        try:
-            stderr = stderr.decode("utf-8")
-            raise ValueError(
-                f"Failed to compute {observation_space.id} observation: {stderr}"
-            )
-        except UnicodeDecodeError as e:
-            raise ValueError(
-                f"Failed to compute {observation_space.id} observation"
-            ) from e
 
     try:
         stdout = stdout.decode("utf-8")

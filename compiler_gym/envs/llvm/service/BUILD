@@ -270,3 +270,55 @@ cc_library(
         "@programl//programl/proto:programl_cc",
     ],
 )
+
+# The strip-optnone-attribute binary is a utility for stripping the "optnone"
+# function attribute from LLVM bitcode files. It is used for preparing datasets
+# of bitcodes.
+
+filegroup(
+    name = "strip-optnone-attribute-files",
+    srcs = [
+        ":strip-optnone-attribute",
+    ] + select({
+        "@llvm//:darwin": [],
+        "//conditions:default": [
+            ":libLLVMPolly",
+        ],
+    }),
+)
+
+cc_binary(
+    name = "strip-optnone-attribute-prelinked",
+    srcs = ["StripOptNoneAttribute.cc"],
+    copts = [
+        "-DGOOGLE_PROTOBUF_NO_RTTI",
+        "-fno-rtti",
+    ],
+    deps = [
+        ":BenchmarkFactory",
+        "//compiler_gym/service/proto:compiler_gym_service_cc",
+        "//compiler_gym/util:GrpcStatusMacros",
+        "@boost//:filesystem",
+        "@glog",
+        "@llvm//10.0.0",
+        "@magic_enum",
+    ],
+)
+
+genrule(
+    name = "strip-optnone-bin",
+    srcs = [":strip-optnone-attribute-prelinked"],
+    outs = ["strip-optnone-attribute"],
+    cmd = select({
+        "@llvm//:darwin": (
+            "cp $(location :strip-optnone-attribute-prelinked) $@"
+        ),
+        "//conditions:default": (
+            "cp $(location :strip-optnone-attribute-prelinked) $@ && " +
+            "chmod 666 $@ && " +
+            "patchelf --set-rpath '$$ORIGIN' $@ && " +
+            "chmod 555 $@"
+        ),
+    }),
+    visibility = ["//visibility:public"],
+)

@@ -38,6 +38,15 @@ BenchmarkFactory::BenchmarkFactory(const boost::filesystem::path& workingDirecto
   VLOG(2) << "BenchmarkFactory initialized";
 }
 
+BenchmarkFactory::~BenchmarkFactory() { close(); }
+
+void BenchmarkFactory::close() {
+  VLOG(2) << "BenchmarkFactory closing with " << benchmarks_.size() << " entries";
+  for (auto& entry : benchmarks_) {
+    entry.second.close();
+  }
+}
+
 Status BenchmarkFactory::getBenchmark(const BenchmarkProto& benchmarkMessage,
                                       std::unique_ptr<Benchmark>* benchmark) {
   // Check if the benchmark has already been loaded into memory.
@@ -61,11 +70,11 @@ Status BenchmarkFactory::getBenchmark(const BenchmarkProto& benchmarkMessage,
     }
     case compiler_gym::File::DataCase::kUri: {
       VLOG(3) << "LLVM benchmark cache miss, read from URI: " << benchmarkMessage.uri();
-      // Check the protocol of the benchmark URI.
+      // Check the scheme of the benchmark URI.
       if (programFile.uri().find("file:///") != 0) {
         return Status(StatusCode::INVALID_ARGUMENT,
                       fmt::format("Invalid benchmark data URI. "
-                                  "Only the file:/// protocol is supported: \"{}\"",
+                                  "Only the file:/// scheme is supported: \"{}\"",
                                   programFile.uri()));
       }
 
@@ -99,6 +108,7 @@ Status BenchmarkFactory::addBitcode(const std::string& uri, const Bitcode& bitco
       auto iterator = std::next(std::begin(benchmarks_), index);
 
       // Evict the benchmark from the pool of loaded benchmarks.
+      iterator->second.close();
       benchmarks_.erase(iterator);
     }
   }

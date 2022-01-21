@@ -36,8 +36,3 @@ uris:
         )
     )
     assert len(cfg.uris) == 1
-
-
-def test_benchmarks_uris_invalid_regex():
-    with pytest.raises(ValidationError):
-        Benchmarks(uris=["bad-uri"])

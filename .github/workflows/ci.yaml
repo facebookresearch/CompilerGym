@@ -14,15 +14,6 @@ jobs:
     build-linux:
         runs-on: ubuntu-latest
         steps:
-            - name: Persist the bazel cache
-              uses: actions/cache@v2
-              with:
-                  path: ~/.cache/bazel/_bazel_runner
-                  key: bazel-${{ runner.os }}-${{ hashFiles('WORKSPACE') }}-${{ hashFiles('**/BUILD') }}
-                  restore-keys: |
-                      bazel-${{ runner.os }}-${{ hashFiles('WORKSPACE') }}-
-                      bazel-${{ runner.os }}-
-
             - uses: actions/checkout@v2
 
             - uses: actions/setup-python@v2
@@ -49,18 +40,46 @@ jobs:
                   if-no-files-found: error
                   retention-days: 7
 
+    build-linux-cmake:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v2
+
+            - uses: actions/setup-python@v2
+              with:
+                  python-version: 3.9
+
+            - name: Install build dependencies
+              uses: ./.github/actions/install-cmake-build-dependencies
+
+            - name: CMake Build
+              run: |
+                  cmake \
+                      -GNinja \
+                      -DCMAKE_C_COMPILER=clang-9 \
+                      -DCMAKE_CXX_COMPILER=clang++-9 \
+                      -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=lld" \
+                      -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=lld" \
+                      -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=lld" \
+                      -DPython3_FIND_VIRTUALENV=FIRST \
+                      -DCOMPILER_GYM_BUILD_TESTS=ON \
+                      -DCOMPILER_GYM_BUILD_EXAMPLES=ON \
+                      -S . \
+                      -B ~/cmake_build
+                  cmake --build ~/cmake_build
+              shell: bash
+
+            - name: Upload Python wheel
+              uses: actions/upload-artifact@v2
+              with:
+                  name: linux-wheel-cmake
+                  path: ~/cmake_build/py_pkg/dist/*.whl
+                  if-no-files-found: error
+                  retention-days: 7
+
     build-macos:
         runs-on: macos-latest
         steps:
-            - name: Persist the bazel cache
-              uses: actions/cache@v2
-              with:
-                  path: /private/var/tmp/_bazel_runner
-                  key: bazel-${{ runner.os }}-${{ hashFiles('WORKSPACE') }}-${{ hashFiles('**/BUILD') }}
-                  restore-keys: |
-                      bazel-${{ runner.os }}-${{ hashFiles('WORKSPACE') }}-
-                      bazel-${{ runner.os }}-
-
             - uses: actions/checkout@v2
 
             - uses: actions/setup-python@v2
@@ -119,6 +138,39 @@ jobs:
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
+
+    test-linux-cmake:
+        needs: build-linux-cmake
+        runs-on: ubuntu-latest
+        strategy:
+            fail-fast: false
+            matrix:
+                python: [3.9]
+        steps:
+            - uses: actions/checkout@v2
+
+            - name: Set up Python ${{ matrix.python }}
+              uses: actions/setup-python@v2
+              with:
+                  python-version: ${{ matrix.python }}
+
+            - name: Download Python wheel
+              uses: actions/download-artifact@v2
+              with:
+                  name: linux-wheel-cmake
+
+            - name: Install wheel
+              run: python -m pip install *.whl
+
+            - name: Install runtime dependencies
+              uses: ./.github/actions/install-runtime-dependencies
+
+            - name: Install test dependencies
+              run: python -m pip install -r tests/requirements.txt
+
+            - name: Run the test suite
+              run: make install-test
+
     test-macos:
         needs: build-macos
         runs-on: macos-latest

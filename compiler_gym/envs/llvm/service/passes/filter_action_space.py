@@ -12,8 +12,8 @@ import logging
 import sys
 from typing import Iterable
 
-from compiler_gym.envs.llvm.service.passes import config
-from compiler_gym.envs.llvm.service.passes.common import Pass
+import config
+from common import Pass
 
 logger = logging.getLogger(__name__)
 
