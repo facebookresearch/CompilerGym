@@ -54,19 +54,30 @@ struct llvm::yaml::MappingTraits<Loop*> {
 
     std::string id_str;
     llvm::raw_string_ostream id_stream(id_str);
-    auto id = L->getLoopID()->getMetadataID();
     L->getLoopID()->printAsOperand(id_stream, M);
 
+    // this id always prints a value of 4. Not sure if I am using it correctly
+    auto id_wrong = L->getLoopID()->getMetadataID();
+
     std::string name = L->getName();
+
+    std::string name1 = L->getLoopPreheader()->getName();
+    static int count = 0;
+    if (name1.length() == 0) {
+      name1 = "loop_" + std::to_string(count++);
+      L->getLoopPreheader()->setName(name1);
+    }
 
     std::string str;
     llvm::raw_string_ostream stream(str);
     L->print(stream, true, true);
 
     io.mapRequired("id", id_str);
+    io.mapRequired("id_wrong", id_wrong);
+    io.mapRequired("name", name);
+    io.mapRequired("name1", name1);
     io.mapRequired("function", fname);
     io.mapRequired("module", mname);
-    io.mapRequired("name", name);
     io.mapOptional("llvm", str);
   }
 };
@@ -178,7 +189,7 @@ class LoopLog : public llvm::FunctionPass {
       if (L->getLoopID() == nullptr) {
         // workaround to add metadata
         // TODO: is there a better way to add metadata to aloop?
-        addStringMetadataToLoop(L, "llvm.loop.isvectorized", false);
+        addStringMetadataToLoop(L, "custom.label.loop", true);
       }
     }
 
