@@ -61,6 +61,8 @@ struct llvm::yaml::MappingTraits<Loop*> {
 
     std::string name = L->getName();
 
+    int depth = L->getLoopDepth();
+
     std::string name1 = L->getLoopPreheader()->getName();
     static int count = 0;
     if (name1.length() == 0) {
@@ -78,6 +80,7 @@ struct llvm::yaml::MappingTraits<Loop*> {
     io.mapRequired("name1", name1);
     io.mapRequired("function", fname);
     io.mapRequired("module", mname);
+    io.mapRequired("depth", depth);
     io.mapOptional("llvm", str);
   }
 };
