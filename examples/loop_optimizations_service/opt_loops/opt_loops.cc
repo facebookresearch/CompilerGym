@@ -46,12 +46,26 @@ using llvm::yaml::ScalarEnumerationTraits;
 template <>
 struct llvm::yaml::MappingTraits<Loop*> {
   static void mapping(IO& io, Loop*& L) {
+    Function* F = L->getLoopPreheader()->getParent();
+    std::string fname = F->getName();
+
+    Module* M = L->getLoopPreheader()->getParent()->getParent();
+    std::string mname = M->getName();
+
+    if (L->getLoopID() == nullptr) {
+      addStringMetadataToLoop(L, "llvm.loop.isvectorized", false);
+    }
+    auto id = L->getLoopID()->getMetadataID();
+    L->getLoopID()->printAsOperand(llvm::dbgs(), M);
     std::string name = L->getName();
 
     std::string str;
     llvm::raw_string_ostream stream(str);
     L->print(stream, true, true);
 
+    io.mapRequired("id", id);
+    io.mapRequired("function", fname);
+    io.mapRequired("module", mname);
     io.mapRequired("name", name);
     io.mapOptional("llvm", str);
   }
