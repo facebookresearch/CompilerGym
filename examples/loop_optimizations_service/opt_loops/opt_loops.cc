@@ -52,18 +52,18 @@ struct llvm::yaml::MappingTraits<Loop*> {
     Module* M = L->getLoopPreheader()->getParent()->getParent();
     std::string mname = M->getName();
 
-    if (L->getLoopID() == nullptr) {
-      addStringMetadataToLoop(L, "llvm.loop.isvectorized", false);
-    }
+    std::string id_str;
+    llvm::raw_string_ostream id_stream(id_str);
     auto id = L->getLoopID()->getMetadataID();
-    L->getLoopID()->printAsOperand(llvm::dbgs(), M);
+    L->getLoopID()->printAsOperand(id_stream, M);
+
     std::string name = L->getName();
 
     std::string str;
     llvm::raw_string_ostream stream(str);
     L->print(stream, true, true);
 
-    io.mapRequired("id", id);
+    io.mapRequired("id", id_str);
     io.mapRequired("function", fname);
     io.mapRequired("module", mname);
     io.mapRequired("name", name);
@@ -172,6 +172,15 @@ class LoopLog : public llvm::FunctionPass {
 
     // Should really account for module, too.
     counts[F.getName().str()] = Loops.size();
+
+    // ensure that all loops have metadata
+    for (auto L : Loops) {
+      if (L->getLoopID() == nullptr) {
+        // workaround to add metadata
+        // TODO: is there a better way to add metadata to aloop?
+        addStringMetadataToLoop(L, "llvm.loop.isvectorized", false);
+      }
+    }
 
     for (auto L : Loops) {
       Yaml << L;
