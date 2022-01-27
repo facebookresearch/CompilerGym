@@ -130,6 +130,12 @@ class BenchmarkUri(BaseModel):
             fragment=components.fragment,
         )
 
+    def startswith(self, *args):
+        return str(self).startswith(*args)
+
+    def endswith(self, *args):
+        return str(self).endswith(*args)
+
     def __repr__(self):
         return urlunparse(
             ParseResult(
