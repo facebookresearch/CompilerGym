@@ -43,6 +43,16 @@ using namespace llvm::yaml;
 using llvm::yaml::IO;
 using llvm::yaml::ScalarEnumerationTraits;
 
+std::string getStringMetadataFromLoop(Loop*& L, const char* MDString) {
+  Optional<const MDOperand*> Value = findStringMetadataForLoop(L, MDString);
+  if (!Value)
+    return "None";
+
+  const MDOperand* Op = *Value;
+  assert(Op && mdconst::hasa<ConstantInt>(*Op) && "invalid metadata");
+  return std::to_string(mdconst::extract<ConstantInt>(*Op)->getZExtValue());
+}
+
 template <>
 struct llvm::yaml::MappingTraits<Loop*> {
   static void mapping(IO& io, Loop*& L) {
@@ -63,16 +73,27 @@ struct llvm::yaml::MappingTraits<Loop*> {
 
     int depth = L->getLoopDepth();
 
-    std::string name1 = L->getLoopPreheader()->getName();
+    // TODO: find a way to provide a name to the loop that will remain consisten across multiple
+    // `opt` calls
+    std::string name1 = L->getHeader()->getName();
     static int count = 0;
     if (name1.length() == 0) {
       name1 = "loop_" + std::to_string(count++);
-      L->getLoopPreheader()->setName(name1);
+      L->getHeader()->setName(name1);
     }
 
     std::string str;
     llvm::raw_string_ostream stream(str);
     L->print(stream, true, true);
+
+    std::string MetaLoopUnrollEnable = getStringMetadataFromLoop(L, "llvm.loop.unroll.enable");
+    std::string MetaLoopUnrollDisable = getStringMetadataFromLoop(L, "llvm.loop.unroll.disable");
+    std::string MetaLoopUnrollCount = getStringMetadataFromLoop(L, "llvm.loop.unroll.count");
+    std::string MetaLoopIsUnrolled = getStringMetadataFromLoop(L, "llvm.loop.isunrolled");
+    std::string MetaLoopVectorEnable = getStringMetadataFromLoop(L, "llvm.loop.vector.enable");
+    std::string MetaLoopVectorDisable = getStringMetadataFromLoop(L, "llvm.loop.vector.disable");
+    std::string MetaLoopVectorWidth = getStringMetadataFromLoop(L, "llvm.loop.vector.width");
+    std::string MetaLoopIsVectorized = getStringMetadataFromLoop(L, "llvm.loop.isvectorized");
 
     io.mapRequired("id", id_str);
     io.mapRequired("id_wrong", id_wrong);
@@ -82,6 +103,14 @@ struct llvm::yaml::MappingTraits<Loop*> {
     io.mapRequired("module", mname);
     io.mapRequired("depth", depth);
     io.mapOptional("llvm", str);
+    io.mapOptional("llvm.loop.unroll.enable", MetaLoopUnrollEnable);
+    io.mapOptional("llvm.loop.unroll.disable", MetaLoopUnrollDisable);
+    io.mapOptional("llvm.loop.unroll.count", MetaLoopUnrollCount);
+    io.mapOptional("llvm.loop.isunrolled", MetaLoopIsUnrolled);
+    io.mapOptional("llvm.loop.vectorize.enable", MetaLoopVectorEnable);
+    io.mapOptional("llvm.loop.vectorize.disable", MetaLoopVectorDisable);
+    io.mapOptional("llvm.loop.vectorize.width", MetaLoopVectorWidth);
+    io.mapOptional("llvm.loop.isvectorized", MetaLoopIsVectorized);
   }
 };
 
@@ -197,6 +226,7 @@ class LoopLog : public llvm::FunctionPass {
     }
 
     for (auto L : Loops) {
+      // this will invoke mapping(IO& io, Loop*& L) in llvm::yaml::MappingTraits<Loop*>
       Yaml << L;
     }
 
