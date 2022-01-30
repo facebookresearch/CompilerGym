@@ -65,13 +65,19 @@ struct llvm::yaml::MappingTraits<Loop*> {
     std::string id_str;
     llvm::raw_string_ostream id_stream(id_str);
     L->getLoopID()->printAsOperand(id_stream, M);
+    io.mapRequired("id", id_str);
+    io.mapRequired("function", fname);
+    io.mapRequired("module", mname);
 
     // this id always prints a value of 4. Not sure if I am using it correctly
     auto id_wrong = L->getLoopID()->getMetadataID();
+    io.mapRequired("id_wrong", id_wrong);
 
     std::string name = L->getName();
+    io.mapRequired("name", name);
 
     int depth = L->getLoopDepth();
+    io.mapRequired("depth", depth);
 
     // TODO: find a way to provide a name to the loop that will remain consisten across multiple
     // `opt` calls
@@ -81,36 +87,37 @@ struct llvm::yaml::MappingTraits<Loop*> {
       name1 = "loop_" + std::to_string(count++);
       L->getHeader()->setName(name1);
     }
+    io.mapRequired("name1", name1);
 
+    std::string MetaLoopUnrollEnable = getStringMetadataFromLoop(L, "llvm.loop.unroll.enable");
+    io.mapOptional("llvm.loop.unroll.enable", MetaLoopUnrollEnable);
+
+    std::string MetaLoopUnrollDisable = getStringMetadataFromLoop(L, "llvm.loop.unroll.disable");
+    io.mapOptional("llvm.loop.unroll.disable", MetaLoopUnrollDisable);
+
+    std::string MetaLoopUnrollCount = getStringMetadataFromLoop(L, "llvm.loop.unroll.count");
+    io.mapOptional("llvm.loop.unroll.count", MetaLoopUnrollCount);
+
+    std::string MetaLoopIsUnrolled = getStringMetadataFromLoop(L, "llvm.loop.isunrolled");
+    io.mapOptional("llvm.loop.isunrolled", MetaLoopIsUnrolled);
+
+    std::string MetaLoopVectorEnable = getStringMetadataFromLoop(L, "llvm.loop.vector.enable");
+    io.mapOptional("llvm.loop.vectorize.enable", MetaLoopVectorEnable);
+
+    std::string MetaLoopVectorDisable = getStringMetadataFromLoop(L, "llvm.loop.vector.disable");
+    io.mapOptional("llvm.loop.vectorize.disable", MetaLoopVectorDisable);
+
+    std::string MetaLoopVectorWidth = getStringMetadataFromLoop(L, "llvm.loop.vector.width");
+    io.mapOptional("llvm.loop.vectorize.width", MetaLoopVectorWidth);
+
+    std::string MetaLoopIsVectorized = getStringMetadataFromLoop(L, "llvm.loop.isvectorized");
+    io.mapOptional("llvm.loop.isvectorized", MetaLoopIsVectorized);
+
+    // dump the IR of the loop
     std::string str;
     llvm::raw_string_ostream stream(str);
     L->print(stream, true, true);
-
-    std::string MetaLoopUnrollEnable = getStringMetadataFromLoop(L, "llvm.loop.unroll.enable");
-    std::string MetaLoopUnrollDisable = getStringMetadataFromLoop(L, "llvm.loop.unroll.disable");
-    std::string MetaLoopUnrollCount = getStringMetadataFromLoop(L, "llvm.loop.unroll.count");
-    std::string MetaLoopIsUnrolled = getStringMetadataFromLoop(L, "llvm.loop.isunrolled");
-    std::string MetaLoopVectorEnable = getStringMetadataFromLoop(L, "llvm.loop.vector.enable");
-    std::string MetaLoopVectorDisable = getStringMetadataFromLoop(L, "llvm.loop.vector.disable");
-    std::string MetaLoopVectorWidth = getStringMetadataFromLoop(L, "llvm.loop.vector.width");
-    std::string MetaLoopIsVectorized = getStringMetadataFromLoop(L, "llvm.loop.isvectorized");
-
-    io.mapRequired("id", id_str);
-    io.mapRequired("id_wrong", id_wrong);
-    io.mapRequired("name", name);
-    io.mapRequired("name1", name1);
-    io.mapRequired("function", fname);
-    io.mapRequired("module", mname);
-    io.mapRequired("depth", depth);
     io.mapOptional("llvm", str);
-    io.mapOptional("llvm.loop.unroll.enable", MetaLoopUnrollEnable);
-    io.mapOptional("llvm.loop.unroll.disable", MetaLoopUnrollDisable);
-    io.mapOptional("llvm.loop.unroll.count", MetaLoopUnrollCount);
-    io.mapOptional("llvm.loop.isunrolled", MetaLoopIsUnrolled);
-    io.mapOptional("llvm.loop.vectorize.enable", MetaLoopVectorEnable);
-    io.mapOptional("llvm.loop.vectorize.disable", MetaLoopVectorDisable);
-    io.mapOptional("llvm.loop.vectorize.width", MetaLoopVectorWidth);
-    io.mapOptional("llvm.loop.isvectorized", MetaLoopIsVectorized);
   }
 };
 
