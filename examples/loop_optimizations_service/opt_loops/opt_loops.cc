@@ -56,10 +56,10 @@ std::string getStringMetadataFromLoop(Loop*& L, const char* MDString) {
 template <>
 struct llvm::yaml::MappingTraits<Loop*> {
   static void mapping(IO& io, Loop*& L) {
-    Function* F = L->getLoopPreheader()->getParent();
+    Function* F = L->getBlocks()[0]->getParent();
     std::string fname = F->getName();
 
-    Module* M = L->getLoopPreheader()->getParent()->getParent();
+    Module* M = F->getParent();
     std::string mname = M->getName();
 
     std::string id_str;
