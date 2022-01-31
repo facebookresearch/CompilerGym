@@ -165,7 +165,7 @@ static cl::opt<unsigned> UnrollCount(
                               "unroll_count pragma values, for testing purposes"));
 
 static cl::opt<bool> VectorizeEnable("floop-vectorize", cl::desc("Enable loop vectorize"),
-                                     cl::init("false"));
+                                     cl::init(false));
 
 static cl::opt<unsigned> VectorizationFactor("fforce-vector-width",
                                              cl::desc("Sets the SIMD width. Zero is autoselect."));
