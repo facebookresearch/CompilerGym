@@ -115,7 +115,7 @@ struct llvm::yaml::MappingTraits<Loop*> {
     bool MetaLoopUnrollDisable = getBooleanLoopAttribute(L, "llvm.loop.unroll.disable");
     io.mapOptional("llvm.loop.unroll.disable", MetaLoopUnrollDisable);
 
-    std::string MetaLoopUnrollCount = getStringMetadataFromLoop(L, "llvm.loop.unroll.count");
+    auto MetaLoopUnrollCount = getOptionalIntLoopAttribute(L, "llvm.loop.unroll.count");
     io.mapOptional("llvm.loop.unroll.count", MetaLoopUnrollCount);
 
     bool MetaLoopIsUnrolled = getBooleanLoopAttribute(L, "llvm.loop.isunrolled");
@@ -127,7 +127,7 @@ struct llvm::yaml::MappingTraits<Loop*> {
     bool MetaLoopVectorDisable = getBooleanLoopAttribute(L, "llvm.loop.vector.disable");
     io.mapOptional("llvm.loop.vectorize.disable", MetaLoopVectorDisable);
 
-    std::string MetaLoopVectorWidth = getStringMetadataFromLoop(L, "llvm.loop.vector.width");
+    auto MetaLoopVectorWidth = getOptionalIntLoopAttribute(L, "llvm.loop.vector.width");
     io.mapOptional("llvm.loop.vectorize.width", MetaLoopVectorWidth);
 
     bool MetaLoopIsVectorized = getBooleanLoopAttribute(L, "llvm.loop.isvectorized");
