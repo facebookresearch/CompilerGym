@@ -149,6 +149,13 @@ cl::opt<std::string> InputFilename(cl::Positional, cl::desc("Specify input filen
 cl::opt<std::string> OutputFilename("o", cl::desc("Specify output filename"),
                                     cl::value_desc("filename"), cl::init("-"));
 
+/// Output YAML log file name.
+cl::opt<std::string> OutputYAMLFile("emit-yaml", cl::desc("Specify output YAML log filename"),
+                                    cl::value_desc("filename"), cl::init("/tmp/loops.log"));
+
+// TODO: add other features like "read-yaml", "print-yaml-after-all", "print-yaml-before-all",
+// "print-yaml-after=<list of passes>", "print-yaml-before=<list of passes>" etc.
+
 /// Loop Optimizations
 static cl::opt<bool> UnrollEnable("floop-unroll", cl::desc("Enable loop unrolling"),
                                   cl::init(false));
@@ -361,13 +368,12 @@ int main(int argc, char** argv) {
   }
 
   // Prepare loops dump/configuration yaml file
-  raw_fd_ostream ToolConfigFile("/tmp/loops.log", EC);
+  raw_fd_ostream ToolConfigFile(OutputYAMLFile, EC);
   yaml::Output Yaml(ToolConfigFile);
 
   initializeLoopLogPass(*PassRegistry::getPassRegistry());
   OptCustomPassManager PM;
   LoopConfiguratorPass* LoopConfigurator = new LoopConfiguratorPass();
-  PM.add(createLoopLogPass(Yaml));
   PM.add(LoopConfigurator);
   PM.add(createLoopUnrollPass());
   PM.add(createLICMPass());
@@ -375,6 +381,8 @@ int main(int argc, char** argv) {
   PassManagerBuilder Builder;
   Builder.LoopVectorize = VectorizeEnable;
   Builder.populateModulePassManager(PM);
+
+  PM.add(createLoopLogPass(Yaml));
 
   // PM to output the module
   if (OutputAssembly) {
