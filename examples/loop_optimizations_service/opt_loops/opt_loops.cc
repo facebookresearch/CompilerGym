@@ -77,37 +77,37 @@ template <>
 struct llvm::yaml::MappingTraits<Loop*> {
   static void mapping(IO& io, Loop*& L) {
     Function* F = L->getBlocks()[0]->getParent();
-    std::string fname = F->getName();
+    std::string FName = F->getName();
 
     Module* M = F->getParent();
-    std::string mname = M->getName();
+    std::string MName = M->getName();
 
-    std::string id_str;
-    llvm::raw_string_ostream id_stream(id_str);
-    L->getLoopID()->printAsOperand(id_stream, M);
-    io.mapRequired("id", id_str);
-    io.mapRequired("function", fname);
-    io.mapRequired("module", mname);
+    std::string IDStr;
+    llvm::raw_string_ostream IDStream(IDStr);
+    L->getLoopID()->printAsOperand(IDStream, M);
+    io.mapRequired("ID", IDStr);
+    io.mapRequired("Function", FName);
+    io.mapRequired("Module", MName);
 
     // this id always prints a value of 4. Not sure if I am using it correctly
-    auto id_wrong = L->getLoopID()->getMetadataID();
-    io.mapRequired("id_wrong", id_wrong);
+    auto MetadataID = L->getLoopID()->getMetadataID();
+    io.mapRequired("MetadataID", MetadataID);
 
-    std::string name = L->getName();
-    io.mapRequired("name", name);
+    std::string Name = L->getName();
+    io.mapRequired("Name", Name);
 
-    int depth = L->getLoopDepth();
-    io.mapRequired("depth", depth);
+    int Depth = L->getLoopDepth();
+    io.mapRequired("Depth", Depth);
 
-    // TODO: find a way to provide a name to the loop that will remain consisten across multiple
+    // TODO: find a way to provide a Name to the loop that will remain consisten across multiple
     // `opt` calls
-    std::string name1 = L->getHeader()->getName();
-    static int count = 0;
-    if (name1.length() == 0) {
-      name1 = "loop_" + std::to_string(count++);
-      L->getHeader()->setName(name1);
+    std::string HeaderName = L->getHeader()->getName();
+    static int Count = 0;
+    if (HeaderName.length() == 0) {
+      HeaderName = "loop_" + std::to_string(Count++);
+      L->getHeader()->setName(HeaderName);
     }
-    io.mapRequired("name1", name1);
+    io.mapRequired("HeaderName", HeaderName);
 
     bool MetaLoopUnrollEnable = getBooleanLoopAttribute(L, "llvm.loop.unroll.enable");
     io.mapOptional("llvm.loop.unroll.enable", MetaLoopUnrollEnable);
@@ -134,10 +134,10 @@ struct llvm::yaml::MappingTraits<Loop*> {
     io.mapOptional("llvm.loop.isvectorized", MetaLoopIsVectorized);
 
     // dump the IR of the loop
-    std::string str;
-    llvm::raw_string_ostream stream(str);
+    std::string IR;
+    llvm::raw_string_ostream stream(IR);
     L->print(stream, true, true);
-    io.mapOptional("llvm", str);
+    io.mapOptional("llvm", IR);
   }
 };
 
@@ -292,7 +292,7 @@ class LoopConfiguratorPass : public llvm::FunctionPass {
       if (UnrollEnable)
         addStringMetadataToLoop(ALoop, "llvm.loop.unroll.enable", UnrollEnable);
       if (UnrollCount)
-        addStringMetadataToLoop(ALoop, "llvm.loop.unroll.count", UnrollCount);
+        addStringMetadataToLoop(ALoop, "llvm.loop.unroll.Count", UnrollCount);
       if (VectorizeEnable)
         addStringMetadataToLoop(ALoop, "llvm.loop.vectorize.enable", VectorizeEnable);
       if (VectorizationFactor)
@@ -309,7 +309,7 @@ char LoopConfiguratorPass::ID = 1;
 /// On error, messages are written to stderr and null is returned.
 ///
 /// \param Context LLVM Context for the module.
-/// \param Name Input file name.
+/// \param Name Input file Name.
 static std::unique_ptr<Module> readModule(LLVMContext& Context, StringRef Name) {
   SMDiagnostic Diag;
   std::unique_ptr<Module> Module = parseIRFile(Name, Diag, Context);
