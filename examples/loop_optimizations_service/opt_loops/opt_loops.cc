@@ -43,6 +43,26 @@ using namespace llvm::yaml;
 using llvm::yaml::IO;
 using llvm::yaml::ScalarEnumerationTraits;
 
+static Optional<bool> getOptionalBoolLoopAttribute(const Loop* TheLoop, StringRef Name) {
+  MDNode* MD = findOptionMDForLoop(TheLoop, Name);
+  if (!MD)
+    return None;
+  switch (MD->getNumOperands()) {
+    case 1:
+      // When the value is absent it is interpreted as 'attribute set'.
+      return true;
+    case 2:
+      if (ConstantInt* IntMD = mdconst::extract_or_null<ConstantInt>(MD->getOperand(1).get()))
+        return IntMD->getZExtValue();
+      return true;
+  }
+  llvm_unreachable("unexpected number of options");
+}
+
+static bool getBooleanLoopAttribute(const Loop* TheLoop, StringRef Name) {
+  return getOptionalBoolLoopAttribute(TheLoop, Name).getValueOr(false);
+}
+
 std::string getStringMetadataFromLoop(Loop*& L, const char* MDString) {
   Optional<const MDOperand*> Value = findStringMetadataForLoop(L, MDString);
   if (!Value)
@@ -92,7 +112,7 @@ struct llvm::yaml::MappingTraits<Loop*> {
     std::string MetaLoopUnrollEnable = getStringMetadataFromLoop(L, "llvm.loop.unroll.enable");
     io.mapOptional("llvm.loop.unroll.enable", MetaLoopUnrollEnable);
 
-    std::string MetaLoopUnrollDisable = getStringMetadataFromLoop(L, "llvm.loop.unroll.disable");
+    bool MetaLoopUnrollDisable = getBooleanLoopAttribute(L, "llvm.loop.unroll.disable");
     io.mapOptional("llvm.loop.unroll.disable", MetaLoopUnrollDisable);
 
     std::string MetaLoopUnrollCount = getStringMetadataFromLoop(L, "llvm.loop.unroll.count");
