@@ -93,7 +93,7 @@ struct llvm::yaml::MappingTraits<Loop*> {
     auto MetadataID = L->getLoopID()->getMetadataID();
     io.mapRequired("MetadataID", MetadataID);
 
-    std::string Name = L->getName();
+    std::string Name = L->getName();  // NOTE: actually L->getName calls L->getHeader()->getName()
     io.mapRequired("Name", Name);
 
     int Depth = L->getLoopDepth();
@@ -292,7 +292,7 @@ class LoopConfiguratorPass : public llvm::FunctionPass {
       if (UnrollEnable)
         addStringMetadataToLoop(ALoop, "llvm.loop.unroll.enable", UnrollEnable);
       if (UnrollCount)
-        addStringMetadataToLoop(ALoop, "llvm.loop.unroll.Count", UnrollCount);
+        addStringMetadataToLoop(ALoop, "llvm.loop.unroll.count", UnrollCount);
       if (VectorizeEnable)
         addStringMetadataToLoop(ALoop, "llvm.loop.vectorize.enable", VectorizeEnable);
       if (VectorizationFactor)
