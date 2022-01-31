@@ -235,7 +235,7 @@ using llvm::yaml::Output;
 class LoopLog : public llvm::FunctionPass {
  public:
   static char ID;
-  std::unordered_map<std::string, int> counts;
+  std::unordered_map<std::string, int> Counts;
 
   LoopLog(yaml::Output& Yaml = *(new yaml::Output(llvm::dbgs()))) : FunctionPass(ID), Yaml(Yaml) {}
 
@@ -248,7 +248,7 @@ class LoopLog : public llvm::FunctionPass {
     auto Loops = LI.getLoopsInPreorder();
 
     // Should really account for module, too.
-    counts[F.getName().str()] = Loops.size();
+    Counts[F.getName().str()] = Loops.size();
 
     // ensure that all loops have metadata
     for (auto L : Loops) {
