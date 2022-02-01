@@ -29,6 +29,9 @@ from compiler_gym.service.proto import (
     ObservationSpace,
     Space,
     StringSpace,
+    ScalarLimit,
+    ScalarRange,
+    ScalarRangeList,
 )
 from compiler_gym.service.runtime import create_and_run_compiler_gym_service
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_NAMES
