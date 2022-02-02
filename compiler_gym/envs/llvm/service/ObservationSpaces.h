@@ -17,9 +17,9 @@ namespace compiler_gym::llvm_service {
  *   1. Add a new entry to this LlvmObservationSpace enum.
  *   2. Add a new switch case to getLlvmObservationSpaceList() to return the
  *      ObserverationSpace.
- *   3. Add a new switch case to LlvmSession::getObservation() to compute
- *      the actual observation.
- *   4. Run `bazel test //compiler_gym/...` and update the newly failing tests.
+ *   3. Add a new switch case to setObservation() to compute the actual
+ *      observation.
+ *   4. Run `make test` and update the newly failing tests.
  */
 enum class LlvmObservationSpace {
   /**
