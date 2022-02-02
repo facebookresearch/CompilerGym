@@ -245,6 +245,7 @@ cc_library(
         "//compiler_gym/util:GrpcStatusMacros",
         "@boost//:filesystem",
         "@glog",
+        "@ir2vec",
         "@llvm//10.0.0",
         "@magic_enum",
         "@nlohmann_json//:json",

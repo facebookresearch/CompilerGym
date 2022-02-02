@@ -20,6 +20,7 @@
 #include "compiler_gym/util/GrpcStatusMacros.h"
 #include "llvm/Bitcode/BitcodeWriter.h"
 // #include "llvm/IR/Metadata.h"
+#include "IR2Vec.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Support/raw_ostream.h"
 #include "nlohmann/json.hpp"
