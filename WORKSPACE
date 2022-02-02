@@ -341,3 +341,50 @@ http_archive(
 load("@programl//tools:bzl/deps.bzl", "programl_deps")
 
 programl_deps()
+
+# === IR2Vec ===
+# https://github.com/IITH-Compilers/IR2Vec
+
+http_archive(
+    name = "ir2vec",
+    build_file_content = """
+genrule(
+    name = "version",
+    outs = ["version.h"],
+    cmd = "echo '#define IR2VEC_VERSION \\"1\\"' > $@",
+)
+
+cc_library(
+    name = "ir2vec",
+    srcs = glob(["src/*.cpp"]) + [":version.h"],
+    hdrs = glob(["src/include/*.h"]),
+    copts = ["-Iexternal/ir2vec/src/include"],
+    strip_include_prefix = "src/include",
+    visibility = ["//visibility:public"],
+    deps = [
+        "@eigen//:eigen",
+        "@llvm//10.0.0",
+    ],
+)
+""",
+    sha256 = "92cbe1d023593c2d45588caf2b1530795f376045e8bc3d2868ba349fb8d61ea5",
+    strip_prefix = "IR2Vec-1.1.0",
+    urls = ["https://github.com/IITH-Compilers/IR2Vec/archive/refs/tags/v1.1.0.tar.gz"],
+)
+
+# === Eigen ===
+# https://eigen.tuxfamily.org/index.php?title=Main_Page
+
+http_archive(
+    name = "eigen",
+    build_file_content = """
+cc_library(
+    name = "eigen",
+    hdrs = glob(["Eigen/**/*"]),
+    visibility = ["//visibility:public"],
+)
+""",
+    sha256 = "d56fbad95abf993f8af608484729e3d87ef611dd85b3380a8bad1d5cbc373a57",
+    strip_prefix = "eigen-3.3.7",
+    urls = ["https://gitlab.com/libeigen/eigen/-/archive/3.3.7/eigen-3.3.7.tar.gz"],
+)
