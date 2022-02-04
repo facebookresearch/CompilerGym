@@ -11,6 +11,7 @@ cg_py_library(
   SRCS
     "__init__.py"
   DEPS
+    ::common
     ::box
     ::commandline
     ::dict
@@ -21,6 +22,11 @@ cg_py_library(
     ::sequence
     ::tuple
   PUBLIC
+)
+
+cg_py_library(
+  NAME common
+  SRCS "common.py"
 )
 
 cg_py_library(
@@ -75,6 +81,8 @@ cg_py_library(
     scalar
   SRCS
     "scalar.py"
+  DEPS
+    ::common
   PUBLIC
 )
 
@@ -85,6 +93,7 @@ cg_py_library(
     "sequence.py"
   DEPS
     ::scalar
+    ::common
   PUBLIC
 )
 

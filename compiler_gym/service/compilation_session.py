@@ -5,13 +5,10 @@
 from pathlib import Path
 from typing import List, Optional, Tuple
 
-from compiler_gym.service.proto import (
-    Action,
-    ActionSpace,
-    Benchmark,
-    Observation,
-    ObservationSpace,
-)
+from compiler_gym.service.proto import ActionSpace, Benchmark
+from compiler_gym.service.proto import Event as Action
+from compiler_gym.service.proto import Event as Observation
+from compiler_gym.service.proto import ObservationSpace
 
 
 class CompilationSession:

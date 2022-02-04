@@ -79,10 +79,13 @@ def test_observation_spaces(env: CompilerEnv):
     env.reset()
     assert env.observation.spaces.keys() == {"ir", "features", "runtime", "size"}
     assert env.observation.spaces["ir"].space == Sequence(
-        name="ir", size_range=(0, None), dtype=str, opaque_data_format=""
+        name="ir",
+        size_range=(0, np.iinfo(np.int64).max),
+        dtype=str,
+        opaque_data_format=None,
     )
     assert env.observation.spaces["features"].space == Box(
-        name="features", shape=(3,), low=0, high=1e5, dtype=int
+        name="features", shape=(3,), low=0, high=100000, dtype=int
     )
     assert env.observation.spaces["runtime"].space == Scalar(
         name="runtime", min=0, max=np.inf, dtype=float

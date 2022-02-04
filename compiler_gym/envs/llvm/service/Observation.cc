@@ -37,13 +37,14 @@ using nlohmann::json;
 const programl::ProgramGraphOptions programlOptions;
 
 Status setObservation(LlvmObservationSpace space, const fs::path& workingDirectory,
-                      Benchmark& benchmark, Observation& reply) {
+                      Benchmark& benchmark, Event& reply) {
   switch (space) {
     case LlvmObservationSpace::IR: {
       // Serialize the LLVM module to an IR string.
       std::string ir;
       llvm::raw_string_ostream rso(ir);
       benchmark.module().print(rso, /*AAW=*/nullptr);
+      rso.flush();
       reply.set_string_value(ir);
       break;
     }
@@ -63,7 +64,9 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
       std::string bitcode;
       llvm::raw_string_ostream outbuffer(bitcode);
       llvm::WriteBitcodeToFile(benchmark.module(), outbuffer);
-      reply.set_binary_value(outbuffer.str());
+      outbuffer.flush();
+      *reply.mutable_byte_tensor()->mutable_shape()->Add() = bitcode.size();
+      *reply.mutable_byte_tensor()->mutable_value() = bitcode;
       break;
     }
     case LlvmObservationSpace::BITCODE_FILE: {
@@ -75,12 +78,14 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
     }
     case LlvmObservationSpace::INST_COUNT: {
       const auto features = InstCount::getFeatureVector(benchmark.module());
-      *reply.mutable_int64_list()->mutable_value() = {features.begin(), features.end()};
+      *reply.mutable_int64_tensor()->mutable_shape()->Add() = features.size();
+      *reply.mutable_int64_tensor()->mutable_value() = {features.begin(), features.end()};
       break;
     }
     case LlvmObservationSpace::AUTOPHASE: {
       const auto features = autophase::InstCount::getFeatureVector(benchmark.module());
-      *reply.mutable_int64_list()->mutable_value() = {features.begin(), features.end()};
+      *reply.mutable_int64_tensor()->mutable_shape()->Add() = features.size();
+      *reply.mutable_int64_tensor()->mutable_value() = {features.begin(), features.end()};
       break;
     }
     case LlvmObservationSpace::PROGRAML:
@@ -99,7 +104,11 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
       if (!status.ok()) {
         return Status(StatusCode::INTERNAL, status.error_message());
       }
-      *reply.mutable_string_value() = nodeLinkGraph.dump();
+      Opaque opaque;
+      opaque.set_format(space == LlvmObservationSpace::PROGRAML ? "json://networkx/MultiDiGraph"
+                                                                : "json://");
+      *opaque.mutable_data() = nodeLinkGraph.dump();
+      reply.mutable_any_value()->PackFrom(opaque);
       break;
     }
     case LlvmObservationSpace::CPU_INFO: {
@@ -124,57 +133,60 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
       hwinfo["cores_count"] = cpuinfo_get_cores_count();
       auto cpu = cpuinfo_get_packages();
       hwinfo["name"] = cpu->name;
-      *reply.mutable_string_value() = hwinfo.dump();
+      Opaque opaque;
+      opaque.set_format("json://");
+      *opaque.mutable_data() = hwinfo.dump();
+      reply.mutable_any_value()->PackFrom(opaque);
       break;
     }
     case LlvmObservationSpace::IR_INSTRUCTION_COUNT: {
       double cost;
       RETURN_IF_ERROR(setCost(LlvmCostFunction::IR_INSTRUCTION_COUNT, benchmark.module(),
                               workingDirectory, &cost));
-      reply.set_scalar_int64(static_cast<int64_t>(cost));
+      reply.set_int64_value(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::IR_INSTRUCTION_COUNT_O0: {
       const auto cost = getBaselineCost(benchmark.baselineCosts(), LlvmBaselinePolicy::O0,
                                         LlvmCostFunction::IR_INSTRUCTION_COUNT);
-      reply.set_scalar_int64(static_cast<int64_t>(cost));
+      reply.set_int64_value(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::IR_INSTRUCTION_COUNT_O3: {
       const auto cost = getBaselineCost(benchmark.baselineCosts(), LlvmBaselinePolicy::O3,
                                         LlvmCostFunction::IR_INSTRUCTION_COUNT);
-      reply.set_scalar_int64(static_cast<int64_t>(cost));
+      reply.set_int64_value(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::IR_INSTRUCTION_COUNT_OZ: {
       const auto cost = getBaselineCost(benchmark.baselineCosts(), LlvmBaselinePolicy::Oz,
                                         LlvmCostFunction::IR_INSTRUCTION_COUNT);
-      reply.set_scalar_int64(static_cast<int64_t>(cost));
+      reply.set_int64_value(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::OBJECT_TEXT_SIZE_BYTES: {
       double cost;
       RETURN_IF_ERROR(setCost(LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES, benchmark.module(),
                               workingDirectory, &cost));
-      reply.set_scalar_int64(static_cast<int64_t>(cost));
+      reply.set_int64_value(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::OBJECT_TEXT_SIZE_O0: {
       const auto cost = getBaselineCost(benchmark.baselineCosts(), LlvmBaselinePolicy::O0,
                                         LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES);
-      reply.set_scalar_int64(static_cast<int64_t>(cost));
+      reply.set_int64_value(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::OBJECT_TEXT_SIZE_O3: {
       const auto cost = getBaselineCost(benchmark.baselineCosts(), LlvmBaselinePolicy::O3,
                                         LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES);
-      reply.set_scalar_int64(static_cast<int64_t>(cost));
+      reply.set_int64_value(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::OBJECT_TEXT_SIZE_OZ: {
       const auto cost = getBaselineCost(benchmark.baselineCosts(), LlvmBaselinePolicy::Oz,
                                         LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES);
-      reply.set_scalar_int64(static_cast<int64_t>(cost));
+      reply.set_int64_value(static_cast<int64_t>(cost));
       break;
     }
 #ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
@@ -182,25 +194,25 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
       double cost;
       RETURN_IF_ERROR(
           setCost(LlvmCostFunction::TEXT_SIZE_BYTES, benchmark.module(), workingDirectory, &cost));
-      reply.set_scalar_int64(static_cast<int64_t>(cost));
+      reply.set_int64_value(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::TEXT_SIZE_O0: {
       const auto cost = getBaselineCost(benchmark.baselineCosts(), LlvmBaselinePolicy::O0,
                                         LlvmCostFunction::TEXT_SIZE_BYTES);
-      reply.set_scalar_int64(static_cast<int64_t>(cost));
+      reply.set_int64_value(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::TEXT_SIZE_O3: {
       const auto cost = getBaselineCost(benchmark.baselineCosts(), LlvmBaselinePolicy::O3,
                                         LlvmCostFunction::TEXT_SIZE_BYTES);
-      reply.set_scalar_int64(static_cast<int64_t>(cost));
+      reply.set_int64_value(static_cast<int64_t>(cost));
       break;
     }
     case LlvmObservationSpace::TEXT_SIZE_OZ: {
       const auto cost = getBaselineCost(benchmark.baselineCosts(), LlvmBaselinePolicy::Oz,
                                         LlvmCostFunction::TEXT_SIZE_BYTES);
-      reply.set_scalar_int64(static_cast<int64_t>(cost));
+      reply.set_int64_value(static_cast<int64_t>(cost));
       break;
     }
 #endif
@@ -208,11 +220,11 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
       return benchmark.computeRuntime(reply);
     }
     case LlvmObservationSpace::IS_BUILDABLE: {
-      reply.set_scalar_int64(benchmark.isBuildable() ? 1 : 0);
+      reply.set_boolean_value(benchmark.isBuildable());
       break;
     }
     case LlvmObservationSpace::IS_RUNNABLE: {
-      reply.set_scalar_int64(benchmark.isRunnable() ? 1 : 0);
+      reply.set_boolean_value(benchmark.isRunnable());
       break;
     }
     case LlvmObservationSpace::BUILDTIME: {

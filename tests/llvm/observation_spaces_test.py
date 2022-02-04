@@ -77,7 +77,7 @@ def test_ir_observation_space(env: LlvmEnv):
     space = env.observation.spaces[key]
     assert isinstance(space.space, Sequence)
     assert space.space.dtype == str
-    assert space.space.size_range == (0, None)
+    assert space.space.size_range == (0, np.iinfo(np.int64).max)
 
     value: str = env.observation[key]
     print(value)  # For debugging in case of error.
@@ -111,15 +111,16 @@ def test_bitcode_observation_space(env: LlvmEnv):
     key = "Bitcode"
     space = env.observation.spaces[key]
     assert isinstance(space.space, Sequence)
-    assert space.space.dtype == bytes
-    assert space.space.size_range == (0, None)
+    assert space.space.dtype == np.int8
+    assert space.space.size_range == (0, np.iinfo(np.int64).max)
 
     assert space.deterministic
     assert not space.platform_dependent
 
     value: str = env.observation[key]
     print(value)  # For debugging in case of error.
-    assert isinstance(value, bytes)
+    assert isinstance(value, np.ndarray)
+    assert value.dtype == np.int8
     assert space.space.contains(value)
 
 
@@ -157,7 +158,7 @@ def test_bitcode_file_equivalence(env: LlvmEnv, benchmark_uri: str):
         with open(bitcode_file, "rb") as f:
             bitcode_from_file = f.read()
 
-        assert bitcode == bitcode_from_file
+        assert bitcode.tobytes() == bitcode_from_file
     finally:
         os.unlink(bitcode_file)
 
@@ -1279,12 +1280,7 @@ def test_runtime_observation_space_not_runnable(env: LlvmEnv):
     key = "Runtime"
     space = env.observation.spaces[key]
     assert isinstance(space.space, Sequence)
-
-    value: np.ndarray = env.observation[key]
-    print(value.tolist())  # For debugging in case of error.
-    assert isinstance(value, np.ndarray)
-    assert value.shape == (0,)
-    assert space.space.contains(value)
+    assert env.observation[key] is None
 
 
 @pytest.mark.xfail(
@@ -1318,10 +1314,7 @@ def test_buildtime_observation_space_not_runnable(env: LlvmEnv):
     assert not space.deterministic
     assert space.platform_dependent
 
-    value: np.ndarray = env.observation[key]
-    print(value)  # For debugging in case of error.
-    assert value.shape == (0,)
-    assert space.space.contains(value)
+    assert env.observation[key] is None
 
 
 def test_is_runnable_observation_space(env: LlvmEnv):

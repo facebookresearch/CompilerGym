@@ -93,7 +93,7 @@ class CompilationSession {
    * @param actionHadNoEffect If the action had no effect, set this to true.
    * @return `OK` on success, else an errro code and message.
    */
-  [[nodiscard]] virtual grpc::Status applyAction(const Action& action, bool& endOfEpisode,
+  [[nodiscard]] virtual grpc::Status applyAction(const Event& action, bool& endOfEpisode,
                                                  std::optional<ActionSpace>& newActionSpace,
                                                  bool& actionHadNoEffect) = 0;
 
@@ -103,7 +103,7 @@ class CompilationSession {
    * @return `OK` on success, else an errro code and message.
    */
   [[nodiscard]] virtual grpc::Status computeObservation(const ObservationSpace& observationSpace,
-                                                        Observation& observation) = 0;
+                                                        Event& observation) = 0;
 
   /**
    * Optional. This will be called after all applyAction() and
