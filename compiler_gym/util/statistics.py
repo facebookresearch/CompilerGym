@@ -5,9 +5,9 @@
 import numpy as np
 
 
-def geometric_mean(iterable):
+def geometric_mean(array_like):
     """Zero-length-safe geometric mean."""
-    values = np.asarray(iterable)
+    values = np.asarray(array_like)
     if not values.size:
         return 0
     # Shortcut to return 0 when any element of the input is not positive.
@@ -17,17 +17,17 @@ def geometric_mean(iterable):
     return np.exp(a.sum() / len(a))
 
 
-def arithmetic_mean(iterable):
+def arithmetic_mean(array_like):
     """Zero-length-safe arithmetic mean."""
-    values = np.asarray(iterable)
+    values = np.asarray(array_like)
     if not values.size:
         return 0
     return values.mean()
 
 
-def stdev(iterable):
+def stdev(array_like):
     """Zero-length-safe standard deviation."""
-    values = np.asarray(iterable)
+    values = np.asarray(array_like)
     if not values.size:
         return 0
     return values.std()
