@@ -27,7 +27,7 @@ class Reward(Scalar):
     """
 
     __slots__ = [
-        "id",
+        "name",
         "observation_spaces",
         "default_value",
         "default_negates_returns",
@@ -38,9 +38,7 @@ class Reward(Scalar):
 
     def __init__(
         self,
-        # TODO(github.com/facebookresearch/CompilerGym/issues/381): Rename `id`
-        # to `name` for consistency with the other space classes.
-        id: str,
+        name: str,
         observation_spaces: Optional[List[str]] = None,
         default_value: RewardType = 0,
         min: Optional[RewardType] = None,
@@ -52,7 +50,7 @@ class Reward(Scalar):
     ):
         """Constructor.
 
-        :param id: The ID of the reward space. This is a unique name used to
+        :param name: The name of the reward space. This is a unique name used to
             represent the reward.
         :param observation_spaces: A list of observation space IDs
             (:class:`space.id <compiler_gym.views.ObservationSpaceSpec>` values)
@@ -79,12 +77,12 @@ class Reward(Scalar):
             execution environment of the service.
         """
         super().__init__(
-            name=id,
+            name=name,
             min=-np.inf if min is None else min,
             max=np.inf if max is None else max,
             dtype=np.float64,
         )
-        self.id = id
+        self.name = name
         self.observation_spaces = observation_spaces or []
         self.default_value: RewardType = default_value
         self.default_negates_returns: bool = default_negates_returns
@@ -142,13 +140,13 @@ class Reward(Scalar):
         return (self.min, self.max)
 
     def __repr__(self):
-        return self.id
+        return self.name
 
     def __eq__(self, other: Union["Reward", str]) -> bool:
         if isinstance(other, str):
-            return self.id == other
+            return self.name == other
         elif isinstance(other, Reward):
-            return self.id == other.id
+            return self.name == other.name
         else:
             return False
 
@@ -156,7 +154,7 @@ class Reward(Scalar):
 class DefaultRewardFromObservation(Reward):
     def __init__(self, observation_name: str, **kwargs):
         super().__init__(
-            observation_spaces=[observation_name], id=observation_name, **kwargs
+            observation_spaces=[observation_name], name=observation_name, **kwargs
         )
         self.previous_value: Optional[ObservationType] = None
 

@@ -75,14 +75,14 @@ class RewardView:
 
         :param space: The reward space to be added.
         """
-        if space.id in self.spaces:
-            warnings.warn(f"Replacing existing reward space '{space.id}'")
+        if space.name in self.spaces:
+            warnings.warn(f"Replacing existing reward space '{space.name}'")
         self._add_space(space)
 
     def _add_space(self, space: Reward):
         """Register a new space."""
-        self.spaces[space.id] = space
+        self.spaces[space.name] = space
         # Bind a new method to this class that is a callback to compute the
-        # given reward space. E.g. if a new space is added with ID `FooBar`,
+        # given reward space. E.g. if a new space is added with name `FooBar`,
         # this reward can be computed using env.reward.FooBar().
-        setattr(self, space.id, lambda: self[space.id])
+        setattr(self, space.name, lambda: self[space.name])

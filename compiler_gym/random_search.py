@@ -163,7 +163,7 @@ def random_search(
 
         if not env.reward_space:
             raise ValueError("A reward space must be specified for random search")
-        reward_space_name = env.reward_space.id
+        reward_space_name = env.reward_space.name
 
         action_space_names = list(env.action_space.names)
 

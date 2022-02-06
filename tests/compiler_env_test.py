@@ -116,7 +116,7 @@ def test_gym_make_kwargs():
         "llvm-v0", observation_space="Autophase", reward_space="IrInstructionCount"
     ) as env:
         assert env.observation_space_spec.id == "Autophase"
-        assert env.reward_space.id == "IrInstructionCount"
+        assert env.reward_space.name == "IrInstructionCount"
 
 
 def test_step_session_id_not_found(env: LlvmEnv):

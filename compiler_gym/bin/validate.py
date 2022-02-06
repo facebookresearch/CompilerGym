@@ -169,7 +169,7 @@ def main(argv):
             )
 
         if env.reward_space:
-            reward_name = f"{reward_aggregation_name} {env.reward_space.id}"
+            reward_name = f"{reward_aggregation_name} {env.reward_space.name}"
         else:
             reward_name = ""
 

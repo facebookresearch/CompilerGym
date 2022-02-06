@@ -43,7 +43,7 @@ class RuntimeReward(Reward):
 
     def __init__(self):
         super().__init__(
-            id="runtime",
+            name="runtime",
             observation_spaces=["runtime"],
             default_value=0,
             default_negates_returns=True,
@@ -69,7 +69,7 @@ class SizeReward(Reward):
 
     def __init__(self):
         super().__init__(
-            id="size",
+            name="size",
             observation_spaces=["size"],
             default_value=0,
             default_negates_returns=True,

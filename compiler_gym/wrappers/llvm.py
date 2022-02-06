@@ -32,7 +32,7 @@ class RuntimePointEstimateReward(CompilerEnvWrapper):
             estimator: Callable[[Iterable[float]], float],
         ):
             super().__init__(
-                id="runtime",
+                name="runtime",
                 observation_spaces=["Runtime"],
                 default_value=0,
                 min=None,

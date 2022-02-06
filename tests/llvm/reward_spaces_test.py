@@ -40,7 +40,7 @@ def test_instruction_count_reward(env: LlvmEnv):
 
 def test_reward_space(env: LlvmEnv):
     env.reward_space = "IrInstructionCount"
-    assert env.reward_space.id == "IrInstructionCount"
+    assert env.reward_space.name == "IrInstructionCount"
 
     env.reward_space = None
     assert env.reward_space is None
