@@ -399,7 +399,6 @@ Pass* createLoopLogPass() { return new LoopLog(); }
 
 LLVM_YAML_IS_FLOW_SEQUENCE_VECTOR(LoopConfig)
 
-#include <iostream>
 int main(int argc, char** argv) {
   cl::ParseCommandLineOptions(argc, argv,
                               " opt_loops\n\n"
@@ -451,6 +450,7 @@ int main(int argc, char** argv) {
     PM.add(createBitcodeWriterPass(Out.os(), PreserveBitcodeUseListOrder));
   }
   PM.run(*Module);
+  Out.keep();
 
   // Log loop configuration
   auto jsonObjects = json::array();
@@ -458,9 +458,7 @@ int main(int argc, char** argv) {
   ToolJSONFile << jsonObjects;
 
   Yaml << LCs;  // this invokes mapping(IO& io, LoopConfig& LC) and writes to file
-  ToolJSONFile.close();
   ToolYAMLFile.close();
-  Out.keep();
 
   return 0;
 }
