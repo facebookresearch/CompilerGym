@@ -19,5 +19,6 @@ cc_binary(
     visibility = ["//visibility:public"],
     deps = [
         "@llvm//10.0.0",
+        "@nlohmann_json//:json",
     ],
 )

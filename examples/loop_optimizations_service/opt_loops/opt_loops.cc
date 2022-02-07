@@ -36,12 +36,29 @@
 #include "llvm/Transforms/Utils/Debugify.h"
 #include "llvm/Transforms/Utils/LoopUtils.h"
 #include "llvm/Transforms/Vectorize.h"
+#include "nlohmann/json.hpp"
 
 using namespace llvm;
 
 using namespace llvm::yaml;
 using llvm::yaml::IO;
 using llvm::yaml::ScalarEnumerationTraits;
+
+using json = nlohmann::json;
+
+// a version of LLVM's getOptionalIntLoopAttribute(...) that accepts `const` Loop as argument
+// this is required to invoke in to_json(...)
+llvm::Optional<int> getOptionalIntLoopAttribute1(const Loop* TheLoop, StringRef Name) {
+  const MDOperand* AttrMD = findStringMetadataForLoop(TheLoop, Name).getValueOr(nullptr);
+  if (!AttrMD)
+    return None;
+
+  ConstantInt* IntMD = mdconst::extract_or_null<ConstantInt>(AttrMD->get());
+  if (!IntMD)
+    return None;
+
+  return IntMD->getSExtValue();
+}
 
 static Optional<bool> getOptionalBoolLoopAttribute(const Loop* TheLoop, StringRef Name) {
   MDNode* MD = findOptionMDForLoop(TheLoop, Name);
@@ -72,6 +89,76 @@ std::string getStringMetadataFromLoop(Loop*& L, const char* MDString) {
   assert(Op && mdconst::hasa<ConstantInt>(*Op) && "invalid metadata");
   return std::to_string(mdconst::extract<ConstantInt>(*Op)->getZExtValue());
 }
+
+namespace llvm {
+void to_json(json& j, const Loop& Lobj) {
+  auto L = &Lobj;
+  Function* F = L->getBlocks()[0]->getParent();
+  std::string FName = F->getName();
+
+  Module* M = F->getParent();
+  std::string MName = M->getName();
+
+  std::string IDStr;
+  llvm::raw_string_ostream IDStream(IDStr);
+  L->getLoopID()->printAsOperand(IDStream, M);
+  j["ID"] = IDStr;
+  j["Function"] = FName;
+  j["Module"] = MName;
+
+  // this id always prints a value of 4. Not sure if I am using it correctly
+  auto MetadataID = L->getLoopID()->getMetadataID();
+  j["MetadataID"] = MetadataID;
+
+  std::string Name = L->getName();  // NOTE: actually L->getName calls L->getHeader()->getName()
+  j["Name"] = L->getName();
+
+  int Depth = L->getLoopDepth();
+  j["Depth"] = Depth;
+
+  // TODO: find a way to provide a Name to the loop that will remain consisten across multiple
+  // `opt` calls
+  std::string HeaderName = L->getHeader()->getName();
+  static int Count = 0;
+  if (HeaderName.length() == 0) {
+    HeaderName = "loop_" + std::to_string(Count++);
+    L->getHeader()->setName(HeaderName);
+  }
+  j["HeaderName"] = HeaderName;
+
+  bool MetaLoopUnrollEnable = getBooleanLoopAttribute(L, "llvm.loop.unroll.enable");
+  j["llvm.loop.unroll.enable"] = MetaLoopUnrollEnable;
+
+  bool MetaLoopUnrollDisable = getBooleanLoopAttribute(L, "llvm.loop.unroll.disable");
+  j["llvm.loop.unroll.disable"] = MetaLoopUnrollDisable;
+
+  auto MetaLoopUnrollCount = getOptionalIntLoopAttribute1(L, "llvm.loop.unroll.count");
+  if (MetaLoopUnrollCount.hasValue())
+    j["llvm.loop.unroll.count"] = MetaLoopUnrollCount.getValue();
+
+  bool MetaLoopIsUnrolled = getBooleanLoopAttribute(L, "llvm.loop.isunrolled");
+  j["llvm.loop.isunrolled"] = MetaLoopIsUnrolled;
+
+  bool MetaLoopVectorEnable = getBooleanLoopAttribute(L, "llvm.loop.vector.enable");
+  j["llvm.loop.vectorize.enable"] = MetaLoopVectorEnable;
+
+  bool MetaLoopVectorDisable = getBooleanLoopAttribute(L, "llvm.loop.vector.disable");
+  j["llvm.loop.vectorize.disable"] = MetaLoopVectorDisable;
+
+  /*auto MetaLoopVectorWidth = getOptionalIntLoopAttribute(L, "llvm.loop.vector.width");
+  if (MetaLoopVectorWidth.hasValue())
+    j["llvm.loop.vectorize.width"] = MetaLoopVectorWidth.getValue();*/
+
+  bool MetaLoopIsVectorized = getBooleanLoopAttribute(L, "llvm.loop.isvectorized");
+  j["llvm.loop.isvectorized"] = MetaLoopIsVectorized;
+
+  // dump the IR of the loop
+  std::string IR;
+  llvm::raw_string_ostream stream(IR);
+  L->print(stream, true, true);
+  j["llvm"] = IR;
+}
+}  // namespace llvm
 
 template <>
 struct llvm::yaml::MappingTraits<Loop*> {
@@ -149,9 +236,12 @@ cl::opt<std::string> InputFilename(cl::Positional, cl::desc("Specify input filen
 cl::opt<std::string> OutputFilename("o", cl::desc("Specify output filename"),
                                     cl::value_desc("filename"), cl::init("-"));
 
-/// Output YAML log file name.
+/// Output Loop Configuration/Features file in various formats.
 cl::opt<std::string> OutputYAMLFile("emit-yaml", cl::desc("Specify output YAML log filename"),
-                                    cl::value_desc("filename"), cl::init("/tmp/loops.log"));
+                                    cl::value_desc("filename"), cl::init("/tmp/loops.yaml"));
+
+cl::opt<std::string> OutputJSONFile("emit-json", cl::desc("Specify output JSON log filename"),
+                                    cl::value_desc("filename"), cl::init("/tmp/loops.json"));
 
 // TODO: add other features like "read-yaml", "print-yaml-after-all", "print-yaml-before-all",
 // "print-yaml-after=<list of passes>", "print-yaml-before=<list of passes>" etc.
@@ -243,6 +333,7 @@ class LoopLog : public llvm::FunctionPass {
     AU.addRequired<LoopInfoWrapperPass>();
   }
 
+#include <iostream>
   bool runOnFunction(llvm::Function& F) override {
     LoopInfo& LI = getAnalysis<LoopInfoWrapperPass>().getLoopInfo();
     auto Loops = LI.getLoopsInPreorder();
@@ -263,6 +354,13 @@ class LoopLog : public llvm::FunctionPass {
       // this will invoke mapping(IO& io, Loop*& L) in llvm::yaml::MappingTraits<Loop*>
       Yaml << L;
     }
+
+    auto jsonObjects = json::array();
+    for (auto L : Loops) {
+      json j = *L;
+      jsonObjects.push_back(j);
+    }
+    std::cout << jsonObjects << std::endl;
 
     return false;
   }
@@ -368,8 +466,11 @@ int main(int argc, char** argv) {
   }
 
   // Prepare loops dump/configuration yaml file
-  raw_fd_ostream ToolConfigFile(OutputYAMLFile, EC);
-  yaml::Output Yaml(ToolConfigFile);
+  raw_fd_ostream ToolYAMLFile(OutputYAMLFile, EC);
+  yaml::Output Yaml(ToolYAMLFile);
+
+  // Prepare loops dump/configuration json file
+  raw_fd_ostream ToolJSONFile(OutputJSONFile, EC);
 
   initializeLoopLogPass(*PassRegistry::getPassRegistry());
   OptCustomPassManager PM;
@@ -393,7 +494,7 @@ int main(int argc, char** argv) {
   PM.run(*Module);
 
   Out.keep();
-  ToolConfigFile.close();
+  ToolYAMLFile.close();
 
   return 0;
 }
