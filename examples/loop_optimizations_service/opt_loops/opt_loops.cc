@@ -455,12 +455,8 @@ int main(int argc, char** argv) {
 
   // Log loop configuration
   auto jsonObjects = json::array();
-  for (auto LC : LCs) {
-    // Yaml << LC;   // this invokes mapping(IO& io, LoopConfig& LC) in
-    json j = LC;  // this invokes to_json(json& j, const LoopConfig& LC)
-    jsonObjects.push_back(LC);
-  }
-  Yaml << LCs;
+  jsonObjects = LCs;  // this invokes to_json(json& j, const LoopConfig& LC)
+  Yaml << LCs;        // this invokes mapping(IO& io, LoopConfig& LC)
   ToolJSONFile << jsonObjects;
 
   ToolYAMLFile.close();
