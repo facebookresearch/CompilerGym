@@ -15,7 +15,9 @@ from compiler_gym.envs import LlvmEnv, llvm
 from compiler_gym.errors import BenchmarkInitError
 from compiler_gym.service.proto import Benchmark as BenchmarkProto
 from compiler_gym.service.proto import File
+from compiler_gym.third_party import llvm as llvm_paths
 from compiler_gym.util.runfiles_path import runfiles_path
+from compiler_gym.util.temporary_working_directory import temporary_working_directory
 from tests.pytest_plugins.common import bazel_only
 from tests.test_main import main
 
@@ -133,7 +135,7 @@ def test_make_benchmark_single_bitcode(env: LlvmEnv):
 def test_make_benchmark_single_ll():
     """Test passing a single .ll file into make_benchmark()."""
     benchmark = llvm.make_benchmark(INVALID_IR_PATH)
-    assert benchmark.uri.startswith("benchmark://user-v0/")
+    assert str(benchmark.uri).startswith("benchmark://user-v0/")
     assert benchmark.uri.scheme == "benchmark"
     assert benchmark.uri.dataset == "user-v0"
 
@@ -302,6 +304,65 @@ def test_failing_build_cmd(env: LlvmEnv, tmpdir):
         match=r"clang: error: unknown argument: '-invalid-cc-argument'",
     ):
         env.reset(benchmark=benchmark)
+
+
+def test_make_benchmark_from_command_line_empty_input(env: LlvmEnv):
+    with pytest.raises(ValueError, match="Input command line is empty"):
+        env.make_benchmark_from_command_line("")
+    with pytest.raises(ValueError, match="Input command line is empty"):
+        env.make_benchmark_from_command_line([])
+
+
+@pytest.mark.parametrize("cmd", ["gcc in.c -o foo", ["gcc", "in.c", "-o", "foo"]])
+def test_make_benchmark_from_command_line(env: LlvmEnv, cmd):
+    with temporary_working_directory() as cwd:
+        with open("in.c", "w") as f:
+            f.write("int main() { return 0; }")
+
+        bm = env.make_benchmark_from_command_line(
+            cmd,
+            system_includes=False,
+        )
+
+        env.reset(benchmark=bm)
+        assert "main()" in env.ir
+
+        assert bm.proto.dynamic_config.build_cmd.argument == [
+            str(llvm_paths.clang_path()),
+            "-xir",
+            "$IN",
+            "-o",
+            f"{cwd}/foo",
+        ]
+
+        assert not (cwd / "foo").is_file()
+        bm.compile(env)
+        assert (cwd / "foo").is_file()
+
+
+def test_make_benchmark_from_command_line_no_system_includes(env: LlvmEnv):
+    with temporary_working_directory():
+        with open("in.c", "w") as f:
+            f.write(
+                """
+#include <stdio.h>
+int main() { return 0; }
+"""
+            )
+        with pytest.raises(BenchmarkInitError, match="stdio.h"):
+            env.make_benchmark_from_command_line("gcc in.c", system_includes=False)
+
+
+def test_make_benchmark_from_command_line_system_includes(env: LlvmEnv):
+    with temporary_working_directory():
+        with open("in.c", "w") as f:
+            f.write(
+                """
+#include <stdio.h>
+int main() { return 0; }
+"""
+            )
+        env.make_benchmark_from_command_line("gcc in.c")
 
 
 if __name__ == "__main__":

@@ -17,6 +17,7 @@
 #   USA
 import argparse
 import os
+from pathlib import Path
 
 
 def cmdline_to_argv(cmdline):
@@ -66,11 +67,30 @@ class GccInvocation:
     """
 
     def __init__(self, argv):
+
+        # Strip `-Xclang` arguments now because the hyphenated parameters
+        # confuse argparse:
+        sanitized_argv = argv.copy()
+        for i in range(len(argv) - 2, -1, -1):
+            if argv[i] == "-Xclang":
+                del argv[i + 1]
+                del argv[i]
+
         self.argv = argv
 
         self.executable = argv[0]
         self.progname = os.path.basename(self.executable)
-        DRIVER_NAMES = ("c89", "c99", "cc", "gcc", "c++", "g++", "xgcc")
+        DRIVER_NAMES = (
+            "c89",
+            "c99",
+            "cc",
+            "gcc",
+            "c++",
+            "g++",
+            "xgcc",
+            "clang",
+            "clang++",
+        )
         self.is_driver = self.progname in DRIVER_NAMES
         self.sources = []
         self.defines = []
@@ -119,6 +139,10 @@ class GccInvocation:
         add_opt_with_param("-MQ")
         add_opt_with_param("-MT")
 
+        # Additional arguments for clang:
+        add_opt_with_param("-resource-dir")
+        add_opt_with_param("-target")
+
         # Various other arguments that take a 2nd argument:
         for arg in [
             "-include",
@@ -140,8 +164,9 @@ class GccInvocation:
             parser.add_argument(arg, type=str)
         # (for now, drop them on the floor)
 
-        args, remainder = parser.parse_known_args(argv[1:])
+        args, remainder = parser.parse_known_args(sanitized_argv[1:])
 
+        self.parsed_args = args
         self.defines = args.D
         self.includepaths = args.I
 
@@ -150,6 +175,10 @@ class GccInvocation:
                 self.otherargs.append(arg)
             else:
                 self.sources.append(arg)
+
+        # Determine the absolute path of the generated output.
+        output = self.parsed_args.o or "a.out"
+        self.output_path = Path(output).absolute()
 
     @classmethod
     def from_cmdline(cls, cmdline):

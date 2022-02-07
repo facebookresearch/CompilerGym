@@ -3,16 +3,24 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Extensions to the ClientServiceCompilerEnv environment for LLVM."""
+import logging
 import os
+import shlex
 import shutil
+import subprocess
 from pathlib import Path
 from typing import Iterable, List, Optional, Union, cast
 
 import numpy as np
 
 from compiler_gym.datasets import Benchmark, Dataset
+from compiler_gym.envs.llvm.benchmark_from_command_line import BenchmarkFromCommandLine
 from compiler_gym.envs.llvm.datasets import get_llvm_datasets
-from compiler_gym.envs.llvm.llvm_benchmark import ClangInvocation, make_benchmark
+from compiler_gym.envs.llvm.llvm_benchmark import (
+    ClangInvocation,
+    get_system_library_flags,
+    make_benchmark,
+)
 from compiler_gym.envs.llvm.llvm_rewards import (
     BaselineImprovementNormalizedReward,
     CostFunctionReward,
@@ -25,13 +33,16 @@ from compiler_gym.spaces import Dict as DictSpace
 from compiler_gym.spaces import Scalar, Sequence
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_NAMES
 from compiler_gym.third_party.inst2vec import Inst2vecEncoder
-from compiler_gym.third_party.llvm import download_llvm_files
+from compiler_gym.third_party.llvm import clang_path, download_llvm_files
 from compiler_gym.third_party.llvm.instcount import INST_COUNT_FEATURE_NAMES
+from compiler_gym.util.commands import Popen
 
 _INST2VEC_ENCODER = Inst2vecEncoder()
 
 
 _LLVM_DATASETS: Optional[List[Dataset]] = None
+
+logger = logging.getLogger(__name__)
 
 
 def _get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset]:
@@ -619,3 +630,101 @@ class LlvmEnv(ClientServiceCompilerEnv):
         if self.runtime_warmup_runs_count is not None:
             fkd.runtime_warmup_runs_count = self.runtime_warmup_runs_count
         return fkd
+
+    def make_benchmark_from_command_line(
+        self,
+        cmd: Union[str, List[str]],
+        replace_driver: bool = True,
+        system_includes: bool = True,
+        timeout: int = 600,
+    ) -> Benchmark:
+        """Create a benchmark for use with this environment.
+
+        This function takes a command line compiler invocation as input,
+        modifies it to produce an unoptimized LLVM-IR bitcode, and then runs
+        the modified command line to produce a bitcode benchmark.
+
+        For example, the command line:
+
+            >>> benchmark = env.make_benchmark_from_command_line(
+            ...     ["gcc", "-DNDEBUG", "a.c", "b.c", "-o", "foo", "-lm"]
+            ... )
+
+        Will compile a.c and b.c to an unoptimized benchmark that can be then
+        passed to :meth:`reset() <compiler_env.envs.CompilerEnv.reset>`.
+
+        :param cmd: A command line compiler invocation, either as a list of
+            arguments (e.g. :code:`["clang", "in.c"]`) or as a single shell
+            string (e.g. :code:`"clang in.c"`).
+
+        :param replace_driver: Whether to replace the first argument of the
+            command with the clang driver used by this environment.
+
+        :param system_includes: Whether to include the system standard libraries
+            during compilation jobs. This requires a system toolchain. See
+            :func:`get_system_library_flags`.
+
+        :param timeout: The maximum number of seconds to allow the compilation
+            job to run before terminating.
+
+        :return: A :code:`Benchmark` instance.
+
+        :raises ValueError: If no command line is provided.
+
+        :raises BenchmarkInitError: If executing the command line fails.
+
+        :raises TimeoutExpired: If a compilation job exceeds :code:`timeout`
+            seconds.
+        """
+        if not cmd:
+            raise ValueError("Input command line is empty")
+
+        # Split the command line if passed a single string.
+        if isinstance(cmd, str):
+            cmd = shlex.split(cmd)
+
+        # Append include flags for the system headers if requested.
+        if system_includes:
+            for directory in get_system_library_flags():
+                cmd += ["-isystem", str(directory)]
+
+        # Use the CompilerGym clang binary in place of the original driver.
+        if replace_driver:
+            cmd[0] = str(clang_path())
+
+        # Adapt and execute the command line so that it will generate an unoptimized
+        # bitecode file.
+        emit_bitcode_command = cmd.copy()
+        # Strip the -S flag, if present, as that changes the output format.
+        emit_bitcode_command = [c for c in cmd if c != "-S"]
+        # Strip the output specifier. This is not strictly required (we override it
+        # later), but makes the generated command easier to understand.
+        for i in range(len(emit_bitcode_command) - 2, -1, -1):
+            if emit_bitcode_command[i] == "-o":
+                del emit_bitcode_command[i + 1]
+                del emit_bitcode_command[i]
+        emit_bitcode_command += [
+            "-c",
+            "-emit-llvm",
+            "-o",
+            "-",
+            "-Xclang",
+            "-disable-llvm-passes",
+            "-Xclang",
+            "-disable-llvm-optzns",
+        ]
+        with Popen(
+            emit_bitcode_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+        ) as llvm_link:
+            logger.debug(
+                f"Generating LLVM bitcode benchmark: {shlex.join(emit_bitcode_command)}"
+            )
+            bitcode, stderr = llvm_link.communicate(timeout=timeout)
+            if llvm_link.returncode:
+                raise BenchmarkInitError(
+                    f"Failed to generate LLVM bitcode with error:\n"
+                    f"{stderr.decode('utf-8').rstrip()}\n"
+                    f"Running command: {shlex.join(emit_bitcode_command)}"
+                )
+
+        return BenchmarkFromCommandLine(cmd, bitcode, timeout)

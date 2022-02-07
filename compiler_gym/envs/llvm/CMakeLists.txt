@@ -25,6 +25,16 @@ cg_py_library(
 )
 
 cg_py_library(
+  NAME benchmark_from_command_line
+  SRCS benchmark_from_command_line.py
+  DEPS
+    compiler_gym::datasets
+    compiler_gym::service::proto
+    compiler_gym::third_party::gccinvocation
+    compiler_gym::util::util
+)
+
+cg_py_library(
   NAME compute_observation
   SRCS compute_observation.py
   DATA compiler_gym::envs::llvm::service::compute_observation-files

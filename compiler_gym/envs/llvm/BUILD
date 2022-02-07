@@ -21,6 +21,17 @@ py_library(
 )
 
 py_library(
+    name = "benchmark_from_command_line",
+    srcs = ["benchmark_from_command_line.py"],
+    deps = [
+        "//compiler_gym/datasets",
+        "//compiler_gym/service/proto",
+        "//compiler_gym/third_party/gccinvocation",
+        "//compiler_gym/util",
+    ],
+)
+
+py_library(
     name = "compute_observation",
     srcs = ["compute_observation.py"],
     data = ["//compiler_gym/envs/llvm/service:compute_observation-files"],
@@ -46,6 +57,7 @@ py_library(
     name = "llvm_env",
     srcs = ["llvm_env.py"],
     deps = [
+        ":benchmark_from_command_line",
         ":llvm_benchmark",
         ":llvm_rewards",
         "//compiler_gym/datasets",
