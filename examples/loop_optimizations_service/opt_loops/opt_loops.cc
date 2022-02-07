@@ -208,7 +208,7 @@ cl::opt<std::string> OutputYAMLFile("emit-yaml", cl::desc("Specify output YAML l
 cl::opt<std::string> OutputJSONFile("emit-json", cl::desc("Specify output JSON log filename"),
                                     cl::value_desc("filename"), cl::init("/tmp/loops.json"));
 
-// TODO: add other features like "read-yaml", "print-yaml-after-all", "print-yaml-before-all",
+// TODO(mostafaelhoushi): add other features like "read-yaml", "print-yaml-after-all", "print-yaml-before-all",
 // "print-yaml-after=<list of passes>", "print-yaml-before=<list of passes>" etc.
 
 /// Loop Optimizations
