@@ -3,6 +3,7 @@
 // This source code is licensed under the MIT license found in the
 // LICENSE file in the root directory of this source tree.
 #include <algorithm>
+#include <fstream>
 #include <iostream>
 #include <string>
 #include <unordered_map>
@@ -425,7 +426,7 @@ int main(int argc, char** argv) {
   yaml::Output Yaml(ToolYAMLFile);
 
   // Prepare loops dump/configuration json file
-  raw_fd_ostream ToolJSONFile(OutputJSONFile, EC);
+  std::fstream ToolJSONFile(OutputJSONFile, std::fstream::in | std::fstream::out);
 
   initializeLoopLogPass(*PassRegistry::getPassRegistry());
   OptCustomPassManager PM;
@@ -457,9 +458,10 @@ int main(int argc, char** argv) {
     json j = LC;  // this invokes to_json(json& j, const LoopConfig& LC)
     jsonObjects.push_back(LC);
   }
-  std::cout << jsonObjects << std::endl;
+  ToolJSONFile << jsonObjects;
 
   ToolYAMLFile.close();
+  ToolJSONFile.close();
 
   return 0;
 }
