@@ -209,8 +209,9 @@ cl::opt<std::string> OutputYAMLFile("emit-yaml", cl::desc("Specify output YAML l
 cl::opt<std::string> OutputJSONFile("emit-json", cl::desc("Specify output JSON log filename"),
                                     cl::value_desc("filename"), cl::init("/tmp/loops.json"));
 
-// TODO(mostafaelhoushi): add other features like "read-yaml", "print-yaml-after-all", "print-yaml-before-all",
-// "print-yaml-after=<list of passes>", "print-yaml-before=<list of passes>" etc.
+// TODO(mostafaelhoushi): add other features like "read-yaml", "print-yaml-after-all",
+// "print-yaml-before-all", "print-yaml-after=<list of passes>", "print-yaml-before=<list of
+// passes>" etc.
 
 /// Loop Optimizations
 static cl::opt<bool> UnrollEnable("floop-unroll", cl::desc("Enable loop unrolling"),
@@ -244,20 +245,6 @@ static cl::opt<bool> PreserveAssemblyUseListOrder(
 // added from opt.cpp
 static cl::opt<bool> DebugifyEach(
     "debugify-each", cl::desc("Start each pass with debugify and end it with check-debugify"));
-
-/// \name Canonicalizer flags.
-/// @{
-/// Preserves original order of instructions.
-cl::opt<bool> PreserveOrder("preserve-order", cl::desc("Preserves original instruction order"));
-/// Renames all instructions (including user-named).
-cl::opt<bool> RenameAll("rename-all", cl::desc("Renames all instructions (including user-named)"));
-/// Folds all regular instructions (including pre-outputs).
-cl::opt<bool> FoldPreoutputs("fold-all",
-                             cl::desc("Folds all regular instructions (including pre-outputs)"));
-/// Sorts and reorders operands in commutative instructions.
-cl::opt<bool> ReorderOperands("reorder-operands",
-                              cl::desc("Sorts and reorders operands in commutative instructions"));
-/// @}
 
 class OptCustomPassManager : public legacy::PassManager {
   DebugifyStatsMap DIStatsMap;

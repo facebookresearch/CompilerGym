@@ -16,6 +16,20 @@
 
 using namespace llvm;
 
+/// \name Canonicalizer flags.
+/// @{
+/// Preserves original order of instructions.
+cl::opt<bool> PreserveOrder("preserve-order", cl::desc("Preserves original instruction order"));
+/// Renames all instructions (including user-named).
+cl::opt<bool> RenameAll("rename-all", cl::desc("Renames all instructions (including user-named)"));
+/// Folds all regular instructions (including pre-outputs).
+cl::opt<bool> FoldPreoutputs("fold-all",
+                             cl::desc("Folds all regular instructions (including pre-outputs)"));
+/// Sorts and reorders operands in commutative instructions.
+cl::opt<bool> ReorderOperands("reorder-operands",
+                              cl::desc("Sorts and reorders operands in commutative instructions"));
+/// @}
+
 char IRCanonicalizer::ID = 0;
 
 /// Entry method to the IRCanonicalizer.

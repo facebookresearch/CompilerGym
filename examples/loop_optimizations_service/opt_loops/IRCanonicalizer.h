@@ -6,6 +6,19 @@
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Pass.h"
+#include "llvm/Support/CommandLine.h"
+
+/// \name Canonicalizer flags.
+/// @{
+/// Preserves original order of instructions.
+extern llvm::cl::opt<bool> PreserveOrder;
+/// Renames all instructions (including user-named).
+extern llvm::cl::opt<bool> RenameAll;
+/// Folds all regular instructions (including pre-outputs).
+extern llvm::cl::opt<bool> FoldPreoutputs;
+/// Sorts and reorders operands in commutative instructions.
+extern llvm::cl::opt<bool> ReorderOperands;
+/// @}
 
 /// IRCanonicalizer aims to transform LLVM IR into canonical form.
 class IRCanonicalizer : public llvm::FunctionPass {
