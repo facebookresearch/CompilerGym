@@ -283,19 +283,19 @@ class OptCustomPassManager : public legacy::PassManager {
   const DebugifyStatsMap& getDebugifyStatsMap() const { return DIStatsMap; }
 };
 
+std::vector<LoopConfig> LCs;
 using llvm::yaml::Output;
 class LoopLog : public llvm::FunctionPass {
  public:
   static char ID;
   std::unordered_map<std::string, int> Counts;
 
-  LoopLog(yaml::Output& Yaml = *(new yaml::Output(llvm::dbgs()))) : FunctionPass(ID), Yaml(Yaml) {}
+  LoopLog() : FunctionPass(ID) {}
 
   virtual void getAnalysisUsage(AnalysisUsage& AU) const override {
     AU.addRequired<LoopInfoWrapperPass>();
   }
 
-#include <iostream>
   bool runOnFunction(llvm::Function& F) override {
     LoopInfo& LI = getAnalysis<LoopInfoWrapperPass>().getLoopInfo();
     auto Loops = LI.getLoopsInPreorder();
@@ -312,20 +312,15 @@ class LoopLog : public llvm::FunctionPass {
       }
     }
 
-    auto jsonObjects = json::array();
     for (auto L : Loops) {
       LoopConfig LC(L);
-      Yaml << LC;   // this invokes mapping(IO& io, LoopConfig& LC) in
-      json j = LC;  // this invokes to_json(json& j, const LoopConfig& LC)
-      jsonObjects.push_back(j);
+      LCs.push_back(LC);
     }
-    std::cout << jsonObjects << std::endl;
 
     return false;
   }
 
  protected:
-  yaml::Output& Yaml;
 };
 
 char LoopLog::ID = 0;
@@ -386,24 +381,25 @@ void initializeLoopConfiguratorPassPass(PassRegistry& Registry);
 }  // namespace llvm
 
 // Initialise the pass. We have to declare the dependencies we use.
-INITIALIZE_PASS_BEGIN(LoopLog, "count-loops", "Count loops", false, false)
+INITIALIZE_PASS_BEGIN(LoopLog, "log-loops", "Log loops IR and configuration", false, false)
 INITIALIZE_PASS_DEPENDENCY(LoopInfoWrapperPass)
-INITIALIZE_PASS_END(LoopLog, "count-loops", "Count loops", false, false)
+INITIALIZE_PASS_END(LoopLog, "log-loops", "Log loops IR and configuration", false, false)
 
-INITIALIZE_PASS_BEGIN(LoopConfiguratorPass, "unroll-loops-configurator",
-                      "Configurates loop unrolling", false, false)
+INITIALIZE_PASS_BEGIN(LoopConfiguratorPass, "loops-configurator", "Configurates loop optimization",
+                      false, false)
 INITIALIZE_PASS_DEPENDENCY(LoopInfoWrapperPass)
-INITIALIZE_PASS_END(LoopConfiguratorPass, "unroll-loops-configurator",
-                    "Configurates loop unrolling", false, false)
+INITIALIZE_PASS_END(LoopConfiguratorPass, "loops-configurator", "Configurates loop optimization",
+                    false, false)
 
 namespace llvm {
-Pass* createLoopLogPass(yaml::Output& Yaml) { return new LoopLog(Yaml); }
+Pass* createLoopLogPass() { return new LoopLog(); }
 }  // end namespace llvm
 
+#include <iostream>
 int main(int argc, char** argv) {
   cl::ParseCommandLineOptions(argc, argv,
-                              " LLVM-Counter\n\n"
-                              " Count the loops in a bitcode file.\n");
+                              " opt_loops\n\n"
+                              " Fine grain loop optimizer and configuration logger.\n");
 
   LLVMContext Context;
   SMDiagnostic Err;
@@ -442,7 +438,7 @@ int main(int argc, char** argv) {
   Builder.LoopVectorize = VectorizeEnable;
   Builder.populateModulePassManager(PM);
 
-  PM.add(createLoopLogPass(Yaml));
+  PM.add(createLoopLogPass());
 
   // PM to output the module
   if (OutputAssembly) {
@@ -453,6 +449,16 @@ int main(int argc, char** argv) {
   PM.run(*Module);
 
   Out.keep();
+
+  // Log loop configuration
+  auto jsonObjects = json::array();
+  for (auto LC : LCs) {
+    Yaml << LC;   // this invokes mapping(IO& io, LoopConfig& LC) in
+    json j = LC;  // this invokes to_json(json& j, const LoopConfig& LC)
+    jsonObjects.push_back(LC);
+  }
+  std::cout << jsonObjects << std::endl;
+
   ToolYAMLFile.close();
 
   return 0;
