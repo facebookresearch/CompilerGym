@@ -233,6 +233,9 @@ static cl::opt<bool> Force("f", cl::desc("Enable binary output on terminals"));
 // Output assembly
 static cl::opt<bool> OutputAssembly("S", cl::desc("Write output as LLVM assembly"));
 
+// Canonicalize the IR
+static cl::opt<bool> Canonicalize("canonicalize", cl::desc("Canonicalize the IR"), cl::init(false));
+
 // Preserve use list order
 static cl::opt<bool> PreserveBitcodeUseListOrder(
     "preserve-bc-uselistorder", cl::desc("Preserve use-list order when writing LLVM bitcode."),
@@ -426,10 +429,12 @@ int main(int argc, char** argv) {
   }
 
   // Canonicalize IR
-  IRCanonicalizer Canonicalizer(PreserveOrder, RenameAll, FoldPreoutputs, ReorderOperands);
+  if (Canonicalize) {
+    IRCanonicalizer Canonicalizer(PreserveOrder, RenameAll, FoldPreoutputs, ReorderOperands);
 
-  for (auto& Function : *Module) {
-    Canonicalizer.runOnFunction(Function);
+    for (auto& Function : *Module) {
+      Canonicalizer.runOnFunction(Function);
+    }
   }
 
   // Prepare loops dump/configuration yaml file
