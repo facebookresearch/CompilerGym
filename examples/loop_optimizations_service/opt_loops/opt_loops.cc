@@ -43,8 +43,8 @@ using namespace llvm;
 
 using namespace llvm::yaml;
 using llvm::yaml::IO;
+using llvm::yaml::Output;
 using llvm::yaml::ScalarEnumerationTraits;
-
 using json = nlohmann::json;
 
 // a version of LLVM's getOptionalIntLoopAttribute(...) that accepts `const` Loop as argument
@@ -108,6 +108,8 @@ struct LoopConfig {
   llvm::Optional<int> MetaLoopVectorWidth;
   bool MetaLoopIsVectorized;
   std::string IR;
+
+  LoopConfig() {}
 
   LoopConfig(Loop*& L) {
     Function* F = L->getBlocks()[0]->getParent();
@@ -285,7 +287,6 @@ class OptCustomPassManager : public legacy::PassManager {
 };
 
 std::vector<LoopConfig> LCs;
-using llvm::yaml::Output;
 class LoopLog : public llvm::FunctionPass {
  public:
   static char ID;
@@ -396,7 +397,8 @@ namespace llvm {
 Pass* createLoopLogPass() { return new LoopLog(); }
 }  // end namespace llvm
 
-#include <iostream>
+LLVM_YAML_IS_FLOW_SEQUENCE_VECTOR(LoopConfig)
+
 int main(int argc, char** argv) {
   cl::ParseCommandLineOptions(argc, argv,
                               " opt_loops\n\n"
@@ -454,10 +456,11 @@ int main(int argc, char** argv) {
   // Log loop configuration
   auto jsonObjects = json::array();
   for (auto LC : LCs) {
-    Yaml << LC;   // this invokes mapping(IO& io, LoopConfig& LC) in
+    // Yaml << LC;   // this invokes mapping(IO& io, LoopConfig& LC) in
     json j = LC;  // this invokes to_json(json& j, const LoopConfig& LC)
     jsonObjects.push_back(LC);
   }
+  Yaml << LCs;
   ToolJSONFile << jsonObjects;
 
   ToolYAMLFile.close();
