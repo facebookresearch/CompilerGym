@@ -228,6 +228,63 @@ struct llvm::yaml::MappingTraits<Loop*> {
   }
 };
 
+struct LoopConfig {
+  std::string FName;
+  std::string MName;
+  std::string IDStr;
+  unsigned int MetadataID;
+  std::string Name;
+  int Depth;
+  std::string HeaderName;
+  bool MetaLoopUnrollEnable;
+  bool MetaLoopUnrollDisable;
+  llvm::Optional<int> MetaLoopUnrollCount;
+  bool MetaLoopIsUnrolled;
+  bool MetaLoopVectorEnable;
+  bool MetaLoopVectorDisable;
+  llvm::Optional<int> MetaLoopVectorWidth;
+  bool MetaLoopIsVectorized;
+  std::string IR;
+
+  LoopConfig(Loop*& L) {
+    Function* F = L->getBlocks()[0]->getParent();
+    FName = F->getName();
+
+    Module* M = F->getParent();
+    MName = M->getName();
+
+    llvm::raw_string_ostream IDStream(IDStr);
+    L->getLoopID()->printAsOperand(IDStream, M);
+
+    MetadataID = L->getLoopID()->getMetadataID();  // this id always prints a value of 4. Not sure
+                                                   // if I am using it correctly
+    Name = L->getName();  // NOTE: actually L->getName calls L->getHeader()->getName()
+    Depth = L->getLoopDepth();
+
+    // TODO: find a way to provide a Name to the loop that will remain consisten across multiple
+    // `opt` calls
+    HeaderName = L->getHeader()->getName();
+    static int Count = 0;
+    if (HeaderName.length() == 0) {
+      HeaderName = "loop_" + std::to_string(Count++);
+      L->getHeader()->setName(HeaderName);
+    }
+
+    MetaLoopUnrollEnable = getBooleanLoopAttribute(L, "llvm.loop.unroll.enable");
+    MetaLoopUnrollDisable = getBooleanLoopAttribute(L, "llvm.loop.unroll.disable");
+    MetaLoopUnrollCount = getOptionalIntLoopAttribute(L, "llvm.loop.unroll.count");
+    MetaLoopIsUnrolled = getBooleanLoopAttribute(L, "llvm.loop.isunrolled");
+    MetaLoopVectorEnable = getBooleanLoopAttribute(L, "llvm.loop.vector.enable");
+    MetaLoopVectorDisable = getBooleanLoopAttribute(L, "llvm.loop.vector.disable");
+    MetaLoopVectorWidth = getOptionalIntLoopAttribute(L, "llvm.loop.vector.width");
+    MetaLoopIsVectorized = getBooleanLoopAttribute(L, "llvm.loop.isvectorized");
+
+    // dump the IR of the loop
+    llvm::raw_string_ostream stream(IR);
+    L->print(stream, true, true);
+  }
+};
+
 namespace {
 /// Input LLVM module file name.
 cl::opt<std::string> InputFilename(cl::Positional, cl::desc("Specify input filename"),
