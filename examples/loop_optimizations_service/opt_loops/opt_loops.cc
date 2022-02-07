@@ -399,6 +399,7 @@ Pass* createLoopLogPass() { return new LoopLog(); }
 
 LLVM_YAML_IS_FLOW_SEQUENCE_VECTOR(LoopConfig)
 
+#include <iostream>
 int main(int argc, char** argv) {
   cl::ParseCommandLineOptions(argc, argv,
                               " opt_loops\n\n"
@@ -428,7 +429,7 @@ int main(int argc, char** argv) {
   yaml::Output Yaml(ToolYAMLFile);
 
   // Prepare loops dump/configuration json file
-  std::fstream ToolJSONFile(OutputJSONFile, std::fstream::in | std::fstream::out);
+  std::fstream ToolJSONFile(OutputJSONFile, std::fstream::out);
 
   initializeLoopLogPass(*PassRegistry::getPassRegistry());
   OptCustomPassManager PM;
@@ -451,16 +452,15 @@ int main(int argc, char** argv) {
   }
   PM.run(*Module);
 
-  Out.keep();
-
   // Log loop configuration
   auto jsonObjects = json::array();
   jsonObjects = LCs;  // this invokes to_json(json& j, const LoopConfig& LC)
-  Yaml << LCs;        // this invokes mapping(IO& io, LoopConfig& LC)
   ToolJSONFile << jsonObjects;
 
-  ToolYAMLFile.close();
+  Yaml << LCs;  // this invokes mapping(IO& io, LoopConfig& LC) and writes to file
   ToolJSONFile.close();
+  ToolYAMLFile.close();
+  Out.keep();
 
   return 0;
 }
