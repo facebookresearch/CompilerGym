@@ -145,9 +145,9 @@ void to_json(json& j, const Loop& Lobj) {
   bool MetaLoopVectorDisable = getBooleanLoopAttribute(L, "llvm.loop.vector.disable");
   j["llvm.loop.vectorize.disable"] = MetaLoopVectorDisable;
 
-  /*auto MetaLoopVectorWidth = getOptionalIntLoopAttribute(L, "llvm.loop.vector.width");
+  auto MetaLoopVectorWidth = getOptionalIntLoopAttribute1(L, "llvm.loop.vector.width");
   if (MetaLoopVectorWidth.hasValue())
-    j["llvm.loop.vectorize.width"] = MetaLoopVectorWidth.getValue();*/
+    j["llvm.loop.vectorize.width"] = MetaLoopVectorWidth.getValue();
 
   bool MetaLoopIsVectorized = getBooleanLoopAttribute(L, "llvm.loop.isvectorized");
   j["llvm.loop.isvectorized"] = MetaLoopIsVectorized;
