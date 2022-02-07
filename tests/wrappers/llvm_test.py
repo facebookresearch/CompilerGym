@@ -66,7 +66,7 @@ def test_reward_range_not_runnable_benchmark(env: LlvmEnv):
 def test_fork(env: LlvmEnv):
     env = RuntimePointEstimateReward(env)
     with env.fork() as fkd:
-        assert fkd.reward_space_spec.id == "runtime"
+        assert fkd.reward_space_spec.name == "runtime"
 
 
 @pytest.mark.xfail(

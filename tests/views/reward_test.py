@@ -10,8 +10,8 @@ from tests.test_main import main
 
 
 class MockReward:
-    def __init__(self, id, ret=None):
-        self.id = id
+    def __init__(self, name, ret=None):
+        self.name = name
         self.ret = list(reversed(ret or []))
         self.observation_spaces = []
 
@@ -33,15 +33,15 @@ def test_empty_space():
 
 
 def test_invalid_reward_name():
-    reward = RewardView([MockReward(id="foo")], MockObservationView())
+    reward = RewardView([MockReward(name="foo")], MockObservationView())
     with pytest.raises(KeyError):
         _ = reward["invalid"]
 
 
 def test_reward_values():
     spaces = [
-        MockReward(id="codesize", ret=[-5]),
-        MockReward(id="runtime", ret=[10]),
+        MockReward(name="codesize", ret=[-5]),
+        MockReward(name="runtime", ret=[10]),
     ]
     reward = RewardView(spaces, MockObservationView())
 
@@ -54,8 +54,8 @@ def test_reward_values():
 
 def test_reward_values_bound_methods():
     spaces = [
-        MockReward(id="codesize", ret=[-5]),
-        MockReward(id="runtime", ret=[10]),
+        MockReward(name="codesize", ret=[-5]),
+        MockReward(name="runtime", ret=[10]),
     ]
     reward = RewardView(spaces, MockObservationView())
 

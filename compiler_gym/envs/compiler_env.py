@@ -485,7 +485,7 @@ class CompilerEnv(gym.Env):
     def reward_space(self, reward_space: Optional[Union[str, Reward]]) -> None:
         # Coerce the observation space into a string.
         reward_space: Optional[str] = (
-            reward_space.id if isinstance(reward_space, Reward) else reward_space
+            reward_space.name if isinstance(reward_space, Reward) else reward_space
         )
 
         if reward_space:
@@ -633,7 +633,7 @@ class CompilerEnv(gym.Env):
         if self.observation_space:
             new_env.observation_space = self.observation_space_spec.id
         if self.reward_space:
-            new_env.reward_space = self.reward_space.id
+            new_env.reward_space = self.reward_space.name
 
         # Copy over the mutable episode state.
         new_env.episode_reward = self.episode_reward

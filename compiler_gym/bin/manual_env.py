@@ -684,7 +684,7 @@ The 'tutorial' command will give a step by step guide."""
         Tab completion will be used if available.
         """
         if arg == "" and self.env.reward_space:
-            arg = self.env.reward_space.id
+            arg = self.env.reward_space.name
 
         if self.rewards.count(arg):
             with Timer(f"Reward {arg}"):

@@ -25,7 +25,7 @@ class FLOPSReward(Reward):
 
     def __init__(self):
         super().__init__(
-            id="flops",
+            name="flops",
             observation_spaces=["flops"],
             default_value=0,
             default_negates_returns=True,

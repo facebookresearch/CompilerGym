@@ -77,7 +77,7 @@ class LlvmEnv(CompilerEnv):
             datasets=_get_llvm_datasets(site_data_base=datasets_site_path),
             rewards=[
                 CostFunctionReward(
-                    id="IrInstructionCount",
+                    name="IrInstructionCount",
                     cost_function="IrInstructionCount",
                     init_cost_function="IrInstructionCountO0",
                     default_negates_returns=True,
@@ -85,7 +85,7 @@ class LlvmEnv(CompilerEnv):
                     platform_dependent=False,
                 ),
                 NormalizedReward(
-                    id="IrInstructionCountNorm",
+                    name="IrInstructionCountNorm",
                     cost_function="IrInstructionCount",
                     init_cost_function="IrInstructionCountO0",
                     max=1,
@@ -94,7 +94,7 @@ class LlvmEnv(CompilerEnv):
                     platform_dependent=False,
                 ),
                 BaselineImprovementNormalizedReward(
-                    id="IrInstructionCountO3",
+                    name="IrInstructionCountO3",
                     cost_function="IrInstructionCount",
                     baseline_cost_function="IrInstructionCountO3",
                     init_cost_function="IrInstructionCountO0",
@@ -104,7 +104,7 @@ class LlvmEnv(CompilerEnv):
                     platform_dependent=False,
                 ),
                 BaselineImprovementNormalizedReward(
-                    id="IrInstructionCountOz",
+                    name="IrInstructionCountOz",
                     cost_function="IrInstructionCount",
                     baseline_cost_function="IrInstructionCountOz",
                     init_cost_function="IrInstructionCountO0",
@@ -114,7 +114,7 @@ class LlvmEnv(CompilerEnv):
                     platform_dependent=False,
                 ),
                 CostFunctionReward(
-                    id="ObjectTextSizeBytes",
+                    name="ObjectTextSizeBytes",
                     cost_function="ObjectTextSizeBytes",
                     init_cost_function="ObjectTextSizeO0",
                     default_negates_returns=True,
@@ -122,7 +122,7 @@ class LlvmEnv(CompilerEnv):
                     platform_dependent=True,
                 ),
                 NormalizedReward(
-                    id="ObjectTextSizeNorm",
+                    name="ObjectTextSizeNorm",
                     cost_function="ObjectTextSizeBytes",
                     init_cost_function="ObjectTextSizeO0",
                     max=1,
@@ -131,7 +131,7 @@ class LlvmEnv(CompilerEnv):
                     platform_dependent=True,
                 ),
                 BaselineImprovementNormalizedReward(
-                    id="ObjectTextSizeO3",
+                    name="ObjectTextSizeO3",
                     cost_function="ObjectTextSizeBytes",
                     init_cost_function="ObjectTextSizeO0",
                     baseline_cost_function="ObjectTextSizeO3",
@@ -141,7 +141,7 @@ class LlvmEnv(CompilerEnv):
                     platform_dependent=True,
                 ),
                 BaselineImprovementNormalizedReward(
-                    id="ObjectTextSizeOz",
+                    name="ObjectTextSizeOz",
                     cost_function="ObjectTextSizeBytes",
                     init_cost_function="ObjectTextSizeO0",
                     baseline_cost_function="ObjectTextSizeOz",

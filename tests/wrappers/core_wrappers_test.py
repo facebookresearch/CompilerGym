@@ -190,7 +190,7 @@ def test_wrapped_env_changes_default_spaces(env: LlvmEnv, wrapper_type):
     env = MyWrapper(env)
     assert env.observation_space.shape == (56,)
     assert env.observation_space_spec.id == "Autophase"
-    assert env.reward_space.id == "IrInstructionCount"
+    assert env.reward_space.name == "IrInstructionCount"
 
     observation = env.reset()
     assert env.observation_space.contains(observation)
@@ -210,7 +210,7 @@ def test_wrapped_env_change_spaces(env: LlvmEnv, wrapper_type):
 
     assert env.observation_space.shape == (56,)
     assert env.observation_space_spec.id == "Autophase"
-    assert env.reward_space.id == "IrInstructionCount"
+    assert env.reward_space.name == "IrInstructionCount"
 
 
 def test_wrapped_action(env: LlvmEnv):
