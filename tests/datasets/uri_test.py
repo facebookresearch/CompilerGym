@@ -95,5 +95,19 @@ def test_canonicalize_1():
     assert BenchmarkUri.canonicalize("test-v0") == "benchmark://test-v0"
 
 
+def test_startswith():
+    uri = BenchmarkUri.from_string("benchmark://test-v0/foo")
+    assert not uri.startswith("!!!")
+    assert uri.startswith("b")
+    assert uri.startswith("benchmark://test-v0/fo")
+
+
+def test_endswith():
+    uri = BenchmarkUri.from_string("benchmark://test-v0/foo")
+    assert not uri.endswith("!!!")
+    assert uri.endswith("o")
+    assert uri.endswith("mark://test-v0/foo")
+
+
 if __name__ == "__main__":
     main()
