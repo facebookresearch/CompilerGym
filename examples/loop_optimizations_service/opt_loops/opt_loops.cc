@@ -9,7 +9,7 @@
 #include <unordered_map>
 #include <vector>
 
-#include "IRCanonicalizer.h"
+#include "compiler_gym/third_party/LLVM-Canon/IRCanonicalizer.h"
 #include "llvm/ADT/SetVector.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/SmallVector.h"

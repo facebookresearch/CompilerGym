@@ -4,12 +4,15 @@
 # in the root directory of this source tree.
 #
 # This package exposes the LLVM optimization pipeline as a CompilerGym service.
-load("@rules_cc//cc:defs.bzl", "cc_binary")
+load("@rules_cc//cc:defs.bzl", "cc_binary", "cc_library")
 
-cc_binary(
-    name = "opt_loops",
+cc_library(
+    name = "IRCanonicalizer",
     srcs = [
-        "opt_loops.cc",
+        "IRCanonicalizer.cc",
+    ],
+    hdrs = [
+        "IRCanonicalizer.h",
     ],
     copts = [
         "-Wall",
@@ -18,8 +21,6 @@ cc_binary(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//compiler_gym/third_party/LLVM-Canon:IRCanonicalizer",
         "@llvm//10.0.0",
-        "@nlohmann_json//:json",
     ],
 )
