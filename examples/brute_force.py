@@ -178,7 +178,7 @@ def run_brute_force(
 
         if not env.reward_space:
             raise ValueError("A reward space must be specified for random search")
-        reward_space_name = env.reward_space.id
+        reward_space_name = env.reward_space.name
 
         actions = [env.action_space.names.index(a) for a in action_names]
         benchmark_uri = str(env.benchmark)
