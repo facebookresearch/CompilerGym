@@ -428,15 +428,6 @@ int main(int argc, char** argv) {
     return 1;
   }
 
-  // Canonicalize IR
-  if (Canonicalize) {
-    IRCanonicalizer Canonicalizer(PreserveOrder, RenameAll, FoldPreoutputs, ReorderOperands);
-
-    for (auto& Function : *Module) {
-      Canonicalizer.runOnFunction(Function);
-    }
-  }
-
   // Prepare loops dump/configuration yaml file
   raw_fd_ostream ToolYAMLFile(OutputYAMLFile, EC);
   yaml::Output Yaml(ToolYAMLFile);
@@ -446,6 +437,14 @@ int main(int argc, char** argv) {
 
   initializeLoopLogPass(*PassRegistry::getPassRegistry());
   OptCustomPassManager PM;
+
+  // Canonicalize IR
+  if (Canonicalize) {
+    IRCanonicalizer* Canonicalizer =
+        new IRCanonicalizer(PreserveOrder, RenameAll, FoldPreoutputs, ReorderOperands);
+
+    PM.add(Canonicalizer);
+  }
   LoopConfiguratorPass* LoopConfigurator = new LoopConfiguratorPass();
   PM.add(LoopConfigurator);
   PM.add(createLoopUnrollPass());
