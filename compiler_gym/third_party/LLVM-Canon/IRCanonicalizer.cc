@@ -1,3 +1,7 @@
+/* Adapted from:
+ * https://github.com/michalpaszkowski/LLVM-Canon
+ */
+
 #include "IRCanonicalizer.h"
 
 #include <algorithm>
