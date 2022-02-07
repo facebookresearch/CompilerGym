@@ -18,7 +18,26 @@ cc_binary(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        ":IRCanonicalizer",
         "@llvm//10.0.0",
         "@nlohmann_json//:json",
+    ],
+)
+
+cc_library(
+    name = "IRCanonicalizer",
+    srcs = [
+        "IRCanonicalizer.cc",
+    ],
+    hdrs = [
+        "IRCanonicalizer.h",
+    ],
+    copts = [
+        "-Wall",
+        "-fdiagnostics-color=always",
+        "-fno-rtti",
+    ],
+    deps = [
+        "@llvm//10.0.0",
     ],
 )

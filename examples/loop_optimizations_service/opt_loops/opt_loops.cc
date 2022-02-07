@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include <vector>
 
+#include "IRCanonicalizer.h"
 #include "llvm/ADT/SetVector.h"
 #include "llvm/ADT/SmallPtrSet.h"
 #include "llvm/ADT/SmallVector.h"
@@ -244,6 +245,20 @@ static cl::opt<bool> PreserveAssemblyUseListOrder(
 static cl::opt<bool> DebugifyEach(
     "debugify-each", cl::desc("Start each pass with debugify and end it with check-debugify"));
 
+/// \name Canonicalizer flags.
+/// @{
+/// Preserves original order of instructions.
+cl::opt<bool> PreserveOrder("preserve-order", cl::desc("Preserves original instruction order"));
+/// Renames all instructions (including user-named).
+cl::opt<bool> RenameAll("rename-all", cl::desc("Renames all instructions (including user-named)"));
+/// Folds all regular instructions (including pre-outputs).
+cl::opt<bool> FoldPreoutputs("fold-all",
+                             cl::desc("Folds all regular instructions (including pre-outputs)"));
+/// Sorts and reorders operands in commutative instructions.
+cl::opt<bool> ReorderOperands("reorder-operands",
+                              cl::desc("Sorts and reorders operands in commutative instructions"));
+/// @}
+
 class OptCustomPassManager : public legacy::PassManager {
   DebugifyStatsMap DIStatsMap;
 
@@ -421,6 +436,13 @@ int main(int argc, char** argv) {
                        "Could not open output file: " + EC.message());
     Err.print(argv[0], errs());
     return 1;
+  }
+
+  // Canonicalize IR
+  IRCanonicalizer Canonicalizer(PreserveOrder, RenameAll, FoldPreoutputs, ReorderOperands);
+
+  for (auto& Function : *Module) {
+    Canonicalizer.runOnFunction(Function);
   }
 
   // Prepare loops dump/configuration yaml file
