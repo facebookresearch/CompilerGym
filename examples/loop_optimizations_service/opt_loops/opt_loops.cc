@@ -90,76 +90,6 @@ std::string getStringMetadataFromLoop(Loop*& L, const char* MDString) {
   return std::to_string(mdconst::extract<ConstantInt>(*Op)->getZExtValue());
 }
 
-namespace llvm {
-void to_json(json& j, const Loop& Lobj) {
-  auto L = &Lobj;
-  Function* F = L->getBlocks()[0]->getParent();
-  std::string FName = F->getName();
-
-  Module* M = F->getParent();
-  std::string MName = M->getName();
-
-  std::string IDStr;
-  llvm::raw_string_ostream IDStream(IDStr);
-  L->getLoopID()->printAsOperand(IDStream, M);
-  j["ID"] = IDStr;
-  j["Function"] = FName;
-  j["Module"] = MName;
-
-  // this id always prints a value of 4. Not sure if I am using it correctly
-  auto MetadataID = L->getLoopID()->getMetadataID();
-  j["MetadataID"] = MetadataID;
-
-  std::string Name = L->getName();  // NOTE: actually L->getName calls L->getHeader()->getName()
-  j["Name"] = L->getName();
-
-  int Depth = L->getLoopDepth();
-  j["Depth"] = Depth;
-
-  // TODO: find a way to provide a Name to the loop that will remain consisten across multiple
-  // `opt` calls
-  std::string HeaderName = L->getHeader()->getName();
-  static int Count = 0;
-  if (HeaderName.length() == 0) {
-    HeaderName = "loop_" + std::to_string(Count++);
-    L->getHeader()->setName(HeaderName);
-  }
-  j["HeaderName"] = HeaderName;
-
-  bool MetaLoopUnrollEnable = getBooleanLoopAttribute(L, "llvm.loop.unroll.enable");
-  j["llvm.loop.unroll.enable"] = MetaLoopUnrollEnable;
-
-  bool MetaLoopUnrollDisable = getBooleanLoopAttribute(L, "llvm.loop.unroll.disable");
-  j["llvm.loop.unroll.disable"] = MetaLoopUnrollDisable;
-
-  auto MetaLoopUnrollCount = getOptionalIntLoopAttribute1(L, "llvm.loop.unroll.count");
-  if (MetaLoopUnrollCount.hasValue())
-    j["llvm.loop.unroll.count"] = MetaLoopUnrollCount.getValue();
-
-  bool MetaLoopIsUnrolled = getBooleanLoopAttribute(L, "llvm.loop.isunrolled");
-  j["llvm.loop.isunrolled"] = MetaLoopIsUnrolled;
-
-  bool MetaLoopVectorEnable = getBooleanLoopAttribute(L, "llvm.loop.vector.enable");
-  j["llvm.loop.vectorize.enable"] = MetaLoopVectorEnable;
-
-  bool MetaLoopVectorDisable = getBooleanLoopAttribute(L, "llvm.loop.vector.disable");
-  j["llvm.loop.vectorize.disable"] = MetaLoopVectorDisable;
-
-  auto MetaLoopVectorWidth = getOptionalIntLoopAttribute1(L, "llvm.loop.vector.width");
-  if (MetaLoopVectorWidth.hasValue())
-    j["llvm.loop.vectorize.width"] = MetaLoopVectorWidth.getValue();
-
-  bool MetaLoopIsVectorized = getBooleanLoopAttribute(L, "llvm.loop.isvectorized");
-  j["llvm.loop.isvectorized"] = MetaLoopIsVectorized;
-
-  // dump the IR of the loop
-  std::string IR;
-  llvm::raw_string_ostream stream(IR);
-  L->print(stream, true, true);
-  j["llvm"] = IR;
-}
-}  // namespace llvm
-
 template <>
 struct llvm::yaml::MappingTraits<Loop*> {
   static void mapping(IO& io, Loop*& L) {
@@ -284,6 +214,27 @@ struct LoopConfig {
     L->print(stream, true, true);
   }
 };
+
+void to_json(json& j, const LoopConfig& LC) {
+  j["ID"] = LC.IDStr;
+  j["Function"] = LC.FName;
+  j["Module"] = LC.MName;
+  j["MetadataID"] = LC.MetadataID;
+  j["Name"] = LC.Name;
+  j["Depth"] = LC.Depth;
+  j["HeaderName"] = LC.HeaderName;
+  j["llvm.loop.unroll.enable"] = LC.MetaLoopUnrollEnable;
+  j["llvm.loop.unroll.disable"] = LC.MetaLoopUnrollDisable;
+  if (LC.MetaLoopUnrollCount.hasValue())
+    j["llvm.loop.unroll.count"] = LC.MetaLoopUnrollCount.getValue();
+  j["llvm.loop.isunrolled"] = LC.MetaLoopIsUnrolled;
+  j["llvm.loop.vectorize.enable"] = LC.MetaLoopVectorEnable;
+  j["llvm.loop.vectorize.disable"] = LC.MetaLoopVectorDisable;
+  if (LC.MetaLoopVectorWidth.hasValue())
+    j["llvm.loop.vectorize.width"] = LC.MetaLoopVectorWidth.getValue();
+  j["llvm.loop.isvectorized"] = LC.MetaLoopIsVectorized;
+  j["llvm"] = LC.IR;
+}
 
 namespace {
 /// Input LLVM module file name.
@@ -414,7 +365,8 @@ class LoopLog : public llvm::FunctionPass {
 
     auto jsonObjects = json::array();
     for (auto L : Loops) {
-      json j = *L;
+      LoopConfig LC(L);
+      json j = LC;
       jsonObjects.push_back(j);
     }
     std::cout << jsonObjects << std::endl;
