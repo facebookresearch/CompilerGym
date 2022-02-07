@@ -90,74 +90,6 @@ std::string getStringMetadataFromLoop(Loop*& L, const char* MDString) {
   return std::to_string(mdconst::extract<ConstantInt>(*Op)->getZExtValue());
 }
 
-template <>
-struct llvm::yaml::MappingTraits<Loop*> {
-  static void mapping(IO& io, Loop*& L) {
-    Function* F = L->getBlocks()[0]->getParent();
-    std::string FName = F->getName();
-
-    Module* M = F->getParent();
-    std::string MName = M->getName();
-
-    std::string IDStr;
-    llvm::raw_string_ostream IDStream(IDStr);
-    L->getLoopID()->printAsOperand(IDStream, M);
-    io.mapRequired("ID", IDStr);
-    io.mapRequired("Function", FName);
-    io.mapRequired("Module", MName);
-
-    // this id always prints a value of 4. Not sure if I am using it correctly
-    auto MetadataID = L->getLoopID()->getMetadataID();
-    io.mapRequired("MetadataID", MetadataID);
-
-    std::string Name = L->getName();  // NOTE: actually L->getName calls L->getHeader()->getName()
-    io.mapRequired("Name", Name);
-
-    int Depth = L->getLoopDepth();
-    io.mapRequired("Depth", Depth);
-
-    // TODO: find a way to provide a Name to the loop that will remain consisten across multiple
-    // `opt` calls
-    std::string HeaderName = L->getHeader()->getName();
-    static int Count = 0;
-    if (HeaderName.length() == 0) {
-      HeaderName = "loop_" + std::to_string(Count++);
-      L->getHeader()->setName(HeaderName);
-    }
-    io.mapRequired("HeaderName", HeaderName);
-
-    bool MetaLoopUnrollEnable = getBooleanLoopAttribute(L, "llvm.loop.unroll.enable");
-    io.mapOptional("llvm.loop.unroll.enable", MetaLoopUnrollEnable);
-
-    bool MetaLoopUnrollDisable = getBooleanLoopAttribute(L, "llvm.loop.unroll.disable");
-    io.mapOptional("llvm.loop.unroll.disable", MetaLoopUnrollDisable);
-
-    auto MetaLoopUnrollCount = getOptionalIntLoopAttribute(L, "llvm.loop.unroll.count");
-    io.mapOptional("llvm.loop.unroll.count", MetaLoopUnrollCount);
-
-    bool MetaLoopIsUnrolled = getBooleanLoopAttribute(L, "llvm.loop.isunrolled");
-    io.mapOptional("llvm.loop.isunrolled", MetaLoopIsUnrolled);
-
-    bool MetaLoopVectorEnable = getBooleanLoopAttribute(L, "llvm.loop.vector.enable");
-    io.mapOptional("llvm.loop.vectorize.enable", MetaLoopVectorEnable);
-
-    bool MetaLoopVectorDisable = getBooleanLoopAttribute(L, "llvm.loop.vector.disable");
-    io.mapOptional("llvm.loop.vectorize.disable", MetaLoopVectorDisable);
-
-    auto MetaLoopVectorWidth = getOptionalIntLoopAttribute(L, "llvm.loop.vector.width");
-    io.mapOptional("llvm.loop.vectorize.width", MetaLoopVectorWidth);
-
-    bool MetaLoopIsVectorized = getBooleanLoopAttribute(L, "llvm.loop.isvectorized");
-    io.mapOptional("llvm.loop.isvectorized", MetaLoopIsVectorized);
-
-    // dump the IR of the loop
-    std::string IR;
-    llvm::raw_string_ostream stream(IR);
-    L->print(stream, true, true);
-    io.mapOptional("llvm", IR);
-  }
-};
-
 struct LoopConfig {
   std::string FName;
   std::string MName;
@@ -235,6 +167,28 @@ void to_json(json& j, const LoopConfig& LC) {
   j["llvm.loop.isvectorized"] = LC.MetaLoopIsVectorized;
   j["llvm"] = LC.IR;
 }
+
+template <>
+struct llvm::yaml::MappingTraits<LoopConfig> {
+  static void mapping(IO& io, LoopConfig& LC) {
+    io.mapRequired("ID", LC.IDStr);
+    io.mapRequired("Function", LC.FName);
+    io.mapRequired("Module", LC.MName);
+    io.mapRequired("MetadataID", LC.MetadataID);
+    io.mapRequired("Name", LC.Name);
+    io.mapRequired("Depth", LC.Depth);
+    io.mapRequired("HeaderName", LC.HeaderName);
+    io.mapOptional("llvm.loop.unroll.enable", LC.MetaLoopUnrollEnable);
+    io.mapOptional("llvm.loop.unroll.disable", LC.MetaLoopUnrollDisable);
+    io.mapOptional("llvm.loop.unroll.count", LC.MetaLoopUnrollCount);
+    io.mapOptional("llvm.loop.isunrolled", LC.MetaLoopIsUnrolled);
+    io.mapOptional("llvm.loop.vectorize.enable", LC.MetaLoopVectorEnable);
+    io.mapOptional("llvm.loop.vectorize.disable", LC.MetaLoopVectorDisable);
+    io.mapOptional("llvm.loop.vectorize.width", LC.MetaLoopVectorWidth);
+    io.mapOptional("llvm.loop.isvectorized", LC.MetaLoopIsVectorized);
+    io.mapOptional("llvm", LC.IR);
+  }
+};
 
 namespace {
 /// Input LLVM module file name.
@@ -358,15 +312,11 @@ class LoopLog : public llvm::FunctionPass {
       }
     }
 
-    for (auto L : Loops) {
-      // this will invoke mapping(IO& io, Loop*& L) in llvm::yaml::MappingTraits<Loop*>
-      Yaml << L;
-    }
-
     auto jsonObjects = json::array();
     for (auto L : Loops) {
       LoopConfig LC(L);
-      json j = LC;
+      Yaml << LC;   // this invokes mapping(IO& io, LoopConfig& LC) in
+      json j = LC;  // this invokes to_json(json& j, const LoopConfig& LC)
       jsonObjects.push_back(j);
     }
     std::cout << jsonObjects << std::endl;
