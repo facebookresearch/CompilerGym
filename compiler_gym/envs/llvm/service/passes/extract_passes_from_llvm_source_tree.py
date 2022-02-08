@@ -18,7 +18,7 @@ Implementation notes
 This implements a not-very-good parser for the INITIALIZE_PASS() family of
 macros, which are used in the LLVM sources to declare a pass using it's name,
 flag, and docstring. Parsing known macros like this is fragile and likely to
-break as the LLVM sources evolve. Currently only tested on LLVM 10.0.
+break as the LLVM sources evolve. Currently only tested on LLVM 10.0 and 13.0.1.
 
 A more robust solution would be to parse the C++ sources and extract all classes
 which inherit from ModulePass etc.
@@ -56,6 +56,24 @@ def parse_initialize_pass(
     source_path: Path, header: Optional[str], input_source: str, defines: Dict[str, str]
 ) -> Iterable[Pass]:
     """A shitty parser for INITIALIZE_PASS() macro invocations.."""
+    # ****************************************************
+    #           __        _
+    #         _/  \    _(\(o
+    #        /     \  /  _  ^^^o
+    #       /   !   \/  ! '!!!v'
+    #      !  !  \ _' ( \____
+    #      ! . \ _!\   \===^\)
+    #       \ \_!  / __!
+    #        \!   /    \
+    #  (\_      _/   _\ )
+    #   \ ^^--^^ __-^ /(__
+    #    ^^----^^    "^--v'
+    #
+    #           HERE BE DRAGONS!
+    #
+    # TODO(cummins): Take this code out back and shoot it.
+    # ****************************************************
+
     # Squish down to a single line.
     source = re.sub(r"\n\s*", " ", input_source, re.MULTILINE)
     # Contract multi-spaces to single space.
