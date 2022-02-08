@@ -96,19 +96,7 @@ else()
   find_package(glog REQUIRED)
 endif()
 
-# # C++ subprocess management. https://github.com/arun11299/cpp-subprocess
-
-set(COMPILER_GYM_SUBPROCESS_PROVIDER "internal" CACHE STRING "Find or build subprocess together with Compiler Gym.")
-set_property(CACHE COMPILER_GYM_SUBPROCESS_PROVIDER PROPERTY STRINGS "internal" "external")
-if(COMPILER_GYM_SUBPROCESS_PROVIDER STREQUAL "internal")
-  build_external_cmake_project(
-    NAME subprocess
-    SRC_DIR "${CMAKE_CURRENT_LIST_DIR}/subprocess"
-  )
-endif()
-find_package(Subprocess REQUIRED)
-
-# # === LLVM ===
+# === LLVM ===
 
 set(COMPILER_GYM_LLVM_PROVIDER "internal" CACHE STRING "Find or build llvm together with Compiler Gym.")
 set_property(CACHE COMPILER_GYM_LLVM_PROVIDER PROPERTY STRINGS "internal" "external")

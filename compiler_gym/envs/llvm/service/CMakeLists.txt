@@ -210,7 +210,6 @@ cg_cc_library(
     ProGraML::graph::format::node_link_graph
     ProGraML::ir::llvm::llvm-10
     ProGraML::proto::programl_cc
-    Subprocess::libsubprocess
     CpuInfo::cpuinfo
     Clog::libclog
   INCLUDES
