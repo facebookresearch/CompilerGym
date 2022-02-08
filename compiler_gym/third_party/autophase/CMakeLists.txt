@@ -52,12 +52,3 @@ cg_cc_binary(
   DEFINES
     ${LLVM_DEFINITIONS}
 )
-
-cg_genrule(
-  NAME libLLVMPolly
-  OUTS "libLLVMPolly.so"
-  COMMAND
-    "cp $<TARGET_FILE:LLVMPolly> $@"
-  ABS_DEPENDS
-    LLVMPolly
-)

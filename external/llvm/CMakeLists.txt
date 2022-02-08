@@ -32,7 +32,7 @@ else()
   set(_INSTALL_COMMAND "${CMAKE_COMMAND}" --install "<BINARY_DIR>")
 endif()
 
-file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/llvm_initial_cache.cmake" "set(LLVM_ENABLE_PROJECTS \"clang;polly\" CACHE STRING \"\")\n")
+file(APPEND "${CMAKE_CURRENT_BINARY_DIR}/llvm_initial_cache.cmake" "set(LLVM_ENABLE_PROJECTS \"clang\" CACHE STRING \"\")\n")
 
 ExternalProject_Add(
   llvm

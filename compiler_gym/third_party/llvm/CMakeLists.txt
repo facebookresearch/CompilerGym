@@ -33,15 +33,6 @@ cg_cc_binary(
     ${LLVM_DEFINITIONS}
 )
 
-cg_genrule(
-  NAME libLLVMPolly
-  OUTS "libLLVMPolly.so"
-  COMMAND
-    "cp $<TARGET_FILE:LLVMPolly> $@"
-  ABS_DEPENDS
-    LLVMPolly
-)
-
 cg_py_library(
   NAME
     instcount
