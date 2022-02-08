@@ -326,8 +326,6 @@ class LoopLog : public llvm::FunctionPass {
 
     return false;
   }
-
- protected:
 };
 
 char LoopLog::ID = 0;
