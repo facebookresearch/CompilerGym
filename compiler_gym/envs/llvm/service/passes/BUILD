@@ -2,7 +2,7 @@
 # and converting them to an action space for reinforcement learning.
 #
 # These scripts are used to programatically generate C++ headers and sources
-# that are then used to compiler the C++ LLVM compiler service.
+# that are then used to compile the LLVM compiler service.
 load("@rules_python//python:defs.bzl", "py_binary", "py_library")
 
 genrule(
