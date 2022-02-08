@@ -366,7 +366,7 @@ char LoopConfiguratorPass::ID = 1;
 /// On error, messages are written to stderr and null is returned.
 ///
 /// \param Context LLVM Context for the module.
-/// \param Name Input file Name.
+/// \param Name Input file name.
 static std::unique_ptr<Module> readModule(LLVMContext& Context, StringRef Name) {
   SMDiagnostic Diag;
   std::unique_ptr<Module> Module = parseIRFile(Name, Diag, Context);
