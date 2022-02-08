@@ -28,6 +28,7 @@ import csv
 import logging
 import os
 import re
+import shlex
 import subprocess
 import sys
 from pathlib import Path
@@ -92,6 +93,7 @@ def parse_initialize_pass(
     start = 0
     in_quotes = False
     in_comment = False
+    substr = ""
     for i in range(len(source)):
         if (
             not in_comment
@@ -100,6 +102,7 @@ def parse_initialize_pass(
             and source[i + 1] == "*"
         ):
             in_comment = True
+            substr += source[start:i].strip()
         if (
             in_comment
             and source[i] == "*"
@@ -111,9 +114,11 @@ def parse_initialize_pass(
         if source[i] == '"':
             in_quotes = not in_quotes
         if not in_quotes and source[i] == ",":
-            components.append(source[start:i].strip())
+            substr += source[start:i].strip()
+            components.append(substr)
+            substr = ""
             start = i + 2
-    components.append(source[start:].strip())
+    components.append(substr + source[start:].strip())
     if len(components) != 5:
         raise ParseError(
             f"Expected 5 components, found {len(components)}", source, components
@@ -126,14 +131,18 @@ def parse_initialize_pass(
     if not name:
         raise ParseError(f"Empty name: `{name}`", source, components)
 
-    while arg in defines:
-        arg = defines[arg]
+    # Dodgy code to combine adjacent strings with macro expansion. For example,
+    # 'DEBUG_TYPE "-foo"'.
+    arg_components = shlex.split(arg)
+    for i, _ in enumerate(arg_components):
+        while arg_components[i] in defines:
+            arg_components[i] = defines[arg_components[i]]
+    arg = " ".join(arg_components)
+    if arg[0] == '"' and arg[-1] == '"':
+        arg = arg[1:-1]
+
     while name in defines:
         name = defines[name]
-
-    if not (arg[0] == '"' and arg[-1] == '"'):
-        raise ParseError(f"Could not interpret arg `{arg}`", source, components)
-    arg = arg[1:-1]
     if not (name[0] == '"' and name[-1] == '"'):
         raise ParseError(f"Could not interpret name `{name}`", source, components)
     name = name[1:-1]
