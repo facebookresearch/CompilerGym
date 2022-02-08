@@ -10,7 +10,7 @@ include(build_external_cmake_project)
 
 unset(FETCH_CONTENT_LIST)
 
-# # === Google test ===
+# === Google test ===
 
 set(COMPILER_GYM_GTEST_PROVIDER "internal" CACHE STRING "Find or build gtest together with Compiler Gym.")
 set_property(CACHE COMPILER_GYM_GTEST_PROVIDER PROPERTY STRINGS "internal" "external")
@@ -28,7 +28,7 @@ else()
   find_package(GTest REQUIRED)
 endif()
 
-# # === Google benchmark ===
+# === Google benchmark ===
 
 set(COMPILER_GYM_BENCHMARK_PROVIDER "internal" CACHE STRING "Find or build benchmark together with Compiler Gym.")
 set_property(CACHE COMPILER_GYM_BENCHMARK_PROVIDER PROPERTY STRINGS "internal" "external")
@@ -57,7 +57,7 @@ else()
   find_package(benchmark REQUIRED)
 endif()
 
-# # === Abseil ===
+# === Abseil ===
 
 set(COMPILER_GYM_ABSEIL_PROVIDER "internal" CACHE STRING "Find or build abseil together with Compiler Gym.")
 set_property(CACHE COMPILER_GYM_ABSEIL_PROVIDER PROPERTY STRINGS "internal" "external")
@@ -68,7 +68,7 @@ if(COMPILER_GYM_ABSEIL_PROVIDER STREQUAL "internal")
 endif()
 find_package(absl REQUIRED)
 
-# # === Google flags ===
+# === Google flags ===
 
 set(COMPILER_GYM_GFLAGS_PROVIDER "internal" CACHE STRING "Find or build gflags together with Compiler Gym.")
 set_property(CACHE COMPILER_GYM_GFLAGS_PROVIDER PROPERTY STRINGS "internal" "external")
@@ -79,8 +79,7 @@ if(COMPILER_GYM_GFLAGS_PROVIDER STREQUAL "internal")
 endif()
 find_package(gflags REQUIRED)
 
-
-# # === Google logging ===
+# === Google logging ===
 
 set(COMPILER_GYM_GLOG_PROVIDER "internal" CACHE STRING "Find or build glog together with Compiler Gym.")
 set_property(CACHE COMPILER_GYM_GLOG_PROVIDER PROPERTY STRINGS "internal" "external")
@@ -109,8 +108,7 @@ find_package(LLVM 10.0.0 EXACT REQUIRED)
 # In a bunch of places in the code it is used "#include <include/llvm/...>"
 list(APPEND LLVM_INCLUDE_DIRS "${CMAKE_CURRENT_BINARY_DIR}/external/llvm/install")
 
-
-# # === Protocol buffers ===
+# === Protocol buffers ===
 
 set(COMPILER_GYM_PROTOBUF_PROVIDER "internal" CACHE STRING "Find or build protobuf together with Compiler Gym.")
 set_property(CACHE COMPILER_GYM_PROTOBUF_PROVIDER PROPERTY STRINGS "internal" "external")
@@ -137,7 +135,7 @@ if(COMPILER_GYM_PROTOBUF_PROVIDER STREQUAL "internal")
 endif()
 find_package(Protobuf REQUIRED)
 
-# # === GRPC ===
+# === GRPC ===
 
 set(COMPILER_GYM_GRPC_PROVIDER "internal" CACHE STRING "Find or build gRPC together with Compiler Gym.")
 set_property(CACHE COMPILER_GYM_GRPC_PROVIDER PROPERTY STRINGS "internal" "external")
@@ -185,8 +183,8 @@ else()
   set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:grpc::grpc_cpp_plugin>)
 endif()
 
-# # === C++ enum trickery ===
-# # https://github.com/Neargye/magic_enum
+# === C++ enum trickery ===
+# https://github.com/Neargye/magic_enum
 
 set(COMPILER_GYM_MAGIC_ENUM_PROVIDER "internal" CACHE STRING "Find or build magic_enum together with Compiler Gym.")
 set_property(CACHE COMPILER_GYM_MAGIC_ENUM_PROVIDER PROPERTY STRINGS "internal" "external")
@@ -202,8 +200,8 @@ else()
   find_package(magic_enum REQUIRED)
 endif()
 
-# # === ctuning-programs ===
-# # https://github.com/ChrisCummins/ctuning-programs
+# === ctuning-programs ===
+# https://github.com/ChrisCummins/ctuning-programs
 
 # This seems to be unused.
 #ExternalProject_Add(
@@ -228,8 +226,8 @@ source_group(
     FILES "ctuning-programs/README.md"
 )
 
-# # === cBench ===
-# # https://ctuning.org/wiki/index.php/CTools:CBench
+# === cBench ===
+# https://ctuning.org/wiki/index.php/CTools:CBench
 
 FetchContent_Declare(
     cBench
@@ -250,7 +248,7 @@ FetchContent_Declare(
 FetchContent_MakeAvailable(ctuning-ai)
 FetchContent_GetProperties(ctuning-ai SOURCE_DIR ctuning_ai_SRC_DIR)
 
-# # Datasets.
+# Datasets.
 
 FetchContent_Declare(
   cBench_consumer_tiff_data
@@ -362,7 +360,7 @@ FetchContent_MakeAvailable(cBench_automotive_qsort_data)
 set(cBench_automotive_qsort_data_FILE
   "${CMAKE_CURRENT_BINARY_DIR}/external/cBench_automotive_qsort_data/src/cDatasets_V1.1_automotive_qsort_data.tar.gz")
 
-# # === C++ cpuinfo ===
+# === C++ cpuinfo ===
 
 set(COMPILER_GYM_CPUINFO_PROVIDER "internal" CACHE STRING "Find or build cpuinfo together with Compiler Gym.")
 set_property(CACHE COMPILER_GYM_CPUINFO_PROVIDER PROPERTY STRINGS "internal" "external")
@@ -389,8 +387,8 @@ find_package(Clog REQUIRED)
 #  "${_CpuInfo_LINK_LIBS}")
 
 
-# # === Csmith ===
-# # https://embed.cs.utah.edu/csmith/
+# === Csmith ===
+# https://embed.cs.utah.edu/csmith/
 
 build_external_cmake_project(
   NAME csmith
@@ -398,8 +396,8 @@ build_external_cmake_project(
   INSTALL_PREFIX "${CMAKE_CURRENT_BINARY_DIR}/external/csmith/install/csmith")
 find_package(Csmith REQUIRED)
 
-# # === DeepDataFlow ===
-# # https://zenodo.org/record/4122437
+# === DeepDataFlow ===
+# https://zenodo.org/record/4122437
 
 #FetchContent_Declare(
 #    DeepDataFlow
@@ -427,7 +425,7 @@ else()
   find_package(fmt REQUIRED)
 endif()
 
-# # === Boost ===
+# === Boost ===
 
 set(COMPILER_GYM_BOOST_PROVIDER "internal" CACHE STRING "Find or build boost together with Compiler Gym.")
 set_property(CACHE COMPILER_GYM_BOOST_PROVIDER PROPERTY STRINGS "internal" "external")
@@ -441,7 +439,7 @@ if(COMPILER_GYM_BOOST_PROVIDER STREQUAL "internal")
 endif()
 find_package(Boost REQUIRED COMPONENTS filesystem headers)
 
-# # === nlohmann_json ===
+# === nlohmann_json ===
 
 set(COMPILER_GYM_NLOHMANN_JSON_PROVIDER "internal" CACHE STRING "Find or build nlohmann_json together with Compiler Gym.")
 set_property(CACHE COMPILER_GYM_NLOHMANN_JSON_PROVIDER PROPERTY STRINGS "internal" "external")
@@ -457,8 +455,8 @@ else()
   find_package(nlohmann_json REQUIRED)
 endif()
 
-# # === ProGraML ===
-# # https://github.com/ChrisCummins/ProGraML
+# === ProGraML ===
+# https://github.com/ChrisCummins/ProGraML
 
 build_external_cmake_project(
   NAME programl
