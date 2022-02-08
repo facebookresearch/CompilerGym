@@ -49,7 +49,7 @@ if (Csmith_EXECUTABLE)
 
   get_filename_component(Csmith_ROOT_DIR "${Csmith_EXECUTABLE}" DIRECTORY)
   get_filename_component(Csmith_ROOT_DIR "${Csmith_ROOT_DIR}/.." ABSOLUTE)
-  set(Csmith_ROOT_DIR "${Csmith_ROOT_DIR}" CACHE string "Path to the root installation directory of Csmith.")
+  set(Csmith_ROOT_DIR "${Csmith_ROOT_DIR}" CACHE STRING "Path to the root installation directory of Csmith.")
 endif()
 find_path(Csmith_INCLUDE_DIRS csmith.h PATH_SUFFIXES csmith csmith-2.3.0)
 find_library(Csmith_LIBRARIES csmith)
