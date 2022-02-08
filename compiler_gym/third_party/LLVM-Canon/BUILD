@@ -13,8 +13,6 @@ cc_library(
         "IRCanonicalizer.h",
     ],
     copts = [
-        "-Wall",
-        "-fdiagnostics-color=always",
         "-fno-rtti",
     ],
     visibility = ["//visibility:public"],
