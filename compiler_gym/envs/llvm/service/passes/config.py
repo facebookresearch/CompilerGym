@@ -7,11 +7,12 @@ from common import Pass
 
 # A set of headers that must be included.
 EXTRA_LLVM_HEADERS = {
-    "include/llvm/LinkAllPasses.h",
-    "include/llvm/Transforms/Coroutines.h",
-    "include/llvm/Transforms/IPO.h",
-    "include/llvm/Transforms/Scalar.h",
-    "include/llvm/Transforms/Utils.h",
+    "llvm/LinkAllPasses.h",
+    "llvm/Transforms/Coroutines.h",
+    "llvm/Transforms/Instrumentation.h",
+    "llvm/Transforms/IPO.h",
+    "llvm/Transforms/Scalar.h",
+    "llvm/Transforms/Utils.h",
 }
 
 # A mapping from the name of a pass as defined in a INITIALIZE_PASS(name, ...)

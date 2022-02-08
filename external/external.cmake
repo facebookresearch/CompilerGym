@@ -105,8 +105,6 @@ build_external_cmake_project(
   CONFIG_ARGS "-DCOMPILER_GYM_LLVM_PROVIDER=${COMPILER_GYM_LLVM_PROVIDER}")
 set(LLVM_SRC_DIR "${CMAKE_CURRENT_BINARY_DIR}/external/llvm/llvm/src/llvm")
 find_package(LLVM 10.0.0 EXACT REQUIRED)
-# In a bunch of places in the code it is used "#include <include/llvm/...>"
-list(APPEND LLVM_INCLUDE_DIRS "${CMAKE_CURRENT_BINARY_DIR}/external/llvm/install")
 
 # === Protocol buffers ===
 

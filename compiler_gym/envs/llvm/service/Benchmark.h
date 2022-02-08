@@ -14,9 +14,9 @@
 #include "compiler_gym/envs/llvm/service/Cost.h"
 #include "compiler_gym/service/proto/compiler_gym_service.pb.h"
 #include "compiler_gym/util/Subprocess.h"
-#include "include/llvm/IR/ModuleSummaryIndex.h"
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
+#include "llvm/IR/ModuleSummaryIndex.h"
 
 namespace compiler_gym::llvm_service {
 
