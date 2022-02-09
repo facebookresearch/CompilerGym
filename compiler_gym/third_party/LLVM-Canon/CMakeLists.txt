@@ -21,4 +21,3 @@ cg_cc_library(
   DEFINES
     ${LLVM_DEFINITIONS}
 )
-
