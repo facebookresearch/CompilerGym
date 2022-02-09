@@ -37,8 +37,8 @@ a standalone script without using the bazel build system.
 1. Build the `loop_unroller` custom tool that modifies the unrolling factor of each loop in a LLVM IR file:
 Follow the [Building from source using CMake](../../INSTALL.md#building-from-source-with-cmake) instructions with `-DCOMPILER_GYM_BUILD_EXAMPLES=ON` added to the `cmake` command.
 
-2. Run the example
+2. Run the example from the `examples` directory of the repo
 ```sh
 $ cd examples
-$ python3 example_compiler_gym_service/demo_without_bazel.py
+$ python3 example_unrolling_service/demo_without_bazel.py
 ```
