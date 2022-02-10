@@ -72,3 +72,7 @@ repos:
       rev: v1.0
       hooks:
           - id: dockerlint
+    - repo: https://github.com/BlankSpruce/gersemi
+      rev: 0.7.5
+      hooks:
+          - id: gersemi
