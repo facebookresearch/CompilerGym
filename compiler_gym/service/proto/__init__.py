@@ -109,7 +109,6 @@ __all__ = [
     "GetVersionReply",
     "GetVersionRequest",
     "Int64Box",
-    "Int64List",
     "Int64Range",
     "Int64SequenceSpace",
     "Int64Tensor",

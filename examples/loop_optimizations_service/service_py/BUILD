@@ -17,6 +17,8 @@ py_binary(
         "//compiler_gym/service",
         "//compiler_gym/service/proto",
         "//compiler_gym/service/runtime",
+        "//compiler_gym/spaces",
+        "//compiler_gym/third_party/inst2vec",
         "//compiler_gym/third_party/llvm",
     ],
 )
