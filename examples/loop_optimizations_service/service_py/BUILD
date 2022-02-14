@@ -8,6 +8,7 @@ py_binary(
     name = "loops-opt-service-py",
     srcs = ["loops_opt_service.py"],
     data = [
+        "//compiler_gym/third_party/autophase",
         "//examples/loop_optimizations_service/opt_loops",
     ],
     main = "loops_opt_service.py",
