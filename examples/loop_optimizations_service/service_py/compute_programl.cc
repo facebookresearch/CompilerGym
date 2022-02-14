@@ -21,7 +21,7 @@ const programl::ProgramGraphOptions programlOptions;
 int main(int argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
 
-  CHECK(argc == 2) << "Usage: programl <bitcode-path>";
+  CHECK(argc == 2) << "Usage: compute_xprograml <bitcode-path>";
 
   auto buf = llvm::MemoryBuffer::getFileOrSTDIN(argv[1]);
   if (!buf) {
