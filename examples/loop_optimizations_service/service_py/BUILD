@@ -14,7 +14,6 @@ py_binary(
     main = "loops_opt_service.py",
     visibility = ["//visibility:public"],
     deps = [
-        ":utils",
         "//compiler_gym/service",
         "//compiler_gym/service/proto",
         "//compiler_gym/service/runtime",
