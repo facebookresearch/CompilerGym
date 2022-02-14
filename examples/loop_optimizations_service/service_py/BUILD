@@ -8,6 +8,7 @@ py_binary(
     name = "loops-opt-service-py",
     srcs = ["loops_opt_service.py"],
     data = [
+        ":compute_programl-prelinked",
         "//compiler_gym/third_party/autophase",
         "//examples/loop_optimizations_service/opt_loops",
     ],
@@ -23,8 +24,20 @@ py_binary(
     ],
 )
 
-py_library(
-    name = "utils",
-    srcs = ["utils.py"],
+cc_binary(
+    name = "compute_programl-prelinked",
+    srcs = ["compute_programl.cc"],
+    copts = [
+        "-DGOOGLE_PROTOBUF_NO_RTTI",
+        "-fno-rtti",
+    ],
     visibility = ["//visibility:public"],
+    deps = [
+        "@glog",
+        "@llvm//10.0.0",
+        "@nlohmann_json//:json",
+        "@programl//programl/graph/format:node_link_graph",
+        "@programl//programl/ir/llvm:llvm-10",
+        "@programl//programl/proto:programl_cc",
+    ],
 )
