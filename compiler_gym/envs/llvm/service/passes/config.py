@@ -5,14 +5,12 @@
 """Configuration for building an action space from a list of LLVM passes."""
 from common import Pass
 
-# A set of headers that must be included.
-EXTRA_LLVM_HEADERS = {
+# A set of headers that must be included to use the generated pass list.
+LLVM_ACTION_INCLUDES = {
     "llvm/LinkAllPasses.h",
+    # A handle of coroutine utility passes are not pulled in by the
+    # LinkAllPasses.h header.
     "llvm/Transforms/Coroutines.h",
-    "llvm/Transforms/Instrumentation.h",
-    "llvm/Transforms/IPO.h",
-    "llvm/Transforms/Scalar.h",
-    "llvm/Transforms/Utils.h",
 }
 
 # A mapping from the name of a pass as defined in a INITIALIZE_PASS(name, ...)

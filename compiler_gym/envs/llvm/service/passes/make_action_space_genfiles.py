@@ -82,7 +82,7 @@ import sys
 from pathlib import Path
 
 from common import Pass
-from config import EXTRA_LLVM_HEADERS
+from config import LLVM_ACTION_INCLUDES
 
 logger = logging.getLogger(__name__)
 
@@ -103,7 +103,7 @@ def process_pass(pass_, headers, enum_f, switch_f):
 def make_action_sources(pass_iterator, outpath: Path):
     """Generate the enum and switch content."""
     total_passes = 0
-    headers = set(EXTRA_LLVM_HEADERS)
+    headers = set(LLVM_ACTION_INCLUDES)
 
     passes = sorted(list(pass_iterator), key=lambda p: p.name)
 
