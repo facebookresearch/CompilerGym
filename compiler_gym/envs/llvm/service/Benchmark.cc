@@ -54,22 +54,6 @@ std::unique_ptr<llvm::Module> makeModuleOrDie(llvm::LLVMContext& context, const 
   return module;
 }
 
-RealizedBenchmarkDynamicConfig realizeDynamicConfig(const BenchmarkDynamicConfig& original,
-                                                    const fs::path& scratchDirectory) {
-  BenchmarkDynamicConfig cfg;
-  cfg.CopyFrom(original);
-
-  // Set up the environment variables.
-  (*cfg.mutable_build_cmd()->mutable_env())["CC"] =
-      util::getSiteDataPath("llvm-v0/bin/clang").string();
-  (*cfg.mutable_build_cmd()->mutable_env())["IN"] = (scratchDirectory / "out.bc").string();
-
-  // Register the IR as a pre-requisite build file.
-  cfg.mutable_build_cmd()->add_infile((scratchDirectory / "out.bc").string());
-
-  return RealizedBenchmarkDynamicConfig(cfg);
-}
-
 /**
  * Create a temporary directory to use as a scratch pad for on-disk storage.
  * This directory is guaranteed to exist.
@@ -159,8 +143,8 @@ std::unique_ptr<llvm::Module> makeModule(llvm::LLVMContext& context, const Bitco
 
 // A benchmark is an LLVM module and the LLVM context that owns it.
 Benchmark::Benchmark(const std::string& name, const Bitcode& bitcode,
-                     const BenchmarkDynamicConfig& dynamicConfig, const fs::path& workingDirectory,
-                     const BaselineCosts& baselineCosts)
+                     const compiler_gym::BenchmarkDynamicConfig& dynamicConfig,
+                     const fs::path& workingDirectory, const BaselineCosts& baselineCosts)
     : context_(std::make_unique<llvm::LLVMContext>()),
       module_(makeModuleOrDie(*context_, bitcode, name)),
       scratchDirectory_(createScratchDirectoryOrDie()),
@@ -175,8 +159,8 @@ Benchmark::Benchmark(const std::string& name, const Bitcode& bitcode,
 
 Benchmark::Benchmark(const std::string& name, std::unique_ptr<llvm::LLVMContext> context,
                      std::unique_ptr<llvm::Module> module,
-                     const BenchmarkDynamicConfig& dynamicConfig, const fs::path& workingDirectory,
-                     const BaselineCosts& baselineCosts)
+                     const compiler_gym::BenchmarkDynamicConfig& dynamicConfig,
+                     const fs::path& workingDirectory, const BaselineCosts& baselineCosts)
     : context_(std::move(context)),
       module_(std::move(module)),
       scratchDirectory_(createScratchDirectoryOrDie()),
@@ -229,7 +213,7 @@ Status Benchmark::writeBitcodeToFile(const fs::path& path) {
 }
 
 Status Benchmark::computeRuntime(Event& observation) {
-  const RealizedBenchmarkDynamicConfig& cfg = dynamicConfig();
+  const BenchmarkDynamicConfig& cfg = dynamicConfig();
 
   if (!cfg.isRunnable()) {
     return Status::OK;
@@ -339,26 +323,5 @@ Status Benchmark::compile() {
 bool Benchmark::applyBaselineOptimizations(unsigned optLevel, unsigned sizeLevel) {
   return applyBaselineOptimizationsToModule(&module(), optLevel, sizeLevel);
 }
-
-namespace {
-
-std::vector<util::LocalShellCommand> commandsFromProto(
-    const google::protobuf::RepeatedPtrField<Command>& cmds) {
-  std::vector<util::LocalShellCommand> outs;
-  for (const auto& cmd : cmds) {
-    outs.push_back(util::LocalShellCommand(cmd));
-  }
-  return outs;
-}
-
-}  // anonymous namespace
-
-RealizedBenchmarkDynamicConfig::RealizedBenchmarkDynamicConfig(const BenchmarkDynamicConfig& cfg)
-    : buildCommand_(cfg.build_cmd()),
-      runCommand_(cfg.run_cmd()),
-      preRunCommands_(commandsFromProto(cfg.pre_run_cmd())),
-      postRunCommands_(commandsFromProto(cfg.post_run_cmd())),
-      isBuildable_(!buildCommand_.empty()),
-      isRunnable_(!(buildCommand_.empty() || runCommand_.empty())) {}
 
 }  // namespace compiler_gym::llvm_service

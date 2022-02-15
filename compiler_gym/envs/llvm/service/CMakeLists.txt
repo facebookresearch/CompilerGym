@@ -53,6 +53,7 @@ cg_cc_library(
   SRCS
     "Benchmark.cc"
   DEPS
+    ::BenchmarkDynamicConfig
     ::Cost
     compiler_gym::service::proto::compiler_gym_service_cc
     compiler_gym::util::GrpcStatusMacros
@@ -69,6 +70,21 @@ cg_cc_library(
   DEFINES
     ${LLVM_DEFINITIONS}
   PUBLIC
+)
+
+cg_cc_library(
+  NAME
+    BenchmarkDynamicConfig
+  HDRS
+    "BenchmarkDynamicConfig.h"
+  SRCS
+    "BenchmarkDynamicConfig.cc"
+  DEPS
+    compiler_gym::service::proto::compiler_gym_service_cc
+    compiler_gym::util::RunfilesPath
+    compiler_gym::util::Subprocess
+  ABS_DEPS
+    Boost::filesystem
 )
 
 llvm_map_components_to_libnames(_LLVM_LIBS core)

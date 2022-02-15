@@ -11,6 +11,7 @@
 #include <vector>
 
 #include "boost/filesystem.hpp"
+#include "compiler_gym/envs/llvm/service/BenchmarkDynamicConfig.h"
 #include "compiler_gym/envs/llvm/service/Cost.h"
 #include "compiler_gym/service/proto/compiler_gym_service.pb.h"
 #include "compiler_gym/util/Subprocess.h"
@@ -83,33 +84,6 @@ std::unique_ptr<llvm::Module> makeModule(llvm::LLVMContext& context, const Bitco
                                          const std::string& name, grpc::Status* status);
 
 /**
- * Represents a BenchmarkDynamicConfig protocol buffer.
- */
-class RealizedBenchmarkDynamicConfig {
- public:
-  explicit RealizedBenchmarkDynamicConfig(const BenchmarkDynamicConfig& cfg);
-
-  inline const util::LocalShellCommand& buildCommand() const { return buildCommand_; };
-  inline const util::LocalShellCommand& runCommand() const { return runCommand_; };
-  inline const std::vector<util::LocalShellCommand>& preRunCommands() const {
-    return preRunCommands_;
-  };
-  inline const std::vector<util::LocalShellCommand>& postRunCommands() const {
-    return postRunCommands_;
-  };
-  inline bool isBuildable() const { return isBuildable_; }
-  inline bool isRunnable() const { return isRunnable_; }
-
- private:
-  const util::LocalShellCommand buildCommand_;
-  const util::LocalShellCommand runCommand_;
-  const std::vector<util::LocalShellCommand> preRunCommands_;
-  const std::vector<util::LocalShellCommand> postRunCommands_;
-  const bool isBuildable_;
-  const bool isRunnable_;
-};
-
-/**
  * An LLVM module and the LLVM context that owns it.
  *
  * A benchmark is mutable and can be changed over the course of a session.
@@ -120,14 +94,15 @@ class Benchmark {
    * Construct a benchmark from a bitcode.
    */
   Benchmark(const std::string& name, const Bitcode& bitcode,
-            const BenchmarkDynamicConfig& dynamicConfig,
+            const compiler_gym::BenchmarkDynamicConfig& dynamicConfig,
             const boost::filesystem::path& workingDirectory, const BaselineCosts& baselineCosts);
 
   /**
    * Construct a benchmark from an LLVM module.
    */
   Benchmark(const std::string& name, std::unique_ptr<llvm::LLVMContext> context,
-            std::unique_ptr<llvm::Module> module, const BenchmarkDynamicConfig& dynamicConfig,
+            std::unique_ptr<llvm::Module> module,
+            const compiler_gym::BenchmarkDynamicConfig& dynamicConfig,
             const boost::filesystem::path& workingDirectory, const BaselineCosts& baselineCosts);
 
   void close();
@@ -232,7 +207,7 @@ class Benchmark {
   /**
    * A reference to the dynamic configuration object.
    */
-  inline const RealizedBenchmarkDynamicConfig& dynamicConfig() const { return dynamicConfig_; }
+  inline const BenchmarkDynamicConfig& dynamicConfig() const { return dynamicConfig_; }
 
   inline bool isBuildable() const { return dynamicConfig().isBuildable(); }
 
@@ -285,8 +260,8 @@ class Benchmark {
   std::unique_ptr<llvm::LLVMContext> context_;
   std::unique_ptr<llvm::Module> module_;
   const boost::filesystem::path scratchDirectory_;
-  const BenchmarkDynamicConfig dynamicConfigProto_;
-  const RealizedBenchmarkDynamicConfig dynamicConfig_;
+  const compiler_gym::BenchmarkDynamicConfig dynamicConfigProto_;
+  const BenchmarkDynamicConfig dynamicConfig_;
   const BaselineCosts baselineCosts_;
   /** The directory used for storing build / runtime artifacts. The difference
    * between the scratch directory and the working directory is that the working

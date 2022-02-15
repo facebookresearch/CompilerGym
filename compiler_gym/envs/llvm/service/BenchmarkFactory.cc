@@ -24,6 +24,7 @@ using grpc::Status;
 using grpc::StatusCode;
 
 using BenchmarkProto = compiler_gym::Benchmark;
+using BenchmarkDynamicConfigProto = compiler_gym::BenchmarkDynamicConfig;
 
 namespace compiler_gym::llvm_service {
 
@@ -91,7 +92,7 @@ Status BenchmarkFactory::getBenchmark(const BenchmarkProto& benchmarkMessage,
 }
 
 Status BenchmarkFactory::addBitcode(const std::string& uri, const Bitcode& bitcode,
-                                    std::optional<BenchmarkDynamicConfig> dynamicConfig) {
+                                    std::optional<BenchmarkDynamicConfigProto> dynamicConfig) {
   Status status;
   std::unique_ptr<llvm::LLVMContext> context = std::make_unique<llvm::LLVMContext>();
   std::unique_ptr<llvm::Module> module = makeModule(*context, bitcode, uri, &status);
@@ -118,7 +119,7 @@ Status BenchmarkFactory::addBitcode(const std::string& uri, const Bitcode& bitco
 
   benchmarks_.insert(
       {uri, Benchmark(uri, std::move(context), std::move(module),
-                      (dynamicConfig.has_value() ? *dynamicConfig : BenchmarkDynamicConfig()),
+                      (dynamicConfig.has_value() ? *dynamicConfig : BenchmarkDynamicConfigProto()),
                       workingDirectory_, baselineCosts)});
 
   VLOG(2) << "Cached LLVM benchmark: " << uri << ". Cache size = " << benchmarks_.size()
@@ -128,7 +129,7 @@ Status BenchmarkFactory::addBitcode(const std::string& uri, const Bitcode& bitco
 }
 
 Status BenchmarkFactory::addBitcode(const std::string& uri, const fs::path& path,
-                                    std::optional<BenchmarkDynamicConfig> dynamicConfig) {
+                                    std::optional<BenchmarkDynamicConfigProto> dynamicConfig) {
   VLOG(2) << "addBitcode(" << path.string() << ")";
 
   Bitcode bitcode;
