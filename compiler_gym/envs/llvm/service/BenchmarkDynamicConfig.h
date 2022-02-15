@@ -17,7 +17,8 @@ namespace compiler_gym::llvm_service {
  */
 class BenchmarkDynamicConfig {
  public:
-  explicit BenchmarkDynamicConfig(const compiler_gym::BenchmarkDynamicConfig& cfg);
+  BenchmarkDynamicConfig(const compiler_gym::BenchmarkDynamicConfig& cfg,
+                         const boost::filesystem::path& scratchDirectory);
 
   inline const util::LocalShellCommand& buildCommand() const { return buildCommand_; };
   inline const util::LocalShellCommand& runCommand() const { return runCommand_; };
@@ -29,6 +30,7 @@ class BenchmarkDynamicConfig {
   };
   inline bool isBuildable() const { return isBuildable_; }
   inline bool isRunnable() const { return isRunnable_; }
+  inline const boost::filesystem::path& scratchDirectory() const { return scratchDirectory_; }
 
  private:
   const util::LocalShellCommand buildCommand_;
@@ -37,6 +39,7 @@ class BenchmarkDynamicConfig {
   const std::vector<util::LocalShellCommand> postRunCommands_;
   const bool isBuildable_;
   const bool isRunnable_;
+  const boost::filesystem::path scratchDirectory_;
 };
 
 BenchmarkDynamicConfig realizeDynamicConfig(const compiler_gym::BenchmarkDynamicConfig& proto,

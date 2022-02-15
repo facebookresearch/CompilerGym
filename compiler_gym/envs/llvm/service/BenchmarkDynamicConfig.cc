@@ -38,15 +38,17 @@ BenchmarkDynamicConfig realizeDynamicConfig(const BenchmarkDynamicConfigProto& p
   // Register the IR as a pre-requisite build file.
   cfg.mutable_build_cmd()->add_infile((scratchDirectory / "out.bc").string());
 
-  return BenchmarkDynamicConfig(cfg);
+  return BenchmarkDynamicConfig(cfg, scratchDirectory);
 }
 
-BenchmarkDynamicConfig::BenchmarkDynamicConfig(const BenchmarkDynamicConfigProto& cfg)
+BenchmarkDynamicConfig::BenchmarkDynamicConfig(const BenchmarkDynamicConfigProto& cfg,
+                                               const boost::filesystem::path& scratchDirectory)
     : buildCommand_(cfg.build_cmd()),
       runCommand_(cfg.run_cmd()),
       preRunCommands_(commandsFromProto(cfg.pre_run_cmd())),
       postRunCommands_(commandsFromProto(cfg.post_run_cmd())),
       isBuildable_(!buildCommand_.empty()),
-      isRunnable_(!(buildCommand_.empty() || runCommand_.empty())) {}
+      isRunnable_(!(buildCommand_.empty() || runCommand_.empty())),
+      scratchDirectory_(scratchDirectory) {}
 
 }  // namespace compiler_gym::llvm_service

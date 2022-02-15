@@ -125,15 +125,16 @@ Status BenchmarkFactory::addBitcode(const std::string& uri, const Bitcode& bitco
   const fs::path scratchDirectory = createBenchmarkScratchDirectoryOrDie();
   BenchmarkDynamicConfig realDynamicConfig =
       realizeDynamicConfig(realDynamicConfigProto, scratchDirectory);
+
+  BaselineCosts baselineCosts;
+  RETURN_IF_ERROR(setBaselineCosts(*module, workingDirectory_, realDynamicConfig, &baselineCosts));
+
   sys::error_code ec;
   fs::remove_all(scratchDirectory, ec);
   if (ec) {
     return Status(StatusCode::INTERNAL,
                   fmt::format("Failed to delete scratch directory: {}", scratchDirectory.string()));
   }
-
-  BaselineCosts baselineCosts;
-  RETURN_IF_ERROR(setBaselineCosts(*module, workingDirectory_, realDynamicConfig, &baselineCosts));
 
   benchmarks_.insert({uri, Benchmark(uri, std::move(context), std::move(module),
                                      realDynamicConfigProto, workingDirectory_, baselineCosts)});

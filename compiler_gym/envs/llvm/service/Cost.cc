@@ -19,6 +19,7 @@
 #include "compiler_gym/util/RunfilesPath.h"
 #include "compiler_gym/util/Subprocess.h"
 #include "compiler_gym/util/Unreachable.h"
+#include "llvm/Bitcode/BitcodeWriter.h"
 #include "llvm/IR/LegacyPassManager.h"
 #include "llvm/Transforms/IPO.h"
 #include "llvm/Transforms/IPO/PassManagerBuilder.h"
@@ -41,97 +42,39 @@ std::string moduleToString(llvm::Module& module) {
   return str;
 }
 
-// For the experimental binary .text size cost, getTextSizeInBytes() is extended
-// to support a list of additional args to pass to clang.
-#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
-Status getTextSizeInBytes(llvm::Module& module, int64_t* value,
-                          const std::vector<std::string>& clangArgs,
-                          const fs::path& workingDirectory) {
-#else
-Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& workingDirectory) {
-#endif
-  const auto clangPath = util::getSiteDataPath("llvm-v0/bin/clang");
-  const auto llvmSizePath = util::getSiteDataPath("llvm-v0/bin/llvm-size");
-  DCHECK(fs::exists(clangPath)) << fmt::format("File not found: {}", clangPath.string());
-  DCHECK(fs::exists(llvmSizePath)) << fmt::format("File not found: {}", llvmSizePath.string());
+Status writeBitcodeFile(const llvm::Module& module, const fs::path& path) {
+  std::error_code error;
+  llvm::raw_fd_ostream outfile(path.string(), error);
+  if (error.value()) {
+    return Status(StatusCode::INTERNAL,
+                  fmt::format("Failed to write bitcode file: {}", path.string()));
+  }
+  llvm::WriteBitcodeToFile(module, outfile);
+  return Status::OK;
+}
 
-  // Lower the module to an object file using clang and extract the .text
-  // section size using llvm-size.
-  const std::string ir = moduleToString(module);
+Status getTextSizeInBytes(const fs::path& file, int64_t* value) {
+  // Run llvm-size on the compiled file.
+  const std::string llvmSizeCmd = fmt::format("{} {}", llvmSizePath.string(), file.string());
 
-  const auto tmpFile = fs::unique_path(workingDirectory / "obj-%%%%.o");
-  std::string llvmSizeOutput;
+  boost::asio::io_context llvmSizeStdoutStream;
+  std::future<std::string> llvmSizeStdoutFuture;
 
-  try {
-// Use clang to compile the object file.
-#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
-    std::string clangCmd = fmt::format("{} -w -xir - -o {}", clangPath.string(), tmpFile.string());
-    for (const auto& arg : clangArgs) {
-      clangCmd += " " + arg;
-    }
-#else
-    const std::string clangCmd =
-        fmt::format("{} -w -xir - -o {} -c", clangPath.string(), tmpFile.string());
-#endif
+  bp::child llvmSize(llvmSizeCmd, bp::std_in.close(), bp::std_out > llvmSizeStdoutFuture,
+                      bp::std_err > bp::null, llvmSizeStdoutStream);
 
-    boost::asio::io_context clangContext;
-    auto stdinBuffer{boost::asio::buffer(ir)};
-    bp::async_pipe stdinPipe(clangContext);
-    boost::asio::io_context clangStderrStream;
-    std::future<std::string> clangStderrFuture;
+  llvmSizeStdoutStream.run_for(std::chrono::seconds(60));
+  if (llvmSizeStdoutStream.poll()) {
+    return Status(StatusCode::DEADLINE_EXCEEDED,
+                  fmt::format("Failed to compute .text size cost within 60 seconds"));
+  }
+  llvmSize.wait();
+  llvmSizeOutput = llvmSizeStdoutFuture.get();
 
-    bp::child clang(clangCmd, bp::std_in<stdinPipe, bp::std_out> bp::null,
-                    bp::std_err > clangStderrFuture, clangStderrStream);
-
-    // Write the IR to stdin.
-    boost::asio::async_write(
-        stdinPipe, stdinBuffer,
-        [&](const boost::system::error_code& ec, std::size_t n) { stdinPipe.async_close(); });
-
-    clangContext.run_for(std::chrono::seconds(60));
-    if (clangContext.poll()) {
-      return Status(StatusCode::INVALID_ARGUMENT,
-                    fmt::format("Failed to compute .text size cost within 60 seconds"));
-    }
-    clang.wait();
-    clangStderrStream.run();
-
-    if (clang.exit_code()) {
-      const std::string stderr = clangStderrFuture.get();
-      return Status(StatusCode::INVALID_ARGUMENT,
-                    fmt::format("Failed to compute .text size cost. "
-                                "Command returned exit code {}: {}. Error: {}",
-                                clang.exit_code(), clangCmd, stderr));
-    }
-
-    // Run llvm-size on the compiled file.
-    const std::string llvmSizeCmd = fmt::format("{} {}", llvmSizePath.string(), tmpFile.string());
-
-    boost::asio::io_context llvmSizeStdoutStream;
-    std::future<std::string> llvmSizeStdoutFuture;
-
-    bp::child llvmSize(llvmSizeCmd, bp::std_in.close(), bp::std_out > llvmSizeStdoutFuture,
-                       bp::std_err > bp::null, llvmSizeStdoutStream);
-
-    llvmSizeStdoutStream.run_for(std::chrono::seconds(60));
-    if (llvmSizeStdoutStream.poll()) {
-      return Status(StatusCode::DEADLINE_EXCEEDED,
-                    fmt::format("Failed to compute .text size cost within 60 seconds"));
-    }
-    llvmSize.wait();
-    llvmSizeOutput = llvmSizeStdoutFuture.get();
-
-    fs::remove(tmpFile);
-    if (llvmSize.exit_code()) {
-      return Status(StatusCode::INVALID_ARGUMENT, fmt::format("Failed to compute .text size cost. "
-                                                              "Command returned exit code {}: {}",
-                                                              llvmSize.exit_code(), llvmSizeCmd));
-    }
-
-  } catch (bp::process_error& e) {
-    fs::remove(tmpFile);
-    return Status(StatusCode::INVALID_ARGUMENT,
-                  fmt::format("Failed to compute .text size cost: {}", e.what()));
+  if (llvmSize.exit_code()) {
+    return Status(StatusCode::INVALID_ARGUMENT, fmt::format("Failed to compute .text size cost. "
+                                                            "Command returned exit code {}: {}",
+                                                            llvmSize.exit_code(), llvmSizeCmd));
   }
 
   // The output of llvm-size is in berkley format, e.g.:
@@ -157,6 +100,95 @@ Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& 
   }
 
   return Status::OK;
+}
+
+Status getTextSizeInBytesUsingBuildCommand(llvm::Module& module, int64_t* value,
+                                           const fs::path& workingDirectory,
+                                           const BenchmarkDynamicConfig& dynamicConfig) {
+  const util::LocalShellCommand& buildCommand = dynamicConfig.buildCommand();
+
+  if (buildCommand.outfiles().size() != 1) {
+    return Status(StatusCode::INVALID_ARGUMENT,
+                  fmt::format("Expected a single output from build job, actual: {}. Command: {}",
+                              buildCommand.outfiles().size(), buildCommand.commandline()));
+  }
+  const auto& outfile = buildCommand.outfiles()[0];
+
+  if (chdir(dynamicConfig.scratchDirectory().string().c_str())) {
+    return Status(StatusCode::INTERNAL, fmt::format("Failed to set working directory: {}",
+                                                    dynamicConfig.scratchDirectory().string()));
+  }
+
+  // Write the bitcode to the expected place.
+  RETURN_IF_ERROR(writeBitcodeFile(module, dynamicConfig.scratchDirectory() / "out.bc"));
+
+  RETURN_IF_ERROR(buildCommand.checkInfiles());
+  RETURN_IF_ERROR(buildCommand.checkCall());
+  RETURN_IF_ERROR(buildCommand.checkOutfiles());
+
+  return getTextSizeInBytes(outfile, value);
+}
+
+Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& workingDirectory,
+                          const BenchmarkDynamicConfig& dynamicConfig) {
+  // TODO(cummins): Replace getTextSizeInBytes() with getTextSizeInBytesUsingBuildCommand(), using a
+  // default build command if none is set.
+  if (dynamicConfig.isBuildable()) {
+    return getTextSizeInBytesUsingBuildCommand(module, value, workingDirectory, dynamicConfig);
+  }
+
+  const auto clangPath = util::getSiteDataPath("llvm-v0/bin/clang");
+  const auto llvmSizePath = util::getSiteDataPath("llvm-v0/bin/llvm-size");
+  DCHECK(fs::exists(clangPath)) << fmt::format("File not found: {}", clangPath.string());
+  DCHECK(fs::exists(llvmSizePath)) << fmt::format("File not found: {}", llvmSizePath.string());
+
+  // Lower the module to an object file using clang and extract the .text
+  // section size using llvm-size.
+  const std::string ir = moduleToString(module);
+
+  const auto tmpFile = fs::unique_path(workingDirectory / "obj-%%%%.o");
+
+  try {
+    const std::string clangCmd =
+        fmt::format("{} -w -xir - -o {} -c", clangPath.string(), tmpFile.string());
+
+    boost::asio::io_context clangContext;
+    auto stdinBuffer{boost::asio::buffer(ir)};
+    bp::async_pipe stdinPipe(clangContext);
+    boost::asio::io_context clangStderrStream;
+    std::future<std::string> clangStderrFuture;
+
+    bp::child clang(clangCmd, bp::std_in<stdinPipe, bp::std_out> bp::null,
+                    bp::std_err > clangStderrFuture, clangStderrStream);
+
+    // Write the IR to stdin.
+    boost::asio::async_write(
+        stdinPipe, stdinBuffer,
+        [&](const boost::system::error_code& ec, std::size_t n) { stdinPipe.async_close(); });
+
+    clangContext.run_for(std::chrono::seconds(60));
+    if (clangContext.poll()) {
+      return Status(StatusCode::INVALID_ARGUMENT,
+                    "Failed to compute .text size cost within 60 seconds");
+    }
+    clang.wait();
+    clangStderrStream.run();
+
+    if (clang.exit_code()) {
+      const std::string stderr = clangStderrFuture.get();
+      return Status(StatusCode::INVALID_ARGUMENT,
+                    fmt::format("Failed to compute .text size cost. "
+                                "Command returned exit code {}: {}. Error: {}",
+                                clang.exit_code(), clangCmd, stderr));
+    }
+  } catch (bp::process_error& e) {
+    return Status(StatusCode::INVALID_ARGUMENT,
+                  fmt::format("Failed to compute .text size cost: {}", e.what()));
+  }
+
+  Status status = getTextSizeInBytes(tmpFile, value);
+  fs::remove(tmpFile);
+  return status;
 }
 
 inline size_t getBaselineCostIndex(LlvmBaselinePolicy policy, LlvmCostFunction cost) {
@@ -211,9 +243,9 @@ Status setCost(const LlvmCostFunction& costFunction, llvm::Module& module,
     case LlvmCostFunction::OBJECT_TEXT_SIZE_BYTES: {
       int64_t size;
 #ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
-      RETURN_IF_ERROR(getTextSizeInBytes(module, &size, {"-c"}, workingDirectory));
+      RETURN_IF_ERROR(getTextSizeInBytes(module, &size, {"-c"}, workingDirectory, dynamicConfig));
 #else
-      RETURN_IF_ERROR(getTextSizeInBytes(module, &size, workingDirectory));
+      RETURN_IF_ERROR(getTextSizeInBytes(module, &size, workingDirectory, dynamicConfig));
 #endif
       *cost = static_cast<double>(size);
       break;
