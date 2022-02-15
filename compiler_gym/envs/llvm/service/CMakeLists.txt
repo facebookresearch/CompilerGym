@@ -97,6 +97,7 @@ cg_cc_library(
     "BenchmarkFactory.cc"
   DEPS
     ::Benchmark
+    ::BenchmarkDynamicConfig
     ::Cost
     compiler_gym::service::proto::compiler_gym_service_cc
     compiler_gym::util::GrpcStatusMacros
@@ -156,6 +157,7 @@ cg_cc_library(
   SRCS
     "Cost.cc"
   DEPS
+    ::BenchmarkDynamicConfig
     compiler_gym::util::GrpcStatusMacros
     compiler_gym::util::RunfilesPath
     compiler_gym::util::Subprocess

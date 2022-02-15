@@ -54,15 +54,9 @@ std::unique_ptr<llvm::Module> makeModuleOrDie(llvm::LLVMContext& context, const 
   return module;
 }
 
-/**
- * Create a temporary directory to use as a scratch pad for on-disk storage.
- * This directory is guaranteed to exist.
- *
- * Errors in this function are fatal.
- *
- * @return fs::path A path.
- */
-fs::path createScratchDirectoryOrDie() {
+}  // anonymous namespace
+
+fs::path createBenchmarkScratchDirectoryOrDie() {
   const fs::path cacheRoot = util::getCacheRootPath();
   const fs::path dir = fs::unique_path(cacheRoot / "benchmark-scratch-%%%%-%%%%");
 
@@ -71,8 +65,6 @@ fs::path createScratchDirectoryOrDie() {
   CHECK(!ec) << "Failed to create scratch directory: " << dir;
   return dir;
 }
-
-}  // anonymous namespace
 
 Status readBitcodeFile(const fs::path& path, Bitcode* bitcode) {
   std::ifstream ifs(path.string());
@@ -147,7 +139,7 @@ Benchmark::Benchmark(const std::string& name, const Bitcode& bitcode,
                      const fs::path& workingDirectory, const BaselineCosts& baselineCosts)
     : context_(std::make_unique<llvm::LLVMContext>()),
       module_(makeModuleOrDie(*context_, bitcode, name)),
-      scratchDirectory_(createScratchDirectoryOrDie()),
+      scratchDirectory_(createBenchmarkScratchDirectoryOrDie()),
       dynamicConfigProto_(dynamicConfig),
       dynamicConfig_(realizeDynamicConfig(dynamicConfig, scratchDirectory_)),
       baselineCosts_(baselineCosts),
@@ -163,7 +155,7 @@ Benchmark::Benchmark(const std::string& name, std::unique_ptr<llvm::LLVMContext>
                      const fs::path& workingDirectory, const BaselineCosts& baselineCosts)
     : context_(std::move(context)),
       module_(std::move(module)),
-      scratchDirectory_(createScratchDirectoryOrDie()),
+      scratchDirectory_(createBenchmarkScratchDirectoryOrDie()),
       dynamicConfigProto_(dynamicConfig),
       dynamicConfig_(realizeDynamicConfig(dynamicConfig, scratchDirectory_)),
       baselineCosts_(baselineCosts),

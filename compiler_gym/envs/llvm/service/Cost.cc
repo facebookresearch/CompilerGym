@@ -201,7 +201,8 @@ bool applyBaselineOptimizationsToModule(llvm::Module* module, unsigned optLevel,
 }
 
 Status setCost(const LlvmCostFunction& costFunction, llvm::Module& module,
-               const fs::path& workingDirectory, double* cost) {
+               const fs::path& workingDirectory, const BenchmarkDynamicConfig& dynamicConfig,
+               double* cost) {
   switch (costFunction) {
     case LlvmCostFunction::IR_INSTRUCTION_COUNT: {
       *cost = static_cast<double>(module.getInstructionCount());
@@ -244,8 +245,8 @@ double getBaselineCost(const BaselineCosts& baselineCosts, LlvmBaselinePolicy po
   return baselineCosts[getBaselineCostIndex(policy, cost)];
 }
 
-Status setBaselineCosts(llvm::Module& unoptimizedModule, BaselineCosts* baselineCosts,
-                        const fs::path& workingDirectory) {
+Status setBaselineCosts(llvm::Module& unoptimizedModule, const fs::path& workingDirectory,
+                        const BenchmarkDynamicConfig& dynamicConfig, BaselineCosts* baselineCosts) {
   llvm::Module* moduleO0 = &unoptimizedModule;
 
   // Create a copy of the unoptimized module and apply the default set of LLVM
@@ -277,7 +278,8 @@ Status setBaselineCosts(llvm::Module& unoptimizedModule, BaselineCosts* baseline
     // Compute and set the baseline costs.
     for (const auto cost : magic_enum::enum_values<LlvmCostFunction>()) {
       const auto idx = getBaselineCostIndex(policy, cost);
-      RETURN_IF_ERROR(setCost(cost, *baselineModule, workingDirectory, &(*baselineCosts)[idx]));
+      RETURN_IF_ERROR(
+          setCost(cost, *baselineModule, workingDirectory, dynamicConfig, &(*baselineCosts)[idx]));
     }
   }
 

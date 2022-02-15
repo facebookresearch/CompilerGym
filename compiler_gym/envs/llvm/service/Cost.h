@@ -10,6 +10,7 @@
 #include <optional>
 
 #include "boost/filesystem.hpp"
+#include "compiler_gym/envs/llvm/service/BenchmarkDynamicConfig.h"
 #include "llvm/IR/Module.h"
 
 namespace compiler_gym::llvm_service {
@@ -73,7 +74,8 @@ bool applyBaselineOptimizationsToModule(llvm::Module* module, unsigned optLevel,
  * @return `OK` on success.
  */
 [[nodiscard]] grpc::Status setCost(const LlvmCostFunction& costFunction, llvm::Module& module,
-                                   const boost::filesystem::path& workingDirectory, double* cost);
+                                   const boost::filesystem::path& workingDirectory,
+                                   const BenchmarkDynamicConfig& dynamicConfig, double* cost);
 
 /**
  * Return a baseline cost.
@@ -98,7 +100,8 @@ double getBaselineCost(const BaselineCosts& baselineCosts, LlvmBaselinePolicy po
  *    storage.
  */
 [[nodiscard]] grpc::Status setBaselineCosts(llvm::Module& unoptimizedModule,
-                                            BaselineCosts* baselineCosts,
-                                            const boost::filesystem::path& workingDirectory);
+                                            const boost::filesystem::path& workingDirectory,
+                                            const BenchmarkDynamicConfig& dynamicConfig,
+                                            BaselineCosts* baselineCosts);
 
 }  // namespace compiler_gym::llvm_service

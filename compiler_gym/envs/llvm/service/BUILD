@@ -123,6 +123,7 @@ cc_library(
     hdrs = ["BenchmarkFactory.h"],
     deps = [
         ":Benchmark",
+        ":BenchmarkDynamicConfig",
         ":Cost",
         "//compiler_gym/service/proto:compiler_gym_service_cc",
         "//compiler_gym/util:GrpcStatusMacros",
@@ -190,6 +191,7 @@ cc_library(
     srcs = ["Cost.cc"],
     hdrs = ["Cost.h"],
     deps = [
+        ":BenchmarkDynamicConfig",
         "//compiler_gym/util:GrpcStatusMacros",
         "//compiler_gym/util:RunfilesPath",
         "//compiler_gym/util:Subprocess",

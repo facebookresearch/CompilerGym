@@ -276,4 +276,14 @@ class Benchmark {
   int buildtimesPerObservationCount_;
 };
 
+/**
+ * Create a temporary directory to use as a scratch pad for on-disk storage.
+ * This directory is guaranteed to exist.
+ *
+ * Errors in this function are fatal.
+ *
+ * @return fs::path A path.
+ */
+boost::filesystem::path createBenchmarkScratchDirectoryOrDie();
+
 }  // namespace compiler_gym::llvm_service

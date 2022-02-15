@@ -11,6 +11,7 @@
 #include <memory>
 #include <string>
 
+#include "compiler_gym/envs/llvm/service/BenchmarkDynamicConfig.h"
 #include "compiler_gym/envs/llvm/service/Cost.h"
 #include "compiler_gym/util/GrpcStatusMacros.h"
 #include "compiler_gym/util/RunfilesPath.h"
@@ -19,6 +20,7 @@
 #include "llvm/IR/Module.h"
 
 namespace fs = boost::filesystem;
+namespace sys = boost::system;
 
 using grpc::Status;
 using grpc::StatusCode;
@@ -114,13 +116,27 @@ Status BenchmarkFactory::addBitcode(const std::string& uri, const Bitcode& bitco
     }
   }
 
-  BaselineCosts baselineCosts;
-  RETURN_IF_ERROR(setBaselineCosts(*module, &baselineCosts, workingDirectory_));
+  // TODO(cummins): This is very clumsy. In order to compute the baseline costs
+  // we need a realized BenchmarkDynamicConfig. To create this, we need to
+  // generate a scratch directory. This is then duplicated in the constructor of
+  // the Benchmark class. Suggest a refactor.
+  BenchmarkDynamicConfigProto realDynamicConfigProto =
+      (dynamicConfig.has_value() ? *dynamicConfig : BenchmarkDynamicConfigProto());
+  const fs::path scratchDirectory = createBenchmarkScratchDirectoryOrDie();
+  BenchmarkDynamicConfig realDynamicConfig =
+      realizeDynamicConfig(realDynamicConfigProto, scratchDirectory);
+  sys::error_code ec;
+  fs::remove_all(scratchDirectory, ec);
+  if (ec) {
+    return Status(StatusCode::INTERNAL,
+                  fmt::format("Failed to delete scratch directory: {}", scratchDirectory.string()));
+  }
 
-  benchmarks_.insert(
-      {uri, Benchmark(uri, std::move(context), std::move(module),
-                      (dynamicConfig.has_value() ? *dynamicConfig : BenchmarkDynamicConfigProto()),
-                      workingDirectory_, baselineCosts)});
+  BaselineCosts baselineCosts;
+  RETURN_IF_ERROR(setBaselineCosts(*module, workingDirectory_, realDynamicConfig, &baselineCosts));
+
+  benchmarks_.insert({uri, Benchmark(uri, std::move(context), std::move(module),
+                                     realDynamicConfigProto, workingDirectory_, baselineCosts)});
 
   VLOG(2) << "Cached LLVM benchmark: " << uri << ". Cache size = " << benchmarks_.size()
           << " items";
