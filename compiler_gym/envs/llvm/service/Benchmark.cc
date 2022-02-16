@@ -121,33 +121,40 @@ std::unique_ptr<llvm::Module> makeModule(llvm::LLVMContext& context, const Bitco
                                          const std::string& name, Status* status) {
   llvm::MemoryBufferRef buffer(llvm::StringRef(bitcode.data(), bitcode.size()), name);
   VLOG(3) << "llvm::parseBitcodeFile(" << bitcode.size() << " bits)";
+
   llvm::Expected<std::unique_ptr<llvm::Module>> moduleOrError =
       llvm::parseBitcodeFile(buffer, context);
-  if (moduleOrError) {
-    *status = Status::OK;
-    std::unique_ptr<llvm::Module> module = std::move(moduleOrError.get());
-
-    // Strip the module identifiers and source file names from the module to
-    // anonymize them. This is to deter learning algorithms from overfitting to
-    // benchmarks by their name.
-    module->setModuleIdentifier("-");
-    module->setSourceFileName("-");
-
-    // Strip module debug info.
-    llvm::StripDebugInfo(*module);
-
-    // Erase module-level named metadata.
-    while (!module->named_metadata_empty()) {
-      llvm::NamedMDNode* nmd = &*module->named_metadata_begin();
-      module->eraseNamedMetadata(nmd);
-    }
-
-    return module;
-  } else {
+  if (auto error = moduleOrError.takeError()) {
     *status = Status(StatusCode::INVALID_ARGUMENT,
                      fmt::format("Failed to parse LLVM bitcode: \"{}\"", name));
     return nullptr;
   }
+
+  *status = Status::OK;
+  std::unique_ptr<llvm::Module> module = std::move(moduleOrError.get());
+
+  if (!module) {
+    *status = Status(StatusCode::INTERNAL,
+                     "llvm::parseBitcodeFile return null");
+    return nullptr;
+  }
+
+  // Strip the module identifiers and source file names from the module to
+  // anonymize them. This is to deter learning algorithms from overfitting to
+  // benchmarks by their name.
+  module->setModuleIdentifier("-");
+  module->setSourceFileName("-");
+
+  // Strip module debug info.
+  llvm::StripDebugInfo(*module);
+
+  // Erase module-level named metadata.
+  while (!module->named_metadata_empty()) {
+    llvm::NamedMDNode* nmd = &*module->named_metadata_begin();
+    module->eraseNamedMetadata(nmd);
+  }
+
+  return module;
 }
 
 // A benchmark is an LLVM module and the LLVM context that owns it.
