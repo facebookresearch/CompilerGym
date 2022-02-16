@@ -13,7 +13,9 @@ if(DARWIN)
 endif()
 cg_filegroup(
   NAME "service"
-  DEPENDS ${_DEPS}
+  DEPENDS
+    ${_DEPS}
+    compiler_gym::third_party::ir2vec::embeddings
 )
 
 cg_genrule(

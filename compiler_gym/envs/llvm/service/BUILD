@@ -17,6 +17,8 @@ filegroup(
     name = "service",
     srcs = [
         ":compiler_gym-llvm-service",
+        # Runtime data dependencies:
+        "//compiler_gym/third_party/ir2vec:embeddings",
     ] + select({
         "@llvm//:darwin": [],
         "//conditions:default": [

@@ -6,7 +6,7 @@
 # IR2Vec. https://github.com/IITH-Compilers/IR2Vec
 
 filegroup(
-    name = "seedEmbeddingVocab-300-llvm10",
+    name = "embeddings",
     srcs = ["seedEmbeddingVocab-300-llvm10.txt"],
     visibility = ["//visibility:public"],
 )
