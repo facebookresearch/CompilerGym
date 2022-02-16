@@ -8,7 +8,9 @@ cg_add_all_subdirs()
 set(_DEPS "compiler_gym-llvm-service")
 cg_filegroup(
   NAME "service"
-  DEPENDS ${_DEPS}
+  DEPENDS
+    ${_DEPS}
+    compiler_gym::third_party::ir2vec::embeddings
 )
 
 cg_cc_binary(
