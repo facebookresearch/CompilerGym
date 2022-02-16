@@ -18,8 +18,8 @@
 #include "compiler_gym/third_party/autophase/InstCount.h"
 #include "compiler_gym/third_party/llvm/InstCount.h"
 #include "compiler_gym/util/GrpcStatusMacros.h"
-#include "llvm/Bitcode/BitcodeWriter.h"
 #include "compiler_gym/util/RunfilesPath.h"
+#include "llvm/Bitcode/BitcodeWriter.h"
 // #include "llvm/IR/Metadata.h"
 #include "IR2Vec.h"
 #include "llvm/IR/Module.h"
@@ -29,9 +29,6 @@
 #include "programl/ir/llvm/llvm.h"
 
 namespace fs = boost::filesystem;
-
-//Runfile for IR2Vec vocabulary
-const auto ir2vecEmbeddingsPath=compiler_gym::util::getRunfilesPath("compiler_gym/external/ir2vec/vocabulary/seedEmbeddingVocab-300-llvm10.txt");
 
 namespace compiler_gym::llvm_service {
 
@@ -89,12 +86,15 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
       break;
     }
     case LlvmObservationSpace::IR2VEC_FS: {
-      IR2Vec::Embeddings test(benchmark.module(),IR2Vec::IR2VecMode::FlowAware,ir2vecEmbeddingsPath.string());
-      const auto features = test.getProgramVector();
+      const auto ir2vecEmbeddingsPath = util::getRunfilesPath(
+          "compiler_gym/third_party/ir2vec/seedEmbeddingVocab-300-llvm10.txt");
+
+      IR2Vec::Embeddings embeddings(benchmark.module(), IR2Vec::IR2VecMode::FlowAware,
+                                    ir2vecEmbeddingsPath.string());
+      const auto features = embeddings.getProgramVector();
       *reply.mutable_double_list()->mutable_value() = {features.begin(), features.end()};
       break;
     }
-				  
     case LlvmObservationSpace::PROGRAML:
     case LlvmObservationSpace::PROGRAML_JSON: {
       // Build the ProGraML graph.
