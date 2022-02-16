@@ -34,6 +34,7 @@ from compiler_gym.service.runtime import create_and_run_compiler_gym_service
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_NAMES
 from compiler_gym.third_party.inst2vec import Inst2vecEncoder
 from compiler_gym.util.commands import run_command
+from compiler_gym.util.runfiles_path import runfiles_path
 
 _INST2VEC_ENCODER = Inst2vecEncoder()
 
@@ -246,7 +247,9 @@ class LoopsOptCompilationSession(CompilationSession):
         elif observation_space.name == "Autophase":
             Autophase_str = run_command(
                 [
-                    "../../../compiler_gym/third_party/autophase/compute_autophase-prelinked",
+                    runfiles_path(
+                        "compiler_gym/third_party/autophase/compute_autophase-prelinked"
+                    ),
                     self._llvm_path,
                 ],
                 timeout=30,
