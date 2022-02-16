@@ -93,6 +93,15 @@ class LoopsOptCompilationSession(CompilationSession):
                     }
                 )
             ),
+            deterministic=True,
+            platform_dependent=False,
+        ),
+        ObservationSpace(
+            name="Programl",
+            space=Space(string_value=StringSpace(length_range=Int64Range(min=0))),
+            deterministic=True,
+            platform_dependent=False,
+            default_observation=Event(string_value=""),
         ),
         ObservationSpace(
             name="runtime",
@@ -257,6 +266,17 @@ class LoopsOptCompilationSession(CompilationSession):
                 timeout=30,
             )
             return Event(string_value=Autophase_str)
+        elif observation_space.name == "Programl":
+            Programl_str = run_command(
+                [
+                    runfiles_path(
+                        "examples/loop_optimizations_service/service_py/compute_programl"
+                    ),
+                    self._llvm_path,
+                ],
+                timeout=30,
+            )
+            return Event(string_value=Programl_str)
         elif observation_space.name == "runtime":
             # compile LLVM to object file
             run_command(

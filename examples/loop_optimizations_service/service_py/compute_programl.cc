@@ -21,7 +21,7 @@ const programl::ProgramGraphOptions programlOptions;
 int main(int argc, char** argv) {
   google::InitGoogleLogging(argv[0]);
 
-  CHECK(argc == 2) << "Usage: compute_xprograml <bitcode-path>";
+  CHECK(argc == 2) << "Usage: compute_programl <bitcode-path>";
 
   auto buf = llvm::MemoryBuffer::getFileOrSTDIN(argv[1]);
   if (!buf) {
@@ -49,6 +49,7 @@ int main(int argc, char** argv) {
   }
 
   nodeLinkGraph.dump();
+  std::cout << nodeLinkGraph << "\n";
 
   return 0;
 }
