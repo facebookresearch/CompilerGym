@@ -354,8 +354,6 @@ genrule(
     cmd = "echo '#define IR2VEC_VERSION \\"1\\"' > $@",
 )
 
-#TODO: Add the seed_embedding file under vocabulary as a data dependency for the cc_libary
-
 cc_library(
     name = "ir2vec",
     srcs = glob(["src/*.cpp"]) + [":version.h"],
