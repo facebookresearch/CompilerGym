@@ -35,8 +35,11 @@ from compiler_gym.util.shell_format import plural
 from compiler_gym.util.truncate import truncate_lines
 
 GRPC_CHANNEL_OPTIONS = [
-    # Raise the default inbound message filter from 4MB.
-    ("grpc.max_receive_message_length", 512 * 1024 * 1024),
+    # Disable the inbound message length filter to allow for large messages such
+    # as observations.
+    ("grpc.max_receive_message_length", -1),
+    # Fix for "received initial metadata size exceeds limit"
+    ("grpc.max_metadata_size", 512 * 1024),
     # Spurious error UNAVAILABLE "Trying to connect an http1.x server".
     # https://putridparrot.com/blog/the-unavailable-trying-to-connect-an-http1-x-server-grpc-error/
     ("grpc.enable_http_proxy", 0),
