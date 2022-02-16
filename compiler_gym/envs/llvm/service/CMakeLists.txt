@@ -7,22 +7,11 @@ cg_add_all_subdirs()
 
 set(_DEPS "compiler_gym-llvm-service")
 if(DARWIN)
-  list(APPEND _DEPS ::libLLVMPolly)
-  #TODO(boian): figure out what is this target.
   #list(APPEND _DEPS "@llvm//:darwin")
 endif()
 cg_filegroup(
   NAME "service"
   DEPENDS ${_DEPS}
-)
-
-cg_genrule(
-  NAME libLLVMPolly
-  OUTS "libLLVMPolly.so"
-  COMMAND
-    "cp $<TARGET_FILE:LLVMPolly> $@"
-  ABS_DEPENDS
-    LLVMPolly
 )
 
 cg_cc_binary(
@@ -210,7 +199,6 @@ cg_cc_library(
     ProGraML::graph::format::node_link_graph
     ProGraML::ir::llvm::llvm-10
     ProGraML::proto::programl_cc
-    Subprocess::libsubprocess
     CpuInfo::cpuinfo
     Clog::libclog
   INCLUDES

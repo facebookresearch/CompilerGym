@@ -18,8 +18,8 @@ The following files are generated:
     Example:
 
         #pragma once
-        #include "include/llvm/LinkAllPasses.h"
-        #include "include/llvm/Transforms/AggressiveInstCombine/AggressiveInstCombine.h"
+        #include "llvm/LinkAllPasses.h"
+        #include "llvm/Transforms/AggressiveInstCombine/AggressiveInstCombine.h"
         ...
 
     This file includes the set of LLVM headers that must be included to use the
@@ -82,7 +82,7 @@ import sys
 from pathlib import Path
 
 from common import Pass
-from config import EXTRA_LLVM_HEADERS
+from config import LLVM_ACTION_INCLUDES
 
 logger = logging.getLogger(__name__)
 
@@ -90,7 +90,11 @@ logger = logging.getLogger(__name__)
 def process_pass(pass_, headers, enum_f, switch_f):
     """Extract and process transform passes in header."""
     if pass_.header:
-        headers.add(pass_.header)
+        # Strip a leading "include/" from the header path.
+        header = pass_.header
+        if header.startswith("include/"):
+            header = header[len("include/") :]
+        headers.add(header)
 
     # The name of the pass in UPPER_PASCAL_CASE.
     enum_name = pass_.flag[1:].replace("-", "_").upper()
@@ -103,7 +107,7 @@ def process_pass(pass_, headers, enum_f, switch_f):
 def make_action_sources(pass_iterator, outpath: Path):
     """Generate the enum and switch content."""
     total_passes = 0
-    headers = set(EXTRA_LLVM_HEADERS)
+    headers = set(LLVM_ACTION_INCLUDES)
 
     passes = sorted(list(pass_iterator), key=lambda p: p.name)
 
