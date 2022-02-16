@@ -269,9 +269,7 @@ class LoopsOptCompilationSession(CompilationSession):
         elif observation_space.name == "Programl":
             Programl_str = run_command(
                 [
-                    runfiles_path(
-                        "examples/loop_optimizations_service/service_py/compute_programl"
-                    ),
+                    runfiles_path("compiler_gym/third_party/programl/compute_programl"),
                     self._llvm_path,
                 ],
                 timeout=30,
