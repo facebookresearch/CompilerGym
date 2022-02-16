@@ -8,7 +8,7 @@ py_binary(
     name = "loops-opt-service-py",
     srcs = ["loops_opt_service.py"],
     data = [
-        ":compute_programl-prelinked",
+        ":compute_programl",
         "//compiler_gym/third_party/autophase",
         "//examples/loop_optimizations_service/opt_loops",
     ],
@@ -25,7 +25,7 @@ py_binary(
 )
 
 cc_binary(
-    name = "compute_programl-prelinked",
+    name = "compute_programl",
     srcs = ["compute_programl.cc"],
     copts = [
         "-DGOOGLE_PROTOBUF_NO_RTTI",
