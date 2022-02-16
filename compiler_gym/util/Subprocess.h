@@ -67,7 +67,7 @@ class LocalShellCommand {
   inline const std::vector<boost::filesystem::path>& outfiles() const { return outfiles_; }
 
   /**
-   *  Get the list of command line arguments as a concatenated string.
+   * Get the list of command line arguments as a concatenated string.
    *
    * This is for debugging purposes, it should not be used to execute commands
    * as it does no escaping of arguments.
