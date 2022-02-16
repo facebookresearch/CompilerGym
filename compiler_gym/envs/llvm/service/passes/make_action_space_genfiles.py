@@ -90,7 +90,11 @@ logger = logging.getLogger(__name__)
 def process_pass(pass_, headers, enum_f, switch_f):
     """Extract and process transform passes in header."""
     if pass_.header:
-        headers.add(pass_.header)
+        # Strip a leading "include/" from the header path.
+        header = pass_.header
+        if header.startswith("include/"):
+            header = header[len("include/") :]
+        headers.add(header)
 
     # The name of the pass in UPPER_PASCAL_CASE.
     enum_name = pass_.flag[1:].replace("-", "_").upper()
