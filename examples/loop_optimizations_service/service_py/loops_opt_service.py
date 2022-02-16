@@ -191,7 +191,9 @@ class LoopsOptCompilationSession(CompilationSession):
                 args[i] = arg
             run_command(
                 [
-                    "../opt_loops/opt_loops",
+                    runfiles_path(
+                        "examples/loop_optimizations_service/opt_loops/opt_loops"
+                    ),
                     self._llvm_path,
                     *args,
                     "-S",
