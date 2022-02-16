@@ -45,6 +45,18 @@ enum class LlvmObservationSpace {
    *     & Wawrzynek, J. (2019). Autophase: Compiler phase-ordering for HLS with
    *     deep reinforcement learning. FCCM.
    */
+  
+  IR2VEC_FS,
+  
+  /**
+   * The IR2Vec Flow-sensitive feature vector
+   *
+   * From : 
+   * 	
+   * 	  XXXXXX
+   *
+   */
+  
   AUTOPHASE,
   /**
    * Returns the graph representation of a program as a networkx Graph.
