@@ -189,7 +189,6 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
       reply.set_int64_value(static_cast<int64_t>(cost));
       break;
     }
-#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
     case LlvmObservationSpace::TEXT_SIZE_BYTES: {
       double cost;
       RETURN_IF_ERROR(setCost(LlvmCostFunction::TEXT_SIZE_BYTES, benchmark.module(),
@@ -215,7 +214,6 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
       reply.set_int64_value(static_cast<int64_t>(cost));
       break;
     }
-#endif
     case LlvmObservationSpace::RUNTIME: {
       return benchmark.computeRuntime(reply);
     }

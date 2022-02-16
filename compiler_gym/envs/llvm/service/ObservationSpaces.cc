@@ -177,18 +177,16 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
         observationSpace.mutable_default_observation()->set_int64_value(0);
         break;
       }
-#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
       case LlvmObservationSpace::TEXT_SIZE_BYTES:
       case LlvmObservationSpace::TEXT_SIZE_O0:
       case LlvmObservationSpace::TEXT_SIZE_O3:
       case LlvmObservationSpace::TEXT_SIZE_OZ: {
         space.mutable_int64_value()->set_min(0);
         observationSpace.set_deterministic(true);
-        observationSpace.set_platform_dependent(false);
+        observationSpace.set_platform_dependent(true);
         observationSpace.mutable_default_observation()->set_int64_value(0);
         break;
       }
-#endif
       case LlvmObservationSpace::RUNTIME:
       case LlvmObservationSpace::BUILDTIME: {
         space.mutable_double_sequence()->mutable_length_range()->set_min(0);
