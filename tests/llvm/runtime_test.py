@@ -9,8 +9,8 @@ import numpy as np
 import pytest
 from flaky import flaky
 
+from compiler_gym.datasets import BenchmarkInitError
 from compiler_gym.envs.llvm import LlvmEnv, llvm_benchmark
-from compiler_gym.service.connection import ServiceError
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
@@ -120,11 +120,8 @@ def test_failing_build_cmd(env: LlvmEnv, tmpdir):
 
     env.reset(benchmark=benchmark)
     with pytest.raises(
-        ServiceError,
-        match=(
-            r"Command '\$CC \$IN -invalid-cc-argument -o a.out -c' failed with "
-            r"exit code 1: clang: error: unknown argument: '-invalid-cc-argument'"
-        ),
+        BenchmarkInitError,
+        match="clang: error: unknown argument: '-invalid-cc-argument'",
     ):
         env.observation.Runtime()
 
