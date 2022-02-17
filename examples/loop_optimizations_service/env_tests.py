@@ -193,6 +193,16 @@ def test_default_ir_observation(env: CompilerEnv):
     assert reward is None
 
 
+def test_default_inst2vec_observation(env: CompilerEnv):
+    """Test default observation space."""
+    env.observation_space = "Inst2vec"
+    observation = env.reset()
+    assert isinstance(observation, np.ndarray)
+    assert len(observation) >= 0
+    assert observation.dtype == np.int64
+    assert all(obs >= 0 for obs in observation.tolist())
+
+
 def test_default_autophase_observation(env: CompilerEnv):
     """Test default observation space."""
     env.observation_space = "Autophase"
@@ -201,6 +211,18 @@ def test_default_autophase_observation(env: CompilerEnv):
     assert observation.shape == (len(AUTOPHASE_FEATURE_NAMES),)
     assert observation.dtype == np.int64
     assert all(obs >= 0 for obs in observation.tolist())
+
+
+def test_default_programl_observation(env: CompilerEnv):
+    """Test default observation space."""
+    env.observation_space = "Programl"
+    observation = env.reset()
+    assert len(observation) > 0
+
+    observation, reward, done, info = env.step(0)
+    assert not done, info
+    assert len(observation) > 0
+    assert reward is None
 
 
 def test_default_reward(env: CompilerEnv):
