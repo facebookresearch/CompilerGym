@@ -240,6 +240,8 @@ def test_observations(env: CompilerEnv):
     env.reset()
     assert len(env.observation["ir"]) > 0
     assert all(env.observation["Inst2vec"] >= 0)
+    assert all(env.observation["Autophase"] >= 0)
+    assert len(env.observation["Programl"]) > 0
 
 
 def test_rewards(env: CompilerEnv):
