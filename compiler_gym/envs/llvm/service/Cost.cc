@@ -74,9 +74,9 @@ Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& 
         fmt::format("{} -w -xir - -o {} -c", clangPath.string(), tmpFile.string());
 #endif
 
-    boost::asio::io_service clangService;
+    boost::asio::io_context clangContext;
     auto stdinBuffer{boost::asio::buffer(ir)};
-    bp::async_pipe stdinPipe(clangService);
+    bp::async_pipe stdinPipe(clangContext);
     boost::asio::io_context clangStderrStream;
     std::future<std::string> clangStderrFuture;
 
@@ -88,8 +88,8 @@ Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& 
         stdinPipe, stdinBuffer,
         [&](const boost::system::error_code& ec, std::size_t n) { stdinPipe.async_close(); });
 
-    clangService.run_for(std::chrono::seconds(60));
-    if (clangService.poll()) {
+    clangContext.run_for(std::chrono::seconds(60));
+    if (clangContext.poll()) {
       return Status(StatusCode::INVALID_ARGUMENT,
                     fmt::format("Failed to compute .text size cost within 60 seconds"));
     }
