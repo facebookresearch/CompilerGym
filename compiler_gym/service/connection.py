@@ -43,6 +43,10 @@ GRPC_CHANNEL_OPTIONS = [
     # Spurious error UNAVAILABLE "Trying to connect an http1.x server".
     # https://putridparrot.com/blog/the-unavailable-trying-to-connect-an-http1-x-server-grpc-error/
     ("grpc.enable_http_proxy", 0),
+    # Disable TCP port re-use to mitigate port conflict errors when starting
+    # many services in parallel. Context:
+    # https://github.com/facebookresearch/CompilerGym/issues/572
+    ("grpc.so_reuseport", 0),
 ]
 
 logger = logging.getLogger(__name__)
