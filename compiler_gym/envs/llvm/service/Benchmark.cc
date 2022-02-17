@@ -110,8 +110,7 @@ std::unique_ptr<llvm::Module> makeModule(llvm::LLVMContext& context, const Bitco
   std::unique_ptr<llvm::Module> module = std::move(moduleOrError.get());
 
   if (!module) {
-    *status = Status(StatusCode::INTERNAL,
-                     "llvm::parseBitcodeFile return null");
+    *status = Status(StatusCode::INTERNAL, "llvm::parseBitcodeFile return null");
     return nullptr;
   }
 
