@@ -40,34 +40,38 @@ def test_observation_spaces(env: LlvmEnv):
     env.reset("cbench-v1/crc32")
 
     assert set(env.observation.spaces.keys()) == {
-        "Ir",
-        "IrSha1",
+        "Autophase",
+        "AutophaseDict",
         "Bitcode",
         "BitcodeFile",
+        "Buildtime",
+        "CpuInfo",
+        "Inst2vec",
+        "Inst2vecEmbeddingIndices",
+        "Inst2vecPreprocessedText",
         "InstCount",
         "InstCountDict",
         "InstCountNorm",
         "InstCountNormDict",
-        "Autophase",
-        "AutophaseDict",
-        "Programl",
-        "ProgramlJson",
-        "CpuInfo",
-        "Inst2vecPreprocessedText",
-        "Inst2vecEmbeddingIndices",
-        "Inst2vec",
+        "Ir",
         "IrInstructionCount",
         "IrInstructionCountO0",
         "IrInstructionCountO3",
         "IrInstructionCountOz",
+        "IrSha1",
+        "IsBuildable",
+        "IsRunnable",
         "ObjectTextSizeBytes",
         "ObjectTextSizeO0",
         "ObjectTextSizeO3",
         "ObjectTextSizeOz",
+        "Programl",
+        "ProgramlJson",
         "Runtime",
-        "Buildtime",
-        "IsBuildable",
-        "IsRunnable",
+        "TextSizeBytes",
+        "TextSizeO0",
+        "TextSizeO3",
+        "TextSizeOz",
     }
 
 
@@ -1194,6 +1198,53 @@ def test_object_text_size_observation_spaces(env: LlvmEnv):
     assert value == crc32_code_sizes[sys.platform][1]
 
     key = "ObjectTextSizeOz"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Scalar)
+    assert space.deterministic
+    assert space.platform_dependent
+    value: int = env.observation[key]
+    print(value)  # For debugging in case of error.
+    assert isinstance(value, int)
+    assert value == crc32_code_sizes[sys.platform][2]
+
+
+def test_text_size_observation_spaces(env: LlvmEnv):
+    env.reset("cbench-v1/crc32")
+
+    # Expected .text sizes for this benchmark: -O0, -O3, -Oz.
+    crc32_code_sizes = {"darwin": [1171, 3825, 3289], "linux": [2747, 5539, 4868]}
+
+    key = "TextSizeBytes"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Scalar)
+    assert space.deterministic
+    assert space.platform_dependent
+    value: int = env.observation[key]
+    print(value)  # For debugging in case of error.
+    assert isinstance(value, int)
+    assert value == crc32_code_sizes[sys.platform][0]
+
+    key = "TextSizeO0"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Scalar)
+    assert space.deterministic
+    assert space.platform_dependent
+    value: int = env.observation[key]
+    print(value)  # For debugging in case of error.
+    assert isinstance(value, int)
+    assert value == crc32_code_sizes[sys.platform][0]
+
+    key = "TextSizeO3"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Scalar)
+    assert space.deterministic
+    assert space.platform_dependent
+    value: int = env.observation[key]
+    print(value)  # For debugging in case of error.
+    assert isinstance(value, int)
+    assert value == crc32_code_sizes[sys.platform][1]
+
+    key = "TextSizeOz"
     space = env.observation.spaces[key]
     assert isinstance(space.space, Scalar)
     assert space.deterministic
