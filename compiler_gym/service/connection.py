@@ -37,6 +37,7 @@ from compiler_gym.util.truncate import truncate_lines
 GRPC_CHANNEL_OPTIONS = [
     # Disable the inbound message length filter to allow for large messages such
     # as observations.
+    ("grpc.max_send_message_length", -1),
     ("grpc.max_receive_message_length", -1),
     # Fix for "received initial metadata size exceeds limit"
     ("grpc.max_metadata_size", 512 * 1024),
