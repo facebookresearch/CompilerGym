@@ -145,10 +145,8 @@ Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& 
     return getTextSizeInBytes(module, value, workingDirectory, buildCommand);
   }
 
-  // TODO(cummins): Remove this legacy implementation by providing a default
-  // buildCommand for the dynamicConfig.
-  DCHECK(compile_only)
-      << "Legacy getTextSizeInBytes() implementation only supports compile_only=true";
+  // TODO(cummins): We only provide an implementation for the compile_only path
+  // here.
 
   const auto clangPath = util::getSiteDataPath("llvm-v0/bin/clang");
   const auto llvmSizePath = util::getSiteDataPath("llvm-v0/bin/llvm-size");
