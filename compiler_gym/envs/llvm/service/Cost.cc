@@ -113,12 +113,14 @@ Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& 
     bp::child llvmSize(llvmSizeCmd, bp::std_in.close(), bp::std_out > llvmSizeStdoutFuture,
                        bp::std_err > bp::null, llvmSizeStdoutStream);
 
-    if (!util::wait_for(llvmSize, std::chrono::seconds(60))) {
+    llvmSizeStdoutStream.run_for(std::chrono::seconds(60));
+    if (llvmSizeStdoutStream.poll()) {
       return Status(StatusCode::DEADLINE_EXCEEDED,
                     fmt::format("Failed to compute .text size cost within 60 seconds"));
     }
+    llvmSize.wait();
+    llvmSizeOutput = llvmSizeStdoutFuture.get();
 
-    llvmSizeStdoutStream.run();
     fs::remove(tmpFile);
     if (llvmSize.exit_code()) {
       return Status(StatusCode::INVALID_ARGUMENT, fmt::format("Failed to compute .text size cost. "
@@ -126,7 +128,6 @@ Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& 
                                                               llvmSize.exit_code(), llvmSizeCmd));
     }
 
-    llvmSizeOutput = llvmSizeStdoutFuture.get();
   } catch (bp::process_error& e) {
     fs::remove(tmpFile);
     return Status(StatusCode::INVALID_ARGUMENT,
@@ -154,6 +155,7 @@ Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& 
     return Status(StatusCode::INTERNAL,
                   fmt::format("Failed to parse .TEXT size: `{}`\n", llvmSizeOutput));
   }
+
   return Status::OK;
 }
 
