@@ -102,6 +102,16 @@ Status getTextSizeInBytes(const fs::path& file, int64_t* value) {
   return Status::OK;
 }
 
+#define TEXT_SIZE_RETURN_IF_ERROR(expr)                                                            \
+  while (1) {                                                                                      \
+    const auto status = expr;                                                                      \
+    if (!status.ok()) {                                                                            \
+      return Status(StatusCode::INVALID_ARGUMENT,                                                  \
+                    fmt::format("Failed to compute .text size cost: {}", status.error_message())); \
+    }                                                                                              \
+    break;                                                                                         \
+  }
+
 Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& workingDirectory,
                           const util::LocalShellCommand& buildCommand) {
   if (buildCommand.outfiles().size() != 1) {
@@ -114,12 +124,14 @@ Status getTextSizeInBytes(llvm::Module& module, int64_t* value, const fs::path& 
   // Write the bitcode to the expected place.
   RETURN_IF_ERROR(writeBitcodeFile(module, "out.bc"));
 
-  RETURN_IF_ERROR(buildCommand.checkInfiles());
-  RETURN_IF_ERROR(buildCommand.checkCall());
-  RETURN_IF_ERROR(buildCommand.checkOutfiles());
+  TEXT_SIZE_RETURN_IF_ERROR(buildCommand.checkInfiles());
+  TEXT_SIZE_RETURN_IF_ERROR(buildCommand.checkCall());
+  TEXT_SIZE_RETURN_IF_ERROR(buildCommand.checkOutfiles());
 
   return getTextSizeInBytes(outfile, value);
 }
+
+#undef TEXT_SIZE_RETURN_IF_ERROR
 
 util::LocalShellCommand getBuildCommand(const BenchmarkDynamicConfig& dynamicConfig,
                                         bool compile_only) {
@@ -127,7 +139,30 @@ util::LocalShellCommand getBuildCommand(const BenchmarkDynamicConfig& dynamicCon
   if (compile_only) {
     Command newCommand;
     newCommand.CopyFrom(dynamicConfig.buildCommand().proto());
+
+    // Determine if the compilation specifies an output file using the `-o
+    // <file>` flag. If not, then add one so that when we append the `-c` flag
+    // we still know where the generated object file will go.
+    bool outfileSpecified = false;
+    for (int i = 0; i < newCommand.argument_size() - 1; ++i) {
+      if (newCommand.argument(i) == "-o") {
+        outfileSpecified = true;
+        break;
+      }
+    }
+    if (!outfileSpecified) {
+      newCommand.add_argument("-o");
+      if (newCommand.outfile_size() < 1) {
+        newCommand.add_argument("a.out");
+        newCommand.add_outfile("a.out");
+      } else {
+        const auto& outfile = newCommand.outfile(0);
+        newCommand.add_argument(outfile);
+      }
+    }
+
     newCommand.add_argument("-c");
+
     return util::LocalShellCommand(newCommand);
   }
   return dynamicConfig.buildCommand();
