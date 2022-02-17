@@ -256,7 +256,7 @@ class LoopsOptCompilationSession(CompilationSession):
                 int64_tensor=Int64Tensor(shape=[len(Inst2vec_ids)], value=Inst2vec_ids)
             )
         elif observation_space.name == "Autophase":
-            Autophase_str = run_command(
+            Autophase_ids_str = run_command(
                 [
                     runfiles_path(
                         "compiler_gym/third_party/autophase/compute_autophase-prelinked"
@@ -265,7 +265,12 @@ class LoopsOptCompilationSession(CompilationSession):
                 ],
                 timeout=30,
             )
-            return Event(string_value=Autophase_str)
+            Autophase_ids_int = list(map(int, list(Autophase_ids_str.split(" "))))
+            return Event(
+                int64_tensor=Int64Tensor(
+                    shape=[len(Autophase_ids_int)], value=Autophase_ids_int
+                )
+            )
         elif observation_space.name == "Programl":
             Programl_str = run_command(
                 [
