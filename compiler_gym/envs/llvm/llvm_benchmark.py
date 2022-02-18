@@ -6,10 +6,13 @@
 import logging
 import os
 import random
+import shlex
 import subprocess
+import sys
 import tempfile
 from concurrent.futures import as_completed
 from datetime import datetime
+from functools import lru_cache
 from pathlib import Path
 from typing import Iterable, List, Optional, Union
 
@@ -22,22 +25,31 @@ from compiler_gym.util.thread_pool import get_thread_pool_executor
 logger = logging.getLogger(__name__)
 
 
-def get_compiler_includes(compiler: str) -> Iterable[Path]:
-    """Run the system compiler in verbose mode on a dummy input to get the
-    system header search path.
+def _get_system_library_flags(compiler: str) -> Iterable[str]:
+    """Run the given compiler in verbose mode on a dummy input to extract the
+    set of system include paths, and on macOS, the location of
+    libclang_rt.osx.a.
+
+    Returns an iterable sequence of compiler line flags.
     """
     # Create a temporary directory to write the compiled 'binary' to, since
     # GNU assembler does not support piping to stdout.
     with tempfile.TemporaryDirectory() as d:
         try:
+            cmd = [compiler, "-xc++", "-v", "-", "-o", str(Path(d) / "a.out")]
+            # On macOS we need to compile a binary to invoke the linker.
+            if sys.platform != "darwin":
+                cmd.append("-c")
             with Popen(
-                [compiler, "-xc++", "-v", "-c", "-", "-o", str(Path(d) / "a.out")],
+                cmd,
                 stdout=subprocess.DEVNULL,
                 stderr=subprocess.PIPE,
                 stdin=subprocess.PIPE,
                 universal_newlines=True,
             ) as process:
-                _, stderr = process.communicate(input="", timeout=30)
+                _, stderr = process.communicate(
+                    input="int main(){return 0;}", timeout=30
+                )
                 if process.returncode:
                     raise OSError(
                         f"Failed to invoke {compiler}. "
@@ -59,18 +71,21 @@ def get_compiler_includes(compiler: str) -> Iterable[Path]:
     #     /path/2
     #     End of search list
     in_search_list = False
-    for line in stderr.split("\n"):
+    lines = stderr.split("\n")
+    for line in lines:
         if in_search_list and line.startswith("End of search list"):
             break
         elif in_search_list:
             # We have an include path to return.
             path = Path(line.strip())
-            yield path
+            yield "-isystem"
+            yield str(path)
             # Compatibility fix for compiling benchmark sources which use the
             # '#include <endian.h>' header, which on macOS is located in a
             # 'machine/endian.h' directory.
             if (path / "machine").is_dir():
-                yield path / "machine"
+                yield "-isystem"
+                yield str(path / "machine")
         elif line.startswith("#include <...> search starts here:"):
             in_search_list = True
     else:
@@ -80,32 +95,40 @@ def get_compiler_includes(compiler: str) -> Iterable[Path]:
             msg += f":\n{stderr}"
         raise OSError(msg)
 
+    # On macOS we need to provide the location of the libclang_rt.osx.a library,
+    # which we can grab from the linker invocation.
+    if sys.platform == "darwin":
+        ld_invocation = shlex.split(lines[-1])
+        for i in range(1, len(ld_invocation) - 1):
+            if ld_invocation[i] == "-lSystem":
+                yield "-lSystem"
+                yield ld_invocation[i + 1]
 
-# Memoized search paths. Call get_system_includes() to access them.
-_SYSTEM_INCLUDES = None
 
-
-def get_system_includes() -> List[Path]:
-    """Determine the system include paths for C/C++ compilation jobs.
+@lru_cache(maxsize=16)
+def get_system_library_flags(compiler: Optional[str] = None) -> List[str]:
+    """Determine the set of compilation flags needed to use the host system
+    libraries.
 
     This uses the system compiler to determine the search paths for C/C++ system
-    headers. By default, :code:`c++` is invoked. This can be overridden by
-    setting :code:`os.environ["CXX"]`.
+    headers, and on macOS, the location of libclang_rt.osx.a. By default,
+    :code:`c++` is invoked. This can be overridden by setting
+    :code:`os.environ["CXX"]` prior to calling this function.
 
-    :return: A list of paths to system header directories.
-    :raises OSError: If the compiler fails, or if the search paths cannot be
-        determined.
+    The results of this function are cached, so changes to CXX will have no
+    effect on subsequent calls.
+
+    :return: A list of command line flags for a compiler.
+
+    :raises OSError: If the compiler fails, or if the output of the compiler
+        cannot be understood.
     """
-    # Memoize the system includes paths.
-    global _SYSTEM_INCLUDES
-    if _SYSTEM_INCLUDES is None:
-        system_compiler = os.environ.get("CXX", "c++")
-        try:
-            _SYSTEM_INCLUDES = list(get_compiler_includes(system_compiler))
-        except OSError as e:
-            logger.warning("%s", e)
-            _SYSTEM_INCLUDES = []
-    return _SYSTEM_INCLUDES
+    compiler = compiler or os.environ.get("CXX", "c++")
+    try:
+        return list(_get_system_library_flags(compiler))
+    except OSError as e:
+        logger.warning("%s", e)
+        return []
 
 
 class ClangInvocation:
@@ -119,7 +142,7 @@ class ClangInvocation:
         :param args: The list of arguments to pass to clang.
         :param system_includes: Whether to include the system standard libraries
             during compilation jobs. This requires a system toolchain. See
-            :func:`get_system_includes`.
+            :func:`get_system_library_flags`.
         :param timeout: The maximum number of seconds to allow clang to run
             before terminating.
         """
@@ -130,8 +153,7 @@ class ClangInvocation:
     def command(self, outpath: Path) -> List[str]:
         cmd = [str(llvm.clang_path())]
         if self.system_includes:
-            for directory in get_system_includes():
-                cmd += ["-isystem", str(directory)]
+            cmd += get_system_library_flags()
 
         cmd += [str(s) for s in self.args]
         cmd += ["-c", "-emit-llvm", "-o", str(outpath)]
@@ -253,7 +275,7 @@ def make_benchmark(
 
     :param system_includes: Whether to include the system standard libraries
         during compilation jobs. This requires a system toolchain. See
-        :func:`get_system_includes`.
+        :func:`get_system_library_flags`.
 
     :param timeout: The maximum number of seconds to allow clang to run before
         terminating.

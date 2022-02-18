@@ -387,7 +387,7 @@ class LlvmEnv(CompilerEnv):
 
         :param system_includes: Whether to include the system standard libraries
             during compilation jobs. This requires a system toolchain. See
-            :func:`get_system_includes`.
+            :func:`get_system_library_flags`.
 
         :param timeout: The maximum number of seconds to allow clang to run
             before terminating.

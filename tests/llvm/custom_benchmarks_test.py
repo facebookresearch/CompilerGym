@@ -13,6 +13,7 @@ import pytest
 
 from compiler_gym.datasets import Benchmark
 from compiler_gym.envs import LlvmEnv, llvm
+from compiler_gym.envs.llvm.llvm_benchmark import get_system_library_flags
 from compiler_gym.service.proto import Benchmark as BenchmarkProto
 from compiler_gym.service.proto import File
 from compiler_gym.util.runfiles_path import runfiles_path
@@ -286,26 +287,29 @@ def test_two_custom_benchmarks_reset(env: LlvmEnv):
     assert env.benchmark == benchmark2.uri
 
 
-def test_get_compiler_includes_not_found():
-    with pytest.raises(OSError, match=r"Failed to invoke not-a-real-binary"):
-        list(llvm.llvm_benchmark.get_compiler_includes("not-a-real-binary"))
+def test_get_system_library_flags_not_found(caplog):
+    assert get_system_library_flags("not-a-real-binary") == []
+    logging_message = caplog.record_tuples[-1][-1]
+    assert "Failed to invoke not-a-real-binary" in logging_message
 
 
-def test_get_compiler_includes_nonzero_exit_status():
+def test_get_system_library_flags_nonzero_exit_status(caplog):
     """Test that setting the $CXX to an invalid binary raises an error."""
-    with pytest.raises(OSError, match=r"Failed to invoke false"):
-        list(llvm.llvm_benchmark.get_compiler_includes("false"))
+    assert get_system_library_flags("false") == []
+    logging_message = caplog.record_tuples[-1][-1]
+    assert "Failed to invoke false" in logging_message
 
 
-def test_get_compiler_includes_output_parse_failure():
+def test_get_system_library_flags_output_parse_failure(caplog):
     """Test that setting the $CXX to an invalid binary raises an error."""
     old_cxx = os.environ.get("CXX")
-    os.environ["CXX"] = "echo"
     try:
-        with pytest.raises(
-            OSError, match="Failed to parse '#include <...>' search paths from echo"
-        ):
-            list(llvm.llvm_benchmark.get_compiler_includes("echo"))
+        os.environ["CXX"] = "echo"
+        assert get_system_library_flags("echo") == []
+        logging_message = caplog.record_tuples[-1][-1]
+        assert (
+            "Failed to parse '#include <...>' search paths from echo" in logging_message
+        )
     finally:
         if old_cxx:
             os.environ["CXX"] = old_cxx
