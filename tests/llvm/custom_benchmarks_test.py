@@ -13,7 +13,7 @@ import pytest
 
 from compiler_gym.datasets import Benchmark
 from compiler_gym.envs import LlvmEnv, llvm
-from compiler_gym.envs.llvm.llvm_benchmark import get_system_library_flags
+from compiler_gym.envs.llvm import llvm_benchmark
 from compiler_gym.service.proto import Benchmark as BenchmarkProto
 from compiler_gym.service.proto import File
 from compiler_gym.util.runfiles_path import runfiles_path
@@ -288,16 +288,16 @@ def test_two_custom_benchmarks_reset(env: LlvmEnv):
 
 
 def test_get_system_library_flags_not_found(caplog):
-    assert get_system_library_flags("not-a-real-binary") == []
-    logging_message = caplog.record_tuples[-1][-1]
-    assert "Failed to invoke not-a-real-binary" in logging_message
+    flags, error = llvm_benchmark._get_cached_system_library_flags("not-a-real-binary")
+    assert flags == []
+    assert "Failed to invoke not-a-real-binary" in error
 
 
 def test_get_system_library_flags_nonzero_exit_status(caplog):
     """Test that setting the $CXX to an invalid binary raises an error."""
-    assert get_system_library_flags("false") == []
-    logging_message = caplog.record_tuples[-1][-1]
-    assert "Failed to invoke false" in logging_message
+    flags, error = llvm_benchmark._get_cached_system_library_flags("false")
+    assert flags == []
+    assert "Failed to invoke false" in error
 
 
 def test_get_system_library_flags_output_parse_failure(caplog):
@@ -305,11 +305,9 @@ def test_get_system_library_flags_output_parse_failure(caplog):
     old_cxx = os.environ.get("CXX")
     try:
         os.environ["CXX"] = "echo"
-        assert get_system_library_flags("echo") == []
-        logging_message = caplog.record_tuples[-1][-1]
-        assert (
-            "Failed to parse '#include <...>' search paths from echo" in logging_message
-        )
+        flags, error = llvm_benchmark._get_cached_system_library_flags("echo")
+        assert flags == []
+        assert "Failed to parse '#include <...>' search paths from echo" in error
     finally:
         if old_cxx:
             os.environ["CXX"] = old_cxx

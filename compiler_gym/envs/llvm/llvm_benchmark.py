@@ -14,7 +14,7 @@ from concurrent.futures import as_completed
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
-from typing import Iterable, List, Optional, Union
+from typing import Iterable, List, Optional, Tuple, Union
 
 from compiler_gym.datasets import Benchmark, BenchmarkInitError
 from compiler_gym.third_party import llvm
@@ -26,17 +26,12 @@ logger = logging.getLogger(__name__)
 
 
 def _get_system_library_flags(compiler: str) -> Iterable[str]:
-    """Run the given compiler in verbose mode on a dummy input to extract the
-    set of system include paths, and on macOS, the location of
-    libclang_rt.osx.a.
-
-    Returns an iterable sequence of compiler line flags.
-    """
-    # Create a temporary directory to write the compiled 'binary' to, since
-    # GNU assembler does not support piping to stdout.
-    with tempfile.TemporaryDirectory() as d:
+    """Private implementation function."""
+    # Create a temporary directory to write the compiled binary to, since GNU
+    # assembler does not support piping to stdout.
+    with tempfile.NamedTemporaryFile(dir=transient_cache_path(".")) as f:
         try:
-            cmd = [compiler, "-xc++", "-v", "-", "-o", str(Path(d) / "a.out")]
+            cmd = [compiler, "-xc++", "-v", "-", "-o", f.name]
             # On macOS we need to compile a binary to invoke the linker.
             if sys.platform != "darwin":
                 cmd.append("-c")
@@ -105,7 +100,15 @@ def _get_system_library_flags(compiler: str) -> Iterable[str]:
                 yield ld_invocation[i + 1]
 
 
-@lru_cache(maxsize=16)
+@lru_cache(maxsize=32)
+def _get_cached_system_library_flags(compiler: str) -> Tuple[List[str], str]:
+    """Private implementation detail."""
+    try:
+        return list(_get_system_library_flags(compiler)), None
+    except OSError as e:
+        return [], str(e)
+
+
 def get_system_library_flags(compiler: Optional[str] = None) -> List[str]:
     """Determine the set of compilation flags needed to use the host system
     libraries.
@@ -124,11 +127,14 @@ def get_system_library_flags(compiler: Optional[str] = None) -> List[str]:
         cannot be understood.
     """
     compiler = compiler or os.environ.get("CXX", "c++")
-    try:
-        return list(_get_system_library_flags(compiler))
-    except OSError as e:
-        logger.warning("%s", e)
-        return []
+    # We want to cache the results of this expensive query, but also emit a
+    # logging warning when the function is called, including when the call
+    # results in a cache hit. We therefore must cache both the flags and the
+    # error, if any.
+    flags, error = _get_cached_system_library_flags(compiler)
+    if error:
+        logger.warning("%s", error)
+    return flags
 
 
 class ClangInvocation:
