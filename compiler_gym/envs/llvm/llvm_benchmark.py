@@ -119,9 +119,6 @@ def get_system_library_flags(compiler: Optional[str] = None) -> List[str]:
     :code:`c++` is invoked. This can be overridden by setting
     :code:`os.environ["CXX"]` prior to calling this function.
 
-    The results of this function are cached, so changes to CXX will have no
-    effect on subsequent calls.
-
     :return: A list of command line flags for a compiler.
 
     :raises HostCompilerFailure: If the host compiler cannot be determined, or
