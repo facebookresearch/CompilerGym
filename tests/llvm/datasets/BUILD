@@ -20,8 +20,9 @@ py_test(
 
 py_test(
     name = "cbench_test",
-    timeout = "moderate",
+    timeout = "long",
     srcs = ["cbench_test.py"],
+    shard_count = 4,
     deps = [
         "//compiler_gym/envs/llvm",
         "//compiler_gym/envs/llvm/datasets",
