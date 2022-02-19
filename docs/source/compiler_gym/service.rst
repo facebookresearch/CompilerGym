@@ -47,6 +47,7 @@ The connection object
    .. automethod:: __init__
    .. automethod:: __call__
 
+
 Configuring the connection
 --------------------------
 
@@ -54,6 +55,13 @@ The :class:`ConnectionOpts <compiler_gym.service.ConnectionOpts>` object is used
 to configure the options used for managing a service connection.
 
 .. autoclass:: ConnectionOpts
+   :members:
+
+
+The connection pool
+-------------------
+
+.. autoclass:: ServiceConnectionPool
    :members:
 
 

@@ -14,6 +14,7 @@ py_library(
     deps = [
         ":compilation_session",
         ":connection",
+        ":connection_pool",
         # TODO(github.com/facebookresearch/CompilerGym/pull/633):
         # add this after circular dependencies are resolved
         # ":client_service_compiler_env",
@@ -74,6 +75,15 @@ py_library(
         "//compiler_gym/util",
         "//compiler_gym/views",
     ],
+)
+
+py_library(
+    name = "connection_pool",
+    srcs = ["connection_pool.py"],
+    visibility = ["//visibility:public"],
+    deps = [
+        ":connection",
+    ]
 )
 
 py_library(

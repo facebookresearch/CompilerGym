@@ -33,7 +33,7 @@ def dead_connection() -> CompilerGymServiceConnection:
 
 def test_create_invalid_options():
     with pytest.raises(TypeError, match="No endpoint provided for service connection"):
-        CompilerGymServiceConnection("")
+        CompilerGymServiceConnection("", ConnectionOpts())
 
 
 def test_create_channel_failed_subprocess(
@@ -89,16 +89,13 @@ def test_call_stub_negative_timeout(connection: CompilerGymServiceConnection):
 
 def test_ManagedConnection_repr(connection: CompilerGymServiceConnection):
     cnx = connection.connection
-    assert (
-        repr(cnx)
-        == f"Connection to service at {cnx.url} running on PID {cnx.process.pid}"
-    )
+    assert repr(cnx) == f"ManagedConnection({cnx.url}, pid={cnx.process.pid})"
 
     # Kill the service.
     cnx.process.terminate()
     cnx.process.communicate()
 
-    assert repr(cnx) == f"Connection to dead service at {cnx.url}"
+    assert repr(cnx) == f"ManagedConnection({cnx.url}, not running)"
 
 
 if __name__ == "__main__":

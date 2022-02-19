@@ -533,10 +533,8 @@ class ManagedConnection(Connection):
 
     def __repr__(self):
         if self.process.poll() is None:
-            return (
-                f"Connection to service at {self.url} running on PID {self.process.pid}"
-            )
-        return f"Connection to dead service at {self.url}"
+            return f"ManagedConnection({self.url}, pid={self.process.pid})"
+        return f"ManagedConnection({self.url}, not running)"
 
 
 class UnmanagedConnection(Connection):
@@ -576,7 +574,7 @@ class UnmanagedConnection(Connection):
         super().__init__(channel, url)
 
     def __repr__(self):
-        return f"Connection to unmanaged service {self.url}"
+        return f"UnmanagedConnection({self.url})"
 
 
 class CompilerGymServiceConnection:
@@ -631,20 +629,33 @@ class CompilerGymServiceConnection:
     def __init__(
         self,
         endpoint: Union[str, Path],
-        opts: ConnectionOpts = None,
+        opts: ConnectionOpts,
+        owning_service_pool: Optional["ServiceConnectionPool"] = None,  # noqa: F821
     ):
         """Constructor.
 
         :param endpoint: The connection endpoint. Either the URL of a service,
             e.g. "localhost:8080", or the path of a local service binary.
+
         :param opts: The connection options.
+
+        :param owning_service_pool: A backref to the owning
+            :class:`ServiceConnectionPool
+            <compiler_gym.service.ServiceConnectionPool>`, if this service is
+            managed by one.
+
         :raises ValueError: If the provided options are invalid.
-        :raises FileNotFoundError: In case opts.local_service_binary is not found.
+
+        :raises FileNotFoundError: In case opts.local_service_binary is not
+            found.
+
         :raises TimeoutError: In case the service failed to start within
                 opts.init_max_seconds seconds.
         """
+        self.released = False
         self.endpoint = endpoint
         self.opts = opts or ConnectionOpts()
+        self.owning_service_pool = owning_service_pool
         self.connection = None
         self.stub = None
         self._establish_connection()
@@ -727,20 +738,55 @@ class CompilerGymServiceConnection:
         )
 
     def __repr__(self):
-        if self.connection is None:
-            return f"Closed connection to {self.endpoint}"
-        return str(self.endpoint)
+        return f"CompilerGymServiceConnection({self.connection or 'detached'})"
 
     @property
     def closed(self) -> bool:
         """Whether the connection is closed."""
         return self.connection is None
 
-    def close(self):
+    def acquire(self) -> "CompilerGymServiceConnection":
+        """Mark this connection as in-use."""
+        if not self.released:
+            raise TypeError(
+                "Attempting to acquire a connection that is already acquired."
+            )
+        self.released = False
+        return self
+
+    def release(self) -> None:
+        """Mark this connection as not in-use."""
+        if not self.released:
+            self.owning_service_pool.release(self)
+            self.released = True
+
+    def shutdown(self):
+        """Shut down the connection.
+
+        Once a connection has been shutdown, it cannot be re-used.
+        """
         if self.closed:
             return
+
         self.connection.close()
         self.connection = None
+
+    def close(self):
+        """Mark this connection as closed.
+
+        If the service is managed by a :class:`ServiceConnectionPool
+        <compiler_gym.service.ServiceConnectionPool>`, this will indicate to
+        the pool that the connection is safe to re-use. If the service is not
+        managed by a pool, this will shut it down.
+        """
+        if self.owned_by_service_pool:
+            self.release()
+        else:
+            self.shutdown()
+
+    @property
+    def owned_by_service_pool(self):
+        return self.owning_service_pool is not None
 
     def __del__(self):
         # Don't let the subprocess be orphaned if user forgot to close(), or
@@ -826,3 +872,12 @@ class CompilerGymServiceConnection:
                 retry_wait_backoff_exponent or self.opts.retry_wait_backoff_exponent
             ),
         )
+
+    def __enter__(self) -> "CompilerGymServiceConnection":
+        """Support for 'with' statements."""
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        """Support for 'with' statements."""
+        self.close()
+        return False

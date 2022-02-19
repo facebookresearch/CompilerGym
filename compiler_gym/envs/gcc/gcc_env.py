@@ -9,6 +9,8 @@ import pickle
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
+from frozendict import frozendict
+
 from compiler_gym.datasets import Benchmark
 from compiler_gym.envs.gcc.datasets import get_gcc_datasets
 from compiler_gym.envs.gcc.gcc import Gcc, GccSpec
@@ -63,9 +65,13 @@ class GccEnv(ClientServiceCompilerEnv):
 
         :raises ServiceInitError: If the requested GCC version cannot be used.
         """
-        connection_settings = connection_settings or ConnectionOpts()
         # Pass the executable path via an environment variable
-        connection_settings.script_env = {"CC": gcc_bin}
+        if connection_settings is None:
+            connection_settings = ConnectionOpts(script_env=frozendict({"CC": gcc_bin}))
+        else:
+            connection_settings = ConnectionOpts(
+                script_env=frozendict({"CC": gcc_bin}, **connection_settings._asdict())
+            )
 
         # Eagerly create a GCC compiler instance now because:
         #
@@ -87,6 +93,9 @@ class GccEnv(ClientServiceCompilerEnv):
             connection_settings=connection_settings,
         )
         self._timeout = timeout
+
+    def commandline_to_actions(self, commandline: str) -> List[int]:
+        return NotImplementedError
 
     def reset(
         self,

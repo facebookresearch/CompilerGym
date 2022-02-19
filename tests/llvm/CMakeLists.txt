@@ -108,7 +108,7 @@ cg_py_test(
   DATA
     compiler_gym::third_party::cbench::crc32
   DEPS
-    compiler_gym::envs::envs
+    compiler_gym
     tests::pytest_plugins::llvm
     tests::test_main
 )
