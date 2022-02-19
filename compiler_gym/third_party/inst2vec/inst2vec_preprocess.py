@@ -339,16 +339,16 @@ def preprocess(data):
 # XFG-transforming (inline and abstract statements)
 ########################################################################################################################
 # Helper regexs for structure type inlining
-vector_type = "<\d+ x " + rgx.first_class_type + ">"
-array_type = "\[\d+ x " + rgx.first_class_type + "\]"
-array_of_array_type = "\[\d+ x " + "\[\d+ x " + rgx.first_class_type + "\]" + "\]"
+vector_type = r"<\d+ x " + rgx.first_class_type + r">"
+array_type = r"\[\d+ x " + rgx.first_class_type + r"\]"
+array_of_array_type = r"\[\d+ x " + r"\[\d+ x " + rgx.first_class_type + r"\]" + r"\]"
 function_type = (
     rgx.first_class_type
-    + " \("
+    + r" \("
     + rgx.any_of([rgx.first_class_type, vector_type, array_type, "..."], ",")
     + "*"
     + rgx.any_of([rgx.first_class_type, vector_type, array_type, "..."])
-    + "\)\**"
+    + r"\)\**"
 )
 structure_entry = rgx.any_of(
     [
@@ -460,7 +460,7 @@ def construct_struct_types_dictionary_for_file(data):
             struct_prev.append(comp_structure)
             struct_prev_with_comma.append(comp_structure + ", ")
         else:
-            comp_structure = "<?{ [ <>{}\dx\[\]\(\)\.,\*%IDvfloatdubeipqcy]+}>?$"
+            comp_structure = r"<?{ [ <>{}\dx\[\]\(\)\.,\*%IDvfloatdubeipqcy]+}>?$"
 
         # Loop over contents of to_process
         for i in list(to_process.items()):
