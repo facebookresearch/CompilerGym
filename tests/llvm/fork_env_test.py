@@ -9,6 +9,7 @@ import sys
 import pytest
 
 from compiler_gym.envs import LlvmEnv
+from compiler_gym.service import ServiceError
 from compiler_gym.util.runfiles_path import runfiles_path
 from tests.test_main import main
 
@@ -248,6 +249,23 @@ def test_fork_previous_cost_lazy_reward_update(env: LlvmEnv):
         fkd.step(env.action_space.flags.index("-mem2reg"))
 
         assert env.reward["IrInstructionCount"] == fkd.reward["IrInstructionCount"]
+
+
+def test_forked_service_dies(env: LlvmEnv):
+    """Test that if the service dies on a forked environment, each environment
+    creates new, independent services.
+    """
+    with env.fork() as fkd:
+        assert env.service == fkd.service
+        try:
+            fkd.service.shutdown()
+        except ServiceError:
+            pass  # shutdown() raises service error if in-episode.
+        fkd.service.close()
+
+        env.reset()
+        fkd.reset()
+        assert env.service != fkd.service
 
 
 if __name__ == "__main__":
