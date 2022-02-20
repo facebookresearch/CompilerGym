@@ -234,6 +234,10 @@ def download_cBench_runtime_data() -> bool:
     if (cbench_data / "unpacked").is_file():
         return False
     else:
+        logger.warning(
+            "Installing the cBench runtime inputs. This may take a few moments ..."
+        )
+
         # Clean up any partially-extracted data directory.
         if cbench_data.is_dir():
             shutil.rmtree(cbench_data)
