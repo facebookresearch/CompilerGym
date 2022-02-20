@@ -10,11 +10,12 @@ import sys
 from pathlib import Path
 from signal import Signals
 from time import sleep, time
-from typing import Dict, Iterable, List, Optional, TypeVar, Union
+from typing import Dict, FrozenSet, Iterable, List, NamedTuple, Optional, TypeVar, Union
 
 import grpc
 from deprecated.sphinx import deprecated
 from pydantic import BaseModel
+from frozendict import frozendict
 
 import compiler_gym.errors
 from compiler_gym.service.proto import (
@@ -49,7 +50,7 @@ GRPC_CHANNEL_OPTIONS = [
 logger = logging.getLogger(__name__)
 
 
-class ConnectionOpts(BaseModel):
+class ConnectionOpts(NamedTuple):
     """The options used to configure a connection to a service."""
 
     rpc_call_max_seconds: float = 300
@@ -96,11 +97,11 @@ class ConnectionOpts(BaseModel):
     benchmark. In case of benchmark re-use, leave this :code:`False`.
     """
 
-    script_args: List[str] = []
+    script_args: FrozenSet[str] = frozenset([])
     """If the service is started from a local script, this set of args is used
     on the command line. No effect when used for existing sockets."""
 
-    script_env: Dict[str, str] = {}
+    script_env: Dict[str, str] = frozendict({})
     """If the service is started from a local script, this set of env vars is
     used on the command line. No effect when used for existing sockets."""
 
@@ -301,7 +302,7 @@ class ManagedConnection(Connection):
         port_init_max_seconds: float,
         rpc_init_max_seconds: float,
         process_exit_max_seconds: float,
-        script_args: List[str],
+        script_args: FrozenSet[str],
         script_env: Dict[str, str],
     ):
         """Constructor.
@@ -323,7 +324,7 @@ class ManagedConnection(Connection):
             f"--working_dir={self.cache.path}",
         ]
         # Add any custom arguments
-        cmd += script_args
+        cmd += list(script_args)
 
         # Set the root of the runfiles directory.
         env = os.environ.copy()

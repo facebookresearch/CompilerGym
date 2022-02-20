@@ -266,7 +266,9 @@ def main(argv):
 
     if FLAGS.run_on_port:
         assert FLAGS.env, "Must specify an --env to run"
-        settings = ConnectionOpts(script_args=["--port", str(FLAGS.run_on_port)])
+        settings = ConnectionOpts(
+            script_args=frozenset(["--port", str(FLAGS.run_on_port)])
+        )
         with gym.make(FLAGS.env, connection_settings=settings) as env:
             print(
                 f"=== Started a service on port {FLAGS.run_on_port}. Use C-c to terminate. ==="
