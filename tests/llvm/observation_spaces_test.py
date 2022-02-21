@@ -1212,7 +1212,7 @@ def test_text_size_observation_spaces(env: LlvmEnv):
     env.reset("cbench-v1/crc32")
 
     # Expected .text sizes for this benchmark: -O0, -O3, -Oz.
-    crc32_code_sizes = {"darwin": [1171, 3825, 3289], "linux": [2747, 5539, 4868]}
+    crc32_code_sizes = {"darwin": [1171, 3825, 3289], "linux": [2850, 5652, 4980]}
 
     key = "TextSizeBytes"
     space = env.observation.spaces[key]
