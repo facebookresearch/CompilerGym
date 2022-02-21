@@ -59,15 +59,14 @@ def test_get_system_library_flags_nonzero_exit_status(caplog):
 
 def test_get_system_library_flags_output_parse_failure(caplog):
     """Test that setting the $CXX to an invalid binary raises an error."""
-    old_cxx = os.environ.get("CXX")
+    old_cxx = os.environ.get("CXX", "")
     try:
         os.environ["CXX"] = "echo"
         flags, error = llvm_benchmark._get_cached_system_library_flags("echo")
         assert flags == []
         assert "Failed to parse '#include <...>' search paths from echo" in error
     finally:
-        if old_cxx:
-            os.environ["CXX"] = old_cxx
+        os.environ["CXX"] = old_cxx
 
 
 def test_get_system_library_flags():

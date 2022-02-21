@@ -119,7 +119,7 @@ def get_system_library_flags(compiler: Optional[str] = None) -> List[str]:
     :raises OSError: If the compiler fails, or if the output of the compiler
         cannot be understood.
     """
-    compiler = compiler or os.environ.get("CXX", "c++")
+    compiler = compiler or (os.environ.get("CXX") or "c++")
     # We want to cache the results of this expensive query, but also emit a
     # logging warning when the function is called, including when the call
     # results in a cache hit. We therefore must cache both the flags and the
