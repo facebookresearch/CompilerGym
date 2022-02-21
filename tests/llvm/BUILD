@@ -171,8 +171,8 @@ py_test(
 )
 
 py_test(
-    name = "llvm_benchmarks_test",
-    srcs = ["llvm_benchmarks_test.py"],
+    name = "llvm_benchmark_test",
+    srcs = ["llvm_benchmark_test.py"],
     deps = [
         "//compiler_gym/envs",
         "//compiler_gym/service/proto",

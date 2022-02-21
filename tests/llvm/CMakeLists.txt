@@ -167,9 +167,9 @@ cg_py_test(
 
 cg_py_test(
   NAME
-    llvm_benchmarks_test
+    llvm_benchmark_test
   SRCS
-    "llvm_benchmarks_test.py"
+    "llvm_benchmark_test.py"
   DEPS
     compiler_gym::envs::envs
     compiler_gym::service::proto::proto
