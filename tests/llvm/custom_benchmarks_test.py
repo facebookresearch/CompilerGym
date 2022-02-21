@@ -3,7 +3,6 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Tests for LLVM benchmark handling."""
-import os
 import re
 import tempfile
 from pathlib import Path
@@ -13,7 +12,6 @@ import pytest
 
 from compiler_gym.datasets import Benchmark
 from compiler_gym.envs import LlvmEnv, llvm
-from compiler_gym.envs.llvm import llvm_benchmark
 from compiler_gym.service.proto import Benchmark as BenchmarkProto
 from compiler_gym.service.proto import File
 from compiler_gym.util.runfiles_path import runfiles_path
@@ -285,32 +283,6 @@ def test_two_custom_benchmarks_reset(env: LlvmEnv):
         env.benchmark = benchmark2
     env.reset()
     assert env.benchmark == benchmark2.uri
-
-
-def test_get_system_library_flags_not_found(caplog):
-    flags, error = llvm_benchmark._get_cached_system_library_flags("not-a-real-binary")
-    assert flags == []
-    assert "Failed to invoke not-a-real-binary" in error
-
-
-def test_get_system_library_flags_nonzero_exit_status(caplog):
-    """Test that setting the $CXX to an invalid binary raises an error."""
-    flags, error = llvm_benchmark._get_cached_system_library_flags("false")
-    assert flags == []
-    assert "Failed to invoke false" in error
-
-
-def test_get_system_library_flags_output_parse_failure(caplog):
-    """Test that setting the $CXX to an invalid binary raises an error."""
-    old_cxx = os.environ.get("CXX")
-    try:
-        os.environ["CXX"] = "echo"
-        flags, error = llvm_benchmark._get_cached_system_library_flags("echo")
-        assert flags == []
-        assert "Failed to parse '#include <...>' search paths from echo" in error
-    finally:
-        if old_cxx:
-            os.environ["CXX"] = old_cxx
 
 
 if __name__ == "__main__":

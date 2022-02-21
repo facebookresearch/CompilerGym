@@ -6,7 +6,6 @@
 import logging
 import os
 import random
-import shlex
 import subprocess
 import sys
 import tempfile
@@ -90,14 +89,8 @@ def _get_system_library_flags(compiler: str) -> Iterable[str]:
             msg += f":\n{stderr}"
         raise OSError(msg)
 
-    # On macOS we need to provide the location of the libclang_rt.osx.a library,
-    # which we can grab from the linker invocation.
     if sys.platform == "darwin":
-        ld_invocation = shlex.split(lines[-1])
-        for i in range(1, len(ld_invocation) - 1):
-            if ld_invocation[i] == "-lSystem":
-                yield "-lSystem"
-                yield ld_invocation[i + 1]
+        yield "-L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib"
 
 
 @lru_cache(maxsize=32)
@@ -157,12 +150,10 @@ class ClangInvocation:
         self.timeout = timeout
 
     def command(self, outpath: Path) -> List[str]:
-        cmd = [str(llvm.clang_path())]
+        cmd = [str(llvm.clang_path()), "-c", "-emit-llvm", "-o", str(outpath)]
         if self.system_includes:
             cmd += get_system_library_flags()
-
         cmd += [str(s) for s in self.args]
-        cmd += ["-c", "-emit-llvm", "-o", str(outpath)]
 
         return cmd
 
