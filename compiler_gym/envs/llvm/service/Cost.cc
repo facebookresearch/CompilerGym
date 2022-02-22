@@ -54,27 +54,35 @@ Status writeBitcodeFile(const llvm::Module& module, const fs::path& path) {
 }
 
 Status getTextSizeInBytes(const fs::path& file, int64_t* value) {
-  // Run llvm-size on the compiled file.
+  const auto llvmSizePath = util::getSiteDataPath("llvm-v0/bin/llvm-size");
+  DCHECK(fs::exists(llvmSizePath)) << fmt::format("File not found: {}", llvmSizePath.string());
+
   const std::string llvmSizeCmd = fmt::format("{} {}", llvmSizePath.string(), file.string());
 
   boost::asio::io_context llvmSizeStdoutStream;
   std::future<std::string> llvmSizeStdoutFuture;
+  std::string llvmSizeOutput;
 
-  bp::child llvmSize(llvmSizeCmd, bp::std_in.close(), bp::std_out > llvmSizeStdoutFuture,
-                      bp::std_err > bp::null, llvmSizeStdoutStream);
+  try {
+    bp::child llvmSize(llvmSizeCmd, bp::std_in.close(), bp::std_out > llvmSizeStdoutFuture,
+                       bp::std_err > bp::null, llvmSizeStdoutStream);
 
-  llvmSizeStdoutStream.run_for(std::chrono::seconds(60));
-  if (llvmSizeStdoutStream.poll()) {
-    return Status(StatusCode::DEADLINE_EXCEEDED,
-                  fmt::format("Failed to compute .text size cost within 60 seconds"));
-  }
-  llvmSize.wait();
-  llvmSizeOutput = llvmSizeStdoutFuture.get();
+    llvmSizeStdoutStream.run_for(std::chrono::seconds(60));
+    if (llvmSizeStdoutStream.poll()) {
+      return Status(StatusCode::DEADLINE_EXCEEDED,
+                    fmt::format("Failed to compute .text size cost within 60 seconds"));
+    }
+    llvmSize.wait();
+    llvmSizeOutput = llvmSizeStdoutFuture.get();
 
-  if (llvmSize.exit_code()) {
-    return Status(StatusCode::INVALID_ARGUMENT, fmt::format("Failed to compute .text size cost. "
-                                                            "Command returned exit code {}: {}",
-                                                            llvmSize.exit_code(), llvmSizeCmd));
+    if (llvmSize.exit_code()) {
+      return Status(StatusCode::INVALID_ARGUMENT, fmt::format("Failed to compute .text size cost. "
+                                                              "Command returned exit code {}: {}",
+                                                              llvmSize.exit_code(), llvmSizeCmd));
+    }
+  } catch (bp::process_error& e) {
+    return Status(StatusCode::INVALID_ARGUMENT,
+                  fmt::format("Failed to compute .text size cost: {}", e.what()));
   }
 
   // The output of llvm-size is in berkley format, e.g.:

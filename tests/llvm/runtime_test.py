@@ -122,8 +122,8 @@ def test_failing_build_cmd(env: LlvmEnv, tmpdir):
     with pytest.raises(
         ServiceError,
         match=(
-            r"Command '\$CC \$IN -invalid-cc-argument' failed with exit code 1: "
-            r"clang: error: unknown argument: '-invalid-cc-argument'"
+            r"Command '\$CC \$IN -invalid-cc-argument -o a.out -c' failed with "
+            r"exit code 1: clang: error: unknown argument: '-invalid-cc-argument'"
         ),
     ):
         env.observation.Runtime()
