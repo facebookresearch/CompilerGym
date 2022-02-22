@@ -82,5 +82,17 @@ def test_get_system_library_flags_system_libraries():
     assert flags[-1] == "-L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib"
 
 
+def test_ClangInvocation_system_libs():
+    cmd = llvm_benchmark.ClangInvocation(["foo.c"]).command("a.out")
+    assert "-isystem" in cmd
+
+
+def test_ClangInvocation_no_system_libs():
+    cmd = llvm_benchmark.ClangInvocation(["foo.c"], system_includes=False).command(
+        "a.out"
+    )
+    assert "-isystem" not in cmd
+
+
 if __name__ == "__main__":
     main()
