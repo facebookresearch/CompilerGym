@@ -735,7 +735,14 @@ class CompilerEnv(gym.Env):
 
         def _retry(error) -> Optional[ObservationType]:
             """Abort and retry on error."""
-            logger.warning("%s during reset(): %s", type(error).__name__, error)
+            # Log the error that we are recovering from, but treat
+            # ServiceIsClosed errors as unimportant since we know what causes
+            # them.
+            log_severity = (
+                logger.debug if isinstance(error, ServiceIsClosed) else logger.warning
+            )
+            log_severity("%s during reset(): %s", type(error).__name__, error)
+
             if self.service:
                 try:
                     self.service.close()
