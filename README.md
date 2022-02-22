@@ -126,18 +126,18 @@ pipeline.
 This leaderboard tracks the results achieved by algorithms on the `llvm-ic-v0`
 environment on the 23 benchmarks in the `cbench-v1` dataset.
 
-| Author | Algorithm | Links | Date | Walltime (mean) | Codesize Reduction (geomean) |
-| --- | --- | --- | --- |-----------------|------------------------------|
- | Leibniz University| PPO + Guided Search | [write-up](leaderboard/llvm_instcount/ppo/README.md), [results](leaderboard/llvm_instcount/random_search/results.csv) | 2022-02 | 69.821s  | **1.070×**                   |
-| Facebook | Random search (t=10800) | [write-up](leaderboard/llvm_instcount/random_search/README.md), [results](leaderboard/llvm_instcount/random_search/results_p125_t10800.csv) | 2021-03 | 10,512.356s     | 1.062×                       |
-| Facebook | Random search (t=3600) | [write-up](leaderboard/llvm_instcount/random_search/README.md), [results](leaderboard/llvm_instcount/random_search/results_p125_t3600.csv) | 2021-03 | 3,630.821s      | 1.061×                       |
-| Facebook | Greedy search | [write-up](leaderboard/llvm_instcount/e_greedy/README.md), [results](leaderboard/llvm_instcount/e_greedy/results_e0.csv) | 2021-03 | 169.237s        | 1.055×                       |
-| Facebook | Random search (t=60) | [write-up](leaderboard/llvm_instcount/random_search/README.md), [results](leaderboard/llvm_instcount/random_search/results_p125_t60.csv) | 2021-03 | 91.215s         | 1.045×                       |
-| Facebook | e-Greedy search (e=0.1) | [write-up](leaderboard/llvm_instcount/e_greedy/README.md), [results](leaderboard/llvm_instcount/e_greedy/results_e10.csv) | 2021-03 | 152.579s        | 1.041×                       |
-| Jiadong Guo | Tabular Q (N=5000, H=10) | [write-up](leaderboard/llvm_instcount/tabular_q/README.md), [results](leaderboard/llvm_instcount/tabular_q/results-H10-N5000.csv) | 2021-04 | 2534.305        | 1.036×                       |
-| Facebook | Random search (t=10) | [write-up](leaderboard/llvm_instcount/random_search/README.md), [results](leaderboard/llvm_instcount/random_search/results_p125_t10.csv) | 2021-03 | 42.939s         | 1.031×                       |
-| Patrick Hesse | DQN (N=4000, H=10) | [write-up](leaderboard/llvm_instcount/dqn/README.md), [results](leaderboard/llvm_instcount/dqn/results-instcountnorm-H10-N4000.csv) | 2021-06 | 91.018s         | 1.029×                       |
-| Jiadong Guo | Tabular Q (N=2000, H=5) | [write-up](leaderboard/llvm_instcount/tabular_q/README.md), [results](leaderboard/llvm_instcount/tabular_q/results-H5-N2000.csv) | 2021-04 | 694.105         | 0.988×                       |
+| Author                                           | Algorithm | Links | Date | Walltime (mean) | Codesize Reduction (geomean) |
+|--------------------------------------------------| --- | --- | --- |-----------------|------------------------------|
+ | Robin Schmöcker, Yannik Mahlau, Nicolas Fröhlich | PPO + Guided Search | [write-up](leaderboard/llvm_instcount/ppo/README.md), [results](leaderboard/llvm_instcount/random_search/results.csv) | 2022-02 | 69.821s  | **1.070×**                   |
+| Facebook                                         | Random search (t=10800) | [write-up](leaderboard/llvm_instcount/random_search/README.md), [results](leaderboard/llvm_instcount/random_search/results_p125_t10800.csv) | 2021-03 | 10,512.356s     | 1.062×                       |
+| Facebook                                         | Random search (t=3600) | [write-up](leaderboard/llvm_instcount/random_search/README.md), [results](leaderboard/llvm_instcount/random_search/results_p125_t3600.csv) | 2021-03 | 3,630.821s      | 1.061×                       |
+| Facebook                                         | Greedy search | [write-up](leaderboard/llvm_instcount/e_greedy/README.md), [results](leaderboard/llvm_instcount/e_greedy/results_e0.csv) | 2021-03 | 169.237s        | 1.055×                       |
+| Facebook                                         | Random search (t=60) | [write-up](leaderboard/llvm_instcount/random_search/README.md), [results](leaderboard/llvm_instcount/random_search/results_p125_t60.csv) | 2021-03 | 91.215s         | 1.045×                       |
+| Facebook                                         | e-Greedy search (e=0.1) | [write-up](leaderboard/llvm_instcount/e_greedy/README.md), [results](leaderboard/llvm_instcount/e_greedy/results_e10.csv) | 2021-03 | 152.579s        | 1.041×                       |
+| Jiadong Guo                                      | Tabular Q (N=5000, H=10) | [write-up](leaderboard/llvm_instcount/tabular_q/README.md), [results](leaderboard/llvm_instcount/tabular_q/results-H10-N5000.csv) | 2021-04 | 2534.305        | 1.036×                       |
+| Facebook                                         | Random search (t=10) | [write-up](leaderboard/llvm_instcount/random_search/README.md), [results](leaderboard/llvm_instcount/random_search/results_p125_t10.csv) | 2021-03 | 42.939s         | 1.031×                       |
+| Patrick Hesse                                    | DQN (N=4000, H=10) | [write-up](leaderboard/llvm_instcount/dqn/README.md), [results](leaderboard/llvm_instcount/dqn/results-instcountnorm-H10-N4000.csv) | 2021-06 | 91.018s         | 1.029×                       |
+| Jiadong Guo                                      | Tabular Q (N=2000, H=5) | [write-up](leaderboard/llvm_instcount/tabular_q/README.md), [results](leaderboard/llvm_instcount/tabular_q/results-H5-N2000.csv) | 2021-04 | 694.105         | 0.988×                       |
 
 
 ## Contributing
