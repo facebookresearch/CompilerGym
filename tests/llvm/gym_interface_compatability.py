@@ -4,17 +4,11 @@
 # LICENSE file in the root directory of this source tree.
 """Test that LlvmEnv is compatible with OpenAI gym interface."""
 import gym
-import pytest
 
 from compiler_gym.envs.llvm import LlvmEnv
 from tests.test_main import main
 
-
-@pytest.fixture(scope="function")
-def env() -> LlvmEnv:
-    """Create an LLVM environment."""
-    with gym.make("llvm-autophase-ic-v0") as env_:
-        yield env_
+pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
 def test_type_classes(env: LlvmEnv):

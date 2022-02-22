@@ -3,8 +3,6 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Unit tests for compiler_gym.wrappers.llvm."""
-import sys
-
 import numpy as np
 import pytest
 from flaky import flaky
@@ -17,11 +15,6 @@ from tests.test_main import main
 pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
-@pytest.mark.xfail(
-    sys.platform == "darwin",
-    strict=True,
-    reason="github.com/facebookresearch/CompilerGym/issues/459",
-)
 def test_invalid_runtime_count(env: LlvmEnv):
     env = RuntimePointEstimateReward(env, runtime_count=-10)
     with pytest.raises(
@@ -30,11 +23,6 @@ def test_invalid_runtime_count(env: LlvmEnv):
         env.reset()
 
 
-@pytest.mark.xfail(
-    sys.platform == "darwin",
-    strict=True,
-    reason="github.com/facebookresearch/CompilerGym/issues/459",
-)
 def test_invalid_warmup_count(env: LlvmEnv):
     env = RuntimePointEstimateReward(env, warmup_count=-10)
     with pytest.raises(
@@ -58,22 +46,12 @@ def test_reward_range_not_runnable_benchmark(env: LlvmEnv):
         env.reset(benchmark="benchmark://npb-v0/1")
 
 
-@pytest.mark.xfail(
-    sys.platform == "darwin",
-    strict=True,
-    reason="github.com/facebookresearch/CompilerGym/issues/459",
-)
 def test_fork(env: LlvmEnv):
     env = RuntimePointEstimateReward(env)
     with env.fork() as fkd:
         assert fkd.reward_space_spec.name == "runtime"
 
 
-@pytest.mark.xfail(
-    sys.platform == "darwin",
-    strict=True,
-    reason="github.com/facebookresearch/CompilerGym/issues/459",
-)
 @pytest.mark.parametrize("runtime_count", [1, 3, 5])
 @pytest.mark.parametrize("warmup_count", [0, 1, 3])
 @pytest.mark.parametrize("estimator", [np.median, min])

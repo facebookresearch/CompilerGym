@@ -21,7 +21,7 @@ from typing import Iterable
 
 import compiler_gym
 from compiler_gym.datasets import Benchmark, Dataset
-from compiler_gym.envs.llvm.llvm_benchmark import get_system_includes
+from compiler_gym.envs.llvm.llvm_benchmark import get_system_library_flags
 from compiler_gym.spaces import Reward
 from compiler_gym.third_party import llvm
 from compiler_gym.util.registration import register
@@ -124,8 +124,7 @@ class UnrollingDataset(Dataset):
             str(NEURO_VECTORIZER_HEADER.parent),
             src,
         ]
-        for directory in get_system_includes():
-            cmd += ["-isystem", str(directory)]
+        cmd += get_system_library_flags()
         return subprocess.check_output(
             cmd,
             timeout=300,

@@ -29,11 +29,9 @@ namespace compiler_gym::runtime {
 
 extern std::promise<void> shutdownSignal;
 
-// Increase maximum message size beyond the 4MB default as inbound message
-// may be larger (e.g., in the case of IR strings).
-constexpr size_t kMaxMessageSizeInBytes = 512 * 1024 * 1024;
-
 void shutdown_handler(int signum);
+
+void setGrpcChannelOptions(grpc::ServerBuilder& builder);
 
 // Create a service, configured using --port and --working_dir flags, and run
 // it. This function never returns.
@@ -87,7 +85,7 @@ template <typename CompilationSessionType>
   grpc::ServerBuilder builder;
   builder.RegisterService(&service);
 
-  builder.SetMaxMessageSize(kMaxMessageSizeInBytes);
+  setGrpcChannelOptions(builder);
 
   // Start a channel on the port.
   int port;

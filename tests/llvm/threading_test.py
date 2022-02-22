@@ -53,8 +53,7 @@ class ThreadedWorkerWithEnv(Thread):
         self.done = True
 
 
-# Timeout may be exceeded if the environment is slow to start.
-@flaky
+@flaky  # Timeout may be exceeded if the environment is slow to start.
 def test_running_environment_in_background_thread():
     """Test launching and running an LLVM environment in a background thread."""
     thread = ThreadedWorker(
@@ -63,7 +62,7 @@ def test_running_environment_in_background_thread():
         actions=[0, 0, 0],
     )
     thread.start()
-    thread.join(timeout=60)
+    thread.join(timeout=10)
 
     assert thread.done
     assert thread.observation is not None
@@ -71,6 +70,7 @@ def test_running_environment_in_background_thread():
     assert thread.info
 
 
+@flaky  # Timeout may be exceeded if the environment is slow to start.
 def test_moving_environment_to_background_thread():
     """Test running an LLVM environment from a background thread. The environment
     is made in the main thread and used in the background thread.

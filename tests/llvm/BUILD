@@ -28,18 +28,6 @@ py_test(
 )
 
 py_test(
-    name = "all_benchmarks_init_close_test",
-    timeout = "long",
-    srcs = ["all_benchmarks_init_close_test.py"],
-    shard_count = 6,
-    deps = [
-        "//compiler_gym/envs",
-        "//tests:test_main",
-        "//tests/pytest_plugins:llvm",
-    ],
-)
-
-py_test(
     name = "autophase_test",
     timeout = "short",
     srcs = ["autophase_test.py"],
@@ -183,8 +171,8 @@ py_test(
 )
 
 py_test(
-    name = "llvm_benchmarks_test",
-    srcs = ["llvm_benchmarks_test.py"],
+    name = "llvm_benchmark_test",
+    srcs = ["llvm_benchmark_test.py"],
     deps = [
         "//compiler_gym/envs",
         "//compiler_gym/service/proto",

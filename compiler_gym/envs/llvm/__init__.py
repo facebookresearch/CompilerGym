@@ -9,7 +9,7 @@ from itertools import product
 from compiler_gym.envs.llvm.compute_observation import compute_observation
 from compiler_gym.envs.llvm.llvm_benchmark import (
     ClangInvocation,
-    get_system_includes,
+    get_system_library_flags,
     make_benchmark,
 )
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
@@ -24,7 +24,7 @@ from compiler_gym.util.runfiles_path import runfiles_path
 __all__ = [
     "ClangInvocation",
     "compute_observation",
-    "get_system_includes",
+    "get_system_library_flags",
     "LLVM_SERVICE_BINARY",
     "LlvmEnv",
     "make_benchmark",

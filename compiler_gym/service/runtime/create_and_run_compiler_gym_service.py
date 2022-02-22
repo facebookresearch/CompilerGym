@@ -18,6 +18,7 @@ from typing import Type
 import grpc
 from absl import app, flags, logging
 
+from compiler_gym.service import connection
 from compiler_gym.service.compilation_session import CompilationSession
 from compiler_gym.service.proto import compiler_gym_service_pb2_grpc
 from compiler_gym.service.runtime.compiler_gym_service import CompilerGymService
@@ -94,10 +95,7 @@ def create_and_run_compiler_gym_service(
         # Create the service.
         server = grpc.server(
             futures.ThreadPoolExecutor(max_workers=FLAGS.rpc_service_threads),
-            options=[
-                ("grpc.max_send_message_length", MAX_MESSAGE_SIZE_IN_BYTES),
-                ("grpc.max_receive_message_length", MAX_MESSAGE_SIZE_IN_BYTES),
-            ],
+            options=connection.GRPC_CHANNEL_OPTIONS,
         )
         service = CompilerGymService(
             working_directory=working_dir,

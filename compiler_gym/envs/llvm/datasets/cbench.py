@@ -21,6 +21,7 @@ import fasteners
 
 from compiler_gym.datasets import Benchmark, TarDatasetWithManifest
 from compiler_gym.datasets.uri import BenchmarkUri
+from compiler_gym.envs.llvm import llvm_benchmark
 from compiler_gym.service.proto import BenchmarkDynamicConfig, Command
 from compiler_gym.third_party import llvm
 from compiler_gym.util.commands import Popen
@@ -491,7 +492,9 @@ def validator(
     DYNAMIC_CONFIGS[uri.path].append(
         BenchmarkDynamicConfig(
             build_cmd=Command(
-                argument=["$CC", "$IN"] + linkopts,
+                argument=["$CC", "$IN"]
+                + llvm_benchmark.get_system_library_flags()
+                + linkopts,
                 timeout_seconds=60,
                 outfile=["a.out"],
             ),

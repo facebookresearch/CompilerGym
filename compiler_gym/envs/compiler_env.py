@@ -1142,6 +1142,15 @@ class CompilerEnv(gym.Env):
         if not self.in_episode:
             self.reset(benchmark=state.benchmark)
 
+        # TODO(cummins): Does this behavior make sense? Take, for example:
+        #
+        #     >>> env.apply(state)
+        #     >>> env.benchmark == state.benchmark
+        #     False
+        #
+        # I think most users would reasonable expect `env.apply(state)` to fully
+        # apply the state, not just the sequence of actions. And what about the
+        # choice of observation space, reward space, etc?
         if self.benchmark != state.benchmark:
             warnings.warn(
                 f"Applying state from environment for benchmark '{state.benchmark}' "

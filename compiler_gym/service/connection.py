@@ -37,12 +37,17 @@ from compiler_gym.util.truncate import truncate_lines
 GRPC_CHANNEL_OPTIONS = [
     # Disable the inbound message length filter to allow for large messages such
     # as observations.
+    ("grpc.max_send_message_length", -1),
     ("grpc.max_receive_message_length", -1),
     # Fix for "received initial metadata size exceeds limit"
     ("grpc.max_metadata_size", 512 * 1024),
     # Spurious error UNAVAILABLE "Trying to connect an http1.x server".
     # https://putridparrot.com/blog/the-unavailable-trying-to-connect-an-http1-x-server-grpc-error/
     ("grpc.enable_http_proxy", 0),
+    # Disable TCP port re-use to mitigate port conflict errors when starting
+    # many services in parallel. Context:
+    # https://github.com/facebookresearch/CompilerGym/issues/572
+    ("grpc.so_reuseport", 0),
 ]
 
 logger = logging.getLogger(__name__)
@@ -529,8 +534,11 @@ class ManagedConnection(Connection):
             super().close()
 
     def __repr__(self):
-        alive_or_dead = "alive" if self.process.poll() else "dead"
-        return f"{self.url} running on PID={self.process.pid} ({alive_or_dead})"
+        if self.process.poll() is None:
+            return (
+                f"Connection to service at {self.url} running on PID {self.process.pid}"
+            )
+        return f"Connection to dead service at {self.url}"
 
 
 class UnmanagedConnection(Connection):
@@ -570,7 +578,7 @@ class UnmanagedConnection(Connection):
         super().__init__(channel, url)
 
     def __repr__(self):
-        return self.url
+        return f"Connection to unmanaged service {self.url}"
 
 
 class CompilerGymServiceConnection:

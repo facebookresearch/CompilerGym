@@ -28,17 +28,6 @@ cg_py_test(
 
 cg_py_test(
   NAME
-    all_benchmarks_init_close_test
-  SRCS
-    "all_benchmarks_init_close_test.py"
-  DEPS
-    compiler_gym::envs::envs
-    tests::pytest_plugins::llvm
-    tests::test_main
-)
-
-cg_py_test(
-  NAME
     autophase_test
   SRCS
     "autophase_test.py"
@@ -178,9 +167,9 @@ cg_py_test(
 
 cg_py_test(
   NAME
-    llvm_benchmarks_test
+    llvm_benchmark_test
   SRCS
-    "llvm_benchmarks_test.py"
+    "llvm_benchmark_test.py"
   DEPS
     compiler_gym::envs::envs
     compiler_gym::service::proto::proto

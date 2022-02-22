@@ -101,5 +101,11 @@ def test_cbench_v1_dataset_out_of_range(env: LlvmEnv):
         env.datasets.benchmark("cbench-v1/qsort?dataset=abc")
 
 
+def test_cbench_v1_init_close_test(env: LlvmEnv, benchmark_name: str):
+    """Create an environment for each benchmark and close it."""
+    env.reset(benchmark=benchmark_name)
+    assert env.benchmark == benchmark_name
+
+
 if __name__ == "__main__":
     main()

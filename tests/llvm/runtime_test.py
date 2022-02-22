@@ -3,25 +3,19 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Integrations tests for LLVM runtime support."""
-import sys
 from pathlib import Path
 
 import numpy as np
 import pytest
 from flaky import flaky
 
-from compiler_gym.envs.llvm import LlvmEnv
+from compiler_gym.envs.llvm import LlvmEnv, llvm_benchmark
 from compiler_gym.service.connection import ServiceError
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
-@pytest.mark.xfail(
-    sys.platform == "darwin",
-    strict=True,
-    reason="github.com/facebookresearch/CompilerGym/issues/459",
-)
 @pytest.mark.parametrize("runtime_observation_count", [1, 3, 5])
 def test_custom_benchmark_runtime(env: LlvmEnv, tmpdir, runtime_observation_count: int):
     env.reset()
@@ -43,7 +37,9 @@ def test_custom_benchmark_runtime(env: LlvmEnv, tmpdir, runtime_observation_coun
 
     benchmark = env.make_benchmark(Path(tmpdir) / "program.c")
 
-    benchmark.proto.dynamic_config.build_cmd.argument.extend(["$CC", "$IN"])
+    benchmark.proto.dynamic_config.build_cmd.argument.extend(
+        ["$CC", "$IN"] + llvm_benchmark.get_system_library_flags()
+    )
     benchmark.proto.dynamic_config.build_cmd.outfile.extend(["a.out"])
     benchmark.proto.dynamic_config.build_cmd.timeout_seconds = 10
 
@@ -56,11 +52,6 @@ def test_custom_benchmark_runtime(env: LlvmEnv, tmpdir, runtime_observation_coun
     assert np.all(runtimes > 0)
 
 
-@pytest.mark.xfail(
-    sys.platform == "darwin",
-    strict=True,
-    reason="github.com/facebookresearch/CompilerGym/issues/459",
-)
 @flaky
 def test_custom_benchmark_runtimes_differ(env: LlvmEnv, tmpdir):
     """Same as above, but test that runtimes differ from run to run."""
@@ -84,7 +75,9 @@ def test_custom_benchmark_runtimes_differ(env: LlvmEnv, tmpdir):
 
     benchmark = env.make_benchmark(Path(tmpdir) / "program.c")
 
-    benchmark.proto.dynamic_config.build_cmd.argument.extend(["$CC", "$IN"])
+    benchmark.proto.dynamic_config.build_cmd.argument.extend(
+        ["$CC", "$IN"] + llvm_benchmark.get_system_library_flags()
+    )
     benchmark.proto.dynamic_config.build_cmd.outfile.extend(["a.out"])
     benchmark.proto.dynamic_config.build_cmd.timeout_seconds = 10
 
