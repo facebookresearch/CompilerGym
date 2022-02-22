@@ -37,7 +37,9 @@ def _get_system_library_flags(compiler: str) -> Iterable[str]:
     """Private implementation function."""
     # Create a temporary directory to write the compiled binary to, since GNU
     # assembler does not support piping to stdout.
-    with tempfile.NamedTemporaryFile(dir=transient_cache_path(".")) as f:
+    transient_cache = transient_cache_path(".")
+    transient_cache.mkdir(parents=True, exist_ok=True)
+    with tempfile.NamedTemporaryFile(dir=transient_cache) as f:
         try:
             cmd = [compiler, "-xc++", "-v", "-", "-o", f.name]
             # On macOS we need to compile a binary to invoke the linker.
