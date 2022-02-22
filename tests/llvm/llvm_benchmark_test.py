@@ -44,20 +44,24 @@ def test_add_benchmark_invalid_path(env: CompilerEnv):
         assert str(ctx.value).endswith(str(tmp))
 
 
-def test_get_system_library_flags_not_found(caplog):
+# pylint: disable=protected-access
+# pylint: disable=use-implicit-booleaness-not-comparison
+
+
+def test_get_system_library_flags_not_found():
     flags, error = llvm_benchmark._get_cached_system_library_flags("not-a-real-binary")
     assert flags == []
     assert "Failed to invoke not-a-real-binary" in error
 
 
-def test_get_system_library_flags_nonzero_exit_status(caplog):
+def test_get_system_library_flags_nonzero_exit_status():
     """Test that setting the $CXX to an invalid binary raises an error."""
     flags, error = llvm_benchmark._get_cached_system_library_flags("false")
     assert flags == []
     assert "Failed to invoke false" in error
 
 
-def test_get_system_library_flags_output_parse_failure(caplog):
+def test_get_system_library_flags_output_parse_failure():
     """Test that setting the $CXX to an invalid binary raises an error."""
     old_cxx = os.environ.get("CXX", "")
     try:
@@ -67,6 +71,10 @@ def test_get_system_library_flags_output_parse_failure(caplog):
         assert "Failed to parse '#include <...>' search paths from echo" in error
     finally:
         os.environ["CXX"] = old_cxx
+
+
+# pylint: enable=use-implicit-booleaness-not-comparison
+# pylint: enable=protected-access
 
 
 def test_get_system_library_flags():
