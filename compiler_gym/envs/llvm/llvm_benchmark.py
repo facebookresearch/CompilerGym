@@ -13,7 +13,7 @@ from concurrent.futures import as_completed
 from datetime import datetime
 from functools import lru_cache
 from pathlib import Path
-from typing import Iterable, List, Optional, Tuple, Union
+from typing import Iterable, List, Optional, Union
 
 from compiler_gym.datasets import Benchmark, BenchmarkInitError
 from compiler_gym.third_party import llvm
@@ -22,6 +22,15 @@ from compiler_gym.util.runfiles_path import transient_cache_path
 from compiler_gym.util.thread_pool import get_thread_pool_executor
 
 logger = logging.getLogger(__name__)
+
+
+class HostCompilerFailure(OSError):
+    """Exception raised when the system compiler fails."""
+
+
+class UnableToParseHostCompilerOutput(HostCompilerFailure):
+    """Exception raised if unable to parse the verbose output of the host
+    compiler."""
 
 
 def _get_system_library_flags(compiler: str) -> Iterable[str]:
@@ -45,14 +54,14 @@ def _get_system_library_flags(compiler: str) -> Iterable[str]:
                     input="int main(){return 0;}", timeout=30
                 )
                 if process.returncode:
-                    raise OSError(
-                        f"Failed to invoke {compiler}. "
+                    raise HostCompilerFailure(
+                        f"Failed to invoke '{compiler}'. "
                         f"Is there a working system compiler?\n"
                         f"Error: {stderr.strip()}"
                     )
         except FileNotFoundError as e:
-            raise OSError(
-                f"Failed to invoke {compiler}. "
+            raise HostCompilerFailure(
+                f"Failed to invoke '{compiler}'. "
                 f"Is there a working system compiler?\n"
                 f"Error: {e}"
             ) from e
@@ -83,23 +92,20 @@ def _get_system_library_flags(compiler: str) -> Iterable[str]:
         elif line.startswith("#include <...> search starts here:"):
             in_search_list = True
     else:
-        msg = f"Failed to parse '#include <...>' search paths from {compiler}"
+        msg = f"Failed to parse '#include <...>' search paths from '{compiler}'"
         stderr = stderr.strip()
         if stderr:
             msg += f":\n{stderr}"
-        raise OSError(msg)
+        raise UnableToParseHostCompilerOutput(msg)
 
     if sys.platform == "darwin":
         yield "-L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib"
 
 
 @lru_cache(maxsize=32)
-def _get_cached_system_library_flags(compiler: str) -> Tuple[List[str], str]:
+def _get_cached_system_library_flags(compiler: str) -> List[str]:
     """Private implementation detail."""
-    try:
-        return list(_get_system_library_flags(compiler)), None
-    except OSError as e:
-        return [], str(e)
+    return list(_get_system_library_flags(compiler))
 
 
 def get_system_library_flags(compiler: Optional[str] = None) -> List[str]:
@@ -116,18 +122,17 @@ def get_system_library_flags(compiler: Optional[str] = None) -> List[str]:
 
     :return: A list of command line flags for a compiler.
 
-    :raises OSError: If the compiler fails, or if the output of the compiler
+    :raises HostCompilerFailure: If the host compiler cannot be determined, or
+        fails to compile a trivial piece of code.
+
+    :raises UnableToParseHostCompilerOutput: If the output of the compiler
         cannot be understood.
     """
     compiler = compiler or (os.environ.get("CXX") or "c++")
-    # We want to cache the results of this expensive query, but also emit a
-    # logging warning when the function is called, including when the call
-    # results in a cache hit. We therefore must cache both the flags and the
-    # error, if any.
-    flags, error = _get_cached_system_library_flags(compiler)
-    if error:
-        logger.warning("%s", error)
-    return flags
+    # We want to cache the results of this expensive query after resolving the
+    # default value for the compiler argument, as it can changed based on
+    # environment variables.
+    return _get_cached_system_library_flags(compiler)
 
 
 class ClangInvocation:
