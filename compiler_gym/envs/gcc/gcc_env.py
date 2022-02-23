@@ -69,9 +69,10 @@ class GccEnv(ClientServiceCompilerEnv):
         if connection_settings is None:
             connection_settings = ConnectionOpts(script_env=frozendict({"CC": gcc_bin}))
         else:
-            connection_settings = ConnectionOpts(
-                script_env=frozendict({"CC": gcc_bin}, **connection_settings._asdict())
-            )
+            script_env = frozendict({"CC": gcc_bin}, **connection_settings.script_env)
+            opts = connection_settings._asdict()
+            opts["script_env"] = script_env
+            connection_settings = ConnectionOpts(**opts)
 
         # Eagerly create a GCC compiler instance now because:
         #
