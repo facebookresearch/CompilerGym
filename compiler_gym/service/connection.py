@@ -768,7 +768,17 @@ class CompilerGymServiceConnection:
         if self.closed:
             return
 
-        self.connection.close()
+        try:
+            self.connection.close()
+        except ServiceError as e:
+            # close() can raise ServiceError if the service exists with a
+            # non-zero return code. We swallow the error here as we are
+            # disposing o f the service.
+            logger.debug(
+                "Ignoring service error during shutdown attempt: %s (%s)",
+                e,
+                type(e).__name__,
+            )
         self.connection = None
 
     def close(self):
@@ -786,7 +796,11 @@ class CompilerGymServiceConnection:
 
     @property
     def owned_by_service_pool(self):
-        return self.owning_service_pool is not None
+        # Defensive hasattr() test because this property is accessed by the
+        # destructor, where the object could be in a partially initialized
+        # state.
+        if hasattr(self, "owning_service_pool"):
+            return self.owning_service_pool is not None
 
     def __del__(self):
         # Don't let the subprocess be orphaned if user forgot to close(), or
