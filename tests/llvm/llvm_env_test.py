@@ -20,7 +20,7 @@ from compiler_gym.compiler_env_state import (
 from compiler_gym.envs import CompilerEnv, llvm
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.errors import ServiceError
-from compiler_gym.service.connection import CompilerGymServiceConnection
+from compiler_gym.service.connection import CompilerGymServiceConnection, ConnectionOpts
 from tests.pytest_plugins import llvm as llvm_plugin
 from tests.test_main import main
 
@@ -34,7 +34,9 @@ def env(request) -> CompilerEnv:
         with gym.make("llvm-v0") as env:
             yield env
     else:
-        service = CompilerGymServiceConnection(llvm.LLVM_SERVICE_BINARY)
+        service = CompilerGymServiceConnection(
+            llvm.LLVM_SERVICE_BINARY, ConnectionOpts()
+        )
         try:
             with LlvmEnv(service=service.connection.url) as env:
                 yield env
@@ -90,7 +92,7 @@ def test_connection_dies_default_reward(env: LlvmEnv):
     # with env.reset() above. For UnmanagedConnection, this error will not be
     # raised.
     try:
-        env.service.close()
+        env.service.shutdown()
     except ServiceError as e:
         assert "Service exited with returncode " in str(e)
 
@@ -114,7 +116,7 @@ def test_connection_dies_default_reward_negated(env: LlvmEnv):
     # with env.reset() above. For UnmanagedConnection, this error will not be
     # raised.
     try:
-        env.service.close()
+        env.service.shutdown()
     except ServiceError as e:
         assert "Service exited with returncode " in str(e)
 
