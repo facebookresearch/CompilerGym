@@ -110,9 +110,11 @@ class ServiceConnectionPool:
 
             self.allocated.remove(service)
 
-            # A dead service cannot be reused, discard it.
-            if service.closed or service.connection.process.poll() is not None:
-                return
+            # Only managed processes have a process attribute.
+            if hasattr(service.connection, "process"):
+                # A dead service cannot be reused, discard it.
+                if service.closed or service.connection.process.poll() is not None:
+                    return
 
             self.pool[key].append(service)
 
