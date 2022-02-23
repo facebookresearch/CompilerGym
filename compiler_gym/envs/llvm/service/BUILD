@@ -91,6 +91,7 @@ cc_library(
     srcs = ["Benchmark.cc"],
     hdrs = ["Benchmark.h"],
     deps = [
+        ":BenchmarkDynamicConfig",
         ":Cost",
         "//compiler_gym/service/proto:compiler_gym_service_cc",
         "//compiler_gym/util:GrpcStatusMacros",
@@ -105,11 +106,24 @@ cc_library(
 )
 
 cc_library(
+    name = "BenchmarkDynamicConfig",
+    srcs = ["BenchmarkDynamicConfig.cc"],
+    hdrs = ["BenchmarkDynamicConfig.h"],
+    deps = [
+        "//compiler_gym/service/proto:compiler_gym_service_cc",
+        "//compiler_gym/util:RunfilesPath",
+        "//compiler_gym/util:Subprocess",
+        "@boost//:filesystem",
+    ],
+)
+
+cc_library(
     name = "BenchmarkFactory",
     srcs = ["BenchmarkFactory.cc"],
     hdrs = ["BenchmarkFactory.h"],
     deps = [
         ":Benchmark",
+        ":BenchmarkDynamicConfig",
         ":Cost",
         "//compiler_gym/service/proto:compiler_gym_service_cc",
         "//compiler_gym/util:GrpcStatusMacros",
@@ -177,6 +191,7 @@ cc_library(
     srcs = ["Cost.cc"],
     hdrs = ["Cost.h"],
     deps = [
+        ":BenchmarkDynamicConfig",
         "//compiler_gym/util:GrpcStatusMacros",
         "//compiler_gym/util:RunfilesPath",
         "//compiler_gym/util:Subprocess",

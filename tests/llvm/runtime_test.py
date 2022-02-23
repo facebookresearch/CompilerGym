@@ -10,7 +10,6 @@ import pytest
 from flaky import flaky
 
 from compiler_gym.envs.llvm import LlvmEnv, llvm_benchmark
-from compiler_gym.service.connection import ServiceError
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
@@ -88,45 +87,6 @@ def test_custom_benchmark_runtimes_differ(env: LlvmEnv, tmpdir):
     runtimes_a = env.observation.Runtime()
     runtimes_b = env.observation.Runtime()
     assert not np.all(runtimes_a == runtimes_b)
-
-
-def test_failing_build_cmd(env: LlvmEnv, tmpdir):
-    """Test that Runtime observation raises an error if build command fails."""
-    with open(tmpdir / "program.c", "w") as f:
-        f.write(
-            """
-    #include <stdio.h>
-
-    int main(int argc, char** argv) {
-        printf("Hello\\n");
-        for (int i = 0; i < 10; ++i) {
-            argc += 2;
-        }
-        return argc - argc;
-    }
-        """
-        )
-
-    benchmark = env.make_benchmark(Path(tmpdir) / "program.c")
-
-    benchmark.proto.dynamic_config.build_cmd.argument.extend(
-        ["$CC", "$IN", "-invalid-cc-argument"]
-    )
-    benchmark.proto.dynamic_config.build_cmd.outfile.extend(["a.out"])
-    benchmark.proto.dynamic_config.build_cmd.timeout_seconds = 10
-
-    benchmark.proto.dynamic_config.run_cmd.argument.extend(["./a.out"])
-    benchmark.proto.dynamic_config.run_cmd.timeout_seconds = 10
-
-    env.reset(benchmark=benchmark)
-    with pytest.raises(
-        ServiceError,
-        match=(
-            r"Command '\$CC \$IN -invalid-cc-argument' failed with exit code 1: "
-            r"clang: error: unknown argument: '-invalid-cc-argument'"
-        ),
-    ):
-        env.observation.Runtime()
 
 
 def test_invalid_runtime_count(env: LlvmEnv):

@@ -737,12 +737,23 @@ class CompilerEnv(gym.Env):
             """Abort and retry on error."""
             logger.warning("%s during reset(): %s", type(error).__name__, error)
             if self.service:
-                self.service.close()
+                try:
+                    self.service.close()
+                except ServiceError as e:
+                    # close() can raise ServiceError if the service exists with
+                    # a non-zero return code. We swallow the error here as we
+                    # are about to retry.
+                    logger.debug(
+                        "Ignoring service error during reset() attempt: %s (%s)",
+                        e,
+                        type(e).__name__,
+                    )
             self.service = None
 
             if retry_count >= self._connection_settings.init_max_attempts:
                 raise OSError(
-                    f"Failed to reset environment using benchmark {self.benchmark} after {retry_count - 1} attempts.\n"
+                    "Failed to reset environment using benchmark "
+                    f"{self.benchmark} after {retry_count - 1} attempts.\n"
                     f"Last error ({type(error).__name__}): {error}"
                 ) from error
             else:

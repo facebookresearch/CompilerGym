@@ -84,7 +84,6 @@ enum class LlvmObservationSpace {
   OBJECT_TEXT_SIZE_O3,
   /** The platform-dependent size of the .text section of the lowered module. */
   OBJECT_TEXT_SIZE_OZ,
-#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
   /** The platform-dependent size of the .text section of the compiled binary. */
   TEXT_SIZE_BYTES,
   /** The platform-dependent size of the .text section of the compiled binary. */
@@ -93,7 +92,6 @@ enum class LlvmObservationSpace {
   TEXT_SIZE_O3,
   /** The platform-dependent size of the .text section of the compiled binary. */
   TEXT_SIZE_OZ,
-#endif
   /** Return 1 if the benchmark is buildable, else 0.
    */
   IS_BUILDABLE,

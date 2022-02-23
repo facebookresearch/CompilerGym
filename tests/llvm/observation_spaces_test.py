@@ -17,6 +17,7 @@ from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.spaces import Box
 from compiler_gym.spaces import Dict as DictSpace
 from compiler_gym.spaces import Scalar, Sequence
+from tests.pytest_plugins.common import ci_only
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
@@ -40,34 +41,38 @@ def test_observation_spaces(env: LlvmEnv):
     env.reset("cbench-v1/crc32")
 
     assert set(env.observation.spaces.keys()) == {
-        "Ir",
-        "IrSha1",
+        "Autophase",
+        "AutophaseDict",
         "Bitcode",
         "BitcodeFile",
+        "Buildtime",
+        "CpuInfo",
+        "Inst2vec",
+        "Inst2vecEmbeddingIndices",
+        "Inst2vecPreprocessedText",
         "InstCount",
         "InstCountDict",
         "InstCountNorm",
         "InstCountNormDict",
-        "Autophase",
-        "AutophaseDict",
-        "Programl",
-        "ProgramlJson",
-        "CpuInfo",
-        "Inst2vecPreprocessedText",
-        "Inst2vecEmbeddingIndices",
-        "Inst2vec",
+        "Ir",
         "IrInstructionCount",
         "IrInstructionCountO0",
         "IrInstructionCountO3",
         "IrInstructionCountOz",
+        "IrSha1",
+        "IsBuildable",
+        "IsRunnable",
         "ObjectTextSizeBytes",
         "ObjectTextSizeO0",
         "ObjectTextSizeO3",
         "ObjectTextSizeOz",
+        "Programl",
+        "ProgramlJson",
         "Runtime",
-        "Buildtime",
-        "IsBuildable",
-        "IsRunnable",
+        "TextSizeBytes",
+        "TextSizeO0",
+        "TextSizeO3",
+        "TextSizeOz",
     }
 
 
@@ -1202,6 +1207,71 @@ def test_object_text_size_observation_spaces(env: LlvmEnv):
     print(value)  # For debugging in case of error.
     assert isinstance(value, int)
     assert value == crc32_code_sizes[sys.platform][2]
+
+
+def test_text_size_observation_spaces(env: LlvmEnv):
+    env.reset("cbench-v1/crc32")
+
+    key = "TextSizeBytes"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Scalar)
+    assert space.deterministic
+    assert space.platform_dependent
+    value: int = env.observation[key]
+    print(value)  # For debugging in case of error.
+    assert isinstance(value, int)
+
+    key = "TextSizeO0"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Scalar)
+    assert space.deterministic
+    assert space.platform_dependent
+    value: int = env.observation[key]
+    print(value)  # For debugging in case of error.
+    assert isinstance(value, int)
+    assert value > 0  # Exact value is system dependent, see below.
+
+    key = "TextSizeO3"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Scalar)
+    assert space.deterministic
+    assert space.platform_dependent
+    value: int = env.observation[key]
+    print(value)  # For debugging in case of error.
+    assert isinstance(value, int)
+    assert value > 0  # Exact value is system dependent, see below.
+
+    key = "TextSizeOz"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Scalar)
+    assert space.deterministic
+    assert space.platform_dependent
+    value: int = env.observation[key]
+    print(value)  # For debugging in case of error.
+    assert isinstance(value, int)
+    assert value > 0  # Exact value is system dependent, see below.
+
+
+# NOTE(cummins): The exact values here depend on the system toolchain and
+# libraries, so only run this test on the GitHub CI runner environment where we
+# can hardcode the values. If this test starts to fail, it may be because the CI
+# runner environment has changed.
+@ci_only
+def test_text_size_observation_space_values(env: LlvmEnv):
+    env.reset("cbench-v1/crc32")
+
+    # Expected .text sizes for this benchmark: -O0, -O3, -Oz.
+    crc32_code_sizes = {"darwin": [16384, 16384, 16384], "linux": [2850, 5652, 4980]}
+
+    # For debugging in case of error.
+    print(env.observation["TextSizeO0"])
+    print(env.observation["TextSizeO3"])
+    print(env.observation["TextSizeOz"])
+
+    assert env.observation.TextSizeO0() == crc32_code_sizes[sys.platform][0]
+    assert env.observation.TextSizeO0() == crc32_code_sizes[sys.platform][0]
+    assert env.observation.TextSizeO3() == crc32_code_sizes[sys.platform][1]
+    assert env.observation.TextSizeOz() == crc32_code_sizes[sys.platform][2]
 
 
 @flaky  # Runtimes can timeout

@@ -97,7 +97,7 @@ def test_list_rewards():
     FLAGS.unparse_flags()
     io_check(
         """list_rewards""",
-        r"""compiler_gym:cbench-v1/qsort> .*IrInstructionCount.* ObjectTextSizeOz.*""",
+        r"""compiler_gym:cbench-v1/qsort> .*IrInstructionCount.* TextSizeOz.*""",
     )
 
 
@@ -105,7 +105,7 @@ def test_list_observations():
     FLAGS.unparse_flags()
     io_check(
         """list_observations""",
-        r"""compiler_gym:cbench-v1/qsort> Autophase, .*, Runtime""",
+        r"""compiler_gym:cbench-v1/qsort> Autophase, .*, TextSizeOz""",
     )
 
 
