@@ -10,12 +10,13 @@ import sys
 from pathlib import Path
 from signal import Signals
 from time import sleep, time
-from typing import Dict, FrozenSet, Iterable, List, NamedTuple, Optional, TypeVar, Union
+from typing import Dict, FrozenSet, Iterable, List, Optional, TypeVar, Union
 
 import grpc
 from deprecated.sphinx import deprecated
 from pydantic import BaseModel
 from frozendict import frozendict
+from pydantic import BaseModel
 
 import compiler_gym.errors
 from compiler_gym.service.proto import (
@@ -50,7 +51,14 @@ GRPC_CHANNEL_OPTIONS = [
 logger = logging.getLogger(__name__)
 
 
-class ConnectionOpts(NamedTuple):
+class HashableBaseModel(BaseModel):
+    """A pydantic model that is hashable."""
+
+    def __hash__(self):
+        return hash((type(self),) + tuple(self.__dict__.values()))
+
+
+class ConnectionOpts(HashableBaseModel):
     """The options used to configure a connection to a service."""
 
     rpc_call_max_seconds: float = 300
