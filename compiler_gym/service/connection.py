@@ -751,7 +751,10 @@ class CompilerGymServiceConnection:
     @property
     def closed(self) -> bool:
         """Whether the connection is closed."""
-        return self.connection is None
+        # Defensive hasattr() because this property is accessed by destructor.
+        if hasattr(self, "connection"):
+            return self.connection is None
+        return True
 
     def acquire(self) -> "CompilerGymServiceConnection":
         """Mark this connection as in-use."""
