@@ -10,7 +10,7 @@ from pathlib import Path
 import gym
 import pytest
 
-from compiler_gym.datasets import Benchmark
+from compiler_gym.datasets import Benchmark, BenchmarkInitError
 from compiler_gym.envs import LlvmEnv, llvm
 from compiler_gym.service.proto import Benchmark as BenchmarkProto
 from compiler_gym.service.proto import File
@@ -283,6 +283,24 @@ def test_two_custom_benchmarks_reset(env: LlvmEnv):
         env.benchmark = benchmark2
     env.reset()
     assert env.benchmark == benchmark2.uri
+
+
+def test_failing_build_cmd(env: LlvmEnv, tmpdir):
+    """Test that reset() raises an error if build command fails."""
+    (Path(tmpdir) / "program.c").touch()
+
+    benchmark = env.make_benchmark(Path(tmpdir) / "program.c")
+
+    benchmark.proto.dynamic_config.build_cmd.argument.extend(
+        ["$CC", "$IN", "-invalid-cc-argument"]
+    )
+    benchmark.proto.dynamic_config.build_cmd.timeout_seconds = 10
+
+    with pytest.raises(
+        BenchmarkInitError,
+        match=r"clang: error: unknown argument: '-invalid-cc-argument'",
+    ):
+        env.reset(benchmark=benchmark)
 
 
 if __name__ == "__main__":
