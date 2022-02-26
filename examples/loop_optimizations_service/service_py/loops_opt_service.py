@@ -19,6 +19,7 @@ from compiler_gym.service import CompilationSession
 from compiler_gym.service.proto import (
     ActionSpace,
     Benchmark,
+    DictEvent,
     DictSpace,
     DoubleRange,
     Event,
@@ -85,6 +86,19 @@ class LoopsOptCompilationSession(CompilationSession):
         ),
         ObservationSpace(
             name="Autophase",
+            space=Space(
+                int64_sequence=Int64SequenceSpace(
+                    length_range=Int64Range(
+                        min=len(AUTOPHASE_FEATURE_NAMES),
+                        max=len(AUTOPHASE_FEATURE_NAMES),
+                    )
+                ),
+            ),
+            deterministic=True,
+            platform_dependent=False,
+        ),
+        ObservationSpace(
+            name="AutophaseDict",
             space=Space(
                 space_dict=DictSpace(
                     space={
@@ -256,7 +270,7 @@ class LoopsOptCompilationSession(CompilationSession):
                 int64_tensor=Int64Tensor(shape=[len(Inst2vec_ids)], value=Inst2vec_ids)
             )
         elif observation_space.name == "Autophase":
-            Autophase_ids_str = run_command(
+            Autophase_str = run_command(
                 [
                     runfiles_path(
                         "compiler_gym/third_party/autophase/compute_autophase-prelinked"
@@ -265,12 +279,28 @@ class LoopsOptCompilationSession(CompilationSession):
                 ],
                 timeout=30,
             )
-            Autophase_ids_int = list(map(int, list(Autophase_ids_str.split(" "))))
+            Autophase_list = list(map(int, list(Autophase_str.split(" "))))
             return Event(
                 int64_tensor=Int64Tensor(
-                    shape=[len(Autophase_ids_int)], value=Autophase_ids_int
+                    shape=[len(Autophase_list)], value=Autophase_list
                 )
             )
+        elif observation_space.name == "AutophaseDict":
+            Autophase_str = run_command(
+                [
+                    runfiles_path(
+                        "compiler_gym/third_party/autophase/compute_autophase-prelinked"
+                    ),
+                    self._llvm_path,
+                ],
+                timeout=30,
+            )
+            Autophase_list = list(map(int, list(Autophase_str.split(" "))))
+            Autophase_dict = {
+                name: Event(int64_value=val)
+                for name, val in zip(AUTOPHASE_FEATURE_NAMES, Autophase_list)
+            }
+            return Event(event_dict=DictEvent(event=Autophase_dict))
         elif observation_space.name == "Programl":
             Programl_str = run_command(
                 [
