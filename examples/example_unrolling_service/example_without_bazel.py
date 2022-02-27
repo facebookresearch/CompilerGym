@@ -14,7 +14,6 @@ Usage:
 
 It is equivalent in behavior to the example.py script in this directory.
 """
-import os
 import subprocess
 from pathlib import Path
 from typing import Iterable
@@ -99,13 +98,13 @@ class UnrollingDataset(Dataset):
         )
 
         self._benchmarks = {
-            "benchmark://unrolling-v0/offsets1": Benchmark.from_file_contents(
+            "/offsets1": Benchmark.from_file_contents(
                 "benchmark://unrolling-v0/offsets1",
-                self.preprocess(os.path.join(BENCHMARKS_PATH, "offsets1.c")),
+                self.preprocess(BENCHMARKS_PATH / "offsets1.c"),
             ),
-            "benchmark://unrolling-v0/conv2d": Benchmark.from_file_contents(
+            "/conv2d": Benchmark.from_file_contents(
                 "benchmark://unrolling-v0/conv2d",
-                self.preprocess(os.path.join(BENCHMARKS_PATH, "conv2d.c")),
+                self.preprocess(BENCHMARKS_PATH / "conv2d.c"),
             ),
         }
 

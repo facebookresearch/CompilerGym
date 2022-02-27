@@ -97,15 +97,15 @@ class LoopsDataset(Dataset):
         )
 
         self._benchmarks = {
-            "benchmark://loops-opt-v0/add": Benchmark.from_file_contents(
+            "/add": Benchmark.from_file_contents(
                 "benchmark://loops-opt-v0/add",
                 self.preprocess(BENCHMARKS_PATH / "add.c"),
             ),
-            "benchmark://loops-opt-v0/offsets1": Benchmark.from_file_contents(
+            "/offsets1": Benchmark.from_file_contents(
                 "benchmark://loops-opt-v0/offsets1",
                 self.preprocess(BENCHMARKS_PATH / "offsets1.c"),
             ),
-            "benchmark://loops-opt-v0/conv2d": Benchmark.from_file_contents(
+            "/conv2d": Benchmark.from_file_contents(
                 "benchmark://loops-opt-v0/conv2d",
                 self.preprocess(BENCHMARKS_PATH / "conv2d.c"),
             ),
