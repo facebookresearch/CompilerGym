@@ -24,5 +24,12 @@ cg_cc_binary(
     ${LLVM_DEFINITIONS}
 )
 
+cg_genrule(
+  NAME opt_loops_bin
+  OUTS "opt_loops"
+  SRCS "opt_loops"
+  COMMAND "cp ${CMAKE_BINARY_DIR}/examples/loop_optimizations_service/opt_loops/opt_loops $(@D)"
+)
+
 ADD_CUSTOM_TARGET(link_opt_loops_target ALL
                   COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_BINARY_DIR}/examples/loop_optimizations_service/opt_loops/opt_loops ${CMAKE_SOURCE_DIR}/examples/loop_optimizations_service/opt_loops/opt_loops)
