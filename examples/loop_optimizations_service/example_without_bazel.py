@@ -20,6 +20,7 @@ from typing import Iterable
 
 import compiler_gym
 from compiler_gym.datasets import Benchmark, Dataset
+from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.envs.llvm.llvm_benchmark import get_system_library_flags
 from compiler_gym.spaces import Reward
 from compiler_gym.third_party import llvm
@@ -132,11 +133,11 @@ class LoopsDataset(Dataset):
         )
 
     def benchmark_uris(self) -> Iterable[str]:
-        yield from self._benchmarks.keys()
+        yield from (f"benchmark://loops-opt-v0{k}" for k in self._benchmarks.keys())
 
-    def benchmark(self, uri: str) -> Benchmark:
-        if uri in self._benchmarks:
-            return self._benchmarks[uri]
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
+        if uri.path in self._benchmarks:
+            return self._benchmarks[uri.path]
         else:
             raise LookupError("Unknown program name")
 
