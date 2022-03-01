@@ -40,14 +40,6 @@ Development
 -----------
 
 
-I found a bug. How do I report it?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-Great! Please file an issue using the `GitHub issue tracker
-<https://github.com/facebookresearch/CompilerGym/issues>`_.  See
-:doc:`contributing` for more details.
-
-
 I updated with "git pull" and now it doesn't work
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -87,3 +79,11 @@ in. The service codebase is located at
 :code:`compiler_gym/envs/$COMPILER/service`, where :code:`$COMPILER` is the name
 of the compiler service you would wish to modify, e.g. llvm. Once done, send us
 a pull request!
+
+
+I found a bug. How do I report it?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Great! Please file an issue using the `GitHub issue tracker
+<https://github.com/facebookresearch/CompilerGym/issues>`_.  See
+:doc:`contributing` for more details.
