@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 """Test that LlvmEnv is compatible with OpenAI gym interface."""
 import gym
+import pytest
 
 from compiler_gym.envs.llvm import LlvmEnv
 from tests.test_main import main
@@ -70,6 +71,29 @@ def test_reward_wrapper(env: LlvmEnv):
 
     _, reward, _, _ = wrapped.step(0)
     assert reward == 1
+
+
+@pytest.mark.xfail(
+    reason="github.com/facebookresearch/CompilerGym/issues/587", strict=True
+)
+def test_env_spec_make(env: LlvmEnv):
+    """Test that demonstrates a failure in gym compatibility: env.spec does
+    not encode mutable state like benchmark, reward space, and observation
+    space.
+    """
+    env.reset(benchmark="cbench-v1/bitcount")
+    with env.spec.make() as new_env:
+        assert new_env.benchmark == env.benchmark
+
+
+def test_env_spec_make_workaround(env: LlvmEnv):
+    """Demonstrate how #587 would be fixed, by updating the 'kwargs' dict."""
+    env.reset(benchmark="cbench-v1/bitcount")
+    env.spec._kwargs[  # pylint: disable=protected-access
+        "benchmark"
+    ] = "cbench-v1/bitcount"
+    with env.spec.make() as new_env:
+        assert new_env.benchmark == env.benchmark
 
 
 if __name__ == "__main__":
