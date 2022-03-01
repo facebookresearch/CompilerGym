@@ -139,9 +139,9 @@ cg_py_test(
 
 cg_py_test(
   NAME
-    gym_interface_compatability
+    gym_interface_compatability_test
   SRCS
-    "gym_interface_compatability.py"
+    "gym_interface_compatability_test.py"
   DEPS
     compiler_gym::envs::llvm::llvm
     tests::pytest_plugins::llvm

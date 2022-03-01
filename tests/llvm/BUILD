@@ -148,9 +148,9 @@ py_test(
 )
 
 py_test(
-    name = "gym_interface_compatability",
+    name = "gym_interface_compatability_test",
     timeout = "short",
-    srcs = ["gym_interface_compatability.py"],
+    srcs = ["gym_interface_compatability_test.py"],
     deps = [
         "//compiler_gym/envs/llvm",
         "//tests:test_main",
