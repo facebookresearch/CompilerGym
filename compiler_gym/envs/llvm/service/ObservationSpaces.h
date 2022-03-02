@@ -47,14 +47,31 @@ enum class LlvmObservationSpace {
    */
   AUTOPHASE,
   /**
-   * The IR2Vec Flow-sensitive feature vector.
+   * The IR2Vec Flow-Aware feature vector.
    *
-   * From :
+   * From:
    *
-   * 	  XXXXXX
+   * 	  S. VenkataKeerthy, Rohit Aggarwal, Shalini Jain, Maunendra Sankar Desarkar,
+                                Ramakrishna Upadrasta, and Y. N. Srikant. (2020).
+                                IR2VEC: LLVM IR Based Scalable Program Embeddings.
+                                ACM Trans. Archit. Code Optim. 17, 4, Article 32 (December 2020), 27
+   pages. DOI:https://doi.org/10.1145/3418463
    *
    */
-  IR2VEC_FS,
+  IR2VEC_FA,
+  /**
+  * The IR2Vec Symbolic feature vector.
+  *
+  * From:
+  *
+  * 	  S. VenkataKeerthy, Rohit Aggarwal, Shalini Jain, Maunendra Sankar Desarkar,
+                               Ramakrishna Upadrasta, and Y. N. Srikant. (2020).
+                               IR2VEC: LLVM IR Based Scalable Program Embeddings.
+                               ACM Trans. Archit. Code Optim. 17, 4, Article 32 (December 2020), 27
+  pages. DOI:https://doi.org/10.1145/3418463
+  *
+  */
+  IR2VEC_SYM,
   /**
    * Returns the graph representation of a program as a networkx Graph.
    *

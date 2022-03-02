@@ -55,7 +55,7 @@ def test_observation_spaces(env: LlvmEnv):
         "InstCountNorm",
         "InstCountNormDict",
         "Ir",
-        "Ir2vecFs",
+        "Ir2vecFa",
         "IrInstructionCount",
         "IrInstructionCountO0",
         "IrInstructionCountO3",
