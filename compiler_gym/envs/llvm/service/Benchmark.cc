@@ -162,9 +162,12 @@ Benchmark::Benchmark(const std::string& name, std::unique_ptr<llvm::LLVMContext>
       needsRecompile_(true) {}
 
 void Benchmark::close() {
+  VLOG(3) << "Closing benchmark " << name() << " with scratch directory "
+          << scratchDirectory().string();
   sys::error_code ec;
   fs::remove_all(scratchDirectory(), ec);
   CHECK(!ec) << "Failed to delete scratch directory: " << scratchDirectory().string();
+  VLOG(3) << "Closed benchmark " << name();
 }
 
 std::unique_ptr<Benchmark> Benchmark::clone(const fs::path& workingDirectory) const {
