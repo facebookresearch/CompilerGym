@@ -74,7 +74,7 @@ class ExampleDataset(Dataset):
 
     def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
         if uri.path in self._benchmarks:
-            return self._benchmarks[uri]
+            return self._benchmarks[uri.path]
         else:
             raise LookupError("Unknown program name")
 
