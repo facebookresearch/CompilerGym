@@ -129,6 +129,7 @@ template <typename CompilationSessionType>
   VLOG(2) << "Shutting down the RPC service";
   server->Shutdown();
   serverThread.join();
+  VLOG(2) << "Service closed";
 
   if (service.sessionCount()) {
     LOG(ERROR) << "ERROR: Killing a service with " << service.sessionCount()
