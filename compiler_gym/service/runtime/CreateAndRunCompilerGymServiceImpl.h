@@ -51,7 +51,7 @@ void setGrpcChannelOptions(grpc::ServerBuilder& builder);
 //       createAndRunCompilerGymServiceImpl(argc, argv, "usage string");
 //     }
 template <typename CompilationSessionType>
-[[noreturn]] void createAndRunCompilerGymServiceImpl(int argc, char** argv, const char* usage) {
+[[nodiscard]] int createAndRunCompilerGymServiceImpl(int argc, char** argv, const char* usage) {
   // Register a signal handler for SIGTERM that will set the shutdown_signal
   // future value.
   std::signal(SIGTERM, shutdown_handler);
@@ -62,7 +62,7 @@ template <typename CompilationSessionType>
   gflags::ParseCommandLineFlags(&argc, &argv, /*remove_flags=*/true);
   if (argc > 1) {
     std::cerr << "ERROR: unknown command line argument '" << argv[1] << '\'';
-    exit(1);
+    return 1;
   }
 
   // Set up the working and logging directories.
@@ -134,10 +134,10 @@ template <typename CompilationSessionType>
     LOG(ERROR) << "ERROR: Killing a service with " << service.sessionCount()
                << (service.sessionCount() > 1 ? " active sessions!" : " active session!")
                << std::endl;
-    exit(6);
+    return 6;
   }
 
-  exit(0);
+  return 0;
 }
 
 }  // namespace compiler_gym::runtime

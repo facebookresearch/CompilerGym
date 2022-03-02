@@ -59,5 +59,7 @@ void initLlvm() {
 
 int main(int argc, char** argv) {
   initLlvm();
-  createAndRunCompilerGymService<LlvmSession>(argc, argv, usage);
+  const auto ret = createAndRunCompilerGymService<LlvmSession>(argc, argv, usage);
+
+  return ret;
 }

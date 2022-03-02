@@ -133,5 +133,5 @@ class ExampleCompilationSession final : public CompilationSession {
 }  // namespace
 
 int main(int argc, char** argv) {
-  runtime::createAndRunCompilerGymService<ExampleCompilationSession>(argc, argv, usage);
+  return runtime::createAndRunCompilerGymService<ExampleCompilationSession>(argc, argv, usage);
 }
