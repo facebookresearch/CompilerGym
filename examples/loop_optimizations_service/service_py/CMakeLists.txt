@@ -12,6 +12,8 @@ cg_py_library(
     "loops_opt_service.py"
   DATA
     examples::loop_optimizations_service::opt_loops::opt_loops
+    compiler_gym::third_party::autophase:compute_autophase-prelinked
+    compiler_gym::third_party::programl:compute_programl
   DEPS
   PUBLIC
 )
