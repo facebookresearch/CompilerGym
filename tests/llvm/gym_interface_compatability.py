@@ -12,6 +12,10 @@ pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
 def test_type_classes(env: LlvmEnv):
+    env.observation_space = "Autophase"
+    env.reward_space = "IrInstructionCount"
+    env.reset()
+
     assert isinstance(env, gym.Env)
     assert isinstance(env, LlvmEnv)
     assert isinstance(env.unwrapped, LlvmEnv)
