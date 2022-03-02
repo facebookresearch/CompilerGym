@@ -8,6 +8,7 @@ from pathlib import Path
 from typing import Iterable
 
 from compiler_gym.datasets import Benchmark, Dataset
+from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.envs.llvm.llvm_benchmark import get_system_library_flags
 from compiler_gym.spaces import Reward
 from compiler_gym.third_party import llvm
@@ -86,15 +87,15 @@ class LoopsDataset(Dataset):
         )
 
         self._benchmarks = {
-            "benchmark://loops-opt-v0/add": Benchmark.from_file_contents(
+            "/add": Benchmark.from_file_contents(
                 "benchmark://loops-opt-v0/add",
                 self.preprocess(BENCHMARKS_PATH / "add.c"),
             ),
-            "benchmark://loops-opt-v0/offsets1": Benchmark.from_file_contents(
+            "/offsets1": Benchmark.from_file_contents(
                 "benchmark://loops-opt-v0/offsets1",
                 self.preprocess(BENCHMARKS_PATH / "offsets1.c"),
             ),
-            "benchmark://loops-opt-v0/conv2d": Benchmark.from_file_contents(
+            "/conv2d": Benchmark.from_file_contents(
                 "benchmark://loops-opt-v0/conv2d",
                 self.preprocess(BENCHMARKS_PATH / "conv2d.c"),
             ),
@@ -122,11 +123,11 @@ class LoopsDataset(Dataset):
         )
 
     def benchmark_uris(self) -> Iterable[str]:
-        yield from self._benchmarks.keys()
+        yield from (f"benchmark://loops-opt-v0{k}" for k in self._benchmarks.keys())
 
-    def benchmark(self, uri: str) -> Benchmark:
-        if uri in self._benchmarks:
-            return self._benchmarks[uri]
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
+        if uri.path in self._benchmarks:
+            return self._benchmarks[uri.path]
         else:
             raise LookupError("Unknown program name")
 
