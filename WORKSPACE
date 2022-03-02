@@ -279,7 +279,10 @@ http_archive(
     build_file_content = all_content,
     sha256 = "86d08c19a1f123054ed9350b7962edaad7d46612de0e07c10b73e578911156fd",
     strip_prefix = "csmith-csmith-2.3.0",
-    urls = ["https://github.com/csmith-project/csmith/archive/refs/tags/csmith-2.3.0.tar.gz"],
+    urls = [
+        "https://github.com/ChrisCummins/csmith/archive/refs/tags/csmith-2.3.0.tar.gz",
+        "https://github.com/csmith-project/csmith/archive/refs/tags/csmith-2.3.0.tar.gz",
+    ],
 )
 
 # === DeepDataFlow ===
