@@ -177,6 +177,7 @@ py_test(
         "//compiler_gym/envs",
         "//compiler_gym/service/proto",
         "//tests:test_main",
+        "//tests/pytest_plugins:common",
         "//tests/pytest_plugins:llvm",
     ],
 )

@@ -173,6 +173,7 @@ cg_py_test(
   DEPS
     compiler_gym::envs::envs
     compiler_gym::service::proto::proto
+    tests::pytest_plugins::common
     tests::pytest_plugins::llvm
     tests::test_main
 )
