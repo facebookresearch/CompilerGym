@@ -85,11 +85,21 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
       *reply.mutable_int64_list()->mutable_value() = {features.begin(), features.end()};
       break;
     }
-    case LlvmObservationSpace::IR2VEC_FS: {
+    case LlvmObservationSpace::IR2VEC_FA: {
       const auto ir2vecEmbeddingsPath = util::getRunfilesPath(
           "compiler_gym/third_party/ir2vec/seedEmbeddingVocab-300-llvm10.txt");
 
       IR2Vec::Embeddings embeddings(benchmark.module(), IR2Vec::IR2VecMode::FlowAware,
+                                    ir2vecEmbeddingsPath.string());
+      const auto features = embeddings.getProgramVector();
+      *reply.mutable_double_list()->mutable_value() = {features.begin(), features.end()};
+      break;
+    }
+    case LlvmObservationSpace::IR2VEC_SYM: {
+      const auto ir2vecEmbeddingsPath = util::getRunfilesPath(
+          "compiler_gym/third_party/ir2vec/seedEmbeddingVocab-300-llvm10.txt");
+
+      IR2Vec::Embeddings embeddings(benchmark.module(), IR2Vec::IR2VecMode::Symbolic,
                                     ir2vecEmbeddingsPath.string());
       const auto features = embeddings.getProgramVector();
       *reply.mutable_double_list()->mutable_value() = {features.begin(), features.end()};

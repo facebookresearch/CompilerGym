@@ -56,7 +56,7 @@ def test_observation_spaces(env: LlvmEnv):
         "Inst2vecPreprocessedText",
         "Inst2vecEmbeddingIndices",
         "Inst2vec",
-        "Ir2vecFs",
+        "Ir2vecFa",
         "IrInstructionCount",
         "IrInstructionCountO0",
         "IrInstructionCountO3",
