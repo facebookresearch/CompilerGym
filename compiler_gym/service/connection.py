@@ -52,7 +52,7 @@ logger = logging.getLogger(__name__)
 
 
 class HashableBaseModel(BaseModel):
-    """A pydantic model that is hashable."""
+    """A pydantic model that is hashable. Requires that all fields are hashable."""
 
     def __hash__(self):
         return hash((type(self),) + tuple(self.__dict__.values()))
