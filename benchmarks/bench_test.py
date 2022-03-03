@@ -25,6 +25,8 @@ from compiler_gym.envs import CompilerEnv, LlvmEnv, llvm
 from compiler_gym.service import CompilerGymServiceConnection
 from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
 from compiler_gym.service import CompilerGymServiceConnection, ConnectionOpts
+import examples.example_compiler_gym_service  # noqa Environment import.
+from compiler_gym.envs import CompilerEnv
 from tests.pytest_plugins.llvm import OBSERVATION_SPACE_NAMES, REWARD_SPACE_NAMES
 from tests.test_main import main
 
@@ -47,10 +49,10 @@ def env(request) -> CompilerEnv:
 
 @pytest.mark.parametrize(
     "env_id",
-    ["llvm-v0", "example-cc-v0", "example-py-v0"],
-    ids=["llvm", "dummy-cc", "dummy-py"],
+    ["llvm-v0", "example-cc-v0", "example-py-v0", "loop_tool-v0"],
+    ids=["llvm", "dummy-cc", "dummy-py", "loop_tool"],
 )
-def test_make_local(benchmark, env_id):
+def test_make_env(benchmark, env_id):
     benchmark(lambda: gym.make(env_id).close())
 
 
