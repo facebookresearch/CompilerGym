@@ -27,9 +27,8 @@ class ServiceConnectionPool:
 
     There is a global instance of this class, available via the static
     :meth:`ServiceConnectionPool.get()
-    <compier_gym.service.ServiceConnectionPool.get>` method.
-
-    To use the pool, acquire a reference to the global instance, and call the
+    <compier_gym.service.ServiceConnectionPool.get>` method. To use the pool,
+    acquire a reference to the global instance, and call the
     :meth:`ServiceConnectionPool.acquire()
     <compier_gym.service.ServiceConnectionPool.acquire>` method to construct and
     return service connections:
@@ -39,13 +38,14 @@ class ServiceConnectionPool:
         ...    # Do something with the service.
 
     When a service is closed (by calling :meth:`service.close()
-    <compier_gym.service.CompilerGymServiceConnection.close>`), it is
+    <compiler_gym.service.CompilerGymServiceConnection.close>`), it is
     automatically released back to the pool so that a future request for the
     same type of service will reuse the connection.
 
     :ivar pool: A pool of service connections that are ready for use.
 
-    :vartype pool: Dict[ServiceConnectionCacheKey, List[CompilerGymServiceConnection]]
+    :vartype pool: Dict[Tuple[Path, ConnectionOpts],
+        List[CompilerGymServiceConnection]]
 
     :ivar allocated: The set of service connections that are currently in use.
 
@@ -104,7 +104,7 @@ class ServiceConnectionPool:
         .. note::
 
             This method is called automatically by the :meth:`service.close()
-            <compier_gym.service.CompilerGymServiceConnection.close>` method of
+            <compiler_gym.service.CompilerGymServiceConnection.close>` method of
             acquired service connections. You do not have to call this method
             yourself.
         """

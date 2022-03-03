@@ -42,8 +42,8 @@ GRPC_CHANNEL_OPTIONS = [
     # Spurious error UNAVAILABLE "Trying to connect an http1.x server".
     # https://putridparrot.com/blog/the-unavailable-trying-to-connect-an-http1-x-server-grpc-error/
     ("grpc.enable_http_proxy", 0),
-    # Disable TCP port re-use to mitigate port conflict errors when starting
-    # many services in parallel. Context:
+    # Disable TCP port reuse to mitigate port conflict errors when starting many
+    # services in parallel. Context:
     # https://github.com/facebookresearch/CompilerGym/issues/572
     ("grpc.so_reuseport", 0),
 ]
@@ -100,9 +100,9 @@ class ConnectionOpts(HashableBaseModel):
     always_send_benchmark_on_reset: bool = False
     """Send the full benchmark program data to the compiler service on ever call
     to :meth:`env.reset() <compiler_gym.envs.CompilerEnv.reset>`. This is more
-    efficient in cases where the majority of calls to
-    :meth:`env.reset() <compiler_gym.envs.CompilerEnv.reset>` uses a different
-    benchmark. In case of benchmark re-use, leave this :code:`False`.
+    efficient in cases where the majority of calls to :meth:`env.reset()
+    <compiler_gym.envs.CompilerEnv.reset>` uses a different benchmark. In case
+    of benchmark reuse, leave this :code:`False`.
     """
 
     script_args: FrozenSet[str] = frozenset([])
@@ -595,18 +595,19 @@ class CompilerGymServiceConnection:
     """A connection to a compiler gym service.
 
     There are two types of service connections: managed and unmanaged. The type
-    of connection is determined by the endpoint. If a "host:port" URL is provided,
-    an unmanaged connection is created. If the path of a file is provided, a
-    managed connection is used. The difference between a managed and unmanaged
-    connection is that with a managed connection, the lifecycle of the service
-    if controlled by the client connection. That is, when a managed connection
-    is created, a service subprocess is started by executing the specified path.
-    When the connection is closed, the subprocess is terminated. With an
-    unmanaged connection, if the service fails is goes offline, the client will
-    fail.
+    of connection is determined by the endpoint. If a "host:port" URL is
+    provided, an unmanaged connection is created. If the path of a file is
+    provided, a managed connection is used. The difference between a managed and
+    unmanaged connection is that with a managed connection, the lifecycle of the
+    service if controlled by the client connection. That is, when a managed
+    connection is created, a service subprocess is started by executing the
+    specified path. When the connection is closed, the subprocess is terminated.
+    With an unmanaged connection, if the service fails is goes offline, the
+    client will fail.
 
-    This class provides a common abstraction between the two types of connection,
-    and provides a call method for invoking remote procedures on the service.
+    This class provides a common abstraction between the two types of
+    connection, and provides a call method for invoking remote procedures on the
+    service.
 
     Example usage of an unmanaged service connection:
 
@@ -635,7 +636,9 @@ class CompilerGymServiceConnection:
     :ivar stub: A CompilerGymServiceStub that can be used as the first argument
         to :py:meth:`__call__()` to specify an RPC
         method to call.
+
     :ivar action_spaces: A list of action spaces provided by the service.
+
     :ivar observation_spaces: A list of observation spaces provided by the
         service.
     """
@@ -647,6 +650,13 @@ class CompilerGymServiceConnection:
         owning_service_pool: Optional["ServiceConnectionPool"] = None,  # noqa: F821
     ):
         """Constructor.
+
+        .. note::
+
+            Starting new services is expensive. Consider using the
+            :class:`ServiceConnectionPool
+            <compiler_gym.service.ServiceConnectionPool>` class to manage
+            services rather than constructing them yourself.
 
         :param endpoint: The connection endpoint. Either the URL of a service,
             e.g. "localhost:8080", or the path of a local service binary.
@@ -780,7 +790,7 @@ class CompilerGymServiceConnection:
     def shutdown(self):
         """Shut down the connection.
 
-        Once a connection has been shutdown, it cannot be re-used.
+        Once a connection has been shutdown, it cannot be reused.
         """
         if self.closed:
             return
@@ -802,8 +812,8 @@ class CompilerGymServiceConnection:
         """Mark this connection as closed.
 
         If the service is managed by a :class:`ServiceConnectionPool
-        <compiler_gym.service.ServiceConnectionPool>`, this will indicate to
-        the pool that the connection is safe to re-use. If the service is not
+        <compiler_gym.service.ServiceConnectionPool>`, this will indicate to the
+        pool that the connection is ready to be reused. If the service is not
         managed by a pool, this will shut it down.
         """
         if self.owned_by_service_pool:
