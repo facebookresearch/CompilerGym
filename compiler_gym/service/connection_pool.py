@@ -42,6 +42,14 @@ class ServiceConnectionPool:
     <compier_gym.service.CompilerGymServiceConnection.close>`), it is
     automatically released back to the pool so that a future request for the
     same type of service will reuse the connection.
+
+    :ivar pool: A pool of service connections that are ready for use.
+
+    :vartype pool: Dict[ServiceConnectionCacheKey, List[CompilerGymServiceConnection]]
+
+    :ivar allocated: The set of service connections that are currently in use.
+
+    :vartype allocated: Set[CompilerGymServiceConnection]
     """
 
     def __init__(self) -> None:

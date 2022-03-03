@@ -790,7 +790,7 @@ class CompilerGymServiceConnection:
         except ServiceError as e:
             # close() can raise ServiceError if the service exists with a
             # non-zero return code. We swallow the error here as we are
-            # disposing o f the service.
+            # disposing of the service.
             logger.debug(
                 "Ignoring service error during shutdown attempt: %s (%s)",
                 e,
