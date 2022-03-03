@@ -9,7 +9,7 @@
 #include <boost/current_function.hpp>
 
 #include "glog/logging.h"
-#include "include/grpcpp/grpcpp.h"
+#include "grpcpp/grpcpp.h"
 
 using grpc::Status;
 
