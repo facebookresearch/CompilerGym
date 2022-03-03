@@ -163,10 +163,9 @@ def test_service_pool_forked_service_dies(pool: ServiceConnectionPool):
         with env.fork() as fkd:
             assert env.service == fkd.service
             try:
-                fkd.service.shutdown()
+                fkd.service.connection.close()
             except ServiceError:
                 pass  # shutdown() raises service error if in-episode.
-            fkd.service.close()
 
             env.reset()
             fkd.reset()

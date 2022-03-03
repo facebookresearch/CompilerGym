@@ -108,13 +108,25 @@ class ServiceConnectionPool:
             if self.closed:
                 return
 
+            if service not in self.allocated:
+                logger.debug(
+                    "Ignoring attempt to release connection "
+                    "that does not belong to pool"
+                )
+                return
+
             self.allocated.remove(service)
 
             # Only managed processes have a process attribute.
             if hasattr(service.connection, "process"):
                 # A dead service cannot be reused, discard it.
                 if service.closed or service.connection.process.poll() is not None:
+                    logger.debug("Ignoring attempt to release dead connection")
                     return
+            # A service that has been shutdown cannot be reused, discard it.
+            if not service.connection:
+                logger.debug("Ignoring attempt to service without connection")
+                return
 
             self.pool[key].append(service)
 
@@ -143,7 +155,7 @@ class ServiceConnectionPool:
             if self.closed:
                 return
 
-            logging.debug(
+            logger.debug(
                 "Closing the service connection pool with %d cached and %d live connections",
                 self.size,
                 len(self.allocated),

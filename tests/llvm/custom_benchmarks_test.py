@@ -39,11 +39,12 @@ def test_reset_invalid_benchmark(env: LlvmEnv):
 
 def test_invalid_benchmark_data(env: LlvmEnv):
     benchmark = Benchmark.from_file_contents(
-        "benchmark://new", "Invalid bitcode".encode("utf-8")
+        "benchmark://test_invalid_benchmark_data", "Invalid bitcode".encode("utf-8")
     )
 
     with pytest.raises(
-        ValueError, match='Failed to parse LLVM bitcode: "benchmark://new"'
+        ValueError,
+        match='Failed to parse LLVM bitcode: "benchmark://test_invalid_benchmark_data"',
     ):
         env.reset(benchmark=benchmark)
 
@@ -51,7 +52,7 @@ def test_invalid_benchmark_data(env: LlvmEnv):
 def test_invalid_benchmark_missing_file(env: LlvmEnv):
     benchmark = Benchmark(
         BenchmarkProto(
-            uri="benchmark://new",
+            uri="benchmark://test_invalid_benchmark_missing_file",
         )
     )
 
@@ -64,7 +65,9 @@ def test_benchmark_path_empty_file(env: LlvmEnv):
         tmpdir = Path(tmpdir)
         (tmpdir / "test.bc").touch()
 
-        benchmark = Benchmark.from_file("benchmark://new", tmpdir / "test.bc")
+        benchmark = Benchmark.from_file(
+            "benchmark://test_benchmark_path_empty_file", tmpdir / "test.bc"
+        )
 
         with pytest.raises(ValueError, match="Failed to parse LLVM bitcode"):
             env.reset(benchmark=benchmark)
@@ -76,7 +79,9 @@ def test_invalid_benchmark_path_contents(env: LlvmEnv):
         with open(str(tmpdir / "test.bc"), "w") as f:
             f.write("Invalid bitcode")
 
-        benchmark = Benchmark.from_file("benchmark://new", tmpdir / "test.bc")
+        benchmark = Benchmark.from_file(
+            "benchmark://test_invalid_benchmark_path_contents", tmpdir / "test.bc"
+        )
 
         with pytest.raises(ValueError, match="Failed to parse LLVM bitcode"):
             env.reset(benchmark=benchmark)
@@ -85,7 +90,8 @@ def test_invalid_benchmark_path_contents(env: LlvmEnv):
 def test_benchmark_path_invalid_scheme(env: LlvmEnv):
     benchmark = Benchmark(
         BenchmarkProto(
-            uri="benchmark://new", program=File(uri="invalid_scheme://test")
+            uri="benchmark://test_benchmark_path_invalid_scheme",
+            program=File(uri="invalid_scheme://test"),
         ),
     )
 
@@ -100,16 +106,20 @@ def test_benchmark_path_invalid_scheme(env: LlvmEnv):
 
 
 def test_custom_benchmark(env: LlvmEnv):
-    benchmark = Benchmark.from_file("benchmark://new", EXAMPLE_BITCODE_FILE)
+    benchmark = Benchmark.from_file(
+        "benchmark://test_custom_benchmark", EXAMPLE_BITCODE_FILE
+    )
     env.reset(benchmark=benchmark)
-    assert env.benchmark == "benchmark://new"
+    assert env.benchmark == "benchmark://test_custom_benchmark"
 
 
 def test_custom_benchmark_constructor():
-    benchmark = Benchmark.from_file("benchmark://new", EXAMPLE_BITCODE_FILE)
+    benchmark = Benchmark.from_file(
+        "benchmark://test_custom_benchmark_constructor", EXAMPLE_BITCODE_FILE
+    )
     with gym.make("llvm-v0", benchmark=benchmark) as env:
         env.reset()
-        assert env.benchmark == "benchmark://new"
+        assert env.benchmark == "benchmark://test_custom_benchmark_constructor"
 
 
 def test_make_benchmark_single_bitcode(env: LlvmEnv):

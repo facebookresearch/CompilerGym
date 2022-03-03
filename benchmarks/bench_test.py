@@ -24,6 +24,7 @@ import examples.example_compiler_gym_service as dummy
 from compiler_gym.envs import CompilerEnv, LlvmEnv, llvm
 from compiler_gym.service import CompilerGymServiceConnection
 from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
+from compiler_gym.service import CompilerGymServiceConnection, ConnectionOpts
 from tests.pytest_plugins.llvm import OBSERVATION_SPACE_NAMES, REWARD_SPACE_NAMES
 from tests.test_main import main
 
@@ -64,7 +65,7 @@ def test_make_local(benchmark, env_id):
 )
 def test_make_service(benchmark, args):
     service_binary, env_class = args
-    service = CompilerGymServiceConnection(service_binary)
+    service = CompilerGymServiceConnection(service_binary, ConnectionOpts())
     try:
         benchmark(lambda: env_class(service=service.connection.url).close())
     finally:

@@ -16,7 +16,7 @@ import grpc
 from deprecated.sphinx import deprecated
 from pydantic import BaseModel
 from frozendict import frozendict
-from pydantic import BaseModel
+from pydantic import BaseModel, root_validator
 
 import compiler_gym.errors
 from compiler_gym.service.proto import (
@@ -112,6 +112,12 @@ class ConnectionOpts(HashableBaseModel):
     script_env: Dict[str, str] = frozendict({})
     """If the service is started from a local script, this set of env vars is
     used on the command line. No effect when used for existing sockets."""
+
+    @root_validator
+    def freeze_types(cls, values):
+        values["script_args"] = frozenset(values["script_args"])
+        values["script_env"] = frozendict(values["script_env"])
+        return values
 
 
 # Deprecated since v0.2.4.

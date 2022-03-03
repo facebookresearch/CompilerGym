@@ -271,7 +271,7 @@ def test_forked_service_dies(env: LlvmEnv):
     with env.fork() as fkd:
         assert env.service == fkd.service
         try:
-            fkd.service.shutdown()
+            fkd.service.connection.close()
         except ServiceError:
             pass  # shutdown() raises service error if in-episode.
         fkd.service.close()
