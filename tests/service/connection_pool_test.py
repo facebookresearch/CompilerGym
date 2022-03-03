@@ -174,9 +174,14 @@ def test_service_pool_forked_service_dies(pool: ServiceConnectionPool):
             assert fkd.service in pool
 
 
-# TODO: Test case where forked environment kills the service.
-
-# TODO: Service pool connection does not interfere with pool.
+def test_service_pool_forked_environment_ends_scope(pool: ServiceConnectionPool):
+    """Test that the original service does not close when the forked environment
+    goes out of scope."""
+    with compiler_gym.make("llvm-v0", service_pool=pool) as env:
+        with env.fork() as fkd:
+            assert env.service == fkd.service
+            assert not env.service.closed
+        assert not env.service.closed
 
 
 if __name__ == "__main__":
