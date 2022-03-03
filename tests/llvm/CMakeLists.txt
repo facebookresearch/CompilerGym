@@ -173,6 +173,7 @@ cg_py_test(
   DEPS
     compiler_gym::envs::envs
     compiler_gym::service::proto::proto
+    tests::pytest_plugins::common
     tests::pytest_plugins::llvm
     tests::test_main
 )
@@ -230,6 +231,7 @@ cg_py_test(
     "observation_spaces_test.py"
   DEPS
     compiler_gym::envs::envs
+    tests::pytest_plugins::common
     tests::pytest_plugins::llvm
     tests::test_main
 )

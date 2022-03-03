@@ -177,6 +177,7 @@ py_test(
         "//compiler_gym/envs",
         "//compiler_gym/service/proto",
         "//tests:test_main",
+        "//tests/pytest_plugins:common",
         "//tests/pytest_plugins:llvm",
     ],
 )
@@ -232,6 +233,7 @@ py_test(
     deps = [
         "//compiler_gym/envs",
         "//tests:test_main",
+        "//tests/pytest_plugins:common",
         "//tests/pytest_plugins:llvm",
     ],
 )
