@@ -201,7 +201,7 @@ def test_fork_modified_ir_is_the_same(env: LlvmEnv):
     env.reset("cbench-v1/crc32")
 
     # Apply an action that modifies the benchmark.
-    _, _, done, info = env.step(env.action_space.flags.index("-mem2reg"))
+    _, _, done, info = env.step(env.action_space["-mem2reg"])
     assert not done
     assert not info["action_had_no_effect"]
 
@@ -209,8 +209,8 @@ def test_fork_modified_ir_is_the_same(env: LlvmEnv):
         assert "\n".join(env.ir.split("\n")[1:]) == "\n".join(fkd.ir.split("\n")[1:])
 
         # Apply another action.
-        _, _, done, info = env.step(env.action_space.flags.index("-gvn"))
-        _, _, done, info = fkd.step(fkd.action_space.flags.index("-gvn"))
+        _, _, done, info = env.step(env.action_space["-gvn"])
+        _, _, done, info = fkd.step(fkd.action_space["-gvn"])
         assert not done
         assert not info["action_had_no_effect"]
 
@@ -227,7 +227,10 @@ def test_fork_rewards(env: LlvmEnv, reward_space: str):
     env.reward_space = reward_space
     env.reset("cbench-v1/dijkstra")
 
-    actions = [env.action_space.flags.index(n) for n in ["-mem2reg", "-simplifycfg"]]
+    actions = [
+        env.action_space["-mem2reg"],
+        env.action_space["-simplifycfg"],
+    ]
 
     forked = env.fork()
     try:
@@ -245,21 +248,21 @@ def test_fork_previous_cost_reward_update(env: LlvmEnv):
     env.reward_space = "IrInstructionCount"
     env.reset("cbench-v1/crc32")
 
-    env.step(env.action_space.flags.index("-mem2reg"))
+    env.step(env.action_space["-mem2reg"])
     with env.fork() as fkd:
-        _, a, _, _ = env.step(env.action_space.flags.index("-mem2reg"))
-        _, b, _, _ = fkd.step(env.action_space.flags.index("-mem2reg"))
+        _, a, _, _ = env.step(env.action_space["-mem2reg"])
+        _, b, _, _ = fkd.step(env.action_space["-mem2reg"])
         assert a == b
 
 
 def test_fork_previous_cost_lazy_reward_update(env: LlvmEnv):
     env.reset("cbench-v1/crc32")
 
-    env.step(env.action_space.flags.index("-mem2reg"))
+    env.step(env.action_space["-mem2reg"])
     env.reward["IrInstructionCount"]  # noqa
     with env.fork() as fkd:
-        env.step(env.action_space.flags.index("-mem2reg"))
-        fkd.step(env.action_space.flags.index("-mem2reg"))
+        env.step(env.action_space["-mem2reg"])
+        fkd.step(env.action_space["-mem2reg"])
 
         assert env.reward["IrInstructionCount"] == fkd.reward["IrInstructionCount"]
 

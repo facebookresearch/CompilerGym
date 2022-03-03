@@ -19,7 +19,7 @@ def test_validate_benchmark_semantics(env: LlvmEnv, validatable_cbench_uri: str)
     env.reset(benchmark=validatable_cbench_uri)
 
     # Run a single step.
-    env.step(env.action_space.flags.index("-mem2reg"))
+    env.step(env.action_space["-mem2reg"])
 
     # Validate the environment state.
     result: ValidationResult = env.validate()
@@ -41,7 +41,7 @@ def test_non_validatable_benchmark_validate(
     env.reset(benchmark=non_validatable_cbench_uri)
 
     # Run a single step.
-    env.step(env.action_space.flags.index("-mem2reg"))
+    env.step(env.action_space["-mem2reg"])
 
     # Validate the environment state.
     result: ValidationResult = env.validate()

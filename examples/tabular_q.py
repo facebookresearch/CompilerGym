@@ -120,7 +120,7 @@ def rollout(qtable, env, printout=False):
     for i in range(FLAGS.episode_length):
         a = select_action(qtable, observation, i)
         action_seq.append(a)
-        observation, reward, done, info = env.step(env.action_space.flags.index(a))
+        observation, reward, done, info = env.step(env.action_space[a])
         rewards.append(reward)
         if done:
             break
@@ -146,10 +146,10 @@ def train(q_table, env):
             hashed = make_q_table_key(observation, a, current_length)
             if hashed not in q_table:
                 q_table[hashed] = 0
-            # Take a stap in the environment, record the reward and state transition.
+            # Take a step in the environment, record the reward and state transition.
             # Effectively we are evaluating the policy by taking a step in the
             # environment.
-            observation, reward, done, info = env.step(env.action_space.flags.index(a))
+            observation, reward, done, info = env.step(env.action_space[a])
             if done:
                 break
             current_length += 1

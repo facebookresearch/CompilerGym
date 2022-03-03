@@ -143,7 +143,7 @@ class ConstrainedCommandline(ActionWrapper):
                     flag=env.action_space.flags[a],
                     description=env.action_space.descriptions[a],
                 )
-                for a in (env.action_space.flags.index(f) for f in flags)
+                for a in (env.action_space[f] for f in flags)
             ],
             name=f"{type(self).__name__}<{name or env.action_space.name}, {len(flags)}>",
         )

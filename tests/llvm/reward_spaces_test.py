@@ -23,7 +23,7 @@ def test_instruction_count_reward(env: LlvmEnv):
     env.reset(benchmark="cbench-v1/crc32")
 
     assert env.observation.IrInstructionCount() == CRC32_INSTRUCTION_COUNT
-    action = env.action_space.flags.index("-reg2mem")
+    action = env.action_space["-reg2mem"]
     env.step(action)
     assert env.observation.IrInstructionCount() == CRC32_INSTRUCTION_COUNT_AFTER_REG2MEM
 
