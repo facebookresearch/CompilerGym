@@ -42,9 +42,11 @@ On Linux, install Docker using:
         "deb [arch=amd64 signed-by=/usr/share/keyrings/docker-archive-keyring.gpg] https://download.docker.com/linux/ubuntu \
         $(lsb_release -cs) stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
     sudo apt-get update && sudo apt-get install docker-ce docker-ce-cli containerd.io
+    sudo usermod -aG docker $USER
+    su - $USER
 
 See the `official documentation <https://docs.docker.com/engine/install>`_ for
-alternative installation options.
+more details and alternative installation options.
 
 On both Linux and macOS, use the following command to check if Docker is
 working:
