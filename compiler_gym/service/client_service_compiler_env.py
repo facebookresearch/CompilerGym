@@ -194,7 +194,8 @@ class ClientServiceCompilerEnv(CompilerEnv):
             to use.
 
         :param service_pool: A service pool to use for acquiring a service
-            connection. If not specified, the global service pool is used.
+            connection. If not specified, the :meth:`global service pool
+            <compiler_gym.service.ServiceConnectionPool.get>` is used.
 
         :raises FileNotFoundError: If service is a path to a file that is not
             found.
@@ -395,6 +396,8 @@ class ClientServiceCompilerEnv(CompilerEnv):
         """Calling this method on a :class:`ClientServiceCompilerEnv
         <compiler_gym.envs.ClientServiceCompilerEnv>` instance raises
         :code:`NotImplementedError`.
+
+        :return: A string commandline invocation.
         """
         raise NotImplementedError("abstract method")
 
