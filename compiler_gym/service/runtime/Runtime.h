@@ -20,20 +20,20 @@ namespace compiler_gym::runtime {
  *     #include "my_compiler_service/MyCompilationSession.h"
  *
  *     int main(int argc, char** argv) {
- *       createAndRunCompilerGymService<MyCompilationSession>(
+ *       return createAndRunCompilerGymService<MyCompilationSession>(
  *           argc, argc, "My compiler service"
  *       );
  *     }
  * \endcode
  *
- * This function never returns.
- *
  * @tparam CompilationSessionType A sublass of CompilationSession that provides
  *    implementations of the abstract methods.
+ *
+ * @return An integer return code.
  */
 template <typename CompilationSessionType>
-[[noreturn]] void createAndRunCompilerGymService(int argc, char** argv, const char* usage) {
-  createAndRunCompilerGymServiceImpl<CompilationSessionType>(argc, argv, usage);
+[[nodiscard]] int createAndRunCompilerGymService(int argc, char** argv, const char* usage) {
+  return createAndRunCompilerGymServiceImpl<CompilationSessionType>(argc, argv, usage);
 }
 
 }  // namespace compiler_gym::runtime

@@ -48,6 +48,7 @@ void BenchmarkFactory::close() {
   for (auto& entry : benchmarks_) {
     entry.second.close();
   }
+  benchmarks_.clear();
 }
 
 Status BenchmarkFactory::getBenchmark(const BenchmarkProto& benchmarkMessage,

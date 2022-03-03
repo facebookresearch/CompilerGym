@@ -63,6 +63,7 @@ cc_binary(
     name = "compiler_gym-llvm-service-prelinked",
     srcs = ["RunService.cc"],
     deps = [
+        ":BenchmarkFactory",
         ":LlvmSession",
         "//compiler_gym/service/runtime:cc_runtime",
     ],

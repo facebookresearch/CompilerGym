@@ -21,6 +21,7 @@ cg_cc_binary(
     "RunService.cc"
   DEPS
     ::LlvmSession
+    ::BenchmarkFactory
     compiler_gym::service::runtime::cc_runtime
 )
 

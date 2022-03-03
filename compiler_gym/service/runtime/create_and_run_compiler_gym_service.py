@@ -130,6 +130,7 @@ def create_and_run_compiler_gym_service(
         logging.info("Shutting down the RPC service")
         server.stop(60).wait()
         server_thread.join()
+        logging.info("Service closed")
 
         if len(service.sessions):
             print(

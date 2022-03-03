@@ -2,6 +2,7 @@
 //
 // This source code is licensed under the MIT license found in the
 // LICENSE file in the root directory of this source tree.
+#include "compiler_gym/envs/llvm/service/BenchmarkFactory.h"
 #include "compiler_gym/envs/llvm/service/LlvmSession.h"
 #include "compiler_gym/service/runtime/Runtime.h"
 #include "llvm/InitializePasses.h"
@@ -59,5 +60,17 @@ void initLlvm() {
 
 int main(int argc, char** argv) {
   initLlvm();
-  createAndRunCompilerGymService<LlvmSession>(argc, argv, usage);
+  const auto ret = createAndRunCompilerGymService<LlvmSession>(argc, argv, usage);
+
+  // NOTE(github.com/facebookresearch/CompilerGym/issues/582): We need to make
+  // sure that BenchmarkFactory::close() is called on the global singleton
+  // instance, so that the temporary scratch directories are tidied up.
+  //
+  // TODO(github.com/facebookresearch/CompilerGym/issues/591): Once the runtime
+  // has been refactored to support intra-session mutable state, this singleton
+  // can be replaced by a member variable that is closed on
+  // CompilerGymServiceContext::shutdown().
+  BenchmarkFactory::getSingleton(FLAGS_working_dir).close();
+
+  return ret;
 }
