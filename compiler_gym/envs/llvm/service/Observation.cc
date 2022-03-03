@@ -105,6 +105,44 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
       *reply.mutable_double_list()->mutable_value() = {features.begin(), features.end()};
       break;
     }
+    case LlvmObservationSpace::IR2VEC_FUN_FA: {
+      const auto ir2vecEmbeddingsPath = util::getRunfilesPath(
+          "compiler_gym/third_party/ir2vec/seedEmbeddingVocab-300-llvm10.txt");
+      IR2Vec::Embeddings embeddings(benchmark.module(), IR2Vec::IR2VecMode::FlowAware,
+                                    ir2vecEmbeddingsPath.string());
+      const auto FuncMap = embeddings.getFunctionVecMap();
+      json Embeddings = json::array({});
+
+      for (auto func : FuncMap) {
+        std::vector<double> FuncEmb = {func.second.begin(), func.second.end()};
+        json FuncEmbJson = FuncEmb;
+        json FuncJson;
+        std::string FuncName = func.first->getName();
+        FuncJson[func.first->getName()] = FuncEmbJson;
+        Embeddings.push_back(FuncJson);
+      }
+      *reply.mutable_string_value() = Embeddings.dump();
+      break;
+    }
+    case LlvmObservationSpace::IR2VEC_FUN_SYM: {
+      const auto ir2vecEmbeddingsPath = util::getRunfilesPath(
+          "compiler_gym/third_party/ir2vec/seedEmbeddingVocab-300-llvm10.txt");
+      IR2Vec::Embeddings embeddings(benchmark.module(), IR2Vec::IR2VecMode::Symbolic,
+                                    ir2vecEmbeddingsPath.string());
+      const auto FuncMap = embeddings.getFunctionVecMap();
+      json Embeddings = json::array({});
+
+      for (auto func : FuncMap) {
+        std::vector<double> FuncEmb = {func.second.begin(), func.second.end()};
+        json FuncEmbJson = FuncEmb;
+        json FuncJson;
+        std::string FuncName = func.first->getName();
+        FuncJson[func.first->getName()] = FuncEmbJson;
+        Embeddings.push_back(FuncJson);
+      }
+      *reply.mutable_string_value() = Embeddings.dump();
+      break;
+    }
     case LlvmObservationSpace::PROGRAML:
     case LlvmObservationSpace::PROGRAML_JSON: {
       // Build the ProGraML graph.

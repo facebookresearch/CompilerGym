@@ -128,6 +128,38 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
             defaultValue.begin(), defaultValue.end()};
         break;
       }
+      case LlvmObservationSpace::IR2VEC_FUN_FA: {
+        space.set_opaque_data_format("json://");
+        space.mutable_string_size_range()->mutable_min()->set_value(0.0);
+        space.set_deterministic(true);
+        space.set_platform_dependent(false);
+        // std::map <std::string,std::vector<double>> testMap;
+        std::vector<double> defaultEmbs;
+        for (double i = 0; i < 300; i++) defaultEmbs.push_back(i);
+        json vectorJson = defaultEmbs;
+        json FunctionKey;
+        json embeddings;
+        FunctionKey["default"] = vectorJson;
+        embeddings["embeddings"] = FunctionKey;
+        *space.mutable_default_value()->mutable_string_value() = embeddings.dump();
+        break;
+      }
+      case LlvmObservationSpace::IR2VEC_FUN_SYM: {
+        space.set_opaque_data_format("json://");
+        space.mutable_string_size_range()->mutable_min()->set_value(0.0);
+        space.set_deterministic(true);
+        space.set_platform_dependent(false);
+        // std::map <std::string,std::vector<double>> testMap;
+        std::vector<double> defaultEmbs;
+        for (double i = 0; i < 300; i++) defaultEmbs.push_back(i);
+        json vectorJson = defaultEmbs;
+        json FunctionKey;
+        json embeddings;
+        FunctionKey["default"] = vectorJson;
+        embeddings["embeddings"] = FunctionKey;
+        *space.mutable_default_value()->mutable_string_value() = embeddings.dump();
+        break;
+      }
       case LlvmObservationSpace::PROGRAML: {
         // ProGraML serializes the graph to JSON.
         space.set_opaque_data_format("json://networkx/MultiDiGraph");
