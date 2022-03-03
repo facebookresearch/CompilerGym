@@ -16,6 +16,7 @@ from tests.test_main import main
 pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
+@pytest.mark.timeout(900)  # Validation can take a long time!
 def test_validate_state_no_reward():
     state = CompilerEnvState(
         benchmark="benchmark://cbench-v1/crc32",
@@ -30,6 +31,7 @@ def test_validate_state_no_reward():
     assert str(result) == "✅  cbench-v1/crc32"
 
 
+@pytest.mark.timeout(900)  # Validation can take a long time!
 def test_validate_state_with_reward():
     state = CompilerEnvState(
         benchmark="benchmark://cbench-v1/crc32",
@@ -46,6 +48,7 @@ def test_validate_state_with_reward():
     assert str(result) == "✅  cbench-v1/crc32  0.0000"
 
 
+@pytest.mark.timeout(900)  # Validation can take a long time!
 def test_validate_state_invalid_reward():
     state = CompilerEnvState(
         benchmark="benchmark://cbench-v1/crc32",
@@ -64,6 +67,7 @@ def test_validate_state_invalid_reward():
     )
 
 
+@pytest.mark.timeout(900)  # Validation can take a long time!
 def test_validate_state_without_state_reward():
     """Validating state when state has no reward value."""
     state = CompilerEnvState(
@@ -102,6 +106,7 @@ def test_validate_state_without_env_reward():
     assert not result.reward_validation_failed
 
 
+@pytest.mark.timeout(900)  # Validation can take a long time!
 def test_no_validation_callback_for_custom_benchmark(env: LlvmEnv):
     """Test that a custom benchmark has no validation callback."""
     with tempfile.TemporaryDirectory() as d:
