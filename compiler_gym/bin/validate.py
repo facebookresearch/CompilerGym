@@ -207,7 +207,7 @@ def main(argv):
     progress_message(len(states))
     result_dicts = []
 
-    def dump_result_dicst_to_json():
+    def dump_result_dicts_to_json():
         with open(FLAGS.validation_logfile, "w") as f:
             json.dump(result_dicts, f)
 
@@ -223,9 +223,9 @@ def main(argv):
             walltimes.append(result.state.walltime)
 
         if not i % 10:
-            dump_result_dicst_to_json()
+            dump_result_dicts_to_json()
 
-    dump_result_dicst_to_json()
+    dump_result_dicts_to_json()
 
     # Print a summary footer.
     intermediate_print("\r\033[K----", "-" * name_col_width, "-----------", sep="")
