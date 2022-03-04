@@ -51,7 +51,7 @@ if(COMPILER_GYM_BENCHMARK_PROVIDER STREQUAL "internal")
         "${CMAKE_CURRENT_BINARY_DIR}/external/benchmark"
         GIT_REPOSITORY "https://github.com/google/benchmark.git"
         GIT_TAG
-            9913418d323e64a0111ca0da81388260c2bbe1e9 #tag v1.4.0
+            0d98dba29d66e93259db7daa53a9327df767a415 #tag v1.6.1
     )
 
     if(NOT benchmark_POPULATED)
