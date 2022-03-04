@@ -15,15 +15,16 @@ from typing import Optional, Tuple
 import numpy as np
 
 import compiler_gym.third_party.llvm as llvm
-import examples.loop_optimizations_service.service_py.utils as utils
 from compiler_gym.service import CompilationSession
 from compiler_gym.service.proto import (
     ActionSpace,
     Benchmark,
+    DictEvent,
+    DictSpace,
     DoubleRange,
     Event,
-    Int64Box,
     Int64Range,
+    Int64SequenceSpace,
     Int64Tensor,
     NamedDiscreteSpace,
     ObservationSpace,
@@ -31,7 +32,12 @@ from compiler_gym.service.proto import (
     StringSpace,
 )
 from compiler_gym.service.runtime import create_and_run_compiler_gym_service
+from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_NAMES
+from compiler_gym.third_party.inst2vec import Inst2vecEncoder
 from compiler_gym.util.commands import run_command
+from compiler_gym.util.runfiles_path import runfiles_path
+
+_INST2VEC_ENCODER = Inst2vecEncoder()
 
 
 class LoopsOptCompilationSession(CompilationSession):
@@ -73,13 +79,43 @@ class LoopsOptCompilationSession(CompilationSession):
             default_observation=Event(string_value=""),
         ),
         ObservationSpace(
-            name="features",
+            name="Inst2vec",
             space=Space(
-                int64_box=Int64Box(
-                    low=Int64Tensor(shape=[3], value=[0, 0, 0]),
-                    high=Int64Tensor(shape=[3], value=[int(1e5), int(1e5), int(1e5)]),
+                int64_sequence=Int64SequenceSpace(length_range=Int64Range(min=0)),
+            ),
+        ),
+        ObservationSpace(
+            name="Autophase",
+            space=Space(
+                int64_sequence=Int64SequenceSpace(
+                    length_range=Int64Range(
+                        min=len(AUTOPHASE_FEATURE_NAMES),
+                        max=len(AUTOPHASE_FEATURE_NAMES),
+                    )
+                ),
+            ),
+            deterministic=True,
+            platform_dependent=False,
+        ),
+        ObservationSpace(
+            name="AutophaseDict",
+            space=Space(
+                space_dict=DictSpace(
+                    space={
+                        name: Space(int64_value=Int64Range(min=0))
+                        for name in AUTOPHASE_FEATURE_NAMES
+                    }
                 )
             ),
+            deterministic=True,
+            platform_dependent=False,
+        ),
+        ObservationSpace(
+            name="Programl",
+            space=Space(string_value=StringSpace(length_range=Int64Range(min=0))),
+            deterministic=True,
+            platform_dependent=False,
+            default_observation=Event(string_value=""),
         ),
         ObservationSpace(
             name="runtime",
@@ -112,6 +148,8 @@ class LoopsOptCompilationSession(CompilationSession):
         logging.info("Started a compilation session for %s", benchmark.uri)
         self._benchmark = benchmark
         self._action_space = action_space
+
+        self.inst2vec = _INST2VEC_ENCODER
 
         # Resolve the paths to LLVM binaries once now.
         self._clang = str(llvm.clang_path())
@@ -176,7 +214,7 @@ class LoopsOptCompilationSession(CompilationSession):
                 args[i] = arg
             run_command(
                 [
-                    "../opt_loops/opt_loops",
+                    os.path.join(os.path.dirname(__file__), "../opt_loops/opt_loops"),
                     self._llvm_path,
                     *args,
                     "-S",
@@ -223,11 +261,53 @@ class LoopsOptCompilationSession(CompilationSession):
         logging.info("Computing observation from space %s", observation_space.name)
         if observation_space.name == "ir":
             return Event(string_value=self.ir)
-        elif observation_space.name == "features":
-            stats = utils.extract_statistics_from_ir(self.ir)
-            vals = stats.values()
-            observation = Event(int64_tensor=Int64Tensor(shape=[len(vals)], value=vals))
-            return observation
+        elif observation_space.name == "Inst2vec":
+            Inst2vec_str = self.inst2vec.preprocess(self.ir)
+            Inst2vec_ids = self.inst2vec.encode(Inst2vec_str)
+            return Event(
+                int64_tensor=Int64Tensor(shape=[len(Inst2vec_ids)], value=Inst2vec_ids)
+            )
+        elif observation_space.name == "Autophase":
+            Autophase_str = run_command(
+                [
+                    runfiles_path(
+                        "compiler_gym/third_party/autophase/compute_autophase-prelinked"
+                    ),
+                    self._llvm_path,
+                ],
+                timeout=30,
+            )
+            Autophase_list = list(map(int, list(Autophase_str.split(" "))))
+            return Event(
+                int64_tensor=Int64Tensor(
+                    shape=[len(Autophase_list)], value=Autophase_list
+                )
+            )
+        elif observation_space.name == "AutophaseDict":
+            Autophase_str = run_command(
+                [
+                    runfiles_path(
+                        "compiler_gym/third_party/autophase/compute_autophase-prelinked"
+                    ),
+                    self._llvm_path,
+                ],
+                timeout=30,
+            )
+            Autophase_list = list(map(int, list(Autophase_str.split(" "))))
+            Autophase_dict = {
+                name: Event(int64_value=val)
+                for name, val in zip(AUTOPHASE_FEATURE_NAMES, Autophase_list)
+            }
+            return Event(event_dict=DictEvent(event=Autophase_dict))
+        elif observation_space.name == "Programl":
+            Programl_str = run_command(
+                [
+                    runfiles_path("compiler_gym/third_party/programl/compute_programl"),
+                    self._llvm_path,
+                ],
+                timeout=30,
+            )
+            return Event(string_value=Programl_str)
         elif observation_space.name == "runtime":
             # compile LLVM to object file
             run_command(

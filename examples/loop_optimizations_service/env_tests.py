@@ -14,7 +14,8 @@ import compiler_gym
 import examples.loop_optimizations_service as loop_optimizations_service
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.service import SessionNotFound
-from compiler_gym.spaces import Box, NamedDiscrete, Scalar, Sequence
+from compiler_gym.spaces import Dict, NamedDiscrete, Scalar, Sequence
+from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_NAMES
 from tests.test_main import main
 
 
@@ -83,14 +84,41 @@ def test_action_space(env: CompilerEnv):
 def test_observation_spaces(env: CompilerEnv):
     """Test that the environment reports the service's observation spaces."""
     env.reset()
-    assert env.observation.spaces.keys() == {"ir", "features", "runtime", "size"}
+    assert env.observation.spaces.keys() == {
+        "ir",
+        "Inst2vec",
+        "Autophase",
+        "AutophaseDict",
+        "Programl",
+        "runtime",
+        "size",
+    }
     assert env.observation.spaces["ir"].space == Sequence(
         name="ir",
         size_range=(0, np.iinfo(int).max),
         dtype=str,
     )
-    assert env.observation.spaces["features"].space == Box(
-        name="features", shape=(3,), low=0, high=1e5, dtype=int
+    assert env.observation.spaces["Inst2vec"].space == Sequence(
+        name="Inst2vec",
+        size_range=(0, np.iinfo(int).max),
+        dtype=int,
+    )
+    assert env.observation.spaces["Autophase"].space == Sequence(
+        name="Autophase",
+        size_range=(len(AUTOPHASE_FEATURE_NAMES), len(AUTOPHASE_FEATURE_NAMES)),
+        dtype=int,
+    )
+    assert env.observation.spaces["AutophaseDict"].space == Dict(
+        name="AutophaseDict",
+        spaces={
+            name: Scalar(name="", min=0, max=np.iinfo(np.int64).max, dtype=np.int64)
+            for name in AUTOPHASE_FEATURE_NAMES
+        },
+    )
+    assert env.observation.spaces["Programl"].space == Sequence(
+        name="Programl",
+        size_range=(0, np.iinfo(int).max),
+        dtype=str,
     )
     assert env.observation.spaces["runtime"].space == Scalar(
         name="runtime", min=0, max=np.inf, dtype=float
@@ -160,7 +188,7 @@ def test_Step_out_of_range(env: CompilerEnv):
 
 
 def test_default_ir_observation(env: CompilerEnv):
-    """Test default observation space."""
+    """Test default IR observation space."""
     env.observation_space = "ir"
     observation = env.reset()
     assert len(observation) > 0
@@ -171,14 +199,46 @@ def test_default_ir_observation(env: CompilerEnv):
     assert reward is None
 
 
-def test_default_features_observation(env: CompilerEnv):
-    """Test default observation space."""
-    env.observation_space = "features"
+def test_default_inst2vec_observation(env: CompilerEnv):
+    """Test default inst2vec observation space."""
+    env.observation_space = "Inst2vec"
     observation = env.reset()
     assert isinstance(observation, np.ndarray)
-    assert observation.shape == (3,)
+    assert len(observation) >= 0
     assert observation.dtype == np.int64
     assert all(obs >= 0 for obs in observation.tolist())
+
+
+def test_default_autophase_observation(env: CompilerEnv):
+    """Test default autophase observation space."""
+    env.observation_space = "Autophase"
+    observation = env.reset()
+    assert isinstance(observation, np.ndarray)
+    assert observation.shape == (len(AUTOPHASE_FEATURE_NAMES),)
+    assert observation.dtype == np.int64
+    assert all(obs >= 0 for obs in observation.tolist())
+
+
+def test_default_autophase_dict_observation(env: CompilerEnv):
+    """Test default autophase dict observation space."""
+    env.observation_space = "AutophaseDict"
+    observation = env.reset()
+    assert isinstance(observation, dict)
+    assert observation.keys() == AUTOPHASE_FEATURE_NAMES
+    assert len(observation.values()) == len(AUTOPHASE_FEATURE_NAMES)
+    assert all(obs >= 0 for obs in observation.values())
+
+
+def test_default_programl_observation(env: CompilerEnv):
+    """Test default observation space."""
+    env.observation_space = "Programl"
+    observation = env.reset()
+    assert len(observation) > 0
+
+    observation, reward, done, info = env.step(0)
+    assert not done, info
+    assert len(observation) > 0
+    assert reward is None
 
 
 def test_default_reward(env: CompilerEnv):
@@ -195,7 +255,9 @@ def test_observations(env: CompilerEnv):
     """Test observation spaces."""
     env.reset()
     assert len(env.observation["ir"]) > 0
-    np.testing.assert_array_less([-1, -1, -1], env.observation["features"])
+    assert all(env.observation["Inst2vec"] >= 0)
+    assert all(env.observation["Autophase"] >= 0)
+    assert len(env.observation["Programl"]) > 0
 
 
 def test_rewards(env: CompilerEnv):

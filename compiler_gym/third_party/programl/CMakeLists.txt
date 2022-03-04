@@ -5,45 +5,20 @@
 
 cg_add_all_subdirs()
 
-cg_py_library(
-  NAME
-    autophase
-  SRCS
-    "__init__.py"
-  PUBLIC
-)
-
-llvm_map_components_to_libnames(_LLVM_LIBS analysis core support)
-cg_cc_library(
-  NAME
-    InstCount
-  COPTS
-    "-DGOOGLE_PROTOBUF_NO_RTTI"
-    "-fno-rtti"
-  HDRS
-    "InstCount.h"
-  SRCS
-    "InstCount.cc"
-  ABS_DEPS
-    ${_LLVM_LIBS}
-  INCLUDES
-    ${LLVM_INCLUDE_DIRS}
-  DEFINES
-    ${LLVM_DEFINITIONS}
-  PUBLIC
-)
-
 llvm_map_components_to_libnames(_LLVM_LIBS analysis core irreader support)
 cg_cc_binary(
   NAME
-    compute_autophase
+    compute_programl
   SRCS
-    "compute_autophase.cc"
+    "compute_programl.cc"
   COPTS
     "-DGOOGLE_PROTOBUF_NO_RTTI"
     "-fno-rtti"
   DEPS
-    ::InstCount
+    nlohmann_json::nlohmann_json
+    ProGraML::graph::format::node_link_graph
+    ProGraML::ir::llvm::llvm-10
+    ProGraML::proto::programl_cc
   ABS_DEPS
     glog::glog
     ${_LLVM_LIBS}

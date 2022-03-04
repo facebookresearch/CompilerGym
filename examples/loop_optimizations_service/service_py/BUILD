@@ -8,21 +8,19 @@ py_binary(
     name = "loops-opt-service-py",
     srcs = ["loops_opt_service.py"],
     data = [
+        "//compiler_gym/third_party/autophase:compute_autophase-prelinked",
+        "//compiler_gym/third_party/programl:compute_programl",
         "//examples/loop_optimizations_service/opt_loops",
     ],
     main = "loops_opt_service.py",
     visibility = ["//visibility:public"],
     deps = [
-        ":utils",
         "//compiler_gym/service",
         "//compiler_gym/service/proto",
         "//compiler_gym/service/runtime",
+        "//compiler_gym/spaces",
+        "//compiler_gym/third_party/autophase",
+        "//compiler_gym/third_party/inst2vec",
         "//compiler_gym/third_party/llvm",
     ],
-)
-
-py_library(
-    name = "utils",
-    srcs = ["utils.py"],
-    visibility = ["//visibility:public"],
 )
