@@ -51,4 +51,5 @@ cg_cc_binary(
     ${LLVM_INCLUDE_DIRS}
   DEFINES
     ${LLVM_DEFINITIONS}
+  PUBLIC
 )
