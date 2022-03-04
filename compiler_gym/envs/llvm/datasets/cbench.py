@@ -15,11 +15,12 @@ import tempfile
 from collections import defaultdict
 from pathlib import Path
 from threading import Lock
-from typing import Callable, Dict, List, NamedTuple, Optional
+from typing import Callable, Dict, Iterable, List, NamedTuple, Optional
 
 import fasteners
 
 from compiler_gym.datasets import Benchmark, TarDatasetWithManifest
+from compiler_gym.datasets.benchmark import ValidationCallback
 from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.envs.llvm import llvm_benchmark
 from compiler_gym.service.proto import BenchmarkDynamicConfig, Command
@@ -269,7 +270,7 @@ def _make_cBench_validator(
     pre_execution_callback: Optional[Callable[[Path], None]] = None,
     sanitizer: Optional[LlvmSanitizer] = None,
     flakiness: int = 5,
-) -> Callable[["LlvmEnv"], Optional[ValidationError]]:  # noqa: F821
+) -> ValidationCallback:
     """Construct a validation callback for a cBench benchmark. See validator() for usage."""
     input_files = input_files or []
     output_files = output_files or []
@@ -407,6 +408,11 @@ def _make_cBench_validator(
                 # Timeout errors can be raised by the environment in case of a
                 # slow step / observation, and should be retried.
                 pass
+
+            # No point in repeating compilation failures as they are not flaky.
+            if error.type == "Compilation failed":
+                return error
+
             logger.warning(
                 "Validation callback failed (%s), attempt=%d/%d",
                 error.type,
@@ -415,7 +421,16 @@ def _make_cBench_validator(
             )
         return error
 
-    return flaky_wrapped_cb
+    # The flaky_wrapped_cb() function takes an environment and produces a single
+    # error. We need the validator to produce an iterable of errors.
+    def adapt_validator_return_type(
+        env: "LlvmEnv",  # noqa: F821
+    ) -> Iterable[ValidationError]:
+        error = flaky_wrapped_cb(env)
+        if error:
+            yield error
+
+    return adapt_validator_return_type
 
 
 def validator(
@@ -658,9 +673,7 @@ class CBenchLegacyDataset(TarDatasetWithManifest):
 
 
 # A map from benchmark name to validation callbacks.
-VALIDATORS: Dict[
-    str, List[Callable[["LlvmEnv"], Optional[str]]]  # noqa: F821
-] = defaultdict(list)
+VALIDATORS: Dict[str, List[ValidationCallback]] = defaultdict(list)
 
 
 # A map from cBench benchmark path to a list of BenchmarkDynamicConfig messages,
