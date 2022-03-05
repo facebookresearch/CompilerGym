@@ -21,11 +21,23 @@ py_library(
     srcs = ["compiler_env.py"],
     visibility = ["//compiler_gym:__subpackages__"],
     deps = [
+        ":env",
         "//compiler_gym:compiler_env_state",
         "//compiler_gym:validation_result",
         "//compiler_gym/datasets",
         "//compiler_gym/service",
         "//compiler_gym/service/proto",
+        "//compiler_gym/spaces",
+        "//compiler_gym/util",
+        "//compiler_gym/views",
+    ],
+)
+
+py_library(
+    name = "env",
+    srcs = ["env.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
+    deps = [
         "//compiler_gym/spaces",
         "//compiler_gym/util",
         "//compiler_gym/views",

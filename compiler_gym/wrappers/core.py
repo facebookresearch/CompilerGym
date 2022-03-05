@@ -4,18 +4,19 @@
 # LICENSE file in the root directory of this source tree.
 import warnings
 from collections.abc import Iterable as IterableType
-from typing import Iterable, List, Optional, Union
+from typing import Any, Iterable, List, Optional, Tuple, Union
 
-import gym
+from gym import Wrapper
+from gym.spaces import Space
 
-from compiler_gym.envs import CompilerEnv
+from compiler_gym.envs import Env
 from compiler_gym.spaces.reward import Reward
 from compiler_gym.util.gym_type_hints import ActionType, ObservationType
 from compiler_gym.views import ObservationSpaceSpec
 
 
-class CompilerEnvWrapper(gym.Wrapper):
-    """Wraps a :class:`CompilerEnv <compiler_gym.envs.CompilerEnv>` environment
+class CompilerEnvWrapper(Env, Wrapper):
+    """Wraps a :class:`CompilerEnv <compiler_gym.envs.Env>` environment
     to allow a modular transformation.
 
     This class is the base class for all wrappers. This class must be used
@@ -23,7 +24,7 @@ class CompilerEnvWrapper(gym.Wrapper):
     such as the :code:`fork()` method.
     """
 
-    def __init__(self, env: CompilerEnv):  # pylint: disable=super-init-not-called
+    def __init__(self, env: Env):  # pylint: disable=super-init-not-called
         """Constructor.
 
         :param env: The environment to wrap.
@@ -36,14 +37,11 @@ class CompilerEnvWrapper(gym.Wrapper):
         # CompilerEnv class is a property with a custom setter. Instead we set
         # the observation_space_spec directly.
         self.env = env
-        self.action_space = self.env.action_space
-        self.reward_range = self.env.reward_range
-        self.metadata = self.env.metadata
 
-    def reset(self, *args, **kwargs) -> ObservationType:
+    def reset(self, *args, **kwargs) -> Optional[ObservationType]:
         return self.env.reset(*args, **kwargs)
 
-    def fork(self) -> CompilerEnv:
+    def fork(self) -> Env:
         return type(self)(env=self.env.fork())
 
     def step(  # pylint: disable=arguments-differ
@@ -116,9 +114,16 @@ class CompilerEnvWrapper(gym.Wrapper):
         )
 
     @property
+    def reward_range(self) -> Tuple[float, float]:
+        return self.env.reward_range
+
+    @reward_range.setter
+    def reward_range(self, value: Tuple[float, float]):
+        self.env.reward_range = value
+
+    @property
     def observation_space(self):
-        if self.env.observation_space_spec:
-            return self.env.observation_space_spec.space
+        return self.env.observation_space
 
     @observation_space.setter
     def observation_space(
@@ -143,6 +148,22 @@ class CompilerEnvWrapper(gym.Wrapper):
     @reward_space.setter
     def reward_space(self, reward_space: Optional[Union[str, Reward]]) -> None:
         self.env.reward_space = reward_space
+
+    @property
+    def action_space(self) -> Space:
+        return self.env.action_space
+
+    @action_space.setter
+    def action_space(self, action_space: Optional[str]):
+        self.env.action_space = action_space
+
+    @property
+    def spec(self) -> Any:
+        return self.env.spec
+
+    @spec.setter
+    def spec(self, value: Any):
+        self.env.spec = value
 
 
 class ActionWrapper(CompilerEnvWrapper):

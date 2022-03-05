@@ -2,7 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""This module defines the OpenAI gym interface for compilers."""
+
 import logging
 import numbers
 import warnings
@@ -13,7 +13,6 @@ from pathlib import Path
 from time import time
 from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
-import gym
 import numpy as np
 from deprecated.sphinx import deprecated
 from gym.spaces import Space
@@ -21,6 +20,7 @@ from gym.spaces import Space
 from compiler_gym.compiler_env_state import CompilerEnvState
 from compiler_gym.datasets import Benchmark, Dataset, Datasets
 from compiler_gym.datasets.uri import BenchmarkUri
+from compiler_gym.envs.env import Env
 from compiler_gym.service import (
     CompilerGymServiceConnection,
     ConnectionOpts,
@@ -81,7 +81,7 @@ def _wrapped_step(
         raise
 
 
-class CompilerEnv(gym.Env):
+class CompilerEnv(Env):
     """An OpenAI gym environment for compiler optimizations.
 
     The easiest way to create a CompilerGym environment is to call
@@ -324,10 +324,20 @@ class CompilerEnv(gym.Env):
         self.actions: List[ActionType] = []
 
         # Initialize the default observation/reward spaces.
-        self.observation_space_spec: Optional[ObservationSpaceSpec] = None
+        self.observation_space_spec = None
         self.reward_space_spec: Optional[Reward] = None
         self.observation_space = observation_space
         self.reward_space = reward_space
+
+    @property
+    def observation_space_spec(self) -> ObservationSpaceSpec:
+        return self._observation_space_spec
+
+    @observation_space_spec.setter
+    def observation_space_spec(
+        self, observation_space_spec: Optional[ObservationSpaceSpec]
+    ):
+        self._observation_space_spec = observation_space_spec
 
     @property
     @deprecated(
@@ -559,29 +569,6 @@ class CompilerEnv(gym.Env):
         }
 
     def fork(self) -> "CompilerEnv":
-        """Fork a new environment with exactly the same state.
-
-        This creates a duplicate environment instance with the current state.
-        The new environment is entirely independently of the source environment.
-        The user must call :meth:`close() <compiler_gym.envs.CompilerEnv.close>`
-        on the original and new environments.
-
-        If not already in an episode, :meth:`reset()
-        <compiler_gym.envs.CompilerEnv.reset>` is called.
-
-        Example usage:
-
-            >>> env = gym.make("llvm-v0")
-            >>> env.reset()
-            # ... use env
-            >>> new_env = env.fork()
-            >>> new_env.state == env.state
-            True
-            >>> new_env.step(1) == env.step(1)
-            True
-
-        :return: A new environment instance.
-        """
         if not self.in_episode:
             actions = self.actions.copy()
             self.reset()
@@ -1026,7 +1013,7 @@ class CompilerEnv(gym.Env):
 
         return observations, rewards, reply.end_of_session, info
 
-    def step(  # pylint: disable=arguments-differ
+    def step(
         self,
         action: ActionType,
         observation_spaces: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
@@ -1034,26 +1021,8 @@ class CompilerEnv(gym.Env):
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
     ) -> StepType:
-        """Take a step.
-
-        :param action: An action.
-
-        :param observation_spaces: A list of observation spaces to compute
-            observations from. If provided, this changes the :code:`observation`
-            element of the return tuple to be a list of observations from the
-            requested spaces. The default :code:`env.observation_space` is not
-            returned.
-
-        :param reward_spaces: A list of reward spaces to compute rewards from. If
-            provided, this changes the :code:`reward` element of the return
-            tuple to be a list of rewards from the requested spaces. The default
-            :code:`env.reward_space` is not returned.
-
-        :return: A tuple of observation, reward, done, and info. Observation and
-            reward are None if default observation/reward is not set.
-
-        :raises SessionNotFound: If :meth:`reset()
-            <compiler_gym.envs.CompilerEnv.reset>` has not been called.
+        """:raises SessionNotFound: If :meth:`reset()
+        <compiler_gym.envs.CompilerEnv.reset>` has not been called.
         """
         if isinstance(action, IterableType):
             warnings.warn(
@@ -1092,26 +1061,8 @@ class CompilerEnv(gym.Env):
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
     ):
-        """Take a sequence of steps and return the final observation and reward.
-
-        :param action: A sequence of actions to apply in order.
-
-        :param observation_spaces: A list of observation spaces to compute
-            observations from. If provided, this changes the :code:`observation`
-            element of the return tuple to be a list of observations from the
-            requested spaces. The default :code:`env.observation_space` is not
-            returned.
-
-        :param reward_spaces: A list of reward spaces to compute rewards from. If
-            provided, this changes the :code:`reward` element of the return
-            tuple to be a list of rewards from the requested spaces. The default
-            :code:`env.reward_space` is not returned.
-
-        :return: A tuple of observation, reward, done, and info. Observation and
-            reward are None if default observation/reward is not set.
-
-        :raises SessionNotFound: If :meth:`reset()
-            <compiler_gym.envs.CompilerEnv.reset>` has not been called.
+        """:raises SessionNotFound: If :meth:`reset()
+        <compiler_gym.envs.CompilerEnv.reset>` has not been called.
         """
         if observations is not None:
             warnings.warn(

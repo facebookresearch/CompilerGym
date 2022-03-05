@@ -24,6 +24,7 @@ cg_py_library(
   SRCS
     "compiler_env.py"
   DEPS
+    ::env_py
     compiler_gym::compiler_env_state
     compiler_gym::datasets::datasets
     compiler_gym::service::service
@@ -31,6 +32,18 @@ cg_py_library(
     compiler_gym::spaces::spaces
     compiler_gym::util::util
     compiler_gym::validation_result
+    compiler_gym::views::views
+  PUBLIC
+)
+
+cg_py_library(
+  NAME
+    env_py
+  SRCS
+    "env.py"
+  DEPS
+    compiler_gym::spaces::spaces
+    compiler_gym::util::util
     compiler_gym::views::views
   PUBLIC
 )
