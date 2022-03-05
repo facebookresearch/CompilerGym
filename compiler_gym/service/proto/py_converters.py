@@ -70,10 +70,6 @@ from compiler_gym.spaces.sequence import Sequence
 from compiler_gym.spaces.tuple import Tuple
 
 
-def proto_to_action_space(space: ActionSpace):
-    return message_default_converter(space)
-
-
 class TypeBasedConverter:
     """Converter that dispatches based on the exact type of the parameter.
 
