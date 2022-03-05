@@ -56,6 +56,7 @@ from compiler_gym.service.proto.compiler_gym_service_pb2 import (
     ObservationSpace,
     Opaque,
     Space,
+    SpaceSequenceSpace,
     StringSequenceSpace,
     StringSpace,
     StringTensor,
@@ -65,8 +66,10 @@ from compiler_gym.spaces.commandline import Commandline, CommandlineFlag
 from compiler_gym.spaces.dict import Dict
 from compiler_gym.spaces.discrete import Discrete
 from compiler_gym.spaces.named_discrete import NamedDiscrete
+from compiler_gym.spaces.permutation import Permutation
 from compiler_gym.spaces.scalar import Scalar
 from compiler_gym.spaces.sequence import Sequence
+from compiler_gym.spaces.space_sequence import SpaceSequence
 from compiler_gym.spaces.tuple import Tuple
 
 
@@ -187,6 +190,22 @@ convert_tensor_message_to_numpy = TypeBasedConverter(
 
 def convert_bytes_to_numpy(arr: bytes) -> np.ndarray:
     return np.frombuffer(arr, dtype=np.int8)
+
+
+def convert_permutation_space_message(space: Space) -> Permutation:
+    if (
+        space.int64_sequence.scalar_range.max
+        - space.int64_sequence.scalar_range.min
+        + 1
+        != space.int64_sequence.length_range.min
+        or space.int64_sequence.length_range.min
+        != space.int64_sequence.length_range.max
+    ):
+        raise ValueError(f"Invalid permutation space message:\n{space}.")
+    return Permutation(
+        name=None,
+        scalar_range=convert_range_message(space.int64_sequence.scalar_range),
+    )
 
 
 class NumpyToTensorMessageConverter:
@@ -434,9 +453,11 @@ def make_message_default_converter() -> Callable[[Any], Any]:
 
     conversion_map[Space] = TypeIdDispatchConverter(
         default_converter=SpaceMessageDefaultConverter(res),
+        conversion_map={"permutation": convert_permutation_space_message},
     )
     conversion_map[ListSpace] = ListSpaceMessageConverter(conversion_map[Space])
     conversion_map[DictSpace] = DictSpaceMessageConverter(conversion_map[Space])
+    conversion_map[SpaceSequenceSpace] = SpaceSequenceSpaceMessageConverter(res)
     conversion_map[ActionSpace] = ActionSpaceMessageConverter(res)
     conversion_map[ObservationSpace] = ObservationSpaceMessageConverter(res)
 
@@ -691,6 +712,20 @@ class ToSequenceSpaceMessageConverter:
 
 
 convert_to_sequence_space_message = ToSequenceSpaceMessageConverter()
+
+
+class SpaceSequenceSpaceMessageConverter:
+    space_message_converter: Callable[[Space], GymSpace]
+
+    def __init__(self, space_message_converter):
+        self.space_message_converter = space_message_converter
+
+    def __call__(self, seq: SpaceSequenceSpace) -> GymSpace:
+        return SpaceSequence(
+            name=None,
+            space=self.space_message_converter(seq.space),
+            size_range=(seq.length_range.min, seq.length_range.max),
+        )
 
 
 class SpaceMessageDefaultConverter:

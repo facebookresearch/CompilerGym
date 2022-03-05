@@ -40,6 +40,7 @@ from compiler_gym.service.proto import (
     NamedDiscreteSpace,
     Opaque,
     Space,
+    SpaceSequenceSpace,
     StringSpace,
     StringTensor,
     py_converters,
@@ -50,8 +51,10 @@ from compiler_gym.spaces import (
     Dict,
     Discrete,
     NamedDiscrete,
+    Permutation,
     Scalar,
     Sequence,
+    SpaceSequence,
     Tuple,
 )
 from tests.test_main import main
@@ -776,6 +779,23 @@ def test_convert_to_string_space():
     assert converted_space.length_range.max == 2
 
 
+def test_convert_space_sequence_space():
+    space = Space(
+        space_sequence=SpaceSequenceSpace(
+            length_range=Int64Range(min=0, max=2),
+            space=Space(int64_value=Int64Range(min=-1, max=1)),
+        ),
+    )
+    converted_space = py_converters.message_default_converter(space)
+    assert isinstance(converted_space, SpaceSequence)
+    assert converted_space.size_range[0] == space.space_sequence.length_range.min
+    assert converted_space.size_range[1] == space.space_sequence.length_range.max
+    assert isinstance(converted_space.space, Scalar)
+    assert np.dtype(converted_space.space.dtype) == np.int64
+    assert converted_space.space.min == space.space_sequence.space.int64_value.min
+    assert converted_space.space.max == space.space_sequence.space.int64_value.max
+
+
 def test_space_message_default_converter():
     message_converter = py_converters.TypeBasedConverter(
         conversion_map={StringSpace: py_converters.convert_sequence_space}
@@ -926,6 +946,21 @@ def test_type_id_dispatch_converter():
         type_id_converter(Event(string_value="msg_val", type_id="type_2"))
         == "msg_val_type_2"
     )
+
+
+def test_convert_permutation_space_message():
+    msg = Space(
+        type_id="permutation",
+        int64_sequence=Int64SequenceSpace(
+            length_range=Int64Range(min=5, max=5), scalar_range=Int64Range(min=0, max=4)
+        ),
+    )
+    permutation = py_converters.message_default_converter(msg)
+    assert isinstance(permutation, Permutation)
+    assert permutation.scalar_range.min == 0
+    assert permutation.scalar_range.max == 4
+    assert permutation.size_range[0] == 5
+    assert permutation.size_range[1] == 5
 
 
 if __name__ == "__main__":

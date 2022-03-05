@@ -5,7 +5,7 @@
 """Unit tests for //compiler_gym/spaces:sequence."""
 import pytest
 
-from compiler_gym.spaces import Scalar, Sequence
+from compiler_gym.spaces import Scalar, Sequence, SpaceSequence
 from tests.test_main import main
 
 
@@ -62,6 +62,15 @@ def test_bytes_contains():
     assert space.contains(b"Hello, world!")
     assert space.contains(b"")
     assert not space.contains("Hello, world!")
+
+
+def test_space_sequence_contains():
+    subspace = Scalar(name="subspace", min=0, max=1, dtype=float)
+    space_seq = SpaceSequence(name="seq", space=subspace, size_range=(0, 2))
+    assert space_seq.contains([0.5, 0.6])
+    assert not space_seq.contains(["not-a-number"])
+    assert not space_seq.contains([2.0])
+    assert not space_seq.contains([0.1, 0.2, 0.3])
 
 
 if __name__ == "__main__":

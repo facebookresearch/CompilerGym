@@ -90,6 +90,16 @@ cg_py_test(
 )
 
 cg_py_test(
+  NAME
+    permutation_test
+  SRCS
+    "permutation_test.py"
+  DEPS
+    compiler_gym::util::util
+    tests::test_main
+)
+
+cg_py_test(
   NAME runfiles_path_test
   SRCS "runfiles_path_test.py"
   DEPS

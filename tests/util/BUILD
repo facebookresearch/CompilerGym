@@ -94,6 +94,16 @@ py_test(
 )
 
 py_test(
+    name = "permutation_test",
+    timeout = "short",
+    srcs = ["permutation_test.py"],
+    deps = [
+        "//compiler_gym/util",
+        "//tests:test_main",
+    ],
+)
+
+py_test(
     name = "runfiles_path_test",
     srcs = ["runfiles_path_test.py"],
     deps = [

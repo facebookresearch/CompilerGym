@@ -23,8 +23,10 @@ py_library(
         "//compiler_gym/spaces:dict",
         "//compiler_gym/spaces:discrete",
         "//compiler_gym/spaces:named_discrete",
+        "//compiler_gym/spaces:permutation",
         "//compiler_gym/spaces:scalar",
         "//compiler_gym/spaces:sequence",
+        "//compiler_gym/spaces:space_sequence",
         "//compiler_gym/spaces:tuple",
     ],
 )
