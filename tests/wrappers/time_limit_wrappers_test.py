@@ -28,7 +28,9 @@ def test_wrapped_fork_type(env: LlvmEnv):
 def test_wrapped_step_multi_step(env: LlvmEnv):
     env = TimeLimit(env, max_episode_steps=5)
     env.reset(benchmark="benchmark://cbench-v1/dijkstra")
-    env.step([0, 0, 0])
+    env.step(0)
+    env.step(0)
+    env.step(0)
 
     assert env.benchmark == "benchmark://cbench-v1/dijkstra"
     assert env.actions == [0, 0, 0]

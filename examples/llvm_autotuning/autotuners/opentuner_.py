@@ -93,7 +93,8 @@ def opentuner_ga(
         wrapped = DesiredResult(Configuration(manipulator.best_config))
         manipulator.run(wrapped, None, None)
         env.reset()
-        env.step(manipulator.serialize_actions(manipulator.best_config))
+        for action in manipulator.serialize_actions(manipulator.best_config):
+            env.step(action)
 
 
 class LlvmOptFlagsTuner(MeasurementInterface):

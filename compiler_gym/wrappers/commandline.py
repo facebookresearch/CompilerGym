@@ -6,8 +6,9 @@ from collections.abc import Iterable as IterableType
 from typing import Dict, Iterable, List, Optional, Union
 
 from compiler_gym.envs import CompilerEnv
-from compiler_gym.spaces import Commandline, CommandlineFlag
+from compiler_gym.spaces import Commandline, CommandlineFlag, Reward
 from compiler_gym.util.gym_type_hints import StepType
+from compiler_gym.views import ObservationSpaceSpec
 from compiler_gym.wrappers.core import ActionWrapper, CompilerEnvWrapper
 
 
@@ -57,23 +58,26 @@ class CommandlineWithTerminalAction(CompilerEnvWrapper):
         )
 
     def step(self, action: int) -> StepType:
-        if isinstance(action, int):
-            end_of_episode = action == 0
-            action = [] if end_of_episode else action - 1
+        end_of_episode = action == 0
+        if end_of_episode:
+            if self.observation_space_spec:
+                observation_spaces: List[ObservationSpaceSpec] = [
+                    self.observation_space_spec
+                ]
+            else:
+                observation_spaces: List[ObservationSpaceSpec] = []
+            if self.reward_space:
+                reward_spaces: List[Reward] = [self.reward_space]
+            else:
+                reward_spaces: List[Reward] = []
+            observation, reward, done, info = self.env.raw_step(
+                [], observation_spaces, reward_spaces
+            )
+            if not done:
+                done = True
+                info["terminal_action"] = True
         else:
-            try:
-                index = action.index(0)
-                end_of_episode = True
-            except ValueError:
-                index = len(action)
-                end_of_episode = False
-            action = [a - 1 for a in action[:index]]
-
-        observation, reward, done, info = self.env.step(action)
-        if end_of_episode and not done:
-            done = True
-            info["terminal_action"] = True
-
+            observation, reward, done, info = self.env.step(action - 1)
         return observation, reward, done, info
 
 

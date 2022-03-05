@@ -115,7 +115,9 @@ def run_one_trial(
     num_warmup_steps = random.randint(0, max_warmup_steps)
     warmup_actions = [env.action_space.sample() for _ in range(num_warmup_steps)]
     env.reward_space = reward_space
-    _, _, done, _ = env.step(warmup_actions)
+    done = False
+    for action in warmup_actions:
+        _, _, done, _ = env.step(action)
     if done:
         return None
     _, (reward,), done, _ = env.step(action, rewards=[reward_space])

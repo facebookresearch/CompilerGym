@@ -159,8 +159,8 @@ def compute_edges(env, sequence):
     for action in range(env.action_space.n):
         env.reset()
         reward_sum = 0.0
-        for action in sequence + [action]:
-            _, reward, _, _ = env.step(action)
+        for a in sequence + [action]:
+            _, reward, _, _ = env.step(a)
             reward_sum += reward
 
         edges.append((env_to_fingerprint(env), reward_sum))

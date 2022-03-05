@@ -92,7 +92,9 @@ def test_wrapped_step_multi_step(env: LlvmEnv):
     """Test passing a list of actions to step()."""
     env = CompilerEnvWrapper(env)
     env.reset()
-    env.step([0, 0, 0])
+    env.step(0)
+    env.step(0)
+    env.step(0)
 
     assert env.actions == [0, 0, 0]
 
@@ -109,11 +111,12 @@ def test_wrapped_step_custom_args(env: LlvmEnv, wrapper_type):
 
     env = MyWrapper(env)
     env.reset()
-    (ir, ic), (icr, icroz), _, _ = env.step(
-        action=[0, 0, 0],
-        observations=["Ir", "IrInstructionCount"],
-        rewards=["IrInstructionCount", "IrInstructionCountOz"],
-    )
+    for i in range(3):
+        (ir, ic), (icr, icroz), _, _ = env.step(
+            action=0,
+            observations=["Ir", "IrInstructionCount"],
+            rewards=["IrInstructionCount", "IrInstructionCountOz"],
+        )
     assert isinstance(ir, str)
     assert isinstance(ic, int)
     assert isinstance(icr, float)

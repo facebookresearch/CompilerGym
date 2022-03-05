@@ -2,9 +2,10 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-from typing import Iterable, Optional, Union
+from typing import Optional
 
 from compiler_gym.envs import CompilerEnv
+from compiler_gym.util.gym_type_hints import ActionType
 from compiler_gym.wrappers.core import CompilerEnvWrapper
 
 
@@ -31,7 +32,7 @@ class TimeLimit(CompilerEnvWrapper):
         self._max_episode_steps = max_episode_steps
         self._elapsed_steps = None
 
-    def step(self, action: Union[int, Iterable[int]], **kwargs):
+    def step(self, action: ActionType, **kwargs):
         assert (
             self._elapsed_steps is not None
         ), "Cannot call env.step() before calling reset()"

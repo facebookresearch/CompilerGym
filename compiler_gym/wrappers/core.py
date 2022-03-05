@@ -2,13 +2,13 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-from typing import Iterable, Optional, Union
+from typing import Optional, Union
 
 import gym
 
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.spaces.reward import Reward
-from compiler_gym.util.gym_type_hints import ObservationType, StepType
+from compiler_gym.util.gym_type_hints import ActionType, ObservationType, StepType
 from compiler_gym.views import ObservationSpaceSpec
 
 
@@ -82,9 +82,7 @@ class ActionWrapper(CompilerEnvWrapper):
     to allow an action space transformation.
     """
 
-    def step(
-        self, action: Union[int, Iterable[int]], observations=None, rewards=None
-    ) -> StepType:
+    def step(self, action: ActionType, observations=None, rewards=None) -> StepType:
         return self.env.step(
             self.action(action), observations=observations, rewards=rewards
         )

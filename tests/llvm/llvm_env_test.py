@@ -221,8 +221,9 @@ def test_step_multiple_actions_list(env: LlvmEnv):
         env.action_space.flags.index("-mem2reg"),
         env.action_space.flags.index("-reg2mem"),
     ]
-    _, _, done, _ = env.step(actions)
-    assert not done
+    for action in actions:
+        _, _, done, _ = env.step(action)
+        assert not done
     assert env.actions == actions
 
 
@@ -233,8 +234,9 @@ def test_step_multiple_actions_generator(env: LlvmEnv):
         env.action_space.flags.index("-mem2reg"),
         env.action_space.flags.index("-reg2mem"),
     )
-    _, _, done, _ = env.step(actions)
-    assert not done
+    for action in actions:
+        _, _, done, _ = env.step(action)
+        assert not done
     assert env.actions == [
         env.action_space.flags.index("-mem2reg"),
         env.action_space.flags.index("-reg2mem"),

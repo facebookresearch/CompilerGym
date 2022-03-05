@@ -32,7 +32,8 @@ def nevergrad(
 
         def calculate_negative_reward(actions: Tuple[int]) -> float:
             env.reset()
-            env.step(actions)
+            for action in actions:
+                env.step(action)
             return -env.episode_reward
 
     else:
@@ -40,7 +41,8 @@ def nevergrad(
         @lru_cache(maxsize=int(1e4))
         def calculate_negative_reward(actions: Tuple[int]) -> float:
             env.reset()
-            env.step(actions)
+            for action in actions:
+                env.step(action)
             return -env.episode_reward
 
     params = ng.p.Choice(

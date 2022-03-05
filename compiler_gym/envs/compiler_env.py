@@ -6,7 +6,6 @@
 import logging
 import numbers
 import warnings
-from collections.abc import Iterable as IterableType
 from copy import deepcopy
 from math import isclose
 from pathlib import Path
@@ -409,7 +408,7 @@ class CompilerEnv(gym.Env):
         )
 
     @property
-    def action_space(self) -> NamedDiscrete:
+    def action_space(self) -> Space:
         """The current action space.
 
         :getter: Get the current action space.
@@ -587,7 +586,9 @@ class CompilerEnv(gym.Env):
             self.reset()
             if actions:
                 logger.warning("Parent service of fork() has died, replaying state")
-                _, _, done, _ = self.step(actions)
+                done = False
+                for action in actions:
+                    _, _, done, _ = self.step(action)
                 assert not done, "Failed to replay action sequence"
 
         request = ForkSessionRequest(session_id=self._session_id)
@@ -620,7 +621,9 @@ class CompilerEnv(gym.Env):
             # replay the state.
             new_env = type(self)(**self._init_kwargs())
             new_env.reset()
-            _, _, done, _ = new_env.step(self.actions)
+            done = False
+            for action in self.actions:
+                _, _, done, _ = new_env.step(action)
             assert not done, "Failed to replay action sequence in forked environment"
 
         # Create copies of the mutable reward and observation spaces. This
@@ -878,7 +881,7 @@ class CompilerEnv(gym.Env):
 
     def raw_step(
         self,
-        actions: Iterable[int],
+        actions: Iterable[ActionType],
         observations: Iterable[ObservationSpaceSpec],
         rewards: Iterable[Reward],
     ) -> StepType:
@@ -1024,15 +1027,13 @@ class CompilerEnv(gym.Env):
 
     def step(
         self,
-        action: Union[ActionType, Iterable[ActionType]],
+        action: ActionType,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
     ) -> StepType:
         """Take a step.
 
-        :param action: An action, or a sequence of actions. When multiple
-            actions are provided the observation and reward are returned after
-            running all of the actions.
+        :param action: An action.
 
         :param observations: A list of observation spaces to compute
             observations from. If provided, this changes the :code:`observation`
@@ -1052,7 +1053,7 @@ class CompilerEnv(gym.Env):
             <compiler_gym.envs.CompilerEnv.reset>` has not been called.
         """
         # Coerce actions into a list.
-        actions = action if isinstance(action, IterableType) else [action]
+        actions = [action]
 
         # Coerce observation spaces into a list of ObservationSpaceSpec instances.
         if observations:
@@ -1169,7 +1170,9 @@ class CompilerEnv(gym.Env):
             )
 
         actions = self.commandline_to_actions(state.commandline)
-        _, _, done, info = self.step(actions)
+        done = False
+        for action in actions:
+            _, _, done, info = self.step(action)
         if done:
             raise ValueError(
                 f"Environment terminated with error: `{info.get('error_details')}`"

@@ -15,7 +15,7 @@ from compiler_gym.random_search import (
 )
 
 
-@deprecated(version="0.2.1", reason="Use env.step(actions) instead")
+@deprecated(version="0.2.1", reason="Use env.step(action) instead")
 def replay_actions(env: CompilerEnv, action_names: List[str], outdir: Path):
     return replay_actions_(env, action_names, outdir)
 

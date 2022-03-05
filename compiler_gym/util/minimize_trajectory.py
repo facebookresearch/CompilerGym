@@ -41,7 +41,9 @@ def _apply_and_test(env, actions, hypothesis, flakiness) -> bool:
     env.reset(benchmark=env.benchmark)
     for _ in range(flakiness):
         logger.debug("Applying %d actions ...", len(actions))
-        _, _, done, info = env.step(actions)
+        done = False
+        for action in actions:
+            _, _, done, info = env.step(action)
         if done:
             raise MinimizationError(
                 f"Failed to replay actions: {info.get('error_details', '')}"

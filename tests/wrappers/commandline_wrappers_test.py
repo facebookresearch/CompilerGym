@@ -23,7 +23,9 @@ def test_commandline_with_terminal_action(env: LlvmEnv):
     env.reset()
     _, _, done, info = env.step(mem2reg_index + 1)
     assert not done, info
-    _, _, done, info = env.step([reg2mem_index + 1, reg2mem_index + 1])
+    _, _, done, info = env.step(reg2mem_index + 1)
+    assert not done, info
+    _, _, done, info = env.step(reg2mem_index + 1)
     assert not done, info
 
     assert env.actions == [mem2reg_index, reg2mem_index, reg2mem_index]
@@ -63,7 +65,8 @@ def test_constrained_action_space(env: LlvmEnv):
 
     env.reset()
     env.step(0)
-    env.step([1, 1])
+    env.step(1)
+    env.step(1)
 
     assert env.actions == [0, 1, 1]
 
@@ -84,7 +87,8 @@ def test_constrained_action_space_fork(env: LlvmEnv):
 
         fkd.reset()
         fkd.step(0)
-        fkd.step([1, 1])
+        fkd.step(1)
+        fkd.step(1)
 
         assert fkd.actions == [0, 1, 1]
     finally:

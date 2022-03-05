@@ -217,7 +217,7 @@ def _step(request: StepRequest) -> StepReply:
         if request.all_states:
             # Replay actions one at a time to receive incremental rewards. The
             # first item represents the state prior to any actions.
-            (instcount, autophase), _, done, info = env.step(
+            (instcount, autophase), _, done, info = env.raw_step(
                 action=[],
                 observations=[
                     env.observation.spaces["InstCountDict"],

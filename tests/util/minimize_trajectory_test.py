@@ -49,10 +49,9 @@ class MockEnv:
         self.actions = []
         assert benchmark == self.benchmark
 
-    def step(self, actions):
-        for action in actions:
-            assert action in self.original_trajectory
-        self.actions += actions
+    def step(self, action):
+        assert action in self.original_trajectory
+        self.actions.append(action)
         return None, None, False, {}
 
 
@@ -151,13 +150,9 @@ def test_random_minimization_no_effect():
 def test_minimize_trajectory_iteratively_llvm_crc32(env):
     """Test trajectory minimization on a real environment."""
     env.reset(benchmark="cbench-v1/crc32")
-    env.step(
-        [
-            env.action_space["-mem2reg"],
-            env.action_space["-gvn"],
-            env.action_space["-reg2mem"],
-        ]
-    )
+    env.step(env.action_space["-mem2reg"])
+    env.step(env.action_space["-gvn"])
+    env.step(env.action_space["-reg2mem"])
 
     def hypothesis(env):
         return (
