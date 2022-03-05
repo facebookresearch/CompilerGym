@@ -11,7 +11,7 @@ from compiler_gym.datasets.benchmark import BenchmarkInitError
 from compiler_gym.envs.llvm import LlvmEnv
 from compiler_gym.service.connection import ServiceError
 from compiler_gym.spaces import Reward
-from compiler_gym.util.gym_type_hints import ObservationType
+from compiler_gym.util.gym_type_hints import ActionType, ObservationType
 from compiler_gym.wrappers import CompilerEnvWrapper
 
 
@@ -65,7 +65,7 @@ class RuntimePointEstimateReward(CompilerEnvWrapper):
 
         def update(
             self,
-            actions: List[int],
+            actions: List[ActionType],
             observations: List[ObservationType],
             observation_view,
         ) -> float:

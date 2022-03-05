@@ -11,7 +11,7 @@ from copy import deepcopy
 from math import isclose
 from pathlib import Path
 from time import time
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 
 import gym
 import numpy as np
@@ -128,7 +128,7 @@ class CompilerEnv(gym.Env):
     :ivar actions: The list of actions that have been performed since the
         previous call to :func:`reset`.
 
-    :vartype actions: List[int]
+    :vartype actions: List[ActionType]
 
     :ivar reward_range: A tuple indicating the range of reward values. Default
         range is (-inf, +inf).
@@ -321,7 +321,7 @@ class CompilerEnv(gym.Env):
         self.reward_range: Tuple[float, float] = (-np.inf, np.inf)
         self.episode_reward: Optional[float] = None
         self.episode_start_time: float = time()
-        self.actions: List[int] = []
+        self.actions: List[ActionType] = []
 
         # Initialize the default observation/reward spaces.
         self.observation_space_spec: Optional[ObservationSpaceSpec] = None
@@ -375,7 +375,7 @@ class CompilerEnv(gym.Env):
         """
         raise NotImplementedError("abstract method")
 
-    def commandline_to_actions(self, commandline: str) -> List[int]:
+    def commandline_to_actions(self, commandline: str) -> List[ActionType]:
         """Interface for :class:`CompilerEnv <compiler_gym.envs.CompilerEnv>`
         subclasses to convert from a commandline invocation to a sequence of
         actions.
@@ -409,7 +409,7 @@ class CompilerEnv(gym.Env):
         )
 
     @property
-    def action_space(self) -> NamedDiscrete:
+    def action_space(self) -> Space:
         """The current action space.
 
         :getter: Get the current action space.
@@ -587,7 +587,7 @@ class CompilerEnv(gym.Env):
             self.reset()
             if actions:
                 logger.warning("Parent service of fork() has died, replaying state")
-                _, _, done, _ = self.step(actions)
+                _, _, done, _ = self.multistep(actions)
                 assert not done, "Failed to replay action sequence"
 
         request = ForkSessionRequest(session_id=self._session_id)
@@ -620,7 +620,7 @@ class CompilerEnv(gym.Env):
             # replay the state.
             new_env = type(self)(**self._init_kwargs())
             new_env.reset()
-            _, _, done, _ = new_env.step(self.actions)
+            _, _, done, _ = new_env.multistep(self.actions)
             assert not done, "Failed to replay action sequence in forked environment"
 
         # Create copies of the mutable reward and observation spaces. This
@@ -885,9 +885,9 @@ class CompilerEnv(gym.Env):
 
     def raw_step(
         self,
-        actions: Iterable[int],
-        observations: Iterable[ObservationSpaceSpec],
-        rewards: Iterable[Reward],
+        actions: Iterable[ActionType],
+        observation_spaces: List[ObservationSpaceSpec],
+        reward_spaces: List[Reward],
     ) -> StepType:
         """Take a step.
 
@@ -908,17 +908,14 @@ class CompilerEnv(gym.Env):
 
         .. warning::
 
-            Prefer :meth:`step() <compiler_gym.envs.CompilerEnv.step>` to
-            :meth:`raw_step() <compiler_gym.envs.CompilerEnv.step>`.
-            :meth:`step() <compiler_gym.envs.CompilerEnv.step>` has equivalent
-            functionality, and is less likely to change in the future.
+            Don't call this method directly, use :meth:`step()
+            <compiler_gym.envs.CompilerEnv.step>` or :meth:`multistep()
+            <compiler_gym.envs.CompilerEnv.multistep>` instead. The
+            :meth:`raw_step() <compiler_gym.envs.CompilerEnv.step>` method is an
+            implementation detail.
         """
         if not self.in_episode:
             raise SessionNotFound("Must call reset() before step()")
-
-        # Build the list of observations that must be computed by the backend
-        user_observation_spaces: List[ObservationSpaceSpec] = list(observations)
-        reward_spaces: List[Reward] = list(rewards)
 
         reward_observation_spaces: List[ObservationSpaceSpec] = []
         for reward_space in reward_spaces:
@@ -927,7 +924,7 @@ class CompilerEnv(gym.Env):
             ]
 
         observations_to_compute: List[ObservationSpaceSpec] = list(
-            set(user_observation_spaces).union(set(reward_observation_spaces))
+            set(observation_spaces).union(set(reward_observation_spaces))
         )
         observation_space_index_map: Dict[ObservationSpaceSpec, int] = {
             observation_space: i
@@ -974,7 +971,7 @@ class CompilerEnv(gym.Env):
 
             default_observations = [
                 observation_space.default_value
-                for observation_space in user_observation_spaces
+                for observation_space in observation_spaces
             ]
             default_rewards = [
                 float(reward_space.reward_on_error(self.episode_reward))
@@ -1002,7 +999,7 @@ class CompilerEnv(gym.Env):
         # Get the user-requested observation.
         observations: List[ObservationType] = [
             computed_observations[observation_space_index_map[observation_space]]
-            for observation_space in user_observation_spaces
+            for observation_space in observation_spaces
         ]
 
         # Update and compute the rewards.
@@ -1032,22 +1029,22 @@ class CompilerEnv(gym.Env):
     def step(  # pylint: disable=arguments-differ
         self,
         action: ActionType,
+        observation_spaces: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
     ) -> StepType:
         """Take a step.
 
-        :param action: An action, or a sequence of actions. When multiple
-            actions are provided the observation and reward are returned after
-            running all of the actions.
+        :param action: An action.
 
-        :param observations: A list of observation spaces to compute
+        :param observation_spaces: A list of observation spaces to compute
             observations from. If provided, this changes the :code:`observation`
             element of the return tuple to be a list of observations from the
             requested spaces. The default :code:`env.observation_space` is not
             returned.
 
-        :param rewards: A list of reward spaces to compute rewards from. If
+        :param reward_spaces: A list of reward spaces to compute rewards from. If
             provided, this changes the :code:`reward` element of the return
             tuple to be a list of rewards from the requested spaces. The default
             :code:`env.reward_space` is not returned.
@@ -1058,22 +1055,42 @@ class CompilerEnv(gym.Env):
         :raises SessionNotFound: If :meth:`reset()
             <compiler_gym.envs.CompilerEnv.reset>` has not been called.
         """
-        # NOTE(github.com/facebookresearch/CompilerGym/issues/610): This
-        # workaround for accepting a list of actions will be removed in v0.2.4.
         if isinstance(action, IterableType):
             warnings.warn(
-                "env.step() only takes a single action. Use env.multistep() "
-                "for an iterable of actions",
+                "Argument `action` of CompilerEnv.step no longer accepts a list "
+                " of actions. Please use CompilerEnv.multistep instead",
                 category=DeprecationWarning,
             )
-        else:
-            action = [action]
-
-        return self.multistep(action, observations, rewards)
+            return self.multistep(
+                action,
+                observation_spaces=observation_spaces,
+                reward_spaces=reward_spaces,
+                observations=observations,
+                rewards=rewards,
+            )
+        if observations is not None:
+            warnings.warn(
+                "Argument `observations` of CompilerEnv.step has been "
+                "renamed `observation_spaces`. Please update your code",
+                category=DeprecationWarning,
+            )
+            observation_spaces = observations
+        if rewards is not None:
+            warnings.warn(
+                "Argument `rewards` of CompilerEnv.step has been renamed "
+                "`reward_spaces`. Please update your code",
+                category=DeprecationWarning,
+            )
+            reward_spaces = rewards
+        return self._multistep(
+            self.raw_step, [action], observation_spaces, reward_spaces
+        )
 
     def multistep(
         self,
         actions: Iterable[ActionType],
+        observation_spaces: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
     ):
@@ -1081,13 +1098,13 @@ class CompilerEnv(gym.Env):
 
         :param action: A sequence of actions to apply in order.
 
-        :param observations: A list of observation spaces to compute
+        :param observation_spaces: A list of observation spaces to compute
             observations from. If provided, this changes the :code:`observation`
             element of the return tuple to be a list of observations from the
             requested spaces. The default :code:`env.observation_space` is not
             returned.
 
-        :param rewards: A list of reward spaces to compute rewards from. If
+        :param reward_spaces: A list of reward spaces to compute rewards from. If
             provided, this changes the :code:`reward` element of the return
             tuple to be a list of rewards from the requested spaces. The default
             :code:`env.reward_space` is not returned.
@@ -1098,49 +1115,77 @@ class CompilerEnv(gym.Env):
         :raises SessionNotFound: If :meth:`reset()
             <compiler_gym.envs.CompilerEnv.reset>` has not been called.
         """
+        if observations is not None:
+            warnings.warn(
+                "Argument `observations` of CompilerEnv.multistep has been "
+                "renamed `observation_spaces`. Please update your code",
+                category=DeprecationWarning,
+            )
+            observation_spaces = observations
+        if rewards is not None:
+            warnings.warn(
+                "Argument `rewards` of CompilerEnv.multistep has been renamed "
+                "`reward_spaces`. Please update your code",
+                category=DeprecationWarning,
+            )
+            reward_spaces = rewards
+        return self._multistep(
+            self.raw_step, list(actions), observation_spaces, reward_spaces
+        )
+
+    def _multistep(
+        self,
+        raw_step: Callable[
+            [Iterable[ActionType], Iterable[ObservationSpaceSpec], Iterable[Reward]],
+            StepType,
+        ],
+        actions: Iterable[ActionType],
+        observation_spaces: Optional[Iterable[Union[str, ObservationSpaceSpec]]],
+        reward_spaces: Optional[Iterable[Union[str, Reward]]],
+    ) -> StepType:
         # Coerce observation spaces into a list of ObservationSpaceSpec instances.
-        if observations:
-            observation_spaces: List[ObservationSpaceSpec] = [
+        if observation_spaces:
+            observation_spaces_to_compute: List[ObservationSpaceSpec] = [
                 obs
                 if isinstance(obs, ObservationSpaceSpec)
                 else self.observation.spaces[obs]
-                for obs in observations
+                for obs in observation_spaces
             ]
         elif self.observation_space_spec:
-            observation_spaces: List[ObservationSpaceSpec] = [
+            observation_spaces_to_compute: List[ObservationSpaceSpec] = [
                 self.observation_space_spec
             ]
         else:
-            observation_spaces: List[ObservationSpaceSpec] = []
+            observation_spaces_to_compute: List[ObservationSpaceSpec] = []
 
         # Coerce reward spaces into a list of Reward instances.
-        if rewards:
-            reward_spaces: List[Reward] = [
+        if reward_spaces:
+            reward_spaces_to_compute: List[Reward] = [
                 rew if isinstance(rew, Reward) else self.reward.spaces[rew]
-                for rew in rewards
+                for rew in reward_spaces
             ]
         elif self.reward_space:
-            reward_spaces: List[Reward] = [self.reward_space]
+            reward_spaces_to_compute: List[Reward] = [self.reward_space]
         else:
-            reward_spaces: List[Reward] = []
+            reward_spaces_to_compute: List[Reward] = []
 
         # Perform the underlying environment step.
-        observation_values, reward_values, done, info = self.raw_step(
-            actions, observation_spaces, reward_spaces
+        observation_values, reward_values, done, info = raw_step(
+            actions, observation_spaces_to_compute, reward_spaces_to_compute
         )
 
         # Translate observations lists back to the appropriate types.
-        if observations is None and self.observation_space_spec:
+        if observation_spaces is None and self.observation_space_spec:
             observation_values = observation_values[0]
-        elif not observation_spaces:
+        elif not observation_spaces_to_compute:
             observation_values = None
 
         # Translate reward lists back to the appropriate types.
-        if rewards is None and self.reward_space:
+        if reward_spaces is None and self.reward_space:
             reward_values = reward_values[0]
             # Update the cumulative episode reward
             self.episode_reward += reward_values
-        elif not reward_spaces:
+        elif not reward_spaces_to_compute:
             reward_values = None
 
         return observation_values, reward_values, done, info
@@ -1213,7 +1258,9 @@ class CompilerEnv(gym.Env):
             )
 
         actions = self.commandline_to_actions(state.commandline)
-        _, _, done, info = self.step(actions)
+        done = False
+        for action in actions:
+            _, _, done, info = self.step(action)
         if done:
             raise ValueError(
                 f"Environment terminated with error: `{info.get('error_details')}`"

@@ -9,7 +9,7 @@ JsonDictType = Dict[str, Any]
 
 # Type hints for the values returned by gym.Env.step().
 ObservationType = TypeVar("ObservationType")
-ActionType = int
+ActionType = TypeVar("ActionType")
 RewardType = float
 DoneType = bool
 InfoType = JsonDictType

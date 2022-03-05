@@ -10,6 +10,7 @@ from typing import List
 import pytest
 
 from compiler_gym.util import minimize_trajectory as mt
+from compiler_gym.util.gym_type_hints import ActionType
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
@@ -38,7 +39,7 @@ class MockValidationResult:
 class MockEnv:
     """A mock environment for testing trajectory minimization."""
 
-    def __init__(self, actions: List[int], validate=lambda env: True):
+    def __init__(self, actions: List[ActionType], validate=lambda env: True):
         self.original_trajectory = actions
         self.actions = actions.copy()
         self.validate = lambda: MockValidationResult(validate(self))
@@ -49,7 +50,7 @@ class MockEnv:
         self.actions = []
         assert benchmark == self.benchmark
 
-    def step(self, actions):
+    def multistep(self, actions):
         for action in actions:
             assert action in self.original_trajectory
         self.actions += actions

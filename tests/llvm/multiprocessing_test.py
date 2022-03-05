@@ -12,11 +12,14 @@ import pytest
 from flaky import flaky
 
 from compiler_gym.envs import LlvmEnv
+from compiler_gym.util.gym_type_hints import ActionType
 from tests.pytest_plugins.common import macos_only
 from tests.test_main import main
 
 
-def process_worker(env_name: str, benchmark: str, actions: List[int], queue: mp.Queue):
+def process_worker(
+    env_name: str, benchmark: str, actions: List[ActionType], queue: mp.Queue
+):
     assert actions
     with gym.make(env_name) as env:
         env.reset(benchmark=benchmark)
@@ -28,7 +31,7 @@ def process_worker(env_name: str, benchmark: str, actions: List[int], queue: mp.
         queue.put((observation, reward, done, info))
 
 
-def process_worker_with_env(env: LlvmEnv, actions: List[int], queue: mp.Queue):
+def process_worker_with_env(env: LlvmEnv, actions: List[ActionType], queue: mp.Queue):
     assert actions
 
     for action in actions:

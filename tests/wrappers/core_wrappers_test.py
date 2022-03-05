@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Unit tests for //compiler_gym/wrappers."""
+import numpy as np
 import pytest
 
 from compiler_gym.datasets import Datasets
@@ -92,7 +93,7 @@ def test_wrapped_step_multi_step(env: LlvmEnv):
     """Test passing a list of actions to step()."""
     env = CompilerEnvWrapper(env)
     env.reset()
-    env.step([0, 0, 0])
+    env.multistep([0, 0, 0])
 
     assert env.actions == [0, 0, 0]
 
@@ -109,10 +110,10 @@ def test_wrapped_step_custom_args(env: LlvmEnv, wrapper_type):
 
     env = MyWrapper(env)
     env.reset()
-    (ir, ic), (icr, icroz), _, _ = env.step(
-        action=[0, 0, 0],
-        observations=["Ir", "IrInstructionCount"],
-        rewards=["IrInstructionCount", "IrInstructionCountOz"],
+    (ir, ic), (icr, icroz), _, _ = env.multistep(
+        actions=[0, 0, 0],
+        observation_spaces=["Ir", "IrInstructionCount"],
+        reward_spaces=["IrInstructionCount", "IrInstructionCountOz"],
     )
     assert isinstance(ir, str)
     assert isinstance(ic, int)
@@ -213,7 +214,7 @@ def test_wrapped_env_change_spaces(env: LlvmEnv, wrapper_type):
     assert env.reward_space.name == "IrInstructionCount"
 
 
-def test_wrapped_action(env: LlvmEnv):
+def test_wrapped_action(mocker, env: LlvmEnv):
     class MyWrapper(ActionWrapper):
         def action(self, action):
             return action - 1
@@ -222,14 +223,17 @@ def test_wrapped_action(env: LlvmEnv):
             return action + 1
 
     env = MyWrapper(env)
+    mocker.spy(env, "action")
+
     env.reset()
     env.step(1)
     env.step(2)
 
+    assert env.action.call_count == 2  # pylint: disable=no-member
     assert env.actions == [0, 1]
 
 
-def test_wrapped_observation(env: LlvmEnv):
+def test_wrapped_observation(mocker, env: LlvmEnv):
     """Test using an ObservationWrapper that returns the length of the Ir string."""
 
     class MyWrapper(ObservationWrapper):
@@ -241,8 +245,10 @@ def test_wrapped_observation(env: LlvmEnv):
             return len(observation)
 
     env = MyWrapper(env)
+
     assert env.reset() > 0
     observation, _, _, _ = env.step(0)
+
     assert observation > 0
 
 
@@ -251,6 +257,22 @@ def test_wrapped_observation_missing_definition(env: LlvmEnv):
     env = ObservationWrapper(env)
     with pytest.raises(NotImplementedError):
         env.reset()
+
+
+def test_wrapped_observation_not_applied_to_non_default_observations(env: LlvmEnv):
+    class MyWrapper(ObservationWrapper):
+        def __init__(self, env):
+            super().__init__(env)
+            self.observation_space = "Ir"
+
+        def observation(self, observation):
+            return len(observation)
+
+    env = MyWrapper(env)
+    env.reset()
+    (observation,), _, _, _ = env.step(0, observation_spaces=["Autophase"])
+    print(observation)
+    assert isinstance(observation, np.ndarray)
 
 
 def test_wrapped_reward(env: LlvmEnv):

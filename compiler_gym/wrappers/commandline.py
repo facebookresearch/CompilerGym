@@ -6,8 +6,9 @@ from collections.abc import Iterable as IterableType
 from typing import Dict, Iterable, List, Optional, Union
 
 from compiler_gym.envs import CompilerEnv
-from compiler_gym.spaces import Commandline, CommandlineFlag
-from compiler_gym.util.gym_type_hints import StepType
+from compiler_gym.spaces import Commandline, CommandlineFlag, Reward
+from compiler_gym.util.gym_type_hints import ActionType, StepType
+from compiler_gym.views import ObservationSpaceSpec
 from compiler_gym.wrappers.core import ActionWrapper, CompilerEnvWrapper
 
 
@@ -40,8 +41,7 @@ class CommandlineWithTerminalAction(CompilerEnvWrapper):
 
         # Redefine the action space, inserting the terminal action at the start.
         self.action_space = Commandline(
-            items=[terminal]
-            + [
+            items=[
                 CommandlineFlag(
                     name=name,
                     flag=flag,
@@ -52,25 +52,36 @@ class CommandlineWithTerminalAction(CompilerEnvWrapper):
                     env.action_space.flags,
                     env.action_space.descriptions,
                 )
-            ],
+            ]
+            + [terminal],
             name=f"{type(self).__name__}<{env.action_space.name}>",
         )
 
-    def step(self, action: int) -> StepType:
-        if isinstance(action, int):
-            end_of_episode = action == 0
-            action = [] if end_of_episode else action - 1
-        else:
-            try:
-                index = action.index(0)
-                end_of_episode = True
-            except ValueError:
-                index = len(action)
-                end_of_episode = False
-            action = [a - 1 for a in action[:index]]
+    def raw_step(
+        self,
+        actions: List[ActionType],
+        observation_spaces: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
+    ) -> StepType:
+        terminal_action: int = len(self.action_space.flags) - 1
 
-        observation, reward, done, info = self.env.step(action)
-        if end_of_episode and not done:
+        try:
+            index_of_terminal = actions.index(terminal_action)
+        except ValueError:
+            index_of_terminal = -1
+
+        # Run only the actions up to the terminal action.
+        if index_of_terminal >= 0:
+            actions = actions[:index_of_terminal]
+
+        observation, reward, done, info = self.env.raw_step(
+            actions,
+            observation_spaces=observation_spaces,
+            reward_spaces=reward_spaces,
+        )
+
+        # Communicate back to the frontend.
+        if index_of_terminal >= 0 and not done:
             done = True
             info["terminal_action"] = True
 
