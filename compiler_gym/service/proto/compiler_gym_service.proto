@@ -306,7 +306,9 @@ message CommandlineSpace {
 }
 
 message Space {
-  string type_id = 2;
+  oneof optional_type_id {
+    string type_id = 2;
+  }
   oneof value {
     ListSpace space_list = 3;
     DictSpace space_dict = 4;
@@ -361,7 +363,9 @@ message DictEvent {
 
 // Common structure shared between actions and observations.
 message Event {
-  string type_id = 1;
+  oneof optional_type_id {
+    string type_id = 1;
+  }
   oneof value {
     ListEvent event_list = 2;
     DictEvent event_dict = 3;
