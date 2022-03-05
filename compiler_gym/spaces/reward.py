@@ -8,7 +8,7 @@ import numpy as np
 
 import compiler_gym
 from compiler_gym.spaces.scalar import Scalar
-from compiler_gym.util.gym_type_hints import ObservationType, RewardType
+from compiler_gym.util.gym_type_hints import ActionType, ObservationType, RewardType
 
 
 class Reward(Scalar):
@@ -104,7 +104,7 @@ class Reward(Scalar):
 
     def update(
         self,
-        actions: List[int],
+        actions: List[ActionType],
         observations: List[ObservationType],
         observation_view: "compiler_gym.views.ObservationView",  # noqa: F821
     ) -> RewardType:

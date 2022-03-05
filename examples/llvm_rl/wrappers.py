@@ -3,13 +3,13 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Environment wrappers to closer replicate the MLSys'20 Autophase paper."""
-from collections.abc import Iterable as IterableType
-from typing import List, Union
+from typing import List
 
 import gym
 import numpy as np
 
 from compiler_gym.envs import CompilerEnv, LlvmEnv
+from compiler_gym.util.gym_type_hints import ActionType
 from compiler_gym.wrappers import (
     ConstrainedCommandline,
     ObservationWrapper,
@@ -126,12 +126,16 @@ class ConcatActionsHistogram(ObservationWrapper):
         )
         return super().reset(*args, **kwargs)
 
-    def step(self, action: Union[int, List[int]], observations=None, **kwargs):
-        if not isinstance(action, IterableType):
-            action = [action]
-        for a in action:
+    def raw_step(
+        self,
+        actions: List[ActionType],
+        observation_spaces=None,
+        observations=None,
+        **kwargs,
+    ):
+        for a in actions:
             self.histogram[a] += self.increment
-        return super().step(action, **kwargs)
+        return self.env.raw_step(actions, **kwargs)
 
     def observation(self, observation):
         return np.concatenate((observation, self.histogram)).astype(

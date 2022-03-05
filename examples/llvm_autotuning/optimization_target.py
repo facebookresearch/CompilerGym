@@ -68,7 +68,7 @@ class OptimizationTarget(str, Enum):
         actions = list(env.actions)
         env.reset()
         for i in range(1, 5 + 1):
-            _, _, done, info = env.step(actions)
+            _, _, done, info = env.multistep(actions)
             if not done:
                 break
             logger.warning(

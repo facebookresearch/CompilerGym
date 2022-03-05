@@ -7,7 +7,7 @@ from typing import List, Optional
 
 from compiler_gym.datasets import Benchmark
 from compiler_gym.spaces.reward import Reward
-from compiler_gym.util.gym_type_hints import ObservationType, RewardType
+from compiler_gym.util.gym_type_hints import ActionType, ObservationType, RewardType
 from compiler_gym.views.observation import ObservationView
 
 
@@ -44,7 +44,7 @@ class CostFunctionReward(Reward):
 
     def update(
         self,
-        actions: List[int],
+        actions: List[ActionType],
         observations: List[ObservationType],
         observation_view: ObservationView,
     ) -> RewardType:
@@ -81,7 +81,7 @@ class NormalizedReward(CostFunctionReward):
 
     def update(
         self,
-        actions: List[int],
+        actions: List[ActionType],
         observations: List[ObservationType],
         observation_view: ObservationView,
     ) -> RewardType:

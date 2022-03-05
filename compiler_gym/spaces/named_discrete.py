@@ -2,9 +2,11 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+from collections.abc import Iterable as IterableType
 from typing import Iterable, List, Union
 
 from compiler_gym.spaces.discrete import Discrete
+from compiler_gym.util.gym_type_hints import ActionType
 
 
 class NamedDiscrete(Discrete):
@@ -51,18 +53,20 @@ class NamedDiscrete(Discrete):
     def __repr__(self) -> str:
         return f"NamedDiscrete([{', '.join(self.names)}])"
 
-    def to_string(self, values: Union[int, Iterable[int]]) -> str:
+    def to_string(self, values: Union[int, Iterable[ActionType]]) -> str:
         """Convert an action, or sequence of actions, to string.
 
         :param values: A numeric value, or list of numeric values.
         :return: A string representing the values.
         """
-        if isinstance(values, int):
-            return self.names[values]
-        else:
+        if isinstance(values, IterableType):
             return " ".join([self.names[v] for v in values])
+        else:
+            return self.names[values]
 
-    def from_string(self, values: Union[str, Iterable[str]]) -> Union[int, List[int]]:
+    def from_string(
+        self, values: Union[str, Iterable[str]]
+    ) -> Union[ActionType, List[ActionType]]:
         """Convert a name, or list of names, to numeric values.
 
         :param values: A name, or list of names.
