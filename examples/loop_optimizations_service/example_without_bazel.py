@@ -158,7 +158,7 @@ register(
 with compiler_gym.make(
     "loops-opt-py-v0",
     benchmark="loops-opt-v0/add",
-    observation_space="AutophaseDict",
+    observation_space="Programl",
     reward_space="runtime",
 ) as env:
     compiler_gym.set_debug_level(4)  # TODO: check why this has no effect
