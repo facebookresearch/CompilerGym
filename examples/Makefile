@@ -48,7 +48,12 @@ install:
 uninstall:
 	$(PYTHON) -m pip uninstall -y compiler_gym_examples
 
-test:
+# DGL creates ~/.dgl on first run and I have found that this will fail if tests
+# are invoked before this file exists. Suppress errors.
+dgl-init:
+	python3 -c 'import dgl; print(dgl.__version__)' &>/dev/null || true
+
+test: dgl-init
 	pytest --no-success-flaky-report --benchmark-disable -n auto --durations=5 . --cov=compiler_gym --cov-report=xml:$(COV_REPORT) $(PYTEST_ARGS)
 	$(MAKE) -C makefile_integration clean
 	SEARCH_TIME=3 $(MAKE) -C makefile_integration test
@@ -60,4 +65,4 @@ disclean: clean
 
 purge: distclean uninstall
 
-.PHONY: help install uninstall test clean distclean purge
+.PHONY: help install uninstall dgl-init test clean distclean purge
