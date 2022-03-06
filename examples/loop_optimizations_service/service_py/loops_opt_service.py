@@ -272,7 +272,7 @@ class LoopsOptCompilationSession(CompilationSession):
                 [
                     os.path.join(
                         os.path.dirname(__file__),
-                        "../../../compiler_gym/third_party/autophase/compute_autophase",
+                        "../../../compiler_gym/third_party/autophase/compute_autophase-prelinked",
                     ),
                     self._llvm_path,
                 ],
@@ -289,7 +289,7 @@ class LoopsOptCompilationSession(CompilationSession):
                 [
                     os.path.join(
                         os.path.dirname(__file__),
-                        "../../../compiler_gym/third_party/autophase/compute_autophase",
+                        "../../../compiler_gym/third_party/autophase/compute_autophase-prelinked",
                     ),
                     self._llvm_path,
                 ],
