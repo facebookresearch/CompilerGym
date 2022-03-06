@@ -1022,7 +1022,7 @@ class CompilerEnv(gym.Env):
 
         return observations, rewards, reply.end_of_session, info
 
-    def step(
+    def step(  # pylint: disable=arguments-differ
         self,
         action: Union[ActionType, Iterable[ActionType]],
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
