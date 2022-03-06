@@ -1024,7 +1024,7 @@ class CompilerEnv(gym.Env):
 
     def step(  # pylint: disable=arguments-differ
         self,
-        action: Union[ActionType, Iterable[ActionType]],
+        action: ActionType,
         observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
     ) -> StepType:
@@ -1051,9 +1051,46 @@ class CompilerEnv(gym.Env):
         :raises SessionNotFound: If :meth:`reset()
             <compiler_gym.envs.CompilerEnv.reset>` has not been called.
         """
-        # Coerce actions into a list.
-        actions = action if isinstance(action, IterableType) else [action]
+        # NOTE(github.com/facebookresearch/CompilerGym/issues/610): This
+        # workaround for accepting a list of actions will be removed in v0.2.4.
+        if isinstance(action, IterableType):
+            warnings.warn(
+                "env.step() only takes a single action. Use env.multistep() "
+                "for an iterable of actions",
+                category=DeprecationWarning,
+            )
+        else:
+            action = [action]
 
+        return self.multistep(action, observations, rewards)
+
+    def multistep(
+        self,
+        actions: Iterable[ActionType],
+        observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        rewards: Optional[Iterable[Union[str, Reward]]] = None,
+    ):
+        """Take a sequence of steps and return the final observation and reward.
+
+        :param action: A sequence of actions to apply in order.
+
+        :param observations: A list of observation spaces to compute
+            observations from. If provided, this changes the :code:`observation`
+            element of the return tuple to be a list of observations from the
+            requested spaces. The default :code:`env.observation_space` is not
+            returned.
+
+        :param rewards: A list of reward spaces to compute rewards from. If
+            provided, this changes the :code:`reward` element of the return
+            tuple to be a list of rewards from the requested spaces. The default
+            :code:`env.reward_space` is not returned.
+
+        :return: A tuple of observation, reward, done, and info. Observation and
+            reward are None if default observation/reward is not set.
+
+        :raises SessionNotFound: If :meth:`reset()
+            <compiler_gym.envs.CompilerEnv.reset>` has not been called.
+        """
         # Coerce observation spaces into a list of ObservationSpaceSpec instances.
         if observations:
             observation_spaces: List[ObservationSpaceSpec] = [
