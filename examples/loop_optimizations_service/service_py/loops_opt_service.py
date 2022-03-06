@@ -270,8 +270,9 @@ class LoopsOptCompilationSession(CompilationSession):
         elif observation_space.name == "Autophase":
             Autophase_str = run_command(
                 [
-                    runfiles_path(
-                        "compiler_gym/third_party/autophase/compute_autophase-prelinked"
+                    os.path.join(
+                        os.path.dirname(__file__),
+                        "../../../compiler_gym/third_party/autophase/compute_autophase",
                     ),
                     self._llvm_path,
                 ],
@@ -287,7 +288,7 @@ class LoopsOptCompilationSession(CompilationSession):
             Autophase_str = run_command(
                 [
                     runfiles_path(
-                        "compiler_gym/third_party/autophase/compute_autophase-prelinked"
+                        "compiler_gym/third_party/autophase/compute_autophase"
                     ),
                     self._llvm_path,
                 ],
