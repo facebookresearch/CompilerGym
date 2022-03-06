@@ -174,8 +174,6 @@ if(COMPILER_GYM_GRPC_PROVIDER STREQUAL "internal")
   )
   FetchContent_MakeAvailable(grpc)
   set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:grpc_cpp_plugin>)
-  #TODO(boian): remove this when GrpcStatusMacros.h uses the correct include path.
-  target_include_directories(grpc++ INTERFACE "${grpc_SOURCE_DIR}")
 else()
   find_package(gRPC REQUIRED)
   set(_GRPC_CPP_PLUGIN_EXECUTABLE $<TARGET_FILE:grpc::grpc_cpp_plugin>)
