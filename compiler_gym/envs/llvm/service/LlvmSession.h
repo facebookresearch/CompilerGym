@@ -37,7 +37,7 @@ namespace compiler_gym::llvm_service {
  */
 class LlvmSession final : public CompilationSession {
  public:
-  LlvmSession(const boost::filesystem::path& workingDirectory);
+  LlvmSession(CompilerGymServiceContext* const context);
 
   std::string getCompilerVersion() const final override;
 

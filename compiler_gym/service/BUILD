@@ -31,6 +31,7 @@ cc_library(
     hdrs = ["CompilationSession.h"],
     visibility = ["//visibility:public"],
     deps = [
+        ":CompilerGymServiceContext",
         "//compiler_gym/service/proto:compiler_gym_service_cc",
         "@boost//:filesystem",
         "@com_github_grpc_grpc//:grpc++",

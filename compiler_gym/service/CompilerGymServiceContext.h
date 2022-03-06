@@ -28,7 +28,7 @@ namespace compiler_gym {
  *
  *     using namespace compiler_gym;
  *
- *     class MyServiceContext final : public ServiceContext { ... }
+ *     class MyServiceContext final : public CompilerGymServiceContext { ... }
  *
  *     class MyCompilationSession final : public CompilationSession { ... }
  *
