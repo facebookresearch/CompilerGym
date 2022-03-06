@@ -14,14 +14,13 @@ cg_cc_binary(
   COPTS
     "-DGOOGLE_PROTOBUF_NO_RTTI"
     "-fno-rtti"
-  DEPS
-    nlohmann_json::nlohmann_json
-    ProGraML::graph::format::node_link_graph
-    ProGraML::ir::llvm::llvm-10
-    ProGraML::proto::programl_cc
   ABS_DEPS
     glog::glog
     ${_LLVM_LIBS}
+    ProGraML::graph::format::node_link_graph
+    ProGraML::ir::llvm::llvm-10
+    ProGraML::proto::programl_cc
+    nlohmann_json::nlohmann_json
   INCLUDES
     ${LLVM_INCLUDE_DIRS}
   DEFINES
