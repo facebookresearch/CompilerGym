@@ -6,11 +6,12 @@
 
 Usage:
 
-    $ extract_passes_from_llvm_source_tree /path/to/llvm/source/root
+    $ python extract_passes_from_llvm_source_tree.py /path/to/llvm-project/llvm
 
 Optionally accepts a list of specific files to examine:
 
-    $ extract_passes_from_llvm_source_tree /path/to/llvm/source/root /path/to/llvm/source/file
+    $ python extract_passes_from_llvm_source_tree.py \
+        /path/to/llvm-project/llvm /path/to/llvm/source/file
 
 Implementation notes
 --------------------
