@@ -37,6 +37,18 @@ cc_library(
     ],
 )
 
+cc_library(
+    name = "CompilerGymServiceContext",
+    srcs = ["CompilerGymServiceContext.cc"],
+    hdrs = ["CompilerGymServiceContext.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//compiler_gym/service/proto:compiler_gym_service_cc",
+        "@boost//:filesystem",
+        "@com_github_grpc_grpc//:grpc++",
+    ],
+)
+
 py_library(
     name = "connection",
     srcs = ["connection.py"],
