@@ -16,14 +16,15 @@ class CompilerGymServiceContext:
     sessions. An instance of this class is passed to every new
     CompilationSession.
 
-    You may subclass CompilerGymServiceContext to add additional mutable state.
-    The subclass .
+    You may subclass CompilerGymServiceContext to add additional mutable state,
+    or startup and shutdown routines. When overriding methods, subclasses should
+    call the parent class implementation first.
 
     .. code-block:: python
 
-        from compiler_gym.service import CompilationSession
-        from compiler_gym.service import CompilerGymServiceContext
-        from compiler_gym.service import runtime
+        from compiler_gym.service import CompilationSession from
+        compiler_gym.service import CompilerGymServiceContext from
+        compiler_gym.service import runtime
 
         class MyServiceContext(CompilerGymServiceContext):
             ...
@@ -58,3 +59,11 @@ class CompilerGymServiceContext:
         service will terminate with a nonzero error code.
         """
         logger.debug("Closing compiler service context")
+
+    def __enter__(self) -> "CompilerGymServiceContext":
+        """Support 'with' syntax."""
+        return self
+
+    def __exit__(self, *args):
+        """Support 'with' syntax."""
+        self.shutdown()

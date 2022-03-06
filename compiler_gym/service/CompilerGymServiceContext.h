@@ -17,8 +17,9 @@ namespace compiler_gym {
  * sessions. An instance of this class is passed to every new
  * CompilationSession.
  *
- * You may subclass CompilerGymServiceContext to add additional mutable state.
- * The subclass .
+ * You may subclass CompilerGymServiceContext to add additional mutable state,
+ * or startup and shutdown routines. When overriding methods, subclasses should
+ * call the parent class implementation first.
  *
  * \code{.cpp}
  *
