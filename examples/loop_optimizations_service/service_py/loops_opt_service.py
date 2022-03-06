@@ -287,8 +287,9 @@ class LoopsOptCompilationSession(CompilationSession):
         elif observation_space.name == "AutophaseDict":
             Autophase_str = run_command(
                 [
-                    runfiles_path(
-                        "compiler_gym/third_party/autophase/compute_autophase"
+                    os.path.join(
+                        os.path.dirname(__file__),
+                        "../../../compiler_gym/third_party/autophase/compute_autophase",
                     ),
                     self._llvm_path,
                 ],
