@@ -5,7 +5,7 @@
 
 cg_add_all_subdirs()
 
-llvm_map_components_to_libnames(_LLVM_LIBS analysis core irreader support)
+llvm_map_components_to_libnames(_LLVM_LIBS analysis core irreader support passes)
 cg_cc_binary(
   NAME
     compute_programl
@@ -21,6 +21,7 @@ cg_cc_binary(
     ProGraML::ir::llvm::llvm-10
     ProGraML::proto::programl_cc
     nlohmann_json::nlohmann_json
+    protobuf::libprotobuf
   INCLUDES
     ${LLVM_INCLUDE_DIRS}
   DEFINES
