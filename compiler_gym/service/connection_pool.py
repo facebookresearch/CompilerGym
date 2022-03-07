@@ -174,11 +174,18 @@ class ServiceConnectionPool(ServiceConnectionPoolBase):
             if self.closed:
                 return
 
-            logger.debug(
-                "Closing the service connection pool with %d cached and %d live connections",
-                self.size,
-                len(self.allocated),
-            )
+            try:
+                logger.debug(
+                    "Closing the service connection pool with %d cached and %d live connections",
+                    self.size,
+                    len(self.allocated),
+                )
+            except ValueError:
+                # As this method is invoked by the atexit callback, the logger
+                # may already have closed its streams, in which case a
+                # ValueError is raised.
+                pass
+
             for connections in self.pool.values():
                 for connection in connections:
                     connection.shutdown()
