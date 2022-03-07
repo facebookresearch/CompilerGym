@@ -17,6 +17,7 @@ from compiler_gym.envs.gcc.gcc_rewards import AsmSizeReward, ObjSizeReward
 from compiler_gym.service import ConnectionOpts
 from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
 from compiler_gym.spaces import Reward
+from compiler_gym.service.connection_pool import ServiceConnectionPoolBase
 from compiler_gym.util.decorators import memoized_property
 from compiler_gym.util.gym_type_hints import ObservationType, OptionalArgumentValue
 from compiler_gym.views import ObservationSpaceSpec
@@ -78,6 +79,13 @@ class GccEnv(ClientServiceCompilerEnv):
         #    start the backend service, as otherwise the backend service
         #    initialization may time out.
         Gcc(bin=gcc_bin)
+
+        # NOTE(github.com/facebookresearch/CompilerGym/pull/583): The GCC
+        # environment stalls on the StartSession() RPC call when service
+        # connection caching is enabled. I believe this has something to do with
+        # the runtime code generation, but have not been able to diagnose it
+        # yet. For now, disable service connection caching for GCC environments.
+        kwargs["service_pool"] = ServiceConnectionPoolBase()
 
         super().__init__(
             *args,
