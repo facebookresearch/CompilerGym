@@ -223,7 +223,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         self._connection_settings = connection_settings or ConnectionOpts()
 
         if service_connection is None:
-            self._service_pool = (
+            self._service_pool: Optional[ServiceConnectionPoolBase] = (
                 ServiceConnectionPool.get() if service_pool is None else service_pool
             )
             self.service = self._service_pool.acquire(
@@ -231,7 +231,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
                 opts=self._connection_settings,
             )
         else:
-            self._service_pool = service_pool
+            self._service_pool: Optional[ServiceConnectionPoolBase] = service_pool
             self.service = service_connection
 
         self.datasets = Datasets(datasets or [])

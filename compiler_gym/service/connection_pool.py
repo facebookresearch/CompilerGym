@@ -18,7 +18,21 @@ logger = logging.getLogger(__name__)
 ServiceConnectionCacheKey = Tuple[Path, ConnectionOpts]
 
 
-class ServiceConnectionPool:
+class ServiceConnectionPoolBase:
+    """A class that provides the base interface for service connection pools."""
+
+    def acquire(
+        self, endpoint: Path, opts: ConnectionOpts
+    ) -> CompilerGymServiceConnection:
+        return CompilerGymServiceConnection(
+            endpoint=endpoint, opts=opts, owning_service_pool=self
+        )
+
+    def release(self, service: CompilerGymServiceConnection) -> None:
+        pass
+
+
+class ServiceConnectionPool(ServiceConnectionPoolBase):
     """An object pool for compiler service connections.
 
     This class implements a thread-safe pool for compiler service connections.
@@ -52,7 +66,7 @@ class ServiceConnectionPool:
     :vartype allocated: Set[CompilerGymServiceConnection]
     """
 
-    def __init__(self) -> None:
+    def __init__(self):
         """"""
         self._lock = Lock()
         self.pool: Dict[
