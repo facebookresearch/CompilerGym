@@ -131,10 +131,7 @@ class ServiceConnectionPool(ServiceConnectionPoolBase):
                 return
 
             if service not in self.allocated:
-                logger.debug(
-                    "Ignoring attempt to release connection "
-                    "that does not belong to pool"
-                )
+                logger.debug("Discarding service that does not belong to pool")
                 return
 
             self.allocated.remove(service)
@@ -143,11 +140,11 @@ class ServiceConnectionPool(ServiceConnectionPoolBase):
             if hasattr(service.connection, "process"):
                 # A dead service cannot be reused, discard it.
                 if service.closed or service.connection.process.poll() is not None:
-                    logger.debug("Ignoring attempt to release dead connection")
+                    logger.debug("Discarding service with dead process")
                     return
             # A service that has been shutdown cannot be reused, discard it.
             if not service.connection:
-                logger.debug("Ignoring attempt to service without connection")
+                logger.debug("Discarding service that has no connection")
                 return
 
             self.pool[key].append(service)
@@ -209,7 +206,7 @@ class ServiceConnectionPool(ServiceConnectionPoolBase):
         return _SERVICE_CONNECTION_POOL
 
     def __repr__(self) -> str:
-        return f"ServiceConnectionPool(size={self.size})"
+        return f"{type(self).__name__}(size={self.size})"
 
 
 _SERVICE_CONNECTION_POOL = ServiceConnectionPool()
