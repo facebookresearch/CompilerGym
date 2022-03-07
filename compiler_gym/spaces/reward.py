@@ -2,6 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+import warnings
 from typing import List, Optional, Tuple, Union
 
 import numpy as np
@@ -38,7 +39,10 @@ class Reward(Scalar):
 
     def __init__(
         self,
-        name: str,
+        # NOTE(github.com/facebookresearch/CompilerGym/issues/381): Once `id`
+        # argument has been removed, the default value for `name` can be
+        # removed.
+        name: str = None,
         observation_spaces: Optional[List[str]] = None,
         default_value: RewardType = 0,
         min: Optional[RewardType] = None,
@@ -47,6 +51,10 @@ class Reward(Scalar):
         success_threshold: Optional[RewardType] = None,
         deterministic: bool = False,
         platform_dependent: bool = True,
+        # NOTE(github.com/facebookresearch/CompilerGym/issues/381): Backwards
+        # compatability workaround for deprecated parameter, will be removed in
+        # v0.2.4.
+        id: Optional[str] = None,
     ):
         """Constructor.
 
@@ -56,18 +64,18 @@ class Reward(Scalar):
             (:class:`space.id <compiler_gym.views.ObservationSpaceSpec>` values)
             that are used to compute the reward. May be an empty list if no
             observations are requested. Requested observations will be provided
-            to the :code:`observations` argument of
-            :meth:`reward.update() <compiler_gym.spaces.Reward.update>`.
+            to the :code:`observations` argument of :meth:`reward.update()
+            <compiler_gym.spaces.Reward.update>`.
         :param default_value: A default reward. This value will be returned by
-            :meth:`env.step() <compiler_gym.envs.CompilerEnv.step>` if
-            the service terminates.
+            :meth:`env.step() <compiler_gym.envs.CompilerEnv.step>` if the
+            service terminates.
         :param min: The lower bound of the reward.
         :param max: The upper bound of the reward.
         :param default_negates_returns: If true, the default value will be
             offset by the sum of all rewards for the current episode. For
             example, given a default reward value of *-10.0* and an episode with
-            prior rewards *[0.1, 0.3, -0.15]*, the default value is:
-            *-10.0 - sum(0.1, 0.3, -0.15)*.
+            prior rewards *[0.1, 0.3, -0.15]*, the default value is: *-10.0 -
+            sum(0.1, 0.3, -0.15)*.
         :param success_threshold: The cumulative reward threshold before an
             episode is considered successful. For example, episodes where reward
             is scaled to an existing heuristic can be considered “successful”
@@ -75,6 +83,10 @@ class Reward(Scalar):
         :param deterministic: Whether the reward space is deterministic.
         :param platform_dependent: Whether the reward values depend on the
             execution environment of the service.
+        :param id: The name of the reward space.
+
+            .. deprecated:: 0.2.3
+                Use :code:`name` instead.
         """
         super().__init__(
             name=name,
@@ -82,7 +94,23 @@ class Reward(Scalar):
             max=np.inf if max is None else max,
             dtype=np.float64,
         )
-        self.name = name
+
+        # NOTE(github.com/facebookresearch/CompilerGym/issues/381): Backwards
+        # compatability workaround for deprecated parameter, will be removed in
+        # v0.2.4.
+        if id is not None:
+            warnings.warn(
+                "The `id` argument of "
+                "compiler_gym.spaces.Reward.__init__() "
+                "has been renamed `name`. This will break in a future release, "
+                "please update your code.",
+                DeprecationWarning,
+            )
+        self.name = name or id
+        self.id = self.name
+        if not self.name:
+            raise TypeError("No name given")
+
         self.observation_spaces = observation_spaces or []
         self.default_value: RewardType = default_value
         self.default_negates_returns: bool = default_negates_returns
