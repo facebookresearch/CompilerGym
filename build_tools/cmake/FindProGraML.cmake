@@ -69,28 +69,16 @@ endif()
 # For some reason the linker takes the path to the library
 # instead of just the name for the dynamic section when linking to these libs.
 # See https://stackoverflow.com/questions/70088552/linker-adds-the-path-to-library-in-the-dynamic-section-instead-of-its-name
-find_library(
-    ProGraML_proto_programl_cc_LIBRARIES
-    ${CMAKE_STATIC_LIBRARY_PREFIX}programl${CMAKE_STATIC_LIBRARY_SUFFIX}
-    PATH_SUFFIXES programl/proto
-)
-find_path(
-    ProGraML_proto_programl_cc_INCLUDE_DIRS
-    programl/proto/program_graph_options.pb.h
-)
-if(
-    ProGraML_proto_programl_cc_LIBRARIES
-    AND ProGraML_proto_programl_cc_INCLUDE_DIRS
-)
-    add_library(ProGraML::proto::programl_cc UNKNOWN IMPORTED)
-    set_target_properties(
-        ProGraML::proto::programl_cc
-        PROPERTIES
-            INTERFACE_INCLUDE_DIRECTORIES
-                "${ProGraML_proto_programl_cc_INCLUDE_DIRS}"
-            IMPORTED_LINK_INTERFACE_LANGUAGES "CXX"
-            IMPORTED_LOCATION "${ProGraML_proto_programl_cc_LIBRARIES}"
-    )
+find_library(ProGraML_proto_programl_cc_LIBRARIES
+  ${CMAKE_STATIC_LIBRARY_PREFIX}programl${CMAKE_STATIC_LIBRARY_SUFFIX}
+  PATH_SUFFIXES programl/proto)
+find_path(ProGraML_proto_programl_cc_INCLUDE_DIRS programl/proto/program_graph.pb.h)
+if (ProGraML_proto_programl_cc_LIBRARIES AND ProGraML_proto_programl_cc_INCLUDE_DIRS)
+  add_library(ProGraML::proto::programl_cc UNKNOWN IMPORTED)
+  set_target_properties(ProGraML::proto::programl_cc PROPERTIES
+    INTERFACE_INCLUDE_DIRECTORIES "${ProGraML_proto_programl_cc_INCLUDE_DIRS}"
+    IMPORTED_LINK_INTERFACE_LANGUAGES "CXX"
+    IMPORTED_LOCATION "${ProGraML_proto_programl_cc_LIBRARIES}")
 endif()
 
 find_library(
