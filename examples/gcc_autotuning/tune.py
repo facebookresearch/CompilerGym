@@ -5,7 +5,6 @@
 """Autotuning script for GCC command line options."""
 import random
 from itertools import islice, product
-from multiprocessing import Lock
 from pathlib import Path
 from typing import NamedTuple
 
@@ -63,10 +62,6 @@ flags.DEFINE_integer("pop_size", 100, "Population size for GA", lower_bound=1)
 flags.DEFINE_enum(
     "objective", "obj_size", ["asm_size", "obj_size"], "Which objective to use"
 )
-
-# Lock to prevent multiple processes all calling compiler_gym.make("gcc-v0")
-# simultaneously as this can cause issues with the docker API.
-GCC_ENV_CONSTRUCTOR_LOCK = Lock()
 
 
 def random_search(env: CompilerEnv):
@@ -160,10 +155,7 @@ class SearchResult(NamedTuple):
 
 def run_search(search: str, benchmark: str, seed: int) -> SearchResult:
     """Run a search and return the search class instance."""
-    with GCC_ENV_CONSTRUCTOR_LOCK:
-        env = compiler_gym.make("gcc-v0", gcc_bin=FLAGS.gcc_bin)
-
-    try:
+    with compiler_gym.make("gcc-v0", gcc_bin=FLAGS.gcc_bin) as env:
         random.seed(seed)
         np.random.seed(seed)
 
@@ -172,8 +164,6 @@ def run_search(search: str, benchmark: str, seed: int) -> SearchResult:
         baseline_size = objective(env)
         env.reset(benchmark=benchmark)
         best_size = _SEARCH_FUNCTIONS[search](env)
-    finally:
-        env.close()
 
     return SearchResult(
         search=search,

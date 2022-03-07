@@ -7,6 +7,7 @@ import codecs
 import json
 import pickle
 from pathlib import Path
+from threading import Lock
 from typing import Any, Dict, List, Optional, Union
 
 from compiler_gym.datasets import Benchmark
@@ -218,3 +219,19 @@ class GccEnv(ClientServiceCompilerEnv):
             "gcc_bin": self.gcc_spec.gcc.bin,
             **super()._init_kwargs(),
         }
+
+
+_GCC_ENV_DOCKER_CONSTRUCTOR_LOCK = Lock()
+
+
+def make(*args, gcc_bin: Union[str, Path] = DEFAULT_GCC, **kwargs):
+    """Construct a GccEnv class using a lock to ensure thread exclusivity.
+
+    This is to prevent multiple threads running the docker initialization
+    routines simultaneously as this can cause issues with the docker API.
+    """
+    if gcc_bin.startswith("docker:"):
+        with _GCC_ENV_DOCKER_CONSTRUCTOR_LOCK:
+            return GccEnv(*args, gcc_bin=gcc_bin, **kwargs)
+    else:
+        return GccEnv(*args, gcc_bin=gcc_bin, **kwargs)
