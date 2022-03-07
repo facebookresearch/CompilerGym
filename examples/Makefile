@@ -43,6 +43,7 @@ help:
 	@echo "$$HELP"
 
 install:
+	$(PYTHON) -m pip install -r requirements.txt
 	$(PYTHON) setup.py install
 
 uninstall:
