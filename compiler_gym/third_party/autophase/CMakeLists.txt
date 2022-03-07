@@ -53,3 +53,6 @@ cg_cc_binary(
     ${LLVM_DEFINITIONS}
   PUBLIC
 )
+
+ADD_CUSTOM_TARGET(link_compute_autophase_target ALL
+                  COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_BINARY_DIR}/compiler_gym/third_party/autophase/compute_autophase ${CMAKE_SOURCE_DIR}/compiler_gym/third_party/autophase/compute_autophase-prelinked)
