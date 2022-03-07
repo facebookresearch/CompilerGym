@@ -52,6 +52,7 @@ def info(
 
     if not dfs:
         print("No results")
+        return
 
     df = pd.concat(dfs)
     df = df.groupby(["timestamp", "search"])[["scaled_size"]].agg(geometric_mean)
