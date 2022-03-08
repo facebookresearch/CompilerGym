@@ -133,7 +133,6 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
         space.mutable_string_size_range()->mutable_min()->set_value(0.0);
         space.set_deterministic(true);
         space.set_platform_dependent(false);
-        // std::map <std::string,std::vector<double>> testMap;
         std::vector<double> defaultEmbs;
         for (double i = 0; i < 300; i++) defaultEmbs.push_back(i);
         json vectorJson = defaultEmbs;
@@ -149,7 +148,6 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
         space.mutable_string_size_range()->mutable_min()->set_value(0.0);
         space.set_deterministic(true);
         space.set_platform_dependent(false);
-        // std::map <std::string,std::vector<double>> testMap;
         std::vector<double> defaultEmbs;
         for (double i = 0; i < 300; i++) defaultEmbs.push_back(i);
         json vectorJson = defaultEmbs;
