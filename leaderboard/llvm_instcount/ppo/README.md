@@ -11,7 +11,7 @@ probabilities of the PPO-Model
 **Publication:** Not Available
 <!-- A link to a publication, if applicable. -->
 
-**Results:** Geometric Mean: 1.070, [results](/results.csv)
+**Results:** Geometric Mean: 1.070, [results](results.csv)
 <!-- Add one or more links to CSV files containing the raw results. -->
 
 **CompilerGym version:** 0.2.1

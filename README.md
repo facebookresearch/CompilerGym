@@ -128,7 +128,7 @@ environment on the 23 benchmarks in the `cbench-v1` dataset.
 
 | Author                                           | Algorithm | Links | Date | Walltime (mean) | Codesize Reduction (geomean) |
 |--------------------------------------------------| --- | --- | --- |-----------------|------------------------------|
- | Robin Schmöcker, Yannik Mahlau, Nicolas Fröhlich | PPO + Guided Search | [write-up](leaderboard/llvm_instcount/ppo/README.md), [results](leaderboard/llvm_instcount/random_search/results.csv) | 2022-02 | 69.821s  | **1.070×**                   |
+ | Robin Schmöcker, Yannik Mahlau, Nicolas Fröhlich | PPO + Guided Search | [write-up](leaderboard/llvm_instcount/ppo/README.md), [results](leaderboard/llvm_instcount/ppo/results.csv) | 2022-02 | 69.821s  | **1.070×**                   |
 | Facebook                                         | Random search (t=10800) | [write-up](leaderboard/llvm_instcount/random_search/README.md), [results](leaderboard/llvm_instcount/random_search/results_p125_t10800.csv) | 2021-03 | 10,512.356s     | 1.062×                       |
 | Facebook                                         | Random search (t=3600) | [write-up](leaderboard/llvm_instcount/random_search/README.md), [results](leaderboard/llvm_instcount/random_search/results_p125_t3600.csv) | 2021-03 | 3,630.821s      | 1.061×                       |
 | Facebook                                         | Greedy search | [write-up](leaderboard/llvm_instcount/e_greedy/README.md), [results](leaderboard/llvm_instcount/e_greedy/results_e0.csv) | 2021-03 | 169.237s        | 1.055×                       |
