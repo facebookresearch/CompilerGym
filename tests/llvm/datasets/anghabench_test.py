@@ -64,5 +64,10 @@ def test_anghabench_random_select(
     assert (tmpwd / "function.c").is_file()
 
 
+def test_anghabench_runnable(env: LlvmEnv):
+    pass
+    # TODO: Test away!
+
+
 if __name__ == "__main__":
     main()
