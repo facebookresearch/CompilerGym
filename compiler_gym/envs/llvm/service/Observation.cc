@@ -118,7 +118,7 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
         json FuncEmbJson = FuncEmb;
         json FuncJson;
         std::string FuncName = func.first->getName();
-        FuncJson[func.first->getName()] = FuncEmbJson;
+        FuncJson[FuncName] = FuncEmbJson;
         Embeddings.push_back(FuncJson);
       }
       *reply.mutable_string_value() = Embeddings.dump();
@@ -137,7 +137,7 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
         json FuncEmbJson = FuncEmb;
         json FuncJson;
         std::string FuncName = func.first->getName();
-        FuncJson[func.first->getName()] = FuncEmbJson;
+        FuncJson[FuncName] = FuncEmbJson;
         Embeddings.push_back(FuncJson);
       }
       *reply.mutable_string_value() = Embeddings.dump();
