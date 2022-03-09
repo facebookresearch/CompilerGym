@@ -1,0 +1,124 @@
+Add DWARF path discriminators
+Aggressive Dead Code Elimination
+Combine pattern based expressions
+Alignment from assumptions
+Inliner for always_inline functions
+Promote 'by reference' arguments to scalars
+Deduce and propagate attributes
+A No-Op Barrier Pass
+Bit-Tracking Dead Code Elimination
+Break critical edges in CFG
+Simplify the CFG
+Call-site splitting
+Called Value Propagation
+Canonicalize aliases
+Constant Hoisting
+Merge Duplicate Global Constants
+Simple constant propagation
+Lower all coroutine related intrinsics
+Lower early coroutine intrinsics
+Coroutine frame allocation elision and indirect calls replacement
+Split coroutine into a set of functions driving its state machine
+Value Propagation
+Cross-DSO CFI
+Dead Argument Elimination
+Dead Code Elimination
+Dead Instruction Elimination
+Dead Store Elimination
+Demote all values to stack slots
+Hoist/decompose integer division and remainder
+Early CSE w/ MemorySSA
+Early CSE
+Eliminate Available Externally Globals
+Instrument function entry/exit with calls to e.g. mcount()(pre inlining)
+Flatten the CFG
+Float to int
+Force set function attributes
+Function Integration/Inlining
+Insert instrumentation for GCOV profiling
+Early GVN Hoisting of Expressions
+Global Value Numbering
+Dead Global Elimination
+Global Variable Optimizer
+Global splitter
+Widen guards
+Hot Cold Splitting
+Interprocedural constant propagation
+Interprocedural Sparse Conditional Constant Propagation
+Induction Variable Simplification
+Inductive range check elimination
+Infer address spaces
+Infer set function attributes
+Inject TLI Mappings
+Remove redundant instructions
+Combine redundant instructions
+Assign names to anonymous instructions
+Jump Threading
+Loop-Closed SSA Form Pass
+Loop Invariant Code Motion
+Conditionally eliminate dead library calls
+Vectorize load and Store instructions
+Loop Data Prefetch
+Delete dead loops
+Loop Distribution
+Loop Fusion
+Widen guards (within a single loop, as a loop pass)
+Recognize loop idioms
+Simplify instructions in loops
+Interchanges loops for cache reuse
+Loop Load Elimination
+Loop predication
+Reroll loops
+Rotate Loops
+Simplify loop CFG
+Canonicalize natural loops
+Loop Sink
+Loop Strength Reduction
+Unroll and Jam loops
+Unroll loops
+Unswitch loops
+Loop Vectorization
+Loop Versioning For LICM
+Loop Versioning
+Lower atomic intrinsics to non-atomic form
+Lower constant intrinsics
+Lower 'expect' Intrinsics
+Lower the guard intrinsic to normal control flow
+Lower invoke and unwind, for unwindless code generators
+Lower the matrix intrinsics
+Lower SwitchInst's to branches
+Lower the widenable condition to default true value
+MemCpy Optimization
+Merge Functions
+Merge contiguous icmps into a memcmp
+MergedLoadStoreMotion
+Pass for instrumenting coverage on functions
+Provide a name to nameless globals
+Nary reassociation
+Global Value Numbering
+Optimize memory intrinsic using its size value profile
+Partial Inliner
+Partially inline calls to library functions
+Instrument function entry/exit with calls to e.g. mcount()" "(post inlining)
+Deduce function attributes
+Promote Memory to " "Register
+Remove unused exception handling info
+Reassociate expressions
+Redundant Dbg Instruction Elimination
+Deduce function attributes in RPO
+Make relocations explicit at statepoints
+Sparse Conditional Constant Propagation
+SLP Vectorizer
+Scalar Replacement Of Aggregates
+Scalarize vector operations
+Split GEPs to a variadic base and a constant offset for better CSE
+Simple unswitch loops
+Code sinking
+Speculatively execute instructions
+Straight line strength reduction
+Strip Unused Function Prototypes
+Strip all llvm.dbg.declare intrinsics
+Strip all symbols, except dbg symbols, from a module
+Strip all symbols from a module
+Tail Call Elimination
+Unify function exit nodes
