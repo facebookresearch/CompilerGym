@@ -76,9 +76,9 @@ cc_library(
     ],
     hdrs = [
         "ActionSpace.h",
-        "//compiler_gym/envs/llvm/service/passes:ActionEnum.h",
     ],
     deps = [
+        "//compiler_gym/envs/llvm/service/passes/10.0.0:headers",
         "//compiler_gym/service/proto:compiler_gym_service_cc",
         "//compiler_gym/util:EnumUtil",
         "//compiler_gym/util:Unreachable",
@@ -212,8 +212,7 @@ cc_library(
     srcs = ["LlvmSession.cc"],
     hdrs = [
         "LlvmSession.h",
-        "//compiler_gym/envs/llvm/service/passes:ActionHeaders.h",
-        "//compiler_gym/envs/llvm/service/passes:ActionSwitch.h",
+        "//compiler_gym/envs/llvm/service/passes/10.0.0:headers",
     ],
     copts = [
         "-DGOOGLE_PROTOBUF_NO_RTTI",

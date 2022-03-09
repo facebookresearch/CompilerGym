@@ -25,7 +25,7 @@ from compiler_gym.envs.llvm.llvm_env import LlvmEnv  # noqa: E402
 from compiler_gym.util.runfiles_path import runfiles_path  # noqa: E402
 
 with open(
-    runfiles_path("compiler_gym/envs/llvm/service/passes/flag_descriptions.txt")
+    runfiles_path("compiler_gym/envs/llvm/service/passes/10.0.0/flag_descriptions.txt")
 ) as f:
     _FLAG_DESCRIPTIONS = [ln.rstrip() for ln in f.readlines()]
 

@@ -83,7 +83,7 @@ genrule(
 py_binary(
     name = "make_specs",
     srcs = ["make_specs.py"],
-    data = ["//compiler_gym/envs/llvm/service/passes:flag_descriptions.txt"],
+    data = ["//compiler_gym/envs/llvm/service/passes/10.0.0:files"],
     deps = [
         ":llvm_env",
         "//compiler_gym/util",
