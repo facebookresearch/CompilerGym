@@ -44,13 +44,14 @@ include(build_tools/cmake/cg_filegroup.cmake)
 include(build_tools/cmake/grpc.cmake)
 include(build_tools/cmake/protobuf.cmake)
 
-set(COMPILER_GYM_PYTHONPATH "$ENV{PYTHONPATH}"
+# Set up the build Python path.
+set(COMPILER_GYM_BUILD_PYTHONPATH "$ENV{PYTHONPATH}"
     CACHE STRING "PYTHONPATH environment variable during build step."
 )
-if(COMPILER_GYM_PYTHONPATH)
-    string(PREPEND COMPILER_GYM_PYTHONPATH ":")
+if(COMPILER_GYM_BUILD_PYTHONPATH)
+    string(PREPEND COMPILER_GYM_BUILD_PYTHONPATH ":")
 endif()
-string(PREPEND COMPILER_GYM_PYTHONPATH "${CMAKE_BINARY_DIR}")
+string(PREPEND COMPILER_GYM_BUILD_PYTHONPATH "${CMAKE_BINARY_DIR}")
 include(build_tools/cmake/set_command_pythonpath.cmake)
 
 set(DEFAULT_CMAKE_BUILD_TYPE "Release")
