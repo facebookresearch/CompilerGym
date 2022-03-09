@@ -5,14 +5,6 @@
 # that are then used to compile the LLVM compiler service.
 load("@rules_cc//cc:defs.bzl", "cc_library")
 
-filegroup(
-    name = "files",
-    srcs = [
-        "flag_descriptions.txt",
-    ],
-    visibility = ["//visibility:public"],
-)
-
 cc_library(
     name = "headers",
     hdrs = [

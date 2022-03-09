@@ -91,14 +91,3 @@ cg_genrule(
     compiler_gym::envs::llvm::service::service
     compiler_gym::envs::llvm::service::compiler_gym-llvm-service
 )
-
-cg_py_binary(
-  NAME
-    make_specs
-  SRCS
-    "make_specs.py"
-  DATA "${CMAKE_CURRENT_BINARY_DIR}/service/passes/flag_descriptions.txt"
-  DEPS
-    ::llvm_env
-    compiler_gym::util::util
-)
