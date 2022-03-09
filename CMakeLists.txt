@@ -18,8 +18,6 @@ if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(DARWIN TRUE)
 endif()
 
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
-
 project(compiler_gym ASM C CXX)
 
 set(CMAKE_C_STANDARD 11 CACHE STRING "C standard to be used.")
