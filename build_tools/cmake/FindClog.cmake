@@ -24,19 +24,20 @@ This will define the following variables in your project:
 
 include(FindPackageHandleStandardArgs)
 
-find_path(Clog_INCLUDE_DIRS clog.h
-  PATH_SUFFIXES include)
+find_path(Clog_INCLUDE_DIRS clog.h PATH_SUFFIXES include)
 
 find_library(Clog_LIBRARIES clog PATH_SUFFIXES lib)
 if(Clog_INCLUDE_DIRS AND Clog_LIBRARIES)
-  add_library(Clog::libclog UNKNOWN IMPORTED)
-  set_target_properties(Clog::libclog PROPERTIES
-    INTERFACE_INCLUDE_DIRECTORIES "${Clog_INCLUDE_DIRS}"
-    IMPORTED_LINK_INTERFACE_LANGUAGES "C"
-    IMPORTED_LOCATION "${Clog_LIBRARIES}")
+    add_library(Clog::libclog UNKNOWN IMPORTED)
+    set_target_properties(
+        Clog::libclog
+        PROPERTIES
+            INTERFACE_INCLUDE_DIRECTORIES "${Clog_INCLUDE_DIRS}"
+            IMPORTED_LINK_INTERFACE_LANGUAGES "C"
+            IMPORTED_LOCATION "${Clog_LIBRARIES}"
+    )
 endif()
 find_package_handle_standard_args(
-  Clog
-  REQUIRED_VARS
-    Clog_INCLUDE_DIRS
-    Clog_LIBRARIES)
+    Clog
+    REQUIRED_VARS Clog_INCLUDE_DIRS Clog_LIBRARIES
+)

@@ -7,7 +7,7 @@ cg_add_all_subdirs()
 
 set(_DEPS "compiler_gym-llvm-service")
 if(DARWIN)
-  #list(APPEND _DEPS "@llvm//:darwin")
+    #list(APPEND _DEPS "@llvm//:darwin")
 endif()
 cg_filegroup(
   NAME "service"
@@ -142,7 +142,7 @@ cg_cc_binary(
 
 set(_FILES "${CMAKE_CURRENT_BINARY_DIR}/compute_observation")
 if(DARWIN)
-  message(FATAL_ERROR "TODO(boian): implement")
+    message(FATAL_ERROR "TODO(boian): implement")
 endif()
 cg_filegroup(
   NAME compute_observation-files
@@ -181,7 +181,7 @@ cg_cc_library(
 llvm_map_components_to_libnames(_LLVM_LIBS
   core analysis coroutines objcarcopts target codegen
   x86codegen x86asmparser #TODO(boian): can these be found programmatically
-  )
+)
 cg_cc_library(
   NAME
     LlvmSession
@@ -230,7 +230,7 @@ cg_cc_library(
 
 llvm_map_components_to_libnames(_LLVM_LIBS
   core support bitwriter
-  )
+)
 cg_cc_library(
     NAME Observation
     SRCS Observation.cc

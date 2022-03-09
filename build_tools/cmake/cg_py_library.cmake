@@ -28,61 +28,60 @@ include(cg_macros)
 # TESTONLY: When added, this target will only be built if user passes -DCOMPILER_GYM_BUILD_TESTS=ON to CMake.
 #
 function(cg_py_library)
-  cmake_parse_arguments(
-    _RULE
-    "PUBLIC;TESTONLY"
-    "NAME"
-    "SRCS;GENERATED_SRCS;DATA;DEPS"
-    ${ARGN}
-  )
+    cmake_parse_arguments(
+        _RULE
+        "PUBLIC;TESTONLY"
+        "NAME"
+        "SRCS;GENERATED_SRCS;DATA;DEPS"
+        ${ARGN}
+    )
 
-  if(_RULE_TESTONLY AND NOT COMPILER_GYM_BUILD_TESTS)
-    return()
-  endif()
-
-    # TODO(boian): remove this renaming when call sites do not include ":" in target dependency names
-  rename_bazel_targets(_RULE_DEPS "${_RULE_DEPS}")
-
-  # Prefix the library with the package name, so we get: cg_package_name.
-  rename_bazel_targets(_NAME "${_RULE_NAME}")
-
-  unset(_BIN_PATHS)
-  # Symlink each file as its own target.
-  foreach(_SRC_FILE ${_RULE_SRCS})
-    if(IS_ABSOLUTE _SRC_FILE)
-      message(FATAL_ERROR "Absolute path for SRCS not allowed.")
+    if(_RULE_TESTONLY AND NOT COMPILER_GYM_BUILD_TESTS)
+        return()
     endif()
 
-    # _SRC_FILE could have other path components in it, so we need to make a
-    # directory for it. Ninja does this automatically, but make doesn't. See
-    # https://github.com/google/iree/issues/6801
-    set(_SRC_BIN_PATH "${CMAKE_CURRENT_BINARY_DIR}/${_SRC_FILE}")
-    get_filename_component(_SRC_BIN_DIR "${_SRC_BIN_PATH}" DIRECTORY)
-    add_custom_command(
-      OUTPUT "${_SRC_BIN_PATH}"
-      COMMAND
-        ${CMAKE_COMMAND} -E make_directory "${_SRC_BIN_DIR}"
-      COMMAND ${CMAKE_COMMAND} -E create_symlink
-        "${CMAKE_CURRENT_SOURCE_DIR}/${_SRC_FILE}" "${_SRC_BIN_PATH}"
-      DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${_SRC_FILE}"
-      VERBATIM
-    )
-    list(APPEND _BIN_PATHS "${_SRC_BIN_PATH}")
-  endforeach()
+    # TODO(boian): remove this renaming when call sites do not include ":" in target dependency names
+    rename_bazel_targets(_RULE_DEPS "${_RULE_DEPS}")
 
-  list(APPEND _BIN_PATHS ${_RULE_GENERATED_SRCS})
+    # Prefix the library with the package name, so we get: cg_package_name.
+    rename_bazel_targets(_NAME "${_RULE_NAME}")
 
-  set(_DEPS ${_RULE_DEPS} ${_BIN_PATHS})
-  add_custom_target(${_NAME} ALL DEPENDS ${_DEPS})
+    unset(_BIN_PATHS)
+    # Symlink each file as its own target.
+    foreach(_SRC_FILE ${_RULE_SRCS})
+        if(IS_ABSOLUTE _SRC_FILE)
+            message(FATAL_ERROR "Absolute path for SRCS not allowed.")
+        endif()
 
-  cg_add_data_dependencies(NAME ${_RULE_NAME} DATA ${_RULE_DATA})
+        # _SRC_FILE could have other path components in it, so we need to make a
+        # directory for it. Ninja does this automatically, but make doesn't. See
+        # https://github.com/google/iree/issues/6801
+        set(_SRC_BIN_PATH "${CMAKE_CURRENT_BINARY_DIR}/${_SRC_FILE}")
+        get_filename_component(_SRC_BIN_DIR "${_SRC_BIN_PATH}" DIRECTORY)
+        add_custom_command(
+            OUTPUT "${_SRC_BIN_PATH}"
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${_SRC_BIN_DIR}"
+            COMMAND
+                ${CMAKE_COMMAND} -E create_symlink
+                "${CMAKE_CURRENT_SOURCE_DIR}/${_SRC_FILE}" "${_SRC_BIN_PATH}"
+            DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/${_SRC_FILE}"
+            VERBATIM
+        )
+        list(APPEND _BIN_PATHS "${_SRC_BIN_PATH}")
+    endforeach()
 
-  # If only one src file set the LOCATION target property to point to it.
-  list(LENGTH _BIN_PATHS _BIN_PATHS_LENGTH)
-  if(_BIN_PATHS_LENGTH EQUAL "1")
-    set_target_properties(${_NAME} PROPERTIES LOCATION "${_BIN_PATHS}")
-  endif()
+    list(APPEND _BIN_PATHS ${_RULE_GENERATED_SRCS})
 
-  # TODO(boian): add install rules
+    set(_DEPS ${_RULE_DEPS} ${_BIN_PATHS})
+    add_custom_target(${_NAME} ALL DEPENDS ${_DEPS})
 
+    cg_add_data_dependencies(NAME ${_RULE_NAME} DATA ${_RULE_DATA})
+
+    # If only one src file set the LOCATION target property to point to it.
+    list(LENGTH _BIN_PATHS _BIN_PATHS_LENGTH)
+    if(_BIN_PATHS_LENGTH EQUAL "1")
+        set_target_properties(${_NAME} PROPERTIES LOCATION "${_BIN_PATHS}")
+    endif()
+
+    # TODO(boian): add install rules
 endfunction()

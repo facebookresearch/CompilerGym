@@ -39,7 +39,8 @@ cg_py_test(
 
 cg_filegroup(
   NAME custom_benchmarks_test_files
-  FILES "${CMAKE_CURRENT_LIST_DIR}/invalid_ir.ll")
+  FILES "${CMAKE_CURRENT_LIST_DIR}/invalid_ir.ll"
+)
 cg_py_test(
   NAME
     custom_benchmarks_test
@@ -150,7 +151,8 @@ cg_py_test(
 
 cg_filegroup(
   NAME invalid_ir_test_files
-  FILES "${CMAKE_CURRENT_LIST_DIR}/invalid_ir.ll")
+  FILES "${CMAKE_CURRENT_LIST_DIR}/invalid_ir.ll"
+)
 cg_py_test(
   NAME
     invalid_ir_test

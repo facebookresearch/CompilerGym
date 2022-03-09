@@ -113,10 +113,13 @@ cg_py_test(
     compiler_gym::compiler_gym
 )
 
-string(CONCAT _CMD
-  "\"${CMAKE_COMMAND}\" -E create_symlink"
+string(
+    CONCAT
+    _CMD
+    "\"${CMAKE_COMMAND}\" -E create_symlink"
     " \"${CMAKE_CURRENT_SOURCE_DIR}/../VERSION\""
-    " \"${CMAKE_CURRENT_BINARY_DIR}/../VERSION\"")
+    " \"${CMAKE_CURRENT_BINARY_DIR}/../VERSION\""
+)
 cg_genrule(
   NAME version_file
   SRCS "${CMAKE_CURRENT_SOURCE_DIR}/../VERSION"
@@ -136,14 +139,21 @@ cg_py_test(
     tests::pytest_plugins::common
 )
 
-file(GLOB_RECURSE _SRC_TEST_FILES
-  LIST_DIRECTORIES true "${CMAKE_CURRENT_SOURCE_DIR}")
+file(
+    GLOB_RECURSE _SRC_TEST_FILES
+    LIST_DIRECTORIES true
+    "${CMAKE_CURRENT_SOURCE_DIR}"
+)
 set(_TESTS_BIN_DIR "${CMAKE_CURRENT_BINARY_DIR}/py_pkg")
-string(CONCAT _CMD
-  "cd \"${CMAKE_CURRENT_SOURCE_DIR}/..\""
-  " && make install-test")
+string(
+    CONCAT
+    _CMD
+    "cd \"${CMAKE_CURRENT_SOURCE_DIR}/..\""
+    " && make install-test"
+)
 cg_genrule(
   NAME python_package_tests
   COMMAND "${_CMD}"
   DEPENDS compiler_gym::install_python_package
-  EXCLUDE_FROM_ALL)
+  EXCLUDE_FROM_ALL
+)

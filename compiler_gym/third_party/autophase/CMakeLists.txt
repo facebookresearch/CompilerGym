@@ -54,5 +54,11 @@ cg_cc_binary(
   PUBLIC
 )
 
-ADD_CUSTOM_TARGET(link_compute_autophase_target ALL
-                  COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_BINARY_DIR}/compiler_gym/third_party/autophase/compute_autophase ${CMAKE_SOURCE_DIR}/compiler_gym/third_party/autophase/compute_autophase-prelinked)
+add_custom_target(
+    link_compute_autophase_target
+    ALL
+    COMMAND
+        ${CMAKE_COMMAND} -E create_symlink
+        ${CMAKE_BINARY_DIR}/compiler_gym/third_party/autophase/compute_autophase
+        ${CMAKE_SOURCE_DIR}/compiler_gym/third_party/autophase/compute_autophase-prelinked
+)
