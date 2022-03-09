@@ -29,5 +29,11 @@ cg_cc_binary(
   PUBLIC
 )
 
-ADD_CUSTOM_TARGET(link_compute_programl_target ALL
-                  COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_BINARY_DIR}/compiler_gym/third_party/programl/compute_programl ${CMAKE_SOURCE_DIR}/compiler_gym/third_party/programl/compute_programl)
+add_custom_target(
+    link_compute_programl_target
+    ALL
+    COMMAND
+        ${CMAKE_COMMAND} -E create_symlink
+        ${CMAKE_BINARY_DIR}/compiler_gym/third_party/programl/compute_programl
+        ${CMAKE_SOURCE_DIR}/compiler_gym/third_party/programl/compute_programl
+)

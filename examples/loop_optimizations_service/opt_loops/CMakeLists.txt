@@ -5,7 +5,6 @@
 
 cg_add_all_subdirs()
 
-
 llvm_map_components_to_libnames(_LLVM_LIBS analysis core irreader support passes)
 cg_cc_binary(
   NAME
@@ -31,5 +30,11 @@ cg_genrule(
   COMMAND "cp ${CMAKE_BINARY_DIR}/examples/loop_optimizations_service/opt_loops/opt_loops $(@D)"
 )
 
-ADD_CUSTOM_TARGET(link_opt_loops_target ALL
-                  COMMAND ${CMAKE_COMMAND} -E create_symlink ${CMAKE_BINARY_DIR}/examples/loop_optimizations_service/opt_loops/opt_loops ${CMAKE_SOURCE_DIR}/examples/loop_optimizations_service/opt_loops/opt_loops)
+add_custom_target(
+    link_opt_loops_target
+    ALL
+    COMMAND
+        ${CMAKE_COMMAND} -E create_symlink
+        ${CMAKE_BINARY_DIR}/examples/loop_optimizations_service/opt_loops/opt_loops
+        ${CMAKE_SOURCE_DIR}/examples/loop_optimizations_service/opt_loops/opt_loops
+)

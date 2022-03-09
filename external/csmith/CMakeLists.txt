@@ -8,16 +8,17 @@ cmake_minimum_required(VERSION 3.15)
 
 include(ExternalProject)
 
-ExternalProject_Add(
-  csmith
-  PREFIX "${CMAKE_CURRENT_BINARY_DIR}/csmith"
-  GIT_REPOSITORY "https://github.com/csmith-project/csmith.git"
-  GIT_TAG 30dccd73b78652c4719f36572994778a5b233a4e #tag csmith-2.3.0
-  CMAKE_ARGS
-    -C "${CMAKE_CURRENT_BINARY_DIR}/csmith_initial_cache.cmake"
-    "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"
-    "-DCOMPILE_DEFINITIONS=_LIBCPP_ENABLE_CXX17_REMOVED_FEATURES"
-  USES_TERMINAL_CONFIGURE TRUE
-  USES_TERMINAL_BUILD TRUE
-  USES_TERMINAL_INSTALL TRUE
+externalproject_add(
+    csmith
+    PREFIX "${CMAKE_CURRENT_BINARY_DIR}/csmith"
+    GIT_REPOSITORY "https://github.com/csmith-project/csmith.git"
+    GIT_TAG
+        30dccd73b78652c4719f36572994778a5b233a4e #tag csmith-2.3.0
+    CMAKE_ARGS
+        -C "${CMAKE_CURRENT_BINARY_DIR}/csmith_initial_cache.cmake"
+        "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"
+        "-DCOMPILE_DEFINITIONS=_LIBCPP_ENABLE_CXX17_REMOVED_FEATURES"
+    USES_TERMINAL_CONFIGURE TRUE
+    USES_TERMINAL_BUILD TRUE
+    USES_TERMINAL_INSTALL TRUE
 )

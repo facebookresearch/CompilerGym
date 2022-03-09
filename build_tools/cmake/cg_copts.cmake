@@ -40,7 +40,6 @@
 #
 #   See: https://en.wikipedia.org/wiki/Auto-linking
 
-
 set(COMPILER_GYM_CXX_STANDARD ${CMAKE_CXX_STANDARD})
 
 # TODO(benvanik): fix these names (or remove entirely).

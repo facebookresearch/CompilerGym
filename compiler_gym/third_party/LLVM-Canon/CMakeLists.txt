@@ -5,7 +5,6 @@
 
 cg_add_all_subdirs()
 
-
 llvm_map_components_to_libnames(_LLVM_LIBS analysis core irreader support passes)
 cg_cc_library(
   NAME
