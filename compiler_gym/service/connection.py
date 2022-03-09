@@ -204,7 +204,7 @@ class Connection:
             except ValueError as e:
                 if str(e) == "Cannot invoke RPC on closed channel!":
                     raise ServiceIsClosed(
-                        f"RPC communication failed with message: {e}"
+                        "RPC communication failed because channel is closed"
                     ) from None
                 raise e
             except grpc.RpcError as e:
