@@ -126,7 +126,7 @@ By default most dependencies are built together with Compiler Gym. To search for
 * `COMPILER_GYM_PROTOBUF_PROVIDER`
 
 ```bash
-cmake -GNinja \
+cmake \
   -DCMAKE_C_COMPILER=clang-9 \
   -DCMAKE_CXX_COMPILER=clang++-9 \
   -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=lld" -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=lld" -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=lld" \ # For faster builds, can be removed
