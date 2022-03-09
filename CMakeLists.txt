@@ -25,7 +25,10 @@ list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_LIST_DIR}/build_tools/cmake)
 set(COMPILER_GYM_BUILD_TESTS OFF CACHE BOOL "Enable Compiler Gym tests.")
 set(COMPILER_GYM_BUILD_EXAMPLES OFF CACHE BOOL "Enable Comiler Gym examples.")
 
+# Toolchain configuration.
 include(build_tools/cmake/FindAndEnableCcache.cmake)
+include(build_tools/cmake/FindAndEnableLld.cmake)
+
 include(build_tools/cmake/cg_macros.cmake)
 include(build_tools/cmake/cg_copts.cmake)
 include(build_tools/cmake/cg_genrule.cmake)
