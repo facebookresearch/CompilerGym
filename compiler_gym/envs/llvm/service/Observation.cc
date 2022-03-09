@@ -90,7 +90,7 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
       *reply.mutable_int64_tensor()->mutable_value() = {features.begin(), features.end()};
       break;
     }
-    case LlvmObservationSpace::IR2VEC_FA: {
+    case LlvmObservationSpace::IR2VEC_FLOW_AWARE: {
       const auto ir2vecEmbeddingsPath = util::getRunfilesPath(
           "compiler_gym/third_party/ir2vec/seedEmbeddingVocab-300-llvm10.txt");
 
@@ -100,7 +100,7 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
       *reply.mutable_double_list()->mutable_value() = {features.begin(), features.end()};
       break;
     }
-    case LlvmObservationSpace::IR2VEC_SYM: {
+    case LlvmObservationSpace::IR2VEC_SYMBOLIC: {
       const auto ir2vecEmbeddingsPath = util::getRunfilesPath(
           "compiler_gym/third_party/ir2vec/seedEmbeddingVocab-300-llvm10.txt");
 
@@ -110,7 +110,7 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
       *reply.mutable_double_list()->mutable_value() = {features.begin(), features.end()};
       break;
     }
-    case LlvmObservationSpace::IR2VEC_FUN_FA: {
+    case LlvmObservationSpace::IR2VEC_FUNCTION_LEVEL_FLOW_AWARE: {
       const auto ir2vecEmbeddingsPath = util::getRunfilesPath(
           "compiler_gym/third_party/ir2vec/seedEmbeddingVocab-300-llvm10.txt");
       IR2Vec::Embeddings embeddings(benchmark.module(), IR2Vec::IR2VecMode::FlowAware,
@@ -129,7 +129,7 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
       *reply.mutable_string_value() = Embeddings.dump();
       break;
     }
-    case LlvmObservationSpace::IR2VEC_FUN_SYM: {
+    case LlvmObservationSpace::IR2VEC_FUNCTION_LEVEL_SYMBOLIC: {
       const auto ir2vecEmbeddingsPath = util::getRunfilesPath(
           "compiler_gym/third_party/ir2vec/seedEmbeddingVocab-300-llvm10.txt");
       IR2Vec::Embeddings embeddings(benchmark.module(), IR2Vec::IR2VecMode::Symbolic,

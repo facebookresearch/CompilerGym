@@ -52,52 +52,52 @@ enum class LlvmObservationSpace {
    * From:
    *
    * 	  S. VenkataKeerthy, Rohit Aggarwal, Shalini Jain, Maunendra Sankar Desarkar,
-                                Ramakrishna Upadrasta, and Y. N. Srikant. (2020).
-                                IR2VEC: LLVM IR Based Scalable Program Embeddings.
-                                ACM Trans. Archit. Code Optim. 17, 4, Article 32 (December 2020), 27
-   pages. DOI:https://doi.org/10.1145/3418463
+          Ramakrishna Upadrasta, and Y. N. Srikant. (2020).
+          IR2VEC: LLVM IR Based Scalable Program Embeddings.
+          ACM Trans. Archit. Code Optim. 17, 4, Article 32 (December 2020), 27 pages.
+          DOI:https://doi.org/10.1145/3418463
    *
    */
-  IR2VEC_FA,
+  IR2VEC_FLOW_AWARE,
   /**
   * The IR2Vec Program Level Symbolic embeddings.
   *
   * From:
   *
   * 	  S. VenkataKeerthy, Rohit Aggarwal, Shalini Jain, Maunendra Sankar Desarkar,
-                               Ramakrishna Upadrasta, and Y. N. Srikant. (2020).
-                               IR2VEC: LLVM IR Based Scalable Program Embeddings.
-                               ACM Trans. Archit. Code Optim. 17, 4, Article 32 (December 2020), 27
-  pages. DOI:https://doi.org/10.1145/3418463
+          Ramakrishna Upadrasta, and Y. N. Srikant. (2020).
+          IR2VEC: LLVM IR Based Scalable Program Embeddings.
+          ACM Trans. Archit. Code Optim. 17, 4, Article 32 (December 2020), 27 pages.
+          DOI:https://doi.org/10.1145/3418463
   *
   */
-  IR2VEC_SYM,
+  IR2VEC_SYMBOLIC,
   /**
-* The IR2Vec Function level Flow Aware embeddings.
-*
-* From:
-*
-* 	  S. VenkataKeerthy, Rohit Aggarwal, Shalini Jain, Maunendra Sankar Desarkar,
-                         Ramakrishna Upadrasta, and Y. N. Srikant. (2020).
-                         IR2VEC: LLVM IR Based Scalable Program Embeddings.
-                         ACM Trans. Archit. Code Optim. 17, 4, Article 32 (December 2020), 27
-pages. DOI:https://doi.org/10.1145/3418463
-*
-*/
-  IR2VEC_FUN_FA,
+  * The IR2Vec Function level Flow Aware embeddings.
+  *
+  * From:
+  *
+  * 	  S. VenkataKeerthy, Rohit Aggarwal, Shalini Jain, Maunendra Sankar Desarkar,
+          Ramakrishna Upadrasta, and Y. N. Srikant. (2020).
+          IR2VEC: LLVM IR Based Scalable Program Embeddings.
+          ACM Trans. Archit. Code Optim. 17, 4, Article 32 (December 2020), 27 pages.
+          DOI:https://doi.org/10.1145/3418463
+  *
+  */
+  IR2VEC_FUNCTION_LEVEL_FLOW_AWARE,
   /**
   * The IR2Vec Function level Symbolic embeddings.
   *
   * From:
   *
   * 	  S. VenkataKeerthy, Rohit Aggarwal, Shalini Jain, Maunendra Sankar Desarkar,
-                               Ramakrishna Upadrasta, and Y. N. Srikant. (2020).
-                               IR2VEC: LLVM IR Based Scalable Program Embeddings.
-                               ACM Trans. Archit. Code Optim. 17, 4, Article 32 (December 2020), 27
-  pages. DOI:https://doi.org/10.1145/3418463
+          Ramakrishna Upadrasta, and Y. N. Srikant. (2020).
+          IR2VEC: LLVM IR Based Scalable Program Embeddings.
+          ACM Trans. Archit. Code Optim. 17, 4, Article 32 (December 2020), 27 pages.
+          DOI:https://doi.org/10.1145/3418463
   *
   */
-  IR2VEC_FUN_SYM,
+  IR2VEC_FUNCTION_LEVEL_SYMBOLIC,
   /**
    * Returns the graph representation of a program as a networkx Graph.
    *
