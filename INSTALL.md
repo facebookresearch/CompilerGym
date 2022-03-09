@@ -129,7 +129,6 @@ By default most dependencies are built together with Compiler Gym. To search for
 cmake -GNinja \
   -DCMAKE_C_COMPILER=clang-9 \
   -DCMAKE_CXX_COMPILER=clang++-9 \
-  -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \ # For faster rebuilds, can be removed
   -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=lld" -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=lld" -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=lld" \ # For faster builds, can be removed
   -DPython3_FIND_VIRTUALENV=FIRST \
   -DCMAKE_BUILD_WITH_INSTALL_RPATH=true \

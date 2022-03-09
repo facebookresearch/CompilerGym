@@ -12,6 +12,8 @@ if(CMAKE_CURRENT_SOURCE_DIR STREQUAL CMAKE_CURRENT_BINARY_DIR)
     )
 endif()
 
+include(build_tools/cmake/FindAndEnableCcache.cmake)
+
 if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
     set(DARWIN TRUE)
 endif()
