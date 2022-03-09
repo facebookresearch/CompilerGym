@@ -9,8 +9,7 @@ runs:
         - name: Install CMake dependencies
           run: |
               if [ "$(uname)" = "Darwin" ]; then
-                  echo "CMake build for Darwin is unimplemented."
-                  exit 1
+                  brew install bazelisk ccache cmake zlib
               else
                   # Compiler
                   sudo apt-get install clang++-9 lld-9 tar bzip2 ninja-build
