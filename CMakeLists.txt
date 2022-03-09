@@ -14,10 +14,6 @@ endif()
 
 include(build_tools/cmake/FindAndEnableCcache.cmake)
 
-if(${CMAKE_SYSTEM_NAME} MATCHES "Darwin")
-    set(DARWIN TRUE)
-endif()
-
 project(compiler_gym ASM C CXX)
 
 set(CMAKE_C_STANDARD 11 CACHE STRING "C standard to be used.")

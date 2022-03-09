@@ -6,9 +6,6 @@
 cg_add_all_subdirs()
 
 set(_DEPS "compiler_gym-llvm-service")
-if(DARWIN)
-    #list(APPEND _DEPS "@llvm//:darwin")
-endif()
 cg_filegroup(
   NAME "service"
   DEPENDS ${_DEPS}
@@ -141,9 +138,6 @@ cg_cc_binary(
 )
 
 set(_FILES "${CMAKE_CURRENT_BINARY_DIR}/compute_observation")
-if(DARWIN)
-    message(FATAL_ERROR "TODO(boian): implement")
-endif()
 cg_filegroup(
   NAME compute_observation-files
   FILES ${_FILES}
