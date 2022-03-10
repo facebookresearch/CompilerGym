@@ -183,8 +183,7 @@ cg_cc_library(
     "-DGOOGLE_PROTOBUF_NO_RTTI"
     "-fno-rtti"
   HDRS
-    "$<TARGET_PROPERTY:compiler_gym__envs__llvm__service__passes__actions_genfiles,BINARY_DIR>/ActionHeaders.h"
-    "$<TARGET_PROPERTY:compiler_gym__envs__llvm__service__passes__actions_genfiles,BINARY_DIR>/ActionSwitch.h"
+    compiler_gym::envs::llvm::service::passes::10.0.0::headers
     "LlvmSession.h"
   SRCS
     "LlvmSession.cc"
