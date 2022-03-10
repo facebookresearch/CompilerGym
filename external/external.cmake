@@ -144,13 +144,16 @@ set_property(
     CACHE COMPILER_GYM_LLVM_PROVIDER
     PROPERTY STRINGS "internal" "external"
 )
-build_external_cmake_project(
-  NAME llvm
-  SRC_DIR "${CMAKE_CURRENT_LIST_DIR}/llvm"
-  CONFIG_ARGS "-DCOMPILER_GYM_LLVM_PROVIDER=${COMPILER_GYM_LLVM_PROVIDER}"
-)
+if(COMPILER_GYM_LLVM_PROVIDER STREQUAL "internal")
+    build_external_cmake_project(
+        NAME llvm
+        SRC_DIR "${CMAKE_CURRENT_LIST_DIR}/llvm"
+        CONFIG_ARGS "-DCOMPILER_GYM_LLVM_PROVIDER=${COMPILER_GYM_LLVM_PROVIDER}"
+    )
+endif()
 set(LLVM_SRC_DIR "${CMAKE_CURRENT_BINARY_DIR}/external/llvm/llvm/src/llvm")
 find_package(LLVM 10.0.0 EXACT REQUIRED)
+message("Using LLVM version ${LLVM_VERSION} from ${LLVM_DIR}")
 
 # === Protocol buffers ===
 
