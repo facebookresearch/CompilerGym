@@ -37,8 +37,6 @@ cg_cc_library(
   ABS_DEPS
     fmt
     magic_enum
-  NON_LIB_DEPS
-    compiler_gym::envs::llvm::service::passes::actions_genfiles
   PUBLIC
 )
 
@@ -183,7 +181,6 @@ cg_cc_library(
     "-DGOOGLE_PROTOBUF_NO_RTTI"
     "-fno-rtti"
   HDRS
-    compiler_gym::envs::llvm::service::passes::10.0.0::headers
     "LlvmSession.h"
   SRCS
     "LlvmSession.cc"
@@ -194,6 +191,7 @@ cg_cc_library(
     ::Cost
     ::Observation
     ::ObservationSpaces
+    compiler_gym::envs::llvm::service::passes::10.0.0::headers
     compiler_gym::service::CompilationSession
     compiler_gym::service::proto::compiler_gym_service_cc_grpc
     compiler_gym::third_party::autophase::InstCount
@@ -215,7 +213,6 @@ cg_cc_library(
     Clog::libclog
   INCLUDES
     ${LLVM_INCLUDE_DIRS}
-    "$<TARGET_PROPERTY:compiler_gym__envs__llvm__service__passes__actions_genfiles,BINARY_DIR>"
   DEFINES
     ${LLVM_DEFINITIONS}
   PUBLIC

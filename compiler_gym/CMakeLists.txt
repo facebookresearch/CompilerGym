@@ -23,7 +23,6 @@ cg_py_library(
     compiler_gym::util::util
     compiler_gym::util::flags::flags
     compiler_gym::wrappers::wrappers
-    compiler_gym::envs::llvm::specs
   PUBLIC
 )
 
