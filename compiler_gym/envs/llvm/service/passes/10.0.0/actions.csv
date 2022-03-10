@@ -1,0 +1,125 @@
+name,flag,description,source,header,cfg,is_analysis
+AddDiscriminatorsPass,-add-discriminators,Add DWARF path discriminators,lib/Transforms/Utils/AddDiscriminators.cpp,include/llvm/Transforms/Utils/AddDiscriminators.h,False,False
+AggressiveDCEPass,-adce,Aggressive Dead Code Elimination,lib/Transforms/Scalar/ADCE.cpp,include/llvm/Transforms/Scalar/ADCE.h,False,False
+AggressiveInstCombinerPass,-aggressive-instcombine,Combine pattern based expressions,lib/Transforms/AggressiveInstCombine/AggressiveInstCombine.cpp,include/llvm/Transforms/AggressiveInstCombine/AggressiveInstCombine.h,False,False
+AlignmentFromAssumptionsPass,-alignment-from-assumptions,Alignment from assumptions,lib/Transforms/Scalar/AlignmentFromAssumptions.cpp,include/llvm/Transforms/Scalar/AlignmentFromAssumptions.h,False,False
+AlwaysInlinerLegacyPass,-always-inline,Inliner for always_inline functions,lib/Transforms/IPO/AlwaysInliner.cpp,include/llvm/Transforms/IPO/AlwaysInliner.h,False,False
+ArgumentPromotionPass,-argpromotion,Promote 'by reference' arguments to scalars,lib/Transforms/IPO/ArgumentPromotion.cpp,include/llvm/Transforms/IPO/ArgumentPromotion.h,False,False
+AttributorLegacyPass,-attributor,Deduce and propagate attributes,lib/Transforms/IPO/Attributor.cpp,include/llvm/Transforms/IPO/Attributor.h,False,False
+BarrierNoopPass,-barrier,A No-Op Barrier Pass,lib/Transforms/IPO/BarrierNoopPass.cpp,,False,False
+BitTrackingDCEPass,-bdce,Bit-Tracking Dead Code Elimination,lib/Transforms/Scalar/BDCE.cpp,include/llvm/Transforms/Scalar/BDCE.h,False,False
+BreakCriticalEdgesPass,-break-crit-edges,Break critical edges in CFG,lib/Transforms/Utils/BreakCriticalEdges.cpp,include/llvm/Transforms/Utils/BreakCriticalEdges.h,False,False
+CFGSimplificationPass,-simplifycfg,Simplify the CFG,lib/Transforms/Scalar/SimplifyCFGPass.cpp,,False,False
+CallSiteSplittingPass,-callsite-splitting,Call-site splitting,lib/Transforms/Scalar/CallSiteSplitting.cpp,include/llvm/Transforms/Scalar/CallSiteSplitting.h,False,False
+CalledValuePropagationPass,-called-value-propagation,Called Value Propagation,lib/Transforms/IPO/CalledValuePropagation.cpp,include/llvm/Transforms/IPO/CalledValuePropagation.h,False,False
+CanonicalizeAliasesPass,-canonicalize-aliases,Canonicalize aliases,lib/Transforms/Utils/CanonicalizeAliases.cpp,include/llvm/Transforms/Utils/CanonicalizeAliases.h,False,False
+ConstantHoistingPass,-consthoist,Constant Hoisting,lib/Transforms/Scalar/ConstantHoisting.cpp,include/llvm/Transforms/Scalar/ConstantHoisting.h,False,False
+ConstantMergePass,-constmerge,Merge Duplicate Global Constants,lib/Transforms/IPO/ConstantMerge.cpp,include/llvm/Transforms/IPO/ConstantMerge.h,False,False
+ConstantPropagationPass,-constprop,Simple constant propagation,lib/Transforms/Scalar/ConstantProp.cpp,,False,False
+CoroCleanupLegacyPass,-coro-cleanup,Lower all coroutine related intrinsics,lib/Transforms/Coroutines/CoroCleanup.cpp,,False,False
+CoroEarlyLegacyPass,-coro-early,Lower early coroutine intrinsics,lib/Transforms/Coroutines/CoroEarly.cpp,,False,False
+CoroElideLegacyPass,-coro-elide,Coroutine frame allocation elision and indirect calls replacement,lib/Transforms/Coroutines/CoroElide.cpp,,False,False
+CoroSplitLegacyPass,-coro-split,Split coroutine into a set of functions driving its state machine,lib/Transforms/Coroutines/CoroSplit.cpp,,False,False
+CorrelatedValuePropagationPass,-correlated-propagation,Value Propagation,lib/Transforms/Scalar/CorrelatedValuePropagation.cpp,include/llvm/Transforms/Scalar/CorrelatedValuePropagation.h,False,False
+CrossDSOCFIPass,-cross-dso-cfi,Cross-DSO CFI,lib/Transforms/IPO/CrossDSOCFI.cpp,include/llvm/Transforms/IPO/CrossDSOCFI.h,False,False
+DeadArgEliminationPass,-deadargelim,Dead Argument Elimination,lib/Transforms/IPO/DeadArgumentElimination.cpp,include/llvm/Transforms/IPO/DeadArgumentElimination.h,False,False
+DeadCodeEliminationPass,-dce,Dead Code Elimination,lib/Transforms/Scalar/DCE.cpp,include/llvm/Transforms/Scalar/DCE.h,False,False
+DeadInstEliminationPass,-die,Dead Instruction Elimination,lib/Transforms/Scalar/DCE.cpp,include/llvm/Transforms/Scalar/DCE.h,False,False
+DeadStoreEliminationPass,-dse,Dead Store Elimination,lib/Transforms/Scalar/DeadStoreElimination.cpp,include/llvm/Transforms/Scalar/DeadStoreElimination.h,False,False
+DemoteRegisterToMemoryPass,-reg2mem,Demote all values to stack slots,lib/Transforms/Scalar/Reg2Mem.cpp,,False,False
+DivRemPairsPass,-div-rem-pairs,Hoist/decompose integer division and remainder,lib/Transforms/Scalar/DivRemPairs.cpp,include/llvm/Transforms/Scalar/DivRemPairs.h,False,False
+EarlyCSEMemSSAPass,-early-cse-memssa,Early CSE w/ MemorySSA,lib/Transforms/Scalar/EarlyCSE.cpp,include/llvm/Transforms/Scalar/EarlyCSE.h,False,False
+EarlyCSEPass,-early-cse,Early CSE,lib/Transforms/Scalar/EarlyCSE.cpp,include/llvm/Transforms/Scalar/EarlyCSE.h,False,False
+EliminateAvailableExternallyPass,-elim-avail-extern,Eliminate Available Externally Globals,lib/Transforms/IPO/ElimAvailExtern.cpp,include/llvm/Transforms/IPO/ElimAvailExtern.h,False,False
+EntryExitInstrumenterPass,-ee-instrument,Instrument function entry/exit with calls to e.g. mcount()(pre inlining),lib/Transforms/Utils/EntryExitInstrumenter.cpp,include/llvm/Transforms/Utils/EntryExitInstrumenter.h,False,False
+FlattenCFGPass,-flattencfg,Flatten the CFG,lib/Transforms/Scalar/FlattenCFGPass.cpp,,False,False
+Float2IntPass,-float2int,Float to int,lib/Transforms/Scalar/Float2Int.cpp,include/llvm/Transforms/Scalar/Float2Int.h,False,False
+ForceFunctionAttrsLegacyPass,-forceattrs,Force set function attributes,lib/Transforms/IPO/ForceFunctionAttrs.cpp,include/llvm/Transforms/IPO/ForceFunctionAttrs.h,False,False
+FunctionInliningPass,-inline,Function Integration/Inlining,lib/Transforms/IPO/InlineSimple.cpp,,False,False
+GCOVProfilerPass,-insert-gcov-profiling,Insert instrumentation for GCOV profiling,lib/Transforms/Instrumentation/GCOVProfiling.cpp,,False,False
+GVNHoistPass,-gvn-hoist,Early GVN Hoisting of Expressions,lib/Transforms/Scalar/GVNHoist.cpp,,False,False
+GVNPass,-gvn,Global Value Numbering,lib/Transforms/Scalar/GVN.cpp,include/llvm/Transforms/Scalar/GVN.h,False,False
+GlobalDCEPass,-globaldce,Dead Global Elimination,lib/Transforms/IPO/GlobalDCE.cpp,include/llvm/Transforms/IPO/GlobalDCE.h,False,False
+GlobalOptimizerPass,-globalopt,Global Variable Optimizer,lib/Transforms/IPO/GlobalOpt.cpp,include/llvm/Transforms/IPO/GlobalOpt.h,False,False
+GlobalSplitPass,-globalsplit,Global splitter,lib/Transforms/IPO/GlobalSplit.cpp,include/llvm/Transforms/IPO/GlobalSplit.h,False,False
+GuardWideningPass,-guard-widening,Widen guards,lib/Transforms/Scalar/GuardWidening.cpp,include/llvm/Transforms/Scalar/GuardWidening.h,False,False
+HotColdSplittingPass,-hotcoldsplit,Hot Cold Splitting,lib/Transforms/IPO/HotColdSplitting.cpp,include/llvm/Transforms/IPO/HotColdSplitting.h,False,False
+IPConstantPropagationPass,-ipconstprop,Interprocedural constant propagation,lib/Transforms/IPO/IPConstantPropagation.cpp,,False,False
+IPSCCPPass,-ipsccp,Interprocedural Sparse Conditional Constant Propagation,lib/Transforms/IPO/SCCP.cpp,include/llvm/Transforms/IPO/SCCP.h,False,False
+IndVarSimplifyPass,-indvars,Induction Variable Simplification,lib/Transforms/Scalar/IndVarSimplify.cpp,include/llvm/Transforms/Scalar/IndVarSimplify.h,False,False
+InductiveRangeCheckEliminationPass,-irce,Inductive range check elimination,lib/Transforms/Scalar/InductiveRangeCheckElimination.cpp,include/llvm/Transforms/Scalar/InductiveRangeCheckElimination.h,False,False
+InferAddressSpacesPass,-infer-address-spaces,Infer address spaces,lib/Transforms/Scalar/InferAddressSpaces.cpp,,False,False
+InferFunctionAttrsLegacyPass,-inferattrs,Infer set function attributes,lib/Transforms/IPO/InferFunctionAttrs.cpp,include/llvm/Transforms/IPO/InferFunctionAttrs.h,False,False
+InjectTLIMappingsLegacyPass,-inject-tli-mappings,Inject TLI Mappings,lib/Transforms/Utils/InjectTLIMappings.cpp,include/llvm/Transforms/Utils/InjectTLIMappings.h,False,False
+InstSimplifyLegacyPass,-instsimplify,Remove redundant instructions,lib/Transforms/Scalar/InstSimplifyPass.cpp,include/llvm/Transforms/Scalar/InstSimplifyPass.h,False,False
+InstructionCombiningPass,-instcombine,Combine redundant instructions,lib/Transforms/InstCombine/InstructionCombining.cpp,,False,False
+InstructionNamerPass,-instnamer,Assign names to anonymous instructions,lib/Transforms/Utils/InstructionNamer.cpp,,False,False
+JumpThreadingPass,-jump-threading,Jump Threading,lib/Transforms/Scalar/JumpThreading.cpp,include/llvm/Transforms/Scalar/JumpThreading.h,False,False
+LCSSAPass,-lcssa,Loop-Closed SSA Form Pass,lib/Transforms/Utils/LCSSA.cpp,include/llvm/Transforms/Utils/LCSSA.h,False,False
+LICMPass,-licm,Loop Invariant Code Motion,lib/Transforms/Scalar/LICM.cpp,include/llvm/Transforms/Scalar/LICM.h,False,False
+LibCallsShrinkWrapPass,-libcalls-shrinkwrap,Conditionally eliminate dead library calls,lib/Transforms/Utils/LibCallsShrinkWrap.cpp,include/llvm/Transforms/Utils/LibCallsShrinkWrap.h,False,False
+LoadStoreVectorizerPass,-load-store-vectorizer,Vectorize load and Store instructions,lib/Transforms/Vectorize/LoadStoreVectorizer.cpp,include/llvm/Transforms/Vectorize/LoadStoreVectorizer.h,False,False
+LoopDataPrefetchPass,-loop-data-prefetch,Loop Data Prefetch,lib/Transforms/Scalar/LoopDataPrefetch.cpp,include/llvm/Transforms/Scalar/LoopDataPrefetch.h,False,False
+LoopDeletionPass,-loop-deletion,Delete dead loops,lib/Transforms/Scalar/LoopDeletion.cpp,include/llvm/Transforms/Scalar/LoopDeletion.h,False,False
+LoopDistributePass,-loop-distribute,Loop Distribution,lib/Transforms/Scalar/LoopDistribute.cpp,include/llvm/Transforms/Scalar/LoopDistribute.h,False,False
+LoopFusePass,-loop-fusion,Loop Fusion,lib/Transforms/Scalar/LoopFuse.cpp,include/llvm/Transforms/Scalar/LoopFuse.h,False,False
+LoopGuardWideningPass,-loop-guard-widening,"Widen guards (within a single loop, as a loop pass)",lib/Transforms/Scalar/GuardWidening.cpp,include/llvm/Transforms/Scalar/GuardWidening.h,False,False
+LoopIdiomPass,-loop-idiom,Recognize loop idioms,lib/Transforms/Scalar/LoopIdiomRecognize.cpp,include/llvm/Transforms/Scalar/LoopIdiomRecognize.h,False,False
+LoopInstSimplifyPass,-loop-instsimplify,Simplify instructions in loops,lib/Transforms/Scalar/LoopInstSimplify.cpp,include/llvm/Transforms/Scalar/LoopInstSimplify.h,False,False
+LoopInterchangePass,-loop-interchange,Interchanges loops for cache reuse,lib/Transforms/Scalar/LoopInterchange.cpp,,False,False
+LoopLoadEliminationPass,-loop-load-elim,Loop Load Elimination,lib/Transforms/Scalar/LoopLoadElimination.cpp,include/llvm/Transforms/Scalar/LoopLoadElimination.h,False,False
+LoopPredicationPass,-loop-predication,Loop predication,lib/Transforms/Scalar/LoopPredication.cpp,include/llvm/Transforms/Scalar/LoopPredication.h,False,False
+LoopRerollPass,-loop-reroll,Reroll loops,lib/Transforms/Scalar/LoopRerollPass.cpp,,False,False
+LoopRotatePass,-loop-rotate,Rotate Loops,lib/Transforms/Scalar/LoopRotation.cpp,include/llvm/Transforms/Scalar/LoopRotation.h,False,False
+LoopSimplifyCFGPass,-loop-simplifycfg,Simplify loop CFG,lib/Transforms/Scalar/LoopSimplifyCFG.cpp,include/llvm/Transforms/Scalar/LoopSimplifyCFG.h,False,False
+LoopSimplifyPass,-loop-simplify,Canonicalize natural loops,lib/Transforms/Utils/LoopSimplify.cpp,include/llvm/Transforms/Utils/LoopSimplify.h,False,False
+LoopSinkPass,-loop-sink,Loop Sink,lib/Transforms/Scalar/LoopSink.cpp,include/llvm/Transforms/Scalar/LoopSink.h,False,False
+LoopStrengthReducePass,-loop-reduce,Loop Strength Reduction,lib/Transforms/Scalar/LoopStrengthReduce.cpp,include/llvm/Transforms/Scalar/LoopStrengthReduce.h,False,False
+LoopUnrollAndJamPass,-loop-unroll-and-jam,Unroll and Jam loops,lib/Transforms/Scalar/LoopUnrollAndJamPass.cpp,include/llvm/Transforms/Scalar/LoopUnrollAndJamPass.h,False,False
+LoopUnrollPass,-loop-unroll,Unroll loops,lib/Transforms/Scalar/LoopUnrollPass.cpp,include/llvm/Transforms/Scalar/LoopUnrollPass.h,False,False
+LoopUnswitchPass,-loop-unswitch,Unswitch loops,lib/Transforms/Scalar/LoopUnswitch.cpp,,False,False
+LoopVectorizePass,-loop-vectorize,Loop Vectorization,lib/Transforms/Vectorize/LoopVectorize.cpp,include/llvm/Transforms/Vectorize/LoopVectorize.h,False,False
+LoopVersioningLICMPass,-loop-versioning-licm,Loop Versioning For LICM,lib/Transforms/Scalar/LoopVersioningLICM.cpp,,False,False
+LoopVersioningPass,-loop-versioning,Loop Versioning,lib/Transforms/Utils/LoopVersioning.cpp,include/llvm/Transforms/Utils/LoopVersioning.h,False,False
+LowerAtomicPass,-loweratomic,Lower atomic intrinsics to non-atomic form,lib/Transforms/Scalar/LowerAtomic.cpp,include/llvm/Transforms/Scalar/LowerAtomic.h,False,False
+LowerConstantIntrinsicsPass,-lower-constant-intrinsics,Lower constant intrinsics,lib/Transforms/Scalar/LowerConstantIntrinsics.cpp,include/llvm/Transforms/Scalar/LowerConstantIntrinsics.h,False,False
+LowerExpectIntrinsicPass,-lower-expect,Lower 'expect' Intrinsics,lib/Transforms/Scalar/LowerExpectIntrinsic.cpp,include/llvm/Transforms/Scalar/LowerExpectIntrinsic.h,False,False
+LowerGuardIntrinsicPass,-lower-guard-intrinsic,Lower the guard intrinsic to normal control flow,lib/Transforms/Scalar/LowerGuardIntrinsic.cpp,include/llvm/Transforms/Scalar/LowerGuardIntrinsic.h,False,False
+LowerInvokePass,-lowerinvoke,"Lower invoke and unwind, for unwindless code generators",lib/Transforms/Utils/LowerInvoke.cpp,include/llvm/Transforms/Utils/LowerInvoke.h,False,False
+LowerMatrixIntrinsicsPass,-lower-matrix-intrinsics,Lower the matrix intrinsics,lib/Transforms/Scalar/LowerMatrixIntrinsics.cpp,include/llvm/Transforms/Scalar/LowerMatrixIntrinsics.h,False,False
+LowerSwitchPass,-lowerswitch,Lower SwitchInst's to branches,lib/Transforms/Utils/LowerSwitch.cpp,,False,False
+LowerWidenableConditionPass,-lower-widenable-condition,Lower the widenable condition to default true value,lib/Transforms/Scalar/LowerWidenableCondition.cpp,include/llvm/Transforms/Scalar/LowerWidenableCondition.h,False,False
+MemCpyOptPass,-memcpyopt,MemCpy Optimization,lib/Transforms/Scalar/MemCpyOptimizer.cpp,include/llvm/Transforms/Scalar/MemCpyOptimizer.h,False,False
+MergeFunctionsPass,-mergefunc,Merge Functions,lib/Transforms/IPO/MergeFunctions.cpp,include/llvm/Transforms/IPO/MergeFunctions.h,False,False
+MergeICmpsLegacyPass,-mergeicmps,Merge contiguous icmps into a memcmp,lib/Transforms/Scalar/MergeICmps.cpp,include/llvm/Transforms/Scalar/MergeICmps.h,False,False
+MergedLoadStoreMotionPass,-mldst-motion,MergedLoadStoreMotion,lib/Transforms/Scalar/MergedLoadStoreMotion.cpp,include/llvm/Transforms/Scalar/MergedLoadStoreMotion.h,False,False
+ModuleSanitizerCoverageLegacyPassPass,-sancov,Pass for instrumenting coverage on functions,lib/Transforms/Instrumentation/SanitizerCoverage.cpp,include/llvm/Transforms/Instrumentation/SanitizerCoverage.h,False,False
+NameAnonGlobalPass,-name-anon-globals,Provide a name to nameless globals,lib/Transforms/Utils/NameAnonGlobals.cpp,include/llvm/Transforms/Utils/NameAnonGlobals.h,False,False
+NaryReassociatePass,-nary-reassociate,Nary reassociation,lib/Transforms/Scalar/NaryReassociate.cpp,include/llvm/Transforms/Scalar/NaryReassociate.h,False,False
+NewGVNPass,-newgvn,Global Value Numbering,lib/Transforms/Scalar/NewGVN.cpp,include/llvm/Transforms/Scalar/NewGVN.h,False,False
+PGOMemOPSizeOptLegacyPass,-pgo-memop-opt,Optimize memory intrinsic using its size value profile,lib/Transforms/Instrumentation/PGOMemOPSizeOpt.cpp,,False,False
+PartialInliningPass,-partial-inliner,Partial Inliner,lib/Transforms/IPO/PartialInlining.cpp,include/llvm/Transforms/IPO/PartialInlining.h,False,False
+PartiallyInlineLibCallsPass,-partially-inline-libcalls,Partially inline calls to library functions,lib/Transforms/Scalar/PartiallyInlineLibCalls.cpp,include/llvm/Transforms/Scalar/PartiallyInlineLibCalls.h,False,False
+PostInlineEntryExitInstrumenterPass,-post-inline-ee-instrument,"Instrument function entry/exit with calls to e.g. mcount()"" ""(post inlining)",lib/Transforms/Utils/EntryExitInstrumenter.cpp,include/llvm/Transforms/Utils/EntryExitInstrumenter.h,False,False
+PostOrderFunctionAttrsLegacyPass,-functionattrs,Deduce function attributes,lib/Transforms/IPO/FunctionAttrs.cpp,include/llvm/Transforms/IPO/FunctionAttrs.h,False,False
+PromoteMemoryToRegisterPass,-mem2reg,"Promote Memory to "" ""Register",lib/Transforms/Utils/Mem2Reg.cpp,include/llvm/Transforms/Utils/Mem2Reg.h,False,False
+PruneEHPass,-prune-eh,Remove unused exception handling info,lib/Transforms/IPO/PruneEH.cpp,,False,False
+ReassociatePass,-reassociate,Reassociate expressions,lib/Transforms/Scalar/Reassociate.cpp,include/llvm/Transforms/Scalar/Reassociate.h,False,False
+RedundantDbgInstEliminationPass,-redundant-dbg-inst-elim,Redundant Dbg Instruction Elimination,lib/Transforms/Scalar/DCE.cpp,include/llvm/Transforms/Scalar/DCE.h,False,False
+ReversePostOrderFunctionAttrsPass,-rpo-functionattrs,Deduce function attributes in RPO,lib/Transforms/IPO/FunctionAttrs.cpp,include/llvm/Transforms/IPO/FunctionAttrs.h,False,False
+RewriteStatepointsForGCLegacyPass,-rewrite-statepoints-for-gc,Make relocations explicit at statepoints,lib/Transforms/Scalar/RewriteStatepointsForGC.cpp,include/llvm/Transforms/Scalar/RewriteStatepointsForGC.h,False,False
+SCCPPass,-sccp,Sparse Conditional Constant Propagation,lib/Transforms/Scalar/SCCP.cpp,include/llvm/Transforms/Scalar/SCCP.h,False,False
+SLPVectorizerPass,-slp-vectorizer,SLP Vectorizer,lib/Transforms/Vectorize/SLPVectorizer.cpp,include/llvm/Transforms/Vectorize/SLPVectorizer.h,False,False
+SROAPass,-sroa,Scalar Replacement Of Aggregates,lib/Transforms/Scalar/SROA.cpp,include/llvm/Transforms/Scalar/SROA.h,False,False
+ScalarizerPass,-scalarizer,Scalarize vector operations,lib/Transforms/Scalar/Scalarizer.cpp,include/llvm/Transforms/Scalar/Scalarizer.h,False,False
+SeparateConstOffsetFromGEPPass,-separate-const-offset-from-gep,Split GEPs to a variadic base and a constant offset for better CSE,lib/Transforms/Scalar/SeparateConstOffsetFromGEP.cpp,,False,False
+SimpleLoopUnswitchLegacyPass,-simple-loop-unswitch,Simple unswitch loops,lib/Transforms/Scalar/SimpleLoopUnswitch.cpp,include/llvm/Transforms/Scalar/SimpleLoopUnswitch.h,False,False
+SinkingPass,-sink,Code sinking,lib/Transforms/Scalar/Sink.cpp,include/llvm/Transforms/Scalar/Sink.h,False,False
+SpeculativeExecutionPass,-speculative-execution,Speculatively execute instructions,lib/Transforms/Scalar/SpeculativeExecution.cpp,include/llvm/Transforms/Scalar/SpeculativeExecution.h,False,False
+StraightLineStrengthReducePass,-slsr,Straight line strength reduction,lib/Transforms/Scalar/StraightLineStrengthReduce.cpp,,False,False
+StripDeadPrototypesPass,-strip-dead-prototypes,Strip Unused Function Prototypes,lib/Transforms/IPO/StripDeadPrototypes.cpp,include/llvm/Transforms/IPO/StripDeadPrototypes.h,False,False
+StripDebugDeclarePass,-strip-debug-declare,Strip all llvm.dbg.declare intrinsics,lib/Transforms/IPO/StripSymbols.cpp,,False,False
+StripNonDebugSymbolsPass,-strip-nondebug,"Strip all symbols, except dbg symbols, from a module",lib/Transforms/IPO/StripSymbols.cpp,,False,False
+StripSymbolsPass,-strip,Strip all symbols from a module,lib/Transforms/IPO/StripSymbols.cpp,,False,False
+TailCallEliminationPass,-tailcallelim,Tail Call Elimination,lib/Transforms/Scalar/TailRecursionElimination.cpp,include/llvm/Transforms/Scalar/TailRecursionElimination.h,False,False
+UnifyFunctionExitNodesPass,-mergereturn,Unify function exit nodes,lib/Transforms/Utils/UnifyFunctionExitNodes.cpp,include/llvm/Transforms/Utils/UnifyFunctionExitNodes.h,False,False

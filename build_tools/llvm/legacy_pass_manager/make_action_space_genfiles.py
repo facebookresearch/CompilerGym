@@ -117,7 +117,9 @@ def make_action_sources(pass_iterator, outpath: Path):
     flags_path = Path(outpath / "flags.txt")
     descriptions_path = Path(outpath / "flag_descriptions.txt")
 
-    with open(switch_path, "w") as switch_f, open(enum_path, "w") as enum_f:
+    with open(switch_path, "w", encoding="utf-8") as switch_f, open(
+        enum_path, "w", encoding="utf-8"
+    ) as enum_f:
         print("enum class LlvmAction {", file=enum_f)
         print("#define HANDLE_ACTION(action, handlePass) \\", file=switch_f)
         print("  switch (action) {  \\", file=switch_f)
@@ -130,30 +132,18 @@ def make_action_sources(pass_iterator, outpath: Path):
     logger.debug("Generated %s", switch_path.name)
     logger.debug("Generated %s", enum_path.name)
 
-    with open(include_path, "w") as f:
+    with open(include_path, "w", encoding="utf-8") as f:
         print("#pragma once", file=f)
         for header in sorted(headers):
             print(f'#include "{header}"', file=f)
 
-        # Inject an ad-hoc workaround for the non-standard constructor of the
-        # EarlyCSEMemSSAPass.
-        print(
-            """
-namespace llvm {
-FunctionPass* createEarlyCSEMemSSAPass() {
-  return createEarlyCSEPass(/*UseMemorySSA=*/true);
-}
-} // namespace llvm
-""",
-            file=f,
-        )
     logger.debug("Generated %s", include_path.name)
 
-    with open(flags_path, "w") as f:
+    with open(flags_path, "w", encoding="utf-8") as f:
         print("\n".join(p.flag for p in passes), file=f)
     logger.debug("Generated %s", flags_path.name)
 
-    with open(descriptions_path, "w") as f:
+    with open(descriptions_path, "w", encoding="utf-8") as f:
         print("\n".join(p.description for p in passes), file=f)
     logger.debug("Generated %s", descriptions_path.name)
 

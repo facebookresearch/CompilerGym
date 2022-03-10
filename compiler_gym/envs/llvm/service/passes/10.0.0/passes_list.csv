@@ -1,0 +1,574 @@
+name,flag,description,source,header,cfg,is_analysis
+AAEvalLegacyPass,-aa-eval,Exhaustive Alias Analysis Precision Evaluator,lib/Analysis/AliasAnalysisEvaluator.cpp,include/llvm/Analysis/AliasAnalysisEvaluator.h,False,True
+AAResultsWrapperPass,-aa,Function Alias Analysis Results,lib/Analysis/AliasAnalysis.cpp,include/llvm/Analysis/AliasAnalysis.h,False,True
+AArch64A53Fix835769,-aarch64-fix-cortex-a53-835769-pass,AArch64 fix for A53 erratum 835769,lib/Target/AArch64/AArch64A53Fix835769.cpp,,False,False
+AArch64A57FPLoadBalancing,-aarch64-a57-fp-load-balancing,AArch64 A57 FP Load-Balancing,lib/Target/AArch64/AArch64A57FPLoadBalancing.cpp,,False,False
+AArch64AdvSIMDScalar,-aarch64-simd-scalar,AdvSIMD Scalar Operation Optimization,lib/Target/AArch64/AArch64AdvSIMDScalarPass.cpp,,False,False
+AArch64BranchTargets,-aarch64-branch-targets,AArch64 Branch Targets,lib/Target/AArch64/AArch64BranchTargets.cpp,,False,False
+AArch64CollectLOH,-aarch64-collect-loh,AArch64 Collect Linker Optimization Hint (LOH),lib/Target/AArch64/AArch64CollectLOH.cpp,,False,False
+AArch64CompressJumpTables,-aarch64-jump-tables,AArch64 compress jump tables pass,lib/Target/AArch64/AArch64CompressJumpTables.cpp,,False,False
+AArch64CondBrTuning,-aarch64-cond-br-tuning,AArch64 Conditional Branch Tuning,lib/Target/AArch64/AArch64CondBrTuning.cpp,,False,False
+AArch64ConditionOptimizer,-aarch64-condopt,AArch64 CondOpt Pass,lib/Target/AArch64/AArch64ConditionOptimizer.cpp,,False,False
+AArch64ConditionalCompares,-aarch64-ccmp,AArch64 CCMP Pass,lib/Target/AArch64/AArch64ConditionalCompares.cpp,,False,False
+AArch64DeadRegisterDefinitions,-aarch64-dead-defs,AArch64 Dead register definitions,lib/Target/AArch64/AArch64DeadRegisterDefinitionsPass.cpp,,False,False
+AArch64ExpandPseudo,-aarch64-expand-pseudo,AArch64 pseudo instruction expansion pass,lib/Target/AArch64/AArch64ExpandPseudoInsts.cpp,,False,False
+AArch64LoadStoreOpt,-aarch64-ldst-opt,AArch64 load / store optimization pass,lib/Target/AArch64/AArch64LoadStoreOptimizer.cpp,,False,False
+AArch64PreLegalizerCombiner,-aarch64-prelegalizer-combiner,Combine AArch64 machine instrs before legalization,lib/Target/AArch64/AArch64PreLegalizerCombiner.cpp,,False,False
+AArch64PromoteConstant,-aarch64-promote-const,AArch64 Promote Constant Pass,lib/Target/AArch64/AArch64PromoteConstant.cpp,,False,False
+AArch64RedundantCopyElimination,-aarch64-copyelim,AArch64 redundant copy elimination pass,lib/Target/AArch64/AArch64RedundantCopyElimination.cpp,,False,False
+AArch64SIMDInstrOpt,-aarch64-simdinstr-opt,AArch64 SIMD instructions optimization pass,lib/Target/AArch64/AArch64SIMDInstrOpt.cpp,,False,False
+AArch64SpeculationHardening,-aarch64-speculation-hardening,AArch64 speculation hardening pass,lib/Target/AArch64/AArch64SpeculationHardening.cpp,,False,False
+AArch64StackTagging,-stack-tagging,AArch64 Stack Tagging,lib/Target/AArch64/AArch64StackTagging.cpp,,False,False
+AArch64StackTaggingPreRA,-aarch64-stack-tagging-pre-ra,AArch64 Stack Tagging PreRA Pass,lib/Target/AArch64/AArch64StackTaggingPreRA.cpp,,False,False
+AArch64StorePairSuppress,-aarch64-stp-suppress,AArch64 Store Pair Suppression,lib/Target/AArch64/AArch64StorePairSuppress.cpp,,False,False
+AMDGPUAAWrapperPass,-amdgpu-aa,AMDGPU Address space based Alias Analysis,lib/Target/AMDGPU/AMDGPUAliasAnalysis.cpp,,False,True
+AMDGPUAlwaysInline,-amdgpu-always-inline,AMDGPU Inline All Functions,lib/Target/AMDGPU/AMDGPUAlwaysInlinePass.cpp,,False,False
+AMDGPUAnnotateKernelFeatures,-amdgpu-annotate-kernel-features,Add AMDGPU function attributes,lib/Target/AMDGPU/AMDGPUAnnotateKernelFeatures.cpp,,False,False
+AMDGPUAnnotateUniformValues,-amdgpu-annotate-uniform,Add AMDGPU uniform metadata,lib/Target/AMDGPU/AMDGPUAnnotateUniformValues.cpp,,False,False
+AMDGPUArgumentUsageInfo,-amdgpu-argument-reg-usage-info,Argument Register Usage Information Storage,lib/Target/AMDGPU/AMDGPUArgumentUsageInfo.cpp,,False,True
+AMDGPUAtomicOptimizer,-amdgpu-atomic-optimizer,AMDGPU atomic optimizations,lib/Target/AMDGPU/AMDGPUAtomicOptimizer.cpp,,False,False
+AMDGPUCFGStructurizer,-amdgpustructurizer,AMDGPU CFG Structurizer,lib/Target/AMDGPU/AMDILCFGStructurizer.cpp,,False,False
+AMDGPUCodeGenPrepare,-amdgpu-codegenprepare,AMDGPU IR optimizations,lib/Target/AMDGPU/AMDGPUCodeGenPrepare.cpp,,False,False
+AMDGPUDAGToDAGISel,-amdgpu-isel,AMDGPU DAG->DAG Pattern Instruction Selection,lib/Target/AMDGPU/AMDGPUISelDAGToDAG.cpp,,False,False
+AMDGPUExternalAAWrapper,-amdgpu-aa-wrapper,AMDGPU Address space based Alias Analysis Wrapper,lib/Target/AMDGPU/AMDGPUAliasAnalysis.cpp,,False,True
+AMDGPUFixFunctionBitcasts,-amdgpu-fix-function-bitcasts,Fix function bitcasts for AMDGPU,lib/Target/AMDGPU/AMDGPUFixFunctionBitcasts.cpp,,False,False
+AMDGPUInliner,-amdgpu-inline,AMDGPU Function Integration/Inlining,lib/Target/AMDGPU/AMDGPUInline.cpp,,False,False
+AMDGPULowerIntrinsics,-amdgpu-lower-intrinsics,Lower intrinsics,lib/Target/AMDGPU/AMDGPULowerIntrinsics.cpp,,False,False
+AMDGPULowerKernelArguments,-amdgpu-lower-kernel-arguments,AMDGPU Lower Kernel Arguments,lib/Target/AMDGPU/AMDGPULowerKernelArguments.cpp,,False,False
+AMDGPULowerKernelAttributes,-amdgpu-lower-kernel-attributes,AMDGPU IR optimizations,lib/Target/AMDGPU/AMDGPULowerKernelAttributes.cpp,,False,False
+AMDGPUMachineCFGStructurizer,-amdgpu-machine-cfg-structurizer,AMDGPU Machine CFG Structurizer,lib/Target/AMDGPU/AMDGPUMachineCFGStructurizer.cpp,,False,False
+AMDGPUOpenCLEnqueuedBlockLowering,-amdgpu-lower-enqueued-block,Lower OpenCL enqueued blocks,lib/Target/AMDGPU/AMDGPUOpenCLEnqueuedBlockLowering.cpp,,False,False
+AMDGPUPerfHintAnalysis,-amdgpu-perf-hint,Analysis if a function is memory bound,lib/Target/AMDGPU/AMDGPUPerfHintAnalysis.cpp,,True,True
+AMDGPUPrintfRuntimeBinding,-amdgpu-printf-runtime-binding,AMDGPU Printf lowering,lib/Target/AMDGPU/AMDGPUPrintfRuntimeBinding.cpp,,False,False
+AMDGPUPromoteAlloca,-amdgpu-promote-alloca,AMDGPU promote alloca to vector or LDS,lib/Target/AMDGPU/AMDGPUPromoteAlloca.cpp,,False,False
+AMDGPUPropagateAttributesEarly,-amdgpu-propagate-attributes-early,Early propagate attributes from kernels to functions,lib/Target/AMDGPU/AMDGPUPropagateAttributes.cpp,,False,False
+AMDGPUPropagateAttributesLate,-amdgpu-propagate-attributes-late,Late propagate attributes from kernels to functions,lib/Target/AMDGPU/AMDGPUPropagateAttributes.cpp,,False,False
+AMDGPURewriteOutArguments,-amdgpu-rewrite-out-arguments,AMDGPU Rewrite Out Arguments,lib/Target/AMDGPU/AMDGPURewriteOutArguments.cpp,,False,False
+AMDGPUSimplifyLibCalls,-amdgpu-simplifylib,Simplify well-known AMD library calls,lib/Target/AMDGPU/AMDGPULibCalls.cpp,,False,False
+AMDGPUUnifyDivergentExitNodes,-amdgpu-unify-divergent-exit-nodes,Unify divergent function exit nodes,lib/Target/AMDGPU/AMDGPUUnifyDivergentExitNodes.cpp,,False,False
+AMDGPUUnifyMetadata,-amdgpu-unify-metadata,Unify multiple OpenCL metadata due to linking,lib/Target/AMDGPU/AMDGPUUnifyMetadata.cpp,,False,False
+AMDGPUUseNativeCalls,-amdgpu-usenative,Replace builtin math calls with that native versions.,lib/Target/AMDGPU/AMDGPULibCalls.cpp,,False,False
+ARCBranchFinalize,-arc-branch-finalize,ARC finalize branches,lib/Target/ARC/ARCBranchFinalize.cpp,,False,False
+ARCOptAddrMode,-arc-addr-mode,ARC load/store address mode,lib/Target/ARC/ARCOptAddrMode.cpp,,False,False
+ARMConstantIslands,-arm-cp-islands,ARM constant island placement and branch shortening pass,lib/Target/ARM/ARMConstantIslandPass.cpp,,False,False
+ARMExecutionDomainFix,-arm-execution-domain-fix,ARM Execution Domain Fix,lib/Target/ARM/ARMTargetMachine.cpp,,False,False
+ARMExpandPseudo,-arm-pseudo,ARM pseudo instruction expansion pass,lib/Target/ARM/ARMExpandPseudoInsts.cpp,,False,False
+ARMLoadStoreOpt,-arm-ldst-opt,ARM load / store optimization pass,lib/Target/ARM/ARMLoadStoreOptimizer.cpp,,False,False
+ARMLowOverheadLoops,-arm-low-overhead-loops,ARM Low Overhead Loops pass,lib/Target/ARM/ARMLowOverheadLoops.cpp,,False,False
+ARMParallelDSP,-arm-parallel-dsp,Transform functions to use DSP intrinsics,lib/Target/ARM/ARMParallelDSP.cpp,,False,False
+ARMPreAllocLoadStoreOpt,-arm-prera-ldst-opt,ARM pre- register allocation load / store optimization pass,lib/Target/ARM/ARMLoadStoreOptimizer.cpp,,False,False
+ASanGlobalsMetadataWrapperPass,-asan-globals-md,"Read metadata to mark which globals should be instrumented "" ""when running ASan.",lib/Transforms/Instrumentation/AddressSanitizer.cpp,include/llvm/Transforms/Instrumentation/AddressSanitizer.h,False,True
+AVRExpandPseudo,-avr-expand-pseudo,AVR pseudo instruction expansion pass,lib/Target/AVR/AVRExpandPseudoInsts.cpp,,False,False
+AVRRelaxMem,-avr-relax-mem,AVR memory operation relaxation pass,lib/Target/AVR/AVRRelaxMemOperations.cpp,,False,False
+AddDiscriminatorsPass,-add-discriminators,Add DWARF path discriminators,lib/Transforms/Utils/AddDiscriminators.cpp,include/llvm/Transforms/Utils/AddDiscriminators.h,False,False
+AddressSanitizerLegacyPass,-asan,AddressSanitizer: detects use-after-free and out-of-bounds bugs.,lib/Transforms/Instrumentation/AddressSanitizer.cpp,include/llvm/Transforms/Instrumentation/AddressSanitizer.h,False,False
+AggressiveDCEPass,-adce,Aggressive Dead Code Elimination,lib/Transforms/Scalar/ADCE.cpp,include/llvm/Transforms/Scalar/ADCE.h,False,False
+AggressiveInstCombinerPass,-aggressive-instcombine,Combine pattern based expressions,lib/Transforms/AggressiveInstCombine/AggressiveInstCombine.cpp,include/llvm/Transforms/AggressiveInstCombine/AggressiveInstCombine.h,False,False
+AliasSetPrinter,-print-alias-sets,Alias Set Printer,lib/Analysis/AliasSetTracker.cpp,include/llvm/Analysis/AliasSetTracker.h,False,True
+AlignmentFromAssumptionsPass,-alignment-from-assumptions,Alignment from assumptions,lib/Transforms/Scalar/AlignmentFromAssumptions.cpp,include/llvm/Transforms/Scalar/AlignmentFromAssumptions.h,False,False
+AlwaysInlinerLegacyPass,-always-inline,Inliner for always_inline functions,lib/Transforms/IPO/AlwaysInliner.cpp,include/llvm/Transforms/IPO/AlwaysInliner.h,False,False
+ArgumentPromotionPass,-argpromotion,Promote 'by reference' arguments to scalars,lib/Transforms/IPO/ArgumentPromotion.cpp,include/llvm/Transforms/IPO/ArgumentPromotion.h,False,False
+AssumptionCacheTracker,-assumption-cache-tracker,Assumption Cache Tracker,lib/Analysis/AssumptionCache.cpp,include/llvm/Analysis/AssumptionCache.h,False,True
+AtomicExpand,-atomic-expand,Expand Atomic instructions,lib/CodeGen/AtomicExpandPass.cpp,,False,False
+AttributorLegacyPass,-attributor,Deduce and propagate attributes,lib/Transforms/IPO/Attributor.cpp,include/llvm/Transforms/IPO/Attributor.h,False,False
+BPFAbstractMemberAccess,-bpf-abstract-member-access,abstracting struct/union member accessees,lib/Target/BPF/BPFAbstractMemberAccess.cpp,,False,False
+BPFMIPeephole,-bpf-mi-zext-elim,BPF MachineSSA Peephole Optimization For ZEXT Eliminate,lib/Target/BPF/BPFMIPeephole.cpp,,False,False
+BPFMIPeepholeTruncElim,-bpf-mi-trunc-elim,BPF MachineSSA Peephole Optimization For TRUNC Eliminate,lib/Target/BPF/BPFMIPeephole.cpp,,False,False
+BPFMIPreEmitChecking,-bpf-mi-pemit-checking,BPF PreEmit Checking,lib/Target/BPF/BPFMIChecking.cpp,,False,False
+BPFMIPreEmitPeephole,-bpf-mi-pemit-peephole,BPF PreEmit Peephole Optimization,lib/Target/BPF/BPFMIPeephole.cpp,,False,False
+BPFMISimplifyPatchable,-bpf-mi-simplify-patchable,BPF PreEmit SimplifyPatchable,lib/Target/BPF/BPFMISimplifyPatchable.cpp,,False,False
+BarrierNoopPass,-barrier,A No-Op Barrier Pass,lib/Transforms/IPO/BarrierNoopPass.cpp,,False,False
+BasicAAWrapperPass,-basicaa,Basic Alias Analysis (stateless AA impl),lib/Analysis/BasicAliasAnalysis.cpp,include/llvm/Analysis/BasicAliasAnalysis.h,False,True
+BitTrackingDCEPass,-bdce,Bit-Tracking Dead Code Elimination,lib/Transforms/Scalar/BDCE.cpp,include/llvm/Transforms/Scalar/BDCE.h,False,False
+BlockExtractorPass,-extract-blocks,Extract basic blocks from module,lib/Transforms/IPO/BlockExtractor.cpp,,False,False
+BlockFrequencyInfoWrapperPass,-block-freq,Block Frequency Analysis,lib/Analysis/BlockFrequencyInfo.cpp,include/llvm/Analysis/BlockFrequencyInfo.h,True,True
+BoundsCheckingLegacyPass,-bounds-checking,Run-time bounds checking,lib/Transforms/Instrumentation/BoundsChecking.cpp,include/llvm/Transforms/Instrumentation/BoundsChecking.h,False,False
+BranchFolderPass,-branch-folder,Control Flow Optimizer,lib/CodeGen/BranchFolding.cpp,,False,False
+BranchProbabilityInfoWrapperPass,-branch-prob,Branch Probability Analysis,lib/Analysis/BranchProbabilityInfo.cpp,include/llvm/Analysis/BranchProbabilityInfo.h,False,True
+BranchRelaxation,-branch-relaxation,Branch relaxation pass,lib/CodeGen/BranchRelaxation.cpp,,False,False
+BreakCriticalEdgesPass,-break-crit-edges,Break critical edges in CFG,lib/Transforms/Utils/BreakCriticalEdges.cpp,include/llvm/Transforms/Utils/BreakCriticalEdges.h,False,False
+BreakFalseDeps,-break-false-deps,BreakFalseDeps,lib/CodeGen/BreakFalseDeps.cpp,,False,False
+CFGOnlyPrinterLegacyPass,-dot-cfg-only,Print CFG of function to 'dot' file (with no function bodies),lib/Analysis/CFGPrinter.cpp,include/llvm/Analysis/CFGPrinter.h,False,True
+CFGOnlyViewerLegacyPass,-view-cfg-only,View CFG of function (with no function bodies),lib/Analysis/CFGPrinter.cpp,include/llvm/Analysis/CFGPrinter.h,False,True
+CFGPrinterLegacyPass,-dot-cfg,Print CFG of function to 'dot' file,lib/Analysis/CFGPrinter.cpp,include/llvm/Analysis/CFGPrinter.h,False,True
+CFGSimplificationPass,-simplifycfg,Simplify the CFG,lib/Transforms/Scalar/SimplifyCFGPass.cpp,,False,False
+CFGViewerLegacyPass,-view-cfg,View CFG of function,lib/Analysis/CFGPrinter.cpp,include/llvm/Analysis/CFGPrinter.h,False,True
+CFGuardCheckPass,-CFGuard,CFGuard,lib/Transforms/CFGuard/CFGuard.cpp,,False,False
+CFGuardDispatchPass,-CFGuard,CFGuard,lib/Transforms/CFGuard/CFGuard.cpp,,False,False
+CFGuardLongjmp,-CFGuardLongjmp,Insert symbols at valid longjmp targets for /guard:cf,lib/CodeGen/CFGuardLongjmp.cpp,,False,False
+CFIInstrInserter,-cfi-instr-inserter,Check CFA info and insert CFI instructions if needed,lib/CodeGen/CFIInstrInserter.cpp,,False,False
+CFLAndersAAWrapperPass,-cfl-anders-aa,Inclusion-Based CFL Alias Analysis,lib/Analysis/CFLAndersAliasAnalysis.cpp,include/llvm/Analysis/CFLAndersAliasAnalysis.h,False,True
+CFLSteensAAWrapperPass,-cfl-steens-aa,Unification-Based CFL Alias Analysis,lib/Analysis/CFLSteensAliasAnalysis.cpp,include/llvm/Analysis/CFLSteensAliasAnalysis.h,False,True
+CallGraphDOTPrinter,-dot-callgraph,Print call graph to 'dot' file,lib/Analysis/CallPrinter.cpp,include/llvm/Analysis/CallPrinter.h,False,False
+CallGraphPrinterLegacyPass,-print-callgraph,Print a call graph,lib/Analysis/CallGraph.cpp,include/llvm/Analysis/CallGraph.h,True,True
+CallGraphViewer,-view-callgraph,View call graph,lib/Analysis/CallPrinter.cpp,include/llvm/Analysis/CallPrinter.h,False,False
+CallGraphWrapperPass,-basiccg,CallGraph Construction,lib/Analysis/CallGraph.cpp,include/llvm/Analysis/CallGraph.h,False,True
+CallSiteSplittingPass,-callsite-splitting,Call-site splitting,lib/Transforms/Scalar/CallSiteSplitting.cpp,include/llvm/Transforms/Scalar/CallSiteSplitting.h,False,False
+CalledValuePropagationPass,-called-value-propagation,Called Value Propagation,lib/Transforms/IPO/CalledValuePropagation.cpp,include/llvm/Transforms/IPO/CalledValuePropagation.h,False,False
+CanonicalizeAliasesPass,-canonicalize-aliases,Canonicalize aliases,lib/Transforms/Utils/CanonicalizeAliases.cpp,include/llvm/Transforms/Utils/CanonicalizeAliases.h,False,False
+CodeGenPrepare,-codegenprepare,Optimize for code generation,lib/CodeGen/CodeGenPrepare.cpp,,False,False
+ConstantHoistingPass,-consthoist,Constant Hoisting,lib/Transforms/Scalar/ConstantHoisting.cpp,include/llvm/Transforms/Scalar/ConstantHoisting.h,False,False
+ConstantMergePass,-constmerge,Merge Duplicate Global Constants,lib/Transforms/IPO/ConstantMerge.cpp,include/llvm/Transforms/IPO/ConstantMerge.h,False,False
+ConstantPropagationPass,-constprop,Simple constant propagation,lib/Transforms/Scalar/ConstantProp.cpp,,False,False
+ControlHeightReductionLegacyPass,-chr,Reduce control height in the hot paths,lib/Transforms/Instrumentation/ControlHeightReduction.cpp,include/llvm/Transforms/Instrumentation/ControlHeightReduction.h,False,False
+CoroCleanupLegacyPass,-coro-cleanup,Lower all coroutine related intrinsics,lib/Transforms/Coroutines/CoroCleanup.cpp,,False,False
+CoroEarlyLegacyPass,-coro-early,Lower early coroutine intrinsics,lib/Transforms/Coroutines/CoroEarly.cpp,,False,False
+CoroElideLegacyPass,-coro-elide,Coroutine frame allocation elision and indirect calls replacement,lib/Transforms/Coroutines/CoroElide.cpp,,False,False
+CoroSplitLegacyPass,-coro-split,Split coroutine into a set of functions driving its state machine,lib/Transforms/Coroutines/CoroSplit.cpp,,False,False
+CorrelatedValuePropagationPass,-correlated-propagation,Value Propagation,lib/Transforms/Scalar/CorrelatedValuePropagation.cpp,include/llvm/Transforms/Scalar/CorrelatedValuePropagation.h,False,False
+CostModelAnalysis,-cost-model,Cost Model Analysis,lib/Analysis/CostModel.cpp,,False,True
+CrossDSOCFIPass,-cross-dso-cfi,Cross-DSO CFI,lib/Transforms/IPO/CrossDSOCFI.cpp,include/llvm/Transforms/IPO/CrossDSOCFI.h,False,False
+DAH,-deadarghaX0r,Dead Argument Hacking (BUGPOINT USE ONLY; DO NOT USE),lib/Transforms/IPO/DeadArgumentElimination.cpp,include/llvm/Transforms/IPO/DeadArgumentElimination.h,False,False
+DataFlowSanitizerPass,-dfsan,DataFlowSanitizer: dynamic data flow analysis.,lib/Transforms/Instrumentation/DataFlowSanitizer.cpp,,False,False
+DeadArgEliminationPass,-deadargelim,Dead Argument Elimination,lib/Transforms/IPO/DeadArgumentElimination.cpp,include/llvm/Transforms/IPO/DeadArgumentElimination.h,False,False
+DeadCodeEliminationPass,-dce,Dead Code Elimination,lib/Transforms/Scalar/DCE.cpp,include/llvm/Transforms/Scalar/DCE.h,False,False
+DeadInstEliminationPass,-die,Dead Instruction Elimination,lib/Transforms/Scalar/DCE.cpp,include/llvm/Transforms/Scalar/DCE.h,False,False
+DeadMachineInstructionElim,-dead-mi-elimination,Remove dead machine instructions,lib/CodeGen/DeadMachineInstructionElim.cpp,,False,False
+DeadStoreEliminationPass,-dse,Dead Store Elimination,lib/Transforms/Scalar/DeadStoreElimination.cpp,include/llvm/Transforms/Scalar/DeadStoreElimination.h,False,False
+Delinearization,-delinearize,Delinearization,lib/Analysis/Delinearization.cpp,,True,True
+DemandedBitsWrapperPass,-demanded-bits,Demanded bits analysis,lib/Analysis/DemandedBits.cpp,include/llvm/Analysis/DemandedBits.h,False,False
+DemoteRegisterToMemoryPass,-reg2mem,Demote all values to stack slots,lib/Transforms/Scalar/Reg2Mem.cpp,,False,False
+DependenceAnalysisWrapperPass,-da,Dependence Analysis,lib/Analysis/DependenceAnalysis.cpp,include/llvm/Analysis/DependenceAnalysis.h,True,True
+DetectDeadLanes,-detect-dead-lanes,Detect Dead Lanes,lib/CodeGen/DetectDeadLanes.cpp,,False,False
+DivRemPairsPass,-div-rem-pairs,Hoist/decompose integer division and remainder,lib/Transforms/Scalar/DivRemPairs.cpp,include/llvm/Transforms/Scalar/DivRemPairs.h,False,False
+DomOnlyPrinter,-dot-dom-only,"Print dominance tree of function to 'dot' file "" ""(with no function bodies)",lib/Analysis/DomPrinter.cpp,include/llvm/Analysis/DomPrinter.h,False,False
+DomOnlyViewer,-view-dom-only,View dominance tree of function (with no function bodies),lib/Analysis/DomPrinter.cpp,include/llvm/Analysis/DomPrinter.h,False,False
+DomPrinter,-dot-dom,Print dominance tree of function to 'dot' file,lib/Analysis/DomPrinter.cpp,include/llvm/Analysis/DomPrinter.h,False,False
+DomViewer,-view-dom,View dominance tree of function,lib/Analysis/DomPrinter.cpp,include/llvm/Analysis/DomPrinter.h,False,False
+DominanceFrontierWrapperPass,-domfrontier,Dominance Frontier Construction,lib/Analysis/DominanceFrontier.cpp,include/llvm/Analysis/DominanceFrontier.h,True,True
+DominatorTreeWrapperPass,-domtree,Dominator Tree Construction,lib/IR/Dominators.cpp,include/llvm/IR/Dominators.h,True,True
+DummyCGSCCPass,-DummyCGSCCPass,DummyCGSCCPass,lib/Analysis/CallGraphSCCPass.cpp,include/llvm/Analysis/CallGraphSCCPass.h,False,False
+DwarfEHPrepare,-dwarfehprepare,Prepare DWARF exceptions,lib/CodeGen/DwarfEHPrepare.cpp,,False,False
+EarlyCSEMemSSAPass,-early-cse-memssa,Early CSE w/ MemorySSA,lib/Transforms/Scalar/EarlyCSE.cpp,include/llvm/Transforms/Scalar/EarlyCSE.h,False,False
+EarlyCSEPass,-early-cse,Early CSE,lib/Transforms/Scalar/EarlyCSE.cpp,include/llvm/Transforms/Scalar/EarlyCSE.h,False,False
+EarlyIfConverter,-early-if-predicator,Early If Converter,lib/CodeGen/EarlyIfConversion.cpp,,False,False
+EarlyIfPredicator,-early-if-predicator,Early If Predicator,lib/CodeGen/EarlyIfConversion.cpp,,False,False
+EarlyMachineLICM,-early-machinelicm,Early Machine Loop Invariant Code Motion,lib/CodeGen/MachineLICM.cpp,,False,False
+EarlyTailDuplicate,-early-tailduplication,Early Tail Duplication,lib/CodeGen/TailDuplication.cpp,,False,False
+EdgeBundles,-edge-bundles,Bundle Machine CFG Edges,lib/CodeGen/EdgeBundles.cpp,include/llvm/CodeGen/EdgeBundles.h,True,True
+EliminateAvailableExternallyPass,-elim-avail-extern,Eliminate Available Externally Globals,lib/Transforms/IPO/ElimAvailExtern.cpp,include/llvm/Transforms/IPO/ElimAvailExtern.h,False,False
+EntryExitInstrumenterPass,-ee-instrument,Instrument function entry/exit with calls to e.g. mcount()(pre inlining),lib/Transforms/Utils/EntryExitInstrumenter.cpp,include/llvm/Transforms/Utils/EntryExitInstrumenter.h,False,False
+EvexToVexInstPass,-x86-evex-to-vex-compress,Compressing EVEX instrs to VEX encoding when possible,lib/Target/X86/X86EvexToVex.cpp,,False,False
+ExpandMemCmpPass,-expandmemcmp,Expand memcmp()to load/stores,lib/CodeGen/ExpandMemCmp.cpp,,False,False
+ExpandPostRA,-postrapseudos,Post-RA pseudo instruction expansion pass,lib/CodeGen/ExpandPostRAPseudos.cpp,,False,False
+ExpandReductions,-expand-reductions,Expand reduction intrinsics,lib/CodeGen/ExpandReductions.cpp,include/llvm/CodeGen/ExpandReductions.h,False,False
+ExternalAAWrapperPass,-external-aa,External Alias Analysis,lib/Analysis/AliasAnalysis.cpp,include/llvm/Analysis/AliasAnalysis.h,False,True
+FEntryInserter,-fentry-insert,Insert fentry calls,lib/CodeGen/FEntryInserter.cpp,,False,False
+FPS,-x86-codegen,X86 FP Stackifier,lib/Target/X86/X86FloatingPoint.cpp,,False,False
+FalkorHWPFFix,-falkor-hwpf-fix-late,Falkor HW Prefetch Fix Late Phase,lib/Target/AArch64/AArch64FalkorHWPFFix.cpp,,False,False
+FalkorMarkStridedAccessesLegacy,-falkor-hwpf-fix,Falkor HW Prefetch Fix,lib/Target/AArch64/AArch64FalkorHWPFFix.cpp,,False,False
+FinalizeISel,-finalize-isel,Finalize ISel and expand pseudo-instructions,lib/CodeGen/FinalizeISel.cpp,,False,False
+FinalizeMachineBundles,-finalize-mi-bundles,Finalize machine instruction bundles,lib/CodeGen/MachineInstrBundle.cpp,include/llvm/CodeGen/MachineInstrBundle.h,False,False
+FixFunctionBitcasts,-wasm-fix-function-bitcasts,Fix mismatching bitcasts for WebAssembly,lib/Target/WebAssembly/WebAssemblyFixFunctionBitcasts.cpp,,False,False
+FixupBWInstPass,-x86-fixup-bw-insts,X86 Byte/Word Instruction Fixup,lib/Target/X86/X86FixupBWInsts.cpp,,False,False
+FixupLEAPass,-x86-fixup-LEAs,X86 LEA Fixup,lib/Target/X86/X86FixupLEAs.cpp,,False,False
+FlattenCFGPass,-flattencfg,Flatten the CFG,lib/Transforms/Scalar/FlattenCFGPass.cpp,,False,False
+Float2IntPass,-float2int,Float to int,lib/Transforms/Scalar/Float2Int.cpp,include/llvm/Transforms/Scalar/Float2Int.h,False,False
+ForceFunctionAttrsLegacyPass,-forceattrs,Force set function attributes,lib/Transforms/IPO/ForceFunctionAttrs.cpp,include/llvm/Transforms/IPO/ForceFunctionAttrs.h,False,False
+FuncletLayout,-funclet-layout,Contiguously Lay Out Funclets,lib/CodeGen/FuncletLayout.cpp,,False,False
+FunctionImportPass,-function-import,Summary Based Function Import,lib/Transforms/IPO/FunctionImport.cpp,include/llvm/Transforms/IPO/FunctionImport.h,False,False
+FunctionInliningPass,-inline,Function Integration/Inlining,lib/Transforms/IPO/InlineSimple.cpp,,False,False
+GCMachineCodeAnalysis,-gc-analysis,Analyze Machine Code For Garbage Collection,lib/CodeGen/GCRootLowering.cpp,,False,False
+GCModuleInfo,-collector-metadata,Create Garbage Collector Module Metadata,lib/CodeGen/GCMetadata.cpp,include/llvm/CodeGen/GCMetadata.h,False,False
+GCNDPPCombine,-gcn-dpp-combine,GCN DPP Combine,lib/Target/AMDGPU/GCNDPPCombine.cpp,,False,False
+GCNNSAReassign,-amdgpu-nsa-reassign,GCN NSA Reassign,lib/Target/AMDGPU/GCNNSAReassign.cpp,,False,False
+GCNRegBankReassign,-amdgpu-regbanks-reassign,GCN RegBank Reassign,lib/Target/AMDGPU/GCNRegBankReassign.cpp,,False,False
+GCOVProfilerPass,-insert-gcov-profiling,Insert instrumentation for GCOV profiling,lib/Transforms/Instrumentation/GCOVProfiling.cpp,,False,False
+GISelCSEAnalysisWrapperPass,-cseinfo,Analysis containing CSE Info,lib/CodeGen/GlobalISel/CSEInfo.cpp,include/llvm/CodeGen/GlobalISel/CSEInfo.h,False,True
+GISelKnownBitsAnalysis,-gisel-known-bits,Analysis for ComputingKnownBits,lib/CodeGen/GlobalISel/GISelKnownBits.cpp,include/llvm/CodeGen/GlobalISel/GISelKnownBits.h,False,True
+GVNHoistPass,-gvn-hoist,Early GVN Hoisting of Expressions,lib/Transforms/Scalar/GVNHoist.cpp,,False,False
+GVNPass,-gvn,Global Value Numbering,lib/Transforms/Scalar/GVN.cpp,include/llvm/Transforms/Scalar/GVN.h,False,False
+GVNSinkPass,-gvn-sink,Early GVN sinking of Expressions,lib/Transforms/Scalar/GVNSink.cpp,,False,False
+GenericToNVVM,-generic-to-nvvm,Ensure that the global variables are in the global address space,lib/Target/NVPTX/NVPTXGenericToNVVM.cpp,,False,False
+GlobalDCEPass,-globaldce,Dead Global Elimination,lib/Transforms/IPO/GlobalDCE.cpp,include/llvm/Transforms/IPO/GlobalDCE.h,False,False
+GlobalMerge,-global-merge,Merge global variables,lib/CodeGen/GlobalMerge.cpp,,False,False
+GlobalOptimizerPass,-globalopt,Global Variable Optimizer,lib/Transforms/IPO/GlobalOpt.cpp,include/llvm/Transforms/IPO/GlobalOpt.h,False,False
+GlobalSplitPass,-globalsplit,Global splitter,lib/Transforms/IPO/GlobalSplit.cpp,include/llvm/Transforms/IPO/GlobalSplit.h,False,False
+GlobalsAAWrapperPass,-globals-aa,Globals Alias Analysis,lib/Analysis/GlobalsModRef.cpp,include/llvm/Analysis/GlobalsModRef.h,False,True
+GuardWideningPass,-guard-widening,Widen guards,lib/Transforms/Scalar/GuardWidening.cpp,include/llvm/Transforms/Scalar/GuardWidening.h,False,False
+HWAddressSanitizerLegacyPass,-hwasan,HWAddressSanitizer: detect memory bugs using tagged addressing.,lib/Transforms/Instrumentation/HWAddressSanitizer.cpp,include/llvm/Transforms/Instrumentation/HWAddressSanitizer.h,False,False
+HardwareLoops,-hardware-loops,Hardware Loop Insertion,lib/CodeGen/HardwareLoops.cpp,,False,False
+HexagonBitSimplify,-hexagon-bit-simplify,Hexagon bit simplification,lib/Target/Hexagon/HexagonBitSimplify.cpp,,False,False
+HexagonBranchRelaxation,-hexagon-brelax,Hexagon Branch Relaxation,lib/Target/Hexagon/HexagonBranchRelaxation.cpp,,False,False
+HexagonCFGOptimizer,-hexagon-cfg,Hexagon CFG Optimizer,lib/Target/Hexagon/HexagonCFGOptimizer.cpp,,False,False
+HexagonCallFrameInformation,-hexagon-cfi,Hexagon call frame information,lib/Target/Hexagon/HexagonFrameLowering.cpp,,False,False
+HexagonCommonGEP,-hcommgep,Hexagon Common GEP,lib/Target/Hexagon/HexagonCommonGEP.cpp,,False,False
+HexagonConstExtenders,-hexagon-cext-opt,Hexagon constant-extender optimization,lib/Target/Hexagon/HexagonConstExtenders.cpp,,False,False
+HexagonConstPropagation,-hexagon-constp,Hexagon Constant Propagation,lib/Target/Hexagon/HexagonConstPropagation.cpp,,False,False
+HexagonCopyToCombine,-hexagon-copy-combine,Hexagon Copy-To-Combine Pass,lib/Target/Hexagon/HexagonCopyToCombine.cpp,,False,False
+HexagonEarlyIfConversion,-hexagon-early-if,Hexagon early if conversion,lib/Target/Hexagon/HexagonEarlyIfConv.cpp,,False,False
+HexagonExpandCondsets,-expand-condsets,Hexagon Expand Condsets,lib/Target/Hexagon/HexagonExpandCondsets.cpp,,False,False
+HexagonFixupHwLoops,-hwloopsfixup,Hexagon Hardware Loops Fixup,lib/Target/Hexagon/HexagonFixupHwLoops.cpp,,False,False
+HexagonGenExtract,-hextract,"Hexagon generate "" ""\""extract\"" instructions",lib/Target/Hexagon/HexagonGenExtract.cpp,,False,False
+HexagonGenInsert,-hexinsert,"Hexagon generate \""insert\"" instructions",lib/Target/Hexagon/HexagonGenInsert.cpp,,False,False
+HexagonGenMux,-hexagon-gen-mux,Hexagon generate mux instructions,lib/Target/Hexagon/HexagonGenMux.cpp,,False,False
+HexagonGenPredicate,-hexagon-gen-pred,Hexagon generate predicate operations,lib/Target/Hexagon/HexagonGenPredicate.cpp,,False,False
+HexagonHardwareLoops,-hwloops,Hexagon Hardware Loops,lib/Target/Hexagon/HexagonHardwareLoops.cpp,,False,False
+HexagonLoopIdiomRecognize,-hexagon-loop-idiom,Recognize Hexagon-specific loop idioms,lib/Target/Hexagon/HexagonLoopIdiomRecognition.cpp,,False,False
+HexagonLoopRescheduling,-hexagon-loop-resched,Hexagon Loop Rescheduling,lib/Target/Hexagon/HexagonBitSimplify.cpp,,False,False
+HexagonNewValueJump,-hexagon-nvj,Hexagon NewValueJump,lib/Target/Hexagon/HexagonNewValueJump.cpp,,False,False
+HexagonOptAddrMode,-amode-opt,Optimize addressing mode,lib/Target/Hexagon/HexagonOptAddrMode.cpp,,False,False
+HexagonOptimizeSZextends,-reargs,Remove Sign and Zero Extends for Args,lib/Target/Hexagon/HexagonOptimizeSZextends.cpp,,False,False
+HexagonPacketizer,-hexagon-packetizer,Hexagon Packetizer,lib/Target/Hexagon/HexagonVLIWPacketizer.cpp,,False,False
+HexagonPeephole,-hexagon-peephole,Hexagon Peephole,lib/Target/Hexagon/HexagonPeephole.cpp,,False,False
+HexagonRDFOpt,-hexagon-rdf-opt,Hexagon RDF optimizations,lib/Target/Hexagon/HexagonRDFOpt.cpp,,False,False
+HexagonSplitConst32AndConst64,-split-const-for-sdata,Hexagon Split Const32s and Const64s,lib/Target/Hexagon/HexagonSplitConst32AndConst64.cpp,,False,False
+HexagonSplitDoubleRegs,-hexagon-split-double,Hexagon Split Double Registers,lib/Target/Hexagon/HexagonSplitDouble.cpp,,False,False
+HexagonStoreWidening,-hexagon-widen-stores,Hexason Store Widening,lib/Target/Hexagon/HexagonStoreWidening.cpp,,False,False
+HexagonVExtract,-hexagon-vextract,Hexagon optimize vextract,lib/Target/Hexagon/HexagonVExtract.cpp,,False,False
+HexagonVectorLoopCarriedReuse,-hexagon-vlcr,Hexagon-specific predictive commoning for HVX vectors,lib/Target/Hexagon/HexagonVectorLoopCarriedReuse.cpp,,False,False
+HexagonVectorPrint,-hexagon-vector-print,Hexagon VectorPrint pass,lib/Target/Hexagon/HexagonVectorPrint.cpp,,False,False
+HotColdSplittingPass,-hotcoldsplit,Hot Cold Splitting,lib/Transforms/IPO/HotColdSplitting.cpp,include/llvm/Transforms/IPO/HotColdSplitting.h,False,False
+IPConstantPropagationPass,-ipconstprop,Interprocedural constant propagation,lib/Transforms/IPO/IPConstantPropagation.cpp,,False,False
+IPSCCPPass,-ipsccp,Interprocedural Sparse Conditional Constant Propagation,lib/Transforms/IPO/SCCP.cpp,include/llvm/Transforms/IPO/SCCP.h,False,False
+IRTranslator,-irtranslator,IRTranslator LLVM IR -> MI,lib/CodeGen/GlobalISel/IRTranslator.cpp,include/llvm/CodeGen/GlobalISel/IRTranslator.h,False,False
+IVUsersWrapperPass,-iv-users,Induction Variable Users,lib/Analysis/IVUsers.cpp,include/llvm/Analysis/IVUsers.h,False,True
+IfConverter,-if-converter,If Converter,lib/CodeGen/IfConversion.cpp,,False,False
+ImplicitNullChecks,-implicit-null-checks,Implicit null checks,lib/CodeGen/ImplicitNullChecks.cpp,,False,False
+IndVarSimplifyPass,-indvars,Induction Variable Simplification,lib/Transforms/Scalar/IndVarSimplify.cpp,include/llvm/Transforms/Scalar/IndVarSimplify.h,False,False
+IndirectBrExpandPass,-indirectbr-expand,Expand indirectbr instructions,lib/CodeGen/IndirectBrExpandPass.cpp,,False,False
+InductiveRangeCheckEliminationPass,-irce,Inductive range check elimination,lib/Transforms/Scalar/InductiveRangeCheckElimination.cpp,include/llvm/Transforms/Scalar/InductiveRangeCheckElimination.h,False,False
+InferAddressSpacesPass,-infer-address-spaces,Infer address spaces,lib/Transforms/Scalar/InferAddressSpaces.cpp,,False,False
+InferFunctionAttrsLegacyPass,-inferattrs,Infer set function attributes,lib/Transforms/IPO/InferFunctionAttrs.cpp,include/llvm/Transforms/IPO/InferFunctionAttrs.h,False,False
+InjectTLIMappingsLegacyPass,-inject-tli-mappings,Inject TLI Mappings,lib/Transforms/Utils/InjectTLIMappings.cpp,include/llvm/Transforms/Utils/InjectTLIMappings.h,False,False
+InstCount,-instcount,Counts the various types of Instructions,lib/Analysis/InstCount.cpp,,False,True
+InstSimplifyLegacyPass,-instsimplify,Remove redundant instructions,lib/Transforms/Scalar/InstSimplifyPass.cpp,include/llvm/Transforms/Scalar/InstSimplifyPass.h,False,False
+InstrOrderFilePass,-instrorderfile,Instrumentation for Order File,lib/Transforms/Instrumentation/InstrOrderFile.cpp,include/llvm/Transforms/Instrumentation/InstrOrderFile.h,False,False
+InstrProfilingLegacyPass,-instrprof,Frontend instrumentation-based coverage lowering.,lib/Transforms/Instrumentation/InstrProfiling.cpp,include/llvm/Transforms/Instrumentation/InstrProfiling.h,False,False
+InstructionCombiningPass,-instcombine,Combine redundant instructions,lib/Transforms/InstCombine/InstructionCombining.cpp,,False,False
+InstructionNamerPass,-instnamer,Assign names to anonymous instructions,lib/Transforms/Utils/InstructionNamer.cpp,,False,False
+InstructionSelect,-instruction-select,Select target instructions out of generic instructions,lib/CodeGen/GlobalISel/InstructionSelect.cpp,include/llvm/CodeGen/GlobalISel/InstructionSelect.h,False,False
+InterleavedAccess,-interleaved-access,Lower interleaved memory accesses to target specific intrinsics,lib/CodeGen/InterleavedAccessPass.cpp,,False,False
+InterleavedLoadCombine,-interleaved-load-combine,Combine interleaved loads into wide loads and shufflevector instructions,lib/CodeGen/InterleavedLoadCombinePass.cpp,,False,False
+InternalizePass,-internalize,Internalize Global Symbols,lib/Transforms/IPO/Internalize.cpp,include/llvm/Transforms/IPO/Internalize.h,False,False
+IntervalPartition,-intervals,Interval Partition Construction,lib/Analysis/IntervalPartition.cpp,include/llvm/Analysis/IntervalPartition.h,True,True
+JumpThreadingPass,-jump-threading,Jump Threading,lib/Transforms/Scalar/JumpThreading.cpp,include/llvm/Transforms/Scalar/JumpThreading.h,False,False
+LCSSAPass,-lcssa,Loop-Closed SSA Form Pass,lib/Transforms/Utils/LCSSA.cpp,include/llvm/Transforms/Utils/LCSSA.h,False,False
+LCSSAVerificationPass,-lcssa-verification,LCSSA Verifier,lib/Analysis/LoopPass.cpp,include/llvm/Analysis/LoopPass.h,False,False
+LDTLSCleanup,-aarch64-local-dynamic-tls-cleanup,AArch64 Local Dynamic TLS Access Clean-up,lib/Target/AArch64/AArch64CleanupLocalDynamicTLSPass.cpp,,False,False
+LICMPass,-licm,Loop Invariant Code Motion,lib/Transforms/Scalar/LICM.cpp,include/llvm/Transforms/Scalar/LICM.h,False,False
+LanaiMemAluCombiner,-lanai-mem-alu-combiner,Lanai memory ALU combiner pass,lib/Target/Lanai/LanaiMemAluCombiner.cpp,,False,False
+LazyBlockFrequencyInfoPass,-lazy-block-freq,Lazy Block Frequency Analysis,lib/Analysis/LazyBlockFrequencyInfo.cpp,include/llvm/Analysis/LazyBlockFrequencyInfo.h,True,True
+LazyBranchProbabilityInfoPass,-lazy-branch-prob,Lazy Branch Probability Analysis,lib/Analysis/LazyBranchProbabilityInfo.cpp,include/llvm/Analysis/LazyBranchProbabilityInfo.h,True,True
+LazyMachineBlockFrequencyInfoPass,-lazy-machine-block-freq,Lazy Machine Block Frequency Analysis,lib/CodeGen/LazyMachineBlockFrequencyInfo.cpp,include/llvm/CodeGen/LazyMachineBlockFrequencyInfo.h,True,True
+LazyValueInfoPrinter,-print-lazy-value-info,Lazy Value Info Printer Pass,lib/Analysis/LazyValueInfo.cpp,include/llvm/Analysis/LazyValueInfo.h,False,False
+LazyValueInfoWrapperPass,-lazy-value-info,Lazy Value Information Analysis,lib/Analysis/LazyValueInfo.cpp,include/llvm/Analysis/LazyValueInfo.h,False,True
+LegacyDivergenceAnalysis,-divergence,Legacy Divergence Analysis,lib/Analysis/LegacyDivergenceAnalysis.cpp,include/llvm/Analysis/LegacyDivergenceAnalysis.h,False,True
+Legalizer,-legalizer,Legalize the Machine IR a function's Machine IR,lib/CodeGen/GlobalISel/Legalizer.cpp,include/llvm/CodeGen/GlobalISel/Legalizer.h,False,False
+LibCallsShrinkWrapPass,-libcalls-shrinkwrap,Conditionally eliminate dead library calls,lib/Transforms/Utils/LibCallsShrinkWrap.cpp,include/llvm/Transforms/Utils/LibCallsShrinkWrap.h,False,False
+Lint,-lint,Statically lint-checks LLVM IR,lib/Analysis/Lint.cpp,include/llvm/Analysis/Lint.h,False,True
+LiveDebugValues,-livedebugvalues,Live DEBUG_VALUE analysis,lib/CodeGen/LiveDebugValues.cpp,,False,False
+LiveDebugVariables,-livedebugvars,Debug Variable Analysis,lib/CodeGen/LiveDebugVariables.cpp,,False,False
+LiveIntervals,-liveintervals,Live Interval Analysis,lib/CodeGen/LiveIntervals.cpp,include/llvm/CodeGen/LiveIntervals.h,False,False
+LiveRangeShrink,-lrshrink,Live Range Shrink Pass,lib/CodeGen/LiveRangeShrink.cpp,,False,False
+LiveRegMatrix,-liveregmatrix,Live Register Matrix,lib/CodeGen/LiveRegMatrix.cpp,include/llvm/CodeGen/LiveRegMatrix.h,False,False
+LiveStacks,-livestacks,Live Stack Slot Analysis,lib/CodeGen/LiveStacks.cpp,include/llvm/CodeGen/LiveStacks.h,False,False
+LiveVariables,-livevars,Live Variable Analysis,lib/CodeGen/LiveVariables.cpp,include/llvm/CodeGen/LiveVariables.h,False,False
+LoadStoreVectorizerPass,-load-store-vectorizer,Vectorize load and Store instructions,lib/Transforms/Vectorize/LoadStoreVectorizer.cpp,include/llvm/Transforms/Vectorize/LoadStoreVectorizer.h,False,False
+LocalStackSlotPass,-localstackalloc,Local Stack Slot Allocation,lib/CodeGen/LocalStackSlotAllocation.cpp,,False,False
+Localizer,-localizer,Move/duplicate certain instructions close to their use,lib/CodeGen/GlobalISel/Localizer.cpp,include/llvm/CodeGen/GlobalISel/Localizer.h,False,False
+LoopAccessLegacyAnalysis,-loop-accesses,Loop Access Analysis,lib/Analysis/LoopAccessAnalysis.cpp,include/llvm/Analysis/LoopAccessAnalysis.h,False,True
+LoopDataPrefetchPass,-loop-data-prefetch,Loop Data Prefetch,lib/Transforms/Scalar/LoopDataPrefetch.cpp,include/llvm/Transforms/Scalar/LoopDataPrefetch.h,False,False
+LoopDeletionPass,-loop-deletion,Delete dead loops,lib/Transforms/Scalar/LoopDeletion.cpp,include/llvm/Transforms/Scalar/LoopDeletion.h,False,False
+LoopDistributePass,-loop-distribute,Loop Distribution,lib/Transforms/Scalar/LoopDistribute.cpp,include/llvm/Transforms/Scalar/LoopDistribute.h,False,False
+LoopExtractorPass,-loop-extract,Extract loops into new functions,lib/Transforms/IPO/LoopExtractor.cpp,,False,False
+LoopFusePass,-loop-fusion,Loop Fusion,lib/Transforms/Scalar/LoopFuse.cpp,include/llvm/Transforms/Scalar/LoopFuse.h,False,False
+LoopGuardWideningPass,-loop-guard-widening,"Widen guards (within a single loop, as a loop pass)",lib/Transforms/Scalar/GuardWidening.cpp,include/llvm/Transforms/Scalar/GuardWidening.h,False,False
+LoopIdiomPass,-loop-idiom,Recognize loop idioms,lib/Transforms/Scalar/LoopIdiomRecognize.cpp,include/llvm/Transforms/Scalar/LoopIdiomRecognize.h,False,False
+LoopInfoWrapperPass,-loops,Natural Loop Information,lib/Analysis/LoopInfo.cpp,include/llvm/Analysis/LoopInfo.h,True,True
+LoopInstSimplifyPass,-loop-instsimplify,Simplify instructions in loops,lib/Transforms/Scalar/LoopInstSimplify.cpp,include/llvm/Transforms/Scalar/LoopInstSimplify.h,False,False
+LoopInterchangePass,-loop-interchange,Interchanges loops for cache reuse,lib/Transforms/Scalar/LoopInterchange.cpp,,False,False
+LoopLoadEliminationPass,-loop-load-elim,Loop Load Elimination,lib/Transforms/Scalar/LoopLoadElimination.cpp,include/llvm/Transforms/Scalar/LoopLoadElimination.h,False,False
+LoopPredicationPass,-loop-predication,Loop predication,lib/Transforms/Scalar/LoopPredication.cpp,include/llvm/Transforms/Scalar/LoopPredication.h,False,False
+LoopRerollPass,-loop-reroll,Reroll loops,lib/Transforms/Scalar/LoopRerollPass.cpp,,False,False
+LoopRotatePass,-loop-rotate,Rotate Loops,lib/Transforms/Scalar/LoopRotation.cpp,include/llvm/Transforms/Scalar/LoopRotation.h,False,False
+LoopSimplifyCFGPass,-loop-simplifycfg,Simplify loop CFG,lib/Transforms/Scalar/LoopSimplifyCFG.cpp,include/llvm/Transforms/Scalar/LoopSimplifyCFG.h,False,False
+LoopSimplifyPass,-loop-simplify,Canonicalize natural loops,lib/Transforms/Utils/LoopSimplify.cpp,include/llvm/Transforms/Utils/LoopSimplify.h,False,False
+LoopSinkPass,-loop-sink,Loop Sink,lib/Transforms/Scalar/LoopSink.cpp,include/llvm/Transforms/Scalar/LoopSink.h,False,False
+LoopStrengthReducePass,-loop-reduce,Loop Strength Reduction,lib/Transforms/Scalar/LoopStrengthReduce.cpp,include/llvm/Transforms/Scalar/LoopStrengthReduce.h,False,False
+LoopUnrollAndJamPass,-loop-unroll-and-jam,Unroll and Jam loops,lib/Transforms/Scalar/LoopUnrollAndJamPass.cpp,include/llvm/Transforms/Scalar/LoopUnrollAndJamPass.h,False,False
+LoopUnrollPass,-loop-unroll,Unroll loops,lib/Transforms/Scalar/LoopUnrollPass.cpp,include/llvm/Transforms/Scalar/LoopUnrollPass.h,False,False
+LoopUnswitchPass,-loop-unswitch,Unswitch loops,lib/Transforms/Scalar/LoopUnswitch.cpp,,False,False
+LoopVectorizePass,-loop-vectorize,Loop Vectorization,lib/Transforms/Vectorize/LoopVectorize.cpp,include/llvm/Transforms/Vectorize/LoopVectorize.h,False,False
+LoopVersioningLICMPass,-loop-versioning-licm,Loop Versioning For LICM,lib/Transforms/Scalar/LoopVersioningLICM.cpp,,False,False
+LoopVersioningPass,-loop-versioning,Loop Versioning,lib/Transforms/Utils/LoopVersioning.cpp,include/llvm/Transforms/Utils/LoopVersioning.h,False,False
+LowerAtomicPass,-loweratomic,Lower atomic intrinsics to non-atomic form,lib/Transforms/Scalar/LowerAtomic.cpp,include/llvm/Transforms/Scalar/LowerAtomic.h,False,False
+LowerConstantIntrinsicsPass,-lower-constant-intrinsics,Lower constant intrinsics,lib/Transforms/Scalar/LowerConstantIntrinsics.cpp,include/llvm/Transforms/Scalar/LowerConstantIntrinsics.h,False,False
+LowerEmuTLS,-loweremutls,Add __emutls_[vt]. variables for emultated TLS model,lib/CodeGen/LowerEmuTLS.cpp,,False,False
+LowerExpectIntrinsicPass,-lower-expect,Lower 'expect' Intrinsics,lib/Transforms/Scalar/LowerExpectIntrinsic.cpp,include/llvm/Transforms/Scalar/LowerExpectIntrinsic.h,False,False
+LowerGlobalDtors,-wasm-lower-global-dtors,Lower @llvm.global_dtors for WebAssembly,lib/Target/WebAssembly/WebAssemblyLowerGlobalDtors.cpp,,False,False
+LowerGuardIntrinsicPass,-lower-guard-intrinsic,Lower the guard intrinsic to normal control flow,lib/Transforms/Scalar/LowerGuardIntrinsic.cpp,include/llvm/Transforms/Scalar/LowerGuardIntrinsic.h,False,False
+LowerIntrinsics,-gc-lowering,GC Lowering,lib/CodeGen/GCRootLowering.cpp,,False,False
+LowerInvokePass,-lowerinvoke,"Lower invoke and unwind, for unwindless code generators",lib/Transforms/Utils/LowerInvoke.cpp,include/llvm/Transforms/Utils/LowerInvoke.h,False,False
+LowerMatrixIntrinsicsPass,-lower-matrix-intrinsics,Lower the matrix intrinsics,lib/Transforms/Scalar/LowerMatrixIntrinsics.cpp,include/llvm/Transforms/Scalar/LowerMatrixIntrinsics.h,False,False
+LowerSwitchPass,-lowerswitch,Lower SwitchInst's to branches,lib/Transforms/Utils/LowerSwitch.cpp,,False,False
+LowerTypeTests,-lowertypetests,Lower type metadata,lib/Transforms/IPO/LowerTypeTests.cpp,include/llvm/Transforms/IPO/LowerTypeTests.h,False,False
+LowerWidenableConditionPass,-lower-widenable-condition,Lower the widenable condition to default true value,lib/Transforms/Scalar/LowerWidenableCondition.cpp,include/llvm/Transforms/Scalar/LowerWidenableCondition.h,False,False
+MIRCanonicalizer,-mir-canonicalizer,Rename Register Operands Canonically,lib/CodeGen/MIRCanonicalizerPass.cpp,,False,False
+MIRNamer,-mir-namer,Rename Register Operands,lib/CodeGen/MIRNamerPass.cpp,,False,False
+MIRPrintingPass,-mir-printer,MIR Printer,lib/CodeGen/MIRPrintingPass.cpp,,False,False
+MVEGatherScatterLowering,-mve-gather-scatter-lowering,MVE gather/scattering lowering pass,lib/Target/ARM/MVEGatherScatterLowering.cpp,,False,False
+MVETailPredication,-mve-tail-predication,Transform predicated vector loops to use MVE tail predication,lib/Target/ARM/MVETailPredication.cpp,,False,False
+MVEVPTBlock,-arm-mve-vpt,ARM MVE VPT block pass,lib/Target/ARM/MVEVPTBlockPass.cpp,,False,False
+MachineBlockFrequencyInfo,-machine-block-freq,Machine Block Frequency Analysis,lib/CodeGen/MachineBlockFrequencyInfo.cpp,include/llvm/CodeGen/MachineBlockFrequencyInfo.h,True,True
+MachineBlockPlacement,-block-placement,Branch Probability Basic Block Placement,lib/CodeGen/MachineBlockPlacement.cpp,,False,False
+MachineBlockPlacementStats,-block-placement-stats,Basic Block Placement Stats,lib/CodeGen/MachineBlockPlacement.cpp,,False,False
+MachineBranchProbabilityInfo,-machine-branch-prob,Machine Branch Probability Analysis,lib/CodeGen/MachineBranchProbabilityInfo.cpp,include/llvm/CodeGen/MachineBranchProbabilityInfo.h,False,True
+MachineCSE,-machine-cse,Machine Common Subexpression Elimination,lib/CodeGen/MachineCSE.cpp,,False,False
+MachineCombiner,-machine-combiner,Machine InstCombiner,lib/CodeGen/MachineCombiner.cpp,,False,False
+MachineCopyPropagation,-machine-cp,Machine Copy Propagation Pass,lib/CodeGen/MachineCopyPropagation.cpp,,False,False
+MachineDominanceFrontier,-machine-domfrontier,Machine Dominance Frontier Construction,lib/CodeGen/MachineDominanceFrontier.cpp,include/llvm/CodeGen/MachineDominanceFrontier.h,True,True
+MachineDominatorTree,-machinedomtree,MachineDominator Tree Construction,lib/CodeGen/MachineDominators.cpp,include/llvm/CodeGen/MachineDominators.h,True,True
+MachineFunctionPrinterPass,-machineinstr-printer,Machine Function Printer,lib/CodeGen/MachineFunctionPrinterPass.cpp,,False,False
+MachineLICM,-machinelicm,Machine Loop Invariant Code Motion,lib/CodeGen/MachineLICM.cpp,,False,False
+MachineLoopInfo,-machine-loops,Machine Natural Loop Construction,lib/CodeGen/MachineLoopInfo.cpp,include/llvm/CodeGen/MachineLoopInfo.h,True,True
+MachineModuleInfoWrapperPass,-machinemoduleinfo,Machine Module Information,lib/CodeGen/MachineModuleInfo.cpp,include/llvm/CodeGen/MachineModuleInfo.h,False,False
+MachineOptimizationRemarkEmitterPass,-machine-opt-remark-emitter,Machine Optimization Remark Emitter,lib/CodeGen/MachineOptimizationRemarkEmitter.cpp,include/llvm/CodeGen/MachineOptimizationRemarkEmitter.h,False,True
+MachineOutliner,-machine-outliner,Machine Function Outliner,lib/CodeGen/MachineOutliner.cpp,include/llvm/CodeGen/MachineOutliner.h,False,False
+MachinePipeliner,-pipeliner,Modulo Software Pipelining,lib/CodeGen/MachinePipeliner.cpp,include/llvm/CodeGen/MachinePipeliner.h,False,False
+MachinePostDominatorTree,-machinepostdomtree,MachinePostDominator Tree Construction,lib/CodeGen/MachinePostDominators.cpp,include/llvm/CodeGen/MachinePostDominators.h,True,True
+MachineRegionInfoPass,-machine-region-info,Detect single entry single exit regions,lib/CodeGen/MachineRegionInfo.cpp,include/llvm/CodeGen/MachineRegionInfo.h,True,True
+MachineScheduler,-machine-scheduler,Machine Instruction Scheduler,lib/CodeGen/MachineScheduler.cpp,include/llvm/CodeGen/MachineScheduler.h,False,False
+MachineSinking,-machine-sink,Machine code sinking,lib/CodeGen/MachineSink.cpp,,False,False
+MachineTraceMetrics,-machine-trace-metrics,Machine Trace Metrics,lib/CodeGen/MachineTraceMetrics.cpp,include/llvm/CodeGen/MachineTraceMetrics.h,False,True
+MachineVerifierPass,-machineverifier,Verify generated machine code,lib/CodeGen/MachineVerifier.cpp,,False,False
+MakeGuardsExplicitLegacyPass,-make-guards-explicit,Lower the guard intrinsic to explicit control flow form,lib/Transforms/Scalar/MakeGuardsExplicit.cpp,include/llvm/Transforms/Scalar/MakeGuardsExplicit.h,False,False
+MemCpyOptPass,-memcpyopt,MemCpy Optimization,lib/Transforms/Scalar/MemCpyOptimizer.cpp,include/llvm/Transforms/Scalar/MemCpyOptimizer.h,False,False
+MemDepPrinter,-print-memdeps,Print MemDeps of function,lib/Analysis/MemDepPrinter.cpp,,False,True
+MemDerefPrinter,-print-memderefs,Memory Dereferenciblity of pointers in function,lib/Analysis/MemDerefPrinter.cpp,,False,True
+MemoryDependenceWrapperPass,-memdep,Memory Dependence Analysis,lib/Analysis/MemoryDependenceAnalysis.cpp,include/llvm/Analysis/MemoryDependenceAnalysis.h,False,True
+MemorySSAPrinterLegacyPass,-print-memoryssa,Memory SSA Printer,lib/Analysis/MemorySSA.cpp,include/llvm/Analysis/MemorySSA.h,False,False
+MemorySSAWrapperPass,-memoryssa,Memory SSA,lib/Analysis/MemorySSA.cpp,include/llvm/Analysis/MemorySSA.h,False,True
+MemorySanitizerLegacyPassPass,-msan,MemorySanitizer: detects uninitialized reads.,lib/Transforms/Instrumentation/MemorySanitizer.cpp,include/llvm/Transforms/Instrumentation/MemorySanitizer.h,False,False
+MergeFunctionsPass,-mergefunc,Merge Functions,lib/Transforms/IPO/MergeFunctions.cpp,include/llvm/Transforms/IPO/MergeFunctions.h,False,False
+MergeICmpsLegacyPass,-mergeicmps,Merge contiguous icmps into a memcmp,lib/Transforms/Scalar/MergeICmps.cpp,include/llvm/Transforms/Scalar/MergeICmps.h,False,False
+MergedLoadStoreMotionPass,-mldst-motion,MergedLoadStoreMotion,lib/Transforms/Scalar/MergedLoadStoreMotion.cpp,include/llvm/Transforms/Scalar/MergedLoadStoreMotion.h,False,False
+MetaRenamerPass,-metarenamer,Assign new names to everything,lib/Transforms/Utils/MetaRenamer.cpp,,False,False
+MicroMipsSizeReduce,-micromips-reduce-size,MicroMips instruction size reduce pass,lib/Target/Mips/MicroMipsSizeReduction.cpp,,False,False
+MipsBranchExpansion,-mips-branch-expansion,"Expand out of range branch instructions and fix forbidden"" "" slot hazards",lib/Target/Mips/MipsBranchExpansion.cpp,,False,False
+MipsDelaySlotFiller,-mips-delay-slot-filler,Fill delay slot for MIPS,lib/Target/Mips/MipsDelaySlotFiller.cpp,,False,False
+MipsPreLegalizerCombiner,-mips-prelegalizer-combiner,Combine Mips machine instrs before legalization,lib/Target/Mips/MipsPreLegalizerCombiner.cpp,,False,False
+ModuleAddressSanitizerLegacyPassPass,-asan-module,"AddressSanitizer: detects use-after-free and out-of-bounds bugs."" ""ModulePass",lib/Transforms/Instrumentation/AddressSanitizer.cpp,include/llvm/Transforms/Instrumentation/AddressSanitizer.h,False,False
+ModuleDebugInfoPrinter,-module-debuginfo,Decodes module-level debug info,lib/Analysis/ModuleDebugInfoPrinter.cpp,,False,True
+ModuleSanitizerCoverageLegacyPassPass,-sancov,Pass for instrumenting coverage on functions,lib/Transforms/Instrumentation/SanitizerCoverage.cpp,include/llvm/Transforms/Instrumentation/SanitizerCoverage.h,False,False
+ModuleSummaryIndexWrapperPass,-module-summary-analysis,Module Summary Analysis,lib/Analysis/ModuleSummaryAnalysis.cpp,include/llvm/Analysis/ModuleSummaryAnalysis.h,False,True
+ModuloScheduleTest,-modulo-schedule-test,Modulo Schedule test pass,lib/CodeGen/ModuloSchedule.cpp,include/llvm/CodeGen/ModuloSchedule.h,False,False
+MustBeExecutedContextPrinter,-print-must-be-executed-contexts,print the must-be-executed-contexed for all instructions,lib/Analysis/MustExecute.cpp,include/llvm/Analysis/MustExecute.h,False,True
+MustExecutePrinter,-print-mustexecute,Instructions which execute on loop entry,lib/Analysis/MustExecute.cpp,include/llvm/Analysis/MustExecute.h,False,True
+NVPTXAllocaHoisting,-alloca-hoisting,Hoisting alloca instructions in non-entry blocks to the entry block,lib/Target/NVPTX/NVPTXAllocaHoisting.cpp,,False,False
+NVPTXAssignValidGlobalNames,-nvptx-assign-valid-global-names,Assign valid PTX names to globals,lib/Target/NVPTX/NVPTXAssignValidGlobalNames.cpp,,False,False
+NVPTXLowerAggrCopies,-nvptx-lower-aggr-copies,"Lower aggregate copies, and llvm.mem* intrinsics into loops",lib/Target/NVPTX/NVPTXLowerAggrCopies.cpp,,False,False
+NVPTXLowerAlloca,-nvptx-lower-alloca,Lower Alloca,lib/Target/NVPTX/NVPTXLowerAlloca.cpp,,False,False
+NVPTXLowerArgs,-nvptx-lower-args,Lower arguments (NVPTX),lib/Target/NVPTX/NVPTXLowerArgs.cpp,,False,False
+NVPTXPeephole,-nvptx-peephole,NVPTX Peephole,lib/Target/NVPTX/NVPTXPeephole.cpp,,False,False
+NVPTXProxyRegErasure,-nvptx-proxyreg-erasure,NVPTX ProxyReg Erasure,lib/Target/NVPTX/NVPTXProxyRegErasure.cpp,,False,False
+NVVMIntrRange,-nvvm-intr-range,Add !range metadata to NVVM intrinsics.,lib/Target/NVPTX/NVVMIntrRange.cpp,,False,False
+NVVMReflect,-nvvm-reflect,Replace occurrences of __nvvm_reflect()calls with 0/1,lib/Target/NVPTX/NVVMReflect.cpp,,False,False
+NameAnonGlobalPass,-name-anon-globals,Provide a name to nameless globals,lib/Transforms/Utils/NameAnonGlobals.cpp,include/llvm/Transforms/Utils/NameAnonGlobals.h,False,False
+NaryReassociatePass,-nary-reassociate,Nary reassociation,lib/Transforms/Scalar/NaryReassociate.cpp,include/llvm/Transforms/Scalar/NaryReassociate.h,False,False
+NewGVNPass,-newgvn,Global Value Numbering,lib/Transforms/Scalar/NewGVN.cpp,include/llvm/Transforms/Scalar/NewGVN.h,False,False
+ObjCARCAAWrapperPass,-objc-arc-aa,ObjC-ARC-Based Alias Analysis,lib/Analysis/ObjCARCAliasAnalysis.cpp,include/llvm/Analysis/ObjCARCAliasAnalysis.h,False,True
+ObjCARCAPElimPass,-objc-arc-apelim,ObjC ARC autorelease pool elimination,lib/Transforms/ObjCARC/ObjCARCAPElim.cpp,,False,False
+ObjCARCContractPass,-objc-arc-contract,ObjC ARC contraction,lib/Transforms/ObjCARC/ObjCARCContract.cpp,,False,False
+ObjCARCExpandPass,-objc-arc-expand,ObjC ARC expansion,lib/Transforms/ObjCARC/ObjCARCExpand.cpp,,False,False
+ObjCARCOptPass,-objc-arc,ObjC ARC optimization,lib/Transforms/ObjCARC/ObjCARCOpts.cpp,,False,False
+OptimizationRemarkEmitterWrapperPass,-opt-remark-emitter,Optimization Remark Emitter,lib/Analysis/OptimizationRemarkEmitter.cpp,include/llvm/Analysis/OptimizationRemarkEmitter.h,False,True
+OptimizePHIs,-opt-phis,Optimize machine instruction PHIs,lib/CodeGen/OptimizePHIs.cpp,,False,False
+OptimizeReturned,-wasm-optimize-returned,"Optimize calls with \""returned\"" attributes for WebAssembly",lib/Target/WebAssembly/WebAssemblyOptimizeReturned.cpp,,False,False
+PAEvalPass,-pa-eval,Evaluate ProvenanceAnalysis on all pairs,lib/Transforms/ObjCARC/ProvenanceAnalysisEvaluator.cpp,,False,True
+PEI,-prologepilog,Prologue/Epilogue Insertion,lib/CodeGen/PrologEpilogInserter.cpp,,False,False
+PGOIndirectCallPromotionLegacyPass,-pgo-icall-prom,"Use PGO instrumentation profile to promote indirect "" ""calls to direct calls.",lib/Transforms/Instrumentation/IndirectCallPromotion.cpp,,False,False
+PGOInstrumentationGenCreateVarLegacyPass,-pgo-instr-gen-create-var,Create PGO instrumentation version variable for CSPGO.,lib/Transforms/Instrumentation/PGOInstrumentation.cpp,include/llvm/Transforms/Instrumentation/PGOInstrumentation.h,False,False
+PGOInstrumentationGenLegacyPass,-pgo-instr-gen,PGO instrumentation.,lib/Transforms/Instrumentation/PGOInstrumentation.cpp,include/llvm/Transforms/Instrumentation/PGOInstrumentation.h,False,False
+PGOInstrumentationUseLegacyPass,-pgo-instr-use,Read PGO instrumentation profile.,lib/Transforms/Instrumentation/PGOInstrumentation.cpp,include/llvm/Transforms/Instrumentation/PGOInstrumentation.h,False,False
+PGOMemOPSizeOptLegacyPass,-pgo-memop-opt,Optimize memory intrinsic using its size value profile,lib/Transforms/Instrumentation/PGOMemOPSizeOpt.cpp,,False,False
+PHIElimination,-phi-node-elimination,Eliminate PHI nodes for register allocation,lib/CodeGen/PHIElimination.cpp,,False,False
+PPCBSel,-ppc-branch-select,PowerPC Branch Selector,lib/Target/PowerPC/PPCBranchSelector.cpp,,False,False
+PPCBoolRetToInt,-bool-ret-to-int,Convert i1 constants to i32/i64 if they are returned,lib/Target/PowerPC/PPCBoolRetToInt.cpp,,False,False
+PPCBranchCoalescing,-ppc-branch-coalescing,Branch Coalescing,lib/Target/PowerPC/PPCBranchCoalescing.cpp,,False,False
+PPCCTRLoopsVerify,-ppc-ctr-loops-verify,PowerPC CTR Loops Verify,lib/Target/PowerPC/PPCCTRLoops.cpp,,False,False
+PPCEarlyReturn,-ppc-early-ret,PowerPC Early-Return Creation,lib/Target/PowerPC/PPCEarlyReturn.cpp,,False,False
+PPCExpandISEL,-ppc-expand-isel,PowerPC Expand ISEL Generation,lib/Target/PowerPC/PPCExpandISEL.cpp,,False,False
+PPCLoopInstrFormPrep,-ppc-loop-instr-form-prep,Prepare loop for ppc preferred instruction forms,lib/Target/PowerPC/PPCLoopInstrFormPrep.cpp,,False,False
+PPCLowerMASSVEntries,-ppc-lower-massv-entries,Lower MASSV entries,lib/Target/PowerPC/PPCLowerMASSVEntries.cpp,,False,False
+PPCMIPeephole,-ppc-mi-peepholes,PowerPC MI Peephole Optimization,lib/Target/PowerPC/PPCMIPeephole.cpp,,False,False
+PPCPreEmitPeephole,-ppc-pre-emit-peephole,PowerPC Pre-Emit Peephole,lib/Target/PowerPC/PPCPreEmitPeephole.cpp,,False,False
+PPCQPXLoadSplat,-ppc-qpx-load-splat,PowerPC QPX Load Splat Simplification,lib/Target/PowerPC/PPCQPXLoadSplat.cpp,,False,False
+PPCReduceCRLogicals,-ppc-reduce-cr-ops,PowerPC Reduce CR logical Operation,lib/Target/PowerPC/PPCReduceCRLogicals.cpp,,False,False
+PPCTLSDynamicCall,-ppc-tls-dynamic-call,PowerPC TLS Dynamic Call Fixup,lib/Target/PowerPC/PPCTLSDynamicCall.cpp,,False,False
+PPCTOCRegDeps,-ppc-toc-reg-deps,PowerPC TOC Register Dependencies,lib/Target/PowerPC/PPCTOCRegDeps.cpp,,False,False
+PPCVSXCopy,-ppc-vsx-copy,PowerPC VSX Copy Legalization,lib/Target/PowerPC/PPCVSXCopy.cpp,,False,False
+PPCVSXFMAMutate,-ppc-vsx-fma-mutate,PowerPC VSX FMA Mutation,lib/Target/PowerPC/PPCVSXFMAMutate.cpp,,False,False
+PPCVSXSwapRemoval,-ppc-vsx-swaps,PowerPC VSX Swap Removal,lib/Target/PowerPC/PPCVSXSwapRemoval.cpp,,False,False
+PartialInliningPass,-partial-inliner,Partial Inliner,lib/Transforms/IPO/PartialInlining.cpp,include/llvm/Transforms/IPO/PartialInlining.h,False,False
+PartiallyInlineLibCallsPass,-partially-inline-libcalls,Partially inline calls to library functions,lib/Transforms/Scalar/PartiallyInlineLibCalls.cpp,include/llvm/Transforms/Scalar/PartiallyInlineLibCalls.h,False,False
+PatchableFunction,-patchable-function,Implement the 'patchable-function' attribute,lib/CodeGen/PatchableFunction.cpp,,False,False
+PeepholeOptimizer,-peephole-opt,Peephole Optimizations,lib/CodeGen/PeepholeOptimizer.cpp,,False,False
+PhiValuesWrapperPass,-phi-values,Phi Values Analysis,lib/Analysis/PhiValues.cpp,include/llvm/Analysis/PhiValues.h,False,True
+PhysicalRegisterUsageInfo,-reg-usage-info,Register Usage Information Storage,lib/CodeGen/RegisterUsageInfo.cpp,include/llvm/CodeGen/RegisterUsageInfo.h,False,True
+PlaceBackedgeSafepointsImpl,-place-backedge-safepoints-impl,Place Backedge Safepoints,lib/Transforms/Scalar/PlaceSafepoints.cpp,,False,False
+PlaceSafepointsPass,-place-safepoints,Place Safepoints,lib/Transforms/Scalar/PlaceSafepoints.cpp,,False,False
+PostDomOnlyPrinter,-dot-postdom-only,"Print postdominance tree of function to 'dot' file "" ""(with no function bodies)",lib/Analysis/DomPrinter.cpp,include/llvm/Analysis/DomPrinter.h,False,False
+PostDomOnlyViewer,-view-postdom-only,"View postdominance tree of function "" ""(with no function bodies)",lib/Analysis/DomPrinter.cpp,include/llvm/Analysis/DomPrinter.h,False,False
+PostDomPrinter,-dot-postdom,Print postdominance tree of function to 'dot' file,lib/Analysis/DomPrinter.cpp,include/llvm/Analysis/DomPrinter.h,False,False
+PostDomViewer,-view-postdom,View postdominance tree of function,lib/Analysis/DomPrinter.cpp,include/llvm/Analysis/DomPrinter.h,False,False
+PostDominatorTreeWrapperPass,-postdomtree,Post-Dominator Tree Construction,lib/Analysis/PostDominators.cpp,include/llvm/Analysis/PostDominators.h,True,True
+PostInlineEntryExitInstrumenterPass,-post-inline-ee-instrument,"Instrument function entry/exit with calls to e.g. mcount()"" ""(post inlining)",lib/Transforms/Utils/EntryExitInstrumenter.cpp,include/llvm/Transforms/Utils/EntryExitInstrumenter.h,False,False
+PostMachineScheduler,-postmisched,PostRA Machine Instruction Scheduler,lib/CodeGen/MachineScheduler.cpp,include/llvm/CodeGen/MachineScheduler.h,False,False
+PostOrderFunctionAttrsLegacyPass,-functionattrs,Deduce function attributes,lib/Transforms/IPO/FunctionAttrs.cpp,include/llvm/Transforms/IPO/FunctionAttrs.h,False,False
+PostRAHazardRecognizer,-post-RA-hazard-rec,Post RA hazard recognizer,lib/CodeGen/PostRAHazardRecognizer.cpp,,False,False
+PostRAMachineSinking,-postra-machine-sink,PostRA Machine Sink,lib/CodeGen/MachineSink.cpp,,False,False
+PostRAScheduler,-post-RA-sched,Post RA top-down list latency scheduler,lib/CodeGen/PostRASchedulerList.cpp,,False,False
+PreISelIntrinsicLoweringLegacyPass,-pre-isel-intrinsic-lowering,Pre-ISel Intrinsic Lowering,lib/CodeGen/PreISelIntrinsicLowering.cpp,include/llvm/CodeGen/PreISelIntrinsicLowering.h,False,False
+PredicateInfoPrinterLegacyPass,-print-predicateinfo,PredicateInfo Printer,lib/Transforms/Utils/PredicateInfo.cpp,include/llvm/Transforms/Utils/PredicateInfo.h,False,False
+PrintFunctionPassWrapper,-print-function,Print function to stderr,lib/IR/IRPrintingPasses.cpp,include/llvm/IR/IRPrintingPasses.h,False,True
+PrintModulePassWrapper,-print-module,Print module to stderr,lib/IR/IRPrintingPasses.cpp,include/llvm/IR/IRPrintingPasses.h,False,True
+ProcessImplicitDefs,-processimpdefs,Process Implicit Definitions,lib/CodeGen/ProcessImplicitDefs.cpp,,False,False
+ProfileSummaryInfoWrapperPass,-profile-summary-info,Profile summary info,lib/Analysis/ProfileSummaryInfo.cpp,include/llvm/Analysis/ProfileSummaryInfo.h,False,True
+PromoteMemoryToRegisterPass,-mem2reg,"Promote Memory to "" ""Register",lib/Transforms/Utils/Mem2Reg.cpp,include/llvm/Transforms/Utils/Mem2Reg.h,False,False
+PruneEHPass,-prune-eh,Remove unused exception handling info,lib/Transforms/IPO/PruneEH.cpp,,False,False
+R600ClauseMergePass,-r600mergeclause,R600 Clause Merge,lib/Target/AMDGPU/R600ClauseMergePass.cpp,,False,False
+R600ControlFlowFinalizer,-r600cf,R600 Control Flow Finalizer,lib/Target/AMDGPU/R600ControlFlowFinalizer.cpp,,False,False
+R600EmitClauseMarkers,-emitclausemarkers,R600 Emit Clause Markters,lib/Target/AMDGPU/R600EmitClauseMarkers.cpp,,False,False
+R600ExpandSpecialInstrsPass,-r600-expand-special-instrs,R600 Expand Special Instrs,lib/Target/AMDGPU/R600ExpandSpecialInstrs.cpp,,False,False
+R600Packetizer,-packets,R600 Packetizer,lib/Target/AMDGPU/R600Packetizer.cpp,,False,False
+R600VectorRegMerger,-vec-merger,R600 Vector Reg Merger,lib/Target/AMDGPU/R600OptimizeVectorRegisters.cpp,,False,False
+RABasic,-regallocbasic,Basic Register Allocator,lib/CodeGen/RegAllocBasic.cpp,,False,False
+RAGreedy,-greedy,Greedy Register Allocator,lib/CodeGen/RegAllocGreedy.cpp,,False,False
+RISCVExpandPseudo,-riscv-expand-pseudo,RISCV pseudo instruction expansion pass,lib/Target/RISCV/RISCVExpandPseudoInsts.cpp,,False,False
+RISCVMergeBaseOffsetOpt,-riscv-merge-base-offset,RISCV Merge Base Offset,lib/Target/RISCV/RISCVMergeBaseOffset.cpp,,False,False
+ReachingDefAnalysis,-reaching-deps-analysis,ReachingDefAnalysis,lib/CodeGen/ReachingDefAnalysis.cpp,include/llvm/CodeGen/ReachingDefAnalysis.h,False,True
+ReassociatePass,-reassociate,Reassociate expressions,lib/Transforms/Scalar/Reassociate.cpp,include/llvm/Transforms/Scalar/Reassociate.h,False,False
+RedundantDbgInstEliminationPass,-redundant-dbg-inst-elim,Redundant Dbg Instruction Elimination,lib/Transforms/Scalar/DCE.cpp,include/llvm/Transforms/Scalar/DCE.h,False,False
+RegAllocFast,-regallocfast,Fast Register Allocator,lib/CodeGen/RegAllocFast.cpp,,False,False
+RegBankSelect,-regbankselect,Assign register bank of generic virtual registers,lib/CodeGen/GlobalISel/RegBankSelect.cpp,include/llvm/CodeGen/GlobalISel/RegBankSelect.h,False,False
+RegUsageInfoCollector,-RegUsageInfoCollector,Register Usage Information Collector,lib/CodeGen/RegUsageInfoCollector.cpp,,False,False
+RegUsageInfoPropagation,-reg-usage-propagation,Register Usage Information Propagation,lib/CodeGen/RegUsageInfoPropagate.cpp,,False,False
+RegionInfoPass,-regions,Detect single entry single exit regions,lib/Analysis/RegionInfo.cpp,include/llvm/Analysis/RegionInfo.h,True,True
+RegionOnlyPrinter,-dot-regions-only,Print regions of function to 'dot' file (with no function bodies),lib/Analysis/RegionPrinter.cpp,include/llvm/Analysis/RegionPrinter.h,True,True
+RegionOnlyViewer,-view-regions-only,View regions of function (with no function bodies),lib/Analysis/RegionPrinter.cpp,include/llvm/Analysis/RegionPrinter.h,True,True
+RegionPrinter,-dot-regions,Print regions of function to 'dot' file,lib/Analysis/RegionPrinter.cpp,include/llvm/Analysis/RegionPrinter.h,True,True
+RegionViewer,-view-regions,View regions of function,lib/Analysis/RegionPrinter.cpp,include/llvm/Analysis/RegionPrinter.h,True,True
+RegisterCoalescer,-simple-register-coalescing,Simple Register Coalescing,lib/CodeGen/RegisterCoalescer.cpp,,False,False
+RenameIndependentSubregs,-rename-independent-subregs,Rename Independent Subregisters,lib/CodeGen/RenameIndependentSubregs.cpp,,False,False
+ResetMachineFunction,-reset-machine-function,Reset machine function if ISel failed,lib/CodeGen/ResetMachineFunctionPass.cpp,,False,False
+ReversePostOrderFunctionAttrsPass,-rpo-functionattrs,Deduce function attributes in RPO,lib/Transforms/IPO/FunctionAttrs.cpp,include/llvm/Transforms/IPO/FunctionAttrs.h,False,False
+RewriteStatepointsForGCLegacyPass,-rewrite-statepoints-for-gc,Make relocations explicit at statepoints,lib/Transforms/Scalar/RewriteStatepointsForGC.cpp,include/llvm/Transforms/Scalar/RewriteStatepointsForGC.h,False,False
+RewriteSymbolsPass,-rewrite-symbols,Rewrite Symbols,lib/Transforms/Utils/SymbolRewriter.cpp,include/llvm/Transforms/Utils/SymbolRewriter.h,False,False
+SCCPPass,-sccp,Sparse Conditional Constant Propagation,lib/Transforms/Scalar/SCCP.cpp,include/llvm/Transforms/Scalar/SCCP.h,False,False
+SCEVAAWrapperPass,-scev-aa,ScalarEvolution-based Alias Analysis,lib/Analysis/ScalarEvolutionAliasAnalysis.cpp,include/llvm/Analysis/ScalarEvolutionAliasAnalysis.h,False,True
+SIAddIMGInit,-si-img-init,SI Add IMG Init,lib/Target/AMDGPU/SIAddIMGInit.cpp,,False,False
+SIAnnotateControlFlow,-si-annotate-control-flow,Annotate SI Control Flow,lib/Target/AMDGPU/SIAnnotateControlFlow.cpp,,False,False
+SIFixSGPRCopies,-si-fix-sgpr-copies,SI Fix SGPR copies,lib/Target/AMDGPU/SIFixSGPRCopies.cpp,,False,False
+SIFixVGPRCopies,-si-fix-vgpr-copies,SI Fix VGPR copies,lib/Target/AMDGPU/SIFixVGPRCopies.cpp,,False,False
+SIFixupVectorISel,-si-fixup-vector-isel,SI Fixup Vector ISel,lib/Target/AMDGPU/SIFixupVectorISel.cpp,,False,False
+SIFoldOperands,-si-fold-operands,SI Fold Operands,lib/Target/AMDGPU/SIFoldOperands.cpp,,False,False
+SIFormMemoryClauses,-si-form-memory-clauses,SI Form memory clauses,lib/Target/AMDGPU/SIFormMemoryClauses.cpp,,False,False
+SIInsertSkips,-si-insert-skips,SI insert s_cbranch_execz instructions,lib/Target/AMDGPU/SIInsertSkips.cpp,,False,False
+SIInsertWaitcnts,-si-insert-waitcnts,SI Insert Waitcnts,lib/Target/AMDGPU/SIInsertWaitcnts.cpp,,False,False
+SILoadStoreOptimizer,-si-load-store-opt,SI Load Store Optimizer,lib/Target/AMDGPU/SILoadStoreOptimizer.cpp,,False,False
+SILowerControlFlow,-si-lower-control-flow,SI lower control flow,lib/Target/AMDGPU/SILowerControlFlow.cpp,,False,False
+SILowerI1Copies,-si-i1-copies,SI Lower i1 Copies,lib/Target/AMDGPU/SILowerI1Copies.cpp,,False,False
+SILowerSGPRSpills,-si-lower-sgpr-spills,SI lower SGPR spill instructions,lib/Target/AMDGPU/SILowerSGPRSpills.cpp,,False,False
+SIMemoryLegalizer,-si-memory-legalizer,SI Memory Legalizer,lib/Target/AMDGPU/SIMemoryLegalizer.cpp,,False,False
+SIModeRegister,-si-mode-register,Insert required mode register values,lib/Target/AMDGPU/SIModeRegister.cpp,,False,False
+SIOptimizeExecMasking,-si-optimize-exec-masking,SI optimize exec mask operations,lib/Target/AMDGPU/SIOptimizeExecMasking.cpp,,False,False
+SIOptimizeExecMaskingPreRA,-si-optimize-exec-masking-pre-ra,SI optimize exec mask operations pre-RA,lib/Target/AMDGPU/SIOptimizeExecMaskingPreRA.cpp,,False,False
+SIPeepholeSDWA,-si-peephole-sdwa,SI Peephole SDWA,lib/Target/AMDGPU/SIPeepholeSDWA.cpp,,False,False
+SIPreAllocateWWMRegs,-si-pre-allocate-wwm-regs,SI Pre-allocate WWM Registers,lib/Target/AMDGPU/SIPreAllocateWWMRegs.cpp,,False,False
+SIShrinkInstructions,-si-shrink-instructions,SI Shrink Instructions,lib/Target/AMDGPU/SIShrinkInstructions.cpp,,False,False
+SIWholeQuadMode,-si-wqm,SI Whole Quad Mode,lib/Target/AMDGPU/SIWholeQuadMode.cpp,,False,False
+SLPVectorizerPass,-slp-vectorizer,SLP Vectorizer,lib/Transforms/Vectorize/SLPVectorizer.cpp,include/llvm/Transforms/Vectorize/SLPVectorizer.h,False,False
+SROAPass,-sroa,Scalar Replacement Of Aggregates,lib/Transforms/Scalar/SROA.cpp,include/llvm/Transforms/Scalar/SROA.h,False,False
+SafeStackLegacyPass,-safe-stack,Safe Stack instrumentation pass,lib/CodeGen/SafeStack.cpp,,False,False
+SafepointIRVerifier,-verify-safepoint-ir,Safepoint IR Verifier,lib/IR/SafepointIRVerifier.cpp,include/llvm/IR/SafepointIRVerifier.h,False,False
+SampleProfileLoaderPass,-sample-profile,Sample Profile loader,lib/Transforms/IPO/SampleProfile.cpp,include/llvm/Transforms/IPO/SampleProfile.h,False,False
+ScalarEvolutionWrapperPass,-scalar-evolution,Scalar Evolution Analysis,lib/Analysis/ScalarEvolution.cpp,include/llvm/Analysis/ScalarEvolution.h,False,True
+ScalarizeMaskedMemIntrin,-scalarize-masked-mem-intrin,Scalarize unsupported masked memory intrinsics,lib/CodeGen/ScalarizeMaskedMemIntrin.cpp,,False,False
+ScalarizerPass,-scalarizer,Scalarize vector operations,lib/Transforms/Scalar/Scalarizer.cpp,include/llvm/Transforms/Scalar/Scalarizer.h,False,False
+ScavengerTest,-scavenger-test,Scavenge virtual registers inside basic blocks,lib/CodeGen/RegisterScavenging.cpp,include/llvm/CodeGen/RegisterScavenging.h,False,False
+ScopedNoAliasAAWrapperPass,-scoped-noalias,Scoped NoAlias Alias Analysis,lib/Analysis/ScopedNoAliasAA.cpp,include/llvm/Analysis/ScopedNoAliasAA.h,False,True
+SeparateConstOffsetFromGEPPass,-separate-const-offset-from-gep,Split GEPs to a variadic base and a constant offset for better CSE,lib/Transforms/Scalar/SeparateConstOffsetFromGEP.cpp,,False,False
+ShadowStackGCLowering,-shadow-stack-gc-lowering,Shadow Stack GC Lowering,lib/CodeGen/ShadowStackGCLowering.cpp,,False,False
+ShrinkWrap,-shrink-wrap,Shrink Wrap Pass,lib/CodeGen/ShrinkWrap.cpp,,False,False
+SimpleLoopUnswitchLegacyPass,-simple-loop-unswitch,Simple unswitch loops,lib/Transforms/Scalar/SimpleLoopUnswitch.cpp,include/llvm/Transforms/Scalar/SimpleLoopUnswitch.h,False,False
+SingleLoopExtractorPass,-loop-extract-single,Extract at most one loop into a new function,lib/Transforms/IPO/LoopExtractor.cpp,,False,False
+SinkingPass,-sink,Code sinking,lib/Transforms/Scalar/Sink.cpp,include/llvm/Transforms/Scalar/Sink.h,False,False
+SjLjEHPrepare,-sjljehprepare,Prepare SjLj exceptions,lib/CodeGen/SjLjEHPrepare.cpp,,False,False
+SlotIndexes,-slotindexes,Slot index numbering,lib/CodeGen/SlotIndexes.cpp,include/llvm/CodeGen/SlotIndexes.h,False,False
+SpeculativeExecutionPass,-speculative-execution,Speculatively execute instructions,lib/Transforms/Scalar/SpeculativeExecution.cpp,include/llvm/Transforms/Scalar/SpeculativeExecution.h,False,False
+SpillPlacement,-spill-code-placement,Spill Code Placement Analysis,lib/CodeGen/SpillPlacement.cpp,,True,True
+StackColoring,-stack-coloring,Merge disjoint stack slots,lib/CodeGen/StackColoring.cpp,,False,False
+StackMapLiveness,-stackmap-liveness,StackMap Liveness Analysis,lib/CodeGen/StackMapLivenessAnalysis.cpp,,False,False
+StackProtector,-stack-protector,Insert stack protectors,lib/CodeGen/StackProtector.cpp,include/llvm/CodeGen/StackProtector.h,False,True
+StackSafetyGlobalInfoWrapperPass,-stack-safety,Stack Safety Analysis,lib/Analysis/StackSafetyAnalysis.cpp,include/llvm/Analysis/StackSafetyAnalysis.h,False,False
+StackSafetyInfoWrapperPass,-stack-safety-local,Stack Safety Local Analysis,lib/Analysis/StackSafetyAnalysis.cpp,include/llvm/Analysis/StackSafetyAnalysis.h,False,True
+StackSlotColoring,-stack-slot-coloring,Stack Slot Coloring,lib/CodeGen/StackSlotColoring.cpp,,False,False
+StraightLineStrengthReducePass,-slsr,Straight line strength reduction,lib/Transforms/Scalar/StraightLineStrengthReduce.cpp,,False,False
+StripDeadDebugInfoPass,-strip-dead-debug-info,Strip debug info for unused symbols,lib/Transforms/IPO/StripSymbols.cpp,,False,False
+StripDeadPrototypesPass,-strip-dead-prototypes,Strip Unused Function Prototypes,lib/Transforms/IPO/StripDeadPrototypes.cpp,include/llvm/Transforms/IPO/StripDeadPrototypes.h,False,False
+StripDebugDeclarePass,-strip-debug-declare,Strip all llvm.dbg.declare intrinsics,lib/Transforms/IPO/StripSymbols.cpp,,False,False
+StripGCRelocates,-strip-gc-relocates,Strip gc.relocates inserted through RewriteStatepointsForGC,lib/Transforms/Utils/StripGCRelocates.cpp,,True,False
+StripNonDebugSymbolsPass,-strip-nondebug,"Strip all symbols, except dbg symbols, from a module",lib/Transforms/IPO/StripSymbols.cpp,,False,False
+StripNonLineTableDebugInfoPass,-strip-nonlinetable-debuginfo,Strip all debug info except linetables,lib/Transforms/Utils/StripNonLineTableDebugInfo.cpp,,False,False
+StripSymbolsPass,-strip,Strip all symbols from a module,lib/Transforms/IPO/StripSymbols.cpp,,False,False
+StructurizeCFGPass,-structurizecfg,Structurize the CFG,lib/Transforms/Scalar/StructurizeCFG.cpp,,False,False
+SystemZPostRewrite,-systemz-post-rewrite,SystemZ Post Rewrite pass,lib/Target/SystemZ/SystemZPostRewrite.cpp,,False,False
+SystemZTDCPass,-systemz-tdc,SystemZ Test Data Class optimization,lib/Target/SystemZ/SystemZTDC.cpp,,False,False
+TailCallEliminationPass,-tailcallelim,Tail Call Elimination,lib/Transforms/Scalar/TailRecursionElimination.cpp,include/llvm/Transforms/Scalar/TailRecursionElimination.h,False,False
+TailDuplicate,-tailduplication,Tail Duplication,lib/CodeGen/TailDuplication.cpp,,False,False
+TargetLibraryInfoWrapperPass,-targetlibinfo,Target Library Information,lib/Analysis/TargetLibraryInfo.cpp,include/llvm/Analysis/TargetLibraryInfo.h,False,True
+TargetPassConfig,-targetpassconfig,Target Pass Configuration,lib/CodeGen/TargetPassConfig.cpp,include/llvm/CodeGen/TargetPassConfig.h,False,False
+TargetTransformInfoWrapperPass,-tti,Target Transform Information,lib/Analysis/TargetTransformInfo.cpp,include/llvm/Analysis/TargetTransformInfo.h,False,True
+ThreadSanitizerLegacyPassPass,-tsan,ThreadSanitizer: detects data races.,lib/Transforms/Instrumentation/ThreadSanitizer.cpp,include/llvm/Transforms/Instrumentation/ThreadSanitizer.h,False,False
+Thumb2ITBlock,-thumb2-it,Thumb IT blocks insertion pass,lib/Target/ARM/Thumb2ITBlockPass.cpp,,False,False
+Thumb2SizeReduce,-t2-reduce-size,Thumb2 instruction size reduce pass,lib/Target/ARM/Thumb2SizeReduction.cpp,,False,False
+TwoAddressInstructionPass,-twoaddressinstruction,Two-Address instruction pass,lib/CodeGen/TwoAddressInstructionPass.cpp,,False,False
+TypeBasedAAWrapperPass,-tbaa,Type-Based Alias Analysis,lib/Analysis/TypeBasedAliasAnalysis.cpp,include/llvm/Analysis/TypeBasedAliasAnalysis.h,False,True
+TypePromotion,-type-promotion,Type Promotion,lib/CodeGen/TypePromotion.cpp,,False,False
+UnifyFunctionExitNodesPass,-mergereturn,Unify function exit nodes,lib/Transforms/Utils/UnifyFunctionExitNodes.cpp,include/llvm/Transforms/Utils/UnifyFunctionExitNodes.h,False,False
+UnpackMachineBundles,-unpack-mi-bundles,Unpack machine instruction bundles,lib/CodeGen/MachineInstrBundle.cpp,include/llvm/CodeGen/MachineInstrBundle.h,False,False
+UnreachableBlockElimLegacyPass,-unreachableblockelim,Remove unreachable blocks from the CFG,lib/CodeGen/UnreachableBlockElim.cpp,include/llvm/CodeGen/UnreachableBlockElim.h,False,False
+UnreachableMachineBlockElim,-unreachable-mbb-elimination,Remove unreachable machine basic blocks,lib/CodeGen/UnreachableBlockElim.cpp,include/llvm/CodeGen/UnreachableBlockElim.h,False,False
+VerifierLegacyPass,-verify,Module Verifier,lib/IR/Verifier.cpp,include/llvm/IR/Verifier.h,False,False
+VirtRegMap,-virtregmap,Virtual Register Map,lib/CodeGen/VirtRegMap.cpp,include/llvm/CodeGen/VirtRegMap.h,False,False
+VirtRegRewriter,-virtregrewriter,Virtual Register Rewriter,lib/CodeGen/VirtRegMap.cpp,include/llvm/CodeGen/VirtRegMap.h,False,False
+WarnMissedTransformationsLegacy,-transform-warning,Warn about non-applied transformations,lib/Transforms/Scalar/WarnMissedTransforms.cpp,include/llvm/Transforms/Scalar/WarnMissedTransforms.h,False,False
+WasmEHPrepare,-wasmehprepare,Prepare WebAssembly exceptions,lib/CodeGen/WasmEHPrepare.cpp,,False,False
+WebAssemblyAddMissingPrototypes,-wasm-add-missing-prototypes,Add prototypes to prototypes-less functions,lib/Target/WebAssembly/WebAssemblyAddMissingPrototypes.cpp,,False,False
+WebAssemblyArgumentMove,-wasm-argument-move,Move ARGUMENT instructions for WebAssembly,lib/Target/WebAssembly/WebAssemblyArgumentMove.cpp,,False,False
+WebAssemblyCFGSort,-wasm-cfg-sort,Reorders blocks in topological order,lib/Target/WebAssembly/WebAssemblyCFGSort.cpp,,False,False
+WebAssemblyCFGStackify,-wasm-cfg-stackify,Insert BLOCK/LOOP/TRY markers for WebAssembly scopes,lib/Target/WebAssembly/WebAssemblyCFGStackify.cpp,,False,False
+WebAssemblyCallIndirectFixup,-wasm-call-indirect-fixup,Rewrite call_indirect argument orderings,lib/Target/WebAssembly/WebAssemblyCallIndirectFixup.cpp,,False,False
+WebAssemblyExceptionInfo,-wasm-exception-info,WebAssembly Exception Information,lib/Target/WebAssembly/WebAssemblyExceptionInfo.cpp,,True,True
+WebAssemblyExplicitLocals,-wasm-explicit-locals,Convert registers to WebAssembly locals,lib/Target/WebAssembly/WebAssemblyExplicitLocals.cpp,,False,False
+WebAssemblyFixIrreducibleControlFlow,-wasm-fix-irreducible-control-flow,Removes irreducible control flow,lib/Target/WebAssembly/WebAssemblyFixIrreducibleControlFlow.cpp,,False,False
+WebAssemblyLateEHPrepare,-wasm-late-eh-prepare,WebAssembly Late Exception Preparation,lib/Target/WebAssembly/WebAssemblyLateEHPrepare.cpp,,False,False
+WebAssemblyLowerBrUnless,-wasm-lower-br_unless,Lowers br_unless into inverted br_if,lib/Target/WebAssembly/WebAssemblyLowerBrUnless.cpp,,False,False
+WebAssemblyLowerEmscriptenEHSjLj,-wasm-lower-em-ehsjlj,WebAssembly Lower Emscripten Exceptions / Setjmp / Longjmp,lib/Target/WebAssembly/WebAssemblyLowerEmscriptenEHSjLj.cpp,,False,False
+WebAssemblyMemIntrinsicResults,-wasm-mem-intrinsic-results,Optimize memory intrinsic result values for WebAssembly,lib/Target/WebAssembly/WebAssemblyMemIntrinsicResults.cpp,,False,False
+WebAssemblyOptimizeLiveIntervals,-wasm-optimize-live-intervals,Optimize LiveIntervals for WebAssembly,lib/Target/WebAssembly/WebAssemblyOptimizeLiveIntervals.cpp,,False,False
+WebAssemblyPeephole,-wasm-peephole,WebAssembly peephole optimizations,lib/Target/WebAssembly/WebAssemblyPeephole.cpp,,False,False
+WebAssemblyPrepareForLiveIntervals,-wasm-prepare-for-live-intervals,Fix up code for LiveIntervals,lib/Target/WebAssembly/WebAssemblyPrepareForLiveIntervals.cpp,,False,False
+WebAssemblyRegColoring,-wasm-reg-coloring,Minimize number of registers used,lib/Target/WebAssembly/WebAssemblyRegColoring.cpp,,False,False
+WebAssemblyRegNumbering,-wasm-reg-numbering,Assigns WebAssembly register numbers for virtual registers,lib/Target/WebAssembly/WebAssemblyRegNumbering.cpp,,False,False
+WebAssemblyRegStackify,-wasm-reg-stackify,Reorder instructions to use the WebAssembly value stack,lib/Target/WebAssembly/WebAssemblyRegStackify.cpp,,False,False
+WebAssemblyReplacePhysRegs,-wasm-replace-phys-regs,Replace physical registers with virtual registers,lib/Target/WebAssembly/WebAssemblyReplacePhysRegs.cpp,,False,False
+WebAssemblySetP2AlignOperands,-wasm-set-p2align-operands,Set the p2align operands for WebAssembly loads and stores,lib/Target/WebAssembly/WebAssemblySetP2AlignOperands.cpp,,False,False
+WholeProgramDevirt,-wholeprogramdevirt,Whole program devirtualization,lib/Transforms/IPO/WholeProgramDevirt.cpp,include/llvm/Transforms/IPO/WholeProgramDevirt.h,False,False
+WinEHPrepare,-winehprepare,Prepare Windows exceptions,lib/CodeGen/WinEHPrepare.cpp,,False,False
+WinEHStatePass,-x86-winehstate,Insert stores for EH state numbers,lib/Target/X86/X86WinEHState.cpp,,False,False
+WriteBitcodePass,-write-bitcode,Write Bitcode,lib/Bitcode/Writer/BitcodeWriterPass.cpp,,False,True
+WriteThinLTOBitcode,-write-thinlto-bitcode,Write ThinLTO Bitcode,lib/Transforms/IPO/ThinLTOBitcodeWriter.cpp,include/llvm/Transforms/IPO/ThinLTOBitcodeWriter.h,False,True
+X86AvoidSFBPass,-x86-avoid-SFB,Machine code sinking,lib/Target/X86/X86AvoidStoreForwardingBlocks.cpp,,False,False
+X86CallFrameOptimization,-x86-cf-opt,X86 Call Frame Optimization,lib/Target/X86/X86CallFrameOptimization.cpp,,False,False
+X86CmovConverterPass,-x86-cmov-conversion,X86 cmov Conversion,lib/Target/X86/X86CmovConversion.cpp,,False,False
+X86CondBrFoldingPass,-X86CondBrFolding,X86CondBrFolding,lib/Target/X86/X86CondBrFolding.cpp,,False,False
+X86DomainReassignment,-x86-domain-reassignment,X86 Domain Reassignment Pass,lib/Target/X86/X86DomainReassignment.cpp,,False,False
+X86ExecutionDomainFix,-x86-execution-domain-fix,X86 Execution Domain Fix,lib/Target/X86/X86TargetMachine.cpp,,False,False
+X86ExpandPseudo,-x86-pseudo,X86 pseudo instruction expansion pass,lib/Target/X86/X86ExpandPseudo.cpp,,False,False
+X86FlagsCopyLoweringPass,-x86-flags-copy-lowering,X86 EFLAGS copy lowering,lib/Target/X86/X86FlagsCopyLowering.cpp,,False,False
+X86OptimizeLEAPass,-x86-optimize-LEAs,X86 optimize LEA pass,lib/Target/X86/X86OptimizeLEAs.cpp,,False,False
+X86SpeculativeLoadHardeningPass,-x86-slh,X86 speculative load hardener,lib/Target/X86/X86SpeculativeLoadHardening.cpp,,False,False
+XCoreLowerThreadLocal,-xcore-lower-thread-local,Lower thread local variables,lib/Target/XCore/XCoreLowerThreadLocal.cpp,,False,False
+XRayInstrumentation,-xray-instrumentation,Insert XRay ops,lib/CodeGen/XRayInstrumentation.cpp,,False,False

@@ -30,10 +30,10 @@ cg_cc_library(
     ActionSpace
   HDRS
     "ActionSpace.h"
-    "$<TARGET_PROPERTY:compiler_gym__envs__llvm__service__passes__actions_genfiles,BINARY_DIR>/ActionEnum.h"
   SRCS
     "ActionSpace.cc"
   DEPS
+    compiler_gym::envs::llvm::service::passes::10.0.0::headers
     compiler_gym::service::proto::compiler_gym_service_cc
     compiler_gym::util::EnumUtil
     compiler_gym::util::Unreachable

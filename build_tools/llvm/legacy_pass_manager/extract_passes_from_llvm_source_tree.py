@@ -212,7 +212,7 @@ def handle_file(source_path: Path) -> Tuple[Path, List[Pass]]:
     """Parse the passes declared in a file."""
     assert str(source_path).endswith(".cpp"), f"Unexpected file type: {source_path}"
 
-    header = Path("include/llvm/" + str(source_path)[len("lib") : -len("cpp")] + "h")
+    header = Path("llvm/" + str(source_path)[len("lib") : -len("cpp")] + "h")
     if not header.is_file():
         header = ""
 
