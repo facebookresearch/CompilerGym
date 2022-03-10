@@ -277,7 +277,7 @@ http_archive(
 http_archive(
     name = "csmith",
     build_file_content = all_content,
-    sha256 = "86d08c19a1f123054ed9350b7962edaad7d46612de0e07c10b73e578911156fd",
+    sha256 = "9d024a6b202f6a1b9e01351218a85888c06b67b837fe4c6f8ef5bd522fae098c",
     strip_prefix = "csmith-csmith-2.3.0",
     urls = [
         "https://github.com/ChrisCummins/csmith/archive/refs/tags/csmith-2.3.0.tar.gz",
