@@ -25,7 +25,6 @@
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Pass.h"
-#include "programl/proto/util.pb.h"
 
 namespace compiler_gym::llvm_service {
 

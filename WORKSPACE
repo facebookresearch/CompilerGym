@@ -334,9 +334,9 @@ boost_deps()
 
 http_archive(
     name = "programl",
-    sha256 = "c4a20b4a2deade7157dcbc56e78a729ad10e40120e4ad4482e2a0b97738dfe84",
-    strip_prefix = "ProGraML-0.3.2",
-    urls = ["https://github.com/ChrisCummins/ProGraML/archive/refs/tags/v0.3.2.tar.gz"],
+    sha256 = "704826311b842b3ffc2dedcce593fdd319d76e95bdf5386985768007ebb22316",
+    strip_prefix = "ProGraML-83f00233b04f4ecf7f12a79c80ffe23c2953913f",
+    urls = ["https://github.com/ChrisCummins/ProGraML/archive/83f00233b04f4ecf7f12a79c80ffe23c2953913f.tar.gz"],
 )
 
 load("@programl//tools:bzl/deps.bzl", "programl_deps")
