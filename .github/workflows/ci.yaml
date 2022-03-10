@@ -52,6 +52,19 @@ jobs:
             - name: Install build dependencies
               uses: ./.github/actions/install-cmake-build-dependencies
 
+            - name: Download LLVM 10.0.0 release
+              run: |
+                  if [ "$(uname)" = "Darwin" ]; then
+                    wget https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-x86_64-apple-darwin.tar.xz -O ~/llvm.tar.xz
+                  else
+                    wget https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz -O ~/llvm.tar.xz
+                  fi
+                  # TODO(cummins): Remove 'v' debugging flag:
+                  mkdir ~/llvm && tar xvf ~/llvm.tar.xz --strip-components 1 -C ~/llvm
+                  rm ~/llvm.tar.xz
+                  echo "Unpacked, testing for expected file:"
+                  test -d ~/llvm/lib/cmake/llvm
+
             - name: CMake Build
               run: |
                   cmake \
@@ -61,6 +74,8 @@ jobs:
                       -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=lld" \
                       -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=lld" \
                       -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=lld" \
+                      -DCOMPILER_GYM_LLVM_PROVIDER=external \
+                      -DLLVM_DIR=$HOME/llvm/lib/cmake/llvm \
                       -DPython3_FIND_VIRTUALENV=FIRST \
                       -DCOMPILER_GYM_BUILD_TESTS=ON \
                       -DCOMPILER_GYM_BUILD_EXAMPLES=ON \
