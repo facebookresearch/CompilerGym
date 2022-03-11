@@ -6,9 +6,6 @@
 cg_add_all_subdirs()
 
 set(_DEPS "compiler_gym-llvm-service")
-if(DARWIN)
-    #list(APPEND _DEPS "@llvm//:darwin")
-endif()
 cg_filegroup(
   NAME "service"
   DEPENDS ${_DEPS}
@@ -40,8 +37,6 @@ cg_cc_library(
   ABS_DEPS
     fmt
     magic_enum
-  NON_LIB_DEPS
-    compiler_gym::envs::llvm::service::passes::actions_genfiles
   PUBLIC
 )
 
@@ -141,9 +136,6 @@ cg_cc_binary(
 )
 
 set(_FILES "${CMAKE_CURRENT_BINARY_DIR}/compute_observation")
-if(DARWIN)
-    message(FATAL_ERROR "TODO(boian): implement")
-endif()
 cg_filegroup(
   NAME compute_observation-files
   FILES ${_FILES}
@@ -189,8 +181,6 @@ cg_cc_library(
     "-DGOOGLE_PROTOBUF_NO_RTTI"
     "-fno-rtti"
   HDRS
-    "$<TARGET_PROPERTY:compiler_gym__envs__llvm__service__passes__actions_genfiles,BINARY_DIR>/ActionHeaders.h"
-    "$<TARGET_PROPERTY:compiler_gym__envs__llvm__service__passes__actions_genfiles,BINARY_DIR>/ActionSwitch.h"
     "LlvmSession.h"
   SRCS
     "LlvmSession.cc"
@@ -201,6 +191,7 @@ cg_cc_library(
     ::Cost
     ::Observation
     ::ObservationSpaces
+    compiler_gym::envs::llvm::service::passes::10.0.0::headers
     compiler_gym::service::CompilationSession
     compiler_gym::service::proto::compiler_gym_service_cc_grpc
     compiler_gym::third_party::autophase::InstCount
@@ -222,7 +213,6 @@ cg_cc_library(
     Clog::libclog
   INCLUDES
     ${LLVM_INCLUDE_DIRS}
-    "$<TARGET_PROPERTY:compiler_gym__envs__llvm__service__passes__actions_genfiles,BINARY_DIR>"
   DEFINES
     ${LLVM_DEFINITIONS}
   PUBLIC

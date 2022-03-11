@@ -19,9 +19,9 @@ externalproject_add(
     programl
     PREFIX "${CMAKE_CURRENT_BINARY_DIR}/programl"
     URL
-        "https://github.com/ChrisCummins/ProGraML/archive/4f0981d7a0d27aecef3d6e918c886642b231562d.tar.gz"
+        "https://github.com/ChrisCummins/ProGraML/archive/83f00233b04f4ecf7f12a79c80ffe23c2953913f.tar.gz"
     URL_HASH
-        "SHA256=c56360aade351eda1c138a594177fcb7cd2cda2a0a6c5c0d9aa62c7f856194bd"
+        "SHA256=704826311b842b3ffc2dedcce593fdd319d76e95bdf5386985768007ebb22316"
     DOWNLOAD_NO_EXTRACT FALSE
     CONFIGURE_COMMAND ""
     BUILD_COMMAND ""

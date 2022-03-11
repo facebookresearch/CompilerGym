@@ -5,25 +5,9 @@
 
 cg_add_all_subdirs()
 
-# This target trickery with compiler_gym and compiler_gym_partial
-# is needed because specs.py imports the compiler_gym module,
-# therefore creating a circular dependency.
-# compiler_gym_partial is all the other bits of the proto package so that
-# specs.py can import it.
 cg_py_library(
   NAME
     compiler_gym
-  GENERATED_SRCS
-    "$<TARGET_PROPERTY:compiler_gym__envs__llvm__specs,LOCATION>"
-  DEPS
-    ::compiler_gym_partial
-    compiler_gym::envs::llvm::specs
-  PUBLIC
-)
-
-cg_py_library(
-  NAME
-    compiler_gym_partial
   SRCS
     "__init__.py"
   DEPS

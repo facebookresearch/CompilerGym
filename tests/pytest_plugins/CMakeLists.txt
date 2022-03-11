@@ -23,7 +23,6 @@ cg_py_library(
   SRCS
     "llvm.py"
   DATA
-    compiler_gym::envs::llvm::service::passes::actions_genfiles
     compiler_gym::third_party::cbench::benchmarks_list
   DEPS
     compiler_gym::envs::llvm::llvm

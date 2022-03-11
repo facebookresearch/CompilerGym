@@ -76,7 +76,7 @@ find_library(
 )
 find_path(
     ProGraML_proto_programl_cc_INCLUDE_DIRS
-    programl/proto/program_graph_options.pb.h
+    programl/proto/program_graph.pb.h
 )
 if(
     ProGraML_proto_programl_cc_LIBRARIES

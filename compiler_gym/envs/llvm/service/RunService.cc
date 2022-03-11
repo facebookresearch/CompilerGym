@@ -16,10 +16,7 @@ using namespace compiler_gym::llvm_service;
 namespace {
 
 void initLlvm() {
-  llvm::InitializeAllTargets();
-  llvm::InitializeAllTargetMCs();
-  llvm::InitializeAllAsmPrinters();
-  llvm::InitializeAllAsmParsers();
+  llvm::InitializeNativeTarget();
 
   // Initialize passes.
   llvm::PassRegistry& Registry = *llvm::PassRegistry::getPassRegistry();

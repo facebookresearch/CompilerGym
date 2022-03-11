@@ -10,6 +10,7 @@ cg_py_library(
     llvm
   SRCS
     "__init__.py"
+    "specs.py"
   DATA
     compiler_gym::envs::llvm::service::service
   DEPS
@@ -70,24 +71,4 @@ cg_py_library(
     compiler_gym::util::util
     compiler_gym::views::views
   PUBLIC
-)
-
-string(
-    CONCAT
-    _CMD
-    "\"${Python3_EXECUTABLE}\" "
-    "\"$<TARGET_PROPERTY:compiler_gym__envs__llvm__make_specs,LOCATION>\" "
-    "\"$<TARGET_FILE:compiler_gym__envs__llvm__service__compiler_gym-llvm-service>\" "
-    "\"$@\""
-)
-set_command_pythonpath(COMMAND "${_CMD}" RESULT _CMD)
-cg_genrule(
-  NAME specs
-  OUTS "specs.py"
-  COMMAND "${_CMD}"
-  DEPENDS
-    ::make_specs
-    compiler_gym::compiler_gym_partial
-    compiler_gym::envs::llvm::service::service
-    compiler_gym::envs::llvm::service::compiler_gym-llvm-service
 )
