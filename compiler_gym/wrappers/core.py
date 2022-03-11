@@ -4,7 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 import warnings
 from collections.abc import Iterable as IterableType
-from typing import Iterable, Optional, Union
+from typing import Iterable, List, Optional, Union
 
 import gym
 
@@ -40,26 +40,12 @@ class CompilerEnvWrapper(gym.Wrapper):
         self.reward_range = self.env.reward_range
         self.metadata = self.env.metadata
 
-    def raw_step(
-        self,
-        actions: Iterable[ActionType],
-        observation_spaces: Iterable[ObservationSpaceSpec],
-        reward_spaces: Iterable[Reward],
-    ):
-        return self.env.raw_step(
-            actions, observation_spaces=observation_spaces, reward_spaces=reward_spaces
-        )
-
     def reset(self, *args, **kwargs) -> ObservationType:
         return self.env.reset(*args, **kwargs)
 
     def fork(self) -> CompilerEnv:
         return type(self)(env=self.env.fork())
 
-    # NOTE(cummins): This step() method is provided only because
-    # CompilerEnv.step accepts additional arguments over gym.Env.step. Users who
-    # wish to modify the behavior of CompilerEnv.step should overload
-    # raw_step().
     def step(  # pylint: disable=arguments-differ
         self,
         action: ActionType,
@@ -95,8 +81,7 @@ class CompilerEnvWrapper(gym.Wrapper):
                 category=DeprecationWarning,
             )
             reward_spaces = rewards
-        return self.env._multistep(
-            raw_step=self.raw_step,
+        return self.multistep(
             actions=[action],
             observation_spaces=observation_spaces,
             reward_spaces=reward_spaces,
@@ -124,8 +109,7 @@ class CompilerEnvWrapper(gym.Wrapper):
                 category=DeprecationWarning,
             )
             reward_spaces = rewards
-        return self.env._multistep(  # pylint: disable=protected-access
-            raw_step=self.raw_step,
+        return self.env.multistep(
             actions=actions,
             observation_spaces=observation_spaces,
             reward_spaces=reward_spaces,
@@ -166,16 +150,20 @@ class ActionWrapper(CompilerEnvWrapper):
     to allow an action space transformation.
     """
 
-    def raw_step(
+    def multistep(
         self,
         actions: Iterable[ActionType],
-        observation_spaces: Iterable[ObservationSpaceSpec],
-        reward_spaces: Iterable[Reward],
+        observation_spaces: Optional[Iterable[ObservationSpaceSpec]] = None,
+        reward_spaces: Optional[Iterable[Reward]] = None,
+        observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        rewards: Optional[Iterable[Union[str, Reward]]] = None,
     ):
-        return self.env.raw_step(
+        return self.env.multistep(
             [self.action(a) for a in actions],
             observation_spaces=observation_spaces,
             reward_spaces=reward_spaces,
+            observations=observations,
+            rewards=rewards,
         )
 
     def action(self, action: ActionType) -> ActionType:
@@ -196,22 +184,23 @@ class ObservationWrapper(CompilerEnvWrapper):
         observation = self.env.reset(*args, **kwargs)
         return self.observation(observation)
 
-    def raw_step(
+    def multistep(
         self,
-        actions: Iterable[ActionType],
-        observation_spaces: Iterable[ObservationSpaceSpec],
-        reward_spaces: Iterable[Reward],
+        actions: List[ActionType],
+        observation_spaces: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
+        observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        rewards: Optional[Iterable[Union[str, Reward]]] = None,
     ):
-        observation, reward, done, info = self.env.raw_step(
-            actions, observation_spaces=observation_spaces, reward_spaces=reward_spaces
+        observation, reward, done, info = self.env.multistep(
+            actions,
+            observation_spaces=observation_spaces,
+            reward_spaces=reward_spaces,
+            observations=observations,
+            rewards=rewards,
         )
 
-        # Only apply observation transformation if we are using the default
-        # observation space.
-        if observation_spaces == [self.observation_space_spec]:
-            observation = [self.observation(observation)]
-
-        return observation, reward, done, info
+        return self.observation(observation), reward, done, info
 
     def observation(self, observation):
         """Translate an observation to the new space."""
@@ -226,22 +215,23 @@ class RewardWrapper(CompilerEnvWrapper):
     def reset(self, *args, **kwargs):
         return self.env.reset(*args, **kwargs)
 
-    def raw_step(
+    def multistep(
         self,
-        actions: Iterable[ActionType],
-        observation_spaces: Iterable[ObservationSpaceSpec],
-        reward_spaces: Iterable[Reward],
+        actions: List[ActionType],
+        observation_spaces: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
+        observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        rewards: Optional[Iterable[Union[str, Reward]]] = None,
     ):
-        observation, reward, done, info = self.env.step(
-            actions, observation_spaces=observation_spaces, reward_spaces=reward_spaces
+        observation, reward, done, info = self.env.multistep(
+            actions,
+            observation_spaces=observation_spaces,
+            reward_spaces=reward_spaces,
+            observations=observations,
+            rewards=rewards,
         )
 
-        # Only apply rewards transformation if we are using the default
-        # reward space.
-        if reward_spaces == [self.reward_space]:
-            reward = [self.reward(reward)]
-
-        return observation, reward, done, info
+        return observation, self.reward(reward), done, info
 
     def reward(self, reward):
         """Translate a reward to the new space."""

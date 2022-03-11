@@ -5,6 +5,8 @@
 
 cg_add_all_subdirs()
 
+return()
+
 cg_py_library(
   NAME
     loops_opt_service

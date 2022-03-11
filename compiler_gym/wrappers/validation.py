@@ -29,13 +29,13 @@ class ValidateBenchmarkAfterEveryStep(CompilerEnvWrapper):
         super().__init__(env)
         self.reward_penalty = reward_penalty
 
-    def raw_step(
+    def multistep(
         self,
         actions: List[ActionType],
         observation_spaces=None,
         reward_spaces=None,
     ):
-        observation, reward, done, info = self.env.raw_step(
+        observation, reward, done, info = self.env.multistep(
             actions,
             observation_spaces=observation_spaces,
             reward_spaces=reward_spaces,

@@ -57,11 +57,13 @@ class CommandlineWithTerminalAction(CompilerEnvWrapper):
             name=f"{type(self).__name__}<{env.action_space.name}>",
         )
 
-    def raw_step(
+    def multistep(
         self,
         actions: List[ActionType],
         observation_spaces: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
+        observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        rewards: Optional[Iterable[Union[str, Reward]]] = None,
     ) -> StepType:
         terminal_action: int = len(self.action_space.flags) - 1
 
@@ -74,10 +76,12 @@ class CommandlineWithTerminalAction(CompilerEnvWrapper):
         if index_of_terminal >= 0:
             actions = actions[:index_of_terminal]
 
-        observation, reward, done, info = self.env.raw_step(
+        observation, reward, done, info = self.env.multistep(
             actions,
             observation_spaces=observation_spaces,
             reward_spaces=reward_spaces,
+            observations=observations,
+            rewards=rewards,
         )
 
         # Communicate back to the frontend.

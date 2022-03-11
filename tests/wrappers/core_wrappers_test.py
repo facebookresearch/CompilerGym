@@ -3,7 +3,6 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Unit tests for //compiler_gym/wrappers."""
-import numpy as np
 import pytest
 
 from compiler_gym.datasets import Datasets
@@ -107,6 +106,9 @@ def test_wrapped_step_custom_args(env: LlvmEnv, wrapper_type):
 
         def action(self, action):
             return action  # pass thru
+
+        def reward(self, reward):
+            return reward
 
     env = MyWrapper(env)
     env.reset()
@@ -259,22 +261,6 @@ def test_wrapped_observation_missing_definition(env: LlvmEnv):
         env.reset()
 
 
-def test_wrapped_observation_not_applied_to_non_default_observations(env: LlvmEnv):
-    class MyWrapper(ObservationWrapper):
-        def __init__(self, env):
-            super().__init__(env)
-            self.observation_space = "Ir"
-
-        def observation(self, observation):
-            return len(observation)
-
-    env = MyWrapper(env)
-    env.reset()
-    (observation,), _, _, _ = env.step(0, observation_spaces=["Autophase"])
-    print(observation)
-    assert isinstance(observation, np.ndarray)
-
-
 def test_wrapped_reward(env: LlvmEnv):
     class MyWrapper(RewardWrapper):
         def reward(self, reward):
@@ -286,11 +272,9 @@ def test_wrapped_reward(env: LlvmEnv):
     env.reset()
     _, reward, _, _ = env.step(0)
     assert reward == -5
-    assert env.episode_reward == -5
 
     _, reward, _, _ = env.step(0)
     assert reward == -5
-    assert env.episode_reward == -10
 
 
 if __name__ == "__main__":

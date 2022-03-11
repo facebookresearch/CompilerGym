@@ -267,7 +267,7 @@ def _step_worker(
             # Run all actions in a single step().
             steps = [env.action_space.sample() for _ in range(num_steps)]
             with Timer() as timer:
-                _, _, done, _ = env.step(steps)
+                _, _, done, _ = env.multistep(steps)
             if not done:
                 return [timer.time / num_steps] * num_steps
             env.reset()
