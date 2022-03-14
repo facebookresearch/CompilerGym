@@ -13,7 +13,7 @@ import ThemeContext from "./context/ThemeContext";
 import SplashPage from "./components/Pages/SplashPage";
 import MainPage from "./components/Pages/MainPage";
 
-const api = new ApiService("http://127.0.0.1:5000");
+const api = new ApiService();
 const INITIAL_SETTINGS = {
   reward: "IrInstructionCountOz",
   dataset: "benchmark://cbench-v1",
