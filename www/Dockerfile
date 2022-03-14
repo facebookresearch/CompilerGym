@@ -19,10 +19,10 @@ RUN ln -s /lib/x86_64-linux-gnu/libtinfo.so.5 /lib/x86_64-linux-gnu/libtinfo.so
 COPY requirements.txt requirements.txt
 RUN pip3 install --no-cache-dir -r requirements.txt
 
-COPY www.py .
-COPY frontends/compiler_gym/build frontends/compiler_gym/build
-
 # Run the LLVM environment now to warm the CompilerGym caches.
 RUN python3 -m compiler_gym.bin.service --env=llvm-v0
+
+COPY www.py .
+COPY frontends/compiler_gym/build frontends/compiler_gym/build
 
 CMD [ "python3", "www.py"]
