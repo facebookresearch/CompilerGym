@@ -95,24 +95,32 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
         break;
       }
       case LlvmObservationSpace::IR2VEC_FLOW_AWARE: {
+        ScalarRange featureSize;
+        std::vector<ScalarRange> featureSizes;
+        featureSizes.reserve(kIR2VecFeatureDim);
+        for (size_t i = 0; i < kIR2VecFeatureDim; ++i) {
+          featureSizes.push_back(featureSize);
+        }
+        *space.mutable_double_range_list()->mutable_range() = {featureSizes.begin(),
+                                                               featureSizes.end()};
         space.set_deterministic(true);
         space.set_platform_dependent(false);
-        SequenceSpace embeddings;
-        embeddings.mutable_length_range()->mutable_min()->set_value(kIR2VecFeatureDim);
-        embeddings.mutable_length_range()->mutable_max()->set_value(kIR2VecFeatureDim);
-        *space.mutable_double_sequence() = embeddings;
         std::vector<double> defaultValue(kIR2VecFeatureDim, 0.0);
         *space.mutable_default_value()->mutable_double_list()->mutable_value() = {
             defaultValue.begin(), defaultValue.end()};
         break;
       }
       case LlvmObservationSpace::IR2VEC_SYMBOLIC: {
+        ScalarRange featureSize;
+        std::vector<ScalarRange> featureSizes;
+        featureSizes.reserve(kIR2VecFeatureDim);
+        for (size_t i = 0; i < kIR2VecFeatureDim; ++i) {
+          featureSizes.push_back(featureSize);
+        }
+        *space.mutable_double_range_list()->mutable_range() = {featureSizes.begin(),
+                                                               featureSizes.end()};
         space.set_deterministic(true);
         space.set_platform_dependent(false);
-        SequenceSpace embeddings;
-        embeddings.mutable_length_range()->mutable_min()->set_value(kIR2VecFeatureDim);
-        embeddings.mutable_length_range()->mutable_max()->set_value(kIR2VecFeatureDim);
-        *space.mutable_double_sequence() = embeddings;
         std::vector<double> defaultValue(kIR2VecFeatureDim, 0.0);
         *space.mutable_default_value()->mutable_double_list()->mutable_value() = {
             defaultValue.begin(), defaultValue.end()};
