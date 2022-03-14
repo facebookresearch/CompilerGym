@@ -5,12 +5,8 @@
  */
 
 export default class ApiService {
-  constructor(domain) {
-    if (!process.env.NODE_ENV || process.env.NODE_ENV === "development") {
-      this.domain = domain || "http://127.0.0.1:5000";
-    } else {
-      this.domain = domain || "http://production";
-    }
+  constructor() {
+    this.domain = process.env.REACT_APP_API_URL
     this.fetch = this.fetch.bind(this);
   }
 
