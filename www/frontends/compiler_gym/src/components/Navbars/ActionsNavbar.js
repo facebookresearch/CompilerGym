@@ -23,33 +23,28 @@ import LargeModal from "../Modals/LargeModal";
 import { getCommandLineArray } from "../../utils/Helpers";
 
 const CustomMenu = forwardRef(
-  ({ children, style, "aria-labelledby": labeledBy }, ref) => {
-    const [value, setValue] = useState("");
-
+  ({children, style, className, "aria-labelledby": labeledBy}, ref) => {
+    const [value, setValue] = React.useState("");
     return (
       <div
         ref={ref}
-        style={style}
-        className="cg-dropdown"
+        style={{ maxHeight: "18vh", overflow: "auto", padding: "0 0.4rem" }}
+        className={className}
         aria-labelledby={labeledBy}
       >
         <div className="search-bar">
           <FormControl
             autoFocus
             className="my-1"
-            size="sm"
-            placeholder="Search..."
+            placeholder="Search"
             onChange={(e) => setValue(e.target.value)}
             value={value}
           />
         </div>
-        <ul>
+        <ul className="px-0">
           {React.Children.toArray(children).filter(
             (child) =>
-              !value ||
-              child.props.children
-                .toLowerCase()
-                .indexOf(value.toLowerCase()) !== -1
+              !value || child.props.children.toLowerCase().indexOf(value) > -1
           )}
         </ul>
       </div>
