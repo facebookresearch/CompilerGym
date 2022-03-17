@@ -26,7 +26,7 @@ const RenderSvgNode = ({
   handleMouseOutTree,
   layer,
 }) => {
-  const foreignObjectProps = { width: 150, height: 200, x: 20, y: 10 };
+  const foreignObjectProps = { width: 180, height: 150, x: -190, y: -20 };
   const nodeRef = useRef();
   const [seeDescription, setSeeDescription] = useState(false)
 
@@ -67,7 +67,7 @@ const RenderSvgNode = ({
       {seeDescription && (
         <foreignObject {...foreignObjectProps}>
           <div className="active-node-info">
-            <span className="description-tooltip2">
+            <span style={{fontSize:"11px"}}>
              {nodeDatum.description}
             </span>
           </div>

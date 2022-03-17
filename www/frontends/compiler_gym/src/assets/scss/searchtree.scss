@@ -4,12 +4,6 @@
  * LICENSE file in the root directory of this source tree.
  */
 
-.searchtree-nav-wrapper {
-    position: sticky;
-    top: 5.4rem;
-    z-index: 1;
-}
-
 .search-tree-container {
   margin-top: 0rem;
   margin-left: 0rem;
@@ -73,6 +67,7 @@
     stroke-width: 0;
     font-size: 0.8rem;
     fill: black;
+    z-index: 1;
   }
   path {
     fill: none;
@@ -87,8 +82,8 @@
 
 .active-node-info {
   position: sticky;
-  border: 1px solid black;
-  border-radius: 5%;
+  border: 2px solid black;
+  border-radius: 5px;
   background-color: $secondary;
   padding: 0.45rem;
   z-index: 100;
@@ -99,4 +94,8 @@
   height: 85vh;
   justify-content: center;
   align-items: center;
+}
+
+.dark-mode-spinner-wrap {
+  background-color: $dark;
 }

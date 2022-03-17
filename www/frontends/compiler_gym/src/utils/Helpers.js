@@ -154,8 +154,8 @@ export const percIncrease = (a, b) => {
 };
 
 /**
- * This recursive function takes a tree object of parents and returns the translate Y position in canvas as a flat array.
- *
+ * This recursive function takes a tree object of parents and
+ * returns the translate Y position in canvas as a flat array.
  * @param {*} obj the three object of parents
  * @param {*} y_deltas a memoized array with y deltas.
  * @returns
