@@ -34,11 +34,15 @@ class ValidateBenchmarkAfterEveryStep(CompilerEnvWrapper):
         actions: List[ActionType],
         observation_spaces=None,
         reward_spaces=None,
+        observations=None,
+        rewards=None,
     ):
         observation, reward, done, info = self.env.multistep(
             actions,
             observation_spaces=observation_spaces,
             reward_spaces=reward_spaces,
+            observations=observations,
+            rewards=rewards,
         )
 
         # Early exit if environment reaches terminal state.
