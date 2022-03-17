@@ -79,13 +79,14 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
       break;
     }
     case LlvmObservationSpace::INST_COUNT: {
-      const auto features = InstCount::getFeatureVector(benchmark.module());
+      InstCountFeatureVector features = InstCount::getFeatureVector(benchmark.module());
       *reply.mutable_int64_tensor()->mutable_shape()->Add() = features.size();
       *reply.mutable_int64_tensor()->mutable_value() = {features.begin(), features.end()};
       break;
     }
     case LlvmObservationSpace::AUTOPHASE: {
-      const auto features = autophase::InstCount::getFeatureVector(benchmark.module());
+      const std::vector<int64_t> features =
+          autophase::InstCount::getFeatureVector(benchmark.module());
       *reply.mutable_int64_tensor()->mutable_shape()->Add() = features.size();
       *reply.mutable_int64_tensor()->mutable_value() = {features.begin(), features.end()};
       break;
@@ -96,8 +97,9 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
 
       IR2Vec::Embeddings embeddings(benchmark.module(), IR2Vec::IR2VecMode::FlowAware,
                                     ir2vecEmbeddingsPath.string());
-      const auto features = embeddings.getProgramVector();
-      *reply.mutable_double_list()->mutable_value() = {features.begin(), features.end()};
+      const IR2Vec::Vector& features = embeddings.getProgramVector();
+      reply.mutable_float_tensor()->mutable_shape()->Add(features.size());
+      *reply.mutable_float_tensor()->mutable_value() = {features.begin(), features.end()};
       break;
     }
     case LlvmObservationSpace::IR2VEC_SYMBOLIC: {
@@ -106,8 +108,9 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
 
       IR2Vec::Embeddings embeddings(benchmark.module(), IR2Vec::IR2VecMode::Symbolic,
                                     ir2vecEmbeddingsPath.string());
-      const auto features = embeddings.getProgramVector();
-      *reply.mutable_double_list()->mutable_value() = {features.begin(), features.end()};
+      const llvm::SmallVector<double, 300>& features = embeddings.getProgramVector();
+      reply.mutable_float_tensor()->mutable_shape()->Add(features.size());
+      *reply.mutable_float_tensor()->mutable_value() = {features.begin(), features.end()};
       break;
     }
     case LlvmObservationSpace::IR2VEC_FUNCTION_LEVEL_FLOW_AWARE: {
@@ -115,18 +118,19 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
           "compiler_gym/third_party/ir2vec/seedEmbeddingVocab-300-llvm10.txt");
       IR2Vec::Embeddings embeddings(benchmark.module(), IR2Vec::IR2VecMode::FlowAware,
                                     ir2vecEmbeddingsPath.string());
-      const auto FuncMap = embeddings.getFunctionVecMap();
-      json Embeddings = json::array({});
+      const llvm::SmallMapVector<const llvm::Function*, llvm::SmallVector<double, 300>, 16>&
+          functionMap = embeddings.getFunctionVecMap();
 
-      for (auto func : FuncMap) {
-        std::vector<double> FuncEmb = {func.second.begin(), func.second.end()};
-        json FuncEmbJson = FuncEmb;
-        json FuncJson;
-        std::string FuncName = func.first->getName();
-        FuncJson[FuncName] = FuncEmbJson;
-        Embeddings.push_back(FuncJson);
+      json data;
+      for (auto function : functionMap) {
+        data[function.first->getName()] =
+            std::vector<double>({function.second.begin(), function.second.end()});
       }
-      *reply.mutable_string_value() = Embeddings.dump();
+
+      Opaque opaque;
+      opaque.set_format("json://");
+      *opaque.mutable_data() = data.dump();
+      reply.mutable_any_value()->PackFrom(opaque);
       break;
     }
     case LlvmObservationSpace::IR2VEC_FUNCTION_LEVEL_SYMBOLIC: {
@@ -134,18 +138,19 @@ Status setObservation(LlvmObservationSpace space, const fs::path& workingDirecto
           "compiler_gym/third_party/ir2vec/seedEmbeddingVocab-300-llvm10.txt");
       IR2Vec::Embeddings embeddings(benchmark.module(), IR2Vec::IR2VecMode::Symbolic,
                                     ir2vecEmbeddingsPath.string());
-      const auto FuncMap = embeddings.getFunctionVecMap();
-      json Embeddings = json::array({});
+      const llvm::SmallMapVector<const llvm::Function*, llvm::SmallVector<double, 300>, 16>&
+          functionMap = embeddings.getFunctionVecMap();
 
-      for (auto func : FuncMap) {
-        std::vector<double> FuncEmb = {func.second.begin(), func.second.end()};
-        json FuncEmbJson = FuncEmb;
-        json FuncJson;
-        std::string FuncName = func.first->getName();
-        FuncJson[FuncName] = FuncEmbJson;
-        Embeddings.push_back(FuncJson);
+      json data;
+      for (auto function : functionMap) {
+        data[function.first->getName()] =
+            std::vector<double>({function.second.begin(), function.second.end()});
       }
-      *reply.mutable_string_value() = Embeddings.dump();
+
+      Opaque opaque;
+      opaque.set_format("json://");
+      *opaque.mutable_data() = data.dump();
+      reply.mutable_any_value()->PackFrom(opaque);
       break;
     }
     case LlvmObservationSpace::PROGRAML:

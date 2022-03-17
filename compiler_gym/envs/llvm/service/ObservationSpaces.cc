@@ -121,69 +121,85 @@ std::vector<ObservationSpace> getLlvmObservationSpaceList() {
         break;
       }
       case LlvmObservationSpace::IR2VEC_FLOW_AWARE: {
-        ScalarRange featureSize;
-        std::vector<ScalarRange> featureSizes;
-        featureSizes.reserve(kIR2VecFeatureDim);
-        for (size_t i = 0; i < kIR2VecFeatureDim; ++i) {
-          featureSizes.push_back(featureSize);
-        }
-        *space.mutable_double_range_list()->mutable_range() = {featureSizes.begin(),
-                                                               featureSizes.end()};
-        space.set_deterministic(true);
-        space.set_platform_dependent(false);
-        std::vector<double> defaultValue(kIR2VecFeatureDim, 0.0);
-        *space.mutable_default_value()->mutable_double_list()->mutable_value() = {
-            defaultValue.begin(), defaultValue.end()};
+        FloatBox& featureSizes = *space.mutable_float_box();
+
+        FloatTensor& featureSizesLow = *featureSizes.mutable_low();
+        featureSizesLow.add_shape(kIR2VecFeatureDim);
+        const std::vector<float> low(kIR2VecFeatureDim, std::numeric_limits<float>::lowest());
+        *featureSizesLow.mutable_value() = {low.begin(), low.end()};
+
+        FloatTensor& featureSizesHigh = *featureSizes.mutable_high();
+        featureSizesHigh.add_shape(kIR2VecFeatureDim);
+        const std::vector<float> high(kIR2VecFeatureDim, std::numeric_limits<float>::max());
+        *featureSizesHigh.mutable_value() = {high.begin(), high.end()};
+
+        observationSpace.set_deterministic(true);
+        observationSpace.set_platform_dependent(false);
+
+        FloatTensor* defaultObservation =
+            observationSpace.mutable_default_observation()->mutable_float_tensor();
+        defaultObservation->add_shape(kIR2VecFeatureDim);
+        const std::vector<float> defaultValues(kIR2VecFeatureDim, 0.0);
+        *defaultObservation->mutable_value() = {defaultValues.begin(), defaultValues.end()};
         break;
       }
       case LlvmObservationSpace::IR2VEC_SYMBOLIC: {
-        ScalarRange featureSize;
-        std::vector<ScalarRange> featureSizes;
-        featureSizes.reserve(kIR2VecFeatureDim);
-        for (size_t i = 0; i < kIR2VecFeatureDim; ++i) {
-          featureSizes.push_back(featureSize);
-        }
-        *space.mutable_double_range_list()->mutable_range() = {featureSizes.begin(),
-                                                               featureSizes.end()};
-        space.set_deterministic(true);
-        space.set_platform_dependent(false);
-        std::vector<double> defaultValue(kIR2VecFeatureDim, 0.0);
-        *space.mutable_default_value()->mutable_double_list()->mutable_value() = {
-            defaultValue.begin(), defaultValue.end()};
+        FloatBox& featureSizes = *space.mutable_float_box();
+
+        FloatTensor& featureSizesLow = *featureSizes.mutable_low();
+        featureSizesLow.add_shape(kIR2VecFeatureDim);
+        const std::vector<float> low(kIR2VecFeatureDim, std::numeric_limits<float>::lowest());
+        *featureSizesLow.mutable_value() = {low.begin(), low.end()};
+
+        FloatTensor& featureSizesHigh = *featureSizes.mutable_high();
+        featureSizesHigh.add_shape(kIR2VecFeatureDim);
+        const std::vector<float> high(kIR2VecFeatureDim, std::numeric_limits<float>::max());
+        *featureSizesHigh.mutable_value() = {high.begin(), high.end()};
+
+        observationSpace.set_deterministic(true);
+        observationSpace.set_platform_dependent(false);
+
+        FloatTensor* defaultObservation =
+            observationSpace.mutable_default_observation()->mutable_float_tensor();
+        defaultObservation->add_shape(kIR2VecFeatureDim);
+        const std::vector<float> defaultValues(kIR2VecFeatureDim, 0.0);
+        *defaultObservation->mutable_value() = {defaultValues.begin(), defaultValues.end()};
         break;
       }
       case LlvmObservationSpace::IR2VEC_FUNCTION_LEVEL_FLOW_AWARE: {
-        space.set_opaque_data_format("json://");
-        space.mutable_string_size_range()->mutable_min()->set_value(0);
-        space.set_deterministic(true);
-        space.set_platform_dependent(false);
-        std::vector<double> defaultEmbs;
-        for (double i = 0; i < kIR2VecFeatureDim; i++) {
-          defaultEmbs.push_back(i);
-        }
-        json vectorJson = defaultEmbs;
-        json FunctionKey;
+        observationSpace.set_deterministic(true);
+        observationSpace.set_platform_dependent(false);
+
+        space.mutable_string_value()->mutable_length_range()->set_min(0);
+
+        json vectorJson = std::vector<double>(kIR2VecFeatureDim, 0.0);
+        json functionKey;
         json embeddings;
-        FunctionKey["default"] = vectorJson;
-        embeddings["embeddings"] = FunctionKey;
-        *space.mutable_default_value()->mutable_string_value() = embeddings.dump();
+        functionKey["default"] = vectorJson;
+        embeddings["embeddings"] = functionKey;
+
+        Opaque opaque;
+        opaque.set_format("json://");
+        *opaque.mutable_data() = embeddings.dump();
+        observationSpace.mutable_default_observation()->mutable_any_value()->PackFrom(opaque);
         break;
       }
       case LlvmObservationSpace::IR2VEC_FUNCTION_LEVEL_SYMBOLIC: {
-        space.set_opaque_data_format("json://");
-        space.mutable_string_size_range()->mutable_min()->set_value(0);
-        space.set_deterministic(true);
-        space.set_platform_dependent(false);
-        std::vector<double> defaultEmbs;
-        for (double i = 0; i < kIR2VecFeatureDim; i++) {
-          defaultEmbs.push_back(i);
-        }
-        json vectorJson = defaultEmbs;
-        json FunctionKey;
+        observationSpace.set_deterministic(true);
+        observationSpace.set_platform_dependent(false);
+
+        space.mutable_string_value()->mutable_length_range()->set_min(0);
+
+        json vectorJson = std::vector<double>(kIR2VecFeatureDim, 0.0);
+        json functionKey;
         json embeddings;
-        FunctionKey["default"] = vectorJson;
-        embeddings["embeddings"] = FunctionKey;
-        *space.mutable_default_value()->mutable_string_value() = embeddings.dump();
+        functionKey["default"] = vectorJson;
+        embeddings["embeddings"] = functionKey;
+
+        Opaque opaque;
+        opaque.set_format("json://");
+        *opaque.mutable_data() = embeddings.dump();
+        observationSpace.mutable_default_observation()->mutable_any_value()->PackFrom(opaque);
         break;
       }
       case LlvmObservationSpace::PROGRAML: {
