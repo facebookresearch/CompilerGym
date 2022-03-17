@@ -256,6 +256,10 @@ def print_service_capabilities(env: CompilerEnv):
                 headers=("Action",),
             )
             print(table)
+        else:
+            raise NotImplementedError(
+                "Only Commandline and NamedDiscrete are supported."
+            )
 
 
 def main(argv):

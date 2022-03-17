@@ -11,7 +11,7 @@ from copy import deepcopy
 from math import isclose
 from pathlib import Path
 from time import time
-from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
 
 import gym
 import numpy as np
@@ -1082,9 +1082,7 @@ class CompilerEnv(gym.Env):
                 category=DeprecationWarning,
             )
             reward_spaces = rewards
-        return self._multistep(
-            self.raw_step, [action], observation_spaces, reward_spaces
-        )
+        return self.multistep([action], observation_spaces, reward_spaces)
 
     def multistep(
         self,
@@ -1129,20 +1127,7 @@ class CompilerEnv(gym.Env):
                 category=DeprecationWarning,
             )
             reward_spaces = rewards
-        return self._multistep(
-            self.raw_step, list(actions), observation_spaces, reward_spaces
-        )
 
-    def _multistep(
-        self,
-        raw_step: Callable[
-            [Iterable[ActionType], Iterable[ObservationSpaceSpec], Iterable[Reward]],
-            StepType,
-        ],
-        actions: Iterable[ActionType],
-        observation_spaces: Optional[Iterable[Union[str, ObservationSpaceSpec]]],
-        reward_spaces: Optional[Iterable[Union[str, Reward]]],
-    ) -> StepType:
         # Coerce observation spaces into a list of ObservationSpaceSpec instances.
         if observation_spaces:
             observation_spaces_to_compute: List[ObservationSpaceSpec] = [
@@ -1170,7 +1155,7 @@ class CompilerEnv(gym.Env):
             reward_spaces_to_compute: List[Reward] = []
 
         # Perform the underlying environment step.
-        observation_values, reward_values, done, info = raw_step(
+        observation_values, reward_values, done, info = self.raw_step(
             actions, observation_spaces_to_compute, reward_spaces_to_compute
         )
 

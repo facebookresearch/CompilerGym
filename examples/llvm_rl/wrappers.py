@@ -135,7 +135,7 @@ class ConcatActionsHistogram(ObservationWrapper):
     ):
         for a in actions:
             self.histogram[a] += self.increment
-        return self.env.multistep(actions, **kwargs)
+        return super().multistep(actions, **kwargs)
 
     def observation(self, observation):
         return np.concatenate((observation, self.histogram)).astype(
