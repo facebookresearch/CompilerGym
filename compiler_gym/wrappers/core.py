@@ -231,7 +231,17 @@ class RewardWrapper(CompilerEnvWrapper):
             rewards=rewards,
         )
 
-        return observation, self.reward(reward), done, info
+        # Undo the episode_reward update and reapply it once we have transformed
+        # the reward.
+        #
+        # TODO(cummins): Refactor step() so that we don't have to do this
+        # recalculation of episode_reward, as this is prone to errors if, say,
+        # the base reward returns NaN or an invalid type.
+        if reward is not None and self.episode_reward is not None:
+            self.unwrapped.episode_reward -= reward
+            reward = self.reward(reward)
+            self.unwrapped.episode_reward += reward
+        return observation, reward, done, info
 
     def reward(self, reward):
         """Translate a reward to the new space."""
