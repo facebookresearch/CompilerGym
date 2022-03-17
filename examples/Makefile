@@ -56,8 +56,6 @@ dgl-init:
 
 test: dgl-init
 	pytest --no-success-flaky-report --benchmark-disable -n auto --durations=5 . --cov=compiler_gym --cov-report=xml:$(COV_REPORT) $(PYTEST_ARGS)
-	$(MAKE) -C makefile_integration clean
-	SEARCH_TIME=3 $(MAKE) -C makefile_integration test
 
 clean:
 	rm -rf $(DISTTOOLS_OUTS)
