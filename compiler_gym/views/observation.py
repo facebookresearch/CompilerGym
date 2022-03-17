@@ -67,7 +67,7 @@ class ObservationView:
         """
         observation_space: ObservationSpaceSpec = self.spaces[observation_space]
         observations, _, done, info = self._raw_step(
-            actions=[], observations=[observation_space], rewards=[]
+            actions=[], observation_spaces=[observation_space], reward_spaces=[]
         )
 
         if done:

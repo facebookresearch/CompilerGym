@@ -10,13 +10,14 @@ import gym
 from flaky import flaky
 
 from compiler_gym import CompilerEnv
+from compiler_gym.util.gym_type_hints import ActionType
 from tests.test_main import main
 
 
 class ThreadedWorker(Thread):
     """Create an environment and run through a set of actions in a background thread."""
 
-    def __init__(self, env_name: str, benchmark: str, actions: List[int]):
+    def __init__(self, env_name: str, benchmark: str, actions: List[ActionType]):
         super().__init__()
         self.done = False
         self.env_name = env_name
@@ -38,7 +39,7 @@ class ThreadedWorker(Thread):
 class ThreadedWorkerWithEnv(Thread):
     """Create an environment and run through a set of actions in a background thread."""
 
-    def __init__(self, env: CompilerEnv, actions: List[int]):
+    def __init__(self, env: CompilerEnv, actions: List[ActionType]):
         super().__init__()
         self.done = False
         self.env = env

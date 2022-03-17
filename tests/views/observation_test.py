@@ -28,11 +28,11 @@ class MockRawStep:
         self.called_observation_spaces = []
         self.ret = list(reversed(ret or [None]))
 
-    def __call__(self, actions, observations, rewards):
+    def __call__(self, actions, observation_spaces, reward_spaces):
         assert not actions
-        assert len(observations) == 1
-        assert not rewards
-        self.called_observation_spaces.append(observations[0].id)
+        assert len(observation_spaces) == 1
+        assert not reward_spaces
+        self.called_observation_spaces.append(observation_spaces[0].id)
         ret = self.ret[-1]
         del self.ret[-1]
         return [ret], [], False, {}

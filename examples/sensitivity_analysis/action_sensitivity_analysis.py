@@ -40,6 +40,7 @@ from sensitivity_analysis.sensitivity_analysis_eval import (
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.flags.env_from_flags import env_from_flags
+from compiler_gym.util.gym_type_hints import ActionType
 from compiler_gym.util.logs import create_logging_dir
 from compiler_gym.util.timer import Timer
 
@@ -115,15 +116,15 @@ def run_one_trial(
     num_warmup_steps = random.randint(0, max_warmup_steps)
     warmup_actions = [env.action_space.sample() for _ in range(num_warmup_steps)]
     env.reward_space = reward_space
-    _, _, done, _ = env.step(warmup_actions)
+    _, _, done, _ = env.multistep(warmup_actions)
     if done:
         return None
-    _, (reward,), done, _ = env.step(action, rewards=[reward_space])
+    _, (reward,), done, _ = env.step(action, reward_spaces=[reward_space])
     return None if done else reward
 
 
 def run_action_sensitivity_analysis(
-    actions: List[int],
+    actions: List[ActionType],
     rewards_path: Path,
     runtimes_path: Path,
     reward_space: str,

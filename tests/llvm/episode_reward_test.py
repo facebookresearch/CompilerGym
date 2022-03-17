@@ -28,7 +28,7 @@ def test_episode_reward_with_non_default_reward_space(env: LlvmEnv):
     assert env.episode_reward == 0
     _, rewards, _, _ = env.step(
         env.action_space["-mem2reg"],
-        rewards=["IrInstructionCount"],
+        reward_spaces=["IrInstructionCount"],
     )
     assert rewards[0] > 0
     assert env.episode_reward == 0
