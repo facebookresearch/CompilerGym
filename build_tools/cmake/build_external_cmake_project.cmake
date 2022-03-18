@@ -10,7 +10,7 @@ include(write_cache_script)
 function(build_external_cmake_project)
     cmake_parse_arguments(
         _RULE
-        ""
+        "NO_INSTALL"
         "NAME;SRC_DIR;INSTALL_PREFIX"
         "CONFIG_ARGS"
         ${ARGN}
@@ -38,10 +38,25 @@ function(build_external_cmake_project)
         COMMAND "${CMAKE_COMMAND}" --build "${_BIN_DIR}"
         COMMAND_ERROR_IS_FATAL ANY
     )
-    execute_process(
-        COMMAND "${CMAKE_COMMAND}" --install "${_BIN_DIR}"
-        COMMAND_ERROR_IS_FATAL ANY
-    )
+    if(NOT _RULE_NO_INSTALL)
+        execute_process(
+            COMMAND "${CMAKE_COMMAND}" --install "${_BIN_DIR}"
+            COMMAND_ERROR_IS_FATAL ANY
+        )
+    endif()
     list(PREPEND CMAKE_PREFIX_PATH "${_INSTALL_PREFIX}")
     set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} PARENT_SCOPE)
+
+    file(
+        GLOB_RECURSE _CONFIG_DEPS
+        FOLLOW_SYMLINKS
+        LIST_DIRECTORIES
+        true
+        "${_RULE_SRC_DIR}/*"
+    )
+    list(APPEND _CONFOG_DEPS "${_RULE_SRC_DIR}")
+    set_property(
+        DIRECTORY APPEND
+        PROPERTY CMAKE_CONFIGURE_DEPENDS ${_CONFIG_DEPS}
+    )
 endfunction()

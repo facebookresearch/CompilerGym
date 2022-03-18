@@ -68,16 +68,18 @@ cg_py_test(
     tests::test_main
 )
 
-cg_py_test(
-  NAME
-    minimize_trajectory_test
-  SRCS
-    "minimize_trajectory_test.py"
-  DEPS
-    compiler_gym::util::util
-    tests::pytest_plugins::llvm
-    tests::test_main
-)
+if(COMPILER_GYM_ENABLE_LLVM_ENV)
+    cg_py_test(
+      NAME
+        minimize_trajectory_test
+      SRCS
+        "minimize_trajectory_test.py"
+      DEPS
+        compiler_gym::util::util
+        tests::pytest_plugins::llvm
+        tests::test_main
+    )
+endif()
 
 cg_py_test(
   NAME

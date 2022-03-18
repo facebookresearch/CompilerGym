@@ -5,6 +5,21 @@
 
 cg_add_all_subdirs()
 
+if(COMPILER_GYM_ENABLE_LLVM_ENV)
+    list(APPEND MAKE_CONFIG_OPTS " --enable-llvm-env")
+endif()
+if(COMPILER_GYM_ENABLE_MLIR_ENV)
+    list(APPEND MAKE_CONFIG_OPTS " --enable-mlir-env")
+endif()
+execute_process(
+    COMMAND
+        bash -c
+        "\"${CMAKE_CURRENT_SOURCE_DIR}/make_config.py\" --out-file-path \"${CMAKE_CURRENT_BINARY_DIR}/config.py\" ${MAKE_CONFIG_OPTS}"
+    OUTPUT_VARIABLE _PY_PGK_FILE_NAME
+    COMMAND_ERROR_IS_FATAL ANY
+)
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS make_config.py)
+
 cg_py_library(
   NAME
     compiler_gym
@@ -49,13 +64,15 @@ cg_py_library(
   PUBLIC
 )
 
+if(COMPILER_GYM_ENABLE_LLVM_ENV)
+    set(RANDOM_SEARCH_DATA DATA compiler_gym::envs::llvm::service::service)
+endif()
 cg_py_library(
   NAME
     random_search
   SRCS
     "random_search.py"
-  DATA
-    compiler_gym::envs::llvm::service::service
+  ${RANDOM_SEARCH_DATA}
   DEPS
     compiler_gym::envs::envs
     compiler_gym::service::connection
@@ -117,14 +134,10 @@ execute_process(
     OUTPUT_VARIABLE _PY_PGK_FILE_NAME
     COMMAND_ERROR_IS_FATAL ANY
 )
+set_property(DIRECTORY APPEND PROPERTY CMAKE_CONFIGURE_DEPENDS ../setup.py)
+
 string(CONCAT _BUILD_CMD "rm -rf \"${_PY_PKG_OUT_DIR}/build\"" " && ${_CMD}")
-cg_genrule(
-  NAME python_package
-  COMMAND "${_BUILD_CMD}"
-  OUTS "${_PY_PKG_OUT_DIR}/dist/${_PY_PGK_FILE_NAME}"
-  DEPENDS
-    compiler_gym::third_party::cbench::benchmarks_list
-    compiler_gym::third_party::cbench::crc32
+set(PY_PKG_DEPS
     compiler_gym::compiler_gym
     compiler_gym::bin::bin
     compiler_gym::datasets::datasets
@@ -135,6 +148,21 @@ cg_genrule(
     compiler_gym::util::util
     compiler_gym::util::flags::flags
     compiler_gym::views::views
+)
+if(COMPILER_GYM_ENABLE_LLVM_ENV)
+    list(
+        APPEND
+        PY_PKG_DEPS
+        compiler_gym::third_party::cbench::benchmarks_list
+        compiler_gym::third_party::cbench::crc32
+    )
+endif()
+cg_genrule(
+  NAME python_package
+  COMMAND "${_BUILD_CMD}"
+  SRCS "${CMAKE_CURRENT_SOURCE_DIR}/../setup.py"
+  OUTS "${_PY_PKG_OUT_DIR}/dist/${_PY_PGK_FILE_NAME}"
+  DEPENDS ${PY_PKG_DEPS}
 )
 
 string(

@@ -36,6 +36,9 @@ argparser.add_argument(
 args, unknown = argparser.parse_known_args()
 sys.argv = [sys.argv[0]] + unknown
 
+sys.path.insert(0, str((Path(args.package_dir) / "compiler_gym").absolute()))
+import config  # noqa: E402
+
 with open("VERSION") as f:
     version = f.read().strip()
 with open("README.md") as f:
@@ -117,9 +120,6 @@ setup_kwargs = {
         "compiler_gym.envs.gcc.datasets",
         "compiler_gym.envs.gcc.service",
         "compiler_gym.envs.gcc",
-        "compiler_gym.envs.llvm.datasets",
-        "compiler_gym.envs.llvm.service",
-        "compiler_gym.envs.llvm",
         "compiler_gym.envs.loop_tool",
         "compiler_gym.envs.loop_tool.service",
         "compiler_gym.envs",
@@ -129,9 +129,7 @@ setup_kwargs = {
         "compiler_gym.service.runtime",
         "compiler_gym.service",
         "compiler_gym.spaces",
-        "compiler_gym.third_party.autophase",
         "compiler_gym.third_party.inst2vec",
-        "compiler_gym.third_party.llvm",
         "compiler_gym.third_party",
         "compiler_gym.util.flags",
         "compiler_gym.util",
@@ -145,12 +143,7 @@ setup_kwargs = {
     "package_data": {
         "compiler_gym": [
             "envs/gcc/service/compiler_gym-gcc-service",
-            "envs/llvm/service/compiler_gym-llvm-service",
-            "envs/llvm/service/compute_observation",
-            "envs/llvm/service/libLLVMPolly.so",
             "envs/loop_tool/service/compiler_gym-loop_tool-service",
-            "third_party/cbench/benchmarks.txt",
-            "third_party/cbench/cbench-v*/crc32.bc",
             "third_party/csmith/csmith/bin/csmith",
             "third_party/csmith/csmith/include/csmith-2.3.0/*.h",
             "third_party/inst2vec/*.pickle",
@@ -177,6 +170,39 @@ setup_kwargs = {
     "platforms": [distutils.util.get_platform()],
     "zip_safe": False,
 }
+
+if config.enable_llvm_env:
+    setup_kwargs["packages"].extend(
+        [
+            "compiler_gym.envs.llvm.datasets",
+            "compiler_gym.envs.llvm.service",
+            "compiler_gym.envs.llvm",
+            "compiler_gym.third_party.llvm",
+            "compiler_gym.third_party.autophase",
+        ]
+    )
+    setup_kwargs["package_data"]["compiler_gym"].extend(
+        [
+            "envs/llvm/service/compiler_gym-llvm-service",
+            "envs/llvm/service/compute_observation",
+            "third_party/cbench/benchmarks.txt",
+            "third_party/cbench/cbench-v*/crc32.bc",
+        ]
+    )
+
+if config.enable_mlir_env:
+    setup_kwargs["packages"].extend(
+        [
+            "compiler_gym.envs.mlir.datasets",
+            "compiler_gym.envs.mlir.service",
+            "compiler_gym.envs.mlir",
+        ]
+    )
+    setup_kwargs["package_data"]["compiler_gym"].extend(
+        [
+            "envs/mlir/service/compiler_gym-mlir-service",
+        ]
+    )
 
 if args.get_wheel_filename:
     # Instead of generating the wheel file,

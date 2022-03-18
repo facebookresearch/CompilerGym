@@ -5,6 +5,10 @@
 
 cg_add_all_subdirs()
 
+if(NOT COMPILER_GYM_ENABLE_LLVM_ENV)
+    return()
+endif()
+
 cg_py_test(
   NAME
     commandline_wrappers_test

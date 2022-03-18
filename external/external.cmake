@@ -45,38 +45,12 @@ set_property(
     PROPERTY STRINGS "internal" "external"
 )
 if(COMPILER_GYM_BENCHMARK_PROVIDER STREQUAL "internal")
-    fetchcontent_declare(
-        benchmark
-        PREFIX
-        "${CMAKE_CURRENT_BINARY_DIR}/external/benchmark"
-        GIT_REPOSITORY "https://github.com/google/benchmark.git"
-        GIT_TAG
-            0d98dba29d66e93259db7daa53a9327df767a415 #tag v1.6.1
+    build_external_cmake_project(
+      NAME benchmark
+      SRC_DIR   "${CMAKE_CURRENT_LIST_DIR}/benchmark"
     )
-
-    if(NOT benchmark_POPULATED)
-        fetchcontent_populate(benchmark)
-
-        # Benchmark v1.4.0 requires C++03.
-        set(_CMAKE_CXX_STANDARD_OLD ${CMAKE_CXX_STANDARD})
-        unset(CMAKE_CXX_STANDARD CACHE)
-
-        option(
-            BENCHMARK_ENABLE_TESTING
-            "Enable testing of the benchmark library."
-            OFF
-        )
-
-        add_subdirectory(${benchmark_SOURCE_DIR} ${benchmark_BINARY_DIR})
-
-        set(CMAKE_CXX_STANDARD ${_CMAKE_CXX_STANDARD_OLD}
-            CACHE STRING "C++ standard to be used."
-            FORCE
-        )
-    endif()
-else()
-    find_package(benchmark REQUIRED)
 endif()
+find_package(benchmark REQUIRED)
 
 # === Abseil ===
 
@@ -144,19 +118,49 @@ set_property(
     CACHE COMPILER_GYM_LLVM_PROVIDER
     PROPERTY STRINGS "internal" "external"
 )
-if(COMPILER_GYM_LLVM_PROVIDER STREQUAL "internal")
+
+# === LLVM 10.0.0 ===
+
+if(
+    COMPILER_GYM_ENABLE_LLVM_ENV
+    AND COMPILER_GYM_LLVM_PROVIDER STREQUAL "internal"
+)
     build_external_cmake_project(
-        NAME llvm
-        SRC_DIR "${CMAKE_CURRENT_LIST_DIR}/llvm"
-        CONFIG_ARGS "-DCOMPILER_GYM_LLVM_PROVIDER=${COMPILER_GYM_LLVM_PROVIDER}"
+      NAME llvm
+      SRC_DIR   "${CMAKE_CURRENT_LIST_DIR}/llvm"
+      CONFIG_ARGS   "-DCOMPILER_GYM_LLVM_PROVIDER=${COMPILER_GYM_LLVM_PROVIDER}"
     )
+    set(LLVM_SRC_DIR "${CMAKE_CURRENT_BINARY_DIR}/external/llvm/llvm/src/llvm")
+    find_package(LLVM 10.0.0 EXACT REQUIRED)
+    message("Using LLVM version ${LLVM_VERSION} from ${LLVM_DIR}")
 endif()
-set(LLVM_SRC_DIR "${CMAKE_CURRENT_BINARY_DIR}/external/llvm/llvm/src/llvm")
-find_package(LLVM 10.0.0 EXACT REQUIRED)
-message("Using LLVM version ${LLVM_VERSION} from ${LLVM_DIR}")
+
+# === LLVM 13 ===
+
+if(COMPILER_GYM_ENABLE_MLIR_ENV)
+    build_external_cmake_project(
+      NAME llvm-13
+      SRC_DIR   "${CMAKE_CURRENT_LIST_DIR}/llvm-13"
+      CONFIG_ARGS   "-DCOMPILER_GYM_LLVM_PROVIDER=${COMPILER_GYM_LLVM_PROVIDER}"
+    )
+    set(LLVM_SRC_DIR
+        "${CMAKE_CURRENT_BINARY_DIR}/external/llvm-13/llvm-13/src/llvm"
+    )
+    find_package(LLVM REQUIRED)
+    find_package(MLIR REQUIRED CONFIG)
+    list(
+        APPEND
+        LLVM_INCLUDE_DIRS
+        "${CMAKE_CURRENT_BINARY_DIR}/external/llvm-13/install/include"
+        "${CMAKE_CURRENT_BINARY_DIR}/external/llvm-13/install/lib"
+        "${CMAKE_CURRENT_BINARY_DIR}/external/llvm-13/llvm-13/src/llvm/llvm/include"
+        "${CMAKE_CURRENT_BINARY_DIR}/external/llvm-13/llvm-13/src/llvm/mlir/include"
+        "${CMAKE_CURRENT_BINARY_DIR}/external/llvm-13/llvm-13/src/llvm-build/tools/mlir/include"
+    )
+    message("Using LLVM version ${LLVM_VERSION} from ${LLVM_DIR}")
+endif()
 
 # === Protocol buffers ===
-
 set(COMPILER_GYM_PROTOBUF_PROVIDER "internal"
     CACHE STRING "Find or build protobuf together with Compiler Gym."
 )
@@ -165,26 +169,10 @@ set_property(
     PROPERTY STRINGS "internal" "external"
 )
 if(COMPILER_GYM_PROTOBUF_PROVIDER STREQUAL "internal")
-    write_cache_script("${CMAKE_CURRENT_BINARY_DIR}/external/protobuf/protobuf_initial_cache.cmake")
-    execute_process(
-        COMMAND
-            "${CMAKE_COMMAND}" -C
-            "${CMAKE_CURRENT_BINARY_DIR}/external/protobuf/protobuf_initial_cache.cmake"
-            -S "${CMAKE_CURRENT_LIST_DIR}/protobuf" -B
-            "${CMAKE_CURRENT_BINARY_DIR}/external/protobuf" -D
-            "CMAKE_INSTALL_PREFIX=${CMAKE_CURRENT_BINARY_DIR}/external/protobuf/install"
-        COMMAND_ERROR_IS_FATAL ANY
-    )
-    execute_process(
-        COMMAND
-            "${CMAKE_COMMAND}" --build
-            "${CMAKE_CURRENT_BINARY_DIR}/external/protobuf"
-        COMMAND_ERROR_IS_FATAL ANY
-    )
-    list(
-        PREPEND
-        CMAKE_PREFIX_PATH
-        "${CMAKE_CURRENT_BINARY_DIR}/external/protobuf/install"
+    build_external_cmake_project(
+      NAME protobuf
+      SRC_DIR "${CMAKE_CURRENT_LIST_DIR}/protobuf"
+      NO_INSTALL
     )
     if(NOT DEFINED Protobuf_USE_STATIC_LIBS)
         set(Protobuf_USE_STATIC_LIBS ON)
@@ -596,19 +584,21 @@ endif()
 # === ProGraML ===
 # https://github.com/ChrisCummins/ProGraML
 
-build_external_cmake_project(
-  NAME programl
-  SRC_DIR "${CMAKE_CURRENT_LIST_DIR}/programl"
-)
-list(
-    PREPEND
-    CMAKE_PREFIX_PATH
-    "${CMAKE_CURRENT_BINARY_DIR}/external/programl/programl/src/programl/bazel-bin"
-    "${CMAKE_CURRENT_BINARY_DIR}/external/programl/programl/src/programl/bazel-bin/external/labm8"
-    "${CMAKE_CURRENT_BINARY_DIR}/external/programl/programl/src/programl/bazel-programl"
-    "${CMAKE_CURRENT_BINARY_DIR}/external/programl/programl/src/programl/bazel-programl/external/labm8"
-)
-find_package(Labm8 REQUIRED)
-find_package(ProGraML REQUIRED)
+if(COMPILER_GYM_ENABLE_LLVM_ENV)
+    build_external_cmake_project(
+      NAME programl
+      SRC_DIR   "${CMAKE_CURRENT_LIST_DIR}/programl"
+    )
+    list(
+        PREPEND
+        CMAKE_PREFIX_PATH
+        "${CMAKE_CURRENT_BINARY_DIR}/external/programl/programl/src/programl/bazel-bin"
+        "${CMAKE_CURRENT_BINARY_DIR}/external/programl/programl/src/programl/bazel-bin/external/labm8"
+        "${CMAKE_CURRENT_BINARY_DIR}/external/programl/programl/src/programl/bazel-programl"
+        "${CMAKE_CURRENT_BINARY_DIR}/external/programl/programl/src/programl/bazel-programl/external/labm8"
+    )
+    find_package(Labm8 REQUIRED)
+    find_package(ProGraML REQUIRED)
+endif()
 
 fetchcontent_makeavailable(${FETCH_CONTENT_LIST})

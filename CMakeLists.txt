@@ -66,6 +66,17 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
     )
 endif()
 
+option(
+    COMPILER_GYM_ENABLE_MLIR_ENV
+    "Whether or not to include the MLIR environment"
+    OFF
+)
+option(
+    COMPILER_GYM_ENABLE_LLVM_ENV
+    "Whether or not to include the LLVM environment"
+    ON
+)
+
 set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter)

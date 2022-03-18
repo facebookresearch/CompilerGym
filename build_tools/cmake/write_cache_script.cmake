@@ -33,7 +33,7 @@ function(write_cache_script _DST_FILE)
             file(
                 APPEND
                 "${_DST_FILE}"
-                "set(${_VAR} \"${${_VAR}}\" CACHE STRING \"\")\n"
+                "set(${_VAR} \"${${_VAR}}\" CACHE STRING \"\" FORCE)\n"
             )
         endif()
     endforeach()

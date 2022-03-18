@@ -14,3 +14,13 @@ py_test(
         "//tests:test_main",
     ],
 )
+
+cc_test(
+    name = "proto_cc_test",
+    srcs = ["ProtoTest.cc"],
+    deps = [
+        "//compiler_gym/service/proto:proto_cc",
+        "//tests:TestMain",
+        "@gtest",
+    ],
+)

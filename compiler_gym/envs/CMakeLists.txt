@@ -5,16 +5,23 @@
 
 cg_add_all_subdirs()
 
+set(ENVS_DEPS
+    ::compiler_env
+    compiler_gym::envs::gcc::gcc
+    compiler_gym::envs::loop_tool::loop_tool
+)
+if(COMPILER_GYM_ENABLE_LLVM_ENV)
+    list(APPEND ENVS_DEPS compiler_gym::envs::llvm::llvm)
+endif()
+if(COMPILER_GYM_ENABLE_MLIR_ENV)
+    list(APPEND ENVS_DEPS compiler_gym::envs::mlir::mlir)
+endif()
 cg_py_library(
   NAME
     envs
   SRCS
     "__init__.py"
-  DEPS
-    ::compiler_env
-    compiler_gym::envs::gcc::gcc
-    compiler_gym::envs::llvm::llvm
-    compiler_gym::envs::loop_tool::loop_tool
+  DEPS ${ENVS_DEPS}
   PUBLIC
 )
 

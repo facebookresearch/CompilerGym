@@ -54,6 +54,7 @@ py_library(
     data = ["//compiler_gym/envs/llvm/service"],
     visibility = ["//visibility:public"],
     deps = [
+        ":config",
         "//compiler_gym/envs",
         "//compiler_gym/service:connection",
         "//compiler_gym/util",
@@ -88,4 +89,17 @@ py_library(
         ":validation_error",
         "//compiler_gym/util",
     ],
+)
+
+genrule(
+    name = "make_config",
+    srcs = ["make_config.py"],
+    outs = ["config.py"],
+    cmd = "\"$<\" --out-file-path \"$@\" --enable-llvm-env",
+)
+
+py_library(
+    name = "config",
+    srcs = [":config.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
 )

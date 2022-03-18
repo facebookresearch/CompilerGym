@@ -13,13 +13,16 @@ from typing import Callable, List, NamedTuple, Optional, Union
 
 import humanize
 
+from compiler_gym import config
 from compiler_gym.envs import CompilerEnv
-from compiler_gym.envs.llvm import LlvmEnv
 from compiler_gym.service.connection import ServiceError
 from compiler_gym.util import logs
 from compiler_gym.util.gym_type_hints import ActionType
 from compiler_gym.util.logs import create_logging_dir
 from compiler_gym.util.tabulate import tabulate
+
+if config.enable_llvm_env:
+    from compiler_gym.envs.llvm import LlvmEnv
 
 
 class RandomSearchProgressLogEntry(NamedTuple):
@@ -300,8 +303,9 @@ def replay_actions(env: CompilerEnv, action_names: List[str], outdir: Path):
     logs_path = outdir / logs.BEST_ACTIONS_PROGRESS_NAME
     start_time = time()
 
-    if isinstance(env, LlvmEnv):
-        env.write_bitcode(outdir / "unoptimized.bc")
+    if config.enable_llvm_env:
+        if isinstance(env, LlvmEnv):
+            env.write_bitcode(outdir / "unoptimized.bc")
 
     with open(str(logs_path), "w") as f:
         ep_reward = 0
@@ -322,27 +326,28 @@ def replay_actions(env: CompilerEnv, action_names: List[str], outdir: Path):
             )
             print(progress.to_csv(), action, file=f, sep=",")
 
-    if isinstance(env, LlvmEnv):
-        env.write_bitcode(outdir / "optimized.bc")
-        print(
-            tabulate(
-                [
-                    (
-                        "IR instruction count",
-                        env.observation["IrInstructionCountO0"],
-                        env.observation["IrInstructionCountOz"],
-                        env.observation["IrInstructionCount"],
-                    ),
-                    (
-                        "Object .text size (bytes)",
-                        env.observation["ObjectTextSizeO0"],
-                        env.observation["ObjectTextSizeOz"],
-                        env.observation["ObjectTextSizeBytes"],
-                    ),
-                ],
-                headers=("", "-O0", "-Oz", "final"),
+    if config.enable_llvm_env:
+        if isinstance(env, LlvmEnv):
+            env.write_bitcode(outdir / "optimized.bc")
+            print(
+                tabulate(
+                    [
+                        (
+                            "IR instruction count",
+                            env.observation["IrInstructionCountO0"],
+                            env.observation["IrInstructionCountOz"],
+                            env.observation["IrInstructionCount"],
+                        ),
+                        (
+                            "Object .text size (bytes)",
+                            env.observation["ObjectTextSizeO0"],
+                            env.observation["ObjectTextSizeOz"],
+                            env.observation["ObjectTextSizeBytes"],
+                        ),
+                    ],
+                    headers=("", "-O0", "-Oz", "final"),
+                )
             )
-        )
 
 
 def replay_actions_from_logs(env: CompilerEnv, logdir: Path, benchmark=None) -> None:

@@ -27,6 +27,7 @@ For example:
     equivalent to those in OpenAI Gym that you can use to write your own
     wrappers.
 """
+from compiler_gym import config
 from compiler_gym.wrappers.commandline import (
     CommandlineWithTerminalAction,
     ConstrainedCommandline,
@@ -34,6 +35,7 @@ from compiler_gym.wrappers.commandline import (
 from compiler_gym.wrappers.core import (
     ActionWrapper,
     CompilerEnvWrapper,
+    ConversionWrapperEnv,
     ObservationWrapper,
     RewardWrapper,
 )
@@ -43,7 +45,10 @@ from compiler_gym.wrappers.datasets import (
     IterateOverBenchmarks,
     RandomOrderBenchmarks,
 )
-from compiler_gym.wrappers.llvm import RuntimePointEstimateReward
+
+if config.enable_llvm_env:
+    from compiler_gym.wrappers.llvm import RuntimePointEstimateReward  # noqa: F401
+
 from compiler_gym.wrappers.time_limit import TimeLimit
 
 from .validation import ValidateBenchmarkAfterEveryStep
@@ -53,13 +58,16 @@ __all__ = [
     "CommandlineWithTerminalAction",
     "CompilerEnvWrapper",
     "ConstrainedCommandline",
+    "ConversionWrapperEnv",
     "CycleOverBenchmarks",
     "CycleOverBenchmarksIterator",
     "IterateOverBenchmarks",
     "ObservationWrapper",
     "RandomOrderBenchmarks",
     "RewardWrapper",
-    "RuntimePointEstimateReward",
     "TimeLimit",
     "ValidateBenchmarkAfterEveryStep",
 ]
+
+if config.enable_llvm_env:
+    __all__.append("RuntimePointEstimateReward")

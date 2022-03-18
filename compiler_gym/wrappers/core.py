@@ -14,7 +14,12 @@ from compiler_gym.compiler_env_state import CompilerEnvState
 from compiler_gym.datasets import Benchmark, BenchmarkUri, Dataset
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.spaces.reward import Reward
-from compiler_gym.util.gym_type_hints import ActionType, ObservationType
+from compiler_gym.util.gym_type_hints import (
+    ActionType,
+    ObservationType,
+    RewardType,
+    StepType,
+)
 from compiler_gym.validation_result import ValidationResult
 from compiler_gym.views import ObservationSpaceSpec, ObservationView, RewardView
 
@@ -371,3 +376,70 @@ class RewardWrapper(CompilerEnvWrapper, ABC):
     def convert_reward(self, reward):
         """Translate a reward to the new space."""
         raise NotImplementedError
+
+
+class ConversionWrapperEnv(CompilerEnvWrapper):
+    def __init__(self, env: CompilerEnv):
+        super().__init__(env)
+
+    def convert_action_space(self, space: Space) -> Space:
+        return space
+
+    def convert_action(self, action: ActionType) -> ActionType:
+        return action
+
+    def convert_observation_space(self, space: Space) -> Space:
+        return space
+
+    def convert_observation(self, observation: ObservationType) -> ObservationType:
+        return observation
+
+    def convert_reward_space(self, space: Reward) -> Reward:
+        return space
+
+    def convert_reward(self, reward: RewardType) -> RewardType:
+        return reward
+
+    @property
+    def action_space(self) -> Space:
+        return self.convert_action_space(self.env.action_space)
+
+    @property
+    def reward_space(self) -> Optional[Reward]:
+        return self.convert_reward_space(self.env.reward_space)
+
+    @property
+    def reward_range(self) -> Tuple[float, float]:
+        return (
+            self.convert_reward(self.env.reward_range[0]),
+            self.convert_reward(self.env.reward_range[1]),
+        )
+
+    @property
+    def observation_space(self) -> Optional[Space]:
+        return self.convert_observation_space(self.env.observation_space)
+
+    def reset(self, *args, **kwargs) -> Optional[ObservationType]:
+        return self.convert_observation(self.env.reset(*args, **kwargs))
+
+    def multistep(
+        self,
+        actions: Iterable[ActionType],
+        observation_spaces: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
+        observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        rewards: Optional[Iterable[Union[str, Reward]]] = None,
+    ) -> StepType:
+        observation, reward, done, info = self.env.multistep(
+            [self.convert_action(a) for a in actions],
+            observation_spaces=observation_spaces,
+            reward_spaces=reward_spaces,
+            observations=observations,
+            rewards=rewards,
+        )
+        return (
+            self.convert_observation(observation),
+            self.convert_reward(reward),
+            done,
+            info,
+        )
