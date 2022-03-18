@@ -21,18 +21,11 @@ namespace fs = boost::filesystem;
 using namespace compiler_gym;
 using namespace compiler_gym::llvm_service;
 
-int main(int argc, char** argv) {
-  google::InitGoogleLogging(argv[0]);
-
-  CHECK(argc == 2) << "Usage: compute_observation <bitcode-path>";
-
-  const fs::path workingDirectory{"."};
-
+void stripOptNoneAttributesOrDie(const fs::path& path, BenchmarkFactory& benchmarkFactory) {
   compiler_gym::Benchmark request;
   request.set_uri("user");
-  request.mutable_program()->set_uri(fmt::format("file:///{}", argv[1]));
+  request.mutable_program()->set_uri(fmt::format("file:///{}", path.string()));
 
-  auto& benchmarkFactory = BenchmarkFactory::getSingleton(workingDirectory);
   std::unique_ptr<::llvm_service::Benchmark> benchmark;
   {
     const auto status = benchmarkFactory.getBenchmark(request, &benchmark);
@@ -58,9 +51,20 @@ int main(int argc, char** argv) {
     }
   }
 
-  ASSERT_OK(benchmark->writeBitcodeToFile(argv[1]));
-  std::cerr << "Stripped " << removedOptNoneCount << " optnone attributes from " << argv[1]
+  ASSERT_OK(benchmark->writeBitcodeToFile(path.string()));
+  std::cerr << "Stripped " << removedOptNoneCount << " optnone attributes from " << path.string()
             << std::endl;
+}
+
+int main(int argc, char** argv) {
+  google::InitGoogleLogging(argv[0]);
+
+  const fs::path workingDirectory{"."};
+  auto& benchmarkFactory = BenchmarkFactory::getSingleton(workingDirectory);
+
+  for (int i = 1; i < argc; ++i) {
+    stripOptNoneAttributesOrDie(argv[i], benchmarkFactory);
+  }
 
   return 0;
 }

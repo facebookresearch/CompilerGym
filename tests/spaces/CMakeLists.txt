@@ -27,6 +27,16 @@ cg_py_test(
 
 cg_py_test(
   NAME
+    reward_test
+  SRCS
+    "reward_test.py"
+  DEPS
+    compiler_gym::spaces::spaces
+    tests::test_main
+)
+
+cg_py_test(
+  NAME
     scalar_test
   SRCS
     "scalar_test.py"

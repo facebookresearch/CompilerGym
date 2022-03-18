@@ -6,11 +6,12 @@
 
 Usage:
 
-    $ extract_passes_from_llvm_source_tree /path/to/llvm/source/root
+    $ python extract_passes_from_llvm_source_tree.py /path/to/llvm-project/llvm
 
 Optionally accepts a list of specific files to examine:
 
-    $ extract_passes_from_llvm_source_tree /path/to/llvm/source/root /path/to/llvm/source/file
+    $ python extract_passes_from_llvm_source_tree.py \
+        /path/to/llvm-project/llvm /path/to/llvm/source/file
 
 Implementation notes
 --------------------
@@ -18,7 +19,7 @@ Implementation notes
 This implements a not-very-good parser for the INITIALIZE_PASS() family of
 macros, which are used in the LLVM sources to declare a pass using it's name,
 flag, and docstring. Parsing known macros like this is fragile and likely to
-break as the LLVM sources evolve. Currently only tested on LLVM 10.0.
+break as the LLVM sources evolve. Currently only tested on LLVM 10.0 and 13.0.1.
 
 A more robust solution would be to parse the C++ sources and extract all classes
 which inherit from ModulePass etc.
@@ -28,6 +29,7 @@ import csv
 import logging
 import os
 import re
+import shlex
 import subprocess
 import sys
 from pathlib import Path
@@ -56,6 +58,24 @@ def parse_initialize_pass(
     source_path: Path, header: Optional[str], input_source: str, defines: Dict[str, str]
 ) -> Iterable[Pass]:
     """A shitty parser for INITIALIZE_PASS() macro invocations.."""
+    # ****************************************************
+    #           __        _
+    #         _/  \    _(\(o
+    #        /     \  /  _  ^^^o
+    #       /   !   \/  ! '!!!v'
+    #      !  !  \ _' ( \____
+    #      ! . \ _!\   \===^\)
+    #       \ \_!  / __!
+    #        \!   /    \
+    #  (\_      _/   _\ )
+    #   \ ^^--^^ __-^ /(__
+    #    ^^----^^    "^--v'
+    #
+    #           HERE BE DRAGONS!
+    #
+    # TODO(cummins): Take this code out back and shoot it.
+    # ****************************************************
+
     # Squish down to a single line.
     source = re.sub(r"\n\s*", " ", input_source, re.MULTILINE)
     # Contract multi-spaces to single space.
@@ -74,6 +94,7 @@ def parse_initialize_pass(
     start = 0
     in_quotes = False
     in_comment = False
+    substr = ""
     for i in range(len(source)):
         if (
             not in_comment
@@ -82,6 +103,7 @@ def parse_initialize_pass(
             and source[i + 1] == "*"
         ):
             in_comment = True
+            substr += source[start:i].strip()
         if (
             in_comment
             and source[i] == "*"
@@ -93,9 +115,11 @@ def parse_initialize_pass(
         if source[i] == '"':
             in_quotes = not in_quotes
         if not in_quotes and source[i] == ",":
-            components.append(source[start:i].strip())
+            substr += source[start:i].strip()
+            components.append(substr)
+            substr = ""
             start = i + 2
-    components.append(source[start:].strip())
+    components.append(substr + source[start:].strip())
     if len(components) != 5:
         raise ParseError(
             f"Expected 5 components, found {len(components)}", source, components
@@ -108,14 +132,18 @@ def parse_initialize_pass(
     if not name:
         raise ParseError(f"Empty name: `{name}`", source, components)
 
-    while arg in defines:
-        arg = defines[arg]
+    # Dodgy code to combine adjacent strings with macro expansion. For example,
+    # 'DEBUG_TYPE "-foo"'.
+    arg_components = shlex.split(arg)
+    for i, _ in enumerate(arg_components):
+        while arg_components[i] in defines:
+            arg_components[i] = defines[arg_components[i]]
+    arg = " ".join(arg_components)
+    if arg[0] == '"' and arg[-1] == '"':
+        arg = arg[1:-1]
+
     while name in defines:
         name = defines[name]
-
-    if not (arg[0] == '"' and arg[-1] == '"'):
-        raise ParseError(f"Could not interpret arg `{arg}`", source, components)
-    arg = arg[1:-1]
     if not (name[0] == '"' and name[-1] == '"'):
         raise ParseError(f"Could not interpret name `{name}`", source, components)
     name = name[1:-1]
@@ -184,7 +212,7 @@ def handle_file(source_path: Path) -> Tuple[Path, List[Pass]]:
     """Parse the passes declared in a file."""
     assert str(source_path).endswith(".cpp"), f"Unexpected file type: {source_path}"
 
-    header = Path("include/llvm/" + str(source_path)[len("lib") : -len("cpp")] + "h")
+    header = Path("llvm/" + str(source_path)[len("lib") : -len("cpp")] + "h")
     if not header.is_file():
         header = ""
 

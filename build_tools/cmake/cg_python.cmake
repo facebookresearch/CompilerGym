@@ -9,6 +9,9 @@
 # See https://llvm.org/LICENSE.txt for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
 
+# TODO(github.com/facebookresearch/CompilerGym/issues/621): Gersemi fails.
+# gersemi: off
+
 include(CMakeParseArguments)
 include(cg_installed_test)
 
@@ -205,3 +208,5 @@ function(cg_pyext_module)
     endif()
   endif()
 endfunction()
+
+# gersemi: on

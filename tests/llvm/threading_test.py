@@ -10,13 +10,14 @@ import gym
 from flaky import flaky
 
 from compiler_gym import CompilerEnv
+from compiler_gym.util.gym_type_hints import ActionType
 from tests.test_main import main
 
 
 class ThreadedWorker(Thread):
     """Create an environment and run through a set of actions in a background thread."""
 
-    def __init__(self, env_name: str, benchmark: str, actions: List[int]):
+    def __init__(self, env_name: str, benchmark: str, actions: List[ActionType]):
         super().__init__()
         self.done = False
         self.env_name = env_name
@@ -38,7 +39,7 @@ class ThreadedWorker(Thread):
 class ThreadedWorkerWithEnv(Thread):
     """Create an environment and run through a set of actions in a background thread."""
 
-    def __init__(self, env: CompilerEnv, actions: List[int]):
+    def __init__(self, env: CompilerEnv, actions: List[ActionType]):
         super().__init__()
         self.done = False
         self.env = env
@@ -53,8 +54,7 @@ class ThreadedWorkerWithEnv(Thread):
         self.done = True
 
 
-# Timeout may be exceeded if the environment is slow to start.
-@flaky
+@flaky  # Timeout may be exceeded if the environment is slow to start.
 def test_running_environment_in_background_thread():
     """Test launching and running an LLVM environment in a background thread."""
     thread = ThreadedWorker(
@@ -63,7 +63,7 @@ def test_running_environment_in_background_thread():
         actions=[0, 0, 0],
     )
     thread.start()
-    thread.join(timeout=60)
+    thread.join(timeout=10)
 
     assert thread.done
     assert thread.observation is not None
@@ -71,6 +71,7 @@ def test_running_environment_in_background_thread():
     assert thread.info
 
 
+@flaky  # Timeout may be exceeded if the environment is slow to start.
 def test_moving_environment_to_background_thread():
     """Test running an LLVM environment from a background thread. The environment
     is made in the main thread and used in the background thread.

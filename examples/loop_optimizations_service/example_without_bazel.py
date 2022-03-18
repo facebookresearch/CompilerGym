@@ -20,7 +20,8 @@ from typing import Iterable
 
 import compiler_gym
 from compiler_gym.datasets import Benchmark, Dataset
-from compiler_gym.envs.llvm.llvm_benchmark import get_system_includes
+from compiler_gym.datasets.uri import BenchmarkUri
+from compiler_gym.envs.llvm.llvm_benchmark import get_system_library_flags
 from compiler_gym.spaces import Reward
 from compiler_gym.third_party import llvm
 from compiler_gym.util.registration import register
@@ -43,7 +44,7 @@ class RuntimeReward(Reward):
 
     def __init__(self):
         super().__init__(
-            id="runtime",
+            name="runtime",
             observation_spaces=["runtime"],
             default_value=0,
             default_negates_returns=True,
@@ -69,7 +70,7 @@ class SizeReward(Reward):
 
     def __init__(self):
         super().__init__(
-            id="size",
+            name="size",
             observation_spaces=["size"],
             default_value=0,
             default_negates_returns=True,
@@ -97,15 +98,15 @@ class LoopsDataset(Dataset):
         )
 
         self._benchmarks = {
-            "benchmark://loops-opt-v0/add": Benchmark.from_file_contents(
+            "/add": Benchmark.from_file_contents(
                 "benchmark://loops-opt-v0/add",
                 self.preprocess(BENCHMARKS_PATH / "add.c"),
             ),
-            "benchmark://loops-opt-v0/offsets1": Benchmark.from_file_contents(
+            "/offsets1": Benchmark.from_file_contents(
                 "benchmark://loops-opt-v0/offsets1",
                 self.preprocess(BENCHMARKS_PATH / "offsets1.c"),
             ),
-            "benchmark://loops-opt-v0/conv2d": Benchmark.from_file_contents(
+            "/conv2d": Benchmark.from_file_contents(
                 "benchmark://loops-opt-v0/conv2d",
                 self.preprocess(BENCHMARKS_PATH / "conv2d.c"),
             ),
@@ -125,20 +126,18 @@ class LoopsDataset(Dataset):
             "-I",
             str(NEURO_VECTORIZER_HEADER.parent),
             src,
-        ]
-        for directory in get_system_includes():
-            cmd += ["-isystem", str(directory)]
+        ] + get_system_library_flags()
         return subprocess.check_output(
             cmd,
             timeout=300,
         )
 
     def benchmark_uris(self) -> Iterable[str]:
-        yield from self._benchmarks.keys()
+        yield from (f"benchmark://loops-opt-v0{k}" for k in self._benchmarks.keys())
 
-    def benchmark(self, uri: str) -> Benchmark:
-        if uri in self._benchmarks:
-            return self._benchmarks[uri]
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
+        if uri.path in self._benchmarks:
+            return self._benchmarks[uri.path]
         else:
             raise LookupError("Unknown program name")
 
@@ -159,7 +158,7 @@ register(
 with compiler_gym.make(
     "loops-opt-py-v0",
     benchmark="loops-opt-v0/add",
-    observation_space="ir",
+    observation_space="Programl",
     reward_space="runtime",
 ) as env:
     compiler_gym.set_debug_level(4)  # TODO: check why this has no effect

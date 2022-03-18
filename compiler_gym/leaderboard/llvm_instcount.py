@@ -124,7 +124,7 @@ class _EvalPolicyWorker(Thread):
                 ), "Policy changed environment benchmark"
                 assert self.env.reward_space, "Policy unset environment reward space"
                 assert (
-                    self.env.reward_space.id == "IrInstructionCountOz"
+                    self.env.reward_space.name == "IrInstructionCountOz"
                 ), "Policy changed environment reward space"
 
                 # Override walltime in the generated state.

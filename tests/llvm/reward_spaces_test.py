@@ -40,7 +40,7 @@ def test_instruction_count_reward(env: LlvmEnv):
 
 def test_reward_space(env: LlvmEnv):
     env.reward_space = "IrInstructionCount"
-    assert env.reward_space.id == "IrInstructionCount"
+    assert env.reward_space.name == "IrInstructionCount"
 
     env.reward_space = None
     assert env.reward_space is None
@@ -71,6 +71,10 @@ def test_reward_spaces(env: LlvmEnv):
         "ObjectTextSizeNorm",
         "ObjectTextSizeO3",
         "ObjectTextSizeOz",
+        "TextSizeBytes",
+        "TextSizeNorm",
+        "TextSizeO3",
+        "TextSizeOz",
     }
 
 
@@ -118,7 +122,7 @@ def test_instruction_count_reward_spaces(env: LlvmEnv):
     assert space.reward_on_error(episode_reward=5) == -5
 
 
-def test_native_test_size_reward_spaces(env: LlvmEnv):
+def test_object_text_size_reward_spaces(env: LlvmEnv):
     env.reset(benchmark="cbench-v1/crc32")
 
     key = "ObjectTextSizeBytes"
@@ -154,6 +158,50 @@ def test_native_test_size_reward_spaces(env: LlvmEnv):
     key = "ObjectTextSizeOz"
     space = env.reward.spaces[key]
     assert str(space) == "ObjectTextSizeOz"
+    assert env.reward[key] == 0
+    assert space.range == (-np.inf, np.inf)
+    assert space.deterministic
+    assert space.platform_dependent
+    assert space.success_threshold == 1
+    assert space.reward_on_error(episode_reward=5) == -5
+
+
+def test_text_size_reward_spaces(env: LlvmEnv):
+    env.reset(benchmark="cbench-v1/crc32")
+
+    key = "TextSizeBytes"
+    space = env.reward.spaces[key]
+    assert str(space) == "TextSizeBytes"
+    assert env.reward[key] == 0
+    assert space.range == (-np.inf, np.inf)
+    assert space.deterministic
+    assert space.platform_dependent
+    assert space.success_threshold is None
+    assert space.reward_on_error(episode_reward=5) == -5
+
+    key = "TextSizeNorm"
+    space = env.reward.spaces[key]
+    assert str(space) == "TextSizeNorm"
+    assert env.reward[key] == 0
+    assert space.range == (-np.inf, 1.0)
+    assert space.deterministic
+    assert space.platform_dependent
+    assert space.success_threshold is None
+    assert space.reward_on_error(episode_reward=5) == -5
+
+    key = "TextSizeO3"
+    space = env.reward.spaces[key]
+    assert str(space) == "TextSizeO3"
+    assert env.reward[key] == 0
+    assert space.range == (-np.inf, np.inf)
+    assert space.deterministic
+    assert space.platform_dependent
+    assert space.success_threshold == 1
+    assert space.reward_on_error(episode_reward=5) == -5
+
+    key = "TextSizeOz"
+    space = env.reward.spaces[key]
+    assert str(space) == "TextSizeOz"
     assert env.reward[key] == 0
     assert space.range == (-np.inf, np.inf)
     assert space.deterministic

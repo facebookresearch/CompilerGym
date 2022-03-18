@@ -22,8 +22,8 @@
 #include "compiler_gym/envs/llvm/service/Cost.h"
 #include "compiler_gym/envs/llvm/service/Observation.h"
 #include "compiler_gym/envs/llvm/service/ObservationSpaces.h"
-#include "compiler_gym/envs/llvm/service/passes/ActionHeaders.h"
-#include "compiler_gym/envs/llvm/service/passes/ActionSwitch.h"
+#include "compiler_gym/envs/llvm/service/passes/10.0.0/ActionHeaders.h"
+#include "compiler_gym/envs/llvm/service/passes/10.0.0/ActionSwitch.h"
 #include "compiler_gym/third_party/autophase/InstCount.h"
 #include "compiler_gym/third_party/llvm/InstCount.h"
 #include "compiler_gym/util/EnumUtil.h"
@@ -113,7 +113,7 @@ Status LlvmSession::init(const LlvmActionSpace& actionSpace, std::unique_ptr<Ben
   return Status::OK;
 }
 
-Status LlvmSession::applyAction(const Action& action, bool& endOfEpisode,
+Status LlvmSession::applyAction(const Event& action, bool& endOfEpisode,
                                 std::optional<ActionSpace>& newActionSpace,
                                 bool& actionHadNoEffect) {
   DCHECK(benchmark_) << "Calling applyAction() before init()";
@@ -122,12 +122,13 @@ Status LlvmSession::applyAction(const Action& action, bool& endOfEpisode,
   switch (actionSpace()) {
     case LlvmActionSpace::PASSES_ALL:
       LlvmAction actionEnum;
-      if (action.choice_size() != 1) {
-        return Status(
-            StatusCode::INVALID_ARGUMENT,
-            fmt::format("Invalid choice count. Expected 1, received {}", action.choice_size()));
+      if (action.value_case() != Event::ValueCase::kInt64Value) {
+        return Status(StatusCode::INVALID_ARGUMENT,
+                      fmt::format("Invalid action. Expected {}, received {}.",
+                                  magic_enum::enum_name(Event::ValueCase::kInt64Value),
+                                  magic_enum::enum_name(action.value_case())));
       }
-      RETURN_IF_ERROR(util::intToEnum(action.choice(0).named_discrete_value_index(), &actionEnum));
+      RETURN_IF_ERROR(util::intToEnum(action.int64_value(), &actionEnum));
       RETURN_IF_ERROR(applyPassAction(actionEnum, actionHadNoEffect));
   }
 
@@ -144,7 +145,7 @@ Status LlvmSession::endOfStep(bool actionHadNoEffect, bool& endOfEpisode,
 }
 
 Status LlvmSession::computeObservation(const ObservationSpace& observationSpace,
-                                       Observation& observation) {
+                                       Event& observation) {
   DCHECK(benchmark_) << "Calling computeObservation() before init()";
 
   const auto& it = observationSpaceNames_.find(observationSpace.name());

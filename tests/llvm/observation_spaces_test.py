@@ -17,6 +17,7 @@ from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.spaces import Box
 from compiler_gym.spaces import Dict as DictSpace
 from compiler_gym.spaces import Scalar, Sequence
+from tests.pytest_plugins.common import ci_only
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
@@ -40,34 +41,38 @@ def test_observation_spaces(env: LlvmEnv):
     env.reset("cbench-v1/crc32")
 
     assert set(env.observation.spaces.keys()) == {
-        "Ir",
-        "IrSha1",
+        "Autophase",
+        "AutophaseDict",
         "Bitcode",
         "BitcodeFile",
+        "Buildtime",
+        "CpuInfo",
+        "Inst2vec",
+        "Inst2vecEmbeddingIndices",
+        "Inst2vecPreprocessedText",
         "InstCount",
         "InstCountDict",
         "InstCountNorm",
         "InstCountNormDict",
-        "Autophase",
-        "AutophaseDict",
-        "Programl",
-        "ProgramlJson",
-        "CpuInfo",
-        "Inst2vecPreprocessedText",
-        "Inst2vecEmbeddingIndices",
-        "Inst2vec",
+        "Ir",
         "IrInstructionCount",
         "IrInstructionCountO0",
         "IrInstructionCountO3",
         "IrInstructionCountOz",
+        "IrSha1",
+        "IsBuildable",
+        "IsRunnable",
         "ObjectTextSizeBytes",
         "ObjectTextSizeO0",
         "ObjectTextSizeO3",
         "ObjectTextSizeOz",
+        "Programl",
+        "ProgramlJson",
         "Runtime",
-        "Buildtime",
-        "IsBuildable",
-        "IsRunnable",
+        "TextSizeBytes",
+        "TextSizeO0",
+        "TextSizeO3",
+        "TextSizeOz",
     }
 
 
@@ -77,7 +82,7 @@ def test_ir_observation_space(env: LlvmEnv):
     space = env.observation.spaces[key]
     assert isinstance(space.space, Sequence)
     assert space.space.dtype == str
-    assert space.space.size_range == (0, None)
+    assert space.space.size_range == (0, np.iinfo(np.int64).max)
 
     value: str = env.observation[key]
     print(value)  # For debugging in case of error.
@@ -111,15 +116,16 @@ def test_bitcode_observation_space(env: LlvmEnv):
     key = "Bitcode"
     space = env.observation.spaces[key]
     assert isinstance(space.space, Sequence)
-    assert space.space.dtype == bytes
-    assert space.space.size_range == (0, None)
+    assert space.space.dtype == np.int8
+    assert space.space.size_range == (0, np.iinfo(np.int64).max)
 
     assert space.deterministic
     assert not space.platform_dependent
 
     value: str = env.observation[key]
     print(value)  # For debugging in case of error.
-    assert isinstance(value, bytes)
+    assert isinstance(value, np.ndarray)
+    assert value.dtype == np.int8
     assert space.space.contains(value)
 
 
@@ -157,7 +163,7 @@ def test_bitcode_file_equivalence(env: LlvmEnv, benchmark_uri: str):
         with open(bitcode_file, "rb") as f:
             bitcode_from_file = f.read()
 
-        assert bitcode == bitcode_from_file
+        assert bitcode.tobytes() == bitcode_from_file
     finally:
         os.unlink(bitcode_file)
 
@@ -1203,11 +1209,71 @@ def test_object_text_size_observation_spaces(env: LlvmEnv):
     assert value == crc32_code_sizes[sys.platform][2]
 
 
-@pytest.mark.xfail(
-    sys.platform == "darwin",
-    strict=True,
-    reason="github.com/facebookresearch/CompilerGym/issues/459",
-)
+def test_text_size_observation_spaces(env: LlvmEnv):
+    env.reset("cbench-v1/crc32")
+
+    key = "TextSizeBytes"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Scalar)
+    assert space.deterministic
+    assert space.platform_dependent
+    value: int = env.observation[key]
+    print(value)  # For debugging in case of error.
+    assert isinstance(value, int)
+
+    key = "TextSizeO0"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Scalar)
+    assert space.deterministic
+    assert space.platform_dependent
+    value: int = env.observation[key]
+    print(value)  # For debugging in case of error.
+    assert isinstance(value, int)
+    assert value > 0  # Exact value is system dependent, see below.
+
+    key = "TextSizeO3"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Scalar)
+    assert space.deterministic
+    assert space.platform_dependent
+    value: int = env.observation[key]
+    print(value)  # For debugging in case of error.
+    assert isinstance(value, int)
+    assert value > 0  # Exact value is system dependent, see below.
+
+    key = "TextSizeOz"
+    space = env.observation.spaces[key]
+    assert isinstance(space.space, Scalar)
+    assert space.deterministic
+    assert space.platform_dependent
+    value: int = env.observation[key]
+    print(value)  # For debugging in case of error.
+    assert isinstance(value, int)
+    assert value > 0  # Exact value is system dependent, see below.
+
+
+# NOTE(cummins): The exact values here depend on the system toolchain and
+# libraries, so only run this test on the GitHub CI runner environment where we
+# can hardcode the values. If this test starts to fail, it may be because the CI
+# runner environment has changed.
+@ci_only
+def test_text_size_observation_space_values(env: LlvmEnv):
+    env.reset("cbench-v1/crc32")
+
+    # Expected .text sizes for this benchmark: -O0, -O3, -Oz.
+    crc32_code_sizes = {"darwin": [16384, 16384, 16384], "linux": [2850, 5652, 4980]}
+
+    # For debugging in case of error.
+    print(env.observation["TextSizeO0"])
+    print(env.observation["TextSizeO3"])
+    print(env.observation["TextSizeOz"])
+
+    assert env.observation.TextSizeO0() == crc32_code_sizes[sys.platform][0]
+    assert env.observation.TextSizeO0() == crc32_code_sizes[sys.platform][0]
+    assert env.observation.TextSizeO3() == crc32_code_sizes[sys.platform][1]
+    assert env.observation.TextSizeOz() == crc32_code_sizes[sys.platform][2]
+
+
 @flaky  # Runtimes can timeout
 def test_runtime_observation_space(env: LlvmEnv):
     env.reset("cbench-v1/crc32")
@@ -1230,11 +1296,6 @@ def test_runtime_observation_space(env: LlvmEnv):
         assert buildtime > 0
 
 
-@pytest.mark.xfail(
-    sys.platform == "darwin",
-    strict=True,
-    reason="github.com/facebookresearch/CompilerGym/issues/459",
-)
 @flaky  # Runtimes can timeout
 def test_runtime_observation_space_different_observation_count(env: LlvmEnv):
     """Test setting a custom observation count for LLVM runtimes."""
@@ -1256,11 +1317,6 @@ def test_runtime_observation_space_different_observation_count(env: LlvmEnv):
     assert value.shape == (5,)
 
 
-@pytest.mark.xfail(
-    sys.platform == "darwin",
-    strict=True,
-    reason="github.com/facebookresearch/CompilerGym/issues/459",
-)
 @flaky  # Runtimes can timeout
 def test_runtime_observation_space_invalid_observation_count(env: LlvmEnv):
     """Test setting an invalid custom observation count for LLVM runtimes."""
@@ -1279,19 +1335,9 @@ def test_runtime_observation_space_not_runnable(env: LlvmEnv):
     key = "Runtime"
     space = env.observation.spaces[key]
     assert isinstance(space.space, Sequence)
-
-    value: np.ndarray = env.observation[key]
-    print(value.tolist())  # For debugging in case of error.
-    assert isinstance(value, np.ndarray)
-    assert value.shape == (0,)
-    assert space.space.contains(value)
+    assert env.observation[key] is None
 
 
-@pytest.mark.xfail(
-    sys.platform == "darwin",
-    strict=True,
-    reason="github.com/facebookresearch/CompilerGym/issues/459",
-)
 @flaky  # Build can timeout
 def test_buildtime_observation_space(env: LlvmEnv):
     env.reset("cbench-v1/crc32")
@@ -1318,10 +1364,7 @@ def test_buildtime_observation_space_not_runnable(env: LlvmEnv):
     assert not space.deterministic
     assert space.platform_dependent
 
-    value: np.ndarray = env.observation[key]
-    print(value)  # For debugging in case of error.
-    assert value.shape == (0,)
-    assert space.space.contains(value)
+    assert env.observation[key] is None
 
 
 def test_is_runnable_observation_space(env: LlvmEnv):

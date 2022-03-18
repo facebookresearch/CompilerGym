@@ -90,5 +90,19 @@ def test_call_stub_negative_timeout(connection: CompilerGymServiceConnection):
         connection(connection.stub.GetSpaces, GetSpacesRequest(), timeout=-10)
 
 
+def test_ManagedConnection_repr(connection: CompilerGymServiceConnection):
+    cnx = connection.connection
+    assert (
+        repr(cnx)
+        == f"Connection to service at {cnx.url} running on PID {cnx.process.pid}"
+    )
+
+    # Kill the service.
+    cnx.process.terminate()
+    cnx.process.communicate()
+
+    assert repr(cnx) == f"Connection to dead service at {cnx.url}"
+
+
 if __name__ == "__main__":
     main()

@@ -29,11 +29,9 @@ namespace compiler_gym::runtime {
 
 extern std::promise<void> shutdownSignal;
 
-// Increase maximum message size beyond the 4MB default as inbound message
-// may be larger (e.g., in the case of IR strings).
-constexpr size_t kMaxMessageSizeInBytes = 512 * 1024 * 1024;
-
 void shutdown_handler(int signum);
+
+void setGrpcChannelOptions(grpc::ServerBuilder& builder);
 
 // Create a service, configured using --port and --working_dir flags, and run
 // it. This function never returns.
@@ -53,7 +51,7 @@ void shutdown_handler(int signum);
 //       createAndRunCompilerGymServiceImpl(argc, argv, "usage string");
 //     }
 template <typename CompilationSessionType>
-[[noreturn]] void createAndRunCompilerGymServiceImpl(int argc, char** argv, const char* usage) {
+[[nodiscard]] int createAndRunCompilerGymServiceImpl(int argc, char** argv, const char* usage) {
   // Register a signal handler for SIGTERM that will set the shutdown_signal
   // future value.
   std::signal(SIGTERM, shutdown_handler);
@@ -64,7 +62,7 @@ template <typename CompilationSessionType>
   gflags::ParseCommandLineFlags(&argc, &argv, /*remove_flags=*/true);
   if (argc > 1) {
     std::cerr << "ERROR: unknown command line argument '" << argv[1] << '\'';
-    exit(1);
+    return 1;
   }
 
   // Set up the working and logging directories.
@@ -87,7 +85,7 @@ template <typename CompilationSessionType>
   grpc::ServerBuilder builder;
   builder.RegisterService(&service);
 
-  builder.SetMaxMessageSize(kMaxMessageSizeInBytes);
+  setGrpcChannelOptions(builder);
 
   // Start a channel on the port.
   int port;
@@ -131,15 +129,16 @@ template <typename CompilationSessionType>
   VLOG(2) << "Shutting down the RPC service";
   server->Shutdown();
   serverThread.join();
+  VLOG(2) << "Service closed";
 
   if (service.sessionCount()) {
     LOG(ERROR) << "ERROR: Killing a service with " << service.sessionCount()
                << (service.sessionCount() > 1 ? " active sessions!" : " active session!")
                << std::endl;
-    exit(6);
+    return 6;
   }
 
-  exit(0);
+  return 0;
 }
 
 }  // namespace compiler_gym::runtime

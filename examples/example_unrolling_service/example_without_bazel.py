@@ -14,14 +14,14 @@ Usage:
 
 It is equivalent in behavior to the example.py script in this directory.
 """
-import os
 import subprocess
 from pathlib import Path
 from typing import Iterable
 
 import compiler_gym
 from compiler_gym.datasets import Benchmark, Dataset
-from compiler_gym.envs.llvm.llvm_benchmark import get_system_includes
+from compiler_gym.datasets.uri import BenchmarkUri
+from compiler_gym.envs.llvm.llvm_benchmark import get_system_library_flags
 from compiler_gym.spaces import Reward
 from compiler_gym.third_party import llvm
 from compiler_gym.util.registration import register
@@ -45,7 +45,7 @@ class RuntimeReward(Reward):
 
     def __init__(self):
         super().__init__(
-            id="runtime",
+            name="runtime",
             observation_spaces=["runtime"],
             default_value=0,
             default_negates_returns=True,
@@ -71,7 +71,7 @@ class SizeReward(Reward):
 
     def __init__(self):
         super().__init__(
-            id="size",
+            name="size",
             observation_spaces=["size"],
             default_value=0,
             default_negates_returns=True,
@@ -99,13 +99,13 @@ class UnrollingDataset(Dataset):
         )
 
         self._benchmarks = {
-            "benchmark://unrolling-v0/offsets1": Benchmark.from_file_contents(
+            "/offsets1": Benchmark.from_file_contents(
                 "benchmark://unrolling-v0/offsets1",
-                self.preprocess(os.path.join(BENCHMARKS_PATH, "offsets1.c")),
+                self.preprocess(BENCHMARKS_PATH / "offsets1.c"),
             ),
-            "benchmark://unrolling-v0/conv2d": Benchmark.from_file_contents(
+            "/conv2d": Benchmark.from_file_contents(
                 "benchmark://unrolling-v0/conv2d",
-                self.preprocess(os.path.join(BENCHMARKS_PATH, "conv2d.c")),
+                self.preprocess(BENCHMARKS_PATH / "conv2d.c"),
             ),
         }
 
@@ -124,19 +124,18 @@ class UnrollingDataset(Dataset):
             str(NEURO_VECTORIZER_HEADER.parent),
             src,
         ]
-        for directory in get_system_includes():
-            cmd += ["-isystem", str(directory)]
+        cmd += get_system_library_flags()
         return subprocess.check_output(
             cmd,
             timeout=300,
         )
 
     def benchmark_uris(self) -> Iterable[str]:
-        yield from self._benchmarks.keys()
+        yield from (f"benchmark://unrolling-v0{k}" for k in self._benchmarks.keys())
 
-    def benchmark(self, uri: str) -> Benchmark:
-        if uri in self._benchmarks:
-            return self._benchmarks[uri]
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
+        if uri.path in self._benchmarks:
+            return self._benchmarks[uri.path]
         else:
             raise LookupError("Unknown program name")
 

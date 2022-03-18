@@ -5,9 +5,11 @@
  */
 
 import React, { useState, useContext, useEffect } from "react";
+import classnames from "classnames";
 import { useHistory, useLocation } from "react-router";
 import { Spinner } from "react-bootstrap";
 import ApiContext from "../../context/ApiContext";
+import ThemeContext from "../../context/ThemeContext";
 import { makeSessionTreeData } from "../../utils/Helpers";
 import ActionsNavbar from "../Navbars/ActionsNavbar";
 import SearchTree from "./SearchTree";
@@ -17,6 +19,7 @@ import ActionsDict from "../../utils/ActionsDict";
 const ControlsContainer = () => {
   const { compilerGym, session, params, api, setSession } =
     useContext(ApiContext);
+  const { darkTheme } = useContext(ThemeContext);
   const history = useHistory();
   const location = useLocation();
   const searchParams = new URLSearchParams(location.search);
@@ -386,11 +389,16 @@ const ControlsContainer = () => {
         handleResetActionsTracker={handleResetActionsTracker}
       />
       {isLoading ? (
-        <div className="spinner-wrap">
+        <div
+          className={classnames("spinner-wrap", {
+            "dark-mode-spinner-wrap": darkTheme,
+          })}
+        >
           <Spinner
             animation="border"
             role="status"
             aria-hidden="true"
+            variant={darkTheme ? "success" : "dark"}
           />
         </div>
       ) : (

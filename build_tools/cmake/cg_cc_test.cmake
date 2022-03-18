@@ -54,43 +54,43 @@ include(cg_installed_test)
 #     compiler_gym::awesome
 # )
 function(cg_cc_test)
-  if(NOT COMPILER_GYM_BUILD_TESTS)
-    return()
-  endif()
+    if(NOT COMPILER_GYM_BUILD_TESTS)
+        return()
+    endif()
 
-  cmake_parse_arguments(
-    _RULE
-    ""
-    "NAME"
-    "SRCS;COPTS;DEFINES;LINKOPTS;DATA;DEPS;LABELS"
-    ${ARGN}
-  )
+    cmake_parse_arguments(
+        _RULE
+        ""
+        "NAME"
+        "SRCS;COPTS;DEFINES;LINKOPTS;DATA;DEPS;LABELS"
+        ${ARGN}
+    )
 
-  cg_cc_binary(${ARGV})
+    cg_cc_binary(${ARGV})
 
-  rename_bazel_targets(_NAME "${_RULE_NAME}")
-  cg_package_ns(_PACKAGE_NS)
-  string(REPLACE "::" "/" _PACKAGE_PATH ${_PACKAGE_NS})
-  set(_TEST_NAME "${_PACKAGE_PATH}/${_RULE_NAME}")
-  set(_LABELS "${_RULE_LABELS}")
-  list(APPEND _LABELS "${_PACKAGE_PATH}")
+    rename_bazel_targets(_NAME "${_RULE_NAME}")
+    cg_package_ns(_PACKAGE_NS)
+    string(REPLACE "::" "/" _PACKAGE_PATH ${_PACKAGE_NS})
+    set(_TEST_NAME "${_PACKAGE_PATH}/${_RULE_NAME}")
+    set(_LABELS "${_RULE_LABELS}")
+    list(APPEND _LABELS "${_PACKAGE_PATH}")
 
-  cg_add_installed_test(
-    TEST_NAME "${_TEST_NAME}"
-    LABELS "${_LABELS}"
-    COMMAND
-      # We run all our tests through a custom test runner to allow temp
-      # directory cleanup upon test completion.
-      "${CMAKE_SOURCE_DIR}/build_tools/cmake/run_test.${COMPILER_GYM_HOST_SCRIPT_EXT}"
-      "$<TARGET_FILE:${_NAME}>"
-    INSTALLED_COMMAND
-      # Must match install destination below.
-      "${_PACKAGE_PATH}/$<TARGET_FILE_NAME:${_NAME}>"
-  )
+    cg_add_installed_test(
+      TEST_NAME   "${_TEST_NAME}"
+      LABELS   "${_LABELS}"
+      COMMAND
+        # We run all our tests through a custom test runner to allow temp
+        # directory cleanup upon test completion.
+        "${CMAKE_SOURCE_DIR}/build_tools/cmake/run_test.${COMPILER_GYM_HOST_SCRIPT_EXT}"
+        "$<TARGET_FILE:${_NAME}>"
+      INSTALLED_COMMAND
+        # Must match install destination below.
+        "${_PACKAGE_PATH}/$<TARGET_FILE_NAME:${_NAME}>"
+    )
 
-  install(TARGETS ${_NAME}
-    DESTINATION "tests/${_PACKAGE_PATH}"
-    COMPONENT Tests
-  )
-
+    install(
+        TARGETS ${_NAME}
+        DESTINATION "tests/${_PACKAGE_PATH}"
+        COMPONENT Tests
+    )
 endfunction()

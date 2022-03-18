@@ -2,13 +2,15 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-from typing import Iterable, Optional, Union
+import warnings
+from collections.abc import Iterable as IterableType
+from typing import Iterable, List, Optional, Union
 
 import gym
 
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.spaces.reward import Reward
-from compiler_gym.util.gym_type_hints import ObservationType, StepType
+from compiler_gym.util.gym_type_hints import ActionType, ObservationType
 from compiler_gym.views import ObservationSpaceSpec
 
 
@@ -21,7 +23,7 @@ class CompilerEnvWrapper(gym.Wrapper):
     such as the :code:`fork()` method.
     """
 
-    def __init__(self, env: CompilerEnv):
+    def __init__(self, env: CompilerEnv):  # pylint: disable=super-init-not-called
         """Constructor.
 
         :param env: The environment to wrap.
@@ -38,14 +40,80 @@ class CompilerEnvWrapper(gym.Wrapper):
         self.reward_range = self.env.reward_range
         self.metadata = self.env.metadata
 
-    def step(self, action, observations=None, rewards=None):
-        return self.env.step(action, observations=observations, rewards=rewards)
-
     def reset(self, *args, **kwargs) -> ObservationType:
         return self.env.reset(*args, **kwargs)
 
     def fork(self) -> CompilerEnv:
         return type(self)(env=self.env.fork())
+
+    def step(  # pylint: disable=arguments-differ
+        self,
+        action: ActionType,
+        observation_spaces: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
+        observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        rewards: Optional[Iterable[Union[str, Reward]]] = None,
+    ):
+        if isinstance(action, IterableType):
+            warnings.warn(
+                "Argument `action` of CompilerEnv.step no longer accepts a list "
+                " of actions. Please use CompilerEnv.multistep instead",
+                category=DeprecationWarning,
+            )
+            return self.multistep(
+                action,
+                observation_spaces=observation_spaces,
+                reward_spaces=reward_spaces,
+                observations=observations,
+                rewards=rewards,
+            )
+        if observations is not None:
+            warnings.warn(
+                "Argument `observations` of CompilerEnv.multistep has been "
+                "renamed `observation_spaces`. Please update your code",
+                category=DeprecationWarning,
+            )
+            observation_spaces = observations
+        if rewards is not None:
+            warnings.warn(
+                "Argument `rewards` of CompilerEnv.multistep has been renamed "
+                "`reward_spaces`. Please update your code",
+                category=DeprecationWarning,
+            )
+            reward_spaces = rewards
+        return self.multistep(
+            actions=[action],
+            observation_spaces=observation_spaces,
+            reward_spaces=reward_spaces,
+        )
+
+    def multistep(
+        self,
+        actions: Iterable[ActionType],
+        observation_spaces: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
+        observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        rewards: Optional[Iterable[Union[str, Reward]]] = None,
+    ):
+        if observations is not None:
+            warnings.warn(
+                "Argument `observations` of CompilerEnv.multistep has been "
+                "renamed `observation_spaces`. Please update your code",
+                category=DeprecationWarning,
+            )
+            observation_spaces = observations
+        if rewards is not None:
+            warnings.warn(
+                "Argument `rewards` of CompilerEnv.multistep has been renamed "
+                "`reward_spaces`. Please update your code",
+                category=DeprecationWarning,
+            )
+            reward_spaces = rewards
+        return self.env.multistep(
+            actions=actions,
+            observation_spaces=observation_spaces,
+            reward_spaces=reward_spaces,
+        )
 
     @property
     def observation_space(self):
@@ -82,18 +150,27 @@ class ActionWrapper(CompilerEnvWrapper):
     to allow an action space transformation.
     """
 
-    def step(
-        self, action: Union[int, Iterable[int]], observations=None, rewards=None
-    ) -> StepType:
-        return self.env.step(
-            self.action(action), observations=observations, rewards=rewards
+    def multistep(
+        self,
+        actions: Iterable[ActionType],
+        observation_spaces: Optional[Iterable[ObservationSpaceSpec]] = None,
+        reward_spaces: Optional[Iterable[Reward]] = None,
+        observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        rewards: Optional[Iterable[Union[str, Reward]]] = None,
+    ):
+        return self.env.multistep(
+            [self.action(a) for a in actions],
+            observation_spaces=observation_spaces,
+            reward_spaces=reward_spaces,
+            observations=observations,
+            rewards=rewards,
         )
 
-    def action(self, action):
+    def action(self, action: ActionType) -> ActionType:
         """Translate the action to the new space."""
         raise NotImplementedError
 
-    def reverse_action(self, action):
+    def reverse_action(self, action: ActionType) -> ActionType:
         """Translate an action from the new space to the wrapped space."""
         raise NotImplementedError
 
@@ -107,8 +184,22 @@ class ObservationWrapper(CompilerEnvWrapper):
         observation = self.env.reset(*args, **kwargs)
         return self.observation(observation)
 
-    def step(self, *args, **kwargs):
-        observation, reward, done, info = self.env.step(*args, **kwargs)
+    def multistep(
+        self,
+        actions: List[ActionType],
+        observation_spaces: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
+        observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        rewards: Optional[Iterable[Union[str, Reward]]] = None,
+    ):
+        observation, reward, done, info = self.env.multistep(
+            actions,
+            observation_spaces=observation_spaces,
+            reward_spaces=reward_spaces,
+            observations=observations,
+            rewards=rewards,
+        )
+
         return self.observation(observation), reward, done, info
 
     def observation(self, observation):
@@ -124,8 +215,22 @@ class RewardWrapper(CompilerEnvWrapper):
     def reset(self, *args, **kwargs):
         return self.env.reset(*args, **kwargs)
 
-    def step(self, *args, **kwargs):
-        observation, reward, done, info = self.env.step(*args, **kwargs)
+    def multistep(
+        self,
+        actions: List[ActionType],
+        observation_spaces: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
+        observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        rewards: Optional[Iterable[Union[str, Reward]]] = None,
+    ):
+        observation, reward, done, info = self.env.multistep(
+            actions,
+            observation_spaces=observation_spaces,
+            reward_spaces=reward_spaces,
+            observations=observations,
+            rewards=rewards,
+        )
+
         # Undo the episode_reward update and reapply it once we have transformed
         # the reward.
         #

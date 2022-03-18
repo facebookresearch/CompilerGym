@@ -75,20 +75,6 @@
 
 // **** Custom dropdown ****
 
-.cg-dropdown {
-  background-color: $dark;
-  height: 18vh;
-  overflow: auto;
-  border-radius: 5%;
-  padding: 0 0.4rem;
-  z-index: 4;
-  font-size: 0.75rem;
-  text-align: start;
-  ul {
-    padding-left: 0rem;
-  }
-}
-
 .search-bar {
   position: sticky;
   top: 0%;

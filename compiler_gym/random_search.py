@@ -17,6 +17,7 @@ from compiler_gym.envs import CompilerEnv
 from compiler_gym.envs.llvm import LlvmEnv
 from compiler_gym.service.connection import ServiceError
 from compiler_gym.util import logs
+from compiler_gym.util.gym_type_hints import ActionType
 from compiler_gym.util.logs import create_logging_dir
 from compiler_gym.util.tabulate import tabulate
 
@@ -79,8 +80,8 @@ class RandomAgentWorker(Thread):
         self.total_episode_count = 0
         self.total_step_count = 0
         self.best_returns = -float("inf")
-        self.best_actions: List[int] = []
-        self.best_commandline: List[int] = []
+        self.best_actions: List[ActionType] = []
+        self.best_commandline: str = []
         self.best_found_at_time = time()
 
         self.alive = True  # Set this to False to signal the thread to stop.
@@ -112,17 +113,17 @@ class RandomAgentWorker(Thread):
         :return: True if the episode ended gracefully, else False.
         """
         observation = env.reset()
-        actions: List[int] = []
+        actions: List[ActionType] = []
         patience = self._patience
         total_returns = 0
         while patience >= 0:
             patience -= 1
             self.total_step_count += 1
             # === Your agent here! ===
-            action_index = env.action_space.sample()
+            action = env.action_space.sample()
             # === End of agent. ===
-            actions.append(action_index)
-            observation, reward, done, _ = env.step(action_index)
+            actions.append(action)
+            observation, reward, done, _ = env.step(action)
             if done:
                 return False
             total_returns += reward
@@ -163,7 +164,7 @@ def random_search(
 
         if not env.reward_space:
             raise ValueError("A reward space must be specified for random search")
-        reward_space_name = env.reward_space.id
+        reward_space_name = env.reward_space.name
 
         action_space_names = list(env.action_space.names)
 

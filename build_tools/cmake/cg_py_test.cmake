@@ -9,6 +9,8 @@
 # Licensed under the Apache License v2.0 with LLVM Exceptions.
 # See https://llvm.org/LICENSE.txt for license information.
 # SPDX-License-Identifier: Apache-2.0 WITH LLVM-exception
+# TODO(github.com/facebookresearch/CompilerGym/issues/621): Gersemi fails.
+# gersemi: off
 
 include(CMakeParseArguments)
 include(cg_installed_test)
@@ -85,3 +87,5 @@ function(cg_py_test)
   # CMake seems to not allow build targets to be dependencies for tests.
   # One way to achieve this is to make the test execution a target.
 endfunction()
+
+# gersemi: on

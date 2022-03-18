@@ -28,17 +28,6 @@ cg_py_test(
 
 cg_py_test(
   NAME
-    all_benchmarks_init_close_test
-  SRCS
-    "all_benchmarks_init_close_test.py"
-  DEPS
-    compiler_gym::envs::envs
-    tests::pytest_plugins::llvm
-    tests::test_main
-)
-
-cg_py_test(
-  NAME
     autophase_test
   SRCS
     "autophase_test.py"
@@ -50,7 +39,8 @@ cg_py_test(
 
 cg_filegroup(
   NAME custom_benchmarks_test_files
-  FILES "${CMAKE_CURRENT_LIST_DIR}/invalid_ir.ll")
+  FILES "${CMAKE_CURRENT_LIST_DIR}/invalid_ir.ll"
+)
 cg_py_test(
   NAME
     custom_benchmarks_test
@@ -150,9 +140,9 @@ cg_py_test(
 
 cg_py_test(
   NAME
-    gym_interface_compatability
+    gym_interface_compatability_test
   SRCS
-    "gym_interface_compatability.py"
+    "gym_interface_compatability_test.py"
   DEPS
     compiler_gym::envs::llvm::llvm
     tests::pytest_plugins::llvm
@@ -161,7 +151,8 @@ cg_py_test(
 
 cg_filegroup(
   NAME invalid_ir_test_files
-  FILES "${CMAKE_CURRENT_LIST_DIR}/invalid_ir.ll")
+  FILES "${CMAKE_CURRENT_LIST_DIR}/invalid_ir.ll"
+)
 cg_py_test(
   NAME
     invalid_ir_test
@@ -178,12 +169,13 @@ cg_py_test(
 
 cg_py_test(
   NAME
-    llvm_benchmarks_test
+    llvm_benchmark_test
   SRCS
-    "llvm_benchmarks_test.py"
+    "llvm_benchmark_test.py"
   DEPS
     compiler_gym::envs::envs
     compiler_gym::service::proto::proto
+    tests::pytest_plugins::common
     tests::pytest_plugins::llvm
     tests::test_main
 )
@@ -241,6 +233,7 @@ cg_py_test(
     "observation_spaces_test.py"
   DEPS
     compiler_gym::envs::envs
+    tests::pytest_plugins::common
     tests::pytest_plugins::llvm
     tests::test_main
 )

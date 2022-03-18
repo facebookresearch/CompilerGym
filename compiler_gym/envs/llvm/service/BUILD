@@ -63,6 +63,7 @@ cc_binary(
     name = "compiler_gym-llvm-service-prelinked",
     srcs = ["RunService.cc"],
     deps = [
+        ":BenchmarkFactory",
         ":LlvmSession",
         "//compiler_gym/service/runtime:cc_runtime",
     ],
@@ -75,9 +76,9 @@ cc_library(
     ],
     hdrs = [
         "ActionSpace.h",
-        "//compiler_gym/envs/llvm/service/passes:ActionEnum.h",
     ],
     deps = [
+        "//compiler_gym/envs/llvm/service/passes/10.0.0:headers",
         "//compiler_gym/service/proto:compiler_gym_service_cc",
         "//compiler_gym/util:EnumUtil",
         "//compiler_gym/util:Unreachable",
@@ -91,6 +92,7 @@ cc_library(
     srcs = ["Benchmark.cc"],
     hdrs = ["Benchmark.h"],
     deps = [
+        ":BenchmarkDynamicConfig",
         ":Cost",
         "//compiler_gym/service/proto:compiler_gym_service_cc",
         "//compiler_gym/util:GrpcStatusMacros",
@@ -105,11 +107,24 @@ cc_library(
 )
 
 cc_library(
+    name = "BenchmarkDynamicConfig",
+    srcs = ["BenchmarkDynamicConfig.cc"],
+    hdrs = ["BenchmarkDynamicConfig.h"],
+    deps = [
+        "//compiler_gym/service/proto:compiler_gym_service_cc",
+        "//compiler_gym/util:RunfilesPath",
+        "//compiler_gym/util:Subprocess",
+        "@boost//:filesystem",
+    ],
+)
+
+cc_library(
     name = "BenchmarkFactory",
     srcs = ["BenchmarkFactory.cc"],
     hdrs = ["BenchmarkFactory.h"],
     deps = [
         ":Benchmark",
+        ":BenchmarkDynamicConfig",
         ":Cost",
         "//compiler_gym/service/proto:compiler_gym_service_cc",
         "//compiler_gym/util:GrpcStatusMacros",
@@ -177,6 +192,7 @@ cc_library(
     srcs = ["Cost.cc"],
     hdrs = ["Cost.h"],
     deps = [
+        ":BenchmarkDynamicConfig",
         "//compiler_gym/util:GrpcStatusMacros",
         "//compiler_gym/util:RunfilesPath",
         "//compiler_gym/util:Subprocess",
@@ -196,8 +212,7 @@ cc_library(
     srcs = ["LlvmSession.cc"],
     hdrs = [
         "LlvmSession.h",
-        "//compiler_gym/envs/llvm/service/passes:ActionHeaders.h",
-        "//compiler_gym/envs/llvm/service/passes:ActionSwitch.h",
+        "//compiler_gym/envs/llvm/service/passes/10.0.0:headers",
     ],
     copts = [
         "-DGOOGLE_PROTOBUF_NO_RTTI",

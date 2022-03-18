@@ -51,13 +51,14 @@ cg_cc_binary(
     ${LLVM_INCLUDE_DIRS}
   DEFINES
     ${LLVM_DEFINITIONS}
+  PUBLIC
 )
 
-cg_genrule(
-  NAME libLLVMPolly
-  OUTS "libLLVMPolly.so"
-  COMMAND
-    "cp $<TARGET_FILE:LLVMPolly> $@"
-  ABS_DEPENDS
-    LLVMPolly
+add_custom_target(
+    link_compute_autophase_target
+    ALL
+    COMMAND
+        ${CMAKE_COMMAND} -E create_symlink
+        ${CMAKE_BINARY_DIR}/compiler_gym/third_party/autophase/compute_autophase
+        ${CMAKE_SOURCE_DIR}/compiler_gym/third_party/autophase/compute_autophase-prelinked
 )

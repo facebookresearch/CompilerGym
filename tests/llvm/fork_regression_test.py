@@ -57,14 +57,14 @@ def test_fork_regression_test(env: LlvmEnv, test: ForkRegressionTest):
     pre_fork = [env.action_space[f] for f in test.pre_fork.split()]
     post_fork = [env.action_space[f] for f in test.post_fork.split()]
 
-    _, _, done, info = env.step(pre_fork)
+    _, _, done, info = env.multistep(pre_fork)
     assert not done, info
 
     with env.fork() as fkd:
         assert env.state == fkd.state  # Sanity check
 
-        env.step(post_fork)
-        fkd.step(post_fork)
+        env.multistep(post_fork)
+        fkd.multistep(post_fork)
         # Verify that the environment states no longer line up.
         assert env.state != fkd.state
 

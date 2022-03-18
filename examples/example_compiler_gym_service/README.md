@@ -22,7 +22,7 @@ issue](https://github.com/facebookresearch/CompilerGym/issues/new/choose).
   never changes. Actions never end the episode.
 * There are two observation spaces:
   * `ir` which returns the string "Hello, world!".
-  * `features` which returns an `int64_list` of `[0, 0, 0]`.
+  * `features` which returns an `int64_tensor` of `[0, 0, 0]`.
 * A single reward space `runtime` which returns 0.
 * It has a single dataset "benchmark://example-v0" with two programs "foo" and
   "bar".

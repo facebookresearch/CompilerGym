@@ -3,6 +3,7 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 import logging
+import traceback
 from contextlib import contextmanager
 from pathlib import Path
 from threading import Lock
@@ -44,7 +45,10 @@ logger = logging.getLogger(__name__)
 @contextmanager
 def exception_to_grpc_status(context):  # pragma: no cover
     def handle_exception_as(exception, code):
-        logger.warning("%s: %s", type(exception).__name__, exception)
+        exception_trace = "".join(
+            traceback.TracebackException.from_exception(exception).format()
+        )
+        logger.warning("%s", exception_trace)
         context.set_code(code)
         context.set_details(str(exception))
 

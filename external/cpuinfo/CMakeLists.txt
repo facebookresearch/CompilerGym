@@ -8,12 +8,15 @@ cmake_minimum_required(VERSION 3.15)
 
 include(ExternalProject)
 
-ExternalProject_Add(
+externalproject_add(
     cpuinfo
     PREFIX "${CMAKE_CURRENT_BINARY_DIR}/cpuinfo"
     GIT_REPOSITORY "https://github.com/pytorch/cpuinfo.git"
     GIT_TAG 2e79955ecaec85da13ac8f1245a8b2afa10d31c2
     CMAKE_ARGS
-      -C "${CMAKE_CURRENT_BINARY_DIR}/cpuinfo_initial_cache.cmake"
-      "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"
+        -C "${CMAKE_CURRENT_BINARY_DIR}/cpuinfo_initial_cache.cmake"
+        "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"
+    USES_TERMINAL_CONFIGURE TRUE
+    USES_TERMINAL_BUILD TRUE
+    USES_TERMINAL_INSTALL TRUE
 )

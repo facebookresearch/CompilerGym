@@ -5,7 +5,7 @@
 
 cg_add_all_subdirs()
 
-py_test(
+cg_py_test(
   NAME py_converters_test
   SRCS "py_converters_test.py"
   DEPS

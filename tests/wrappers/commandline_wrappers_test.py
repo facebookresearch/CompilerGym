@@ -18,17 +18,17 @@ def test_commandline_with_terminal_action(env: LlvmEnv):
     mem2reg_index = env.action_space["-mem2reg"]
     reg2mem_index = env.action_space["-reg2mem"]
 
-    assert mem2reg_index == mem2reg_unwrapped_index + 1
+    assert mem2reg_index == mem2reg_unwrapped_index
 
     env.reset()
-    _, _, done, info = env.step(mem2reg_index + 1)
+    _, _, done, info = env.step(mem2reg_index)
     assert not done, info
-    _, _, done, info = env.step([reg2mem_index + 1, reg2mem_index + 1])
+    _, _, done, info = env.multistep([reg2mem_index, reg2mem_index])
     assert not done, info
 
     assert env.actions == [mem2reg_index, reg2mem_index, reg2mem_index]
 
-    _, _, done, info = env.step(0)
+    _, _, done, info = env.step(len(env.action_space.flags) - 1)
     assert done
     assert "terminal_action" in info
 
@@ -36,17 +36,14 @@ def test_commandline_with_terminal_action(env: LlvmEnv):
 def test_commandline_with_terminal_action_fork(env: LlvmEnv):
     env = CommandlineWithTerminalAction(env)
     assert env.unwrapped.action_space != env.action_space  # Sanity check.
-    fkd = env.fork()
-    try:
+    with env.fork() as fkd:
         assert fkd.action_space == env.action_space
 
-        _, _, done, info = env.step(0)
+        _, _, done, _ = env.step(len(env.action_space.flags) - 1)
         assert done
 
-        _, _, done, info = fkd.step(0)
+        _, _, done, _ = fkd.step(len(env.action_space.flags) - 1)
         assert done
-    finally:
-        fkd.close()
 
 
 def test_constrained_action_space(env: LlvmEnv):
@@ -63,7 +60,7 @@ def test_constrained_action_space(env: LlvmEnv):
 
     env.reset()
     env.step(0)
-    env.step([1, 1])
+    env.multistep([1, 1])
 
     assert env.actions == [0, 1, 1]
 
@@ -84,7 +81,7 @@ def test_constrained_action_space_fork(env: LlvmEnv):
 
         fkd.reset()
         fkd.step(0)
-        fkd.step([1, 1])
+        fkd.multistep([1, 1])
 
         assert fkd.actions == [0, 1, 1]
     finally:

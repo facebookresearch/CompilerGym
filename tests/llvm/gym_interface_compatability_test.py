@@ -9,15 +9,14 @@ import pytest
 from compiler_gym.envs.llvm import LlvmEnv
 from tests.test_main import main
 
-
-@pytest.fixture(scope="function")
-def env() -> LlvmEnv:
-    """Create an LLVM environment."""
-    with gym.make("llvm-autophase-ic-v0") as env_:
-        yield env_
+pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
 def test_type_classes(env: LlvmEnv):
+    env.observation_space = "Autophase"
+    env.reward_space = "IrInstructionCount"
+    env.reset()
+
     assert isinstance(env, gym.Env)
     assert isinstance(env, LlvmEnv)
     assert isinstance(env.unwrapped, LlvmEnv)
@@ -72,6 +71,29 @@ def test_reward_wrapper(env: LlvmEnv):
 
     _, reward, _, _ = wrapped.step(0)
     assert reward == 1
+
+
+@pytest.mark.xfail(
+    reason="github.com/facebookresearch/CompilerGym/issues/587", strict=True
+)
+def test_env_spec_make(env: LlvmEnv):
+    """Test that demonstrates a failure in gym compatibility: env.spec does
+    not encode mutable state like benchmark, reward space, and observation
+    space.
+    """
+    env.reset(benchmark="cbench-v1/bitcount")
+    with env.spec.make() as new_env:
+        assert new_env.benchmark == env.benchmark
+
+
+def test_env_spec_make_workaround(env: LlvmEnv):
+    """Demonstrate how #587 would be fixed, by updating the 'kwargs' dict."""
+    env.reset(benchmark="cbench-v1/bitcount")
+    env.spec._kwargs[  # pylint: disable=protected-access
+        "benchmark"
+    ] = "cbench-v1/bitcount"
+    with env.spec.make() as new_env:
+        assert new_env.benchmark == env.benchmark
 
 
 if __name__ == "__main__":

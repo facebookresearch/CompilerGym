@@ -10,12 +10,16 @@ include(ExternalProject)
 
 # FetchContent is not used here because for some reason the install step
 # fails with not installing all necessary files in CMake v3.19.6.
-ExternalProject_Add(
+externalproject_add(
     gflags
     PREFIX "${CMAKE_CURRENT_BINARY_DIR}/gflags"
     GIT_REPOSITORY "https://github.com/gflags/gflags.git"
-    GIT_TAG e171aa2d15ed9eb17054558e0b3a6a413bb01067 #tag v2.2.2
+    GIT_TAG
+        e171aa2d15ed9eb17054558e0b3a6a413bb01067 #tag v2.2.2
     CMAKE_ARGS
-      -C "${CMAKE_CURRENT_BINARY_DIR}/gflags_initial_cache.cmake"
-      "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"
+        -C "${CMAKE_CURRENT_BINARY_DIR}/gflags_initial_cache.cmake"
+        "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"
+    USES_TERMINAL_CONFIGURE TRUE
+    USES_TERMINAL_BUILD TRUE
+    USES_TERMINAL_INSTALL TRUE
 )

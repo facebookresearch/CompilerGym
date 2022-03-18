@@ -2,7 +2,10 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+from typing import List
+
 from compiler_gym.envs import CompilerEnv
+from compiler_gym.util.gym_type_hints import ActionType
 from compiler_gym.wrappers.core import CompilerEnvWrapper
 
 
@@ -26,9 +29,20 @@ class ValidateBenchmarkAfterEveryStep(CompilerEnvWrapper):
         super().__init__(env)
         self.reward_penalty = reward_penalty
 
-    def step(self, action, observations=None, rewards=None):
-        observation, reward, done, info = self.env.step(
-            action, observations=observations, rewards=rewards
+    def multistep(
+        self,
+        actions: List[ActionType],
+        observation_spaces=None,
+        reward_spaces=None,
+        observations=None,
+        rewards=None,
+    ):
+        observation, reward, done, info = self.env.multistep(
+            actions,
+            observation_spaces=observation_spaces,
+            reward_spaces=reward_spaces,
+            observations=observations,
+            rewards=rewards,
         )
 
         # Early exit if environment reaches terminal state.

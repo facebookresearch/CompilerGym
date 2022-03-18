@@ -12,7 +12,7 @@ class AsmSizeReward(Reward):
 
     def __init__(self):
         super().__init__(
-            id="asm_size",
+            name="asm_size",
             observation_spaces=["asm_size"],
             default_value=0,
             default_negates_returns=True,
@@ -43,7 +43,7 @@ class ObjSizeReward(Reward):
 
     def __init__(self):
         super().__init__(
-            id="obj_size",
+            name="obj_size",
             observation_spaces=["obj_size"],
             default_value=0,
             default_negates_returns=True,
