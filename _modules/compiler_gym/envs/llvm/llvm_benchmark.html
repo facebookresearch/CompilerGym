@@ -207,9 +207,11 @@
 <span class="kn">import</span> <span class="nn">os</span>
 <span class="kn">import</span> <span class="nn">random</span>
 <span class="kn">import</span> <span class="nn">subprocess</span>
+<span class="kn">import</span> <span class="nn">sys</span>
 <span class="kn">import</span> <span class="nn">tempfile</span>
 <span class="kn">from</span> <span class="nn">concurrent.futures</span> <span class="kn">import</span> <span class="n">as_completed</span>
 <span class="kn">from</span> <span class="nn">datetime</span> <span class="kn">import</span> <span class="n">datetime</span>
+<span class="kn">from</span> <span class="nn">functools</span> <span class="kn">import</span> <span class="n">lru_cache</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
@@ -222,31 +224,46 @@
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
 
 
-<span class="k">def</span> <span class="nf">get_compiler_includes</span><span class="p">(</span><span class="n">compiler</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Run the system compiler in verbose mode on a dummy input to get the</span>
-<span class="sd">    system header search path.</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Create a temporary directory to write the compiled &#39;binary&#39; to, since</span>
-    <span class="c1"># GNU assembler does not support piping to stdout.</span>
-    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">d</span><span class="p">:</span>
+<span class="k">class</span> <span class="nc">HostCompilerFailure</span><span class="p">(</span><span class="ne">OSError</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Exception raised when the system compiler fails.&quot;&quot;&quot;</span>
+
+
+<span class="k">class</span> <span class="nc">UnableToParseHostCompilerOutput</span><span class="p">(</span><span class="n">HostCompilerFailure</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;Exception raised if unable to parse the verbose output of the host</span>
+<span class="sd">    compiler.&quot;&quot;&quot;</span>
+
+
+<span class="k">def</span> <span class="nf">_get_system_library_flags</span><span class="p">(</span><span class="n">compiler</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Private implementation function.&quot;&quot;&quot;</span>
+    <span class="c1"># Create a temporary directory to write the compiled binary to, since GNU</span>
+    <span class="c1"># assembler does not support piping to stdout.</span>
+    <span class="n">transient_cache</span> <span class="o">=</span> <span class="n">transient_cache_path</span><span class="p">(</span><span class="s2">&quot;.&quot;</span><span class="p">)</span>
+    <span class="n">transient_cache</span><span class="o">.</span><span class="n">mkdir</span><span class="p">(</span><span class="n">parents</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+    <span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">NamedTemporaryFile</span><span class="p">(</span><span class="nb">dir</span><span class="o">=</span><span class="n">transient_cache</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
         <span class="k">try</span><span class="p">:</span>
+            <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="n">compiler</span><span class="p">,</span> <span class="s2">&quot;-xc++&quot;</span><span class="p">,</span> <span class="s2">&quot;-v&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="n">f</span><span class="o">.</span><span class="n">name</span><span class="p">]</span>
+            <span class="c1"># On macOS we need to compile a binary to invoke the linker.</span>
+            <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">!=</span> <span class="s2">&quot;darwin&quot;</span><span class="p">:</span>
+                <span class="n">cmd</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot;-c&quot;</span><span class="p">)</span>
             <span class="k">with</span> <span class="n">Popen</span><span class="p">(</span>
-                <span class="p">[</span><span class="n">compiler</span><span class="p">,</span> <span class="s2">&quot;-xc++&quot;</span><span class="p">,</span> <span class="s2">&quot;-v&quot;</span><span class="p">,</span> <span class="s2">&quot;-c&quot;</span><span class="p">,</span> <span class="s2">&quot;-&quot;</span><span class="p">,</span> <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">Path</span><span class="p">(</span><span class="n">d</span><span class="p">)</span> <span class="o">/</span> <span class="s2">&quot;a.out&quot;</span><span class="p">)],</span>
+                <span class="n">cmd</span><span class="p">,</span>
                 <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">DEVNULL</span><span class="p">,</span>
                 <span class="n">stderr</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
                 <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
                 <span class="n">universal_newlines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
             <span class="p">)</span> <span class="k">as</span> <span class="n">process</span><span class="p">:</span>
-                <span class="n">_</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span><span class="nb">input</span><span class="o">=</span><span class="s2">&quot;&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span><span class="p">)</span>
+                <span class="n">_</span><span class="p">,</span> <span class="n">stderr</span> <span class="o">=</span> <span class="n">process</span><span class="o">.</span><span class="n">communicate</span><span class="p">(</span>
+                    <span class="nb">input</span><span class="o">=</span><span class="s2">&quot;int main(){return 0;}&quot;</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="mi">30</span>
+                <span class="p">)</span>
                 <span class="k">if</span> <span class="n">process</span><span class="o">.</span><span class="n">returncode</span><span class="p">:</span>
-                    <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;Failed to invoke </span><span class="si">{</span><span class="n">compiler</span><span class="si">}</span><span class="s2">. &quot;</span>
+                    <span class="k">raise</span> <span class="n">HostCompilerFailure</span><span class="p">(</span>
+                        <span class="sa">f</span><span class="s2">&quot;Failed to invoke &#39;</span><span class="si">{</span><span class="n">compiler</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
                         <span class="sa">f</span><span class="s2">&quot;Is there a working system compiler?</span><span class="se">\n</span><span class="s2">&quot;</span>
                         <span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">stderr</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="si">}</span><span class="s2">&quot;</span>
                     <span class="p">)</span>
         <span class="k">except</span> <span class="ne">FileNotFoundError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Failed to invoke </span><span class="si">{</span><span class="n">compiler</span><span class="si">}</span><span class="s2">. &quot;</span>
+            <span class="k">raise</span> <span class="n">HostCompilerFailure</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Failed to invoke &#39;</span><span class="si">{</span><span class="n">compiler</span><span class="si">}</span><span class="s2">&#39;. &quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;Is there a working system compiler?</span><span class="se">\n</span><span class="s2">&quot;</span>
                 <span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
             <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
@@ -259,53 +276,62 @@
     <span class="c1">#     /path/2</span>
     <span class="c1">#     End of search list</span>
     <span class="n">in_search_list</span> <span class="o">=</span> <span class="kc">False</span>
-    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">stderr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">):</span>
+    <span class="n">lines</span> <span class="o">=</span> <span class="n">stderr</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
         <span class="k">if</span> <span class="n">in_search_list</span> <span class="ow">and</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;End of search list&quot;</span><span class="p">):</span>
             <span class="k">break</span>
         <span class="k">elif</span> <span class="n">in_search_list</span><span class="p">:</span>
             <span class="c1"># We have an include path to return.</span>
             <span class="n">path</span> <span class="o">=</span> <span class="n">Path</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">())</span>
-            <span class="k">yield</span> <span class="n">path</span>
+            <span class="k">yield</span> <span class="s2">&quot;-isystem&quot;</span>
+            <span class="k">yield</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span><span class="p">)</span>
             <span class="c1"># Compatibility fix for compiling benchmark sources which use the</span>
             <span class="c1"># &#39;#include &lt;endian.h&gt;&#39; header, which on macOS is located in a</span>
             <span class="c1"># &#39;machine/endian.h&#39; directory.</span>
             <span class="k">if</span> <span class="p">(</span><span class="n">path</span> <span class="o">/</span> <span class="s2">&quot;machine&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">is_dir</span><span class="p">():</span>
-                <span class="k">yield</span> <span class="n">path</span> <span class="o">/</span> <span class="s2">&quot;machine&quot;</span>
+                <span class="k">yield</span> <span class="s2">&quot;-isystem&quot;</span>
+                <span class="k">yield</span> <span class="nb">str</span><span class="p">(</span><span class="n">path</span> <span class="o">/</span> <span class="s2">&quot;machine&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;#include &lt;...&gt; search starts here:&quot;</span><span class="p">):</span>
             <span class="n">in_search_list</span> <span class="o">=</span> <span class="kc">True</span>
     <span class="k">else</span><span class="p">:</span>
-        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to parse &#39;#include &lt;...&gt;&#39; search paths from </span><span class="si">{</span><span class="n">compiler</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">msg</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;Failed to parse &#39;#include &lt;...&gt;&#39; search paths from &#39;</span><span class="si">{</span><span class="n">compiler</span><span class="si">}</span><span class="s2">&#39;&quot;</span>
         <span class="n">stderr</span> <span class="o">=</span> <span class="n">stderr</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span>
         <span class="k">if</span> <span class="n">stderr</span><span class="p">:</span>
             <span class="n">msg</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;:</span><span class="se">\n</span><span class="si">{</span><span class="n">stderr</span><span class="si">}</span><span class="s2">&quot;</span>
-        <span class="k">raise</span> <span class="ne">OSError</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+        <span class="k">raise</span> <span class="n">UnableToParseHostCompilerOutput</span><span class="p">(</span><span class="n">msg</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">sys</span><span class="o">.</span><span class="n">platform</span> <span class="o">==</span> <span class="s2">&quot;darwin&quot;</span><span class="p">:</span>
+        <span class="k">yield</span> <span class="s2">&quot;-L/Library/Developer/CommandLineTools/SDKs/MacOSX.sdk/usr/lib&quot;</span>
 
 
-<span class="c1"># Memoized search paths. Call get_system_includes() to access them.</span>
-<span class="n">_SYSTEM_INCLUDES</span> <span class="o">=</span> <span class="kc">None</span>
+<span class="nd">@lru_cache</span><span class="p">(</span><span class="n">maxsize</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
+<span class="k">def</span> <span class="nf">_get_cached_system_library_flags</span><span class="p">(</span><span class="n">compiler</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Private implementation detail.&quot;&quot;&quot;</span>
+    <span class="k">return</span> <span class="nb">list</span><span class="p">(</span><span class="n">_get_system_library_flags</span><span class="p">(</span><span class="n">compiler</span><span class="p">))</span>
 
 
-<div class="viewcode-block" id="get_system_includes"><a class="viewcode-back" href="../../../../llvm/api.html#compiler_gym.envs.llvm.get_system_includes">[docs]</a><span class="k">def</span> <span class="nf">get_system_includes</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Path</span><span class="p">]:</span>
-    <span class="sd">&quot;&quot;&quot;Determine the system include paths for C/C++ compilation jobs.</span>
+<span class="k">def</span> <span class="nf">get_system_library_flags</span><span class="p">(</span><span class="n">compiler</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="sd">&quot;&quot;&quot;Determine the set of compilation flags needed to use the host system</span>
+<span class="sd">    libraries.</span>
 
 <span class="sd">    This uses the system compiler to determine the search paths for C/C++ system</span>
-<span class="sd">    headers. By default, :code:`c++` is invoked. This can be overridden by</span>
-<span class="sd">    setting :code:`os.environ[&quot;CXX&quot;]`.</span>
+<span class="sd">    headers, and on macOS, the location of libclang_rt.osx.a. By default,</span>
+<span class="sd">    :code:`c++` is invoked. This can be overridden by setting</span>
+<span class="sd">    :code:`os.environ[&quot;CXX&quot;]` prior to calling this function.</span>
 
-<span class="sd">    :return: A list of paths to system header directories.</span>
-<span class="sd">    :raises OSError: If the compiler fails, or if the search paths cannot be</span>
-<span class="sd">        determined.</span>
+<span class="sd">    :return: A list of command line flags for a compiler.</span>
+
+<span class="sd">    :raises HostCompilerFailure: If the host compiler cannot be determined, or</span>
+<span class="sd">        fails to compile a trivial piece of code.</span>
+
+<span class="sd">    :raises UnableToParseHostCompilerOutput: If the output of the compiler</span>
+<span class="sd">        cannot be understood.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Memoize the system includes paths.</span>
-    <span class="k">global</span> <span class="n">_SYSTEM_INCLUDES</span>
-    <span class="k">if</span> <span class="n">_SYSTEM_INCLUDES</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-        <span class="n">system_compiler</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;CXX&quot;</span><span class="p">,</span> <span class="s2">&quot;c++&quot;</span><span class="p">)</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">_SYSTEM_INCLUDES</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">get_compiler_includes</span><span class="p">(</span><span class="n">system_compiler</span><span class="p">))</span>
-        <span class="k">except</span> <span class="ne">OSError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
-            <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
-            <span class="n">_SYSTEM_INCLUDES</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">return</span> <span class="n">_SYSTEM_INCLUDES</span></div>
+    <span class="n">compiler</span> <span class="o">=</span> <span class="n">compiler</span> <span class="ow">or</span> <span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;CXX&quot;</span><span class="p">)</span> <span class="ow">or</span> <span class="s2">&quot;c++&quot;</span><span class="p">)</span>
+    <span class="c1"># We want to cache the results of this expensive query after resolving the</span>
+    <span class="c1"># default value for the compiler argument, as it can changed based on</span>
+    <span class="c1"># environment variables.</span>
+    <span class="k">return</span> <span class="n">_get_cached_system_library_flags</span><span class="p">(</span><span class="n">compiler</span><span class="p">)</span>
 
 
 <div class="viewcode-block" id="ClangInvocation"><a class="viewcode-back" href="../../../../llvm/api.html#compiler_gym.envs.llvm.ClangInvocation">[docs]</a><span class="k">class</span> <span class="nc">ClangInvocation</span><span class="p">:</span>
@@ -319,7 +345,7 @@
 <span class="sd">        :param args: The list of arguments to pass to clang.</span>
 <span class="sd">        :param system_includes: Whether to include the system standard libraries</span>
 <span class="sd">            during compilation jobs. This requires a system toolchain. See</span>
-<span class="sd">            :func:`get_system_includes`.</span>
+<span class="sd">            :func:`get_system_library_flags`.</span>
 <span class="sd">        :param timeout: The maximum number of seconds to allow clang to run</span>
 <span class="sd">            before terminating.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -328,13 +354,10 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">timeout</span> <span class="o">=</span> <span class="n">timeout</span></div>
 
     <span class="k">def</span> <span class="nf">command</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">outpath</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
-        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">llvm</span><span class="o">.</span><span class="n">clang_path</span><span class="p">())]</span>
+        <span class="n">cmd</span> <span class="o">=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">llvm</span><span class="o">.</span><span class="n">clang_path</span><span class="p">()),</span> <span class="s2">&quot;-c&quot;</span><span class="p">,</span> <span class="s2">&quot;-emit-llvm&quot;</span><span class="p">,</span> <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">outpath</span><span class="p">)]</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">system_includes</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">directory</span> <span class="ow">in</span> <span class="n">get_system_includes</span><span class="p">():</span>
-                <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;-isystem&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">directory</span><span class="p">)]</span>
-
+            <span class="n">cmd</span> <span class="o">+=</span> <span class="n">get_system_library_flags</span><span class="p">()</span>
         <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="nb">str</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">args</span><span class="p">]</span>
-        <span class="n">cmd</span> <span class="o">+=</span> <span class="p">[</span><span class="s2">&quot;-c&quot;</span><span class="p">,</span> <span class="s2">&quot;-emit-llvm&quot;</span><span class="p">,</span> <span class="s2">&quot;-o&quot;</span><span class="p">,</span> <span class="nb">str</span><span class="p">(</span><span class="n">outpath</span><span class="p">)]</span>
 
         <span class="k">return</span> <span class="n">cmd</span>
 
@@ -453,7 +476,7 @@
 
 <span class="sd">    :param system_includes: Whether to include the system standard libraries</span>
 <span class="sd">        during compilation jobs. This requires a system toolchain. See</span>
-<span class="sd">        :func:`get_system_includes`.</span>
+<span class="sd">        :func:`get_system_library_flags`.</span>
 
 <span class="sd">    :param timeout: The maximum number of seconds to allow clang to run before</span>
 <span class="sd">        terminating.</span>

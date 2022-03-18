@@ -277,7 +277,7 @@
             <span class="n">datasets</span><span class="o">=</span><span class="n">_get_llvm_datasets</span><span class="p">(</span><span class="n">site_data_base</span><span class="o">=</span><span class="n">datasets_site_path</span><span class="p">),</span>
             <span class="n">rewards</span><span class="o">=</span><span class="p">[</span>
                 <span class="n">CostFunctionReward</span><span class="p">(</span>
-                    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;IrInstructionCount&quot;</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;IrInstructionCount&quot;</span><span class="p">,</span>
                     <span class="n">cost_function</span><span class="o">=</span><span class="s2">&quot;IrInstructionCount&quot;</span><span class="p">,</span>
                     <span class="n">init_cost_function</span><span class="o">=</span><span class="s2">&quot;IrInstructionCountO0&quot;</span><span class="p">,</span>
                     <span class="n">default_negates_returns</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -285,7 +285,7 @@
                     <span class="n">platform_dependent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">NormalizedReward</span><span class="p">(</span>
-                    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;IrInstructionCountNorm&quot;</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;IrInstructionCountNorm&quot;</span><span class="p">,</span>
                     <span class="n">cost_function</span><span class="o">=</span><span class="s2">&quot;IrInstructionCount&quot;</span><span class="p">,</span>
                     <span class="n">init_cost_function</span><span class="o">=</span><span class="s2">&quot;IrInstructionCountO0&quot;</span><span class="p">,</span>
                     <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -294,7 +294,7 @@
                     <span class="n">platform_dependent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">BaselineImprovementNormalizedReward</span><span class="p">(</span>
-                    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;IrInstructionCountO3&quot;</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;IrInstructionCountO3&quot;</span><span class="p">,</span>
                     <span class="n">cost_function</span><span class="o">=</span><span class="s2">&quot;IrInstructionCount&quot;</span><span class="p">,</span>
                     <span class="n">baseline_cost_function</span><span class="o">=</span><span class="s2">&quot;IrInstructionCountO3&quot;</span><span class="p">,</span>
                     <span class="n">init_cost_function</span><span class="o">=</span><span class="s2">&quot;IrInstructionCountO0&quot;</span><span class="p">,</span>
@@ -304,7 +304,7 @@
                     <span class="n">platform_dependent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">BaselineImprovementNormalizedReward</span><span class="p">(</span>
-                    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;IrInstructionCountOz&quot;</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;IrInstructionCountOz&quot;</span><span class="p">,</span>
                     <span class="n">cost_function</span><span class="o">=</span><span class="s2">&quot;IrInstructionCount&quot;</span><span class="p">,</span>
                     <span class="n">baseline_cost_function</span><span class="o">=</span><span class="s2">&quot;IrInstructionCountOz&quot;</span><span class="p">,</span>
                     <span class="n">init_cost_function</span><span class="o">=</span><span class="s2">&quot;IrInstructionCountO0&quot;</span><span class="p">,</span>
@@ -314,7 +314,7 @@
                     <span class="n">platform_dependent</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">CostFunctionReward</span><span class="p">(</span>
-                    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;ObjectTextSizeBytes&quot;</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ObjectTextSizeBytes&quot;</span><span class="p">,</span>
                     <span class="n">cost_function</span><span class="o">=</span><span class="s2">&quot;ObjectTextSizeBytes&quot;</span><span class="p">,</span>
                     <span class="n">init_cost_function</span><span class="o">=</span><span class="s2">&quot;ObjectTextSizeO0&quot;</span><span class="p">,</span>
                     <span class="n">default_negates_returns</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -322,7 +322,7 @@
                     <span class="n">platform_dependent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">NormalizedReward</span><span class="p">(</span>
-                    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;ObjectTextSizeNorm&quot;</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ObjectTextSizeNorm&quot;</span><span class="p">,</span>
                     <span class="n">cost_function</span><span class="o">=</span><span class="s2">&quot;ObjectTextSizeBytes&quot;</span><span class="p">,</span>
                     <span class="n">init_cost_function</span><span class="o">=</span><span class="s2">&quot;ObjectTextSizeO0&quot;</span><span class="p">,</span>
                     <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
@@ -331,7 +331,7 @@
                     <span class="n">platform_dependent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">BaselineImprovementNormalizedReward</span><span class="p">(</span>
-                    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;ObjectTextSizeO3&quot;</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ObjectTextSizeO3&quot;</span><span class="p">,</span>
                     <span class="n">cost_function</span><span class="o">=</span><span class="s2">&quot;ObjectTextSizeBytes&quot;</span><span class="p">,</span>
                     <span class="n">init_cost_function</span><span class="o">=</span><span class="s2">&quot;ObjectTextSizeO0&quot;</span><span class="p">,</span>
                     <span class="n">baseline_cost_function</span><span class="o">=</span><span class="s2">&quot;ObjectTextSizeO3&quot;</span><span class="p">,</span>
@@ -341,10 +341,47 @@
                     <span class="n">platform_dependent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                 <span class="p">),</span>
                 <span class="n">BaselineImprovementNormalizedReward</span><span class="p">(</span>
-                    <span class="nb">id</span><span class="o">=</span><span class="s2">&quot;ObjectTextSizeOz&quot;</span><span class="p">,</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;ObjectTextSizeOz&quot;</span><span class="p">,</span>
                     <span class="n">cost_function</span><span class="o">=</span><span class="s2">&quot;ObjectTextSizeBytes&quot;</span><span class="p">,</span>
                     <span class="n">init_cost_function</span><span class="o">=</span><span class="s2">&quot;ObjectTextSizeO0&quot;</span><span class="p">,</span>
                     <span class="n">baseline_cost_function</span><span class="o">=</span><span class="s2">&quot;ObjectTextSizeOz&quot;</span><span class="p">,</span>
+                    <span class="n">success_threshold</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="n">default_negates_returns</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">deterministic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">platform_dependent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">CostFunctionReward</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;TextSizeBytes&quot;</span><span class="p">,</span>
+                    <span class="n">cost_function</span><span class="o">=</span><span class="s2">&quot;TextSizeBytes&quot;</span><span class="p">,</span>
+                    <span class="n">init_cost_function</span><span class="o">=</span><span class="s2">&quot;TextSizeO0&quot;</span><span class="p">,</span>
+                    <span class="n">default_negates_returns</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">deterministic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">platform_dependent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">NormalizedReward</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;TextSizeNorm&quot;</span><span class="p">,</span>
+                    <span class="n">cost_function</span><span class="o">=</span><span class="s2">&quot;TextSizeBytes&quot;</span><span class="p">,</span>
+                    <span class="n">init_cost_function</span><span class="o">=</span><span class="s2">&quot;TextSizeO0&quot;</span><span class="p">,</span>
+                    <span class="nb">max</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="n">default_negates_returns</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">deterministic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">platform_dependent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">BaselineImprovementNormalizedReward</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;TextSizeO3&quot;</span><span class="p">,</span>
+                    <span class="n">cost_function</span><span class="o">=</span><span class="s2">&quot;TextSizeBytes&quot;</span><span class="p">,</span>
+                    <span class="n">init_cost_function</span><span class="o">=</span><span class="s2">&quot;TextSizeO0&quot;</span><span class="p">,</span>
+                    <span class="n">baseline_cost_function</span><span class="o">=</span><span class="s2">&quot;TextSizeO3&quot;</span><span class="p">,</span>
+                    <span class="n">success_threshold</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+                    <span class="n">default_negates_returns</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">deterministic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                    <span class="n">platform_dependent</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+                <span class="p">),</span>
+                <span class="n">BaselineImprovementNormalizedReward</span><span class="p">(</span>
+                    <span class="n">name</span><span class="o">=</span><span class="s2">&quot;TextSizeOz&quot;</span><span class="p">,</span>
+                    <span class="n">cost_function</span><span class="o">=</span><span class="s2">&quot;TextSizeBytes&quot;</span><span class="p">,</span>
+                    <span class="n">init_cost_function</span><span class="o">=</span><span class="s2">&quot;TextSizeO0&quot;</span><span class="p">,</span>
+                    <span class="n">baseline_cost_function</span><span class="o">=</span><span class="s2">&quot;TextSizeOz&quot;</span><span class="p">,</span>
                     <span class="n">success_threshold</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
                     <span class="n">default_negates_returns</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
                     <span class="n">deterministic</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
@@ -587,7 +624,7 @@
 
 <span class="sd">        :param system_includes: Whether to include the system standard libraries</span>
 <span class="sd">            during compilation jobs. This requires a system toolchain. See</span>
-<span class="sd">            :func:`get_system_includes`.</span>
+<span class="sd">            :func:`get_system_library_flags`.</span>
 
 <span class="sd">        :param timeout: The maximum number of seconds to allow clang to run</span>
 <span class="sd">            before terminating.</span>

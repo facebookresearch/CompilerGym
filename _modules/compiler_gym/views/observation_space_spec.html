@@ -202,33 +202,13 @@
 <span class="c1">#</span>
 <span class="c1"># This source code is licensed under the MIT license found in the</span>
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
-<span class="kn">import</span> <span class="nn">json</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">ClassVar</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
-<span class="kn">import</span> <span class="nn">networkx</span> <span class="k">as</span> <span class="nn">nx</span>
-<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">gym.spaces</span> <span class="kn">import</span> <span class="n">Space</span>
 
-<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">Observation</span><span class="p">,</span> <span class="n">ObservationSpace</span><span class="p">,</span> <span class="n">ScalarRange</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.spaces.box</span> <span class="kn">import</span> <span class="n">Box</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.spaces.scalar</span> <span class="kn">import</span> <span class="n">Scalar</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.spaces.sequence</span> <span class="kn">import</span> <span class="n">Sequence</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">Event</span><span class="p">,</span> <span class="n">ObservationSpace</span><span class="p">,</span> <span class="n">py_converters</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.gym_type_hints</span> <span class="kn">import</span> <span class="n">ObservationType</span>
-
-
-<span class="k">def</span> <span class="nf">_json2nx</span><span class="p">(</span><span class="n">observation</span><span class="p">):</span>
-    <span class="n">json_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">observation</span><span class="o">.</span><span class="n">string_value</span><span class="p">)</span>
-    <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">readwrite</span><span class="o">.</span><span class="n">json_graph</span><span class="o">.</span><span class="n">node_link_graph</span><span class="p">(</span>
-        <span class="n">json_data</span><span class="p">,</span> <span class="n">multigraph</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">True</span>
-    <span class="p">)</span>
-
-
-<span class="k">def</span> <span class="nf">_scalar_range2tuple</span><span class="p">(</span><span class="n">sr</span><span class="p">:</span> <span class="n">ScalarRange</span><span class="p">,</span> <span class="n">defaults</span><span class="o">=</span><span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)):</span>
-    <span class="sd">&quot;&quot;&quot;Convert a ScalarRange to a tuple of (min, max) bounds.&quot;&quot;&quot;</span>
-    <span class="k">return</span> <span class="p">(</span>
-        <span class="n">sr</span><span class="o">.</span><span class="n">min</span><span class="o">.</span><span class="n">value</span> <span class="k">if</span> <span class="n">sr</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;min&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">defaults</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span>
-        <span class="n">sr</span><span class="o">.</span><span class="n">max</span><span class="o">.</span><span class="n">value</span> <span class="k">if</span> <span class="n">sr</span><span class="o">.</span><span class="n">HasField</span><span class="p">(</span><span class="s2">&quot;max&quot;</span><span class="p">)</span> <span class="k">else</span> <span class="n">defaults</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>
-    <span class="p">)</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.shell_format</span> <span class="kn">import</span> <span class="n">indent</span>
 
 
 <div class="viewcode-block" id="ObservationSpaceSpec"><a class="viewcode-back" href="../../../compiler_gym/views.html#compiler_gym.views.ObservationSpaceSpec">[docs]</a><span class="k">class</span> <span class="nc">ObservationSpaceSpec</span><span class="p">:</span>
@@ -257,12 +237,16 @@
 <span class="sd">        is set and the service terminates.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">message_converter</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span>
+        <span class="n">Callable</span><span class="p">[[</span><span class="n">Any</span><span class="p">],</span> <span class="n">Any</span><span class="p">]</span>
+    <span class="p">]</span> <span class="o">=</span> <span class="n">py_converters</span><span class="o">.</span><span class="n">make_message_default_converter</span><span class="p">()</span>
+
     <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="nb">id</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span>
         <span class="n">space</span><span class="p">:</span> <span class="n">Space</span><span class="p">,</span>
-        <span class="n">translate</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Union</span><span class="p">[</span><span class="n">ObservationType</span><span class="p">,</span> <span class="n">Observation</span><span class="p">]],</span> <span class="n">ObservationType</span><span class="p">],</span>
+        <span class="n">translate</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">Union</span><span class="p">[</span><span class="n">ObservationType</span><span class="p">,</span> <span class="n">Event</span><span class="p">]],</span> <span class="n">ObservationType</span><span class="p">],</span>
         <span class="n">to_string</span><span class="p">:</span> <span class="n">Callable</span><span class="p">[[</span><span class="n">ObservationType</span><span class="p">],</span> <span class="nb">str</span><span class="p">],</span>
         <span class="n">deterministic</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
         <span class="n">platform_dependent</span><span class="p">:</span> <span class="nb">bool</span><span class="p">,</span>
@@ -310,146 +294,41 @@
 
     <span class="nd">@classmethod</span>
     <span class="k">def</span> <span class="nf">from_proto</span><span class="p">(</span><span class="bp">cls</span><span class="p">,</span> <span class="n">index</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">proto</span><span class="p">:</span> <span class="n">ObservationSpace</span><span class="p">):</span>
-        <span class="sd">&quot;&quot;&quot;Construct a space from an ObservationSpace message.&quot;&quot;&quot;</span>
-        <span class="n">shape_type</span> <span class="o">=</span> <span class="n">proto</span><span class="o">.</span><span class="n">WhichOneof</span><span class="p">(</span><span class="s2">&quot;shape&quot;</span><span class="p">)</span>
+        <span class="sd">&quot;&quot;&quot;Create an observation space from a ObservationSpace protocol buffer.</span>
 
-        <span class="k">def</span> <span class="nf">make_box</span><span class="p">(</span><span class="n">scalar_range_list</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">defaults</span><span class="p">):</span>
-            <span class="n">bounds</span> <span class="o">=</span> <span class="p">[</span><span class="n">_scalar_range2tuple</span><span class="p">(</span><span class="n">r</span><span class="p">,</span> <span class="n">defaults</span><span class="p">)</span> <span class="k">for</span> <span class="n">r</span> <span class="ow">in</span> <span class="n">scalar_range_list</span><span class="p">]</span>
-            <span class="k">return</span> <span class="n">Box</span><span class="p">(</span>
-                <span class="n">name</span><span class="o">=</span><span class="n">proto</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                <span class="n">low</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bounds</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">),</span>
-                <span class="n">high</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">bounds</span><span class="p">],</span> <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">),</span>
-                <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
-            <span class="p">)</span>
+<span class="sd">        :param index: The index of this observation space into the list of</span>
+<span class="sd">            observation spaces that the compiler service supports.</span>
 
-        <span class="k">def</span> <span class="nf">make_scalar</span><span class="p">(</span><span class="n">scalar_range</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">defaults</span><span class="p">):</span>
-            <span class="n">scalar_range_tuple</span> <span class="o">=</span> <span class="n">_scalar_range2tuple</span><span class="p">(</span><span class="n">scalar_range</span><span class="p">,</span> <span class="n">defaults</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">Scalar</span><span class="p">(</span>
-                <span class="n">name</span><span class="o">=</span><span class="n">proto</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                <span class="nb">min</span><span class="o">=</span><span class="n">dtype</span><span class="p">(</span><span class="n">scalar_range_tuple</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>
-                <span class="nb">max</span><span class="o">=</span><span class="n">dtype</span><span class="p">(</span><span class="n">scalar_range_tuple</span><span class="p">[</span><span class="mi">1</span><span class="p">]),</span>
-                <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
-            <span class="p">)</span>
+<span class="sd">        :param proto: An ObservationSpace protocol buffer.</span>
 
-        <span class="k">def</span> <span class="nf">make_seq</span><span class="p">(</span><span class="n">size_range</span><span class="p">,</span> <span class="n">dtype</span><span class="p">,</span> <span class="n">defaults</span><span class="p">,</span> <span class="n">scalar_range</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-            <span class="k">return</span> <span class="n">Sequence</span><span class="p">(</span>
-                <span class="n">name</span><span class="o">=</span><span class="n">proto</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
-                <span class="n">size_range</span><span class="o">=</span><span class="n">_scalar_range2tuple</span><span class="p">(</span><span class="n">size_range</span><span class="p">,</span> <span class="n">defaults</span><span class="p">),</span>
-                <span class="n">dtype</span><span class="o">=</span><span class="n">dtype</span><span class="p">,</span>
-                <span class="n">opaque_data_format</span><span class="o">=</span><span class="n">proto</span><span class="o">.</span><span class="n">opaque_data_format</span><span class="p">,</span>
-                <span class="n">scalar_range</span><span class="o">=</span><span class="n">scalar_range</span><span class="p">,</span>
-            <span class="p">)</span>
+<span class="sd">        :raises ValueError: If protocol buffer is invalid.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">spec</span> <span class="o">=</span> <span class="n">ObservationSpaceSpec</span><span class="o">.</span><span class="n">message_converter</span><span class="p">(</span><span class="n">proto</span><span class="o">.</span><span class="n">space</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Error interpreting description of observation space &#39;</span><span class="si">{</span><span class="n">proto</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;.</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;ObservationSpace message:</span><span class="se">\n</span><span class="s2">&quot;</span>
+                <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">indent</span><span class="p">(</span><span class="n">proto</span><span class="o">.</span><span class="n">space</span><span class="p">,</span> <span class="n">n</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 
-        <span class="c1"># Translate from protocol buffer specification to python. There are</span>
-        <span class="c1"># three variables to derive:</span>
-        <span class="c1">#   (1) space: the gym.Space instance describing the space.</span>
-        <span class="c1">#   (2) translate: is a callback that translates from an Observation</span>
-        <span class="c1">#           message to a python type.</span>
-        <span class="c1">#   (3) to_string: is a callback that translates from a python type to a</span>
-        <span class="c1">#           string for printing.</span>
-        <span class="k">if</span> <span class="n">proto</span><span class="o">.</span><span class="n">opaque_data_format</span> <span class="o">==</span> <span class="s2">&quot;json://networkx/MultiDiGraph&quot;</span><span class="p">:</span>
-            <span class="c1"># TODO(cummins): Add a Graph space.</span>
-            <span class="n">space</span> <span class="o">=</span> <span class="n">make_seq</span><span class="p">(</span><span class="n">proto</span><span class="o">.</span><span class="n">string_size_range</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
-
-            <span class="k">def</span> <span class="nf">translate</span><span class="p">(</span><span class="n">observation</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">nx</span><span class="o">.</span><span class="n">readwrite</span><span class="o">.</span><span class="n">json_graph</span><span class="o">.</span><span class="n">node_link_graph</span><span class="p">(</span>
-                    <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">observation</span><span class="o">.</span><span class="n">string_value</span><span class="p">),</span> <span class="n">multigraph</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">directed</span><span class="o">=</span><span class="kc">True</span>
-                <span class="p">)</span>
-
-            <span class="k">def</span> <span class="nf">to_string</span><span class="p">(</span><span class="n">observation</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span>
-                    <span class="n">nx</span><span class="o">.</span><span class="n">readwrite</span><span class="o">.</span><span class="n">json_graph</span><span class="o">.</span><span class="n">node_link_data</span><span class="p">(</span><span class="n">observation</span><span class="p">),</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span>
-                <span class="p">)</span>
-
-        <span class="k">elif</span> <span class="n">proto</span><span class="o">.</span><span class="n">opaque_data_format</span> <span class="o">==</span> <span class="s2">&quot;json://&quot;</span><span class="p">:</span>
-            <span class="n">space</span> <span class="o">=</span> <span class="n">make_seq</span><span class="p">(</span><span class="n">proto</span><span class="o">.</span><span class="n">string_size_range</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
-
-            <span class="k">def</span> <span class="nf">translate</span><span class="p">(</span><span class="n">observation</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">observation</span><span class="o">.</span><span class="n">string_value</span><span class="p">)</span>
-
-            <span class="k">def</span> <span class="nf">to_string</span><span class="p">(</span><span class="n">observation</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">observation</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
-
-        <span class="k">elif</span> <span class="n">shape_type</span> <span class="o">==</span> <span class="s2">&quot;int64_range_list&quot;</span><span class="p">:</span>
-            <span class="n">space</span> <span class="o">=</span> <span class="n">make_box</span><span class="p">(</span>
-                <span class="n">proto</span><span class="o">.</span><span class="n">int64_range_list</span><span class="o">.</span><span class="n">range</span><span class="p">,</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">,</span>
-                <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">),</span>
-            <span class="p">)</span>
-
-            <span class="k">def</span> <span class="nf">translate</span><span class="p">(</span><span class="n">observation</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">observation</span><span class="o">.</span><span class="n">int64_list</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span>
-
-            <span class="n">to_string</span> <span class="o">=</span> <span class="nb">str</span>
-        <span class="k">elif</span> <span class="n">shape_type</span> <span class="o">==</span> <span class="s2">&quot;double_range_list&quot;</span><span class="p">:</span>
-            <span class="n">space</span> <span class="o">=</span> <span class="n">make_box</span><span class="p">(</span>
-                <span class="n">proto</span><span class="o">.</span><span class="n">double_range_list</span><span class="o">.</span><span class="n">range</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
-            <span class="p">)</span>
-
-            <span class="k">def</span> <span class="nf">translate</span><span class="p">(</span><span class="n">observation</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">observation</span><span class="o">.</span><span class="n">double_list</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-
-            <span class="n">to_string</span> <span class="o">=</span> <span class="nb">str</span>
-        <span class="k">elif</span> <span class="n">shape_type</span> <span class="o">==</span> <span class="s2">&quot;string_size_range&quot;</span><span class="p">:</span>
-            <span class="n">space</span> <span class="o">=</span> <span class="n">make_seq</span><span class="p">(</span><span class="n">proto</span><span class="o">.</span><span class="n">string_size_range</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
-
-            <span class="k">def</span> <span class="nf">translate</span><span class="p">(</span><span class="n">observation</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">observation</span><span class="o">.</span><span class="n">string_value</span>
-
-            <span class="n">to_string</span> <span class="o">=</span> <span class="nb">str</span>
-        <span class="k">elif</span> <span class="n">shape_type</span> <span class="o">==</span> <span class="s2">&quot;binary_size_range&quot;</span><span class="p">:</span>
-            <span class="n">space</span> <span class="o">=</span> <span class="n">make_seq</span><span class="p">(</span><span class="n">proto</span><span class="o">.</span><span class="n">binary_size_range</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">None</span><span class="p">))</span>
-
-            <span class="k">def</span> <span class="nf">translate</span><span class="p">(</span><span class="n">observation</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">observation</span><span class="o">.</span><span class="n">binary_value</span>
-
-            <span class="n">to_string</span> <span class="o">=</span> <span class="nb">str</span>
-        <span class="k">elif</span> <span class="n">shape_type</span> <span class="o">==</span> <span class="s2">&quot;scalar_int64_range&quot;</span><span class="p">:</span>
-            <span class="n">space</span> <span class="o">=</span> <span class="n">make_scalar</span><span class="p">(</span>
-                <span class="n">proto</span><span class="o">.</span><span class="n">scalar_int64_range</span><span class="p">,</span>
-                <span class="nb">int</span><span class="p">,</span>
-                <span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span><span class="o">.</span><span class="n">min</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">iinfo</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int64</span><span class="p">)</span><span class="o">.</span><span class="n">max</span><span class="p">),</span>
-            <span class="p">)</span>
-
-            <span class="k">def</span> <span class="nf">translate</span><span class="p">(</span><span class="n">observation</span><span class="p">):</span>
-                <span class="k">return</span> <span class="nb">int</span><span class="p">(</span><span class="n">observation</span><span class="o">.</span><span class="n">scalar_int64</span><span class="p">)</span>
-
-            <span class="n">to_string</span> <span class="o">=</span> <span class="nb">str</span>
-        <span class="k">elif</span> <span class="n">shape_type</span> <span class="o">==</span> <span class="s2">&quot;scalar_double_range&quot;</span><span class="p">:</span>
-            <span class="n">space</span> <span class="o">=</span> <span class="n">make_scalar</span><span class="p">(</span><span class="n">proto</span><span class="o">.</span><span class="n">scalar_double_range</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">))</span>
-
-            <span class="k">def</span> <span class="nf">translate</span><span class="p">(</span><span class="n">observation</span><span class="p">):</span>
-                <span class="k">return</span> <span class="nb">float</span><span class="p">(</span><span class="n">observation</span><span class="o">.</span><span class="n">scalar_double</span><span class="p">)</span>
-
-            <span class="n">to_string</span> <span class="o">=</span> <span class="nb">str</span>
-        <span class="k">elif</span> <span class="n">shape_type</span> <span class="o">==</span> <span class="s2">&quot;double_sequence&quot;</span><span class="p">:</span>
-            <span class="n">space</span> <span class="o">=</span> <span class="n">make_seq</span><span class="p">(</span>
-                <span class="n">proto</span><span class="o">.</span><span class="n">double_sequence</span><span class="o">.</span><span class="n">length_range</span><span class="p">,</span>
-                <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span>
-                <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">),</span>
-                <span class="n">make_scalar</span><span class="p">(</span>
-                    <span class="n">proto</span><span class="o">.</span><span class="n">double_sequence</span><span class="o">.</span><span class="n">scalar_range</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">,</span> <span class="p">(</span><span class="o">-</span><span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">)</span>
-                <span class="p">),</span>
-            <span class="p">)</span>
-
-            <span class="k">def</span> <span class="nf">translate</span><span class="p">(</span><span class="n">observation</span><span class="p">):</span>
-                <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">observation</span><span class="o">.</span><span class="n">double_list</span><span class="o">.</span><span class="n">value</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float64</span><span class="p">)</span>
-
-            <span class="n">to_string</span> <span class="o">=</span> <span class="nb">str</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span>
-                <span class="sa">f</span><span class="s2">&quot;Unknown shape &#39;</span><span class="si">{</span><span class="n">shape_type</span><span class="si">}</span><span class="s2">&#39; for ObservationSpace:</span><span class="se">\n</span><span class="si">{</span><span class="n">proto</span><span class="si">}</span><span class="s2">&quot;</span>
-            <span class="p">)</span>
+        <span class="c1"># TODO(cummins): Additional validation of the observation space</span>
+        <span class="c1"># specification would be useful here, such as making sure that the size</span>
+        <span class="c1"># of {low, high} tensors for box shapes match. At present, these errors</span>
+        <span class="c1"># tend not to show up until later, making it more difficult to debug.</span>
 
         <span class="k">return</span> <span class="bp">cls</span><span class="p">(</span>
             <span class="nb">id</span><span class="o">=</span><span class="n">proto</span><span class="o">.</span><span class="n">name</span><span class="p">,</span>
             <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">,</span>
-            <span class="n">space</span><span class="o">=</span><span class="n">space</span><span class="p">,</span>
-            <span class="n">translate</span><span class="o">=</span><span class="n">translate</span><span class="p">,</span>
-            <span class="n">to_string</span><span class="o">=</span><span class="n">to_string</span><span class="p">,</span>
+            <span class="n">space</span><span class="o">=</span><span class="n">spec</span><span class="p">,</span>
+            <span class="n">translate</span><span class="o">=</span><span class="n">ObservationSpaceSpec</span><span class="o">.</span><span class="n">message_converter</span><span class="p">,</span>
+            <span class="n">to_string</span><span class="o">=</span><span class="nb">str</span><span class="p">,</span>
             <span class="n">deterministic</span><span class="o">=</span><span class="n">proto</span><span class="o">.</span><span class="n">deterministic</span><span class="p">,</span>
             <span class="n">platform_dependent</span><span class="o">=</span><span class="n">proto</span><span class="o">.</span><span class="n">platform_dependent</span><span class="p">,</span>
-            <span class="n">default_value</span><span class="o">=</span><span class="n">translate</span><span class="p">(</span><span class="n">proto</span><span class="o">.</span><span class="n">default_value</span><span class="p">),</span>
+            <span class="n">default_value</span><span class="o">=</span><span class="n">ObservationSpaceSpec</span><span class="o">.</span><span class="n">message_converter</span><span class="p">(</span>
+                <span class="n">proto</span><span class="o">.</span><span class="n">default_observation</span>
+            <span class="p">),</span>
         <span class="p">)</span>
 
 <div class="viewcode-block" id="ObservationSpaceSpec.make_derived_space"><a class="viewcode-back" href="../../../compiler_gym/views.html#compiler_gym.views.ObservationSpaceSpec.make_derived_space">[docs]</a>    <span class="k">def</span> <span class="nf">make_derived_space</span><span class="p">(</span>

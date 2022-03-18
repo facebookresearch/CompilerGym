@@ -1,7 +1,30 @@
 .. image:: /_static/img/logo.png
 
-`CompilerGym <https://github.com/facebookresearch/CompilerGym>`_ is a toolkit
-for applying reinforcement learning to compiler optimizations.
+|pypi| |downloads| |stars| |forks|
+
+.. |pypi| image:: https://badge.fury.io/py/compiler-gym.svg
+   :target: https://pypi.org/project/compiler-gym/
+   :height: 20px
+
+.. |downloads| image:: https://pepy.tech/badge/compiler-gym
+   :target: https://pypi.org/project/compiler-gym/
+   :height: 20px
+
+.. |stars| image:: https://img.shields.io/github/stars/facebookresearch/CompilerGym?style=social
+   :target: https://github.com/facebookresearch/CompilerGym
+   :height: 20px
+
+.. |forks| image:: https://img.shields.io/github/forks/facebookresearch/CompilerGym?style=social
+   :target: https://github.com/facebookresearch/CompilerGym
+   :height: 20px
+
+
+`CompilerGym <https://github.com/facebookresearch/CompilerGym>`_  is a library
+of easy to use and performant reinforcement learning environments for compiler
+tasks. It allows ML researchers to interact with important compiler optimization
+problems in a language and vocabulary with which they are comfortable, and
+provides a toolkit for systems developers to expose new compiler tasks for ML
+research. We aim to act as a catalyst for making compilers faster using ML.
 
 .. toctree::
    :maxdepth: 1

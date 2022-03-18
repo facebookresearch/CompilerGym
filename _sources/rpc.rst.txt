@@ -95,40 +95,103 @@ Core Message Types
 .. doxygenstruct:: ActionSpace
    :members:
 
-.. doxygenstruct:: Action
-   :members:
-
-.. doxygenstruct:: ChoiceSpace
-   :members:
-
-.. doxygenstruct:: Choice
-   :members:
-
 .. doxygenstruct:: ObservationSpace
    :members:
 
-.. doxygenstruct:: Observation
+.. doxygenstruct:: Event
+   :members:
+
+.. doxygenstruct:: BooleanTensor
+   :members:
+
+.. doxygenstruct:: ByteTensor
+   :members:
+
+.. doxygenstruct:: Int64Tensor
+   :members:
+
+.. doxygenstruct:: FloatTensor
+   :members:
+
+.. doxygenstruct:: DoubleTensor
+   :members:
+
+.. doxygenstruct:: StringTensor
+   :members:
+
+.. doxygenstruct:: BooleanRange
+   :members:
+
+.. doxygenstruct:: Int64Range
+   :members:
+
+.. doxygenstruct:: FloatRange
+   :members:
+
+.. doxygenstruct:: DoubleRange
+   :members:
+
+.. doxygenstruct:: BooleanBox
+   :members:
+
+.. doxygenstruct:: ByteBox
+   :members:
+
+.. doxygenstruct:: Int64Box
+   :members:
+
+.. doxygenstruct:: FloatBox
+   :members:
+
+.. doxygenstruct:: DoubleBox
+   :members:
+
+.. doxygenstruct:: ListSpace
+   :members:
+
+.. doxygenstruct:: DictSpace
+   :members:
+
+.. doxygenstruct:: DiscreteSpace
    :members:
 
 .. doxygenstruct:: NamedDiscreteSpace
    :members:
 
-.. doxygenstruct:: Int64List
+.. doxygenstruct:: BooleanSequenceSpace
    :members:
 
-.. doxygenstruct:: DoubleList
+.. doxygenstruct:: ByteSequenceSpace
    :members:
 
-.. doxygenstruct:: ScalarRange
+.. doxygenstruct:: BytesSequenceSpace
    :members:
 
-.. doxygenstruct:: ScalarLimit
+.. doxygenstruct:: Int64SequenceSpace
    :members:
 
-.. doxygenstruct:: ScalarRangeList
+.. doxygenstruct:: FloatSequenceSpace
    :members:
 
-.. doxygenstruct:: SequenceSpace
+.. doxygenstruct:: DoubleSequenceSpace
+   :members:
+
+.. doxygenstruct:: StringSequenceSpace
+   :members:
+
+.. doxygenstruct:: StringSpace
+   :members:
+
+.. doxygenstruct:: Opaque
+   :members:
+
+.. doxygenstruct:: CommandlineSpace
+   :members:
+
+.. doxygenstruct:: ListEvent
+   :members:
+
+.. doxygenstruct:: DictEvent
    :members:
 
 .. doxygenstruct:: Benchmark

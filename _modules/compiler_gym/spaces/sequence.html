@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.spaces.sequence &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>compiler_gym.spaces.sequence &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
   
 
   
@@ -69,7 +71,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -202,8 +204,10 @@
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
+<span class="kn">import</span> <span class="nn">numpy</span> <span class="k">as</span> <span class="nn">np</span>
 <span class="kn">from</span> <span class="nn">gym.spaces</span> <span class="kn">import</span> <span class="n">Space</span>
 
+<span class="kn">from</span> <span class="nn">compiler_gym.spaces.common</span> <span class="kn">import</span> <span class="n">issubdtype</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.spaces.scalar</span> <span class="kn">import</span> <span class="n">Scalar</span>
 
 
@@ -292,15 +296,18 @@
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="ow">in</span> <span class="p">{</span><span class="nb">str</span><span class="p">,</span> <span class="nb">bytes</span><span class="p">}:</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
                 <span class="k">return</span> <span class="kc">False</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">element</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
-                    <span class="k">return</span> <span class="kc">False</span>
+        <span class="k">elif</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="s2">&quot;dtype&quot;</span><span class="p">):</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">issubdtype</span><span class="p">(</span><span class="n">x</span><span class="o">.</span><span class="n">dtype</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+                <span class="k">return</span> <span class="kc">False</span>
 
         <span class="c1"># Run the bounds check on every scalar element, if there is a scalar</span>
         <span class="c1"># range specified.</span>
-        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar_range</span><span class="p">:</span>
+        <span class="k">elif</span> <span class="bp">self</span><span class="o">.</span><span class="n">scalar_range</span><span class="p">:</span>
             <span class="k">return</span> <span class="nb">all</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">scalar_range</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">s</span><span class="p">)</span> <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">x</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">element</span> <span class="ow">in</span> <span class="n">x</span><span class="p">:</span>
+                <span class="k">if</span> <span class="ow">not</span> <span class="n">issubdtype</span><span class="p">(</span><span class="nb">type</span><span class="p">(</span><span class="n">element</span><span class="p">),</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">):</span>
+                    <span class="k">return</span> <span class="kc">False</span>
 
         <span class="k">return</span> <span class="kc">True</span></div>
 
@@ -318,7 +325,7 @@
             <span class="k">return</span> <span class="kc">False</span>
         <span class="k">return</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">size_range</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">size_range</span>
-            <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">dtype</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">dtype</span>
+            <span class="ow">and</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span> <span class="o">==</span> <span class="n">np</span><span class="o">.</span><span class="n">dtype</span><span class="p">(</span><span class="n">other</span><span class="o">.</span><span class="n">dtype</span><span class="p">)</span>
             <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">opaque_data_format</span> <span class="o">==</span> <span class="n">other</span><span class="o">.</span><span class="n">opaque_data_format</span>
         <span class="p">)</span></div>
 </pre></div>

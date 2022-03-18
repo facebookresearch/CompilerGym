@@ -235,11 +235,19 @@
 <span class="kn">from</span> <span class="nn">compiler_gym.util.truncate</span> <span class="kn">import</span> <span class="n">truncate_lines</span>
 
 <span class="n">GRPC_CHANNEL_OPTIONS</span> <span class="o">=</span> <span class="p">[</span>
-    <span class="c1"># Raise the default inbound message filter from 4MB.</span>
-    <span class="p">(</span><span class="s2">&quot;grpc.max_receive_message_length&quot;</span><span class="p">,</span> <span class="mi">512</span> <span class="o">*</span> <span class="mi">1024</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">),</span>
+    <span class="c1"># Disable the inbound message length filter to allow for large messages such</span>
+    <span class="c1"># as observations.</span>
+    <span class="p">(</span><span class="s2">&quot;grpc.max_send_message_length&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+    <span class="p">(</span><span class="s2">&quot;grpc.max_receive_message_length&quot;</span><span class="p">,</span> <span class="o">-</span><span class="mi">1</span><span class="p">),</span>
+    <span class="c1"># Fix for &quot;received initial metadata size exceeds limit&quot;</span>
+    <span class="p">(</span><span class="s2">&quot;grpc.max_metadata_size&quot;</span><span class="p">,</span> <span class="mi">512</span> <span class="o">*</span> <span class="mi">1024</span><span class="p">),</span>
     <span class="c1"># Spurious error UNAVAILABLE &quot;Trying to connect an http1.x server&quot;.</span>
     <span class="c1"># https://putridparrot.com/blog/the-unavailable-trying-to-connect-an-http1-x-server-grpc-error/</span>
     <span class="p">(</span><span class="s2">&quot;grpc.enable_http_proxy&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+    <span class="c1"># Disable TCP port re-use to mitigate port conflict errors when starting</span>
+    <span class="c1"># many services in parallel. Context:</span>
+    <span class="c1"># https://github.com/facebookresearch/CompilerGym/issues/572</span>
+    <span class="p">(</span><span class="s2">&quot;grpc.so_reuseport&quot;</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
 <span class="p">]</span>
 
 <span class="n">logger</span> <span class="o">=</span> <span class="n">logging</span><span class="o">.</span><span class="n">getLogger</span><span class="p">(</span><span class="vm">__name__</span><span class="p">)</span>
@@ -396,7 +404,7 @@
             <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
                 <span class="k">if</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span> <span class="o">==</span> <span class="s2">&quot;Cannot invoke RPC on closed channel!&quot;</span><span class="p">:</span>
                     <span class="k">raise</span> <span class="n">ServiceIsClosed</span><span class="p">(</span>
-                        <span class="sa">f</span><span class="s2">&quot;RPC communication failed with message: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
+                        <span class="s2">&quot;RPC communication failed because channel is closed&quot;</span>
                     <span class="p">)</span> <span class="kn">from</span> <span class="bp">None</span>
                 <span class="k">raise</span> <span class="n">e</span>
             <span class="k">except</span> <span class="n">grpc</span><span class="o">.</span><span class="n">RpcError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
@@ -726,8 +734,11 @@
             <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="n">alive_or_dead</span> <span class="o">=</span> <span class="s2">&quot;alive&quot;</span> <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span> <span class="k">else</span> <span class="s2">&quot;dead&quot;</span>
-        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2"> running on PID=</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">pid</span><span class="si">}</span><span class="s2"> (</span><span class="si">{</span><span class="n">alive_or_dead</span><span class="si">}</span><span class="s2">)&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">poll</span><span class="p">()</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;Connection to service at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2"> running on PID </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">process</span><span class="o">.</span><span class="n">pid</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Connection to dead service at </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span>
 
 
 <span class="k">class</span> <span class="nc">UnmanagedConnection</span><span class="p">(</span><span class="n">Connection</span><span class="p">):</span>
@@ -767,7 +778,7 @@
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">channel</span><span class="p">,</span> <span class="n">url</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="fm">__repr__</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">url</span>
+        <span class="k">return</span> <span class="sa">f</span><span class="s2">&quot;Connection to unmanaged service </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span>
 
 
 <div class="viewcode-block" id="CompilerGymServiceConnection"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.CompilerGymServiceConnection">[docs]</a><span class="k">class</span> <span class="nc">CompilerGymServiceConnection</span><span class="p">:</span>

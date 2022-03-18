@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.views.reward &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>compiler_gym.views.reward &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
   
 
   
@@ -69,7 +71,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -273,17 +275,17 @@
 
 <span class="sd">        :param space: The reward space to be added.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">if</span> <span class="n">space</span><span class="o">.</span><span class="n">id</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">:</span>
-            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Replacing existing reward space &#39;</span><span class="si">{</span><span class="n">space</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">space</span><span class="o">.</span><span class="n">name</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Replacing existing reward space &#39;</span><span class="si">{</span><span class="n">space</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_add_space</span><span class="p">(</span><span class="n">space</span><span class="p">)</span></div>
 
     <span class="k">def</span> <span class="nf">_add_space</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">space</span><span class="p">:</span> <span class="n">Reward</span><span class="p">):</span>
         <span class="sd">&quot;&quot;&quot;Register a new space.&quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">space</span><span class="o">.</span><span class="n">id</span><span class="p">]</span> <span class="o">=</span> <span class="n">space</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">spaces</span><span class="p">[</span><span class="n">space</span><span class="o">.</span><span class="n">name</span><span class="p">]</span> <span class="o">=</span> <span class="n">space</span>
         <span class="c1"># Bind a new method to this class that is a callback to compute the</span>
-        <span class="c1"># given reward space. E.g. if a new space is added with ID `FooBar`,</span>
+        <span class="c1"># given reward space. E.g. if a new space is added with name `FooBar`,</span>
         <span class="c1"># this reward can be computed using env.reward.FooBar().</span>
-        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">space</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="n">space</span><span class="o">.</span><span class="n">id</span><span class="p">])</span></div>
+        <span class="nb">setattr</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">space</span><span class="o">.</span><span class="n">name</span><span class="p">,</span> <span class="k">lambda</span><span class="p">:</span> <span class="bp">self</span><span class="p">[</span><span class="n">space</span><span class="o">.</span><span class="n">name</span><span class="p">])</span></div>
 </pre></div>
 
            </div>

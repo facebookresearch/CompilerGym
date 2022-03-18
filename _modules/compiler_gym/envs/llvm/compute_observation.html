@@ -209,7 +209,7 @@
 
 <span class="kn">import</span> <span class="nn">google.protobuf.text_format</span>
 
-<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">Observation</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">Event</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.commands</span> <span class="kn">import</span> <span class="n">Popen</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.gym_type_hints</span> <span class="kn">import</span> <span class="n">ObservationType</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.runfiles_path</span> <span class="kn">import</span> <span class="n">runfiles_path</span>
@@ -305,7 +305,7 @@
             <span class="sa">f</span><span class="s2">&quot;Failed to parse </span><span class="si">{</span><span class="n">observation_space</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> observation: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span>
         <span class="p">)</span> <span class="kn">from</span> <span class="nn">e</span>
 
-    <span class="n">observation</span> <span class="o">=</span> <span class="n">Observation</span><span class="p">()</span>
+    <span class="n">observation</span> <span class="o">=</span> <span class="n">Event</span><span class="p">()</span>
     <span class="k">try</span><span class="p">:</span>
         <span class="n">google</span><span class="o">.</span><span class="n">protobuf</span><span class="o">.</span><span class="n">text_format</span><span class="o">.</span><span class="n">Parse</span><span class="p">(</span><span class="n">stdout</span><span class="p">,</span> <span class="n">observation</span><span class="p">)</span>
     <span class="k">except</span> <span class="n">google</span><span class="o">.</span><span class="n">protobuf</span><span class="o">.</span><span class="n">text_format</span><span class="o">.</span><span class="n">ParseError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>

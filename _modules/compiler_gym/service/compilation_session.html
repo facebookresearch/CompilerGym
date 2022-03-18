@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.service.compilation_session &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>compiler_gym.service.compilation_session &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
   
 
   
@@ -69,7 +71,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -203,13 +205,10 @@
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span>
 
-<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="p">(</span>
-    <span class="n">Action</span><span class="p">,</span>
-    <span class="n">ActionSpace</span><span class="p">,</span>
-    <span class="n">Benchmark</span><span class="p">,</span>
-    <span class="n">Observation</span><span class="p">,</span>
-    <span class="n">ObservationSpace</span><span class="p">,</span>
-<span class="p">)</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">ActionSpace</span><span class="p">,</span> <span class="n">Benchmark</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">Event</span> <span class="k">as</span> <span class="n">Action</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">Event</span> <span class="k">as</span> <span class="n">Observation</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">ObservationSpace</span>
 
 
 <div class="viewcode-block" id="CompilationSession"><a class="viewcode-back" href="../../../compiler_gym/service.html#compiler_gym.service.CompilationSession">[docs]</a><span class="k">class</span> <span class="nc">CompilationSession</span><span class="p">:</span>

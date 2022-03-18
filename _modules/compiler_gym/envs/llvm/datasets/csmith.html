@@ -214,6 +214,7 @@
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">BenchmarkSource</span><span class="p">,</span> <span class="n">Dataset</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets.benchmark</span> <span class="kn">import</span> <span class="n">BenchmarkInitError</span><span class="p">,</span> <span class="n">BenchmarkWithSource</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets.uri</span> <span class="kn">import</span> <span class="n">BenchmarkUri</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm</span> <span class="kn">import</span> <span class="n">llvm_benchmark</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm.llvm_benchmark</span> <span class="kn">import</span> <span class="n">ClangInvocation</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">BenchmarkDynamicConfig</span><span class="p">,</span> <span class="n">Command</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.commands</span> <span class="kn">import</span> <span class="n">Popen</span><span class="p">,</span> <span class="n">communicate</span>
@@ -242,7 +243,7 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">proto</span><span class="o">.</span><span class="n">dynamic_config</span><span class="o">.</span><span class="n">MergeFrom</span><span class="p">(</span>
             <span class="n">BenchmarkDynamicConfig</span><span class="p">(</span>
                 <span class="n">build_cmd</span><span class="o">=</span><span class="n">Command</span><span class="p">(</span>
-                    <span class="n">argument</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;$CC&quot;</span><span class="p">,</span> <span class="s2">&quot;$IN&quot;</span><span class="p">],</span>
+                    <span class="n">argument</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;$CC&quot;</span><span class="p">,</span> <span class="s2">&quot;$IN&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">llvm_benchmark</span><span class="o">.</span><span class="n">get_system_library_flags</span><span class="p">(),</span>
                     <span class="n">outfile</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a.out&quot;</span><span class="p">],</span>
                     <span class="n">timeout_seconds</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
                 <span class="p">),</span>

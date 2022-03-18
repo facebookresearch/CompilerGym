@@ -217,12 +217,14 @@
 <span class="kn">from</span> <span class="nn">collections</span> <span class="kn">import</span> <span class="n">defaultdict</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Lock</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Callable</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">NamedTuple</span><span class="p">,</span> <span class="n">Optional</span>
 
 <span class="kn">import</span> <span class="nn">fasteners</span>
 
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets</span> <span class="kn">import</span> <span class="n">Benchmark</span><span class="p">,</span> <span class="n">TarDatasetWithManifest</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.datasets.benchmark</span> <span class="kn">import</span> <span class="n">ValidationCallback</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.datasets.uri</span> <span class="kn">import</span> <span class="n">BenchmarkUri</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.envs.llvm</span> <span class="kn">import</span> <span class="n">llvm_benchmark</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.service.proto</span> <span class="kn">import</span> <span class="n">BenchmarkDynamicConfig</span><span class="p">,</span> <span class="n">Command</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.third_party</span> <span class="kn">import</span> <span class="n">llvm</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.util.commands</span> <span class="kn">import</span> <span class="n">Popen</span>
@@ -470,7 +472,7 @@
     <span class="n">pre_execution_callback</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="n">Path</span><span class="p">],</span> <span class="kc">None</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">sanitizer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LlvmSanitizer</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="n">flakiness</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Callable</span><span class="p">[[</span><span class="s2">&quot;LlvmEnv&quot;</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="n">ValidationError</span><span class="p">]]:</span>  <span class="c1"># noqa: F821</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ValidationCallback</span><span class="p">:</span>
     <span class="sd">&quot;&quot;&quot;Construct a validation callback for a cBench benchmark. See validator() for usage.&quot;&quot;&quot;</span>
     <span class="n">input_files</span> <span class="o">=</span> <span class="n">input_files</span> <span class="ow">or</span> <span class="p">[]</span>
     <span class="n">output_files</span> <span class="o">=</span> <span class="n">output_files</span> <span class="ow">or</span> <span class="p">[]</span>
@@ -608,6 +610,11 @@
                 <span class="c1"># Timeout errors can be raised by the environment in case of a</span>
                 <span class="c1"># slow step / observation, and should be retried.</span>
                 <span class="k">pass</span>
+
+            <span class="c1"># No point in repeating compilation failures as they are not flaky.</span>
+            <span class="k">if</span> <span class="n">error</span><span class="o">.</span><span class="n">type</span> <span class="o">==</span> <span class="s2">&quot;Compilation failed&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">error</span>
+
             <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span>
                 <span class="s2">&quot;Validation callback failed (</span><span class="si">%s</span><span class="s2">), attempt=</span><span class="si">%d</span><span class="s2">/</span><span class="si">%d</span><span class="s2">&quot;</span><span class="p">,</span>
                 <span class="n">error</span><span class="o">.</span><span class="n">type</span><span class="p">,</span>
@@ -616,7 +623,16 @@
             <span class="p">)</span>
         <span class="k">return</span> <span class="n">error</span>
 
-    <span class="k">return</span> <span class="n">flaky_wrapped_cb</span>
+    <span class="c1"># The flaky_wrapped_cb() function takes an environment and produces a single</span>
+    <span class="c1"># error. We need the validator to produce an iterable of errors.</span>
+    <span class="k">def</span> <span class="nf">adapt_validator_return_type</span><span class="p">(</span>
+        <span class="n">env</span><span class="p">:</span> <span class="s2">&quot;LlvmEnv&quot;</span><span class="p">,</span>  <span class="c1"># noqa: F821</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ValidationError</span><span class="p">]:</span>
+        <span class="n">error</span> <span class="o">=</span> <span class="n">flaky_wrapped_cb</span><span class="p">(</span><span class="n">env</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">error</span><span class="p">:</span>
+            <span class="k">yield</span> <span class="n">error</span>
+
+    <span class="k">return</span> <span class="n">adapt_validator_return_type</span>
 
 
 <span class="k">def</span> <span class="nf">validator</span><span class="p">(</span>
@@ -693,7 +709,9 @@
     <span class="n">DYNAMIC_CONFIGS</span><span class="p">[</span><span class="n">uri</span><span class="o">.</span><span class="n">path</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
         <span class="n">BenchmarkDynamicConfig</span><span class="p">(</span>
             <span class="n">build_cmd</span><span class="o">=</span><span class="n">Command</span><span class="p">(</span>
-                <span class="n">argument</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;$CC&quot;</span><span class="p">,</span> <span class="s2">&quot;$IN&quot;</span><span class="p">]</span> <span class="o">+</span> <span class="n">linkopts</span><span class="p">,</span>
+                <span class="n">argument</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;$CC&quot;</span><span class="p">,</span> <span class="s2">&quot;$IN&quot;</span><span class="p">]</span>
+                <span class="o">+</span> <span class="n">llvm_benchmark</span><span class="o">.</span><span class="n">get_system_library_flags</span><span class="p">()</span>
+                <span class="o">+</span> <span class="n">linkopts</span><span class="p">,</span>
                 <span class="n">timeout_seconds</span><span class="o">=</span><span class="mi">60</span><span class="p">,</span>
                 <span class="n">outfile</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;a.out&quot;</span><span class="p">],</span>
             <span class="p">),</span>
@@ -857,9 +875,7 @@
 
 
 <span class="c1"># A map from benchmark name to validation callbacks.</span>
-<span class="n">VALIDATORS</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span>
-    <span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Callable</span><span class="p">[[</span><span class="s2">&quot;LlvmEnv&quot;</span><span class="p">],</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]]]</span>  <span class="c1"># noqa: F821</span>
-<span class="p">]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+<span class="n">VALIDATORS</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">ValidationCallback</span><span class="p">]]</span> <span class="o">=</span> <span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
 
 
 <span class="c1"># A map from cBench benchmark path to a list of BenchmarkDynamicConfig messages,</span>

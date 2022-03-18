@@ -107,13 +107,19 @@
 <li class="toctree-l1"><a class="reference internal" href="changelog.html">Changelog</a></li>
 <li class="toctree-l1"><a class="reference internal" href="contributing.html">Contributing</a></li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Frequently Asked Questions</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#what-can-i-do-with-this">What can I do with this?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#do-i-have-to-use-reinforcement-learning">Do I have to use reinforcement learning?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#what-features-are-going-to-be-added-in-the-future">What features are going to be added in the future?</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#development">Development</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#usage">Usage</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#what-can-i-do-with-this">What can I do with this?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#do-i-have-to-use-reinforcement-learning">Do I have to use reinforcement learning?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#why-does-my-environment-s-step-function-return-done">Why does my environment’s step() function return “done”?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#how-do-i-debug-crashes-or-errors">How do I debug crashes or errors?</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#i-found-a-bug-how-do-i-report-it">I found a bug. How do I report it?</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#development">Development</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#what-features-are-going-to-be-added-in-the-future">What features are going to be added in the future?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#i-want-to-modify-a-compilergym-environment-where-do-i-start">I want to modify a CompilerGym environment, where do I start?</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#i-want-to-add-a-new-compilergym-environment-where-do-i-start">I want to add a new CompilerGym environment, where do I start?</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#i-updated-with-git-pull-and-now-it-doesn-t-work">I updated with “git pull” and now it doesn’t work</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#i-want-to-add-a-new-program-representation-reward-signal-how-do-i-do-that">I want to add a new program representation / reward signal. How do I do that?</a></li>
 </ul>
 </li>
 </ul>
@@ -219,20 +225,29 @@ question not answered here? File an issue on the <a class="reference external" h
 <div class="contents local topic" id="topics">
 <p class="topic-title">Topics:</p>
 <ul class="simple">
-<li><p><a class="reference internal" href="#what-can-i-do-with-this" id="id3">What can I do with this?</a></p></li>
-<li><p><a class="reference internal" href="#do-i-have-to-use-reinforcement-learning" id="id4">Do I have to use reinforcement learning?</a></p></li>
-<li><p><a class="reference internal" href="#what-features-are-going-to-be-added-in-the-future" id="id5">What features are going to be added in the future?</a></p></li>
-<li><p><a class="reference internal" href="#development" id="id6">Development</a></p>
+<li><p><a class="reference internal" href="#usage" id="id3">Usage</a></p>
 <ul>
-<li><p><a class="reference internal" href="#i-found-a-bug-how-do-i-report-it" id="id7">I found a bug. How do I report it?</a></p></li>
-<li><p><a class="reference internal" href="#i-updated-with-git-pull-and-now-it-doesn-t-work" id="id8">I updated with “git pull” and now it doesn’t work</a></p></li>
-<li><p><a class="reference internal" href="#i-want-to-add-a-new-program-representation-reward-signal-how-do-i-do-that" id="id9">I want to add a new program representation / reward signal. How do I do that?</a></p></li>
+<li><p><a class="reference internal" href="#what-can-i-do-with-this" id="id4">What can I do with this?</a></p></li>
+<li><p><a class="reference internal" href="#do-i-have-to-use-reinforcement-learning" id="id5">Do I have to use reinforcement learning?</a></p></li>
+<li><p><a class="reference internal" href="#why-does-my-environment-s-step-function-return-done" id="id6">Why does my environment’s step() function return “done”?</a></p></li>
+<li><p><a class="reference internal" href="#how-do-i-debug-crashes-or-errors" id="id7">How do I debug crashes or errors?</a></p></li>
+<li><p><a class="reference internal" href="#i-found-a-bug-how-do-i-report-it" id="id8">I found a bug. How do I report it?</a></p></li>
+</ul>
+</li>
+<li><p><a class="reference internal" href="#development" id="id9">Development</a></p>
+<ul>
+<li><p><a class="reference internal" href="#what-features-are-going-to-be-added-in-the-future" id="id10">What features are going to be added in the future?</a></p></li>
+<li><p><a class="reference internal" href="#i-want-to-modify-a-compilergym-environment-where-do-i-start" id="id11">I want to modify a CompilerGym environment, where do I start?</a></p></li>
+<li><p><a class="reference internal" href="#i-want-to-add-a-new-compilergym-environment-where-do-i-start" id="id12">I want to add a new CompilerGym environment, where do I start?</a></p></li>
+<li><p><a class="reference internal" href="#i-updated-with-git-pull-and-now-it-doesn-t-work" id="id13">I updated with “git pull” and now it doesn’t work</a></p></li>
 </ul>
 </li>
 </ul>
 </div>
+<div class="section" id="usage">
+<h2><a class="toc-backref" href="#id3">Usage</a><a class="headerlink" href="#usage" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="what-can-i-do-with-this">
-<h2><a class="toc-backref" href="#id3">What can I do with this?</a><a class="headerlink" href="#what-can-i-do-with-this" title="Permalink to this headline">¶</a></h2>
+<h3><a class="toc-backref" href="#id4">What can I do with this?</a><a class="headerlink" href="#what-can-i-do-with-this" title="Permalink to this headline">¶</a></h3>
 <p>CompilerGym lets you control the decisions that a compiler makes when optimizing
 a program. Currently, it lets you control the selection and ordering of
 optimization passes for LLVM, the command line flags for the GCC compiler, and
@@ -241,7 +256,7 @@ producing the best compiled program, as determined by a reward signal that
 measures some property of the program such as its code size or execution time.</p>
 </div>
 <div class="section" id="do-i-have-to-use-reinforcement-learning">
-<h2><a class="toc-backref" href="#id4">Do I have to use reinforcement learning?</a><a class="headerlink" href="#do-i-have-to-use-reinforcement-learning" title="Permalink to this headline">¶</a></h2>
+<h3><a class="toc-backref" href="#id5">Do I have to use reinforcement learning?</a><a class="headerlink" href="#do-i-have-to-use-reinforcement-learning" title="Permalink to this headline">¶</a></h3>
 <p>No. We think that the the gym provides a useful abstraction for sequential
 decision making. You may use any technique you wish to explore the optimization
 space. Researchers have had success using search techniques, genetic algorithms,
@@ -249,19 +264,112 @@ supervised and unsupervised machine learning, and deep reinforcement learning.
 Take a look at <a class="reference external" href="https://chriscummins.cc/pub/2020-fdl.pdf">this paper</a> for a
 brief introduction to the field.</p>
 </div>
-<div class="section" id="what-features-are-going-to-be-added-in-the-future">
-<h2><a class="toc-backref" href="#id5">What features are going to be added in the future?</a><a class="headerlink" href="#what-features-are-going-to-be-added-in-the-future" title="Permalink to this headline">¶</a></h2>
-<p>See <a class="reference internal" href="about.html#roadmap"><span class="std std-ref">roadmap</span></a>.</p>
+<div class="section" id="why-does-my-environment-s-step-function-return-done">
+<h3><a class="toc-backref" href="#id6">Why does my environment’s step() function return “done”?</a><a class="headerlink" href="#why-does-my-environment-s-step-function-return-done" title="Permalink to this headline">¶</a></h3>
+<p>The third element of the tuple returned by <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.step" title="compiler_gym.envs.CompilerEnv.step"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.step()</span></code></a> is a boolean that indicates whether the
+current episode is “done”. There are two reasons why an episode may be “done”:</p>
+<ol class="arabic simple">
+<li><p>A terminal state has been reached, as defined by the dynamics of the
+environment. This could be because there are no further decisions to be made,
+or because of an artificial limit to the episode length such as provided by
+the <a class="reference internal" href="compiler_gym/wrappers.html#compiler_gym.wrappers.TimeLimit" title="compiler_gym.wrappers.TimeLimit"><code class="xref py py-class docutils literal notranslate"><span class="pre">TimeLimit</span></code></a> and
+<a class="reference internal" href="compiler_gym/wrappers.html#compiler_gym.wrappers.CommandlineWithTerminalAction" title="compiler_gym.wrappers.CommandlineWithTerminalAction"><code class="xref py py-class docutils literal notranslate"><span class="pre">CommandlineWithTerminalAction</span></code></a> wrappers.</p></li>
+<li><p>The environment has encountered an unrecoverable error and can no longer
+proceed with the episode. This could be because of an error such as a
+compiler crashing, a timeout from an action that takes too long, or an
+overloaded system causing an out-of-memory error.</p></li>
+</ol>
+<p>In case of an unrecoverable error, CompilerGym will provide a description of the
+error through a string <code class="code docutils literal notranslate"><span class="pre">error_details</span></code> in the returned <code class="code docutils literal notranslate"><span class="pre">info</span></code> dict:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span> <span class="nn">compiler_gym</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span> <span class="o">=</span> <span class="n">compiler_gym</span><span class="o">.</span><span class="n">make</span><span class="p">(</span><span class="s2">&quot;llvm-v0&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1000</span><span class="p">):</span>
+<span class="gp">... </span>    <span class="n">observation</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">env</span><span class="o">.</span><span class="n">action_space</span><span class="o">.</span><span class="n">sample</span><span class="p">())</span>
+<span class="gp">... </span>    <span class="k">if</span> <span class="n">done</span><span class="p">:</span>
+<span class="gp">... </span>        <span class="nb">print</span><span class="p">(</span><span class="n">info</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;error_details&quot;</span><span class="p">))</span>
+<span class="gp">... </span>        <span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">()</span>
+</pre></div>
 </div>
-<div class="section" id="development">
-<h2><a class="toc-backref" href="#id6">Development</a><a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
+<p>In either case, calling <a class="reference internal" href="compiler_gym/envs.html#compiler_gym.envs.CompilerEnv.reset" title="compiler_gym.envs.CompilerEnv.reset"><code class="xref py py-meth docutils literal notranslate"><span class="pre">env.reset()</span></code></a> will reset the environment and start a
+new episode.</p>
+</div>
+<div class="section" id="how-do-i-debug-crashes-or-errors">
+<h3><a class="toc-backref" href="#id7">How do I debug crashes or errors?</a><a class="headerlink" href="#how-do-i-debug-crashes-or-errors" title="Permalink to this headline">¶</a></h3>
+<p>The first step is to produce a minimal, reproducible example. The easiest way to
+do this is usually to copy your code into a new file and to iteratively remove
+as many dependencies and chunks of code as possible while still preserving the
+error behavior of interest. Second, you can inspect CompilerGym’s logging
+output.</p>
+<p>CompilerGym uses Python’s built in logging mechanism, but emits warning and
+error messages sparingly. In normal use, the logging messages from CompilerGym
+will not be seen by users. To enable these messages to be logged to standard out
+insert the following snippet at the start of your script, before instantiating
+any CompilerGym environments:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+<span class="c1"># ... rest of script</span>
+</pre></div>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>CompilerGym uses per-module loggers. For fine-grained control over logging,
+access the <code class="code docutils literal notranslate"><span class="pre">compiler_gym</span></code> logger or its children.</p>
+</div>
+<p>Additionally, even-more-verbose logging can be enabled by setting the environment
+variable <code class="code docutils literal notranslate"><span class="pre">COMPILER_GYM_DEBUG</span></code> to 4:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">os</span>
+<span class="n">os</span><span class="o">.</span><span class="n">environ</span><span class="p">[</span><span class="s2">&quot;COMPILER_GYM_DEBUG&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="s2">&quot;4&quot;</span>
+<span class="n">logging</span><span class="o">.</span><span class="n">basicConfig</span><span class="p">(</span><span class="n">level</span><span class="o">=</span><span class="n">logging</span><span class="o">.</span><span class="n">DEBUG</span><span class="p">)</span>
+
+<span class="c1"># ... rest of script</span>
+</pre></div>
+</div>
+<p>Inspecting the verbose logs may help understand what is going on, and is
+incredibly helpful when reporting bugs. See <a class="reference internal" href="#report-bug"><span class="std std-ref">I found a bug. How do I report it?</span></a>.</p>
+</div>
 <div class="section" id="i-found-a-bug-how-do-i-report-it">
-<h3><a class="toc-backref" href="#id7">I found a bug. How do I report it?</a><a class="headerlink" href="#i-found-a-bug-how-do-i-report-it" title="Permalink to this headline">¶</a></h3>
+<span id="report-bug"></span><h3><a class="toc-backref" href="#id8">I found a bug. How do I report it?</a><a class="headerlink" href="#i-found-a-bug-how-do-i-report-it" title="Permalink to this headline">¶</a></h3>
 <p>Great! Please file an issue using the <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/issues">GitHub issue tracker</a>.  See
 <a class="reference internal" href="contributing.html"><span class="doc">Contributing</span></a> for more details.</p>
 </div>
+</div>
+<div class="section" id="development">
+<h2><a class="toc-backref" href="#id9">Development</a><a class="headerlink" href="#development" title="Permalink to this headline">¶</a></h2>
+<div class="section" id="what-features-are-going-to-be-added-in-the-future">
+<h3><a class="toc-backref" href="#id10">What features are going to be added in the future?</a><a class="headerlink" href="#what-features-are-going-to-be-added-in-the-future" title="Permalink to this headline">¶</a></h3>
+<p>See <a class="reference internal" href="about.html#roadmap"><span class="std std-ref">roadmap</span></a>.</p>
+</div>
+<div class="section" id="i-want-to-modify-a-compilergym-environment-where-do-i-start">
+<h3><a class="toc-backref" href="#id11">I want to modify a CompilerGym environment, where do I start?</a><a class="headerlink" href="#i-want-to-modify-a-compilergym-environment-where-do-i-start" title="Permalink to this headline">¶</a></h3>
+<p>Many modifications to CompilerGym environments can be achieved through
+<a class="reference internal" href="compiler_gym/wrappers.html#module-compiler_gym.wrappers" title="compiler_gym.wrappers"><code class="xref py py-mod docutils literal notranslate"><span class="pre">wrappers</span></code></a>. For example, you can use the existing
+wrappers to artificially limit the length of episodes using <a class="reference internal" href="compiler_gym/wrappers.html#compiler_gym.wrappers.TimeLimit" title="compiler_gym.wrappers.TimeLimit"><code class="xref py py-class docutils literal notranslate"><span class="pre">TimeLimit</span></code></a>, constrain the actions available to the agent
+through <a class="reference internal" href="compiler_gym/wrappers.html#compiler_gym.wrappers.ConstrainedCommandline" title="compiler_gym.wrappers.ConstrainedCommandline"><code class="xref py py-class docutils literal notranslate"><span class="pre">ConstrainedCommandline</span></code></a>, or randomize the benchmark that
+is selected on <code class="code docutils literal notranslate"><span class="pre">reset()</span></code> using <a class="reference internal" href="compiler_gym/wrappers.html#compiler_gym.wrappers.RandomOrderBenchmarks" title="compiler_gym.wrappers.RandomOrderBenchmarks"><code class="xref py py-class docutils literal notranslate"><span class="pre">RandomOrderBenchmarks</span></code></a>.</p>
+<p>Many new types of modular transformations can be implemented by extending the
+base wrapper classes. For example, custom reward shaping can be implemented by
+implementing the <code class="code docutils literal notranslate"><span class="pre">reward()</span></code> method in <a class="reference internal" href="compiler_gym/wrappers.html#compiler_gym.wrappers.RewardWrapper" title="compiler_gym.wrappers.RewardWrapper"><code class="xref py py-class docutils literal notranslate"><span class="pre">RewardWrapper</span></code></a>.</p>
+<p>For more invasive changes, you may need to modify the underlying environment
+implementation. To do that, fork this project and build it from source (see
+<a class="reference external" href="https://github.com/facebookresearch/CompilerGym/blob/development/INSTALL.md">installation</a>).
+Then modify the compiler service implementation for the compiler that you are
+interested in. The service codebase is located at
+<code class="code docutils literal notranslate"><span class="pre">compiler_gym/envs/$COMPILER/service</span></code>, where <code class="code docutils literal notranslate"><span class="pre">$COMPILER</span></code> is the name
+of the compiler service you would wish to modify, e.g.
+<code class="code docutils literal notranslate"><span class="pre">compiler_gym/envs/llvm/service</span></code> for the <a class="reference internal" href="llvm/index.html"><span class="doc">LLVM environment</span></a>. Once done, send us a pull request!</p>
+</div>
+<div class="section" id="i-want-to-add-a-new-compilergym-environment-where-do-i-start">
+<h3><a class="toc-backref" href="#id12">I want to add a new CompilerGym environment, where do I start?</a><a class="headerlink" href="#i-want-to-add-a-new-compilergym-environment-where-do-i-start" title="Permalink to this headline">¶</a></h3>
+<p>To add a new environment, you must implement the <a class="reference internal" href="compiler_gym/service.html#compiler_gym.service.CompilationSession" title="compiler_gym.service.CompilationSession"><code class="xref py py-class docutils literal notranslate"><span class="pre">CompilationSession</span></code></a> interface to provide a new
+compilation service, and then register this service with the CompilerGym
+frontend. The whole process takes less than 200 lines of code. Full end-to-end
+examples are provided for both Python and C++ in the <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/tree/development/examples/example_compiler_gym_service">examples directory</a>. Once done, send us a pull request!</p>
+</div>
 <div class="section" id="i-updated-with-git-pull-and-now-it-doesn-t-work">
-<h3><a class="toc-backref" href="#id8">I updated with “git pull” and now it doesn’t work</a><a class="headerlink" href="#i-updated-with-git-pull-and-now-it-doesn-t-work" title="Permalink to this headline">¶</a></h3>
+<h3><a class="toc-backref" href="#id13">I updated with “git pull” and now it doesn’t work</a><a class="headerlink" href="#i-updated-with-git-pull-and-now-it-doesn-t-work" title="Permalink to this headline">¶</a></h3>
 <p>The first thing to is to re-run <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">init</span></code> to ensure that you have the
 correct development dependencies installed, as those can change between
 releases. Then run <code class="code docutils literal notranslate"><span class="pre">make</span> <span class="pre">distclean</span></code> to tidy up any build artifacts from
@@ -275,21 +383,6 @@ stability. If you would like to build from source but do not require the
 latest feature set, use the
 <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/commits/stable">stable</a>
 branch which lags to the latest release with hotfixes.</p>
-</div>
-<div class="section" id="i-want-to-add-a-new-program-representation-reward-signal-how-do-i-do-that">
-<h3><a class="toc-backref" href="#id9">I want to add a new program representation / reward signal. How do I do that?</a><a class="headerlink" href="#i-want-to-add-a-new-program-representation-reward-signal-how-do-i-do-that" title="Permalink to this headline">¶</a></h3>
-<p>If your reward or observation is a transformation of an existing space, consider
-using the <a class="reference internal" href="compiler_gym/wrappers.html#module-compiler_gym.wrappers" title="compiler_gym.wrappers"><code class="xref py py-mod docutils literal notranslate"><span class="pre">compiler_gym.wrappers</span></code></a> module to define a wrapper that performs
-the translation from the base space.</p>
-<p>If your reward or observation requires combining multiple existing spaces,
-consider using <a class="reference internal" href="compiler_gym/views.html#compiler_gym.views.ObservationView.add_derived_space" title="compiler_gym.views.ObservationView.add_derived_space"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_derived_space()</span></code></a> or <a class="reference internal" href="compiler_gym/views.html#compiler_gym.views.RewardView.add_space" title="compiler_gym.views.RewardView.add_space"><code class="xref py py-meth docutils literal notranslate"><span class="pre">add_space()</span></code></a>.</p>
-<p>If you require modifying the underlying compiler service implementation, fork
-this project and build it from source (see <a class="reference external" href="https://github.com/facebookresearch/CompilerGym/blob/development/INSTALL.md">installation</a>).
-Then modify the service implementation for the compiler that you are interested
-in. The service codebase is located at
-<code class="code docutils literal notranslate"><span class="pre">compiler_gym/envs/$COMPILER/service</span></code>, where <code class="code docutils literal notranslate"><span class="pre">$COMPILER</span></code> is the name
-of the compiler service you would wish to modify, e.g. llvm. Once done, send us
-a pull request!</p>
 </div>
 </div>
 </div>

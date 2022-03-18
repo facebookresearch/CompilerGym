@@ -303,7 +303,7 @@ separately and then linked to a single module:</p>
 source files.</p></li>
 <li><p><strong>system_includes</strong> – Whether to include the system standard libraries
 during compilation jobs. This requires a system toolchain. See
-<a class="reference internal" href="#compiler_gym.envs.llvm.get_system_includes" title="compiler_gym.envs.llvm.get_system_includes"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_system_includes()</span></code></a>.</p></li>
+<code class="xref py py-func docutils literal notranslate"><span class="pre">get_system_library_flags()</span></code>.</p></li>
 <li><p><strong>timeout</strong> – The maximum number of seconds to allow clang to run before
 terminating.</p></li>
 </ul>
@@ -338,7 +338,7 @@ seconds.</p></li>
 <li><p><strong>args</strong> – The list of arguments to pass to clang.</p></li>
 <li><p><strong>system_includes</strong> – Whether to include the system standard libraries
 during compilation jobs. This requires a system toolchain. See
-<a class="reference internal" href="#compiler_gym.envs.llvm.get_system_includes" title="compiler_gym.envs.llvm.get_system_includes"><code class="xref py py-func docutils literal notranslate"><span class="pre">get_system_includes()</span></code></a>.</p></li>
+<code class="xref py py-func docutils literal notranslate"><span class="pre">get_system_library_flags()</span></code>.</p></li>
 <li><p><strong>timeout</strong> – The maximum number of seconds to allow clang to run
 before terminating.</p></li>
 </ul>
@@ -346,24 +346,6 @@ before terminating.</p></li>
 </dl>
 </dd></dl>
 
-</dd></dl>
-
-<dl class="py function">
-<dt class="sig sig-object py" id="compiler_gym.envs.llvm.get_system_includes">
-<span class="sig-prename descclassname"><span class="pre">compiler_gym.envs.llvm.</span></span><span class="sig-name descname"><span class="pre">get_system_includes</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span> &#x2192; <span class="pre">List</span><span class="p"><span class="pre">[</span></span><span class="pre">pathlib.Path</span><span class="p"><span class="pre">]</span></span><a class="reference internal" href="../_modules/compiler_gym/envs/llvm/llvm_benchmark.html#get_system_includes"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#compiler_gym.envs.llvm.get_system_includes" title="Permalink to this definition">¶</a></dt>
-<dd><p>Determine the system include paths for C/C++ compilation jobs.</p>
-<p>This uses the system compiler to determine the search paths for C/C++ system
-headers. By default, <code class="code docutils literal notranslate"><span class="pre">c++</span></code> is invoked. This can be overridden by
-setting <code class="code docutils literal notranslate"><span class="pre">os.environ[&quot;CXX&quot;]</span></code>.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Returns</dt>
-<dd class="field-odd"><p>A list of paths to system header directories.</p>
-</dd>
-<dt class="field-even">Raises</dt>
-<dd class="field-even"><p><strong>OSError</strong> – If the compiler fails, or if the search paths cannot be
-determined.</p>
-</dd>
-</dl>
 </dd></dl>
 
 </div>

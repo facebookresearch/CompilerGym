@@ -7,7 +7,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   
-  <title>compiler_gym.wrappers.core &mdash; CompilerGym 0.2.1 documentation</title>
+  <title>compiler_gym.wrappers.core &mdash; CompilerGym 0.2.2 documentation</title>
   
 
   
@@ -18,6 +18,8 @@
   <link rel="stylesheet" href="../../../_static/css/custom.css" type="text/css" />
 
   
+  
+    <link rel="shortcut icon" href="../../../_static/favicon.png"/>
   
 
   
@@ -69,7 +71,7 @@
             
             
               <div class="version">
-                0.2.1
+                0.2.2
               </div>
             
           
@@ -200,13 +202,15 @@
 <span class="c1">#</span>
 <span class="c1"># This source code is licensed under the MIT license found in the</span>
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
-<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">import</span> <span class="nn">warnings</span>
+<span class="kn">from</span> <span class="nn">collections.abc</span> <span class="kn">import</span> <span class="n">Iterable</span> <span class="k">as</span> <span class="n">IterableType</span>
+<span class="kn">from</span> <span class="nn">typing</span> <span class="kn">import</span> <span class="n">Iterable</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span> <span class="nn">gym</span>
 
 <span class="kn">from</span> <span class="nn">compiler_gym.envs</span> <span class="kn">import</span> <span class="n">CompilerEnv</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.spaces.reward</span> <span class="kn">import</span> <span class="n">Reward</span>
-<span class="kn">from</span> <span class="nn">compiler_gym.util.gym_type_hints</span> <span class="kn">import</span> <span class="n">ObservationType</span><span class="p">,</span> <span class="n">StepType</span>
+<span class="kn">from</span> <span class="nn">compiler_gym.util.gym_type_hints</span> <span class="kn">import</span> <span class="n">ActionType</span><span class="p">,</span> <span class="n">ObservationType</span>
 <span class="kn">from</span> <span class="nn">compiler_gym.views</span> <span class="kn">import</span> <span class="n">ObservationSpaceSpec</span>
 
 
@@ -219,7 +223,7 @@
 <span class="sd">    such as the :code:`fork()` method.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-<div class="viewcode-block" id="CompilerEnvWrapper.__init__"><a class="viewcode-back" href="../../../compiler_gym/wrappers.html#compiler_gym.wrappers.CompilerEnvWrapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">:</span> <span class="n">CompilerEnv</span><span class="p">):</span>
+<div class="viewcode-block" id="CompilerEnvWrapper.__init__"><a class="viewcode-back" href="../../../compiler_gym/wrappers.html#compiler_gym.wrappers.CompilerEnvWrapper.__init__">[docs]</a>    <span class="k">def</span> <span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">env</span><span class="p">:</span> <span class="n">CompilerEnv</span><span class="p">):</span>  <span class="c1"># pylint: disable=super-init-not-called</span>
         <span class="sd">&quot;&quot;&quot;Constructor.</span>
 
 <span class="sd">        :param env: The environment to wrap.</span>
@@ -236,14 +240,80 @@
         <span class="bp">self</span><span class="o">.</span><span class="n">reward_range</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">reward_range</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">metadata</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">metadata</span></div>
 
-    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">,</span> <span class="n">observations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rewards</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">observations</span><span class="o">=</span><span class="n">observations</span><span class="p">,</span> <span class="n">rewards</span><span class="o">=</span><span class="n">rewards</span><span class="p">)</span>
-
     <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ObservationType</span><span class="p">:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
     <span class="k">def</span> <span class="nf">fork</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">CompilerEnv</span><span class="p">:</span>
         <span class="k">return</span> <span class="nb">type</span><span class="p">(</span><span class="bp">self</span><span class="p">)(</span><span class="n">env</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">fork</span><span class="p">())</span>
+
+    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span>  <span class="c1"># pylint: disable=arguments-differ</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">action</span><span class="p">:</span> <span class="n">ActionType</span><span class="p">,</span>
+        <span class="n">observation_spaces</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">reward_spaces</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Reward</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">observations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">rewards</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Reward</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">action</span><span class="p">,</span> <span class="n">IterableType</span><span class="p">):</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Argument `action` of CompilerEnv.step no longer accepts a list &quot;</span>
+                <span class="s2">&quot; of actions. Please use CompilerEnv.multistep instead&quot;</span><span class="p">,</span>
+                <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">multistep</span><span class="p">(</span>
+                <span class="n">action</span><span class="p">,</span>
+                <span class="n">observation_spaces</span><span class="o">=</span><span class="n">observation_spaces</span><span class="p">,</span>
+                <span class="n">reward_spaces</span><span class="o">=</span><span class="n">reward_spaces</span><span class="p">,</span>
+                <span class="n">observations</span><span class="o">=</span><span class="n">observations</span><span class="p">,</span>
+                <span class="n">rewards</span><span class="o">=</span><span class="n">rewards</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">if</span> <span class="n">observations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Argument `observations` of CompilerEnv.multistep has been &quot;</span>
+                <span class="s2">&quot;renamed `observation_spaces`. Please update your code&quot;</span><span class="p">,</span>
+                <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">observation_spaces</span> <span class="o">=</span> <span class="n">observations</span>
+        <span class="k">if</span> <span class="n">rewards</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Argument `rewards` of CompilerEnv.multistep has been renamed &quot;</span>
+                <span class="s2">&quot;`reward_spaces`. Please update your code&quot;</span><span class="p">,</span>
+                <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">reward_spaces</span> <span class="o">=</span> <span class="n">rewards</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">multistep</span><span class="p">(</span>
+            <span class="n">actions</span><span class="o">=</span><span class="p">[</span><span class="n">action</span><span class="p">],</span>
+            <span class="n">observation_spaces</span><span class="o">=</span><span class="n">observation_spaces</span><span class="p">,</span>
+            <span class="n">reward_spaces</span><span class="o">=</span><span class="n">reward_spaces</span><span class="p">,</span>
+        <span class="p">)</span>
+
+    <span class="k">def</span> <span class="nf">multistep</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">actions</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ActionType</span><span class="p">],</span>
+        <span class="n">observation_spaces</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">reward_spaces</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Reward</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">observations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">rewards</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Reward</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">if</span> <span class="n">observations</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Argument `observations` of CompilerEnv.multistep has been &quot;</span>
+                <span class="s2">&quot;renamed `observation_spaces`. Please update your code&quot;</span><span class="p">,</span>
+                <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">observation_spaces</span> <span class="o">=</span> <span class="n">observations</span>
+        <span class="k">if</span> <span class="n">rewards</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">warnings</span><span class="o">.</span><span class="n">warn</span><span class="p">(</span>
+                <span class="s2">&quot;Argument `rewards` of CompilerEnv.multistep has been renamed &quot;</span>
+                <span class="s2">&quot;`reward_spaces`. Please update your code&quot;</span><span class="p">,</span>
+                <span class="n">category</span><span class="o">=</span><span class="ne">DeprecationWarning</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">reward_spaces</span> <span class="o">=</span> <span class="n">rewards</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">multistep</span><span class="p">(</span>
+            <span class="n">actions</span><span class="o">=</span><span class="n">actions</span><span class="p">,</span>
+            <span class="n">observation_spaces</span><span class="o">=</span><span class="n">observation_spaces</span><span class="p">,</span>
+            <span class="n">reward_spaces</span><span class="o">=</span><span class="n">reward_spaces</span><span class="p">,</span>
+        <span class="p">)</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span> <span class="nf">observation_space</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -280,18 +350,27 @@
 <span class="sd">    to allow an action space transformation.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="n">Iterable</span><span class="p">[</span><span class="nb">int</span><span class="p">]],</span> <span class="n">observations</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">rewards</span><span class="o">=</span><span class="kc">None</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">StepType</span><span class="p">:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">action</span><span class="p">(</span><span class="n">action</span><span class="p">),</span> <span class="n">observations</span><span class="o">=</span><span class="n">observations</span><span class="p">,</span> <span class="n">rewards</span><span class="o">=</span><span class="n">rewards</span>
+    <span class="k">def</span> <span class="nf">multistep</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">actions</span><span class="p">:</span> <span class="n">Iterable</span><span class="p">[</span><span class="n">ActionType</span><span class="p">],</span>
+        <span class="n">observation_spaces</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">ObservationSpaceSpec</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">reward_spaces</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Reward</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">observations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">rewards</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Reward</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">multistep</span><span class="p">(</span>
+            <span class="p">[</span><span class="bp">self</span><span class="o">.</span><span class="n">action</span><span class="p">(</span><span class="n">a</span><span class="p">)</span> <span class="k">for</span> <span class="n">a</span> <span class="ow">in</span> <span class="n">actions</span><span class="p">],</span>
+            <span class="n">observation_spaces</span><span class="o">=</span><span class="n">observation_spaces</span><span class="p">,</span>
+            <span class="n">reward_spaces</span><span class="o">=</span><span class="n">reward_spaces</span><span class="p">,</span>
+            <span class="n">observations</span><span class="o">=</span><span class="n">observations</span><span class="p">,</span>
+            <span class="n">rewards</span><span class="o">=</span><span class="n">rewards</span><span class="p">,</span>
         <span class="p">)</span>
 
-<div class="viewcode-block" id="ActionWrapper.action"><a class="viewcode-back" href="../../../compiler_gym/wrappers.html#compiler_gym.wrappers.ActionWrapper.action">[docs]</a>    <span class="k">def</span> <span class="nf">action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+<div class="viewcode-block" id="ActionWrapper.action"><a class="viewcode-back" href="../../../compiler_gym/wrappers.html#compiler_gym.wrappers.ActionWrapper.action">[docs]</a>    <span class="k">def</span> <span class="nf">action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">ActionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ActionType</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Translate the action to the new space.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div>
 
-<div class="viewcode-block" id="ActionWrapper.reverse_action"><a class="viewcode-back" href="../../../compiler_gym/wrappers.html#compiler_gym.wrappers.ActionWrapper.reverse_action">[docs]</a>    <span class="k">def</span> <span class="nf">reverse_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">):</span>
+<div class="viewcode-block" id="ActionWrapper.reverse_action"><a class="viewcode-back" href="../../../compiler_gym/wrappers.html#compiler_gym.wrappers.ActionWrapper.reverse_action">[docs]</a>    <span class="k">def</span> <span class="nf">reverse_action</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">action</span><span class="p">:</span> <span class="n">ActionType</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">ActionType</span><span class="p">:</span>
         <span class="sd">&quot;&quot;&quot;Translate an action from the new space to the wrapped space.&quot;&quot;&quot;</span>
         <span class="k">raise</span> <span class="ne">NotImplementedError</span></div></div>
 
@@ -305,8 +384,22 @@
         <span class="n">observation</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="p">(</span><span class="n">observation</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">observation</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">multistep</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">actions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ActionType</span><span class="p">],</span>
+        <span class="n">observation_spaces</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">reward_spaces</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Reward</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">observations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">rewards</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Reward</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">observation</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">multistep</span><span class="p">(</span>
+            <span class="n">actions</span><span class="p">,</span>
+            <span class="n">observation_spaces</span><span class="o">=</span><span class="n">observation_spaces</span><span class="p">,</span>
+            <span class="n">reward_spaces</span><span class="o">=</span><span class="n">reward_spaces</span><span class="p">,</span>
+            <span class="n">observations</span><span class="o">=</span><span class="n">observations</span><span class="p">,</span>
+            <span class="n">rewards</span><span class="o">=</span><span class="n">rewards</span><span class="p">,</span>
+        <span class="p">)</span>
+
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">observation</span><span class="p">(</span><span class="n">observation</span><span class="p">),</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span>
 
 <div class="viewcode-block" id="ObservationWrapper.observation"><a class="viewcode-back" href="../../../compiler_gym/wrappers.html#compiler_gym.wrappers.ObservationWrapper.observation">[docs]</a>    <span class="k">def</span> <span class="nf">observation</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">observation</span><span class="p">):</span>
@@ -322,8 +415,22 @@
     <span class="k">def</span> <span class="nf">reset</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">reset</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
 
-    <span class="k">def</span> <span class="nf">step</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">):</span>
-        <span class="n">observation</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">step</span><span class="p">(</span><span class="o">*</span><span class="n">args</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+    <span class="k">def</span> <span class="nf">multistep</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">actions</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">ActionType</span><span class="p">],</span>
+        <span class="n">observation_spaces</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">reward_spaces</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Reward</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">observations</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">ObservationSpaceSpec</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">rewards</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Iterable</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Reward</span><span class="p">]]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="p">):</span>
+        <span class="n">observation</span><span class="p">,</span> <span class="n">reward</span><span class="p">,</span> <span class="n">done</span><span class="p">,</span> <span class="n">info</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">env</span><span class="o">.</span><span class="n">multistep</span><span class="p">(</span>
+            <span class="n">actions</span><span class="p">,</span>
+            <span class="n">observation_spaces</span><span class="o">=</span><span class="n">observation_spaces</span><span class="p">,</span>
+            <span class="n">reward_spaces</span><span class="o">=</span><span class="n">reward_spaces</span><span class="p">,</span>
+            <span class="n">observations</span><span class="o">=</span><span class="n">observations</span><span class="p">,</span>
+            <span class="n">rewards</span><span class="o">=</span><span class="n">rewards</span><span class="p">,</span>
+        <span class="p">)</span>
+
         <span class="c1"># Undo the episode_reward update and reapply it once we have transformed</span>
         <span class="c1"># the reward.</span>
         <span class="c1">#</span>

@@ -203,6 +203,7 @@
 <span class="c1"># This source code is licensed under the MIT license found in the</span>
 <span class="c1"># LICENSE file in the root directory of this source tree.</span>
 <span class="kn">import</span> <span class="nn">logging</span>
+<span class="kn">import</span> <span class="nn">traceback</span>
 <span class="kn">from</span> <span class="nn">contextlib</span> <span class="kn">import</span> <span class="n">contextmanager</span>
 <span class="kn">from</span> <span class="nn">pathlib</span> <span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span> <span class="nn">threading</span> <span class="kn">import</span> <span class="n">Lock</span>
@@ -244,7 +245,10 @@
 <span class="nd">@contextmanager</span>
 <span class="k">def</span> <span class="nf">exception_to_grpc_status</span><span class="p">(</span><span class="n">context</span><span class="p">):</span>  <span class="c1"># pragma: no cover</span>
     <span class="k">def</span> <span class="nf">handle_exception_as</span><span class="p">(</span><span class="n">exception</span><span class="p">,</span> <span class="n">code</span><span class="p">):</span>
-        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">: </span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="nb">type</span><span class="p">(</span><span class="n">exception</span><span class="p">)</span><span class="o">.</span><span class="vm">__name__</span><span class="p">,</span> <span class="n">exception</span><span class="p">)</span>
+        <span class="n">exception_trace</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span>
+            <span class="n">traceback</span><span class="o">.</span><span class="n">TracebackException</span><span class="o">.</span><span class="n">from_exception</span><span class="p">(</span><span class="n">exception</span><span class="p">)</span><span class="o">.</span><span class="n">format</span><span class="p">()</span>
+        <span class="p">)</span>
+        <span class="n">logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;</span><span class="si">%s</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">exception_trace</span><span class="p">)</span>
         <span class="n">context</span><span class="o">.</span><span class="n">set_code</span><span class="p">(</span><span class="n">code</span><span class="p">)</span>
         <span class="n">context</span><span class="o">.</span><span class="n">set_details</span><span class="p">(</span><span class="nb">str</span><span class="p">(</span><span class="n">exception</span><span class="p">))</span>
 
