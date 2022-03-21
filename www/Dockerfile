@@ -1,6 +1,7 @@
 # syntax=docker/dockerfile:1
 
 # ####################
+<<<<<<< HEAD
 #  React Web App - Build
 # ####################
 FROM node:16.8.0 as builder
@@ -21,6 +22,29 @@ COPY frontends/compiler_gym/.env.production .
 
 # Build Ract app
 RUN --mount=type=cache,target=/usr/src/app/.npm --mount=type=cache,target=/usr/src/app/node_modules \
+=======
+#  Web App - Build
+# ####################
+FROM node:16.8.0 as builder
+
+ARG API_ENDPOINT
+
+WORKDIR /usr/src/react_web_app
+# copy npm package and lock file
+COPY frontends/compiler_gym/package.json frontends/compiler_gym/package-lock.json ./
+RUN --mount=type=cache,target=/usr/src/react_web_app/.npm --mount=type=cache,target=/usr/src/react_web_app/node_modules \
+    npm install
+
+# copy remaining UI code.
+COPY frontends/compiler_gym/public public
+COPY frontends/compiler_gym/src src
+
+# configure api endpoint
+RUN echo REACT_APP_API_HOST=${API_ENDPOINT} > .env.production
+
+# Compile frontend
+RUN --mount=type=cache,target=/usr/src/react_web_app/.npm --mount=type=cache,target=/usr/src/react_web_app/node_modules \
+>>>>>>> 5b1b6ba87e1b3f3272a0b2ad6a5a54b8b2997ef6
     npm run build
 
 
@@ -47,6 +71,10 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 RUN python3 -m compiler_gym.bin.service --env=llvm-v0
 
 COPY www.py .
+<<<<<<< HEAD
 COPY --from=builder /usr/src/app/build frontends/compiler_gym/build
+=======
+COPY --from=builder /usr/src/react_web_app/build frontends/compiler_gym/build
+>>>>>>> 5b1b6ba87e1b3f3272a0b2ad6a5a54b8b2997ef6
 
 CMD [ "python3", "www.py"]
