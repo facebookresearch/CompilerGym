@@ -1,28 +1,6 @@
 # syntax=docker/dockerfile:1
 
 # ####################
-<<<<<<< HEAD
-#  React Web App - Build
-# ####################
-FROM node:16.8.0 as builder
-
-WORKDIR /usr/src/app
-
-# Copy npm package info
-COPY frontends/compiler_gym/package.json frontends/compiler_gym/package-lock.json ./
-
-# Instal npm packages
-RUN --mount=type=cache,target=/usr/src/app/.npm --mount=type=cache,target=/usr/src/app/node_modules \
-    npm install
-
-# Copy source
-COPY frontends/compiler_gym/public public
-COPY frontends/compiler_gym/src src
-COPY frontends/compiler_gym/.env.production .
-
-# Build Ract app
-RUN --mount=type=cache,target=/usr/src/app/.npm --mount=type=cache,target=/usr/src/app/node_modules \
-=======
 #  Web App - Build
 # ####################
 FROM node:16.8.0 as builder
@@ -44,7 +22,6 @@ RUN echo REACT_APP_API_HOST=${API_ENDPOINT} > .env.production
 
 # Compile frontend
 RUN --mount=type=cache,target=/usr/src/react_web_app/.npm --mount=type=cache,target=/usr/src/react_web_app/node_modules \
->>>>>>> 5b1b6ba87e1b3f3272a0b2ad6a5a54b8b2997ef6
     npm run build
 
 
