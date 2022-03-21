@@ -367,9 +367,9 @@ cc_library(
     ],
 )
 """,
-    sha256 = "92cbe1d023593c2d45588caf2b1530795f376045e8bc3d2868ba349fb8d61ea5",
-    strip_prefix = "IR2Vec-1.1.0",
-    urls = ["https://github.com/IITH-Compilers/IR2Vec/archive/refs/tags/v1.1.0.tar.gz"],
+    sha256 = "92cbe1d0235a3c2d45588caf2b1530795f376045e8bc3d2868ba349fb8d61ea5",
+    strip_prefix = "IR2Vec-828e50584b9c8bc305208e22d2cca272bdb1ab64",
+    urls = ["https://github.com/ChrisCummins/IR2Vec/archive/828e50584b9c8bc305208e22d2cca272bdb1ab64.tar.gz"],
 )
 
 # === Eigen ===

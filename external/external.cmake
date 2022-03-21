@@ -135,6 +135,25 @@ else()
     find_package(glog REQUIRED)
 endif()
 
+# === IR2Vec ===
+# https://github.com/IITH-Compilers/IR2Vec
+
+set(COMPILER_GYM_IR2VEC_PROVIDER "internal"
+    CACHE STRING "Find or build IR2Vec together with Compiler Gym."
+)
+set_property(
+    CACHE COMPILER_GYM_IR2VEC_PROVIDER
+    PROPERTY STRINGS "internal" "external"
+)
+if(COMPILER_GYM_IR2VEC_PROVIDER STREQUAL "internal")
+    build_external_cmake_project(
+      NAME ir2vec
+      SRC_DIR     "${CMAKE_CURRENT_LIST_DIR}/ir2vec"
+    )
+else()
+    find_package(ir2vec REQUIRED)
+endif()
+
 # === LLVM ===
 
 set(COMPILER_GYM_LLVM_PROVIDER "internal"

@@ -238,6 +238,7 @@ cg_cc_library(
       CpuInfo::cpuinfo
       Boost::filesystem
       glog::glog
+      ir2vec::ir2vec
       ${_LLVM_LIBS}
       magic_enum
       nlohmann_json::nlohmann_json
