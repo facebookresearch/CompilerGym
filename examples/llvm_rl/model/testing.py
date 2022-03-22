@@ -10,7 +10,7 @@ import numpy as np
 from pydantic import BaseModel, Field, validator
 
 from compiler_gym.datasets import Benchmark
-from compiler_gym.envs import CompilerEnv
+from compiler_gym.envs import ClientServiceCompilerEnv
 
 from .benchmarks import Benchmarks
 
@@ -39,13 +39,13 @@ class Testing(BaseModel):
 
     # === Start of public API. ===
 
-    def benchmarks_iterator(self, env: CompilerEnv) -> Iterable[Benchmark]:
+    def benchmarks_iterator(self, env: ClientServiceCompilerEnv) -> Iterable[Benchmark]:
         """Return an iterator over the test benchmarks."""
         for _ in range(self.runs_per_benchmark):
             for bm in self.benchmarks:
                 yield from bm.benchmarks_iterator(env)
 
-    def benchmark_uris_iterator(self, env: CompilerEnv) -> Iterable[str]:
+    def benchmark_uris_iterator(self, env: ClientServiceCompilerEnv) -> Iterable[str]:
         """Return an iterator over the test benchmark URIs."""
         for _ in range(self.runs_per_benchmark):
             for bm in self.benchmarks:
@@ -62,7 +62,7 @@ class Testing(BaseModel):
 
 
 def get_testing_benchmarks(
-    env: CompilerEnv, max_benchmarks: int = 50, seed: int = 0
+    env: ClientServiceCompilerEnv, max_benchmarks: int = 50, seed: int = 0
 ) -> List[str]:
     rng = np.random.default_rng(seed=seed)
     for dataset in env.datasets:

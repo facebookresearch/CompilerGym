@@ -67,7 +67,7 @@ py_library(
     deps = [
         ":validation_error",
         ":validation_result",
-        "//compiler_gym/envs:compiler_env",
+        "//compiler_gym/envs:client_service_compiler_env",
         "//compiler_gym/spaces",
         "//compiler_gym/util",
     ],

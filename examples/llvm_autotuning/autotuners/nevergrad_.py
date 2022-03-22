@@ -9,12 +9,12 @@ from typing import Tuple
 import nevergrad as ng
 from llvm_autotuning.optimization_target import OptimizationTarget
 
-from compiler_gym.envs import CompilerEnv
+from compiler_gym.envs import ClientServiceCompilerEnv
 from compiler_gym.util.gym_type_hints import ActionType
 
 
 def nevergrad(
-    env: CompilerEnv,
+    env: ClientServiceCompilerEnv,
     optimization_target: OptimizationTarget,
     search_time_seconds: int,
     seed: int,

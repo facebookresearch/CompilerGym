@@ -8,7 +8,7 @@ import sys
 import pytest
 from flaky import flaky
 
-from compiler_gym.envs import CompilerEnv
+from compiler_gym.envs import ClientServiceCompilerEnv
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
@@ -19,7 +19,7 @@ pytest_plugins = ["tests.pytest_plugins.llvm"]
     reason="github.com/facebookresearch/CompilerGym/issues/459",
 )
 @flaky  # Runtime can timeout
-def test_step(env: CompilerEnv, observation_space: str, reward_space: str):
+def test_step(env: ClientServiceCompilerEnv, observation_space: str, reward_space: str):
     """Request every combination of observation and reward in a fresh environment."""
     env.reward_space = None
     env.observation_space = None

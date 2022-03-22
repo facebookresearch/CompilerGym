@@ -50,7 +50,7 @@ cg_py_library(
     ::llvm_benchmark
     ::llvm_rewards
     compiler_gym::datasets::datasets
-    compiler_gym::envs::compiler_env
+    compiler_gym::envs::client_service_compiler_env
     compiler_gym::envs::llvm::datasets::datasets
     compiler_gym::spaces::spaces
     compiler_gym::third_party::autophase::autophase

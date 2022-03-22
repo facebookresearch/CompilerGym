@@ -11,7 +11,7 @@ from pathlib import Path
 import numpy as np
 from llvm_autotuning.optimization_target import OptimizationTarget
 
-from compiler_gym.envs import CompilerEnv
+from compiler_gym.envs import ClientServiceCompilerEnv
 from compiler_gym.envs.llvm import compute_observation
 from compiler_gym.service.connection import ServiceError
 from compiler_gym.third_party.llvm import opt_path
@@ -33,7 +33,7 @@ from opentuner.tuningrunmain import TuningRunMain  # noqa: E402
 
 
 def opentuner_ga(
-    env: CompilerEnv,
+    env: ClientServiceCompilerEnv,
     optimization_target: OptimizationTarget,
     search_time_seconds: int,
     seed: int,

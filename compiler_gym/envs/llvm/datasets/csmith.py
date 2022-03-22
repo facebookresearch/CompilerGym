@@ -89,7 +89,7 @@ class CsmithDataset(Dataset):
     Note that Csmith is a tool that is used to find errors in compilers. As
     such, there is a higher likelihood that the benchmark cannot be used for an
     environment and that :meth:`env.reset()
-    <compiler_gym.envs.CompilerEnv.reset>` will raise :class:`BenchmarkInitError
+    <compiler_gym.envs.ClientServiceCompilerEnv.reset>` will raise :class:`BenchmarkInitError
     <compiler_gym.datasets.BenchmarkInitError>`.
     """
 

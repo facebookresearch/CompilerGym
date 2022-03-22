@@ -10,7 +10,7 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 from compiler_gym.datasets import Benchmark
-from compiler_gym.envs.compiler_env import CompilerEnv
+from compiler_gym.envs.client_service_compiler_env import ClientServiceCompilerEnv
 from compiler_gym.envs.gcc.datasets import get_gcc_datasets
 from compiler_gym.envs.gcc.gcc import Gcc, GccSpec
 from compiler_gym.envs.gcc.gcc_rewards import AsmSizeReward, ObjSizeReward
@@ -22,8 +22,8 @@ from compiler_gym.util.gym_type_hints import ObservationType
 DEFAULT_GCC: str = "docker:gcc:11.2.0"
 
 
-class GccEnv(CompilerEnv):
-    """A specialized CompilerEnv for GCC.
+class GccEnv(ClientServiceCompilerEnv):
+    """A specialized ClientServiceCompilerEnv for GCC.
 
     This class exposes the optimization space of GCC's command line flags
     as an environment for reinforcement learning. For further details, see the

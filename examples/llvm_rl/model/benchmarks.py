@@ -8,7 +8,7 @@ from typing import Iterable, List, Union
 from pydantic import BaseModel, Field, root_validator, validator
 
 from compiler_gym.datasets import Benchmark, BenchmarkUri
-from compiler_gym.envs import CompilerEnv
+from compiler_gym.envs import ClientServiceCompilerEnv
 
 
 class Benchmarks(BaseModel):
@@ -54,11 +54,11 @@ class Benchmarks(BaseModel):
 
     # === Start of public API. ===
 
-    def benchmarks_iterator(self, env: CompilerEnv) -> Iterable[Benchmark]:
+    def benchmarks_iterator(self, env: ClientServiceCompilerEnv) -> Iterable[Benchmark]:
         """Return an iterator over the benchmarks."""
         return self._benchmark_iterator(env)
 
-    def benchmark_uris_iterator(self, env: CompilerEnv) -> Iterable[str]:
+    def benchmark_uris_iterator(self, env: ClientServiceCompilerEnv) -> Iterable[str]:
         """Return an iterator over the URIs of the benchmarks."""
         return self._benchmark_iterator(env, uris=True)
 
@@ -80,7 +80,7 @@ class Benchmarks(BaseModel):
         return list(value)
 
     def _benchmark_iterator(
-        self, env: CompilerEnv, uris: bool = False
+        self, env: ClientServiceCompilerEnv, uris: bool = False
     ) -> Union[Iterable[Benchmark], Iterable[str]]:
         return (
             self._uris_iterator(env, uris)
@@ -89,7 +89,7 @@ class Benchmarks(BaseModel):
         )
 
     def _uris_iterator(
-        self, env: CompilerEnv, uris: bool = False
+        self, env: ClientServiceCompilerEnv, uris: bool = False
     ) -> Union[Iterable[Benchmark], Iterable[str]]:
         """Iterate from a URIs list."""
         start = self.benchmarks_start_at
@@ -105,7 +105,7 @@ class Benchmarks(BaseModel):
         return islice((env.datasets.benchmark(u) for u in self.uris), start, start + n)
 
     def _dataset_iterator(
-        self, env: CompilerEnv, uris: bool = False
+        self, env: ClientServiceCompilerEnv, uris: bool = False
     ) -> Union[Iterable[Benchmark], Iterable[str]]:
         """Iterate from a dataset name."""
         dataset = env.datasets[self.dataset]

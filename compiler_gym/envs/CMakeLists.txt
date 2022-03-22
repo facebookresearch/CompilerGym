@@ -11,7 +11,7 @@ cg_py_library(
   SRCS
     "__init__.py"
   DEPS
-    ::compiler_env
+    ::client_service_compiler_env
     compiler_gym::envs::gcc::gcc
     compiler_gym::envs::llvm::llvm
     compiler_gym::envs::loop_tool::loop_tool
@@ -20,9 +20,9 @@ cg_py_library(
 
 cg_py_library(
   NAME
-    compiler_env
+    client_service_compiler_env
   SRCS
-    "compiler_env.py"
+    "client_service_compiler_env.py"
   DEPS
     ::env_py
     compiler_gym::compiler_env_state

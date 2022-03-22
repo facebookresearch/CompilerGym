@@ -3,13 +3,13 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Integrations tests for the LLVM CompilerGym environments."""
-from compiler_gym.envs import CompilerEnv
+from compiler_gym.envs import ClientServiceCompilerEnv
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
-def test_autophase_crc32_feature_vector(env: CompilerEnv):
+def test_autophase_crc32_feature_vector(env: ClientServiceCompilerEnv):
     env.reset(benchmark="cbench-v1/crc32")
     print(env.benchmark)  # For debugging in case of error.
     features = env.observation["AutophaseDict"]

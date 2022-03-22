@@ -94,9 +94,9 @@ class ConnectionOpts(BaseModel):
 
     always_send_benchmark_on_reset: bool = False
     """Send the full benchmark program data to the compiler service on ever call
-    to :meth:`env.reset() <compiler_gym.envs.CompilerEnv.reset>`. This is more
+    to :meth:`env.reset() <compiler_gym.envs.ClientServiceCompilerEnv.reset>`. This is more
     efficient in cases where the majority of calls to
-    :meth:`env.reset() <compiler_gym.envs.CompilerEnv.reset>` uses a different
+    :meth:`env.reset() <compiler_gym.envs.ClientServiceCompilerEnv.reset>` uses a different
     benchmark. In case of benchmark re-use, leave this :code:`False`.
     """
 

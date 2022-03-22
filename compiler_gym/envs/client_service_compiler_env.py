@@ -64,7 +64,7 @@ from compiler_gym.views import ObservationSpaceSpec, ObservationView, RewardView
 logger = logging.getLogger(__name__)
 
 # NOTE(cummins): This is only required to prevent a name conflict with the now
-# deprecated CompilerEnv.logger attribute. This can be removed once the logger
+# deprecated ClientServiceCompilerEnv.logger attribute. This can be removed once the logger
 # attribute is removed, scheduled for release 0.2.3.
 _logger = logger
 
@@ -81,7 +81,7 @@ def _wrapped_step(
         raise
 
 
-class CompilerEnv(Env):
+class ClientServiceCompilerEnv(Env):
     """An OpenAI gym environment for compiler optimizations.
 
     The easiest way to create a CompilerGym environment is to call
@@ -96,7 +96,7 @@ class CompilerEnv(Env):
     connecting to a running compiler service at :code:`localhost:8080` (see
     :doc:`this document </compiler_gym/service>` for more details):
 
-        >>> env = CompilerEnv(
+        >>> env = ClientServiceCompilerEnv(
         ...     service="localhost:8080",
         ...     observation_space="features",
         ...     reward_space="runtime",
@@ -145,7 +145,7 @@ class CompilerEnv(Env):
 
     :vartype reward: compiler_gym.views.RewardView
 
-    :ivar episode_reward: If :func:`CompilerEnv.reward_space
+    :ivar episode_reward: If :func:`ClientServiceCompilerEnv.reward_space
         <compiler_gym.envs.CompilerGym.reward_space>` is set, this value is the
         sum of all rewards for the current episode.
 
@@ -193,7 +193,7 @@ class CompilerEnv(Env):
             <compiler_gym.views.ObservationSpaceSpec>`. If not provided,
             :func:`step()` returns :code:`None` for the observation value. Can
             be set later using :meth:`env.observation_space
-            <compiler_gym.envs.CompilerEnv.observation_space>`. For available
+            <compiler_gym.envs.ClientServiceCompilerEnv.observation_space>`. For available
             spaces, see :class:`env.observation.spaces
             <compiler_gym.views.ObservationView>`.
 
@@ -202,7 +202,7 @@ class CompilerEnv(Env):
             <compiler_gym.spaces.Reward>`. If not provided, :func:`step()`
             returns :code:`None` for the reward value. Can be set later using
             :meth:`env.reward_space
-            <compiler_gym.envs.CompilerEnv.reward_space>`. For available spaces,
+            <compiler_gym.envs.ClientServiceCompilerEnv.reward_space>`. For available spaces,
             see :class:`env.reward.spaces <compiler_gym.views.RewardView>`.
 
         :param action_space: The name of the action space to use. If not
@@ -228,9 +228,9 @@ class CompilerEnv(Env):
         # in release 0.2.3.
         if logger:
             warnings.warn(
-                "The `logger` argument is deprecated on CompilerEnv.__init__() "
-                "and will be removed in a future release. All CompilerEnv "
-                "instances share a logger named compiler_gym.envs.compiler_env",
+                "The `logger` argument is deprecated on ClientServiceCompilerEnv.__init__() "
+                "and will be removed in a future release. All ClientServiceCompilerEnv "
+                "instances share a logger named compiler_gym.envs.client_service_compiler_env",
                 DeprecationWarning,
             )
 
@@ -290,7 +290,7 @@ class CompilerEnv(Env):
             self._benchmark_in_use = self._next_benchmark
         except StopIteration:
             # StopIteration raised on next(self.datasets.benchmarks()) if there
-            # are no benchmarks available. This is to allow CompilerEnv to be
+            # are no benchmarks available. This is to allow ClientServiceCompilerEnv to be
             # used without any datasets by setting a benchmark before/during the
             # first reset() call.
             pass
@@ -343,8 +343,8 @@ class CompilerEnv(Env):
     @deprecated(
         version="0.2.1",
         reason=(
-            "The `CompilerEnv.logger` attribute is deprecated. All CompilerEnv "
-            "instances share a logger named compiler_gym.envs.compiler_env"
+            "The `ClientServiceCompilerEnv.logger` attribute is deprecated. All ClientServiceCompilerEnv "
+            "instances share a logger named compiler_gym.envs.client_service_compiler_env"
         ),
     )
     def logger(self):
@@ -370,15 +370,15 @@ class CompilerEnv(Env):
         return self.versions.compiler_version
 
     def commandline(self) -> str:
-        """Interface for :class:`CompilerEnv <compiler_gym.envs.CompilerEnv>`
+        """Interface for :class:`ClientServiceCompilerEnv <compiler_gym.envs.ClientServiceCompilerEnv>`
         subclasses to provide an equivalent commandline invocation to the
         current environment state.
 
         See also :meth:`commandline_to_actions()
-        <compiler_gym.envs.CompilerEnv.commandline_to_actions>`.
+        <compiler_gym.envs.ClientServiceCompilerEnv.commandline_to_actions>`.
 
-        Calling this method on a :class:`CompilerEnv
-        <compiler_gym.envs.CompilerEnv>` instance raises
+        Calling this method on a :class:`ClientServiceCompilerEnv
+        <compiler_gym.envs.ClientServiceCompilerEnv>` instance raises
         :code:`NotImplementedError`.
 
         :return: A string commandline invocation.
@@ -386,15 +386,15 @@ class CompilerEnv(Env):
         raise NotImplementedError("abstract method")
 
     def commandline_to_actions(self, commandline: str) -> List[ActionType]:
-        """Interface for :class:`CompilerEnv <compiler_gym.envs.CompilerEnv>`
+        """Interface for :class:`ClientServiceCompilerEnv <compiler_gym.envs.ClientServiceCompilerEnv>`
         subclasses to convert from a commandline invocation to a sequence of
         actions.
 
         See also :meth:`commandline()
-        <compiler_gym.envs.CompilerEnv.commandline>`.
+        <compiler_gym.envs.ClientServiceCompilerEnv.commandline>`.
 
-        Calling this method on a :class:`CompilerEnv
-        <compiler_gym.envs.CompilerEnv>` instance raises
+        Calling this method on a :class:`ClientServiceCompilerEnv
+        <compiler_gym.envs.ClientServiceCompilerEnv>` instance raises
         :code:`NotImplementedError`.
 
         :return: A list of actions.
@@ -404,7 +404,7 @@ class CompilerEnv(Env):
     @property
     def episode_walltime(self) -> float:
         """Return the amount of time in seconds since the last call to
-        :meth:`reset() <compiler_env.envs.CompilerEnv.reset>`.
+        :meth:`reset() <client_service_compiler_env.envs.ClientServiceCompilerEnv.reset>`.
         """
         return time() - self.episode_start_time
 
@@ -454,7 +454,7 @@ class CompilerEnv(Env):
         .. note::
 
             Setting a new benchmark has no effect until
-            :func:`env.reset() <compiler_gym.envs.CompilerEnv.reset>` is called.
+            :func:`env.reset() <compiler_gym.envs.ClientServiceCompilerEnv.reset>` is called.
         """
         return self._benchmark_in_use
 
@@ -568,7 +568,7 @@ class CompilerEnv(Env):
             "service": self._service_endpoint,
         }
 
-    def fork(self) -> "CompilerEnv":
+    def fork(self) -> "ClientServiceCompilerEnv":
         if not self.in_episode:
             actions = self.actions.copy()
             self.reset()
@@ -642,7 +642,7 @@ class CompilerEnv(Env):
             underlying compiler (see :ref:`compiler_gym.service
             <compiler_gym/service:compiler_gym.service>` for details). This
             means it is important to call :meth:`env.close()
-            <compiler_gym.envs.CompilerEnv.close>` after use to free up
+            <compiler_gym.envs.ClientServiceCompilerEnv.close>` after use to free up
             resources and prevent orphan subprocesses or files. We recommend
             using the :code:`with`-statement pattern for creating environments:
 
@@ -651,7 +651,7 @@ class CompilerEnv(Env):
                 ...    # use env how you like
 
             This removes the need to call :meth:`env.close()
-            <compiler_gym.envs.CompilerEnv.close>` yourself.
+            <compiler_gym.envs.ClientServiceCompilerEnv.close>` yourself.
         """
         # Try and close out the episode, but errors are okay.
         close_service = True
@@ -891,14 +891,14 @@ class CompilerEnv(Env):
             and rewards are lists.
 
         :raises SessionNotFound: If :meth:`reset()
-            <compiler_gym.envs.CompilerEnv.reset>` has not been called.
+            <compiler_gym.envs.ClientServiceCompilerEnv.reset>` has not been called.
 
         .. warning::
 
             Don't call this method directly, use :meth:`step()
-            <compiler_gym.envs.CompilerEnv.step>` or :meth:`multistep()
-            <compiler_gym.envs.CompilerEnv.multistep>` instead. The
-            :meth:`raw_step() <compiler_gym.envs.CompilerEnv.step>` method is an
+            <compiler_gym.envs.ClientServiceCompilerEnv.step>` or :meth:`multistep()
+            <compiler_gym.envs.ClientServiceCompilerEnv.multistep>` instead. The
+            :meth:`raw_step() <compiler_gym.envs.ClientServiceCompilerEnv.step>` method is an
             implementation detail.
         """
         if not self.in_episode:
@@ -1022,12 +1022,12 @@ class CompilerEnv(Env):
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
     ) -> StepType:
         """:raises SessionNotFound: If :meth:`reset()
-        <compiler_gym.envs.CompilerEnv.reset>` has not been called.
+        <compiler_gym.envs.ClientServiceCompilerEnv.reset>` has not been called.
         """
         if isinstance(action, IterableType):
             warnings.warn(
-                "Argument `action` of CompilerEnv.step no longer accepts a list "
-                " of actions. Please use CompilerEnv.multistep instead",
+                "Argument `action` of ClientServiceCompilerEnv.step no longer accepts a list "
+                " of actions. Please use ClientServiceCompilerEnv.multistep instead",
                 category=DeprecationWarning,
             )
             return self.multistep(
@@ -1039,14 +1039,14 @@ class CompilerEnv(Env):
             )
         if observations is not None:
             warnings.warn(
-                "Argument `observations` of CompilerEnv.step has been "
+                "Argument `observations` of ClientServiceCompilerEnv.step has been "
                 "renamed `observation_spaces`. Please update your code",
                 category=DeprecationWarning,
             )
             observation_spaces = observations
         if rewards is not None:
             warnings.warn(
-                "Argument `rewards` of CompilerEnv.step has been renamed "
+                "Argument `rewards` of ClientServiceCompilerEnv.step has been renamed "
                 "`reward_spaces`. Please update your code",
                 category=DeprecationWarning,
             )
@@ -1062,18 +1062,18 @@ class CompilerEnv(Env):
         rewards: Optional[Iterable[Union[str, Reward]]] = None,
     ):
         """:raises SessionNotFound: If :meth:`reset()
-        <compiler_gym.envs.CompilerEnv.reset>` has not been called.
+        <compiler_gym.envs.ClientServiceCompilerEnv.reset>` has not been called.
         """
         if observations is not None:
             warnings.warn(
-                "Argument `observations` of CompilerEnv.multistep has been "
+                "Argument `observations` of ClientServiceCompilerEnv.multistep has been "
                 "renamed `observation_spaces`. Please update your code",
                 category=DeprecationWarning,
             )
             observation_spaces = observations
         if rewards is not None:
             warnings.warn(
-                "Argument `rewards` of CompilerEnv.multistep has been renamed "
+                "Argument `rewards` of ClientServiceCompilerEnv.multistep has been renamed "
                 "`reward_spaces`. Please update your code",
                 category=DeprecationWarning,
             )
@@ -1132,7 +1132,7 @@ class CompilerEnv(Env):
     ) -> Optional[str]:
         """Render the environment.
 
-        CompilerEnv instances support two render modes: "human", which prints
+        ClientServiceCompilerEnv instances support two render modes: "human", which prints
         the current environment state to the terminal and return nothing; and
         "ansi", which returns a string representation of the current environment
         state.
@@ -1170,7 +1170,7 @@ class CompilerEnv(Env):
     def apply(self, state: CompilerEnvState) -> None:  # noqa
         """Replay this state on the given an environment.
 
-        :param env: A :class:`CompilerEnv <compiler_gym.envs.CompilerEnv>`
+        :param env: A :class:`ClientServiceCompilerEnv <compiler_gym.envs.ClientServiceCompilerEnv>`
             instance.
 
         :raises ValueError: If this state cannot be applied.
@@ -1307,7 +1307,7 @@ class CompilerEnv(Env):
     def send_param(self, key: str, value: str) -> str:
         """Send a single <key, value> parameter to the compiler service.
 
-        See :meth:`send_params() <compiler_gym.envs.CompilerEnv.send_params>`
+        See :meth:`send_params() <compiler_gym.envs.ClientServiceCompilerEnv.send_params>`
         for more information.
 
         :param key: The parameter key.
@@ -1317,7 +1317,7 @@ class CompilerEnv(Env):
         :return: The response from the compiler service.
 
         :raises SessionNotFound: If called before :meth:`reset()
-            <compiler_gym.envs.CompilerEnv.reset>`.
+            <compiler_gym.envs.ClientServiceCompilerEnv.reset>`.
         """
         return self.send_params((key, value))[0]
 
@@ -1332,7 +1332,7 @@ class CompilerEnv(Env):
         for a specific compiler service to see what parameters, if any, are
         supported.
 
-        Must have called :meth:`reset() <compiler_gym.envs.CompilerEnv.reset>`
+        Must have called :meth:`reset() <compiler_gym.envs.ClientServiceCompilerEnv.reset>`
         first.
 
         :param params: A list of parameters, where each parameter is a
@@ -1341,7 +1341,7 @@ class CompilerEnv(Env):
         :return: A list of string responses, one per parameter.
 
         :raises SessionNotFound: If called before :meth:`reset()
-            <compiler_gym.envs.CompilerEnv.reset>`.
+            <compiler_gym.envs.ClientServiceCompilerEnv.reset>`.
         """
         if not self.in_episode:
             raise SessionNotFound("Must call reset() before send_params()")
@@ -1362,11 +1362,11 @@ class CompilerEnv(Env):
 
         return list(reply.reply)
 
-    def __copy__(self) -> "CompilerEnv":
+    def __copy__(self) -> "ClientServiceCompilerEnv":
         raise TypeError(
-            "CompilerEnv instances do not support shallow copies. Use deepcopy()"
+            "ClientServiceCompilerEnv instances do not support shallow copies. Use deepcopy()"
         )
 
-    def __deepcopy__(self, memo) -> "CompilerEnv":
+    def __deepcopy__(self, memo) -> "ClientServiceCompilerEnv":
         del memo  # unused
         return self.fork()

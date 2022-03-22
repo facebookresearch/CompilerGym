@@ -21,7 +21,7 @@ import gym
 import pytest
 
 import examples.example_compiler_gym_service as dummy
-from compiler_gym.envs import CompilerEnv, LlvmEnv, llvm
+from compiler_gym.envs import ClientServiceCompilerEnv, LlvmEnv, llvm
 from compiler_gym.service import CompilerGymServiceConnection
 from tests.pytest_plugins.llvm import OBSERVATION_SPACE_NAMES, REWARD_SPACE_NAMES
 from tests.test_main import main
@@ -39,7 +39,7 @@ def env_id(request) -> str:
     params=["llvm-v0", "example-cc-v0", "example-py-v0"],
     ids=["llvm", "dummy-cc", "dummy-py"],
 )
-def env(request) -> CompilerEnv:
+def env(request) -> ClientServiceCompilerEnv:
     yield request.param
 
 
@@ -56,8 +56,8 @@ def test_make_local(benchmark, env_id):
     "args",
     [
         (llvm.LLVM_SERVICE_BINARY, LlvmEnv),
-        (dummy.EXAMPLE_CC_SERVICE_BINARY, CompilerEnv),
-        (dummy.EXAMPLE_PY_SERVICE_BINARY, CompilerEnv),
+        (dummy.EXAMPLE_CC_SERVICE_BINARY, ClientServiceCompilerEnv),
+        (dummy.EXAMPLE_PY_SERVICE_BINARY, ClientServiceCompilerEnv),
     ],
     ids=["llvm", "dummy-cc", "dummy-py"],
 )
@@ -80,7 +80,7 @@ def test_make_service(benchmark, args):
     ],
     ids=["llvm;fast-benchmark", "llvm;slow-benchmark", "dummy-cc", "dummy-py"],
 )
-def test_reset(benchmark, make_env: CompilerEnv):
+def test_reset(benchmark, make_env: ClientServiceCompilerEnv):
     with make_env() as env:
         benchmark(env.reset)
 

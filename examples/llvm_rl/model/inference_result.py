@@ -12,7 +12,7 @@ from ray.rllib.agents.impala import ImpalaTrainer  # noqa
 from ray.rllib.agents.ppo import PPOTrainer  # noqa
 
 from compiler_gym.datasets import BenchmarkUri
-from compiler_gym.envs import CompilerEnv
+from compiler_gym.envs import ClientServiceCompilerEnv
 from compiler_gym.util.timer import Timer
 
 logger = logging.getLogger(__name__)
@@ -44,7 +44,11 @@ class InferenceResult(BaseModel):
 
     @classmethod
     def from_agent(
-        cls, env: CompilerEnv, agent, runtime: bool = True, runtimes_count: int = 30
+        cls,
+        env: ClientServiceCompilerEnv,
+        agent,
+        runtime: bool = True,
+        runtimes_count: int = 30,
     ):
         # We calculate our own reward at the end, no need for incremental
         # rewards during inference.

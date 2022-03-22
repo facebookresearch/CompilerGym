@@ -9,7 +9,7 @@ py_library(
     srcs = ["__init__.py"],
     visibility = ["//visibility:public"],
     deps = [
-        ":compiler_env",
+        ":client_service_compiler_env",
         "//compiler_gym/envs/gcc",
         "//compiler_gym/envs/llvm",
         "//compiler_gym/envs/loop_tool",
@@ -17,8 +17,8 @@ py_library(
 )
 
 py_library(
-    name = "compiler_env",
-    srcs = ["compiler_env.py"],
+    name = "client_service_compiler_env",
+    srcs = ["client_service_compiler_env.py"],
     visibility = ["//compiler_gym:__subpackages__"],
     deps = [
         ":env",

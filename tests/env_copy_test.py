@@ -2,7 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""Tests for the copy() and deepcopy() operators on CompilerEnv."""
+"""Tests for the copy() and deepcopy() operators on ClientServiceCompilerEnv."""
 from copy import copy, deepcopy
 
 import pytest
@@ -17,7 +17,7 @@ def test_forbidden_shallow_copy(env: LlvmEnv):
     """Test that shallow copy operator is explicitly forbidden."""
     with pytest.raises(
         TypeError,
-        match=r"^CompilerEnv instances do not support shallow copies. Use deepcopy\(\)",
+        match=r"^ClientServiceCompilerEnv instances do not support shallow copies. Use deepcopy\(\)",
     ):
         copy(env)
 

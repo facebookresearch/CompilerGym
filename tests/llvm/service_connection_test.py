@@ -8,7 +8,7 @@ import numpy as np
 import pytest
 
 import compiler_gym  # noqa Register environments.
-from compiler_gym.envs import CompilerEnv, llvm
+from compiler_gym.envs import ClientServiceCompilerEnv, llvm
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.service import ServiceError
 from compiler_gym.service.connection import CompilerGymServiceConnection
@@ -19,7 +19,7 @@ pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
 @pytest.fixture(scope="function", params=["local", "service"])
-def env(request) -> CompilerEnv:
+def env(request) -> ClientServiceCompilerEnv:
     # Redefine fixture to test both gym.make(...) and unmanaged service
     # connections.
     if request.param == "local":
@@ -34,7 +34,7 @@ def env(request) -> CompilerEnv:
             service.close()
 
 
-def test_service_env_dies_reset(env: CompilerEnv):
+def test_service_env_dies_reset(env: ClientServiceCompilerEnv):
     env.observation_space = "Autophase"
     env.reward_space = "IrInstructionCount"
     env.reset("cbench-v1/crc32")

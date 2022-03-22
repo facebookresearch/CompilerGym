@@ -88,7 +88,7 @@ class ExampleDataset(Dataset):
 # Register the environment for use with gym.make(...).
 register(
     id="example-v0",
-    entry_point="compiler_gym.envs:CompilerEnv",
+    entry_point="compiler_gym.envs:ClientServiceCompilerEnv",
     kwargs={
         "service": EXAMPLE_PY_SERVICE_BINARY,
         "rewards": [RuntimeReward()],

@@ -15,7 +15,7 @@ from llvm_autotuning.optimization_target import OptimizationTarget
 from pydantic import BaseModel, validator
 
 from compiler_gym.compiler_env_state import CompilerEnvState
-from compiler_gym.envs import CompilerEnv
+from compiler_gym.envs import ClientServiceCompilerEnv
 from compiler_gym.util.capture_output import capture_output
 from compiler_gym.util.runfiles_path import transient_cache_path
 from compiler_gym.util.temporary_working_directory import temporary_working_directory
@@ -26,7 +26,7 @@ class Autotuner(BaseModel):
     """This class represents an instance of an autotuning algorithm.
 
     After instantiating from a config dict, instances of this class can be used
-    to tune CompilerEnv instances:
+    to tune ClientServiceCompilerEnv instances:
 
         >>> autotuner = Autotuner(
             algorithm="greedy",
@@ -53,7 +53,7 @@ class Autotuner(BaseModel):
     def autotune(self):
         """Return the autotuner function for this algorithm.
 
-        An autotuner function takes a single CompilerEnv argument and optional
+        An autotuner function takes a single ClientServiceCompilerEnv argument and optional
         keyword configuration arguments (determined by algorithm_config) and
         tunes the environment, returning nothing.
         """
@@ -76,7 +76,9 @@ class Autotuner(BaseModel):
         kwargs.update(self.algorithm_config)
         return kwargs
 
-    def __call__(self, env: CompilerEnv, seed: int = 0xCC) -> CompilerEnvState:
+    def __call__(
+        self, env: ClientServiceCompilerEnv, seed: int = 0xCC
+    ) -> CompilerEnvState:
         """Autotune the given environment.
 
         :param env: The environment to autotune.

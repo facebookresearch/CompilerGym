@@ -83,7 +83,7 @@ class ExampleDataset(Dataset):
 # the example-v0 environment will be available to gym.make(...).
 register(
     id="example-cc-v0",
-    entry_point="compiler_gym.envs:CompilerEnv",
+    entry_point="compiler_gym.envs:ClientServiceCompilerEnv",
     kwargs={
         "service": EXAMPLE_CC_SERVICE_BINARY,
         "rewards": [RuntimeReward()],
@@ -93,7 +93,7 @@ register(
 
 register(
     id="example-py-v0",
-    entry_point="compiler_gym.envs:CompilerEnv",
+    entry_point="compiler_gym.envs:ClientServiceCompilerEnv",
     kwargs={
         "service": EXAMPLE_PY_SERVICE_BINARY,
         "rewards": [RuntimeReward()],

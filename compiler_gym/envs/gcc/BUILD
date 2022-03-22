@@ -17,7 +17,7 @@ py_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//compiler_gym/envs:compiler_env",
+        "//compiler_gym/envs:client_service_compiler_env",
         "//compiler_gym/envs/gcc/datasets",
         "//compiler_gym/service",
         "//compiler_gym/service/runtime",  # Implicit dependency of service.

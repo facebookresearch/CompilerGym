@@ -8,13 +8,13 @@ from concurrent.futures import as_completed
 from typing import Callable, Iterable, Optional
 
 from compiler_gym.compiler_env_state import CompilerEnvState
-from compiler_gym.envs.compiler_env import CompilerEnv
+from compiler_gym.envs.client_service_compiler_env import ClientServiceCompilerEnv
 from compiler_gym.util import thread_pool
 from compiler_gym.validation_result import ValidationResult
 
 
 def _validate_states_worker(
-    make_env: Callable[[], CompilerEnv], state: CompilerEnvState
+    make_env: Callable[[], ClientServiceCompilerEnv], state: CompilerEnvState
 ) -> ValidationResult:
     with make_env() as env:
         result = env.validate(state)
@@ -22,13 +22,13 @@ def _validate_states_worker(
 
 
 def validate_states(
-    make_env: Callable[[], CompilerEnv],
+    make_env: Callable[[], ClientServiceCompilerEnv],
     states: Iterable[CompilerEnvState],
     nproc: Optional[int] = None,
     inorder: bool = False,
 ) -> Iterable[ValidationResult]:
     """A parallelized implementation of
-    :meth:`env.validate() <compiler_gym.envs.CompilerEnv.validate>` for batched
+    :meth:`env.validate() <compiler_gym.envs.ClientServiceCompilerEnv.validate>` for batched
     validation.
 
     :param make_env: A callback which instantiates a compiler environment.

@@ -13,10 +13,12 @@ from compiler_gym.util import thread_pool
 from compiler_gym.util.decorators import memoized_property
 from compiler_gym.validation_error import ValidationError
 
-# A validation callback is a function that takes a single CompilerEnv instance
+# A validation callback is a function that takes a single ClientServiceCompilerEnv instance
 # as its argument and returns an iterable sequence of zero or more
 # ValidationError tuples.
-ValidationCallback = Callable[["CompilerEnv"], Iterable[ValidationError]]  # noqa: F821
+ValidationCallback = Callable[
+    ["ClientServiceCompilerEnv"], Iterable[ValidationError]  # noqa: F821
+]
 
 
 class BenchmarkSource(NamedTuple):
@@ -42,8 +44,8 @@ class BenchmarkSource(NamedTuple):
 class Benchmark:
     """A benchmark represents a particular program that is being compiled.
 
-    A benchmark is a program that can be used by a :class:`CompilerEnv
-    <compiler_gym.envs.CompilerEnv>` as a program to optimize. A benchmark
+    A benchmark is a program that can be used by a :class:`ClientServiceCompilerEnv
+    <compiler_gym.envs.ClientServiceCompilerEnv>` as a program to optimize. A benchmark
     comprises the data that is fed into the compiler, identified by a URI.
 
     Benchmarks are not normally instantiated directly. Instead, benchmarks are
@@ -72,9 +74,9 @@ class Benchmark:
     instances.
 
     The benchmark for an environment can be set during :meth:`env.reset()
-    <compiler_gym.envs.CompilerEnv.reset>`. The currently active benchmark can
+    <compiler_gym.envs.ClientServiceCompilerEnv.reset>`. The currently active benchmark can
     be queried using :attr:`env.benchmark
-    <compiler_gym.envs.CompilerEnv.benchmark>`:
+    <compiler_gym.envs.ClientServiceCompilerEnv.benchmark>`:
 
         >>> env = gym.make("llvm-v0")
         >>> env.reset(benchmark="benchmark://cbench-v1/crc32")
@@ -150,7 +152,9 @@ class Benchmark:
         """
         return self._validation_callbacks != []
 
-    def validate(self, env: "CompilerEnv") -> List[ValidationError]:  # noqa: F821
+    def validate(
+        self, env: "ClientServiceCompilerEnv"  # noqa: F821
+    ) -> List[ValidationError]:
         """Run the validation callbacks and return any errors.
 
         If no errors are returned, validation has succeeded:
@@ -175,7 +179,7 @@ class Benchmark:
             >>> benchmark.validate(env) == list(benchmark.ivalidate(env))
             True
 
-        :param env: The :class:`CompilerEnv <compiler_gym.envs.CompilerEnv>`
+        :param env: The :class:`ClientServiceCompilerEnv <compiler_gym.envs.ClientServiceCompilerEnv>`
             instance that is being validated.
 
         :return: A list of zero or more :class:`ValidationError
@@ -184,13 +188,15 @@ class Benchmark:
         """
         return list(self.ivalidate(env))
 
-    def ivalidate(self, env: "CompilerEnv") -> Iterable[ValidationError]:  # noqa: F821
+    def ivalidate(
+        self, env: "ClientServiceCompilerEnv"  # noqa: F821
+    ) -> Iterable[ValidationError]:
         """Run the validation callbacks and return a generator of errors.
 
         This is an asynchronous version of :meth:`validate()
         <compiler_gym.datasets.Benchmark.validate>` that returns immediately.
 
-        :parameter env: A :class:`CompilerEnv <compiler_gym.envs.CompilerEnv>`
+        :parameter env: A :class:`ClientServiceCompilerEnv <compiler_gym.envs.ClientServiceCompilerEnv>`
             instance to validate.
 
         :return: A generator of :class:`ValidationError
@@ -231,7 +237,7 @@ class Benchmark:
         :meth:`validate() <compiler_gym.datasets.Benchmark.validate>`.
 
         :param validation_callback: A callback that accepts a single
-            :class:`CompilerEnv <compiler_gym.envs.CompilerEnv>` argument and
+            :class:`ClientServiceCompilerEnv <compiler_gym.envs.ClientServiceCompilerEnv>` argument and
             returns an iterable sequence of zero or more :class:`ValidationError
             <compiler_gym.ValidationError>` tuples. Validation callbacks must be
             thread safe and must not modify the environment.

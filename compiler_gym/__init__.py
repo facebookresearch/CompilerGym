@@ -4,7 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 """CompilerGym is a set of compiler optimization environments for reinforcement learning.
 
-After importing this module, the :class:`CompilerGym environments <compiler_gym.envs.CompilerEnv>`
+After importing this module, the :class:`CompilerGym environments <compiler_gym.envs.ClientServiceCompilerEnv>`
 will be available through the :code:`gym.make(...)` interface:
 
     >>> import gym
@@ -34,7 +34,7 @@ from compiler_gym.compiler_env_state import (
     CompilerEnvStateReader,
     CompilerEnvStateWriter,
 )
-from compiler_gym.envs import COMPILER_GYM_ENVS, CompilerEnv
+from compiler_gym.envs import COMPILER_GYM_ENVS, ClientServiceCompilerEnv
 from compiler_gym.random_search import random_search
 from compiler_gym.util.debug_util import (
     get_debug_level,
@@ -58,7 +58,7 @@ __all__ = [
     "cache_path",
     "COMPILER_GYM_ENVS",
     "make",
-    "CompilerEnv",
+    "ClientServiceCompilerEnv",
     "CompilerEnvState",
     "CompilerEnvStateWriter",
     "CompilerEnvStateReader",

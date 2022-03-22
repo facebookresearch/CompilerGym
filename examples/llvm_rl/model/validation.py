@@ -7,7 +7,7 @@ from typing import Iterable, List
 from pydantic import BaseModel, Field, validator
 
 from compiler_gym.datasets import Benchmark
-from compiler_gym.envs import CompilerEnv
+from compiler_gym.envs import ClientServiceCompilerEnv
 from compiler_gym.wrappers import CycleOverBenchmarks
 
 from .benchmarks import Benchmarks
@@ -28,17 +28,17 @@ class Validation(BaseModel):
 
     # === Start of public API. ===
 
-    def benchmarks_iterator(self, env: CompilerEnv) -> Iterable[Benchmark]:
+    def benchmarks_iterator(self, env: ClientServiceCompilerEnv) -> Iterable[Benchmark]:
         """Return an iterator over the validation benchmarks."""
         for bm in self.benchmarks:
             yield from bm.benchmarks_iterator(env)
 
-    def benchmark_uris_iterator(self, env: CompilerEnv) -> Iterable[str]:
+    def benchmark_uris_iterator(self, env: ClientServiceCompilerEnv) -> Iterable[str]:
         """Return an iterator over the training benchmark URIs."""
         for bm in self.benchmarks:
             yield from bm.benchmark_uris_iterator(env)
 
-    def wrap_env(self, env: CompilerEnv) -> CompilerEnv:
+    def wrap_env(self, env: ClientServiceCompilerEnv) -> ClientServiceCompilerEnv:
         """Wrap an environment for use in the training loop that is configured
         to iterate over the validation benchmarks on each call to
         :code:`reset()`.
