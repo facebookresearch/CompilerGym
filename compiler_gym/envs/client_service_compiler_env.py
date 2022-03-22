@@ -20,7 +20,7 @@ from gym.spaces import Space
 from compiler_gym.compiler_env_state import CompilerEnvState
 from compiler_gym.datasets import Benchmark, Dataset, Datasets
 from compiler_gym.datasets.uri import BenchmarkUri
-from compiler_gym.envs.env import Env
+from compiler_gym.envs.compiler_env import CompilerEnv
 from compiler_gym.service import (
     CompilerGymServiceConnection,
     ConnectionOpts,
@@ -81,7 +81,7 @@ def _wrapped_step(
         raise
 
 
-class ClientServiceCompilerEnv(Env):
+class ClientServiceCompilerEnv(CompilerEnv):
     """An OpenAI gym environment for compiler optimizations.
 
     The easiest way to create a CompilerGym environment is to call

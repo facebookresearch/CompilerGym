@@ -40,7 +40,7 @@ cg_py_library(
   NAME
     env_py
   SRCS
-    "env.py"
+    "compiler_env.py"
   DEPS
     compiler_gym::spaces::spaces
     compiler_gym::util::util

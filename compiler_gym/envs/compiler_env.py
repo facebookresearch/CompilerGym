@@ -13,7 +13,7 @@ from compiler_gym.util.gym_type_hints import ActionType, ObservationType, StepTy
 from compiler_gym.views import ObservationSpaceSpec
 
 
-class Env(gym.Env, ABC):
+class CompilerEnv(gym.Env, ABC):
     @property
     @abstractmethod
     def observation_space_spec(self) -> ObservationSpaceSpec:
@@ -27,7 +27,7 @@ class Env(gym.Env, ABC):
         raise NotImplementedError("abstract method")
 
     @abstractmethod
-    def fork(self) -> "Env":
+    def fork(self) -> "CompilerEnv":
         """Fork a new environment with exactly the same state.
 
         This creates a duplicate environment instance with the current state.
@@ -36,7 +36,7 @@ class Env(gym.Env, ABC):
         on the original and new environments.
 
         If not already in an episode, :meth:`reset()
-        <compiler_gym.envs.Env.reset>` is called.
+        <compiler_gym.envs.CompilerEnv.reset>` is called.
 
         Example usage:
 

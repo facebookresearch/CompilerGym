@@ -9,14 +9,14 @@ from typing import Any, Iterable, List, Optional, Tuple, Union
 from gym import Wrapper
 from gym.spaces import Space
 
-from compiler_gym.envs import Env
+from compiler_gym.envs import CompilerEnv
 from compiler_gym.spaces.reward import Reward
 from compiler_gym.util.gym_type_hints import ActionType, ObservationType
 from compiler_gym.views import ObservationSpaceSpec
 
 
-class CompilerEnvWrapper(Env, Wrapper):
-    """Wraps a :class:`CompilerEnv <compiler_gym.envs.Env>` environment
+class CompilerEnvWrapper(CompilerEnv, Wrapper):
+    """Wraps a :class:`CompilerEnv <compiler_gym.envs.CompilerEnv>` environment
     to allow a modular transformation.
 
     This class is the base class for all wrappers. This class must be used
@@ -24,7 +24,7 @@ class CompilerEnvWrapper(Env, Wrapper):
     such as the :code:`fork()` method.
     """
 
-    def __init__(self, env: Env):  # pylint: disable=super-init-not-called
+    def __init__(self, env: CompilerEnv):  # pylint: disable=super-init-not-called
         """Constructor.
 
         :param env: The environment to wrap.
@@ -41,7 +41,7 @@ class CompilerEnvWrapper(Env, Wrapper):
     def reset(self, *args, **kwargs) -> Optional[ObservationType]:
         return self.env.reset(*args, **kwargs)
 
-    def fork(self) -> Env:
+    def fork(self) -> CompilerEnv:
         return type(self)(env=self.env.fork())
 
     def step(  # pylint: disable=arguments-differ
