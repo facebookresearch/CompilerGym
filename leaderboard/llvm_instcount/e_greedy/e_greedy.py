@@ -10,7 +10,7 @@ from typing import NamedTuple
 
 from absl import flags
 
-from compiler_gym.envs import ClientServiceCompilerEnv, LlvmEnv
+from compiler_gym.envs import CompilerEnv, LlvmEnv
 from compiler_gym.leaderboard.llvm_instcount import eval_llvm_instcount_policy
 
 flags.DEFINE_float(
@@ -27,12 +27,10 @@ class RewardAction(NamedTuple):
     action: int
 
 
-def select_best_action(
-    env: ClientServiceCompilerEnv, executor: ThreadPoolExecutor
-) -> RewardAction:
+def select_best_action(env: CompilerEnv, executor: ThreadPoolExecutor) -> RewardAction:
     """Determine the best action by trying all possible options and ranking them."""
 
-    def eval_action(fkd: ClientServiceCompilerEnv, action: int) -> RewardAction:
+    def eval_action(fkd: CompilerEnv, action: int) -> RewardAction:
         """Evaluate the given action."""
         try:
             _, reward, _, _ = fkd.step(action)

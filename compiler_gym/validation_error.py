@@ -10,7 +10,7 @@ from pydantic import BaseModel
 
 class ValidationError(BaseModel):
     """A ValidationError describes an error encountered in a call to
-    :meth:`env.validate() <compiler_gym.envs.ClientServiceCompilerEnv.validate>`.
+    :meth:`env.validate() <compiler_gym.envs.CompilerEnv.validate>`.
     """
 
     type: str

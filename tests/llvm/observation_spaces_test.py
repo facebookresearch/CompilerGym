@@ -1422,7 +1422,7 @@ def test_is_buildable_observation_space_not_buildable(env: LlvmEnv):
 def test_add_derived_space(env: LlvmEnv):
     env.reset()
     with pytest.deprecated_call(
-        match="Use the derived_observation_spaces argument to ClientServiceCompilerEnv constructor."
+        match="Use the derived_observation_spaces argument to CompilerEnv constructor."
     ):
         env.observation.add_derived_space(
             id="IrLen",

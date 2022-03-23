@@ -6,7 +6,7 @@
 
 import numpy as np
 
-from compiler_gym.envs import ClientServiceCompilerEnv
+from compiler_gym.envs import CompilerEnv
 from compiler_gym.service.connection import ServiceError
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_DIM
 from tests.test_main import main
@@ -14,7 +14,7 @@ from tests.test_main import main
 pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
-def test_step(env: ClientServiceCompilerEnv, action_name: str):
+def test_step(env: CompilerEnv, action_name: str):
     """Run each action on a single benchmark."""
     env.reward_space = "IrInstructionCount"
     env.observation_space = "Autophase"

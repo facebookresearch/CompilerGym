@@ -166,7 +166,7 @@ def eval_llvm_instcount_policy(policy: Policy) -> None:
     The role of your policy is to perform a sequence of actions on the supplied
     environment so as to maximize cumulative reward. By default, no observation
     space is set on the environment, so :meth:`env.step()
-    <compiler_gym.envs.ClientServiceCompilerEnv.step>` will return :code:`None` for the
+    <compiler_gym.envs.CompilerEnv.step>` will return :code:`None` for the
     observation. You may set a new observation space:
 
         >>> env.observation_space = "InstCount"  # Set a new space for env.step()

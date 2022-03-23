@@ -9,7 +9,7 @@ from pathlib import Path
 import pytest
 
 from compiler_gym.datasets import Benchmark
-from compiler_gym.envs import ClientServiceCompilerEnv
+from compiler_gym.envs import CompilerEnv
 from compiler_gym.envs.llvm import llvm_benchmark
 from compiler_gym.service.proto import Benchmark as BenchmarkProto
 from compiler_gym.service.proto import File
@@ -19,7 +19,7 @@ from tests.test_main import main
 pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
-def test_add_benchmark_invalid_scheme(env: ClientServiceCompilerEnv):
+def test_add_benchmark_invalid_scheme(env: CompilerEnv):
     with pytest.raises(ValueError) as ctx:
         env.reset(
             benchmark=Benchmark(
@@ -34,7 +34,7 @@ def test_add_benchmark_invalid_scheme(env: ClientServiceCompilerEnv):
     )
 
 
-def test_add_benchmark_invalid_path(env: ClientServiceCompilerEnv):
+def test_add_benchmark_invalid_path(env: CompilerEnv):
     with tempfile.TemporaryDirectory() as d:
         tmp = Path(d) / "not_a_file"
         with pytest.raises(FileNotFoundError) as ctx:

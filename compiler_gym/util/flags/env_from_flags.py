@@ -11,7 +11,7 @@ from typing import Optional, Union
 import gym
 from absl import app, flags
 
-from compiler_gym.envs import ClientServiceCompilerEnv
+from compiler_gym.envs import CompilerEnv
 from compiler_gym.service import ConnectionOpts
 from compiler_gym.service.proto import Benchmark
 from compiler_gym.util.registration import COMPILER_GYM_ENVS
@@ -109,9 +109,7 @@ def connection_settings_from_flags(
     )
 
 
-def env_from_flags(
-    benchmark: Optional[Union[str, Benchmark]] = None
-) -> ClientServiceCompilerEnv:
+def env_from_flags(benchmark: Optional[Union[str, Benchmark]] = None) -> CompilerEnv:
     if FLAGS.ls_env:
         print("\n".join(sorted(COMPILER_GYM_ENVS)))
         sys.exit(0)
@@ -145,6 +143,6 @@ def env_from_flags(
 @contextmanager
 def env_session_from_flags(
     benchmark: Optional[Union[str, Benchmark]] = None
-) -> ClientServiceCompilerEnv:
+) -> CompilerEnv:
     with env_from_flags(benchmark=benchmark) as env:
         yield env

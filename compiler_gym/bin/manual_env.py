@@ -228,7 +228,7 @@ from itertools import islice
 
 from absl import app, flags
 
-from compiler_gym.envs import ClientServiceCompilerEnv
+from compiler_gym.envs import CompilerEnv
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.flags.env_from_flags import env_from_flags
 from compiler_gym.util.shell_format import emph
@@ -277,7 +277,7 @@ class CompilerGymShell(cmd.Cmd):
 Type help or ? for more information.
 The 'tutorial' command will give a step by step guide."""
 
-    def __init__(self, env: ClientServiceCompilerEnv):
+    def __init__(self, env: CompilerEnv):
         """Initialise with an environment.
         :param env: The environment to run.
         """

@@ -10,7 +10,7 @@ from pydantic import BaseModel, Field, validator
 from pydantic.class_validators import root_validator
 
 import compiler_gym
-from compiler_gym import ClientServiceCompilerEnv
+from compiler_gym import CompilerEnv
 from compiler_gym.wrappers import *  # noqa wrapper definitions
 from compiler_gym.wrappers import TimeLimit
 
@@ -35,13 +35,13 @@ class EnvironmentWrapperConfig(BaseModel):
         """Return the wrapper class type."""
         return self._to_class(self.wrapper)
 
-    def wrap(self, env: ClientServiceCompilerEnv) -> ClientServiceCompilerEnv:
+    def wrap(self, env: CompilerEnv) -> CompilerEnv:
         """Wrap the given environment."""
         try:
             return self.wrapper_class(env=env, **self.args)
         except TypeError as e:
             raise TypeError(
-                f"Error constructing ClientServiceCompilerEnv wrapper {self.wrapper_class.__name__}: {e}"
+                f"Error constructing CompilerEnv wrapper {self.wrapper_class.__name__}: {e}"
             ) from e
 
     # === Start of implementation details. ===
@@ -67,7 +67,7 @@ class EnvironmentWrapperConfig(BaseModel):
 
 
 class Environment(BaseModel):
-    """Represents a ClientServiceCompilerEnv environment."""
+    """Represents a CompilerEnv environment."""
 
     id: str = Field(allow_mutation=False)
     """The environment ID, as passed to :code:`gym.make(...)`."""
@@ -93,7 +93,7 @@ class Environment(BaseModel):
 
     # === Start of public API. ===
 
-    def make_env(self) -> ClientServiceCompilerEnv:
+    def make_env(self) -> CompilerEnv:
         """Construct a compiler environment from the given config."""
         env = compiler_gym.make(self.id)
         if self.observation_space:

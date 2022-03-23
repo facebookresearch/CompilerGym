@@ -6,13 +6,13 @@ from tempfile import TemporaryDirectory
 
 from llvm_autotuning.optimization_target import OptimizationTarget
 
-from compiler_gym.envs import ClientServiceCompilerEnv
+from compiler_gym.envs import CompilerEnv
 from compiler_gym.random_search import random_search as lib_random_search
 from compiler_gym.util.runfiles_path import transient_cache_path
 
 
 def random(
-    env: ClientServiceCompilerEnv,
+    env: CompilerEnv,
     optimization_target: OptimizationTarget,
     search_time_seconds: int,
     patience: int = 350,

@@ -13,7 +13,7 @@ from typing import Callable, List, NamedTuple, Optional, Union
 
 import humanize
 
-from compiler_gym.envs import ClientServiceCompilerEnv
+from compiler_gym.envs import CompilerEnv
 from compiler_gym.envs.llvm import LlvmEnv
 from compiler_gym.service.connection import ServiceError
 from compiler_gym.util import logs
@@ -68,7 +68,7 @@ class RandomAgentWorker(Thread):
 
     def __init__(
         self,
-        make_env: Callable[[], ClientServiceCompilerEnv],
+        make_env: Callable[[], CompilerEnv],
         patience: int,
     ):
         super().__init__()
@@ -99,14 +99,14 @@ class RandomAgentWorker(Thread):
                 self._patience = self._patience or env.action_space.n
                 self.run_one_environment(env)
 
-    def run_one_environment(self, env: ClientServiceCompilerEnv) -> None:
+    def run_one_environment(self, env: CompilerEnv) -> None:
         """Run random walks in an infinite loop. Returns if the environment ends."""
         while self.should_run_one_episode:
             self.total_episode_count += 1
             if not self.run_one_episode(env):
                 return
 
-    def run_one_episode(self, env: ClientServiceCompilerEnv) -> bool:
+    def run_one_episode(self, env: CompilerEnv) -> bool:
         """Run a single random episode.
 
         :param env: An environment.
@@ -141,18 +141,18 @@ class RandomAgentWorker(Thread):
 
 
 def random_search(
-    make_env: Callable[[], ClientServiceCompilerEnv],
+    make_env: Callable[[], CompilerEnv],
     outdir: Optional[Union[str, Path]] = None,
     total_runtime: Optional[float] = 600,
     patience: int = 0,
     nproc: int = cpu_count(),
     skip_done: bool = False,
-) -> ClientServiceCompilerEnv:
+) -> CompilerEnv:
     with make_env() as env:
         env.reset()
-        if not isinstance(env.unwrapped, ClientServiceCompilerEnv):
+        if not isinstance(env.unwrapped, CompilerEnv):
             raise TypeError(
-                f"random_search() requires ClientServiceCompilerEnv. Called with: {type(env).__name__}"
+                f"random_search() requires CompilerEnv. Called with: {type(env).__name__}"
             )
 
         benchmark_uri = env.benchmark.uri
@@ -296,9 +296,7 @@ def random_search(
     return env
 
 
-def replay_actions(
-    env: ClientServiceCompilerEnv, action_names: List[str], outdir: Path
-):
+def replay_actions(env: CompilerEnv, action_names: List[str], outdir: Path):
     logs_path = outdir / logs.BEST_ACTIONS_PROGRESS_NAME
     start_time = time()
 
@@ -347,9 +345,7 @@ def replay_actions(
         )
 
 
-def replay_actions_from_logs(
-    env: ClientServiceCompilerEnv, logdir: Path, benchmark=None
-) -> None:
+def replay_actions_from_logs(env: CompilerEnv, logdir: Path, benchmark=None) -> None:
     best_actions_path = logdir / logs.BEST_ACTIONS_NAME
     meta_path = logdir / logs.METADATA_NAME
 

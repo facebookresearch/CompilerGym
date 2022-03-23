@@ -32,8 +32,8 @@ class ObservationSpaceSpec:
     :vartype platform_dependent: bool
 
     :ivar default_value: A default observation. This value will be returned by
-        :func:`ClientServiceCompilerEnv.step() <compiler_gym.envs.ClientServiceCompilerEnv.step>` if
-        :func:`ClientServiceCompilerEnv.observation_space <compiler_gym.envs.ClientServiceCompilerEnv.observation_space>`
+        :func:`CompilerEnv.step() <compiler_gym.envs.CompilerEnv.step>` if
+        :func:`CompilerEnv.observation_space <compiler_gym.envs.CompilerEnv.observation_space>`
         is set and the service terminates.
     """
 

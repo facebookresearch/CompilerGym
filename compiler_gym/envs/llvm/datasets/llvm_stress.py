@@ -32,7 +32,7 @@ class LlvmStressDataset(Dataset):
     Note that llvm-stress is a tool that is used to find errors in LLVM. As
     such, there is a higher likelihood that the benchmark cannot be used for an
     environment and that :meth:`env.reset()
-    <compiler_gym.envs.ClientServiceCompilerEnv.reset>` will raise
+    <compiler_gym.envs.CompilerEnv.reset>` will raise
     :class:`BenchmarkInitError <compiler_gym.datasets.BenchmarkInitError>`.
     """
 

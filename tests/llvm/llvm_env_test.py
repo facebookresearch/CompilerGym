@@ -17,7 +17,7 @@ from compiler_gym.compiler_env_state import (
     CompilerEnvStateReader,
     CompilerEnvStateWriter,
 )
-from compiler_gym.envs import ClientServiceCompilerEnv, llvm
+from compiler_gym.envs import CompilerEnv, llvm
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.service import ServiceError
 from compiler_gym.service.connection import CompilerGymServiceConnection
@@ -28,7 +28,7 @@ pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.llvm"]
 
 
 @pytest.fixture(scope="function", params=["local", "service"])
-def env(request) -> ClientServiceCompilerEnv:
+def env(request) -> CompilerEnv:
     """Create an LLVM environment."""
     if request.param == "local":
         with gym.make("llvm-v0") as env:

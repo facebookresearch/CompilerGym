@@ -17,7 +17,7 @@ import compiler_gym
 import compiler_gym.util.flags.nproc  # noqa Flag definition.
 import compiler_gym.util.flags.output_dir  # noqa Flag definition.
 import compiler_gym.util.flags.seed  # noqa Flag definition.
-from compiler_gym.envs import ClientServiceCompilerEnv
+from compiler_gym.envs import CompilerEnv
 from compiler_gym.envs.gcc import DEFAULT_GCC
 from compiler_gym.service import ServiceError
 from compiler_gym.util.executor import Executor
@@ -69,7 +69,7 @@ flags.DEFINE_enum(
 GCC_ENV_CONSTRUCTOR_LOCK = Lock()
 
 
-def random_search(env: ClientServiceCompilerEnv):
+def random_search(env: CompilerEnv):
     best = float("inf")
     for _ in range(FLAGS.gcc_search_budget):
         env.reset()
@@ -81,7 +81,7 @@ def random_search(env: ClientServiceCompilerEnv):
     return best
 
 
-def hill_climb(env: ClientServiceCompilerEnv):
+def hill_climb(env: CompilerEnv):
     best = float("inf")
     for _ in range(FLAGS.gcc_search_budget):
         with env.fork() as fkd:
@@ -98,7 +98,7 @@ def hill_climb(env: ClientServiceCompilerEnv):
     return best
 
 
-def genetic_algorithm(env: ClientServiceCompilerEnv):
+def genetic_algorithm(env: CompilerEnv):
     def f(choices):
         env.reset()
         env.choices = choices = list(map(int, choices))

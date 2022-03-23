@@ -263,7 +263,7 @@ class CompilerEnv(gym.Env, ABC):
 
     @abstractmethod
     def commandline(self) -> str:
-        """Interface for :class:`ClientServiceCompilerEnv <compiler_gym.envs.CompilerEnv>`
+        """Interface for :class:`CompilerEnv <compiler_gym.envs.CompilerEnv>`
         subclasses to provide an equivalent commandline invocation to the
         current environment state.
 
@@ -276,12 +276,12 @@ class CompilerEnv(gym.Env, ABC):
 
     @abstractmethod
     def commandline_to_actions(self, commandline: str) -> List[ActionType]:
-        """Interface for :class:`ClientServiceCompilerEnv <compiler_gym.envs.ClientServiceCompilerEnv>`
+        """Interface for :class:`CompilerEnv <compiler_gym.envs.CompilerEnv>`
         subclasses to convert from a commandline invocation to a sequence of
         actions.
 
         See also :meth:`commandline()
-        <compiler_gym.envs.ClientServiceCompilerEnv.commandline>`.
+        <compiler_gym.envs.CompilerEnv.commandline>`.
 
         :return: A list of actions.
         """

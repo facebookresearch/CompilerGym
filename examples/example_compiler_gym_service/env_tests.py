@@ -14,7 +14,7 @@ import pytest
 from flaky import flaky
 
 import examples.example_compiler_gym_service as example
-from compiler_gym.envs import ClientServiceCompilerEnv
+from compiler_gym.envs import CompilerEnv
 from compiler_gym.service import SessionNotFound
 from compiler_gym.spaces import Box, NamedDiscrete, Scalar, Sequence
 from compiler_gym.util.commands import Popen
@@ -26,7 +26,7 @@ EXAMPLE_ENVIRONMENTS = ["example-cc-v0", "example-py-v0"]
 
 
 @pytest.fixture(scope="function", params=EXAMPLE_ENVIRONMENTS)
-def env(request) -> ClientServiceCompilerEnv:
+def env(request) -> CompilerEnv:
     """Text fixture that yields an environment."""
     with gym.make(request.param) as env:
         yield env
@@ -64,12 +64,12 @@ def test_invalid_arguments(bin: Path):
     assert returncode == 1
 
 
-def test_versions(env: ClientServiceCompilerEnv):
+def test_versions(env: CompilerEnv):
     """Tests the GetVersion() RPC endpoint."""
     assert env.compiler_version == "1.0.0"
 
 
-def test_action_space(env: ClientServiceCompilerEnv):
+def test_action_space(env: CompilerEnv):
     """Test that the environment reports the service's action spaces."""
     assert env.action_spaces == [
         NamedDiscrete(
@@ -79,7 +79,7 @@ def test_action_space(env: ClientServiceCompilerEnv):
     ]
 
 
-def test_observation_spaces(env: ClientServiceCompilerEnv):
+def test_observation_spaces(env: CompilerEnv):
     """Test that the environment reports the service's observation spaces."""
     env.reset()
     assert env.observation.spaces.keys() == {"ir", "features", "runtime"}
@@ -96,50 +96,50 @@ def test_observation_spaces(env: ClientServiceCompilerEnv):
     )
 
 
-def test_reward_spaces(env: ClientServiceCompilerEnv):
+def test_reward_spaces(env: CompilerEnv):
     """Test that the environment reports the service's reward spaces."""
     env.reset()
     assert env.reward.spaces.keys() == {"runtime"}
 
 
-def test_step_before_reset(env: ClientServiceCompilerEnv):
+def test_step_before_reset(env: CompilerEnv):
     """Taking a step() before reset() is illegal."""
     with pytest.raises(SessionNotFound, match=r"Must call reset\(\) before step\(\)"):
         env.step(0)
 
 
-def test_observation_before_reset(env: ClientServiceCompilerEnv):
+def test_observation_before_reset(env: CompilerEnv):
     """Taking an observation before reset() is illegal."""
     with pytest.raises(SessionNotFound, match=r"Must call reset\(\) before step\(\)"):
         _ = env.observation["ir"]
 
 
-def test_reward_before_reset(env: ClientServiceCompilerEnv):
+def test_reward_before_reset(env: CompilerEnv):
     """Taking a reward before reset() is illegal."""
     with pytest.raises(SessionNotFound, match=r"Must call reset\(\) before step\(\)"):
         _ = env.reward["runtime"]
 
 
-def test_reset_invalid_benchmark(env: ClientServiceCompilerEnv):
+def test_reset_invalid_benchmark(env: CompilerEnv):
     """Test requesting a specific benchmark."""
     with pytest.raises(LookupError) as ctx:
         env.reset(benchmark="example-v0/foobar")
     assert str(ctx.value) == "Unknown program name"
 
 
-def test_invalid_observation_space(env: ClientServiceCompilerEnv):
+def test_invalid_observation_space(env: CompilerEnv):
     """Test error handling with invalid observation space."""
     with pytest.raises(LookupError):
         env.observation_space = 100
 
 
-def test_invalid_reward_space(env: ClientServiceCompilerEnv):
+def test_invalid_reward_space(env: CompilerEnv):
     """Test error handling with invalid reward space."""
     with pytest.raises(LookupError):
         env.reward_space = 100
 
 
-def test_double_reset(env: ClientServiceCompilerEnv):
+def test_double_reset(env: CompilerEnv):
     """Test that reset() can be called twice."""
     env.reset()
     assert env.in_episode
@@ -147,7 +147,7 @@ def test_double_reset(env: ClientServiceCompilerEnv):
     assert env.in_episode
 
 
-def test_double_reset_with_step(env: ClientServiceCompilerEnv):
+def test_double_reset_with_step(env: CompilerEnv):
     """Test that reset() can be called twice with a step."""
     env.reset()
     assert env.in_episode
@@ -159,7 +159,7 @@ def test_double_reset_with_step(env: ClientServiceCompilerEnv):
     assert env.in_episode
 
 
-def test_Step_out_of_range(env: ClientServiceCompilerEnv):
+def test_Step_out_of_range(env: CompilerEnv):
     """Test error handling with an invalid action."""
     env.reset()
     with pytest.raises(ValueError) as ctx:
@@ -167,7 +167,7 @@ def test_Step_out_of_range(env: ClientServiceCompilerEnv):
     assert str(ctx.value) == "Out-of-range"
 
 
-def test_default_ir_observation(env: ClientServiceCompilerEnv):
+def test_default_ir_observation(env: CompilerEnv):
     """Test default observation space."""
     env.observation_space = "ir"
     observation = env.reset()
@@ -179,7 +179,7 @@ def test_default_ir_observation(env: ClientServiceCompilerEnv):
     assert not done
 
 
-def test_default_features_observation(env: ClientServiceCompilerEnv):
+def test_default_features_observation(env: CompilerEnv):
     """Test default observation space."""
     env.observation_space = "features"
     observation = env.reset()
@@ -189,7 +189,7 @@ def test_default_features_observation(env: ClientServiceCompilerEnv):
     assert observation.tolist() == [0, 0, 0]
 
 
-def test_default_reward(env: ClientServiceCompilerEnv):
+def test_default_reward(env: CompilerEnv):
     """Test default reward space."""
     env.reward_space = "runtime"
     env.reset()
@@ -199,27 +199,27 @@ def test_default_reward(env: ClientServiceCompilerEnv):
     assert not done
 
 
-def test_observations(env: ClientServiceCompilerEnv):
+def test_observations(env: CompilerEnv):
     """Test observation spaces."""
     env.reset()
     assert env.observation["ir"] == "Hello, world!"
     np.testing.assert_array_equal(env.observation["features"], [0, 0, 0])
 
 
-def test_rewards(env: ClientServiceCompilerEnv):
+def test_rewards(env: CompilerEnv):
     """Test reward spaces."""
     env.reset()
     assert env.reward["runtime"] == 0
 
 
-def test_benchmarks(env: ClientServiceCompilerEnv):
+def test_benchmarks(env: CompilerEnv):
     assert list(env.datasets.benchmark_uris()) == [
         "benchmark://example-v0/foo",
         "benchmark://example-v0/bar",
     ]
 
 
-def test_fork(env: ClientServiceCompilerEnv):
+def test_fork(env: CompilerEnv):
     env.reset()
     env.step(0)
     env.step(1)

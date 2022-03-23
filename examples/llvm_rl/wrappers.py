@@ -8,7 +8,7 @@ from typing import List
 import gym
 import numpy as np
 
-from compiler_gym.envs import ClientServiceCompilerEnv, LlvmEnv
+from compiler_gym.envs import CompilerEnv, LlvmEnv
 from compiler_gym.util.gym_type_hints import ActionType
 from compiler_gym.wrappers import (
     ConstrainedCommandline,
@@ -24,7 +24,7 @@ class ClampedReward(RewardWrapper):
 
     def __init__(
         self,
-        env: ClientServiceCompilerEnv,
+        env: CompilerEnv,
         min: float = -1,
         max: float = 1,
         leakiness_factor: float = 0.001,
@@ -50,7 +50,7 @@ class AutophaseNormalizedFeatures(ObservationWrapper):
     # The index of the "TotalInsts" feature of autophase.
     TotalInsts_index = 51
 
-    def __init__(self, env: ClientServiceCompilerEnv):
+    def __init__(self, env: CompilerEnv):
         super().__init__(env=env)
         # Force Autophase observation space.
         self.env.observation_space = self.env.unwrapped.observation.spaces["Autophase"]
@@ -86,7 +86,7 @@ class ConcatActionsHistogram(ObservationWrapper):
     steps.
     """
 
-    def __init__(self, env: ClientServiceCompilerEnv, norm_to_episode_len: int = 0):
+    def __init__(self, env: CompilerEnv, norm_to_episode_len: int = 0):
         super().__init__(env=env)
         assert isinstance(
             self.observation_space, gym.spaces.Box
