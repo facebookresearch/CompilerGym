@@ -9,9 +9,12 @@ from typing import Any, Iterable, List, Optional, Tuple, Union
 from gym import Wrapper
 from gym.spaces import Space
 
+from compiler_gym.compiler_env_state import CompilerEnvState
+from compiler_gym.datasets import Benchmark, BenchmarkUri, Dataset
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.spaces.reward import Reward
 from compiler_gym.util.gym_type_hints import ActionType, ObservationType
+from compiler_gym.validation_result import ValidationResult
 from compiler_gym.views import ObservationSpaceSpec
 
 
@@ -142,6 +145,14 @@ class CompilerEnvWrapper(CompilerEnv, Wrapper):
         self.env.observation_space_spec = observation_space_spec
 
     @property
+    def reward_space_spec(self) -> Optional[Reward]:
+        return self.env.reward_space_spec
+
+    @reward_space_spec.setter
+    def reward_space_spec(self, val: Optional[Reward]):
+        self.env.reward_space_spec = val
+
+    @property
     def reward_space(self) -> Optional[Reward]:
         return self.env.reward_space
 
@@ -161,9 +172,57 @@ class CompilerEnvWrapper(CompilerEnv, Wrapper):
     def spec(self) -> Any:
         return self.env.spec
 
-    @spec.setter
-    def spec(self, value: Any):
-        self.env.spec = value
+    @property
+    def benchmark(self) -> Benchmark:
+        return self.env.benchmark
+
+    @benchmark.setter
+    def benchmark(self, benchmark: Optional[Union[str, Benchmark, BenchmarkUri]]):
+        self.env.benchmark = benchmark
+
+    @property
+    def datasets(self) -> Iterable[Dataset]:
+        return self.env.datasets
+
+    @datasets.setter
+    def datasets(self, datasets: Iterable[Dataset]):
+        self.env.datasets = datasets
+
+    @property
+    def episode_walltime(self) -> float:
+        return self.env.episode_walltime
+
+    @property
+    def in_episode(self) -> bool:
+        return self.env.in_episode
+
+    @property
+    def episode_reward(self) -> Optional[float]:
+        return self.env.episode_reward
+
+    @episode_reward.setter
+    def episode_reward(self, episode_reward: Optional[float]):
+        self.env.episode_reward = episode_reward
+
+    @property
+    def actions(self) -> List[ActionType]:
+        return self.env.actions
+
+    @property
+    def state(self) -> CompilerEnvState:
+        return self.env.state
+
+    def commandline(self) -> str:
+        return self.env.commandline()
+
+    def commandline_to_actions(self, commandline: str) -> List[ActionType]:
+        return self.env.commandline_to_actions(commandline)
+
+    def apply(self, state: CompilerEnvState) -> None:  # noqa
+        self.env.apply(state)
+
+    def validate(self, state: Optional[CompilerEnvState] = None) -> ValidationResult:
+        return self.env.validate(state)
 
 
 class ActionWrapper(CompilerEnvWrapper):

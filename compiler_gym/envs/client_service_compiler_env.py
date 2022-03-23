@@ -247,7 +247,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
             endpoint=self._service_endpoint,
             opts=self._connection_settings,
         )
-        self.datasets = Datasets(datasets or [])
+        self._datasets = Datasets(datasets or [])
 
         self.action_space_name = action_space
 
@@ -319,13 +319,13 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
         # Mutable state initialized in reset().
         self.reward_range: Tuple[float, float] = (-np.inf, np.inf)
-        self.episode_reward: Optional[float] = None
+        self.episode_reward = None
         self.episode_start_time: float = time()
-        self.actions: List[ActionType] = []
+        self._actions: List[ActionType] = []
 
         # Initialize the default observation/reward spaces.
         self.observation_space_spec = None
-        self.reward_space_spec: Optional[Reward] = None
+        self.reward_space_spec = None
         self.observation_space = observation_space
         self.reward_space = reward_space
 
@@ -338,6 +338,42 @@ class ClientServiceCompilerEnv(CompilerEnv):
         self, observation_space_spec: Optional[ObservationSpaceSpec]
     ):
         self._observation_space_spec = observation_space_spec
+
+    @property
+    def reward_space_spec(self) -> Optional[Reward]:
+        return self._reward_space_spec
+
+    @reward_space_spec.setter
+    def reward_space_spec(self, val: Optional[Reward]):
+        self._reward_space_spec = val
+
+    @property
+    def benchmark(self) -> Benchmark:
+        return self._benchmark
+
+    @benchmark.setter
+    def benchmark(self, benchmark: Optional[Union[str, Benchmark, BenchmarkUri]]):
+        self._benchmark = benchmark
+
+    @property
+    def datasets(self) -> Iterable[Dataset]:
+        return self._datasets
+
+    @datasets.setter
+    def datasets(self, datasets: Iterable[Dataset]):
+        self._datastes = datasets
+
+    @property
+    def episode_reward(self) -> Optional[float]:
+        return self._episode_reward
+
+    @episode_reward.setter
+    def episode_reward(self, episode_reward: Optional[float]):
+        self._episode_reward = episode_reward
+
+    @property
+    def actions(self) -> List[ActionType]:
+        return self._actions
 
     @property
     @deprecated(
@@ -370,47 +406,25 @@ class ClientServiceCompilerEnv(CompilerEnv):
         return self.versions.compiler_version
 
     def commandline(self) -> str:
-        """Interface for :class:`ClientServiceCompilerEnv <compiler_gym.envs.ClientServiceCompilerEnv>`
-        subclasses to provide an equivalent commandline invocation to the
-        current environment state.
-
-        See also :meth:`commandline_to_actions()
-        <compiler_gym.envs.ClientServiceCompilerEnv.commandline_to_actions>`.
-
-        Calling this method on a :class:`ClientServiceCompilerEnv
+        """Calling this method on a :class:`ClientServiceCompilerEnv
         <compiler_gym.envs.ClientServiceCompilerEnv>` instance raises
         :code:`NotImplementedError`.
-
-        :return: A string commandline invocation.
         """
         raise NotImplementedError("abstract method")
 
     def commandline_to_actions(self, commandline: str) -> List[ActionType]:
-        """Interface for :class:`ClientServiceCompilerEnv <compiler_gym.envs.ClientServiceCompilerEnv>`
-        subclasses to convert from a commandline invocation to a sequence of
-        actions.
-
-        See also :meth:`commandline()
-        <compiler_gym.envs.ClientServiceCompilerEnv.commandline>`.
-
-        Calling this method on a :class:`ClientServiceCompilerEnv
+        """Calling this method on a :class:`ClientServiceCompilerEnv
         <compiler_gym.envs.ClientServiceCompilerEnv>` instance raises
         :code:`NotImplementedError`.
-
-        :return: A list of actions.
         """
         raise NotImplementedError("abstract method")
 
     @property
     def episode_walltime(self) -> float:
-        """Return the amount of time in seconds since the last call to
-        :meth:`reset() <client_service_compiler_env.envs.ClientServiceCompilerEnv.reset>`.
-        """
         return time() - self.episode_start_time
 
     @property
     def state(self) -> CompilerEnvState:
-        """The tuple representation of the current environment state."""
         return CompilerEnvState(
             benchmark=str(self.benchmark) if self.benchmark else None,
             reward=self.episode_reward,
@@ -420,13 +434,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
     @property
     def action_space(self) -> Space:
-        """The current action space.
-
-        :getter: Get the current action space.
-        :setter: Set the action space to use. Must be an entry in
-            :code:`action_spaces`. If :code:`None`, the default action space is
-            selected.
-        """
         return self._action_space
 
     @action_space.setter
@@ -441,21 +448,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
     @property
     def benchmark(self) -> Benchmark:
-        """Get or set the benchmark to use.
-
-        :getter: Get :class:`Benchmark <compiler_gym.datasets.Benchmark>` that
-            is currently in use.
-
-        :setter: Set the benchmark to use. Either a :class:`Benchmark
-            <compiler_gym.datasets.Benchmark>` instance, or the URI of a
-            benchmark as in :meth:`env.datasets.benchmark_uris()
-            <compiler_gym.datasets.Datasets.benchmark_uris>`.
-
-        .. note::
-
-            Setting a new benchmark has no effect until
-            :func:`env.reset() <compiler_gym.envs.ClientServiceCompilerEnv.reset>` is called.
-        """
         return self._benchmark_in_use
 
     @benchmark.setter
@@ -482,13 +474,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
     @property
     def reward_space(self) -> Optional[Reward]:
-        """The default reward space that is used to return a reward value from
-        :func:`~step()`.
-
-        :getter: Returns a :class:`Reward <compiler_gym.spaces.Reward>`,
-            or :code:`None` if not set.
-        :setter: Set the default reward space.
-        """
         return self.reward_space_spec
 
     @reward_space.setter
@@ -520,22 +505,10 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
     @property
     def in_episode(self) -> bool:
-        """Whether the service is ready for :func:`step` to be called,
-        i.e. :func:`reset` has been called and :func:`close` has not.
-
-        :return: :code:`True` if in an episode, else :code:`False`.
-        """
         return self._session_id is not None
 
     @property
     def observation_space(self) -> Optional[Space]:
-        """The observation space that is used to return an observation value in
-        :func:`~step()`.
-
-        :getter: Returns the underlying observation space, or :code:`None` if
-            not set.
-        :setter: Set the default observation space.
-        """
         if self.observation_space_spec:
             return self.observation_space_spec.space
 
@@ -625,7 +598,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         # Copy over the mutable episode state.
         new_env.episode_reward = self.episode_reward
         new_env.episode_start_time = self.episode_start_time
-        new_env.actions = self.actions.copy()
+        new_env._actions = self.actions.copy()
 
         return new_env
 
@@ -851,7 +824,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         self.observation.session_id = reply.session_id
         self.reward.get_cost = self.observation.__getitem__
         self.episode_start_time = time()
-        self.actions = []
+        self._actions = []
 
         # If the action space has changed, update it.
         if reply.HasField("new_action_space"):
@@ -919,7 +892,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         }
 
         # Record the actions.
-        self.actions += actions
+        self._actions += actions
 
         # Send the request to the backend service.
         request = StepRequest(
@@ -1168,13 +1141,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
         return RewardView
 
     def apply(self, state: CompilerEnvState) -> None:  # noqa
-        """Replay this state on the given an environment.
-
-        :param env: A :class:`ClientServiceCompilerEnv <compiler_gym.envs.ClientServiceCompilerEnv>`
-            instance.
-
-        :raises ValueError: If this state cannot be applied.
-        """
         if not self.in_episode:
             self.reset(benchmark=state.benchmark)
 
@@ -1203,13 +1169,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
             )
 
     def validate(self, state: Optional[CompilerEnvState] = None) -> ValidationResult:
-        """Validate an environment's state.
-
-        :param state: A state to environment. If not provided, the current state
-            is validated.
-
-        :returns: A :class:`ValidationResult <compiler_gym.ValidationResult>`.
-        """
         if state:
             self.reset(benchmark=state.benchmark)
             in_place = False
