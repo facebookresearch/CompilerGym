@@ -13,8 +13,8 @@ py_library(
     data = ["//compiler_gym/envs/loop_tool/service"],
     visibility = ["//visibility:public"],
     deps = [
-        "//compiler_gym/envs:client_service_compiler_env",
         "//compiler_gym/service",
+        "//compiler_gym/service:client_service_compiler_env",
         "//compiler_gym/service/proto",
         "//compiler_gym/service/runtime",
     ],

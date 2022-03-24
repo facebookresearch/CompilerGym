@@ -8,7 +8,7 @@ from concurrent.futures import as_completed
 from typing import Callable, Iterable, Optional
 
 from compiler_gym.compiler_env_state import CompilerEnvState
-from compiler_gym.envs.client_service_compiler_env import CompilerEnv
+from compiler_gym.envs.compiler_env import CompilerEnv
 from compiler_gym.util import thread_pool
 from compiler_gym.validation_result import ValidationResult
 

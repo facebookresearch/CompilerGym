@@ -8,9 +8,10 @@ import numpy as np
 import pytest
 
 import compiler_gym  # noqa Register environments.
-from compiler_gym.envs import ClientServiceCompilerEnv, llvm
+from compiler_gym.envs import llvm
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
 from compiler_gym.service import ServiceError
+from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
 from compiler_gym.service.connection import CompilerGymServiceConnection
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_DIM
 from tests.test_main import main

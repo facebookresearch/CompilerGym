@@ -8,7 +8,7 @@ from typing import List
 
 from deprecated import deprecated
 
-from compiler_gym.envs.client_service_compiler_env import CompilerEnv
+from compiler_gym import CompilerEnv
 from compiler_gym.random_search import replay_actions as replay_actions_
 from compiler_gym.random_search import (
     replay_actions_from_logs as replay_actions_from_logs_,

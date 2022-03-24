@@ -135,7 +135,7 @@ class UnrollingDataset(Dataset):
 
 register(
     id="unrolling-py-v0",
-    entry_point="compiler_gym.envs:ClientServiceCompilerEnv",
+    entry_point="compiler_gym.service.client_service_compiler_env:ClientServiceCompilerEnv",
     kwargs={
         "service": UNROLLING_PY_SERVICE_BINARY,
         "rewards": [RuntimeReward(), SizeReward()],

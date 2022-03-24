@@ -79,7 +79,7 @@ class CompilerEnv(gym.Env, ABC):
     @abstractmethod
     def episode_walltime(self) -> float:
         """Return the amount of time in seconds since the last call to
-        :meth:`reset() <client_service_compiler_env.envs.CompilerEnv.reset>`.
+        :meth:`reset() <compiler_gym.envs.CompilerEnv.reset>`.
         """
         raise NotImplementedError("abstract method")
 

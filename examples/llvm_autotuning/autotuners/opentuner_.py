@@ -11,8 +11,8 @@ from pathlib import Path
 import numpy as np
 from llvm_autotuning.optimization_target import OptimizationTarget
 
-from compiler_gym.envs import ClientServiceCompilerEnv
 from compiler_gym.envs.llvm import compute_observation
+from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
 from compiler_gym.service.connection import ServiceError
 from compiler_gym.third_party.llvm import opt_path
 from compiler_gym.util.runfiles_path import transient_cache_path

@@ -10,11 +10,11 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional, Union
 
 from compiler_gym.datasets import Benchmark
-from compiler_gym.envs.client_service_compiler_env import ClientServiceCompilerEnv
 from compiler_gym.envs.gcc.datasets import get_gcc_datasets
 from compiler_gym.envs.gcc.gcc import Gcc, GccSpec
 from compiler_gym.envs.gcc.gcc_rewards import AsmSizeReward, ObjSizeReward
 from compiler_gym.service import ConnectionOpts
+from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
 from compiler_gym.util.decorators import memoized_property
 from compiler_gym.util.gym_type_hints import ObservationType
 

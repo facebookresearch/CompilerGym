@@ -12,8 +12,9 @@ import pytest
 
 import compiler_gym
 import examples.loop_optimizations_service as loop_optimizations_service
-from compiler_gym.envs import ClientServiceCompilerEnv, CompilerEnv
+from compiler_gym.envs import CompilerEnv
 from compiler_gym.service import SessionNotFound
+from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
 from compiler_gym.spaces import Dict, NamedDiscrete, Scalar, Sequence
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_NAMES
 from tests.test_main import main

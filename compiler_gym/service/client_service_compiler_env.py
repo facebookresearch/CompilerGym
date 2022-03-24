@@ -230,7 +230,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
             warnings.warn(
                 "The `logger` argument is deprecated on ClientServiceCompilerEnv.__init__() "
                 "and will be removed in a future release. All ClientServiceCompilerEnv "
-                "instances share a logger named compiler_gym.envs.client_service_compiler_env",
+                "instances share a logger named compiler_gym.service.client_service_compiler_env",
                 DeprecationWarning,
             )
 
@@ -380,7 +380,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         version="0.2.1",
         reason=(
             "The `ClientServiceCompilerEnv.logger` attribute is deprecated. All ClientServiceCompilerEnv "
-            "instances share a logger named compiler_gym.envs.client_service_compiler_env"
+            "instances share a logger named compiler_gym.service.client_service_compiler_env"
         ),
     )
     def logger(self):

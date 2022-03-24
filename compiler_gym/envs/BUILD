@@ -9,27 +9,10 @@ py_library(
     srcs = ["__init__.py"],
     visibility = ["//visibility:public"],
     deps = [
-        ":client_service_compiler_env",
+        ":compiler_env",
         "//compiler_gym/envs/gcc",
         "//compiler_gym/envs/llvm",
         "//compiler_gym/envs/loop_tool",
-    ],
-)
-
-py_library(
-    name = "client_service_compiler_env",
-    srcs = ["client_service_compiler_env.py"],
-    visibility = ["//compiler_gym:__subpackages__"],
-    deps = [
-        ":compiler_env",
-        "//compiler_gym:compiler_env_state",
-        "//compiler_gym:validation_result",
-        "//compiler_gym/datasets",
-        "//compiler_gym/service",
-        "//compiler_gym/service/proto",
-        "//compiler_gym/spaces",
-        "//compiler_gym/util",
-        "//compiler_gym/views",
     ],
 )
 
@@ -38,6 +21,9 @@ py_library(
     srcs = ["compiler_env.py"],
     visibility = ["//compiler_gym:__subpackages__"],
     deps = [
+        "//compiler_gym:compiler_env_state",
+        "//compiler_gym:validation_result",
+        "//compiler_gym/datasets",
         "//compiler_gym/spaces",
         "//compiler_gym/util",
         "//compiler_gym/views",

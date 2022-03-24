@@ -12,7 +12,7 @@ from ray.rllib.agents.impala import ImpalaTrainer  # noqa
 from ray.rllib.agents.ppo import PPOTrainer  # noqa
 
 from compiler_gym.datasets import BenchmarkUri
-from compiler_gym.envs import ClientServiceCompilerEnv
+from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
 from compiler_gym.util.timer import Timer
 
 logger = logging.getLogger(__name__)

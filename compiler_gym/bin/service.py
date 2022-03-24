@@ -103,7 +103,7 @@ import gym
 from absl import app, flags
 
 from compiler_gym.datasets import Dataset
-from compiler_gym.envs import ClientServiceCompilerEnv
+from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
 from compiler_gym.service.connection import ConnectionOpts
 from compiler_gym.spaces import Commandline, NamedDiscrete
 from compiler_gym.util.flags.env_from_flags import env_from_flags
