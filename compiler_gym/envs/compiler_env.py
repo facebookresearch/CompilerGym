@@ -18,6 +18,42 @@ from compiler_gym.views import ObservationSpaceSpec
 
 
 class CompilerEnv(gym.Env, ABC):
+    """An OpenAI gym environment for compiler optimizations.
+
+    The easiest way to create a CompilerGym environment is to call
+    :code:`gym.make()` on one of the registered environments:
+
+        >>> env = gym.make("llvm-v0")
+
+    See :code:`compiler_gym.COMPILER_GYM_ENVS` for a list of registered
+    environment names.
+
+    Alternatively, an environment can be constructed directly, such as by
+    connecting to a running compiler service at :code:`localhost:8080` (see
+    :doc:`this document </compiler_gym/service>` for more details):
+
+        >>> env = ClientServiceCompilerEnv(
+        ...     service="localhost:8080",
+        ...     observation_space="features",
+        ...     reward_space="runtime",
+        ...     rewards=[env_reward_spaces],
+        ... )
+
+    Once constructed, an environment can be used in exactly the same way as a
+    regular :code:`gym.Env`, e.g.
+
+        >>> observation = env.reset()
+        >>> cumulative_reward = 0
+        >>> for i in range(100):
+        >>>     action = env.action_space.sample()
+        >>>     observation, reward, done, info = env.step(action)
+        >>>     cumulative_reward += reward
+        >>>     if done:
+        >>>         break
+        >>> print(f"Reward after {i} steps: {cumulative_reward}")
+        Reward after 100 steps: -0.32123
+    """
+
     @property
     @abstractmethod
     def observation_space_spec(self) -> ObservationSpaceSpec:
@@ -233,6 +269,7 @@ class CompilerEnv(gym.Env, ABC):
         """
         raise NotImplementedError("abstract method")
 
+    @abstractmethod
     def multistep(
         self,
         actions: Iterable[ActionType],
