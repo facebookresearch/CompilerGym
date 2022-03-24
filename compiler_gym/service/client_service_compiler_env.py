@@ -316,14 +316,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
         self._reward_space_spec = val
 
     @property
-    def benchmark(self) -> Benchmark:
-        return self._benchmark
-
-    @benchmark.setter
-    def benchmark(self, benchmark: Optional[Union[str, Benchmark, BenchmarkUri]]):
-        self._benchmark = benchmark
-
-    @property
     def datasets(self) -> Iterable[Dataset]:
         return self._datasets
 
