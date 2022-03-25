@@ -230,7 +230,7 @@ def make_benchmark(
         You must ensure that any :code:`.bc` and :code:`.ll` files are
         compatible with the LLVM version used by CompilerGym, which can be
         reported using :func:`env.compiler_version
-        <compiler_gym.envs.ClientServiceCompilerEnv.compiler_version>`.
+        <compiler_gym.envs.CompilerEnv.compiler_version>`.
 
     E.g. for single-source C/C++ programs, you can pass the path of the source
     file:

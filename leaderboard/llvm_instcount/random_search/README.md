@@ -56,7 +56,7 @@ elapsed.
 Pseudo-code for this search is:
 
 ```c++
-float search_with_patience(ClientServiceCompilerEnv env, int patience, int search_time) {
+float search_with_patience(CompilerEnv env, int patience, int search_time) {
     float best_reward = -INFINITY;
     int end_time = time() + search_time;
     while (time() < end_time) {

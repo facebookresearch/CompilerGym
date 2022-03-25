@@ -103,7 +103,7 @@ import gym
 from absl import app, flags
 
 from compiler_gym.datasets import Dataset
-from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
+from compiler_gym.envs import CompilerEnv
 from compiler_gym.service.connection import ConnectionOpts
 from compiler_gym.spaces import Commandline, NamedDiscrete
 from compiler_gym.util.flags.env_from_flags import env_from_flags
@@ -190,7 +190,7 @@ def summarize_datasets(datasets: Iterable[Dataset]) -> str:
     )
 
 
-def print_service_capabilities(env: ClientServiceCompilerEnv):
+def print_service_capabilities(env: CompilerEnv):
     """Discover and print the capabilities of a CompilerGym service.
 
     :param env: An environment.
