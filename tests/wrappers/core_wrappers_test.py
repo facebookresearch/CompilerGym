@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 """Unit tests for //compiler_gym/wrappers."""
 import pytest
+from pytest import warns
 
 from compiler_gym.datasets import Datasets
 from compiler_gym.envs.llvm import LlvmEnv
@@ -182,7 +183,11 @@ def test_wrapped_set_benchmark(env: LlvmEnv, wrapper_type):
     assert env.benchmark == "benchmark://cbench-v1/dijkstra"
 
     # Repeat again for a different benchmark.
-    env.benchmark = "benchmark://cbench-v1/crc32"
+    with warns(
+        UserWarning,
+        match=r"Changing the benchmark has no effect until reset\(\) is called",
+    ):
+        env.benchmark = "benchmark://cbench-v1/crc32"
     env.reset()
     assert env.benchmark == "benchmark://cbench-v1/crc32"
 
