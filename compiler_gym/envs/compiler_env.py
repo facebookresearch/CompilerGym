@@ -7,6 +7,7 @@ from abc import ABC, abstractmethod
 from typing import Iterable, List, Optional, Union
 
 import gym
+from deprecated.sphinx import deprecated
 from gym.spaces import Space
 
 from compiler_gym.compiler_env_state import CompilerEnvState
@@ -14,7 +15,7 @@ from compiler_gym.datasets import Benchmark, BenchmarkUri, Dataset
 from compiler_gym.spaces import Reward
 from compiler_gym.util.gym_type_hints import ActionType, ObservationType, StepType
 from compiler_gym.validation_result import ValidationResult
-from compiler_gym.views import ObservationSpaceSpec
+from compiler_gym.views import ObservationSpaceSpec, ObservationView, RewardView
 
 
 class CompilerEnv(gym.Env, ABC):
@@ -146,6 +147,26 @@ class CompilerEnv(gym.Env, ABC):
 
     @property
     @abstractmethod
+    @deprecated(
+        version="0.2.1",
+    )
+    def logger(self):
+        raise NotImplementedError("abstract method")
+
+    @property
+    @abstractmethod
+    def version(self) -> str:
+        """The version string of the compiler service."""
+        raise NotImplementedError("abstract method")
+
+    @property
+    @abstractmethod
+    def compiler_version(self) -> str:
+        """The version string of the underlying compiler that this service supports."""
+        raise NotImplementedError("abstract method")
+
+    @property
+    @abstractmethod
     def state(self) -> CompilerEnvState:
         """The tuple representation of the current environment state."""
         raise NotImplementedError("abstract method")
@@ -165,6 +186,17 @@ class CompilerEnv(gym.Env, ABC):
     @action_space.setter
     @abstractmethod
     def action_space(self, action_space: Optional[str]):
+        raise NotImplementedError("abstract method")
+
+    @property
+    @abstractmethod
+    def action_spaces(self) -> List[str]:
+        """A list of supported action space names."""
+        raise NotImplementedError("abstract method")
+
+    @action_spaces.setter
+    @abstractmethod
+    def action_spaces(self, action_spaces: List[str]):
         raise NotImplementedError("abstract method")
 
     @property
@@ -201,6 +233,32 @@ class CompilerEnv(gym.Env, ABC):
     def observation_space(
         self, observation_space: Optional[Union[str, ObservationSpaceSpec]]
     ) -> None:
+        raise NotImplementedError("abstract method")
+
+    @property
+    @abstractmethod
+    def observation(self) -> ObservationView:
+        """A view of the available observation spaces that permits
+        on-demand computation of observations.
+        """
+        raise NotImplementedError("abstract method")
+
+    @observation.setter
+    @abstractmethod
+    def observation(self, observation: ObservationView) -> None:
+        raise NotImplementedError("abstract method")
+
+    @property
+    @abstractmethod
+    def reward(self) -> RewardView:
+        """A view of the available reward spaces that permits on-demand
+        computation of rewards.
+        """
+        raise NotImplementedError("abstract method")
+
+    @reward.setter
+    @abstractmethod
+    def reward(self, reward: RewardView) -> None:
         raise NotImplementedError("abstract method")
 
     @abstractmethod
@@ -295,6 +353,19 @@ class CompilerEnv(gym.Env, ABC):
 
         :return: A tuple of observation, reward, done, and info. Observation and
             reward are None if default observation/reward is not set.
+        """
+        raise NotImplementedError("abstract method")
+
+    @abstractmethod
+    def render(
+        self,
+        mode="human",
+    ) -> Optional[str]:
+        """Render the environment.
+
+        :param mode: The render mode to use.
+        :raises TypeError: If a default observation space is not set, or if the
+            requested render mode does not exist.
         """
         raise NotImplementedError("abstract method")
 

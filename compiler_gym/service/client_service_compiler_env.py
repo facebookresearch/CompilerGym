@@ -308,6 +308,14 @@ class ClientServiceCompilerEnv(CompilerEnv):
         self._observation_space_spec = observation_space_spec
 
     @property
+    def observation(self) -> ObservationView:
+        return self._observation
+
+    @observation.setter
+    def observation(self, observation: ObservationView) -> None:
+        self._observation = observation
+
+    @property
     def reward_space_spec(self) -> Optional[Reward]:
         return self._reward_space_spec
 
@@ -407,6 +415,14 @@ class ClientServiceCompilerEnv(CompilerEnv):
         self._action_space: NamedDiscrete = self.action_spaces[index]
 
     @property
+    def action_spaces(self) -> List[str]:
+        return self._action_spaces
+
+    @action_spaces.setter
+    def action_spaces(self, action_spaces: List[str]):
+        self._action_spaces = action_spaces
+
+    @property
     def benchmark(self) -> Benchmark:
         return self._benchmark_in_use
 
@@ -462,6 +478,14 @@ class ClientServiceCompilerEnv(CompilerEnv):
             # unbounded.
             self.reward_space_spec = None
             self.reward_range = (-np.inf, np.inf)
+
+    @property
+    def reward(self) -> RewardView:
+        return self._reward
+
+    @reward.setter
+    def reward(self, reward: RewardView) -> None:
+        self._reward = reward
 
     @property
     def in_episode(self) -> bool:
