@@ -133,6 +133,10 @@ class CompilerEnv(gym.Env, ABC):
     @property
     @abstractmethod
     def episode_reward(self) -> Optional[float]:
+        """If :func:`CompilerEnv.reward_space
+        <compiler_gym.envs.CompilerGym.reward_space>` is set, this value is the
+        sum of all rewards for the current episode.
+        """
         raise NotImplementedError("abstract method")
 
     @episode_reward.setter

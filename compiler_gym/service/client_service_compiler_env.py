@@ -89,35 +89,11 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
     :vartype service: compiler_gym.service.CompilerGymServiceConnection
 
-    :ivar action_spaces: A list of supported action space names.
-
-    :vartype action_spaces: List[str]
-
-    :ivar actions: The list of actions that have been performed since the
-        previous call to :func:`reset`.
-
-    :vartype actions: List[ActionType]
 
     :ivar reward_range: A tuple indicating the range of reward values. Default
         range is (-inf, +inf).
 
     :vartype reward_range: Tuple[float, float]
-
-    :ivar observation: A view of the available observation spaces that permits
-        on-demand computation of observations.
-
-    :vartype observation: compiler_gym.views.ObservationView
-
-    :ivar reward: A view of the available reward spaces that permits on-demand
-        computation of rewards.
-
-    :vartype reward: compiler_gym.views.RewardView
-
-    :ivar episode_reward: If :func:`ClientServiceCompilerEnv.reward_space
-        <compiler_gym.envs.CompilerGym.reward_space>` is set, this value is the
-        sum of all rewards for the current episode.
-
-    :vartype episode_reward: float
     """
 
     def __init__(
