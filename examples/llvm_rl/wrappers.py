@@ -137,7 +137,7 @@ class ConcatActionsHistogram(ObservationWrapper):
             self.histogram[a] += self.increment
         return super().multistep(actions, **kwargs)
 
-    def observation(self, observation):
+    def convert_observation(self, observation):
         return np.concatenate((observation, self.histogram)).astype(
             self.env.observation_space.dtype
         )
