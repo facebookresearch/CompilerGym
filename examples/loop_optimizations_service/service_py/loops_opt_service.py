@@ -13,24 +13,31 @@ from pathlib import Path
 from typing import Optional, Tuple
 
 import numpy as np
-import utils
 
 import compiler_gym.third_party.llvm as llvm
 from compiler_gym.service import CompilationSession
 from compiler_gym.service.proto import (
-    Action,
     ActionSpace,
     Benchmark,
-    ChoiceSpace,
+    DictEvent,
+    DictSpace,
+    DoubleRange,
+    Event,
+    Int64Range,
+    Int64SequenceSpace,
+    Int64Tensor,
     NamedDiscreteSpace,
-    Observation,
     ObservationSpace,
-    ScalarLimit,
-    ScalarRange,
-    ScalarRangeList,
+    Space,
+    StringSpace,
 )
 from compiler_gym.service.runtime import create_and_run_compiler_gym_service
+from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_NAMES
+from compiler_gym.third_party.inst2vec import Inst2vecEncoder
 from compiler_gym.util.commands import run_command
+from compiler_gym.util.runfiles_path import runfiles_path  # noqa
+
+_INST2VEC_ENCODER = Inst2vecEncoder()
 
 
 class LoopsOptCompilationSession(CompilationSession):
@@ -42,25 +49,22 @@ class LoopsOptCompilationSession(CompilationSession):
     action_spaces = [
         ActionSpace(
             name="loop-opt",
-            choice=[
-                ChoiceSpace(
-                    name="loop-opt",
-                    named_discrete_space=NamedDiscreteSpace(
-                        value=[
-                            "--loop-unroll --unroll-count=2",
-                            "--loop-unroll --unroll-count=4",
-                            "--loop-unroll --unroll-count=8",
-                            "--loop-unroll --unroll-count=16",
-                            "--loop-unroll --unroll-count=32",
-                            "--loop-vectorize -force-vector-width=2",
-                            "--loop-vectorize -force-vector-width=4",
-                            "--loop-vectorize -force-vector-width=8",
-                            "--loop-vectorize -force-vector-width=16",
-                            "--loop-vectorize -force-vector-width=32",
-                        ]
-                    ),
+            space=Space(
+                named_discrete=NamedDiscreteSpace(
+                    name=[
+                        "--loop-unroll --unroll-count=2",
+                        "--loop-unroll --unroll-count=4",
+                        "--loop-unroll --unroll-count=8",
+                        "--loop-unroll --unroll-count=16",
+                        "--loop-unroll --unroll-count=32",
+                        "--loop-vectorize -force-vector-width=2",
+                        "--loop-vectorize -force-vector-width=4",
+                        "--loop-vectorize -force-vector-width=8",
+                        "--loop-vectorize -force-vector-width=16",
+                        "--loop-vectorize -force-vector-width=32",
+                    ]
                 ),
-            ],
+            ),
         )
     ]
 
@@ -69,37 +73,66 @@ class LoopsOptCompilationSession(CompilationSession):
     observation_spaces = [
         ObservationSpace(
             name="ir",
-            string_size_range=ScalarRange(min=ScalarLimit(value=0)),
+            space=Space(string_value=StringSpace(length_range=Int64Range(min=0))),
             deterministic=True,
             platform_dependent=False,
-            default_value=Observation(string_value=""),
+            default_observation=Event(string_value=""),
         ),
         ObservationSpace(
-            name="features",
-            int64_range_list=ScalarRangeList(
-                range=[
-                    ScalarRange(min=ScalarLimit(value=0), max=ScalarLimit(value=1e5)),
-                    ScalarRange(min=ScalarLimit(value=0), max=ScalarLimit(value=1e5)),
-                    ScalarRange(min=ScalarLimit(value=0), max=ScalarLimit(value=1e5)),
-                ]
+            name="Inst2vec",
+            space=Space(
+                int64_sequence=Int64SequenceSpace(length_range=Int64Range(min=0)),
             ),
         ),
         ObservationSpace(
+            name="Autophase",
+            space=Space(
+                int64_sequence=Int64SequenceSpace(
+                    length_range=Int64Range(
+                        min=len(AUTOPHASE_FEATURE_NAMES),
+                        max=len(AUTOPHASE_FEATURE_NAMES),
+                    )
+                ),
+            ),
+            deterministic=True,
+            platform_dependent=False,
+        ),
+        ObservationSpace(
+            name="AutophaseDict",
+            space=Space(
+                space_dict=DictSpace(
+                    space={
+                        name: Space(int64_value=Int64Range(min=0))
+                        for name in AUTOPHASE_FEATURE_NAMES
+                    }
+                )
+            ),
+            deterministic=True,
+            platform_dependent=False,
+        ),
+        ObservationSpace(
+            name="Programl",
+            space=Space(string_value=StringSpace(length_range=Int64Range(min=0))),
+            deterministic=True,
+            platform_dependent=False,
+            default_observation=Event(string_value=""),
+        ),
+        ObservationSpace(
             name="runtime",
-            scalar_double_range=ScalarRange(min=ScalarLimit(value=0)),
+            space=Space(double_value=DoubleRange(min=0)),
             deterministic=False,
             platform_dependent=True,
-            default_value=Observation(
-                scalar_double=0,
+            default_observation=Event(
+                double_value=0,
             ),
         ),
         ObservationSpace(
             name="size",
-            scalar_double_range=ScalarRange(min=ScalarLimit(value=0)),
+            space=Space(double_value=DoubleRange(min=0)),
             deterministic=True,
             platform_dependent=True,
-            default_value=Observation(
-                scalar_double=0,
+            default_observation=Event(
+                double_value=0,
             ),
         ),
     ]
@@ -115,6 +148,8 @@ class LoopsOptCompilationSession(CompilationSession):
         logging.info("Started a compilation session for %s", benchmark.uri)
         self._benchmark = benchmark
         self._action_space = action_space
+
+        self.inst2vec = _INST2VEC_ENCODER
 
         # Resolve the paths to LLVM binaries once now.
         self._clang = str(llvm.clang_path())
@@ -150,19 +185,16 @@ class LoopsOptCompilationSession(CompilationSession):
             timeout=30,
         )
 
-    def apply_action(self, action: Action) -> Tuple[bool, Optional[ActionSpace], bool]:
-        num_choices = len(self._action_space.choice[0].named_discrete_space.value)
-
-        if len(action.choice) != 1:
-            raise ValueError("Currently we support one choice at a time")
+    def apply_action(self, action: Event) -> Tuple[bool, Optional[ActionSpace], bool]:
+        num_choices = len(self._action_space.space.named_discrete.name)
 
         # This is the index into the action space's values ("a", "b", "c") that
         # the user selected, e.g. 0 -> "a", 1 -> "b", 2 -> "c".
-        choice_index = action.choice[0].named_discrete_value_index
+        choice_index = action.int64_value
         if choice_index < 0 or choice_index >= num_choices:
             raise ValueError("Out-of-range")
 
-        args = self._action_space.choice[0].named_discrete_space.value[choice_index]
+        args = self._action_space.space.named_discrete.name[choice_index]
         logging.info(
             "Applying action %d, equivalent command-line arguments: '%s'",
             choice_index,
@@ -182,7 +214,7 @@ class LoopsOptCompilationSession(CompilationSession):
                 args[i] = arg
             run_command(
                 [
-                    "../opt_loops/opt_loops",
+                    os.path.join(os.path.dirname(__file__), "../opt_loops/opt_loops"),
                     self._llvm_path,
                     *args,
                     "-S",
@@ -225,15 +257,62 @@ class LoopsOptCompilationSession(CompilationSession):
         with open(self._llvm_path) as f:
             return f.read()
 
-    def get_observation(self, observation_space: ObservationSpace) -> Observation:
+    def get_observation(self, observation_space: ObservationSpace) -> Event:
         logging.info("Computing observation from space %s", observation_space.name)
         if observation_space.name == "ir":
-            return Observation(string_value=self.ir)
-        elif observation_space.name == "features":
-            stats = utils.extract_statistics_from_ir(self.ir)
-            observation = Observation()
-            observation.int64_list.value[:] = list(stats.values())
-            return observation
+            return Event(string_value=self.ir)
+        elif observation_space.name == "Inst2vec":
+            Inst2vec_str = self.inst2vec.preprocess(self.ir)
+            Inst2vec_ids = self.inst2vec.encode(Inst2vec_str)
+            return Event(
+                int64_tensor=Int64Tensor(shape=[len(Inst2vec_ids)], value=Inst2vec_ids)
+            )
+        elif observation_space.name == "Autophase":
+            Autophase_str = run_command(
+                [
+                    os.path.join(
+                        os.path.dirname(__file__),
+                        "../../../compiler_gym/third_party/autophase/compute_autophase-prelinked",
+                    ),
+                    self._llvm_path,
+                ],
+                timeout=30,
+            )
+            Autophase_list = list(map(int, list(Autophase_str.split(" "))))
+            return Event(
+                int64_tensor=Int64Tensor(
+                    shape=[len(Autophase_list)], value=Autophase_list
+                )
+            )
+        elif observation_space.name == "AutophaseDict":
+            Autophase_str = run_command(
+                [
+                    os.path.join(
+                        os.path.dirname(__file__),
+                        "../../../compiler_gym/third_party/autophase/compute_autophase-prelinked",
+                    ),
+                    self._llvm_path,
+                ],
+                timeout=30,
+            )
+            Autophase_list = list(map(int, list(Autophase_str.split(" "))))
+            Autophase_dict = {
+                name: Event(int64_value=val)
+                for name, val in zip(AUTOPHASE_FEATURE_NAMES, Autophase_list)
+            }
+            return Event(event_dict=DictEvent(event=Autophase_dict))
+        elif observation_space.name == "Programl":
+            Programl_str = run_command(
+                [
+                    os.path.join(
+                        os.path.dirname(__file__),
+                        "../../../compiler_gym/third_party/programl/compute_programl",
+                    ),
+                    self._llvm_path,
+                ],
+                timeout=30,
+            )
+            return Event(string_value=Programl_str)
         elif observation_space.name == "runtime":
             # compile LLVM to object file
             run_command(
@@ -277,7 +356,7 @@ class LoopsOptCompilationSession(CompilationSession):
                     )
             exec_times = np.sort(exec_times)
             avg_exec_time = np.mean(exec_times[1:4])
-            return Observation(scalar_double=avg_exec_time)
+            return Event(double_value=avg_exec_time)
         elif observation_space.name == "size":
             # compile LLVM to object file
             run_command(
@@ -303,7 +382,7 @@ class LoopsOptCompilationSession(CompilationSession):
                 timeout=30,
             )
             binary_size = os.path.getsize(self._exe_path)
-            return Observation(scalar_double=binary_size)
+            return Event(double_value=binary_size)
         else:
             raise KeyError(observation_space.name)
 

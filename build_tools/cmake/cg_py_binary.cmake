@@ -31,15 +31,15 @@ include(cg_py_library)
 # unique in the project.
 #
 function(cg_py_binary)
-  cmake_parse_arguments(
-    _RULE
-    "PUBLIC;TESTONLY"
-    "NAME;SRCS;GENERATED_SRCS"
-    "DATA;DEPS"
-    ${ARGN}
-  )
+    cmake_parse_arguments(
+        _RULE
+        "PUBLIC;TESTONLY"
+        "NAME;SRCS;GENERATED_SRCS"
+        "DATA;DEPS"
+        ${ARGN}
+    )
 
-  # Currently the same as adding a library.
-  # When install rules are added they will need to split.
-  cg_py_library(${ARGV})
+    # Currently the same as adding a library.
+    # When install rules are added they will need to split.
+    cg_py_library(${ARGV})
 endfunction()

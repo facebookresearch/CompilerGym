@@ -1,8 +1,10 @@
 ---
-# This workflow pip install's teh compiler_gym package and checks that the
-# module can be imported. The goal of this workflow is to catch failures in the
-# installation process that can occur because of a breaking change in the
-# dependent packages.
+# This workflow pip install's the compiler_gym package and checks that the
+# module can be imported.
+#
+# The goal of this workflow is to catch failures in the installation process
+# that can occur because of a breaking change in the dependent packages, and to
+# test for any import-time error.
 name: Pip install test
 
 on:
@@ -26,7 +28,12 @@ jobs:
                   python-version: ${{ matrix.python }}
 
             - name: Install python wheel
-              run: python -m pip install compiler_gym
+              # We use the TestPyPI repository to install the compiler_gym
+              # package from because we use the install count on the main
+              # repository to track growth and usage of the project. We also
+              # provide the main PyPI repo as a fallback for installing
+              # dependencies.
+              run: python -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ compiler_gym
 
             - name: Check package version
               run: python -c 'import compiler_gym; print(compiler_gym.__version__)'

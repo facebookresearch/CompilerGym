@@ -9,7 +9,7 @@ from typing import Iterable
 
 from compiler_gym.datasets import Benchmark, Dataset
 from compiler_gym.datasets.uri import BenchmarkUri
-from compiler_gym.envs.llvm.llvm_benchmark import get_system_includes
+from compiler_gym.envs.llvm.llvm_benchmark import get_system_library_flags
 from compiler_gym.spaces import Reward
 from compiler_gym.third_party import llvm
 from compiler_gym.util.registration import register
@@ -33,7 +33,7 @@ class RuntimeReward(Reward):
 
     def __init__(self):
         super().__init__(
-            id="runtime",
+            name="runtime",
             observation_spaces=["runtime"],
             default_value=0,
             default_negates_returns=True,
@@ -59,7 +59,7 @@ class SizeReward(Reward):
 
     def __init__(self):
         super().__init__(
-            id="size",
+            name="size",
             observation_spaces=["size"],
             default_value=0,
             default_negates_returns=True,
@@ -114,9 +114,7 @@ class UnrollingDataset(Dataset):
             "-I",
             str(NEURO_VECTORIZER_HEADER.parent),
             src,
-        ]
-        for directory in get_system_includes():
-            cmd += ["-isystem", str(directory)]
+        ] + get_system_library_flags()
         return subprocess.check_output(
             cmd,
             timeout=300,

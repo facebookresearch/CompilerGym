@@ -8,6 +8,8 @@ from typing import Optional
 import numpy as np
 from gym.spaces import Space
 
+from compiler_gym.spaces.common import issubdtype
+
 
 class Scalar(Space):
     """A scalar value."""
@@ -44,7 +46,7 @@ class Scalar(Space):
         return self.dtype(random.uniform(min, max))
 
     def contains(self, x):
-        if not isinstance(x, self.dtype):
+        if not issubdtype(type(x), self.dtype):
             return False
         min = -float("inf") if self.min is None else self.min
         max = float("inf") if self.max is None else self.max
@@ -61,4 +63,8 @@ class Scalar(Space):
         """Equality test."""
         if not isinstance(rhs, Scalar):
             return False
-        return self.min == rhs.min and self.max == rhs.max and self.dtype == rhs.dtype
+        return (
+            self.min == rhs.min
+            and self.max == rhs.max
+            and np.dtype(self.dtype) == np.dtype(rhs.dtype)
+        )

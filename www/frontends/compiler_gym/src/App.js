@@ -44,7 +44,6 @@ function App() {
           INITIAL_SETTINGS.reward,
           "",
         );
-        console.log(initSession);
         setCompilerGym(options);
         setSession(initSession);
         setIsLoading(false);

@@ -1,11 +1,22 @@
 # CompilerGym Examples <!-- omit in toc -->
 
-This directory contains code samples for everything from implementing simple
-RL agents to adding support for entirely new compilers. Is there an example that
-you think is missing? If so, please [contribute](/CONTRIBUTING.md)!
+This directory contains standalone code samples for everything from implementing
+simple RL agents to adding support for entirely new compilers. You can run these
+examples using a `pip` installed CompilerGym, though there are some additional
+dependencies that can be installed using:
+
+    make install
+
+Then run the python scripts from this directory. E.g.:
+
+    python actor_critic.py
+
+Is there an example that you think is missing? If so, please file a [feature
+request](https://github.com/facebookresearch/CompilerGym/issues/new/choose) or
+[contribute](/CONTRIBUTING.md)!
 
 
-**Table of contents:**
+## Table of contents  <!-- omit in toc -->
 
 - [Autotuning](#autotuning)
   - [Performing a random walk of an environment](#performing-a-random-walk-of-an-environment)

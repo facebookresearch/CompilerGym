@@ -10,6 +10,7 @@
 #include <optional>
 
 #include "boost/filesystem.hpp"
+#include "compiler_gym/envs/llvm/service/BenchmarkDynamicConfig.h"
 #include "llvm/IR/Module.h"
 
 namespace compiler_gym::llvm_service {
@@ -28,12 +29,10 @@ enum class LlvmCostFunction {
    * Returns the size (in bytes) of the .TEXT section of the compiled module.
    */
   OBJECT_TEXT_SIZE_BYTES,
-#ifdef COMPILER_GYM_EXPERIMENTAL_TEXT_SIZE_COST
   /**
    * Returns the size (in bytes) of the .TEXT section of the compiled binary.
    */
   TEXT_SIZE_BYTES,
-#endif
 };
 
 /**
@@ -73,7 +72,8 @@ bool applyBaselineOptimizationsToModule(llvm::Module* module, unsigned optLevel,
  * @return `OK` on success.
  */
 [[nodiscard]] grpc::Status setCost(const LlvmCostFunction& costFunction, llvm::Module& module,
-                                   const boost::filesystem::path& workingDirectory, double* cost);
+                                   const boost::filesystem::path& workingDirectory,
+                                   const BenchmarkDynamicConfig& dynamicConfig, double* cost);
 
 /**
  * Return a baseline cost.
@@ -98,7 +98,8 @@ double getBaselineCost(const BaselineCosts& baselineCosts, LlvmBaselinePolicy po
  *    storage.
  */
 [[nodiscard]] grpc::Status setBaselineCosts(llvm::Module& unoptimizedModule,
-                                            BaselineCosts* baselineCosts,
-                                            const boost::filesystem::path& workingDirectory);
+                                            const boost::filesystem::path& workingDirectory,
+                                            const BenchmarkDynamicConfig& dynamicConfig,
+                                            BaselineCosts* baselineCosts);
 
 }  // namespace compiler_gym::llvm_service

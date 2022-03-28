@@ -48,6 +48,7 @@ const RewardHistoryChart = ({ session, highlightedPoint, handleClickOnChart }) =
       type: "areaspline",
       height: 18 + "%",
       width: panel.current?.clientWidth,
+      animation: false,
     },
     title: {
       text: "Rewards",

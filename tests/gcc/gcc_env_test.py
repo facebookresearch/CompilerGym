@@ -71,7 +71,7 @@ def test_observation_spaces_failing_because_of_bug(gcc_bin: str):
             name="obj_size", min=-1, max=np.iinfo(np.int64).max, dtype=int
         )
         assert env.observation.spaces["asm"].space == Sequence(
-            name="asm", size_range=(0, None), dtype=str, opaque_data_format=""
+            name="asm", size_range=(0, np.iinfo(np.int64).max), dtype=str
         )
 
 
@@ -290,7 +290,7 @@ def test_obj_observation():
     """Test observation spaces."""
     with gym.make("gcc-v0") as env:
         env.reset()
-        assert env.obj[:5] == b"\x7fELF\x02"
+        assert env.obj[:5].tobytes() == b"\x7fELF\x02"
 
 
 @with_docker

@@ -2,13 +2,14 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+import warnings
 from typing import List, Optional, Tuple, Union
 
 import numpy as np
 
 import compiler_gym
 from compiler_gym.spaces.scalar import Scalar
-from compiler_gym.util.gym_type_hints import ObservationType, RewardType
+from compiler_gym.util.gym_type_hints import ActionType, ObservationType, RewardType
 
 
 class Reward(Scalar):
@@ -27,7 +28,7 @@ class Reward(Scalar):
     """
 
     __slots__ = [
-        "id",
+        "name",
         "observation_spaces",
         "default_value",
         "default_negates_returns",
@@ -38,9 +39,10 @@ class Reward(Scalar):
 
     def __init__(
         self,
-        # TODO(github.com/facebookresearch/CompilerGym/issues/381): Rename `id`
-        # to `name` for consistency with the other space classes.
-        id: str,
+        # NOTE(github.com/facebookresearch/CompilerGym/issues/381): Once `id`
+        # argument has been removed, the default value for `name` can be
+        # removed.
+        name: str = None,
         observation_spaces: Optional[List[str]] = None,
         default_value: RewardType = 0,
         min: Optional[RewardType] = None,
@@ -49,27 +51,31 @@ class Reward(Scalar):
         success_threshold: Optional[RewardType] = None,
         deterministic: bool = False,
         platform_dependent: bool = True,
+        # NOTE(github.com/facebookresearch/CompilerGym/issues/381): Backwards
+        # compatability workaround for deprecated parameter, will be removed in
+        # v0.2.4.
+        id: Optional[str] = None,
     ):
         """Constructor.
 
-        :param id: The ID of the reward space. This is a unique name used to
+        :param name: The name of the reward space. This is a unique name used to
             represent the reward.
         :param observation_spaces: A list of observation space IDs
             (:class:`space.id <compiler_gym.views.ObservationSpaceSpec>` values)
             that are used to compute the reward. May be an empty list if no
             observations are requested. Requested observations will be provided
-            to the :code:`observations` argument of
-            :meth:`reward.update() <compiler_gym.spaces.Reward.update>`.
+            to the :code:`observations` argument of :meth:`reward.update()
+            <compiler_gym.spaces.Reward.update>`.
         :param default_value: A default reward. This value will be returned by
-            :meth:`env.step() <compiler_gym.envs.CompilerEnv.step>` if
-            the service terminates.
+            :meth:`env.step() <compiler_gym.envs.CompilerEnv.step>` if the
+            service terminates.
         :param min: The lower bound of the reward.
         :param max: The upper bound of the reward.
         :param default_negates_returns: If true, the default value will be
             offset by the sum of all rewards for the current episode. For
             example, given a default reward value of *-10.0* and an episode with
-            prior rewards *[0.1, 0.3, -0.15]*, the default value is:
-            *-10.0 - sum(0.1, 0.3, -0.15)*.
+            prior rewards *[0.1, 0.3, -0.15]*, the default value is: *-10.0 -
+            sum(0.1, 0.3, -0.15)*.
         :param success_threshold: The cumulative reward threshold before an
             episode is considered successful. For example, episodes where reward
             is scaled to an existing heuristic can be considered “successful”
@@ -77,14 +83,34 @@ class Reward(Scalar):
         :param deterministic: Whether the reward space is deterministic.
         :param platform_dependent: Whether the reward values depend on the
             execution environment of the service.
+        :param id: The name of the reward space.
+
+            .. deprecated:: 0.2.3
+                Use :code:`name` instead.
         """
         super().__init__(
-            name=id,
+            name=name,
             min=-np.inf if min is None else min,
             max=np.inf if max is None else max,
             dtype=np.float64,
         )
-        self.id = id
+
+        # NOTE(github.com/facebookresearch/CompilerGym/issues/381): Backwards
+        # compatability workaround for deprecated parameter, will be removed in
+        # v0.2.4.
+        if id is not None:
+            warnings.warn(
+                "The `id` argument of "
+                "compiler_gym.spaces.Reward.__init__() "
+                "has been renamed `name`. This will break in a future release, "
+                "please update your code.",
+                DeprecationWarning,
+            )
+        self.name = name or id
+        self.id = self.name
+        if not self.name:
+            raise TypeError("No name given")
+
         self.observation_spaces = observation_spaces or []
         self.default_value: RewardType = default_value
         self.default_negates_returns: bool = default_negates_returns
@@ -106,7 +132,7 @@ class Reward(Scalar):
 
     def update(
         self,
-        actions: List[int],
+        actions: List[ActionType],
         observations: List[ObservationType],
         observation_view: "compiler_gym.views.ObservationView",  # noqa: F821
     ) -> RewardType:
@@ -142,13 +168,13 @@ class Reward(Scalar):
         return (self.min, self.max)
 
     def __repr__(self):
-        return self.id
+        return self.name
 
     def __eq__(self, other: Union["Reward", str]) -> bool:
         if isinstance(other, str):
-            return self.id == other
+            return self.name == other
         elif isinstance(other, Reward):
-            return self.id == other.id
+            return self.name == other.name
         else:
             return False
 
@@ -156,7 +182,7 @@ class Reward(Scalar):
 class DefaultRewardFromObservation(Reward):
     def __init__(self, observation_name: str, **kwargs):
         super().__init__(
-            observation_spaces=[observation_name], id=observation_name, **kwargs
+            observation_spaces=[observation_name], name=observation_name, **kwargs
         )
         self.previous_value: Optional[ObservationType] = None
 

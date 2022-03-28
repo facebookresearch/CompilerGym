@@ -40,25 +40,6 @@ http_archive(
     urls = ["https://github.com/google/glog/archive/v0.4.0.tar.gz"],
 )
 
-# C++ subprocess management. https://github.com/arun11299/cpp-subprocess
-
-http_archive(
-    name = "subprocess",
-    build_file_content = """
-cc_library(
-    name = "subprocess",
-    hdrs = ["subprocess.hpp"],
-    include_prefix = "subprocess",
-    visibility = ["//visibility:public"],
-)
-""",
-    sha256 = "886df0a814a7bb7a3fdeead22f75400abd8d3235b81d05817bc8c1125eeebb8f",
-    strip_prefix = "cpp-subprocess-2.0",
-    urls = [
-        "https://github.com/arun11299/cpp-subprocess/archive/v2.0.tar.gz",
-    ],
-)
-
 # === LLVM ===
 
 http_archive(
@@ -296,9 +277,12 @@ http_archive(
 http_archive(
     name = "csmith",
     build_file_content = all_content,
-    sha256 = "ba871c1e5a05a71ecd1af514fedba30561b16ee80b8dd5ba8f884eaded47009f",
+    sha256 = "9d024a6b202f6a1b9e01351218a85888c06b67b837fe4c6f8ef5bd522fae098c",
     strip_prefix = "csmith-csmith-2.3.0",
-    urls = ["https://github.com/csmith-project/csmith/archive/refs/tags/csmith-2.3.0.tar.gz"],
+    urls = [
+        "https://github.com/ChrisCummins/csmith/archive/refs/tags/csmith-2.3.0.tar.gz",
+        "https://github.com/csmith-project/csmith/archive/refs/tags/csmith-2.3.0.tar.gz",
+    ],
 )
 
 # === DeepDataFlow ===
@@ -350,9 +334,9 @@ boost_deps()
 
 http_archive(
     name = "programl",
-    sha256 = "c56360aade351eda1c138a594177fcb7cd2cda2a0a6c5c0d9aa62c7f856194bd",
-    strip_prefix = "ProGraML-4f0981d7a0d27aecef3d6e918c886642b231562d",
-    urls = ["https://github.com/ChrisCummins/ProGraML/archive/4f0981d7a0d27aecef3d6e918c886642b231562d.tar.gz"],
+    sha256 = "704826311b842b3ffc2dedcce593fdd319d76e95bdf5386985768007ebb22316",
+    strip_prefix = "ProGraML-83f00233b04f4ecf7f12a79c80ffe23c2953913f",
+    urls = ["https://github.com/ChrisCummins/ProGraML/archive/83f00233b04f4ecf7f12a79c80ffe23c2953913f.tar.gz"],
 )
 
 load("@programl//tools:bzl/deps.bzl", "programl_deps")

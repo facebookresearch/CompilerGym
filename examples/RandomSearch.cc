@@ -51,7 +51,7 @@ class Environment {
       : service_(workingDir), benchmark_(benchmark) {}
 
   // Reset the environment and compute the initial observation.
-  [[nodiscard]] Status reset(Observation* observation) {
+  [[nodiscard]] Status reset(Event* observation) {
     if (inEpisode_) {
       RETURN_IF_ERROR(close());
     }
@@ -85,12 +85,12 @@ class Environment {
   }
 
   // Apply the given action and compute an observation.
-  [[nodiscard]] Status step(LlvmAction action, Observation* observation) {
+  [[nodiscard]] Status step(LlvmAction action, Event* observation) {
     StepRequest request;
     StepReply reply;
 
     request.set_session_id(sessionId_);
-    request.add_action()->add_choice()->set_named_discrete_value_index(static_cast<int>(action));
+    request.add_action()->set_int64_value(static_cast<int>(action));
     request.add_observation_space(static_cast<int>(observationSpace));
     RETURN_IF_ERROR(service_.Step(nullptr, &request, &reply));
     CHECK(reply.observation_size() == 1);
@@ -109,9 +109,9 @@ Status runSearch(const fs::path& workingDir, std::vector<int>* bestActions, int6
   Environment<LlvmObservationSpace::IR_INSTRUCTION_COUNT> environment(workingDir, FLAGS_benchmark);
 
   // Reset the environment.
-  Observation init;
-  RETURN_IF_ERROR(environment.reset(&init));
-  *bestCost = init.scalar_int64();
+  Event observation;
+  RETURN_IF_ERROR(environment.reset(&observation));
+  *bestCost = observation.int64_value();
 
   // Run a bunch of actions randomly.
   srand(time(NULL));
@@ -120,9 +120,9 @@ Status runSearch(const fs::path& workingDir, std::vector<int>* bestActions, int6
     int action = rand() % magic_enum::enum_count<LlvmAction>();
     actions.push_back(action);
 
-    Observation obs;
+    Event obs;
     RETURN_IF_ERROR(environment.step(static_cast<LlvmAction>(action), &obs));
-    int64_t cost = obs.scalar_int64();
+    int64_t cost = obs.int64_value();
 
     if (cost < *bestCost) {
       *bestCost = cost;

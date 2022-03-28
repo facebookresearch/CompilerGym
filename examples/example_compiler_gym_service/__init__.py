@@ -28,7 +28,7 @@ class RuntimeReward(Reward):
 
     def __init__(self):
         super().__init__(
-            id="runtime",
+            name="runtime",
             observation_spaces=["runtime"],
             default_value=0,
             default_negates_returns=True,
@@ -72,9 +72,9 @@ class ExampleDataset(Dataset):
     def benchmark_uris(self) -> Iterable[str]:
         yield from (f"benchmark://example-v0{k}" for k in self._benchmarks.keys())
 
-    def benchmark_from_parsed_uris(self, uri: BenchmarkUri) -> Benchmark:
+    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
         if uri.path in self._benchmarks:
-            return self._benchmarks[uri]
+            return self._benchmarks[uri.path]
         else:
             raise LookupError("Unknown program name")
 

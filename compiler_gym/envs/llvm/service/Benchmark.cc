@@ -54,31 +54,9 @@ std::unique_ptr<llvm::Module> makeModuleOrDie(llvm::LLVMContext& context, const 
   return module;
 }
 
-RealizedBenchmarkDynamicConfig realizeDynamicConfig(const BenchmarkDynamicConfig& original,
-                                                    const fs::path& scratchDirectory) {
-  BenchmarkDynamicConfig cfg;
-  cfg.CopyFrom(original);
+}  // anonymous namespace
 
-  // Set up the environment variables.
-  (*cfg.mutable_build_cmd()->mutable_env())["CC"] =
-      util::getSiteDataPath("llvm-v0/bin/clang").string();
-  (*cfg.mutable_build_cmd()->mutable_env())["IN"] = (scratchDirectory / "out.bc").string();
-
-  // Register the IR as a pre-requisite build file.
-  cfg.mutable_build_cmd()->add_infile((scratchDirectory / "out.bc").string());
-
-  return RealizedBenchmarkDynamicConfig(cfg);
-}
-
-/**
- * Create a temporary directory to use as a scratch pad for on-disk storage.
- * This directory is guaranteed to exist.
- *
- * Errors in this function are fatal.
- *
- * @return fs::path A path.
- */
-fs::path createScratchDirectoryOrDie() {
+fs::path createBenchmarkScratchDirectoryOrDie() {
   const fs::path cacheRoot = util::getCacheRootPath();
   const fs::path dir = fs::unique_path(cacheRoot / "benchmark-scratch-%%%%-%%%%");
 
@@ -87,8 +65,6 @@ fs::path createScratchDirectoryOrDie() {
   CHECK(!ec) << "Failed to create scratch directory: " << dir;
   return dir;
 }
-
-}  // anonymous namespace
 
 Status readBitcodeFile(const fs::path& path, Bitcode* bitcode) {
   std::ifstream ifs(path.string());
@@ -121,42 +97,48 @@ std::unique_ptr<llvm::Module> makeModule(llvm::LLVMContext& context, const Bitco
                                          const std::string& name, Status* status) {
   llvm::MemoryBufferRef buffer(llvm::StringRef(bitcode.data(), bitcode.size()), name);
   VLOG(3) << "llvm::parseBitcodeFile(" << bitcode.size() << " bits)";
+
   llvm::Expected<std::unique_ptr<llvm::Module>> moduleOrError =
       llvm::parseBitcodeFile(buffer, context);
-  if (moduleOrError) {
-    *status = Status::OK;
-    std::unique_ptr<llvm::Module> module = std::move(moduleOrError.get());
-
-    // Strip the module identifiers and source file names from the module to
-    // anonymize them. This is to deter learning algorithms from overfitting to
-    // benchmarks by their name.
-    module->setModuleIdentifier("-");
-    module->setSourceFileName("-");
-
-    // Strip module debug info.
-    llvm::StripDebugInfo(*module);
-
-    // Erase module-level named metadata.
-    while (!module->named_metadata_empty()) {
-      llvm::NamedMDNode* nmd = &*module->named_metadata_begin();
-      module->eraseNamedMetadata(nmd);
-    }
-
-    return module;
-  } else {
+  if (auto error = moduleOrError.takeError()) {
     *status = Status(StatusCode::INVALID_ARGUMENT,
                      fmt::format("Failed to parse LLVM bitcode: \"{}\"", name));
     return nullptr;
   }
+
+  *status = Status::OK;
+  std::unique_ptr<llvm::Module> module = std::move(moduleOrError.get());
+
+  if (!module) {
+    *status = Status(StatusCode::INTERNAL, "llvm::parseBitcodeFile return null");
+    return nullptr;
+  }
+
+  // Strip the module identifiers and source file names from the module to
+  // anonymize them. This is to deter learning algorithms from overfitting to
+  // benchmarks by their name.
+  module->setModuleIdentifier("-");
+  module->setSourceFileName("-");
+
+  // Strip module debug info.
+  llvm::StripDebugInfo(*module);
+
+  // Erase module-level named metadata.
+  while (!module->named_metadata_empty()) {
+    llvm::NamedMDNode* nmd = &*module->named_metadata_begin();
+    module->eraseNamedMetadata(nmd);
+  }
+
+  return module;
 }
 
 // A benchmark is an LLVM module and the LLVM context that owns it.
 Benchmark::Benchmark(const std::string& name, const Bitcode& bitcode,
-                     const BenchmarkDynamicConfig& dynamicConfig, const fs::path& workingDirectory,
-                     const BaselineCosts& baselineCosts)
+                     const compiler_gym::BenchmarkDynamicConfig& dynamicConfig,
+                     const fs::path& workingDirectory, const BaselineCosts& baselineCosts)
     : context_(std::make_unique<llvm::LLVMContext>()),
       module_(makeModuleOrDie(*context_, bitcode, name)),
-      scratchDirectory_(createScratchDirectoryOrDie()),
+      scratchDirectory_(createBenchmarkScratchDirectoryOrDie()),
       dynamicConfigProto_(dynamicConfig),
       dynamicConfig_(realizeDynamicConfig(dynamicConfig, scratchDirectory_)),
       baselineCosts_(baselineCosts),
@@ -168,11 +150,11 @@ Benchmark::Benchmark(const std::string& name, const Bitcode& bitcode,
 
 Benchmark::Benchmark(const std::string& name, std::unique_ptr<llvm::LLVMContext> context,
                      std::unique_ptr<llvm::Module> module,
-                     const BenchmarkDynamicConfig& dynamicConfig, const fs::path& workingDirectory,
-                     const BaselineCosts& baselineCosts)
+                     const compiler_gym::BenchmarkDynamicConfig& dynamicConfig,
+                     const fs::path& workingDirectory, const BaselineCosts& baselineCosts)
     : context_(std::move(context)),
       module_(std::move(module)),
-      scratchDirectory_(createScratchDirectoryOrDie()),
+      scratchDirectory_(createBenchmarkScratchDirectoryOrDie()),
       dynamicConfigProto_(dynamicConfig),
       dynamicConfig_(realizeDynamicConfig(dynamicConfig, scratchDirectory_)),
       baselineCosts_(baselineCosts),
@@ -180,9 +162,12 @@ Benchmark::Benchmark(const std::string& name, std::unique_ptr<llvm::LLVMContext>
       needsRecompile_(true) {}
 
 void Benchmark::close() {
+  VLOG(3) << "Closing benchmark " << name() << " with scratch directory "
+          << scratchDirectory().string();
   sys::error_code ec;
   fs::remove_all(scratchDirectory(), ec);
   CHECK(!ec) << "Failed to delete scratch directory: " << scratchDirectory().string();
+  VLOG(3) << "Closed benchmark " << name();
 }
 
 std::unique_ptr<Benchmark> Benchmark::clone(const fs::path& workingDirectory) const {
@@ -221,8 +206,8 @@ Status Benchmark::writeBitcodeToFile(const fs::path& path) {
   return writeBitcodeFile(module(), path);
 }
 
-Status Benchmark::computeRuntime(Observation& observation) {
-  const RealizedBenchmarkDynamicConfig& cfg = dynamicConfig();
+Status Benchmark::computeRuntime(Event& observation) {
+  const BenchmarkDynamicConfig& cfg = dynamicConfig();
 
   if (!cfg.isRunnable()) {
     return Status::OK;
@@ -253,14 +238,15 @@ Status Benchmark::computeRuntime(Observation& observation) {
 
   // Run the binary.
   VLOG(3) << "Running " << getRuntimesPerObservationCount() << " iterations of binary";
+  *observation.mutable_double_tensor()->mutable_shape()->Add() = getRuntimesPerObservationCount();
   for (int i = 0; i < getRuntimesPerObservationCount(); ++i) {
     const auto startTime = std::chrono::steady_clock::now();
     RETURN_IF_ERROR(cfg.runCommand().checkCall());
     const auto endTime = std::chrono::steady_clock::now();
     const auto elapsedMicroseconds =
         std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime).count();
-    observation.mutable_double_list()->add_value(static_cast<double>(elapsedMicroseconds) /
-                                                 1000000);
+    *observation.mutable_double_tensor()->mutable_value()->Add() =
+        static_cast<double>(elapsedMicroseconds) / 1000000;
   }
 
   RETURN_IF_ERROR(cfg.runCommand().checkOutfiles());
@@ -275,15 +261,16 @@ Status Benchmark::computeRuntime(Observation& observation) {
   return Status::OK;
 }
 
-Status Benchmark::computeBuildtime(Observation& observation) {
+Status Benchmark::computeBuildtime(Event& observation) {
   if (!dynamicConfig().isBuildable()) {
     return Status::OK;
   }
 
   RETURN_IF_ERROR(compile());
 
-  observation.mutable_double_list()->add_value(static_cast<double>(lastBuildTimeMicroseconds()) /
-                                               1000000);
+  *observation.mutable_double_tensor()->mutable_shape()->Add() = 1;
+  *observation.mutable_double_tensor()->mutable_value()->Add() =
+      static_cast<double>(lastBuildTimeMicroseconds()) / 1000000;
 
   return Status::OK;
 }
@@ -330,26 +317,5 @@ Status Benchmark::compile() {
 bool Benchmark::applyBaselineOptimizations(unsigned optLevel, unsigned sizeLevel) {
   return applyBaselineOptimizationsToModule(&module(), optLevel, sizeLevel);
 }
-
-namespace {
-
-std::vector<util::LocalShellCommand> commandsFromProto(
-    const google::protobuf::RepeatedPtrField<Command>& cmds) {
-  std::vector<util::LocalShellCommand> outs;
-  for (const auto& cmd : cmds) {
-    outs.push_back(util::LocalShellCommand(cmd));
-  }
-  return outs;
-}
-
-}  // anonymous namespace
-
-RealizedBenchmarkDynamicConfig::RealizedBenchmarkDynamicConfig(const BenchmarkDynamicConfig& cfg)
-    : buildCommand_(cfg.build_cmd()),
-      runCommand_(cfg.run_cmd()),
-      preRunCommands_(commandsFromProto(cfg.pre_run_cmd())),
-      postRunCommands_(commandsFromProto(cfg.post_run_cmd())),
-      isBuildable_(!buildCommand_.empty()),
-      isRunnable_(!(buildCommand_.empty() || runCommand_.empty())) {}
 
 }  // namespace compiler_gym::llvm_service

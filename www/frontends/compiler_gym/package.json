@@ -14,7 +14,7 @@
     "highcharts-react-official": "^3.0.0",
     "node-sass": "^6.0.1",
     "react": "^17.0.2",
-    "react-bootstrap": "^2.0.0-beta.4",
+    "react-bootstrap": "^2.0.4",
     "react-d3-tree": "^3.1.1",
     "react-dom": "^17.0.2",
     "react-highlight": "^0.14.0",
@@ -23,8 +23,13 @@
     "web-vitals": "^1.1.2"
   },
   "scripts": {
+<<<<<<< HEAD
     "start": "react-scripts start",
     "build": "react-scripts build",
+=======
+    "start": "react-scripts --openssl-legacy-provider start",
+    "build": "react-scripts --openssl-legacy-provider build",
+>>>>>>> origin/development
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

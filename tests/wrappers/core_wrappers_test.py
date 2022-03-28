@@ -92,7 +92,7 @@ def test_wrapped_step_multi_step(env: LlvmEnv):
     """Test passing a list of actions to step()."""
     env = CompilerEnvWrapper(env)
     env.reset()
-    env.step([0, 0, 0])
+    env.multistep([0, 0, 0])
 
     assert env.actions == [0, 0, 0]
 
@@ -107,12 +107,15 @@ def test_wrapped_step_custom_args(env: LlvmEnv, wrapper_type):
         def action(self, action):
             return action  # pass thru
 
+        def reward(self, reward):
+            return reward
+
     env = MyWrapper(env)
     env.reset()
-    (ir, ic), (icr, icroz), _, _ = env.step(
-        action=[0, 0, 0],
-        observations=["Ir", "IrInstructionCount"],
-        rewards=["IrInstructionCount", "IrInstructionCountOz"],
+    (ir, ic), (icr, icroz), _, _ = env.multistep(
+        actions=[0, 0, 0],
+        observation_spaces=["Ir", "IrInstructionCount"],
+        reward_spaces=["IrInstructionCount", "IrInstructionCountOz"],
     )
     assert isinstance(ir, str)
     assert isinstance(ic, int)
@@ -190,7 +193,7 @@ def test_wrapped_env_changes_default_spaces(env: LlvmEnv, wrapper_type):
     env = MyWrapper(env)
     assert env.observation_space.shape == (56,)
     assert env.observation_space_spec.id == "Autophase"
-    assert env.reward_space.id == "IrInstructionCount"
+    assert env.reward_space.name == "IrInstructionCount"
 
     observation = env.reset()
     assert env.observation_space.contains(observation)
@@ -210,10 +213,10 @@ def test_wrapped_env_change_spaces(env: LlvmEnv, wrapper_type):
 
     assert env.observation_space.shape == (56,)
     assert env.observation_space_spec.id == "Autophase"
-    assert env.reward_space.id == "IrInstructionCount"
+    assert env.reward_space.name == "IrInstructionCount"
 
 
-def test_wrapped_action(env: LlvmEnv):
+def test_wrapped_action(mocker, env: LlvmEnv):
     class MyWrapper(ActionWrapper):
         def action(self, action):
             return action - 1
@@ -222,14 +225,17 @@ def test_wrapped_action(env: LlvmEnv):
             return action + 1
 
     env = MyWrapper(env)
+    mocker.spy(env, "action")
+
     env.reset()
     env.step(1)
     env.step(2)
 
+    assert env.action.call_count == 2  # pylint: disable=no-member
     assert env.actions == [0, 1]
 
 
-def test_wrapped_observation(env: LlvmEnv):
+def test_wrapped_observation(mocker, env: LlvmEnv):
     """Test using an ObservationWrapper that returns the length of the Ir string."""
 
     class MyWrapper(ObservationWrapper):
@@ -241,8 +247,10 @@ def test_wrapped_observation(env: LlvmEnv):
             return len(observation)
 
     env = MyWrapper(env)
+
     assert env.reset() > 0
     observation, _, _, _ = env.step(0)
+
     assert observation > 0
 
 

@@ -2,33 +2,13 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-import json
-from typing import Callable, Optional, Union
+from typing import Any, Callable, ClassVar, Optional, Union
 
-import networkx as nx
-import numpy as np
 from gym.spaces import Space
 
-from compiler_gym.service.proto import Observation, ObservationSpace, ScalarRange
-from compiler_gym.spaces.box import Box
-from compiler_gym.spaces.scalar import Scalar
-from compiler_gym.spaces.sequence import Sequence
+from compiler_gym.service.proto import Event, ObservationSpace, py_converters
 from compiler_gym.util.gym_type_hints import ObservationType
-
-
-def _json2nx(observation):
-    json_data = json.loads(observation.string_value)
-    return nx.readwrite.json_graph.node_link_graph(
-        json_data, multigraph=True, directed=True
-    )
-
-
-def _scalar_range2tuple(sr: ScalarRange, defaults=(-np.inf, np.inf)):
-    """Convert a ScalarRange to a tuple of (min, max) bounds."""
-    return (
-        sr.min.value if sr.HasField("min") else defaults[0],
-        sr.max.value if sr.HasField("max") else defaults[1],
-    )
+from compiler_gym.util.shell_format import indent
 
 
 class ObservationSpaceSpec:
@@ -57,12 +37,16 @@ class ObservationSpaceSpec:
         is set and the service terminates.
     """
 
+    message_converter: ClassVar[
+        Callable[[Any], Any]
+    ] = py_converters.make_message_default_converter()
+
     def __init__(
         self,
         id: str,
         index: int,
         space: Space,
-        translate: Callable[[Union[ObservationType, Observation]], ObservationType],
+        translate: Callable[[Union[ObservationType, Event]], ObservationType],
         to_string: Callable[[ObservationType], str],
         deterministic: bool,
         platform_dependent: bool,
@@ -110,146 +94,41 @@ class ObservationSpaceSpec:
 
     @classmethod
     def from_proto(cls, index: int, proto: ObservationSpace):
-        """Construct a space from an ObservationSpace message."""
-        shape_type = proto.WhichOneof("shape")
+        """Create an observation space from a ObservationSpace protocol buffer.
 
-        def make_box(scalar_range_list, dtype, defaults):
-            bounds = [_scalar_range2tuple(r, defaults) for r in scalar_range_list]
-            return Box(
-                name=proto.name,
-                low=np.array([b[0] for b in bounds], dtype=dtype),
-                high=np.array([b[1] for b in bounds], dtype=dtype),
-                dtype=dtype,
-            )
+        :param index: The index of this observation space into the list of
+            observation spaces that the compiler service supports.
 
-        def make_scalar(scalar_range, dtype, defaults):
-            scalar_range_tuple = _scalar_range2tuple(scalar_range, defaults)
-            return Scalar(
-                name=proto.name,
-                min=dtype(scalar_range_tuple[0]),
-                max=dtype(scalar_range_tuple[1]),
-                dtype=dtype,
-            )
+        :param proto: An ObservationSpace protocol buffer.
 
-        def make_seq(size_range, dtype, defaults, scalar_range=None):
-            return Sequence(
-                name=proto.name,
-                size_range=_scalar_range2tuple(size_range, defaults),
-                dtype=dtype,
-                opaque_data_format=proto.opaque_data_format,
-                scalar_range=scalar_range,
-            )
+        :raises ValueError: If protocol buffer is invalid.
+        """
+        try:
+            spec = ObservationSpaceSpec.message_converter(proto.space)
+        except ValueError as e:
+            raise ValueError(
+                f"Error interpreting description of observation space '{proto.name}'.\n"
+                f"Error: {e}\n"
+                f"ObservationSpace message:\n"
+                f"{indent(proto.space, n=2)}"
+            ) from e
 
-        # Translate from protocol buffer specification to python. There are
-        # three variables to derive:
-        #   (1) space: the gym.Space instance describing the space.
-        #   (2) translate: is a callback that translates from an Observation
-        #           message to a python type.
-        #   (3) to_string: is a callback that translates from a python type to a
-        #           string for printing.
-        if proto.opaque_data_format == "json://networkx/MultiDiGraph":
-            # TODO(cummins): Add a Graph space.
-            space = make_seq(proto.string_size_range, str, (0, None))
-
-            def translate(observation):
-                return nx.readwrite.json_graph.node_link_graph(
-                    json.loads(observation.string_value), multigraph=True, directed=True
-                )
-
-            def to_string(observation):
-                return json.dumps(
-                    nx.readwrite.json_graph.node_link_data(observation), indent=2
-                )
-
-        elif proto.opaque_data_format == "json://":
-            space = make_seq(proto.string_size_range, str, (0, None))
-
-            def translate(observation):
-                return json.loads(observation.string_value)
-
-            def to_string(observation):
-                return json.dumps(observation, indent=2)
-
-        elif shape_type == "int64_range_list":
-            space = make_box(
-                proto.int64_range_list.range,
-                np.int64,
-                (np.iinfo(np.int64).min, np.iinfo(np.int64).max),
-            )
-
-            def translate(observation):
-                return np.array(observation.int64_list.value, dtype=np.int64)
-
-            to_string = str
-        elif shape_type == "double_range_list":
-            space = make_box(
-                proto.double_range_list.range, np.float64, (-np.inf, np.inf)
-            )
-
-            def translate(observation):
-                return np.array(observation.double_list.value, dtype=np.float64)
-
-            to_string = str
-        elif shape_type == "string_size_range":
-            space = make_seq(proto.string_size_range, str, (0, None))
-
-            def translate(observation):
-                return observation.string_value
-
-            to_string = str
-        elif shape_type == "binary_size_range":
-            space = make_seq(proto.binary_size_range, bytes, (0, None))
-
-            def translate(observation):
-                return observation.binary_value
-
-            to_string = str
-        elif shape_type == "scalar_int64_range":
-            space = make_scalar(
-                proto.scalar_int64_range,
-                int,
-                (np.iinfo(np.int64).min, np.iinfo(np.int64).max),
-            )
-
-            def translate(observation):
-                return int(observation.scalar_int64)
-
-            to_string = str
-        elif shape_type == "scalar_double_range":
-            space = make_scalar(proto.scalar_double_range, float, (-np.inf, np.inf))
-
-            def translate(observation):
-                return float(observation.scalar_double)
-
-            to_string = str
-        elif shape_type == "double_sequence":
-            space = make_seq(
-                proto.double_sequence.length_range,
-                np.float64,
-                (-np.inf, np.inf),
-                make_scalar(
-                    proto.double_sequence.scalar_range, np.float64, (-np.inf, np.inf)
-                ),
-            )
-
-            def translate(observation):
-                return np.array(observation.double_list.value, dtype=np.float64)
-
-            to_string = str
-        else:
-            raise TypeError(
-                f"Unknown shape '{shape_type}' for ObservationSpace:\n{proto}"
-            )
+        # TODO(cummins): Additional validation of the observation space
+        # specification would be useful here, such as making sure that the size
+        # of {low, high} tensors for box shapes match. At present, these errors
+        # tend not to show up until later, making it more difficult to debug.
 
         return cls(
             id=proto.name,
             index=index,
-            space=space,
-            translate=translate,
-            to_string=to_string,
+            space=spec,
+            translate=ObservationSpaceSpec.message_converter,
+            to_string=str,
             deterministic=proto.deterministic,
             platform_dependent=proto.platform_dependent,
-            default_value=translate(proto.default_value),
+            default_value=ObservationSpaceSpec.message_converter(
+                proto.default_observation
+            ),
         )
 
     def make_derived_space(

@@ -9,11 +9,5 @@ runs:
               if [ "$(uname)" = "Darwin" ]; then
                   brew install zlib
               fi
-          shell: bash
-
-        # DGL creates ~/.dgl on first run and I have found that this will fail
-        # if run from pytest / bazel. Suppress errors if DGL is not installed.
-        - name: Initialize DGL
-          run: |
-              python3 -c 'import dgl; print(dgl.__version__)' || true
+              python -m pip install -U pip wheel
           shell: bash

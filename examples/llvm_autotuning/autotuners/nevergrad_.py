@@ -10,6 +10,7 @@ import nevergrad as ng
 from llvm_autotuning.optimization_target import OptimizationTarget
 
 from compiler_gym.envs import CompilerEnv
+from compiler_gym.util.gym_type_hints import ActionType
 
 
 def nevergrad(
@@ -30,17 +31,17 @@ def nevergrad(
     """
     if optimization_target == OptimizationTarget.RUNTIME:
 
-        def calculate_negative_reward(actions: Tuple[int]) -> float:
+        def calculate_negative_reward(actions: Tuple[ActionType]) -> float:
             env.reset()
-            env.step(actions)
+            env.multistep(actions)
             return -env.episode_reward
 
     else:
         # Only cache the deterministic non-runtime rewards.
         @lru_cache(maxsize=int(1e4))
-        def calculate_negative_reward(actions: Tuple[int]) -> float:
+        def calculate_negative_reward(actions: Tuple[ActionType]) -> float:
             env.reset()
-            env.step(actions)
+            env.multistep(actions)
             return -env.episode_reward
 
     params = ng.p.Choice(
@@ -61,4 +62,4 @@ def nevergrad(
     # Get best solution and replay it.
     recommendation = optimizer.provide_recommendation()
     env.reset()
-    env.step(recommendation.value)
+    env.multistep(recommendation.value)

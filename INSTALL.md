@@ -54,7 +54,7 @@ with the required dependencies:
 
     conda create -y -n compiler_gym python=3.8
     conda activate compiler_gym
-    conda install -y -c conda-forge cmake pandoc patchelf
+    conda install -y -c conda-forge cmake doxygen pandoc patchelf
 
 Then clone the CompilerGym source code using:
 
@@ -122,24 +122,24 @@ By default most dependencies are built together with Compiler Gym. To search for
 * `COMPILER_GYM_GLOG_PROVIDER`
 * `COMPILER_GYM_GRPC_PROVIDER`
 * `COMPILER_GYM_GTEST_PROVIDER`
+* `COMPILER_GYM_LLVM_PROVIDER`
 * `COMPILER_GYM_NLOHMANN_JSON_PROVIDER`
 * `COMPILER_GYM_PROTOBUF_PROVIDER`
 
 ```bash
-cmake -GNinja \
+cmake \
   -DCMAKE_C_COMPILER=clang-9 \
   -DCMAKE_CXX_COMPILER=clang++-9 \
-  -DCMAKE_C_COMPILER_LAUNCHER=ccache -DCMAKE_CXX_COMPILER_LAUNCHER=ccache \ # For faster rebuilds, can be removed
-  -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=lld" -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=lld" -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=lld" \ # For faster builds, can be removed
   -DPython3_FIND_VIRTUALENV=FIRST \
   -DCMAKE_BUILD_WITH_INSTALL_RPATH=true \
   -S "<path to source directory>" \
   -B "<path to build directory>"
 
-cmake  --build "<path to build directory>"
+cmake --build "<path to build directory>"
 
 pip install <path to build directory>/py_pkg/dist/compiler_gym*.whl --force-reinstall
 ```
+
 Additional optional configuration arguments:
 
 * Enables testing.
@@ -168,3 +168,18 @@ Additional optional configuration arguments:
     -DCMAKE_C_COMPILER_LAUNCHER=ccache
     -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
     ```
+
+By default, CompilerGym builds LLVM from source. This takes a long time and a
+lot of compute resources. To prevent this, download a pre-compiled clang+llvm
+release of LLVM 10.0.0 from the [llvm-project releases
+page](https://github.com/llvm/llvm-project/releases/tag/llvmorg-10.0.0), unpack
+it, and pass path of the `lib/cmake/llvm` subdirectory in the archive you just
+extracted to `LLVM_DIR`:
+
+```
+$ cmake ... \
+    -DCOMPILER_GYM_LLVM_PROVIDER=external \
+    -DLLVM_DIR=/path/to/llvm/lib/cmake/llvm
+```
+
+⚠️ CompilerGym requires exactly LLVM 10.0.0.

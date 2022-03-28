@@ -51,10 +51,6 @@ Post-installation Tests
         the fuzz tests for a minimum of one minute. This requires that the
         CompilerGym package has been installed (`make install`).
 
-    make examples-test
-        Run pytest in the examples directory. This requires that the CompilerGym
-        package has been installed (`make install`).
-
 
 Documentation
 -------------
@@ -169,9 +165,6 @@ DISTTOOLS_OUTS := \
 	build \
 	compiler_gym.egg-info \
 	dist \
-	examples/build \
-	examples/compiler_gym_examples.egg-info \
-	examples/dist \
 	$(NULL)
 
 BUILD_TARGET ?= //:package
@@ -333,12 +326,6 @@ endef
 install-test: | install-test-setup
 	$(call pytest,--no-success-flaky-report --benchmark-disable -n auto -k "not fuzz" --durations=5)
 
-examples-pip-install:
-	cd examples && python setup.py install
-
-examples-test: examples-pip-install
-	cd examples && pytest --no-success-flaky-report --benchmark-disable -n auto --durations=5 . --cov=compiler_gym --cov-report=xml:$(COV_REPORT) $(PYTEST_ARGS)
-
 # Note we export $CI=1 so that the tests always run as if within the CI
 # environement. This is to ensure that the reported coverage matches that of
 # the value on: https://codecov.io/gh/facebookresearch/CompilerGym
@@ -352,11 +339,7 @@ FUZZ_SECONDS ?= 300
 install-fuzz: install-test-setup
 	$(call pytest,--no-success-flaky-report -p no:sugar -x -vv -k fuzz --seconds=$(FUZZ_SECONDS))
 
-post-install-test:
-	$(MAKE) -C examples/makefile_integration clean
-	SEARCH_TIME=3 $(MAKE) -C examples/makefile_integration test
-
-.PHONY: test post-install-test examples-pip-install examples-test
+.PHONY: test post-install-test
 
 
 ################
@@ -370,6 +353,7 @@ pip-install: uninstall
 	$(PYTHON) setup.py install
 
 install: |  init-runtime-requirements bazel-build pip-install
+	$(MAKE) -C examples install
 
 .PHONY: pip-install install
 
@@ -402,6 +386,7 @@ distclean: clean
 
 uninstall:
 	$(PYTHON) -m pip uninstall -y compiler_gym
+	$(MAKE) -C examples uninstall
 
 purge: distclean uninstall
 	rm -rf $(COMPILER_GYM_DATA_FILE_LOCATIONS)

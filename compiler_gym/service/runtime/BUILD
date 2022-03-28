@@ -93,6 +93,7 @@ py_library(
     srcs = ["create_and_run_compiler_gym_service.py"],
     deps = [
         ":compiler_gym_service",
+        "//compiler_gym/service:connection",
         "//compiler_gym/service/proto",
         "//compiler_gym/util",
     ],

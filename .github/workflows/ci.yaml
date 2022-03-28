@@ -52,15 +52,30 @@ jobs:
             - name: Install build dependencies
               uses: ./.github/actions/install-cmake-build-dependencies
 
+            - name: Download LLVM 10.0.0 release
+              run: |
+                  if [ "$(uname)" = "Darwin" ]; then
+                    wget https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-x86_64-apple-darwin.tar.xz -O ~/llvm.tar.xz
+                  else
+                    wget https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-x86_64-linux-gnu-ubuntu-18.04.tar.xz -O ~/llvm.tar.xz
+                  fi
+                  # TODO(cummins): Remove 'v' debugging flag:
+                  mkdir ~/llvm && tar xvf ~/llvm.tar.xz --strip-components 1 -C ~/llvm
+                  rm ~/llvm.tar.xz
+                  echo "Unpacked, testing for expected file:"
+                  test -d ~/llvm/lib/cmake/llvm
+
             - name: CMake Build
               run: |
                   cmake \
                       -GNinja \
-                      -DCMAKE_C_COMPILER=clang-9 \
-                      -DCMAKE_CXX_COMPILER=clang++-9 \
+                      -DCMAKE_C_COMPILER=clang \
+                      -DCMAKE_CXX_COMPILER=clang++ \
                       -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=lld" \
                       -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=lld" \
                       -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=lld" \
+                      -DCOMPILER_GYM_LLVM_PROVIDER=external \
+                      -DLLVM_DIR=$HOME/llvm/lib/cmake/llvm \
                       -DPython3_FIND_VIRTUALENV=FIRST \
                       -DCOMPILER_GYM_BUILD_TESTS=ON \
                       -DCOMPILER_GYM_BUILD_EXAMPLES=ON \
@@ -348,42 +363,6 @@ jobs:
         needs: build-macos
         runs-on: macos-latest
         steps:
-            - uses: docker-practice/actions-setup-docker@master
-
-            - name: Confirm docker install
-              run: docker version
-
-            - uses: actions/checkout@v2
-
-            - name: Set up Python
-              uses: actions/setup-python@v2
-              with:
-                  python-version: 3.9
-
-            - name: Download Python wheel
-              uses: actions/download-artifact@v2
-              with:
-                  name: macos-wheel
-
-            - name: Install wheel
-              run: python -m pip install *.whl
-
-            - name: Install runtime dependencies
-              uses: ./.github/actions/install-runtime-dependencies
-
-            - name: Install test dependencies
-              run: python -m pip install -r tests/requirements.txt
-
-            - name: Run the test suite
-              run: make install-test-cov TEST_TARGET="tests/gcc"
-
-            - name: Upload coverage report to Codecov
-              uses: codecov/codecov-action@v2
-
-    test-gcc-env-macos-no-docker:
-        needs: build-macos
-        runs-on: macos-latest
-        steps:
             - uses: actions/checkout@v2
 
             - name: Set up Python
@@ -446,11 +425,6 @@ jobs:
         needs: build-macos
         runs-on: macos-latest
         steps:
-            - uses: docker-practice/actions-setup-docker@master
-
-            - name: Confirm docker install
-              run: docker version
-
             - uses: actions/checkout@v2
 
             - name: Set up Python
@@ -501,14 +475,14 @@ jobs:
             - name: Install wheel
               run: python -m pip install *.whl
 
-            - name: Install test dependencies
-              run: python -m pip install -r examples/requirements.txt -r tests/requirements.txt
-
             - name: Install runtime dependencies
               uses: ./.github/actions/install-runtime-dependencies
 
+            - name: Install test dependencies
+              run: make -C examples install
+
             - name: Run the test suite
-              run: make examples-test
+              run: make -C examples test
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
@@ -536,14 +510,14 @@ jobs:
             - name: Install wheel
               run: python -m pip install *.whl
 
-            - name: Install test dependencies
-              run: python -m pip install -r examples/requirements.txt -r tests/requirements.txt
-
             - name: Install runtime dependencies
               uses: ./.github/actions/install-runtime-dependencies
 
+            - name: Install test dependencies
+              run: make -C examples install
+
             - name: Run the test suite
-              run: make examples-test
+              run: make -C examples test
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
@@ -636,7 +610,7 @@ jobs:
             fail-fast: false
             matrix:
                 os: [ubuntu-latest, macos-latest]
-                node: [16]
+                node: [17]
         steps:
             - uses: actions/checkout@v2
 

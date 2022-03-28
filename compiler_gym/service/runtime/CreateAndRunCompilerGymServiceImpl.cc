@@ -20,4 +20,15 @@ void shutdown_handler(int signum) {
   shutdownSignal.set_value();
 }
 
+// Configure the gRPC server, using the same options as the python client. See
+// GRPC_CHANNEL_OPTIONS in compiler_gym/service/connection.py for the python
+// equivalents and the rationale for each.
+void setGrpcChannelOptions(grpc::ServerBuilder& builder) {
+  builder.SetMaxReceiveMessageSize(-1);
+  builder.SetMaxSendMessageSize(-1);
+  builder.AddChannelArgument(GRPC_ARG_MAX_METADATA_SIZE, 512 * 1024);
+  builder.AddChannelArgument(GRPC_ARG_ENABLE_HTTP_PROXY, 0);
+  builder.AddChannelArgument(GRPC_ARG_ALLOW_REUSEPORT, 0);
+}
+
 }  // namespace compiler_gym::runtime

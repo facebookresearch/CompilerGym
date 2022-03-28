@@ -3,7 +3,6 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Tests for LLVM benchmark handling."""
-import os
 import re
 import tempfile
 from pathlib import Path
@@ -11,7 +10,7 @@ from pathlib import Path
 import gym
 import pytest
 
-from compiler_gym.datasets import Benchmark
+from compiler_gym.datasets import Benchmark, BenchmarkInitError
 from compiler_gym.envs import LlvmEnv, llvm
 from compiler_gym.service.proto import Benchmark as BenchmarkProto
 from compiler_gym.service.proto import File
@@ -286,29 +285,22 @@ def test_two_custom_benchmarks_reset(env: LlvmEnv):
     assert env.benchmark == benchmark2.uri
 
 
-def test_get_compiler_includes_not_found():
-    with pytest.raises(OSError, match=r"Failed to invoke not-a-real-binary"):
-        list(llvm.llvm_benchmark.get_compiler_includes("not-a-real-binary"))
+def test_failing_build_cmd(env: LlvmEnv, tmpdir):
+    """Test that reset() raises an error if build command fails."""
+    (Path(tmpdir) / "program.c").touch()
 
+    benchmark = env.make_benchmark(Path(tmpdir) / "program.c")
 
-def test_get_compiler_includes_nonzero_exit_status():
-    """Test that setting the $CXX to an invalid binary raises an error."""
-    with pytest.raises(OSError, match=r"Failed to invoke false"):
-        list(llvm.llvm_benchmark.get_compiler_includes("false"))
+    benchmark.proto.dynamic_config.build_cmd.argument.extend(
+        ["$CC", "$IN", "-invalid-cc-argument"]
+    )
+    benchmark.proto.dynamic_config.build_cmd.timeout_seconds = 10
 
-
-def test_get_compiler_includes_output_parse_failure():
-    """Test that setting the $CXX to an invalid binary raises an error."""
-    old_cxx = os.environ.get("CXX")
-    os.environ["CXX"] = "echo"
-    try:
-        with pytest.raises(
-            OSError, match="Failed to parse '#include <...>' search paths from echo"
-        ):
-            list(llvm.llvm_benchmark.get_compiler_includes("echo"))
-    finally:
-        if old_cxx:
-            os.environ["CXX"] = old_cxx
+    with pytest.raises(
+        BenchmarkInitError,
+        match=r"clang: error: unknown argument: '-invalid-cc-argument'",
+    ):
+        env.reset(benchmark=benchmark)
 
 
 if __name__ == "__main__":

@@ -25,6 +25,16 @@ py_test(
 )
 
 py_test(
+    name = "reward_test",
+    timeout = "short",
+    srcs = ["reward_test.py"],
+    deps = [
+        "//compiler_gym/spaces",
+        "//tests:test_main",
+    ],
+)
+
+py_test(
     name = "scalar_test",
     timeout = "short",
     srcs = ["scalar_test.py"],

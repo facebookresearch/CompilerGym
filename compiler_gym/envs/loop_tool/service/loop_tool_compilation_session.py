@@ -15,17 +15,17 @@ import pkg_resources
 
 from compiler_gym.service import CompilationSession, EnvironmentNotSupported
 from compiler_gym.service.proto import (
-    Action,
     ActionSpace,
     Benchmark,
-    ChoiceSpace,
-    Int64List,
+    DoubleRange,
+    Event,
+    Int64Box,
+    Int64Range,
+    Int64Tensor,
     NamedDiscreteSpace,
-    Observation,
     ObservationSpace,
-    ScalarLimit,
-    ScalarRange,
-    ScalarRangeList,
+    Space,
+    StringSpace,
 )
 
 logger = logging.getLogger(__name__)
@@ -39,64 +39,58 @@ class LoopToolCompilationSession(CompilationSession):
     # keep it simple for now: 1 variable, 1 nest
     action_spaces = [
         ActionSpace(
-            # shift around a single pre-split order, changing the size of splits
             name="simple",
-            choice=[
-                ChoiceSpace(
-                    name="controls",
-                    named_discrete_space=NamedDiscreteSpace(
-                        value=["toggle_mode", "up", "down", "toggle_thread"],
-                    ),
-                )
-            ],
+            space=Space(
+                # shift around a single pre-split order, changing the size of splits
+                named_discrete=NamedDiscreteSpace(
+                    name=["toggle_mode", "up", "down", "toggle_thread"],
+                ),
+            ),
         ),
         ActionSpace(
-            # potentially define new splits
             name="split",
-            choice=[
-                ChoiceSpace(
-                    name="controls",
-                    named_discrete_space=NamedDiscreteSpace(
-                        value=["toggle_mode", "up", "down", "toggle_thread", "split"],
-                    ),
-                )
-            ],
+            space=Space(
+                # potentially define new splits
+                named_discrete=NamedDiscreteSpace(
+                    name=["toggle_mode", "up", "down", "toggle_thread", "split"],
+                ),
+            ),
         ),
     ]
 
     observation_spaces = [
         ObservationSpace(
             name="flops",
-            scalar_double_range=ScalarRange(),
+            space=Space(double_value=DoubleRange()),
             deterministic=False,
             platform_dependent=True,
-            default_value=Observation(
-                scalar_double=0,
+            default_observation=Event(
+                double_value=0,
             ),
         ),
         ObservationSpace(
             name="loop_tree",
-            string_size_range=ScalarRange(),
+            space=Space(
+                string_value=StringSpace(length_range=Int64Range(min=0)),
+            ),
             deterministic=True,
             platform_dependent=False,
-            default_value=Observation(
+            default_observation=Event(
                 string_value="",
             ),
         ),
         ObservationSpace(
             name="action_state",
-            int64_range_list=ScalarRangeList(
-                range=[
-                    ScalarRange(
-                        min=ScalarLimit(value=0),
-                        max=ScalarLimit(value=2 ** 36),
-                    ),
-                ]
+            space=Space(
+                int64_box=Int64Box(
+                    low=Int64Tensor(shape=[1], value=[0]),
+                    high=Int64Tensor(shape=[1], value=[2 ** 36]),
+                ),
             ),
             deterministic=True,
             platform_dependent=False,
-            default_value=Observation(
-                int64_list=Int64List(value=[0]),
+            default_observation=Event(
+                int64_tensor=Int64Tensor(shape=[1], value=[0]),
             ),
         ),
     ]
@@ -211,19 +205,19 @@ class LoopToolCompilationSession(CompilationSession):
             end_size == self.size
         ), f"{end_size} != {self.size} ({a}, {b}), ({x}, {y}) -> ({a_}, {b_}), ({x + increment}, 0)"
 
-    def apply_action(self, action: Action) -> Tuple[bool, Optional[ActionSpace], bool]:
-        if len(action.choice) != 1:
-            raise ValueError("Invalid choice count")
+    def apply_action(self, action: Event) -> Tuple[bool, Optional[ActionSpace], bool]:
+        if not action.HasField("int64_value"):
+            raise ValueError("Invalid action. int64_value expected.")
 
-        choice_index = action.choice[0].named_discrete_value_index
+        choice_index = action.int64_value
         if choice_index < 0 or choice_index >= len(
-            self.action_space.choice[0].named_discrete_space.value
+            self.action_space.space.named_discrete.name
         ):
             raise ValueError("Out-of-range")
 
         logger.info("Applied action %d", choice_index)
 
-        act = self.action_space.choice[0].named_discrete_space.value[choice_index]
+        act = self.action_space.space.named_discrete.name[choice_index]
         if self.mode not in ["size", "select"]:
             raise RuntimeError("Invalid mode set: {}".format(self.mode))
         if act == "toggle_mode":
@@ -290,18 +284,18 @@ class LoopToolCompilationSession(CompilationSession):
         flops = self.size * iters / (t_ - t) / 1e9
         return flops
 
-    def get_observation(self, observation_space: ObservationSpace) -> Observation:
+    def get_observation(self, observation_space: ObservationSpace) -> Event:
         if observation_space.name == "action_state":
-            observation = Observation()
             # cursor, (size, tail)
             o = self.order[self.cursor]
-            observation.int64_list.value[:] = [self.cursor, o[0], o[1]]
-            return observation
+            return Event(
+                int64_tensor=Int64Tensor(shape=[3], value=[self.cursor, o[0], o[1]])
+            )
         elif observation_space.name == "flops":
-            return Observation(scalar_double=self.flops())
+            return Event(double_value=self.flops())
         elif observation_space.name == "loop_tree":
             loop_tree, parallel = self.lower()
-            return Observation(
+            return Event(
                 string_value=loop_tree.dump(
                     lambda x: "[thread]" if x in parallel else ""
                 )

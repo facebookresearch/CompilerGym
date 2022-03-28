@@ -25,7 +25,6 @@
 #include "llvm/IR/LLVMContext.h"
 #include "llvm/IR/Module.h"
 #include "llvm/Pass.h"
-#include "programl/proto/program_graph_options.pb.h"
 
 namespace compiler_gym::llvm_service {
 
@@ -51,7 +50,7 @@ class LlvmSession final : public CompilationSession {
 
   [[nodiscard]] grpc::Status init(CompilationSession* other) final override;
 
-  [[nodiscard]] grpc::Status applyAction(const Action& action, bool& endOfEpisode,
+  [[nodiscard]] grpc::Status applyAction(const Event& action, bool& endOfEpisode,
                                          std::optional<ActionSpace>& newActionSpace,
                                          bool& actionHadNoEffect) final override;
 
@@ -59,7 +58,7 @@ class LlvmSession final : public CompilationSession {
                                        std::optional<ActionSpace>& newActionSpace) final override;
 
   [[nodiscard]] grpc::Status computeObservation(const ObservationSpace& observationSpace,
-                                                Observation& observation) final override;
+                                                Event& observation) final override;
 
   [[nodiscard]] virtual grpc::Status handleSessionParameter(
       const std::string& key, const std::string& value,
@@ -69,7 +68,7 @@ class LlvmSession final : public CompilationSession {
 
  private:
   [[nodiscard]] grpc::Status computeObservation(LlvmObservationSpace observationSpace,
-                                                Observation& observation);
+                                                Event& observation);
 
   [[nodiscard]] grpc::Status init(const LlvmActionSpace& actionSpace,
                                   std::unique_ptr<Benchmark> benchmark);

@@ -18,8 +18,8 @@ The following files are generated:
     Example:
 
         #pragma once
-        #include "include/llvm/LinkAllPasses.h"
-        #include "include/llvm/Transforms/AggressiveInstCombine/AggressiveInstCombine.h"
+        #include "llvm/LinkAllPasses.h"
+        #include "llvm/Transforms/AggressiveInstCombine/AggressiveInstCombine.h"
         ...
 
     This file includes the set of LLVM headers that must be included to use the
@@ -82,7 +82,7 @@ import sys
 from pathlib import Path
 
 from common import Pass
-from config import EXTRA_LLVM_HEADERS
+from config import LLVM_ACTION_INCLUDES
 
 logger = logging.getLogger(__name__)
 
@@ -90,7 +90,11 @@ logger = logging.getLogger(__name__)
 def process_pass(pass_, headers, enum_f, switch_f):
     """Extract and process transform passes in header."""
     if pass_.header:
-        headers.add(pass_.header)
+        # Strip a leading "include/" from the header path.
+        header = pass_.header
+        if header.startswith("include/"):
+            header = header[len("include/") :]
+        headers.add(header)
 
     # The name of the pass in UPPER_PASCAL_CASE.
     enum_name = pass_.flag[1:].replace("-", "_").upper()
@@ -103,7 +107,7 @@ def process_pass(pass_, headers, enum_f, switch_f):
 def make_action_sources(pass_iterator, outpath: Path):
     """Generate the enum and switch content."""
     total_passes = 0
-    headers = set(EXTRA_LLVM_HEADERS)
+    headers = set(LLVM_ACTION_INCLUDES)
 
     passes = sorted(list(pass_iterator), key=lambda p: p.name)
 
@@ -113,7 +117,9 @@ def make_action_sources(pass_iterator, outpath: Path):
     flags_path = Path(outpath / "flags.txt")
     descriptions_path = Path(outpath / "flag_descriptions.txt")
 
-    with open(switch_path, "w") as switch_f, open(enum_path, "w") as enum_f:
+    with open(switch_path, "w", encoding="utf-8") as switch_f, open(
+        enum_path, "w", encoding="utf-8"
+    ) as enum_f:
         print("enum class LlvmAction {", file=enum_f)
         print("#define HANDLE_ACTION(action, handlePass) \\", file=switch_f)
         print("  switch (action) {  \\", file=switch_f)
@@ -126,30 +132,18 @@ def make_action_sources(pass_iterator, outpath: Path):
     logger.debug("Generated %s", switch_path.name)
     logger.debug("Generated %s", enum_path.name)
 
-    with open(include_path, "w") as f:
+    with open(include_path, "w", encoding="utf-8") as f:
         print("#pragma once", file=f)
         for header in sorted(headers):
             print(f'#include "{header}"', file=f)
 
-        # Inject an ad-hoc workaround for the non-standard constructor of the
-        # EarlyCSEMemSSAPass.
-        print(
-            """
-namespace llvm {
-FunctionPass* createEarlyCSEMemSSAPass() {
-  return createEarlyCSEPass(/*UseMemorySSA=*/true);
-}
-} // namespace llvm
-""",
-            file=f,
-        )
     logger.debug("Generated %s", include_path.name)
 
-    with open(flags_path, "w") as f:
+    with open(flags_path, "w", encoding="utf-8") as f:
         print("\n".join(p.flag for p in passes), file=f)
     logger.debug("Generated %s", flags_path.name)
 
-    with open(descriptions_path, "w") as f:
+    with open(descriptions_path, "w", encoding="utf-8") as f:
         print("\n".join(p.description for p in passes), file=f)
     logger.debug("Generated %s", descriptions_path.name)
 

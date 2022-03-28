@@ -25,73 +25,67 @@
 # all tests run in the tests/ directory.
 # LABELS: Labels to pass to add_test() and installed tests.
 function(cg_add_installed_test)
-  cmake_parse_arguments(
-    _RULE
-    ""
-    "TEST_NAME"
-    "COMMAND;ENVIRONMENT;INSTALLED_COMMAND;WORKING_DIRECTORY;LABELS"
-    ${ARGN}
-  )
+    cmake_parse_arguments(
+        _RULE
+        ""
+        "TEST_NAME"
+        "COMMAND;ENVIRONMENT;INSTALLED_COMMAND;WORKING_DIRECTORY;LABELS"
+        ${ARGN}
+    )
 
-
-  add_test(
-    NAME
-      ${_RULE_TEST_NAME}
-    COMMAND
-      ${_RULE_COMMAND}
-  )
-  if (DEFINED _RULE_WORKING_DIRECTORY)
+    add_test(NAME ${_RULE_TEST_NAME} COMMAND ${_RULE_COMMAND})
+    if(DEFINED _RULE_WORKING_DIRECTORY)
+        set_property(
+            TEST ${_RULE_TEST_NAME}
+            PROPERTY WORKING_DIRECTORY "${_RULE_WORKING_DIRECTORY}"
+        )
+    endif()
+    set_property(TEST ${_RULE_TEST_NAME} PROPERTY LABELS "${_RULE_LABELS}")
     set_property(
-      TEST
-        ${_RULE_TEST_NAME}
-      PROPERTY WORKING_DIRECTORY
-        "${_RULE_WORKING_DIRECTORY}"
+        TEST ${_RULE_TEST_NAME}
+        PROPERTY
+            ENVIRONMENT
+            "TEST_TMPDIR=${CMAKE_BINARY_DIR}/${_RULE_TEST_NAME}_test_tmpdir"
+            ${_RULE_ENVIRONMENT}
     )
-  endif()
-  set_property(
-    TEST
-      ${_RULE_TEST_NAME}
-    PROPERTY LABELS
-      "${_RULE_LABELS}"
-  )
-  set_property(
-    TEST
-      ${_RULE_TEST_NAME}
-    PROPERTY ENVIRONMENT
-      "TEST_TMPDIR=${CMAKE_BINARY_DIR}/${_RULE_TEST_NAME}_test_tmpdir"
-      ${_RULE_ENVIRONMENT}
-  )
-  cg_add_test_environment_properties(${_RULE_TEST_NAME})
+    cg_add_test_environment_properties(${_RULE_TEST_NAME})
 
-  # Write the to the installed ctest file template.
-  set(_installed_ctest_input_file
-        "${CMAKE_BINARY_DIR}/cg_installed_tests.cmake.in")
-  get_property(_has_tests GLOBAL PROPERTY COMPILER_GYM_HAS_INSTALLED_TESTS)
-  if(NOT _has_tests)
-    # First time.
-    file(WRITE "${_installed_ctest_input_file}")  # Truncate.
-    set_property(GLOBAL PROPERTY COMPILER_GYM_HAS_INSTALLED_TESTS ON)
-  endif()
-
-  # Now write directives to the installed tests cmake file.
-  file(APPEND "${_installed_ctest_input_file}"
-    "add_test(${_RULE_TEST_NAME} ${_RULE_INSTALLED_COMMAND})\n"
-    "set_tests_properties(${_RULE_TEST_NAME} PROPERTIES LABELS \"${_RULE_LABELS}\")\n"
-  )
-
-  # First time generation and setup to install. Note that since this all runs
-  # at the generate phase, it doesn't matter that we trigger it before all
-  # tests accumulate.
-  if(NOT _has_tests)
-    set(_installed_ctest_output_file "${CMAKE_BINARY_DIR}/cg_installed_tests.cmake")
-    file(GENERATE
-      OUTPUT "${_installed_ctest_output_file}"
-      INPUT "${_installed_ctest_input_file}"
+    # Write the to the installed ctest file template.
+    set(_installed_ctest_input_file
+        "${CMAKE_BINARY_DIR}/cg_installed_tests.cmake.in"
     )
-    install(FILES "${_installed_ctest_output_file}"
-      DESTINATION tests
-      RENAME "CTestTestfile.cmake"
-      COMPONENT Tests
+    get_property(_has_tests GLOBAL PROPERTY COMPILER_GYM_HAS_INSTALLED_TESTS)
+    if(NOT _has_tests)
+        # First time.
+        file(WRITE "${_installed_ctest_input_file}") # Truncate.
+        set_property(GLOBAL PROPERTY COMPILER_GYM_HAS_INSTALLED_TESTS ON)
+    endif()
+
+    # Now write directives to the installed tests cmake file.
+    file(
+        APPEND
+        "${_installed_ctest_input_file}"
+        "add_test(${_RULE_TEST_NAME} ${_RULE_INSTALLED_COMMAND})\n"
+        "set_tests_properties(${_RULE_TEST_NAME} PROPERTIES LABELS \"${_RULE_LABELS}\")\n"
     )
-  endif()
+
+    # First time generation and setup to install. Note that since this all runs
+    # at the generate phase, it doesn't matter that we trigger it before all
+    # tests accumulate.
+    if(NOT _has_tests)
+        set(_installed_ctest_output_file
+            "${CMAKE_BINARY_DIR}/cg_installed_tests.cmake"
+        )
+        file(
+            GENERATE
+            OUTPUT "${_installed_ctest_output_file}"
+            INPUT "${_installed_ctest_input_file}"
+        )
+        install(
+            FILES "${_installed_ctest_output_file}"
+            DESTINATION tests
+            RENAME "CTestTestfile.cmake"
+            COMPONENT Tests
+        )
+    endif()
 endfunction()

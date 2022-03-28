@@ -51,8 +51,7 @@ void conv2d(int* ret) {
       for (int ow = 0; ow < Ow; ow++) {
         for (int oc = 0; oc < Oc; oc++) {
           y[n][oh][ow][oc] = 0;
-// loop over filter
-#pragma unroll(Kh)
+          // loop over filter
           for (int kh = 0; kh < Kh; kh++) {
             for (int kw = 0; kw < Kw; kw++) {
               for (int ic = 0; ic < Iw; ic++) {

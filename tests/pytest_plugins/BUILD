@@ -23,7 +23,6 @@ py_library(
     testonly = 1,
     srcs = ["llvm.py"],
     data = [
-        "//compiler_gym/envs/llvm/service/passes:actions_genfiles",
         "//compiler_gym/third_party/cbench:benchmarks_list",
     ],
     deps = [

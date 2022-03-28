@@ -105,7 +105,7 @@ from absl import app, flags
 from compiler_gym.datasets import Dataset
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.service.connection import ConnectionOpts
-from compiler_gym.spaces import Commandline
+from compiler_gym.spaces import Commandline, NamedDiscrete
 from compiler_gym.util.flags.env_from_flags import env_from_flags
 from compiler_gym.util.tabulate import tabulate
 from compiler_gym.util.truncate import truncate
@@ -249,12 +249,17 @@ def print_service_capabilities(env: CompilerEnv):
                 ],
                 headers=("Action", "Description"),
             )
-        else:
+            print(table)
+        elif isinstance(action_space, NamedDiscrete):
             table = tabulate(
                 [(a,) for a in sorted(action_space.names)],
                 headers=("Action",),
             )
-        print(table)
+            print(table)
+        else:
+            raise NotImplementedError(
+                "Only Commandline and NamedDiscrete are supported."
+            )
 
 
 def main(argv):

@@ -6,23 +6,9 @@
 cg_add_all_subdirs()
 
 set(_DEPS "compiler_gym-llvm-service")
-if(DARWIN)
-  list(APPEND _DEPS ::libLLVMPolly)
-  #TODO(boian): figure out what is this target.
-  #list(APPEND _DEPS "@llvm//:darwin")
-endif()
 cg_filegroup(
   NAME "service"
   DEPENDS ${_DEPS}
-)
-
-cg_genrule(
-  NAME libLLVMPolly
-  OUTS "libLLVMPolly.so"
-  COMMAND
-    "cp $<TARGET_FILE:LLVMPolly> $@"
-  ABS_DEPENDS
-    LLVMPolly
 )
 
 cg_cc_binary(
@@ -32,6 +18,7 @@ cg_cc_binary(
     "RunService.cc"
   DEPS
     ::LlvmSession
+    ::BenchmarkFactory
     compiler_gym::service::runtime::cc_runtime
 )
 
@@ -40,18 +27,16 @@ cg_cc_library(
     ActionSpace
   HDRS
     "ActionSpace.h"
-    "$<TARGET_PROPERTY:compiler_gym__envs__llvm__service__passes__actions_genfiles,BINARY_DIR>/ActionEnum.h"
   SRCS
     "ActionSpace.cc"
   DEPS
+    compiler_gym::envs::llvm::service::passes::10.0.0::headers
     compiler_gym::service::proto::compiler_gym_service_cc
     compiler_gym::util::EnumUtil
     compiler_gym::util::Unreachable
   ABS_DEPS
     fmt
     magic_enum
-  NON_LIB_DEPS
-    compiler_gym::envs::llvm::service::passes::actions_genfiles
   PUBLIC
 )
 
@@ -64,6 +49,7 @@ cg_cc_library(
   SRCS
     "Benchmark.cc"
   DEPS
+    ::BenchmarkDynamicConfig
     ::Cost
     compiler_gym::service::proto::compiler_gym_service_cc
     compiler_gym::util::GrpcStatusMacros
@@ -82,6 +68,21 @@ cg_cc_library(
   PUBLIC
 )
 
+cg_cc_library(
+  NAME
+    BenchmarkDynamicConfig
+  HDRS
+    "BenchmarkDynamicConfig.h"
+  SRCS
+    "BenchmarkDynamicConfig.cc"
+  DEPS
+    compiler_gym::service::proto::compiler_gym_service_cc
+    compiler_gym::util::RunfilesPath
+    compiler_gym::util::Subprocess
+  ABS_DEPS
+    Boost::filesystem
+)
+
 llvm_map_components_to_libnames(_LLVM_LIBS core)
 cg_cc_library(
   NAME
@@ -92,6 +93,7 @@ cg_cc_library(
     "BenchmarkFactory.cc"
   DEPS
     ::Benchmark
+    ::BenchmarkDynamicConfig
     ::Cost
     compiler_gym::service::proto::compiler_gym_service_cc
     compiler_gym::util::GrpcStatusMacros
@@ -134,9 +136,6 @@ cg_cc_binary(
 )
 
 set(_FILES "${CMAKE_CURRENT_BINARY_DIR}/compute_observation")
-if(DARWIN)
-  message(FATAL_ERROR "TODO(boian): implement")
-endif()
 cg_filegroup(
   NAME compute_observation-files
   FILES ${_FILES}
@@ -151,6 +150,7 @@ cg_cc_library(
   SRCS
     "Cost.cc"
   DEPS
+    ::BenchmarkDynamicConfig
     compiler_gym::util::GrpcStatusMacros
     compiler_gym::util::RunfilesPath
     compiler_gym::util::Subprocess
@@ -173,7 +173,7 @@ cg_cc_library(
 llvm_map_components_to_libnames(_LLVM_LIBS
   core analysis coroutines objcarcopts target codegen
   x86codegen x86asmparser #TODO(boian): can these be found programmatically
-  )
+)
 cg_cc_library(
   NAME
     LlvmSession
@@ -181,8 +181,6 @@ cg_cc_library(
     "-DGOOGLE_PROTOBUF_NO_RTTI"
     "-fno-rtti"
   HDRS
-    "$<TARGET_PROPERTY:compiler_gym__envs__llvm__service__passes__actions_genfiles,BINARY_DIR>/ActionHeaders.h"
-    "$<TARGET_PROPERTY:compiler_gym__envs__llvm__service__passes__actions_genfiles,BINARY_DIR>/ActionSwitch.h"
     "LlvmSession.h"
   SRCS
     "LlvmSession.cc"
@@ -193,6 +191,7 @@ cg_cc_library(
     ::Cost
     ::Observation
     ::ObservationSpaces
+    compiler_gym::envs::llvm::service::passes::10.0.0::headers
     compiler_gym::service::CompilationSession
     compiler_gym::service::proto::compiler_gym_service_cc_grpc
     compiler_gym::third_party::autophase::InstCount
@@ -210,12 +209,10 @@ cg_cc_library(
     ProGraML::graph::format::node_link_graph
     ProGraML::ir::llvm::llvm-10
     ProGraML::proto::programl_cc
-    Subprocess::libsubprocess
     CpuInfo::cpuinfo
     Clog::libclog
   INCLUDES
     ${LLVM_INCLUDE_DIRS}
-    "$<TARGET_PROPERTY:compiler_gym__envs__llvm__service__passes__actions_genfiles,BINARY_DIR>"
   DEFINES
     ${LLVM_DEFINITIONS}
   PUBLIC
@@ -223,7 +220,7 @@ cg_cc_library(
 
 llvm_map_components_to_libnames(_LLVM_LIBS
   core support bitwriter
-  )
+)
 cg_cc_library(
     NAME Observation
     SRCS Observation.cc
