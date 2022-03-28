@@ -18,7 +18,7 @@ COPY frontends/compiler_gym/public public
 COPY frontends/compiler_gym/src src
 
 # configure api endpoint
-RUN echo REACT_APP_API_HOST=${API_ENDPOINT} > .env.production
+RUN echo REACT_APP_API_URL=${API_ENDPOINT} > .env.production
 
 # Compile frontend
 RUN --mount=type=cache,target=/usr/src/react_web_app/.npm --mount=type=cache,target=/usr/src/react_web_app/node_modules \
