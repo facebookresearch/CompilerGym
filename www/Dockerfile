@@ -48,10 +48,6 @@ RUN pip3 install --no-cache-dir -r requirements.txt
 RUN python3 -m compiler_gym.bin.service --env=llvm-v0
 
 COPY www.py .
-<<<<<<< HEAD
-COPY --from=builder /usr/src/app/build frontends/compiler_gym/build
-=======
 COPY --from=builder /usr/src/react_web_app/build frontends/compiler_gym/build
->>>>>>> 5b1b6ba87e1b3f3272a0b2ad6a5a54b8b2997ef6
 
 CMD [ "python3", "www.py"]
