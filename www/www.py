@@ -173,6 +173,11 @@ class StepReply(BaseModel):
     states: List[StateToVisualize]
 
 
+@app.route("/health")
+def healthy():
+    return {'message': 'Healthy'}
+
+
 @app.route("/api/v4/describe")
 def describe():
     with env_lock:
