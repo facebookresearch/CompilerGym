@@ -13,7 +13,8 @@ cg_py_library(
   DEPS
     ::compilation_session
     ::connection
-    # TODO: add this after circular dependencies are resolved
+    # TODO(github.com/facebookresearch/CompilerGym/pull/633):
+    # add this after circular dependencies are resolved
     #::client_service_compiler_env
     compiler_gym::service::proto::proto
   PUBLIC
