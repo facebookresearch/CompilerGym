@@ -8,18 +8,15 @@ from pytest import warns
 
 from compiler_gym.datasets import Datasets
 from compiler_gym.envs.llvm import LlvmEnv
-from compiler_gym.wrappers import (
-    ActionWrapper,
-    CompilerEnvWrapper,
-    ObservationWrapper,
-    RewardWrapper,
-)
+from compiler_gym.wrappers import ActionWrapper, CompilerEnvWrapper
+from compiler_gym.wrappers import ObservationWrapper as CoreObservationWrapper
+from compiler_gym.wrappers import RewardWrapper as CoreRewardWrapper
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]
 
 
-class ObservationDummyWrapper(ObservationWrapper):
+class ObservationWrapper(CoreObservationWrapper):
     def __init__(self, env):
         super().__init__(env)
 
@@ -27,7 +24,7 @@ class ObservationDummyWrapper(ObservationWrapper):
         return observation
 
 
-class RewardDummyWrapper(RewardWrapper):
+class RewardWrapper(CoreRewardWrapper):
     def __init__(self, env):
         super().__init__(env)
 
@@ -40,8 +37,8 @@ class RewardDummyWrapper(RewardWrapper):
     params=[
         ActionWrapper,
         CompilerEnvWrapper,
-        ObservationDummyWrapper,
-        RewardDummyWrapper,
+        ObservationWrapper,
+        RewardWrapper,
     ],
 )
 def wrapper_type(request):
@@ -285,7 +282,7 @@ def test_wrapped_observation(mocker, env: LlvmEnv):
 
 def test_wrapped_observation_missing_definition(env: LlvmEnv):
     with pytest.raises(TypeError):
-        env = ObservationWrapper(env)
+        env = CoreObservationWrapper(env)
 
 
 def test_wrapped_reward(env: LlvmEnv):
