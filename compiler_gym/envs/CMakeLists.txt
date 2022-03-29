@@ -24,13 +24,11 @@ cg_py_library(
   SRCS
     "compiler_env.py"
   DEPS
-    compiler_gym::compiler_env_state
-    compiler_gym::datasets::datasets
-    compiler_gym::service::service
-    compiler_gym::service::proto::proto
     compiler_gym::spaces::spaces
     compiler_gym::util::util
-    compiler_gym::validation_result
     compiler_gym::views::views
+    compiler_gym::compiler_env_state
+    compiler_gym::validation_result
+    compiler_gym::datasets::datasets
   PUBLIC
 )

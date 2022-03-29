@@ -14,6 +14,7 @@ import compiler_gym
 import examples.loop_optimizations_service as loop_optimizations_service
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.service import SessionNotFound
+from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
 from compiler_gym.spaces import Dict, NamedDiscrete, Scalar, Sequence
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_NAMES
 from tests.test_main import main
@@ -54,7 +55,7 @@ def test_invalid_arguments(bin: Path):
     assert returncode == 1
 
 
-def test_versions(env: CompilerEnv):
+def test_versions(env: ClientServiceCompilerEnv):
     """Tests the GetVersion() RPC endpoint."""
     assert env.version == compiler_gym.__version__
     assert env.compiler_version == "1.0.0"

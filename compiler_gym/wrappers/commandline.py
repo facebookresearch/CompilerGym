@@ -5,6 +5,8 @@
 from collections.abc import Iterable as IterableType
 from typing import Dict, Iterable, List, Optional, Union
 
+from gym import Space
+
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.spaces import Commandline, CommandlineFlag, Reward
 from compiler_gym.util.gym_type_hints import ActionType, StepType
@@ -91,6 +93,14 @@ class CommandlineWithTerminalAction(CompilerEnvWrapper):
 
         return observation, reward, done, info
 
+    @property
+    def action_space(self) -> Space:
+        return self._action_space
+
+    @action_space.setter
+    def action_space(self, action_space: Space):
+        self._action_space = action_space
+
 
 class ConstrainedCommandline(ActionWrapper):
     """Constrains a Commandline action space to a subset of the original space's
@@ -157,3 +167,11 @@ class ConstrainedCommandline(ActionWrapper):
         return ConstrainedCommandline(
             env=self.env.fork(), flags=self._flags, name=self.action_space.name
         )
+
+    @property
+    def action_space(self) -> Space:
+        return self._action_space
+
+    @action_space.setter
+    def action_space(self, action_space: Space):
+        self._action_space = action_space

@@ -2,7 +2,7 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""Extensions to the CompilerEnv environment for LLVM."""
+"""Extensions to the ClientServiceCompilerEnv environment for LLVM."""
 import os
 import shutil
 from pathlib import Path
@@ -11,7 +11,6 @@ from typing import Iterable, List, Optional, Union, cast
 import numpy as np
 
 from compiler_gym.datasets import Benchmark, BenchmarkInitError, Dataset
-from compiler_gym.envs.compiler_env import CompilerEnv
 from compiler_gym.envs.llvm.datasets import get_llvm_datasets
 from compiler_gym.envs.llvm.llvm_benchmark import ClangInvocation, make_benchmark
 from compiler_gym.envs.llvm.llvm_rewards import (
@@ -19,6 +18,7 @@ from compiler_gym.envs.llvm.llvm_rewards import (
     CostFunctionReward,
     NormalizedReward,
 )
+from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
 from compiler_gym.spaces import Box, Commandline
 from compiler_gym.spaces import Dict as DictSpace
 from compiler_gym.spaces import Scalar, Sequence
@@ -45,11 +45,11 @@ def _get_llvm_datasets(site_data_base: Optional[Path] = None) -> Iterable[Datase
     return get_llvm_datasets(site_data_base=site_data_base)
 
 
-class LlvmEnv(CompilerEnv):
-    """A specialized CompilerEnv for LLVM.
+class LlvmEnv(ClientServiceCompilerEnv):
+    """A specialized ClientServiceCompilerEnv for LLVM.
 
-    This extends the default :class:`CompilerEnv
-    <compiler_gym.envs.CompilerEnv>` environment, adding extra LLVM
+    This extends the default :class:`ClientServiceCompilerEnv
+    <compiler_gym.envs.ClientServiceCompilerEnv>` environment, adding extra LLVM
     functionality. Specifically, the actions use the :class:`CommandlineFlag
     <compiler_gym.spaces.CommandlineFlag>` space, which is a type of
     :code:`Discrete` space that provides additional documentation about each
@@ -378,7 +378,7 @@ class LlvmEnv(CompilerEnv):
             You must ensure that any :code:`.bc` and :code:`.ll` files are
             compatible with the LLVM version used by CompilerGym, which can be
             reported using :func:`env.compiler_version
-            <compiler_gym.envs.CompilerEnv.compiler_version>`.
+            <compiler_gym.envs.ClientServiceCompilerEnv.compiler_version>`.
 
         E.g. for single-source C/C++ programs, you can pass the path of the source
         file:

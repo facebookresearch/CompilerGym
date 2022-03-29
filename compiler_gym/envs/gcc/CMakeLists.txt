@@ -16,7 +16,7 @@ cg_py_library(
   DATA
     compiler_gym::envs::gcc::service::service
   DEPS
-    compiler_gym::envs::compiler_env
+    compiler_gym::service::client_service_compiler_env
     compiler_gym::envs::gcc::datasets::datasets
     compiler_gym::service::service
     compiler_gym::service::runtime::runtime

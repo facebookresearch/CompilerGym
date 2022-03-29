@@ -71,7 +71,6 @@ cg_py_library(
     "reward.py"
   DEPS
     ::scalar
-    compiler_gym::service::service
     compiler_gym::util::util
   PUBLIC
 )

@@ -14,6 +14,15 @@ client and service is managed by the :class:`CompilerGymServiceConnection
     :local:
 
 
+ClientServiceCompilerEnv
+------------------------
+
+.. autoclass:: ClientServiceCompilerEnv
+   :members:
+
+   .. automethod:: __init__
+
+
 The CompilationSession Interface
 --------------------------------
 

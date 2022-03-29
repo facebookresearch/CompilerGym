@@ -137,7 +137,7 @@ class LoopsDataset(Dataset):
 
 register(
     id="loops-opt-py-v0",
-    entry_point="compiler_gym.envs:CompilerEnv",
+    entry_point="compiler_gym.service.client_service_compiler_env:ClientServiceCompilerEnv",
     kwargs={
         "service": LOOPS_OPT_PY_SERVICE_BINARY,
         "rewards": [RuntimeReward(), SizeReward()],

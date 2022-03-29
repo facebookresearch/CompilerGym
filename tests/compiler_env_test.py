@@ -36,7 +36,7 @@ def test_benchmark_set_in_reset(env: LlvmEnv):
 
 def test_logger_is_deprecated(env: LlvmEnv):
     with pytest.deprecated_call(
-        match="The `CompilerEnv.logger` attribute is deprecated"
+        match="The `ClientServiceCompilerEnv.logger` attribute is deprecated"
     ):
         env.logger
 

@@ -93,7 +93,7 @@ class CompilationSession:
 
         Session parameters provide a method to send ad-hoc key-value messages to
         a compilation session through the :meth:`env.send_session_parameter()
-        <compiler_gym.envs.CompilerEnv.send_session_parameter>` method. It us up
+        <compiler_gym.envs.ClientServiceCompilerEnv.send_session_parameter>` method. It us up
         to the client/service to agree on a common schema for encoding and
         decoding these parameters.
 

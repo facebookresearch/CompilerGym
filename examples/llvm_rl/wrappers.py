@@ -34,7 +34,7 @@ class ClampedReward(RewardWrapper):
         self.max = max
         self.leakiness_factor = leakiness_factor
 
-    def reward(self, reward: float) -> float:
+    def convert_reward(self, reward: float) -> float:
         if reward > self.max:
             return self.max + (reward - self.max) * self.leakiness_factor
         elif reward < self.min:
@@ -65,7 +65,7 @@ class AutophaseNormalizedFeatures(ObservationWrapper):
             dtype=np.float32,
         )
 
-    def observation(self, observation):
+    def convert_observation(self, observation):
         if observation[self.TotalInsts_index] <= 0:
             return np.zeros(observation.shape, dtype=np.float32)
         return np.clip(
@@ -137,7 +137,7 @@ class ConcatActionsHistogram(ObservationWrapper):
             self.histogram[a] += self.increment
         return super().multistep(actions, **kwargs)
 
-    def observation(self, observation):
+    def convert_observation(self, observation):
         return np.concatenate((observation, self.histogram)).astype(
             self.env.observation_space.dtype
         )
