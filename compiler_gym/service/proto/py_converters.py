@@ -234,6 +234,7 @@ class ToEventMessageConverter:
             DictEvent: "event_dict",
             bool: "boolean_value",
             int: "int64_value",
+            np.int32: "int64_value",
             np.float32: "float_value",
             float: "double_value",
             str: "string_value",
@@ -371,7 +372,9 @@ def make_message_default_converter() -> TypeBasedConverter:
     conversion_map = {
         bool: convert_trivial,
         int: convert_trivial,
+        np.int32: convert_trivial,
         float: convert_trivial,
+        np.float32: convert_trivial,
         str: convert_trivial,
         bytes: convert_bytes_to_numpy,
         BooleanTensor: convert_tensor_message_to_numpy,
@@ -425,7 +428,9 @@ def to_event_message_default_converter() -> ToEventMessageConverter:
     conversion_map = {
         bool: convert_trivial,
         int: convert_trivial,
+        np.int32: convert_trivial,
         float: convert_trivial,
+        np.float32: convert_trivial,
         str: convert_trivial,
         np.ndarray: NumpyToTensorMessageConverter(),
     }
