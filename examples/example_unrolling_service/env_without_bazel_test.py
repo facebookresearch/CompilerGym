@@ -2,34 +2,40 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-"""Tests for the example CompilerGym service."""
+"""Tests for the unrolling CompilerGym service example."""
 import os
-import socket
 import subprocess
 import sys
 from getpass import getuser
 from pathlib import Path
-from time import sleep
 from typing import Iterable, List, Optional
 
 import gym
 import numpy as np
 import pytest
-from flaky import flaky
 
+import compiler_gym
 from compiler_gym.datasets import Benchmark, Dataset
 from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.envs import CompilerEnv
-from compiler_gym.service import SessionNotFound
+from compiler_gym.envs.llvm.llvm_benchmark import get_system_library_flags
+from compiler_gym.errors import SessionNotFound
 from compiler_gym.spaces import Box, NamedDiscrete, Reward, Scalar, Sequence
+from compiler_gym.third_party import llvm
 from compiler_gym.util import debug_util as dbg
 from compiler_gym.util.commands import Popen
 from compiler_gym.util.registration import register
 
-EXAMPLE_PY_SERVICE_BINARY: Path = Path(
-    "example_compiler_gym_service/service_py/example_service.py"
+UNROLLING_PY_SERVICE_BINARY: Path = Path(
+    "example_unrolling_service/service_py/example_service.py"
 )
-assert EXAMPLE_PY_SERVICE_BINARY.is_file(), "Service script not found"
+assert UNROLLING_PY_SERVICE_BINARY.is_file(), "Service script not found"
+
+BENCHMARKS_PATH: Path = Path("example_unrolling_service/benchmarks")
+
+NEURO_VECTORIZER_HEADER: Path = Path(
+    "../compiler_gym/third_party/neuro-vectorizer/header.h"
+)
 
 
 class RuntimeReward(Reward):
@@ -46,117 +52,86 @@ class RuntimeReward(Reward):
             deterministic=False,
             platform_dependent=True,
         )
-        self.previous_runtime = None
+        self.baseline_runtime = 0
 
     def reset(self, benchmark: str, observation_view):
         del benchmark  # unused
-        self.previous_runtime = None
+        self.baseline_runtime = observation_view["runtime"]
 
     def update(self, action, observations, observation_view):
-        del action
-        del observation_view
-
-        if self.previous_runtime is None:
-            self.previous_runtime = observations[0]
-
-        reward = float(self.previous_runtime - observations[0])
-        self.previous_runtime = observations[0]
-        return reward
+        del action  # unused
+        del observation_view  # unused
+        return float(self.baseline_runtime - observations[0]) / self.baseline_runtime
 
 
-class ExampleDataset(Dataset):
-    def __init__(self, *args, **kwargs):
-        super().__init__(
-            name="benchmark://example-v1",
-            license="MIT",
-            description="An example dataset",
-        )
-        self._benchmarks = {
-            "/foo": Benchmark.from_file_contents(
-                "benchmark://example-v1/foo", "Ir data".encode("utf-8")
-            ),
-            "/bar": Benchmark.from_file_contents(
-                "benchmark://example-v1/bar", "Ir data".encode("utf-8")
-            ),
-        }
-
-    def benchmark_uris(self) -> Iterable[str]:
-        yield from (f"benchmark://example-v1{k}" for k in self._benchmarks.keys())
-
-    def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
-        if uri.path in self._benchmarks:
-            return self._benchmarks[uri.path]
-        else:
-            raise LookupError("Unknown program name")
-
-
-# Register the environment for use with gym.make(...).
-register(
-    id="example-v1",
-    entry_point="compiler_gym.service.client_service_compiler_env:ClientServiceCompilerEnv",
-    kwargs={
-        "service": EXAMPLE_PY_SERVICE_BINARY,
-        "rewards": [RuntimeReward()],
-        "datasets": [ExampleDataset()],
-    },
-)
-
-EXAMPLE_PY_SERVICE_BINARY: Path = Path(
-    "example_compiler_gym_service/service_py/example_service.py"
-)
-assert EXAMPLE_PY_SERVICE_BINARY.is_file(), "Service script not found"
-
-
-class RuntimeReward(Reward):
-    """An example reward that uses changes in the "runtime" observation value
+class SizeReward(Reward):
+    """An example reward that uses changes in the "size" observation value
     to compute incremental reward.
     """
 
     def __init__(self):
         super().__init__(
-            name="runtime",
-            observation_spaces=["runtime"],
+            name="size",
+            observation_spaces=["size"],
             default_value=0,
             default_negates_returns=True,
             deterministic=False,
             platform_dependent=True,
         )
-        self.previous_runtime = None
+        self.baseline_size = 0
 
     def reset(self, benchmark: str, observation_view):
         del benchmark  # unused
-        self.previous_runtime = None
+        self.baseline_runtime = observation_view["size"]
 
     def update(self, action, observations, observation_view):
-        del action
-        del observation_view
-
-        if self.previous_runtime is None:
-            self.previous_runtime = observations[0]
-
-        reward = float(self.previous_runtime - observations[0])
-        self.previous_runtime = observations[0]
-        return reward
+        del action  # unused
+        del observation_view  # unused
+        return float(self.baseline_size - observations[0]) / self.baseline_size
 
 
-class ExampleDataset(Dataset):
+class UnrollingDataset(Dataset):
     def __init__(self, *args, **kwargs):
         super().__init__(
-            name="benchmark://example-v0",
+            name="benchmark://unrolling-v2",
             license="MIT",
-            description="An example dataset",
+            description="Unrolling example dataset",
         )
+
         self._benchmarks = {
-            "/foo": Benchmark.from_file_contents(
-                "benchmark://example-v1/foo", "Ir data".encode("utf-8")
+            "/offsets1": Benchmark.from_file_contents(
+                "benchmark://unrolling-v2/offsets1",
+                self.preprocess(BENCHMARKS_PATH / "offsets1.c"),
             ),
-            "/bar": Benchmark.from_file_contents(
-                "benchmark://example-v1/bar", "Ir data".encode("utf-8")
+            "/conv2d": Benchmark.from_file_contents(
+                "benchmark://unrolling-v2/conv2d",
+                self.preprocess(BENCHMARKS_PATH / "conv2d.c"),
             ),
         }
 
+    @staticmethod
+    def preprocess(src: Path) -> bytes:
+        """Front a C source through the compiler frontend."""
+        # TODO(github.com/facebookresearch/CompilerGym/issues/325): We can skip
+        # this pre-processing, or do it on the service side, once support for
+        # multi-file benchmarks lands.
+        cmd = [
+            str(llvm.clang_path()),
+            "-E",
+            "-o",
+            "-",
+            "-I",
+            str(NEURO_VECTORIZER_HEADER.parent),
+            src,
+        ]
+        cmd += get_system_library_flags()
+        return subprocess.check_output(
+            cmd,
+            timeout=300,
+        )
+
     def benchmark_uris(self) -> Iterable[str]:
-        yield from (f"benchmark://example-v1{k}" for k in self._benchmarks.keys())
+        yield from (f"benchmark://unrolling-v2{k}" for k in self._benchmarks.keys())
 
     def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
         if uri.path in self._benchmarks:
@@ -165,38 +140,30 @@ class ExampleDataset(Dataset):
             raise LookupError("Unknown program name")
 
 
-# Register the environment for use with gym.make(...).
+# Register the unrolling example service on module import. After importing this module,
+# the unrolling-py-v2 environment will be available to gym.make(...).
+
 register(
-    id="example-v1",
+    id="unrolling-py-v2",
     entry_point="compiler_gym.service.client_service_compiler_env:ClientServiceCompilerEnv",
     kwargs={
-        "service": EXAMPLE_PY_SERVICE_BINARY,
-        "rewards": [RuntimeReward()],
-        "datasets": [ExampleDataset()],
+        "service": UNROLLING_PY_SERVICE_BINARY,
+        "rewards": [RuntimeReward(), SizeReward()],
+        "datasets": [UnrollingDataset()],
     },
 )
 
-# Given that the C++ and Python service implementations have identical
-# featuresets, we can parameterize the tests and run them against both backends.
-EXAMPLE_ENVIRONMENTS = ["example-v1"]
 
-
-@pytest.fixture(scope="function", params=EXAMPLE_ENVIRONMENTS)
-def env(request) -> CompilerEnv:
+@pytest.fixture(scope="function")
+def env() -> CompilerEnv:
     """Text fixture that yields an environment."""
-    with gym.make(request.param) as env:
-        yield env
+    with gym.make("unrolling-py-v2") as env_:
+        yield env_
 
 
-@pytest.fixture(
-    scope="module",
-    params=[
-        EXAMPLE_PY_SERVICE_BINARY,
-    ],
-    ids=["example-v1"],
-)
-def bin(request) -> Path:
-    yield request.param
+@pytest.fixture(scope="module")
+def bin() -> Path:
+    return UNROLLING_PY_SERVICE_BINARY
 
 
 def test_invalid_arguments(bin: Path):
@@ -224,6 +191,7 @@ def test_invalid_arguments(bin: Path):
 
 def test_versions(env: CompilerEnv):
     """Tests the GetVersion() RPC endpoint."""
+    assert env.version == compiler_gym.__version__
     assert env.compiler_version == "1.0.0"
 
 
@@ -231,8 +199,12 @@ def test_action_space(env: CompilerEnv):
     """Test that the environment reports the service's action spaces."""
     assert env.action_spaces == [
         NamedDiscrete(
-            name="default",
-            items=["a", "b", "c"],
+            name="unrolling",
+            items=[
+                "-loop-unroll -unroll-count=2",
+                "-loop-unroll -unroll-count=4",
+                "-loop-unroll -unroll-count=8",
+            ],
         )
     ]
 
@@ -240,31 +212,28 @@ def test_action_space(env: CompilerEnv):
 def test_observation_spaces(env: CompilerEnv):
     """Test that the environment reports the service's observation spaces."""
     env.reset()
-    assert env.observation.spaces.keys() == {"ir", "features", "runtime"}
-
-    ir_space = env.observation.spaces["ir"]
-    assert isinstance(ir_space.space, Sequence)
-    assert ir_space.space.dtype == str
-    assert ir_space.space.size_range == (0, np.iinfo(np.int64).max)
-
-    feature_space = env.observation.spaces["features"].space
-    assert isinstance(feature_space, Box)
-    assert feature_space.shape == (3,)
-    assert np.all(feature_space.low == [-100, -100, -100])
-    assert np.all(feature_space.high == [100, 100, 100])
-    assert feature_space.dtype == int
-
-    runtime_space = env.observation.spaces["runtime"].space
-    assert isinstance(runtime_space, Scalar)
-    assert runtime_space.min == 0
-    assert runtime_space.max == np.inf
-    assert runtime_space.dtype == float
+    assert env.observation.spaces.keys() == {"ir", "features", "runtime", "size"}
+    assert env.observation.spaces["ir"].space == Sequence(
+        name="ir",
+        size_range=(0, np.iinfo(np.int64).max),
+        dtype=str,
+        opaque_data_format=None,
+    )
+    assert env.observation.spaces["features"].space == Box(
+        name="features", shape=(3,), low=0, high=100000, dtype=int
+    )
+    assert env.observation.spaces["runtime"].space == Scalar(
+        name="runtime", min=0, max=np.inf, dtype=float
+    )
+    assert env.observation.spaces["size"].space == Scalar(
+        name="size", min=0, max=np.inf, dtype=float
+    )
 
 
 def test_reward_spaces(env: CompilerEnv):
     """Test that the environment reports the service's reward spaces."""
     env.reset()
-    assert env.reward.spaces.keys() == {"runtime"}
+    assert env.reward.spaces.keys() == {"runtime", "size"}
 
 
 def test_step_before_reset(env: CompilerEnv):
@@ -288,7 +257,7 @@ def test_reward_before_reset(env: CompilerEnv):
 def test_reset_invalid_benchmark(env: CompilerEnv):
     """Test requesting a specific benchmark."""
     with pytest.raises(LookupError) as ctx:
-        env.reset(benchmark="example-v1/foobar")
+        env.reset(benchmark="unrolling-v2/foobar")
     assert str(ctx.value) == "Unknown program name"
 
 
@@ -312,18 +281,6 @@ def test_double_reset(env: CompilerEnv):
     assert env.in_episode
 
 
-def test_double_reset_with_step(env: CompilerEnv):
-    """Test that reset() can be called twice with a step."""
-    env.reset()
-    assert env.in_episode
-    _, _, done, info = env.step(env.action_space.sample())
-    assert not done, info
-    env.reset()
-    _, _, done, info = env.step(env.action_space.sample())
-    assert not done, info
-    assert env.in_episode
-
-
 def test_Step_out_of_range(env: CompilerEnv):
     """Test error handling with an invalid action."""
     env.reset()
@@ -336,12 +293,12 @@ def test_default_ir_observation(env: CompilerEnv):
     """Test default observation space."""
     env.observation_space = "ir"
     observation = env.reset()
-    assert observation == "Hello, world!"
+    assert len(observation) > 0
 
     observation, reward, done, info = env.step(0)
-    assert observation == "Hello, world!"
+    assert not done, info
+    assert len(observation) > 0
     assert reward is None
-    assert not done
 
 
 def test_default_features_observation(env: CompilerEnv):
@@ -351,7 +308,7 @@ def test_default_features_observation(env: CompilerEnv):
     assert isinstance(observation, np.ndarray)
     assert observation.shape == (3,)
     assert observation.dtype == np.int64
-    assert observation.tolist() == [0, 0, 0]
+    assert all(obs >= 0 for obs in observation.tolist())
 
 
 def test_default_reward(env: CompilerEnv):
@@ -359,28 +316,28 @@ def test_default_reward(env: CompilerEnv):
     env.reward_space = "runtime"
     env.reset()
     observation, reward, done, info = env.step(0)
+    assert not done, info
     assert observation is None
-    assert reward == 0
-    assert not done
+    assert reward is not None
 
 
 def test_observations(env: CompilerEnv):
     """Test observation spaces."""
     env.reset()
-    assert env.observation["ir"] == "Hello, world!"
-    np.testing.assert_array_equal(env.observation["features"], [0, 0, 0])
+    assert len(env.observation["ir"]) > 0
+    np.testing.assert_array_less([-1, -1, -1], env.observation["features"])
 
 
 def test_rewards(env: CompilerEnv):
     """Test reward spaces."""
     env.reset()
-    assert env.reward["runtime"] == 0
+    assert env.reward["runtime"] is not None
 
 
 def test_benchmarks(env: CompilerEnv):
     assert list(env.datasets.benchmark_uris()) == [
-        "benchmark://example-v1/foo",
-        "benchmark://example-v1/bar",
+        "benchmark://unrolling-v2/offsets1",
+        "benchmark://unrolling-v2/conv2d",
     ]
 
 
@@ -394,67 +351,6 @@ def test_fork(env: CompilerEnv):
         assert other_env.actions == [0, 1]
     finally:
         other_env.close()
-
-
-@flaky  # Timeout-based test.
-def test_force_working_dir(bin: Path, tmpdir):
-    """Test that expected files are generated in the working directory."""
-    tmpdir = Path(tmpdir) / "subdir"
-    with Popen([str(bin), "--working_dir", str(tmpdir)]):
-        for _ in range(10):
-            sleep(0.5)
-            if (tmpdir / "pid.txt").is_file() and (tmpdir / "port.txt").is_file():
-                break
-        else:
-            pytest.fail(f"PID file not found in {tmpdir}: {list(tmpdir.iterdir())}")
-
-
-def unsafe_select_unused_port() -> int:
-    """Try and select an unused port that on the local system.
-
-    There is nothing to prevent the port number returned by this function from
-    being claimed by another process or thread, so it is liable to race conditions
-    """
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    s.bind(("127.0.0.1", 0))
-    s.listen(1)
-    port = s.getsockname()[1]
-    s.close()
-    return port
-
-
-def port_is_free(port: int) -> bool:
-    """Determine if a port is in use"""
-    s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    try:
-        s.bind(("127.0.0.1", port))
-        return True
-    except OSError:
-        return False
-    finally:
-        s.close()
-
-
-@flaky  # Unsafe free port allocation
-def test_force_port(bin: Path, tmpdir):
-    """Test that a forced --port value is respected."""
-    port = unsafe_select_unused_port()
-    assert port_is_free(port)  # Sanity check
-
-    tmpdir = Path(tmpdir)
-    with Popen([str(bin), "--port", str(port), "--working_dir", str(tmpdir)]):
-        for _ in range(10):
-            sleep(0.5)
-            if (tmpdir / "pid.txt").is_file() and (tmpdir / "port.txt").is_file():
-                break
-        else:
-            pytest.fail(f"PID file not found in {tmpdir}: {list(tmpdir.iterdir())}")
-
-        with open(tmpdir / "port.txt") as f:
-            actual_port = int(f.read())
-
-        assert actual_port == port
-        assert not port_is_free(actual_port)
 
 
 # Copied from CompilerGym/tests/test_main.py because there were errors in trying to import it here

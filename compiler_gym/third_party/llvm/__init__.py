@@ -5,6 +5,7 @@
 """Module for resolving paths to LLVM binaries and libraries."""
 import io
 import logging
+import os
 import shutil
 import sys
 import tarfile
@@ -20,14 +21,15 @@ from compiler_gym.util.runfiles_path import cache_path, site_data_path
 logger = logging.getLogger(__name__)
 
 # The data archive containing LLVM binaries and libraries.
+# HACK: I had to use the original llvm download binaries so that they contain the include files I need
 _LLVM_URL, _LLVM_SHA256 = {
     "darwin": (
-        "https://dl.fbaipublicfiles.com/compiler_gym/llvm-v0-macos.tar.bz2",
-        "731ae351b62c5713fb5043e0ccc56bfba4609e284dc816f0b2a5598fb809bf6b",
+        "https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-x86_64-apple-darwin.tar.xz",  # "https://dl.fbaipublicfiles.com/compiler_gym/llvm-v0-macos.tar.bz2",
+        "633a833396bf2276094c126b072d52b59aca6249e7ce8eae14c728016edb5e61",  # "731ae351b62c5713fb5043e0ccc56bfba4609e284dc816f0b2a5598fb809bf6b",
     ),
     "linux": (
-        "https://dl.fbaipublicfiles.com/compiler_gym/llvm-v0-linux.tar.bz2",
-        "59c3f328efd51994a11168ca15e43a8d422233796c6bc167c9eb771c7bd6b57e",
+        "https://github.com/llvm/llvm-project/releases/download/llvmorg-10.0.0/clang+llvm-10.0.0-aarch64-linux-gnu.tar.xz",  # "https://dl.fbaipublicfiles.com/compiler_gym/llvm-v0-linux.tar.bz2",
+        "c2072390dc6c8b4cc67737f487ef384148253a6a97b38030e012c4d7214b7295",  # "59c3f328efd51994a11168ca15e43a8d422233796c6bc167c9eb771c7bd6b57e",
     ),
 }[sys.platform]
 
@@ -49,11 +51,28 @@ def _download_llvm_files(destination: Path) -> Path:
 
     tar_contents = io.BytesIO(download(_LLVM_URL, sha256=_LLVM_SHA256))
     destination.parent.mkdir(parents=True, exist_ok=True)
-    with tarfile.open(fileobj=tar_contents, mode="r:bz2") as tar:
+    with tarfile.open(fileobj=tar_contents, mode="r:xz") as tar:
         tar.extractall(destination)
+    # HACK: llvm original tar files have a root directory which we want to bypass
+    sub_dir = os.listdir(destination)[0]
+    for item in os.listdir(os.path.join(str(destination), sub_dir)):
+        shutil.move(
+            os.path.join(str(destination), sub_dir, item),
+            os.path.join(str(destination), item),
+        )
+    shutil.rmtree(os.path.join(str(destination), sub_dir), ignore_errors=True)
+    # HACK: the downloaded binaries from LLVM website has "clang-10" rather than "clang"
+    if os.path.exists(os.path.join(str(destination), "clang-10")) and not os.path.join(
+        str(destination), "clang"
+    ):
+        shutil.move(
+            os.path.join(str(destination), "clang-10"),
+            os.path.join(str(destination), "clang"),
+        )
 
     assert destination.is_dir()
-    assert (destination / "LICENSE").is_file()
+    # HACK: llvm original downloads don't contain a LIENSE file
+    # assert (destination / "LICENSE").is_file()
 
     return destination
 

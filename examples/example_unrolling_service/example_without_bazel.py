@@ -93,18 +93,18 @@ class SizeReward(Reward):
 class UnrollingDataset(Dataset):
     def __init__(self, *args, **kwargs):
         super().__init__(
-            name="benchmark://unrolling-v0",
+            name="benchmark://unrolling-v1",
             license="MIT",
             description="Unrolling example dataset",
         )
 
         self._benchmarks = {
             "/offsets1": Benchmark.from_file_contents(
-                "benchmark://unrolling-v0/offsets1",
+                "benchmark://unrolling-v1/offsets1",
                 self.preprocess(BENCHMARKS_PATH / "offsets1.c"),
             ),
             "/conv2d": Benchmark.from_file_contents(
-                "benchmark://unrolling-v0/conv2d",
+                "benchmark://unrolling-v1/conv2d",
                 self.preprocess(BENCHMARKS_PATH / "conv2d.c"),
             ),
         }
@@ -131,7 +131,7 @@ class UnrollingDataset(Dataset):
         )
 
     def benchmark_uris(self) -> Iterable[str]:
-        yield from (f"benchmark://unrolling-v0{k}" for k in self._benchmarks.keys())
+        yield from (f"benchmark://unrolling-v1{k}" for k in self._benchmarks.keys())
 
     def benchmark_from_parsed_uri(self, uri: BenchmarkUri) -> Benchmark:
         if uri.path in self._benchmarks:
@@ -141,10 +141,10 @@ class UnrollingDataset(Dataset):
 
 
 # Register the unrolling example service on module import. After importing this module,
-# the unrolling-py-v0 environment will be available to gym.make(...).
+# the unrolling-py-v1 environment will be available to gym.make(...).
 
 register(
-    id="unrolling-py-v0",
+    id="unrolling-py-v1",
     entry_point="compiler_gym.service.client_service_compiler_env:ClientServiceCompilerEnv",
     kwargs={
         "service": UNROLLING_PY_SERVICE_BINARY,
@@ -154,8 +154,8 @@ register(
 )
 
 with compiler_gym.make(
-    "unrolling-py-v0",
-    benchmark="unrolling-v0/offsets1",
+    "unrolling-py-v1",
+    benchmark="unrolling-v1/offsets1",
     observation_space="features",
     reward_space="runtime",
 ) as env:
