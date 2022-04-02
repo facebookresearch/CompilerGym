@@ -33,7 +33,7 @@ repos:
           - id: requirements-txt-fixer
           - id: trailing-whitespace
     - repo: https://github.com/jumanjihouse/pre-commit-hook-yamlfmt
-      rev: 0.1.0
+      rev: 750078a4aedba5d63c04442e697ccda3ddf71351
       hooks:
           - id: yamlfmt
     - repo: https://github.com/timothycrosley/isort
