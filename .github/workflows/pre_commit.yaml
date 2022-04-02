@@ -30,12 +30,12 @@ jobs:
 
             - name: Install buildifier
               run: |
-                  go get github.com/bazelbuild/buildtools/buildifier
+                  go install github.com/bazelbuild/buildtools/buildifier@latest
                   buildifier --version
 
             - name: Install prototool
               run: |
-                  GO111MODULE=on go get github.com/uber/prototool/cmd/prototool@dev
+                  GO111MODULE=on go install github.com/uber/prototool/cmd/prototool@dev
                   prototool version
 
             - name: Install hadolint
