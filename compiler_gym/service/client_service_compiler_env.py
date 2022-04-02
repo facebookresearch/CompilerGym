@@ -55,6 +55,7 @@ from compiler_gym.util.gym_type_hints import (
     ObservationType,
     RewardType,
     StepType,
+    OptionalArgumentValue,
 )
 from compiler_gym.util.shell_format import plural
 from compiler_gym.util.timer import Timer
@@ -666,6 +667,8 @@ class ClientServiceCompilerEnv(CompilerEnv):
         benchmark: Optional[Union[str, Benchmark]] = None,
         action_space: Optional[str] = None,
         retry_count: int = 0,
+        reward_space=OptionalArgumentValue.UNCHANGED,
+        observation_space=OptionalArgumentValue.UNCHANGED,
     ) -> Optional[ObservationType]:
         """Reset the environment state.
 
@@ -691,6 +694,12 @@ class ClientServiceCompilerEnv(CompilerEnv):
         :raises TypeError: If no benchmark has been set, and the environment
             does not have a default benchmark to select from.
         """
+
+        if reward_space != OptionalArgumentValue.UNCHANGED:
+            self.reward_space = reward_space
+
+        if observation_space != OptionalArgumentValue.UNCHANGED:
+            self.observation_space = observation_space
 
         def _retry(error) -> Optional[ObservationType]:
             """Abort and retry on error."""
