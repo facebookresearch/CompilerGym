@@ -23,7 +23,7 @@ def test_permutation_number_mapping():
     mapped_permutation2 = permutation.convert_number_to_permutation(
         n=permutation_number2, permutation_size=len(original_permutation2)
     )
-    assert np.array_equal(original_permutation2, mapped_permutation2)
+    np.testing.assert_array_equal(original_permutation2, mapped_permutation2)
 
 
 if __name__ == "__main__":

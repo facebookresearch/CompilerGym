@@ -962,6 +962,15 @@ def test_convert_permutation_space_message():
     assert permutation.size_range[0] == 5
     assert permutation.size_range[1] == 5
 
+    invalid_permutation_space_msg = Space(
+        type_id="permutation",
+        int64_sequence=Int64SequenceSpace(
+            length_range=Int64Range(min=3, max=5), scalar_range=Int64Range(min=0, max=4)
+        ),
+    )
+    with pytest.raises(ValueError, match="Invalid permutation space message"):
+        py_converters.message_default_converter(invalid_permutation_space_msg)
+
 
 if __name__ == "__main__":
     main()

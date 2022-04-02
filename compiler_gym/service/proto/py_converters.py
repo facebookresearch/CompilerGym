@@ -201,7 +201,12 @@ def convert_permutation_space_message(space: Space) -> Permutation:
         or space.int64_sequence.length_range.min
         != space.int64_sequence.length_range.max
     ):
-        raise ValueError(f"Invalid permutation space message:\n{space}.")
+        raise ValueError(
+            f"Invalid permutation space message:\n{space}."
+            " Variable sequence length is not allowed."
+            " A permutation must also include all integers in its range "
+            "[min, min + length)."
+        )
     return Permutation(
         name=None,
         scalar_range=convert_range_message(space.int64_sequence.scalar_range),

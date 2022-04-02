@@ -12,13 +12,17 @@ from gym.spaces import Space
 
 
 class SpaceSequence(Space):
-    name: str
-    space: Space
-    size_range: Tuple[int, Optional[int]]
+    """Variable-length sequence of subspaces that have the same definition."""
 
     def __init__(
         self, name: str, space: Space, size_range: Tuple[int, Optional[int]] = (0, None)
     ):
+        """Constructor.
+
+        :param name: The name of the space.
+        :param space: Shared definition of the spaces in the sequence.
+        :param size_range: Range of the sequence length.
+        """
         self.name = name
         self.space = space
         self.size_range = size_range

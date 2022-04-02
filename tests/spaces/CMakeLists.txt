@@ -27,6 +27,16 @@ cg_py_test(
 
 cg_py_test(
   NAME
+    permutation_test
+  SRCS
+    "permutation_test.py"
+  DEPS
+    compiler_gym::spaces::spaces
+    tests::test_main
+)
+
+cg_py_test(
+  NAME
     reward_test
   SRCS
     "reward_test.py"
