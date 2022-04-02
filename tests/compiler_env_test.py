@@ -147,9 +147,9 @@ def test_switch_default_reward_space_in_episode(env: LlvmEnv):
     """Test that switching reward space during an episode resets the cumulative
     episode reward.
     """
-    env.reward_space = None
+    # env.reward_space = None
 
-    env.reset()
+    env.reset(reward_space=None)
     _, _, done, info = env.step(0)
     assert not done, info
     assert env.episode_reward is None
@@ -167,9 +167,9 @@ def test_set_same_default_reward_space_in_episode(env: LlvmEnv):
     """Test that setting the reward space during an episode does not reset the
     cumulative episode reward if the reward space is unchanged.
     """
-    env.reward_space = "IrInstructionCount"
+    # env.reward_space = "IrInstructionCount"
 
-    env.reset()
+    env.reset(reward_space="IrInstructionCount")
 
     env.episode_reward = 10
 
