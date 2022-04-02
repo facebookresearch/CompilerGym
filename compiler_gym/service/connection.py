@@ -157,7 +157,6 @@ if sys.version_info > (3, 8, 0):
         ) -> Reply:  # pylint: disable=undefined-variable
             ...
 
-
 else:
     # Legacy support for Python < 3.8.
     from typing import Callable

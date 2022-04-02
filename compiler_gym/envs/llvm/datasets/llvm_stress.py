@@ -15,7 +15,7 @@ from compiler_gym.third_party import llvm
 from compiler_gym.util.commands import Popen
 
 # The maximum value for the --seed argument to llvm-stress.
-UINT_MAX = (2 ** 32) - 1
+UINT_MAX = (2**32) - 1
 
 
 class LlvmStressDataset(Dataset):

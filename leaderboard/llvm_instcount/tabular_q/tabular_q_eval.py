@@ -23,7 +23,7 @@ FLAGS = flags.FLAGS
 
 
 def train_and_run(env: LlvmEnv) -> None:
-    """ Run tabular Q learning on an environment """
+    """Run tabular Q learning on an environment"""
     FLAGS.log_every = 0  # Disable printing to stdout
 
     q_table: Dict[StateActionTuple, float] = {}

@@ -84,7 +84,7 @@ class LoopToolCompilationSession(CompilationSession):
             space=Space(
                 int64_box=Int64Box(
                     low=Int64Tensor(shape=[1], value=[0]),
-                    high=Int64Tensor(shape=[1], value=[2 ** 36]),
+                    high=Int64Tensor(shape=[1], value=[2**36]),
                 ),
             ),
             deterministic=True,
