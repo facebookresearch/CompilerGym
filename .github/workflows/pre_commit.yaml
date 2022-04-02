@@ -54,7 +54,6 @@ jobs:
                   python3 -m pip install --upgrade wheel
                   python3 -m pip install -r requirements_pre_commit.txt
                   python3 -m isort --version
-                  python3 -m black --version
                   python3 -m pre_commit --version
 
             - name: Run pre-commit checks

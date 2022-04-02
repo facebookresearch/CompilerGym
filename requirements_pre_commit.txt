@@ -1,5 +1,3 @@
-black==19.10b0
-click==8.0.4  # https://github.com/psf/black/issues/2964
 flake8==3.9.2
 isort==4.3.21
 pre-commit>=2.12.1
