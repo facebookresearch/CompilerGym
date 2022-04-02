@@ -91,6 +91,36 @@ class TypeBasedConverter:
 
 
 class TypeIdDispatchConverter:
+    """Dispatches conversion of a <google.protobuf.message.Message>
+    based on the value of its field "type_id".
+
+    If the "type_id" filed is not present the conversion falls back on `default_converter`.
+    Example:
+    ```
+    from compiler_gym.service.proto import Event, py_converters
+
+    def default_converter(msg):
+        return msg.string_value + "_default"
+
+    conversion_map = {
+        "type_1": lambda msg: msg.string_value + "_type_1",
+        "type_2": lambda msg: msg.string_value + "_type_2",
+    }
+    type_id_converter = py_converters.TypeIdDispatchConverter(
+        default_converter=default_converter, conversion_map=conversion_map
+    )
+    assert type_id_converter(Event(string_value="msg_val")) == "msg_val_default"
+    assert (
+        type_id_converter(Event(string_value="msg_val", type_id="type_1"))
+        == "msg_val_type_1"
+    )
+    assert (
+        type_id_converter(Event(string_value="msg_val", type_id="type_2"))
+        == "msg_val_type_2"
+    )
+    ```
+    """
+
     conversion_map: DictType[str, Callable[[Message], Any]]
     default_converter: Callable[[Message], Any]
 
