@@ -84,7 +84,7 @@ def test_observation_spaces(env: CompilerEnv):
     env.reset()
     assert env.observation.spaces.keys() == {"ir", "features", "runtime"}
     assert env.observation.spaces["ir"].space == Sequence(
-        name="test",
+        name="ir",
         size_range=(0, np.iinfo(np.int64).max),
         dtype=str,
     )

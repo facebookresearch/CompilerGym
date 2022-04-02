@@ -104,7 +104,7 @@ class ObservationSpaceSpec:
         :raises ValueError: If protocol buffer is invalid.
         """
         try:
-            spec = ObservationSpaceSpec.message_converter(proto.space)
+            spec = ObservationSpaceSpec.message_converter(proto)
         except ValueError as e:
             raise ValueError(
                 f"Error interpreting description of observation space '{proto.name}'.\n"
