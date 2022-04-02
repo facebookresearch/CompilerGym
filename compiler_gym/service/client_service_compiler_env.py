@@ -83,6 +83,14 @@ def _wrapped_step(
 
 
 class ServiceMessageConverters:
+    """Allows for customization of conversion to/from gRPC messages for the
+    <ClientServiceCompilerEnv>.
+
+    Supports conversion customizations:
+    * <compiler_gym.service.proto.ActionSpace> -> <gym.spaces.Space>.
+    * <compiler_gym.util.gym_type_hints.ActionType> -> <compiler_gym.service.proto.Event>.
+    """
+
     action_space_converter: Callable[[ActionSpace], Space]
     action_converter: Callable[[ActionType], Event]
 
@@ -178,7 +186,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
             passed to :meth:`env.observation.add_derived_space()
             <compiler_gym.views.observation.Observation.add_derived_space>`.
 
-        :param service_message_converters: custom converters for action spaces and actions.
+        :param service_message_converters: Custom converters for action spaces and actions.
 
         :param connection_settings: The settings used to establish a connection
             with the remote service.
