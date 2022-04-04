@@ -34,7 +34,6 @@ def test_equal():
         success_threshold=3,
         deterministic=False,
         platform_dependent=True,
-        id="id",
     )
     assert reward == deepcopy(reward)
     assert reward == "test_reward"
@@ -51,7 +50,6 @@ def test_not_equal():
         success_threshold=3,
         deterministic=False,
         platform_dependent=True,
-        id="id",
     )
     reward2 = deepcopy(reward)
     reward2.name = "test_reward_2"

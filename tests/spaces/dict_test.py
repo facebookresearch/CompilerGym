@@ -6,6 +6,7 @@
 from gym.spaces import Discrete
 
 from compiler_gym.spaces import Dict
+from tests.test_main import main
 
 
 def test_equal():
@@ -20,3 +21,7 @@ def test_not_equal():
     assert dict_space != Dict({"a": Discrete(2)}, name="test_dict")
     assert dict_space != Dict({"a": Discrete(2), "b": Discrete(3)}, name="test_dict_2")
     assert dict_space != "not_a_dict"
+
+
+if __name__ == "__main__":
+    main()
