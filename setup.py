@@ -60,7 +60,6 @@ try:
             python, abi = "py3", "none"
             return python, abi, plat
 
-
 except ImportError:
     bdist_wheel = None
 
