@@ -45,5 +45,19 @@ def test_to_string():
     assert space.to_string([0, 0, 1]) == "foo foo bar"
 
 
+def test_equal():
+    assert NamedDiscrete(["a", "b"], name="test_named_discrete") == NamedDiscrete(
+        ["a", "b"], name="test_named_discrete"
+    )
+
+
+def test_not_equal():
+    named_discrete = NamedDiscrete(["a", "b"], name="test_named_discrete")
+    assert named_discrete != NamedDiscrete(["a", "bb"], name="test_named_discrete")
+    assert named_discrete != NamedDiscrete(["a", "b", "c"], name="test_named_discrete")
+    assert named_discrete != NamedDiscrete(["a", "b"], name="test_named_discrete_2")
+    assert named_discrete != "not_a_named_discrete"
+
+
 if __name__ == "__main__":
     main()
