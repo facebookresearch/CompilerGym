@@ -12,7 +12,7 @@ from copy import deepcopy
 from math import isclose
 from pathlib import Path
 from time import time
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
+from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 
 import numpy as np
 from deprecated.sphinx import deprecated
@@ -31,7 +31,7 @@ from compiler_gym.service import (
     SessionNotFound,
 )
 from compiler_gym.service.connection import ServiceIsClosed
-from compiler_gym.service.proto import AddBenchmarkRequest
+from compiler_gym.service.proto import ActionSpace, AddBenchmarkRequest
 from compiler_gym.service.proto import Benchmark as BenchmarkProto
 from compiler_gym.service.proto import (
     EndSessionReply,
@@ -47,7 +47,7 @@ from compiler_gym.service.proto import (
     StartSessionRequest,
     StepReply,
     StepRequest,
-    proto_to_action_space,
+    py_converters,
 )
 from compiler_gym.spaces import DefaultRewardFromObservation, NamedDiscrete, Reward
 from compiler_gym.util.gym_type_hints import (
@@ -82,6 +82,35 @@ def _wrapped_step(
         raise
 
 
+class ServiceMessageConverters:
+    """Allows for customization of conversion to/from gRPC messages for the
+    <ClientServiceCompilerEnv>.
+
+    Supports conversion customizations:
+    * <compiler_gym.service.proto.ActionSpace> -> <gym.spaces.Space>.
+    * <compiler_gym.util.gym_type_hints.ActionType> -> <compiler_gym.service.proto.Event>.
+    """
+
+    action_space_converter: Callable[[ActionSpace], Space]
+    action_converter: Callable[[ActionType], Event]
+
+    def __init__(
+        self,
+        action_space_converter: Optional[Callable[[ActionSpace], Space]] = None,
+        action_converter: Optional[Callable[[Any], Event]] = None,
+    ):
+        self.action_space_converter = (
+            py_converters.make_message_default_converter()
+            if action_space_converter is None
+            else action_space_converter
+        )
+        self.action_converter = (
+            py_converters.to_event_message_default_converter()
+            if action_converter is None
+            else action_converter
+        )
+
+
 class ClientServiceCompilerEnv(CompilerEnv):
     """Implementation using gRPC for a client-server communication.
 
@@ -106,6 +135,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         reward_space: Optional[Union[str, Reward]] = None,
         action_space: Optional[str] = None,
         derived_observation_spaces: Optional[List[Dict[str, Any]]] = None,
+        service_message_converters: ServiceMessageConverters = None,
         connection_settings: Optional[ConnectionOpts] = None,
         service_connection: Optional[CompilerGymServiceConnection] = None,
         logger: Optional[logging.Logger] = None,
@@ -155,6 +185,8 @@ class ClientServiceCompilerEnv(CompilerEnv):
         :param derived_observation_spaces: An optional list of arguments to be
             passed to :meth:`env.observation.add_derived_space()
             <compiler_gym.views.observation.Observation.add_derived_space>`.
+
+        :param service_message_converters: Custom converters for action spaces and actions.
 
         :param connection_settings: The settings used to establish a connection
             with the remote service.
@@ -239,9 +271,16 @@ class ClientServiceCompilerEnv(CompilerEnv):
             # first reset() call.
             pass
 
+        self.service_message_converters = (
+            ServiceMessageConverters()
+            if service_message_converters is None
+            else service_message_converters
+        )
+
         # Process the available action, observation, and reward spaces.
         self.action_spaces = [
-            proto_to_action_space(space) for space in self.service.action_spaces
+            self.service_message_converters.action_space_converter(space)
+            for space in self.service.action_spaces
         ]
 
         self.observation = self._observation_view_type(
@@ -788,7 +827,9 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
         # If the action space has changed, update it.
         if reply.HasField("new_action_space"):
-            self.action_space = proto_to_action_space(reply.new_action_space)
+            self.action_space = self.service_message_converters.action_space_converter(
+                reply.new_action_space
+            )
 
         self.reward.reset(benchmark=self.benchmark, observation_view=self.observation)
         if self.reward_space:
@@ -857,7 +898,9 @@ class ClientServiceCompilerEnv(CompilerEnv):
         # Send the request to the backend service.
         request = StepRequest(
             session_id=self._session_id,
-            action=[Event(int64_value=a) for a in actions],
+            action=[
+                self.service_message_converters.action_converter(a) for a in actions
+            ],
             observation_space=[
                 observation_space.index for observation_space in observations_to_compute
             ],
@@ -901,7 +944,9 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
         # If the action space has changed, update it.
         if reply.HasField("new_action_space"):
-            self.action_space = proto_to_action_space(reply.new_action_space)
+            self.action_space = self.service_message_converters.action_space_converter(
+                reply.new_action_space
+            )
 
         # Translate observations to python representations.
         if len(reply.observation) != len(observations_to_compute):

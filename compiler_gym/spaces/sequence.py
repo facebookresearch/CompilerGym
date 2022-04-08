@@ -124,7 +124,9 @@ class Sequence(Space):
         if not isinstance(other, Sequence):
             return False
         return (
-            self.size_range == other.size_range
+            self.name == other.name
+            and self.size_range == other.size_range
             and np.dtype(self.dtype) == np.dtype(other.dtype)
             and self.opaque_data_format == other.opaque_data_format
+            and self.scalar_range == other.scalar_range
         )

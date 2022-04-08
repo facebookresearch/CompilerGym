@@ -73,10 +73,6 @@ from compiler_gym.spaces.space_sequence import SpaceSequence
 from compiler_gym.spaces.tuple import Tuple
 
 
-def proto_to_action_space(space: ActionSpace):
-    return message_default_converter(space)
-
-
 class TypeBasedConverter:
     """Converter that dispatches based on the exact type of the parameter.
 
@@ -94,6 +90,36 @@ class TypeBasedConverter:
 
 
 class TypeIdDispatchConverter:
+    """Dispatches conversion of a <google.protobuf.message.Message>
+    based on the value of its field "type_id".
+
+    If the "type_id" filed is not present the conversion falls back on `default_converter`.
+    Example:
+    .. code-block:: python
+        from compiler_gym.service.proto import Event, py_converters
+
+        def default_converter(msg):
+            return msg.string_value + "_default"
+
+        conversion_map = {
+            "type_1": lambda msg: msg.string_value + "_type_1",
+            "type_2": lambda msg: msg.string_value + "_type_2",
+        }
+        type_id_converter = py_converters.TypeIdDispatchConverter(
+            default_converter=default_converter, conversion_map=conversion_map
+        )
+        assert type_id_converter(Event(string_value="msg_val")) == "msg_val_default"
+        assert (
+            type_id_converter(Event(string_value="msg_val", type_id="type_1"))
+            == "msg_val_type_1"
+        )
+        assert (
+            type_id_converter(Event(string_value="msg_val", type_id="type_2"))
+            == "msg_val_type_2"
+        )
+
+    """
+
     conversion_map: DictType[str, Callable[[Message], Any]]
     default_converter: Callable[[Message], Any]
 
@@ -281,6 +307,7 @@ class ToEventMessageConverter:
             DictEvent: "event_dict",
             bool: "boolean_value",
             int: "int64_value",
+            np.int32: "int64_value",
             np.float32: "float_value",
             float: "double_value",
             str: "string_value",
@@ -418,7 +445,9 @@ def make_message_default_converter() -> Callable[[Any], Any]:
     conversion_map = {
         bool: convert_trivial,
         int: convert_trivial,
+        np.int32: convert_trivial,
         float: convert_trivial,
+        np.float32: convert_trivial,
         str: convert_trivial,
         bytes: convert_bytes_to_numpy,
         BooleanTensor: convert_tensor_message_to_numpy,
@@ -478,7 +507,9 @@ def to_event_message_default_converter() -> ToEventMessageConverter:
     conversion_map = {
         bool: convert_trivial,
         int: convert_trivial,
+        np.int32: convert_trivial,
         float: convert_trivial,
+        np.float32: convert_trivial,
         str: convert_trivial,
         np.ndarray: NumpyToTensorMessageConverter(),
     }

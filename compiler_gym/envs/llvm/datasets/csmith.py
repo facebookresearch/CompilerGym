@@ -24,7 +24,7 @@ from compiler_gym.util.truncate import truncate
 logger = logging.getLogger(__name__)
 
 # The maximum value for the --seed argument to csmith.
-UINT_MAX = (2 ** 32) - 1
+UINT_MAX = (2**32) - 1
 
 _CSMITH_BIN = runfiles_path("compiler_gym/third_party/csmith/csmith/bin/csmith")
 _CSMITH_INCLUDES = runfiles_path(

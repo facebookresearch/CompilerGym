@@ -64,7 +64,8 @@ class Scalar(Space):
         if not isinstance(rhs, Scalar):
             return False
         return (
-            self.min == rhs.min
+            self.name == rhs.name
+            and self.min == rhs.min
             and self.max == rhs.max
             and np.dtype(self.dtype) == np.dtype(rhs.dtype)
         )
