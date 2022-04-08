@@ -86,6 +86,55 @@ class TypeBasedConverter:
         return self.conversion_map[type(val)](val)
 
 
+class TypeIdDispatchConverter:
+    """Dispatches conversion of a <google.protobuf.message.Message>
+    based on the value of its field "type_id".
+
+    If the "type_id" filed is not present the conversion falls back on `default_converter`.
+    Example:
+    .. code-block:: python
+        from compiler_gym.service.proto import Event, py_converters
+
+        def default_converter(msg):
+            return msg.string_value + "_default"
+
+        conversion_map = {
+            "type_1": lambda msg: msg.string_value + "_type_1",
+            "type_2": lambda msg: msg.string_value + "_type_2",
+        }
+        type_id_converter = py_converters.TypeIdDispatchConverter(
+            default_converter=default_converter, conversion_map=conversion_map
+        )
+        assert type_id_converter(Event(string_value="msg_val")) == "msg_val_default"
+        assert (
+            type_id_converter(Event(string_value="msg_val", type_id="type_1"))
+            == "msg_val_type_1"
+        )
+        assert (
+            type_id_converter(Event(string_value="msg_val", type_id="type_2"))
+            == "msg_val_type_2"
+        )
+
+    """
+
+    conversion_map: DictType[str, Callable[[Message], Any]]
+    default_converter: Callable[[Message], Any]
+
+    def __init__(
+        self,
+        default_converter: Callable[[Message], Any],
+        conversion_map: DictType[str, Callable[[Message], Any]] = None,
+    ):
+        self.conversion_map = {} if conversion_map is None else conversion_map
+        self.default_converter = default_converter
+
+    def __call__(self, message: Message) -> Any:
+        if message.HasField("type_id"):
+            return self.conversion_map[message.type_id](message)
+        else:
+            return self.default_converter(message)
+
+
 proto_type_to_dtype_map = {
     BooleanTensor: bool,
     ByteTensor: np.int8,
@@ -209,10 +258,10 @@ class FromMessageConverter:
         return self.conversion_map[message.DESCRIPTOR.full_name](message)
 
 
-class EventMessageConverter:
-    message_converter: TypeBasedConverter
+class EventMessageDefaultConverter:
+    message_converter: Callable[[Any], Any]
 
-    def __init__(self, message_converter: TypeBasedConverter):
+    def __init__(self, message_converter: Callable[[Any], Any]):
         self.message_converter = message_converter
 
     def __call__(self, event: Event):
@@ -260,9 +309,9 @@ class ToEventMessageConverter:
 
 
 class ListEventMessageConverter:
-    event_message_converter: EventMessageConverter
+    event_message_converter: Callable[[Event], Any]
 
-    def __init__(self, event_message_converter: EventMessageConverter):
+    def __init__(self, event_message_converter: Callable[[Event], Any]):
         self.event_message_converter = event_message_converter
 
     def __call__(self, list_event: ListEvent) -> List[Any]:
@@ -280,9 +329,9 @@ class ToListEventMessageConverter:
 
 
 class DictEventMessageConverter:
-    event_message_converter: EventMessageConverter
+    event_message_converter: Callable[[Event], Any]
 
-    def __init__(self, event_message_converter: EventMessageConverter):
+    def __init__(self, event_message_converter: Callable[[Event], Any]):
         self.event_message_converter = event_message_converter
 
     def __call__(self, dict_event: DictEvent) -> DictType[str, Any]:
@@ -331,10 +380,10 @@ class ProtobufAnyUnpacker:
 
 class ProtobufAnyConverter:
     unpacker: ProtobufAnyUnpacker
-    message_converter: TypeBasedConverter
+    message_converter: Callable[[Message], Any]
 
     def __init__(
-        self, unpacker: ProtobufAnyUnpacker, message_converter: TypeBasedConverter
+        self, unpacker: ProtobufAnyUnpacker, message_converter: Callable[[Message], Any]
     ):
         self.unpacker = unpacker
         self.message_converter = message_converter
@@ -368,7 +417,7 @@ class ObservationSpaceMessageConverter:
         return res
 
 
-def make_message_default_converter() -> TypeBasedConverter:
+def make_message_default_converter() -> Callable[[Any], Any]:
     conversion_map = {
         bool: convert_trivial,
         int: convert_trivial,
@@ -406,11 +455,15 @@ def make_message_default_converter() -> TypeBasedConverter:
     }
 
     res = TypeBasedConverter(conversion_map)
-    conversion_map[Event] = EventMessageConverter(res)
+    conversion_map[Event] = TypeIdDispatchConverter(
+        default_converter=EventMessageDefaultConverter(res)
+    )
     conversion_map[ListEvent] = ListEventMessageConverter(conversion_map[Event])
     conversion_map[DictEvent] = DictEventMessageConverter(conversion_map[Event])
 
-    conversion_map[Space] = SpaceMessageConverter(res)
+    conversion_map[Space] = TypeIdDispatchConverter(
+        default_converter=SpaceMessageDefaultConverter(res),
+    )
     conversion_map[ListSpace] = ListSpaceMessageConverter(conversion_map[Space])
     conversion_map[DictSpace] = DictSpaceMessageConverter(conversion_map[Space])
     conversion_map[ActionSpace] = ActionSpaceMessageConverter(res)
@@ -671,7 +724,7 @@ class ToSequenceSpaceMessageConverter:
 convert_to_sequence_space_message = ToSequenceSpaceMessageConverter()
 
 
-class SpaceMessageConverter:
+class SpaceMessageDefaultConverter:
     message_converter: TypeBasedConverter
 
     def __init__(self, message_converter: TypeBasedConverter):
@@ -734,9 +787,9 @@ class ToSpaceMessageConverter:
 
 
 class ListSpaceMessageConverter:
-    space_message_converter: SpaceMessageConverter
+    space_message_converter: Callable[[Space], Any]
 
-    def __init__(self, space_message_converter: SpaceMessageConverter):
+    def __init__(self, space_message_converter: Callable[[Space], Any]):
         self.space_message_converter = space_message_converter
 
     def __call__(self, list_space: ListSpace) -> Tuple:
@@ -759,9 +812,9 @@ class ToListSpaceMessageConverter:
 
 
 class DictSpaceMessageConverter:
-    space_message_converter: SpaceMessageConverter
+    space_message_converter: Callable[[Space], Any]
 
-    def __init__(self, space_message_converter: SpaceMessageConverter):
+    def __init__(self, space_message_converter: Callable[[Space], Any]):
         self.space_message_converter = space_message_converter
 
     def __call__(self, dict_space: DictSpace) -> Dict:

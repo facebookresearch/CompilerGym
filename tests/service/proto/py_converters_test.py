@@ -189,11 +189,11 @@ def test_type_based_converter():
     assert isinstance(numpy_array, np.ndarray)
 
 
-def test_event_message_converter():
+def test_event_message_default_converter():
     message_converter = py_converters.TypeBasedConverter(
         conversion_map={FloatTensor: py_converters.convert_tensor_message_to_numpy}
     )
-    event_converter = py_converters.EventMessageConverter(message_converter)
+    event_converter = py_converters.EventMessageDefaultConverter(message_converter)
     tensor_message = FloatTensor(shape=[1], value=[1])
     event_message = Event(float_tensor=tensor_message)
     numpy_array = event_converter(event_message)
@@ -204,7 +204,7 @@ def test_list_event_message_converter():
     message_converter = py_converters.TypeBasedConverter(
         conversion_map={FloatTensor: py_converters.convert_tensor_message_to_numpy}
     )
-    event_converter = py_converters.EventMessageConverter(message_converter)
+    event_converter = py_converters.EventMessageDefaultConverter(message_converter)
     list_converter = py_converters.ListEventMessageConverter(event_converter)
     tensor_message = FloatTensor(shape=[1], value=[1])
     event_message = Event(float_tensor=tensor_message)
@@ -244,7 +244,7 @@ def test_dict_event_message_converter():
     message_converter = py_converters.TypeBasedConverter(
         conversion_map={FloatTensor: py_converters.convert_tensor_message_to_numpy}
     )
-    event_converter = py_converters.EventMessageConverter(message_converter)
+    event_converter = py_converters.EventMessageDefaultConverter(message_converter)
     dict_converter = py_converters.DictEventMessageConverter(event_converter)
     tensor_message = FloatTensor(shape=[1], value=[1])
     event_message = Event(float_tensor=tensor_message)
@@ -776,11 +776,11 @@ def test_convert_to_string_space():
     assert converted_space.length_range.max == 2
 
 
-def test_space_message_converter():
+def test_space_message_default_converter():
     message_converter = py_converters.TypeBasedConverter(
         conversion_map={StringSpace: py_converters.convert_sequence_space}
     )
-    space_converter = py_converters.SpaceMessageConverter(message_converter)
+    space_converter = py_converters.SpaceMessageDefaultConverter(message_converter)
     val = StringSpace(length_range=Int64Range(min=1, max=2))
     space_message = Space(string_value=val)
     converted_space = space_converter(space_message)
@@ -794,7 +794,7 @@ def test_list_space_message_converter():
     message_converter = py_converters.TypeBasedConverter(
         conversion_map={StringSpace: py_converters.convert_sequence_space}
     )
-    space_converter = py_converters.SpaceMessageConverter(message_converter)
+    space_converter = py_converters.SpaceMessageDefaultConverter(message_converter)
     list_converter = py_converters.ListSpaceMessageConverter(space_converter)
     space_message = ListSpace(
         space=[
@@ -845,7 +845,7 @@ def test_dict_space_message_converter():
     message_converter = py_converters.TypeBasedConverter(
         conversion_map={StringSpace: py_converters.convert_sequence_space}
     )
-    space_converter = py_converters.SpaceMessageConverter(message_converter)
+    space_converter = py_converters.SpaceMessageDefaultConverter(message_converter)
     dict_converter = py_converters.DictSpaceMessageConverter(space_converter)
     space_message = DictSpace(
         space={
@@ -904,6 +904,28 @@ def test_opaque_json_message_converter():
     assert len(converted_message) == 1
     assert "key" in converted_message
     assert converted_message["key"] == "val"
+
+
+def test_type_id_dispatch_converter():
+    def default_converter(msg):
+        return msg.string_value + "_default"
+
+    conversion_map = {
+        "type_1": lambda msg: msg.string_value + "_type_1",
+        "type_2": lambda msg: msg.string_value + "_type_2",
+    }
+    type_id_converter = py_converters.TypeIdDispatchConverter(
+        default_converter=default_converter, conversion_map=conversion_map
+    )
+    assert type_id_converter(Event(string_value="msg_val")) == "msg_val_default"
+    assert (
+        type_id_converter(Event(string_value="msg_val", type_id="type_1"))
+        == "msg_val_type_1"
+    )
+    assert (
+        type_id_converter(Event(string_value="msg_val", type_id="type_2"))
+        == "msg_val_type_2"
+    )
 
 
 if __name__ == "__main__":
