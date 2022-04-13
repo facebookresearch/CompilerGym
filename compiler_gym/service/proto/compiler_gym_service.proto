@@ -294,6 +294,13 @@ message StringSpace {
   Int64Range length_range = 1;
 }
 
+// A variable length sequence of spaces.
+message SpaceSequenceSpace {
+  // The number of spaces in the sequence.
+  Int64Range length_range = 1;
+  Space space = 2;
+}
+
 // Can be used in Space.any_value or Event.any_value to describe an opaque
 // serialized data.
 message Opaque {
@@ -326,6 +333,7 @@ message Space {
     FloatSequenceSpace float_sequence = 16;
     DoubleSequenceSpace double_sequence = 17;
     StringSequenceSpace string_sequence = 18;
+    SpaceSequenceSpace space_sequence = 25;
     BooleanBox boolean_box = 19;
     ByteBox byte_box = 20;
     Int64Box int64_box = 21;

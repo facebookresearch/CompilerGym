@@ -7,9 +7,11 @@ from compiler_gym.spaces.commandline import Commandline, CommandlineFlag
 from compiler_gym.spaces.dict import Dict
 from compiler_gym.spaces.discrete import Discrete
 from compiler_gym.spaces.named_discrete import NamedDiscrete
+from compiler_gym.spaces.permutation import Permutation
 from compiler_gym.spaces.reward import DefaultRewardFromObservation, Reward
 from compiler_gym.spaces.scalar import Scalar
 from compiler_gym.spaces.sequence import Sequence
+from compiler_gym.spaces.space_sequence import SpaceSequence
 from compiler_gym.spaces.tuple import Tuple
 
 __all__ = [
@@ -20,8 +22,10 @@ __all__ = [
     "Dict",
     "Discrete",
     "NamedDiscrete",
+    "Permutation",
     "Reward",
     "Scalar",
     "Sequence",
+    "SpaceSequence",
     "Tuple",
 ]

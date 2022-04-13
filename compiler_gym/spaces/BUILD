@@ -17,9 +17,11 @@ py_library(
         ":dict",
         ":discrete",
         ":named_discrete",
+        ":permutation",
         ":reward",
         ":scalar",
         ":sequence",
+        ":space_sequence",
         ":tuple",
     ],
 )
@@ -91,7 +93,23 @@ py_library(
 )
 
 py_library(
+    name = "space_sequence",
+    srcs = ["space_sequence.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
+)
+
+py_library(
     name = "tuple",
     srcs = ["tuple.py"],
     visibility = ["//compiler_gym:__subpackages__"],
+)
+
+py_library(
+    name = "permutation",
+    srcs = ["permutation.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
+    deps = [
+        ":scalar",
+        ":sequence",
+    ],
 )

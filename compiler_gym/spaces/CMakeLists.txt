@@ -17,9 +17,11 @@ cg_py_library(
     ::dict
     ::discrete
     ::named_discrete
+    ::permutation
     ::reward
     ::scalar
     ::sequence
+    ::space_sequence
     ::tuple
   PUBLIC
 )
@@ -97,6 +99,25 @@ cg_py_library(
 )
 
 cg_py_library(
+  NAME
+    space_sequence
+  SRCS
+    "space_sequence.py"
+  PUBLIC
+)
+
+cg_py_library(
   NAME tuple
   SRCS "tuple.py"
+)
+
+cg_py_library(
+  NAME
+    permutation
+  SRCS
+    "permutation.py"
+  DEPS
+    ::scalar
+    ::sequence
+  PUBLIC
 )

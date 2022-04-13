@@ -52,6 +52,15 @@ NamedDiscrete
    .. automethod:: __getitem__
 
 
+Permutation
+--------
+
+.. autoclass:: Permutation
+   :members:
+
+   .. automethod:: __init__
+
+
 Reward
 ------
 
@@ -65,6 +74,15 @@ Scalar
 ------
 
 .. autoclass:: Scalar
+   :members:
+
+   .. automethod:: __init__
+
+
+SpaceSequence
+------
+
+.. autoclass:: SpaceSequence
    :members:
 
    .. automethod:: __init__

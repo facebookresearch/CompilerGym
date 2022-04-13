@@ -179,6 +179,9 @@ Core Message Types
 .. doxygenstruct:: StringSequenceSpace
    :members:
 
+.. doxygenstruct:: SpaceSequenceSpace
+   :members:
+
 .. doxygenstruct:: StringSpace
    :members:
 

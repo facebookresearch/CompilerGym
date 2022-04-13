@@ -22,6 +22,7 @@ cg_py_library(
     "logs.py"
     "minimize_trajectory.py"
     "parallelization.py"
+    "permutation.py"
     "registration.py"
     "runfiles_path.py"
     "shell_format.py"
