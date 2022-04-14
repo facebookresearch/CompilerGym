@@ -76,7 +76,7 @@ def test_action_space(env: MlirEnv):
                         "tile_sizes": Box(
                             name=None,
                             low=np.array([1] * 3, dtype=int),
-                            high=np.array([2 ** 32] * 3, dtype=int),
+                            high=np.array([2**32] * 3, dtype=int),
                             dtype=np.int64,
                         ),
                         "promote": Scalar(name=None, min=False, max=True, dtype=bool),

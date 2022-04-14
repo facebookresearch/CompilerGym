@@ -149,7 +149,9 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov PYTEST_ARGS="--ignore tests/llvm --ignore tests/gcc --ignore tests/loop_tool"
+              run: |
+                  make install-test-cov \
+                  PYTEST_ARGS="--ignore tests/llvm --ignore tests/gcc --ignore tests/loop_tool --ignore tests/mlir"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
@@ -184,7 +186,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test
+              run: make install-test PYTEST_ARGS="--ignore tests/mlir"
 
     test-macos:
         needs: build-macos
@@ -216,7 +218,9 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test-cov PYTEST_ARGS="--ignore tests/llvm --ignore tests/gcc --ignore tests/loop_tool"
+              run: |
+                  make install-test-cov \
+                  PYTEST_ARGS="--ignore tests/llvm --ignore tests/gcc --ignore tests/loop_tool --ignore tests/mlir"
 
             - name: Upload coverage report to Codecov
               uses: codecov/codecov-action@v2
