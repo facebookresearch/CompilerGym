@@ -121,16 +121,14 @@ set_property(
 
 # === LLVM 10.0.0 ===
 
-if(
-    COMPILER_GYM_ENABLE_LLVM_ENV
-    AND COMPILER_GYM_LLVM_PROVIDER STREQUAL "internal"
-)
-    build_external_cmake_project(
-      NAME llvm
-      SRC_DIR   "${CMAKE_CURRENT_LIST_DIR}/llvm"
-      CONFIG_ARGS   "-DCOMPILER_GYM_LLVM_PROVIDER=${COMPILER_GYM_LLVM_PROVIDER}"
-    )
-    set(LLVM_SRC_DIR "${CMAKE_CURRENT_BINARY_DIR}/external/llvm/llvm/src/llvm")
+if(COMPILER_GYM_ENABLE_LLVM_ENV)
+    if(COMPILER_GYM_LLVM_PROVIDER STREQUAL "internal")
+        build_external_cmake_project(
+          NAME llvm
+          SRC_DIR   "${CMAKE_CURRENT_LIST_DIR}/llvm"
+          CONFIG_ARGS   "-DCOMPILER_GYM_LLVM_PROVIDER=${COMPILER_GYM_LLVM_PROVIDER}"
+        )
+    endif()
     find_package(LLVM 10.0.0 EXACT REQUIRED)
     message("Using LLVM version ${LLVM_VERSION} from ${LLVM_DIR}")
 endif()
@@ -142,9 +140,6 @@ if(COMPILER_GYM_ENABLE_MLIR_ENV)
       NAME llvm-13
       SRC_DIR   "${CMAKE_CURRENT_LIST_DIR}/llvm-13"
       CONFIG_ARGS   "-DCOMPILER_GYM_LLVM_PROVIDER=${COMPILER_GYM_LLVM_PROVIDER}"
-    )
-    set(LLVM_SRC_DIR
-        "${CMAKE_CURRENT_BINARY_DIR}/external/llvm-13/llvm-13/src/llvm"
     )
     find_package(LLVM REQUIRED)
     find_package(MLIR REQUIRED CONFIG)
