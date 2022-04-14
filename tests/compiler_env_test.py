@@ -34,6 +34,30 @@ def test_benchmark_set_in_reset(env: LlvmEnv):
     assert env.benchmark == "benchmark://cbench-v1/dijkstra"
 
 
+def test_reward_space_setter(env: LlvmEnv):
+    env.reward_space = "IrInstructionCount"
+    assert env.reward_space != "IrInstructionCount"
+    env.reset()
+    assert env.reward_space == "IrInstructionCount"
+
+
+def test_reward_space_set_in_reset(env: LlvmEnv):
+    env.reset(reward_space="IrInstructionCount")
+    assert env.reward_space == "IrInstructionCount"
+
+
+def test_observation_space_setter(env: LlvmEnv):
+    env.observation_space = "Autophase"
+    assert env.observation_space != "Autophase"
+    env.reset()
+    assert env.observation_space == "Autophase"
+
+
+def test_observation_space_set_in_reset(env: LlvmEnv):
+    env.reset(observation_space="Autophase")
+    assert env.observation_space == "Autophase"
+
+
 def test_logger_is_deprecated(env: LlvmEnv):
     with pytest.deprecated_call(
         match="The `ClientServiceCompilerEnv.logger` attribute is deprecated"
@@ -64,7 +88,7 @@ def test_uri_substring_candidate_no_match_infer_scheme(env: LlvmEnv):
 
 
 def test_reset_to_force_benchmark(env: LlvmEnv):
-    """Reset that calling reset() with a benchmark forces that benchmark to
+    """Test that calling reset() with a benchmark forces that benchmark to
     be used for every subsequent episode.
     """
     env.reset(benchmark="benchmark://cbench-v1/crc32")
@@ -147,7 +171,6 @@ def test_switch_default_reward_space_in_episode(env: LlvmEnv):
     """Test that switching reward space during an episode resets the cumulative
     episode reward.
     """
-    # env.reward_space = None
 
     env.reset(reward_space=None)
     _, _, done, info = env.step(0)
@@ -167,7 +190,6 @@ def test_set_same_default_reward_space_in_episode(env: LlvmEnv):
     """Test that setting the reward space during an episode does not reset the
     cumulative episode reward if the reward space is unchanged.
     """
-    # env.reward_space = "IrInstructionCount"
 
     env.reset(reward_space="IrInstructionCount")
 
