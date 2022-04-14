@@ -185,6 +185,7 @@ if config.enable_llvm_env:
         [
             "envs/llvm/service/compiler_gym-llvm-service",
             "envs/llvm/service/compute_observation",
+            "envs/llvm/service/libLLVMPolly.so",
             "third_party/cbench/benchmarks.txt",
             "third_party/cbench/cbench-v*/crc32.bc",
         ]
