@@ -36,26 +36,26 @@ def test_benchmark_set_in_reset(env: LlvmEnv):
 
 def test_reward_space_setter(env: LlvmEnv):
     env.reward_space = "IrInstructionCount"
-    assert env.reward_space != "IrInstructionCount"
+    assert str(env.reward_space) != "IrInstructionCount"
     env.reset()
-    assert env.reward_space == "IrInstructionCount"
+    assert str(env.reward_space) == "IrInstructionCount"
 
 
 def test_reward_space_set_in_reset(env: LlvmEnv):
     env.reset(reward_space="IrInstructionCount")
-    assert env.reward_space == "IrInstructionCount"
+    assert str(env.reward_space) == "IrInstructionCount"
 
 
 def test_observation_space_setter(env: LlvmEnv):
     env.observation_space = "Autophase"
-    assert env.observation_space != "Autophase"
+    assert str(env.observation_space) != "Autophase"
     env.reset()
-    assert env.observation_space == "Autophase"
+    assert str(env.observation_space) == "Autophase"
 
 
 def test_observation_space_set_in_reset(env: LlvmEnv):
     env.reset(observation_space="Autophase")
-    assert env.observation_space == "Autophase"
+    assert str(env.observation_space) == "Autophase"
 
 
 def test_logger_is_deprecated(env: LlvmEnv):
