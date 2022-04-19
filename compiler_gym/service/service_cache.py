@@ -20,9 +20,9 @@ def _create_timestamped_unique_service_dir(root: Path) -> Path:
         random_hash = random.getrandbits(16)
         service_name = datetime.now().strftime(f"s/%m%dT%H%M%S-%f-{random_hash:04x}")
         path: Path = root / service_name
-        # Guard against the unlikely scenario that there is a collision
-        # between the randomly generated working directories of multiple
-        # ServiceCache constructors.
+        # Guard against the unlikely scenario that there is a collision between
+        # the randomly generated working directories of multiple ServiceCache
+        # constructors.
         try:
             (path / "logs").mkdir(parents=True, exist_ok=False)
             break
@@ -41,11 +41,13 @@ class ServiceCache:
 
     This provides a directory in which a service can store temporary files and
     artifacts. A service can assume exclusive use of this cache. When supported,
-    the cache will be in an in-memory filesystem. The cache contains two
-    subdirectories: "logs", which may be used for storing log files, and "disk",
-    which may be used for storing files that require being stored on a
-    traditional filesystem. On some Linux distributions, in-memory filesystems
-    do not permit executing files.
+    the cache will be in an in-memory filesystem.
+
+    The cache contains two subdirectories: "logs", which may be used for storing
+    log files, and "disk", which may be used for storing files that require
+    being stored on a traditional filesystem. On some Linux distributions,
+    in-memory filesystems do not permit executing files. See:
+    <github.com/facebookresearch/CompilerGym/issues/465>
     """
 
     def __init__(self):

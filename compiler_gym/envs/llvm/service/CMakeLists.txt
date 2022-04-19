@@ -53,7 +53,6 @@ cg_cc_library(
     ::Cost
     compiler_gym::service::proto::compiler_gym_service_cc
     compiler_gym::util::GrpcStatusMacros
-    compiler_gym::util::RunfilesPath
     compiler_gym::util::Subprocess
   ABS_DEPS
     Boost::filesystem

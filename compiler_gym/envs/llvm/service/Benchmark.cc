@@ -13,7 +13,6 @@
 #include <thread>
 
 #include "compiler_gym/util/GrpcStatusMacros.h"
-#include "compiler_gym/util/RunfilesPath.h"
 #include "compiler_gym/util/Subprocess.h"
 #include "llvm/ADT/SmallVector.h"
 #include "llvm/Bitcode/BitcodeReader.h"
@@ -56,9 +55,17 @@ std::unique_ptr<llvm::Module> makeModuleOrDie(llvm::LLVMContext& context, const 
 
 }  // anonymous namespace
 
-fs::path createBenchmarkScratchDirectoryOrDie() {
-  const fs::path cacheRoot = util::getCacheRootPath();
-  const fs::path dir = fs::unique_path(cacheRoot / "benchmark-scratch-%%%%-%%%%");
+fs::path createBenchmarkScratchDirectoryOrDie(const fs::path& workingDirectory) {
+  // This takes advantage of the fact that
+  // compiler_gym.service.service_cache.ServiceCache in the Python API creates a
+  // subdirectory called "disk" that is meant to be on a "traditional"
+  // filesystem, as opposed to the in-memory filesystem used for the parent
+  // cache, if supported. We want to use a traditional filesystem so that
+  // executables can be run, as some Linux distros prevent execution of
+  // files in in-memory filesystems.
+  //
+  // See: github.com/facebookresearch/CompilerGym/issues/465
+  const fs::path dir = fs::unique_path(workingDirectory / "disk" / "b" / "%%%%-%%%%");
 
   sys::error_code ec;
   fs::create_directories(dir, ec);
@@ -138,7 +145,7 @@ Benchmark::Benchmark(const std::string& name, const Bitcode& bitcode,
                      const fs::path& workingDirectory, const BaselineCosts& baselineCosts)
     : context_(std::make_unique<llvm::LLVMContext>()),
       module_(makeModuleOrDie(*context_, bitcode, name)),
-      scratchDirectory_(createBenchmarkScratchDirectoryOrDie()),
+      scratchDirectory_(createBenchmarkScratchDirectoryOrDie(workingDirectory)),
       dynamicConfigProto_(dynamicConfig),
       dynamicConfig_(realizeDynamicConfig(dynamicConfig, scratchDirectory_)),
       baselineCosts_(baselineCosts),
@@ -154,7 +161,7 @@ Benchmark::Benchmark(const std::string& name, std::unique_ptr<llvm::LLVMContext>
                      const fs::path& workingDirectory, const BaselineCosts& baselineCosts)
     : context_(std::move(context)),
       module_(std::move(module)),
-      scratchDirectory_(createBenchmarkScratchDirectoryOrDie()),
+      scratchDirectory_(createBenchmarkScratchDirectoryOrDie(workingDirectory)),
       dynamicConfigProto_(dynamicConfig),
       dynamicConfig_(realizeDynamicConfig(dynamicConfig, scratchDirectory_)),
       baselineCosts_(baselineCosts),
