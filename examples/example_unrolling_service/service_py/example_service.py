@@ -245,7 +245,7 @@ class UnrollingCompilationSession(CompilationSession):
             # build object file to binary
             run_command(
                 [
-                    "clang",
+                    self._clang,
                     self._obj_path,
                     "-O3",
                     "-o",
@@ -289,7 +289,7 @@ class UnrollingCompilationSession(CompilationSession):
             # build object file to binary
             run_command(
                 [
-                    "clang",
+                    self._clang,
                     self._obj_path,
                     "-Oz",
                     "-o",
