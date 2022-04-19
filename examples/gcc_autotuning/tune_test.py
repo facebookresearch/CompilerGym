@@ -60,6 +60,7 @@ def gcc_bin(request) -> str:
     return request.param
 
 
+@pytest.mark.timeout(600)
 @pytest.mark.parametrize("search", ["random", "hillclimb", "genetic"])
 def test_tune_smoke_test(search: str, gcc_bin: str, capsys, tmpdir: Path):
     tmpdir = Path(tmpdir)
