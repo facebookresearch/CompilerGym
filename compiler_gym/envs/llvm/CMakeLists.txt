@@ -28,9 +28,9 @@ cg_py_library(
   NAME benchmark_from_command_line
   SRCS benchmark_from_command_line.py
   DEPS
-    compiler_gym::datasets
+    compiler_gym::datasets::datasets
     compiler_gym::service::proto
-    compiler_gym::third_party::gccinvocation
+    compiler_gym::third_party::gccinvocation::gccinvocation
     compiler_gym::util::util
 )
 
