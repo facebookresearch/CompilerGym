@@ -8,8 +8,8 @@ import pytest
 
 import compiler_gym
 from compiler_gym.envs.llvm import LLVM_SERVICE_BINARY
-from compiler_gym.service import ConnectionOpts, ServiceConnectionPool
 from compiler_gym.errors import ServiceError
+from compiler_gym.service import ConnectionOpts, ServiceConnectionPool
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]

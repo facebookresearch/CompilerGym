@@ -16,8 +16,8 @@ from compiler_gym.envs.gcc.gcc import Gcc, GccSpec
 from compiler_gym.envs.gcc.gcc_rewards import AsmSizeReward, ObjSizeReward
 from compiler_gym.service import ConnectionOpts
 from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
-from compiler_gym.spaces import Reward
 from compiler_gym.service.connection_pool import ServiceConnectionPoolBase
+from compiler_gym.spaces import Reward
 from compiler_gym.util.decorators import memoized_property
 from compiler_gym.util.gym_type_hints import ObservationType, OptionalArgumentValue
 from compiler_gym.views import ObservationSpaceSpec
