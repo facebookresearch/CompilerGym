@@ -311,11 +311,11 @@ class CompilerEnv(gym.Env, ABC):
         self,
         benchmark: Optional[Union[str, Benchmark]] = None,
         action_space: Optional[str] = None,
-        reward_space: Union[
-            OptionalArgumentValue, str, Reward
-        ] = OptionalArgumentValue.UNCHANGED,
         observation_space: Union[
             OptionalArgumentValue, str, ObservationSpaceSpec
+        ] = OptionalArgumentValue.UNCHANGED,
+        reward_space: Union[
+            OptionalArgumentValue, str, Reward
         ] = OptionalArgumentValue.UNCHANGED,
     ) -> Optional[ObservationType]:
         """Reset the environment state.
