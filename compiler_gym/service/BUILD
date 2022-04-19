@@ -14,6 +14,9 @@ py_library(
     deps = [
         ":compilation_session",
         ":connection",
+        # TODO(github.com/facebookresearch/CompilerGym/pull/633):
+        # add this after circular dependencies are resolved
+        # ":client_service_compiler_env",
         ":connection_pool",
         # TODO(github.com/facebookresearch/CompilerGym/pull/633):
         # add this after circular dependencies are resolved

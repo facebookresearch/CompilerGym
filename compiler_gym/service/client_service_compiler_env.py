@@ -14,7 +14,6 @@ from pathlib import Path
 from time import time
 from typing import Any, Callable, Dict, Iterable, List, Optional, Tuple, Union
 
-from compiler_gym.service.connection_pool import ServiceConnectionPool
 import numpy as np
 from deprecated.sphinx import deprecated
 from gym.spaces import Space
@@ -32,6 +31,10 @@ from compiler_gym.errors import (
     ValidationError,
 )
 from compiler_gym.service import CompilerGymServiceConnection, ConnectionOpts
+from compiler_gym.service.connection_pool import (
+    ServiceConnectionPool,
+    ServiceConnectionPoolBase,
+)
 from compiler_gym.service.proto import ActionSpace, AddBenchmarkRequest
 from compiler_gym.service.proto import Benchmark as BenchmarkProto
 from compiler_gym.service.proto import (
@@ -136,6 +139,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         reward_space: Optional[Union[str, Reward]] = None,
         action_space: Optional[str] = None,
         derived_observation_spaces: Optional[List[Dict[str, Any]]] = None,
+        service_message_converters: ServiceMessageConverters = None,
         connection_settings: Optional[ConnectionOpts] = None,
         service_connection: Optional[CompilerGymServiceConnection] = None,
         service_pool: Optional[ServiceConnectionPool] = None,
@@ -187,6 +191,9 @@ class ClientServiceCompilerEnv(CompilerEnv):
             passed to :meth:`env.observation.add_derived_space()
             <compiler_gym.views.observation.Observation.add_derived_space>`.
 
+        :param service_message_converters: Custom converters for action spaces
+            and actions.
+
         :param connection_settings: The settings used to establish a connection
             with the remote service.
 
@@ -207,9 +214,10 @@ class ClientServiceCompilerEnv(CompilerEnv):
         # in release 0.2.3.
         if logger:
             warnings.warn(
-                "The `logger` argument is deprecated on CompilerEnv.__init__() "
-                "and will be removed in a future release. All CompilerEnv "
-                "instances share a logger named compiler_gym.envs.compiler_env",
+                "The `logger` argument is deprecated on "
+                "ClientServiceCompilerEnv.__init__() and will be removed in a "
+                "future release. All ClientServiceCompilerEnv instances share "
+                "a logger named compiler_gym.envs.compiler_env",
                 DeprecationWarning,
             )
 
@@ -234,7 +242,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
             self._service_pool: Optional[ServiceConnectionPoolBase] = service_pool
             self.service = service_connection
 
-        self.datasets = Datasets(datasets or [])
+        self._datasets = Datasets(datasets or [])
 
         self.action_space_name = action_space
 
@@ -277,14 +285,21 @@ class ClientServiceCompilerEnv(CompilerEnv):
             self._benchmark_in_use = self._next_benchmark
         except StopIteration:
             # StopIteration raised on next(self.datasets.benchmarks()) if there
-            # are no benchmarks available. This is to allow CompilerEnv to be
-            # used without any datasets by setting a benchmark before/during the
-            # first reset() call.
+            # are no benchmarks available. This is to allow
+            # ClientServiceCompilerEnv to be used without any datasets by
+            # setting a benchmark before/during the first reset() call.
             pass
+
+        self.service_message_converters = (
+            ServiceMessageConverters()
+            if service_message_converters is None
+            else service_message_converters
+        )
 
         # Process the available action, observation, and reward spaces.
         self.action_spaces = [
-            proto_to_action_space(space) for space in self.service.action_spaces
+            self.service_message_converters.action_space_converter(space)
+            for space in self.service.action_spaces
         ]
 
         self.observation = self._observation_view_type(
@@ -308,7 +323,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         self._reward_range: Tuple[float, float] = (-np.inf, np.inf)
         self.episode_reward: Optional[float] = None
         self.episode_start_time: float = time()
-        self.actions: List[ActionType] = []
+        self._actions: List[ActionType] = []
 
         # Initialize the default observation/reward spaces.
         self.observation_space_spec: Optional[ObservationSpaceSpec] = None
@@ -548,10 +563,11 @@ class ClientServiceCompilerEnv(CompilerEnv):
             "benchmark": self.benchmark,
             "connection_settings": self._connection_settings,
             "service": self._service_endpoint,
+            "service_pool": self._service_pool,
         }
 
     def fork(self) -> "ClientServiceCompilerEnv":
-                if not self.in_episode:
+        if not self.in_episode:
             actions = self.actions.copy()
             self.reset()
             if actions:
@@ -607,7 +623,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         # Copy over the mutable episode state.
         new_env.episode_reward = self.episode_reward
         new_env.episode_start_time = self.episode_start_time
-        new_env.actions = self.actions.copy()
+        new_env._actions = self.actions.copy()  # pylint: disable=protected-access
 
         return new_env
 
@@ -824,11 +840,13 @@ class ClientServiceCompilerEnv(CompilerEnv):
         self.observation.session_id = reply.session_id
         self.reward.get_cost = self.observation.__getitem__
         self.episode_start_time = time()
-        self.actions = []
+        self._actions: List[ActionType] = []
 
         # If the action space has changed, update it.
         if reply.HasField("new_action_space"):
-            self.action_space = proto_to_action_space(reply.new_action_space)
+            self.action_space = self.service_message_converters.action_space_converter(
+                reply.new_action_space
+            )
 
         self.reward.reset(benchmark=self.benchmark, observation_view=self.observation)
         if self.reward_space:
@@ -864,15 +882,17 @@ class ClientServiceCompilerEnv(CompilerEnv):
             and rewards are lists.
 
         :raises SessionNotFound: If :meth:`reset()
-            <compiler_gym.envs.CompilerEnv.reset>` has not been called.
+            <compiler_gym.envs.ClientServiceCompilerEnv.reset>` has not been
+            called.
 
         .. warning::
 
             Don't call this method directly, use :meth:`step()
-            <compiler_gym.envs.CompilerEnv.step>` or :meth:`multistep()
-            <compiler_gym.envs.CompilerEnv.multistep>` instead. The
-            :meth:`raw_step() <compiler_gym.envs.CompilerEnv.step>` method is an
-            implementation detail.
+            <compiler_gym.envs.ClientServiceCompilerEnv.step>` or
+            :meth:`multistep()
+            <compiler_gym.envs.ClientServiceCompilerEnv.multistep>` instead. The
+            :meth:`raw_step() <compiler_gym.envs.ClientServiceCompilerEnv.step>`
+            method is an implementation detail.
         """
         if not self.in_episode:
             raise SessionNotFound("Must call reset() before step()")
@@ -892,12 +912,14 @@ class ClientServiceCompilerEnv(CompilerEnv):
         }
 
         # Record the actions.
-        self.actions += actions
+        self._actions += actions
 
         # Send the request to the backend service.
         request = StepRequest(
             session_id=self._session_id,
-            action=[Event(int64_value=a) for a in actions],
+            action=[
+                self.service_message_converters.action_converter(a) for a in actions
+            ],
             observation_space=[
                 observation_space.index for observation_space in observations_to_compute
             ],
@@ -941,7 +963,9 @@ class ClientServiceCompilerEnv(CompilerEnv):
 
         # If the action space has changed, update it.
         if reply.HasField("new_action_space"):
-            self.action_space = proto_to_action_space(reply.new_action_space)
+            self.action_space = self.service_message_converters.action_space_converter(
+                reply.new_action_space
+            )
 
         # Translate observations to python representations.
         if len(reply.observation) != len(observations_to_compute):
@@ -1266,8 +1290,9 @@ class ClientServiceCompilerEnv(CompilerEnv):
     def send_param(self, key: str, value: str) -> str:
         """Send a single <key, value> parameter to the compiler service.
 
-        See :meth:`send_params() <compiler_gym.envs.ClientServiceCompilerEnv.send_params>`
-        for more information.
+        See :meth:`send_params()
+        <compiler_gym.envs.ClientServiceCompilerEnv.send_params>` for more
+        information.
 
         :param key: The parameter key.
 
