@@ -3,11 +3,13 @@ compiler_gym.service
 
 .. currentmodule:: compiler_gym.service
 
-CompilerGym uses a client/server architecture. Services provide an interface for
-manipulating compiler behavior. Clients are Python frontend objects that provide
-a reinforcement learning abstraction on top of the service. Communication
-between the service and client is done :doc:`using RPC </rpc>`. The connection between the
-client and service is managed by the :class:`CompilerGymServiceConnection
+The :code:`compiler_gym.service` module provides a client/service implementation
+of the :class:`CompilerEnv <compiler_gym.envs.CompilerEnv>` interface. Services
+provide an interface for manipulating compiler behavior. Clients are Python
+frontend objects that provide a reinforcement learning abstraction on top of the
+service. Communication between the service and client is done :doc:`using RPC
+</rpc>`. The connection between the client and service is managed by the
+:class:`CompilerGymServiceConnection
 <compiler_gym.service.CompilerGymServiceConnection>` object.
 
 .. contents:: Document contents:
