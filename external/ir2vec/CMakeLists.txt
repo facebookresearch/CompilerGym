@@ -13,6 +13,7 @@ externalproject_add(
     PREFIX "${CMAKE_CURRENT_BINARY_DIR}/ir2vec"
     GIT_REPOSITORY "https://github.com/ChrisCummins/IR2Vec.git"
     GIT_TAG 828e50584b9c8bc305208e22d2cca272bdb1ab64
+    SOURCE_SUBDIR "src"
     CMAKE_ARGS
         -C "${CMAKE_CURRENT_BINARY_DIR}/ir2vec_initial_cache.cmake"
         "-DCMAKE_INSTALL_PREFIX=${CMAKE_INSTALL_PREFIX}"
