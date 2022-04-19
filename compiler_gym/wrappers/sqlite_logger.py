@@ -82,6 +82,21 @@ class SynchronousSqliteLogger(CompilerEnvWrapper):
 
     2. Observations: records pickled, compressed, and text observation values
        for each unique state.
+
+    Caveats of this implementation:
+
+    1. Only :class:`LlvmEnv <compiler_gym.envs.LlvmEnv>` environments may be
+       wrapped.
+
+    2. The wrapped environment must have an observation space and reward space
+       set.
+
+    3. The observation spaces and reward spaces that are logged to database
+       are hardcoded. To change what is recorded, you must copy and modify this
+       implementation.
+
+    4. Writing to the database is synchronous and adds significant overhead to
+       the compute cost of the environment.
     """
 
     def __init__(
@@ -91,6 +106,20 @@ class SynchronousSqliteLogger(CompilerEnvWrapper):
         commit_frequency_in_seconds: int = 300,
         max_step_buffer_length: int = 5000,
     ):
+        """Constructor.
+
+        :param env: The environment to wrap.
+
+        :param db_path: The path of the database to log to. This file may
+            already exist. If it does, new entries are appended. If the files
+            does not exist, it is created.
+
+        :param commit_frequency_in_seconds: The maximum amount of time to elapse
+            before writing pending logs to the database.
+
+        :param max_step_buffer_length: The maximum number of calls to
+            :code:`step()` before writing pending logs to the database.
+        """
         super().__init__(env)
         if not hasattr(env, "unwrapped"):
             raise TypeError("Requires LlvmEnv base environment")
