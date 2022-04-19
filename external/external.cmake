@@ -630,4 +630,28 @@ list(
 find_package(Labm8 REQUIRED)
 find_package(ProGraML REQUIRED)
 
+# === Eigen ===
+# https://eigen.tuxfamily.org/index.php?title=Main_Page
+
+set(COMPILER_GYM_EIGEN_PROVIDER "internal"
+    CACHE STRING "Find or build eigen together with Compiler Gym."
+)
+set_property(
+    CACHE COMPILER_GYM_EIGEN_PROVIDER
+    PROPERTY STRINGS "internal" "external"
+)
+if(COMPILER_GYM_EIGEN_PROVIDER STREQUAL "internal")
+    fetchcontent_declare(
+        eigen
+        PREFIX
+        "${CMAKE_CURRENT_BINARY_DIR}/external/eigen"
+        GIT_REPOSITORY "https://gitlab.com/libeigen/eigen.git"
+        GIT_TAG
+            21ae2afd4edaa1b69782c67a54182d34efe43f9c #tag: v3.3.7
+    )
+    list(APPEND FETCH_CONTENT_LIST eigen)
+else()
+    find_package(eigen REQUIRED)
+endif()
+
 fetchcontent_makeavailable(${FETCH_CONTENT_LIST})
