@@ -9,7 +9,6 @@ py_library(
     name = "service",
     srcs = [
         "__init__.py",
-        "service_cache.py",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -18,6 +17,7 @@ py_library(
         # TODO(github.com/facebookresearch/CompilerGym/pull/633):
         # add this after circular dependencies are resolved
         # ":client_service_compiler_env",
+        ":service_cache",
         "//compiler_gym/errors",
         "//compiler_gym/service/proto",
         "//compiler_gym/util",
@@ -50,6 +50,7 @@ py_library(
     srcs = ["connection.py"],
     visibility = ["//visibility:public"],
     deps = [
+        ":service_cache",
         "//compiler_gym/errors",
         "//compiler_gym/service/proto",
         "//compiler_gym/util",
@@ -72,5 +73,14 @@ py_library(
         "//compiler_gym/spaces",
         "//compiler_gym/util",
         "//compiler_gym/views",
+    ],
+)
+
+py_library(
+    name = "service_cache",
+    srcs = ["service_cache.py"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "//compiler_gym/util",
     ],
 )

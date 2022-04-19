@@ -22,7 +22,7 @@ py_test(
     timeout = "short",
     srcs = ["service_cache_test.py"],
     deps = [
-        "//compiler_gym/service",
+        "//compiler_gym/service:service_cache",
         "//tests:test_main",
     ],
 )
