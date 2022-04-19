@@ -66,6 +66,7 @@ py_library(
         "//compiler_gym/service:client_service_compiler_env",
         "//compiler_gym/spaces",
         "//compiler_gym/third_party/autophase",
+        "//compiler_gym/third_party/gccinvocation",
         "//compiler_gym/third_party/inst2vec",
         "//compiler_gym/third_party/llvm",
         "//compiler_gym/third_party/llvm:instcount",

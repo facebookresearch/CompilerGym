@@ -4,6 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 """Tests for LLVM benchmark handling."""
 import re
+import subprocess
 import tempfile
 from pathlib import Path
 
@@ -378,6 +379,82 @@ int main() { return 0; }
 """
             )
         env.make_benchmark_from_command_line("gcc in.c")
+
+
+def test_make_benchmark_from_command_line_stdin(env: LlvmEnv):
+    with pytest.raises(ValueError, match="Input command line reads from stdin"):
+        env.make_benchmark_from_command_line(["gcc", "-xc", "-"])
+
+
+@pytest.mark.parametrize("retcode", [1, 5])
+def test_make_benchmark_from_command_line_multiple_input_sources(
+    env: LlvmEnv, retcode: int
+):
+    """Test that command lines with multiple source files are linked together."""
+    with temporary_working_directory() as cwd:
+        with open("a.c", "w") as f:
+            f.write("int main() { return B(); }")
+
+        with open("b.c", "w") as f:
+            f.write(f"int B() {{ return {retcode}; }}")
+
+        bm = env.make_benchmark_from_command_line(["gcc", "a.c", "b.c", "-o", "foo"])
+        assert not (cwd / "foo").is_file()
+
+        env.reset(benchmark=bm)
+        assert "main()" in env.ir
+
+        bm.compile(env)
+        assert (cwd / "foo").is_file()
+
+        p = subprocess.Popen(["./foo"])
+        p.communicate(timeout=60)
+        assert p.returncode == retcode
+
+
+@pytest.mark.parametrize("retcode", [1, 5])
+def test_make_benchmark_from_command_line_mixed_source_and_object_files(
+    env: LlvmEnv, retcode: int
+):
+    """Test a command line that contains both source files and precompiled
+    object files. The object files should be filtered from compilation but
+    used for the final link.
+    """
+    with temporary_working_directory():
+        with open("a.c", "w") as f:
+            f.write(
+                """
+#include "b.h"
+
+int A() {
+    return B();
+}
+
+int main() {
+    return A();
+}
+"""
+            )
+
+        with open("b.c", "w") as f:
+            f.write(f"int B() {{ return {retcode}; }}")
+
+        with open("b.h", "w") as f:
+            f.write("int B();")
+
+        # Compile b.c to object file:
+        subprocess.check_call([str(llvm_paths.clang_path()), "b.c", "-c"], timeout=60)
+        assert (Path("b.o")).is_file()
+
+        bm = env.make_benchmark_from_command_line(["gcc", "a.c", "b.o", "-o", "foo"])
+        env.reset(benchmark=bm)
+
+        bm.compile(env)
+        assert Path("foo").is_file()
+
+        p = subprocess.Popen(["./foo"])
+        p.communicate(timeout=60)
+        assert p.returncode == retcode
 
 
 if __name__ == "__main__":

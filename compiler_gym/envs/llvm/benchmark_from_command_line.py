@@ -3,10 +3,10 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 import logging
+import os
 import subprocess
 import tempfile
 import urllib.parse
-from typing import List
 
 from compiler_gym.datasets import Benchmark, BenchmarkInitError
 from compiler_gym.service.proto import Benchmark as BenchmarkProto
@@ -20,20 +20,31 @@ logger = logging.getLogger(__name__)
 
 
 class BenchmarkFromCommandLine(Benchmark):
-    def __init__(self, command_line: List[str], bitcode: bytes, timeout: int):
-        uri = f"benchmark://clang-v0/{urllib.parse.quote_plus(join_cmd(command_line))}"
+    def __init__(self, invocation: GccInvocation, bitcode: bytes, timeout: int):
+        uri = f"benchmark://clang-v0/{urllib.parse.quote_plus(join_cmd(invocation.original_argv))}"
         super().__init__(
             proto=BenchmarkProto(uri=str(uri), program=File(contents=bitcode))
         )
-        self.command_line = command_line
-
-        invocation = GccInvocation(command_line)
+        self.command_line = invocation.original_argv
 
         # Modify the commandline so that it takes the bitcode file as input.
         #
-        # Strip the original sources from the build command.
-        sources = set(invocation.sources)
-        build_command = [arg for arg in command_line if arg not in sources]
+        # Strip the original sources from the build command, but leave any
+        # object file inputs.
+        sources = set(s for s in invocation.sources if not s.endswith(".o"))
+        build_command = [arg for arg in invocation.original_argv if arg not in sources]
+
+        # Convert any object file inputs to absolute paths since the backend
+        # service will have a different working directory.
+        #
+        # TODO(cummins): To support distributed execution, we should embed the
+        # contents of these object files in the benchmark proto.
+        object_files = set(s for s in invocation.sources if s.endswith(".o"))
+        build_command = [
+            os.path.abspath(arg) if arg in object_files else arg
+            for arg in build_command
+        ]
+
         # Append the new source to the build command and specify the absolute path
         # to the output.
         for i in range(len(build_command) - 2, -1, -1):

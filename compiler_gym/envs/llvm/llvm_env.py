@@ -9,6 +9,7 @@ import shlex
 import shutil
 import subprocess
 from pathlib import Path
+from tempfile import TemporaryDirectory
 from typing import Iterable, List, Optional, Union, cast
 
 import numpy as np
@@ -32,10 +33,16 @@ from compiler_gym.spaces import Box, Commandline
 from compiler_gym.spaces import Dict as DictSpace
 from compiler_gym.spaces import Scalar, Sequence
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_NAMES
+from compiler_gym.third_party.gccinvocation.gccinvocation import GccInvocation
 from compiler_gym.third_party.inst2vec import Inst2vecEncoder
-from compiler_gym.third_party.llvm import clang_path, download_llvm_files
+from compiler_gym.third_party.llvm import (
+    clang_path,
+    download_llvm_files,
+    llvm_link_path,
+)
 from compiler_gym.third_party.llvm.instcount import INST_COUNT_FEATURE_NAMES
 from compiler_gym.util.commands import Popen
+from compiler_gym.util.runfiles_path import transient_cache_path
 from compiler_gym.util.shell_format import join_cmd
 
 _INST2VEC_ENCODER = Inst2vecEncoder()
@@ -684,50 +691,106 @@ class LlvmEnv(ClientServiceCompilerEnv):
         if isinstance(cmd, str):
             cmd = shlex.split(cmd)
 
+        rewritten_cmd: List[str] = cmd.copy()
+
         if len(cmd) < 2:
             raise ValueError(f"Input command line '{join_cmd(cmd)}' is too short")
 
         # Append include flags for the system headers if requested.
         if system_includes:
-            cmd += get_system_library_flags()
+            rewritten_cmd += get_system_library_flags()
 
         # Use the CompilerGym clang binary in place of the original driver.
         if replace_driver:
-            cmd[0] = str(clang_path())
+            rewritten_cmd[0] = str(clang_path())
 
-        # Adapt and execute the command line so that it will generate an unoptimized
-        # bitecode file.
-        emit_bitcode_command = cmd.copy()
         # Strip the -S flag, if present, as that changes the output format.
-        emit_bitcode_command = [c for c in cmd if c != "-S"]
-        # Strip the output specifier. This is not strictly required (we override it
-        # later), but makes the generated command easier to understand.
-        for i in range(len(emit_bitcode_command) - 2, -1, -1):
-            if emit_bitcode_command[i] == "-o":
-                del emit_bitcode_command[i + 1]
-                del emit_bitcode_command[i]
-        emit_bitcode_command += [
-            "-c",
-            "-emit-llvm",
-            "-o",
-            "-",
-            "-Xclang",
-            "-disable-llvm-passes",
-            "-Xclang",
-            "-disable-llvm-optzns",
-        ]
-        with Popen(
-            emit_bitcode_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
-        ) as llvm_link:
-            logger.debug(
-                f"Generating LLVM bitcode benchmark: {join_cmd(emit_bitcode_command)}"
-            )
-            bitcode, stderr = llvm_link.communicate(timeout=timeout)
-            if llvm_link.returncode:
-                raise BenchmarkInitError(
-                    f"Failed to generate LLVM bitcode with error:\n"
-                    f"{stderr.decode('utf-8').rstrip()}\n"
-                    f"Running command: {join_cmd(emit_bitcode_command)}"
-                )
+        rewritten_cmd = [c for c in rewritten_cmd if c != "-S"]
 
-        return BenchmarkFromCommandLine(cmd, bitcode, timeout)
+        invocation = GccInvocation(rewritten_cmd)
+
+        # Strip the output specifier(s). This is not strictly required since we
+        # override it later, but makes the generated command easier to
+        # understand.
+        for i in range(len(rewritten_cmd) - 2, -1, -1):
+            if rewritten_cmd[i] == "-o":
+                del rewritten_cmd[i + 1]
+                del rewritten_cmd[i]
+
+        # Fail early.
+        if "-" in invocation.sources:
+            raise ValueError(
+                "Input command line reads from stdin, "
+                f"which is not supported: '{join_cmd(cmd)}'"
+            )
+
+        # Convert all of the C/C++ sources to bitcodes which can then be linked
+        # into a single bitcode. We must process them individually because the
+        # '-c' flag does not support multiple sources when we are specifying the
+        # output path using '-o'.
+        sources = set(s for s in invocation.sources if not s.endswith(".o"))
+        bitcodes: List[bytes] = []
+        for source in sources:
+            # Adapt and execute the command line so that it will generate an
+            # unoptimized bitecode file.
+            emit_bitcode_command = rewritten_cmd.copy()
+
+            # Strip the name of other sources:
+            if len(sources) > 1:
+                emit_bitcode_command = [
+                    c for c in emit_bitcode_command if c == source or c not in sources
+                ]
+
+            # Append the flags to emit the bitcode and disable the optimization
+            # passes.
+            emit_bitcode_command += [
+                "-c",
+                "-emit-llvm",
+                "-o",
+                "-",
+                "-Xclang",
+                "-disable-llvm-passes",
+                "-Xclang",
+                "-disable-llvm-optzns",
+            ]
+
+            with Popen(
+                emit_bitcode_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+            ) as clang:
+                logger.debug(
+                    f"Generating LLVM bitcode benchmark: {join_cmd(emit_bitcode_command)}"
+                )
+                bitcode, stderr = clang.communicate(timeout=timeout)
+                if clang.returncode:
+                    raise BenchmarkInitError(
+                        f"Failed to generate LLVM bitcode with error:\n"
+                        f"{stderr.decode('utf-8').rstrip()}\n"
+                        f"Running command: {join_cmd(emit_bitcode_command)}\n"
+                        f"From original commandline: {join_cmd(cmd)}"
+                    )
+                bitcodes.append(bitcode)
+
+        # If there were multiple sources then link the bitcodes together.
+        if len(bitcodes) > 1:
+            with TemporaryDirectory(
+                dir=transient_cache_path("."), prefix="llvm-benchmark-"
+            ) as dir:
+                # Write the bitcodes to files.
+                for i, bitcode in enumerate(bitcodes):
+                    with open(os.path.join(dir, f"{i}.bc"), "wb") as f:
+                        f.write(bitcode)
+
+                # Link the bitcode files.
+                llvm_link_cmd = [str(llvm_link_path()), "-o", "-"] + [
+                    os.path.join(dir, f"{i}.bc") for i in range(len(bitcodes))
+                ]
+                with Popen(
+                    llvm_link_cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE
+                ) as llvm_link:
+                    bitcode, stderr = llvm_link.communicate(timeout=timeout)
+                    if llvm_link.returncode:
+                        raise BenchmarkInitError(
+                            f"Failed to link LLVM bitcodes with error: {stderr.decode('utf-8')}"
+                        )
+
+        return BenchmarkFromCommandLine(invocation, bitcode, timeout)

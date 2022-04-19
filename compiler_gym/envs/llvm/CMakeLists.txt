@@ -69,6 +69,7 @@ cg_py_library(
     compiler_gym::envs::llvm::datasets::datasets
     compiler_gym::spaces::spaces
     compiler_gym::third_party::autophase::autophase
+    compiler_gym::third_party::gccinvocation::gccinvocation
     compiler_gym::third_party::inst2vec::inst2vec
     compiler_gym::third_party::llvm::llvm
     compiler_gym::third_party::llvm::instcount

@@ -67,6 +67,8 @@ class GccInvocation:
     """
 
     def __init__(self, argv):
+        # Store the original argv for logging / debugging.
+        self.original_argv = argv
 
         # Strip `-Xclang` arguments now because the hyphenated parameters
         # confuse argparse:
