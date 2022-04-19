@@ -13,6 +13,7 @@ py_library(
     data = ["//compiler_gym/envs/llvm/service"],
     visibility = ["//visibility:public"],
     deps = [
+        ":benchmark_from_command_line",
         ":compute_observation",
         ":llvm_benchmark",
         ":llvm_env",

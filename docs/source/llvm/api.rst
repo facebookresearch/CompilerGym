@@ -15,6 +15,9 @@ Constructing Benchmarks
 
 .. autofunction:: make_benchmark
 
+.. autoclass:: BenchmarkFromCommandLine
+   :members:
+
 .. autoclass:: ClangInvocation
    :members:
 

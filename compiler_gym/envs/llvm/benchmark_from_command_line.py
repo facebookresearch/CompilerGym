@@ -20,6 +20,12 @@ logger = logging.getLogger(__name__)
 
 
 class BenchmarkFromCommandLine(Benchmark):
+    """A benchmark that has been constructed from a command line invocation.
+
+    See :meth:`env.make_benchmark_from_command_line()
+    <compiler_gym.envs.LlvmEnv.make_benchmark_from_command_line>`.
+    """
+
     def __init__(self, invocation: GccInvocation, bitcode: bytes, timeout: int):
         uri = f"benchmark://clang-v0/{urllib.parse.quote_plus(join_cmd(invocation.original_argv))}"
         super().__init__(
@@ -57,7 +63,10 @@ class BenchmarkFromCommandLine(Benchmark):
         self.proto.dynamic_config.build_cmd.outfile[:] = [str(invocation.output_path)]
         self.proto.dynamic_config.build_cmd.timeout_seconds = timeout
 
-    def compile(self, env, timeout: int = 60):
+    def compile(self, env, timeout: int = 60) -> None:
+        """This completes the compilation and linking of the final executable
+        specified by the original command line.
+        """
         with tempfile.NamedTemporaryFile(
             dir=transient_cache_path("."), prefix="benchmark-", suffix=".bc"
         ) as f:

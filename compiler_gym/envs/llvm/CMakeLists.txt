@@ -17,6 +17,7 @@ cg_py_library(
   DATA
     compiler_gym::envs::llvm::service::service
   DEPS
+    ::benchmark_from_command_line
     ::compute_observation
     ::llvm_benchmark
     ::llvm_env

@@ -649,8 +649,8 @@ class LlvmEnv(ClientServiceCompilerEnv):
         """Create a benchmark for use with this environment.
 
         This function takes a command line compiler invocation as input,
-        modifies it to produce an unoptimized LLVM-IR bitcode, and then runs
-        the modified command line to produce a bitcode benchmark.
+        modifies it to produce an unoptimized LLVM-IR bitcode, and then runs the
+        modified command line to produce a bitcode benchmark.
 
         For example, the command line:
 
@@ -660,6 +660,32 @@ class LlvmEnv(ClientServiceCompilerEnv):
 
         Will compile a.c and b.c to an unoptimized benchmark that can be then
         passed to :meth:`reset() <compiler_env.envs.CompilerEnv.reset>`.
+
+        The way this works is to change the first argument of the command line
+        invocation to the version of clang shipped with CompilerGym, and to then
+        append command line flags that causes the compiler to produce LLVM-IR
+        with optimizations disabled. For example the input command line:
+
+        .. code-block::
+
+            gcc -DNDEBUG a.c b.c -o foo -lm
+
+        Will be rewritten to be roughly equivalent to:
+
+        .. code-block::
+
+            /path/to/compiler_gym/clang -DNDEG a.c b.c \\
+                -Xclang -disable-llvm-passes -Xclang -disable-llvm-optzns \\ -c
+                -emit-llvm  -o -
+
+        The generated benchmark then has a method :meth:`compile()
+        <compiler_env.envs.llvm.BenchmarkFromCommandLine.compile>` which
+        completes the linking and compilatilion to executable. For the above
+        example, this would be roughly equivalent to:
+
+        .. code-block::
+
+            /path/to/compiler_gym/clang environment-bitcode.bc -o foo -lm
 
         :param cmd: A command line compiler invocation, either as a list of
             arguments (e.g. :code:`["clang", "in.c"]`) or as a single shell
@@ -675,7 +701,8 @@ class LlvmEnv(ClientServiceCompilerEnv):
         :param timeout: The maximum number of seconds to allow the compilation
             job to run before terminating.
 
-        :return: A :code:`Benchmark` instance.
+        :return: A :class:`BenchmarkFromCommandLine
+            <compiler_gym.envs.llvm.BenchmarkFromCommandLine>` instance.
 
         :raises ValueError: If no command line is provided.
 
