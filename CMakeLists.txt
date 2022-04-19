@@ -79,8 +79,10 @@ option(
 )
 
 set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
+set(CMAKE_BUILD_WITH_INSTALL_RPATH ON)
 
 find_package(Python3 REQUIRED COMPONENTS Interpreter)
+set(Python3_FIND_UNVERSIONED_NAMES FIRST)
 
 include(external/external.cmake)
 

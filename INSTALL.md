@@ -133,7 +133,6 @@ By default most dependencies are built together with Compiler Gym. To search for
 cmake \
   -DCMAKE_C_COMPILER=clang-9 \
   -DCMAKE_CXX_COMPILER=clang++-9 \
-  -DPython3_FIND_UNVERSIONED_NAMES=FIRST \
   -S "<path to source directory>" \
   -B "<path to build directory>"
 
