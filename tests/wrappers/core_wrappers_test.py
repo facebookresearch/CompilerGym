@@ -303,5 +303,13 @@ def test_wrapped_reward(env: LlvmEnv):
     assert env.episode_reward == -10
 
 
+def test_wrapped_env_close(env: LlvmEnv):
+    wrapped = CompilerEnvWrapper(env)
+    wrapped.reset()
+    assert wrapped.service is not None
+    wrapped.close()
+    assert wrapped.service is None
+
+
 if __name__ == "__main__":
     main()
