@@ -104,10 +104,10 @@ Note that not all optimization pass configurations are valid and some will resul
 RL Wrapper
 ~~~~~~~~~~
 
-The environment uses some non OpenAI Gym spaces in the action space.
-To be able to train with off-the-shelf RL frameworks there is a
-`wrapper <compiler_gym.wrappers.mlir.make_mlir_rl_wrapper_env>` that converts
-the action space to use only OpenAI Gym spaces.
+The environment uses some non OpenAI Gym spaces in the action space. To be able
+to train with off-the-shelf RL frameworks there is a wrapper (constructed using
+:func:`compiler_gym.wrappers.mlir.make_mlir_rl_wrapper_env`) that converts the
+action space to use only OpenAI Gym spaces.
 
 
 Installation
