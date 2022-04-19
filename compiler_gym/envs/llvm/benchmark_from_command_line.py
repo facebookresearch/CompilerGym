@@ -37,8 +37,9 @@ class BenchmarkFromCommandLine(Benchmark):
         # Convert any object file inputs to absolute paths since the backend
         # service will have a different working directory.
         #
-        # TODO(cummins): To support distributed execution, we should embed the
-        # contents of these object files in the benchmark proto.
+        # TODO(github.com/facebookresearch/CompilerGym/issues/325): To support
+        # distributed execution, we should embed the contents of these object
+        # files in the benchmark proto.
         object_files = set(s for s in invocation.sources if s.endswith(".o"))
         build_command = [
             os.path.abspath(arg) if arg in object_files else arg
