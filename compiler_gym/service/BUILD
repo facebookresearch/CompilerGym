@@ -9,6 +9,7 @@ py_library(
     name = "service",
     srcs = [
         "__init__.py",
+        "connection_pool.py",
     ],
     visibility = ["//visibility:public"],
     deps = [
@@ -17,7 +18,6 @@ py_library(
         # ":client_service_compiler_env",
         ":compilation_session",
         ":connection",
-        ":connection_pool",
         ":service_cache",
         "//compiler_gym/errors",
         "//compiler_gym/service/proto",
@@ -74,15 +74,6 @@ py_library(
         "//compiler_gym/spaces",
         "//compiler_gym/util",
         "//compiler_gym/views",
-    ],
-)
-
-py_library(
-    name = "connection_pool",
-    srcs = ["connection_pool.py"],
-    visibility = ["//visibility:public"],
-    deps = [
-        ":connection",
     ],
 )
 

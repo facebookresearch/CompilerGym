@@ -10,13 +10,13 @@ cg_py_library(
     service
   SRCS
     "__init__.py"
+    "connection_pool.py"
   DEPS
     # TODO(github.com/facebookresearch/CompilerGym/pull/633):
     # add this after circular dependencies are resolved:
     # ::client_service_compiler_env
     ::compilation_session
     ::connection
-    ::connection_pool
     ::service_cache
     compiler_gym::errors::errors
     compiler_gym::service::proto::proto
@@ -77,15 +77,6 @@ cg_py_library(
     compiler_gym::util::util
     compiler_gym::validation_result
     compiler_gym::views::views
-  PUBLIC
-)
-
-cg_py_library(
-    connection_pool
-  SRCS
-    "connection_pool.py"
-  DEPS
-    ::connection
   PUBLIC
 )
 
