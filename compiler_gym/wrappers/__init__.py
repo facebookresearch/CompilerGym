@@ -44,6 +44,7 @@ from compiler_gym.wrappers.datasets import (
     IterateOverBenchmarks,
     RandomOrderBenchmarks,
 )
+from compiler_gym.wrappers.sqlite_logger import SynchronousSqliteLogger
 
 if config.enable_llvm_env:
     from compiler_gym.wrappers.llvm import RuntimePointEstimateReward  # noqa: F401
@@ -63,6 +64,7 @@ __all__ = [
     "ObservationWrapper",
     "RandomOrderBenchmarks",
     "RewardWrapper",
+    "SynchronousSqliteLogger",
     "TimeLimit",
     "ValidateBenchmarkAfterEveryStep",
 ]
