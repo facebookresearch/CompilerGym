@@ -457,5 +457,20 @@ int main() {
         assert p.returncode == retcode
 
 
+def test_make_benchmark_from_command_line_only_object_files(env: LlvmEnv):
+    with temporary_working_directory():
+        with open("a.c", "w") as f:
+            f.write("int A() { return 5; }")
+
+        # Compile b.c to object file:
+        subprocess.check_call([str(llvm_paths.clang_path()), "a.c", "-c"], timeout=60)
+        assert (Path("a.o")).is_file()
+
+        with pytest.raises(
+            ValueError, match="Input command line has no source file inputs"
+        ):
+            env.make_benchmark_from_command_line(["gcc", "a.o", "-c"])
+
+
 if __name__ == "__main__":
     main()

@@ -729,6 +729,12 @@ class LlvmEnv(ClientServiceCompilerEnv):
         # '-c' flag does not support multiple sources when we are specifying the
         # output path using '-o'.
         sources = set(s for s in invocation.sources if not s.endswith(".o"))
+
+        if not sources:
+            raise ValueError(
+                f"Input command line has no source file inputs: '{join_cmd(cmd)}'"
+            )
+
         bitcodes: List[bytes] = []
         for source in sources:
             # Adapt and execute the command line so that it will generate an
