@@ -85,11 +85,15 @@ def _wrapped_step(
 
 class ServiceMessageConverters:
     """Allows for customization of conversion to/from gRPC messages for the
-    <ClientServiceCompilerEnv>.
+    :class:`ClientServiceCompilerEnv
+    <compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv>`.
 
     Supports conversion customizations:
-    * <compiler_gym.service.proto.ActionSpace> -> <gym.spaces.Space>.
-    * <compiler_gym.util.gym_type_hints.ActionType> -> <compiler_gym.service.proto.Event>.
+
+        - :code:`compiler_gym.service.proto.ActionSpace` ->
+          :code:`gym.spaces.Space`.
+        - :code:`compiler_gym.util.gym_type_hints.ActionType` ->
+          :code:`compiler_gym.service.proto.Event`.
     """
 
     action_space_converter: Callable[[ActionSpace], Space]
@@ -100,6 +104,7 @@ class ServiceMessageConverters:
         action_space_converter: Optional[Callable[[ActionSpace], Space]] = None,
         action_converter: Optional[Callable[[Any], Event]] = None,
     ):
+        """Constructor."""
         self.action_space_converter = (
             py_converters.make_message_default_converter()
             if action_space_converter is None
@@ -113,7 +118,8 @@ class ServiceMessageConverters:
 
 
 class ClientServiceCompilerEnv(CompilerEnv):
-    """Implementation using gRPC for a client-server communication.
+    """Implementation of :class:`CompilerEnv <compiler_gym.envs.CompilerEnv>`
+    using gRPC for client-server communication.
 
     :ivar service: A connection to the underlying compiler service.
 
