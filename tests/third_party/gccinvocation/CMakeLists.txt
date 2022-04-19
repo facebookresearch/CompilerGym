@@ -9,6 +9,6 @@ cg_py_test(
   NAME "gccinvocation_test"
   SRCS "gccinvocation_test.py"
   DEPS
-    compiler_gym::third_party::gccinvocation
+    compiler_gym::third_party::gccinvocation::gccinvocation
     tests::test_main
 )

@@ -29,7 +29,7 @@ cg_py_library(
   SRCS benchmark_from_command_line.py
   DEPS
     compiler_gym::datasets::datasets
-    compiler_gym::service::proto
+    compiler_gym::service::proto::proto
     compiler_gym::third_party::gccinvocation::gccinvocation
     compiler_gym::util::util
 )
