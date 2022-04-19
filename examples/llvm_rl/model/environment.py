@@ -100,11 +100,11 @@ class Environment(BaseModel):
             env.observation_space = self.observation_space
         if self.reward_space:
             env.reward_space = self.reward_space
-        env = TimeLimit(env, max_episode_steps=self.max_episode_steps)
         for wrapper in self.wrappers:
             env = wrapper.wrap(env)
         # Wrap the env to ignore errors during search.
         env = JustKeepGoingEnv(env)
+        env = TimeLimit(env, max_episode_steps=self.max_episode_steps)
         return env
 
     # === Start of implementation details. ===
