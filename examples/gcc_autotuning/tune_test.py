@@ -45,7 +45,7 @@ def system_has_functional_gcc(gcc_path: str) -> bool:
         return False
 
 
-@lru_cache
+@lru_cache(maxsize=1)
 def gcc_bins() -> Iterable[str]:
     """Return a list of available GCCs."""
     if docker_is_available():
