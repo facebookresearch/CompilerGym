@@ -238,7 +238,7 @@ def main(argv):
     )
     reward = f"{reward_aggregation(rewards):.3f}"
     reward_std = f"{stdev(rewards):.3f}"
-    print(f"{reward_name}: {emph(reward)} " f"(std: {emph(reward_std)})")
+    print(f"{reward_name}: {emph(reward)} (std: {emph(reward_std)})")
 
     if error_count:
         sys.exit(1)
