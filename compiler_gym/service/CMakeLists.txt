@@ -11,11 +11,11 @@ cg_py_library(
   SRCS
     "__init__.py"
   DEPS
-    ::compilation_session
-    ::connection
     # TODO(github.com/facebookresearch/CompilerGym/pull/633):
     # add this after circular dependencies are resolved:
     # ::client_service_compiler_env
+    ::compilation_session
+    ::connection
     ::connection_pool
     ::service_cache
     compiler_gym::errors::errors
