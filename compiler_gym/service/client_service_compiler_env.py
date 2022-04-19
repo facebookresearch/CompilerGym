@@ -53,9 +53,9 @@ from compiler_gym.spaces import DefaultRewardFromObservation, NamedDiscrete, Rew
 from compiler_gym.util.gym_type_hints import (
     ActionType,
     ObservationType,
+    OptionalArgumentValue,
     RewardType,
     StepType,
-    OptionalArgumentValue,
 )
 from compiler_gym.util.shell_format import plural
 from compiler_gym.util.timer import Timer
@@ -603,29 +603,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
         return new_env
 
     def close(self):
-        """Close the environment.
-
-        Once closed, :func:`reset` must be called before the environment is used
-        again.
-
-        .. note::
-
-            Internally, CompilerGym environments may launch subprocesses and use
-            temporary files to communicate between the environment and the
-            underlying compiler (see :ref:`compiler_gym.service
-            <compiler_gym/service:compiler_gym.service>` for details). This
-            means it is important to call :meth:`env.close()
-            <compiler_gym.envs.ClientServiceCompilerEnv.close>` after use to free up
-            resources and prevent orphan subprocesses or files. We recommend
-            using the :code:`with`-statement pattern for creating environments:
-
-                >>> with gym.make("llvm-autophase-ic-v0") as env:
-                ...    env.reset()
-                ...    # use env how you like
-
-            This removes the need to call :meth:`env.close()
-            <compiler_gym.envs.ClientServiceCompilerEnv.close>` yourself.
-        """
         # Try and close out the episode, but errors are okay.
         close_service = True
         if self.in_episode:

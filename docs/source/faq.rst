@@ -105,6 +105,31 @@ directories, you may notice a delay the next time you launch a CompilerGym
 environment as files and datasets are re-downloaded and unpacked.
 
 
+Do I need to call env.close()?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Yes! You must ensure that :meth:`env.close()
+<compiler_gym.envs.CompilerEnv.close>` is called once you are done with an
+environment. This is because CompilerGym environments may launch subprocesses
+and create temporary files that must be tidied up when the environment is
+discarded. We recommend using the :code:`with`-statement pattern for creating
+environments:
+
+    >>> with gym.make("llvm-v0") as env:
+    ...    pass  # use env how you like
+
+This removes the need to call :meth:`env.close()
+<compiler_gym.envs.ClientServiceCompilerEnv.close>` yourself since it is closed
+automatically when leaving the scope of the :code:`with`-statement. If this is
+not possible, use :code:`try`/:code:`finally` blocks:
+
+    >>> env = compiler_gym.make("llvm-v0")
+    >>> try:
+    ...     pass  # use env how you like
+    ... finally:
+    ...     env.close()
+
+
 How do I debug crashes or errors?
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
