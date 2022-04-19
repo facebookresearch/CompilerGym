@@ -162,6 +162,14 @@ Additional optional configuration arguments:
     -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
     ```
 
+* For faster linking.
+
+    ```bash
+    -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=lld-9"
+    -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=lld-9"
+    -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=lld-9"
+    ```
+
 By default, CompilerGym builds LLVM from source. This takes a long time and a
 lot of compute resources. To prevent this, download a pre-compiled clang+llvm
 release of LLVM 10.0.0 from the [llvm-project releases
