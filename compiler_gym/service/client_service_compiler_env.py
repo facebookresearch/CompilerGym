@@ -118,12 +118,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
     :ivar service: A connection to the underlying compiler service.
 
     :vartype service: compiler_gym.service.CompilerGymServiceConnection
-
-
-    :ivar reward_range: A tuple indicating the range of reward values. Default
-        range is (-inf, +inf).
-
-    :vartype reward_range: Tuple[float, float]
     """
 
     def __init__(
@@ -302,7 +296,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         self.observation_space: Optional[Space] = None
 
         # Mutable state initialized in reset().
-        self.reward_range: Tuple[float, float] = (-np.inf, np.inf)
+        self._reward_range: Tuple[float, float] = (-np.inf, np.inf)
         self.episode_reward = None
         self.episode_start_time: float = time()
         self._actions: List[ActionType] = []
@@ -482,7 +476,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
             if reward_space == self.reward_space:
                 return
             self.reward_space_spec = self.reward.spaces[reward_space]
-            self.reward_range = (
+            self._reward_range = (
                 self.reward_space_spec.min,
                 self.reward_space_spec.max,
             )
@@ -493,7 +487,11 @@ class ClientServiceCompilerEnv(CompilerEnv):
             # If no reward space is being used then set the reward range to
             # unbounded.
             self.reward_space_spec = None
-            self.reward_range = (-np.inf, np.inf)
+            self._reward_range = (-np.inf, np.inf)
+
+    @property
+    def reward_range(self) -> Tuple[float, float]:
+        return self._reward_range
 
     @property
     def reward(self) -> RewardView:

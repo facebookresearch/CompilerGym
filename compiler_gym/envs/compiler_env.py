@@ -4,7 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 """This module defines the OpenAI gym interface for compilers."""
 from abc import ABC, abstractmethod
-from typing import Iterable, List, Optional, Union
+from typing import Iterable, List, Optional, Tuple, Union
 
 import gym
 from deprecated.sphinx import deprecated
@@ -255,6 +255,15 @@ class CompilerEnv(gym.Env, ABC):
     @observation.setter
     @abstractmethod
     def observation(self, observation: ObservationView) -> None:
+        raise NotImplementedError("abstract method")
+
+    @property
+    @abstractmethod
+    def reward_range(self) -> Tuple[float, float]:
+        """A tuple indicating the range of reward values.
+
+        Default range is (-inf, +inf).
+        """
         raise NotImplementedError("abstract method")
 
     @property
