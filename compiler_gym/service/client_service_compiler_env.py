@@ -735,6 +735,8 @@ class ClientServiceCompilerEnv(CompilerEnv):
                 return self._reset(
                     benchmark=benchmark,
                     action_space=action_space,
+                    observation_space=observation_space,
+                    reward_space=reward_space,
                     retry_count=retry_count + 1,
                 )
 
