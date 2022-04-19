@@ -54,6 +54,17 @@ cg_py_test(
 )
 
 cg_py_test(
+  NAME sqlite_logger_test
+  SRCS "sqlite_logger_test.py"
+  DEPS
+    compiler_gym::envs::llvm::llvm
+    compiler_gym::errors::errors
+    compiler_gym::wrappers::wrappers
+    tests::test_main
+    tests::pytest_plugins::llvm
+)
+
+cg_py_test(
   NAME
     time_limit_wrappers_test
   SRCS
@@ -62,4 +73,15 @@ cg_py_test(
     compiler_gym::wrappers::wrappers
     tests::pytest_plugins::llvm
     tests::test_main
+)
+
+cg_py_test(
+  NAME validation_test
+  SRCS "validation_test.py"
+  DEPS
+    compiler_gym::envs::llvm::llvm
+    compiler_gym::errors::errors
+    compiler_gym::wrappers::wrappers
+    tests::test_main
+    tests::pytest_plugins::llvm
 )
