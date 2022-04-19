@@ -46,6 +46,7 @@ def test_reward_range_not_runnable_benchmark(env: LlvmEnv):
         env.reset(benchmark="benchmark://npb-v0/1")
 
 
+@flaky  # Runtime can fail
 def test_fork(env: LlvmEnv):
     env = RuntimePointEstimateReward(env)
     with env.fork() as fkd:
