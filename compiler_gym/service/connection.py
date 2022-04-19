@@ -14,7 +14,6 @@ from typing import Dict, FrozenSet, Iterable, List, Optional, TypeVar, Union
 
 import grpc
 from deprecated.sphinx import deprecated
-from pydantic import BaseModel
 from frozendict import frozendict
 from pydantic import BaseModel, root_validator
 
