@@ -311,5 +311,24 @@ def test_wrapped_env_close(env: LlvmEnv):
     assert wrapped.service is None
 
 
+def test_wrapped_env_custom_close(env: LlvmEnv):
+    """Test that a custom close() method is called on wrapped environments."""
+
+    class MyWrapper(CompilerEnvWrapper):
+        def __init__(self, env: LlvmEnv):
+            super().__init__(env)
+            self.custom_close = False
+
+        def close(self):
+            self.custom_close = True
+            self.env.close()
+
+    env = MyWrapper(env)
+    assert not env.custom_close
+
+    env.close()
+    assert env.custom_close
+
+
 if __name__ == "__main__":
     main()

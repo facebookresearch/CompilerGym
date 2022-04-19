@@ -44,6 +44,7 @@ from compiler_gym.wrappers.datasets import (
     IterateOverBenchmarks,
     RandomOrderBenchmarks,
 )
+from compiler_gym.wrappers.fork import ForkOnStep
 
 if config.enable_llvm_env:
     from compiler_gym.wrappers.llvm import RuntimePointEstimateReward  # noqa: F401
@@ -62,6 +63,7 @@ __all__ = [
     "ConstrainedCommandline",
     "CycleOverBenchmarks",
     "CycleOverBenchmarksIterator",
+    "ForkOnStep",
     "IterateOverBenchmarks",
     "ObservationWrapper",
     "RandomOrderBenchmarks",

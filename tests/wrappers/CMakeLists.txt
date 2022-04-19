@@ -43,6 +43,17 @@ cg_py_test(
 )
 
 cg_py_test(
+  NAME fork_test
+  SRCS "fork_test.py"
+  DEPS
+    compiler_gym::envs::llvm::llvm
+    compiler_gym::errors::errors
+    compiler_gym::wrappers::wrappers
+    tests::test_main
+    tests::pytest_plugins::llvm
+)
+
+cg_py_test(
   NAME llvm_test
   SRCS "llvm_test.py"
   DEPS

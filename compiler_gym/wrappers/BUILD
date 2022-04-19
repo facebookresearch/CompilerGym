@@ -11,6 +11,7 @@ py_library(
         "commandline.py",
         "core.py",
         "datasets.py",
+        "fork.py",
         "llvm.py",
         "sqlite_logger.py",
         "time_limit.py",
