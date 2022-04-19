@@ -2,7 +2,9 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-from typing import Any
+import shlex
+import sys
+from typing import Any, Iterable
 
 
 class ShellFormatCodes:
@@ -33,3 +35,14 @@ def plural(quantity: int, singular: str, plural: str) -> str:
 def indent(string: str, n=4) -> str:
     """Indent a multi-line string by given number of spaces."""
     return "\n".join(" " * n + x for x in str(string).split("\n"))
+
+
+def join_cmd(cmd: Iterable[str]) -> str:
+    """Join a list of command line arguments into a single string.
+
+    This is intended for logging purposes only. It does not provide any safety
+    guarantees.
+    """
+    if sys.version_info >= (3, 8, 0):
+        return shlex.join(cmd)
+    return " ".join(cmd)

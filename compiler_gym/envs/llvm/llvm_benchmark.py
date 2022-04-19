@@ -6,7 +6,6 @@
 import logging
 import os
 import random
-import shlex
 import subprocess
 import sys
 import tempfile
@@ -20,6 +19,7 @@ from compiler_gym.datasets import Benchmark, BenchmarkInitError
 from compiler_gym.third_party import llvm
 from compiler_gym.util.commands import Popen, communicate, run_command
 from compiler_gym.util.runfiles_path import transient_cache_path
+from compiler_gym.util.shell_format import join_cmd
 from compiler_gym.util.thread_pool import get_thread_pool_executor
 
 logger = logging.getLogger(__name__)
@@ -78,7 +78,7 @@ def _get_system_library_flags(compiler: str) -> Iterable[str]:
                 ) from e
         else:
             raise HostCompilerFailure(
-                f"Compiler invocation '{shlex.join(cmd)}' timed out after 3 attempts."
+                f"Compiler invocation '{join_cmd(cmd)}' timed out after 3 attempts."
             )
 
     # Parse the compiler output that matches the conventional output format
