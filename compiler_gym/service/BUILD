@@ -7,7 +7,10 @@ load("@rules_cc//cc:defs.bzl", "cc_library")
 
 py_library(
     name = "service",
-    srcs = ["__init__.py"],
+    srcs = [
+        "__init__.py",
+        "service_cache.py",
+    ],
     visibility = ["//visibility:public"],
     deps = [
         ":compilation_session",
@@ -17,6 +20,7 @@ py_library(
         # ":client_service_compiler_env",
         "//compiler_gym/errors",
         "//compiler_gym/service/proto",
+        "//compiler_gym/util",
     ],
 )
 

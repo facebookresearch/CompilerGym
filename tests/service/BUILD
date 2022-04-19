@@ -16,3 +16,13 @@ py_test(
         "//tests:test_main",
     ],
 )
+
+py_test(
+    name = "service_cache_test",
+    timeout = "short",
+    srcs = ["service_cache_test.py"],
+    deps = [
+        "//compiler_gym/service",
+        "//tests:test_main",
+    ],
+)
