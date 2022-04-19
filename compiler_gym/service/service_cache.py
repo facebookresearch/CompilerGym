@@ -70,3 +70,6 @@ class ServiceCache:
         """Remove the cache directory. This must be called."""
         for directory in self._directories_to_remove:
             shutil.rmtree(directory, ignore_errors=True)
+
+    def __repr__(self) -> str:
+        return str(self.path)
