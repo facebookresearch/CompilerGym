@@ -31,11 +31,12 @@
 #include "mlir/Dialect/Linalg/Utils/Utils.h"
 #include "mlir/Dialect/StandardOps/IR/Ops.h"
 #include "mlir/Dialect/StandardOps/Transforms/Passes.h"
-#include "mlir/Dialect/Vector/VectorOps.h"
+#include "mlir/Dialect/Vector/IR/VectorOps.h"
 #include "mlir/ExecutionEngine/OptUtils.h"
 #include "mlir/IR/AsmState.h"
 #include "mlir/IR/Dialect.h"
 #include "mlir/IR/MLIRContext.h"
+#include "mlir/IR/OwningOpRef.h"
 #include "mlir/IR/PatternMatch.h"
 #include "mlir/InitAllDialects.h"
 #include "mlir/InitAllPasses.h"
@@ -48,6 +49,10 @@
 #include "mlir/Target/LLVMIR/Export.h"
 #include "mlir/Target/LLVMIR/ModuleTranslation.h"
 #include "mlir/Transforms/Passes.h"
+
+namespace mlir {
+class ModuleOp;
+}
 
 namespace compiler_gym::mlir_service {
 
@@ -89,7 +94,8 @@ grpc::Status readBitcodeFile(const boost::filesystem::path& path, Bitcode* bitco
  * @param path The path of the bitcode file to write.
  * @return `OK` on success.
  */
-grpc::Status writeBitcodeFile(mlir::OwningModuleRef& module, const boost::filesystem::path& path);
+grpc::Status writeBitcodeFile(mlir::OwningOpRef<mlir::ModuleOp>& module,
+                              const boost::filesystem::path& path);
 
 /**
  * Construct an MLIR module from a bitcode.
@@ -105,9 +111,10 @@ grpc::Status writeBitcodeFile(mlir::OwningModuleRef& module, const boost::filesy
  * @return A unique pointer to an MLIR module, or `nullptr` on error and sets
  *    `status`.
  */
-std::unique_ptr<mlir::OwningModuleRef> makeModule(mlir::MLIRContext& context,
-                                                  const Bitcode& bitcode, const std::string& name,
-                                                  grpc::Status* status);
+std::unique_ptr<mlir::OwningOpRef<mlir::ModuleOp>> makeModule(mlir::MLIRContext& context,
+                                                              const Bitcode& bitcode,
+                                                              const std::string& name,
+                                                              grpc::Status* status);
 
 /**
  * Represents a BenchmarkDynamicConfig protocol buffer.
@@ -154,7 +161,7 @@ class Benchmark {
    * Construct a benchmark from an MLIR module.
    */
   Benchmark(const std::string& name, std::unique_ptr<mlir::MLIRContext> context,
-            std::unique_ptr<mlir::OwningModuleRef> module,
+            std::unique_ptr<mlir::OwningOpRef<mlir::ModuleOp>> module,
             const BenchmarkDynamicConfig& dynamicConfig,
             const boost::filesystem::path& workingDirectory);
 
@@ -217,12 +224,12 @@ class Benchmark {
   /**
    * The underlying MLIR module.
    */
-  inline mlir::OwningModuleRef& module() { return *module_; }
+  inline mlir::OwningOpRef<mlir::ModuleOp>& module() { return *module_; }
 
   /**
    * The underlying MLIR module.
    */
-  inline const mlir::OwningModuleRef& module() const { return *module_; }
+  inline const mlir::OwningOpRef<mlir::ModuleOp>& module() const { return *module_; }
 
   /**
    * The underlying MLIR context.
@@ -244,7 +251,7 @@ class Benchmark {
   /**
    * A pointer to the underlying MLIR module.
    */
-  inline const mlir::OwningModuleRef* module_ptr() const { return module_.get(); }
+  inline const mlir::OwningOpRef<mlir::ModuleOp>* module_ptr() const { return module_.get(); }
 
   /**
    * A reference to the dynamic configuration object.
@@ -263,7 +270,7 @@ class Benchmark {
    *
    * @param module A new module.
    */
-  inline void replaceModule(std::unique_ptr<mlir::OwningModuleRef> module) {
+  inline void replaceModule(std::unique_ptr<mlir::OwningOpRef<mlir::ModuleOp>> module) {
     module_ = std::move(module);
     markModuleModified();
   }
@@ -300,7 +307,7 @@ class Benchmark {
   // before Module, as class members are destroyed in the reverse order they are
   // declared, and a module must never outlive its context.
   std::unique_ptr<mlir::MLIRContext> context_;
-  std::unique_ptr<mlir::OwningModuleRef> module_;
+  std::unique_ptr<mlir::OwningOpRef<mlir::ModuleOp>> module_;
   const boost::filesystem::path scratchDirectory_;
   const BenchmarkDynamicConfig dynamicConfigProto_;
   const RealizedBenchmarkDynamicConfig dynamicConfig_;

@@ -133,25 +133,25 @@ if(COMPILER_GYM_ENABLE_LLVM_ENV)
     message("Using LLVM version ${LLVM_VERSION} from ${LLVM_DIR}")
 endif()
 
-# === LLVM 13 ===
+# === LLVM 14 ===
 
 if(COMPILER_GYM_ENABLE_MLIR_ENV)
     build_external_cmake_project(
-      NAME llvm-13
-      SRC_DIR   "${CMAKE_CURRENT_LIST_DIR}/llvm-13"
-      CONFIG_ARGS   "-DCOMPILER_GYM_LLVM_PROVIDER=${COMPILER_GYM_LLVM_PROVIDER}"
+        NAME llvm-14
+        SRC_DIR   "${CMAKE_CURRENT_LIST_DIR}/llvm-14"
+        CONFIG_ARGS   "-DCOMPILER_GYM_LLVM_PROVIDER=${COMPILER_GYM_LLVM_PROVIDER}"
     )
     find_package(LLVM REQUIRED)
     find_package(MLIR REQUIRED CONFIG)
-    list(
-        APPEND
-        LLVM_INCLUDE_DIRS
-        "${CMAKE_CURRENT_BINARY_DIR}/external/llvm-13/install/include"
-        "${CMAKE_CURRENT_BINARY_DIR}/external/llvm-13/install/lib"
-        "${CMAKE_CURRENT_BINARY_DIR}/external/llvm-13/llvm-13/src/llvm/llvm/include"
-        "${CMAKE_CURRENT_BINARY_DIR}/external/llvm-13/llvm-13/src/llvm/mlir/include"
-        "${CMAKE_CURRENT_BINARY_DIR}/external/llvm-13/llvm-13/src/llvm-build/tools/mlir/include"
-    )
+    #    list(
+    #        APPEND
+    #        LLVM_INCLUDE_DIRS
+    #        "${CMAKE_CURRENT_BINARY_DIR}/external/llvm-14/install/include"
+    #        "${CMAKE_CURRENT_BINARY_DIR}/external/llvm-14/install/lib"
+    #        "${CMAKE_CURRENT_BINARY_DIR}/external/llvm-14/llvm-14/src/llvm/llvm/include"
+    #        "${CMAKE_CURRENT_BINARY_DIR}/external/llvm-14/llvm-14/src/llvm/mlir/include"
+    #        "${CMAKE_CURRENT_BINARY_DIR}/external/llvm-14/llvm-14/src/llvm-build/tools/mlir/include"
+    #    )
     message("Using LLVM version ${LLVM_VERSION} from ${LLVM_DIR}")
 endif()
 

@@ -23,7 +23,7 @@
 #include "mlir/Dialect/Linalg/Utils/Utils.h"
 #include "mlir/Dialect/StandardOps/IR/Ops.h"
 #include "mlir/Dialect/StandardOps/Transforms/Passes.h"
-#include "mlir/Dialect/Vector/VectorOps.h"
+#include "mlir/Dialect/Vector/IR/VectorOps.h"
 #include "mlir/ExecutionEngine/OptUtils.h"
 #include "mlir/IR/AsmState.h"
 #include "mlir/IR/Dialect.h"
@@ -71,7 +71,7 @@ std::unique_ptr<MLIRContext> createMlirContext() {
 }
 
 // Lower to LLVM
-Status lowerMLIRModuleToLLVM(OwningModuleRef& mlirModule, MLIRContext* context,
+Status lowerMLIRModuleToLLVM(OwningOpRef<mlir::ModuleOp>& mlirModule, MLIRContext* context,
                              llvm::raw_string_ostream& moduleString) {
   ModuleOp module = *mlirModule;
   PassManager pm(context, mlir::OpPassManager::Nesting::Implicit);
@@ -268,7 +268,7 @@ std::unique_ptr<mlir::OperationPass<mlir::FuncOp>> createLinalgCodegenPass(const
 }  // namespace
 
 // Do action
-Status performLinalgCodegen(const Event& action, OwningModuleRef& module) {
+Status performLinalgCodegen(const Event& action, OwningOpRef<mlir::ModuleOp>& module) {
   mlir::ModuleOp moduleOp = *module;
   mlir::PassManager pm(moduleOp.getContext(), mlir::OpPassManager::Nesting::Implicit);
 

@@ -87,7 +87,8 @@ Status BenchmarkFactory::addBitcode(const std::string& uri, const Bitcode& bitco
                                     std::optional<BenchmarkDynamicConfig> dynamicConfig) {
   auto context = mlir::createMlirContext();
   Status status;
-  std::unique_ptr<mlir::OwningModuleRef> module = makeModule(*context, bitcode, uri, &status);
+  std::unique_ptr<mlir::OwningOpRef<mlir::ModuleOp>> module =
+      makeModule(*context, bitcode, uri, &status);
   RETURN_IF_ERROR(status);
   DCHECK(module);
 

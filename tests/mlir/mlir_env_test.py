@@ -3,12 +3,15 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 """Integrations tests for the MLIR CompilerGym environments."""
+import random
 from numbers import Real
 
 import gym
 import numpy as np
 import pytest
 import ray
+import torch
+from flaky import flaky
 from ray.rllib.agents.ppo import PPOTrainer
 from ray.tune.registry import register_env
 
@@ -263,7 +266,12 @@ def test_mlir_rl_wrapper_env_reset(env: MlirEnv):
     assert observation[0] == 0
 
 
+@flaky(max_runs=3, min_passes=1)
 def test_ppo_train_smoke():
+    seed = 123
+    np.random.seed(seed)
+    random.seed(seed)
+    torch.manual_seed(seed)
     register_env(
         "mlir_env", lambda env_config: MlirRlWrapperEnv(env=gym.make("mlir-v0"))
     )

@@ -31,7 +31,7 @@
 #include "mlir/Dialect/Linalg/Utils/Utils.h"
 #include "mlir/Dialect/StandardOps/IR/Ops.h"
 #include "mlir/Dialect/StandardOps/Transforms/Passes.h"
-#include "mlir/Dialect/Vector/VectorOps.h"
+#include "mlir/Dialect/Vector/IR/VectorOps.h"
 #include "mlir/ExecutionEngine/OptUtils.h"
 #include "mlir/IR/AsmState.h"
 #include "mlir/IR/Dialect.h"
@@ -59,9 +59,9 @@ namespace compiler_gym::mlir_service {
 
 namespace {
 
-std::unique_ptr<mlir::OwningModuleRef> makeModuleOrDie(mlir::MLIRContext& context,
-                                                       const Bitcode& bitcode,
-                                                       const std::string& name) {
+std::unique_ptr<mlir::OwningOpRef<mlir::ModuleOp>> makeModuleOrDie(mlir::MLIRContext& context,
+                                                                   const Bitcode& bitcode,
+                                                                   const std::string& name) {
   Status status;
   auto module = makeModule(context, bitcode, name, &status);
   CHECK(status.ok()) << "Failed to make MLIR module: " << status.error_message();
@@ -77,7 +77,7 @@ RealizedBenchmarkDynamicConfig realizeDynamicConfig(const BenchmarkDynamicConfig
 
   // TODO(boian): clang and Benchmark must be included in the compiler_gym python package.
   // Take paths in a common way.
-  const auto llvm_install = util::getRunfilesPath("external/llvm-13/install/");
+  const auto llvm_install = util::getRunfilesPath("external/llvm-14/install/");
   const auto benchmark_install = util::getRunfilesPath("external/benchmark/install/");
 
   // Set up the environment variables.
@@ -168,9 +168,10 @@ std::vector<int> parametersFromUri(std::string uri) {
   return ret;
 }
 
-std::unique_ptr<mlir::OwningModuleRef> makeModule(mlir::MLIRContext& context,
-                                                  const Bitcode& bitcode, const std::string& name,
-                                                  Status* status) {
+std::unique_ptr<mlir::OwningOpRef<mlir::ModuleOp>> makeModule(mlir::MLIRContext& context,
+                                                              const Bitcode& bitcode,
+                                                              const std::string& name,
+                                                              Status* status) {
   auto params = parametersFromUri(name);
   int m, n, k;
   m = params[0];
@@ -180,7 +181,7 @@ std::unique_ptr<mlir::OwningModuleRef> makeModule(mlir::MLIRContext& context,
   boost::replace_all(mlirSource, "${M}", std::to_string(m));
   boost::replace_all(mlirSource, "${N}", std::to_string(n));
   boost::replace_all(mlirSource, "${K}", std::to_string(k));
-  mlir::OwningModuleRef moduleRef = parseSourceString(bitcode, &context);
+  mlir::OwningOpRef<mlir::ModuleOp> moduleRef = parseSourceString(bitcode, &context);
   if (!moduleRef) {
     *status = Status(StatusCode::INVALID_ARGUMENT,
                      fmt::format("Failed to parse MLIR bitcode: \"{}\" :\n {}", name, bitcode));
@@ -193,7 +194,7 @@ std::unique_ptr<mlir::OwningModuleRef> makeModule(mlir::MLIRContext& context,
   // benchmarks by their name.
   module.setName("-");
 
-  return std::make_unique<mlir::OwningModuleRef>(std::move(moduleRef));
+  return std::make_unique<mlir::OwningOpRef<mlir::ModuleOp>>(std::move(moduleRef));
 }
 
 // A benchmark is an MLIR module and the MLIR context that owns it.
@@ -221,7 +222,7 @@ Benchmark::Benchmark(const std::string& name, const Bitcode& bitcode,
 }
 
 Benchmark::Benchmark(const std::string& name, std::unique_ptr<mlir::MLIRContext> context,
-                     std::unique_ptr<mlir::OwningModuleRef> module,
+                     std::unique_ptr<mlir::OwningOpRef<mlir::ModuleOp>> module,
                      const BenchmarkDynamicConfig& dynamicConfig, const fs::path& workingDirectory)
     : context_(std::move(context)),
       module_(std::move(module)),
@@ -260,7 +261,7 @@ Status Benchmark::verify_module() {
   return Status::OK;
 }
 
-Status writeBitcodeFile(mlir::OwningModuleRef& module, const fs::path& path) {
+Status writeBitcodeFile(mlir::OwningOpRef<mlir::ModuleOp>& module, const fs::path& path) {
   std::ofstream output(path);
 
   std::string bitcode;
