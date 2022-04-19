@@ -45,6 +45,7 @@ research. We aim to act as a catalyst for making compilers faster using ML.
    llvm/index
    envs/gcc
    envs/loop_tool
+   envs/mlir
 
 ..
     .. toctree::
