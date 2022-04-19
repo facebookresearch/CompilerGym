@@ -38,6 +38,7 @@ from compiler_gym.wrappers.core import (
     ObservationWrapper,
     RewardWrapper,
 )
+from compiler_gym.wrappers.counter import Counter
 from compiler_gym.wrappers.datasets import (
     CycleOverBenchmarks,
     CycleOverBenchmarksIterator,
@@ -60,6 +61,7 @@ __all__ = [
     "CommandlineWithTerminalAction",
     "CompilerEnvWrapper",
     "ConstrainedCommandline",
+    "Counter",
     "CycleOverBenchmarks",
     "CycleOverBenchmarksIterator",
     "IterateOverBenchmarks",

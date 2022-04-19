@@ -10,6 +10,7 @@ py_library(
         "__init__.py",
         "commandline.py",
         "core.py",
+        "counter.py",
         "datasets.py",
         "llvm.py",
         "sqlite_logger.py",

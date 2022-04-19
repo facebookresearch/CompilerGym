@@ -9,6 +9,7 @@ set(WRAPPERS_SRCS
     "__init__.py"
     "commandline.py"
     "core.py"
+    "counter.py"
     "datasets.py"
     "time_limit.py"
     "validation.py"

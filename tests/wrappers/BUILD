@@ -27,6 +27,16 @@ py_test(
 )
 
 py_test(
+    name = "counter_test",
+    srcs = ["counter_test.py"],
+    deps = [
+        "//compiler_gym/wrappers",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "datasets_wrappers_test",
     timeout = "short",
     srcs = ["datasets_wrappers_test.py"],
