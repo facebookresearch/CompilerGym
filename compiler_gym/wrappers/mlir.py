@@ -91,7 +91,7 @@ def convert_permutation_to_discrete_space(permutation: Permutation) -> Discrete:
 
 
 def get_tile_size_discrete_space(min: Integral) -> NamedDiscrete:
-    items = [str(min * 2 ** i) for i in range(11)]
+    items = [str(min * 2**i) for i in range(11)]
     return NamedDiscrete(items=items, name=None)
 
 

@@ -18,7 +18,7 @@ from compiler_gym.util.shell_format import plural
 logger = logging.getLogger(__name__)
 
 # The maximum value for the --seed argument to matmul.
-UINT_MAX = (2 ** 32) - 1
+UINT_MAX = (2**32) - 1
 
 _matmul_BIN = runfiles_path("compiler_gym/third_party/matmul/matmul/bin/matmul")
 _matmul_INCLUDES = runfiles_path(
