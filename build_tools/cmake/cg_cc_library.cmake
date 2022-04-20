@@ -61,7 +61,7 @@ function(cg_cc_library)
         _RULE
         "PUBLIC;TESTONLY;SHARED"
         "NAME"
-        "HDRS;TEXTUAL_HDRS;SRCS;COPTS;DEFINES;LINKOPTS;DATA;DEPS;ABS_DEPS;NON_LIB_DEPS;INCLUDES"
+        "HDRS;TEXTUAL_HDRS;SRCS;COPTS;DEFINES;LINKOPTS;DATA;DEPS;ABS_DEPS;NON_LIB_DEPS;ABS_NON_LIB_DEPS;INCLUDES"
         ${ARGN}
     )
 
@@ -182,6 +182,9 @@ function(cg_cc_library)
     if(_RULE_NON_LIB_DEPS)
         rename_bazel_targets(_NON_LIB_DEPS "${_RULE_NON_LIB_DEPS}")
         add_dependencies(${_NAME} ${_NON_LIB_DEPS})
+    endif()
+    if(_RULE_ABS_NON_LIB_DEPS)
+        add_dependencies(${_NAME} ${_RULE_ABS_NON_LIB_DEPS})
     endif()
 
     add_library(${_PACKAGE_NS}::${_RULE_NAME} ALIAS ${_NAME})

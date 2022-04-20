@@ -27,6 +27,7 @@ function(cg_genrule)
 
     # TODO(boian): remove this renaming when call sites do not include ":" in target dependency names
     rename_bazel_targets(_DEPS "${_RULE_DEPENDS}")
+    list(APPEND _DEPS ${_RULE_ABS_DEPENDS})
 
     rename_bazel_targets(_NAME "${_RULE_NAME}")
 

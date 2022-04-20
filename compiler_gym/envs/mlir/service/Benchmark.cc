@@ -77,8 +77,9 @@ RealizedBenchmarkDynamicConfig realizeDynamicConfig(const BenchmarkDynamicConfig
 
   // TODO(boian): clang and Benchmark must be included in the compiler_gym python package.
   // Take paths in a common way.
-  const auto llvm_install = util::getRunfilesPath("external/llvm-14/install/");
-  const auto benchmark_install = util::getRunfilesPath("external/benchmark/install/");
+  const auto llvm_install = util::getRunfilesPath("compiler_gym/envs/mlir/service/llvm");
+  const auto benchmark_install =
+      util::getRunfilesPath("compiler_gym/envs/mlir/service/google_benchmark");
 
   // Set up the environment variables.
   (*command->mutable_env())["CC"] = (llvm_install / "bin/clang").string();

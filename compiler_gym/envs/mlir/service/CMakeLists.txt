@@ -83,10 +83,7 @@ cg_cc_library(
   PUBLIC
 )
 
-message(STATUS "MLIR_INCLUDE_DIRS: ${MLIR_INCLUDE_DIRS}")
-
 llvm_map_components_to_libnames(_LLVM_LIBS core support bitwriter)
-# list(APPEND _LLVM_LIBS MLIRIR MLIRAffine)
 cg_cc_library(
   NAME
     Benchmark
@@ -115,6 +112,10 @@ cg_cc_library(
     ${MLIR_INCLUDE_DIRS}
   DEFINES
     ${LLVM_DEFINITIONS}
+  DATA
+    ::clang
+    ::google_benchmark
+    ::MLIRExecutionEngine
   PUBLIC
 )
 
@@ -153,7 +154,6 @@ llvm_map_components_to_libnames(_LLVM_LIBS
   core analysis coroutines objcarcopts target codegen
   x86codegen x86asmparser #TODO(boian): can these be found programmatically
 )
-#message(FATAL_ERROR "_LLVM_LIBS=${_LLVM_LIBS}")
 cg_cc_library(
   NAME
     MlirSession
@@ -298,4 +298,75 @@ cg_cc_library(
     magic_enum
     nlohmann_json::nlohmann_json
   PUBLIC
+)
+
+string(
+    CONCAT
+    clang_CMD
+    "${CMAKE_COMMAND} -E make_directory llvm/bin"
+    " && ${CMAKE_COMMAND} -E create_symlink \"$<TARGET_PROPERTY:clang,LOCATION>\" llvm/bin/clang"
+)
+cg_genrule(
+  NAME clang
+  OUTS llvm/bin/clang
+  COMMAND "${clang_CMD}"
+  ABS_DEPENDS clang
+)
+
+get_target_property(MLIRExecutionEngine_LOCATION MLIRExecutionEngine LOCATION)
+get_filename_component(
+    MLIRExecutionEngine_FILENAME
+    "${MLIRExecutionEngine_LOCATION}"
+    EXT
+)
+if(NOT MLIRExecutionEngine_FILENAME STREQUAL ".a")
+    message(
+        FATAL_ERROR
+        "Only static version of the MLIRExecutionEngine library is supported."
+    )
+endif()
+string(
+    CONCAT
+    MLIRExecutionEngine_CMD
+    "${CMAKE_COMMAND} -E make_directory llvm/lib"
+    " && ${CMAKE_COMMAND} -E create_symlink \"$<TARGET_PROPERTY:MLIRExecutionEngine,LOCATION>\" llvm/lib/libMLIRExecutionEngine.a"
+    " && ${CMAKE_COMMAND} -E make_directory llvm/include/mlir"
+    " && ${CMAKE_COMMAND} -E create_symlink \"${LLVM_INCLUDE_DIRS}/mlir/ExecutionEngine\" llvm/include/mlir/ExecutionEngine"
+)
+cg_genrule(
+  NAME MLIRExecutionEngine
+  OUTS
+    llvm/lib/libMLIRExecutionEngine.a
+    llvm/include/mlir/ExecutionEngine
+  COMMAND "${MLIRExecutionEngine_CMD}"
+  ABS_DEPENDS MLIRExecutionEngine
+)
+
+get_target_property(google_benchmark_LOCATION benchmark::benchmark LOCATION)
+get_filename_component(
+    google_benchmark_FILENAME
+    "${google_benchmark_LOCATION}"
+    EXT
+)
+if(NOT google_benchmark_FILENAME STREQUAL ".a")
+    message(
+        FATAL_ERROR
+        "Only static version of the Google benchmark library is supported."
+    )
+endif()
+string(
+    CONCAT
+    google_benchmark_CMD
+    "${CMAKE_COMMAND} -E make_directory google_benchmark/lib"
+    " && ${CMAKE_COMMAND} -E create_symlink \"$<TARGET_PROPERTY:benchmark::benchmark,LOCATION>\" google_benchmark/lib/libbenchmark.a"
+    " && ${CMAKE_COMMAND} -E make_directory google_benchmark/include"
+    " && ${CMAKE_COMMAND} -E create_symlink \"$<TARGET_PROPERTY:benchmark::benchmark,INTERFACE_INCLUDE_DIRECTORIES>/benchmark\" google_benchmark/include/benchmark"
+)
+cg_genrule(
+  NAME google_benchmark
+  OUTS
+    google_benchmark/lib/libbenchmark.a
+    google_benchmark/include/benchmark
+  COMMAND "${google_benchmark_CMD}"
+  ABS_DEPENDS benchmark::benchmark
 )

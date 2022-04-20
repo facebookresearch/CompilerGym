@@ -136,22 +136,18 @@ endif()
 # === LLVM 14 ===
 
 if(COMPILER_GYM_ENABLE_MLIR_ENV)
-    build_external_cmake_project(
-        NAME llvm-14
-        SRC_DIR   "${CMAKE_CURRENT_LIST_DIR}/llvm-14"
-        CONFIG_ARGS   "-DCOMPILER_GYM_LLVM_PROVIDER=${COMPILER_GYM_LLVM_PROVIDER}"
-    )
-    find_package(LLVM REQUIRED)
+    if(COMPILER_GYM_LLVM_PROVIDER STREQUAL "internal")
+        build_external_cmake_project(
+            NAME llvm-14
+            SRC_DIR   "${CMAKE_CURRENT_LIST_DIR}/llvm-14"
+            CONFIG_ARGS   "-DCOMPILER_GYM_LLVM_PROVIDER=${COMPILER_GYM_LLVM_PROVIDER}"
+        )
+        find_package(LLVM 14.0.0 EXACT REQUIRED)
+    else()
+        find_package(LLVM REQUIRED)
+    endif()
+    find_package(Clang REQUIRED CONFIG)
     find_package(MLIR REQUIRED CONFIG)
-    #    list(
-    #        APPEND
-    #        LLVM_INCLUDE_DIRS
-    #        "${CMAKE_CURRENT_BINARY_DIR}/external/llvm-14/install/include"
-    #        "${CMAKE_CURRENT_BINARY_DIR}/external/llvm-14/install/lib"
-    #        "${CMAKE_CURRENT_BINARY_DIR}/external/llvm-14/llvm-14/src/llvm/llvm/include"
-    #        "${CMAKE_CURRENT_BINARY_DIR}/external/llvm-14/llvm-14/src/llvm/mlir/include"
-    #        "${CMAKE_CURRENT_BINARY_DIR}/external/llvm-14/llvm-14/src/llvm-build/tools/mlir/include"
-    #    )
     message("Using LLVM version ${LLVM_VERSION} from ${LLVM_DIR}")
 endif()
 
