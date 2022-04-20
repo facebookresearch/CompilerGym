@@ -100,7 +100,7 @@ def cache_path(relpath: str) -> Path:
     if forced:
         return Path(forced) / relpath
     elif os.environ.get("HOME"):
-        return Path("~/.cache/compiler_gym").expanduser() / relpath
+        return Path("~/.local/cache/compiler_gym").expanduser() / relpath
     else:
         return Path(f"/tmp/compiler_gym_{getuser()}/cache") / relpath
 
