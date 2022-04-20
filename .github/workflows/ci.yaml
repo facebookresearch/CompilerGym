@@ -268,7 +268,7 @@ jobs:
               run: python -m pip install *.whl
 
             - name: Install runtime dependencies
-              uses: ./.github/actions/install-runtime-dependencies
+              uses: ./.github/actions/install-mlir-env-runtime-dependencies
 
             - name: Install test dependencies
               run: python -m pip install -r tests/requirements.txt

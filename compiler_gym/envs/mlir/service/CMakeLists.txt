@@ -300,15 +300,22 @@ cg_cc_library(
   PUBLIC
 )
 
+get_target_property(clang_LOCATION clang LOCATION)
+get_filename_component(clang_DIR_ "${clang_LOCATION}" DIRECTORY)
+set(clang_INCLUDE_DIR_
+    "${clang_DIR_}/../lib/clang/${LLVM_PACKAGE_VERSION}/include"
+)
 string(
     CONCAT
     clang_CMD
     "${CMAKE_COMMAND} -E make_directory llvm/bin"
-    " && ${CMAKE_COMMAND} -E create_symlink \"$<TARGET_PROPERTY:clang,LOCATION>\" llvm/bin/clang"
+    " && ${CMAKE_COMMAND} -E create_symlink \"${clang_LOCATION}\" llvm/bin/clang"
+    " && ${CMAKE_COMMAND} -E make_directory llvm/lib/clang/${LLVM_PACKAGE_VERSION}"
+    " && ${CMAKE_COMMAND} -E create_symlink \"${clang_INCLUDE_DIR_}\" llvm/lib/clang/${LLVM_PACKAGE_VERSION}/include"
 )
 cg_genrule(
   NAME clang
-  OUTS llvm/bin/clang
+  OUTS llvm/bin/clang lib/clang/${LLVM_PACKAGE_VERSION}/include
   COMMAND "${clang_CMD}"
   ABS_DEPENDS clang
 )
