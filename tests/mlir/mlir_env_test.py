@@ -290,6 +290,7 @@ def test_ppo_train_smoke():
         "num_sgd_iter": 1,
         "rollout_fragment_length": 2,
     }
+    ray.shutdown()
     ray.init(local_mode=True)  # Runs PPO training in the same process
     trainer = PPOTrainer(config=config)
     trainer.train()
