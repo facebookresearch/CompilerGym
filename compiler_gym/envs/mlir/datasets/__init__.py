@@ -11,7 +11,7 @@ from compiler_gym.util.runfiles_path import site_data_path
 
 
 def get_mlir_datasets(site_data_base: Optional[Path] = None) -> Iterable[Dataset]:
-    """Instantiate the builtin LLVM datasets.
+    """Instantiate the builtin datasets.
     :param site_data_base: The root of the site data path.
     :return: An iterable sequence of :class:`Dataset
         <compiler_gym.datasets.Dataset>` instances.

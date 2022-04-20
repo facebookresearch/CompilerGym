@@ -8,8 +8,6 @@ from typing import Iterable, Optional
 
 from compiler_gym.datasets import Benchmark, BenchmarkSource, Dataset
 from compiler_gym.datasets.benchmark import BenchmarkWithSource
-
-# from compiler_gym.envs.mlir.mlir_benchmark import ClangInvocation
 from compiler_gym.service.proto import BenchmarkDynamicConfig, Command
 from compiler_gym.util.decorators import memoized_property
 from compiler_gym.util.runfiles_path import runfiles_path, site_data_path
@@ -25,11 +23,7 @@ _matmul_INCLUDES = runfiles_path(
     "compiler_gym/third_party/matmul/matmul/include/matmul-2.3.0"
 )
 
-matmul_sizes = [
-    (64, 64, 64)
-    # (128, 128, 128),
-    # (1024, 1024, 1024)
-]
+matmul_sizes = [(64, 64, 64)]
 
 
 class MatmulBenchmark(BenchmarkWithSource):
@@ -96,31 +90,16 @@ class MatmulDataset(Dataset):
             name="generator://matmul-v0",
             description="Targeted size matmul programs",
             references={},
-            license="donotsubmit",
+            license="MIT",
             site_data_base=site_data_base,
             sort_order=sort_order,
             benchmark_class=MatmulBenchmark,
         )
         self.matmul_bin_path = matmul_bin or _matmul_BIN
         self.matmul_includes_path = matmul_includes or _matmul_INCLUDES
-        """# The command that is used to compile an mlir-IR bitcode file from a
-        # matmul input. Reads from stdin, writes to stdout.
-        self.clang_compile_command: List[str] = ClangInvocation.from_c_file(
-            "-",  # Read from stdin.
-            copt=[
-                "-xc",  # The C programming language.
-                "-ferror-limit=1",  # Stop on first error.
-                "-w",  # No warnings.
-                f"-I{self.matmul_includes_path}",  # Include the matmul headers.
-            ],
-        ).command(
-            outpath="-"  # Write to stdout.
-        )"""
 
     @property
     def size(self) -> int:
-        # Actually 2^32 - 1, but practically infinite for all intents and
-        # purposes.
         return len(matmul_sizes)
 
     def name_from_size(self, mnk):
@@ -157,11 +136,6 @@ class MatmulDataset(Dataset):
         mnk = list(mnk)
         # Run matmul with the given size and regex to produce the correct mlir
         logger.debug("Exec matmul --mnk %d", mnk)
-        """matmul = subprocess.Popen(
-            [str(self.matmul_bin_path), "--mnk", str(mnk)],
-            stdout=subprocess.PIPE,
-            stderr=subprocess.PIPE,
-        )"""
 
         # TODO(kyleherndon): refactor these to another location
         src_content = """

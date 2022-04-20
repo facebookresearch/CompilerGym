@@ -32,29 +32,5 @@ def _register_mlir_gym_service():
         },
     )
 
-    # TODO(boian): Make better config
-    # observation_spaces = {"runtime": "Runtime"}
-    # reward_spaces = {"runtime": "Runtime"}
-    # for reward_space in reward_spaces:
-    #     register(
-    #         id=f"mlir-{reward_space}-v0",
-    #         entry_point="compiler_gym.envs.mlir:MlirEnv",
-    #         kwargs={
-    #             "service": MLIR_SERVICE_BINARY,
-    #             "reward_space": reward_spaces[reward_space],
-    #         },
-    #     )
-    #
-    # for observation_space, reward_space in product(observation_spaces, reward_spaces):
-    #     register(
-    #         id=f"mlir-{observation_space}-{reward_space}-v0",
-    #         entry_point="compiler_gym.envs.mlir:MlirEnv",
-    #         kwargs={
-    #             "service": MLIR_SERVICE_BINARY,
-    #             "observation_space": observation_spaces[observation_space],
-    #             "reward_space": reward_spaces[reward_space],
-    #         },
-    #     )
-
 
 _register_mlir_gym_service()

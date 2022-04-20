@@ -3,6 +3,7 @@
 #include <iostream>
 
 #include "mlir/ExecutionEngine/RunnerUtils.h"
+
 void init_matrix(float* a, int nrows, int ncols) {
   for (int j = 0; j < ncols; j++) {
     for (int i = 0; i < nrows; i++) {
@@ -10,13 +11,14 @@ void init_matrix(float* a, int nrows, int ncols) {
     }
   }
 }
-\n extern "C" {
-  void matmul(float* aligned_a, float* allocated_a, int64_t offset_a, int64_t size_a0,
-              int64_t size_a1, int64_t strides_a0, int64_t strides_a1, float* aligned_b,
-              float* allocated_b, int64_t offset_b, int64_t size_b0, int64_t size_b1,
-              int64_t strides_b0, int64_t strides_b1, float* aligned_c, float* allocated_c,
-              int64_t offset_c, int64_t size_c0, int64_t size_c1, int64_t strides_c0,
-              int64_t strides_c1);
+
+extern "C" {
+void matmul(float* aligned_a, float* allocated_a, int64_t offset_a, int64_t size_a0,
+            int64_t size_a1, int64_t strides_a0, int64_t strides_a1, float* aligned_b,
+            float* allocated_b, int64_t offset_b, int64_t size_b0, int64_t size_b1,
+            int64_t strides_b0, int64_t strides_b1, float* aligned_c, float* allocated_c,
+            int64_t offset_c, int64_t size_c0, int64_t size_c1, int64_t strides_c0,
+            int64_t strides_c1);
 }
 int main(int argc, char** argv) {
   int MDIM = 64;
