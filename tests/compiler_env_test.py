@@ -20,6 +20,8 @@ def test_benchmark_constructor_arg(env: LlvmEnv):
 
     with gym.make("llvm-v0", benchmark="cbench-v1/dijkstra") as env:
         assert env.benchmark == "benchmark://cbench-v1/dijkstra"
+        env.reset()
+        assert env.benchmark == "benchmark://cbench-v1/dijkstra"
 
 
 def test_benchmark_setter(env: LlvmEnv):
@@ -32,30 +34,44 @@ def test_benchmark_setter(env: LlvmEnv):
 def test_benchmark_set_in_reset(env: LlvmEnv):
     env.reset(benchmark="benchmark://cbench-v1/dijkstra")
     assert env.benchmark == "benchmark://cbench-v1/dijkstra"
-
-
-def test_reward_space_setter(env: LlvmEnv):
-    env.reward_space = "IrInstructionCount"
-    assert str(env.reward_space) != "IrInstructionCount"
     env.reset()
-    assert str(env.reward_space) == "IrInstructionCount"
+    assert env.benchmark == "benchmark://cbench-v1/dijkstra"
 
 
-def test_reward_space_set_in_reset(env: LlvmEnv):
-    env.reset(reward_space="IrInstructionCount")
-    assert str(env.reward_space) == "IrInstructionCount"
-
-
-def test_observation_space_setter(env: LlvmEnv):
-    env.observation_space = "Autophase"
-    assert str(env.observation_space) != "Autophase"
+@pytest.mark.parametrize("reward_space", ["IrInstructionCount", "ObjectTextSizeBytes"])
+def test_reward_space_setter(env: LlvmEnv, reward_space: str):
+    env.reward_space = reward_space
+    assert env.reward_space == reward_space
     env.reset()
-    assert str(env.observation_space) == "Autophase"
+    assert env.reward_space == reward_space
 
 
-def test_observation_space_set_in_reset(env: LlvmEnv):
-    env.reset(observation_space="Autophase")
-    assert str(env.observation_space) == "Autophase"
+@pytest.mark.parametrize("reward_space", ["IrInstructionCount", "ObjectTextSizeBytes"])
+def test_reward_space_set_in_reset(env: LlvmEnv, reward_space: str):
+    env.reset(reward_space=reward_space)
+    assert env.reward_space == reward_space
+    env.reset()
+    assert env.reward_space == reward_space
+
+
+@pytest.mark.parametrize(
+    "observation_space", ["IrInstructionCount", "ObjectTextSizeBytes"]
+)
+def test_observation_space_setter(env: LlvmEnv, observation_space: str):
+    env.observation_space = observation_space
+    assert env.observation_space_spec == observation_space
+    env.reset()
+    assert env.observation_space_spec == observation_space
+
+
+@pytest.mark.parametrize(
+    "observation_space", ["IrInstructionCount", "ObjectTextSizeBytes"]
+)
+def test_observation_space_set_in_reset(env: LlvmEnv, observation_space: str):
+    env.reset(observation_space=observation_space)
+    assert env.observation_space_spec == observation_space
+    env.reset()
+    assert env.observation_space_spec == observation_space
 
 
 def test_logger_is_deprecated(env: LlvmEnv):
