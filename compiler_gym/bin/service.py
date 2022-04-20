@@ -257,7 +257,7 @@ def print_service_capabilities(env: CompilerEnv):
             )
             print(table)
         else:
-            print(f"{type(action_space)} not supported.")
+            print(f"{type(action_space).__name__} not supported.")
 
 
 def main(argv):
