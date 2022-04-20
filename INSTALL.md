@@ -183,10 +183,3 @@ $ cmake ... \
 ```
 
 ⚠️ CompilerGym requires exactly LLVM 10.0.0.
-
-# Contribution
-To install the git pre-commit hooks, in the repository directory run
-
-    ```bash
-    pre-commit install
-    ```
