@@ -64,15 +64,11 @@ cg_py_library(
   PUBLIC
 )
 
-if(COMPILER_GYM_ENABLE_LLVM_ENV)
-    set(RANDOM_SEARCH_DATA DATA compiler_gym::envs::llvm::service::service)
-endif()
 cg_py_library(
   NAME
     random_search
   SRCS
     "random_search.py"
-  ${RANDOM_SEARCH_DATA}
   DEPS
     compiler_gym::envs::envs
     compiler_gym::service::connection

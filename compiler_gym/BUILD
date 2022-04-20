@@ -51,7 +51,6 @@ py_library(
 py_library(
     name = "random_search",
     srcs = ["random_search.py"],
-    data = ["//compiler_gym/envs/llvm/service"],
     visibility = ["//visibility:public"],
     deps = [
         ":config",
