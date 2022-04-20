@@ -13,6 +13,6 @@ runs:
                   echo "Error: Darwin is not supported"
                   exit 1
               else
-                 apt-get install libstdc++-9-dev
+                 sudo apt-get install libstdc++-9-dev
               fi
           shell: bash
