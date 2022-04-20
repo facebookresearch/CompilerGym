@@ -14,6 +14,8 @@ endif()
 
 project(compiler_gym ASM C CXX)
 
+set(CMAKE_EXECUTE_PROCESS_COMMAND_ECHO STDOUT)
+
 set(CMAKE_C_STANDARD 11 CACHE STRING "C standard to be used.")
 set(CMAKE_CXX_STANDARD 17 CACHE STRING "C++ standard to be used.")
 
