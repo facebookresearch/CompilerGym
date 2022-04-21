@@ -273,10 +273,10 @@ def test_ppo_train_smoke():
     random.seed(seed)
     torch.manual_seed(seed)
     register_env(
-        "mlir_env", lambda env_config: MlirRlWrapperEnv(env=gym.make("mlir-v0"))
+        "mlir_rl_env-v0", lambda env_config: MlirRlWrapperEnv(env=gym.make("mlir-v0"))
     )
     config = {
-        "env": "mlir_env",
+        "env": "mlir_rl_env-v0",
         "framework": "torch",
         # Tweak the default model provided automatically by RLlib,
         # given the environment's observation- and action spaces.
