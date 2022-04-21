@@ -37,7 +37,7 @@ class MatmulBenchmark(BenchmarkWithSource):
                 build_cmd=Command(
                     argument=["$CC", "$IN"],
                     outfile=["benchmark_main"],
-                    timeout_seconds=60,
+                    timeout_seconds=120,
                 ),
                 run_cmd=Command(
                     argument=["./benchmark_main", "--benchmark_format=json"],
