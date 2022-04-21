@@ -662,7 +662,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         if hasattr(self, "service") and getattr(self, "service"):
             self.close()
 
-    def reset(  # pylint: disable=arguments-differ
+    def reset(
         self,
         benchmark: Optional[Union[str, Benchmark]] = None,
         action_space: Optional[str] = None,
@@ -673,49 +673,6 @@ class ClientServiceCompilerEnv(CompilerEnv):
             OptionalArgumentValue, str, ObservationSpaceSpec
         ] = OptionalArgumentValue.UNCHANGED,
     ) -> Optional[ObservationType]:
-        """Reset the environment state.
-
-        This method must be called before :func:`step()`.
-
-        :param benchmark: The name of the benchmark to use. If provided, it
-            overrides any value that was set during :func:`__init__`, and
-            becomes subsequent calls to :code:`reset()` will use this benchmark.
-            If no benchmark is provided, and no benchmark was provided to
-            :func:`__init___`, the service will randomly select a benchmark to
-            use.
-
-        :param action_space: The name of the action space to use. If provided,
-            it overrides any value that set during :func:`__init__`, and
-            subsequent calls to :code:`reset()` will use this action space. If
-            no action space is provided, the default action space is used.
-
-        :param observation_space: Compute and return observations at each
-            :func:`step()` from this space. Accepts a string name or an
-            :class:`ObservationSpaceSpec
-            <compiler_gym.views.ObservationSpaceSpec>`. If :code:`None`,
-            :func:`step()` returns :code:`None` for the observation value. If
-            :code:`OptionalArgumentValue.UNCHANGED` (the default value), the
-            observation space remains unchanged from the previous episode. For
-            available spaces, see :class:`env.observation.spaces
-            <compiler_gym.views.ObservationView>`.
-
-        :param reward_space: Compute and return reward at each :func:`step()`
-            from this space. Accepts a string name or a :class:`Reward
-            <compiler_gym.spaces.Reward>`. If :code:`None`, :func:`step()`
-            returns :code:`None` for the reward value.  If
-            :code:`OptionalArgumentValue.UNCHANGED` (the default value), the
-            observation space remains unchanged from the previous episode. For
-            available spaces, see :class:`env.reward.spaces
-            <compiler_gym.views.RewardView>`.
-
-        :return: The initial observation.
-
-        :raises BenchmarkInitError: If the benchmark is invalid. In this case,
-            another benchmark must be used.
-
-        :raises TypeError: If no benchmark has been set, and the environment
-            does not have a default benchmark to select from.
-        """
         return self._reset(
             benchmark=benchmark,
             action_space=action_space,
