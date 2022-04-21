@@ -53,9 +53,9 @@ from compiler_gym.spaces import DefaultRewardFromObservation, NamedDiscrete, Rew
 from compiler_gym.util.gym_type_hints import (
     ActionType,
     ObservationType,
+    OptionalArgumentValue,
     RewardType,
     StepType,
-    OptionalArgumentValue,
 )
 from compiler_gym.util.shell_format import plural
 from compiler_gym.util.timer import Timer
@@ -666,9 +666,12 @@ class ClientServiceCompilerEnv(CompilerEnv):
         self,
         benchmark: Optional[Union[str, Benchmark]] = None,
         action_space: Optional[str] = None,
-        retry_count: int = 0,
-        reward_space=OptionalArgumentValue.UNCHANGED,
-        observation_space=OptionalArgumentValue.UNCHANGED,
+        reward_space: Union[
+            OptionalArgumentValue, str, Reward
+        ] = OptionalArgumentValue.UNCHANGED,
+        observation_space: Union[
+            OptionalArgumentValue, str, ObservationSpaceSpec
+        ] = OptionalArgumentValue.UNCHANGED,
     ) -> Optional[ObservationType]:
         """Reset the environment state.
 
@@ -686,6 +689,25 @@ class ClientServiceCompilerEnv(CompilerEnv):
             subsequent calls to :code:`reset()` will use this action space. If
             no action space is provided, the default action space is used.
 
+        :param observation_space: Compute and return observations at each
+            :func:`step()` from this space. Accepts a string name or an
+            :class:`ObservationSpaceSpec
+            <compiler_gym.views.ObservationSpaceSpec>`. If :code:`None`,
+            :func:`step()` returns :code:`None` for the observation value. If
+            :code:`OptionalArgumentValue.UNCHANGED` (the default value), the
+            observation space remains unchanged from the previous episode. For
+            available spaces, see :class:`env.observation.spaces
+            <compiler_gym.views.ObservationView>`.
+
+        :param reward_space: Compute and return reward at each :func:`step()`
+            from this space. Accepts a string name or a :class:`Reward
+            <compiler_gym.spaces.Reward>`. If :code:`None`, :func:`step()`
+            returns :code:`None` for the reward value.  If
+            :code:`OptionalArgumentValue.UNCHANGED` (the default value), the
+            observation space remains unchanged from the previous episode. For
+            available spaces, see :class:`env.reward.spaces
+            <compiler_gym.views.RewardView>`.
+
         :return: The initial observation.
 
         :raises BenchmarkInitError: If the benchmark is invalid. In this case,
@@ -694,12 +716,29 @@ class ClientServiceCompilerEnv(CompilerEnv):
         :raises TypeError: If no benchmark has been set, and the environment
             does not have a default benchmark to select from.
         """
+        return self._reset(
+            benchmark=benchmark,
+            action_space=action_space,
+            observation_space=observation_space,
+            reward_space=reward_space,
+            retry_count=0,
+        )
 
-        if reward_space != OptionalArgumentValue.UNCHANGED:
-            self.reward_space = reward_space
+    def _reset(  # pylint: disable=arguments-differ
+        self,
+        benchmark: Optional[Union[str, Benchmark]],
+        action_space: Optional[str],
+        observation_space: Union[OptionalArgumentValue, str, ObservationSpaceSpec],
+        reward_space: Union[OptionalArgumentValue, str, Reward],
+        retry_count: int,
+    ) -> Optional[ObservationType]:
+        """Private implementation detail. Call `reset()`, not this."""
 
         if observation_space != OptionalArgumentValue.UNCHANGED:
             self.observation_space = observation_space
+
+        if reward_space != OptionalArgumentValue.UNCHANGED:
+            self.reward_space = reward_space
 
         def _retry(error) -> Optional[ObservationType]:
             """Abort and retry on error."""
