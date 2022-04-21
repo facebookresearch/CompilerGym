@@ -20,6 +20,8 @@ def test_benchmark_constructor_arg(env: LlvmEnv):
 
     with gym.make("llvm-v0", benchmark="cbench-v1/dijkstra") as env:
         assert env.benchmark == "benchmark://cbench-v1/dijkstra"
+        env.reset()
+        assert env.benchmark == "benchmark://cbench-v1/dijkstra"
 
 
 def test_benchmark_setter(env: LlvmEnv):
@@ -32,6 +34,44 @@ def test_benchmark_setter(env: LlvmEnv):
 def test_benchmark_set_in_reset(env: LlvmEnv):
     env.reset(benchmark="benchmark://cbench-v1/dijkstra")
     assert env.benchmark == "benchmark://cbench-v1/dijkstra"
+    env.reset()
+    assert env.benchmark == "benchmark://cbench-v1/dijkstra"
+
+
+@pytest.mark.parametrize("reward_space", ["IrInstructionCount", "ObjectTextSizeBytes"])
+def test_reward_space_setter(env: LlvmEnv, reward_space: str):
+    env.reward_space = reward_space
+    assert env.reward_space == reward_space
+    env.reset()
+    assert env.reward_space == reward_space
+
+
+@pytest.mark.parametrize("reward_space", ["IrInstructionCount", "ObjectTextSizeBytes"])
+def test_reward_space_set_in_reset(env: LlvmEnv, reward_space: str):
+    env.reset(reward_space=reward_space)
+    assert env.reward_space == reward_space
+    env.reset()
+    assert env.reward_space == reward_space
+
+
+@pytest.mark.parametrize(
+    "observation_space", ["IrInstructionCount", "ObjectTextSizeBytes"]
+)
+def test_observation_space_setter(env: LlvmEnv, observation_space: str):
+    env.observation_space = observation_space
+    assert env.observation_space_spec == observation_space
+    env.reset()
+    assert env.observation_space_spec == observation_space
+
+
+@pytest.mark.parametrize(
+    "observation_space", ["IrInstructionCount", "ObjectTextSizeBytes"]
+)
+def test_observation_space_set_in_reset(env: LlvmEnv, observation_space: str):
+    env.reset(observation_space=observation_space)
+    assert env.observation_space_spec == observation_space
+    env.reset()
+    assert env.observation_space_spec == observation_space
 
 
 def test_logger_is_deprecated(env: LlvmEnv):
@@ -64,7 +104,7 @@ def test_uri_substring_candidate_no_match_infer_scheme(env: LlvmEnv):
 
 
 def test_reset_to_force_benchmark(env: LlvmEnv):
-    """Reset that calling reset() with a benchmark forces that benchmark to
+    """Test that calling reset() with a benchmark forces that benchmark to
     be used for every subsequent episode.
     """
     env.reset(benchmark="benchmark://cbench-v1/crc32")
@@ -147,9 +187,8 @@ def test_switch_default_reward_space_in_episode(env: LlvmEnv):
     """Test that switching reward space during an episode resets the cumulative
     episode reward.
     """
-    env.reward_space = None
 
-    env.reset()
+    env.reset(reward_space=None)
     _, _, done, info = env.step(0)
     assert not done, info
     assert env.episode_reward is None
@@ -167,9 +206,8 @@ def test_set_same_default_reward_space_in_episode(env: LlvmEnv):
     """Test that setting the reward space during an episode does not reset the
     cumulative episode reward if the reward space is unchanged.
     """
-    env.reward_space = "IrInstructionCount"
 
-    env.reset()
+    env.reset(reward_space="IrInstructionCount")
 
     env.episode_reward = 10
 

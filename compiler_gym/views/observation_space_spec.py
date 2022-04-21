@@ -82,15 +82,17 @@ class ObservationSpaceSpec:
 
     def __eq__(self, rhs) -> bool:
         """Equality check."""
-        if not isinstance(rhs, ObservationSpaceSpec):
-            return False
-        return (
-            self.id == rhs.id
-            and self.index == rhs.index
-            and self.space == rhs.space
-            and self.platform_dependent == rhs.platform_dependent
-            and self.deterministic == rhs.deterministic
-        )
+        if isinstance(rhs, str):
+            return self.id == rhs
+        elif isinstance(rhs, ObservationSpaceSpec):
+            return (
+                self.id == rhs.id
+                and self.index == rhs.index
+                and self.space == rhs.space
+                and self.platform_dependent == rhs.platform_dependent
+                and self.deterministic == rhs.deterministic
+            )
+        return False
 
     @classmethod
     def from_proto(cls, index: int, proto: ObservationSpace):
