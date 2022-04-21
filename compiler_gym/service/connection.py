@@ -6,7 +6,6 @@
 import logging
 import os
 import random
-import shlex
 import shutil
 import subprocess
 import sys
@@ -32,7 +31,7 @@ from compiler_gym.util.runfiles_path import (
     site_data_path,
     transient_cache_path,
 )
-from compiler_gym.util.shell_format import plural
+from compiler_gym.util.shell_format import join_cmd, plural
 from compiler_gym.util.truncate import truncate_lines
 
 GRPC_CHANNEL_OPTIONS = [
@@ -386,7 +385,7 @@ class ManagedConnection(Connection):
             " ".join(f"{k}={v}" for k, v in script_env.items()) + " "
             if script_env
             else "",
-            shlex.join(cmd),
+            join_cmd(cmd),
         )
 
         self.process = subprocess.Popen(
