@@ -20,13 +20,11 @@ from getpass import getuser
 import gym
 import pytest
 
-import examples.example_compiler_gym_service as dummy
-from compiler_gym.envs import CompilerEnv, LlvmEnv, llvm
-from compiler_gym.service import CompilerGymServiceConnection
-from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
-from compiler_gym.service import CompilerGymServiceConnection, ConnectionOpts
 import examples.example_compiler_gym_service  # noqa Environment import.
-from compiler_gym.envs import CompilerEnv
+import examples.example_compiler_gym_service as dummy  # noqa Environment import.
+from compiler_gym.envs import CompilerEnv, LlvmEnv, llvm
+from compiler_gym.service import CompilerGymServiceConnection, ConnectionOpts
+from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
 from tests.pytest_plugins.llvm import OBSERVATION_SPACE_NAMES, REWARD_SPACE_NAMES
 from tests.test_main import main
 
