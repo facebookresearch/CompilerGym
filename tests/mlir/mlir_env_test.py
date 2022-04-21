@@ -268,7 +268,10 @@ def test_mlir_rl_wrapper_env_reset(env: MlirEnv):
 
 @flaky(max_runs=3, min_passes=1)
 @pytest.mark.filterwarnings(
-    "ignore:`np.bool` is a deprecated alias for the builtin `bool`."
+    "ignore:`np\\.bool` is a deprecated alias for the builtin `bool`\\.",
+    "ignore:Mean of empty slice",
+    "ignore::ResourceWarning",
+    "ignore:using `dtype=` in comparisons is only useful for `dtype=object`",
 )
 def test_ppo_train_smoke():
     ray.shutdown()
