@@ -268,10 +268,12 @@ def test_mlir_rl_wrapper_env_reset(env: MlirEnv):
 
 @flaky(max_runs=3, min_passes=1)
 def test_ppo_train_smoke():
+    ray.shutdown()
     seed = 123
     np.random.seed(seed)
     random.seed(seed)
     torch.manual_seed(seed)
+    ray.init(local_mode=True)  # Runs PPO training in the same process
     register_env(
         "mlir_rl_env-v0", lambda env_config: MlirRlWrapperEnv(env=gym.make("mlir-v0"))
     )
@@ -290,8 +292,6 @@ def test_ppo_train_smoke():
         "num_sgd_iter": 1,
         "rollout_fragment_length": 2,
     }
-    ray.shutdown()
-    ray.init(local_mode=True)  # Runs PPO training in the same process
     trainer = PPOTrainer(config=config)
     trainer.train()
     ray.shutdown()
