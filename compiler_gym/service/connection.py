@@ -6,6 +6,7 @@
 import logging
 import os
 import random
+import shlex
 import shutil
 import subprocess
 import sys
@@ -380,7 +381,14 @@ class ManagedConnection(Connection):
         # Add any custom environment variables
         env.update(script_env)
 
-        logger.debug("Exec %s", cmd)
+        logger.debug(
+            "Exec `%s%s`",
+            " ".join(f"{k}={v}" for k, v in script_env.items()) + " "
+            if script_env
+            else "",
+            shlex.join(cmd),
+        )
+
         self.process = subprocess.Popen(
             cmd,
             env=env,
