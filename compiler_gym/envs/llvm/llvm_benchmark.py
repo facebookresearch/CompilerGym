@@ -6,6 +6,7 @@
 import logging
 import os
 import random
+import shlex
 import subprocess
 import sys
 import tempfile
@@ -17,7 +18,7 @@ from typing import Iterable, List, Optional, Union
 
 from compiler_gym.datasets import Benchmark, BenchmarkInitError
 from compiler_gym.third_party import llvm
-from compiler_gym.util.commands import Popen, run_command
+from compiler_gym.util.commands import Popen, communicate, run_command
 from compiler_gym.util.runfiles_path import transient_cache_path
 from compiler_gym.util.thread_pool import get_thread_pool_executor
 
@@ -35,38 +36,50 @@ class UnableToParseHostCompilerOutput(HostCompilerFailure):
 
 def _get_system_library_flags(compiler: str) -> Iterable[str]:
     """Private implementation function."""
-    # Create a temporary directory to write the compiled binary to, since GNU
+    # Create a temporary file to write the compiled binary to, since GNU
     # assembler does not support piping to stdout.
     transient_cache = transient_cache_path(".")
     transient_cache.mkdir(parents=True, exist_ok=True)
     with tempfile.NamedTemporaryFile(dir=transient_cache) as f:
-        try:
-            cmd = [compiler, "-xc++", "-v", "-", "-o", f.name]
-            # On macOS we need to compile a binary to invoke the linker.
-            if sys.platform != "darwin":
-                cmd.append("-c")
-            with Popen(
-                cmd,
-                stdout=subprocess.DEVNULL,
-                stderr=subprocess.PIPE,
-                stdin=subprocess.PIPE,
-                universal_newlines=True,
-            ) as process:
-                _, stderr = process.communicate(
-                    input="int main(){return 0;}", timeout=30
-                )
-                if process.returncode:
-                    raise HostCompilerFailure(
-                        f"Failed to invoke '{compiler}'. "
-                        f"Is there a working system compiler?\n"
-                        f"Error: {stderr.strip()}"
+        cmd = [compiler, "-xc++", "-v", "-", "-o", f.name]
+        # On macOS we need to compile a binary to invoke the linker.
+        if sys.platform != "darwin":
+            cmd.append("-c")
+
+        # Retry loop to permit timeouts, though unlikely, in case of a
+        # heavily overloaded system (I have observed CI failures because
+        # of this).
+        for _ in range(3):
+            try:
+                with Popen(
+                    cmd,
+                    stdout=subprocess.DEVNULL,
+                    stderr=subprocess.PIPE,
+                    stdin=subprocess.PIPE,
+                    universal_newlines=True,
+                ) as process:
+                    _, stderr = communicate(
+                        process=process, input="int main(){return 0;}", timeout=30
                     )
-        except FileNotFoundError as e:
+                    if process.returncode:
+                        raise HostCompilerFailure(
+                            f"Failed to invoke '{compiler}'. "
+                            f"Is there a working system compiler?\n"
+                            f"Error: {stderr.strip()}"
+                        )
+                    break
+            except subprocess.TimeoutExpired:
+                continue
+            except FileNotFoundError as e:
+                raise HostCompilerFailure(
+                    f"Failed to invoke '{compiler}'. "
+                    f"Is there a working system compiler?\n"
+                    f"Error: {e}"
+                ) from e
+        else:
             raise HostCompilerFailure(
-                f"Failed to invoke '{compiler}'. "
-                f"Is there a working system compiler?\n"
-                f"Error: {e}"
-            ) from e
+                f"Compiler invocation '{shlex.join(cmd)}' timed out after 3 attempts."
+            )
 
     # Parse the compiler output that matches the conventional output format
     # used by clang and GCC:
