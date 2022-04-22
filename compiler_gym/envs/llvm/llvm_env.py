@@ -684,10 +684,12 @@ class LlvmEnv(ClientServiceCompilerEnv):
         if isinstance(cmd, str):
             cmd = shlex.split(cmd)
 
+        if len(cmd) < 2:
+            raise ValueError(f"Input command line '{join_cmd(cmd)}' is too short")
+
         # Append include flags for the system headers if requested.
         if system_includes:
-            for directory in get_system_library_flags():
-                cmd += ["-isystem", str(directory)]
+            cmd += get_system_library_flags()
 
         # Use the CompilerGym clang binary in place of the original driver.
         if replace_driver:

@@ -313,29 +313,44 @@ def test_make_benchmark_from_command_line_empty_input(env: LlvmEnv):
         env.make_benchmark_from_command_line([])
 
 
+@pytest.mark.parametrize("cmd", ["gcc", ["gcc"]])
+def test_make_benchmark_from_command_line_insufficient_args(env: LlvmEnv, cmd):
+    with pytest.raises(ValueError, match="Input command line 'gcc' is too short"):
+        env.make_benchmark_from_command_line(cmd)
+
+
+@pytest.mark.parametrize("cmd", ["gcc in.c -o foo", ["gcc", "in.c", "-o", "foo"]])
+def test_make_benchmark_from_command_line_build_cmd(env: LlvmEnv, cmd):
+    with temporary_working_directory() as cwd:
+        with open("in.c", "w") as f:
+            f.write("int main() { return 0; }")
+
+        bm = env.make_benchmark_from_command_line(cmd, system_includes=False)
+
+        assert bm.proto.dynamic_config.build_cmd.argument[:4] == [
+            str(llvm_paths.clang_path()),
+            "-xir",
+            "$IN",
+            "-o",
+        ]
+        assert bm.proto.dynamic_config.build_cmd.argument[-1].endswith(f"{cwd}/foo")
+
+
 @pytest.mark.parametrize("cmd", ["gcc in.c -o foo", ["gcc", "in.c", "-o", "foo"]])
 def test_make_benchmark_from_command_line(env: LlvmEnv, cmd):
     with temporary_working_directory() as cwd:
         with open("in.c", "w") as f:
             f.write("int main() { return 0; }")
 
-        bm = env.make_benchmark_from_command_line(
-            cmd,
-            system_includes=False,
-        )
+        bm = env.make_benchmark_from_command_line(cmd)
+        assert not (cwd / "foo").is_file()
 
         env.reset(benchmark=bm)
         assert "main()" in env.ir
 
-        assert bm.proto.dynamic_config.build_cmd.argument == [
-            str(llvm_paths.clang_path()),
-            "-xir",
-            "$IN",
-            "-o",
-            f"{cwd}/foo",
-        ]
+        assert (cwd / "foo").is_file()
 
-        assert not (cwd / "foo").is_file()
+        (cwd / "foo").unlink()
         bm.compile(env)
         assert (cwd / "foo").is_file()
 
