@@ -126,10 +126,10 @@ def test_set_observation_space_from_spec(env: MlirEnv):
 
 
 def test_set_reward_space_from_spec(env: MlirEnv):
-    env.reward_space = env.reward.spaces["IsRunnable"]
+    env.reward_space = env.reward.spaces["runtime"]
     reward = env.reward_space
 
-    env.reward_space = "IsRunnable"
+    env.reward_space = "runtime"
     assert env.reward_space == reward
 
 

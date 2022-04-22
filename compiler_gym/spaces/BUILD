@@ -19,6 +19,7 @@ py_library(
         ":named_discrete",
         ":permutation",
         ":reward",
+        ":runtime_reward",
         ":scalar",
         ":sequence",
         ":space_sequence",
@@ -71,6 +72,15 @@ py_library(
     srcs = ["reward.py"],
     deps = [
         ":scalar",
+        "//compiler_gym/util",
+    ],
+)
+
+py_library(
+    name = "runtime_reward",
+    srcs = ["runtime_reward.py"],
+    deps = [
+        ":reward",
         "//compiler_gym/util",
     ],
 )

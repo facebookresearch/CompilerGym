@@ -6,13 +6,12 @@ from collections.abc import Mapping
 from copy import deepcopy
 from math import factorial
 from numbers import Integral
-from typing import Callable, Iterable, List, Optional, Union
+from typing import Iterable, Optional, Union
 
 import numpy as np
 from gym.spaces import Space
 
 from compiler_gym.envs import CompilerEnv
-from compiler_gym.service import ServiceError
 from compiler_gym.spaces import Box
 from compiler_gym.spaces import Dict as DictSpace
 from compiler_gym.spaces import (
@@ -28,62 +27,6 @@ from compiler_gym.util.gym_type_hints import ActionType, ObservationType, StepTy
 from compiler_gym.util.permutation import convert_number_to_permutation
 from compiler_gym.views import ObservationSpaceSpec
 from compiler_gym.wrappers.core import ConversionWrapperEnv
-
-
-class RuntimeReward(Reward):
-    def __init__(
-        self,
-        runtime_count: int,
-        estimator: Callable[[Iterable[float]], float],
-    ):
-        super().__init__(
-            name="runtime",
-            observation_spaces=["Runtime"],
-            # TODO(boian): choose a value dynamically based on past rewards.
-            default_value=-1,
-            min=None,
-            max=None,
-            default_negates_returns=True,
-            deterministic=False,
-            platform_dependent=True,
-        )
-        self.runtime_count = runtime_count
-        self.starting_runtime: Optional[float] = None
-        self.previous_runtime: Optional[float] = None
-        self.current_benchmark: Optional[str] = None
-        self.estimator = estimator
-
-    def reset(self, benchmark, observation_view) -> None:
-        # If we are changing the benchmark then check that it is runnable.
-        if benchmark != self.current_benchmark:
-            self.current_benchmark = benchmark
-            self.starting_runtime = None
-
-        # Compute initial runtime if required, else use previously computed
-        # value.
-        if self.starting_runtime is None:
-            self.starting_runtime = self.estimator(observation_view["Runtime"])
-
-        self.previous_runtime = self.starting_runtime
-
-    def update(
-        self,
-        actions: List[int],
-        observations: List[ObservationType],
-        observation_view,
-    ) -> float:
-        del actions  # unused
-        del observation_view  # unused
-        runtimes = observations[0]
-        if len(runtimes) != self.runtime_count:
-            raise ServiceError(
-                f"Expected {self.runtime_count} runtimes but received {len(runtimes)}"
-            )
-        runtime = self.estimator(runtimes)
-
-        reward = self.previous_runtime - runtime
-        self.previous_runtime = runtime
-        return reward
 
 
 def convert_permutation_to_discrete_space(permutation: Permutation) -> Discrete:
@@ -211,21 +154,11 @@ class MlirRlWrapperEnv(ConversionWrapperEnv):
     def __init__(
         self,
         env: CompilerEnv,
-        runtime_count: int = 1,
-        reward_estimator: Callable[[Iterable[float]], float] = np.median,
         max_subactions: Optional[Integral] = None,
     ):
         super().__init__(env)
-        self.env.unwrapped.reward.add_space(
-            RuntimeReward(
-                runtime_count=runtime_count,
-                estimator=reward_estimator,
-            )
-        )
-        self.env.unwrapped.runtime_observation_count = runtime_count
-        self.env.unwrapped.reset()
-        self.env.unwrapped.reward_space = "runtime"
-        self.env.unwrapped.observation_space = "Runtime"
+        env.reward_space = "runtime"
+        env.observation_space = "Runtime"
         self.max_subactions = max_subactions
 
     def convert_action_space(self, space: Space) -> Space:

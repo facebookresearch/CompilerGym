@@ -6,10 +6,12 @@
 from pathlib import Path
 from typing import Iterable, List, Optional, Union
 
+import numpy as np
+
 from compiler_gym.datasets import Benchmark, Dataset
 from compiler_gym.envs.mlir.datasets import get_mlir_datasets
 from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
-from compiler_gym.spaces import Reward
+from compiler_gym.spaces import Reward, RuntimeReward
 from compiler_gym.util.gym_type_hints import ActionType
 from compiler_gym.views import ObservationSpaceSpec
 
@@ -34,16 +36,30 @@ class MlirEnv(ClientServiceCompilerEnv):
         *args,
         benchmark: Optional[Union[str, Benchmark]] = None,
         datasets_site_path: Optional[Path] = None,
+        rewards: Optional[List[Reward]] = None,
         **kwargs
     ):
         super().__init__(
             *args,
             **kwargs,
+            rewards=[
+                RuntimeReward(
+                    runtime_count=1,
+                    warmup_count=0,
+                    estimator=np.median,
+                    default_value=-1,
+                )
+            ]
+            if rewards is None
+            else rewards,
             datasets=_get_mlir_datasets(site_data_base=datasets_site_path),
             benchmark=benchmark
         )
 
         self._runtimes_per_observation_count: Optional[int] = None
+        self.reset()
+        if rewards is None:
+            self.reward.spaces["runtime"].runtime_count = self.runtime_observation_count
 
     @property
     def runtime_observation_count(self) -> int:
