@@ -732,7 +732,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
                     f"Last error ({type(error).__name__}): {error}"
                 ) from error
             else:
-                return self.reset(
+                return self._reset(
                     benchmark=benchmark,
                     action_space=action_space,
                     retry_count=retry_count + 1,
