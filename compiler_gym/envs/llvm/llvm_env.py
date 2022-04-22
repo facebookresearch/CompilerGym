@@ -36,6 +36,7 @@ from compiler_gym.third_party.inst2vec import Inst2vecEncoder
 from compiler_gym.third_party.llvm import clang_path, download_llvm_files
 from compiler_gym.third_party.llvm.instcount import INST_COUNT_FEATURE_NAMES
 from compiler_gym.util.commands import Popen
+from compiler_gym.util.shell_format import join_cmd
 
 _INST2VEC_ENCODER = Inst2vecEncoder()
 
@@ -717,14 +718,14 @@ class LlvmEnv(ClientServiceCompilerEnv):
             emit_bitcode_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE
         ) as llvm_link:
             logger.debug(
-                f"Generating LLVM bitcode benchmark: {shlex.join(emit_bitcode_command)}"
+                f"Generating LLVM bitcode benchmark: {join_cmd(emit_bitcode_command)}"
             )
             bitcode, stderr = llvm_link.communicate(timeout=timeout)
             if llvm_link.returncode:
                 raise BenchmarkInitError(
                     f"Failed to generate LLVM bitcode with error:\n"
                     f"{stderr.decode('utf-8').rstrip()}\n"
-                    f"Running command: {shlex.join(emit_bitcode_command)}"
+                    f"Running command: {join_cmd(emit_bitcode_command)}"
                 )
 
         return BenchmarkFromCommandLine(cmd, bitcode, timeout)

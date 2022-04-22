@@ -3,7 +3,6 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 import logging
-import shlex
 import subprocess
 import tempfile
 import urllib.parse
@@ -15,15 +14,14 @@ from compiler_gym.service.proto import File
 from compiler_gym.third_party.gccinvocation.gccinvocation import GccInvocation
 from compiler_gym.util.commands import Popen
 from compiler_gym.util.runfiles_path import transient_cache_path
+from compiler_gym.util.shell_format import join_cmd
 
 logger = logging.getLogger(__name__)
 
 
 class BenchmarkFromCommandLine(Benchmark):
     def __init__(self, command_line: List[str], bitcode: bytes, timeout: int):
-        uri = (
-            f"benchmark://clang-v0/{urllib.parse.quote_plus(shlex.join(command_line))}"
-        )
+        uri = f"benchmark://clang-v0/{urllib.parse.quote_plus(join_cmd(command_line))}"
         super().__init__(
             proto=BenchmarkProto(uri=str(uri), program=File(contents=bitcode))
         )
@@ -58,7 +56,7 @@ class BenchmarkFromCommandLine(Benchmark):
             cmd = list(self.proto.dynamic_config.build_cmd.argument).copy()
             cmd = [bitcode_path if c == "$IN" else c for c in cmd]
 
-            logger.debug(f"$ {shlex.join(cmd)}")
+            logger.debug(f"$ {join_cmd(cmd)}")
 
             with Popen(
                 cmd,
@@ -71,5 +69,5 @@ class BenchmarkFromCommandLine(Benchmark):
                 raise BenchmarkInitError(
                     f"Failed to lower LLVM bitcode with error:\n"
                     f"{stdout.decode('utf-8').rstrip()}\n"
-                    f"Running command: {shlex.join(cmd)}"
+                    f"Running command: {join_cmd(cmd)}"
                 )
