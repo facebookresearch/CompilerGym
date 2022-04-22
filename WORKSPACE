@@ -102,10 +102,10 @@ rules_proto_toolchains()
 # Version should be kept in step with compiler_gym/requirements.txt.
 http_archive(
     name = "com_github_grpc_grpc",
-    sha256 = "1a5127c81487f4e3e57973bb332f04b9159f94d860c207e096d8a587d371edbd",
-    strip_prefix = "grpc-1.36.0",
+    sha256 = "e18b16f7976aab9a36c14c38180f042bb0fd196b75c9fd6a20a2b5f934876ad6",
+    strip_prefix = "grpc-1.45.2",
     urls = [
-        "https://github.com/grpc/grpc/archive/v1.36.0.tar.gz",
+        "https://github.com/grpc/grpc/archive/v1.45.2.tar.gz",
     ],
 )
 
@@ -334,9 +334,9 @@ boost_deps()
 
 http_archive(
     name = "programl",
-    sha256 = "704826311b842b3ffc2dedcce593fdd319d76e95bdf5386985768007ebb22316",
-    strip_prefix = "ProGraML-83f00233b04f4ecf7f12a79c80ffe23c2953913f",
-    urls = ["https://github.com/ChrisCummins/ProGraML/archive/83f00233b04f4ecf7f12a79c80ffe23c2953913f.tar.gz"],
+    sha256 = "dbe16a96963c31620bcd7fb60cad7cab76f67e413c70f11ea38347e389f9e1de",
+    strip_prefix = "ProGraML-2b18ea3f1b7ba5668c4f594c555ccb52d735d4bc",
+    urls = ["https://github.com/ChrisCummins/ProGraML/archive/2b18ea3f1b7ba5668c4f594c555ccb52d735d4bc.tar.gz"],
 )
 
 load("@programl//tools:bzl/deps.bzl", "programl_deps")
