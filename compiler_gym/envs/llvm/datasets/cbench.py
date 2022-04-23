@@ -23,13 +23,13 @@ from compiler_gym.datasets import Benchmark, TarDatasetWithManifest
 from compiler_gym.datasets.benchmark import ValidationCallback
 from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.envs.llvm import llvm_benchmark
+from compiler_gym.errors import ValidationError
 from compiler_gym.service.proto import BenchmarkDynamicConfig, Command
 from compiler_gym.third_party import llvm
 from compiler_gym.util.commands import Popen
 from compiler_gym.util.download import download
 from compiler_gym.util.runfiles_path import cache_path, site_data_path
 from compiler_gym.util.timer import Timer
-from compiler_gym.validation_result import ValidationError
 
 logger = logging.getLogger(__name__)
 

@@ -15,7 +15,8 @@ from functools import lru_cache
 from pathlib import Path
 from typing import Iterable, List, Optional, Union
 
-from compiler_gym.datasets import Benchmark, BenchmarkInitError
+from compiler_gym.datasets import Benchmark
+from compiler_gym.errors import BenchmarkInitError
 from compiler_gym.third_party import llvm
 from compiler_gym.util.commands import Popen, run_command
 from compiler_gym.util.runfiles_path import transient_cache_path

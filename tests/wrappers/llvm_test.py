@@ -8,6 +8,7 @@ import pytest
 from flaky import flaky
 
 from compiler_gym.envs.llvm import LlvmEnv
+from compiler_gym.errors import BenchmarkInitError
 from compiler_gym.wrappers import RuntimePointEstimateReward
 from tests.test_main import main
 
@@ -40,7 +41,7 @@ def test_reward_range_not_runnable_benchmark(env: LlvmEnv):
     env = RuntimePointEstimateReward(env, runtime_count=3)
 
     with pytest.raises(
-        ValueError, match=r"^Benchmark is not runnable: benchmark://npb-v0/1$"
+        BenchmarkInitError, match=r"^Benchmark is not runnable: benchmark://npb-v0/1$"
     ):
         env.reset(benchmark="benchmark://npb-v0/1")
 

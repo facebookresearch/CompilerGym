@@ -25,6 +25,7 @@ cg_py_test(
     "all_actions_single_step_test.py"
   DEPS
     compiler_gym::envs::envs
+    compiler_gym::errors::errors
     compiler_gym::third_party::autophase::autophase
     tests::pytest_plugins::llvm
     tests::test_main
@@ -55,6 +56,7 @@ cg_py_test(
     ::custom_benchmarks_test_files
   DEPS
     compiler_gym::envs::envs
+    compiler_gym::errors::errors
     compiler_gym::service::proto::proto
     compiler_gym::util::util
     tests::pytest_plugins::common
@@ -165,6 +167,7 @@ cg_py_test(
   DATA
     invalid_ir_test_files
   DEPS
+    compiler_gym::errors::errors
     compiler_gym::util::util
     tests::pytest_plugins::common
     tests::pytest_plugins::llvm
@@ -203,6 +206,7 @@ cg_py_test(
     "llvm_session_parameters_test.py"
   DEPS
     compiler_gym::envs::envs
+    compiler_gym::errors::errors
     tests::pytest_plugins::llvm
     tests::test_main
 )
@@ -271,6 +275,7 @@ cg_py_test(
   DEPS
     compiler_gym::compiler_gym
     compiler_gym::envs::envs
+    compiler_gym::errors::errors
     compiler_gym::third_party::autophase::autophase
     compiler_gym::util::util
     tests::pytest_plugins::llvm

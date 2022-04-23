@@ -6,12 +6,13 @@ from concurrent.futures import as_completed
 from pathlib import Path
 from typing import Callable, Iterable, List, NamedTuple, Optional, Union
 
+import compiler_gym.errors
 from compiler_gym.datasets.uri import BenchmarkUri
+from compiler_gym.errors import ValidationError
 from compiler_gym.service.proto import Benchmark as BenchmarkProto
 from compiler_gym.service.proto import File
 from compiler_gym.util import thread_pool
 from compiler_gym.util.decorators import memoized_property
-from compiler_gym.validation_error import ValidationError
 
 # A validation callback is a function that takes a single CompilerEnv instance
 # as its argument and returns an iterable sequence of zero or more
@@ -312,8 +313,10 @@ class Benchmark:
         return self < other or self == other
 
 
-class BenchmarkInitError(OSError):
-    """Base class for errors raised if a benchmark fails to initialize."""
+# Deprecated since v0.2.4.
+# This type is form backwards compatibility that will be removed in a future release.
+# Please, use errors from `compiler_gym.errors`.
+BenchmarkInitError = compiler_gym.errors.BenchmarkInitError
 
 
 class BenchmarkWithSource(Benchmark):

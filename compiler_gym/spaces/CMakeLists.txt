@@ -85,6 +85,7 @@ cg_py_library(
     "runtime_reward.py"
   DEPS
     ::reward
+    compiler_gym::errors::errors
     compiler_gym::util::util
   PUBLIC
 )

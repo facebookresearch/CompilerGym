@@ -10,8 +10,7 @@ import numpy as np
 import pytest
 
 import compiler_gym.envs.gcc  # noqa register environments
-from compiler_gym.service import SessionNotFound
-from compiler_gym.service.connection import ServiceError
+from compiler_gym.errors import ServiceError, SessionNotFound
 from compiler_gym.spaces import Scalar, Sequence
 from tests.pytest_plugins.common import with_docker, without_docker
 from tests.pytest_plugins.gcc import docker_is_available, with_gcc_support

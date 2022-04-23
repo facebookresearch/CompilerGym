@@ -14,6 +14,7 @@ if(COMPILER_GYM_ENABLE_LLVM_ENV)
       DEPS
         compiler_gym::compiler_gym
         compiler_gym::envs::envs
+        compiler_gym::errors::errors
         compiler_gym::service::service
         tests::test_main
     )

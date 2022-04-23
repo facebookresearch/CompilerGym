@@ -7,7 +7,7 @@
 import numpy as np
 
 from compiler_gym.envs import CompilerEnv
-from compiler_gym.service.connection import ServiceError
+from compiler_gym.errors import ServiceError
 from compiler_gym.third_party.autophase import AUTOPHASE_FEATURE_DIM
 from tests.test_main import main
 

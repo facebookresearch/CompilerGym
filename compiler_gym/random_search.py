@@ -15,7 +15,7 @@ import humanize
 
 from compiler_gym import config
 from compiler_gym.envs import CompilerEnv
-from compiler_gym.service.connection import ServiceError
+from compiler_gym.errors import ServiceError
 from compiler_gym.util import logs
 from compiler_gym.util.gym_type_hints import ActionType
 from compiler_gym.util.logs import create_logging_dir

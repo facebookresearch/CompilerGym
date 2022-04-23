@@ -35,6 +35,7 @@ py_library(
     visibility = ["//compiler_gym:__subpackages__"],
     deps = [
         "//compiler_gym/datasets",
+        "//compiler_gym/errors",
         "//compiler_gym/service/proto",
         "//compiler_gym/third_party/llvm",
         "//compiler_gym/util",
@@ -49,6 +50,7 @@ py_library(
         ":llvm_rewards",
         "//compiler_gym/datasets",
         "//compiler_gym/envs/llvm/datasets",
+        "//compiler_gym/errors",
         "//compiler_gym/service:client_service_compiler_env",
         "//compiler_gym/spaces",
         "//compiler_gym/third_party/autophase",

@@ -47,6 +47,7 @@ cg_py_test(
   SRCS "llvm_test.py"
   DEPS
     compiler_gym::envs::llvm::llvm
+    compiler_gym::errors::errors
     compiler_gym::wrappers::wrappers
     tests::test_main
     tests::pytest_plugins::llvm

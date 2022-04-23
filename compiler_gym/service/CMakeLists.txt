@@ -16,6 +16,7 @@ cg_py_library(
     # TODO(github.com/facebookresearch/CompilerGym/pull/633):
     # add this after circular dependencies are resolved
     #::client_service_compiler_env
+    compiler_gym::errors::errors
     compiler_gym::service::proto::proto
   PUBLIC
 )
@@ -51,6 +52,7 @@ cg_py_library(
   SRCS
     "connection.py"
   DEPS
+    compiler_gym::errors::errors
     compiler_gym::service::proto::proto
     compiler_gym::util::util
   PUBLIC
@@ -63,6 +65,7 @@ cg_py_library(
     "client_service_compiler_env.py"
   DEPS
     compiler_gym::envs::compiler_env
+    compiler_gym::errors::errors
     compiler_gym::compiler_env_state
     compiler_gym::datasets::datasets
     compiler_gym::service::service

@@ -22,15 +22,15 @@ from compiler_gym.compiler_env_state import CompilerEnvState
 from compiler_gym.datasets import Benchmark, Dataset, Datasets
 from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.envs.compiler_env import CompilerEnv
-from compiler_gym.service import (
-    CompilerGymServiceConnection,
-    ConnectionOpts,
+from compiler_gym.errors import (
     ServiceError,
+    ServiceIsClosed,
     ServiceOSError,
     ServiceTransportError,
     SessionNotFound,
+    ValidationError,
 )
-from compiler_gym.service.connection import ServiceIsClosed
+from compiler_gym.service import CompilerGymServiceConnection, ConnectionOpts
 from compiler_gym.service.proto import ActionSpace, AddBenchmarkRequest
 from compiler_gym.service.proto import Benchmark as BenchmarkProto
 from compiler_gym.service.proto import (
@@ -58,7 +58,6 @@ from compiler_gym.util.gym_type_hints import (
 )
 from compiler_gym.util.shell_format import plural
 from compiler_gym.util.timer import Timer
-from compiler_gym.validation_error import ValidationError
 from compiler_gym.validation_result import ValidationResult
 from compiler_gym.views import ObservationSpaceSpec, ObservationView, RewardView
 

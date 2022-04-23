@@ -18,6 +18,7 @@ py_library(
         "//compiler_gym/bin",
         "//compiler_gym/datasets",
         "//compiler_gym/envs",
+        "//compiler_gym/errors",
         "//compiler_gym/leaderboard",
         "//compiler_gym/service",
         "//compiler_gym/spaces",
@@ -55,7 +56,7 @@ py_library(
     deps = [
         ":config",
         "//compiler_gym/envs",
-        "//compiler_gym/service:connection",
+        "//compiler_gym/errors",
         "//compiler_gym/util",
     ],
 )
@@ -77,6 +78,7 @@ py_library(
     name = "validation_error",
     srcs = ["validation_error.py"],
     visibility = ["//compiler_gym:__subpackages__"],
+    deps = ["//compiler_gym/errors"],
 )
 
 py_library(
@@ -86,6 +88,7 @@ py_library(
     deps = [
         ":compiler_env_state",
         ":validation_error",
+        "//compiler_gym/errors",
         "//compiler_gym/util",
     ],
 )

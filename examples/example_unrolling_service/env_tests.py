@@ -13,7 +13,7 @@ import pytest
 import compiler_gym
 import examples.example_unrolling_service as unrolling_service
 from compiler_gym.envs import CompilerEnv
-from compiler_gym.service import SessionNotFound
+from compiler_gym.errors import SessionNotFound
 from compiler_gym.spaces import Box, NamedDiscrete, Scalar, Sequence
 from compiler_gym.util.commands import Popen
 from tests.test_main import main

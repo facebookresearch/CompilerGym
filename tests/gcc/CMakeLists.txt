@@ -12,7 +12,7 @@ cg_py_test(
     "gcc_bin_test.py"
   DEPS
     compiler_gym::envs::gcc::gcc
-    compiler_gym::service::service
+    compiler_gym::errors::errors
     tests::pytest_plugins::gcc
     tests::test_main
 )
@@ -24,7 +24,7 @@ cg_py_test(
     "gcc_docker_test.py"
   DEPS
     compiler_gym::envs::gcc::gcc
-    compiler_gym::service::service
+    compiler_gym::errors::errors
     tests::pytest_plugins::common
     tests::test_main
 )
@@ -36,7 +36,7 @@ cg_py_test(
     "gcc_env_test.py"
   DEPS
     compiler_gym::envs::gcc::gcc
-    compiler_gym::service::service
+    compiler_gym::errors::errors
     compiler_gym::spaces::spaces
     tests::pytest_plugins::common
     tests::pytest_plugins::gcc

@@ -32,6 +32,7 @@ cg_py_library(
     compiler_gym::bin::bin
     compiler_gym::datasets::datasets
     compiler_gym::envs::envs
+    compiler_gym::errors::errors
     compiler_gym::leaderboard::leaderboard
     compiler_gym::service::service
     compiler_gym::spaces::spaces
@@ -71,7 +72,7 @@ cg_py_library(
     "random_search.py"
   DEPS
     compiler_gym::envs::envs
-    compiler_gym::service::connection
+    compiler_gym::errors::errors
     compiler_gym::util::util
   PUBLIC
 )
@@ -95,6 +96,8 @@ cg_py_library(
     validation_error
   SRCS
     "validation_error.py"
+  DEPS
+    compiler_gym::errors::errors
   PUBLIC
 )
 
@@ -105,6 +108,7 @@ cg_py_library(
     "validation_result.py"
   DEPS
     ::compiler_env_state
+    compiler_gym::errors::errors
     ::validation_error
     compiler_gym::util::util
   PUBLIC

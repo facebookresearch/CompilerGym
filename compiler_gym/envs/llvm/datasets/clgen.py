@@ -14,10 +14,11 @@ from typing import List
 
 from fasteners import InterProcessLock
 
-from compiler_gym.datasets import Benchmark, BenchmarkInitError, TarDatasetWithManifest
+from compiler_gym.datasets import Benchmark, TarDatasetWithManifest
 from compiler_gym.datasets.benchmark import BenchmarkWithSource
 from compiler_gym.datasets.uri import BenchmarkUri
 from compiler_gym.envs.llvm.llvm_benchmark import ClangInvocation
+from compiler_gym.errors import BenchmarkInitError
 from compiler_gym.util.commands import Popen, communicate
 from compiler_gym.util.download import download
 from compiler_gym.util.filesystem import atomic_file_write

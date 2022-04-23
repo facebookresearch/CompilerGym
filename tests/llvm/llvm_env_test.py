@@ -19,7 +19,7 @@ from compiler_gym.compiler_env_state import (
 )
 from compiler_gym.envs import CompilerEnv, llvm
 from compiler_gym.envs.llvm.llvm_env import LlvmEnv
-from compiler_gym.service import ServiceError
+from compiler_gym.errors import ServiceError
 from compiler_gym.service.connection import CompilerGymServiceConnection
 from tests.pytest_plugins import llvm as llvm_plugin
 from tests.test_main import main

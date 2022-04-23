@@ -5,6 +5,7 @@
 
 from typing import Callable, Iterable, List, Optional
 
+from compiler_gym.errors import BenchmarkInitError, ServiceError
 from compiler_gym.spaces.reward import Reward
 from compiler_gym.util.gym_type_hints import ActionType, ObservationType
 
@@ -38,7 +39,7 @@ class RuntimeReward(Reward):
         # If we are changing the benchmark then check that it is runnable.
         if benchmark != self.current_benchmark:
             if not observation_view["IsRunnable"]:
-                raise ValueError(f"Benchmark is not runnable: {benchmark}")
+                raise BenchmarkInitError(f"Benchmark is not runnable: {benchmark}")
             self.current_benchmark = benchmark
             self.starting_runtime = None
 
@@ -59,7 +60,7 @@ class RuntimeReward(Reward):
         del observation_view  # unused
         runtimes = observations[0]
         if len(runtimes) != self.runtime_count:
-            raise ValueError(
+            raise ServiceError(
                 f"Expected {self.runtime_count} runtimes but received {len(runtimes)}"
             )
         runtime = self.estimator(runtimes)

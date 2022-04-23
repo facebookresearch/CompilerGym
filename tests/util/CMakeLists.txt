@@ -32,6 +32,7 @@ cg_py_test(
   SRCS
     "download_test.py"
   DEPS
+    compiler_gym::errors::errors
     compiler_gym::util::util
     tests::test_main
 )

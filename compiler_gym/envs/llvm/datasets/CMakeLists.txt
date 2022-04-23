@@ -22,6 +22,7 @@ cg_py_library(
   DEPS
     compiler_gym::datasets::datasets
     compiler_gym::envs::llvm::llvm_benchmark
+    compiler_gym::errors::errors
     compiler_gym::service::proto::proto
     compiler_gym::third_party::llvm::llvm
     compiler_gym::util::util

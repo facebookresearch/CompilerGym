@@ -81,6 +81,7 @@ py_library(
     srcs = ["runtime_reward.py"],
     deps = [
         ":reward",
+        "//compiler_gym/errors",
         "//compiler_gym/util",
     ],
 )

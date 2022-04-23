@@ -15,6 +15,7 @@ py_library(
         # TODO(github.com/facebookresearch/CompilerGym/pull/633):
         # add this after circular dependencies are resolved
         # ":client_service_compiler_env",
+        "//compiler_gym/errors",
         "//compiler_gym/service/proto",
     ],
 )
@@ -45,6 +46,7 @@ py_library(
     srcs = ["connection.py"],
     visibility = ["//visibility:public"],
     deps = [
+        "//compiler_gym/errors",
         "//compiler_gym/service/proto",
         "//compiler_gym/util",
     ],
@@ -61,6 +63,7 @@ py_library(
         "//compiler_gym:validation_result",
         "//compiler_gym/datasets",
         "//compiler_gym/envs:compiler_env",
+        "//compiler_gym/errors",
         "//compiler_gym/service/proto",
         "//compiler_gym/spaces",
         "//compiler_gym/util",

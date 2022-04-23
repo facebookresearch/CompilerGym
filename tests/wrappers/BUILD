@@ -43,6 +43,7 @@ py_test(
     srcs = ["llvm_test.py"],
     deps = [
         "//compiler_gym/envs/llvm",
+        "//compiler_gym/errors",
         "//compiler_gym/wrappers",
         "//tests:test_main",
         "//tests/pytest_plugins:llvm",

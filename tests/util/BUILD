@@ -37,6 +37,7 @@ py_test(
     name = "download_test",
     srcs = ["download_test.py"],
     deps = [
+        "//compiler_gym/errors",
         "//compiler_gym/util",
         "//tests:test_main",
     ],

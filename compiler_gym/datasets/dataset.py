@@ -16,6 +16,7 @@ import numpy as np
 # this import to prevent shadowing.
 from deprecated.sphinx import deprecated as mark_deprecated
 
+import compiler_gym.errors
 from compiler_gym.datasets.benchmark import Benchmark
 from compiler_gym.datasets.uri import BenchmarkUri
 
@@ -480,8 +481,10 @@ class Dataset:
         return self.benchmark(uri)
 
 
-class DatasetInitError(OSError):
-    """Base class for errors raised if a dataset fails to initialize."""
+# Deprecated since v0.2.4.
+# This type is form backwards compatibility that will be removed in a future release.
+# Please, use errors from `compiler_gym.errors`.
+DatasetInitError = compiler_gym.errors.DatasetInitError
 
 
 @mark_deprecated(

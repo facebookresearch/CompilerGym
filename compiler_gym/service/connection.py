@@ -18,6 +18,7 @@ from typing import Dict, Iterable, List, Optional, TypeVar, Union
 import grpc
 from pydantic import BaseModel
 
+import compiler_gym.errors
 from compiler_gym.service.proto import (
     ActionSpace,
     CompilerGymServiceStub,
@@ -109,34 +110,40 @@ class ConnectionOpts(BaseModel):
     used on the command line. No effect when used for existing sockets."""
 
 
-class ServiceError(Exception):
-    """Error raised from the service."""
+# Deprecated since v0.2.4.
+# This type is form backwards compatibility that will be removed in a future release.
+# Please, use errors from `compiler_gym.errors`.
+ServiceError = compiler_gym.errors.ServiceError
 
+# Deprecated since v0.2.4.
+# This type is form backwards compatibility that will be removed in a future release.
+# Please, use errors from `compiler_gym.errors`.
+SessionNotFound = compiler_gym.errors.SessionNotFound
 
-class SessionNotFound(ServiceError):
-    """Requested session ID not found in service."""
+# Deprecated since v0.2.4.
+# This type is form backwards compatibility that will be removed in a future release.
+# Please, use errors from `compiler_gym.errors`.
+ServiceOSError = compiler_gym.errors.ServiceOSError
 
+# Deprecated since v0.2.4.
+# This type is form backwards compatibility that will be removed in a future release.
+# Please, use errors from `compiler_gym.errors`.
+ServiceInitError = compiler_gym.errors.ServiceInitError
 
-class ServiceOSError(ServiceError, OSError):
-    """System error raised from the service."""
+# Deprecated since v0.2.4.
+# This type is form backwards compatibility that will be removed in a future release.
+# Please, use errors from `compiler_gym.errors`.
+EnvironmentNotSupported = compiler_gym.errors.EnvironmentNotSupported
 
+# Deprecated since v0.2.4.
+# This type is form backwards compatibility that will be removed in a future release.
+# Please, use errors from `compiler_gym.errors`.
+ServiceTransportError = compiler_gym.errors.ServiceTransportError
 
-class ServiceInitError(ServiceError, OSError):
-    """Error raised if the service fails to initialize."""
-
-
-class EnvironmentNotSupported(ServiceInitError):
-    """Error raised if the runtime requirements for an environment are not
-    met on the current system."""
-
-
-class ServiceTransportError(ServiceError, OSError):
-    """Error that is raised if communication with the service fails."""
-
-
-class ServiceIsClosed(ServiceError, TypeError):
-    """Error that is raised if trying to interact with a closed service."""
-
+# Deprecated since v0.2.4.
+# This type is form backwards compatibility that will be removed in a future release.
+# Please, use errors from `compiler_gym.errors`.
+ServiceIsClosed = compiler_gym.errors.ServiceIsClosed
 
 Request = TypeVar("Request")
 Reply = TypeVar("Reply")
