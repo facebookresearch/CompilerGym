@@ -126,6 +126,7 @@ setup_kwargs = {
         "compiler_gym.envs.loop_tool.service",
         "compiler_gym.envs",
         "compiler_gym.envs",
+        "compiler_gym.errors",
         "compiler_gym.leaderboard",
         "compiler_gym.service.proto",
         "compiler_gym.service.runtime",
