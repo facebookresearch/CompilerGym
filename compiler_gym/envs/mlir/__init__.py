@@ -11,8 +11,6 @@ from compiler_gym.util.runfiles_path import runfiles_path
 __all__ = [
     "MLIR_SERVICE_BINARY",
     "MlirEnv",
-    "observation_spaces",
-    "reward_spaces",
 ]
 
 MLIR_SERVICE_BINARY = runfiles_path(
