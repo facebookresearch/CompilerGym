@@ -111,37 +111,37 @@ class ConnectionOpts(BaseModel):
 
 
 # Deprecated since v0.2.4.
-# This type is form backwards compatibility that will be removed in a future release.
+# This type is for backwards compatibility that will be removed in a future release.
 # Please, use errors from `compiler_gym.errors`.
 ServiceError = compiler_gym.errors.ServiceError
 
 # Deprecated since v0.2.4.
-# This type is form backwards compatibility that will be removed in a future release.
+# This type is for backwards compatibility that will be removed in a future release.
 # Please, use errors from `compiler_gym.errors`.
 SessionNotFound = compiler_gym.errors.SessionNotFound
 
 # Deprecated since v0.2.4.
-# This type is form backwards compatibility that will be removed in a future release.
+# This type is for backwards compatibility that will be removed in a future release.
 # Please, use errors from `compiler_gym.errors`.
 ServiceOSError = compiler_gym.errors.ServiceOSError
 
 # Deprecated since v0.2.4.
-# This type is form backwards compatibility that will be removed in a future release.
+# This type is for backwards compatibility that will be removed in a future release.
 # Please, use errors from `compiler_gym.errors`.
 ServiceInitError = compiler_gym.errors.ServiceInitError
 
 # Deprecated since v0.2.4.
-# This type is form backwards compatibility that will be removed in a future release.
+# This type is for backwards compatibility that will be removed in a future release.
 # Please, use errors from `compiler_gym.errors`.
 EnvironmentNotSupported = compiler_gym.errors.EnvironmentNotSupported
 
 # Deprecated since v0.2.4.
-# This type is form backwards compatibility that will be removed in a future release.
+# This type is for backwards compatibility that will be removed in a future release.
 # Please, use errors from `compiler_gym.errors`.
 ServiceTransportError = compiler_gym.errors.ServiceTransportError
 
 # Deprecated since v0.2.4.
-# This type is form backwards compatibility that will be removed in a future release.
+# This type is for backwards compatibility that will be removed in a future release.
 # Please, use errors from `compiler_gym.errors`.
 ServiceIsClosed = compiler_gym.errors.ServiceIsClosed
 

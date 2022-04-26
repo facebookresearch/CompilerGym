@@ -6,10 +6,6 @@
 cg_add_all_subdirs()
 
 set(_DEPS "compiler_gym-mlir-service")
-if(DARWIN)
-    #TODO(boian): figure out what is this target.
-    #list(APPEND _DEPS "@llvm//:darwin")
-endif()
 cg_filegroup(
   NAME "service"
   DEPENDS ${_DEPS}

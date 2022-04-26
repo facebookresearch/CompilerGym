@@ -415,10 +415,6 @@ Status Benchmark::compile() {
   return Status::OK;
 }
 
-// bool Benchmark::applyBaselineOptimizations(unsigned optLevel, unsigned sizeLevel) {
-//   return applyBaselineOptimizationsToModule(&module(), optLevel, sizeLevel);
-// }
-
 namespace {
 
 std::vector<util::LocalShellCommand> commandsFromProto(

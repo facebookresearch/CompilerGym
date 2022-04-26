@@ -303,19 +303,19 @@ class Benchmark {
     return scratchDirectory_.parent_path();
   }
 
-  // NOTE(cummins): Order here is important! The LLVMContext must be declared
+  // NOTE(cummins): Order here is important! The MLIRContext must be declared
   // before Module, as class members are destroyed in the reverse order they are
   // declared, and a module must never outlive its context.
   std::unique_ptr<mlir::MLIRContext> context_;
   std::unique_ptr<mlir::OwningOpRef<mlir::ModuleOp>> module_;
-  const boost::filesystem::path scratchDirectory_;
-  const BenchmarkDynamicConfig dynamicConfigProto_;
-  const RealizedBenchmarkDynamicConfig dynamicConfig_;
   /** The directory used for storing build / runtime artifacts. The difference
    * between the scratch directory and the working directory is that the working
    * directory may be shared across multiple Benchmark instances. The scratch
    * directory is unique.
    */
+  const boost::filesystem::path scratchDirectory_;
+  const BenchmarkDynamicConfig dynamicConfigProto_;
+  const RealizedBenchmarkDynamicConfig dynamicConfig_;
   const std::string name_;
   int m_, n_, k_;
   bool needsRecompile_;

@@ -6,6 +6,6 @@
 import compiler_gym.errors
 
 # Deprecated since v0.2.4.
-# This type is form backwards compatibility that will be removed in a future release.
+# This type is for backwards compatibility that will be removed in a future release.
 # Please, use errors from `compiler_gym.errors`.
 ValidationError = compiler_gym.errors.ValidationError

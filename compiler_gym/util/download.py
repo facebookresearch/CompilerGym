@@ -19,12 +19,12 @@ logger = logging.getLogger(__name__)
 
 
 # Deprecated since v0.2.4.
-# This type is form backwards compatibility that will be removed in a future release.
+# This type is for backwards compatibility that will be removed in a future release.
 # Please, use errors from `compiler_gym.errors`.
 DownloadFailed = compiler_gym.errors.DownloadFailed
 
 # Deprecated since v0.2.4.
-# This type is form backwards compatibility that will be removed in a future release.
+# This type is for backwards compatibility that will be removed in a future release.
 # Please, use errors from `compiler_gym.errors`.
 TooManyRequests = compiler_gym.errors.TooManyRequests
 

@@ -243,19 +243,6 @@ void LinalgCodegenPass::runStrategy(const Event& action, StringRef anchorOpName)
 }
 
 void LinalgCodegenPass::runOnOperation() {
-  // TODO(kyleherndon): figure out why this won't compile/remove it
-  // mlir::MLIRContext *ctx = getOperation().getContext();
-  // llvm::SmallVector<Attribute, 4> attrs;
-  // attrs.push_back(mlir::ArrayAttr::get(ctx,
-  //                                {mlir::StringAttr::get(ctx, "prefer-vector-width"),
-  //                                 mlir::StringAttr::get(ctx, "256")}
-  //                               ));
-  // attrs.push_back(mlir::ArrayAttr::get(ctx,
-  //                                {mlir::StringAttr::get(ctx, "target-cpu"),
-  //                                 mlir::StringAttr::get(ctx, "haswell")}
-  //                               ));
-  // getOperation()->setAttr("passthrough", mlir::ArrayAttr::get(ctx, attrs));
-
   for (const Event& e : action.event_list().event()) {
     runStrategy(e, "linalg.matmul");
   }

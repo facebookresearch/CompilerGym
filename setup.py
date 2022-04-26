@@ -205,7 +205,7 @@ if config.enable_mlir_env:
     setup_kwargs["package_data"]["compiler_gym"].extend(
         ["envs/mlir/service/compiler_gym-mlir-service"]
     )
-    origina_cwd = os.getcwd()
+    original_cwd = os.getcwd()
     try:
         os.chdir(os.path.join(args.package_dir, "compiler_gym"))
         setup_kwargs["package_data"]["compiler_gym"].extend(
@@ -215,7 +215,7 @@ if config.enable_mlir_env:
             glob.glob("envs/mlir/service/google_benchmark/**", recursive=True)
         )
     finally:
-        os.chdir(origina_cwd)
+        os.chdir(original_cwd)
 
 if args.get_wheel_filename:
     # Instead of generating the wheel file,
