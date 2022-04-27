@@ -26,7 +26,11 @@ from compiler_gym.spaces import Tuple as TupleSpace
 from compiler_gym.util.gym_type_hints import ActionType, ObservationType, StepType
 from compiler_gym.util.permutation import convert_number_to_permutation
 from compiler_gym.views import ObservationSpaceSpec
-from compiler_gym.wrappers.core import ConversionWrapperEnv
+from compiler_gym.wrappers.core import (
+    ActionWrapper,
+    CompilerEnvWrapper,
+    ObservationWrapper,
+)
 
 
 def convert_permutation_to_discrete_space(permutation: Permutation) -> Discrete:
@@ -150,55 +154,83 @@ def convert_observation(observation: ObservationType) -> ObservationType:
     )
 
 
-class MlirRlWrapperEnv(ConversionWrapperEnv):
+class MlirRlObservationWrapperEnv(ObservationWrapper):
+    @property
+    def observation_space(self):
+        return convert_observation_space(self.env.observation_space)
+
+    @observation_space.setter
+    def observation_space(
+        self, observation_space: Optional[Union[str, ObservationSpaceSpec]]
+    ) -> None:
+        self.env.observation_space = observation_space
+
+    def convert_observation(self, observation: ObservationType) -> ObservationType:
+        return convert_observation(observation)
+
+
+class MlirRlActionWrapperEnv(ActionWrapper):
     def __init__(
         self,
         env: CompilerEnv,
         max_subactions: Optional[Integral] = None,
     ):
         super().__init__(env)
-        env.reward_space = "runtime"
-        env.observation_space = "Runtime"
         self.max_subactions = max_subactions
 
-    def convert_action_space(self, space: Space) -> Space:
-        return convert_action_space(space, max_subactions=self.max_subactions)
+    @property
+    def action_space(self) -> Space:
+        return convert_action_space(
+            self.env.action_space, max_subactions=self.max_subactions
+        )
 
-    def convert_action(self, action: ActionType) -> ActionType:
+    @action_space.setter
+    def action_space(self, action_space: Optional[str]):
+        self.env.action_space = action_space
+
+    def action(self, action: ActionType) -> ActionType:
         return convert_action(action)
 
-    def convert_observation_space(self, space: Space) -> Space:
-        return convert_observation_space(space)
 
-    def convert_observation(self, observation: ObservationType) -> ObservationType:
-        return convert_observation(observation)
+class MlirRlErrorWrapperEnv(CompilerEnvWrapper):
+    def multistep(
+        self,
+        actions: Iterable[ActionType],
+        observation_spaces: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
+        observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        rewards: Optional[Iterable[Union[str, Reward]]] = None,
+    ) -> StepType:
+        observation, reward, done, info = super().multistep(
+            actions,
+            observation_spaces=observation_spaces,
+            reward_spaces=reward_spaces,
+            observations=observations,
+            rewards=rewards,
+        )
+        if "error_type" in info:
+            raise RuntimeError(str(info))
+        return observation, reward, done, info
 
     def step(
         self,
         action: ActionType,
         observation_spaces: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
         reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
-    ) -> StepType:
-        observation, reward, done, info = self.multistep(
-            [action],
-            observation_spaces=observation_spaces,
-            reward_spaces=reward_spaces,
+        observations: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
+        rewards: Optional[Iterable[Union[str, Reward]]] = None,
+    ):
+        return self.multistep(
+            [action], observation_spaces, reward_spaces, observations, rewards
         )
-        if "error_type" in info:
-            raise RuntimeError(str(info))
-        return observation, reward, done, info
 
-    def multistep(
-        self,
-        actions: Iterable[ActionType],
-        observation_spaces: Optional[Iterable[Union[str, ObservationSpaceSpec]]] = None,
-        reward_spaces: Optional[Iterable[Union[str, Reward]]] = None,
-    ) -> StepType:
-        observation, reward, done, info = super().multistep(
-            actions,
-            observation_spaces=observation_spaces,
-            reward_spaces=reward_spaces,
-        )
-        if "error_type" in info:
-            raise RuntimeError(str(info))
-        return observation, reward, done, info
+
+def make_mlir_rl_wrapper_env(
+    env: CompilerEnv, max_subactions: Optional[Integral] = None
+):
+    env.reward_space = "runtime"
+    env.observation_space = "Runtime"
+    res = MlirRlActionWrapperEnv(env, max_subactions=max_subactions)
+    res = MlirRlObservationWrapperEnv(res)
+    res = MlirRlErrorWrapperEnv(res)
+    return res

@@ -23,7 +23,7 @@ from compiler_gym.spaces import (
     SpaceSequence,
 )
 from compiler_gym.spaces import Tuple as TupleSpace
-from compiler_gym.wrappers.mlir import MlirRlWrapperEnv, convert_action
+from compiler_gym.wrappers.mlir import convert_action, make_mlir_rl_wrapper_env
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.common", "tests.pytest_plugins.mlir"]
@@ -128,7 +128,7 @@ def test_set_reward_space_from_spec(env: MlirEnv):
 
 
 def test_mlir_rl_wrapper_env_action_space(env: MlirEnv):
-    wrapper_env = MlirRlWrapperEnv(env)
+    wrapper_env = make_mlir_rl_wrapper_env(env)
     action_space = wrapper_env.action_space
     tile_size = NamedDiscrete(
         name=None,
@@ -227,7 +227,7 @@ def test_convert_action():
 
 
 def test_mlir_rl_wrapper_env_observation_space(env: MlirEnv):
-    wrapper_env = MlirRlWrapperEnv(env)
+    wrapper_env = make_mlir_rl_wrapper_env(env)
     observation_space = wrapper_env.observation_space
     assert observation_space == Box(
         name="Runtime", shape=[1], low=0, high=np.inf, dtype=float
@@ -235,7 +235,7 @@ def test_mlir_rl_wrapper_env_observation_space(env: MlirEnv):
 
 
 def test_mlir_rl_wrapper_env_step(env: MlirEnv):
-    wrapper_env = MlirRlWrapperEnv(env)
+    wrapper_env = make_mlir_rl_wrapper_env(env)
     action_space = wrapper_env.action_space
     action_space.seed(123)
     action = action_space.sample()
@@ -251,7 +251,7 @@ def test_mlir_rl_wrapper_env_step(env: MlirEnv):
 
 
 def test_mlir_rl_wrapper_env_reset(env: MlirEnv):
-    wrapper_env = MlirRlWrapperEnv(env)
+    wrapper_env = make_mlir_rl_wrapper_env(env)
     action_space = wrapper_env.action_space
     action_space.seed(123)
     observation = wrapper_env.reset()

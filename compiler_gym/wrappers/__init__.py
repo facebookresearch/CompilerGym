@@ -35,7 +35,6 @@ from compiler_gym.wrappers.commandline import (
 from compiler_gym.wrappers.core import (
     ActionWrapper,
     CompilerEnvWrapper,
-    ConversionWrapperEnv,
     ObservationWrapper,
     RewardWrapper,
 )
@@ -58,7 +57,6 @@ __all__ = [
     "CommandlineWithTerminalAction",
     "CompilerEnvWrapper",
     "ConstrainedCommandline",
-    "ConversionWrapperEnv",
     "CycleOverBenchmarks",
     "CycleOverBenchmarksIterator",
     "IterateOverBenchmarks",

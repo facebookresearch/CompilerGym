@@ -13,7 +13,7 @@ from flaky import flaky
 from ray.rllib.agents.ppo import PPOTrainer
 from ray.tune.registry import register_env
 
-from compiler_gym.wrappers.mlir import MlirRlWrapperEnv
+from compiler_gym.wrappers.mlir import make_mlir_rl_wrapper_env
 from tests.test_main import main
 
 
@@ -32,7 +32,8 @@ def test_rllib_ppo_smoke():
     torch.manual_seed(seed)
     ray.init(local_mode=True)  # Runs PPO training in the same process
     register_env(
-        "mlir_rl_env-v0", lambda env_config: MlirRlWrapperEnv(env=gym.make("mlir-v0"))
+        "mlir_rl_env-v0",
+        lambda env_config: make_mlir_rl_wrapper_env(env=gym.make("mlir-v0")),
     )
     config = {
         "env": "mlir_rl_env-v0",
