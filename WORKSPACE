@@ -367,7 +367,7 @@ cc_library(
     ],
 )
 """,
-    sha256 = "92cbe1d0235a3c2d45588caf2b1530795f376045e8bc3d2868ba349fb8d61ea5",
+    sha256 = "f6c5af059840889e584c13331fabc6a469c40cdf0e44b3284e7db4fe9093289c",
     strip_prefix = "IR2Vec-828e50584b9c8bc305208e22d2cca272bdb1ab64",
     urls = ["https://github.com/ChrisCummins/IR2Vec/archive/828e50584b9c8bc305208e22d2cca272bdb1ab64.tar.gz"],
 )
