@@ -11,6 +11,13 @@
 
 namespace compiler_gym {
 
+/**
+ * Checks whether an `Event` is contained inside a `Space`.
+ * This is analogous to the `gym.spaces.Space.contains(...)` method.
+ *
+ * Upon receiving and action in the service backend this class can be used to
+ * check against the service action space if it is a valid action.
+ */
 struct SpaceContainsEventChecker {
   struct Context;
   using TypeIdFuncMap =
