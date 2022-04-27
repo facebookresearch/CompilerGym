@@ -8,8 +8,8 @@ from typing import Iterable, List, Optional, Union
 
 import numpy as np
 
-from compiler_gym.datasets import Benchmark, Dataset
-from compiler_gym.envs.mlir.datasets import get_mlir_datasets
+from compiler_gym.datasets import Dataset
+from compiler_gym.envs.mlir.datasets import MatmulBenchmark, get_mlir_datasets
 from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
 from compiler_gym.spaces import Reward, RuntimeReward
 from compiler_gym.util.gym_type_hints import ActionType
@@ -31,14 +31,40 @@ def _get_mlir_datasets(site_data_base: Optional[Path] = None) -> Iterable[Datase
 
 
 class MlirEnv(ClientServiceCompilerEnv):
+    """Environment that exposes optimization parameters for matrix multiplication in MLIR.
+    It optimizes the operation C = A * B, where A is an MxK matrix and B is an KxN.
+
+    This environment is still under construction.
+
+    The observation space is the running time of the operation.
+    All optimization parameters are supplied in a single step.
+    In other words the episode length is 1 step.
+    It supports x86_64 processors."""
+
     def __init__(
         self,
         *args,
-        benchmark: Optional[Union[str, Benchmark]] = None,
+        benchmark: Optional[Union[str, MatmulBenchmark]] = None,
         datasets_site_path: Optional[Path] = None,
         rewards: Optional[List[Reward]] = None,
         **kwargs
     ):
+        """
+        :param args: Positional arguments passed to the base class
+        `compiler_gym.service.ClientServiceCompilerEnv`.
+
+        :param benchmark: Specifies what MLIR code is to be optimize.
+        Currently the default benchmark and only benchmark is M=N=K=64.
+
+        :param rewards: The reward spaces that this environment supports.
+        Defaults to (-running time).
+
+        :param datasets_site_path: The base path of a directory that will be used to
+            store installed files.
+
+        :param kwargs: keyworded arguments passed to the base class
+        `compiler_gym.service.ClientServiceCompilerEnv`.
+        """
         super().__init__(
             *args,
             **kwargs,
