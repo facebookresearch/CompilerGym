@@ -18,8 +18,8 @@ logger = logging.getLogger(__name__)
 # The maximum value for the --seed argument to matmul.
 UINT_MAX = (2**32) - 1
 
-_matmul_BIN = runfiles_path("compiler_gym/third_party/matmul/matmul/bin/matmul")
-_matmul_INCLUDES = runfiles_path(
+_matmul_bin = runfiles_path("compiler_gym/third_party/matmul/matmul/bin/matmul")
+_matmul_includes = runfiles_path(
     "compiler_gym/third_party/matmul/matmul/include/matmul-2.3.0"
 )
 
@@ -95,8 +95,8 @@ class MatmulDataset(Dataset):
             sort_order=sort_order,
             benchmark_class=MatmulBenchmark,
         )
-        self.matmul_bin_path = matmul_bin or _matmul_BIN
-        self.matmul_includes_path = matmul_includes or _matmul_INCLUDES
+        self.matmul_bin_path = matmul_bin or _matmul_bin
+        self.matmul_includes_path = matmul_includes or _matmul_includes
 
     @property
     def size(self) -> int:
