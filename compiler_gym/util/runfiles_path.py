@@ -66,6 +66,10 @@ def site_data_path(relpath: str) -> Path:
     No checks are to made to ensure that the path, or the containing directory,
     exist.
 
+    Files in this directory are intended to be long lived (this is not a cache),
+    but it is safe to delete this directory, so long as no CompilerGym
+    environments are running.
+
     :param relpath: The relative path within the site data tree.
 
     :return: An absolute path.
@@ -89,6 +93,9 @@ def cache_path(relpath: str) -> Path:
     The default location for this cache is :code:`~/.local/cache/compiler_gym`.
     Set the environment variable :code:`$COMPILER_GYM_CACHE` to override this
     default location.
+
+    It is safe to delete this directory, so long as no CompilerGym environments
+    are running.
 
     No checks are to made to ensure that the path, or the containing directory,
     exist.
@@ -115,6 +122,10 @@ def transient_cache_path(relpath: str) -> Path:
     :meth:`cache_path() <compiler_gym.cache_path>` is used as a fallback. Set
     the environment variable :code:`$COMPILER_GYM_TRANSIENT_CACHE` to override
     the default location.
+
+    Files in this directory are not meant to outlive the lifespan of the
+    CompilerGym environment that creates them. It is safe to delete this
+    directory, so long as no CompilerGym environments are running.
 
     No checks are to made to ensure that the path, or the containing directory,
     exist.
