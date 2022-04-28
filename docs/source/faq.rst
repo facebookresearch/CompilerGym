@@ -168,8 +168,8 @@ What features are going to be added in the future?
 See :ref:`roadmap <about:roadmap>`.
 
 
-I want to modify a CompilerGym environment, where do I start?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+I want to modify one of the environments, where do I start?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 Many modifications to CompilerGym environments can be achieved through
 :mod:`wrappers <compiler_gym.wrappers>`. For example, you can use the existing
@@ -197,8 +197,8 @@ of the compiler service you would wish to modify, e.g.
 <llvm/index>`. Once done, send us a pull request!
 
 
-I want to add a new CompilerGym environment, where do I start?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+I want to add a new compiler environment, where do I start?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To add a new environment, you must implement the :class:`CompilationSession
 <compiler_gym.service.CompilationSession>` interface to provide a new
