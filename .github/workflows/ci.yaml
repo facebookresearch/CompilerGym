@@ -273,7 +273,7 @@ jobs:
               run: python -m pip install -r tests/requirements.txt
 
             - name: Run the test suite
-              run: make install-test TEST_TARGET="tests/mlir"
+              run: make install-test-cov TEST_TARGET="tests/mlir"
 
     test-macos:
         needs: build-macos
