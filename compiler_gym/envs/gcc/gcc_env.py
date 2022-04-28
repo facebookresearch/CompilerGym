@@ -15,9 +15,10 @@ from compiler_gym.envs.gcc.gcc import Gcc, GccSpec
 from compiler_gym.envs.gcc.gcc_rewards import AsmSizeReward, ObjSizeReward
 from compiler_gym.service import ConnectionOpts
 from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
+from compiler_gym.spaces import Reward
 from compiler_gym.util.decorators import memoized_property
-from compiler_gym.util.gym_type_hints import ObservationType
-from compiler_gym.util.gym_type_hints import OptionalArgumentValue
+from compiler_gym.util.gym_type_hints import ObservationType, OptionalArgumentValue
+from compiler_gym.views import ObservationSpaceSpec
 
 # The default gcc_bin argument.
 DEFAULT_GCC: str = "docker:gcc:11.2.0"
@@ -91,14 +92,18 @@ class GccEnv(ClientServiceCompilerEnv):
         self,
         benchmark: Optional[Union[str, Benchmark]] = None,
         action_space: Optional[str] = None,
-        retry_count: int = 0,
-        reward_space=OptionalArgumentValue.UNCHANGED,
-        observation_space=OptionalArgumentValue.UNCHANGED,
+        observation_space: Union[
+            OptionalArgumentValue, str, ObservationSpaceSpec
+        ] = OptionalArgumentValue.UNCHANGED,
+        reward_space: Union[
+            OptionalArgumentValue, str, Reward
+        ] = OptionalArgumentValue.UNCHANGED,
     ) -> Optional[ObservationType]:
-        """Reset the environment. This additionally sets the timeout to the
-        correct value."""
         observation = super().reset(
-            benchmark, action_space, retry_count, reward_space, observation_space
+            benchmark=benchmark,
+            action_space=action_space,
+            observation_space=observation_space,
+            reward_space=reward_space,
         )
         if self._timeout:
             self.send_param("timeout", str(self._timeout))

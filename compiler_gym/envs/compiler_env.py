@@ -4,7 +4,7 @@
 # LICENSE file in the root directory of this source tree.
 """This module defines the OpenAI gym interface for compilers."""
 from abc import ABC, abstractmethod
-from typing import Iterable, List, Optional, Union
+from typing import Iterable, List, Optional, Tuple, Union
 
 import gym
 from deprecated.sphinx import deprecated
@@ -13,7 +13,12 @@ from gym.spaces import Space
 from compiler_gym.compiler_env_state import CompilerEnvState
 from compiler_gym.datasets import Benchmark, BenchmarkUri, Dataset
 from compiler_gym.spaces import Reward
-from compiler_gym.util.gym_type_hints import ActionType, ObservationType, StepType
+from compiler_gym.util.gym_type_hints import (
+    ActionType,
+    ObservationType,
+    OptionalArgumentValue,
+    StepType,
+)
 from compiler_gym.validation_result import ValidationResult
 from compiler_gym.views import ObservationSpaceSpec, ObservationView, RewardView
 
@@ -254,6 +259,15 @@ class CompilerEnv(gym.Env, ABC):
 
     @property
     @abstractmethod
+    def reward_range(self) -> Tuple[float, float]:
+        """A tuple indicating the range of reward values.
+
+        Default range is (-inf, +inf).
+        """
+        raise NotImplementedError("abstract method")
+
+    @property
+    @abstractmethod
     def reward(self) -> RewardView:
         """A view of the available reward spaces that permits on-demand
         computation of rewards.
@@ -294,11 +308,58 @@ class CompilerEnv(gym.Env, ABC):
 
     @abstractmethod
     def reset(  # pylint: disable=arguments-differ
-        self, *args, **kwargs
+        self,
+        benchmark: Optional[Union[str, Benchmark]] = None,
+        action_space: Optional[str] = None,
+        observation_space: Union[
+            OptionalArgumentValue, str, ObservationSpaceSpec
+        ] = OptionalArgumentValue.UNCHANGED,
+        reward_space: Union[
+            OptionalArgumentValue, str, Reward
+        ] = OptionalArgumentValue.UNCHANGED,
     ) -> Optional[ObservationType]:
         """Reset the environment state.
 
         This method must be called before :func:`step()`.
+
+        :param benchmark: The name of the benchmark to use. If provided, it
+            overrides any value that was set during :func:`__init__`, and
+            becomes subsequent calls to :code:`reset()` will use this benchmark.
+            If no benchmark is provided, and no benchmark was provided to
+            :func:`__init___`, the service will randomly select a benchmark to
+            use.
+
+        :param action_space: The name of the action space to use. If provided,
+            it overrides any value that set during :func:`__init__`, and
+            subsequent calls to :code:`reset()` will use this action space. If
+            no action space is provided, the default action space is used.
+
+        :param observation_space: Compute and return observations at each
+            :func:`step()` from this space. Accepts a string name or an
+            :class:`ObservationSpaceSpec
+            <compiler_gym.views.ObservationSpaceSpec>`. If :code:`None`,
+            :func:`step()` returns :code:`None` for the observation value. If
+            :code:`OptionalArgumentValue.UNCHANGED` (the default value), the
+            observation space remains unchanged from the previous episode. For
+            available spaces, see :class:`env.observation.spaces
+            <compiler_gym.views.ObservationView>`.
+
+        :param reward_space: Compute and return reward at each :func:`step()`
+            from this space. Accepts a string name or a :class:`Reward
+            <compiler_gym.spaces.Reward>`. If :code:`None`, :func:`step()`
+            returns :code:`None` for the reward value.  If
+            :code:`OptionalArgumentValue.UNCHANGED` (the default value), the
+            observation space remains unchanged from the previous episode. For
+            available spaces, see :class:`env.reward.spaces
+            <compiler_gym.views.RewardView>`.
+
+        :return: The initial observation.
+
+        :raises BenchmarkInitError: If the benchmark is invalid. In this case,
+            another benchmark must be used.
+
+        :raises TypeError: If no benchmark has been set, and the environment
+            does not have a default benchmark to select from.
         """
         raise NotImplementedError("abstract method")
 

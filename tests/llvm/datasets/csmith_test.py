@@ -62,7 +62,14 @@ def test_csmith_from_seed_retry_count_exceeded(csmith_dataset: CsmithDataset):
         csmith_dataset.benchmark_from_seed(seed=1, max_retries=3, retry_count=5)
 
 
-@flaky(max_runs=5, rerun_filter=lambda err, *args: issubclass(err[0], ServiceError))
+csmith_runtime_flaky = flaky(
+    max_runs=5,
+    rerun_filter=lambda err, *args: issubclass(err[0], ServiceError)
+    or isinstance(err[0], TimeoutError),
+)
+
+
+@csmith_runtime_flaky
 def test_csmith_positive_runtimes(env: LlvmEnv, csmith_dataset: CsmithDataset):
     benchmark = next(csmith_dataset.benchmarks())
     env.reset(benchmark=benchmark)
@@ -71,7 +78,7 @@ def test_csmith_positive_runtimes(env: LlvmEnv, csmith_dataset: CsmithDataset):
     assert np.all(np.greater(val, 0))
 
 
-@flaky(max_runs=5, rerun_filter=lambda err, *args: issubclass(err[0], ServiceError))
+@csmith_runtime_flaky
 def test_csmith_positive_buildtimes(env: LlvmEnv, csmith_dataset: CsmithDataset):
     benchmark = next(csmith_dataset.benchmarks())
     env.reset(benchmark=benchmark)

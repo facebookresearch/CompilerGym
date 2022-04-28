@@ -14,10 +14,10 @@ client and service is managed by the :class:`CompilerGymServiceConnection
     :local:
 
 
-ServiceMessageConverters
-------------------------
+The CompilationSession Interface
+--------------------------------
 
-.. autoclass:: ClientServiceCompilerEnv
+.. autoclass:: CompilationSession
    :members:
 
    .. automethod:: __init__
@@ -26,16 +26,13 @@ ServiceMessageConverters
 ClientServiceCompilerEnv
 ------------------------
 
-.. autoclass:: ClientServiceCompilerEnv
+.. autoclass:: compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv
    :members:
 
    .. automethod:: __init__
 
 
-The CompilationSession Interface
---------------------------------
-
-.. autoclass:: CompilationSession
+.. autoclass:: compiler_gym.service.client_service_compiler_env.ServiceMessageConverters
    :members:
 
    .. automethod:: __init__

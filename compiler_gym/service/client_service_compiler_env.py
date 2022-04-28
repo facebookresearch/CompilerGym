@@ -53,9 +53,9 @@ from compiler_gym.spaces import DefaultRewardFromObservation, NamedDiscrete, Rew
 from compiler_gym.util.gym_type_hints import (
     ActionType,
     ObservationType,
+    OptionalArgumentValue,
     RewardType,
     StepType,
-    OptionalArgumentValue,
 )
 from compiler_gym.util.shell_format import plural
 from compiler_gym.util.timer import Timer
@@ -85,11 +85,15 @@ def _wrapped_step(
 
 class ServiceMessageConverters:
     """Allows for customization of conversion to/from gRPC messages for the
-    <ClientServiceCompilerEnv>.
+    :class:`ClientServiceCompilerEnv
+    <compiler_gym.service.client_service_compiler_env.ClientServiceCompilerEnv>`.
 
     Supports conversion customizations:
-    * <compiler_gym.service.proto.ActionSpace> -> <gym.spaces.Space>.
-    * <compiler_gym.util.gym_type_hints.ActionType> -> <compiler_gym.service.proto.Event>.
+
+        - :code:`compiler_gym.service.proto.ActionSpace` ->
+          :code:`gym.spaces.Space`.
+        - :code:`compiler_gym.util.gym_type_hints.ActionType` ->
+          :code:`compiler_gym.service.proto.Event`.
     """
 
     action_space_converter: Callable[[ActionSpace], Space]
@@ -100,6 +104,7 @@ class ServiceMessageConverters:
         action_space_converter: Optional[Callable[[ActionSpace], Space]] = None,
         action_converter: Optional[Callable[[Any], Event]] = None,
     ):
+        """Constructor."""
         self.action_space_converter = (
             py_converters.make_message_default_converter()
             if action_space_converter is None
@@ -113,17 +118,12 @@ class ServiceMessageConverters:
 
 
 class ClientServiceCompilerEnv(CompilerEnv):
-    """Implementation using gRPC for a client-server communication.
+    """Implementation of :class:`CompilerEnv <compiler_gym.envs.CompilerEnv>`
+    using gRPC for client-server communication.
 
     :ivar service: A connection to the underlying compiler service.
 
     :vartype service: compiler_gym.service.CompilerGymServiceConnection
-
-
-    :ivar reward_range: A tuple indicating the range of reward values. Default
-        range is (-inf, +inf).
-
-    :vartype reward_range: Tuple[float, float]
     """
 
     def __init__(
@@ -302,7 +302,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
         self.observation_space: Optional[Space] = None
 
         # Mutable state initialized in reset().
-        self.reward_range: Tuple[float, float] = (-np.inf, np.inf)
+        self._reward_range: Tuple[float, float] = (-np.inf, np.inf)
         self.episode_reward = None
         self.episode_start_time: float = time()
         self._actions: List[ActionType] = []
@@ -482,7 +482,7 @@ class ClientServiceCompilerEnv(CompilerEnv):
             if reward_space == self.reward_space:
                 return
             self.reward_space_spec = self.reward.spaces[reward_space]
-            self.reward_range = (
+            self._reward_range = (
                 self.reward_space_spec.min,
                 self.reward_space_spec.max,
             )
@@ -493,7 +493,11 @@ class ClientServiceCompilerEnv(CompilerEnv):
             # If no reward space is being used then set the reward range to
             # unbounded.
             self.reward_space_spec = None
-            self.reward_range = (-np.inf, np.inf)
+            self._reward_range = (-np.inf, np.inf)
+
+    @property
+    def reward_range(self) -> Tuple[float, float]:
+        return self._reward_range
 
     @property
     def reward(self) -> RewardView:
@@ -662,44 +666,40 @@ class ClientServiceCompilerEnv(CompilerEnv):
         if hasattr(self, "service") and getattr(self, "service"):
             self.close()
 
-    def reset(  # pylint: disable=arguments-differ
+    def reset(
         self,
         benchmark: Optional[Union[str, Benchmark]] = None,
         action_space: Optional[str] = None,
-        retry_count: int = 0,
-        reward_space=OptionalArgumentValue.UNCHANGED,
-        observation_space=OptionalArgumentValue.UNCHANGED,
+        reward_space: Union[
+            OptionalArgumentValue, str, Reward
+        ] = OptionalArgumentValue.UNCHANGED,
+        observation_space: Union[
+            OptionalArgumentValue, str, ObservationSpaceSpec
+        ] = OptionalArgumentValue.UNCHANGED,
     ) -> Optional[ObservationType]:
-        """Reset the environment state.
+        return self._reset(
+            benchmark=benchmark,
+            action_space=action_space,
+            observation_space=observation_space,
+            reward_space=reward_space,
+            retry_count=0,
+        )
 
-        This method must be called before :func:`step()`.
-
-        :param benchmark: The name of the benchmark to use. If provided, it
-            overrides any value that was set during :func:`__init__`, and
-            becomes subsequent calls to :code:`reset()` will use this benchmark.
-            If no benchmark is provided, and no benchmark was provided to
-            :func:`__init___`, the service will randomly select a benchmark to
-            use.
-
-        :param action_space: The name of the action space to use. If provided,
-            it overrides any value that set during :func:`__init__`, and
-            subsequent calls to :code:`reset()` will use this action space. If
-            no action space is provided, the default action space is used.
-
-        :return: The initial observation.
-
-        :raises BenchmarkInitError: If the benchmark is invalid. In this case,
-            another benchmark must be used.
-
-        :raises TypeError: If no benchmark has been set, and the environment
-            does not have a default benchmark to select from.
-        """
-
-        if reward_space != OptionalArgumentValue.UNCHANGED:
-            self.reward_space = reward_space
+    def _reset(  # pylint: disable=arguments-differ
+        self,
+        benchmark: Optional[Union[str, Benchmark]],
+        action_space: Optional[str],
+        observation_space: Union[OptionalArgumentValue, str, ObservationSpaceSpec],
+        reward_space: Union[OptionalArgumentValue, str, Reward],
+        retry_count: int,
+    ) -> Optional[ObservationType]:
+        """Private implementation detail. Call `reset()`, not this."""
 
         if observation_space != OptionalArgumentValue.UNCHANGED:
             self.observation_space = observation_space
+
+        if reward_space != OptionalArgumentValue.UNCHANGED:
+            self.reward_space = reward_space
 
         def _retry(error) -> Optional[ObservationType]:
             """Abort and retry on error."""
@@ -732,9 +732,11 @@ class ClientServiceCompilerEnv(CompilerEnv):
                     f"Last error ({type(error).__name__}): {error}"
                 ) from error
             else:
-                return self.reset(
+                return self._reset(
                     benchmark=benchmark,
                     action_space=action_space,
+                    observation_space=observation_space,
+                    reward_space=reward_space,
                     retry_count=retry_count + 1,
                 )
 
