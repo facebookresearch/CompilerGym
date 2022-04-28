@@ -58,8 +58,9 @@ def runfiles_path(relpath: str) -> Path:
 def site_data_path(relpath: str) -> Path:
     """Return a path within the site data directory.
 
-    CompilerGym uses a directory to store persistent site data files in, such as benchmark datasets.
-    The default location is :code:`~/.local/share/compiler_gym`. Set the environment variable
+    CompilerGym uses a directory to store persistent site data files in, such as
+    benchmark datasets. The default location is
+    :code:`~/.local/share/compiler_gym`. Set the environment variable
     :code:`$COMPILER_GYM_SITE_DATA` to override this default location.
 
     No checks are to made to ensure that the path, or the containing directory,
@@ -85,8 +86,8 @@ def cache_path(relpath: str) -> Path:
     """Return a path within the cache directory.
 
     CompilerGym uses a directory to cache files in, such as downloaded content.
-    The default location for this cache is :code:`~/.cache/compiler_gym`. Set
-    the environment variable :code:`$COMPILER_GYM_CACHE` to override this
+    The default location for this cache is :code:`~/.local/cache/compiler_gym`.
+    Set the environment variable :code:`$COMPILER_GYM_CACHE` to override this
     default location.
 
     No checks are to made to ensure that the path, or the containing directory,

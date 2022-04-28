@@ -73,8 +73,40 @@ In either case, calling :meth:`env.reset()
 new episode.
 
 
+Where does CompilerGym store files?
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+CompilerGym is a python library, and is located in the `site packages
+<https://docs.python.org/3/library/site.html#site.getsitepackages>`_ directory.
+Remove it using :code:`pip uninstall compiler_gym`. In addition, CompilerGym
+uses the following file system locations to store files:
+
+- :code:`~/.local/cache/compiler_gym` is used to cache files such as downloaded
+  datasets. Set environment variable :code:`$COMPILER_GYM_CACHE` to override
+  this default location.
+
+- :code:`~/.local/share/compiler_gym` is used to store additional datasets and
+  files that are not included in the core CompilerGym library. Set environment
+  variable :code:`$COMPILER_GYM_SITE_DATA` to override this default location.
+
+- :code:`/dev/shm/compiler_gym_${USER}` is used as an in-memory cache on Linux
+  systems which support it. Files in this cache are should not outlive the
+  lifespan of the CompilerGym environments that created them. Set environment
+  variable :code:`$COMPILER_GYM_TRANSIENT_CACHE` to override this default
+  location.
+
+- :code:`~/logs/compiler_gym` is used by some of the example scripts to store
+  logs and experiment artifacts. Set environment variable
+  :code:`$COMPILER_GYM_LOGS` to override this default location.
+
+It is perfectly safe to delete all of the above directories, so long as there
+are no active Python processes using CompilerGym. After deleting the above
+directories, you may notice a delay the next time you launch a CompilerGym
+environment as files and datasets are re-downloaded and unpacked.
+
+
 How do I debug crashes or errors?
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 The first step is to produce a minimal, reproducible example. The easiest way to
 do this is usually to copy your code into a new file and to iteratively remove
