@@ -24,7 +24,7 @@ def _create_timestamped_unique_service_dir(root: Path) -> Path:
         # the randomly generated working directories of multiple ServiceCache
         # constructors.
         try:
-            (path / "logs").mkdir(parents=True, exist_ok=False)
+            path.mkdir(parents=True, exist_ok=False)
             break
         except FileExistsError:
             pass
@@ -52,6 +52,7 @@ class ServiceCache:
 
     def __init__(self):
         self.path = _create_timestamped_unique_service_dir(transient_cache_path("."))
+        (self.path / "logs").mkdir()
 
         self._directories_to_remove = [self.path]
 
