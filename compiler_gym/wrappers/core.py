@@ -42,6 +42,9 @@ class CompilerEnvWrapper(CompilerEnv, Wrapper):
         # the observation_space_spec directly.
         self.env = env
 
+    def close(self):
+        self.env.close()
+
     def reset(self, *args, **kwargs) -> Optional[ObservationType]:
         return self.env.reset(*args, **kwargs)
 

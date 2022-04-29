@@ -60,6 +60,34 @@ class CompilerEnv(gym.Env, ABC):
         Reward after 100 steps: -0.32123
     """
 
+    @abstractmethod
+    def __init__(self):
+        """Construct an environment.
+
+        Do not construct an environment directly. Use :code:`gym.make()` on one
+        of the registered environments:
+
+        >>> with gym.make("llvm-v0") as env:
+        ...     pass  # Use environment
+        """
+        raise NotImplementedError("abstract class")
+
+    @abstractmethod
+    def close(self):
+        """Close the environment.
+
+        Once closed, :func:`reset` must be called before the environment is used
+        again.
+
+        .. note::
+
+            You must make sure to call :code:`env.close()` on a CompilerGym
+            environment when you are done with it. This is needed to perform
+            manual tidying up of temporary files and processes. See :ref:`the
+            FAQ <faq:Do I need to call env.close()?>` for more details.
+        """
+        raise NotImplementedError("abstract method")
+
     @property
     @abstractmethod
     def observation_space_spec(self) -> ObservationSpaceSpec:
