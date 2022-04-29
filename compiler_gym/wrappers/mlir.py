@@ -228,6 +228,9 @@ class MlirRlErrorWrapperEnv(CompilerEnvWrapper):
 def make_mlir_rl_wrapper_env(
     env: CompilerEnv, max_subactions: Optional[Integral] = None
 ):
+    """Create a wrapper for the MLIR environment that is suitable to interface with
+    off-the-shelf RL frameworks.
+    """
     env.reward_space = "runtime"
     env.observation_space = "Runtime"
     res = MlirRlActionWrapperEnv(env, max_subactions=max_subactions)
