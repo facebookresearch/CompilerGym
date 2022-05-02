@@ -108,7 +108,7 @@ Requires CMake (>=3.20).
 wget https://github.com/Kitware/CMake/releases/download/v3.20.5/cmake-3.20.5-linux-x86_64.sh -O cmake.sh
 bash cmake.sh --prefix=$HOME/.local --exclude-subdir --skip-license
 rm cmake.sh
-source ~/.profile
+export PATH=$HOME/.local/bin:$PATH
 ```
 
 ### Dependency Arguments
