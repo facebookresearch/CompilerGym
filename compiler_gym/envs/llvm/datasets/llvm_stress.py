@@ -9,8 +9,8 @@ from typing import Iterable
 import numpy as np
 
 from compiler_gym.datasets import Benchmark, Dataset
-from compiler_gym.datasets.benchmark import BenchmarkInitError
 from compiler_gym.datasets.uri import BenchmarkUri
+from compiler_gym.errors import BenchmarkInitError
 from compiler_gym.third_party import llvm
 from compiler_gym.util.commands import Popen
 

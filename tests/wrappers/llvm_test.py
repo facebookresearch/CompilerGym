@@ -7,8 +7,8 @@ import numpy as np
 import pytest
 from flaky import flaky
 
-from compiler_gym.datasets.benchmark import BenchmarkInitError
 from compiler_gym.envs.llvm import LlvmEnv
+from compiler_gym.errors import BenchmarkInitError
 from compiler_gym.wrappers import RuntimePointEstimateReward
 from tests.test_main import main
 

@@ -21,6 +21,7 @@ py_library(
     deps = [
         "//compiler_gym/datasets",
         "//compiler_gym/envs/llvm:llvm_benchmark",
+        "//compiler_gym/errors",
         "//compiler_gym/service/proto",
         "//compiler_gym/third_party/llvm",
         "//compiler_gym/util",

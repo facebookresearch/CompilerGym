@@ -62,3 +62,15 @@ cc_grpc_library(
     visibility = ["//visibility:public"],
     deps = [":compiler_gym_service_cc"],
 )
+
+cc_library(
+    name = "proto_cc",
+    srcs = ["Proto.cc"],
+    hdrs = ["Proto.h"],
+    visibility = ["//visibility:public"],
+    deps = [
+        "compiler_gym_service_cc",
+        "@glog",
+        "@magic_enum",
+    ],
+)

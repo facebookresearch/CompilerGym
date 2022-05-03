@@ -19,6 +19,7 @@ cg_py_library(
     ::named_discrete
     ::permutation
     ::reward
+    ::runtime_reward
     ::scalar
     ::sequence
     ::space_sequence
@@ -73,6 +74,18 @@ cg_py_library(
     "reward.py"
   DEPS
     ::scalar
+    compiler_gym::util::util
+  PUBLIC
+)
+
+cg_py_library(
+  NAME
+    runtime_reward
+  SRCS
+    "runtime_reward.py"
+  DEPS
+    ::reward
+    compiler_gym::errors::errors
     compiler_gym::util::util
   PUBLIC
 )

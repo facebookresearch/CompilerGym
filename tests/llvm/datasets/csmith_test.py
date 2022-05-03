@@ -14,7 +14,7 @@ from flaky import flaky
 import compiler_gym.envs.llvm  # noqa register environments
 from compiler_gym.envs.llvm import LlvmEnv
 from compiler_gym.envs.llvm.datasets import CsmithBenchmark, CsmithDataset
-from compiler_gym.service import ServiceError
+from compiler_gym.errors import ServiceError
 from tests.pytest_plugins.common import is_ci
 from tests.test_main import main
 

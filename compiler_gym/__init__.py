@@ -35,6 +35,7 @@ from compiler_gym.compiler_env_state import (
     CompilerEnvStateWriter,
 )
 from compiler_gym.envs import COMPILER_GYM_ENVS, CompilerEnv
+from compiler_gym.errors import ValidationError
 from compiler_gym.random_search import random_search
 from compiler_gym.util.debug_util import (
     get_debug_level,
@@ -49,7 +50,6 @@ from compiler_gym.util.runfiles_path import (
     transient_cache_path,
 )
 from compiler_gym.validate import validate_states
-from compiler_gym.validation_error import ValidationError
 from compiler_gym.validation_result import ValidationResult
 
 # The top-level compiler_gym API.

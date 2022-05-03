@@ -78,6 +78,7 @@ cg_py_test(
   DEPS
     compiler_gym::envs::llvm::llvm
     compiler_gym::envs::llvm::datasets::datasets
+    compiler_gym::errors::errors
     tests::pytest_plugins::common
     tests::pytest_plugins::llvm
     tests::test_main
@@ -114,6 +115,7 @@ cg_py_test(
   DEPS
     compiler_gym::envs::llvm::llvm
     compiler_gym::envs::llvm::datasets::datasets
+    compiler_gym::errors::errors
     tests::pytest_plugins::common
     tests::pytest_plugins::llvm
     tests::test_main

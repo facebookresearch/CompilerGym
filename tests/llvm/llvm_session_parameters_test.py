@@ -7,8 +7,7 @@ import pytest
 from flaky import flaky
 
 from compiler_gym.envs.llvm import LlvmEnv
-from compiler_gym.service import SessionNotFound
-from compiler_gym.service.connection import ServiceError
+from compiler_gym.errors import ServiceError, SessionNotFound
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.llvm"]

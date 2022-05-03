@@ -23,7 +23,7 @@ cg_py_library(
     "observation.py"
   DEPS
     ::observation_space_spec
-    compiler_gym::service::service
+    compiler_gym::errors::errors
     compiler_gym::service::proto::proto
     compiler_gym::util::util
   PUBLIC

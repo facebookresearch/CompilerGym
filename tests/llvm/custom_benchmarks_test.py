@@ -10,8 +10,9 @@ from pathlib import Path
 import gym
 import pytest
 
-from compiler_gym.datasets import Benchmark, BenchmarkInitError
+from compiler_gym.datasets import Benchmark
 from compiler_gym.envs import LlvmEnv, llvm
+from compiler_gym.errors import BenchmarkInitError
 from compiler_gym.service.proto import Benchmark as BenchmarkProto
 from compiler_gym.service.proto import File
 from compiler_gym.util.runfiles_path import runfiles_path

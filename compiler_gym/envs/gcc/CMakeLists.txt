@@ -18,7 +18,7 @@ cg_py_library(
   DEPS
     compiler_gym::service::client_service_compiler_env
     compiler_gym::envs::gcc::datasets::datasets
-    compiler_gym::service::service
+    compiler_gym::errors::errors
     compiler_gym::service::runtime::runtime
     compiler_gym::util::util
   PUBLIC

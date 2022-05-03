@@ -257,9 +257,7 @@ def print_service_capabilities(env: CompilerEnv):
             )
             print(table)
         else:
-            raise NotImplementedError(
-                "Only Commandline and NamedDiscrete are supported."
-            )
+            print(f'Action space "{action_space}" is not supported.')
 
 
 def main(argv):

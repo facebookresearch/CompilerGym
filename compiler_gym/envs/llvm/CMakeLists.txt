@@ -2,6 +2,9 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
+if(NOT COMPILER_GYM_ENABLE_LLVM_ENV)
+    return()
+endif()
 
 cg_add_all_subdirs()
 
@@ -35,6 +38,7 @@ cg_py_library(
     "llvm_benchmark.py"
   DEPS
     compiler_gym::datasets::datasets
+    compiler_gym::errors::errors
     compiler_gym::service::proto::proto
     compiler_gym::third_party::llvm::llvm
     compiler_gym::util::util
@@ -50,6 +54,7 @@ cg_py_library(
     ::llvm_benchmark
     ::llvm_rewards
     compiler_gym::datasets::datasets
+    compiler_gym::errors::errors
     compiler_gym::service::client_service_compiler_env
     compiler_gym::envs::llvm::datasets::datasets
     compiler_gym::spaces::spaces

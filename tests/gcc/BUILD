@@ -10,7 +10,7 @@ py_test(
     srcs = ["gcc_bin_test.py"],
     deps = [
         "//compiler_gym/envs/gcc",
-        "//compiler_gym/service",
+        "//compiler_gym/errors",
         "//tests:test_main",
         "//tests/pytest_plugins:gcc",
     ],
@@ -22,7 +22,7 @@ py_test(
     srcs = ["gcc_docker_test.py"],
     deps = [
         "//compiler_gym/envs/gcc",
-        "//compiler_gym/service",
+        "//compiler_gym/errors",
         "//tests:test_main",
         "//tests/pytest_plugins:common",
     ],
@@ -35,7 +35,7 @@ py_test(
     shard_count = 4,
     deps = [
         "//compiler_gym/envs/gcc",
-        "//compiler_gym/service",
+        "//compiler_gym/errors",
         "//compiler_gym/spaces",
         "//tests:test_main",
         "//tests/pytest_plugins:common",

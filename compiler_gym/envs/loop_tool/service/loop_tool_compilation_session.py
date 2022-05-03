@@ -13,7 +13,8 @@ import loop_tool_py as lt
 import numpy as np
 import pkg_resources
 
-from compiler_gym.service import CompilationSession, EnvironmentNotSupported
+from compiler_gym.errors import EnvironmentNotSupported
+from compiler_gym.service import CompilationSession
 from compiler_gym.service.proto import (
     ActionSpace,
     Benchmark,

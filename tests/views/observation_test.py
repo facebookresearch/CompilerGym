@@ -6,7 +6,7 @@
 import numpy as np
 import pytest
 
-from compiler_gym.service.connection import ServiceError
+from compiler_gym.errors import ServiceError
 from compiler_gym.service.proto import (
     DoubleBox,
     DoubleTensor,

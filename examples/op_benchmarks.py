@@ -29,7 +29,7 @@ from tabulate import tabulate
 
 import compiler_gym
 from compiler_gym import CompilerEnv
-from compiler_gym.datasets import BenchmarkInitError
+from compiler_gym.errors import BenchmarkInitError
 from compiler_gym.util.executor import Executor
 from compiler_gym.util.logging import init_logging
 from compiler_gym.util.runfiles_path import create_user_logs_dir

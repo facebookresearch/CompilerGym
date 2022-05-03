@@ -89,9 +89,10 @@ Status LocalShellCommand::checkOutput(std::string& stdout) const {
   try {
     boost::asio::io_context stdoutStream;
     std::future<std::string> stdoutFuture;
+    std::future<std::string> stderrFuture;
 
     bp::child process(arguments(), bp::std_in.close(), bp::std_out > stdoutFuture,
-                      bp::std_err > bp::null, bp::shell, stdoutStream, env());
+                      bp::std_err > stderrFuture, bp::shell, stdoutStream, env());
 
     if (!wait_for(process, timeout())) {
       return Status(StatusCode::DEADLINE_EXCEEDED,
@@ -101,8 +102,15 @@ Status LocalShellCommand::checkOutput(std::string& stdout) const {
     stdoutStream.run();
 
     if (process.exit_code()) {
-      return Status(StatusCode::INTERNAL, fmt::format("Command '{}' failed with exit code {}",
-                                                      commandline(), process.exit_code()));
+      const std::string stderr = stderrFuture.get();
+      if (stderr.size()) {
+        return Status(StatusCode::INTERNAL,
+                      fmt::format("Command '{}' failed with exit code {}: {}", commandline(),
+                                  process.exit_code(), stderr));
+      } else {
+        return Status(StatusCode::INTERNAL, fmt::format("Command '{}' failed with exit code {}",
+                                                        commandline(), process.exit_code()));
+      }
     }
 
     stdout = stdoutFuture.get();

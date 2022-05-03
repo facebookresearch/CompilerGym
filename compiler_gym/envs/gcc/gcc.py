@@ -28,7 +28,7 @@ from typing import Dict, List, NamedTuple, Optional, Union
 
 import docker
 
-from compiler_gym.service import EnvironmentNotSupported, ServiceError, ServiceInitError
+from compiler_gym.errors import EnvironmentNotSupported, ServiceError, ServiceInitError
 from compiler_gym.util.filesystem import atomic_file_write
 from compiler_gym.util.runfiles_path import site_data_path
 

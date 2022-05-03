@@ -62,3 +62,14 @@ py_grpc_library(
     SRCS "::compiler_gym_service"
     DEPS "::compiler_gym_service_py"
 )
+
+cg_cc_library(
+  NAME proto_cc
+  SRCS Proto.cc
+  HDRS Proto.h
+  DEPS
+    compiler_gym_service_cc
+  ABS_DEPS
+    glog::glog
+    magic_enum
+)

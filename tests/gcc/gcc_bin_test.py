@@ -7,7 +7,7 @@ import gym
 import pytest
 
 import compiler_gym.envs.gcc  # noqa register environments
-from compiler_gym.service import ServiceError
+from compiler_gym.errors import ServiceError
 from tests.pytest_plugins.gcc import with_system_gcc, without_system_gcc
 from tests.test_main import main
 

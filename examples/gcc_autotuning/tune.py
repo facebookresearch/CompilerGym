@@ -19,7 +19,7 @@ import compiler_gym.util.flags.output_dir  # noqa Flag definition.
 import compiler_gym.util.flags.seed  # noqa Flag definition.
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.envs.gcc import DEFAULT_GCC
-from compiler_gym.service import ServiceError
+from compiler_gym.errors import ServiceError
 from compiler_gym.util.executor import Executor
 from compiler_gym.util.runfiles_path import create_user_logs_dir
 

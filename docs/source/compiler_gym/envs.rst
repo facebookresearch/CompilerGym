@@ -28,8 +28,16 @@ LlvmEnv
 .. autoclass:: LlvmEnv
    :members:
 
+
 GccEnv
 -------
 
 .. autoclass:: GccEnv
+   :members:
+
+
+MlirEnv
+-------
+
+.. autoclass:: MlirEnv
    :members:

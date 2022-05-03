@@ -11,6 +11,7 @@ py_test(
     deps = [
         "//compiler_gym",
         "//compiler_gym/envs",
+        "//compiler_gym/errors",
         "//compiler_gym/service",
         "//tests:test_main",
     ],

@@ -5,8 +5,8 @@
 """Fuzz test LLVM backend using llvm-stress."""
 import pytest
 
-from compiler_gym.datasets import BenchmarkInitError
 from compiler_gym.envs import LlvmEnv
+from compiler_gym.errors import BenchmarkInitError
 from tests.pytest_plugins.random_util import apply_random_trajectory
 from tests.test_main import main
 

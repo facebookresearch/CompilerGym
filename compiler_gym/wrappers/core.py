@@ -329,7 +329,7 @@ class ObservationWrapper(CompilerEnvWrapper, ABC):
         return self.convert_observation(observation), reward, done, info
 
     @abstractmethod
-    def convert_observation(self, observation):
+    def convert_observation(self, observation: ObservationType) -> ObservationType:
         """Translate an observation to the new space."""
         raise NotImplementedError
 

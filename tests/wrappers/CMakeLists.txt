@@ -5,6 +5,10 @@
 
 cg_add_all_subdirs()
 
+if(NOT COMPILER_GYM_ENABLE_LLVM_ENV)
+    return()
+endif()
+
 cg_py_test(
   NAME
     commandline_wrappers_test
@@ -43,6 +47,7 @@ cg_py_test(
   SRCS "llvm_test.py"
   DEPS
     compiler_gym::envs::llvm::llvm
+    compiler_gym::errors::errors
     compiler_gym::wrappers::wrappers
     tests::test_main
     tests::pytest_plugins::llvm

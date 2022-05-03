@@ -35,6 +35,7 @@ py_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//compiler_gym/errors",
         "@rules_python//python/runfiles",
     ],
 )

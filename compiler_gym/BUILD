@@ -18,6 +18,7 @@ py_library(
         "//compiler_gym/bin",
         "//compiler_gym/datasets",
         "//compiler_gym/envs",
+        "//compiler_gym/errors",
         "//compiler_gym/leaderboard",
         "//compiler_gym/service",
         "//compiler_gym/spaces",
@@ -51,11 +52,11 @@ py_library(
 py_library(
     name = "random_search",
     srcs = ["random_search.py"],
-    data = ["//compiler_gym/envs/llvm/service"],
     visibility = ["//visibility:public"],
     deps = [
+        ":config",
         "//compiler_gym/envs",
-        "//compiler_gym/service:connection",
+        "//compiler_gym/errors",
         "//compiler_gym/util",
     ],
 )
@@ -77,6 +78,7 @@ py_library(
     name = "validation_error",
     srcs = ["validation_error.py"],
     visibility = ["//compiler_gym:__subpackages__"],
+    deps = ["//compiler_gym/errors"],
 )
 
 py_library(
@@ -86,6 +88,20 @@ py_library(
     deps = [
         ":compiler_env_state",
         ":validation_error",
+        "//compiler_gym/errors",
         "//compiler_gym/util",
     ],
+)
+
+genrule(
+    name = "make_config",
+    srcs = ["make_config.py"],
+    outs = ["config.py"],
+    cmd = "\"$<\" --out-file-path \"$@\" --enable-llvm-env",
+)
+
+py_library(
+    name = "config",
+    srcs = [":config.py"],
+    visibility = ["//compiler_gym:__subpackages__"],
 )

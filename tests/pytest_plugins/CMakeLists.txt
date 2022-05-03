@@ -17,20 +17,36 @@ cg_py_library(
   PUBLIC
 )
 
-cg_py_library(
-  NAME
-    llvm
-  SRCS
-    "llvm.py"
-  DATA
-    compiler_gym::third_party::cbench::benchmarks_list
-  DEPS
-    compiler_gym::envs::llvm::llvm
-    compiler_gym::third_party::llvm::llvm
-    compiler_gym::util::util
-  TESTONLY
-  PUBLIC
-)
+if(COMPILER_GYM_ENABLE_LLVM_ENV)
+    cg_py_library(
+      NAME
+        llvm
+      SRCS
+        "llvm.py"
+      DATA
+        compiler_gym::third_party::cbench::benchmarks_list
+      DEPS
+        compiler_gym::envs::llvm::llvm
+        compiler_gym::third_party::llvm::llvm
+        compiler_gym::util::util
+      TESTONLY
+      PUBLIC
+    )
+endif()
+
+if(COMPILER_GYM_ENABLE_MLIR_ENV)
+    cg_py_library(
+      NAME
+        mlir
+      SRCS
+        "mlir.py"
+      DEPS
+        compiler_gym::envs::mlir::mlir
+        compiler_gym::util::util
+      TESTONLY
+      PUBLIC
+    )
+endif()
 
 cg_py_library(
   NAME

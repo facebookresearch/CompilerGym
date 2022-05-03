@@ -81,6 +81,7 @@ py_test(
     deps = [
         "//compiler_gym/envs/llvm",
         "//compiler_gym/envs/llvm/datasets",
+        "//compiler_gym/errors",
         "//tests:test_main",
         "//tests/pytest_plugins:common",
         "//tests/pytest_plugins:llvm",
@@ -118,6 +119,7 @@ py_test(
     deps = [
         "//compiler_gym/envs/llvm",
         "//compiler_gym/envs/llvm/datasets",
+        "//compiler_gym/errors",
         "//tests:test_main",
         "//tests/pytest_plugins:common",
         "//tests/pytest_plugins:llvm",

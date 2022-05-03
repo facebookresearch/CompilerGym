@@ -11,9 +11,9 @@ import numpy as np
 import pytest
 
 import compiler_gym.envs.llvm  # noqa register environments
-from compiler_gym.datasets import BenchmarkInitError
 from compiler_gym.envs.llvm import LlvmEnv
 from compiler_gym.envs.llvm.datasets import LlvmStressDataset
+from compiler_gym.errors import BenchmarkInitError
 from tests.pytest_plugins.common import is_ci
 from tests.test_main import main
 

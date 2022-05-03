@@ -11,9 +11,9 @@ from typing import Iterable, List
 from pydantic import BaseModel, validator
 
 from compiler_gym.compiler_env_state import CompilerEnvState
+from compiler_gym.errors import ValidationError
 from compiler_gym.util.shell_format import plural
 from compiler_gym.util.truncate import truncate
-from compiler_gym.validation_error import ValidationError
 
 
 class ValidationResult(BaseModel):

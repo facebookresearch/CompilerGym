@@ -5,13 +5,15 @@
 
 cg_add_all_subdirs()
 
-cg_py_test(
-  NAME
-    llvm_instcount_test
-  SRCS
-    "llvm_instcount_test.py"
-  DEPS
-    compiler_gym::leaderboard::llvm_instcount
-    tests::pytest_plugins::common
-    tests::test_main
-)
+if(COMPILER_GYM_ENABLE_LLVM_ENV)
+    cg_py_test(
+      NAME
+        llvm_instcount_test
+      SRCS
+        "llvm_instcount_test.py"
+      DEPS
+        compiler_gym::leaderboard::llvm_instcount
+        tests::pytest_plugins::common
+        tests::test_main
+    )
+endif()

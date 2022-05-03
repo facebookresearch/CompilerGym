@@ -13,3 +13,13 @@ cg_py_test(
     compiler_gym::spaces::spaces
     tests::test_main
 )
+
+cg_cc_test(
+  NAME proto_cc_test
+  SRCS ProtoTest.cc
+  DEPS
+    compiler_gym::service::proto::proto_cc
+    tests::TestMain
+  ABS_DEPS
+    GTest::GTest
+)

@@ -14,6 +14,8 @@ endif()
 
 project(compiler_gym ASM C CXX)
 
+set(CMAKE_EXECUTE_PROCESS_COMMAND_ECHO STDOUT)
+
 set(CMAKE_C_STANDARD 11 CACHE STRING "C standard to be used.")
 set(CMAKE_CXX_STANDARD 17 CACHE STRING "C++ standard to be used.")
 
@@ -65,6 +67,17 @@ if(NOT CMAKE_BUILD_TYPE AND NOT CMAKE_CONFIGURATION_TYPES)
         FORCE
     )
 endif()
+
+option(
+    COMPILER_GYM_ENABLE_MLIR_ENV
+    "Whether or not to include the MLIR environment"
+    OFF
+)
+option(
+    COMPILER_GYM_ENABLE_LLVM_ENV
+    "Whether or not to include the LLVM environment"
+    ON
+)
 
 set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
 

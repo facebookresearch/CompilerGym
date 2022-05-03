@@ -18,6 +18,7 @@ py_library(
     deps = [
         ":uri",
         "//compiler_gym:validation_result",
+        "//compiler_gym/errors",
         "//compiler_gym/service/proto",
         "//compiler_gym/util",
     ],

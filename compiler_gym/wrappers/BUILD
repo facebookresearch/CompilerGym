@@ -17,6 +17,7 @@ py_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
+        "//compiler_gym:config",
         "//compiler_gym/datasets",
         "//compiler_gym/envs",
         "//compiler_gym/util",

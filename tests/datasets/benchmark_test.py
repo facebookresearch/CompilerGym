@@ -8,8 +8,8 @@ from pathlib import Path
 import pytest
 
 from compiler_gym.datasets import Benchmark, BenchmarkSource
+from compiler_gym.errors import ValidationError
 from compiler_gym.service.proto import Benchmark as BenchmarkProto
-from compiler_gym.validation_error import ValidationError
 from tests.test_main import main
 
 pytest_plugins = ["tests.pytest_plugins.common"]

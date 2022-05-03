@@ -10,7 +10,7 @@ from typing import Iterable, List, Optional, Union, cast
 
 import numpy as np
 
-from compiler_gym.datasets import Benchmark, BenchmarkInitError, Dataset
+from compiler_gym.datasets import Benchmark, Dataset
 from compiler_gym.envs.llvm.datasets import get_llvm_datasets
 from compiler_gym.envs.llvm.llvm_benchmark import ClangInvocation, make_benchmark
 from compiler_gym.envs.llvm.llvm_rewards import (
@@ -18,6 +18,7 @@ from compiler_gym.envs.llvm.llvm_rewards import (
     CostFunctionReward,
     NormalizedReward,
 )
+from compiler_gym.errors import BenchmarkInitError
 from compiler_gym.service.client_service_compiler_env import ClientServiceCompilerEnv
 from compiler_gym.spaces import Box, Commandline
 from compiler_gym.spaces import Dict as DictSpace

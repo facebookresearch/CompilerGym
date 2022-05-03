@@ -340,6 +340,7 @@ message Space {
     FloatBox float_box = 22;
     DoubleBox double_box = 23;
     google.protobuf.Any any_value = 24;
+    ListSpace space_union = 26;
   }
 }
 
