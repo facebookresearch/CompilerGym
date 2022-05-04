@@ -10,7 +10,7 @@ Ubuntu 18.04, Fedora 28, Debian 10 or newer equivalents).
 # Building from Source
 
 If you prefer, you may build from source. This requires a modern C++ toolchain
-and bazel.
+and Bazel or CMake.
 
 ## macOS
 
@@ -73,6 +73,8 @@ remote changes to the CompilerGym repository.
 
 ## Building from source with Bazel
 
+It is recomended to build with Bazel.
+
 Run the test suite to confirm that everything is working:
 
     make test
@@ -93,7 +95,7 @@ environment using:
 
 ## Building from source with CMake
 
-Darwin is not supported with CMake.
+Building with CMake is still experimental. Darwin is not supported with CMake.
 
 ### Dependency instructions for Ubuntu
 
