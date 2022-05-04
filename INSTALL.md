@@ -100,7 +100,7 @@ Building with CMake is still experimental. Darwin is not supported with CMake.
 ### Dependency instructions for Ubuntu
 
 ```bash
-sudo apt-get install g++ lld-9 \
+sudo apt-get install g++ lld \
   autoconf libtool ninja-build ccache git \
 ```
 
