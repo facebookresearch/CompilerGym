@@ -157,14 +157,6 @@ Additional optional configuration arguments:
     -DCOMPILER_GYM_BUILD_EXAMPLES=ON
     ```
 
-* For faster linking.
-
-    ```bash
-    -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=lld-9"
-    -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=lld-9"
-    -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=lld-9"
-    ```
-
 * For faster rebuilds.
 
     ```bash

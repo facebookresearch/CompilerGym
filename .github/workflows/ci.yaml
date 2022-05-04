@@ -71,9 +71,6 @@ jobs:
                       -GNinja \
                       -DCMAKE_C_COMPILER=clang \
                       -DCMAKE_CXX_COMPILER=clang++ \
-                      -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=lld" \
-                      -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=lld" \
-                      -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=lld" \
                       -DCOMPILER_GYM_LLVM_PROVIDER=external \
                       -DLLVM_DIR=$HOME/llvm/lib/cmake/llvm \
                       -DPython3_FIND_VIRTUALENV=FIRST \
