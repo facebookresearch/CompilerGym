@@ -73,7 +73,7 @@ jobs:
                       -DCMAKE_CXX_COMPILER=clang++ \
                       -DCOMPILER_GYM_LLVM_PROVIDER=external \
                       -DLLVM_DIR=$HOME/llvm/lib/cmake/llvm \
-                      -DPython3_FIND_VIRTUALENV=FIRST \
+                      -DPython3_FIND_UNVERSIONED_NAMES=FIRST \
                       -DCOMPILER_GYM_BUILD_TESTS=ON \
                       -DCOMPILER_GYM_BUILD_EXAMPLES=ON \
                       -S . \
@@ -119,14 +119,11 @@ jobs:
                       -GNinja \
                       -DCMAKE_C_COMPILER=clang \
                       -DCMAKE_CXX_COMPILER=clang++ \
-                      -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=lld" \
-                      -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=lld" \
-                      -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=lld" \
                       -DCOMPILER_GYM_LLVM_PROVIDER=external \
                       -DLLVM_DIR=$HOME/llvm/lib/cmake/llvm \
                       -DMLIR_DIR=$HOME/llvm/lib/cmake/mlir \
                       -DClang_DIR=$HOME/llvm/lib/cmake/clang \
-                      -DPython3_FIND_VIRTUALENV=FIRST \
+                      -DPython3_FIND_UNVERSIONED_NAMES=FIRST \
                       -DCOMPILER_GYM_ENABLE_MLIR_ENV=ON \
                       -DCOMPILER_GYM_ENABLE_LLVM_ENV=OFF \
                       -DCOMPILER_GYM_BUILD_TESTS=ON \
