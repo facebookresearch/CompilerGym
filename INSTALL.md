@@ -31,7 +31,7 @@ Now proceed to [All platforms](#all-platforms) below.
 On debian-based linux systems, install the required toolchain using:
 
 ```sh
-sudo apt install -y clang-9 clang++-9 clang-format golang libjpeg-dev \
+sudo apt install -y clang-9 clang-format golang libjpeg-dev \
   libtinfo5 m4 make patch zlib1g-dev tar bzip2 wget
 mkdir -pv ~/.local/bin
 wget https://github.com/bazelbuild/bazelisk/releases/download/v1.7.5/bazelisk-linux-amd64 -O ~/.local/bin/bazel
