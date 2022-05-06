@@ -10,7 +10,7 @@ Ubuntu 18.04, Fedora 28, Debian 10 or newer equivalents).
 # Building from Source
 
 If you prefer, you may build from source. This requires a modern C++ toolchain
-and Bazel or CMake.
+Bazel and CMake.
 
 ## macOS
 
@@ -54,7 +54,7 @@ with the required dependencies:
 
     conda create -y -n compiler_gym python=3.8
     conda activate compiler_gym
-    conda install -y -c conda-forge doxygen pandoc patchelf
+    conda install -y -c conda-forge cmake doxygen pandoc patchelf
 
 Then clone the CompilerGym source code using:
 
