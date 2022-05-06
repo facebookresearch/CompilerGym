@@ -75,6 +75,7 @@ function(cg_py_library)
         list(APPEND _BIN_PATHS "${_SRC_BIN_PATH}")
     endforeach()
 
+    list(APPEND _BIN_PATHS ${_RULE_GENERATED_SRCS})
     set(_DEPS ${_RULE_DEPS} ${_BIN_PATHS})
     add_custom_target(${_NAME} ALL DEPENDS ${_DEPS})
 
