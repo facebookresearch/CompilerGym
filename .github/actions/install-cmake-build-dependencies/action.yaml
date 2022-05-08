@@ -12,7 +12,7 @@ runs:
                   brew install bazelisk ccache cmake zlib
               else
                   # Compiler
-                  sudo apt-get install -y bzip2 clang-9 clang++-9 lld-9 tar bzip2 ninja-build tar ninja-build
+                  sudo apt install -y bzip2 clang-9 lld tar bzip2 ninja-build tar
                   # CMake
                   wget https://github.com/Kitware/CMake/releases/download/v3.20.5/cmake-3.20.5-linux-x86_64.sh -O /tmp/cmake.sh
                   sudo bash /tmp/cmake.sh --prefix=/usr/local --exclude-subdir --skip-license
