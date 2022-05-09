@@ -32,8 +32,6 @@ cg_py_library(
     "thread_pool.py"
     "timer.py"
     "truncate.py"
-  GENERATED_SRCS
-    "$<TARGET_PROPERTY:compiler_gym__util__make_version,LOCATION>"
   DEPS
     make_version
     compiler_gym::errors::errors

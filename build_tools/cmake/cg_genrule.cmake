@@ -7,6 +7,7 @@ include_guard(GLOBAL)
 
 include(CMakeParseArguments)
 include(cg_macros)
+include(cg_target_outputs)
 
 # cg_genrule()
 #
@@ -55,10 +56,11 @@ function(cg_genrule)
     string(REPLACE "$(@D)" "${_OUTS_DIR}" _CMD "${_CMD}")
 
     if(_OUTS)
+        cg_target_outputs(TARGETS ${_DEPS} RESULT _DEPS_OUTPUTS)
         add_custom_command(
             OUTPUT ${_OUTS}
             COMMAND bash -c "${_CMD}"
-            DEPENDS ${_DEPS} ${_SRCS}
+            DEPENDS ${_DEPS} ${_DEPS_OUTPUTS} ${_SRCS}
             VERBATIM
             USES_TERMINAL
         )
@@ -83,7 +85,7 @@ function(cg_genrule)
         )
     endif()
 
-    set_target_properties(${_NAME} PROPERTIES OUTPUTS "${_OUTS}")
+    set_property(TARGET ${_NAME} PROPERTY OUTPUTS ${_OUTS})
 
     list(LENGTH _OUTS _OUTS_LENGTH)
     if(_OUTS_LENGTH EQUAL "1")

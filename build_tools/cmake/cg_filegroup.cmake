@@ -3,10 +3,18 @@
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
 
+include_guard(GLOBAL)
+include(cg_target_outputs)
+
 function(cg_filegroup)
     cmake_parse_arguments(_ARG "PUBLIC" "NAME" "FILES;DEPENDS" ${ARGN})
     rename_bazel_targets(_NAME "${_ARG_NAME}")
     add_custom_target(${_NAME})
+
+    rename_bazel_targets(_DEPS "${_ARG_DEPENDS}")
+    cg_target_outputs(TARGETS ${_DEPS} RESULT _DEPS_OUTPUTS)
+
+    unset(_OUTPUTS)
 
     foreach(FILE_ ${_ARG_FILES})
         if(IS_ABSOLUTE "${FILE_}")
@@ -29,22 +37,19 @@ function(cg_filegroup)
                     COMMAND
                         ${CMAKE_COMMAND} -E create_symlink "${_INPUT_PATH}"
                         "${_OUTPUT_PATH}"
-                    DEPENDS "${_INPUT_PATH}"
+                    DEPENDS "${_INPUT_PATH}" ${_DEPS_OUTPUTS}
                 )
             endif()
             add_custom_target(${_TARGET} DEPENDS "${_OUTPUT_PATH}")
         endif()
+        list(APPEND _OUTPUTS "${_OUTPUT_PATH}")
 
         add_dependencies(${_NAME} ${_TARGET})
     endforeach()
 
     if(_ARG_DEPENDS)
-        rename_bazel_targets(_DEPS "${_ARG_DEPENDS}")
         add_dependencies(${_NAME} ${_DEPS})
     endif()
 
-    set_target_properties(
-        ${_NAME}
-        PROPERTIES IS_FILEGROUP TRUE OUTPUTS "${_SRCS}"
-    )
+    set_property(TARGET ${_NAME} PROPERTY OUTPUTS ${_OUTPUTS})
 endfunction()
