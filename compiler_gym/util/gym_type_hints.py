@@ -2,8 +2,8 @@
 #
 # This source code is licensed under the MIT license found in the
 # LICENSE file in the root directory of this source tree.
-from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
 from enum import Enum
+from typing import Any, Dict, List, Optional, Tuple, TypeVar, Union
 
 # A JSON dictionary.
 JsonDictType = Dict[str, Any]
