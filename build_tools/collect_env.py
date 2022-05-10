@@ -84,46 +84,49 @@ from __future__ import print_function
 # Unlike the rest of the PyTorch this file must be python2 compliant.
 # This script outputs relevant system environment info
 # Run it with `python collect_env.py`.
-import datetime
 import locale
+import os
 import re
 import subprocess
 import sys
-import os
 from collections import namedtuple
-
 
 try:
     import compiler_gym
+
     COMPILER_GYM_AVAILABLE = True
 except (ImportError, NameError, AttributeError, OSError):
     COMPILER_GYM_AVAILABLE = False
 
 # System Environment Information
-SystemEnv = namedtuple('SystemEnv', [
-    'compiler_gym_version',
-    'is_debug_build',
-    'gcc_version',
-    'clang_version',
-    'cmake_version',
-    'os',
-    'libc_version',
-    'python_version',
-    'python_platform',
-    'pip_version',  # 'pip' or 'pip3'
-    'pip_packages',
-    'conda_packages',
-])
+SystemEnv = namedtuple(
+    "SystemEnv",
+    [
+        "compiler_gym_version",
+        "is_debug_build",
+        "gcc_version",
+        "clang_version",
+        "cmake_version",
+        "os",
+        "libc_version",
+        "python_version",
+        "python_platform",
+        "pip_version",  # 'pip' or 'pip3'
+        "pip_packages",
+        "conda_packages",
+    ],
+)
 
 
 def run(command):
     """Returns (return-code, stdout, stderr)"""
-    p = subprocess.Popen(command, stdout=subprocess.PIPE,
-                         stderr=subprocess.PIPE, shell=True)
+    p = subprocess.Popen(
+        command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True
+    )
     raw_output, raw_err = p.communicate()
     rc = p.returncode
-    if get_platform() == 'win32':
-        enc = 'oem'
+    if get_platform() == "win32":
+        enc = "oem"
     else:
         enc = locale.getpreferredencoding()
     output = raw_output.decode(enc)
@@ -149,95 +152,103 @@ def run_and_parse_first_match(run_lambda, command, regex):
         return None
     return match.group(1)
 
+
 def run_and_return_first_line(run_lambda, command):
     """Runs command using run_lambda and returns first line if output is not empty"""
     rc, out, _ = run_lambda(command)
     if rc != 0:
         return None
-    return out.split('\n')[0]
+    return out.split("\n")[0]
 
 
 def get_conda_packages(run_lambda):
-    if get_platform() == 'win32':
-        system_root = os.environ.get('SYSTEMROOT', 'C:\\Windows')
-    conda = os.environ.get('CONDA_EXE', 'conda')
-    out = run_and_read_all(run_lambda, conda + ' list')
+    conda = os.environ.get("CONDA_EXE", "conda")
+    out = run_and_read_all(run_lambda, conda + " list")
     if out is None:
         return out
     # Comment starting at beginning of line
-    comment_regex = re.compile(r'^#.*\n')
-    return re.sub(comment_regex, '', out)
+    comment_regex = re.compile(r"^#.*\n")
+    return re.sub(comment_regex, "", out)
 
 
 def get_gcc_version(run_lambda):
-    return run_and_parse_first_match(run_lambda, 'gcc --version', r'gcc (.*)')
+    return run_and_parse_first_match(run_lambda, "gcc --version", r"gcc (.*)")
+
 
 def get_clang_version(run_lambda):
-    return run_and_parse_first_match(run_lambda, 'clang --version', r'clang version (.*)')
+    return run_and_parse_first_match(
+        run_lambda, "clang --version", r"clang version (.*)"
+    )
 
 
 def get_cmake_version(run_lambda):
-    return run_and_parse_first_match(run_lambda, 'cmake --version', r'cmake (.*)')
+    return run_and_parse_first_match(run_lambda, "cmake --version", r"cmake (.*)")
 
 
 def get_platform():
-    if sys.platform.startswith('linux'):
-        return 'linux'
-    elif sys.platform.startswith('win32'):
-        return 'win32'
-    elif sys.platform.startswith('cygwin'):
-        return 'cygwin'
-    elif sys.platform.startswith('darwin'):
-        return 'darwin'
+    if sys.platform.startswith("linux"):
+        return "linux"
+    elif sys.platform.startswith("win32"):
+        return "win32"
+    elif sys.platform.startswith("cygwin"):
+        return "cygwin"
+    elif sys.platform.startswith("darwin"):
+        return "darwin"
     else:
         return sys.platform
 
 
 def get_mac_version(run_lambda):
-    return run_and_parse_first_match(run_lambda, 'sw_vers -productVersion', r'(.*)')
+    return run_and_parse_first_match(run_lambda, "sw_vers -productVersion", r"(.*)")
 
 
 def get_windows_version(run_lambda):
-    system_root = os.environ.get('SYSTEMROOT', 'C:\\Windows')
-    wmic_cmd = os.path.join(system_root, 'System32', 'Wbem', 'wmic')
-    findstr_cmd = os.path.join(system_root, 'System32', 'findstr')
-    return run_and_read_all(run_lambda, '{} os get Caption | {} /v Caption'.format(wmic_cmd, findstr_cmd))
+    system_root = os.environ.get("SYSTEMROOT", "C:\\Windows")
+    wmic_cmd = os.path.join(system_root, "System32", "Wbem", "wmic")
+    findstr_cmd = os.path.join(system_root, "System32", "findstr")
+    return run_and_read_all(
+        run_lambda, "{} os get Caption | {} /v Caption".format(wmic_cmd, findstr_cmd)
+    )
 
 
 def get_lsb_version(run_lambda):
-    return run_and_parse_first_match(run_lambda, 'lsb_release -a', r'Description:\t(.*)')
+    return run_and_parse_first_match(
+        run_lambda, "lsb_release -a", r"Description:\t(.*)"
+    )
 
 
 def check_release_file(run_lambda):
-    return run_and_parse_first_match(run_lambda, 'cat /etc/*-release',
-                                     r'PRETTY_NAME="(.*)"')
+    return run_and_parse_first_match(
+        run_lambda, "cat /etc/*-release", r'PRETTY_NAME="(.*)"'
+    )
 
 
 def get_os(run_lambda):
     from platform import machine
+
     platform = get_platform()
 
-    if platform == 'win32' or platform == 'cygwin':
+    if platform == "win32" or platform == "cygwin":
         return get_windows_version(run_lambda)
 
-    if platform == 'darwin':
+    if platform == "darwin":
         version = get_mac_version(run_lambda)
         if version is None:
             return None
-        return 'macOS {} ({})'.format(version, machine())
+        return "macOS {} ({})".format(version, machine())
 
-    if platform == 'linux':
+    if platform == "linux":
         # Ubuntu/Debian based
         desc = get_lsb_version(run_lambda)
         if desc is not None:
-            return '{} ({})'.format(desc, machine())
+            return "{} ({})".format(desc, machine())
 
         # Try reading /etc/*-release
         desc = check_release_file(run_lambda)
         if desc is not None:
-            return '{} ({})'.format(desc, machine())
+            return "{} ({})".format(desc, machine())
 
-        return '{} ({})'.format(platform, machine())
+        return "{} ({})".format(platform, machine())
 
     # Unknown platform
     return platform
@@ -245,18 +256,20 @@ def get_os(run_lambda):
 
 def get_python_platform():
     import platform
+
     return platform.platform()
 
 
 def get_libc_version():
     import platform
-    if get_platform() != 'linux':
-        return 'N/A'
-    return '-'.join(platform.libc_ver())
+
+    if get_platform() != "linux":
+        return "N/A"
+    return "-".join(platform.libc_ver())
 
 
 def indent(s):
-    return '    ' + '\n    '.join(s.split("\n"))
+    return "    " + "\n    ".join(s.split("\n"))
 
 
 def get_pip_packages(run_lambda):
@@ -265,17 +278,18 @@ def get_pip_packages(run_lambda):
     # People generally have `pip` as `pip` or `pip3`
     # But here it is incoved as `python -mpip`
     def run_with_pip(pip):
-        return run_and_read_all(run_lambda, pip + ' list --format=freeze')
+        return run_and_read_all(run_lambda, pip + " list --format=freeze")
 
-    pip_version = 'pip3' if sys.version[0] == '3' else 'pip'
-    out = run_with_pip(sys.executable + ' -mpip')
+    pip_version = "pip3" if sys.version[0] == "3" else "pip"
+    out = run_with_pip(sys.executable + " -mpip")
 
     return pip_version, out
 
 
 def get_cachingallocator_config():
-    ca_config = os.environ.get('PYTORCH_CUDA_ALLOC_CONF', '')
+    ca_config = os.environ.get("PYTORCH_CUDA_ALLOC_CONF", "")
     return ca_config
+
 
 def get_env_info():
     run_lambda = run
@@ -284,16 +298,18 @@ def get_env_info():
     if COMPILER_GYM_AVAILABLE:
         version_str = compiler_gym.__version__
         # NOTE(cummins): CompilerGym does not yet have a debug string.
-        debug_mode_str = 'N/A'
+        debug_mode_str = "N/A"
     else:
-        version_str = debug_mode_str = 'N/A'
+        version_str = debug_mode_str = "N/A"
 
     sys_version = sys.version.replace("\n", " ")
 
     return SystemEnv(
         compiler_gym_version=version_str,
         is_debug_build=debug_mode_str,
-        python_version='{} ({}-bit runtime)'.format(sys_version, sys.maxsize.bit_length() + 1),
+        python_version="{} ({}-bit runtime)".format(
+            sys_version, sys.maxsize.bit_length() + 1
+        ),
         python_platform=get_python_platform(),
         pip_version=pip_version,
         pip_packages=pip_list_output,
@@ -304,6 +320,7 @@ def get_env_info():
         clang_version=get_clang_version(run_lambda),
         cmake_version=get_cmake_version(run_lambda),
     )
+
 
 env_info_fmt = """
 CompilerGym: {compiler_gym_version}
@@ -325,14 +342,14 @@ Versions of all installed libraries:
 
 
 def pretty_str(envinfo):
-    def replace_nones(dct, replacement='Could not collect'):
+    def replace_nones(dct, replacement="Could not collect"):
         for key in dct.keys():
             if dct[key] is not None:
                 continue
             dct[key] = replacement
         return dct
 
-    def replace_bools(dct, true='Yes', false='No'):
+    def replace_bools(dct, true="Yes", false="No"):
         for key in dct.keys():
             if dct[key] is True:
                 dct[key] = true
@@ -340,20 +357,20 @@ def pretty_str(envinfo):
                 dct[key] = false
         return dct
 
-    def prepend(text, tag='[prepend]'):
-        lines = text.split('\n')
+    def prepend(text, tag="[prepend]"):
+        lines = text.split("\n")
         updated_lines = [tag + line for line in lines]
-        return '\n'.join(updated_lines)
+        return "\n".join(updated_lines)
 
-    def replace_if_empty(text, replacement='No relevant packages'):
+    def replace_if_empty(text, replacement="No relevant packages"):
         if text is not None and len(text) == 0:
             return replacement
         return text
 
     def maybe_start_on_next_line(string):
         # If `string` is multiline, prepend a \n to it.
-        if string is not None and len(string.split('\n')) > 1:
-            return '\n{}\n'.format(string)
+        if string is not None and len(string.split("\n")) > 1:
+            return "\n{}\n".format(string)
         return string
 
     mutable_dict = envinfo._asdict()
@@ -365,17 +382,19 @@ def pretty_str(envinfo):
     mutable_dict = replace_nones(mutable_dict)
 
     # If either of these are '', replace with 'No relevant packages'
-    mutable_dict['pip_packages'] = replace_if_empty(mutable_dict['pip_packages'])
-    mutable_dict['conda_packages'] = replace_if_empty(mutable_dict['conda_packages'])
+    mutable_dict["pip_packages"] = replace_if_empty(mutable_dict["pip_packages"])
+    mutable_dict["conda_packages"] = replace_if_empty(mutable_dict["conda_packages"])
 
     # Tag conda and pip packages with a prefix
     # If they were previously None, they'll show up as ie '[conda] Could not collect'
-    if mutable_dict['pip_packages']:
-        mutable_dict['pip_packages'] = prepend(mutable_dict['pip_packages'],
-                                               '    [{}] '.format(envinfo.pip_version))
-    if mutable_dict['conda_packages']:
-        mutable_dict['conda_packages'] = prepend(mutable_dict['conda_packages'],
-                                                 '    [conda] ')
+    if mutable_dict["pip_packages"]:
+        mutable_dict["pip_packages"] = prepend(
+            mutable_dict["pip_packages"], "    [{}] ".format(envinfo.pip_version)
+        )
+    if mutable_dict["conda_packages"]:
+        mutable_dict["conda_packages"] = prepend(
+            mutable_dict["conda_packages"], "    [conda] "
+        )
     return env_info_fmt.format(**mutable_dict)
 
 
@@ -389,5 +408,5 @@ def main():
     print(pretty_str(get_env_info()))
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
