@@ -37,12 +37,12 @@ Please fill in this checklist:
 - GCC/clang version (if compiling from source):
 - Versions of any other relevant libraries:
 
-You may use the PyTorch
-[environment collection script](https://raw.githubusercontent.com/pytorch/pytorch/master/torch/utils/collect_env.py)
+You may use the
+[environment collection script](https://raw.githubusercontent.com/facebookresearch/CompilerGym/stable/build_tools/collect_env.py)
 to generate most of this information. You can get the script and run it with:
 
 ```sh
-wget https://raw.githubusercontent.com/pytorch/pytorch/master/torch/utils/collect_env.py
+wget https://raw.githubusercontent.com/facebookresearch/CompilerGym/stable/build_tools/collect_env.py
 # For security purposes, please check the contents of collect_env.py before running it.
 python collect_env.py
 ```
