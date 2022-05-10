@@ -35,7 +35,6 @@ Please fill in this checklist:
 - Python version:
 - Build command you used (if compiling from source):
 - GCC/clang version (if compiling from source):
-- Bazel version (if compiling from source):
 - Versions of any other relevant libraries:
 
 You may use the PyTorch
