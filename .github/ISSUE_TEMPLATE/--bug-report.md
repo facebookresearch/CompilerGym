@@ -30,7 +30,7 @@ Steps to reproduce the behavior:
 Please fill in this checklist:
 
 - CompilerGym:
-- How you installed CompilerGym (conda, pip, source):
+- How you installed CompilerGym (pip, source):
 - OS:
 - Python version:
 - Build command you used (if compiling from source):
