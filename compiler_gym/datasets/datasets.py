@@ -152,6 +152,7 @@ class Datasets:
         key = self._dataset_key_from_uri(uri)
 
         if key not in self._datasets:
+            print("datasets are ", str(self._datasets))
             raise LookupError(f"Dataset not found: {key}")
 
         return self._datasets[key]

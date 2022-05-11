@@ -1,0 +1,15 @@
+#!/usr/bin/env python3
+
+import os
+import traceback
+
+from compiler_gym.envs.cgra.service.cgra_service import make_cgra_compilation_session
+from compiler_gym.service.runtime import create_and_run_compiler_gym_service
+
+if __name__ == "__main__":
+	# TODO  --- load a CGRA description?
+	try:
+		create_and_run_compiler_gym_service(make_cgra_compilation_session())
+	except:
+		print(traceback.format_exc())
+		raise

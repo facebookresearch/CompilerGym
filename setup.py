@@ -122,6 +122,9 @@ setup_kwargs = {
         "compiler_gym.envs.gcc.datasets",
         "compiler_gym.envs.gcc.service",
         "compiler_gym.envs.gcc",
+        "compiler_gym.envs.cgra.datasets",
+        "compiler_gym.envs.cgra.service",
+        "compiler_gym.envs.cgra",
         "compiler_gym.envs.loop_tool",
         "compiler_gym.envs.loop_tool.service",
         "compiler_gym.envs",
@@ -146,6 +149,8 @@ setup_kwargs = {
     "package_data": {
         "compiler_gym": [
             "envs/gcc/service/compiler_gym-gcc-service",
+            # "envs/cgra/service/compiler_gym-cgra-service",
+            "envs/cgra/service/*",
             "envs/loop_tool/service/compiler_gym-loop_tool-service",
             "third_party/csmith/csmith/bin/csmith",
             "third_party/csmith/csmith/include/csmith-2.3.0/*.h",

@@ -20,18 +20,22 @@ from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.flags.env_from_flags import env_from_flags
 from compiler_gym.util.shell_format import emph
 from compiler_gym.util.timer import Timer
+from compiler_gym.util.gym_type_hints import ActionType
 
-flags.DEFINE_integer(
-    "step_min",
-    12,
-    "The minimum number of steps. Fewer steps may be performed if the "
-    "environment ends the episode early.",
-)
-flags.DEFINE_integer("step_max", 256, "The maximum number of steps.")
-FLAGS = flags.FLAGS
+from typing import List
+
+if __name__ == "__main__":
+    flags.DEFINE_integer(
+        "step_min",
+        12,
+        "The minimum number of steps. Fewer steps may be performed if the "
+        "environment ends the episode early.",
+    )
+    flags.DEFINE_integer("step_max", 256, "The maximum number of steps.")
+    FLAGS = flags.FLAGS
 
 
-def run_random_walk(env: CompilerEnv, step_count: int) -> None:
+def run_random_walk(env: CompilerEnv, step_count: int) -> List[ActionType]:
     """Perform a random walk of the action space.
 
     :param env: The environment to use.
@@ -40,12 +44,14 @@ def run_random_walk(env: CompilerEnv, step_count: int) -> None:
         environment to end the episode.
     """
     rewards = []
+    actions = []
 
     step_num = 0
     with Timer() as episode_time:
         env.reset()
         for step_num in range(1, step_count + 1):
             action_index = env.action_space.sample()
+            actions.append(action_index)
             with Timer() as step_time:
                 observation, reward, done, info = env.step(action_index)
             print(
@@ -75,6 +81,8 @@ def run_random_walk(env: CompilerEnv, step_count: int) -> None:
         f"Max reward:   {max(rewards)} ({reward_percentage(max(rewards), rewards)} "
         f"at step {humanize.intcomma(rewards.index(max(rewards)) + 1)})"
     )
+
+    return actions
 
 
 def main(argv):

@@ -11,6 +11,7 @@ py_library(
     deps = [
         ":compiler_env",
         "//compiler_gym:config",
+        "//compiler_gym/envs/cgra",
         "//compiler_gym/envs/gcc",
         "//compiler_gym/envs/llvm",
         "//compiler_gym/envs/loop_tool",
