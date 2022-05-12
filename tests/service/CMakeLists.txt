@@ -15,7 +15,7 @@ if(COMPILER_GYM_ENABLE_LLVM_ENV)
         compiler_gym::compiler_gym
         compiler_gym::envs::envs
         compiler_gym::errors::errors
-        compiler_gym::service::service
+        compiler_gym::service::service_cache
         tests::test_main
     )
 endif()

@@ -116,10 +116,10 @@ class LlvmOptFlagsTuner(MeasurementInterface):
         ]
 
         self.unoptimized_path = str(
-            self.env.service.connection.working_dir / "opentuner-unoptimized.bc"
+            self.env.service.connection.cache.path / "opentuner-unoptimized.bc"
         )
         self.tmp_optimized_path = str(
-            self.env.service.connection.working_dir / "opentuner-optimized.bc"
+            self.env.service.connection.cache.path / "opentuner-optimized.bc"
         )
         self.env.write_bitcode(self.unoptimized_path)
         self.env.write_bitcode(self.tmp_optimized_path)

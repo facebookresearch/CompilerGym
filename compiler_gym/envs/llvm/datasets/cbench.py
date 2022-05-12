@@ -288,7 +288,7 @@ def _make_cBench_validator(
                 raise FileNotFoundError(f"Required benchmark input not found: {path}")
 
         # Create a temporary working directory to execute the benchmark in.
-        with tempfile.TemporaryDirectory(dir=env.service.connection.working_dir) as d:
+        with tempfile.TemporaryDirectory(dir=env.service.connection.cache.path) as d:
             cwd = Path(d)
 
             # Expand shell variable substitutions in the benchmark command.

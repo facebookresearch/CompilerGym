@@ -123,7 +123,7 @@ Status BenchmarkFactory::addBitcode(const std::string& uri, const Bitcode& bitco
   // the Benchmark class. Suggest a refactor.
   BenchmarkDynamicConfigProto realDynamicConfigProto =
       (dynamicConfig.has_value() ? *dynamicConfig : BenchmarkDynamicConfigProto());
-  const fs::path scratchDirectory = createBenchmarkScratchDirectoryOrDie();
+  const fs::path scratchDirectory = createBenchmarkScratchDirectoryOrDie(workingDirectory_);
   BenchmarkDynamicConfig realDynamicConfig =
       realizeDynamicConfig(realDynamicConfigProto, scratchDirectory);
 

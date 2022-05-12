@@ -96,7 +96,6 @@ cc_library(
         ":Cost",
         "//compiler_gym/service/proto:compiler_gym_service_cc",
         "//compiler_gym/util:GrpcStatusMacros",
-        "//compiler_gym/util:RunfilesPath",
         "//compiler_gym/util:Subprocess",
         "@boost//:filesystem",
         "@com_github_grpc_grpc//:grpc++",
