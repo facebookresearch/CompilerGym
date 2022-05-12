@@ -133,7 +133,6 @@ By default most dependencies are built together with Compiler Gym. To search for
 cmake \
   -DCMAKE_C_COMPILER=clang-9 \
   -DCMAKE_CXX_COMPILER=clang++-9 \
-  -DPython3_FIND_UNVERSIONED_NAMES=FIRST \
   -S "<path to source directory>" \
   -B "<path to build directory>"
 
@@ -161,6 +160,14 @@ Additional optional configuration arguments:
     ```bash
     -DCMAKE_C_COMPILER_LAUNCHER=ccache
     -DCMAKE_CXX_COMPILER_LAUNCHER=ccache
+    ```
+
+* For faster linking.
+
+    ```bash
+    -DCMAKE_EXE_LINKER_FLAGS_INIT="-fuse-ld=lld-9"
+    -DCMAKE_MODULE_LINKER_FLAGS_INIT="-fuse-ld=lld-9"
+    -DCMAKE_SHARED_LINKER_FLAGS_INIT="-fuse-ld=lld-9"
     ```
 
 By default, CompilerGym builds LLVM from source. This takes a long time and a
