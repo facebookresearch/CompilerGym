@@ -126,7 +126,7 @@ class SynchronousSqliteLogger(CompilerEnvWrapper):
         if not isinstance(self.unwrapped, LlvmEnv):
             raise TypeError("Requires LlvmEnv base environment")
         db_path.parent.mkdir(exist_ok=True, parents=True)
-        self.connection = sqlite3.connect(db_path)
+        self.connection = sqlite3.connect(str(db_path))
         self.cursor = self.connection.cursor()
         self.commit_frequency = commit_frequency_in_seconds
         self.max_step_buffer_length = max_step_buffer_length
