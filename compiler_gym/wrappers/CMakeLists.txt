@@ -15,6 +15,7 @@ set(WRAPPERS_SRCS
 )
 if(COMPILER_GYM_ENABLE_LLVM_ENV)
     list(APPEND WRAPPERS_SRCS "llvm.py")
+    list(APPEND WRAPPERS_SRCS "sqlite_logger.py")
 endif()
 if(COMPILER_GYM_ENABLE_MLIR_ENV)
     list(APPEND WRAPPERS_SRCS "mlir.py")

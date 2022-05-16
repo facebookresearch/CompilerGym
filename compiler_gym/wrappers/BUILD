@@ -12,6 +12,7 @@ py_library(
         "core.py",
         "datasets.py",
         "llvm.py",
+        "sqlite_logger.py",
         "time_limit.py",
         "validation.py",
     ],

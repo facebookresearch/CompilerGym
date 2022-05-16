@@ -25,6 +25,7 @@ def humanize_duration(seconds: float) -> str:
 
 
 def humanize_duration_hms(seconds: float) -> str:
+    """Format a time in to :code:`hours:minutes:seconds` format."""
     seconds = int(seconds)
     return f"{seconds // 3600}:{(seconds % 3600) // 60:02d}:{seconds % 60:02d}"
 

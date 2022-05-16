@@ -47,6 +47,9 @@ from compiler_gym.wrappers.datasets import (
 
 if config.enable_llvm_env:
     from compiler_gym.wrappers.llvm import RuntimePointEstimateReward  # noqa: F401
+    from compiler_gym.wrappers.sqlite_logger import (  # noqa: F401
+        SynchronousSqliteLogger,
+    )
 
 from compiler_gym.wrappers.time_limit import TimeLimit
 
@@ -69,3 +72,4 @@ __all__ = [
 
 if config.enable_llvm_env:
     __all__.append("RuntimePointEstimateReward")
+    __all__.append("SynchronousSqliteLogger")

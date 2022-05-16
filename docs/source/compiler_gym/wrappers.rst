@@ -79,3 +79,10 @@ LLVM Environment wrappers
 .. autoclass:: RuntimePointEstimateReward
 
     .. automethod:: __init__
+
+
+.. autoclass:: SynchronousSqliteLogger
+
+    .. automethod:: __init__
+
+    .. automethod:: flush
