@@ -38,6 +38,18 @@ py_test(
 )
 
 py_test(
+    name = "fork_test",
+    srcs = ["fork_test.py"],
+    deps = [
+        "//compiler_gym/envs/llvm",
+        "//compiler_gym/errors",
+        "//compiler_gym/wrappers",
+        "//tests:test_main",
+        "//tests/pytest_plugins:llvm",
+    ],
+)
+
+py_test(
     name = "llvm_test",
     timeout = "long",
     srcs = ["llvm_test.py"],

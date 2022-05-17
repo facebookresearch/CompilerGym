@@ -10,6 +10,7 @@ set(WRAPPERS_SRCS
     "commandline.py"
     "core.py"
     "datasets.py"
+    "fork.py"
     "time_limit.py"
     "validation.py"
 )
