@@ -69,6 +69,12 @@ flags.DEFINE_integer(
     "Limit the total number of trials performed for each action to "
     "max_action_attempts_multiplier * num_trials.",
 )
+flags.DEFINE_integer(
+    "nproc",
+    cpu_count(),
+    "The number of cpus to use"
+)
+
 
 FLAGS = flags.FLAGS
 
@@ -130,7 +136,7 @@ def run_action_sensitivity_analysis(
     reward_space: str,
     num_trials: int,
     max_warmup_steps: int,
-    nproc: int = cpu_count(),
+    nproc: int,
     max_attempts_multiplier: int = 5,
 ):
     """Estimate the immediate reward of a given list of actions."""
@@ -181,7 +187,7 @@ def main(argv):
         rewards_path=rewards_path,
         runtimes_path=runtimes_path,
         actions=actions,
-        reward=FLAGS.reward,
+        reward_space=FLAGS.reward,
         num_trials=FLAGS.num_action_sensitivity_trials,
         max_warmup_steps=FLAGS.max_warmup_steps,
         nproc=FLAGS.nproc,
