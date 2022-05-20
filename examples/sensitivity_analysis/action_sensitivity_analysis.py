@@ -40,10 +40,12 @@ from sensitivity_analysis.sensitivity_analysis_eval import (
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.flags.env_from_flags import env_from_flags
+from compiler_gym.util.flags import nproc
 from compiler_gym.util.gym_type_hints import ActionType
 from compiler_gym.util.logs import create_logging_dir
 from compiler_gym.util.timer import Timer
 
+flags.adopt_module_key_flags(nproc)
 flags.DEFINE_integer(
     "num_action_sensitivity_trials",
     100,
@@ -68,11 +70,6 @@ flags.DEFINE_integer(
     "A trial may fail because the environment crashes, or an action produces an invalid state. "
     "Limit the total number of trials performed for each action to "
     "max_action_attempts_multiplier * num_trials.",
-)
-flags.DEFINE_integer(
-    "nproc",
-    cpu_count(),
-    "The number of cpus to use"
 )
 
 
