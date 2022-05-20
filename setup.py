@@ -132,6 +132,8 @@ setup_kwargs = {
         "compiler_gym.service.runtime",
         "compiler_gym.service",
         "compiler_gym.spaces",
+        "compiler_gym.third_party.autophase",
+        "compiler_gym.third_party.gccinvocation",
         "compiler_gym.third_party.inst2vec",
         "compiler_gym.third_party",
         "compiler_gym.util.flags",
