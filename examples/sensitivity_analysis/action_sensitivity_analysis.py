@@ -45,7 +45,6 @@ from compiler_gym.util.gym_type_hints import ActionType
 from compiler_gym.util.logs import create_logging_dir
 from compiler_gym.util.timer import Timer
 
-flags.adopt_module_key_flags(nproc)
 flags.DEFINE_integer(
     "num_action_sensitivity_trials",
     100,
@@ -71,7 +70,6 @@ flags.DEFINE_integer(
     "Limit the total number of trials performed for each action to "
     "max_action_attempts_multiplier * num_trials.",
 )
-
 
 FLAGS = flags.FLAGS
 
