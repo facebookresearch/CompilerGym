@@ -26,7 +26,6 @@ Evaluate the single-step immediate reward of all actions on LLVM codesize:
 """
 import random
 from concurrent.futures import ThreadPoolExecutor
-from multiprocessing import cpu_count
 from pathlib import Path
 from typing import List, Optional
 
@@ -40,7 +39,7 @@ from sensitivity_analysis.sensitivity_analysis_eval import (
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
 from compiler_gym.util.flags.env_from_flags import env_from_flags
-from compiler_gym.util.flags import nproc
+from compiler_gym.util.flags import nproc  # noqa
 from compiler_gym.util.gym_type_hints import ActionType
 from compiler_gym.util.logs import create_logging_dir
 from compiler_gym.util.timer import Timer
