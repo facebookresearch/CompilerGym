@@ -14,19 +14,18 @@ Example Usage
 Evaluate the impact on LLVM codesize of random actions on the cBench-crc32
 benchmark:
 
-    $ bazel run -c opt //compiler_gym/bin:benchmark_sensitivity_analysis -- \
+    $ python -m sensitivity_analysis.benchmark_sensitivity_analysis \
         --env=llvm-v0 --reward=IrInstructionCountO3 \
-        --benchmark=cBench-crc32 --num_trials=50
+        --benchmark=cbench-v1/crc32 --num_benchmark_sensitivity_trials=25
 
 Evaluate the LLVM codesize episode reward on all benchmarks:
 
-    $ bazel run -c opt //compiler_gym/bin:benchmark_sensitivity_analysis -- \
+    $ python -m sensitivity_analysis.benchmark_sensitivity_analysis \
         --env=llvm-v0 --reward=IrInstructionCountO3
 """
 import random
 from concurrent.futures import ThreadPoolExecutor
 from itertools import islice
-from multiprocessing import cpu_count
 from pathlib import Path
 from typing import List, Optional, Union
 
@@ -37,6 +36,7 @@ from sensitivity_analysis.sensitivity_analysis_eval import (
     run_sensitivity_analysis,
 )
 
+import compiler_gym.util.flags.nproc  # noqa
 from compiler_gym.envs import CompilerEnv
 from compiler_gym.service.proto import Benchmark
 from compiler_gym.util.flags.benchmark_from_flags import benchmark_from_flags
@@ -130,7 +130,7 @@ def run_benchmark_sensitivity_analysis(
     num_trials: int,
     min_steps: int,
     max_steps: int,
-    nproc: int = cpu_count(),
+    nproc: int,
     max_attempts_multiplier: int = 5,
 ):
     """Estimate the cumulative reward of random walks on a list of benchmarks."""
