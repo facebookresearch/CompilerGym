@@ -170,10 +170,10 @@ If you use CompilerGym in any of your work, please cite [our
 paper](https://arxiv.org/pdf/2109.08267.pdf):
 
 ```
-@article{CompilerGym,
+@inproceedings{CompilerGym,
       title={{CompilerGym: Robust, Performant Compiler Optimization Environments for AI Research}},
       author={Chris Cummins and Bram Wasti and Jiadong Guo and Brandon Cui and Jason Ansel and Sahir Gomez and Somya Jain and Jia Liu and Olivier Teytaud and Benoit Steiner and Yuandong Tian and Hugh Leather},
-      journal={arXiv:2109.08267},
-      year={2021},
+      booktitle={CGO},
+      year={2022},
 }
 ```
